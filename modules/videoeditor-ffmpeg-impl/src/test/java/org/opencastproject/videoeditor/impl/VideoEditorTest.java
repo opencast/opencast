@@ -98,6 +98,7 @@ public class VideoEditorTest {
   /** Videos file to test. 2 videos of different framerate, must have same resolution */
   protected static final String mediaResource = "/testresources/testvideo_320x180.mp4";// 320x180, 30fps h264
   protected static final String smilResource = "/testresources/SmilObjectToXml.xml";
+  protected static final String subtitleResource = "/testresources/example.vtt";
 
   /** Duration of first and second movie */
   protected static final long movieDuration = 217650L; //3:37.65 seconds
@@ -114,6 +115,9 @@ public class VideoEditorTest {
   /** The media url */
   protected static TrackImpl track1 = null;
   protected static TrackImpl track2 = null;
+
+  /** The subtitle url */
+  protected static TrackImpl trackSubtitle = null;
 
   /** Temp storage in workspace */
   protected File tempFile1 = null;
@@ -146,13 +150,20 @@ public class VideoEditorTest {
     track2.addStream(new VideoStreamImpl());
     track2.setDuration(movieDuration);
 
+    trackSubtitle = TrackImpl.fromURI(VideoEditorTest.class.getResource(subtitleResource).toURI());
+    trackSubtitle.setIdentifier("subtitle");
+    trackSubtitle.setFlavor(new MediaPackageElementFlavor("captions", "source+en"));
+    trackSubtitle.setMimeType(MimeTypes.TEXT);
+
     /* Start of Smil mockups */
 
     URL mediaUrl = VideoEditorTest.class.getResource(mediaResource);
     URL smilUrl = VideoEditorTest.class.getResource(smilResource);
+    URL subtitleUrl = VideoEditorTest.class.getResource(subtitleResource);
     String smilString = IOUtils.toString(smilUrl);
 
     String trackParamGroupId = "pg-a6d8e576-495f-44c7-8ed7-b5b47c807f0f";
+    String trackParamGroupId2 = "pg-ed341a28-c40e-4ba2-b5d1-bb4df4a5a5be";
 
     SmilMediaParam param1 = EasyMock.createNiceMock(SmilMediaParam.class);
     EasyMock.expect(param1.getName()).andReturn("track-id").anyTimes();
@@ -168,18 +179,43 @@ public class VideoEditorTest {
     EasyMock.expect(param3.getId()).andReturn("param-1bd5e839-0a74-4310-b1d2-daba07914f79").anyTimes();
     EasyMock.replay(param1, param2, param3);
 
+    SmilMediaParam param4 = EasyMock.createNiceMock(SmilMediaParam.class);
+    EasyMock.expect(param4.getName()).andReturn("track-id").anyTimes();
+    EasyMock.expect(param4.getValue()).andReturn("95cf82dd-5238-4caf-b0a0-afdb37fe18c4").anyTimes();
+    EasyMock.expect(param4.getId()).andReturn("param-f924a89e-2ccb-41f5-9b68-4b245b8d83a6").anyTimes();
+    SmilMediaParam param5 = EasyMock.createNiceMock(SmilMediaParam.class);
+    EasyMock.expect(param5.getName()).andReturn("track-src").anyTimes();
+    EasyMock.expect(param5.getValue()).andReturn("file:" + subtitleUrl.getPath()).anyTimes();
+    EasyMock.expect(param5.getId()).andReturn("param-c213e134-4535-412e-8897-067f53bcf9fa").anyTimes();
+    SmilMediaParam param6 = EasyMock.createNiceMock(SmilMediaParam.class);
+    EasyMock.expect(param6.getName()).andReturn("track-flavor").anyTimes();
+    EasyMock.expect(param6.getValue()).andReturn("captions/source+en").anyTimes();
+    EasyMock.expect(param6.getId()).andReturn("param-d542bee2-5af1-4efe-ae3b-f20284c8a89a").anyTimes();
+    EasyMock.replay(param4, param5, param6);
+
     List<SmilMediaParam> params = new ArrayList<SmilMediaParam>();
     params.add(param1);
     params.add(param2);
     params.add(param3);
+
+    List<SmilMediaParam> params2 = new ArrayList<SmilMediaParam>();
+    params2.add(param4);
+    params2.add(param5);
+    params2.add(param6);
 
     SmilMediaParamGroup group1 = EasyMock.createNiceMock(SmilMediaParamGroup.class);
     EasyMock.expect(group1.getParams()).andReturn(params).anyTimes();
     EasyMock.expect(group1.getId()).andReturn(trackParamGroupId).anyTimes();
     EasyMock.replay(group1);
 
+    SmilMediaParamGroup group2 = EasyMock.createNiceMock(SmilMediaParamGroup.class);
+    EasyMock.expect(group2.getParams()).andReturn(params2).anyTimes();
+    EasyMock.expect(group2.getId()).andReturn(trackParamGroupId2).anyTimes();
+    EasyMock.replay(group2);
+
     List<SmilMediaParamGroup> paramGroups = new ArrayList<SmilMediaParamGroup>();
     paramGroups.add(group1);
+    paramGroups.add(group2);
 
     SmilHead head = EasyMock.createNiceMock(SmilHead.class);
     EasyMock.expect(head.getParamGroups()).andReturn(paramGroups).anyTimes();
@@ -191,6 +227,7 @@ public class VideoEditorTest {
     EasyMock.expect(object1.getClipBeginMS()).andReturn(1000L).anyTimes();
     EasyMock.expect(object1.getClipEndMS()).andReturn(12000L).anyTimes();
     EasyMock.expect(object1.getSrc()).andReturn(mediaUrl.toURI()).anyTimes();
+    EasyMock.expect(object1.getMediaType()).andReturn(SmilMediaElement.MediaType.VIDEO).anyTimes();
     EasyMock.replay(object1);
 
     SmilMediaElement object2 = EasyMock.createNiceMock(SmilMediaElement.class);
@@ -199,11 +236,22 @@ public class VideoEditorTest {
     EasyMock.expect(object2.getClipBeginMS()).andReturn(1000L).anyTimes();
     EasyMock.expect(object2.getClipEndMS()).andReturn(13000L).anyTimes();
     EasyMock.expect(object2.getSrc()).andReturn(mediaUrl.toURI()).anyTimes();
+    EasyMock.expect(object2.getMediaType()).andReturn(SmilMediaElement.MediaType.VIDEO).anyTimes();
     EasyMock.replay(object2);
+
+    SmilMediaElement object3 = EasyMock.createNiceMock(SmilMediaElement.class);
+    EasyMock.expect(object3.isContainer()).andReturn(false).anyTimes();
+    EasyMock.expect(object3.getParamGroup()).andReturn(trackParamGroupId2).anyTimes();
+    EasyMock.expect(object3.getClipBeginMS()).andReturn(1000L).anyTimes();
+    EasyMock.expect(object3.getClipEndMS()).andReturn(13000L).anyTimes();
+    EasyMock.expect(object3.getSrc()).andReturn(subtitleUrl.toURI()).anyTimes();
+    EasyMock.expect(object3.getMediaType()).andReturn(SmilMediaElement.MediaType.REF).anyTimes();
+    EasyMock.replay(object3);
 
     List<SmilMediaObject> objects = new ArrayList<SmilMediaObject>();
     objects.add(object1);
     objects.add(object2);
+    objects.add(object3);
 
     SmilMediaContainer objectContainer = EasyMock.createNiceMock(SmilMediaContainer.class);
     EasyMock.expect(objectContainer.isContainer()).andReturn(true).anyTimes();
@@ -220,6 +268,7 @@ public class VideoEditorTest {
 
     smil = EasyMock.createNiceMock(Smil.class);
     EasyMock.expect(smil.get(trackParamGroupId)).andReturn(group1).anyTimes();
+    EasyMock.expect(smil.get(trackParamGroupId2)).andReturn(group2).anyTimes();
     EasyMock.expect(smil.getBody()).andReturn(body).anyTimes();
     EasyMock.expect(smil.getHead()).andReturn(head).anyTimes();
     EasyMock.expect(smil.toXML()).andReturn(smilString).anyTimes();
@@ -253,15 +302,17 @@ public class VideoEditorTest {
     /* mock the workspace for the input/output file */
     // workspace.get(new URI(sourceTrackUri));
     Workspace workspace = EasyMock.createMock(Workspace.class);
-    EasyMock.expect(workspace.rootDirectory()).andReturn(tmpDir.getAbsolutePath());
+    EasyMock.expect(workspace.rootDirectory()).andReturn(tmpDir.getAbsolutePath()).anyTimes();
     EasyMock.expect(workspace.get(track1.getURI())).andReturn(new File(track1.getURI())).anyTimes();
     EasyMock.expect(workspace.get(track2.getURI())).andReturn(new File(track2.getURI())).anyTimes();
+    EasyMock.expect(workspace.get(trackSubtitle.getURI())).andReturn(new File(trackSubtitle.getURI())).anyTimes();
     EasyMock.expect(workspace.putInCollection(EasyMock.anyString(), EasyMock.anyString(),
         EasyMock.anyObject(InputStream.class))).andAnswer(() -> {
+          Object[] things = EasyMock.getCurrentArguments();
           InputStream in = (InputStream) EasyMock.getCurrentArguments()[2];
           IOUtils.copy(in, new FileOutputStream(tempFile1));
           return tempFile1.toURI();
-        });
+        }).anyTimes();
 
     /* mock the role/org/security dependencies */
     User anonymous = new JaxbUser("anonymous", "test", new DefaultOrganization(), new JaxbRole(
@@ -357,6 +408,7 @@ public class VideoEditorTest {
   @Test
   public void testAnalyze() throws Exception {
     logger.debug("SMIL is " + smil.toXML());
+    String wat = smil.toXML();
     for (Job receipt : veditor.processSmil(smil)) {
       assertNotNull("Audiovisual content expected", receipt.getPayload());
       assertTrue("Merged File exists", tempFile1.exists());
