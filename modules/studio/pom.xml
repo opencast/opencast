@@ -13,7 +13,7 @@
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <opencast.studio.url>https://github.com/elan-ev/opencast-studio/releases/download/2022-02-16/2022-02-16-integrated.tar.gz</opencast.studio.url>
+    <opencast.studio.url>https://github.com/elan-ev/opencast-studio/releases/download/2022-02-16/oc-studio-2022-02-16-integrated.tar.gz</opencast.studio.url>
     <opencast.studio.sha256>041f018fccf3ec13ffa50befd09a0d5bf6746b306e1a483328608948dc6c2afb</opencast.studio.sha256>
   </properties>
   <build>
