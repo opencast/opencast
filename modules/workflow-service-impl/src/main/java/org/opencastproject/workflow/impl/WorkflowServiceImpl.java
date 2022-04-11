@@ -588,6 +588,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       if (currentUser == null)
         throw new SecurityException("Current user is unknown");
 
+      if (userDirectoryService.loadUser(currentUser.getUsername()) == null)
+        throw new SecurityException(String.format("Current user '%s' can not be loaded", currentUser.getUsername()));
+
       // Get the current organization
       Organization organization = securityService.getOrganization();
       if (organization == null)
