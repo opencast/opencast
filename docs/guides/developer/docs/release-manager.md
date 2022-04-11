@@ -345,7 +345,7 @@ The following steps outline the necessary steps for cutting the final release:
 
         git push <remote> 6.0:6.0
 
-8 Check the “Create new release” GitHub Actions workflow.
+8. Check the “Create new release” GitHub Actions workflow.
    It will automatically build and upload the release tarballs and create a new release draft.
    Once it is finished, review the draft, adjust the description and publish the release.
 
