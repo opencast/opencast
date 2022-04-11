@@ -31,21 +31,39 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Dictionary;
 import java.util.Map;
+import java.util.Objects;
 
 public class SchedulerUpdateHandler extends UpdateHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(SchedulerUpdateHandler.class);
 
   private static final String DESTINATION_SCHEDULER = "SCHEDULER.Liveschedule";
+  private static final String DELETE_ON_CAPTURE_ERROR = "live.deleteOnCapureError";
 
   protected SchedulerService schedulerService;
 
+  private boolean deleteOnCaptureError = true;
+
   public SchedulerUpdateHandler() {
     super(DESTINATION_SCHEDULER);
+  }
+
+  /**
+   * OSGi callback on component activation.
+   *
+   * @param context
+   *          the component context
+   */
+  public void activate(ComponentContext context) {
+    super.activate(context);
+    Dictionary properties = context.getProperties();
+    deleteOnCaptureError = BooleanUtils.toBoolean(Objects.toString(properties.get(DELETE_ON_CAPTURE_ERROR), "true"));
   }
 
   protected void execute(MessageItem messageItem) {
@@ -101,8 +119,8 @@ public class SchedulerUpdateHandler extends UpdateHandler {
         case UpdateRecordingStatus:
           String state = schedulerItem.getRecordingState();
           if (RecordingState.CAPTURE_FINISHED.equals(state) || RecordingState.UPLOADING.equals(state)
-                  || RecordingState.UPLOADING.equals(state) || RecordingState.CAPTURE_ERROR.equals(state)
-                  || RecordingState.UPLOAD_ERROR.equals(state)) {
+                  || RecordingState.UPLOAD_ERROR.equals(state)
+                  || (RecordingState.CAPTURE_ERROR.equals(state) && deleteOnCaptureError)) {
             if (isLive(mpId)) {
               liveScheduleService.deleteLiveEvent(mpId);
             }
