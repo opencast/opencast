@@ -101,7 +101,7 @@ angular.module('adminNg.controllers')
       if ($scope.states[2].name === 'theme') {
         theme = $scope.states[2].stateController.ud.theme;
       }
-      else if($scope.states[3].name === 'theme'){
+      else if ($scope.states[3].name === 'theme'){
         theme = $scope.states[3].stateController.ud.theme;
       }
       if (angular.isDefined(theme) && theme !== null && !angular.isObject(theme)) {
