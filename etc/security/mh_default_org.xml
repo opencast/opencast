@@ -331,6 +331,7 @@
 
     <!-- Enable access to the LTI service -->
     <sec:intercept-url pattern="/lti-service-gui/**" access="ROLE_OAUTH_USER" />
+    <sec:intercept-url pattern="/lti-service/**" access="ROLE_ADMIN, ROLE_OAUTH_USER" />
 
     <sec:intercept-url pattern="/transcripts/watson/results*" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/transcripts/watson/results*" method="POST" access="ROLE_ANONYMOUS" />
