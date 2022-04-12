@@ -20,7 +20,7 @@
  */
 'use strict';
 
-// Controller for creating a new event. This is a wizard, so it implements a state machine design pattern.
+// Controller for creating a new series. This is a wizard, so it implements a state machine design pattern.
 angular.module('adminNg.controllers')
 .controller('NewSeriesCtrl', ['$scope', 'NewSeriesStates', 'SeriesResource', 'ResourcesListResource', 'Notifications',
   'Modal', 'Table',
