@@ -25,6 +25,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
@@ -40,6 +43,13 @@ import javax.servlet.Filter;
  * organization. Organizational security configurations may be added to the security watch directory, and should be
  * named &lt;organization_id&gt;.xml.
  */
+@Component(
+    immediate = true,
+    service = ArtifactInstaller.class,
+    property = {
+        "service.description=Security Configuration Scanner"
+    }
+)
 public class SpringSecurityConfigurationArtifactInstaller implements ArtifactInstaller {
   protected static final Logger logger = LoggerFactory.getLogger(SpringSecurityConfigurationArtifactInstaller.class);
 
@@ -53,6 +63,7 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
   protected Map<String, OsgiBundleXmlApplicationContext> appContexts = null;
 
   /** OSGi DI. */
+  @Reference
   public void setSecurityFilter(SecurityFilter securityFilter) {
     this.securityFilter = securityFilter;
   }
@@ -60,6 +71,7 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
   /**
    * OSGI activation callback
    */
+  @Activate
   protected void activate(ComponentContext cc) {
     this.bundleContext = cc.getBundleContext();
     this.appContexts = new HashMap<>();

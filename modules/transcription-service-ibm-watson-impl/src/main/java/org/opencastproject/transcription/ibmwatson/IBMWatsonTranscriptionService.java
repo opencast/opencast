@@ -91,6 +91,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,6 +112,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Component(
+    immediate = true,
+    service = { TranscriptionService.class,IBMWatsonTranscriptionService.class },
+    property = {
+        "service.description=IBM Watson Transcription Service",
+        "provider=ibm.watson"
+    }
+)
 public class IBMWatsonTranscriptionService extends AbstractJobProducer implements TranscriptionService {
 
   /** The logger */
@@ -232,6 +243,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   }
 
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
     if (cc != null) {
       // Has this service been enabled?
@@ -849,42 +861,52 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     return callbackAlreadyRegistered;
   }
 
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
+  @Reference
   public void setSmtpService(SmtpService service) {
     this.smtpService = service;
   }
 
+  @Reference
   public void setWorkspace(Workspace ws) {
     this.workspace = ws;
   }
 
+  @Reference
   public void setWorkingFileRepository(WorkingFileRepository wfr) {
     this.wfr = wfr;
   }
 
+  @Reference
   public void setDatabase(TranscriptionDatabase service) {
     this.database = service;
   }
 
+  @Reference
   public void setAssetManager(AssetManager service) {
     this.assetManager = service;
   }
 
+  @Reference
   public void setWorkflowService(WorkflowService service) {
     this.workflowService = service;
   }

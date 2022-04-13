@@ -40,6 +40,8 @@ import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +52,13 @@ import java.util.TimerTask;
 /**
  * It collects and sends statistic data of an registered adopter.
  */
+@Component(
+    immediate = true,
+    service = ScheduledDataCollector.class,
+    property = {
+        "service.description=Adopter Statistics Scheduler"
+    }
+)
 public class ScheduledDataCollector extends TimerTask {
 
   /** The logger */
@@ -209,31 +218,37 @@ public class ScheduledDataCollector extends TimerTask {
   //================================================================================
 
   /** OSGi setter for the adopter form service. */
+  @Reference
   public void setAdopterFormService(Service adopterFormService) {
     this.adopterFormService = adopterFormService;
   }
 
   /** OSGi setter for the service registry. */
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
   /** OSGi setter for the asset manager. */
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
   /** OSGi setter for the series service. */
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
   /** OSGi setter for the user provider. */
+  @Reference
   public void setUserAndRoleProvider(JpaUserAndRoleProvider userAndRoleProvider) {
     this.userAndRoleProvider = userAndRoleProvider;
   }
 
   /** OSGi callback for setting the security service. */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

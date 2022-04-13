@@ -41,8 +41,13 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.LoadUtil;
@@ -51,6 +56,7 @@ import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.functions.Misc;
+import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -62,6 +68,9 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,6 +101,15 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Distributes media to the local media delivery directory.
  */
+@Component(
+    immediate = true,
+    service = { DistributionService.class,DownloadDistributionService.class,ManagedService.class },
+    property = {
+        "service.description=Distribution Service (Local)",
+        "service.pid=org.opencastproject.distribution.download.DownloadDistributionServiceImpl",
+        "distribution.channel=download"
+    }
+)
 public class DownloadDistributionServiceImpl extends AbstractDistributionService
         implements DistributionService, DownloadDistributionService, ManagedService {
 
@@ -148,6 +166,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    *          the OSGi component context
    */
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
     super.activate(cc);
     serviceUrl = cc.getBundleContext().getProperty("org.opencastproject.download.url");
@@ -867,6 +886,42 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
             }
           });
     });
+  }
+
+  @Reference
+  @Override
+  public void setWorkspace(Workspace workspace) {
+    super.setWorkspace(workspace);
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
+  @Reference
+  @Override
+  public void setSecurityService(SecurityService securityService) {
+    super.setSecurityService(securityService);
+  }
+
+  @Reference
+  @Override
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    super.setUserDirectoryService(userDirectoryService);
+  }
+
+  @Reference
+  @Override
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    super.setOrganizationDirectoryService(organizationDirectoryService);
+  }
+
+  @Reference
+  @Override
+  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
+    super.setTrustedHttpClient(trustedHttpClient);
   }
 
 }

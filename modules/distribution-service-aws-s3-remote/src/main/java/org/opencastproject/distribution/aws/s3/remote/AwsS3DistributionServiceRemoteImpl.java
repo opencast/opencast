@@ -27,6 +27,7 @@ import static org.opencastproject.util.JobUtil.jobFromHttpResponse;
 import static org.opencastproject.util.data.functions.Options.join;
 
 import org.opencastproject.distribution.api.DistributionException;
+import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.distribution.aws.s3.api.AwsS3DistributionService;
 import org.opencastproject.job.api.Job;
@@ -34,13 +35,18 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.OsgiUtil;
 
 import com.google.gson.Gson;
 
 import org.apache.http.client.methods.HttpPost;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +59,14 @@ import java.util.Set;
  *
  * @author rsantos
  */
+@Component(
+    immediate = true,
+    service = { DistributionService.class, DownloadDistributionService.class, AwsS3DistributionService.class },
+    property = {
+        "service.description=Distribution (AWS S3) Remote Service Proxy",
+        "distribution.channel=aws.s3"
+    }
+)
 public class AwsS3DistributionServiceRemoteImpl extends RemoteBase implements AwsS3DistributionService,
         DownloadDistributionService {
   /** The logger */
@@ -75,6 +89,7 @@ public class AwsS3DistributionServiceRemoteImpl extends RemoteBase implements Aw
   }
 
   /** activates the component */
+  @Activate
   protected void activate(ComponentContext cc) {
     this.distributionChannel = OsgiUtil.getComponentContextProperty(cc, CONFIG_KEY_STORE_TYPE);
     super.serviceType = JOB_TYPE_PREFIX + this.distributionChannel;
@@ -174,4 +189,17 @@ public class AwsS3DistributionServiceRemoteImpl extends RemoteBase implements Aw
     throw new UnsupportedOperationException("Not supported yet.");
   //stub function
   }
+
+  @Reference
+  @Override
+  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
+    super.setTrustedHttpClient(trustedHttpClient);
+  }
+
+  @Reference
+  @Override
+  public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
+    super.setRemoteServiceManager(serviceRegistry);
+  }
+
 }

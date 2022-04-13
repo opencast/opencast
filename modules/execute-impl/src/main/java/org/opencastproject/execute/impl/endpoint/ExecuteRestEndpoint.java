@@ -40,6 +40,8 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +59,16 @@ import javax.ws.rs.core.Response;
 @Path("/")
 // Endpoint to the execute service, that runs CLI commands using MediaPackageElement's as parameters
 @RestService(name = "execute", title = "Execute Service", notes = {"" }, abstractText = "Runs CLI commands with MediaPackageElement's as parameters")
+@Component(
+    immediate = true,
+    service = ExecuteRestEndpoint.class,
+    property = {
+        "service.description=Execute REST Endpoint",
+        "opencast.service.type=org.opencastproject.execute",
+        "opencast.service.path=/execute",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logging facility */
@@ -153,6 +165,7 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
    *
    * @param service
    */
+  @Reference
   public void setExecuteService(ExecuteService service) {
     this.service = service;
   }
@@ -192,6 +205,7 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

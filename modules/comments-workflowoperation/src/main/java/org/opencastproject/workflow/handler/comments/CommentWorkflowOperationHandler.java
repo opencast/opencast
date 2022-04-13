@@ -28,11 +28,13 @@ import org.opencastproject.job.api.JobContext;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -40,6 +42,8 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +54,14 @@ import java.util.List;
  * A workflow operation handler for creating, resolving and deleting comments
  * automatically during the workflow process.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Comment Workflow Operation Handler",
+        "workflow.operation=comment"
+    }
+)
 public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   protected static final String ACTION = "action";
   protected static final String DESCRIPTION = "description";
@@ -259,16 +271,26 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
    * @param eventCommentService
    *          the workflow service
    */
+  @Reference
   public void setEventCommentService(EventCommentService eventCommentService) {
     this.eventCommentService = eventCommentService;
   }
 
   /** OSGi DI */
+  @Reference
   void setSecurityService(SecurityService service) {
     this.securityService = service;
   }
 
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

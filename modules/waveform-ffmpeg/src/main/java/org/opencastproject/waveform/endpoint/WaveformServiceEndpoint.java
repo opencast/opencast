@@ -36,6 +36,8 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.waveform.api.WaveformService;
 import org.opencastproject.waveform.api.WaveformServiceException;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +55,16 @@ import javax.ws.rs.core.Response;
     title = "Waveform Service REST Endpoint",
     abstractText = "The Waveform Service generates a waveform image from a media file with at least one audio channel.",
     notes = { "All paths above are relative to the REST endpoint base (something like http://your.server/waveform)" }
+)
+@Component(
+    immediate = true,
+    service = WaveformServiceEndpoint.class,
+    property = {
+        "service.description=Waveform Service REST Endpoint",
+        "opencast.service.type=org.opencastproject.waveform",
+        "opencast.service.path=/waveform",
+        "opencast.service.jobproducer=true"
+    }
 )
 public class WaveformServiceEndpoint extends AbstractJobProducerEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(WaveformServiceEndpoint.class);
@@ -121,10 +133,12 @@ public class WaveformServiceEndpoint extends AbstractJobProducerEndpoint {
     return serviceRegistry;
   }
 
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
+  @Reference
   public void setWaveformService(WaveformService waveformService) {
     this.waveformService = waveformService;
   }

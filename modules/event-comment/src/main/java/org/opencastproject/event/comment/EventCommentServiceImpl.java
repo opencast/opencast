@@ -23,11 +23,21 @@ package org.opencastproject.event.comment;
 import org.opencastproject.event.comment.persistence.EventCommentDatabaseService;
 import org.opencastproject.util.NotFoundException;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import java.util.List;
 
 /**
  * Implements permanent storage for event comments.
  */
+@Component(
+    immediate = true,
+    service = EventCommentService.class,
+    property = {
+        "service.description=Event Comment Service"
+    }
+)
 public class EventCommentServiceImpl implements EventCommentService {
 
   private EventCommentDatabaseService eventCommentDatabaseService;
@@ -38,6 +48,7 @@ public class EventCommentServiceImpl implements EventCommentService {
    * @param eventCommentDatabaseService
    *          the event comment database service
    */
+  @Reference
   public void setEventCommentDatabaseService(EventCommentDatabaseService eventCommentDatabaseService) {
     this.eventCommentDatabaseService = eventCommentDatabaseService;
   }

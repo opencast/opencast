@@ -43,6 +43,7 @@ import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
 import org.opencastproject.metadata.mpeg7.Segment;
 import org.opencastproject.metadata.mpeg7.TemporalDecomposition;
 import org.opencastproject.metadata.mpeg7.Video;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
@@ -51,6 +52,7 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -58,6 +60,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +80,14 @@ import java.util.concurrent.ExecutionException;
 /**
  * The workflow definition for creating segment preview images from an segment mpeg-7 catalog.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Segment Preview Images Workflow Operation Handler",
+        "workflow.operation=segmentpreviews"
+    }
+)
 public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -96,6 +108,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
    * @param composerService
    *          the composer service
    */
+  @Reference
   protected void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -106,6 +119,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
    * @param catalogService
    *          the catalog service
    */
+  @Reference(name = "Mpeg7Service")
   protected void setMpeg7CatalogService(Mpeg7CatalogService catalogService) {
     mpeg7CatalogService = catalogService;
   }
@@ -117,8 +131,15 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
   /**

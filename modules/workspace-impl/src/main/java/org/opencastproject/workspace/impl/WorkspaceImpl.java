@@ -37,6 +37,7 @@ import static org.opencastproject.util.data.Prelude.sleep;
 
 import org.opencastproject.assetmanager.util.AssetPathUtils;
 import org.opencastproject.assetmanager.util.DistributionPathUtils;
+import org.opencastproject.cleanup.RecursiveDirectoryCleaner;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
@@ -84,9 +85,10 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -309,6 +311,7 @@ public final class WorkspaceImpl implements Workspace {
     staticCollections.add("inbox");
     staticCollections.add("ocrtext");
     staticCollections.add("sox");
+    staticCollections.add("subtitles");
     staticCollections.add("uploaded");
     staticCollections.add("videoeditor");
     staticCollections.add("videosegments");
@@ -875,7 +878,7 @@ public final class WorkspaceImpl implements Workspace {
     return wfr.getBaseUri();
   }
 
-  @Reference(name = "REPO")
+  @Reference
   public void setRepository(WorkingFileRepository repo) {
     this.wfr = repo;
     if (repo instanceof PathMappable) {
@@ -884,12 +887,12 @@ public final class WorkspaceImpl implements Workspace {
     }
   }
 
-  @Reference(name = "trustedHttpClient")
+  @Reference
   public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
     this.trustedHttpClient = trustedHttpClient;
   }
 
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -929,28 +932,8 @@ public final class WorkspaceImpl implements Workspace {
               + "avoid deleting data in use by running workflows.");
     }
 
-    // Get workspace root directly
-    final File workspaceDirectory = new File(wsRoot);
-    logger.info("Starting cleanup of workspace at {}", workspaceDirectory);
-
-    long now = new Date().getTime();
-    for (File file: FileUtils.listFiles(workspaceDirectory, null, true)) {
-      long fileLastModified = file.lastModified();
-      // Ensure file/dir is older than maxAge
-      long fileAgeInSeconds = (now - fileLastModified) / 1000;
-      if (fileLastModified == 0 || fileAgeInSeconds < maxAgeInSeconds) {
-        logger.debug("File age ({}) < max age ({}) or unknown: Skipping {} ", fileAgeInSeconds, maxAgeInSeconds, file);
-        continue;
-      }
-
-      // Delete old files
-      if (FileUtils.deleteQuietly(file)) {
-        logger.info("Deleted {}", file);
-      } else {
-        logger.warn("Could not delete {}", file);
-      }
-    }
-    logger.info("Finished cleanup of workspace");
+    // Clean workspace root directly
+    RecursiveDirectoryCleaner.cleanDirectory(Paths.get(wsRoot), Duration.ofSeconds(maxAgeInSeconds));
   }
 
   @Override

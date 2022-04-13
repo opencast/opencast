@@ -56,6 +56,11 @@
       <groupId>jakarta.ws.rs</groupId>
       <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi.cmpn</artifactId>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
 
   <profiles>
@@ -97,31 +102,16 @@
               </execution>
 
               <execution>
-                <id>esline</id>
+                <id>build</id>
                 <goals>
                   <goal>exec</goal>
                 </goals>
-                <phase>test</phase>
+                <phase>compile</phase>
                 <configuration>
                   <executable>npm</executable>
                   <arguments>
                     <argument>run</argument>
-                    <argument>eslint</argument>
-                  </arguments>
-                </configuration>
-              </execution>
-
-              <execution>
-                <id>html-linter</id>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <phase>test</phase>
-                <configuration>
-                  <executable>npm</executable>
-                  <arguments>
-                    <argument>run</argument>
-                    <argument>html-linter</argument>
+                    <argument>build</argument>
                   </arguments>
                 </configuration>
               </execution>
@@ -238,10 +228,6 @@
             <Export-Package>
               org.opencastproject.lti;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/opencast-lti.xml,
-              OSGI-INF/opencast-lti-service-gui-endpoint.xml
-            </Service-Component>
             <Private-Package>tools.*</Private-Package>
             <Http-Alias>/ltitools</Http-Alias>
             <Http-Classpath>/tools</Http-Classpath>

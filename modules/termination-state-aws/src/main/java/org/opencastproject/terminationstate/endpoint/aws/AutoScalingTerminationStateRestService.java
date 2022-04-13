@@ -35,6 +35,8 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.json.simple.JSONObject;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.FormParam;
@@ -63,6 +65,15 @@ import javax.ws.rs.core.Response;
             + "not anticipated. In other words, there is a bug! You should file an error report "
             + "with your server logs from the time when the error occurred: "
             + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
+    }
+)
+@Component(
+    immediate = true,
+    service = AutoScalingTerminationStateRestService.class,
+    property = {
+        "service.description=Termination State Rest Service: AWS Auto Scaling",
+        "opencast.service.type=org.opencastproject.terminationstate.aws.autoscaling",
+        "opencast.service.path=/termination/aws/autoscaling"
     }
 )
 public class AutoScalingTerminationStateRestService implements TerminationStateRestService {
@@ -156,6 +167,9 @@ public class AutoScalingTerminationStateRestService implements TerminationStateR
    OSGI injection callback
    @param service termination state service instance
   */
+  @Reference(
+      target = "(&(vendor.name=aws)(vendor.service=autoscaling))"
+  )
   public void setService(TerminationStateService service) {
     this.service = service;
   }

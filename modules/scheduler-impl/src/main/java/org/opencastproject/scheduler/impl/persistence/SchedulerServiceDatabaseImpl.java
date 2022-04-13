@@ -31,6 +31,9 @@ import com.google.gson.Gson;
 
 import org.joda.time.DateTime;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +51,10 @@ import javax.persistence.TypedQuery;
 /**
  * Implements {@link SchedulerServiceDatabase}.
  */
+@Component(
+    immediate = true,
+    service = SchedulerServiceDatabase.class
+)
 public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /** JPA persistence unit name */
@@ -65,11 +72,13 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
   private static final Gson gson = new Gson();
 
   /** OSGi DI */
+  @Reference(target = "(osgi.unit.name=org.opencastproject.scheduler.impl.persistence)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
 
   /** OSGi DI */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -79,6 +88,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
    *
    * @param cc
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for scheduler");
   }

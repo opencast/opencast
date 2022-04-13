@@ -42,8 +42,10 @@ import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
@@ -68,6 +70,8 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,6 +90,13 @@ import java.util.TimeZone;
 /**
  * A proxy to a remote series service.
  */
+@Component(
+    immediate = true,
+    service = SchedulerService.class,
+    property = {
+        "service.description=Scheduler Remote Service Proxy"
+    }
+)
 public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerService {
 
   private static final Logger logger = LoggerFactory.getLogger(SchedulerServiceRemoteImpl.class);
@@ -880,6 +891,17 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     for (Map.Entry<String, String> entry : properties.entrySet())
       wfPropertiesString.append(entry.getKey() + "=" + entry.getValue() + "\n");
     return wfPropertiesString.toString();
+  }
+
+  @Reference
+  @Override
+  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
+    super.setTrustedHttpClient(trustedHttpClient);
+  }
+  @Reference
+  @Override
+  public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
+    super.setRemoteServiceManager(serviceRegistry);
   }
 
 }

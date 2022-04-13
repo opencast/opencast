@@ -24,6 +24,8 @@ package org.opencastproject.workflow.handler.distribution;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.workflow.handler.distribution.EngagePublicationChannel.CHANNEL_ID;
 
+import org.opencastproject.distribution.api.DownloadDistributionService;
+import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -35,12 +37,19 @@ import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
+import org.opencastproject.search.api.SearchService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +61,14 @@ import java.util.Set;
 /**
  * Workflow operation for retracting parts of a media package from the engage player.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Engage Partial Retraction Workflow Operation Handler",
+        "workflow.operation=retract-partial"
+    }
+)
 public class PartialRetractEngageWorkflowOperationHandler extends RetractEngageWorkflowOperationHandler {
 
   /** The logging facility */
@@ -59,6 +76,12 @@ public class PartialRetractEngageWorkflowOperationHandler extends RetractEngageW
 
   private static final String RETRACT_FLAVORS = "retract-flavors";
   private static final String RETRACT_TAGS = "retract-tags";
+
+  @Activate
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
+  }
 
   /**
    * {@inheritDoc}
@@ -201,4 +224,29 @@ public class PartialRetractEngageWorkflowOperationHandler extends RetractEngageW
 
     return hasTitle && hasTracks;
   }
+
+  @Reference(target = "(distribution.channel=download)")
+  @Override
+  public void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
+    super.setDownloadDistributionService(downloadDistributionService);
+  }
+
+  @Reference
+  @Override
+  public void setSearchService(SearchService searchService) {
+    super.setSearchService(searchService);
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
+  @Reference(target = "(distribution.channel=streaming)")
+  @Override
+  public void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
+    super.setStreamingDistributionService(streamingDistributionService);
+  }
+
 }

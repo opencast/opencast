@@ -27,6 +27,9 @@ import org.opencastproject.security.api.JaxbGroup;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +38,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component(
+    immediate = true,
+    service = ResourceListProvider.class,
+    property = {
+        "service.description=Groups list provider",
+        "opencast.service.type=org.opencastproject.index.service.resources.list.provider.GroupsListProvider"
+    }
+)
 public class GroupsListProvider implements ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "GROUPS";
@@ -47,11 +58,13 @@ public class GroupsListProvider implements ResourceListProvider {
 
   private JpaGroupRoleProvider groupRoleProvider;
 
+  @Activate
   protected void activate(BundleContext bundleContext) {
     logger.info("Groups list provider activated!");
   }
 
   /** OSGi callback for groups services. */
+  @Reference
   public void setGroupProvider(JpaGroupRoleProvider groupRoleProvider) {
     this.groupRoleProvider = groupRoleProvider;
   }

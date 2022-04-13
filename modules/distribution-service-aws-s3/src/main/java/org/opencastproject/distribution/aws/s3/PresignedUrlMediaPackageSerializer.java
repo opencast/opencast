@@ -23,6 +23,8 @@ package org.opencastproject.distribution.aws.s3;
 import org.opencastproject.distribution.aws.s3.api.AwsS3DistributionService;
 import org.opencastproject.mediapackage.MediaPackageSerializer;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +34,13 @@ import java.net.URISyntaxException;
 /**
  * Implementation of a {@link MediaPackageSerializer} that will support presigned URL feature for a Mediapackage
  */
+@Component(
+    immediate = true,
+    service = MediaPackageSerializer.class,
+    property = {
+        "service.pid=org.opencastproject.distribution.aws.s3.PresignedUrlMediaPackageSerializer"
+    }
+)
 public class PresignedUrlMediaPackageSerializer implements MediaPackageSerializer {
 
   private static final Logger logger = LoggerFactory.getLogger(PresignedUrlMediaPackageSerializer.class);
@@ -45,6 +54,7 @@ public class PresignedUrlMediaPackageSerializer implements MediaPackageSerialize
     logger.info("Init PresignedUrlMediaPackageSerializer");
   }
 
+  @Reference
   public void setService(AwsS3DistributionService service) {
     this.service = service;
   }

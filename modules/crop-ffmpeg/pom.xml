@@ -107,9 +107,6 @@
               org.opencastproject.crop.impl;version=${project.version},
               org.opencastproject.crop.endpoint;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/crop.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

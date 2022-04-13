@@ -31,14 +31,20 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageReference;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,13 +58,29 @@ import java.util.List;
  *
  * @see AssetManager#takeSnapshot(String, MediaPackage)
  */
+@Component(
+    immediate = true,
+    name = "org.opencastproject.workflow.handler.assetmanager.AssetManagerAddWorkflowOperationHandler",
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Asset Manager Take Snapshot Workflow Operation Handler",
+        "workflow.operation=snapshot"
+    }
+)
 public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerSnapshotWorkflowOperationHandler.class);
 
   /** The asset manager. */
   private AssetManager assetManager;
 
+  @Activate
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
+  }
+
   /** OSGi DI */
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -180,4 +202,11 @@ public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkfl
     }
     return mp;
   }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

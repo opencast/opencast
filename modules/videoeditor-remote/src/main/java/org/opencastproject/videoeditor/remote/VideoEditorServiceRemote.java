@@ -24,7 +24,9 @@ package org.opencastproject.videoeditor.remote;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.videoeditor.api.ProcessFailedException;
 import org.opencastproject.videoeditor.api.VideoEditorService;
@@ -35,6 +37,8 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +49,13 @@ import java.util.List;
 /**
  * Video editor service proxy for use as a JVM local service.
  */
+@Component(
+    immediate = true,
+    service = VideoEditorService.class,
+    property = {
+        "service.description=Video Editor Remote Service Proxy"
+    }
+)
 public class VideoEditorServiceRemote extends RemoteBase implements VideoEditorService {
 
   private static final Logger logger = LoggerFactory.getLogger(VideoEditorServiceRemote.class);
@@ -89,5 +100,17 @@ public class VideoEditorServiceRemote extends RemoteBase implements VideoEditorS
     throw new ProcessFailedException("Unable to proccess smil "
             + smil.getId() + " using a remote videoeditor service.");
   }
-}
 
+  @Reference
+  @Override
+  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
+    super.setTrustedHttpClient(trustedHttpClient);
+  }
+
+  @Reference
+  @Override
+  public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
+    super.setRemoteServiceManager(serviceRegistry);
+  }
+
+}

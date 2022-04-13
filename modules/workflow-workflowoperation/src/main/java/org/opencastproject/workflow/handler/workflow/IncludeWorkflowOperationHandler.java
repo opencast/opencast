@@ -24,10 +24,12 @@ package org.opencastproject.workflow.handler.workflow;
 import static com.entwinemedia.fn.Stream.$;
 
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.api.WorkflowService;
@@ -35,6 +37,9 @@ import org.opencastproject.workflow.api.WorkflowService;
 import com.entwinemedia.fn.Fn2;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +50,14 @@ import java.util.Map;
  * Workflow operation handler that will conditionally insert a complete workflow into the current one
  * at its own position.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Include Operation Handler",
+        "workflow.operation=include"
+    }
+)
 public final class IncludeWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(IncludeWorkflowOperationHandler.class);
@@ -60,6 +73,7 @@ public final class IncludeWorkflowOperationHandler extends AbstractWorkflowOpera
    *
    */
   @Override
+  @Activate
   public void activate(ComponentContext componentContext) {
     super.activate(componentContext);
   }
@@ -114,7 +128,15 @@ public final class IncludeWorkflowOperationHandler extends AbstractWorkflowOpera
   /**
    * OSGi DI.
    */
+  @Reference
   public void setWorkflowService(WorkflowService service) {
     this.workflowService = service;
   }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

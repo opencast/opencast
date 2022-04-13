@@ -20,12 +20,25 @@
  */
 package org.opencastproject.security.urlsigning.provider.impl;
 
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.urlsigning.provider.UrlSigningProvider;
 import org.opencastproject.urlsigning.common.BasicResourceStrategyImpl;
 import org.opencastproject.urlsigning.common.ResourceStrategy;
 
+import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Component(
+    immediate = true,
+    service = { ManagedService.class, UrlSigningProvider.class },
+    property = {
+        "service.description=Generic Url Signing Provider",
+        "service.pid=org.opencastproject.security.urlsigning.provider.impl.GenericUrlSigningProvider"
+    }
+)
 public class GenericUrlSigningProvider extends AbstractUrlSigningProvider {
   private static final Logger logger = LoggerFactory.getLogger(GenericUrlSigningProvider.class);
   /** The resource strategy to use to convert from the base url to a resource url. */
@@ -44,6 +57,12 @@ public class GenericUrlSigningProvider extends AbstractUrlSigningProvider {
   @Override
   public String toString() {
     return "Generic URL Signing Provider";
+  }
+
+  @Reference
+  @Override
+  public void setSecurityService(SecurityService securityService) {
+    super.setSecurityService(securityService);
   }
 
 }

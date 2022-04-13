@@ -33,6 +33,10 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +54,14 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+@Component(
+    immediate = true,
+    service = ResourceListProvider.class,
+    property = {
+        "service.description=Contributors list provider",
+        "opencast.service.type=org.opencastproject.index.service.resources.list.provider.ContributorsListProvider"
+    }
+)
 public class ContributorsListProvider implements ResourceListProvider {
 
   private static final String CONFIGURATION_KEY_EXCLUDE_USER_PROVIDER = "exclude.user.provider";
@@ -69,11 +81,13 @@ public class ContributorsListProvider implements ResourceListProvider {
   private UserDirectoryService userDirectoryService;
   private ElasticsearchIndex searchIndex;
 
+  @Activate
   protected void activate(Map<String, Object> properties) {
     modified(properties);
     logger.info("Contributors list provider activated!");
   }
 
+  @Modified
   public void modified(Map<String, Object> properties) {
     Object excludeUserProviderValue = properties.get(CONFIGURATION_KEY_EXCLUDE_USER_PROVIDER);
     excludeUserProvider.clear();
@@ -88,11 +102,13 @@ public class ContributorsListProvider implements ResourceListProvider {
   }
 
   /** OSGi callback for users services. */
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
   /** OSGi callback for the search index. */
+  @Reference
   public void setIndex(ElasticsearchIndex index) {
     this.searchIndex = index;
   }

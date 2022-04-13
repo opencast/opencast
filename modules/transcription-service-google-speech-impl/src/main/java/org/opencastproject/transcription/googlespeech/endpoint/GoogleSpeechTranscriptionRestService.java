@@ -32,6 +32,9 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +59,16 @@ import javax.ws.rs.core.Response;
         "All paths above are relative to the REST endpoint base (something like http://your.server/transcripts)"
     }
 )
+@Component(
+    immediate = true,
+    service = GoogleSpeechTranscriptionRestService.class,
+    property = {
+        "service.description=Google Speech Transcription REST Endpoint",
+        "opencast.service.type=org.opencastproject.transcription.googlespeech",
+        "opencast.service.path=/transcripts/googlespeech",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class GoogleSpeechTranscriptionRestService extends AbstractJobProducerEndpoint {
 
   /**
@@ -73,13 +86,16 @@ public class GoogleSpeechTranscriptionRestService extends AbstractJobProducerEnd
    */
   protected ServiceRegistry serviceRegistry = null;
 
+  @Activate
   public void activate(ComponentContext cc) {
   }
 
+  @Reference
   public void setTranscriptionService(GoogleSpeechTranscriptionService service) {
     this.service = service;
   }
 
+  @Reference
   public void setServiceRegistry(ServiceRegistry service) {
     this.serviceRegistry = service;
   }

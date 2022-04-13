@@ -81,6 +81,10 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,6 +107,13 @@ import java.util.stream.Collectors;
 /**
  * The LTI service implementation
  */
+@Component(
+    immediate = true,
+    service = { LtiService.class,ManagedService.class },
+    property = {
+        "service.description=LTI Service"
+    }
+)
 public class LtiServiceImpl implements LtiService, ManagedService {
   private static final Logger logger = LoggerFactory.getLogger(LtiServiceImpl.class);
 
@@ -124,51 +135,65 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<>();
 
   /** OSGi DI */
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
 
   /** OSGI DI */
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
   /** OSGi DI */
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
   /** OSGi DI */
+  @Reference
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
 
   /** OSGi DI */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
   /** OSGi DI */
+  @Reference
   public void setSearchIndex(ElasticsearchIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 
   /** OSGi DI */
+  @Reference
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
   /** OSGi DI */
+  @Reference
   public void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }
 
   /** OSGi DI */
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI. */
+  @Reference(
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeCatalogUIAdapter"
+  )
   public void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     catalogUIAdapters.add(catalogUIAdapter);
   }

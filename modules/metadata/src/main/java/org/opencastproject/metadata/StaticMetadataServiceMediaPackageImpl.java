@@ -35,6 +35,9 @@ import org.opencastproject.util.data.NonEmptyList;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +54,14 @@ import java.util.Map;
  *
  * todo unit tests will follow
  */
+@Component(
+    immediate = true,
+    service = StaticMetadataService.class,
+    property = {
+        "service.description=Static Metadata Service, media package based",
+        "priority=99"
+    }
+)
 public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataService {
 
   private static final Logger logger = LoggerFactory.getLogger(StaticMetadataServiceMediaPackageImpl.class);
@@ -60,10 +71,12 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
 
   protected Workspace workspace = null;
 
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
+  @Activate
   public void activate(@SuppressWarnings("rawtypes") Map properties) {
     logger.debug("activate()");
     if (properties != null) {

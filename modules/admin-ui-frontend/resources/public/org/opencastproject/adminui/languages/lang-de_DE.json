@@ -1301,6 +1301,14 @@
                "RIGHT": "Ausgewählten Rollen",
                "REMOVE": "Rolle entfernen",
                "ADD": "Rolle hinzufügen"
+            },
+            "STRENGTH": {
+               "BAD": "Schlechtes Passwort",
+               "VERYWEAK": "Sehr schwaches Passwort",
+               "WEAK": "Schwaches Passwort",
+               "GOOD": "Gutes Passwort",
+               "STRONG": "Starkes Passwort",
+               "VERYSTRONG": "Sehr starkes Passwort"
             }
          }
       },

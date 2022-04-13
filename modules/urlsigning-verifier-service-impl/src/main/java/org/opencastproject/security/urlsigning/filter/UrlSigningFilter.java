@@ -31,6 +31,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +53,17 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@Component(
+    immediate = true,
+    service = { Filter.class,ManagedService.class },
+    property = {
+        "service.description=Url Signing Filter",
+        "httpContext.id=opencast.httpcontext",
+        "httpContext.shared=true",
+        "service.ranking=9",
+        "urlPatterns=*"
+    }
+)
 public class UrlSigningFilter implements Filter, ManagedService {
   /** The prefix in the configuration file to define the regex that will match a url path. */
   public static final String URL_REGEX_PREFIX = "url.regex";
@@ -71,6 +84,7 @@ public class UrlSigningFilter implements Filter, ManagedService {
   private boolean strict = true;
 
   /** OSGi DI */
+  @Reference
   public void setUrlSigningVerifier(UrlSigningVerifier urlSigningVerifier) {
     this.urlSigningVerifier = urlSigningVerifier;
   }

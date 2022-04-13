@@ -653,9 +653,18 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       for (String key : instance.getConfigurationKeys()) {
         wfProperties.put(key, instance.getConfiguration(key));
       }
-      final Function<String, String> systemVariableGetter = key -> componentContext == null
-              ? null
-              : componentContext.getBundleContext().getProperty(key);
+      final Organization currentOrg = securityService.getOrganization();
+      final Function<String, String> systemVariableGetter = key -> {
+        if (key.startsWith("org_")) {
+          String value = currentOrg.getProperties().get(key.substring(4));
+          if (value != null) {
+            return value;
+          }
+        }
+        return componentContext == null
+            ? null
+            : componentContext.getBundleContext().getProperty(key);
+      };
       if (instance.getOperations().stream().anyMatch(op -> op.getExecutionCondition() != null)) {
         instance = WorkflowParser.parseWorkflowInstance(WorkflowParser.toXml(instance));
         instance.getOperations().stream().filter(op -> op.getExecutionCondition() != null).forEach(
@@ -1996,7 +2005,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param unused
    *          the unused ReadinessIndicator
    */
-  @Reference(name = "profilesReadyIndicator", target = "(artifact=workflowdefinition)")
+  @Reference(target = "(artifact=workflowdefinition)")
   protected void setProfilesReadyIndicator(ReadinessIndicator unused) { }
 
   /**
@@ -2005,7 +2014,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param workspace
    *          the workspace
    */
-  @Reference(name = "workspace")
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -2016,7 +2025,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param registry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry registry) {
     this.serviceRegistry = registry;
   }
@@ -2031,7 +2040,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -2042,7 +2051,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param authorizationService
    *          the authorizationService to set
    */
-  @Reference(name = "authorization")
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -2053,7 +2062,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
-  @Reference(name = "user-directory")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -2064,7 +2073,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param organizationDirectory
    *          the organization directory
    */
-  @Reference(name = "orgDirectory")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }
@@ -2075,7 +2084,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param index
    *          The search index
    */
-  @Reference(name = "index")
+  @Reference
   protected void setDao(WorkflowServiceIndex index) {
     this.index = index;
   }
@@ -2086,7 +2095,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param seriesService
    *          the seriesService to set
    */
-  @Reference(name = "series")
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -2097,7 +2106,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param assetManager
    *          the assetManager to set
    */
-  @Reference(name = "assetManager")
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -2108,7 +2117,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param service
    *          the metadata service
    */
-  @Reference(name = "metadata", cardinality = ReferenceCardinality.AT_LEAST_ONE, policy = ReferencePolicy.DYNAMIC, unbind = "removeMetadataService")
+  @Reference(cardinality = ReferenceCardinality.AT_LEAST_ONE, policy = ReferencePolicy.DYNAMIC, unbind = "removeMetadataService")
   protected void addMetadataService(MediaPackageMetadataService service) {
     metadataServices.add(service);
   }
@@ -2129,7 +2138,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param scanner
    *          the workflow definition scanner
    */
-  @Reference(name = "scanner")
+  @Reference
   protected void addWorkflowDefinitionScanner(WorkflowDefinitionScanner scanner) {
     workflowDefinitionScanner = scanner;
   }
@@ -2140,7 +2149,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param index
    *          the admin UI index.
    */
-  @Reference(name = "elasticsearch-index")
+  @Reference
   public void setIndex(ElasticsearchIndex index) {
     this.elasticsearchIndex = index;
   }

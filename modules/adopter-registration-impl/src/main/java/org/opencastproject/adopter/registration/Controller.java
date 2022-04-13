@@ -35,6 +35,8 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import com.google.gson.Gson;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +58,16 @@ import javax.ws.rs.core.Response;
         title = "Adopter Statistics Registration Service Endpoint",
         abstractText = "Rest Endpoint for the registration form.",
         notes = {"Provides operations regarding the adopter registration form"})
+@Component(
+    immediate = true,
+    service = Controller.class,
+    property = {
+        "service.description=Adopter Statistics REST Endpoint",
+        "opencast.service.type=org.opencastproject.adopter.registration.Controller",
+        "opencast.service.path=/admin-ng/adopter",
+        "opencast.service.jobproducer=false"
+    }
+)
 public class Controller {
 
   /** The logger */
@@ -71,6 +83,7 @@ public class Controller {
   protected Service registrationService;
 
   /** OSGi setter for the registration service */
+  @Reference
   public void setRegistrationService(Service registrationService) {
     this.registrationService = registrationService;
   }

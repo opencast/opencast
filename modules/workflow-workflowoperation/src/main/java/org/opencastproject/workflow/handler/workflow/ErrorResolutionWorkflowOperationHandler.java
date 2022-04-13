@@ -22,15 +22,21 @@
 package org.opencastproject.workflow.handler.workflow;
 
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationAbortedException;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +45,14 @@ import java.util.Map;
 /**
  * Workflow operation handler for choosing the retry strategy after a failing operation
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Error Resolution Operation Handler",
+        "workflow.operation=error-resolution"
+    }
+)
 public class ErrorResolutionWorkflowOperationHandler extends ResumableWorkflowOperationHandlerBase {
 
   /** The logging facility */
@@ -56,11 +70,17 @@ public class ErrorResolutionWorkflowOperationHandler extends ResumableWorkflowOp
    * @see org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase#activate(org.osgi.service.component.ComponentContext)
    */
   @Override
+  @Activate
   public void activate(ComponentContext componentContext) {
     super.activate(componentContext);
     setHoldActionTitle("Select retry strategy");
     registerHoldStateUserInterface(HOLD_UI_PATH);
     logger.info("Registering retry strategy failover hold state ui from classpath {}", HOLD_UI_PATH);
+  }
+
+  @Deactivate
+  public void deactivate() {
+    super.deactivate();
   }
 
   /**
@@ -96,6 +116,12 @@ public class ErrorResolutionWorkflowOperationHandler extends ResumableWorkflowOp
       logger.warn("Unknown retry strategy '{}' submitted for workflow '{}'", strategyValue, workflowInstance);
       return createResult(null, properties, Action.PAUSE, 0);
     }
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
 }

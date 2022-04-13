@@ -48,10 +48,6 @@
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
     </dependency>
     <dependency>
@@ -86,9 +82,6 @@
               !net.sf.cglib.proxy,
               *
             </Import-Package>
-            <Service-Component>
-              OSGI-INF/brightspace-user-factory.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

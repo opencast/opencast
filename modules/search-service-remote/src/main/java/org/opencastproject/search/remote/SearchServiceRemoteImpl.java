@@ -31,8 +31,10 @@ import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchResultImpl;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -42,6 +44,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +55,13 @@ import java.util.List;
 /**
  * A proxy to a remote search service.
  */
+@Component(
+    immediate = true,
+    service = SearchService.class,
+    property = {
+        "service.description=Search Remote Service Proxy"
+    }
+)
 public class SearchServiceRemoteImpl extends RemoteBase implements SearchService {
   private static final Logger logger = LoggerFactory.getLogger(SearchServiceRemoteImpl.class);
 
@@ -265,6 +276,18 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
 
     url.append(URLEncodedUtils.format(queryStringParams, "UTF-8"));
     return url.toString();
+  }
+
+  @Reference
+  @Override
+  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
+    super.setTrustedHttpClient(trustedHttpClient);
+  }
+
+  @Reference
+  @Override
+  public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
+    super.setRemoteServiceManager(serviceRegistry);
   }
 
 }

@@ -44,6 +44,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -53,6 +55,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+@Component(
+    immediate = true,
+    service = ConfigurablePublicationService.class,
+    property = {
+        "service.description=Publication Service (Configurable)"
+    }
+)
 public class ConfigurablePublicationServiceImpl extends AbstractJobProducer implements ConfigurablePublicationService {
 
   /* Gson is thread-safe so we use a single instance */
@@ -85,46 +94,6 @@ public class ConfigurablePublicationServiceImpl extends AbstractJobProducer impl
   private OrganizationDirectoryService organizationDirectoryService;
 
   private ServiceRegistry serviceRegistry;
-
-  public void setDownloadDistributionService(final DownloadDistributionService distributionService) {
-    this.distributionService = distributionService;
-  }
-
-  public void setServiceRegistry(final ServiceRegistry serviceRegistry) {
-    this.serviceRegistry = serviceRegistry;
-  }
-
-  @Override
-  protected ServiceRegistry getServiceRegistry() {
-    return this.serviceRegistry;
-  }
-
-  @Override
-  protected SecurityService getSecurityService() {
-    return this.securityService;
-  }
-
-  public void setSecurityService(final SecurityService securityService) {
-    this.securityService = securityService;
-  }
-
-  public void setUserDirectoryService(final UserDirectoryService userDirectoryService) {
-    this.userDirectoryService = userDirectoryService;
-  }
-
-  public void setOrganizationDirectoryService(final OrganizationDirectoryService organizationDirectoryService) {
-    this.organizationDirectoryService = organizationDirectoryService;
-  }
-
-  @Override
-  protected UserDirectoryService getUserDirectoryService() {
-    return this.userDirectoryService;
-  }
-
-  @Override
-  protected OrganizationDirectoryService getOrganizationDirectoryService() {
-    return this.organizationDirectoryService;
-  }
 
   @Override
   public Job replace(final MediaPackage mediaPackage, final String channelId,
@@ -297,4 +266,50 @@ public class ConfigurablePublicationServiceImpl extends AbstractJobProducer impl
   private Optional<Publication> getPublication(final MediaPackage mp, final String channelId) {
     return Arrays.stream(mp.getPublications()).filter(p -> p.getChannel().equalsIgnoreCase(channelId)).findAny();
   }
+
+  @Override
+  protected ServiceRegistry getServiceRegistry() {
+    return this.serviceRegistry;
+  }
+
+  @Override
+  protected SecurityService getSecurityService() {
+    return this.securityService;
+  }
+
+  @Override
+  protected UserDirectoryService getUserDirectoryService() {
+    return this.userDirectoryService;
+  }
+
+  @Override
+  protected OrganizationDirectoryService getOrganizationDirectoryService() {
+    return this.organizationDirectoryService;
+  }
+
+  @Reference
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = serviceRegistry;
+  }
+
+  @Reference
+  public void setSecurityService(SecurityService securityService) {
+    this.serviceRegistry = serviceRegistry;
+  }
+
+  @Reference
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    this.userDirectoryService = userDirectoryService;
+  }
+
+  @Reference
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    this.organizationDirectoryService = organizationDirectoryService;
+  }
+
+  @Reference(target = "(distribution.channel=download)")
+  public void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
+    this.distributionService = downloadDistributionService;
+  }
+
 }

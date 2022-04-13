@@ -66,10 +66,7 @@ public class AwsAssetDatabaseImpl implements AwsAssetDatabase {
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "entityManagerFactory",
-      target = "(osgi.unit.name=org.opencastproject.assetmanager.aws.persistence)"
-  )
+  @Reference(target = "(osgi.unit.name=org.opencastproject.assetmanager.aws.persistence)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }

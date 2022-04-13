@@ -1,11 +1,17 @@
 Database Configuration
 ======================
 
-Opencast ships with embedded JDBC drivers for the H2, MySQL, MariaDB and PostgreSQL databases.
+Opencast ships with embedded H2, MariaDB and PostgreSQL JDBC drivers.
 The built-in H2 database is used by default and needs no configuration,
 but is not suited for production.
 
-> __H2__ is not supported for updates or distributed systems. Use it for testing only!
+The MariaDB driver also supports connecting to MySQL.
+But this may need additional setting and it not part of Opencast's documentation.
+We also do not test this, and hence do not guarantee that this will work.
+
+<div class=warn>
+  __H2__ is not supported for updates or distributed systems. Use it for testing only!
+</div>
 
 
 ### Requirements
@@ -26,7 +32,6 @@ Other database engines are not tested and specific issues will likely not be add
 
 - __MariaDB__ is the recommended database engine.
   It is used by most adopters and is well tested.
-- __MySQL__ is supported but tested less than MariaDB.
 - __PostgreSQL__ support is experimental.
 - __H2__ is not suitable for anything but testing and development.
   It cannot be used in distributed environments.
@@ -123,20 +128,20 @@ Step 4: Configure Opencast
 --------------------------
 
 The following changes must be made in `etc/custom.properties`.
-Examples are provided for MariaDB/MySQL and PostgreSQL.
+Examples are provided for MariaDB and PostgreSQL.
 
 1. Configure Opencast to use the JDBC driver for MariaDB or PostgreSQL.
    The MariaDB driver will also work for MySQL.
 
-        # MariaDB/MySQL
+        # MariaDB
         org.opencastproject.db.jdbc.driver=org.mariadb.jdbc.Driver
         # PostgreSQL
         org.opencastproject.db.jdbc.driver=org.postgresql.Driver
 
 2. Configure the host where Opencast will find the database (`127.0.0.1`) and the database name (`opencast`).
 
-        # MariaDB/MySQL
-        org.opencastproject.db.jdbc.url=jdbc:mysql://127.0.0.1/opencast?useMysqlMetadata=true
+        # MariaDB
+        org.opencastproject.db.jdbc.url=jdbc:mariadb://127.0.0.1/opencast?useMysqlMetadata=true
         # PostgreSQL
         org.opencastproject.db.jdbc.url=jdbc:postgresql://127.0.0.1/opencast
 

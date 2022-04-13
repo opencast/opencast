@@ -104,6 +104,11 @@
                    ng-required="action != 'edit'"
                    ng-model="user.repeatedPassword"
                    ng-class="{ disabled: !manageable, error: blurred.password && (user.repeatedPassword !== user.password || !userForm.password.$valid) }">
+
+            <div>
+              <pw-strength ng-model="user.password"></pw-strength>
+            </div>
+
           </div>
         </div>
       </div>

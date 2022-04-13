@@ -25,6 +25,7 @@ import static org.opencastproject.util.RequireUtil.notNull;
 
 import org.opencastproject.distribution.api.AbstractDistributionService;
 import org.opencastproject.distribution.api.DistributionException;
+import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.AudioStream;
@@ -36,6 +37,10 @@ import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.TrackImpl.StreamingProtocol;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.LoadUtil;
@@ -44,6 +49,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.XmlSafeParser;
+import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -53,6 +59,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentException;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMException;
@@ -91,6 +101,14 @@ import javax.xml.transform.stream.StreamResult;
 /**
  * Distributes media to the local media delivery directory.
  */
+@Component(
+    immediate = true,
+    service = { DistributionService.class, StreamingDistributionService.class },
+    property = {
+        "service.description=Distribution Service (Streaming)",
+        "distribution.channel=streaming"
+    }
+)
 public class WowzaStreamingDistributionService extends AbstractDistributionService
         implements StreamingDistributionService {
 
@@ -199,11 +217,13 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
     return DISTRIBUTION_TYPE;
   }
 
+  @Activate
   public void activate(BundleContext bundleContext, Map<String, Object> properties)
           throws ComponentException, ConfigurationException {
     modified(bundleContext, properties);
   }
 
+  @Modified
   public void modified(BundleContext bundleContext, Map<String, Object> properties)
           throws ComponentException, ConfigurationException {
 
@@ -1116,4 +1136,35 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
   public File getDistributionDirectory() {
     return distributionDirectory;
   }
+
+  @Reference
+  @Override
+  public void setWorkspace(Workspace workspace) {
+    super.setWorkspace(workspace);
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
+  @Reference
+  @Override
+  public void setSecurityService(SecurityService securityService) {
+    super.setSecurityService(securityService);
+  }
+
+  @Reference
+  @Override
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    super.setUserDirectoryService(userDirectoryService);
+  }
+
+  @Reference
+  @Override
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    super.setOrganizationDirectoryService(organizationDirectoryService);
+  }
+
 }

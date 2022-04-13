@@ -24,11 +24,16 @@ package org.opencastproject.serviceregistry.impl.endpoint;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import org.opencastproject.rest.OsgiAbstractJobProducerEndpoint;
+import org.opencastproject.serviceregistry.api.NopService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.impl.NopServiceImpl;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -40,6 +45,16 @@ import javax.ws.rs.core.Response;
         title = "Nop Service",
         notes = {},
         abstractText = "No operation service. Creates empty jobs for testing purposes.")
+@Component(
+    immediate = true,
+    service = NopServiceEndpoint.class,
+    property = {
+        "service.description=No operation service REST endpoint",
+        "opencast.service.type=org.opencastproject.nop",
+        "opencast.service.path=/nop",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class NopServiceEndpoint extends OsgiAbstractJobProducerEndpoint<NopServiceImpl> {
   @GET
   @Path("nop")
@@ -51,4 +66,16 @@ public class NopServiceEndpoint extends OsgiAbstractJobProducerEndpoint<NopServi
   public Response nop() {
     return RestUtil.R.ok(getSvc().nop());
   }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
+  @Reference
+  public void setService(NopService nopService) {
+    super.setService((NopServiceImpl)nopService);
+  }
+
 }

@@ -35,6 +35,7 @@ import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSele
 import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.mediapackage.track.AudioStreamImpl;
 import org.opencastproject.mediapackage.track.TrackImpl;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.sox.api.SoxException;
 import org.opencastproject.sox.api.SoxService;
 import org.opencastproject.util.NotFoundException;
@@ -42,6 +43,7 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -49,6 +51,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +67,14 @@ import java.util.Map;
 /**
  * The workflow definition for handling "sox" operations
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Normalize Audio Workflow Operation Handler",
+        "workflow.operation=normalize-audio"
+    }
+)
 public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -89,6 +101,7 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
    * @param soxService
    *          the SoX service
    */
+  @Reference
   protected void setSoxService(SoxService soxService) {
     this.soxService = soxService;
   }
@@ -99,6 +112,7 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
    * @param composerService
    *          the composer service
    */
+  @Reference
   protected void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -110,8 +124,15 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)

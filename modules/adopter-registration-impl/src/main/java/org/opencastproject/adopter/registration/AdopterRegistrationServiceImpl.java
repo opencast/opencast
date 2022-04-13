@@ -23,10 +23,20 @@ package org.opencastproject.adopter.registration;
 
 import org.opencastproject.security.api.SecurityService;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * This service is used for registration and retrieving form data for
  * the logged in user in the context of adopter statistics.
  */
+@Component(
+    immediate = true,
+    service = Service.class,
+    property = {
+        "service.description=Adopter Statistics Registration Service"
+    }
+)
 public class AdopterRegistrationServiceImpl implements Service {
 
   //================================================================================
@@ -70,11 +80,13 @@ public class AdopterRegistrationServiceImpl implements Service {
   //================================================================================
 
   /** OSGi setter for the security service. */
+  @Reference
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi setter for the form repository. */
+  @Reference
   protected void setFormRepository(FormRepository formRepository) {
     this.formRepository = formRepository;
   }

@@ -39,6 +39,8 @@ import org.opencastproject.util.doc.rest.RestService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +72,16 @@ import javax.ws.rs.core.Response;
             + "anticipated. In other words, there is a bug!"
     }
 )
+@Component(
+    immediate = true,
+    service = ConfigurablePublicationRestService.class,
+    property = {
+        "service.description=Configurable Publication REST Endpoint",
+        "opencast.service.type=org.opencastproject.publication.configurable",
+        "opencast.service.path=/publication/api",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class ConfigurablePublicationRestService extends AbstractJobProducerEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(ConfigurablePublicationRestService.class);
@@ -80,10 +92,12 @@ public class ConfigurablePublicationRestService extends AbstractJobProducerEndpo
   private ConfigurablePublicationService service;
   private ServiceRegistry serviceRegistry;
 
+  @Reference
   public void setService(final ConfigurablePublicationService service) {
     this.service = service;
   }
 
+  @Reference
   public void setServiceRegistry(final ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -226,4 +240,5 @@ public class ConfigurablePublicationRestService extends AbstractJobProducerEndpo
     }
     return response;
   }
+
 }

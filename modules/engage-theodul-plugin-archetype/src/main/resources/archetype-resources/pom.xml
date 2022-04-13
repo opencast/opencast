@@ -67,7 +67,6 @@
             <Export-Package>${package};version=${project.version}</Export-Package>
             <Import-Package>org.opencastproject.engage.theodul.api;version=${project.version},
               *</Import-Package>
-            <Service-Component>OSGI-INF/engage-plugin.xml</Service-Component>
           </instructions>
         </configuration>
       </plugin>

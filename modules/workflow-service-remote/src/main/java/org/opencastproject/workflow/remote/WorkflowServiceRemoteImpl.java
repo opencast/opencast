@@ -101,7 +101,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
    * @param client
    */
   @Override
-  @Reference(name = "trustedHttpClient")
+  @Reference
   public void setTrustedHttpClient(TrustedHttpClient client) {
     super.setTrustedHttpClient(client);
   }
@@ -112,7 +112,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
    * @param remoteServiceManager
    */
   @Override
-  @Reference(name = "remoteServiceManager")
+  @Reference
   public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
     this.remoteServiceManager = remoteServiceManager;
   }

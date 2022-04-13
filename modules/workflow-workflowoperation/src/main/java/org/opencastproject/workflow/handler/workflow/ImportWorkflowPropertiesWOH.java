@@ -35,12 +35,15 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.fns.Strings;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +60,14 @@ import java.util.Set;
 /**
  * Workflow operation handler for importing workflow properties.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Import Workflow Properties Workflow Operation Handler",
+        "workflow.operation=import-wf-properties"
+    }
+)
 public class ImportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandler {
 
   /* Configuration options */
@@ -69,6 +80,7 @@ public class ImportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
   private Workspace workspace;
 
   /** OSGi DI */
+  @Reference
   void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

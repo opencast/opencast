@@ -46,6 +46,9 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,6 +77,16 @@ import javax.ws.rs.core.Response.Status;
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
         + "other words, there is a bug! You should file an error report with your server logs from the time when the "
         + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+@Component(
+    immediate = true,
+    service = DownloadDistributionRestService.class,
+    property = {
+        "service.description=Download Distribution REST Endpoint",
+        "opencast.service.type=org.opencastproject.distribution.download",
+        "opencast.service.path=/distribution/download",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class DownloadDistributionRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -91,6 +104,7 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -99,6 +113,7 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
    * @param service
    *          the service to set
    */
+  @Reference(target = "(distribution.channel=download)")
   public void setService(DownloadDistributionService service) {
     this.service = service;
   }
@@ -109,6 +124,7 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
    * @param cc
    *          OSGi component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
   }
 

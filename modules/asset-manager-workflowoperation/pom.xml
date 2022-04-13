@@ -79,11 +79,6 @@
             <Export-Package>
               org.opencastproject.workflow.handler.assetmanager;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/operations/snapshot.xml,
-              OSGI-INF/operations/delete.xml,
-              OSGI-INF/operations/move-storage.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

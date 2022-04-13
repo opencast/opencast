@@ -49,8 +49,6 @@
             <Export-Package>
               org.opencastproject.statistics.export.api;version=${project.version},
             </Export-Package>
-            <Service-Component>
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

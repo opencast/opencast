@@ -35,7 +35,7 @@
 
 .medium-modal {
     width: $modal-width;
-    margin-left: -($modal-width / 2);
+    margin-left: -1 * calc($modal-width / 2);
 }
 
 .large-modal {
@@ -62,7 +62,7 @@
     position: absolute;
     top: 100px;
     left: 50%;
-    margin-left: -($modal-width / 2);
+    margin-left: -1 * calc($modal-width / 2);
     background: $body-background;
     border-radius: $main-border-radius;
     box-shadow: 0 0 20px 2px rgba($black, 0.3);

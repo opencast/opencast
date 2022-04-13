@@ -28,9 +28,11 @@ import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 import static org.apache.http.HttpStatus.SC_OK;
 
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
@@ -46,6 +48,8 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +67,14 @@ import java.util.List;
  * Requests will be send using the POST method by default, PUT is a supported alternative method.
  *
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Http Notification Operation Handler",
+        "workflow.operation=http-notify"
+    }
+)
 public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** Configuration key for the target URL of the notification request */
@@ -232,6 +244,12 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
       logger.warn("Request failed on target {}, status code: {}, no more attempt.", request.getURI(), statusCode);
       return false;
     }
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
 }

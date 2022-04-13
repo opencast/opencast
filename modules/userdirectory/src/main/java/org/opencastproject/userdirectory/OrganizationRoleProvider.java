@@ -61,7 +61,7 @@ public class OrganizationRoleProvider implements RoleProvider {
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

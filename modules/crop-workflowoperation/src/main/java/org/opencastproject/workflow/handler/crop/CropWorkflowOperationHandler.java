@@ -30,15 +30,19 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.identifier.IdImpl;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +56,14 @@ import java.util.Map;
 /**
  * The workflow definition will run recordings to crop them from 4:3 to 16:9.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Videosegmentation Workflow Operation Handler",
+        "workflow.operation=crop-video"
+    }
+)
 public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -173,6 +185,7 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
    * @param cropService
    *          the crop service
    */
+  @Reference
   protected void setCropService(CropService cropService) {
     this.cropService = cropService;
   }
@@ -184,7 +197,15 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

@@ -51,6 +51,7 @@ import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.event.EventIndexUtils;
 import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.Catalog;
@@ -125,6 +126,11 @@ import org.joda.time.DateTimeZone;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,6 +164,13 @@ import java.util.stream.Collectors;
 /**
  * Implementation of {@link SchedulerService}.
  */
+@Component(
+    immediate = true,
+    service = { ManagedService.class, SchedulerService.class, IndexProducer.class },
+    property = {
+        "service.description=Scheduler Service"
+    }
+)
 public class SchedulerServiceImpl extends AbstractIndexProducer implements SchedulerService, ManagedService {
 
   /** The logger */
@@ -239,6 +252,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param messageSender
    */
+  @Reference
   public void setMessageSender(MessageSender messageSender) {
     this.messageSender = messageSender;
   }
@@ -248,6 +262,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param persistence
    */
+  @Reference
   public void setPersistence(SchedulerServiceDatabase persistence) {
     this.persistence = persistence;
   }
@@ -257,6 +272,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param seriesService
    */
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -266,6 +282,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param securityService
    */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -275,6 +292,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param assetManager
    */
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -284,6 +302,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param workspace
    */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -293,6 +312,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param authorizationService
    */
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -313,6 +333,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param orgDirectoryService
    */
+  @Reference
   public void setOrgDirectoryService(OrganizationDirectoryService orgDirectoryService) {
     this.orgDirectoryService = orgDirectoryService;
   }
@@ -323,11 +344,17 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @param index
    *          the API index.
    */
+  @Reference
   public void setIndex(ElasticsearchIndex index) {
     this.index = index;
   }
 
   /** OSGi callback to add {@link EventCatalogUIAdapter} instance. */
+  @Reference(
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeCatalogUIAdapter"
+  )
   public void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     eventCatalogUIAdapters.add(catalogUIAdapter);
   }
@@ -344,6 +371,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *          ComponentContext
    * @throws Exception
    */
+  @Activate
   public void activate(ComponentContext cc) throws Exception {
     this.componentContext = cc;
     systemUserName = SecurityUtil.getSystemUserName(cc);
@@ -668,8 +696,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       Date start = extendedEventDto.getStartDate();
       Date end = extendedEventDto.getEndDate();
 
-      verifyActive(mpId, end);
-
       if ((startDateTime.isSome() || endDateTime.isSome()) && endDateTime.getOr(end).before(startDateTime.getOr(start)))
         throw new SchedulerException("The end date is before the start date");
 
@@ -825,19 +851,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       return Opt.some(DublinCores.read(inputStream));
     } finally {
       IOUtils.closeQuietly(inputStream);
-    }
-  }
-
-  private void verifyActive(String eventId, Date end) throws SchedulerException {
-    if (end == null) {
-      throw new IllegalArgumentException("Start and/or end date for event ID " + eventId + " is not set");
-    }
-    // TODO: Assumption of no TimeZone adjustment because catalog temporal is local to server
-    if (new Date().after(end)) {
-      logger.info("Event ID {} has already ended as its end time was {} and current time is {}", eventId,
-          DateTimeSupport.toUTC(end.getTime()), DateTimeSupport.toUTC(new Date().getTime()));
-      throw new SchedulerException("Event ID " + eventId + " has already ended at "
-              + DateTimeSupport.toUTC(end.getTime()) + " and now is " + DateTimeSupport.toUTC(new Date().getTime()));
     }
   }
 

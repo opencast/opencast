@@ -52,6 +52,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +71,13 @@ import java.util.Dictionary;
 import java.util.List;
 import java.util.UUID;
 
+@Component(
+    immediate = true,
+    service = { SoxService.class,ManagedService.class },
+    property = {
+        "service.description=Sox audio processing service"
+    }
+)
 public class SoxServiceImpl extends AbstractJobProducer implements SoxService, ManagedService {
 
   /** The logging instance */
@@ -133,6 +143,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService, M
    *          the component context
    */
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating sox service");
     super.activate(cc);
@@ -408,6 +419,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService, M
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -418,6 +430,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService, M
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -438,6 +451,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService, M
    * @param securityService
    *          the securityService to set
    */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -448,6 +462,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService, M
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -458,6 +473,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService, M
    * @param organizationDirectory
    *          the organization directory
    */
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }

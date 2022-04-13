@@ -25,6 +25,10 @@ import static com.entwinemedia.fn.Stream.$;
 
 import com.entwinemedia.fn.Fn2;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +44,14 @@ import java.util.List;
  * {@link MediaPackage}. For example if you enabled a redirect serializer to move urls from an old server to a new one
  * and a stream security serializer then the urls could be redirected and then signed.
  */
+@Component(
+    immediate = true,
+    service = MediaPackageSerializer.class,
+    property = {
+        "service.pid=org.opencastproject.mediapackage.ChainingMediaPackageSerializer",
+        "service.ranking=1000"
+    }
+)
 public class ChainingMediaPackageSerializer implements MediaPackageSerializer {
 
   /** The logging facility */
@@ -52,6 +64,12 @@ public class ChainingMediaPackageSerializer implements MediaPackageSerializer {
   public static final int RANKING = 0;
 
   /** OSGi DI */
+  @Reference(
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeMediaPackageSerializer",
+      target = "(!(service.pid=org.opencastproject.mediapackage.ChainingMediaPackageSerializer))"
+  )
   void addMediaPackageSerializer(MediaPackageSerializer serializer) {
     serializers.add(serializer);
     Collections.sort(serializers, new Comparator<MediaPackageSerializer>() {

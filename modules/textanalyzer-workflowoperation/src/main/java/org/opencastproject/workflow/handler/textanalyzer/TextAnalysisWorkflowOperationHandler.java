@@ -53,6 +53,7 @@ import org.opencastproject.metadata.mpeg7.TemporalDecomposition;
 import org.opencastproject.metadata.mpeg7.Video;
 import org.opencastproject.metadata.mpeg7.VideoSegment;
 import org.opencastproject.metadata.mpeg7.VideoText;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.textanalyzer.api.TextAnalyzerException;
 import org.opencastproject.textanalyzer.api.TextAnalyzerService;
@@ -60,6 +61,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -69,6 +71,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,6 +95,14 @@ import java.util.concurrent.ExecutionException;
  * run a text analysis on the associated still images. The resulting <code>VideoText</code> elements will then be added
  * to the segments.
  */
+@Component(
+    immediate = true,
+    service = { WorkflowOperationHandler.class, ManagedService.class },
+    property = {
+        "service.description=Text Analysis Workflow Operation Handler",
+        "workflow.operation=extract-text"
+    }
+)
 public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperationHandler implements ManagedService {
 
   /** The logging facility */
@@ -126,6 +138,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param analysisService
    *          the text analysis service
    */
+  @Reference
   protected void setTextAnalyzer(TextAnalyzerService analysisService) {
     this.analysisService = analysisService;
   }
@@ -137,6 +150,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -147,6 +161,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param catalogService
    *          the catalog service
    */
+  @Reference(name = "Mpeg7Service")
   protected void setMpeg7CatalogService(Mpeg7CatalogService catalogService) {
     this.mpeg7CatalogService = catalogService;
   }
@@ -514,8 +529,15 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
    *
    * @param composerService
    */
+  @Reference
   void setComposerService(ComposerService composerService) {
     this.composer = composerService;
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
 }

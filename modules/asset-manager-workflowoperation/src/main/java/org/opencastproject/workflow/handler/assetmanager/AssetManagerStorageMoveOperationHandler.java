@@ -30,18 +30,32 @@ import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Asset Manager Move Storage Operation Handler",
+        "workflow.operation=move-storage"
+    }
+)
 public class AssetManagerStorageMoveOperationHandler extends AbstractWorkflowOperationHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerStorageMoveOperationHandler.class);
@@ -53,12 +67,20 @@ public class AssetManagerStorageMoveOperationHandler extends AbstractWorkflowOpe
   /** The archive */
   private AssetManager assetManager;
 
+  @Activate
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
+  }
+
   /** OSGi DI */
+  @Reference
   public void setJobProducer(AssetManagerJobProducer tsamjp) {
     this.tsamjp = tsamjp;
   }
 
   /** OSGi DI */
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -117,4 +139,11 @@ public class AssetManagerStorageMoveOperationHandler extends AbstractWorkflowOpe
       throw new WorkflowOperationException(String.format("No last version found for mpId: {}", mediaPackageId));
     }
   }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

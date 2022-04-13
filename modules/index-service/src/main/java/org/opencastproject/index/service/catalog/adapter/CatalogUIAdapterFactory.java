@@ -43,6 +43,10 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +58,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * Based on the given service configuration this service factory will create new instances of
  * {@link SeriesCatalogUIAdapter} services and register them in the OSGi service registry.
  */
+@Component(
+    immediate = true,
+    service = ManagedServiceFactory.class,
+    property = {
+        "service.pid=org.opencastproject.ui.metadata.CatalogUIAdapterFactory",
+        "service.description=Admin UI - Catalog UI Adapter Factory"
+    }
+)
 public class CatalogUIAdapterFactory implements ManagedServiceFactory {
 
   /** The logging facility. */
@@ -85,11 +97,13 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
   private BundleContext bundleContext;
 
   /** OSGi callback. */
+  @Activate
   void activate(ComponentContext cc) {
     bundleContext = cc.getBundleContext();
   }
 
   /** OSGi callback for deactivating component. */
+  @Deactivate
   void deactivate() {
     for (String pid : adapterServiceRegistrations.keySet()) {
       deleted(pid);
@@ -193,16 +207,19 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
   }
 
   /** OSGi callback to bind {@link ListProvidersService} instance. */
+  @Reference
   void setListProvidersService(ListProvidersService listProvidersService) {
     this.listProvidersService = listProvidersService;
   }
 
   /** OSGi callback to bind {@link SeriesService} instance. */
+  @Reference
   void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
   /** OSGi callback to bind {@link Workspace} instance. */
+  @Reference
   void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

@@ -41,6 +41,9 @@ import org.opencastproject.util.data.Tuple;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +66,13 @@ import javax.persistence.TypedQuery;
 /**
  * Implements {@link SearchServiceDatabase}. Defines permanent storage for series.
  */
+@Component(
+    immediate = true,
+    service = SearchServiceDatabase.class,
+    property = {
+        "service.description=Search Service Persistence"
+    }
+)
 public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
   /** JPA persistence unit name */
@@ -78,6 +88,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
   protected SecurityService securityService;
 
   /** OSGi DI */
+  @Reference(target = "(osgi.unit.name=org.opencastproject.search.impl.persistence)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -88,6 +99,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
    * @param cc
    * @throws SearchServiceDatabaseException
    */
+  @Activate
   public void activate(ComponentContext cc) throws SearchServiceDatabaseException {
     logger.info("Activating persistence manager for search service");
     this.populateSeriesData();
@@ -99,6 +111,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
    * @param securityService
    *          the securityService to set
    */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

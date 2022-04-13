@@ -26,20 +26,33 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.publication.api.OaiPmhPublicationService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Workflow operation for retracting a media package from OAI-PMH publication repository.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=OAI-PMH Retraction Workflow Operation Handler",
+        "workflow.operation=retract-oaipmh"
+    }
+)
 public class RetractOaiPmhWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -57,6 +70,7 @@ public class RetractOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param publicationService
    *          the publication service
    */
+  @Reference
   public void setPublicationService(OaiPmhPublicationService publicationService) {
     this.publicationService = publicationService;
   }
@@ -67,6 +81,7 @@ public class RetractOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(ComponentContext)
    */
   @Override
+  @Activate
   protected void activate(ComponentContext cc) {
     super.activate(cc);
   }
@@ -113,4 +128,11 @@ public class RetractOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
       throw new WorkflowOperationException(t);
     }
   }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

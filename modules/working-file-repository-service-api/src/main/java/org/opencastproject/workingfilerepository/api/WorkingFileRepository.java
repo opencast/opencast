@@ -230,4 +230,13 @@ public interface WorkingFileRepository extends StorageUsage {
    *          files older than that will be deleted
    */
   boolean cleanupOldFilesFromCollection(String collectionId, long days) throws IOException;
+
+
+  /**
+   * Cleans up media files older than the number of days passed.
+   *
+   * @param days
+   *          files older than that will be deleted
+   */
+  boolean cleanupOldFilesFromMediaPackage(long days) throws IOException;
 }

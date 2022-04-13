@@ -47,6 +47,7 @@ import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
 import org.opencastproject.mediapackage.selector.AttachmentSelector;
 import org.opencastproject.mediapackage.selector.TrackSelector;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
@@ -56,6 +57,7 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -64,6 +66,8 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,6 +87,14 @@ import javax.imageio.ImageIO;
 /**
  * The workflow definition for handling "composite" operations
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Composite Workflow Operation Handler",
+        "workflow.operation=composite"
+    }
+)
 public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   private static final String COLLECTION = "composite";
@@ -126,6 +138,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
    * @param composerService
    *          the local composer service
    */
+  @Reference
   public void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -137,6 +150,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -799,4 +813,11 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
                         + FilenameUtils.getExtension(compositeSettings.getSourceUrlWatermark()));
     }
   }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

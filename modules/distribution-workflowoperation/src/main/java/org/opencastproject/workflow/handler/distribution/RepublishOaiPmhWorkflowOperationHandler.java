@@ -30,13 +30,19 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.publication.api.OaiPmhPublicationService;
 import org.opencastproject.publication.api.PublicationException;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +51,14 @@ import java.util.List;
 import java.util.Set;
 
 /** Workflow operation for handling "republish" operations to OAI-PMH repositories. */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Republish OAI-PMH Workflow Operation Handler",
+        "workflow.operation=republish-oaipmh"
+    }
+)
 public final class RepublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(RepublishOaiPmhWorkflowOperationHandler.class);
@@ -55,6 +69,12 @@ public final class RepublishOaiPmhWorkflowOperationHandler extends AbstractWorkf
   private static final String OPT_SOURCE_FLAVORS = "source-flavors";
   private static final String OPT_SOURCE_TAGS = "source-tags";
   private static final String OPT_REPOSITORY = "repository";
+
+  @Activate
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
+  }
 
   @Override
   public WorkflowOperationResult start(WorkflowInstance wi, JobContext context) throws WorkflowOperationException {
@@ -99,8 +119,15 @@ public final class RepublishOaiPmhWorkflowOperationHandler extends AbstractWorkf
   }
 
   /** OSGI DI */
+  @Reference
   public void setOaiPmhPublicationService(OaiPmhPublicationService oaiPmhPublicationService) {
     this.oaiPmhPublicationService = oaiPmhPublicationService;
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
 }

@@ -27,6 +27,7 @@ import static org.opencastproject.util.data.Collections.dict;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.ingest.api.IngestService;
+import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -34,6 +35,7 @@ import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.series.api.SeriesService;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
@@ -53,11 +55,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * The inbox scanner monitors a directory for incoming media packages.
@@ -114,11 +119,21 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
   public static final String INBOX_TRIES = "inbox.tries";
   public static final String INBOX_TRIES_BETWEEN_SEC = "inbox.tries.between.sec";
 
+  public static final String INBOX_METADATA_REGEX = "inbox.metadata.regex";
+  public static final String INBOX_DATETIME_FORMAT = "inbox.datetime.format";
+  public static final String INBOX_METADATA_FFPROBE = "inbox.metadata.ffprobe";
+  public static final String INBOX_SCHEDULE_MATCH = "inbox.schedule.match";
+  public static final String INBOX_SCHEDULE_MATCH_THRESHOLD = "inbox.schedule.match.threshold";
+
+  public static final String FFPROBE_BINARY_CONFIG = "org.opencastproject.inspection.ffprobe.path";
+  public static final String FFPROBE_BINARY_DEFAULT = "ffprobe";
+
   private IngestService ingestService;
   private SecurityService securityService;
   private UserDirectoryService userDir;
   private OrganizationDirectoryService orgDir;
   private SeriesService seriesService;
+  private SchedulerService schedulerService;
 
   private ComponentContext cc;
 
@@ -172,6 +187,20 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     final int maxTries = NumberUtils.toInt(Objects.toString(properties.get(INBOX_TRIES), "3"));
     final int secondsBetweenTries = NumberUtils.toInt(Objects.toString(properties.get(INBOX_TRIES_BETWEEN_SEC), "300"));
 
+    // Metadata parsing configuration
+    var metadataPattern = Optional.ofNullable(properties.get(INBOX_METADATA_REGEX))
+            .map(Objects::toString)
+            .map(Pattern::compile);
+    var dateFormatter = Optional.ofNullable(properties.get(INBOX_DATETIME_FORMAT))
+            .map(Objects::toString)
+            .map(DateTimeFormatter::ofPattern)
+            .orElse(DateTimeFormatter.ISO_DATE_TIME);
+    var ffprobe = BooleanUtils.toBoolean((String) properties.get(INBOX_METADATA_FFPROBE))
+            ? Objects.toString(cc.getBundleContext().getProperty(FFPROBE_BINARY_CONFIG), FFPROBE_BINARY_DEFAULT)
+            : null;
+    var matchSchedule = BooleanUtils.toBoolean((String) properties.get(INBOX_SCHEDULE_MATCH));
+    var matchThreshold = NumberUtils.toFloat((String) properties.get(INBOX_SCHEDULE_MATCH_THRESHOLD), -1F);
+
     var securityContext = getUserAndOrganization(securityService, orgDir, orgId, userDir, userId)
             .map(a -> new SecurityContext(securityService, a.getB(), a.getA()));
     while (securityContext.isEmpty()) {
@@ -192,7 +221,8 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     fileInstallCfg = configureFileInstall(cc.getBundleContext(), inbox, interval);
     // create new scanner
     this.ingestor = new Ingestor(ingestService, securityContext.get(), workflowDefinition,
-            workflowConfig, mediaFlavor, inbox, maxThreads, seriesService, maxTries, secondsBetweenTries);
+            workflowConfig, mediaFlavor, inbox, maxThreads, seriesService, maxTries, secondsBetweenTries,
+            metadataPattern, dateFormatter, schedulerService, ffprobe, matchSchedule, matchThreshold);
     new Thread(ingestor).start();
     logger.info("Now watching inbox {}", inbox.getAbsolutePath());
   }
@@ -325,5 +355,10 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
   @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
+  }
+
+  @Reference
+  public void setSchedulerService(SchedulerService schedulerService) {
+    this.schedulerService = schedulerService;
   }
 }

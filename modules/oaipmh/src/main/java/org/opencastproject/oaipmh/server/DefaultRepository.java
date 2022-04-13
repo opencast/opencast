@@ -30,7 +30,11 @@ import org.opencastproject.oaipmh.util.ResumptionTokenStore;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
 
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.util.List;
 
@@ -38,6 +42,14 @@ import java.util.List;
  * Factory for the default OAI-PMH repository that ships with each Opencast installation serving the
  * <code>matterhorn</code> metadata format.
  */
+@Component(
+    immediate = true,
+    service = { OaiPmhRepository.class, ManagedService.class },
+    property = {
+        "service.description=Opencast default OAI-PMH repository",
+        "service.pid=org.opencastproject.oaipmh.server.DefaultRepository"
+    }
+)
 public class DefaultRepository extends OaiPmhRepository {
   private static final String PROP_ADMIN_EMAIL = "org.opencastproject.admin.email";
 
@@ -48,11 +60,13 @@ public class DefaultRepository extends OaiPmhRepository {
           Collections.list(new MatterhornMetadataProvider(), new MatterhornInlinedMetadataProvider());
 
   /** OSGi DI */
+  @Reference
   public void setPersistence(OaiPmhDatabase persistence) {
     this.persistence = persistence;
   }
 
   /** OSGi callback */
+  @Activate
   public void activate(ComponentContext cc) {
     adminEmail = getContextProperty(cc, PROP_ADMIN_EMAIL);
   }

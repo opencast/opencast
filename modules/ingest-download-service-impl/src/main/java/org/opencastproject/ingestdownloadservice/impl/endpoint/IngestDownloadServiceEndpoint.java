@@ -35,6 +35,8 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +56,16 @@ import javax.ws.rs.core.Response;
     title = "Ingest download REST endpoint",
     abstractText = "The REST endpoint for the ingest download service.",
     notes = {})
+@Component(
+    immediate = true,
+    service = IngestDownloadServiceEndpoint.class,
+    property = {
+        "service.description=Ingest download service Endpoint",
+        "opencast.service.type=org.opencastproject.ingestdownload",
+        "opencast.service.path=/ingestdownload",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class IngestDownloadServiceEndpoint extends AbstractJobProducerEndpoint {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(IngestDownloadServiceEndpoint.class);
@@ -104,6 +116,7 @@ public class IngestDownloadServiceEndpoint extends AbstractJobProducerEndpoint {
   }
 
 
+  @Reference
   public void setIngestDownloadService(IngestDownloadService service) {
     this.service = service;
   }
@@ -132,6 +145,7 @@ public class IngestDownloadServiceEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

@@ -34,12 +34,23 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.requests.SortCriterion.Order;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Component(
+    immediate = true,
+    service = ResourceListProvider.class,
+    property = {
+        "service.description=Themes list provider",
+        "opencast.service.type=org.opencastproject.index.service.resources.list.provider.ThemesListProvider"
+    }
+)
 public class ThemesListProvider implements ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "THEMES";
@@ -54,16 +65,19 @@ public class ThemesListProvider implements ResourceListProvider {
 
   private SecurityService securityService;
 
+  @Activate
   protected void activate(BundleContext bundleContext) {
     logger.info("Themes list provider activated!");
   }
 
   /** OSGi callback for the search index. */
+  @Reference
   public void setIndex(ElasticsearchIndex index) {
     this.searchIndex = index;
   }
 
   /** OSGi callback for the security service. */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

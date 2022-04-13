@@ -27,9 +27,11 @@ import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -45,6 +47,8 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +61,14 @@ import java.util.Set;
 /**
  * Workflow Operation for POSTing a MediaPackage via HTTP
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Workflow Operation that POSTs MediaPackages via HTTP",
+        "workflow.operation=post-mediapackage"
+    }
+)
 public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -65,8 +77,15 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
   /** search service **/
   private SearchService searchService;
 
+  @Reference
   public void setSearchService(SearchService searchService) {
     this.searchService = searchService;
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)

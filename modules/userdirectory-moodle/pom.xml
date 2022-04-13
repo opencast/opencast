@@ -78,9 +78,6 @@
               !net.sf.cglib.proxy,
               *
             </Import-Package>
-            <Service-Component>
-              OSGI-INF/moodle-user-factory.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

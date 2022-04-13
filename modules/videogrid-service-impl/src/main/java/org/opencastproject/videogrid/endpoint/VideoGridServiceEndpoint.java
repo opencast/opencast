@@ -44,6 +44,8 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.codec.EncoderException;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +73,16 @@ import javax.ws.rs.core.Response;
         "Only meant to be used with the VideoGridWorkflowOperationHandler"
     }
 )
+@Component(
+    immediate = true,
+    service = VideoGridServiceEndpoint.class,
+    property = {
+        "service.description=VideoGrid Service REST Endpoint",
+        "opencast.service.type=org.opencastproject.videogrid",
+        "opencast.service.path=/videogrid",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class VideoGridServiceEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -88,6 +100,7 @@ public class VideoGridServiceEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -98,6 +111,7 @@ public class VideoGridServiceEndpoint extends AbstractJobProducerEndpoint {
    * @param videoGridService
    *          the videoGridService
    */
+  @Reference
   public void setVideoGridService(VideoGridService videoGridService) {
     this.videoGridService = videoGridService;
   }

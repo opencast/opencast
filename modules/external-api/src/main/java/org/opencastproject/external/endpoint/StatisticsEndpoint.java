@@ -55,6 +55,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,6 +87,15 @@ import javax.ws.rs.core.Response;
 @RestService(
   name = "externalapistatistics", title = "External API Statistics Endpoint",
   notes = {}, abstractText = "Provides statistics")
+@Component(
+    immediate = true,
+    service = StatisticsEndpoint.class,
+    property = {
+        "service.description=External API - Statistics Endpoint",
+        "opencast.service.type=org.opencastproject.external.statistics",
+        "opencast.service.path=/api/statistics"
+    }
+)
 public class StatisticsEndpoint {
 
   /** The logging facility */
@@ -95,27 +107,33 @@ public class StatisticsEndpoint {
   private StatisticsService statisticsService;
   private StatisticsExportService statisticsExportService;
 
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
+  @Reference
   public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
     this.elasticsearchIndex = elasticsearchIndex;
   }
 
+  @Reference
   public void setStatisticsService(StatisticsService statisticsService) {
     this.statisticsService = statisticsService;
   }
 
+  @Reference
   public void setStatisticsExportService(StatisticsExportService statisticsExportService) {
     this.statisticsExportService = statisticsExportService;
   }
 
   /** OSGi activation method */
+  @Activate
   void activate(ComponentContext cc) {
     logger.info("Activating External API - Statistics Endpoint");
   }

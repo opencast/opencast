@@ -59,6 +59,14 @@
       </configurations>
     </operation>
 
+    <operation
+      id="start-workflow">
+      <configurations>
+        <configuration key="media-packages">${duplicate_media_package_ids}</configuration>
+        <configuration key="workflow-definition">fast</configuration>
+      </configurations>
+    </operation>
+
     <!-- Clean up work artifacts -->
 
     <operation

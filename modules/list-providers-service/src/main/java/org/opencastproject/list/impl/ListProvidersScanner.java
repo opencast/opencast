@@ -31,6 +31,8 @@ import org.opencastproject.list.api.ResourceListQuery;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +47,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
+@Component(
+    immediate = true,
+    service = { ArtifactInstaller.class,ListProvidersScanner.class },
+    property = {
+        "service.description=List Providers Scanner"
+    }
+)
 public class ListProvidersScanner implements ArtifactInstaller {
   /** The directory name that has the properties file defining the list providers **/
   public static final String LIST_PROVIDERS_DIRECTORY = "listproviders";
@@ -65,6 +74,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
   /** The list providers service to add the list provider to. **/
   private ListProvidersService listProvidersService;
 
+  @Reference
   public void setListProvidersService(ListProvidersService listProvidersService) {
     this.listProvidersService = listProvidersService;
   }

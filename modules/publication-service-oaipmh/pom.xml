@@ -29,6 +29,10 @@
       <artifactId>httpclient-osgi</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi.cmpn</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
@@ -95,9 +99,6 @@
             <Export-Package>
               org.opencastproject.publication.oaipmh;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/publication-service-oaipmh.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

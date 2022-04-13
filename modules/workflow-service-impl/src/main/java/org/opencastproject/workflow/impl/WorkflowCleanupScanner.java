@@ -25,16 +25,25 @@ import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.kernel.scanner.AbstractScanner;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NeedleEye;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workflow.api.WorkflowService;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.impl.StdSchedulerFactory;
@@ -43,6 +52,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 
+@Component(
+    immediate = true,
+    service = ManagedService.class,
+    property = {
+        "service.description=Workflow Cleanup Scanner Service"
+    }
+)
 public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner implements ManagedService {
   private static final String SCANNER_NAME = "Workflow Cleanup Scanner";
 
@@ -84,6 +100,18 @@ public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner implem
     } catch (org.quartz.SchedulerException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Activate
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
+  }
+
+  @Deactivate
+  @Override
+  public void deactivate() {
+    super.deactivate();
   }
 
   @Override
@@ -228,4 +256,29 @@ public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner implem
       logger.info("Finished " + parameters.getScannerName() + " job.");
     }
   }
+
+  @Reference
+  @Override
+  public void bindWorkflowService(WorkflowService workflowService) {
+    super.bindWorkflowService(workflowService);
+  }
+
+  @Reference
+  @Override
+  public void bindServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.bindServiceRegistry(serviceRegistry);
+  }
+
+  @Reference
+  @Override
+  public void bindOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    super.bindOrganizationDirectoryService(organizationDirectoryService);
+  }
+
+  @Reference
+  @Override
+  public void bindSecurityService(SecurityService securityService) {
+    super.bindSecurityService(securityService);
+  }
+
 }

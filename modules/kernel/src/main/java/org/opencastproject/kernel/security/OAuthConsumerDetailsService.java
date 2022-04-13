@@ -24,6 +24,8 @@ package org.opencastproject.kernel.security;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -48,6 +50,13 @@ import java.util.Map;
  * A OAuth consumer details service with multiple consumers. UserDetailsService is used for delegating user
  * lookup requests.
  */
+@Component(
+    immediate = true,
+    service = { ManagedService.class,ConsumerDetailsService.class },
+    property = {
+        "service.description=OAuth consumer details service"
+    }
+)
 public class OAuthConsumerDetailsService implements ConsumerDetailsService, UserDetailsService, ManagedService {
 
   /** The logger */
@@ -71,6 +80,7 @@ public class OAuthConsumerDetailsService implements ConsumerDetailsService, User
   /**
    * OSGi DI
    */
+  @Reference
   public void setDelegate(UserDetailsService delegate) {
     this.delegate = delegate;
   }

@@ -24,12 +24,19 @@ import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEn
 
 import org.opencastproject.util.persistence.PersistenceEnv;
 
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManagerFactory;
 
 /** OSGi bound bundle info database. */
+@Component(
+    immediate = true,
+    service = BundleInfoDb.class
+)
 public class OsgiBundleInfoDb extends AbstractBundleInfoDb {
   private static final Logger logger = LoggerFactory.getLogger(OsgiBundleInfoDb.class);
 
@@ -39,6 +46,7 @@ public class OsgiBundleInfoDb extends AbstractBundleInfoDb {
   private PersistenceEnv penv;
 
   /** OSGi DI */
+  @Reference(target = "(osgi.unit.name=org.opencastproject.kernel)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -48,6 +56,7 @@ public class OsgiBundleInfoDb extends AbstractBundleInfoDb {
   }
 
   /** OSGi callback */
+  @Activate
   public void activate() {
     penv = persistenceEnvironment(emf);
   }

@@ -48,6 +48,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,6 +92,16 @@ import javax.ws.rs.core.Response.Status;
             + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
     }
 )
+@Component(
+    immediate = true,
+    service = StaticFileRestService.class,
+    property = {
+        "service.description=Static File Service REST Endpoint",
+        "opencast.service.type=org.opencastproject.staticfiles",
+        "opencast.service.path=/staticfiles",
+        "opencast.service.jobproducer=false"
+    }
+)
 public class StaticFileRestService {
 
   /** The logging facility */
@@ -130,11 +142,13 @@ public class StaticFileRestService {
   protected boolean useWebserver = false;
 
   /** OSGi callback to bind service instance. */
+  @Reference
   public void setStaticFileService(StaticFileService staticFileService) {
     this.staticFileService = staticFileService;
   }
 
   /** OSGi callback to bind service instance. */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

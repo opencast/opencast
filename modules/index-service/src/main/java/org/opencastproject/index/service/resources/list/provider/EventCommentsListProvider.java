@@ -28,6 +28,9 @@ import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +39,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component(
+    immediate = true,
+    service = ResourceListProvider.class,
+    property = {
+        "service.description=Comments list provider",
+        "opencast.service.type=org.opencastproject.index.service.resources.list.provider.EventCommentsListProvider"
+    }
+)
 public class EventCommentsListProvider implements ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(EventCommentsListProvider.class);
@@ -57,6 +68,7 @@ public class EventCommentsListProvider implements ResourceListProvider {
 
   private EventCommentService eventCommentService;
 
+  @Activate
   protected void activate(BundleContext bundleContext) {
     // Fill the list names
     for (CommentsFilterList value : CommentsFilterList.values()) {
@@ -67,6 +79,7 @@ public class EventCommentsListProvider implements ResourceListProvider {
   }
 
   /** OSGi callback for the event comment service. */
+  @Reference
   public void setEventCommentService(EventCommentService eventCommentService) {
     this.eventCommentService = eventCommentService;
   }

@@ -46,28 +46,26 @@ Behavior changes
     - `no.error.state.service.types` was added. With this, you can define service types that should never go into error
       state.
 - The default location of the user interface configuration service configuration is now
-  `etc/org.opencastproject.uiconfig.UIConfigRest.cfg `. For more details, take a look at
+  `etc/org.opencastproject.uiconfig.UIConfigRest.cfg`. For more details, take a look at
   [pull request #2860](https://github.com/opencast/opencast/pull/2860).
 - There are changes to how hosts are mapped to tenants. If you use a multi-tenant system you therefore need to update
   your `org.opencastproject.organization-*.cfg` configuration files:
   Before Opencast 11 the domain names were mapped to tenants and a common port number was assumed for all domains. Now
   you need to configure a URL per instance you want to map to a tenant.
-  ```
-  # Before:
-  port=8080
-  prop.org.opencastproject.host.admin.example.org=tenant1-admin.example.org 
-  prop.org.opencastproject.host.presentation.example.org=tenant1-presentation.example.org
-
-  # Now:
-  prop.org.opencastproject.host.admin.example.org=https://tenant1-admin.example.org
-  prop.org.opencastproject.host.presentation.example.org=https://tenant1-presentation.example.org:8443
-  ```
+```
+# Before:
+port=8080
+prop.org.opencastproject.host.admin.example.org=tenant1-admin.example.org 
+prop.org.opencastproject.host.presentation.example.org=tenant1-presentation.example.org
+# Now:
+prop.org.opencastproject.host.admin.example.org=https://tenant1-admin.example.org
+prop.org.opencastproject.host.presentation.example.org=https://tenant1-presentation.example.org:8443
+```
 - Support for automatically setting up an HLS encoding ladder via the `{video,audio}.bitrates.mink`
   and `{video,audio}.bitrates.maxk` encoding profile options was removed. Instead, users should now explicitly specify
   the bit rate and bit rate control mechanism in the `ffmpeg.command`.
 - Some S3 distribution workflow operation handlers have been renamed: *publish-aws* to *publish-engage-aws* and
   *retract-aws* to *retract-engage-aws*.
-- If an URL does not exist, it returns to the welcome page.
 - The amount of job statistics for servers displayed in the admin interface was reduced to running and queued jobs to
   avoid performance problems and remove incorrect and/or misleading data.
 
@@ -79,6 +77,53 @@ API changes
 - [[#2878](https://github.com/opencast/opencast/pull/2878)] - Add endpoint to resume Index Rebuild for specified service
 - [[#3002](https://github.com/opencast/opencast/pull/3002)] - Sign publication URL of events in External API
 - [[#3148](https://github.com/opencast/opencast/pull/3148)] - Allow empty track duration
+
+Additional Notes about 11.5
+---------------------------
+
+- Bug Fixes:
+    - This release downgrades Paella from 6.5.5 to 6.4.4 to fix HLS videos not loading on slow connections (forward
+      merged from 10.11 to this release).
+    - Issues with the admin UI configuration (cf. [[#3532](https://github.com/opencast/opencast/pull/3532)]).
+    - Exceptions when signing publication URLs (cf. [[#3540](https://github.com/opencast/opencast/pull/3540)]).
+    - Problems in the admin UI when creating a series with  an empty title (cf.
+      [[#3460](https://github.com/opencast/opencast/pull/3460)]).
+    - Issues with Safari when using the editor (cf. [[#3544](https://github.com/opencast/opencast/pull/3544)]).
+- New Features and updates
+    - A notable new feature is the password strength indicator in the user modal. Also, the stand-alone editor was
+      updated  to version 2022-03-22 (for details on the changes, see the corresponding
+      [release notes](https://github.com/opencast/opencast-editor/releases/tag/2022-03-22) for the editor).
+    - Configuration options for Elasticsearch have been added. In case a request to  Elasticsearch fails because of an
+      `ElasticsearchStatusException`, you can now configure Opencast to try again. For this, set `max.retry.attempts`
+      in `org.opencastproject.elasticsearch.index.ElasticsearchIndex.cfg` to  something higher than 0. Set
+      `retry.waiting.period` to a time period in ms to wait between retries (default: 1 second) so  you don't overwhelm
+      Elasticsearch. Both parameters can be configured separately for read-only actions and those that also update or
+      delete, since arguably the success of the latter is more important. Changing this config does not require  a
+      restart of Opencast. See the [Elasticsearch docs](configuration/elasticsearch.md) for more details.
+    - Traditional chinese translations are back (cf. [[#3545](https://github.com/opencast/opencast/pull/3545)]).
+
+Additional Notes about 11.4
+---------------------------
+
+- Improvements to the inbox behavior:
+    - Extract basic metadata from compressed files using regular expressions.
+      [[#3327](https://github.com/opencast/opencast/pull/3327)]
+    - Match events sent to the inbox against the schedule [[#3340](https://github.com/opencast/opencast/pull/3340)]
+- The capture agent calendar now can be provided as a JSON calendar
+  [[#3368](https://github.com/opencast/opencast/pull/3368)]
+- LDAP user directory behavior from 9.x is back [[#3344](https://github.com/opencast/opencast/pull/3344)]
+
+Additional Notes about 11.3
+---------------------------
+
+This release fixes several bugs and a security issue related to logging which was fixed in 10.9 and forward merged to
+this release (cf. [[#3305](https://github.com/opencast/opencast/pull/3305)]). A notable new feature is the
+`speechtotext` workflow operation introducing support for the STT Engine Vosk (cf. the
+[corresponding docs section](workflowoperationhandlers/speech-to-text-woh.md) and
+[[#2855](https://github.com/opencast/opencast/pull/2855)]). Additionally, the design of the embed code selection
+within the Admin UI was updated (cf. [[#3273](https://github.com/opencast/opencast/pull/3273)]). Furthermore,
+[[#3152](https://github.com/opencast/opencast/pull/3152)] and [[#3154](https://github.com/opencast/opencast/pull/3154)]
+introduced enhancements to the `execute-once` and `execute-many` workflow operations.
 
 Additional Notes about 11.2
 ---------------------------

@@ -37,6 +37,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.staticfiles.api.StaticFileService;
 import org.opencastproject.themes.Theme;
 import org.opencastproject.themes.ThemesServiceDatabase;
@@ -48,6 +49,7 @@ import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
@@ -58,6 +60,8 @@ import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.fns.Strings;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +75,14 @@ import java.util.UUID;
 /**
  * The workflow definition for handling "theme" operations
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Theme Workflow Operation Handler",
+        "workflow.operation=theme"
+    }
+)
 public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   private static final String BUMPER_FLAVOR = "bumper-flavor";
@@ -120,23 +132,33 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
   private Workspace workspace;
 
   /** OSGi callback for the series service. */
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
   /** OSGi callback for the themes database service. */
+  @Reference
   public void setThemesServiceDatabase(ThemesServiceDatabase themesServiceDatabase) {
     this.themesServiceDatabase = themesServiceDatabase;
   }
 
   /** OSGi callback for the static file service. */
+  @Reference
   public void setStaticFileService(StaticFileService staticFileService) {
     this.staticFileService = staticFileService;
   }
 
   /** OSGi callback for the workspace. */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
   @Override

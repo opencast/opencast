@@ -29,6 +29,11 @@ import org.opencastproject.security.api.SecurityService;
 import com.google.common.util.concurrent.Striped;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +49,13 @@ import java.util.concurrent.locks.Lock;
 /**
  * Very simple approach to serialize the work of all three dependent update handlers.
  */
+@Component(
+    immediate = true,
+    service = LiveScheduleMessageReceiver.class,
+    property = {
+        "service.description=Live Schedule Message Receiver"
+    }
+)
 public class LiveScheduleMessageReceiver {
 
   private static final Logger logger = LoggerFactory.getLogger(LiveScheduleMessageReceiver.class);
@@ -62,6 +74,7 @@ public class LiveScheduleMessageReceiver {
   // Pool of threads for executing updates
   private ExecutorService updateExecutor = Executors.newCachedThreadPool();
 
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating {}", LiveScheduleMessageReceiver.class.getName());
   }
@@ -139,14 +152,21 @@ public class LiveScheduleMessageReceiver {
   }
 
   // === Set by OSGI begin
+  @Reference
   public void setMessageReceiver(MessageReceiver messageReceiver) {
     this.messageReceiver = messageReceiver;
   }
 
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference(
+      cardinality = ReferenceCardinality.AT_LEAST_ONE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeUpdateHandler"
+  )
   public void addUpdateHandler(UpdateHandler handler) {
     String queueId = handler.getDestinationId();
     if (updateHandlers.get(queueId) == null) {

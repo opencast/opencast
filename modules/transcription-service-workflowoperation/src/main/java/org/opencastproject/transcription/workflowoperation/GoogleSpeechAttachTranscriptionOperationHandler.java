@@ -27,11 +27,13 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.transcription.api.TranscriptionService;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -39,6 +41,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +50,14 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Attach Google Speech Transcription Workflow Operation Handler",
+        "workflow.operation=google-speech-attach-transcription"
+    }
+)
 public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWorkflowOperationHandler {
 
   /**
@@ -161,16 +173,25 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
     return createResult(mediaPackage, Action.CONTINUE);
   }
 
+  @Reference(target = "(provider=google.speech)")
   public void setTranscriptionService(TranscriptionService service) {
     this.service = service;
   }
 
+  @Reference
   public void setWorkspace(Workspace service) {
     this.workspace = service;
   }
 
+  @Reference
   public void setCaptionService(CaptionService service) {
     this.captionService = service;
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
 }

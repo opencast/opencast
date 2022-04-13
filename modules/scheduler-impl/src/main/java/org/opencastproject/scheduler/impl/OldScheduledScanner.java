@@ -28,10 +28,18 @@ import org.opencastproject.kernel.scanner.AbstractScanner;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NeedleEye;
 
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.Scheduler;
@@ -39,6 +47,13 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Component(
+    immediate = true,
+    service = ManagedService.class,
+    property = {
+        "service.description=Cleanup Finished Recordings from the Schedule Scanner"
+    }
+)
 public class OldScheduledScanner extends AbstractBufferScanner implements ManagedService {
 
   /** The logging facility */
@@ -67,13 +82,44 @@ public class OldScheduledScanner extends AbstractBufferScanner implements Manage
     }
   }
 
+  @Activate
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
+  }
+
+  @Deactivate
+  @Override
+  public void deactivate() {
+    super.deactivate();
+  }
+
   /**
    * Method to set the service this REST endpoint uses
    *
    * @param service
    */
+  @Reference
   public void setService(SchedulerService service) {
     this.service = service;
+  }
+
+  @Reference
+  @Override
+  public void bindServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.bindServiceRegistry(serviceRegistry);
+  }
+
+  @Reference
+  @Override
+  public void bindOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    super.bindOrganizationDirectoryService(organizationDirectoryService);
+  }
+
+  @Reference
+  @Override
+  public void bindSecurityService(SecurityService securityService) {
+    super.bindSecurityService(securityService);
   }
 
   @Override

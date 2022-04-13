@@ -85,6 +85,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
+import com.google.gson.Gson;
 
 import net.fortuna.ical4j.model.property.RRule;
 
@@ -96,6 +97,11 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,6 +119,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
@@ -148,6 +155,15 @@ import javax.ws.rs.core.Response.Status;
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
                 + "other words, there is a bug! You should file an error report with your server logs from the time when the "
                 + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+@Component(
+    immediate = true,
+    service = SchedulerRestService.class,
+    property = {
+        "service.description=Scheduler REST Endpoint",
+        "opencast.service.type=org.opencastproject.scheduler",
+        "opencast.service.path=/recordings"
+    }
+)
 public class SchedulerRestService {
 
   private static final Logger logger = LoggerFactory.getLogger(SchedulerRestService.class);
@@ -160,6 +176,8 @@ public class SchedulerRestService {
   private CaptureNowProlongingService prolongingService;
   private Workspace workspace;
 
+  private final Gson gson = new Gson();
+
   private String defaultWorkflowDefinitionId;
 
   protected String serverUrl = UrlSupport.DEFAULT_BASE_URL;
@@ -170,6 +188,10 @@ public class SchedulerRestService {
    *
    * @param service
    */
+  @Reference(
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "unsetService"
+  )
   public void setService(SchedulerService service) {
     this.service = service;
   }
@@ -188,6 +210,10 @@ public class SchedulerRestService {
    *
    * @param prolongingService
    */
+  @Reference(
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "unsetProlongingService"
+  )
   public void setProlongingService(CaptureNowProlongingService prolongingService) {
     this.prolongingService = prolongingService;
   }
@@ -206,6 +232,11 @@ public class SchedulerRestService {
    *
    * @param agentService
    */
+  @Reference(
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "unsetCaptureAgentStateService"
+  )
   public void setCaptureAgentStateService(CaptureAgentStateService agentService) {
     this.agentService = agentService;
   }
@@ -224,6 +255,7 @@ public class SchedulerRestService {
    *
    * @param workspace
    */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -234,6 +266,7 @@ public class SchedulerRestService {
    * @param cc
    *          The ComponentContext of this service
    */
+  @Activate
   public void activate(ComponentContext cc) {
     // Get the configured server URL
     if (cc != null) {
@@ -532,6 +565,66 @@ public class SchedulerRestService {
     } catch (Exception e) {
       logger.error("Unable to get calendar for capture agent '{}':", captureAgentId, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Produces("application/json")
+  @Path("calendar.json")
+  @RestQuery(
+    name = "getCalendarJSON",
+    description = "Returns a calendar in JSON format for specified events. This endpoint is not yet stable and might change in the future with no priot notice.",
+    returnDescription = "Calendar for events in JSON format",
+    restParameters = {
+      @RestParameter(name = "agentid", description = "Filter events by capture agent", isRequired = false, type = Type.STRING),
+      @RestParameter(name = "cutoff", description = "A cutoff date in UNIX milliseconds to limit the number of events returned in the calendar.", isRequired = false, type = Type.INTEGER)
+    }, responses = {
+      @RestResponse(responseCode = HttpServletResponse.SC_NOT_MODIFIED, description = "Events were not modified since last request"),
+      @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Events were modified, new calendar is in the body")
+    })
+  public Response getCalendarJson(
+          @QueryParam("agentid") String captureAgentId,
+          @QueryParam("cutoff") Long cutoff,
+          @Context HttpServletRequest request) {
+    try {
+      var endDate = Optional.ofNullable(cutoff)
+              .map(Date::new)
+              .map(Opt::some)
+              .orElse(Opt.none());
+      var agent = Optional.ofNullable(captureAgentId)
+              .map(String::trim)
+              .filter(id -> !id.isEmpty())
+              .map(Opt::some)
+              .orElse(Opt.none());
+
+      String lastModified = null;
+      // If the `etag` matches the if-not-modified header,return a 304
+      if (agent.isSome()) {
+        lastModified = service.getScheduleLastModified(agent.get());
+        String ifNoneMatch = request.getHeader(HttpHeaders.IF_NONE_MATCH);
+        if (StringUtils.isNotBlank(ifNoneMatch) && ifNoneMatch.equals(lastModified)) {
+          return Response.notModified(lastModified).expires(null).build();
+        }
+      }
+
+      var result = new ArrayList<Map<String, Object>>();
+      for (var event: service.search(agent, Opt.none(), Opt.none(), Opt.some(new Date()), endDate)) {
+        var id = event.getIdentifier().toString();
+        result.add(Map.of(
+                "data", service.getTechnicalMetadata(id),
+                "episode-dublincore", service.getDublinCore(id).toXmlString()
+                ));
+      }
+
+      final ResponseBuilder response = Response.ok(gson.toJson(result));
+      if (StringUtils.isNotBlank(lastModified)) {
+        response.header(HttpHeaders.ETAG, lastModified);
+      }
+      return response.build();
+    } catch (Exception e) {
+      throw new WebApplicationException(
+              String.format("Unable to get calendar for capture agent %s", captureAgentId),
+              e, Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
 

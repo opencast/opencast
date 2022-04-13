@@ -29,12 +29,23 @@ import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Component(
+    immediate = true,
+    service = ResourceListProvider.class,
+    property = {
+        "service.description=Events list provider",
+        "opencast.service.type=org.opencastproject.index.service.resources.list.provider.EventsListProvider"
+    }
+)
 public class EventsListProvider implements ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "EVENTS";
@@ -60,10 +71,12 @@ public class EventsListProvider implements ResourceListProvider {
 
   private ElasticsearchIndex index;
 
+  @Activate
   protected void activate(BundleContext bundleContext) {
     logger.info("Events list provider activated!");
   }
 
+  @Reference
   public void setIndex(ElasticsearchIndex index) {
     this.index = index;
   }

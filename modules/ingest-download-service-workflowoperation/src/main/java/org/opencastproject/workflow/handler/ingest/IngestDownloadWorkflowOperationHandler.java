@@ -28,16 +28,20 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,6 +50,14 @@ import java.util.stream.Collectors;
  * Downloads all external URI's to the working file repository and optionally deletes external working file repository
  * resources
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Ingest Download Workflow Operation Handler",
+        "workflow.operation=ingest-download"
+    }
+)
 public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** Deleting external working file repository URI's after download config key */
@@ -67,6 +79,7 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
    *      JobContext)
    */
 
+  @Reference
   public void setIngestDownloadService(IngestDownloadService ingestDownloadService) {
     this.ingestDownloadService = ingestDownloadService;
   }
@@ -107,4 +120,11 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
       throw new WorkflowOperationException("Some result element couldn't be serialized", e);
     }
   }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

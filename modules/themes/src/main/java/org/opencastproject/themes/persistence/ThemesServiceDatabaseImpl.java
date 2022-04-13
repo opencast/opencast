@@ -25,6 +25,7 @@ import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
 import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -38,6 +39,9 @@ import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +60,13 @@ import javax.persistence.TypedQuery;
 /**
  * Implements {@link ThemesServiceDatabase}. Defines permanent storage for themes.
  */
+@Component(
+    immediate = true,
+    service = { ThemesServiceDatabase.class, IndexProducer.class },
+    property = {
+        "service.description=Themes Database Service"
+    }
+)
 public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements ThemesServiceDatabase {
 
   public static final String PERSISTENCE_UNIT = "org.opencastproject.themes";
@@ -86,12 +97,14 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    *
    * @param cc
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for themes");
     this.cc = cc;
   }
 
   /** OSGi DI */
+  @Reference(target = "(osgi.unit.name=org.opencastproject.themes)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -102,6 +115,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    * @param securityService
    *          the security service
    */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -112,16 +126,19 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    * @param userDirectoryService
    *          the user directory service
    */
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
   /** OSGi DI */
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
   /** OSGi DI */
+  @Reference
   public void setIndex(ElasticsearchIndex index) {
     this.index = index;
   }

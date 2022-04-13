@@ -26,19 +26,31 @@ import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * WOH that retracts elements from an internal distribution channel and removes the reflective publication elements from
  * the media package.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Configurable Retraction Workflow Handler",
+        "workflow.operation=retract-configure"
+    }
+)
 public class ConfigurableRetractWorkflowOperationHandler extends ConfigurableWorkflowOperationHandlerBase {
 
   private static final String CHANNEL_ID_KEY = "channel-id";
@@ -51,10 +63,12 @@ public class ConfigurableRetractWorkflowOperationHandler extends ConfigurableWor
   private StreamingDistributionService streamingDistributionService;
 
   /** OSGi DI */
+  @Reference(target = "(distribution.channel=download)")
   void setDownloadDistributionService(DownloadDistributionService distributionService) {
     this.downloadDistributionService = distributionService;
   }
 
+  @Reference(target = "(distribution.channel=streaming)")
   void setStreamingDistributionService(StreamingDistributionService distributionService) {
     this.streamingDistributionService = distributionService;
   }
@@ -94,6 +108,12 @@ public class ConfigurableRetractWorkflowOperationHandler extends ConfigurableWor
     retract(mp, channelId, retractStreaming);
 
     return createResult(mp, Action.CONTINUE);
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
 }

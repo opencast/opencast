@@ -49,6 +49,11 @@ import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,6 +93,15 @@ import javax.ws.rs.core.Response;
     "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
       + "other words, there is a bug! You should file an error report with your server logs from the time when the "
       + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+@Component(
+    immediate = true,
+    service = CaptureAgentStateRestService.class,
+    property = {
+        "service.description=Capture Agent Admin REST Endpoint",
+        "opencast.service.type=org.opencastproject.capture.admin",
+        "opencast.service.path=/capture-admin"
+    }
+)
 public class CaptureAgentStateRestService {
 
   private static final Logger logger = LoggerFactory.getLogger(CaptureAgentStateRestService.class);
@@ -100,9 +114,15 @@ public class CaptureAgentStateRestService {
    * @param cc
    *          OSGi component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
   }
 
+  @Reference(
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "unsetService"
+  )
   public void setService(CaptureAgentStateService service) {
     this.service = service;
   }
@@ -111,6 +131,7 @@ public class CaptureAgentStateRestService {
     this.service = null;
   }
 
+  @Reference
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
   }

@@ -42,6 +42,8 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +77,16 @@ import javax.ws.rs.core.Response.Status;
             + "and was not anticipated. In other words, there is a bug!"
     }
 )
+@Component(
+    immediate = true,
+    service = OaiPmhPublicationRestService.class,
+    property = {
+        "service.description=OAI-PMH Publication REST Endpoint",
+        "opencast.service.type=org.opencastproject.publication.oaipmh",
+        "opencast.service.path=/publication/oaipmh",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class OaiPmhPublicationRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -93,6 +105,7 @@ public class OaiPmhPublicationRestService extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -101,6 +114,7 @@ public class OaiPmhPublicationRestService extends AbstractJobProducerEndpoint {
    * @param service
    *          the service to set
    */
+  @Reference
   public void setService(OaiPmhPublicationService service) {
     this.service = service;
   }

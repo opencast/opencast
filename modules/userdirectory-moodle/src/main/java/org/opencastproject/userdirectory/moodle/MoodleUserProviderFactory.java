@@ -35,6 +35,9 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +55,14 @@ import javax.management.ObjectName;
 /**
  * Moodle implementation of the spring UserDetailsService, taking configuration information from the component context.
  */
+@Component(
+    immediate = true,
+    service = ManagedServiceFactory.class,
+    property = {
+        "service.pid=org.opencastproject.userdirectory.moodle",
+        "service.description=Provides Moodle user directory instances"
+    }
+)
 public class MoodleUserProviderFactory implements ManagedServiceFactory {
   /**
    * This service factory's PID
@@ -146,6 +157,7 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
   /**
    * OSGi callback for setting the organization directory service.
    */
+  @Reference
   public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
     this.orgDirectory = orgDirectory;
   }
@@ -155,6 +167,7 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
    *
    * @param cc the component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.debug("Activate MoodleUserProviderFactory");
     this.bundleContext = cc.getBundleContext();

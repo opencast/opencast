@@ -40,6 +40,9 @@ import org.opencastproject.util.requests.SortCriterion;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +53,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component(
+    immediate = true,
+    service = ResourceListProvider.class,
+    property = {
+        "service.description=Series list provider",
+        "opencast.service.type=org.opencastproject.index.service.resources.list.provider.SeriesListProvider"
+    }
+)
 public class SeriesListProvider implements ResourceListProvider {
   private static final Logger logger = LoggerFactory.getLogger(SeriesListProvider.class);
 
@@ -72,16 +83,19 @@ public class SeriesListProvider implements ResourceListProvider {
   /** The security service. */
   private SecurityService securityService;
 
+  @Activate
   protected void activate(BundleContext bundleContext) {
     logger.info("Series list provider activated!");
   }
 
   /** OSGi callback for series services. */
+  @Reference
   public void setSearchIndex(ElasticsearchIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 
   /** OSGi callback for security service */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

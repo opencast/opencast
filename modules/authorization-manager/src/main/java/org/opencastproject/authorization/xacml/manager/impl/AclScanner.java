@@ -38,6 +38,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +55,13 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
+@Component(
+    immediate = true,
+    service = { ArtifactInstaller.class, AclScanner.class },
+    property = {
+        "service.description=Acl Scanner"
+    }
+)
 public class AclScanner implements ArtifactInstaller {
 
   /** The directory name that has the XACML file defining the Acl **/
@@ -76,6 +87,7 @@ public class AclScanner implements ArtifactInstaller {
   /**
    * OSGI service activation method
    */
+  @Activate
   void activate(BundleContext ctx) {
     logger.info("Activated Acl scanner");
   }
@@ -83,21 +95,25 @@ public class AclScanner implements ArtifactInstaller {
   /**
    * OSGI deactivation method
    */
+  @Deactivate
   void deactivate(BundleContext ctx) {
     logger.info("Deactivated Acl scanner");
   }
 
   /** OSGi DI. */
+  @Reference
   void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
   /** OSGi callback for setting persistence. */
+  @Reference
   void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
 
   /** OSGi DI */
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

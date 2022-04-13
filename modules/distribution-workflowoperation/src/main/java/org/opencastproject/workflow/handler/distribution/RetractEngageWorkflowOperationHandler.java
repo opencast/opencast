@@ -34,13 +34,18 @@ import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +57,14 @@ import java.util.Set;
 /**
  * Workflow operation for retracting a media package from the engage player.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Engage Retraction Workflow Operation Handler",
+        "workflow.operation=retract-engage"
+    }
+)
 public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -72,6 +85,7 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param streamingDistributionService
    *          the streaming distribution service
    */
+  @Reference(target = "(distribution.channel=streaming)")
   protected void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
     this.streamingDistributionService = streamingDistributionService;
   }
@@ -82,6 +96,8 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param downloadDistributionService
    *          the download distribution service
    */
+
+  @Reference(target = "(distribution.channel=download)")
   protected void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
     this.downloadDistributionService = downloadDistributionService;
   }
@@ -93,11 +109,19 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param searchService
    *          an instance of the search service
    */
+
+  @Reference
   protected void setSearchService(SearchService searchService) {
     this.searchService = searchService;
   }
 
+  @Reference
+  @Override  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
   @Override
+  @Activate
   protected void activate(ComponentContext cc) {
     super.activate(cc);
   }

@@ -33,11 +33,13 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -45,6 +47,8 @@ import org.opencastproject.workflow.api.WorkflowOperationResultImpl;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +69,14 @@ import java.util.Set;
 /**
  * Runs an operation multiple times with each MediaPackageElement matching the characteristics
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Execute Many Workflow Operation Handler",
+        "workflow.operation=execute-many"
+    }
+)
 public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -360,6 +372,7 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
    *
    * @param service
    */
+  @Reference
   public void setExecuteService(ExecuteService service) {
     executeService = service;
   }
@@ -369,6 +382,7 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
    *
    * @param workspace
    */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -379,7 +393,15 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
    * @param mediaInspectionService
    *          an instance of the media inspection service
    */
+  @Reference
   protected void setMediaInspectionService(MediaInspectionService mediaInspectionService) {
     inspectionService = mediaInspectionService;
   }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }
