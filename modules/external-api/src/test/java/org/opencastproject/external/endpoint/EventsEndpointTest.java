@@ -35,6 +35,7 @@ import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.SchedulingUtils;
 import org.opencastproject.index.service.util.RequestUtils;
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.security.api.AccessControlList;
@@ -48,6 +49,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
@@ -182,6 +184,19 @@ public class EventsEndpointTest {
           .getValue().get().get(CaptureParameters.CAPTURE_DEVICE_NAMES)));
     }
     assertThat(schedulingInfo.toJson().toString(), SameJSONAs.sameJSONAs(jsonString).allowingAnyArrayOrdering());
+  }
+
+  @Test
+  public void testUpdateFlavorWithTrack() {
+    String eventId = TestEventsEndpoint.TRACK_UPDATE_EVENT;
+    given().multiPart("track", new File(getClass().getResource("/event-track-update-file.vtt").getFile()), "text/vtt")
+            .pathParam("event_id", eventId)
+            .formParam("flavor", "captions/source+en")
+            .formParam("overwriteExisting", true)
+            .expect().statusCode(SC_OK)
+            .when().post(env.host("{event_id}/track"));
+    MediaPackage capturedMediaPackage = TestEventsEndpoint.getCapturedMediaPackage().getValue();
+    assertEquals(capturedMediaPackage.getTracks().length, 1);
   }
 
 }

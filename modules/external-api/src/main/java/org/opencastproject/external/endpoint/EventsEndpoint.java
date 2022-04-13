@@ -37,6 +37,8 @@ import static org.opencastproject.external.util.SchedulingUtils.getConflictingEv
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
@@ -119,6 +121,11 @@ import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 import com.entwinemedia.fn.data.json.Jsons.Functions;
 
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -172,7 +179,7 @@ import javax.ws.rs.core.Response.Status;
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
-            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0 })
+            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0 })
 @RestService(name = "externalapievents", title = "External API Events Service", notes = {},
              abstractText = "Provides resources and operations related to the events")
 public class EventsEndpoint implements ManagedService {
@@ -214,6 +221,7 @@ public class EventsEndpoint implements ManagedService {
   };
 
   /* OSGi service references */
+  private AssetManager assetManager;
   private ElasticsearchIndex elasticsearchIndex;
   private IndexService indexService;
   private IngestService ingestService;
@@ -223,6 +231,11 @@ public class EventsEndpoint implements ManagedService {
   private UrlSigningService urlSigningService;
   private SchedulerService schedulerService;
   private CaptureAgentStateService agentStateService;
+
+  /** OSGi DI */
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
+  }
 
   /** OSGi DI */
   void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
@@ -1829,7 +1842,7 @@ public class EventsEndpoint implements ManagedService {
   @Path("{eventId}/scheduling")
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
               ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
-              ApiMediaType.VERSION_1_7_0 })
+              ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0 })
   @RestQuery(name = "geteventscheduling", description = "Returns an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, responses = {
       @RestResponse(description = "The scheduling information for the specified event is returned.", responseCode = HttpServletResponse.SC_OK),
@@ -1859,7 +1872,7 @@ public class EventsEndpoint implements ManagedService {
   @Path("{eventId}/scheduling")
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
               ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
-              ApiMediaType.VERSION_1_7_0 })
+              ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0 })
   @RestQuery(name = "updateeventscheduling", description = "Update an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = Type.STRING) }, restParameters = {
       @RestParameter(name = "scheduling", isRequired = true, description = "Scheduling Information", type = Type.STRING),
@@ -1934,5 +1947,94 @@ public class EventsEndpoint implements ManagedService {
           arr(convertConflictingEvents(Optional.of(id), conflictingEvents, indexService, elasticsearchIndex))));
     }
     return Optional.empty();
+  }
+
+  @POST
+  @Path("{eventId}/track")
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
+  @RestQuery(name = "updateFlavorWithTrack", description = "Update an events track for a given flavor", returnDescription = "",
+          pathParameters = {
+                  @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) },
+          restParameters = {
+                  @RestParameter(description = "Flavor to add track to, e.g. captions/source+en", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+                  @RestParameter(description = "If true, all other tracks in the specified flavor are REMOVED", isRequired = true, name = "overwriteExisting", type = RestParameter.Type.BOOLEAN),
+                  @RestParameter(description = "The track file", isRequired = true, name = "track", type = RestParameter.Type.FILE),
+          },
+          responses = {
+                  @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND),
+                  @RestResponse(description = "The track has been added to the event.", responseCode = HttpServletResponse.SC_OK),
+                  @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          })
+  public Response updateFlavorWithTrack(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
+          @Context HttpServletRequest request) {
+    logger.debug("updateFlavorWithTrack called");
+    try {
+      boolean overwriteExisting = false;
+      MediaPackageElementFlavor tmpFlavor = MediaPackageElementFlavor.parseFlavor("addTrack/temporary");
+      MediaPackageElementFlavor newFlavor = null;
+      Opt<Event> event;
+
+      try {
+        event = indexService.getEvent(id, elasticsearchIndex);
+      } catch (SearchIndexException e) {
+        return RestUtil.R.badRequest(String.format("Error while searching for event with id %s; %s", id, e.getMessage()));
+      }
+
+      if (event.isNone()) {
+        return ApiResponses.notFound(String.format("Unable to find event with id '%s'", id));
+      }
+      MediaPackage mp = indexService.getEventMediapackage(event.get());
+
+      if (!ServletFileUpload.isMultipartContent(request)) {
+        throw new IllegalArgumentException("No multipart content");
+      }
+      for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
+        FileItemStream item = iter.next();
+        String fieldName = item.getFieldName();
+        if (item.isFormField()) {
+          if ("flavor".equals(fieldName)) {
+            String flavorString = Streams.asString(item.openStream());
+            try {
+              newFlavor = MediaPackageElementFlavor.parseFlavor(flavorString);
+            } catch (IllegalArgumentException e) {
+              return RestUtil.R.badRequest(String.format("Could not parse flavor %s; %s", flavorString, e.getMessage()));
+            }
+          } else if ("overwriteExisting".equals(fieldName)) {
+            String hhh = Streams.asString(item.openStream());
+            overwriteExisting = Boolean.parseBoolean(hhh);
+          }
+        } else {
+          // Add track with temporary flavor
+          if ("track".equals(item.getFieldName())) {
+            mp = ingestService.addTrack(item.openStream(), item.getName(), tmpFlavor, mp);
+          }
+        }
+      }
+
+      if (overwriteExisting) {
+        // remove existing attachments of the new flavor
+        Track[] existing = mp.getTracks(newFlavor);
+        for (int i = 0; i < existing.length; i++) {
+          mp.remove(existing[i]);
+          logger.debug("Overwriting existing asset {} {}", tmpFlavor, newFlavor);
+        }
+      }
+      // correct the flavor of the new attachment
+      Track[] elArray = mp.getTracks(tmpFlavor);
+      elArray[0].setFlavor(newFlavor);
+      logger.debug("Updated asset {} {}", tmpFlavor, newFlavor);
+
+      try {
+        assetManager.takeSnapshot(mp);
+      } catch (AssetManagerException e) {
+        logger.error("Error while adding the updated media package ({}) to the archive", mp.getIdentifier(), e);
+        return RestUtil.R.badRequest(e.getMessage());
+      }
+
+      return Response.status(Status.OK).build();
+    } catch (IllegalArgumentException | IOException | FileUploadException | IndexServiceException | IngestException
+            | MediaPackageException e) {
+      return RestUtil.R.badRequest(String.format("Could not add track: %s", e.getMessage()));
+    }
   }
 }

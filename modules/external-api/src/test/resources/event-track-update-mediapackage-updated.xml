@@ -1,0 +1,11 @@
+<ns2:mediapackage xmlns:ns2="http://mediapackage.opencastproject.org" id="trackupdateevent"
+                  duration="-1">
+  <ns2:media>
+    <ns2:track type="addTrack/temporary" id="6b574c7b-bf85-4023-bc41-c3145fa189d6">
+      <ns2:tags />
+      <ns2:url>/av.mov
+      </ns2:url>
+      <ns2:duration>-1</ns2:duration>
+    </ns2:track>
+  </ns2:media>
+</ns2:mediapackage>
