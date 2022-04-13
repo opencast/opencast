@@ -102,7 +102,6 @@ import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.api.WorkflowOperationResultImpl;
-import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
@@ -110,6 +109,7 @@ import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateMapping;
 import org.opencastproject.workflow.api.WorkflowStatistics;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.conditionparser.WorkflowConditionInterpreter;
 import org.opencastproject.workflow.impl.jmx.WorkflowsStatistics;
 import org.opencastproject.workspace.api.Workspace;
@@ -498,7 +498,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         throw new NotFoundException("Workflow '" + id + "' has been deleted");
       }
       if (JOB_TYPE.equals(job.getJobType()) && Operation.START_WORKFLOW.toString().equals(job.getOperation())) {
-        WorkflowInstanceImpl workflow = WorkflowParser.parseWorkflowInstance(job.getPayload());
+        WorkflowInstanceImpl workflow = XmlWorkflowParser.parseWorkflowInstance(job.getPayload());
         assertPermission(workflow, Permissions.Action.READ.toString(), job.getOrganization());
         return workflow;
       } else {
@@ -603,8 +603,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       // Create and configure the workflow instance
       try {
         // Create a new job for this workflow instance
-        String workflowDefinitionXml = WorkflowParser.toXml(workflowDefinition);
-        String workflowInstanceXml = WorkflowParser.toXml(workflowInstance);
+        String workflowDefinitionXml = XmlWorkflowParser.toXml(workflowDefinition);
+        String workflowInstanceXml = XmlWorkflowParser.toXml(workflowInstance);
         String mediaPackageXml = MediaPackageParser.getAsXml(sourceMediaPackage);
 
         List<String> arguments = new ArrayList<>();
@@ -669,15 +669,15 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
             : componentContext.getBundleContext().getProperty(key);
       };
       if (instance.getOperations().stream().anyMatch(op -> op.getExecutionCondition() != null)) {
-        instance = WorkflowParser.parseWorkflowInstance(WorkflowParser.toXml(instance));
+        instance = XmlWorkflowParser.parseWorkflowInstance(XmlWorkflowParser.toXml(instance));
         instance.getOperations().stream().filter(op -> op.getExecutionCondition() != null).forEach(
                 op -> op.setExecutionCondition(WorkflowConditionInterpreter.replaceVariables(op.getExecutionCondition(),
                         systemVariableGetter,
                         properties, true)));
       }
-      String xml = WorkflowConditionInterpreter.replaceVariables(WorkflowParser.toXml(instance),
+      String xml = WorkflowConditionInterpreter.replaceVariables(XmlWorkflowParser.toXml(instance),
               systemVariableGetter, wfProperties, false);
-      return WorkflowParser.parseWorkflowInstance(xml);
+      return XmlWorkflowParser.parseWorkflowInstance(xml);
     } catch (Exception e) {
       throw new IllegalStateException("Unable to replace workflow instance variables", e);
     }
@@ -1175,7 +1175,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     try {
       workflowJob = serviceRegistry.getJob(workflowInstanceId);
       workflowJob.setStatus(Status.RUNNING);
-      workflowJob.setPayload(WorkflowParser.toXml(workflowInstance));
+      workflowJob.setPayload(XmlWorkflowParser.toXml(workflowInstance));
       serviceRegistry.updateJob(workflowJob);
 
       Job operationJob = serviceRegistry.getJob(operationJobId);
@@ -1292,7 +1292,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       WorkflowState workflowState = workflowInstance.getState();
       String xml;
       try {
-        xml = WorkflowParser.toXml(workflowInstance);
+        xml = XmlWorkflowParser.toXml(workflowInstance);
       } catch (Exception e) {
         // Can't happen, since we are converting from an in-memory object
         throw new IllegalStateException("In-memory workflow instance could not be serialized", e);
@@ -1375,7 +1375,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       }
 
       try {
-        WorkflowInstance clone = WorkflowParser.parseWorkflowInstance(WorkflowParser.toXml(workflowInstance));
+        WorkflowInstance clone = XmlWorkflowParser.parseWorkflowInstance(XmlWorkflowParser.toXml(workflowInstance));
         fireListeners(originalWorkflowInstance, clone);
       } catch (Exception e) {
         // Can't happen, since we are converting from an in-memory object
@@ -1701,7 +1701,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     // If the first operation is guaranteed to pause, run the job.
     if (job.getArguments().size() > 1 && job.getArguments().get(0) != null) {
       try {
-        WorkflowDefinition workflowDef = WorkflowParser.parseWorkflowDefinition(job.getArguments().get(0));
+        WorkflowDefinition workflowDef = XmlWorkflowParser.parseWorkflowDefinition(job.getArguments().get(0));
         if (workflowDef.getOperations().size() > 0) {
           String firstOperationId = workflowDef.getOperations().get(0).getId();
           WorkflowOperationHandler handler = getWorkflowOperationHandler(firstOperationId);
@@ -1815,7 +1815,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         op = Operation.valueOf(operation);
         switch (op) {
           case START_WORKFLOW:
-            workflowInstance = WorkflowParser.parseWorkflowInstance(job.getPayload());
+            workflowInstance = XmlWorkflowParser.parseWorkflowInstance(job.getPayload());
             logger.debug("Starting new workflow %s", workflowInstance);
             runWorkflow(workflowInstance);
             break;
@@ -2377,7 +2377,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           }
           WorkflowInstance instance;
           try {
-            instance = WorkflowParser.parseWorkflowInstance(workflow);
+            instance = XmlWorkflowParser.parseWorkflowInstance(workflow);
           } catch (WorkflowParsingException e) {
             logger.warn("Skipping restore of workflow. Error parsing: {}", workflow, e);
             continue;

@@ -67,8 +67,8 @@ import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowStateListener;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -231,7 +231,7 @@ public final class WorkflowOperationSkippingIntricateTest {
     service.activate(null);
 
     try (InputStream is = getClass().getResourceAsStream("/workflow-definition-skipping-intricate.xml")) {
-      workingDefinition = WorkflowParser.parseWorkflowDefinition(is);
+      workingDefinition = XmlWorkflowParser.parseWorkflowDefinition(is);
 
       MediaPackageBuilder mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
       mediaPackageBuilder.setSerializer(new DefaultMediaPackageSerializerImpl(new File("target/test-classes")));

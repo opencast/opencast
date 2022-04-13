@@ -75,11 +75,11 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateListener;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.handler.workflow.ErrorResolutionWorkflowOperationHandler;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
@@ -248,7 +248,7 @@ public class WorkflowServiceImplTest {
     InputStream is = null;
     try {
       is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-exception-handler.xml");
-      WorkflowDefinition exceptionHandler = WorkflowParser.parseWorkflowDefinition(is);
+      WorkflowDefinition exceptionHandler = XmlWorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
 
       /* The exception handler workflow definition needs to be registered as the reference to it in 
@@ -257,19 +257,19 @@ public class WorkflowServiceImplTest {
               new WorkflowIdentifier("exception-handler", securityService.getOrganization().getId()), exceptionHandler);
 
       is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-1.xml");
-      workingDefinition = WorkflowParser.parseWorkflowDefinition(is);
+      workingDefinition = XmlWorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
 
       is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-2.xml");
-      failingDefinitionWithoutErrorHandler = WorkflowParser.parseWorkflowDefinition(is);
+      failingDefinitionWithoutErrorHandler = XmlWorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
 
       is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-3.xml");
-      failingDefinitionWithErrorHandler = WorkflowParser.parseWorkflowDefinition(is);
+      failingDefinitionWithErrorHandler = XmlWorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
 
       is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-4.xml");
-      pausingWorkflowDefinition = WorkflowParser.parseWorkflowDefinition(is);
+      pausingWorkflowDefinition = XmlWorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
 
       MediaPackageBuilder mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
