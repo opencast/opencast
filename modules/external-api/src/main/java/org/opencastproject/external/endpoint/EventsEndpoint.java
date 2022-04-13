@@ -481,16 +481,9 @@ public class EventsEndpoint implements ManagedService {
     if (event.isNone()) {
       return RestUtil.R.notFound(id);
     }
-    final Runnable doOnNotFound = () -> {
-      try {
-        elasticsearchIndex.delete(Event.DOCUMENT_TYPE, id, getSecurityService().getOrganization().getId());
-      } catch (SearchIndexException e) {
-        logger.error("error removing event {}: {}", id, e);
-      }
-    };
     final IndexService.EventRemovalResult result;
     try {
-      result = indexService.removeEvent(event.get(), doOnNotFound, retractWorkflowId);
+      result = indexService.removeEvent(event.get(), retractWorkflowId);
     } catch (WorkflowDatabaseException e) {
       logger.error("Workflow database is not reachable. This may be a temporary problem.");
       return RestUtil.R.serverError();
@@ -506,7 +499,6 @@ public class EventsEndpoint implements ManagedService {
       case GENERAL_FAILURE:
         return Response.serverError().build();
       case NOT_FOUND:
-        doOnNotFound.run();
         return RestUtil.R.notFound(id);
       default:
         throw new RuntimeException("Unknown EventRemovalResult type: " + result.name());

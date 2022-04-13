@@ -527,8 +527,8 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       if (event.isNone()) {
         throw new RuntimeException("Event '" + id + "' not found");
       }
-      final IndexService.EventRemovalResult eventRemovalResult = indexService.removeEvent(event.get(), () -> {
-      }, retractWorkflowId);
+      final IndexService.EventRemovalResult eventRemovalResult = indexService.removeEvent(event.get(),
+              retractWorkflowId);
       if (eventRemovalResult == IndexService.EventRemovalResult.GENERAL_FAILURE) {
         throw new RuntimeException("Error deleting event: " + eventRemovalResult);
       }

@@ -676,7 +676,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     logger.debug("Removing series {} from the {} index.", seriesId, index.getIndexName());
 
     try {
-      index.delete(Series.DOCUMENT_TYPE, seriesId, orgId);
+      index.deleteSeries(seriesId, orgId);
       logger.debug("Series {} removed from the {} index.", seriesId, index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Series {} couldn't be removed from the {} index.", seriesId, index.getIndexName(), e);

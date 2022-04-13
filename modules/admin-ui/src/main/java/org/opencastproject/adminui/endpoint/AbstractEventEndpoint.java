@@ -393,16 +393,9 @@ public abstract class AbstractEventEndpoint {
     if (event.isNone()) {
       return RestUtil.R.notFound(id);
     }
-    final Runnable doOnNotFound = () -> {
-      try {
-        getIndex().delete(Event.DOCUMENT_TYPE,id,getSecurityService().getOrganization().getId());
-      } catch (SearchIndexException e) {
-        logger.error("error removing event {}: {}", id, e);
-      }
-    };
     final IndexService.EventRemovalResult result;
     try {
-      result = getIndexService().removeEvent(event.get(), doOnNotFound, getAdminUIConfiguration().getRetractWorkflowId());
+      result = getIndexService().removeEvent(event.get(), getAdminUIConfiguration().getRetractWorkflowId());
     } catch (WorkflowDatabaseException e) {
       logger.error("Workflow database is not reachable. This may be a temporary problem.");
       return RestUtil.R.serverError();
@@ -418,7 +411,6 @@ public abstract class AbstractEventEndpoint {
       case GENERAL_FAILURE:
         return Response.serverError().build();
       case NOT_FOUND:
-        doOnNotFound.run();
         return RestUtil.R.notFound(id);
       default:
         throw new RuntimeException("Unknown EventRemovalResult type: " + result.name());
@@ -453,19 +445,11 @@ public abstract class AbstractEventEndpoint {
 
     for (Object eventIdObject : eventIdsJsonArray) {
       final String eventId = eventIdObject.toString();
-      final Runnable doOnNotFound = () -> {
-        try {
-          getIndex().delete(Event.DOCUMENT_TYPE,eventId, getSecurityService().getOrganization().getId());
-        } catch (SearchIndexException e) {
-          logger.error("error removing event {}: {}", eventId, e);
-        }
-      };
       try {
         final Opt<Event> event = checkAgentAccessForEvent(eventId);
         if (event.isSome()) {
-          final IndexService.EventRemovalResult  currentResult = getIndexService().removeEvent(event.get(), doOnNotFound,
-            getAdminUIConfiguration().getRetractWorkflowId()
-          );
+          final IndexService.EventRemovalResult currentResult = getIndexService().removeEvent(event.get(),
+                  getAdminUIConfiguration().getRetractWorkflowId());
           switch (currentResult) {
             case SUCCESS:
               result.addOk(eventId);
@@ -477,7 +461,6 @@ public abstract class AbstractEventEndpoint {
               result.addServerError(eventId);
               break;
             case NOT_FOUND:
-              doOnNotFound.run();
               result.addNotFound(eventId);
               break;
             default:
