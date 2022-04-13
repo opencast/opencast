@@ -39,7 +39,7 @@ import org.junit.Test;
 import java.io.Serializable;
 
 /**
- * Test message sending via the AM.
+ * Test event handlers in the asset manager.
  */
 public class AssetManagerMessagingTest extends AssetManagerTestBase {
   private AssetManagerUpdateHandler handler;
