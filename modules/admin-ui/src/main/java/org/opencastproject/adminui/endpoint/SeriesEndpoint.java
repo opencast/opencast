@@ -505,9 +505,8 @@ public class SeriesEndpoint {
           @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "he request could not be fulfilled due to the incorrect syntax of the request"),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If user doesn't have rights to create the series") })
   public Response createNewSeries(@FormParam("metadata") String metadata) throws UnauthorizedException {
-    String seriesId;
     try {
-      seriesId = indexService.createSeries(metadata);
+      String seriesId = indexService.createSeries(metadata);
       return Response.created(URI.create(UrlSupport.concat(serverUrl, "admin-ng/series/", seriesId, "metadata.json")))
               .entity(seriesId).build();
     } catch (IllegalArgumentException e) {
