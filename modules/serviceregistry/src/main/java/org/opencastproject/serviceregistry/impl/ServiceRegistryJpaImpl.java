@@ -67,6 +67,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -85,6 +88,10 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -170,11 +177,20 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Configuration key for the maximum load */
   protected static final String OPT_MAXLOAD = "org.opencastproject.server.maxload";
 
+  /** Configuration key for the maximum hardware load */
+  protected static final String OPT_MAX_HARDWARELOAD = "org.opencastproject.server.max.hardwareload";
+
+  /** Configuration key for the dispatch interval, in seconds */
+  protected static final String OPT_DISPATCHINTERVAL = "dispatch.interval";
+
   /** Configuration key for the interval to check whether the hosts in the service registry are still alive, in seconds */
   protected static final String OPT_HEARTBEATINTERVAL = "heartbeat.interval";
 
   /** Configuration key for the collection of job statistics */
   protected static final String OPT_JOBSTATISTICS = "jobstats.collect";
+
+  /** Configuration key for the flag to enable the usage of hardware loads */
+  protected static final String OPT_HARDWARELOAD = "hardware.load.enabled";
 
   /** Configuration key for the retrieval of service statistics: Do not consider jobs older than max_job_age (in days) */
   protected static final String OPT_SERVICE_STATISTICS_MAX_JOB_AGE = "org.opencastproject.statistics.services.max_job_age";
@@ -194,6 +210,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** Default setting on job statistics collection */
   static final boolean DEFAULT_JOB_STATISTICS = false;
+
+  /** Default setting wether to enable the usage of hardware loads */
+  static final boolean DEFAULT_HARDWARELOAD_ENABLED = false;
+
+  /** Default value for the maximum hardware load */
+  static final double DEFAULT_MAX_HARDWARELOAD = Runtime.getRuntime().availableProcessors();
 
   /** Default setting on service statistics retrieval */
   static final int DEFAULT_SERVICE_STATISTICS_MAX_JOB_AGE = 14;
@@ -258,6 +280,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** Whether to collect detailed job statistics */
   protected boolean collectJobstats = DEFAULT_JOB_STATISTICS;
+
+  /** Whether to use the hardware load */
+  protected boolean hardwareLoadEnabled = DEFAULT_HARDWARELOAD_ENABLED;
+
+  protected double maxHardwareLoad = DEFAULT_MAX_HARDWARELOAD;
 
   /** Maximum age of jobs being considering for service statistics */
   protected int maxJobAge = DEFAULT_SERVICE_STATISTICS_MAX_JOB_AGE;
@@ -382,6 +409,74 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   @Override
   public float getOwnLoad() {
     return localSystemLoad;
+  }
+
+  @Override
+  public double getHardwareLoad() {
+    OperatingSystemMXBean osBeanJava = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
+    double hardwareLoad = osBeanJava.getSystemLoadAverage();
+    if (hardwareLoad < 0)
+      logger.warn("Hardware load is not obtainable form the operating system! Disable the usage of hardware load in your configuration.");
+    return hardwareLoad;
+  }
+
+  @Override
+  public double getMaxHardwareLoad() throws ServiceRegistryException {
+    return maxHardwareLoad;
+  }
+
+  protected SystemLoad getSystemHardwareLoad() {
+
+    SystemLoad loads = new SystemLoad();
+
+    List<HostRegistration> hostsHW = getHostRegistrations();
+    for (HostRegistration hostHW : hostsHW) {
+      float load = getHardwareLoadbyHost(hostHW.toString());
+      float maxLoad = getMaxHardwareLoadbyHost(hostHW.toString());
+
+      loads.addNodeLoad(new NodeLoad(hostHW.toString(), load, maxLoad));
+    }
+    return loads;
+  }
+
+  protected float getHardwareLoadbyHost(String host) {
+    return reachHardwareLoadEndpoint(host, "/services/hardwareload");
+  }
+
+  protected float getMaxHardwareLoadbyHost(String host) {
+    return reachHardwareLoadEndpoint(host, "/services/maxhardwareload");
+  }
+
+  //Helper function for getHardwareLoadbyHost and getMaxHardwareLoadbyHost
+  protected float reachHardwareLoadEndpoint(String host, String endpoint) {
+
+    float load = Float.parseFloat("-1.0");
+    String serviceUrl = UrlSupport.concat(host , endpoint);
+    HttpGet post = new HttpGet(serviceUrl);
+    HttpResponse response = null;
+
+    try {
+      response = client.execute(post);
+
+      StatusLine statusLine = response.getStatusLine();
+      if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        response.getEntity().writeTo(out);
+        String responseString = out.toString();
+        out.close();
+        load = Float.parseFloat(responseString);
+      } else
+        logger.warn("HTTP Status {} trying to reach {}", statusLine.getStatusCode(), serviceUrl);
+    } catch (IOException e) {
+      logger.warn("IOException trying to reach {}", serviceUrl);
+      e.printStackTrace();
+    }
+    return load;
+  }
+
+  @Override
+  public boolean isHardwareLoadEnabled() {
+    return hardwareLoadEnabled;
   }
 
   @Override
@@ -804,6 +899,31 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     } else
       encodingThreshold = DEFAULT_ENCODING_THRESHOLD;
 
+    //get hardware load flag from config
+    String hardwareLoadEnabledString = StringUtils.trimToNull((String) properties.get(OPT_HARDWARELOAD));
+    if (StringUtils.isNotBlank(hardwareLoadEnabledString)) {
+      try {
+        hardwareLoadEnabled = Boolean.valueOf(hardwareLoadEnabledString);
+      } catch (Exception e) {
+        logger.warn("Hardwareload flag '{}' is malformed, setting to {}", hardwareLoadEnabledString,
+            DEFAULT_HARDWARELOAD_ENABLED);
+        hardwareLoadEnabled = DEFAULT_HARDWARELOAD_ENABLED;
+      }
+    }
+    logger.info("Hardware load flag set to {}", hardwareLoadEnabled);
+
+    //get maximum for hardware load from config
+    String maxHardwareloadString = StringUtils.trimToNull((String) properties.get(OPT_MAX_HARDWARELOAD));
+    if (StringUtils.isNotBlank(maxHardwareloadString)) {
+      try {
+        maxHardwareLoad = Double.valueOf(maxHardwareloadString);
+      } catch (Exception e) {
+        logger.warn("Hardwareload flag '{}' is malformed, setting to {}", maxHardwareloadString,
+            DEFAULT_MAX_HARDWARELOAD);
+        maxHardwareLoad = DEFAULT_MAX_HARDWARELOAD;
+      }
+    }
+    logger.info("Node maximum load set to {}", maxHardwareLoad);
 
     String maxJobAgeString = StringUtils.trimToNull((String) properties.get(OPT_SERVICE_STATISTICS_MAX_JOB_AGE));
     if (maxJobAgeString != null) {
@@ -2196,10 +2316,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
-      SystemLoad loadByHost = getHostLoads(em);
+      SystemLoad loads = getHostLoads(em);
       List<HostRegistration> hostRegistrations = getHostRegistrations();
       List<ServiceRegistration> serviceRegistrations = getServiceRegistrationsByType(serviceType);
-      return getServiceRegistrationsByLoad(serviceType, serviceRegistrations, hostRegistrations, loadByHost);
+      // if enabled use the hardware loads instead
+      if (hardwareLoadEnabled)
+        loads = getSystemHardwareLoad();
+      return getServiceRegistrationsByLoad(serviceType, serviceRegistrations, hostRegistrations, loads);
     } finally {
       if (em != null)
         em.close();

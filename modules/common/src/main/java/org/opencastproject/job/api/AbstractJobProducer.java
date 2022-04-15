@@ -178,6 +178,12 @@ public abstract class AbstractJobProducer implements JobProducer {
     // Add the current job load to compare below
     currentLoad += job.getJobLoad();
 
+    //if hardware load is enabled use the hardware load values instead
+    if (getServiceRegistry().isHardwareLoadEnabled()) {
+      currentLoad = (float)getServiceRegistry().getHardwareLoad();
+      maxload.setMaxLoad((float)getServiceRegistry().getMaxHardwareLoad());
+    }
+
     /* Note that this first clause looks at the *job's*, the other two look at the *node's* load
      * We're assuming that if this case is true, then we're also the most powerful node in the system for this service,
      * per the current job dispatching code in ServiceRegistryJpaImpl */

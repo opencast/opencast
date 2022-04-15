@@ -1095,6 +1095,21 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   }
 
   @Override
+  public double getHardwareLoad() throws ServiceRegistryException {
+    return 0;
+  }
+
+  @Override
+  public double getMaxHardwareLoad() throws ServiceRegistryException {
+    return 0;
+  }
+
+  @Override
+  public boolean isHardwareLoadEnabled() throws ServiceRegistryException {
+    return false;
+  }
+
+  @Override
   public String getRegistryHostname() {
     return LOCALHOST;
   }

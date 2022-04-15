@@ -688,6 +688,20 @@ public class ServiceRegistryEndpoint {
   }
 
   @GET
+  @Path("maxhardwareload")
+  @Produces(MediaType.TEXT_PLAIN)
+  @RestQuery(name = "maxhardwareload", description = "Returns the maximum hardware load this service registry can execute concurrently.",
+      returnDescription = "The  maximum hardware load this service registry can execute", restParameters = {},
+      responses = { @RestResponse(responseCode = SC_OK, description = "Maximum hardware load this service registry can execute.") })
+  public Response getMaxHardwareLoad() {
+    try {
+      return Response.ok(serviceRegistry.getMaxHardwareLoad()).build();
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @GET
   @Path("currentload")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "currentload", description = "Returns the current load on the servers in this service registry.  "
@@ -712,6 +726,20 @@ public class ServiceRegistryEndpoint {
   public Response getOwnLoad() {
     try {
       return Response.ok(serviceRegistry.getOwnLoad()).build();
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @GET
+  @Path("hardwareload")
+  @Produces(MediaType.TEXT_PLAIN)
+  @RestQuery(name = "hardwareload", description = "Returns the current hardware load on this service registry's node.",
+      returnDescription = "The current hardware load across the cluster", restParameters = {},
+      responses = { @RestResponse(responseCode = SC_OK, description = "Current hardware load for the cluster.") })
+  public Response getHardwareLoad() {
+    try {
+      return Response.ok(serviceRegistry.getHardwareLoad()).build();
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
     }
