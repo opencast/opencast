@@ -200,6 +200,7 @@ export const postNewEvent = (values, metadataInfo) => async dispatch => {
 
     let formData = new FormData();
     let metadataFields, metadata, source, access, assets;
+    let configuration = {};
 
     // prepare metadata provided by user
     metadataFields = prepareMetadataFieldsForPost(metadataInfo.fields, values);
@@ -302,14 +303,17 @@ export const postNewEvent = (values, metadataInfo) => async dispatch => {
     // prepare access rules provided by user
    access = prepareAccessPolicyRulesForPost(values.policies);
 
+    // prepare configurations for post
+    Object.keys(values.configuration).forEach(config => {
+        configuration[config] = String(values.configuration[config])
+    });
+
     // todo: change placeholder in configuration
     formData.append('metadata', JSON.stringify({
         metadata: metadata,
         processing: {
             workflow: values.processingWorkflow,
-            configuration: {
-                published: false
-            }
+            configuration: configuration
         },
         options: {},
         access: access,

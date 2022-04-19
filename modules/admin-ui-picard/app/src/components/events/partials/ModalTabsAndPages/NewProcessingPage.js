@@ -32,7 +32,7 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, workflowPanelRef, l
       let workflowId = e.target.value;
       let defaultConfiguration = {};
       // find configuration panel information about chosen workflow
-      let configPanel = workflowDef.find(workflow => workflow.id === workflowId).configuration_panel;
+      let configPanel = JSON.parse(workflowDef.find(workflow => workflow.id === workflowId).configuration_panel);
 
       // only set default values if there is an configuration panel
       if (configPanel.length > 0) {

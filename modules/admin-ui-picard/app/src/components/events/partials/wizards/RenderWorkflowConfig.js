@@ -16,7 +16,7 @@ import {
  */
 const RenderWorkflowConfig = (props) => {
     // Get html for configuration panel
-    const configPanel = props.configuration_panel;
+    const configPanel = JSON.parse(props.configuration_panel);
     const description = props.description;
     const displayDescription = props.displayDescription;
     let formik = props.formik;
