@@ -796,14 +796,20 @@ public class SeriesEndpoint {
   public Response getSeriesAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id) throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     JSONParser parser = new JSONParser();
-    for (final Series series : indexService.getSeries(id, elasticsearchIndex)) {
-      // The ACL is stored as JSON string in the index. Parse it and extract the part we want to have in the API.
-      JSONObject acl = (JSONObject) parser.parse(series.getAccessPolicy());
+    Opt<Series> seriesList = indexService.getSeries(id, elasticsearchIndex);
+    if (seriesList != null) {
+      for (final Series series : seriesList) {
+        // The ACL is stored as JSON string in the index. Parse it and extract the part we want to have in the API.
+        if (series.getAccessPolicy() == null) {
+          return ApiResponses.notFound("Acl for series with id '%s' is not defined.", id);
+        }
+        JSONObject acl = (JSONObject) parser.parse(series.getAccessPolicy());
 
-      if (!((JSONObject) acl.get("acl")).containsKey("ace")) {
-        return ApiResponses.notFound("Cannot find acl for series with id '%s'.", id);
-      } else {
-        return ApiResponses.Json.ok(requestedVersion, ((JSONArray) ((JSONObject) acl.get("acl")).get("ace")).toJSONString());
+        if (!((JSONObject) acl.get("acl")).containsKey("ace")) {
+          return ApiResponses.notFound("Cannot find acl for series with id '%s'.", id);
+        } else {
+          return ApiResponses.Json.ok(requestedVersion, ((JSONArray) ((JSONObject) acl.get("acl")).get("ace")).toJSONString());
+        }
       }
     }
 
