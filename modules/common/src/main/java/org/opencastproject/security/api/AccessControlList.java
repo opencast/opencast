@@ -68,6 +68,13 @@ public final class AccessControlList {
     return entries;
   }
 
+  public boolean isValid() {
+    for (AccessControlEntry entry : entries) {
+      if (!entry.isValid()) return false;
+    }
+    return true;
+  }
+
   /**
    * {@inheritDoc}
    *
