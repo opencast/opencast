@@ -21,6 +21,8 @@
 
 package org.opencastproject.security.api;
 
+import org.apache.commons.lang3.StringUtils;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -84,6 +86,10 @@ public final class AccessControlEntry {
    */
   public boolean isAllow() {
     return allow;
+  }
+
+  public boolean isValid() {
+    return StringUtils.isNotBlank(role) && StringUtils.isNotBlank(action);
   }
 
   /**
