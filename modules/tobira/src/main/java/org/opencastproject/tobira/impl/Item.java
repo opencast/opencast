@@ -63,7 +63,8 @@ class Item {
           Jsons.p("updated", event.getModified().getTime())
       );
     } else {
-      // Find a suitable thumbnail. This certainly has to be improved in the future.
+      // Find a suitable thumbnail.
+      // TODO: This certainly has to be improved in the future.
       final String thumbnail = Arrays.stream(event.getMediaPackage().getAttachments())
           .filter(a -> a.getFlavor().getSubtype().equals("player+preview"))
           .map(a -> a.getURI().toString())
