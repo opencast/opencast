@@ -27,7 +27,6 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.search.api.SearchResultItem;
-import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.series.api.Series;
 import org.opencastproject.util.Jsons;
@@ -65,7 +64,7 @@ class Item {
     } else {
       // Find a suitable thumbnail.
       // TODO: This certainly has to be improved in the future.
-      final String thumbnail = Arrays.stream(event.getMediaPackage().getAttachments())
+      final var thumbnail = Arrays.stream(event.getMediaPackage().getAttachments())
           .filter(a -> a.getFlavor().getSubtype().equals("player+preview"))
           .map(a -> a.getURI().toString())
           .findFirst()
@@ -74,10 +73,10 @@ class Item {
       // Obtain JSON array of tracks.
       final List<Jsons.Val> tracks = Arrays.stream(event.getMediaPackage().getTracks())
           .map(track -> {
-            VideoStream[] videoStreams = TrackSupport.byType(track.getStreams(), VideoStream.class);
-            Jsons.Val resolution = Jsons.NULL;
+            var videoStreams = TrackSupport.byType(track.getStreams(), VideoStream.class);
+            var resolution = Jsons.NULL;
             if (videoStreams.length > 0) {
-              final VideoStream stream = videoStreams[0];
+              final var stream = videoStreams[0];
               resolution = Jsons.arr(Jsons.v(stream.getFrameWidth()), Jsons.v(stream.getFrameHeight()));
 
               if (videoStreams.length > 1) {
@@ -98,16 +97,16 @@ class Item {
           .collect(Collectors.toCollection(ArrayList::new));
 
       // Assemble ACL
-      final List<Jsons.Val> canReadRoles = new ArrayList<Jsons.Val>();
-      final List<Jsons.Val> canWriteRoles = new ArrayList<Jsons.Val>();
-      for (final AccessControlEntry entry: event.getAccessControlList().getEntries()) {
+      final var canReadRoles = new ArrayList<Jsons.Val>();
+      final var canWriteRoles = new ArrayList<Jsons.Val>();
+      for (final var entry: event.getAccessControlList().getEntries()) {
         if (entry.getAction().equals(Permissions.Action.READ.toString())) {
           canReadRoles.add(Jsons.v(entry.getRole()));
         } else if (entry.getAction().equals(Permissions.Action.WRITE.toString())) {
           canWriteRoles.add(Jsons.v(entry.getRole()));
         }
       }
-      final Jsons.Obj acl = Jsons.obj(
+      final var acl = Jsons.obj(
           Jsons.p("read", Jsons.arr(canReadRoles)),
           Jsons.p("write", Jsons.arr(canWriteRoles))
       );

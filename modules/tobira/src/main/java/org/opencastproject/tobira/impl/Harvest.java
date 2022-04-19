@@ -22,10 +22,8 @@
 package org.opencastproject.tobira.impl;
 
 import org.opencastproject.search.api.SearchQuery;
-import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.series.api.Series;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.Jsons;
@@ -37,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -78,13 +75,13 @@ final class Harvest {
     //
     // We actually fetch `preferredAmount + 1` to get some useful extra information: whether there
     // are more events and if so, what timestamp that extra event was modified at.
-    final SearchQuery q = new SearchQuery()
+    final var q = new SearchQuery()
         .withUpdatedSince(since)
         .withSort(SearchQuery.Sort.DATE_MODIFIED)
         .includeDeleted(true)
         .withLimit(preferredAmount + 1);
-    final SearchResultItem[] rawEvents = searchService.getForAdministrativeRead(q).getItems();
-    final boolean hasMoreEvents = rawEvents.length == preferredAmount + 1;
+    final var rawEvents = searchService.getForAdministrativeRead(q).getItems();
+    final var hasMoreEvents = rawEvents.length == preferredAmount + 1;
     logger.debug("Retrieved {} events from the index during harvest", rawEvents.length);
 
 
@@ -104,18 +101,18 @@ final class Harvest {
     final Optional<Date> seriesRangeEnd = hasMoreEvents
         ? Optional.of(rawEvents[rawEvents.length - 1].getModified())
         : Optional.empty();
-    final List<Series> rawSeries = seriesService.getAllForAdministrativeRead(
+    final var rawSeries = seriesService.getAllForAdministrativeRead(
         since,
         seriesRangeEnd,
         preferredAmount + 1
     );
-    final boolean hasMoreSeriesInRange = rawSeries.size() == preferredAmount + 1;
+    final var hasMoreSeriesInRange = rawSeries.size() == preferredAmount + 1;
     logger.debug("Retrieved {} series from the database during harvest", rawSeries.size());
 
 
     // Convert events and series into JSON representation. We limit both to `preferredAmount` here
     // again, because we fetched `preferredAmount + 1` above.
-    final Stream<Item> eventItems = Arrays.stream(rawEvents)
+    final var eventItems = Arrays.stream(rawEvents)
         .limit(preferredAmount)
         .filter(event -> {
           // Here, we potentially filter out some events. Compare to above: when loading series
@@ -133,13 +130,12 @@ final class Harvest {
             return true;
           }
 
-          final Date lastSeriesModifiedDate = rawSeries.get(rawSeries.size() - 1)
-              .getModifiedDate();
+          final var lastSeriesModifiedDate = rawSeries.get(rawSeries.size() - 1).getModifiedDate();
           return !event.getModified().after(lastSeriesModifiedDate);
         })
         .map(event -> new Item(event));
 
-    final Stream<Item> seriesItems = rawSeries.stream()
+    final var seriesItems = rawSeries.stream()
         .limit(preferredAmount)
         .map(series -> new Item(series));
 
@@ -149,13 +145,13 @@ final class Harvest {
     // The sorting is, again, not for correctness, because consumers of this API need to be
     // able to deal with that. However, sorting this here will result in fewer temporary objects
     // or invalid states in the consumer.
-    final ArrayList<Item> items = Stream.concat(eventItems, seriesItems)
+    final var items = Stream.concat(eventItems, seriesItems)
         .collect(Collectors.toCollection(ArrayList::new));
     items.sort(Comparator.comparing(item -> item.getModifiedDate()));
 
 
     // Obtain information to allow Tobira to plan the next harvesting request.
-    boolean hasMore = hasMoreEvents || hasMoreSeriesInRange;
+    final var hasMore = hasMoreEvents || hasMoreSeriesInRange;
     final Date includesItemsUntilRaw;
     if (!hasMoreEvents && !hasMoreSeriesInRange) {
       // All events and series up to now have been harvested.
@@ -181,17 +177,17 @@ final class Harvest {
 
     // The `includesItemsUntil` we return has to be at least `TIME_BUFFER_SIZE` in the past. See
     // the constant's documentation for more information on that.
-    final long includesItemsUntil = Math.min(
+    final var includesItemsUntil = Math.min(
         includesItemsUntilRaw.getTime(),
         new Date().getTime() - TIME_BUFFER_SIZE
     );
 
 
     // Assembly full response.
-    final List<Jsons.Val> outItems = items.stream()
+    final var outItems = items.stream()
         .map(item -> item.getJson())
         .collect(Collectors.toCollection(ArrayList::new));
-    final Jsons.Obj json = Jsons.obj(
+    final var json = Jsons.obj(
         Jsons.p("includesItemsUntil", includesItemsUntil),
         Jsons.p("hasMore", hasMore),
         Jsons.p("items", Jsons.arr(outItems))
