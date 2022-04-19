@@ -43,6 +43,11 @@ API changes
 - [[#2644](https://github.com/opencast/opencast/pull/2644)]: Use millisecond precision in Solr date range queries
 
 
+Additional Notes about 10.12
+----------------------------
+
+This release upgrades Paella from 6.4.4 to 6.5.6 to repair HLS functionality.  This release also updates the editor and studio to their latest releases.
+
 Additional Notes about 10.11
 ----------------------------
 

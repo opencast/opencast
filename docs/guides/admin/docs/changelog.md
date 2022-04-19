@@ -4,6 +4,18 @@ Changelog
 Opencast 10
 ----------
 
+### Opencast 10.12
+
+*Released on Apr 19th, 2022*
+
+- [[#3660](https://github.com/opencast/opencast/pull/3660)] -
+  Update Editor to 2022-03-22 and OC Studio to 2022-02-16 for OC 10.x
+- [[#3650](https://github.com/opencast/opencast/pull/3650)] -
+  Fixes admin-ui repeated series name display #3600
+- [[#3626](https://github.com/opencast/opencast/pull/3626)] -
+  Update paella player to paella 6.5.6
+
+
 ### Opencast 10.11
 
 *Released on Mar 22nd, 2022*
