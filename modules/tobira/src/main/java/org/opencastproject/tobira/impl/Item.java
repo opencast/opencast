@@ -97,8 +97,8 @@ class Item {
           .collect(Collectors.toCollection(ArrayList::new));
 
       // Assemble ACL
-      final List<Jsons.Val> canReadRoles = new ArrayList();
-      final List<Jsons.Val> canWriteRoles = new ArrayList();
+      final List<Jsons.Val> canReadRoles = new ArrayList<Jsons.Val>();
+      final List<Jsons.Val> canWriteRoles = new ArrayList<Jsons.Val>();
       for (final AccessControlEntry entry: event.getAccessControlList().getEntries()) {
         if (entry.getAction().equals(Permissions.Action.READ.toString())) {
           canReadRoles.add(Jsons.v(entry.getRole()));
