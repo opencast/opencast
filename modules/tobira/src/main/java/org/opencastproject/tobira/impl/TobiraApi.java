@@ -28,7 +28,6 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type;
 
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.util.Jsons;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -128,7 +127,7 @@ public class TobiraApi {
     logger.debug("Request to '/harvest' with preferredAmount={} since={}", preferredAmount, since);
 
     try {
-      Jsons.Obj json = Harvest.harvest(
+      var json = Harvest.harvest(
           preferredAmount, new Date(since), searchService, seriesService);
 
       return Response.ok()
