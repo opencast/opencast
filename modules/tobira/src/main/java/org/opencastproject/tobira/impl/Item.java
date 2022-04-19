@@ -111,6 +111,10 @@ class Item {
           Jsons.p("write", Jsons.arr(canWriteRoles))
       );
 
+      final List<Jsons.Val> creators = Arrays.stream(mp.getCreators())
+          .map(creator -> Jsons.v(creator))
+          .collect(Collectors.toCollection(ArrayList::new));
+
       this.obj = Jsons.obj(
           Jsons.p("kind", "event"),
           Jsons.p("id", event.getId()),
@@ -118,7 +122,7 @@ class Item {
           Jsons.p("partOf", event.getDcIsPartOf()),
           Jsons.p("description", event.getDcDescription()),
           Jsons.p("created", event.getDcCreated().getTime()),
-          Jsons.p("creator", event.getDcCreator()),
+          Jsons.p("creators", Jsons.arr(creators)),
           Jsons.p("duration", Math.max(0, event.getDcExtent())),
           Jsons.p("thumbnail", thumbnail),
           Jsons.p("tracks", Jsons.arr(tracks)),
