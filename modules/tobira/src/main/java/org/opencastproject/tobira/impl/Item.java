@@ -62,16 +62,18 @@ class Item {
           Jsons.p("updated", event.getModified().getTime())
       );
     } else {
+      final var mp = event.getMediaPackage();
+
       // Find a suitable thumbnail.
       // TODO: This certainly has to be improved in the future.
-      final var thumbnail = Arrays.stream(event.getMediaPackage().getAttachments())
+      final var thumbnail = Arrays.stream(mp.getAttachments())
           .filter(a -> a.getFlavor().getSubtype().equals("player+preview"))
           .map(a -> a.getURI().toString())
           .findFirst()
           .orElse(null);
 
       // Obtain JSON array of tracks.
-      final List<Jsons.Val> tracks = Arrays.stream(event.getMediaPackage().getTracks())
+      final List<Jsons.Val> tracks = Arrays.stream(mp.getTracks())
           .map(track -> {
             var videoStreams = TrackSupport.byType(track.getStreams(), VideoStream.class);
             var resolution = Jsons.NULL;
@@ -95,6 +97,9 @@ class Item {
             );
           })
           .collect(Collectors.toCollection(ArrayList::new));
+
+      // Figure out whether this is a live event
+      final var isLive = Arrays.stream(mp.getTracks()).anyMatch(track -> track.isLive());
 
       // Assemble ACL
       final var canReadRoles = new ArrayList<Jsons.Val>();
@@ -127,6 +132,7 @@ class Item {
           Jsons.p("thumbnail", thumbnail),
           Jsons.p("tracks", Jsons.arr(tracks)),
           Jsons.p("acl", acl),
+          Jsons.p("isLive", isLive),
           Jsons.p("updated", event.getModified().getTime())
       );
     }
