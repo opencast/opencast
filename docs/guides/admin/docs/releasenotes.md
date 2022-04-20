@@ -78,6 +78,30 @@ API changes
 - [[#3002](https://github.com/opencast/opencast/pull/3002)] - Sign publication URL of events in External API
 - [[#3148](https://github.com/opencast/opencast/pull/3148)] - Allow empty track duration
 
+Additional Notes about 11.6
+---------------------------
+
+- Bug fixes:
+    - Upgrade Paella from 6.4.4 to 6.5.6 to repair HLS functionality (forward merged from 10.12 to this release).
+    - LTI edit form not working on the presentation node (cf.
+      [[#3556](https://github.com/opencast/opencast/pull/3556)]).
+    - Concurrency problems with the Vosk module due to parallel removal of directories in the workspace
+      (cf. [[#3630](https://github.com/opencast/opencast/pull/3630)]).
+    - Termination State Services leaving nodes in maintenance mode
+      (cf. [[#3605](https://github.com/opencast/opencast/pull/3605)]).
+    - Stalling boot of services due to workflow definitions which failed to load
+      (cf. [[#3567](https://github.com/opencast/opencast/pull/3567)]).
+    - The `userdirectory-brightspace` module now works again with the latest version of the Brightspace API
+      (cf. [[#3555](https://github.com/opencast/opencast/pull/3555)]).
+- New features and updates:
+    - Update the editor and studio to their latest releases (forward merged from 10.12 to this release).
+    - The Google Speech Transcription Service now offers options to enable punctuations for transcription and to choose
+      the transcription model to use. See the [dedicated doc section](modules/googlespeechtranscripts.md) for more
+      details.
+    - Improved error handling for the Vosk module (cf. [[#3631](https://github.com/opencast/opencast/pull/3631)]).
+    - Added configuration option to control if events without series are added to an auto generated CA series during
+      ingest (cf. [[#3586](https://github.com/opencast/opencast/pull/3586)]).
+
 Additional Notes about 11.5
 ---------------------------
 
