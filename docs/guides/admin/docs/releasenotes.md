@@ -82,7 +82,7 @@ Additional Notes about 11.6
 ---------------------------
 
 - Bug fixes:
-    - Upgrade Paella from 6.4.4 to 6.5.6 to repair HLS functionality (forward merged from 10.12 to this release).    
+    - Upgrade Paella from 6.4.4 to 6.5.6 to repair HLS functionality (forward merged from 10.12 to this release).
     - LTI edit form not working on the presentation node (cf.
       [[#3556](https://github.com/opencast/opencast/pull/3556)]).
     - Concurrency problems with the Vosk module due to parallel removal of directories in the workspace
