@@ -30,7 +30,6 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -71,6 +70,7 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -255,19 +255,21 @@ public class Ingestor implements Runnable {
                   try {
                     Recording recordingState = schedulerService.getRecordingState(id);
                     if (recordingState.getState().equals(UPLOAD_FINISHED)) {
+                      var referenceId = mediaPackage.getIdentifier().toString();
                       mediaPackage = (MediaPackage) mediaPackage.clone();
-                      Id newId = IdImpl.fromUUID();
-                      mediaPackage.setIdentifier(newId);
+                      mediaPackage.setIdentifier(IdImpl.fromUUID());
 
-                      // Update dublincore title
+                      // Update dublincore title and set reference to originally scheduled event
                       try {
-                        String newTitle = mediaPackage.getTitle() + " - " + newId;
                         DublinCoreCatalog dc = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage).get();
+                        var newTitle = dc.get(DublinCore.PROPERTY_TITLE).get(0).getValue()
+                                + " (" + Instant.now().getEpochSecond() + ")";
                         dc.set(DublinCore.PROPERTY_TITLE, newTitle);
+                        dc.set(DublinCore.PROPERTY_REFERENCES, referenceId);
                         mediaPackage = updateDublincCoreCatalog(mediaPackage, dc);
                         mediaPackage.setTitle(newTitle);
                       } catch (Exception e) {
-                        // Don't fail the ingest if we could not set the title for some reason
+                        // Don't fail the ingest if we could not set metadata for some reason
                       }
                     }
                   } catch (NotFoundException e) {
