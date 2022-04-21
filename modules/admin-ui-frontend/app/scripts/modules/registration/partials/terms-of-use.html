@@ -23,7 +23,40 @@
   agree to sending data from all categories.
 </p>
 
+<h1 style="font-size: x-large;margin: 15px 0">
+  Data Stewardship
+</h1>
 
+<p style="padding-bottom: 10px; font-weight: bold">
+  Location
+</p>
+<p style="padding-bottom: 15px">
+  This data will be stored within the European Union, and will be GDPR compliant.
+  The current location can be found <a href="https://docs.opencast.org/develop/developer/#infrastructure/">here</a>
+</p>
+
+<p style="padding-bottom: 10px; font-weight: bold">
+  Storage Duration
+</p>
+<p style="padding-bottom: 5px;">
+  Organizational Profile
+</p>
+<p style="padding-bottom: 10px">
+  Your organizational profile will be purged 6 months after its last update.
+</p>
+<p style="padding-bottom: 5px">
+  Usage statistics and technical data
+<p style="padding-bottom: 15px">
+  Your technical statistics will be purged 24 months after their last update
+</p>
+
+<p style="padding-bottom: 10px; font-weight: bold">
+  Access to Information
+</p>
+<p style="padding-bottom: 15px">
+  Acess to the raw data is restricted to the Opencast board, who can authorize release to commiters on a case-by-case basis.
+  Aggregated summaries of the data will be made available from time to time at locations of the board's choosing.
+</p>
 
 <h1 style="font-size: x-large;margin: 15px 0">
   What Happens With Your Data
@@ -44,26 +77,29 @@
 
 <p style="padding-bottom: 15px">
   This data is anonymized and will be stored without any relation to your organizational
-  or personal data. The data will be sent in a regular interval. The data sent may include
-  the following information:
+  or personal data unless you allow us to link this information. The data will be sent in
+   a regular interval. The data sent may include the following information:
 </p>
 
 <ul style="padding-left: 30px; list-style: disc; padding-bottom: 15px; color: #333">
   <li>A timestamp at which this data has been created</li>
-  <li>An identifier marking the data source but is impossible
-    to link to your personal or organizational data
-  </li>
+  <li>An optional identifier marking the data source to link your organizational data to your install</li>
   <li>The number and status of events in your Opencast system</li>
   <li>The total duration of all media in your Opencast system</li>
   <li>The number of series in your Opencast system</li>
+  <li>The number of Opencast users (does not collect info from external user providers</li>
   <li>The number of capture agents connected to your Opencast system</li>
+  <li>The number of jobs in your Opencast system</li>
+  <li>The number of tenants in your Opencast system</li>
   <li>The version of your Opencast system</li>
   <li>Technical data regarding servers in your Opencast system
     <ul style="padding-left: 80px; list-style: circle">
       <li>A unique anonymous identifier for each server</li>
+      <li>The hostname for each server</li>
       <li>The number of CPU cores of each server</li>
       <li>The system memory of each server</li>
       <li>The disk space of each server</li>
+      <li>The maximum load value for each server </li>
       <li>The Opencast services running on each server</li>
     </ul>
   </li>
