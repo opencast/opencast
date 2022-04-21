@@ -183,6 +183,14 @@ public class Controller {
 
 
   @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("latestToU")
+  public String getLatestTermsofUse() {
+    return Form.getLatestTermsOfUse().name();
+  }
+
+
+  @GET
   @Produces(MediaType.TEXT_HTML)
   @Path("docs")
   public String getDocs() {

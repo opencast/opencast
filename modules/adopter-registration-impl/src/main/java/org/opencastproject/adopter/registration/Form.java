@@ -49,6 +49,14 @@ import javax.persistence.TemporalType;
 })
 public class Form implements IForm {
 
+  public enum TERMSOFUSEVERSION {
+    PRE_2022, APRIL_2022
+  };
+
+  public static final TERMSOFUSEVERSION getLatestTermsOfUse() {
+    return TERMSOFUSEVERSION.APRIL_2022;
+  }
+
 
   //================================================================================
   // Properties
@@ -114,6 +122,13 @@ public class Form implements IForm {
   @Column(name = "registered")
   private boolean registered;
 
+  // The default here is the original terms of use.
+  // Note that this object doesn't get instanciated unless you've agreed to the terms *at some point*
+  // so assuming a default of PRE_2022 is reasonable.  Either no agreement -> no db object at all, or
+  // agreement -> PRE_2022 default
+  @Column(name = "terms_version_agreed")
+  private TERMSOFUSEVERSION termsVersionAgreed = TERMSOFUSEVERSION.PRE_2022;
+
 
   //================================================================================
   // Constructor and Methods
@@ -141,6 +156,9 @@ public class Form implements IForm {
     this.allowsStatistics = allowsStatistics;
     this.allowsErrorReports = allowsErrorReports;
     this.agreedToPolicy = agreedToPolicy;
+    if (this.agreedToPolicy) {
+      this.termsVersionAgreed = getLatestTermsOfUse();
+    }
     this.registered = registered;
   }
 
@@ -160,6 +178,7 @@ public class Form implements IForm {
     this.allowsStatistics = f.allowsStatistics;
     this.allowsErrorReports = f.allowsErrorReports;
     this.agreedToPolicy = f.agreedToPolicy;
+    this.termsVersionAgreed = f.termsVersionAgreed;
     if (!this.registered) {
       // overwrite this field only when an adopter isn't registered yet
       // once an adopter is registered, he stays registered
@@ -341,6 +360,18 @@ public class Form implements IForm {
 
   public void setRegistered(boolean registered) {
     this.registered = registered;
+  }
+
+  public TERMSOFUSEVERSION getTermsVersionAgreed() {
+    return null == termsVersionAgreed ? termsVersionAgreed : TERMSOFUSEVERSION.PRE_2022;
+  }
+
+  public void setTermsVersionAgreed(TERMSOFUSEVERSION version) {
+    if (version == null) {
+      this.termsVersionAgreed = TERMSOFUSEVERSION.PRE_2022;
+    } else {
+      this.termsVersionAgreed = version;
+    }
   }
 
 }

@@ -175,7 +175,13 @@ public class ScheduledDataCollector extends TimerTask {
       return;
     }
 
-    if (adopter.isRegistered() && adopter.agreedToPolicy()) {
+    // Don't send data unless they've agreed to the latest (at time of writing) terms.
+    // Pre April 2022 doesn't allow collection of a bunch of things, and doens't allow linking stat data to org
+    // so rather than burning time turning various things off (after figuring out what needs to be turned off)
+    // we just don't send anything.  By the time we need to update the ToU again this whole thing would need reworking
+    // anyway, so we'll run with this for now.
+    if (adopter.isRegistered() && adopter.agreedToPolicy()
+        && adopter.getTermsVersionAgreed() == Form.TERMSOFUSEVERSION.APRIL_2022) {
       try {
         String generalDataAsJson = collectGeneralData(adopter);
         sender.sendGeneralData(generalDataAsJson);
