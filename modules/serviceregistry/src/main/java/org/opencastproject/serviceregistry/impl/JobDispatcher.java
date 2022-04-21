@@ -111,9 +111,6 @@ public class JobDispatcher {
   /** Default delay between job dispatching attempts, in seconds */
   static final long DEFAULT_DISPATCH_INTERVAL = 2;
 
-  /** Default delay before starting job dispatching, in seconds */
-  static final long DEFAULT_DISPATCH_START_DELAY = 60;
-
   private static final Logger logger = LoggerFactory.getLogger(JobDispatcher.class);
 
   private ServiceRegistryJpaImpl serviceRegistry;
