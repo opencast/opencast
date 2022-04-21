@@ -52,7 +52,10 @@ public interface MediaPackage extends Cloneable {
    * Returns the title for the associated series, if any.
    *
    * @return The series title
+   *
+   * @deprecated This is not guaranteed to be correct. Use the metadata contained in the Dublin Core catalog instead.
    */
+  @Deprecated
   String getSeriesTitle();
 
   void setSeriesTitle(String seriesTitle);
@@ -61,7 +64,10 @@ public interface MediaPackage extends Cloneable {
    * Returns the title of the episode that this mediapackage represents.
    *
    * @return The episode title
+   *
+   * @deprecated This is not guaranteed to be correct. Use the metadata contained in the Dublin Core catalog instead.
    */
+  @Deprecated
   String getTitle();
 
   void addCreator(String creator);
@@ -72,7 +78,10 @@ public interface MediaPackage extends Cloneable {
    * Returns the names of the institutions or people who created this mediapackage
    *
    * @return the creators of this mediapackage
+   *
+   * @deprecated This is not guaranteed to be correct. Use the metadata contained in the Dublin Core catalog instead.
    */
+  @Deprecated
   String[] getCreators();
 
   void setSeries(String identifier);
@@ -90,7 +99,10 @@ public interface MediaPackage extends Cloneable {
    * The license for the content in this mediapackage
    *
    * @return the license
+   *
+   * @deprecated This is not guaranteed to be correct. Use the metadata contained in the Dublin Core catalog instead.
    */
+  @Deprecated
   String getLicense();
 
   void addContributor(String contributor);
@@ -101,7 +113,10 @@ public interface MediaPackage extends Cloneable {
    * Returns the names of the institutions or people who contributed to the content within this mediapackage
    *
    * @return the contributors
+   *
+   * @deprecated This is not guaranteed to be correct. Use the metadata contained in the Dublin Core catalog instead.
    */
+  @Deprecated
   String[] getContributors();
 
   void setLanguage(String language);
@@ -110,7 +125,10 @@ public interface MediaPackage extends Cloneable {
    * Returns the language written and/or spoken in the media content of this mediapackage
    *
    * @return the language
+   *
+   * @deprecated This is not guaranteed to be correct. Use the metadata contained in the Dublin Core catalog instead.
    */
+  @Deprecated
   String getLanguage();
 
   void addSubject(String subject);
@@ -121,7 +139,10 @@ public interface MediaPackage extends Cloneable {
    * The keywords describing the subject(s) or categories describing the content of this mediapackage
    *
    * @return the subjects
+   *
+   * @deprecated This is not guaranteed to be correct. Use the metadata contained in the Dublin Core catalog instead.
    */
+  @Deprecated
   String[] getSubjects();
 
   void setDate(Date date);
@@ -130,14 +151,20 @@ public interface MediaPackage extends Cloneable {
    * Returns the media package start time.
    *
    * @return the start time
+   *
+   * @deprecated This is not guaranteed to be correct. Use the metadata contained in the Dublin Core catalog instead.
    */
+  @Deprecated
   Date getDate();
 
   /**
    * Returns the media package duration in milliseconds or <code>null</code> if no duration is available.
    *
    * @return the duration
+   *
+   * @deprecated This is not guaranteed to be correct. Use the metadata contained in the Dublin Core catalog instead.
    */
+  @Deprecated
   Long getDuration();
 
   /**
@@ -169,7 +196,7 @@ public interface MediaPackage extends Cloneable {
   Iterable<MediaPackageElement> elements();
 
   /**
-   * Returns all of the elements.
+   * Returns all the elements.
    *
    * @return the elements
    */
@@ -265,8 +292,8 @@ public interface MediaPackage extends Cloneable {
   boolean hasTracks();
 
   /**
-   * Returns the attachment identified by <code>attachmentId</code> or <code>null</code> if that attachment doesn't
-   * exists.
+   * Returns the attachment identified by <code>attachmentId</code> or <code>null</code> if that attachment does not
+   * exist.
    *
    * @param attachmentId
    *          the attachment identifier
