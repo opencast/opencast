@@ -29,13 +29,23 @@ import org.opencastproject.adopter.statistic.dto.StatisticData;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.AResult;
+import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.search.api.SearchQuery;
+import org.opencastproject.search.api.SearchResult;
+import org.opencastproject.search.api.SearchResultItem;
+import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
 
 import org.osgi.framework.BundleContext;
@@ -43,9 +53,12 @@ import org.osgi.framework.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 /**
  * It collects and sends statistic data of an registered adopter.
@@ -71,11 +84,19 @@ public class ScheduledDataCollector extends TimerTask {
   /** Provides access to job and host information */
   private ServiceRegistry serviceRegistry;
 
+  /** Provides access to CA counts */
+  private CaptureAgentStateService caStateService;
+
+  private OrganizationDirectoryService organizationDirectoryService;
+
   /** Provides access to recording information */
   private AssetManager assetManager;
 
   /** Provides access to series information */
   private SeriesService seriesService;
+
+  /** Provides access to search information */
+  private SearchService searchService;
 
   /** User and role provider */
   protected JpaUserAndRoleProvider userAndRoleProvider;
@@ -99,6 +120,9 @@ public class ScheduledDataCollector extends TimerTask {
 
   /** The Opencast version this is running in */
   private String version;
+
+  /** The timer for shutdown uses */
+  private Timer t;
 
   //================================================================================
   // Scheduler methods
@@ -127,7 +151,12 @@ public class ScheduledDataCollector extends TimerTask {
     this.sender = new Sender(Objects.toString(serverBaseUrl, DEFAULT_STATISTIC_SERVER_ADDRESS));
 
     // Send data now. Repeat every 24h.
-    new Timer().schedule(this, 0, ONE_DAY_IN_MILLISECONDS);
+    t = new Timer();
+    t.schedule(this, 0, ONE_DAY_IN_MILLISECONDS);
+  }
+
+  public void deactivate() {
+    t.cancel();
   }
 
   /**
@@ -156,7 +185,7 @@ public class ScheduledDataCollector extends TimerTask {
 
       if (adopter.allowsStatistics()) {
         try {
-          String statisticDataAsJson = collectStatisticData(adopter.getStatisticKey());
+          String statisticDataAsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
           sender.sendStatistics(statisticDataAsJson);
         } catch (Exception e) {
           logger.error("Error occurred while processing adopter statistic data.", e);
@@ -186,9 +215,22 @@ public class ScheduledDataCollector extends TimerTask {
    * @return The statistic data as JSON string.
    * @throws Exception General exception that can occur while gathering data.
    */
-  private String collectStatisticData(String statisticKey) throws Exception {
+  private String collectStatisticData(String adopterKey, String statisticKey) throws Exception {
     StatisticData statisticData = new StatisticData(statisticKey);
-    serviceRegistry.getHostRegistrations().forEach(host -> statisticData.addHost(new Host(host)));
+    statisticData.setAdopterKey(adopterKey);
+    serviceRegistry.getHostRegistrations().forEach(host -> {
+      Host h = new Host(host);
+      try {
+        String services = serviceRegistry.getServiceRegistrationsByHost(host.getBaseUrl())
+            .stream()
+            .map(sr -> sr.getServiceType())
+            .collect(Collectors.joining(",\n"));
+        h.setServices(services);
+      } catch (ServiceRegistryException e) {
+        logger.warn("Error gathering services for {}", host.getBaseUrl(), e);
+      }
+      statisticData.addHost(h);
+    });
     statisticData.setJobCount(serviceRegistry.count(null, null));
 
     AQueryBuilder q = assetManager.createQuery();
@@ -199,6 +241,42 @@ public class ScheduledDataCollector extends TimerTask {
 
     statisticData.setSeriesCount(seriesService.getSeriesCount());
     statisticData.setUserCount(userAndRoleProvider.countAllUsers());
+
+    SearchQuery sq = new SearchQuery();
+    sq.withId("");
+    sq.withElementTags(new String[0]);
+    sq.withElementFlavors(new MediaPackageElementFlavor[0]);
+    sq.signURLs(false);
+    sq.includeEpisodes(true);
+    sq.includeSeries(false);
+
+    List<Organization> orgs = organizationDirectoryService.getOrganizations();
+    statisticData.setTenantCount(orgs.size());
+
+    for (Organization org : orgs) {
+      SecurityUtil.runAs(securityService, org, systemAdminUser, () -> {
+        //Calculate the number of attached CAs for this org, add it to the total
+        long current = statisticData.getCACount();
+        int orgCAs = caStateService.getKnownAgents(systemAdminUser, org).size();
+        statisticData.setCACount(current + orgCAs);
+
+        //Calculate the total number of minutes for this org, add it to the total
+        current = statisticData.getTotalMinutes();
+        long orgDuration = 0L;
+        try {
+          SearchResult sr = searchService.getForAdministrativeRead(sq);
+          orgDuration = Arrays.stream(sr.getItems())
+                                     .map(SearchResultItem::getMediaPackage)
+                                     .map(MediaPackage::getDuration)
+                                     .mapToLong(Long::valueOf)
+                                     .sum() / 1000L;
+        } catch (UnauthorizedException e) {
+          //This should never happen, but...
+          logger.warn("Unable to calculate total minutes, unauthorized");
+        }
+        statisticData.setTotalMinutes(current + orgDuration);
+      });
+    }
     statisticData.setVersion(version);
     return statisticData.jsonify();
   }
@@ -218,6 +296,10 @@ public class ScheduledDataCollector extends TimerTask {
     this.serviceRegistry = serviceRegistry;
   }
 
+  public void setCaptureAdminService(CaptureAgentStateService stateService) {
+    this.caStateService = stateService;
+  }
+
   /** OSGi setter for the asset manager. */
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
@@ -228,6 +310,10 @@ public class ScheduledDataCollector extends TimerTask {
     this.seriesService = seriesService;
   }
 
+  public void setSearchService(SearchService searchService) {
+    this.searchService = searchService;
+  }
+
   /** OSGi setter for the user provider. */
   public void setUserAndRoleProvider(JpaUserAndRoleProvider userAndRoleProvider) {
     this.userAndRoleProvider = userAndRoleProvider;
@@ -236,6 +322,11 @@ public class ScheduledDataCollector extends TimerTask {
   /** OSGi callback for setting the security service. */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  /** OSGi callback for setting the org directory service. */
+  public void setOrganizationDirectoryService(OrganizationDirectoryService orgDirServ) {
+    this.organizationDirectoryService = orgDirServ;
   }
 
 }

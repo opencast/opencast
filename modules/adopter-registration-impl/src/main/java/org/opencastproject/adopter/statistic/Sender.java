@@ -28,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -115,8 +116,7 @@ public class Sender {
         responseStream = con.getInputStream();
       }
 
-      try (BufferedReader br = new BufferedReader(
-              new InputStreamReader(responseStream, StandardCharsets.UTF_8))) {
+      try (BufferedReader br = new BufferedReader(new InputStreamReader(responseStream, StandardCharsets.UTF_8))) {
         StringBuilder response = new StringBuilder();
         String responseLine;
         while ((responseLine = br.readLine()) != null) {
@@ -127,7 +127,8 @@ public class Sender {
           throw new RuntimeException(errorMessage);
         }
       }
-
+    } catch (ConnectException e) {
+      logger.debug("Unable to connect to {}, being quiet to prevent annoying adopters", baseUrl);
     } catch (Exception e) {
       logger.error("Error while sending JSON via POST request. The json string: {}", json, e);
       throw e;
