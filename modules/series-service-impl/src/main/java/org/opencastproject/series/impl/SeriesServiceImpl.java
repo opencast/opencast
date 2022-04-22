@@ -189,16 +189,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
         }
 
         logger.debug("Updating series {}", id);
-        // ??? Is this even necessary? This function is about updating DC after all???
-        try {
-          final AccessControlList acl = persistence.getAccessControlList(id);
-          if (acl != null) {
-            updateSeriesAclInIndex(id, elasticsearchIndex, acl);
-          }
-        } catch (NotFoundException ignore) {
-          // Ignore not found since this is the first indexing
-        }
-
         // update API index
         updateSeriesMetadataInIndex(id, elasticsearchIndex, dublinCore);
 
