@@ -36,8 +36,7 @@ const StartTaskModal = ({ close, postTasks }) => {
     ];
 
     const handleSubmit = values => {
-        const response = postTasks(values);
-        console.log(response);
+        postTasks(values);
         close();
     };
 

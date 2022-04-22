@@ -308,7 +308,6 @@ export const postNewEvent = (values, metadataInfo) => async dispatch => {
         configuration[config] = String(values.configuration[config])
     });
 
-    // todo: change placeholder in configuration
     formData.append('metadata', JSON.stringify({
         metadata: metadata,
         processing: {
