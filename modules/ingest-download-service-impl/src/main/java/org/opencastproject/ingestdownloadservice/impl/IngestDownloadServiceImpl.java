@@ -127,7 +127,7 @@ public class IngestDownloadServiceImpl extends AbstractJobProducer implements In
    *
    * @param workspace the workspace
    */
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -137,7 +137,7 @@ public class IngestDownloadServiceImpl extends AbstractJobProducer implements In
    *
    * @param serviceRegistry the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -167,7 +167,7 @@ public class IngestDownloadServiceImpl extends AbstractJobProducer implements In
    *
    * @param securityService the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -177,7 +177,7 @@ public class IngestDownloadServiceImpl extends AbstractJobProducer implements In
    *
    * @param userDirectoryService the userDirectoryService to set
    */
-  @Reference(name = "user-directory")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -207,7 +207,7 @@ public class IngestDownloadServiceImpl extends AbstractJobProducer implements In
    *
    * @param organizationDirectory the organization directory
    */
-  @Reference(name = "orgDirectory")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }

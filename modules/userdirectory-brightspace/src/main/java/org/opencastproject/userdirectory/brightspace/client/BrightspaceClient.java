@@ -31,7 +31,7 @@ public interface BrightspaceClient {
 
   BrightspaceUser findUser(String username) throws BrightspaceClientException;
 
-  Set<String> findCourseIds(String brightspaceUserId) throws BrightspaceClientException;
+  List<String> getRolesFromBrightspace(String username, Set<String> instructorRoles) throws BrightspaceClientException;
 
   List<BrightspaceUser> findAllUsers() throws BrightspaceClientException;
 

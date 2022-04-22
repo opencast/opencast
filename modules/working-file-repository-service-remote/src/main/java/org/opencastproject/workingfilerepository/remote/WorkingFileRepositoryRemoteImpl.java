@@ -79,7 +79,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
    * @param client
    */
   @Override
-  @Reference(name = "trustedHttpClient")
+  @Reference
   public void setTrustedHttpClient(TrustedHttpClient client) {
     super.setTrustedHttpClient(client);
   }
@@ -90,7 +90,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
    * @param remoteServiceManager
    */
   @Override
-  @Reference(name = "remoteServiceManager")
+  @Reference
   public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
     super.setRemoteServiceManager(remoteServiceManager);
   }
@@ -232,6 +232,21 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
     try {
       if (response != null)
         return SC_NO_CONTENT == response.getStatusLine().getStatusCode();
+    } finally {
+      closeConnection(response);
+    }
+    throw new RuntimeException("Error removing older files from collection");
+  }
+
+  @Override
+  public boolean cleanupOldFilesFromMediaPackage(long days) throws IOException {
+    String url = UrlSupport.concat(new String[] { MEDIAPACKAGE_PATH_PREFIX, Long.toString(days) });
+    HttpDelete del = new HttpDelete(url);
+    HttpResponse response = getResponse(del, SC_NO_CONTENT);
+    try {
+      if (response != null) {
+        return SC_NO_CONTENT == response.getStatusLine().getStatusCode();
+      }
     } finally {
       closeConnection(response);
     }

@@ -73,14 +73,13 @@ public class SigningMediaPackageSerializer implements MediaPackageSerializer, Ma
   }
 
   /** OSGi DI */
-  @Reference(name = "SecurityService")
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi callback for UrlSigningService */
   @Reference(
-      name = "url-signing-service",
       cardinality = ReferenceCardinality.OPTIONAL,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "unsetUrlSigningService"

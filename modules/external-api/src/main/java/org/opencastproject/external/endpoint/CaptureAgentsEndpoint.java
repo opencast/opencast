@@ -89,7 +89,7 @@ public class CaptureAgentsEndpoint {
   }
 
   /** OSGi DI */
-  @Reference(name = "agentStateService")
+  @Reference
   public void setAgentStateService(CaptureAgentStateService agentStateService) {
     this.agentStateService = agentStateService;
   }

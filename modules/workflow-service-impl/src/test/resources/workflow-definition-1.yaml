@@ -1,0 +1,27 @@
+---
+id: definition-1
+title: The First Workflow Definition
+description: Unit testing workflow
+tags:
+  - tag1
+  - tag2
+displayOrder: 100
+configuration_panel: |-
+  <div></div>
+operations:
+  - id: op1
+    fail-on-error: true
+    description: "operation 1"
+
+  - id: op2
+    exception-handler-workflow: "partial-error"
+    description: "operation 2"
+    configurations:
+      - key1: value1
+      - key2: value2
+
+state-mappings:
+  - state: "running"
+    value: EVENTS.EVENTS.STATE_MAPPING.IMPORTING
+  - state: "failing"
+    value: EVENTS.EVENTS.STATE_MAPPING.IMPORTING

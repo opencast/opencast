@@ -57,12 +57,12 @@ public class MessageBrokerServiceEndpoint {
   private MessageReceiver messageReceiver;
   private MessageSender messageSender;
 
-  @Reference(name = "messageReceiver")
+  @Reference
   public void setMessageReceiver(MessageReceiver messageReceiver) {
     this.messageReceiver = messageReceiver;
   }
 
-  @Reference(name = "messageSender")
+  @Reference
   public void setMessageSender(MessageSender messageSender) {
     this.messageSender = messageSender;
   }

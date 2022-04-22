@@ -207,19 +207,19 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
   }
 
   /** OSGi callback to bind {@link ListProvidersService} instance. */
-  @Reference(name = "listProvidersService")
+  @Reference
   void setListProvidersService(ListProvidersService listProvidersService) {
     this.listProvidersService = listProvidersService;
   }
 
   /** OSGi callback to bind {@link SeriesService} instance. */
-  @Reference(name = "seriesService")
+  @Reference
   void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
   /** OSGi callback to bind {@link Workspace} instance. */
-  @Reference(name = "workspace")
+  @Reference
   void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

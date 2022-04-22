@@ -83,7 +83,7 @@ public class Controller {
   protected Service registrationService;
 
   /** OSGi setter for the registration service */
-  @Reference(name = "registrationService")
+  @Reference
   public void setRegistrationService(Service registrationService) {
     this.registrationService = registrationService;
   }

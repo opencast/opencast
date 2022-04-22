@@ -101,19 +101,19 @@ public class AclScanner implements ArtifactInstaller {
   }
 
   /** OSGi DI. */
-  @Reference(name = "organizationDirectoryService")
+  @Reference
   void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
   /** OSGi callback for setting persistence. */
-  @Reference(name = "acl-service-factory")
+  @Reference
   void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
 
   /** OSGi DI */
-  @Reference(name = "SecurityService")
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

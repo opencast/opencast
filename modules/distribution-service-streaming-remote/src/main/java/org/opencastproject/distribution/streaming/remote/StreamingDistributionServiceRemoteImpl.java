@@ -197,12 +197,12 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
         elementIds.size(), mediaPackage.getIdentifier().toString()));
   }
 
-  @Reference(name = "trustedHttpClient")
+  @Reference
   @Override
   public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
     super.setTrustedHttpClient(trustedHttpClient);
   }
-  @Reference(name = "remoteServiceManager")
+  @Reference
   @Override
   public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
     super.setRemoteServiceManager(serviceRegistry);

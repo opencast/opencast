@@ -32,13 +32,15 @@ import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
-import org.opencastproject.workflow.api.WorkflowParser;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
+import org.opencastproject.workflow.api.YamlWorkflowParser;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -94,12 +96,28 @@ public class WorkflowInstanceTest {
   @Test
   public void testWorkflowDefinitionDeserialization() throws Exception {
     InputStream in = getClass().getResourceAsStream("/workflow-definition-1.xml");
-    WorkflowDefinition def = WorkflowParser.parseWorkflowDefinition(in);
+    WorkflowDefinition def = XmlWorkflowParser.parseWorkflowDefinition(in);
     IOUtils.closeQuietly(in);
     Assert.assertEquals("The First Workflow Definition", def.getTitle());
     Assert.assertEquals(2, def.getOperations().size());
     Assert.assertEquals("definition-1", def.getId());
     Assert.assertEquals("Unit testing workflow", def.getDescription());
+  }
+
+  @Test
+  public void testWorkflowDefinitionYamlDeserialization() throws Exception {
+    InputStream in = getClass().getResourceAsStream("/workflow-definition-1.yaml");
+    WorkflowDefinition def = YamlWorkflowParser.parseWorkflowDefinition(in);
+    IOUtils.closeQuietly(in);
+    Assert.assertEquals("The First Workflow Definition", def.getTitle());
+    Assert.assertEquals(2, def.getOperations().size());
+    Assert.assertEquals("definition-1", def.getId());
+    Assert.assertEquals("Unit testing workflow", def.getDescription());
+    Assert.assertEquals("partial-error", def.getOperations().get(1).getExceptionHandlingWorkflow());
+    Assert.assertEquals("value1", def.getOperations().get(1).getConfiguration("key1"));
+    Assert.assertEquals("value2", def.getOperations().get(1).getConfiguration("key2"));
+    Assert.assertTrue(Arrays.asList(def.getTags()).contains("tag1"));
+    Assert.assertEquals(100, def.getDisplayOrder());
   }
 
   @Test
@@ -115,15 +133,15 @@ public class WorkflowInstanceTest {
     workflow.setMediaPackage(mp);
 
     // Marshall the workflow to xml
-    String xml = WorkflowParser.toXml(workflow);
+    String xml = XmlWorkflowParser.toXml(workflow);
 
     // Get it back from xml
-    WorkflowInstance instance2 = WorkflowParser.parseWorkflowInstance(xml);
+    WorkflowInstance instance2 = XmlWorkflowParser.parseWorkflowInstance(xml);
     Assert.assertEquals(workflow.getMediaPackage().getTracks()[0].getFlavor(),
             instance2.getMediaPackage().getTracks()[0].getFlavor());
 
     String namespaceXml = "<workflow xmlns=\"http://workflow.opencastproject.org\" xmlns:mp=\"http://mediapackage.opencastproject.org\"><parent/><mp:mediapackage><mp:media><mp:track type=\"presentation/source\" id=\"track-1\"><mp:url>http://testing</mp:url></mp:track></mp:media></mp:mediapackage></workflow>";
-    WorkflowInstance instance3 = WorkflowParser.parseWorkflowInstance(namespaceXml);
+    WorkflowInstance instance3 = XmlWorkflowParser.parseWorkflowInstance(namespaceXml);
     Assert.assertEquals(workflow.getMediaPackage().getTracks()[0].getFlavor(),
             instance3.getMediaPackage().getTracks()[0].getFlavor());
   }

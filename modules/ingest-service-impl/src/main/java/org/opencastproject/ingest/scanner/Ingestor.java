@@ -22,6 +22,7 @@
 package org.opencastproject.ingest.scanner;
 
 import static java.lang.String.format;
+import static org.opencastproject.scheduler.api.RecordingState.UPLOAD_FINISHED;
 
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -32,15 +33,21 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
+import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.util.IoSupport;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
 import com.google.common.util.concurrent.RateLimiter;
+import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,10 +57,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -64,6 +77,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /** Used by the {@link InboxScannerService} to do the actual ingest. */
 public class Ingestor implements Runnable {
@@ -86,6 +100,7 @@ public class Ingestor implements Runnable {
   private final File inbox;
 
   private final SeriesService seriesService;
+  private final SchedulerService schedulerService;
 
   private final int maxTries;
 
@@ -95,6 +110,12 @@ public class Ingestor implements Runnable {
 
   private final Optional<Pattern> metadataPattern;
   private final DateTimeFormatter dateFormatter;
+  private final String ffprobe;
+
+  private final Gson gson = new Gson();
+
+  private final boolean matchSchedule;
+  private final float matchThreshold;
 
   /**
    * Thread pool to run the ingest worker.
@@ -151,68 +172,130 @@ public class Ingestor implements Runnable {
                       workflowInstance.getId());
             } else {
               /* Create MediaPackage and add Track */
-              MediaPackage mp = ingestService.createMediaPackage();
-              logger.info("Start ingest track from file {} to media package {}",
-                      artifact.getName(), mp.getIdentifier().toString());
+              logger.info("Start ingest track from file {}", artifact.getName());
 
-              DublinCoreCatalog dcc = DublinCores.mkOpencastEpisode().getCatalog();
-              String title = null;
+              // Try extracting metadata from the file name and path
+              String title = artifact.getName();
+              String spatial = null;
+              Date created = null;
+              Float duration = null;
               if (metadataPattern.isPresent()) {
                 var matcher = metadataPattern.get().matcher(artifact.getName());
                 if (matcher.find()) {
                   try {
                     title = matcher.group("title");
                   } catch (IllegalArgumentException e) {
-                    logger.debug("{} matches no title in {}", metadataPattern.get(), artifact.getName(), e);
+                    logger.debug("{} matches no 'title' in {}", metadataPattern.get(), artifact.getName(), e);
                   }
                   try {
-                    dcc.add(DublinCore.PROPERTY_SPATIAL, matcher.group("spatial"));
+                    spatial = matcher.group("spatial");
                   } catch (IllegalArgumentException e) {
-                    logger.debug("{} matches no spatial in {}", metadataPattern.get(), artifact.getName(), e);
+                    logger.debug("{} matches no 'spatial' in {}", metadataPattern.get(), artifact.getName(), e);
                   }
                   try {
                     var value = matcher.group("created");
                     logger.debug("Trying to parse matched date '{}' with formatter {}", value, dateFormatter);
-                    var date = Timestamp.valueOf(LocalDateTime.parse(value, dateFormatter));
-                    var created = EncodingSchemeUtils.encodeDate(date, Precision.Second);
-                    dcc.add(DublinCore.PROPERTY_CREATED, created);
+                    created = Timestamp.valueOf(LocalDateTime.parse(value, dateFormatter));
                   } catch (DateTimeParseException e) {
                     logger.warn("Matched date does not match configured date-time format", e);
                   } catch (IllegalArgumentException e) {
-                    logger.debug("{} matches no spatial in {}", metadataPattern, artifact.getName(), e);
+                    logger.debug("{} matches no 'created' in {}", metadataPattern.get(), artifact.getName(), e);
                   }
                 } else {
                   logger.debug("Regular expression {} does not match {}", metadataPattern.get(), artifact.getName());
                 }
               }
-              // fall back to filename for title if matcher did not catch any
-              dcc.add(DublinCore.PROPERTY_TITLE, StringUtils.isNotBlank(title) ? title : artifact.getName());
 
-              /* Check if we have a subdir and if its name matches an existing series */
-              File dir = artifact.getParentFile();
-              String seriesID;
-              if (FileUtils.directoryContains(inbox, dir)) {
-                /* cut away inbox path and trailing slash from artifact path */
-                seriesID = dir.getName();
-                if (seriesService.getSeries(seriesID) != null) {
-                  logger.info("Ingest from inbox into series with id {}", seriesID);
-                  dcc.add(DublinCore.PROPERTY_IS_PART_OF, seriesID);
+              // Try extracting additional metadata via ffprobe
+              if (ffprobe != null) {
+                JsonFormat json = probeMedia(artifact.getAbsolutePath()).format;
+                created = json.tags.getCreationTime() == null ? created : json.tags.getCreationTime();
+                duration = json.getDuration();
+                logger.debug("Extracted metadata from file: {}", json);
+              }
+
+              MediaPackage mediaPackage = null;
+              var currentWorkflowDefinition = workflowDefinition;
+              var currentWorkflowConfig = workflowConfig;
+
+              // Check if we can match this to a scheduled event
+              if (matchSchedule && spatial != null && created != null) {
+                logger.debug("Try finding scheduled event for agent {} at time {}", spatial, created);
+                var end = duration == null ? created : DateUtils.addSeconds(created, duration.intValue());
+                var mediaPackages = schedulerService.findConflictingEvents(spatial, created, end);
+                if (matchThreshold > 0F && mediaPackages.size() > 1) {
+                  var filteredMediaPackages = new ArrayList<MediaPackage>();
+                  for (var mp : mediaPackages) {
+                    var schedule =  schedulerService.getTechnicalMetadata(mp.getIdentifier().toString());
+                    if (overlap(schedule.getStartDate(), schedule.getEndDate(), created, end) > matchThreshold) {
+                      filteredMediaPackages.add(mp);
+                    }
+                  }
+                  mediaPackages = filteredMediaPackages;
+                }
+                if (mediaPackages.size() > 1) {
+                  logger.warn("Metadata match multiple events. Not using any!");
+                } else if (mediaPackages.size() == 1) {
+                  mediaPackage = mediaPackages.get(0);
+                  var id = mediaPackage.getIdentifier().toString();
+                  var eventConfiguration = schedulerService.getCaptureAgentConfiguration(id);
+                  currentWorkflowDefinition = eventConfiguration.getOrDefault(
+                          "org.opencastproject.workflow.definition",
+                          workflowDefinition);
+                  currentWorkflowConfig = eventConfiguration.entrySet().stream()
+                          .filter(e -> e.getKey().startsWith("org.opencastproject.workflow.config."))
+                          .collect(Collectors.toMap(e -> e.getKey().substring(36), Map.Entry::getValue));
+                  schedulerService.updateRecordingState(id, UPLOAD_FINISHED);
+                  logger.info("Found matching scheduled event {}", mediaPackage);
+                } else {
+                  logger.debug("No matching event found.");
                 }
               }
 
-              try (ByteArrayOutputStream dcout = new ByteArrayOutputStream()) {
-                dcc.toXml(dcout, true);
-                try (InputStream dcin = new ByteArrayInputStream(dcout.toByteArray())) {
-                  mp = ingestService.addCatalog(dcin, "dublincore.xml", MediaPackageElements.EPISODE, mp);
-                  logger.info("Added DC catalog to media package for ingest from inbox");
+              // create new media package and metadata catalog if we have none
+              if (mediaPackage == null) {
+                // create new media package
+                mediaPackage = ingestService.createMediaPackage();
+
+                DublinCoreCatalog dcc = DublinCores.mkOpencastEpisode().getCatalog();
+                if (spatial != null) {
+                  dcc.add(DublinCore.PROPERTY_SPATIAL, spatial);
+                }
+                if (created != null) {
+                  dcc.add(DublinCore.PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(created, Precision.Second));
+                }
+                // fall back to filename for title if matcher did not catch any
+                dcc.add(DublinCore.PROPERTY_TITLE, title);
+
+                /* Check if we have a subdir and if its name matches an existing series */
+                final File dir = artifact.getParentFile();
+                if (FileUtils.directoryContains(inbox, dir)) {
+                  /* cut away inbox path and trailing slash from artifact path */
+                  var seriesID = dir.getName();
+                  if (seriesService.getSeries(seriesID) != null) {
+                    logger.info("Ingest from inbox into series with id {}", seriesID);
+                    dcc.add(DublinCore.PROPERTY_IS_PART_OF, seriesID);
+                  }
+                }
+
+                try (ByteArrayOutputStream dcout = new ByteArrayOutputStream()) {
+                  dcc.toXml(dcout, true);
+                  try (InputStream dcin = new ByteArrayInputStream(dcout.toByteArray())) {
+                    mediaPackage = ingestService.addCatalog(dcin, "dublincore.xml", MediaPackageElements.EPISODE,
+                            mediaPackage);
+                    logger.info("Added DC catalog to media package for ingest from inbox");
+                  }
                 }
               }
-              /* Ingest media*/
-              mp = ingestService.addTrack(in, artifact.getName(), mediaFlavor, mp);
-              logger.info("Ingested track from file {} to mediapackage {}",
-                      artifact.getName(), mp.getIdentifier().toString());
-              /* Ingest mediapackage */
-              WorkflowInstance workflowInstance = ingestService.ingest(mp, workflowDefinition, workflowConfig);
+
+              // Ingest media
+              mediaPackage = ingestService.addTrack(in, artifact.getName(), mediaFlavor, mediaPackage);
+              logger.info("Ingested track from file {} to media package {}",
+                      artifact.getName(), mediaPackage.getIdentifier().toString());
+
+              // Ingest media package
+              WorkflowInstance workflowInstance = ingestService.ingest(mediaPackage, currentWorkflowDefinition,
+                      currentWorkflowConfig);
               logger.info("Ingested {} from inbox, workflow {} started", artifact.getName(), workflowInstance.getId());
             }
           } catch (Exception e) {
@@ -227,6 +310,63 @@ public class Ingestor implements Runnable {
           }
           return RetriableIngestJob.this;
       });
+    }
+
+    private JsonFFprobe probeMedia(final String file) throws IOException {
+
+      final String[] command = new String[] {
+              ffprobe,
+              "-show_format",
+              "-of",
+              "json",
+              file
+      };
+
+      // Execute ffprobe and obtain the result
+      logger.debug("Running ffprobe: {}", (Object) command);
+
+      String output;
+      Process process = null;
+      try {
+        process = new ProcessBuilder(command).start();
+        try (InputStream in = process.getInputStream()) {
+          output = IOUtils.toString(in, StandardCharsets.UTF_8);
+        }
+
+        if (process.waitFor() != 0) {
+          throw new IOException("FFprobe exited abnormally");
+        }
+      } catch (InterruptedException e) {
+        throw new IOException(e);
+      } finally {
+        IoSupport.closeQuietly(process);
+      }
+
+      return gson.fromJson(output, JsonFFprobe.class);
+    }
+
+    /**
+     * Calculate the overlap of two events `a` and `b`.
+     * @param aStart Begin of event a
+     * @param aEnd End of event a
+     * @param bStart Begin of event b
+     * @param bEnd End of event b
+     * @return How much of `a` overlaps with `n`. Return a float in the range of <pre>[0.0, 1.0]</pre>.
+     */
+    private float overlap(Date aStart, Date aEnd, Date bStart, Date bEnd) {
+      var min = Math.min(aStart.getTime(), bStart.getTime());
+      var max = Math.max(aEnd.getTime(), bEnd.getTime());
+      var aLen = aEnd.getTime() - aStart.getTime();
+      var bLen = bEnd.getTime() - bStart.getTime();
+      var overlap =  aLen + bLen - (max - min);
+      logger.debug("Detected overlap of {} ({})", overlap, overlap / (float) aLen);
+      if (aLen == 0F) {
+        return 1F;
+      }
+      if (overlap > 0F) {
+        return overlap / (float) aLen;
+      }
+      return 0.0F;
     }
   }
 
@@ -274,7 +414,8 @@ public class Ingestor implements Runnable {
   public Ingestor(IngestService ingestService, SecurityContext secCtx,
           String workflowDefinition, Map<String, String> workflowConfig, String mediaFlavor, File inbox, int maxThreads,
           SeriesService seriesService, int maxTries, int secondsBetweenTries, Optional<Pattern> metadataPattern,
-          DateTimeFormatter dateFormatter) {
+          DateTimeFormatter dateFormatter, SchedulerService schedulerService, String ffprobe, boolean matchSchedule,
+          float matchThreshold) {
     this.ingestService = ingestService;
     this.secCtx = secCtx;
     this.workflowDefinition = workflowDefinition;
@@ -288,6 +429,10 @@ public class Ingestor implements Runnable {
     this.secondsBetweenTries = secondsBetweenTries;
     this.metadataPattern = metadataPattern;
     this.dateFormatter = dateFormatter;
+    this.schedulerService = schedulerService;
+    this.ffprobe = ffprobe;
+    this.matchSchedule = matchSchedule;
+    this.matchThreshold = matchThreshold;
   }
 
   /**
@@ -334,5 +479,41 @@ public class Ingestor implements Runnable {
 
   public String myInfo() {
     return format("[%x thread=%x]", hashCode(), Thread.currentThread().getId());
+  }
+
+  class JsonFFprobe {
+    protected JsonFormat format;
+  }
+
+  class JsonFormat {
+    private String duration;
+    protected JsonTags tags;
+
+    Float getDuration() {
+      return duration == null ? null : Float.parseFloat(duration);
+    }
+
+    @Override
+    public String toString() {
+      return String.format("{duration=%s,tags=%s}", duration, tags);
+    }
+  }
+
+  class JsonTags {
+    @SerializedName(value = "creation_time")
+    private String creationTime;
+
+    Date getCreationTime() throws ParseException {
+      if (creationTime == null) {
+        return  null;
+      }
+      DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSz");
+      return format.parse(creationTime.replaceAll("000Z$", "+0000"));
+    }
+
+    @Override
+    public String toString() {
+      return String.format("{creation_time=%s}", creationTime);
+    }
   }
 }

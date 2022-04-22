@@ -1,0 +1,35 @@
+
+.OpencastPaellaVersionPlugin {
+    font-family: Helvetica, Arial, sans-serif;
+    padding: 1px;
+    color: #f0f0f0;
+    min-width: 300px
+}
+
+.OpencastPaellaVersionPlugin h4 {
+    margin: 0 0 10px 0;
+    border-bottom: 1px lightgrey solid;
+}
+
+.OpencastPaellaVersionPlugin .paella-plugins {
+    margin-top: 10px;
+    margin-left: 10px;
+
+}
+
+.OpencastPaellaVersionPlugin .row {
+    display: flex;
+    min-width: 100px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    border-bottom: 1px #d3a84c dotted;
+}
+
+.OpencastPaellaVersionPlugin .row .component {
+    max-width: 80%;
+}
+
+.OpencastPaellaVersionPlugin .row .version {
+    margin-left: auto;
+    color: lightblue;
+}

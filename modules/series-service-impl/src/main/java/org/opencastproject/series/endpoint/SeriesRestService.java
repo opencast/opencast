@@ -209,7 +209,7 @@ public class SeriesRestService {
    *
    * @param seriesService
    */
-  @Reference(name = "service-impl")
+  @Reference
   public void setService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -219,7 +219,7 @@ public class SeriesRestService {
    *
    * @param dcService
    */
-  @Reference(name = "dc")
+  @Reference
   public void setDublinCoreService(DublinCoreCatalogService dcService) {
     this.dcService = dcService;
   }

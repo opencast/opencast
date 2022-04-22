@@ -695,7 +695,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
    * @param searchService
    *          the service implementation
    */
-  @Reference(name = "service-impl")
+  @Reference
   public void setSearchService(SearchServiceImpl searchService) {
     this.searchService = searchService;
   }
@@ -706,7 +706,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceregistry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

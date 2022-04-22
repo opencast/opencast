@@ -80,13 +80,13 @@ public class AdopterRegistrationServiceImpl implements Service {
   //================================================================================
 
   /** OSGi setter for the security service. */
-  @Reference(name = "securityService")
+  @Reference
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi setter for the form repository. */
-  @Reference(name = "formRepository")
+  @Reference
   protected void setFormRepository(FormRepository formRepository) {
     this.formRepository = formRepository;
   }

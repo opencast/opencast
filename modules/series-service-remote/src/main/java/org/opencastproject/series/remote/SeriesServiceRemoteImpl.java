@@ -140,7 +140,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
    * @param client
    */
   @Override
-  @Reference(name = "trustedHttpClient")
+  @Reference
   public void setTrustedHttpClient(TrustedHttpClient client) {
     super.setTrustedHttpClient(client);
   }
@@ -151,7 +151,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
    * @param remoteServiceManager
    */
   @Override
-  @Reference(name = "remoteServiceManager")
+  @Reference
   public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
     super.setRemoteServiceManager(remoteServiceManager);
   }

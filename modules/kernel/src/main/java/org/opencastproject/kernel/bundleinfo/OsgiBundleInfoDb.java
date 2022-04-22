@@ -46,10 +46,7 @@ public class OsgiBundleInfoDb extends AbstractBundleInfoDb {
   private PersistenceEnv penv;
 
   /** OSGi DI */
-  @Reference(
-      name = "entityManagerFactory",
-      target = "(osgi.unit.name=org.opencastproject.kernel)"
-  )
+  @Reference(target = "(osgi.unit.name=org.opencastproject.kernel)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }

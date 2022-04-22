@@ -197,7 +197,7 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
    * @param composerService
    *          the local composer service
    */
-  @Reference(name = "ComposerService")
+  @Reference
   protected void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -207,7 +207,7 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
    *
    * @param smilService
    */
-  @Reference(name = "SmilService")
+  @Reference
   protected void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }
@@ -219,12 +219,12 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

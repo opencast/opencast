@@ -115,7 +115,7 @@ public class WorkflowDefinitionsEndpoint {
   /**
    * OSGi DI
    */
-  @Reference(name = "workflowService")
+  @Reference
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }

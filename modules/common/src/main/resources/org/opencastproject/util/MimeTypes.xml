@@ -514,4 +514,9 @@
     <Description>Advanced SubStation Alpha</Description>
     <Extensions>ass,ssa</Extensions>
   </MimeType>
+  <MimeType>
+    <Type>video/x-trec</Type>
+    <Description>Camtasia TREC video</Description>
+    <Extensions>trec</Extensions>
+  </MimeType>
 </MimeTypes>

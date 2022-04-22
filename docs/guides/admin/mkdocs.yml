@@ -28,6 +28,8 @@ extra_css:
 # The javascript files in this list will extend the existing javascript from the default theme
 extra_javascript:
    - javascript/extra.js
+   - javascript/popper.js
+   - javascript/tippy.js
 
 # The logo in the header
 extra:
@@ -134,6 +136,8 @@ nav:
         - es.upv.paella.opencast.searchPlugin: 'modules/paella.player/plugins/es.upv.paella.opencast.searchPlugin.md'
         - es.upv.paella.opencast.transcriptionTabBarPlugin: 'modules/paella.player/plugins/es.upv.paella.opencast.transcriptionTabBarPlugin.md'
         - es.upv.paella.opencast.userTrackingSaverPlugIn: 'modules/paella.player/plugins/es.upv.paella.opencast.userTrackingSaverPlugIn.md'
+   - Paella player 7:
+      - Configuration: 'modules/paella.player7/configuration.md'
    - Search Index:
       - Overview: 'modules/searchindex/index.md'
       - Solr: 'modules/searchindex/solr.md'
@@ -219,6 +223,7 @@ nav:
    - Publish Engage: 'workflowoperationhandlers/publish-engage-woh.md'
    - Publish OAI-PMH: 'workflowoperationhandlers/publish-oaipmh-woh.md'
    - Publish YouTube: 'workflowoperationhandlers/publish-youtube-woh.md'
+   - Rename Files: 'workflowoperationhandlers/rename-files-woh.md'
    - Republish OAI-PMH: 'workflowoperationhandlers/republish-oaipmh-woh.md'
    - Retract Engage AWS: 'workflowoperationhandlers/retract-engage-aws-woh.md'
    - Retract Engage: 'workflowoperationhandlers/retract-engage-woh.md'

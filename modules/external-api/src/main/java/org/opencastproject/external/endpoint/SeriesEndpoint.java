@@ -121,6 +121,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -165,25 +166,25 @@ public class SeriesEndpoint {
   private SeriesService seriesService;
 
   /** OSGi DI */
-  @Reference(name = "ElasticsearchIndex")
+  @Reference
   void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
     this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /** OSGi DI */
-  @Reference(name = "IndexService")
+  @Reference
   void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
   /** OSGi DI */
-  @Reference(name = "SecurityService")
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI */
-  @Reference(name = "SeriesService")
+  @Reference
   void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -831,6 +832,9 @@ public class SeriesEndpoint {
     if (optSeries.isPresent()) {
       Series series = optSeries.get();
       // The ACL is stored as JSON string in the index. Parse it and extract the part we want to have in the API.
+      if (series.getAccessPolicy() == null) {
+        return ApiResponses.notFound("Acl for series with id '%s' is not defined.", id);
+      }
       JSONObject acl = (JSONObject) parser.parse(series.getAccessPolicy());
 
       if (!((JSONObject) acl.get("acl")).containsKey("ace")) {

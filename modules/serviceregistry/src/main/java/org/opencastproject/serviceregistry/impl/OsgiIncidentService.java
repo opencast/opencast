@@ -93,7 +93,7 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -132,7 +132,7 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
   }
 
   /** OSGi DI */
-  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.serviceregistry)")
+  @Reference(target = "(osgi.unit.name=org.opencastproject.serviceregistry)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }

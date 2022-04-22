@@ -128,12 +128,12 @@ public final class IncludeWorkflowOperationHandler extends AbstractWorkflowOpera
   /**
    * OSGi DI.
    */
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkflowService(WorkflowService service) {
     this.workflowService = service;
   }
 
-  @Reference(name = "serviceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

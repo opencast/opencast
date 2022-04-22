@@ -154,10 +154,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param streamingDistributionService
    *          the streaming distribution service
    */
-  @Reference(
-      name = "StreamingDistributionService",
-      target = "(distribution.channel=streaming)"
-  )
+  @Reference(target = "(distribution.channel=streaming)")
   protected void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
     this.streamingDistributionService = streamingDistributionService;
   }
@@ -168,10 +165,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param downloadDistributionService
    *          the download distribution service
    */
-  @Reference(
-      name = "DownloadDistributionService",
-      target = "(distribution.channel=download)"
-  )
+  @Reference(target = "(distribution.channel=download)")
   protected void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
     this.downloadDistributionService = downloadDistributionService;
   }
@@ -183,17 +177,17 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param searchService
    *          an instance of the search service
    */
-  @Reference(name = "SearchService")
+  @Reference
   protected void setSearchService(SearchService searchService) {
     this.searchService = searchService;
   }
 
-  @Reference(name = "organizationDirectoryService")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

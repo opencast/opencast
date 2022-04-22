@@ -69,7 +69,7 @@ public class RoleEndpoint {
    * @param organizationDirectory
    *          the organization directory
    */
-  @Reference(name = "orgDirectory")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }
@@ -110,7 +110,7 @@ public class RoleEndpoint {
    * @param roleDirectoryService
    *          the roleDirectoryService to set
    */
-  @Reference(name = "roleDirectoryService")
+  @Reference
   public void setRoleDirectoryService(RoleDirectoryService roleDirectoryService) {
     this.roleDirectoryService = roleDirectoryService;
   }

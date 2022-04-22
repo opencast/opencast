@@ -124,31 +124,31 @@ public class CaptureNowProlongingService implements ManagedService {
   private ComponentContext componentContext;
 
   /** Sets the scheduler service */
-  @Reference(name = "scheduler-service")
+  @Reference
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
   }
 
   /** Sets the security service */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** Sets the service registry */
-  @Reference(name = "service-registry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
   /** Sets the organization directory service */
-  @Reference(name = "organization-directory-service")
+  @Reference
   public void setOrgDirectoryService(OrganizationDirectoryService orgDirectoryService) {
     this.orgDirectoryService = orgDirectoryService;
   }
 
   /** Sets the workspace */
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

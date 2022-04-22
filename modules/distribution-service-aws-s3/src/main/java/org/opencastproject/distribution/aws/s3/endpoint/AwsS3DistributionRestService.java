@@ -116,7 +116,7 @@ public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -125,10 +125,7 @@ public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
    * @param service
    *          the service to set
    */
-  @Reference(
-      name = "distributionService",
-      target = "(distribution.channel=aws.s3)"
-  )
+  @Reference(target = "(distribution.channel=aws.s3)")
   public void setService(AwsS3DistributionService service) {
     this.service = service;
   }

@@ -201,7 +201,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
    * @param ws
    *          the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   void setWorkspace(Workspace ws) {
     this.workspace = ws;
   }
@@ -213,7 +213,6 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
    *          the template scanner service
    */
   @Reference(
-      name = "EmailTemplateScanner",
       cardinality = ReferenceCardinality.OPTIONAL,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "unsetEmailTemplateScanner"
@@ -238,7 +237,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
    * @param incidentService
    *          the incident service
    */
-  @Reference(name = "IncidentService")
+  @Reference
   public void setIncidentService(IncidentService incidentService) {
     this.incidentService = incidentService;
   }

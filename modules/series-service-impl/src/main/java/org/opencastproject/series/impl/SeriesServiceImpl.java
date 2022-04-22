@@ -124,31 +124,31 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   private AclServiceFactory aclServiceFactory;
 
   /** OSGi callback for setting persistance. */
-  @Reference(name = "series-persistence")
+  @Reference
   public void setPersistence(SeriesServiceDatabase persistence) {
     this.persistence = persistence;
   }
 
   /** OSGi callback for setting the security service. */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi callback for setting the organization directory service. */
-  @Reference(name = "orgDirectory")
+  @Reference
   public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
     this.orgDirectory = orgDirectory;
   }
 
   /** OSGi callback for setting the message sender. */
-  @Reference(name = "message-broker-sender")
+  @Reference
   public void setMessageSender(MessageSender messageSender) {
     this.messageSender = messageSender;
   }
 
   /** OSGi callbacks for setting the API index. */
-  @Reference(name = "elasticsearch-index")
+  @Reference
   public void setElasticsearchIndex(ElasticsearchIndex index) {
     this.elasticsearchIndex = index;
   }
@@ -572,7 +572,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     logger.debug("Removing series {} from the {} index.", seriesId, index.getIndexName());
 
     try {
-      index.delete(Series.DOCUMENT_TYPE, seriesId, orgId);
+      index.deleteSeries(seriesId, orgId);
       logger.debug("Series {} removed from the {} index.", seriesId, index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Series {} couldn't be removed from the {} index.", seriesId, index.getIndexName(), e);

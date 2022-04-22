@@ -958,7 +958,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
    * @param workspace
    *            an instance of the workspace
    */
-  @Reference(name = "workspace")
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -981,7 +981,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
    * @param serviceRegistry
    *            the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -1002,7 +1002,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
    * @param securityService
    *            the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -1013,7 +1013,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
    * @param userDirectoryService
    *            the userDirectoryService to set
    */
-  @Reference(name = "user-directory")
+  @Reference
   public void setUserDirectoryService(
       UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
@@ -1025,7 +1025,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
    * @param organizationDirectory
    *            the organization directory
    */
-  @Reference(name = "orgDirectory")
+  @Reference
   public void setOrganizationDirectoryService(
       OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;

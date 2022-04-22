@@ -91,7 +91,7 @@ public class LtiServiceRestEndpoint {
   private LtiService service;
 
   /** OSGi DI */
-  @Reference(name = "LtiService")
+  @Reference
   public void setService(LtiService service) {
     this.service = service;
   }

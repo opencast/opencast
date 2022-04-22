@@ -94,7 +94,7 @@ public class SecurityEndpoint implements ManagedService {
   private UrlSigningService urlSigningService;
 
   /** OSGi DI */
-  @Reference(name = "UrlSigningService")
+  @Reference
   void setUrlSigningService(UrlSigningService urlSigningService) {
     this.urlSigningService = urlSigningService;
   }

@@ -80,7 +80,7 @@ public class OAuthConsumerDetailsService implements ConsumerDetailsService, User
   /**
    * OSGi DI
    */
-  @Reference(name = "userDetailsService")
+  @Reference
   public void setDelegate(UserDetailsService delegate) {
     this.delegate = delegate;
   }

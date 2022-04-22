@@ -80,6 +80,10 @@ do not support multitenancy.
 Hosts can have different schemas (http / https) and port numbers, e.g. when you run behind proxy server. Note, that
 the combination of hostname and port number is uniquely mapped to an organization.
 
+It is not supported for Opencast tenants to be hosted in a subpath.
+Opencast tenants needs to be served from the root path element.
+The RFC 3986 URI path component needs to be empty.
+
 ### Step 2: Security Configuration
 
 Create a file called tenant1.xml in /etc/security. This file specifies access rules for individual URLs that specify

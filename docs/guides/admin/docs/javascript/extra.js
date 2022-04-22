@@ -27,7 +27,23 @@ $(document).ready(function () {
         ga('send', 'pageview');
     }
     tocPaneFix();
+    tooltips();
 });
+
+/**
+ * Style the tooltips.
+ */
+function tooltips() {
+    tippy('[title]', {
+        content(reference) {
+            const title = reference.getAttribute('title');
+            reference.removeAttribute('title');
+            return title;
+        },
+        interactive: true,
+        theme: 'opencast',
+    });
+}
 
 
 /**

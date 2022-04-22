@@ -4,6 +4,106 @@ Changelog
 Opencast 11
 ----------
 
+### Opencast 11.6
+
+*Released on April 20th, 2022*
+
+- [[#3638](https://github.com/opencast/opencast/pull/3638)] -
+  Fix add punctuation and models support to google transcription
+- [[#3633](https://github.com/opencast/opencast/pull/3633)] -
+  allow admin user for node to node communication #3556
+- [[#3631](https://github.com/opencast/opencast/pull/3631)] -
+  Error handling in Vosk module
+- [[#3630](https://github.com/opencast/opencast/pull/3630)] -
+  Fix Vosk Concurrency Problem
+- [[#3605](https://github.com/opencast/opencast/pull/3605)] -
+  fix #3602, Terminate state service, check that host is not in maintenance
+- [[#3586](https://github.com/opencast/opencast/pull/3586)] -
+  Auto-generated series for Capture Agents
+- [[#3567](https://github.com/opencast/opencast/pull/3567)] -
+  Fix workflow definition installation
+- [[#3555](https://github.com/opencast/opencast/pull/3555)] -
+  Rework the userdirectory-brightspace module
+- [[#3550](https://github.com/opencast/opencast/pull/3550)] -
+  Add release notes and changelog for OC 11.5
+- [[#3330](https://github.com/opencast/opencast/pull/3330)] -
+  Removed ManagedService from MediaInspectionService
+
+### Opencast 11.5
+
+*Released on March 23rd, 2022*
+
+- [[#3544](https://github.com/opencast/opencast/pull/3544)] -
+  Fix bug: Editor sometimes doesn't skip deactivated sections on Safari Browser
+- [[#3547](https://github.com/opencast/opencast/pull/3547)] -
+  Redowngrade Paella to 6.4.4
+- [[#3546](https://github.com/opencast/opencast/pull/3546)] -
+  Update Editor to 2022-03-22
+- [[#3545](https://github.com/opencast/opencast/pull/3545)] -
+  Update 11.x translations, restore zh_TW translations
+- [[#3541](https://github.com/opencast/opencast/pull/3541)] -
+  Downgrade commons-io
+- [[#3540](https://github.com/opencast/opencast/pull/3540)] -
+  Fix NPE when signing publication URLs
+- [[#3534](https://github.com/opencast/opencast/pull/3534)] -
+  Fix Admin UI builds due to missing SASS
+- [[#3532](https://github.com/opencast/opencast/pull/3532)] -
+  Fix wrong name of admin UI configuration file
+- [[#3520](https://github.com/opencast/opencast/pull/3520)] -
+  Docs: Force same sample rate for audio files in PartialImport WOH encoding
+- [[#3474](https://github.com/opencast/opencast/pull/3474)] -
+  Fix OC 11.4 release notes layout issues
+- [[#3466](https://github.com/opencast/opencast/pull/3466)] -
+  Check if encoding profile exist for imageToVideo Operation
+- [[#3460](https://github.com/opencast/opencast/pull/3460)] -
+  fix admin-ui endpoint crash, when a series without title exists
+- [[#3459](https://github.com/opencast/opencast/pull/3459)] -
+  Add release notes and changelog for OC 11.4
+- [[#3343](https://github.com/opencast/opencast/pull/3343)] -
+  Password strength indicator
+- [[#3197](https://github.com/opencast/opencast/pull/3197)] -
+  Elasticsearch Retry Config
+
+### Opencast 11.4
+
+*Released on February 16th, 2022*
+
+- [[#3457](https://github.com/opencast/opencast/pull/3457)] -
+  Update Opencast Studio to 2022-02-16
+- [[#3444](https://github.com/opencast/opencast/pull/3444)] -
+  Fix frontend-no-prebuilt profile
+- [[#3437](https://github.com/opencast/opencast/pull/3437)] -
+  Fix merge conflict
+- [[#3432](https://github.com/opencast/opencast/pull/3432)] -
+  Fix `pom.xml` Version
+- [[#3423](https://github.com/opencast/opencast/pull/3423)] -
+  Fixes OSGi error when shutting down Opencast
+- [[#3416](https://github.com/opencast/opencast/pull/3416)] -
+  Fixed Typo in Logging Statement
+- [[#3384](https://github.com/opencast/opencast/pull/3384)] -
+  Add DublinCore Catalog to Scheduler JSON
+- [[#3369](https://github.com/opencast/opencast/pull/3369)] -
+  Update slf4j
+- [[#3368](https://github.com/opencast/opencast/pull/3368)] -
+  Capture agent calendar as JSON
+- [[#3367](https://github.com/opencast/opencast/pull/3367)] -
+  Add release notes and changelog for OC 11.3
+- [[#3365](https://github.com/opencast/opencast/pull/3365)] -
+  Remove `mvn site` Test
+- [[#3344](https://github.com/opencast/opencast/pull/3344)] -
+  merge the ldap userdirectory behaviour from 9.x into the current module
+- [[#3342](https://github.com/opencast/opencast/pull/3342)] -
+  Allow metadata editting
+- [[#3340](https://github.com/opencast/opencast/pull/3340)] -
+  Match Inbox Events Against Schedule
+- [[#3327](https://github.com/opencast/opencast/pull/3327)] -
+  Extend Metadata Extraction in Inbox
+- [[#3203](https://github.com/opencast/opencast/pull/3203)] -
+  start-workflow-wfh allows to pass mediapackage id from previous WFH
+- [[#3155](https://github.com/opencast/opencast/pull/3155)] -
+  Allow the use of organization properties in workflows
+
+
 ### Opencast 11.3
 
 *Released on January 19th, 2022*
@@ -694,10 +794,75 @@ Opencast 11
 Opencast 10
 ----------
 
+### Opencast 10.12
+
+*Released on Apr 19th, 2022*
+
+- [[#3660](https://github.com/opencast/opencast/pull/3660)] -
+  Update Editor to 2022-03-22 and OC Studio to 2022-02-16 for OC 10.x
+- [[#3650](https://github.com/opencast/opencast/pull/3650)] -
+  Fixes admin-ui repeated series name display #3600
+- [[#3626](https://github.com/opencast/opencast/pull/3626)] -
+  Update paella player to paella 6.5.6
+
+
+### Opencast 10.11
+
+*Released on Mar 22nd, 2022*
+
+- [[#3533](https://github.com/opencast/opencast/pull/3533)] -
+  Add activemq upgrade note to 10.x upgrade guide
+- [[#3531](https://github.com/opencast/opencast/pull/3531)] -
+  Revert "Update paella player to paella 6.5.5 (#3142)" since HLS videos do not load on slow connections
+- [[#3517](https://github.com/opencast/opencast/pull/3517)] -
+  Admin-ui-frontend migrate node-sass to sass
+- [[#3512](https://github.com/opencast/opencast/pull/3512)] -
+  Improve Tooltips in Documentation
+- [[#3490](https://github.com/opencast/opencast/pull/3490)] -
+  Document that you cannot run Opencast in a sub-path
+- [[#3467](https://github.com/opencast/opencast/pull/3467)] -
+  Opencast 10.10 release notes and changelog
+
+
+### Opencast 10.10
+
+*Released on Feb 17th, 2022*
+
+- [[#3427](https://github.com/opencast/opencast/pull/3427)] -
+  Fix Typo in Opencast 10 Upgrade Guide
+- [[#3415](https://github.com/opencast/opencast/pull/3415)] -
+  Update pax logging from version 1.11.13 to 1.11.14
+- [[#3414](https://github.com/opencast/opencast/pull/3414)] -
+  Revert "update karaf from version 4.2.9 to 4.2.15"
+- [[#3390](https://github.com/opencast/opencast/pull/3390)] -
+  Endpoint to Remove Tracked Host Bundles
+- [[#3389](https://github.com/opencast/opencast/pull/3389)] -
+  Rename Files Workflow Operation Handler
+- [[#3386](https://github.com/opencast/opencast/pull/3386)] -
+  update karaf from version 4.2.9 to 4.2.15
+- [[#3373](https://github.com/opencast/opencast/pull/3373)] -
+  Adding Camtasia .trec support.
+- [[#3372](https://github.com/opencast/opencast/pull/3372)] -
+  Fix port checking
+- [[#3364](https://github.com/opencast/opencast/pull/3364)] -
+  Automatically Update Matrix Room
+- [[#3363](https://github.com/opencast/opencast/pull/3363)] -
+  Automated Release Title
+- [[#3362](https://github.com/opencast/opencast/pull/3362)] -
+  ConfigurableRetractWorkflowOperationHandle: fixed exception message
+- [[#3361](https://github.com/opencast/opencast/pull/3361)] -
+  Fix metadata for multitenancy
+- [[#3359](https://github.com/opencast/opencast/pull/3359)] -
+  Document Capture Agent Input Selection
+- [[#3345](https://github.com/opencast/opencast/pull/3345)] -
+  Fix Javadocs
+- [[#2811](https://github.com/opencast/opencast/pull/2811)] -
+  Add download artifacts in engage publication
+
 
 ### Opencast 10.9
 
-*Released on January 18th, 2021*
+*Released on January 18th, 2022*
 
 - [[#3341](https://github.com/opencast/opencast/pull/3341)] -
   Update Nexus related documentation

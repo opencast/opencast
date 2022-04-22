@@ -888,37 +888,37 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     });
   }
 
-  @Reference(name = "WORKSPACE")
+  @Reference
   @Override
   public void setWorkspace(Workspace workspace) {
     super.setWorkspace(workspace);
   }
 
-  @Reference(name = "serviceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);
   }
 
-  @Reference(name = "security-service")
+  @Reference
   @Override
   public void setSecurityService(SecurityService securityService) {
     super.setSecurityService(securityService);
   }
 
-  @Reference(name = "user-directory")
+  @Reference
   @Override
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     super.setUserDirectoryService(userDirectoryService);
   }
 
-  @Reference(name = "orgDirectory")
+  @Reference
   @Override
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     super.setOrganizationDirectoryService(organizationDirectoryService);
   }
 
-  @Reference(name = "trustedHttpClient")
+  @Reference
   @Override
   public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
     super.setTrustedHttpClient(trustedHttpClient);

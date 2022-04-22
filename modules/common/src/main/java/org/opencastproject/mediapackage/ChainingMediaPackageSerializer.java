@@ -65,7 +65,6 @@ public class ChainingMediaPackageSerializer implements MediaPackageSerializer {
 
   /** OSGi DI */
   @Reference(
-      name = "mpSerializers",
       cardinality = ReferenceCardinality.MULTIPLE,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "removeMediaPackageSerializer",

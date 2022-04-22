@@ -71,7 +71,7 @@ public class CurrentJobFilter implements Filter {
    * @param serviceRegistry
    *          the serviceRegistry to set
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

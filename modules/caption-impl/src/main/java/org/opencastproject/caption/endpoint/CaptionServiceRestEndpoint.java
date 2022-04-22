@@ -112,7 +112,6 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
    *          the caption service to set
    */
   @Reference(
-      name = "service-impl",
       cardinality = ReferenceCardinality.OPTIONAL,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "unsetCaptionService"
@@ -137,7 +136,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

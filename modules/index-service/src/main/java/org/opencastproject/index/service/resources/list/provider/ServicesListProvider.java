@@ -136,7 +136,7 @@ public class ServicesListProvider implements ResourceListProvider {
   }
 
   /** OSGi callback for the service registry. */
-  @Reference(name = "serviceRegistry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

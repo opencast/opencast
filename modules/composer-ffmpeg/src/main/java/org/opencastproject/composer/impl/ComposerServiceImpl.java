@@ -996,6 +996,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           MediaPackageException {
     try {
       final EncodingProfile profile = profileScanner.getProfile(profileId);
+      if (profile == null) {
+        throw new MediaPackageException(String.format("Encoding profile %s not found", profileId));
+      }
       return serviceRegistry.createJob(JOB_TYPE, Operation.ImageToVideo.toString(), Arrays.asList(
               profileId, MediaPackageElementParser.getAsXml(sourceImageAttachment), Double.toString(time)),
               profile.getJobLoad());
@@ -1912,7 +1915,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param mediaInspectionService
    *          an instance of the media inspection service
    */
-  @Reference(name = "inspection-service")
+  @Reference
   protected void setMediaInspectionService(MediaInspectionService mediaInspectionService) {
     this.inspectionService = mediaInspectionService;
   }
@@ -1923,7 +1926,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(name = "workspace")
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -1934,7 +1937,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -1955,7 +1958,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param scanner
    *          the profile scanner
    */
-  @Reference(name = "profileScanner")
+  @Reference
   protected void setProfileScanner(EncodingProfileScanner scanner) {
     this.profileScanner = scanner;
   }
@@ -1966,7 +1969,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -1977,7 +1980,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
-  @Reference(name = "user-directory")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -1988,7 +1991,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param organizationDirectory
    *          the organization directory
    */
-  @Reference(name = "orgDirectory")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }
@@ -2003,7 +2006,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     return securityService;
   }
 
-  @Reference(name = "smil-service")
+  @Reference
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }
@@ -2028,7 +2031,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     return organizationDirectoryService;
   }
 
-  @Reference(name = "profilesReadyIndicator", target = "(artifact=encodingprofile)")
+  @Reference(target = "(artifact=encodingprofile)")
   public void setEncodingProfileReadinessIndicator(ReadinessIndicator unused) {
     //  Wait for the encoding profiles to load
   }

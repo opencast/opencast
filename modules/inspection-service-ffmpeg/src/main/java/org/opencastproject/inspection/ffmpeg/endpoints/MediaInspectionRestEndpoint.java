@@ -93,7 +93,7 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -104,7 +104,7 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
    * @param service
    *          the inspection service
    */
-  @Reference(name = "service", cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
+  @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
   public void setService(MediaInspectionService service) {
     this.service = service;
   }

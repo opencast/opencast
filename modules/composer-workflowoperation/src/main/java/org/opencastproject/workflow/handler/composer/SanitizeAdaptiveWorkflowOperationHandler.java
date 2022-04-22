@@ -99,12 +99,12 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

@@ -88,7 +88,7 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

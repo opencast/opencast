@@ -107,14 +107,14 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
 
   /** OSGi Di */
   @Override
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     super.setWorkspace(workspace);
   }
 
   /** OSGi Di */
   @Override
-  @Reference(name = "database")
+  @Reference
   public void setDatabase(AwsAssetDatabase db) {
     super.setDatabase(db);
   }

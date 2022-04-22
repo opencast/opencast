@@ -875,33 +875,32 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     }
   }
 
-  @Reference(name = "dublinCoreService")
+  @Reference
   public void setDublinCoreService(DublinCoreCatalogService service) {
     this.dublinCoreService = service;
   }
 
-  @Reference(name = "searchService")
+  @Reference
   public void setSearchService(SearchService service) {
     this.searchService = service;
   }
 
-  @Reference(name = "seriesService")
+  @Reference
   public void setSeriesService(SeriesService service) {
     this.seriesService = service;
   }
 
-  @Reference(name = "serviceRegistry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry service) {
     this.serviceRegistry = service;
   }
 
-  @Reference(name = "captureAgentService")
+  @Reference
   public void setCaptureAgentService(CaptureAgentStateService service) {
     this.captureAgentService = service;
   }
 
   @Reference(
-      name = "distributionService",
       cardinality = ReferenceCardinality.AT_LEAST_ONE,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "unsetDownloadDistributionService"
@@ -919,27 +918,27 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     }
   }
 
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace ws) {
     this.workspace = ws;
   }
 
-  @Reference(name = "assetManager")
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
-  @Reference(name = "authorizationService")
+  @Reference
   public void setAuthorizationService(AuthorizationService service) {
     this.authService = service;
   }
 
-  @Reference(name = "organizationService")
+  @Reference
   public void setOrganizationService(OrganizationDirectoryService service) {
     this.organizationService = service;
   }
 
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService service) {
     this.securityService = service;
   }

@@ -269,9 +269,12 @@
     <!-- anonymous access to user interface configuration -->
     <sec:intercept-url pattern="/ui/config/**" access="ROLE_ANONYMOUS" />
 
-    <!-- Paella player -->
+    <!-- Paella player 6 -->
     <sec:intercept-url pattern="/paella/ui/auth.html" access="ROLE_USER" />
     <sec:intercept-url pattern="/paella/ui/**" access="ROLE_ANONYMOUS" />
+   <!-- Paella player 7 -->
+    <sec:intercept-url pattern="/paella7/ui/auth.html" access="ROLE_USER" />
+    <sec:intercept-url pattern="/paella7/ui/**" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the engage player and the GET endpoints it requires -->
     <sec:intercept-url pattern="/engage/ui/**" access="ROLE_ANONYMOUS" />
@@ -328,6 +331,7 @@
 
     <!-- Enable access to the LTI service -->
     <sec:intercept-url pattern="/lti-service-gui/**" access="ROLE_OAUTH_USER" />
+    <sec:intercept-url pattern="/lti-service/**" access="ROLE_ADMIN, ROLE_OAUTH_USER" />
 
     <sec:intercept-url pattern="/transcripts/watson/results*" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/transcripts/watson/results*" method="POST" access="ROLE_ANONYMOUS" />

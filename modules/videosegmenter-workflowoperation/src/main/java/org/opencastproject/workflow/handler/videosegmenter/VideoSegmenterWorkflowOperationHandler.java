@@ -176,7 +176,7 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
    * @param videosegmenter
    *          the video segmenter
    */
-  @Reference(name = "VideoSegmenterService")
+  @Reference
   protected void setVideoSegmenter(VideoSegmenterService videosegmenter) {
     this.videosegmenter = videosegmenter;
   }
@@ -188,12 +188,12 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

@@ -111,13 +111,13 @@ public class YouTubePublicationServiceRemoteImpl extends RemoteBase implements Y
             + " using a remote youtube publication service");
   }
 
-  @Reference(name = "trustedHttpClient")
+  @Reference
   @Override
   public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
     super.setTrustedHttpClient(trustedHttpClient);
   }
 
-  @Reference(name = "remoteServiceManager")
+  @Reference
   @Override
   public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
     super.setRemoteServiceManager(serviceRegistry);

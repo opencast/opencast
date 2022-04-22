@@ -92,7 +92,7 @@ public class CopyWorkflowOperationHandler extends AbstractWorkflowOperationHandl
    * @param workspace
    *          the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -217,7 +217,7 @@ public class CopyWorkflowOperationHandler extends AbstractWorkflowOperationHandl
     logger.debug("Element {} copied to target {}.", sourceFile.getPath(), targetFile.getPath());
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

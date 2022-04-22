@@ -66,7 +66,7 @@ public class AclListProvider implements ResourceListProvider {
   }
 
   /** OSGi callback for acl services. */
-  @Reference(name = "aclServiceFactory")
+  @Reference
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
@@ -76,7 +76,7 @@ public class AclListProvider implements ResourceListProvider {
    *
    * @param securityService the security service
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

@@ -236,7 +236,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * @param smtpService
    *          the smtp service
    */
-  @Reference(name = "smtpservice")
+  @Reference
   void setSmtpService(SmtpService smtpService) {
     this.smtpService = smtpService;
   }
@@ -247,7 +247,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * @param service
    *          the email template service
    */
-  @Reference(name = "EmailTemplateService")
+  @Reference
   void setEmailTemplateService(EmailTemplateService service) {
     this.emailTemplateService = service;
   }
@@ -258,12 +258,12 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * @param service
    *          the user directory service
    */
-  @Reference(name = "userDirectoryService")
+  @Reference
   void setUserDirectoryService(UserDirectoryService service) {
     this.userDirectoryService = service;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

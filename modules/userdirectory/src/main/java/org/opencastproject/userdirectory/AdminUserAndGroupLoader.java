@@ -336,7 +336,7 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
    * @param groupRoleProvider
    *          the groupRoleProvider to set
    */
-  @Reference(name = "groupRoleProvider")
+  @Reference
   void setGroupRoleProvider(JpaGroupRoleProvider groupRoleProvider) {
     this.groupRoleProvider = groupRoleProvider;
   }
@@ -347,7 +347,7 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
    * @param userAndRoleProvider
    *          the user and role provider to set
    */
-  @Reference(name = "userAndRoleProvider")
+  @Reference
   void setUserAndRoleProvider(JpaUserAndRoleProvider userAndRoleProvider) {
     this.userAndRoleProvider = userAndRoleProvider;
   }
@@ -358,7 +358,7 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
    * @param organizationDirectoryService
    *          the organizationDirectoryService to set
    */
-  @Reference(name = "organizationDirectoryService")
+  @Reference
   void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
     this.organizationDirectoryService.addOrganizationDirectoryListener(this);
@@ -370,7 +370,7 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
    * @param securityService
    *          the security service
    */
-  @Reference(name = "security-service")
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
