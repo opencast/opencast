@@ -83,7 +83,7 @@ import javax.ws.rs.core.Response;
 
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
-            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0 })
+            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0 })
 @RestService(
   name = "externalapistatistics", title = "External API Statistics Endpoint",
   notes = {}, abstractText = "Provides statistics")
@@ -384,8 +384,8 @@ public class StatisticsEndpoint {
   }
 
   private void checkSeriesAccess(final String seriesId) throws UnauthorizedException, SearchIndexException {
-    final Opt<Series> series = indexService.getSeries(seriesId, elasticsearchIndex);
-    if (series.isNone()) {
+    final Optional<Series> series = elasticsearchIndex.getSeries(seriesId, securityService.getOrganization().getId(), securityService.getUser());
+    if (series.isEmpty()) {
       // IndexService checks permissions and returns None if user is unauthorized
       throw new UnauthorizedException(securityService.getUser(), "read");
     }
