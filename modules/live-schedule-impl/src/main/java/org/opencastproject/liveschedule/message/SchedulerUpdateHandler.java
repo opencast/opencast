@@ -150,12 +150,12 @@ public class SchedulerUpdateHandler extends UpdateHandler {
   }
 
   // === Set by OSGI begin
-  @Reference(name = "schedulerService")
+  @Reference
   public void setSchedulerService(SchedulerService service) {
     this.schedulerService = service;
   }
 
-  @Reference(name = "liveScheduleService")
+  @Reference
   @Override
   public void setLiveScheduleService(LiveScheduleService liveScheduleService) {
     super.setLiveScheduleService(liveScheduleService);

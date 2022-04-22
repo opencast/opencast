@@ -213,38 +213,37 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * OSGi dependencies
    */
 
-  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.assetmanager.impl)")
+  @Reference(target = "(osgi.unit.name=org.opencastproject.assetmanager.impl)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.db = new Database(emf);
   }
 
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  @Reference(name = "authorizationService")
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
 
-  @Reference(name = "orgDir")
+  @Reference
   public void setOrgDir(OrganizationDirectoryService orgDir) {
     this.orgDir = orgDir;
   }
 
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(name = "assetStore")
+  @Reference
   public void setAssetStore(AssetStore assetStore) {
     this.assetStore = assetStore;
   }
 
   @Reference(
-      name = "remoteAssetStores",
       cardinality = ReferenceCardinality.MULTIPLE,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "removeRemoteAssetStore"
@@ -257,22 +256,22 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     remoteStores.remove(store.getStoreType());
   }
 
-  @Reference(name = "httpAssetProvider")
+  @Reference
   public void setHttpAssetProvider(HttpAssetProvider httpAssetProvider) {
     this.httpAssetProvider = httpAssetProvider;
   }
 
-  @Reference(name = "messageSender")
+  @Reference
   public void setMessageSender(MessageSender messageSender) {
     this.messageSender = messageSender;
   }
 
-  @Reference(name = "aclServiceFactory")
+  @Reference
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
 
-  @Reference(name = "index")
+  @Reference
   public void setIndex(ElasticsearchIndex index) {
     this.index = index;
   }
@@ -530,15 +529,24 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * @param index
    *         The API index to update
    */
-  private void removeEventFromIndex(String eventId, ElasticsearchIndex index) {
-    final String organization = securityService.getOrganization().getId();
+  private void removeArchivedVersionFromIndex(String eventId, ElasticsearchIndex index) {
+    final String orgId = securityService.getOrganization().getId();
     final User user = securityService.getUser();
     logger.debug("Received AssetManager delete episode message {}", eventId);
+
+    Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+      if (!eventOpt.isPresent()) {
+        logger.warn("Event {} not found for deletion", eventId);
+        return Optional.empty();
+      }
+      Event event = eventOpt.get();
+      event.setArchiveVersion(null);
+      return Optional.of(event);
+    };
+
     try {
-      index.deleteAssets(organization, user, eventId);
+      index.addOrUpdateEvent(eventId, updateFunction, orgId, user);
       logger.debug("Event {} removed from the {} index", eventId, index.getIndexName());
-    } catch (NotFoundException e) {
-      logger.warn("Event {} not found for deletion", eventId);
     } catch (SearchIndexException e) {
       logger.error("Error deleting the event {} from the {} index.", eventId, index.getIndexName(), e);
     }
@@ -861,7 +869,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
             AssetManagerItem.deleteEpisode(mpId, new Date()));
 
-    removeEventFromIndex(mpId, index);
+    removeArchivedVersionFromIndex(mpId, index);
   }
 
   /**

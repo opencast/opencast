@@ -62,7 +62,7 @@ public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperat
    * @param coverImageService
    *          an instance of the cover image service
    */
-  @Reference(name = "CoverImageService")
+  @Reference
   protected void setCoverImageService(CoverImageService coverImageService) {
     this.coverImageService = coverImageService;
   }
@@ -73,7 +73,7 @@ public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperat
    * @param workspace
    *          an instance of the workspace service
    */
-  @Reference(name = "Workspace")
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -84,10 +84,7 @@ public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperat
    * @param srv
    *          an instance of the static metadata service
    */
-  @Reference(
-      name = "MetadataService",
-      target = "(metadata.source=dublincore)"
-  )
+  @Reference(target = "(metadata.source=dublincore)")
   protected void setStaticMetadataService(StaticMetadataService srv) {
     this.metadataService = srv;
   }
@@ -98,12 +95,12 @@ public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperat
    * @param dcService
    *          an instance of the dublin core catalog service
    */
-  @Reference(name = "DublinCoreCatalogService")
+  @Reference
   protected void setDublinCoreCatalogService(DublinCoreCatalogService dcService) {
     this.dcService = dcService;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

@@ -18,6 +18,10 @@ The value must be set to the URL from which the server can be accessed later.
 
     org.opencastproject.server.url=https://example.opencast.org
 
+It is not supported for Opencast to be hosted in a subpath.
+Opencast needs to be served from the root path element.
+The RFC 3986 URI path component needs to be empty.
+
 *Note:* This value will be written to all generated media packages and thus cannot be changed easily for already
 processed media. Please think about this setting carefully.
 

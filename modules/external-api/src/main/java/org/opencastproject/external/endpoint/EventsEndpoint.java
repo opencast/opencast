@@ -239,31 +239,31 @@ public class EventsEndpoint implements ManagedService {
   private CaptureAgentStateService agentStateService;
 
   /** OSGi DI */
-  @Reference(name = "ElasticsearchIndex")
+  @Reference
   void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
     this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /** OSGi DI */
-  @Reference(name = "IndexService")
+  @Reference
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
   /** OSGi DI */
-  @Reference(name = "IngestService")
+  @Reference
   public void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }
 
   /** OSGi DI */
-  @Reference(name = "SecurityService")
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI */
-  @Reference(name = "UrlSigningService")
+  @Reference
   public void setUrlSigningService(UrlSigningService urlSigningService) {
     this.urlSigningService = urlSigningService;
   }
@@ -276,20 +276,19 @@ public class EventsEndpoint implements ManagedService {
     return schedulerService;
   }
 
-  @Reference(name = "SchedulerService")
+  @Reference
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
   }
 
   /** OSGi DI. */
-  @Reference(name = "CommonEventCatalogUIAdapter")
+  @Reference
   public void setCommonEventCatalogUIAdapter(CommonEventCatalogUIAdapter eventCatalogUIAdapter) {
     this.eventCatalogUIAdapter = eventCatalogUIAdapter;
   }
 
   /** OSGi DI. */
   @Reference(
-      name = "EventCatalogUIAdapter",
       cardinality = ReferenceCardinality.MULTIPLE,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "removeCatalogUIAdapter"
@@ -309,7 +308,7 @@ public class EventsEndpoint implements ManagedService {
   }
 
   /** OSGi DI */
-  @Reference(name = "agentStateService")
+  @Reference
   public void setAgentStateService(CaptureAgentStateService agentStateService) {
     this.agentStateService = agentStateService;
   }
@@ -482,16 +481,9 @@ public class EventsEndpoint implements ManagedService {
     if (event.isNone()) {
       return RestUtil.R.notFound(id);
     }
-    final Runnable doOnNotFound = () -> {
-      try {
-        elasticsearchIndex.delete(Event.DOCUMENT_TYPE, id, getSecurityService().getOrganization().getId());
-      } catch (SearchIndexException e) {
-        logger.error("error removing event {}: {}", id, e);
-      }
-    };
     final IndexService.EventRemovalResult result;
     try {
-      result = indexService.removeEvent(event.get(), doOnNotFound, retractWorkflowId);
+      result = indexService.removeEvent(event.get(), retractWorkflowId);
     } catch (WorkflowDatabaseException e) {
       logger.error("Workflow database is not reachable. This may be a temporary problem.");
       return RestUtil.R.serverError();
@@ -507,7 +499,6 @@ public class EventsEndpoint implements ManagedService {
       case GENERAL_FAILURE:
         return Response.serverError().build();
       case NOT_FOUND:
-        doOnNotFound.run();
         return RestUtil.R.notFound(id);
       default:
         throw new RuntimeException("Unknown EventRemovalResult type: " + result.name());

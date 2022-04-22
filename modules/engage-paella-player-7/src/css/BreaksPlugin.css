@@ -1,0 +1,14 @@
+.breaks-plugin-message {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    padding: 25% 0;
+    z-index: 100;
+    font-size: 40px;
+    background-color: rgba(0,0,0,0.6);
+    color: white;
+    box-sizing: border-box;
+}

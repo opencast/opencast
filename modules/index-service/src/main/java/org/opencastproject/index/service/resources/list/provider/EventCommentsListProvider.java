@@ -79,7 +79,7 @@ public class EventCommentsListProvider implements ResourceListProvider {
   }
 
   /** OSGi callback for the event comment service. */
-  @Reference(name = "EventCommentService")
+  @Reference
   public void setEventCommentService(EventCommentService eventCommentService) {
     this.eventCommentService = eventCommentService;
   }

@@ -87,12 +87,12 @@ public class IBMWatsonTranscriptionRestService extends AbstractJobProducerEndpoi
   public void activate(ComponentContext cc) {
   }
 
-  @Reference(name = "transcriptionService")
+  @Reference
   public void setTranscriptionService(IBMWatsonTranscriptionService service) {
     this.service = service;
   }
 
-  @Reference(name = "serviceRegistry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry service) {
     this.serviceRegistry = service;
   }

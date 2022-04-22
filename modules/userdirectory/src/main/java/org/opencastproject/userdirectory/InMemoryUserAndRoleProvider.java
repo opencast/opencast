@@ -375,7 +375,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider, 
    * @param securityService
    *          the security service
    */
-  @Reference(name = "securityService")
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

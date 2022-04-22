@@ -50,12 +50,12 @@ public class PresetProviderImpl implements PresetProvider {
   /** The security service to get the current user's organization */
   private SecurityService securityService;
 
-  @Reference(name = "seriesService")
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
-  @Reference(name = "SecurityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

@@ -89,13 +89,13 @@ public class SeriesListProvider implements ResourceListProvider {
   }
 
   /** OSGi callback for series services. */
-  @Reference(name = "ElasticsearchIndex")
+  @Reference
   public void setSearchIndex(ElasticsearchIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 
   /** OSGi callback for security service */
-  @Reference(name = "SecurityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

@@ -28,7 +28,7 @@
     box-sizing: border-box;
     display: inline-block;
     vertical-align: top;
-    min-width: (40% / $num-cols);
+    min-width: calc(40% / $num-cols);
     margin-bottom: 20px;
     margin-top: 12px;
     padding: 0 5px;

@@ -102,31 +102,16 @@
               </execution>
 
               <execution>
-                <id>esline</id>
+                <id>build</id>
                 <goals>
                   <goal>exec</goal>
                 </goals>
-                <phase>test</phase>
+                <phase>compile</phase>
                 <configuration>
                   <executable>npm</executable>
                   <arguments>
                     <argument>run</argument>
-                    <argument>eslint</argument>
-                  </arguments>
-                </configuration>
-              </execution>
-
-              <execution>
-                <id>html-linter</id>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <phase>test</phase>
-                <configuration>
-                  <executable>npm</executable>
-                  <arguments>
-                    <argument>run</argument>
-                    <argument>html-linter</argument>
+                    <argument>build</argument>
                   </arguments>
                 </configuration>
               </execution>

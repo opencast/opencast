@@ -290,22 +290,22 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
     logger.info("Registering silence detection workflow operation handler");
   }
 
-  @Reference(name = "detectionService")
+  @Reference
   public void setDetectionService(SilenceDetectionService detectionService) {
     this.detetionService = detectionService;
   }
 
-  @Reference(name = "SmilService")
+  @Reference
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }
 
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

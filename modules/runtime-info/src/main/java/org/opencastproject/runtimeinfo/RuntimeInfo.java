@@ -127,7 +127,6 @@ public class RuntimeInfo {
   private URL serverUrl;
 
   @Reference(
-      name = "userid-role-provider",
       cardinality = ReferenceCardinality.OPTIONAL,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "unsetUserIdRoleProvider"
@@ -142,12 +141,12 @@ public class RuntimeInfo {
     }
   }
 
-  @Reference(name = "security-service")
+  @Reference
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  @Reference(name = "service-registry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

@@ -89,7 +89,7 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * @param workspace
    *          the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -207,7 +207,7 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
     return newElement;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

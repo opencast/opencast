@@ -33,6 +33,7 @@ import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +46,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+@Component(
+    immediate = true,
+    service = { CaptionConverter.class },
+    property = {
+        "service.description=Google speech caption converter",
+        "caption.format=google-speech"
+    }
+)
 public class GoogleSpeechCaptionConverter implements CaptionConverter {
 
   /**
@@ -85,59 +94,58 @@ public class GoogleSpeechCaptionConverter implements CaptionConverter {
         JSONArray alternativesArray = (JSONArray) resultElement.get("alternatives");
         if (alternativesArray != null && alternativesArray.size() > 0) {
           JSONObject alternativeElement = (JSONObject) alternativesArray.get(0);
-          // remove trailing space in order to have correct transcript length
-          String transcript = ((String) alternativeElement.get("transcript")).trim();
-          if (transcript != null) {
-            JSONArray timestampsArray = (JSONArray) alternativeElement.get("words");
-            if (timestampsArray == null || timestampsArray.isEmpty()) {
-              logger.warn("Could not build caption object for job {}, result index {}: timestamp data not found",
-                      jobId, i);
-              continue;
-            }
-            // Force a maximum line size of transcriptionLineSize + one word
-            String[] words = transcript.split("\\s+");
-            StringBuffer line = new StringBuffer();
-            int indexFirst = -1;
-            int indexLast = -1;
-            for (int j = 0; j < words.length; j++) {
-              if (indexFirst == -1) {
-                indexFirst = j;
+          if (!alternativeElement.isEmpty()) {
+            // remove trailing space in order to have correct transcript length
+            String transcript = ((String) alternativeElement.get("transcript")).trim();
+            if (transcript != null) {
+              JSONArray timestampsArray = (JSONArray) alternativeElement.get("words");
+              if (timestampsArray == null || timestampsArray.isEmpty()) {
+                logger.warn("Could not build caption object for job {}, result index {}: timestamp data not found", jobId, i);
+                continue;
               }
-              line.append(words[j]);
-              line.append(" ");
-              if (line.length() >= transcriptionLineSize || j == words.length - 1) {
-                indexLast = j;
-                // Create a caption
-                double start = -1;
-                double end = -1;
-                if (indexLast < timestampsArray.size()) {
-                  // Get start time of first element
-                  JSONObject wordTSList = (JSONObject) timestampsArray.get(indexFirst);
-                  if (wordTSList.size() == 3) {
-                    // Remove 's' at the end
-                    Number startNumber = NumberFormat.getInstance(Locale.US).parse(removeEndCharacter((wordTSList.get("startTime").toString()), "s"));
-                    start = startNumber.doubleValue();
-                  }
-                  // Get end time of last element
-                  wordTSList = (JSONObject) timestampsArray.get(indexLast);
-                  if (wordTSList.size() == 3) {
-                    Number endNumber = NumberFormat.getInstance(Locale.US).parse(removeEndCharacter((wordTSList.get("endTime").toString()), "s"));
-                    end = endNumber.doubleValue();
-                  }
+              // Force a maximum line size of transcriptionLineSize + one word
+              String[] words = transcript.split("\\s+");
+              StringBuffer line = new StringBuffer();
+              int indexFirst = -1;
+              int indexLast = -1;
+              for (int j = 0; j < words.length; j++) {
+                if (indexFirst == -1) {
+                  indexFirst = j;
                 }
-                if (start == -1 || end == -1) {
-                  logger.warn("Could not build caption object for job {}, result index {}: start/end times not found",
-                          jobId, i);
-                  continue resultsLoop;
-                }
+                line.append(words[j]);
+                line.append(" ");
+                if (line.length() >= transcriptionLineSize || j == words.length - 1) {
+                  indexLast = j;
+                  // Create a caption
+                  double start = -1;
+                  double end = -1;
+                  if (indexLast < timestampsArray.size()) {
+                    // Get start time of first element
+                    JSONObject wordTSList = (JSONObject) timestampsArray.get(indexFirst);
+                    if (wordTSList.size() == 3) {
+                      // Remove 's' at the end
+                      Number startNumber = NumberFormat.getInstance(Locale.US).parse(removeEndCharacter((wordTSList.get("startTime").toString()), "s"));
+                      start = startNumber.doubleValue();
+                    }
+                    // Get end time of last element
+                    wordTSList = (JSONObject) timestampsArray.get(indexLast);
+                    if (wordTSList.size() == 3) {
+                      Number endNumber = NumberFormat.getInstance(Locale.US).parse(removeEndCharacter((wordTSList.get("endTime").toString()), "s"));
+                      end = endNumber.doubleValue();
+                    }
+                  }
+                  if (start == -1 || end == -1) {
+                    logger.warn("Could not build caption object for job {}, result index {}: start/end times not found", jobId, i);
+                    continue resultsLoop;
+                  }
 
-                String[] captionLines = new String[1];
-                captionLines[0] = line.toString().replace("%HESITATION", "...");
-                captionList.add(new CaptionImpl(buildTime((long) (start * 1000)), buildTime((long) (end * 1000)),
-                        captionLines));
-                indexFirst = -1;
-                indexLast = -1;
-                line.setLength(0);
+                  String[] captionLines = new String[1];
+                  captionLines[0] = line.toString().replace("%HESITATION", "...");
+                  captionList.add(new CaptionImpl(buildTime((long) (start * 1000)), buildTime((long) (end * 1000)), captionLines));
+                  indexFirst = -1;
+                  indexLast = -1;
+                  line.setLength(0);
+                }
               }
             }
           }

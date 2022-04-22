@@ -1,0 +1,30 @@
+
+.description-plugin {
+    font-family: Helvetica, Arial, sans-serif;
+    padding: 1px;
+    color: #f0f0f0;
+    min-width: 300px
+}
+
+.description-plugin .row {
+    display: flex;
+    min-width: 100px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    border-bottom: 1px #d3a84c dotted;
+}
+
+.description-plugin .row .key {
+    max-width: 20%;
+    margin-right: 15px;
+}
+
+.description-plugin .row .value {
+    margin-left: auto;
+    max-width: 80%;
+    color: lightgray
+}
+
+.description-plugin a {
+    color: lightslategray
+}

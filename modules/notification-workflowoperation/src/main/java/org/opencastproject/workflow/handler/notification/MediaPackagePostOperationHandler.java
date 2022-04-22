@@ -77,12 +77,12 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
   /** search service **/
   private SearchService searchService;
 
-  @Reference(name = "search-service-impl")
+  @Reference
   public void setSearchService(SearchService searchService) {
     this.searchService = searchService;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

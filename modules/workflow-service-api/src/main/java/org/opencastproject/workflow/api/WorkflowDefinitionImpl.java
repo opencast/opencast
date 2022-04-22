@@ -315,7 +315,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
    *           If there is a problem marshalling the {@link WorkflowDefinitionImpl} from XML.
    */
   public static WorkflowDefinitionImpl valueOf(String xmlString) throws Exception {
-    return (WorkflowDefinitionImpl) WorkflowParser.parseWorkflowDefinition(xmlString);
+    return (WorkflowDefinitionImpl) XmlWorkflowParser.parseWorkflowDefinition(xmlString);
   }
 
   @Override

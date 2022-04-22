@@ -80,7 +80,7 @@ public class ImportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
   private Workspace workspace;
 
   /** OSGi DI */
-  @Reference(name = "Workspace")
+  @Reference
   void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

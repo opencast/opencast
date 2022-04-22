@@ -175,7 +175,7 @@ public class TagWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     return createResult(mediaPackage, Action.CONTINUE);
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

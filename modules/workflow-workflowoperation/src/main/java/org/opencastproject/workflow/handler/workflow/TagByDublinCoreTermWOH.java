@@ -100,7 +100,7 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

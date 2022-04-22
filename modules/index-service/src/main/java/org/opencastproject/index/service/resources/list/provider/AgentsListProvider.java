@@ -63,7 +63,7 @@ public class AgentsListProvider implements ResourceListProvider {
   }
 
   /** OSGi callback for capture-agents services. */
-  @Reference(name = "captureAgentService")
+  @Reference
   public void setCaptureAgentService(CaptureAgentStateService service) {
     this.agentsService = service;
   }

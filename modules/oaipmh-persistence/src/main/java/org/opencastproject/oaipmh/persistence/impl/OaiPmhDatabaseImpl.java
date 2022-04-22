@@ -83,10 +83,7 @@ public class OaiPmhDatabaseImpl extends AbstractOaiPmhDatabase {
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "entityManagerFactory",
-      target = "(osgi.unit.name=org.opencastproject.oaipmh)"
-  )
+  @Reference(target = "(osgi.unit.name=org.opencastproject.oaipmh)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -97,7 +94,7 @@ public class OaiPmhDatabaseImpl extends AbstractOaiPmhDatabase {
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -108,7 +105,7 @@ public class OaiPmhDatabaseImpl extends AbstractOaiPmhDatabase {
    * @param workspace
    *          the workspace to set
    */
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

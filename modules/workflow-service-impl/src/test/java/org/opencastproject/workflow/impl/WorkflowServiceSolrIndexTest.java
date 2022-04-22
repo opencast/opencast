@@ -39,10 +39,10 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowServiceDatabaseImpl;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
@@ -84,7 +84,7 @@ public class WorkflowServiceSolrIndexTest {
     workflow.setOrganizationId(securityService.getOrganization().getId());
     workflow.setState(WorkflowState.INSTANTIATED);
     workflow.setMediaPackage(MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
-    String jobPayload = WorkflowParser.toXml(workflow);
+    String jobPayload = XmlWorkflowParser.toXml(workflow);
     job.setPayload(jobPayload);
     job.setOrganization(securityService.getOrganization().getId());
     jobs.add(job);

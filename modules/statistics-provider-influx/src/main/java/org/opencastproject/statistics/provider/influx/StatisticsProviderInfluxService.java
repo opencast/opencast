@@ -85,7 +85,7 @@ public class StatisticsProviderInfluxService implements ManagedService, Artifact
   private Map<String, StatisticsProvider> fileNameToProvider = new ConcurrentHashMap<>();
 
 
-  @Reference(name = "statistics-service")
+  @Reference
   public void setStatisticsCoordinator(StatisticsCoordinator service) {
     this.statisticsCoordinator = service;
   }

@@ -95,7 +95,7 @@ public class AddCatalogWorkflowOperationHandler extends AbstractWorkflowOperatio
    * @param workspace
    *          the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

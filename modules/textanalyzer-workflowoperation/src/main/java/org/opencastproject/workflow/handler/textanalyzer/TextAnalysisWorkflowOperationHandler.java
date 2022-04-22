@@ -138,7 +138,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param analysisService
    *          the text analysis service
    */
-  @Reference(name = "TextAnalysisService")
+  @Reference
   protected void setTextAnalyzer(TextAnalyzerService analysisService) {
     this.analysisService = analysisService;
   }
@@ -150,7 +150,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -529,12 +529,12 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
    *
    * @param composerService
    */
-  @Reference(name = "Composer")
+  @Reference
   void setComposerService(ComposerService composerService) {
     this.composer = composerService;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

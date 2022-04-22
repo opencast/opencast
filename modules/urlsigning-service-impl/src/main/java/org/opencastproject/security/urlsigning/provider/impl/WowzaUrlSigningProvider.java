@@ -244,7 +244,7 @@ public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
     return base64Hash;
   }
 
-  @Reference(name = "security-service")
+  @Reference
   @Override
   public void setSecurityService(SecurityService securityService) {
     super.setSecurityService(securityService);

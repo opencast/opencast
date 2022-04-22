@@ -1301,6 +1301,14 @@
                "RIGHT": "Selecteer rollen",
                "REMOVE": "Verwijder rol",
                "ADD": "Voeg rol toe"
+            },
+            "STRENGTH": {
+               "BAD": "Bad password",
+               "VERYWEAK": "Very weak password",
+               "WEAK": "Weak password",
+               "GOOD": "Good password",
+               "STRONG": "Strong password",
+               "VERYSTRONG": "Very strong password"
             }
          }
       },

@@ -166,15 +166,12 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
     return createResult(Action.CONTINUE);
   }
 
-  @Reference(
-      name = "TranscriptionService",
-      target = "(provider=amberscript)"
-  )
+  @Reference(target = "(provider=amberscript)")
   public void setTranscriptionService(TranscriptionService service) {
     this.service = service;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

@@ -129,19 +129,19 @@ public class WorkflowsEndpoint {
   private IndexService indexService;
 
   /** OSGi DI */
-  @Reference(name = "workflowService")
+  @Reference
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
 
   /** OSGi DI */
-  @Reference(name = "ElasticsearchIndex")
+  @Reference
   public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
     this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /** OSGi DI */
-  @Reference(name = "IndexService")
+  @Reference
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }

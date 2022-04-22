@@ -224,6 +224,7 @@ public class IndexServiceImpl implements IndexService {
   private UserDirectoryService userDirectoryService;
   private WorkflowService workflowService;
   private Workspace workspace;
+  private ElasticsearchIndex elasticsearchIndex;
 
   /** The single thread executor service */
   private ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -236,9 +237,14 @@ public class IndexServiceImpl implements IndexService {
    * @param aclServiceFactory
    *          the factory to set
    */
-  @Reference(name = "AclServiceFactory")
+  @Reference
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
+  }
+
+  @Reference
+  public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
+    this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /**
@@ -247,7 +253,7 @@ public class IndexServiceImpl implements IndexService {
    * @param authorizationService
    *          the service to set
    */
-  @Reference(name = "AuthorizationService")
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -258,7 +264,7 @@ public class IndexServiceImpl implements IndexService {
    * @param captureAgentStateService
    *          the service to set
    */
-  @Reference(name = "CaptureAgentStateService")
+  @Reference
   public void setCaptureAgentStateService(CaptureAgentStateService captureAgentStateService) {
     this.captureAgentStateService = captureAgentStateService;
   }
@@ -269,7 +275,7 @@ public class IndexServiceImpl implements IndexService {
    * @param eventCommentService
    *          the service to set
    */
-  @Reference(name = "EventCommentService")
+  @Reference
   public void setEventCommentService(EventCommentService eventCommentService) {
     this.eventCommentService = eventCommentService;
   }
@@ -332,7 +338,7 @@ public class IndexServiceImpl implements IndexService {
    * @param ingestService
    *          the service to set
    */
-  @Reference(name = "IngestService")
+  @Reference
   public void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }
@@ -343,7 +349,7 @@ public class IndexServiceImpl implements IndexService {
    * @param listProvidersService
    *          the service to set
    */
-  @Reference(name = "ListProvidersService")
+  @Reference
   public void setListProvidersService(ListProvidersService listProvidersService) {
     this.listProvidersService = listProvidersService;
   }
@@ -354,7 +360,7 @@ public class IndexServiceImpl implements IndexService {
    * @param assetManager
    *          the manager to set
    */
-  @Reference(name = "AssetManager")
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -365,7 +371,7 @@ public class IndexServiceImpl implements IndexService {
    * @param schedulerService
    *          the service to set
    */
-  @Reference(name = "SchedulerService")
+  @Reference
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
   }
@@ -376,7 +382,7 @@ public class IndexServiceImpl implements IndexService {
    * @param securityService
    *          the service to set
    */
-  @Reference(name = "SecurityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -387,7 +393,7 @@ public class IndexServiceImpl implements IndexService {
    * @param seriesService
    *          the service to set
    */
-  @Reference(name = "SeriesService")
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -398,7 +404,7 @@ public class IndexServiceImpl implements IndexService {
    * @param workflowService
    *          the service to set
    */
-  @Reference(name = "workflowService")
+  @Reference
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
@@ -409,7 +415,7 @@ public class IndexServiceImpl implements IndexService {
    * @param workspace
    *          the workspace to set
    */
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -420,7 +426,7 @@ public class IndexServiceImpl implements IndexService {
    * @param userDirectoryService
    *          the service to set
    */
-  @Reference(name = "userDirectoryService")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -1461,14 +1467,14 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public EventRemovalResult removeEvent(Event event, Runnable doOnNotFound, String retractWorkflowId)
+  public EventRemovalResult removeEvent(Event event, String retractWorkflowId)
       throws UnauthorizedException, WorkflowDatabaseException, NotFoundException {
     final boolean hasOnlyEngageLive = event.getPublications().size() == 1
         && EventUtils.ENGAGE_LIVE_CHANNEL_ID.equals(event.getPublications().get(0).getChannel());
     final boolean retract = event.hasPreview()
         || (!event.getPublications().isEmpty()  && !hasOnlyEngageLive && this.hasSnapshots(event.getIdentifier()));
     if (retract) {
-      retractAndRemoveEvent(event.getIdentifier(), doOnNotFound, retractWorkflowId);
+      retractAndRemoveEvent(event.getIdentifier(), retractWorkflowId);
       return EventRemovalResult.RETRACTING;
     } else {
       try {
@@ -1480,7 +1486,7 @@ public class IndexServiceImpl implements IndexService {
     }
   }
 
-  private void retractAndRemoveEvent(String id, Runnable doOnNotFound, String retractWorkflowId)
+  private void retractAndRemoveEvent(String id, String retractWorkflowId)
       throws WorkflowDatabaseException, NotFoundException {
     final WorkflowDefinition wfd = workflowService.getWorkflowDefinitionById(retractWorkflowId);
     final Workflows workflows = new Workflows(assetManager, workflowService);
@@ -1491,7 +1497,7 @@ public class IndexServiceImpl implements IndexService {
     }
     this.retractions.put(
         result.get(0).getId(),
-        new Retraction(securityService.getUser(), securityService.getOrganization(), doOnNotFound)
+        new Retraction(securityService.getUser(), securityService.getOrganization())
     );
   }
 
@@ -1499,66 +1505,73 @@ public class IndexServiceImpl implements IndexService {
   public boolean removeEvent(String id) throws NotFoundException, UnauthorizedException {
     boolean unauthorizedScheduler = false;
     boolean notFoundScheduler = false;
-    boolean removedScheduler = true;
+    boolean removedScheduler = false;
     try {
       schedulerService.removeEvent(id);
+      removedScheduler = true;
     } catch (NotFoundException e) {
       notFoundScheduler = true;
     } catch (UnauthorizedException e) {
       unauthorizedScheduler = true;
     } catch (SchedulerException e) {
-      removedScheduler = false;
       logger.error("Unable to remove the event '{}' from scheduler service:", id, e);
     }
 
     boolean unauthorizedWorkflow = false;
     boolean notFoundWorkflow = false;
-    boolean removedWorkflow = true;
+    boolean removedWorkflow = false;
     try {
       List<WorkflowInstance> workflowInstances = workflowService.getWorkflowInstancesByMediaPackage(id);
-      if (workflowInstances.size() == 0)
+      if (workflowInstances.size() == 0) {
         notFoundWorkflow = true;
+      }
       for (WorkflowInstance instance : workflowInstances) {
         workflowService.stop(instance.getId());
         workflowService.remove(instance.getId());
       }
+      removedWorkflow = true;
     } catch (NotFoundException e) {
       notFoundWorkflow = true;
     } catch (UnauthorizedException e) {
       unauthorizedWorkflow = true;
-    } catch (WorkflowDatabaseException e) {
-      removedWorkflow = false;
-      logger.error("Unable to remove the event '{}' because removing workflow failed:", id, e);
     } catch (WorkflowException e) {
-      removedWorkflow = false;
       logger.error("Unable to remove the event '{}' because removing workflow failed:", id, e);
     }
 
     boolean unauthorizedArchive = false;
     boolean notFoundArchive = false;
-    boolean removedArchive = true;
+    boolean removedArchive = false;
     try {
       final AQueryBuilder q = assetManager.createQuery();
       final Predicate p = q.organizationId().eq(securityService.getOrganization().getId()).and(q.mediaPackageId(id));
       final AResult r = q.select(q.nothing()).where(p).run();
-      if (r.getSize() > 0)
+      if (r.getSize() > 0) {
         q.delete(DEFAULT_OWNER, q.snapshot()).where(p).run();
+      }
+      removedArchive = true;
     } catch (AssetManagerException e) {
       if (e.getCause() instanceof UnauthorizedException) {
         unauthorizedArchive = true;
       } else if (e.getCause() instanceof NotFoundException) {
         notFoundArchive = true;
       } else {
-        removedArchive = false;
         logger.error("Unable to remove the event '{}' from the archive:", id, e);
       }
     }
 
-    if (notFoundScheduler && notFoundWorkflow && notFoundArchive)
-      throw new NotFoundException("Event id " + id + " not found.");
-
     if (unauthorizedScheduler || unauthorizedWorkflow || unauthorizedArchive)
       throw new UnauthorizedException("Not authorized to remove event id " + id);
+
+    // if all three services either removed the event successfully or couldn't find it, make sure it's also removed
+    // from the index
+    if ((removedScheduler || notFoundScheduler) && (removedWorkflow || notFoundWorkflow)
+            && (removedArchive || notFoundArchive)) {
+      try {
+        elasticsearchIndex.deleteEvent(id, securityService.getOrganization().getId());
+      } catch (SearchIndexException e) {
+        logger.error("Removing event {} from the {} index failed", id, elasticsearchIndex.getIndexName(), e);
+      }
+    }
 
     try {
       eventCommentService.deleteComments(id);
@@ -1566,7 +1579,11 @@ public class IndexServiceImpl implements IndexService {
       logger.error("Unable to remove comments for event '{}':", id, e);
     }
 
-    return removedScheduler && removedWorkflow && removedArchive;
+    if (notFoundScheduler && notFoundWorkflow && notFoundArchive)
+      throw new NotFoundException("Event id " + id + " not found.");
+
+    return ((removedScheduler || notFoundScheduler) && (removedWorkflow || notFoundWorkflow)
+            && (removedArchive || notFoundArchive));
   }
 
   private void updateWorkflowInstance(WorkflowInstance workflowInstance)
@@ -1925,14 +1942,14 @@ public class IndexServiceImpl implements IndexService {
 
   @Override
   public MetadataList updateAllSeriesMetadata(String id, String metadataJSON, ElasticsearchIndex index)
-          throws IllegalArgumentException, IndexServiceException, NotFoundException, UnauthorizedException {
+          throws IllegalArgumentException, IndexServiceException, NotFoundException {
     MetadataList metadataList = getMetadataListWithAllSeriesCatalogUIAdapters();
     return updateSeriesMetadata(id, metadataJSON, index, metadataList);
   }
 
   @Override
   public MetadataList updateAllSeriesMetadata(String id, MetadataList metadataList, ElasticsearchIndex index)
-          throws IndexServiceException, NotFoundException, UnauthorizedException {
+          throws IndexServiceException, NotFoundException {
     checkSeriesExists(id, index);
     updateSeriesMetadata(id, metadataList);
     return metadataList;

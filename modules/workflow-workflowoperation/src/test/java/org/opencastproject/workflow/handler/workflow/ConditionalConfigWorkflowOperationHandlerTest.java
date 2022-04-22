@@ -28,8 +28,8 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowParsingException;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.conditionparser.WorkflowConditionInterpreter;
 
 import org.junit.After;
@@ -114,9 +114,9 @@ public class ConditionalConfigWorkflowOperationHandlerTest {
 
     // Replace operation configuration with variables form wf config
     final Function<String, String> systemVariableGetter = k -> null;
-    String xml = WorkflowConditionInterpreter.replaceVariables(WorkflowParser.toXml(wf),
+    String xml = WorkflowConditionInterpreter.replaceVariables(XmlWorkflowParser.toXml(wf),
             systemVariableGetter, wfConfig, false);
-    return WorkflowParser.parseWorkflowInstance(xml);
+    return XmlWorkflowParser.parseWorkflowInstance(xml);
   }
 
 }

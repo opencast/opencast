@@ -84,7 +84,7 @@ public class UrlSigningFilter implements Filter, ManagedService {
   private boolean strict = true;
 
   /** OSGi DI */
-  @Reference(name = "urlSigningVerifier")
+  @Reference
   public void setUrlSigningVerifier(UrlSigningVerifier urlSigningVerifier) {
     this.urlSigningVerifier = urlSigningVerifier;
   }

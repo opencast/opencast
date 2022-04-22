@@ -135,6 +135,8 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
   private static final int DEFAULT_CLEANUP_RESULTS_DAYS = 7;
   private static final boolean DEFAULT_PROFANITY_FILTER = false;
   private static final String DEFAULT_LANGUAGE = "en-US";
+  private static final boolean DEFAULT_ENABLE_PUNCTUATION = false;
+  private static final String DEFAULT_MODEL = "default";
   private static final String GOOGLE_SPEECH_URL = "https://speech.googleapis.com/v1";
   private static final String GOOGLE_AUTH2_URL = "https://www.googleapis.com/oauth2/v4/token";
   private static final String REQUEST_METHOD = "speech:longrunningrecognize";
@@ -173,6 +175,8 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
   public static final String ENABLED_CONFIG = "enabled";
   public static final String GOOGLE_SPEECH_LANGUAGE = "google.speech.language";
   public static final String PROFANITY_FILTER = "google.speech.profanity.filter";
+  public static final String ENABLE_PUNCTUATION = "google.speech.transcription.punctuation";
+  public static final String TRANSCRIPTION_MODEL = "google.speech.transcription.model";
   public static final String WORKFLOW_CONFIG = "workflow";
   public static final String DISPATCH_WORKFLOW_INTERVAL_CONFIG = "workflow.dispatch.interval";
   public static final String COMPLETION_CHECK_BUFFER_CONFIG = "completion.check.buffer";
@@ -191,6 +195,8 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
    */
   private boolean enabled = false; // Disabled by default
   private boolean profanityFilter = DEFAULT_PROFANITY_FILTER;
+  private boolean enablePunctuation = DEFAULT_ENABLE_PUNCTUATION;
+  private String model = DEFAULT_MODEL;
   private String defaultLanguage = DEFAULT_LANGUAGE;
   private String defaultEncoding = DEFAULT_ENCODING;
   private String workflowDefinitionId = DEFAULT_WF_DEF;
@@ -252,7 +258,22 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     } else {
       logger.info("Default language will be used");
     }
-
+    // Enable punctuation or not
+    Option<String> punctuationOpt = OsgiUtil.getOptCfg(cc.getProperties(), ENABLE_PUNCTUATION);
+    if (punctuationOpt.isSome()) {
+      enablePunctuation = Boolean.parseBoolean(punctuationOpt.get());
+      logger.info("Enable punctuation is set to {}", enablePunctuation);
+    } else {
+      logger.info("Default punctuation setting will be used");
+    }
+    // Transription model to be used
+    Option<String> transModel = OsgiUtil.getOptCfg(cc.getProperties(), TRANSCRIPTION_MODEL);
+    if (transModel.isSome()) {
+      model = transModel.get();
+      logger.info("Transcription model used is {}", model);
+    } else {
+      logger.info("Default Transcription model will be used");
+    }
     // Encoding to be used
     Option<String> encodingOpt = OsgiUtil.getOptCfg(cc.getProperties(), ENCODING_EXTENSION);
     if (encodingOpt.isSome()) {
@@ -493,6 +514,8 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     configValues.put("languageCode", languageCode);
     configValues.put("enableWordTimeOffsets", true);
     configValues.put("profanityFilter", profanityFilter);
+    configValues.put("enableAutomaticPunctuation", enablePunctuation);
+    configValues.put("model", model);
     audioValues.put("uri", audioUrl);
     container.put("config", configValues);
     container.put("audio", audioValues);
@@ -940,52 +963,52 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     return 0;
   }
 
-  @Reference(name = "serviceRegistry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  @Reference(name = "userDirectoryService")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
-  @Reference(name = "organizationDirectoryService")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
-  @Reference(name = "smtpService")
+  @Reference
   public void setSmtpService(SmtpService service) {
     this.smtpService = service;
   }
 
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace ws) {
     this.workspace = ws;
   }
 
-  @Reference(name = "workingFileRepository")
+  @Reference
   public void setWorkingFileRepository(WorkingFileRepository wfr) {
     this.wfr = wfr;
   }
 
-  @Reference(name = "database")
+  @Reference
   public void setDatabase(TranscriptionDatabase service) {
     this.database = service;
   }
 
-  @Reference(name = "assetManager")
+  @Reference
   public void setAssetManager(AssetManager service) {
     this.assetManager = service;
   }
 
-  @Reference(name = "workflowService")
+  @Reference
   public void setWorkflowService(WorkflowService service) {
     this.workflowService = service;
   }
@@ -1053,9 +1076,9 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
           // If the job in progress, check if it should already have finished.
           if (TranscriptionJobControl.Status.InProgress.name().equals(j.getStatus())) {
             // If job should already have been completed, try to get the results. Consider a buffer factor so that we
-            // don't try it too early. Results normally should be ready half of the time of the track duration.
+            // don't try it too early. Results normally should be ready 1/3 of the time of the track duration.
             // The completionCheckBuffer can be used to delay results check.
-            if (j.getDateCreated().getTime() + (j.getTrackDuration() / 2) + completionCheckBuffer * 1000 < System
+            if (j.getDateCreated().getTime() + (j.getTrackDuration() / 3) + completionCheckBuffer * 1000 < System
                     .currentTimeMillis()) {
               try {
                 if (!getAndSaveJobResults(jobId)) {

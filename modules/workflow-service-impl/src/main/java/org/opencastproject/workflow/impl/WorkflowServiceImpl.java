@@ -34,9 +34,12 @@ import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.SU
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.event.EventIndexUtils;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
@@ -97,7 +100,6 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.api.WorkflowOperationResultImpl;
-import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
@@ -106,6 +108,7 @@ import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateMapping;
 import org.opencastproject.workflow.api.WorkflowStatistics;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.conditionparser.WorkflowConditionInterpreter;
 import org.opencastproject.workflow.impl.jmx.WorkflowsStatistics;
 import org.opencastproject.workspace.api.Workspace;
@@ -155,6 +158,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.management.ObjectInstance;
+import javax.ws.rs.HEAD;
 
 /**
  * Implements WorkflowService with in-memory data structures to hold WorkflowOperations and WorkflowInstances.
@@ -589,7 +593,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       // Create and configure the workflow instance
       try {
         // Create a new job for this workflow instance
-        String workflowDefinitionXml = WorkflowParser.toXml(workflowDefinition);
+        String workflowDefinitionXml = XmlWorkflowParser.toXml(workflowDefinition);
         String mediaPackageXml = MediaPackageParser.getAsXml(sourceMediaPackage);
 
         List<String> arguments = new ArrayList<>();
@@ -678,7 +682,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       }
 
       // Previous approach
-//      String xml = WorkflowConditionInterpreter.replaceVariables(WorkflowParser.toXml(instance),
+//      String xml = WorkflowConditionInterpreter.replaceVariables(XmlWorkflowParser.toXml(instance),
 //              systemVariableGetter, wfProperties, false);
 //      return WorkflowParser.parseWorkflowInstance(xml);
       return instance;
@@ -1037,7 +1041,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         // Third, remove workflow instance job itself
         try {
           serviceRegistry.removeJobs(Collections.singletonList(workflowInstanceId));
-          removeWorkflowInstanceFromIndex(instance, elasticsearchIndex);
+          removeWorkflowInstanceFromIndex(instance.getId(), elasticsearchIndex);
         } catch (ServiceRegistryException e) {
           logger.warn("Problems while removing workflow instance job '%d'", workflowInstanceId, e);
         } catch (NotFoundException e) {
@@ -1720,7 +1724,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     // If the first operation is guaranteed to pause, run the job.
     if (job.getArguments().size() > 1 && job.getArguments().get(0) != null) {
       try {
-        WorkflowDefinition workflowDef = WorkflowParser.parseWorkflowDefinition(job.getArguments().get(0));
+        WorkflowDefinition workflowDef = XmlWorkflowParser.parseWorkflowDefinition(job.getArguments().get(0));
         if (workflowDef.getOperations().size() > 0) {
           String firstOperationId = workflowDef.getOperations().get(0).getId();
           WorkflowOperationHandler handler = getWorkflowOperationHandler(firstOperationId);
@@ -2040,7 +2044,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param unused
    *          the unused ReadinessIndicator
    */
-  @Reference(name = "profilesReadyIndicator", target = "(artifact=workflowdefinition)")
+  @Reference(target = "(artifact=workflowdefinition)")
   protected void setProfilesReadyIndicator(ReadinessIndicator unused) { }
 
   /**
@@ -2049,7 +2053,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param workspace
    *          the workspace
    */
-  @Reference(name = "workspace")
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -2060,7 +2064,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param registry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry registry) {
     this.serviceRegistry = registry;
   }
@@ -2075,7 +2079,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -2086,7 +2090,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param authorizationService
    *          the authorizationService to set
    */
-  @Reference(name = "authorization")
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -2097,7 +2101,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
-  @Reference(name = "user-directory")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -2108,7 +2112,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param organizationDirectory
    *          the organization directory
    */
-  @Reference(name = "orgDirectory")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }
@@ -2119,7 +2123,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param index
    *          The search index
    */
-  @Reference(name = "index")
+  @Reference
   protected void setDao(WorkflowServiceIndex index) {
     this.index = index;
   }
@@ -2130,7 +2134,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param seriesService
    *          the seriesService to set
    */
-  @Reference(name = "series")
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -2141,7 +2145,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param assetManager
    *          the assetManager to set
    */
-  @Reference(name = "assetManager")
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -2152,7 +2156,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param service
    *          the metadata service
    */
-  @Reference(name = "metadata", cardinality = ReferenceCardinality.AT_LEAST_ONE, policy = ReferencePolicy.DYNAMIC, unbind = "removeMetadataService")
+  @Reference(cardinality = ReferenceCardinality.AT_LEAST_ONE, policy = ReferencePolicy.DYNAMIC, unbind = "removeMetadataService")
   protected void addMetadataService(MediaPackageMetadataService service) {
     metadataServices.add(service);
   }
@@ -2173,7 +2177,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param scanner
    *          the workflow definition scanner
    */
-  @Reference(name = "scanner")
+  @Reference
   protected void addWorkflowDefinitionScanner(WorkflowDefinitionScanner scanner) {
     workflowDefinitionScanner = scanner;
   }
@@ -2184,7 +2188,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param index
    *          the admin UI index.
    */
-  @Reference(name = "elasticsearch-index")
+  @Reference
   public void setIndex(ElasticsearchIndex index) {
     this.elasticsearchIndex = index;
   }
@@ -2458,30 +2462,63 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   /**
    * Remove a workflow instance from the API index.
    *
-   * @param workflowInstance
-   *         the workflowInstance to remove
+   * @param workflowInstanceId
+   *         the identifier of the workflow instance to remove
    * @param index
    *         the index to update
    */
-  private void removeWorkflowInstanceFromIndex(WorkflowInstance workflowInstance, ElasticsearchIndex index) {
-    final long workflowInstanceId = workflowInstance.getId();
-    final String eventId = workflowInstance.getMediaPackage().getIdentifier().toString();
-
-    final String organization = securityService.getOrganization().getId();
+  private void removeWorkflowInstanceFromIndex(long workflowInstanceId, ElasticsearchIndex index) {
+    final String orgId = securityService.getOrganization().getId();
     final User user = securityService.getUser();
 
+    // find events
+    SearchResult<Event> results;
     try {
+      results = index.getByQuery(new EventSearchQuery(orgId, user).withWorkflowId(workflowInstanceId));
+    } catch (SearchIndexException e) {
+      logger.error("Error retrieving the events for workflow instance {} from the {} index.", workflowInstanceId,
+              index.getIndexName(), e);
+      return;
+    }
+
+    if (results.getItems().length == 0) {
+      logger.warn("No events for workflow instance {} found in the {} index.", workflowInstanceId,
+              index.getIndexName());
+      return;
+    }
+
+    // should be only one event, but better safe than sorry
+    for (SearchResultItem<Event> item: results.getItems()) {
+      String eventId = item.getSource().getIdentifier();
       logger.debug("Removing workflow instance {} of event {} from the {} index.", workflowInstanceId, eventId,
               index.getIndexName());
-      index.deleteWorkflow(organization, user, eventId, workflowInstanceId);
-      logger.debug("Workflow instance {} of event {} removed from the {} index.", workflowInstanceId, eventId,
-              index.getIndexName());
-    } catch (NotFoundException e) {
-      logger.warn("Workflow instance {} of event {} not found for removal from the {} index.", workflowInstanceId,
-              eventId, index.getIndexName());
-    } catch (SearchIndexException e) {
-      logger.error("Error removing the workflow instance {} of event {} from the {} index.", workflowInstanceId,
-              eventId, index.getIndexName(), e);
+
+      Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+        if (!eventOpt.isPresent()) {
+          logger.warn("Event {} of workflow instance {} not found in the {} index.", workflowInstanceId,
+                  eventId, index.getIndexName());
+          return Optional.empty();
+        }
+        Event event = eventOpt.get();
+        if (event.getWorkflowId() != null && event.getWorkflowId().equals(workflowInstanceId)) {
+          logger.debug("Workflow {} is the current workflow of event {}. Removing it from event.", eventId,
+                  workflowInstanceId);
+          event.setWorkflowId(null);
+          event.setWorkflowDefinitionId(null);
+          event.setWorkflowState(null);
+          return Optional.of(event);
+        }
+        return Optional.empty();
+      };
+
+      try {
+        index.addOrUpdateEvent(eventId, updateFunction, orgId, user);
+        logger.debug("Workflow instance {} of event {} removed from the {} index.", workflowInstanceId, eventId,
+                index.getIndexName());
+      } catch (SearchIndexException e) {
+        logger.error("Error removing the workflow instance {} of event {} from the {} index.", workflowInstanceId,
+                eventId, index.getIndexName(), e);
+      }
     }
   }
 
@@ -2501,13 +2538,13 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           DublinCoreCatalog episodeDublincoreCatalog, ElasticsearchIndex index) {
     final long workflowInstanceId = workflowInstance.getId();
     final String eventId = workflowInstance.getMediaPackage().getIdentifier().toString();
-    final String organization = securityService.getOrganization().getId();
+    final String orgId = securityService.getOrganization().getId();
     final User user = securityService.getUser();
 
     logger.debug("Updating workflow instance {} of event {} in the {} index.", workflowInstanceId, eventId,
             index.getIndexName());
     Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
-      Event event = eventOpt.orElse(new Event(eventId, organization));
+      Event event = eventOpt.orElse(new Event(eventId, orgId));
       event.setCreator(user.getName());
       event.setWorkflowId(workflowInstanceId);
       event.setWorkflowDefinitionId(workflowInstance.getTemplate());
@@ -2525,7 +2562,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     };
 
     try {
-      index.addOrUpdateEvent(eventId, updateFunction, organization, user);
+      index.addOrUpdateEvent(eventId, updateFunction, orgId, user);
       logger.debug("Workflow instance {} of event {} updated in the {} index.", workflowInstanceId, eventId,
               index.getIndexName());
     } catch (SearchIndexException e) {

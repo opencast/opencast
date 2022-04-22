@@ -100,7 +100,7 @@ public class GroupRoleEndpoint {
    * @param jpaGroupRoleProvider
    *          the jpaGroupRoleProvider to set
    */
-  @Reference(name = "JpaGroupRoleProvider")
+  @Reference
   public void setJpaGroupRoleProvider(JpaGroupRoleProvider jpaGroupRoleProvider) {
     this.jpaGroupRoleProvider = jpaGroupRoleProvider;
   }

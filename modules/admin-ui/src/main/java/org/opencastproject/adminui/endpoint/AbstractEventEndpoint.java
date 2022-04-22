@@ -395,16 +395,9 @@ public abstract class AbstractEventEndpoint {
     if (event.isNone()) {
       return RestUtil.R.notFound(id);
     }
-    final Runnable doOnNotFound = () -> {
-      try {
-        getIndex().delete(Event.DOCUMENT_TYPE,id,getSecurityService().getOrganization().getId());
-      } catch (SearchIndexException e) {
-        logger.error("error removing event {}: {}", id, e);
-      }
-    };
     final IndexService.EventRemovalResult result;
     try {
-      result = getIndexService().removeEvent(event.get(), doOnNotFound, getAdminUIConfiguration().getRetractWorkflowId());
+      result = getIndexService().removeEvent(event.get(), getAdminUIConfiguration().getRetractWorkflowId());
     } catch (WorkflowDatabaseException e) {
       logger.error("Workflow database is not reachable. This may be a temporary problem.");
       return RestUtil.R.serverError();
@@ -420,7 +413,6 @@ public abstract class AbstractEventEndpoint {
       case GENERAL_FAILURE:
         return Response.serverError().build();
       case NOT_FOUND:
-        doOnNotFound.run();
         return RestUtil.R.notFound(id);
       default:
         throw new RuntimeException("Unknown EventRemovalResult type: " + result.name());
@@ -455,19 +447,11 @@ public abstract class AbstractEventEndpoint {
 
     for (Object eventIdObject : eventIdsJsonArray) {
       final String eventId = eventIdObject.toString();
-      final Runnable doOnNotFound = () -> {
-        try {
-          getIndex().delete(Event.DOCUMENT_TYPE,eventId, getSecurityService().getOrganization().getId());
-        } catch (SearchIndexException e) {
-          logger.error("error removing event {}: {}", eventId, e);
-        }
-      };
       try {
         final Opt<Event> event = checkAgentAccessForEvent(eventId);
         if (event.isSome()) {
-          final IndexService.EventRemovalResult  currentResult = getIndexService().removeEvent(event.get(), doOnNotFound,
-            getAdminUIConfiguration().getRetractWorkflowId()
-          );
+          final IndexService.EventRemovalResult currentResult = getIndexService().removeEvent(event.get(),
+                  getAdminUIConfiguration().getRetractWorkflowId());
           switch (currentResult) {
             case SUCCESS:
               result.addOk(eventId);
@@ -479,7 +463,6 @@ public abstract class AbstractEventEndpoint {
               result.addServerError(eventId);
               break;
             case NOT_FOUND:
-              doOnNotFound.run();
               result.addNotFound(eventId);
               break;
             default:
@@ -1174,6 +1157,29 @@ public abstract class AbstractEventEndpoint {
     }
   }
 
+  /**
+   * Removes emtpy series titles from the collection of the isPartOf Field
+   * @param ml the list to modify
+   */
+  private void removeSeriesWithNullTitlesFromFieldCollection(MetadataList ml) {
+    // get Series MetadataField from MetadataList
+    MetadataField seriesField = Optional.ofNullable(ml.getMetadataList().get("dublincore/episode"))
+            .flatMap(titledMetadataCollection -> Optional.ofNullable(titledMetadataCollection.getCollection()))
+            .flatMap(dcMetadataCollection -> Optional.ofNullable(dcMetadataCollection.getOutputFields()))
+            .flatMap(metadataFields -> Optional.ofNullable(metadataFields.get("isPartOf")))
+            .orElse(null);
+    if (seriesField == null || seriesField.getCollection() == null) {
+      return;
+    }
+
+    // Remove null keys
+    Map<String, String> seriesCollection = seriesField.getCollection();
+    seriesCollection.remove(null);
+    seriesField.setCollection(seriesCollection);
+
+    return;
+  }
+
   @GET
   @Path("{eventId}/metadata.json")
   @Produces(MediaType.APPLICATION_JSON)
@@ -1216,6 +1222,9 @@ public abstract class AbstractEventEndpoint {
     DublinCoreMetadataCollection metadataCollection = eventCatalogUiAdapter.getRawFields(getCollectionQueryOverrides());
     EventUtils.setEventMetadataValues(event, metadataCollection);
     metadataList.add(eventCatalogUiAdapter, metadataCollection);
+
+    // remove series with empty titles from the collection of the isPartOf field as these can't be converted to json
+    removeSeriesWithNullTitlesFromFieldCollection(metadataList);
 
     // lock metadata?
     final String wfState = event.getWorkflowState();
@@ -2248,6 +2257,9 @@ public abstract class AbstractEventEndpoint {
 
     metadataList.add(commonCatalogUiAdapter, commonMetadata);
 
+    // remove series with empty titles from the collection of the isPartOf field as these can't be converted to json
+    removeSeriesWithNullTitlesFromFieldCollection(metadataList);
+
     return okJson(MetadataJson.listToJson(metadataList, true));
   }
 
@@ -2770,6 +2782,9 @@ public abstract class AbstractEventEndpoint {
   }
 
   private URI signUrl(URI url) {
+    if (url == null) {
+      return null;
+    }
     if (getUrlSigningService().accepts(url.toString())) {
       try {
         String clientIP = null;

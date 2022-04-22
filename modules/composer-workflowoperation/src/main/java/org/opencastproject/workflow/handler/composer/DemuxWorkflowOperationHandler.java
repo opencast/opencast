@@ -85,7 +85,7 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * @param composerService
    *          the local composer service
    */
-  @Reference(name = "ComposerService")
+  @Reference
   protected void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -97,7 +97,7 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -267,7 +267,7 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
     }
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

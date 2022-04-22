@@ -104,7 +104,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
   /** The local workspace */
   private Workspace workspace;
 
-  @Reference(name = "dc")
+  @Reference
   public void setDublincoreService(DublinCoreCatalogService dcService) {
     this.dcService = dcService;
   }
@@ -115,7 +115,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
    * @param inspectionService
    *          the inspection service
    */
-  @Reference(name = "InspectionService")
+  @Reference
   protected void setInspectionService(MediaInspectionService inspectionService) {
     this.inspectionService = inspectionService;
   }
@@ -127,7 +127,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -283,7 +283,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
     }
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

@@ -104,7 +104,7 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -114,7 +114,7 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
    */
   private SmilService smilService;
 
-  @Reference(name = "smil-service")
+  @Reference
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }
@@ -305,7 +305,7 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
     return mediaFile.getAbsolutePath();
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

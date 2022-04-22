@@ -62,7 +62,7 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workflow.api.JaxbWorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowParser;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -1089,7 +1089,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       } else {
         workflow = ingestService.addZippedMediaPackage(in, workflowDefinitionId, workflowConfig);
       }
-      return Response.ok(WorkflowParser.toXml(workflow)).build();
+      return Response.ok(XmlWorkflowParser.toXml(workflow)).build();
     } catch (NotFoundException e) {
       logger.info("Not found: {}", e.getMessage());
       return Response.status(Status.NOT_FOUND).build();
@@ -1227,7 +1227,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     try {
       WorkflowInstance workflow = ingest.apply();
       startCache.asMap().remove(mp.getIdentifier().toString());
-      return Response.ok(WorkflowParser.toXml(workflow)).build();
+      return Response.ok(XmlWorkflowParser.toXml(workflow)).build();
     } catch (Exception e) {
       Throwable cause = e.getCause();
       if (cause instanceof NotFoundException) {

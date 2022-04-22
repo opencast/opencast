@@ -107,27 +107,27 @@ public class StatisticsEndpoint {
   private StatisticsService statisticsService;
   private StatisticsExportService statisticsExportService;
 
-  @Reference(name = "SecurityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  @Reference(name = "IndexService")
+  @Reference
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
-  @Reference(name = "ElasticsearchIndex")
+  @Reference
   public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
     this.elasticsearchIndex = elasticsearchIndex;
   }
 
-  @Reference(name = "StatisticsService")
+  @Reference
   public void setStatisticsService(StatisticsService statisticsService) {
     this.statisticsService = statisticsService;
   }
 
-  @Reference(name = "StatisticsExportCSV")
+  @Reference
   public void setStatisticsExportService(StatisticsExportService statisticsExportService) {
     this.statisticsExportService = statisticsExportService;
   }

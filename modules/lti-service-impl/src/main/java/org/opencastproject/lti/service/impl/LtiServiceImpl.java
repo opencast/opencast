@@ -135,62 +135,61 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<>();
 
   /** OSGi DI */
-  @Reference(name = "authorization-service")
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
 
   /** OSGI DI */
-  @Reference(name = "series-service")
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
   /** OSGi DI */
-  @Reference(name = "asset-manager")
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
   /** OSGi DI */
-  @Reference(name = "workflow-service")
+  @Reference
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
 
   /** OSGi DI */
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
   /** OSGi DI */
-  @Reference(name = "search-index")
+  @Reference
   public void setSearchIndex(ElasticsearchIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 
   /** OSGi DI */
-  @Reference(name = "IndexService")
+  @Reference
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
   /** OSGi DI */
-  @Reference(name = "IngestService")
+  @Reference
   public void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }
 
   /** OSGi DI */
-  @Reference(name = "SecurityService")
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI. */
   @Reference(
-      name = "EventCatalogUIAdapter",
       cardinality = ReferenceCardinality.MULTIPLE,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "removeCatalogUIAdapter"
@@ -528,8 +527,8 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       if (event.isNone()) {
         throw new RuntimeException("Event '" + id + "' not found");
       }
-      final IndexService.EventRemovalResult eventRemovalResult = indexService.removeEvent(event.get(), () -> {
-      }, retractWorkflowId);
+      final IndexService.EventRemovalResult eventRemovalResult = indexService.removeEvent(event.get(),
+              retractWorkflowId);
       if (eventRemovalResult == IndexService.EventRemovalResult.GENERAL_FAILURE) {
         throw new RuntimeException("Error deleting event: " + eventRemovalResult);
       }

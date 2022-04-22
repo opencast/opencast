@@ -63,19 +63,19 @@ public class StatisticsWriterWorkflowOperationHandler extends AbstractWorkflowOp
 
   private StatisticsWriter statisticsWriter;
 
-  @Reference(name = "StatisticsWriter")
+  @Reference
   public void setStatisticsWriter(StatisticsWriter statisticsWriter) {
     this.statisticsWriter = statisticsWriter;
   }
 
   private SecurityService securityService;
 
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

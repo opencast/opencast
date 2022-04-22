@@ -189,7 +189,6 @@ public class SchedulerRestService {
    * @param service
    */
   @Reference(
-      name = "service-impl",
       policy = ReferencePolicy.DYNAMIC,
       unbind = "unsetService"
   )
@@ -212,7 +211,6 @@ public class SchedulerRestService {
    * @param prolongingService
    */
   @Reference(
-      name = "prolonging-service",
       policy = ReferencePolicy.DYNAMIC,
       unbind = "unsetProlongingService"
   )
@@ -235,7 +233,6 @@ public class SchedulerRestService {
    * @param agentService
    */
   @Reference(
-      name = "agentService",
       cardinality = ReferenceCardinality.OPTIONAL,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "unsetCaptureAgentStateService"
@@ -258,7 +255,7 @@ public class SchedulerRestService {
    *
    * @param workspace
    */
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -610,10 +607,13 @@ public class SchedulerRestService {
         }
       }
 
-      var result = new ArrayList<TechnicalMetadata>();
+      var result = new ArrayList<Map<String, Object>>();
       for (var event: service.search(agent, Opt.none(), Opt.none(), Opt.some(new Date()), endDate)) {
         var id = event.getIdentifier().toString();
-        result.add(service.getTechnicalMetadata(id));
+        result.add(Map.of(
+                "data", service.getTechnicalMetadata(id),
+                "episode-dublincore", service.getDublinCore(id).toXmlString()
+                ));
       }
 
       final ResponseBuilder response = Response.ok(gson.toJson(result));

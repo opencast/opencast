@@ -110,7 +110,7 @@ public class MessageSenderImpl extends MessageBaseFacility implements MessageSen
   }
 
   /** OSGi DI callback */
-  @Reference(name = "security-service")
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

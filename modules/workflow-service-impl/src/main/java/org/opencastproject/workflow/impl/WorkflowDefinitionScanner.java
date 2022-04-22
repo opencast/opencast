@@ -30,8 +30,9 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowIdentifier;
-import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowStateMapping;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
+import org.opencastproject.workflow.api.YamlWorkflowParser;
 
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
@@ -85,12 +86,9 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
   /** Tag to define if the the workflows definition have already been loaded */
   private boolean isWFSinitialized = false;
 
-  /** The current workflow definition being installed */
-  private WorkflowDefinition currentWFD = null;
-
   private OrganizationDirectoryService organizationDirectoryService;
 
-  @Reference(name = "index")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
@@ -114,43 +112,19 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
    * @see org.apache.felix.fileinstall.ArtifactInstaller#install(java.io.File)
    */
   public void install(File artifact) {
-    WorkflowDefinition def = currentWFD;
-
-    // If the current workflow definition is null, it means this is a first install and not an update...
+    WorkflowDefinition def = parseWorkflowDefinitionFile(artifact);
     if (def == null) {
-      // ... so we have to load the definition first
-      def = parseWorkflowDefinitionFile(artifact);
-
-      if (def == null) {
-        logger.warn("Unable to install workflow from '{}'", artifact.getName());
-        artifactsWithError.add(artifact);
-        return;
-      }
+      logger.warn("Unable to install workflow from '{}'", artifact.getName());
+      artifactsWithError.add(artifact);
+    } else {
+      installWorkflowDefinition(artifact, def);
     }
-
-    // Is there a workflow with the exact same ID, but a different file name? Then ignore.
-    final WorkflowIdentifier workflowIdentifier = new WorkflowIdentifier(def.getId(), def.getOrganization());
-    for (Map.Entry<File, WorkflowIdentifier> fileWithIdentifier : artifactIds.entrySet()) {
-      if (fileWithIdentifier.getValue().equals(workflowIdentifier) && !fileWithIdentifier.getKey().equals(artifact)) {
-        logger.warn("Workflow with identifier '{}' already registered in file '{}', ignoring", workflowIdentifier,
-                fileWithIdentifier.getKey());
-        artifactsWithError.add(artifact);
-        return;
-      }
-    }
-
-    logger.debug("Installing workflow from file '{}'", artifact.getName());
-    artifactsWithError.remove(artifact);
-    artifactIds.put(artifact, workflowIdentifier);
-    putWorkflowDefinition(workflowIdentifier, def);
 
     // Determine the number of available profiles
     String[] filesInDirectory = artifact.getParentFile().list((arg0, name) -> name.endsWith(".xml"));
     if (filesInDirectory == null) {
       throw new RuntimeException("error retrieving files from directory \"" + artifact.getParentFile() + "\"");
     }
-
-    logger.info("Workflow definition '{}' from file '{}' installed", workflowIdentifier, artifact.getName());
 
     // Once all profiles have been loaded, announce readiness
     if ((filesInDirectory.length - artifactsWithError.size()) == artifactIds.size() && !isWFSinitialized) {
@@ -161,7 +135,27 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
       bundleCtx.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);
       isWFSinitialized = true;
     }
+  }
+
+  private void installWorkflowDefinition(File artifact, WorkflowDefinition def) {
+    // Is there a workflow with the exact same ID, but a different file name? Then ignore.
+    final WorkflowIdentifier workflowIdentifier = new WorkflowIdentifier(def.getId(), def.getOrganization());
+    for (Map.Entry<File, WorkflowIdentifier> fileWithIdentifier : artifactIds.entrySet()) {
+      if (fileWithIdentifier.getValue().equals(workflowIdentifier) && !fileWithIdentifier.getKey().equals(artifact)) {
+        logger.warn("Workflow with identifier '{}' already registered in file '{}', ignoring", workflowIdentifier,
+            fileWithIdentifier.getKey());
+        artifactsWithError.add(artifact);
+        return;
+      }
+    }
+
+    logger.debug("Installing workflow from file '{}'", artifact.getName());
+    artifactsWithError.remove(artifact);
+    artifactIds.put(artifact, workflowIdentifier);
+    putWorkflowDefinition(workflowIdentifier, def);
     workflowStateMappings.put(def.getId(), def.getStateMappings());
+
+    logger.info("Workflow definition '{}' from file '{}' installed", workflowIdentifier, artifact.getName());
   }
 
   /**
@@ -184,12 +178,11 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
    * @see org.apache.felix.fileinstall.ArtifactInstaller#update(java.io.File)
    */
   public void update(File artifact) {
-    currentWFD = parseWorkflowDefinitionFile(artifact);
+    WorkflowDefinition def = parseWorkflowDefinitionFile(artifact);
 
-    if (currentWFD != null) {
+    if (def != null) {
       uninstall(artifact);
-      install(artifact);
-      currentWFD = null;
+      installWorkflowDefinition(artifact, def);
     }
   }
 
@@ -206,7 +199,12 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
    */
   public WorkflowDefinition parseWorkflowDefinitionFile(File artifact) {
     try (InputStream stream = new FileInputStream(artifact)) {
-      WorkflowDefinition def = WorkflowParser.parseWorkflowDefinition(stream);
+      WorkflowDefinition def;
+      if (artifact.getName().endsWith(".yml") || artifact.getName().endsWith(".yaml")) {
+        def = YamlWorkflowParser.parseWorkflowDefinition(stream);
+      } else {
+        def = XmlWorkflowParser.parseWorkflowDefinition(stream);
+      }
       if (def.getOperations().size() == 0)
         logger.warn("Workflow '{}' has no operations", def.getId());
       if (def.getOrganization() != null && !organizationExists(def.getOrganization())) {
@@ -294,7 +292,8 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
    * @see org.apache.felix.fileinstall.ArtifactListener#canHandle(java.io.File)
    */
   public boolean canHandle(File artifact) {
-    return "workflows".equals(artifact.getParentFile().getName()) && artifact.getName().endsWith(".xml");
+    return "workflows".equals(artifact.getParentFile().getName())
+        && (artifact.getName().endsWith(".xml") || artifact.getName().endsWith(".yml") || artifact.getName().endsWith(".yaml"));
   }
 
 }

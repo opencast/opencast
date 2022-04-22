@@ -271,23 +271,23 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
    * @param eventCommentService
    *          the workflow service
    */
-  @Reference(name = "event-comment-service")
+  @Reference
   public void setEventCommentService(EventCommentService eventCommentService) {
     this.eventCommentService = eventCommentService;
   }
 
   /** OSGi DI */
-  @Reference(name = "SecurityService")
+  @Reference
   void setSecurityService(SecurityService service) {
     this.securityService = service;
   }
 
-  @Reference(name = "UserDirectory")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

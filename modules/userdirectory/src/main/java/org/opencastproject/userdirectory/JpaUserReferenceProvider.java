@@ -108,7 +108,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
   protected EntityManagerFactory emf = null;
 
   /** OSGi DI */
-  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.common)")
+  @Reference(target = "(osgi.unit.name=org.opencastproject.common)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -117,7 +117,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -126,7 +126,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    * @param groupRoleProvider
    *          the GroupRoleProvider to set
    */
-  @Reference(name = "groupRoleProvider")
+  @Reference
   public void setGroupRoleProvider(JpaGroupRoleProvider groupRoleProvider) {
     this.groupRoleProvider = groupRoleProvider;
   }

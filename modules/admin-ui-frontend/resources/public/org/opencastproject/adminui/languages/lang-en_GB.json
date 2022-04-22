@@ -1301,6 +1301,14 @@
                "RIGHT": "Selected roles",
                "REMOVE": "Remove role",
                "ADD": "Add role"
+            },
+            "STRENGTH": {
+               "BAD": "Bad password",
+               "VERYWEAK": "Very weak password",
+               "WEAK": "Weak password",
+               "GOOD": "Good password",
+               "STRONG": "Strong password",
+               "VERYSTRONG": "Very strong password"
             }
          }
       },
