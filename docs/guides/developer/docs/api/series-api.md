@@ -214,9 +214,9 @@ Query String Parameter |Type                         | Description
 `count`                | [`string`](types.md#basic)  | Maximum number of results
 
 __Sample request__
-```xml
+
 https://opencast.domain.com/api/series/series.json?creator:Administrator&sort=title_DESC&limit=2
-```
+
 
 __Response__
 

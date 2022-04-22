@@ -2,7 +2,11 @@ Upgrading Opencast from 10.x to 11.x
 ===================================
 
 This guide describes how to upgrade Opencast 10.x to 11.x.
-@@ -10,76 +10,18 @@ please refer to [older release notes](https://docs.opencast.org).
+In case you need information about how to upgrade older versions of Opencast,
+please refer to [older release notes](https://docs.opencast.org).
+
+1. Stop your current Opencast instance
+2. Replace Opencast with the new version
 3. Read the release notes (especially the section of behaviour changes)
 4. Review the configuration changes and adjust your configuration accordingly
 5. Do the [database migration](#database-migration)
