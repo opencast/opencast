@@ -19,33 +19,27 @@
  *
  */
 
-package org.opencastproject.index.service.impl.util;
+package org.opencastproject.workflow.api;
 
-import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.User;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-public final class Retraction {
-  private User user;
-  private Organization organization;
+import java.io.IOException;
 
-  public Retraction(User user, Organization organization) {
-    this.user = user;
-    this.organization = organization;
+public class YamlWorkflowConfigurationSerializer extends StdSerializer<WorkflowConfigurationImpl> {
+
+  public YamlWorkflowConfigurationSerializer() {
+    this(null);
   }
 
-  public User getUser() {
-    return this.user;
+  public YamlWorkflowConfigurationSerializer(Class<WorkflowConfigurationImpl> t) {
+    super(t);
   }
 
-  public void setUser(User user) {
-    this.user = user;
-  }
-
-  public Organization getOrganization() {
-    return this.organization;
-  }
-
-  public void setOrganization(Organization organization) {
-    this.organization = organization;
+  @Override
+  public void serialize(WorkflowConfigurationImpl workflowConfiguration, JsonGenerator jsonGenerator,
+      SerializerProvider serializerProvider) throws IOException {
+    jsonGenerator.writeObjectField(workflowConfiguration.getKey(), workflowConfiguration.getValue());
   }
 }

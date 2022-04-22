@@ -34,9 +34,12 @@ import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.SU
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.event.EventIndexUtils;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
@@ -99,7 +102,6 @@ import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.api.WorkflowOperationResultImpl;
-import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
@@ -107,6 +109,7 @@ import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateMapping;
 import org.opencastproject.workflow.api.WorkflowStatistics;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.conditionparser.WorkflowConditionInterpreter;
 import org.opencastproject.workflow.impl.jmx.WorkflowsStatistics;
 import org.opencastproject.workspace.api.Workspace;
@@ -495,7 +498,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         throw new NotFoundException("Workflow '" + id + "' has been deleted");
       }
       if (JOB_TYPE.equals(job.getJobType()) && Operation.START_WORKFLOW.toString().equals(job.getOperation())) {
-        WorkflowInstanceImpl workflow = WorkflowParser.parseWorkflowInstance(job.getPayload());
+        WorkflowInstanceImpl workflow = XmlWorkflowParser.parseWorkflowInstance(job.getPayload());
         assertPermission(workflow, Permissions.Action.READ.toString(), job.getOrganization());
         return workflow;
       } else {
@@ -600,8 +603,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       // Create and configure the workflow instance
       try {
         // Create a new job for this workflow instance
-        String workflowDefinitionXml = WorkflowParser.toXml(workflowDefinition);
-        String workflowInstanceXml = WorkflowParser.toXml(workflowInstance);
+        String workflowDefinitionXml = XmlWorkflowParser.toXml(workflowDefinition);
+        String workflowInstanceXml = XmlWorkflowParser.toXml(workflowInstance);
         String mediaPackageXml = MediaPackageParser.getAsXml(sourceMediaPackage);
 
         List<String> arguments = new ArrayList<>();
@@ -666,15 +669,15 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
             : componentContext.getBundleContext().getProperty(key);
       };
       if (instance.getOperations().stream().anyMatch(op -> op.getExecutionCondition() != null)) {
-        instance = WorkflowParser.parseWorkflowInstance(WorkflowParser.toXml(instance));
+        instance = XmlWorkflowParser.parseWorkflowInstance(XmlWorkflowParser.toXml(instance));
         instance.getOperations().stream().filter(op -> op.getExecutionCondition() != null).forEach(
                 op -> op.setExecutionCondition(WorkflowConditionInterpreter.replaceVariables(op.getExecutionCondition(),
                         systemVariableGetter,
                         properties, true)));
       }
-      String xml = WorkflowConditionInterpreter.replaceVariables(WorkflowParser.toXml(instance),
+      String xml = WorkflowConditionInterpreter.replaceVariables(XmlWorkflowParser.toXml(instance),
               systemVariableGetter, wfProperties, false);
-      return WorkflowParser.parseWorkflowInstance(xml);
+      return XmlWorkflowParser.parseWorkflowInstance(xml);
     } catch (Exception e) {
       throw new IllegalStateException("Unable to replace workflow instance variables", e);
     }
@@ -993,71 +996,76 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     final Lock lock = this.lock.get(workflowInstanceId);
     lock.lock();
     try {
+      // get workflow instance from index
       WorkflowQuery query = new WorkflowQuery();
       query.withId(Long.toString(workflowInstanceId));
       WorkflowSet workflows = index.getWorkflowInstances(query, Permissions.Action.READ.toString(), false);
-      if (workflows.size() == 1) {
-        WorkflowInstance instance = workflows.getItems()[0];
-
-        WorkflowInstance.WorkflowState state = instance.getState();
-        if (state != WorkflowState.SUCCEEDED && state != WorkflowState.FAILED
-            && state != WorkflowState.STOPPED) {
-          if (!force) {
-            throw new WorkflowStateException("Workflow instance with state '" + state + "' cannot be removed. " + "Only states SUCCEEDED, FAILED & STOPPED are allowed");
-          }
-          logger.info("Using force, removing workflow " + workflowInstanceId + " despite being in state " + state);
-        }
-
-        assertPermission(instance, Permissions.Action.WRITE.toString(), instance.getOrganizationId());
-
-        // First, remove temporary files DO THIS BEFORE REMOVING FROM INDEX
-        removeTempFiles(instance);
-
-        // Second, remove jobs related to a operation which belongs to the workflow instance
-        List<WorkflowOperationInstance> operations = instance.getOperations();
-        List<Long> jobsToDelete = new ArrayList<>();
-        for (WorkflowOperationInstance op : operations) {
-          if (op.getId() != null) {
-            long workflowOpId = op.getId();
-            if (workflowOpId != workflowInstanceId) {
-              jobsToDelete.add(workflowOpId);
-            }
-          }
-        }
-        try {
-          serviceRegistry.removeJobs(jobsToDelete);
-        } catch (ServiceRegistryException e) {
-          logger.warn("Problems while removing jobs related to workflow operations '%s': %s", jobsToDelete,
-                  e.getMessage());
-        } catch (NotFoundException e) {
-          logger.debug("No jobs related to one of the workflow operations '%s' found in the service registry",
-                  jobsToDelete);
-        }
-
-        // Third, remove workflow instance job itself
-        try {
-          serviceRegistry.removeJobs(Collections.singletonList(workflowInstanceId));
-          removeWorkflowInstanceFromIndex(instance, elasticsearchIndex);
-        } catch (ServiceRegistryException e) {
-          logger.warn("Problems while removing workflow instance job '%d'", workflowInstanceId, e);
-        } catch (NotFoundException e) {
-          logger.info("No workflow instance job '%d' found in the service registry", workflowInstanceId);
-        }
-
-        // At last, remove workflow instance from the index
-        try {
-          index.remove(workflowInstanceId);
-        } catch (NotFoundException e) {
-          // This should never happen, because we got workflow instance by querying the index...
-          logger.warn("Workflow instance could not be removed from index", e);
-        }
-      } else if (workflows.size() == 0) {
-        throw new NotFoundException("Workflow instance with id '" + Long.toString(workflowInstanceId)
-                                              + "' could not be found");
-      } else {
-        throw new WorkflowDatabaseException("More than one workflow found with id: "
-                                                    + Long.toString(workflowInstanceId));
+      if (workflows.size() == 0) {
+        removeWorkflowInstanceFromIndex(workflowInstanceId, elasticsearchIndex);
+        throw new NotFoundException("Workflow instance with id '" + workflowInstanceId + "' could not be found");
       }
+      if (workflows.size() > 1) {
+        throw new WorkflowDatabaseException("More than one workflow found with id: " + workflowInstanceId);
+      }
+
+      WorkflowInstance instance = workflows.getItems()[0];
+
+      // check workflow state
+      WorkflowInstance.WorkflowState state = instance.getState();
+      if (state != WorkflowState.SUCCEEDED && state != WorkflowState.FAILED && state != WorkflowState.STOPPED) {
+        if (!force) {
+          throw new WorkflowStateException("Workflow instance with state '" + state + "' cannot be removed. "
+                  + "Only states SUCCEEDED, FAILED & STOPPED are allowed");
+        }
+        logger.info("Using force, removing workflow " + workflowInstanceId + " despite being in state " + state);
+      }
+
+      // are we allowed to do this?
+      assertPermission(instance, Permissions.Action.WRITE.toString(), instance.getOrganizationId());
+
+      // First, remove temporary files DO THIS BEFORE REMOVING FROM INDEX
+      removeTempFiles(instance);
+
+      // Second, remove jobs related to a operation which belongs to the workflow instance
+      List<WorkflowOperationInstance> operations = instance.getOperations();
+      List<Long> jobsToDelete = new ArrayList<>();
+      for (WorkflowOperationInstance op : operations) {
+        if (op.getId() != null) {
+          long workflowOpId = op.getId();
+          if (workflowOpId != workflowInstanceId) {
+            jobsToDelete.add(workflowOpId);
+          }
+        }
+      }
+      try {
+        serviceRegistry.removeJobs(jobsToDelete);
+      } catch (ServiceRegistryException e) {
+        logger.warn("Problems while removing jobs related to workflow operations '%s': %s", jobsToDelete,
+                e.getMessage());
+      } catch (NotFoundException e) {
+        logger.debug("No jobs related to one of the workflow operations '%s' found in the service registry",
+                jobsToDelete);
+      }
+
+      // Third, remove workflow instance job itself
+      try {
+        serviceRegistry.removeJobs(Collections.singletonList(workflowInstanceId));
+      } catch (ServiceRegistryException e) {
+        logger.warn("Problems while removing workflow instance job '%d'", workflowInstanceId, e);
+      } catch (NotFoundException e) {
+        logger.info("No workflow instance job '%d' found in the service registry", workflowInstanceId);
+      }
+
+      // Finally, remove workflow instance from the workflow index
+      try {
+        index.remove(workflowInstanceId);
+      } catch (NotFoundException e) {
+        // This should never happen, because we got workflow instance by querying the index...
+        logger.warn("Workflow instance could not be removed from index", e);
+      }
+
+      // Also remove workflow instance from the Elasticsearch index
+      removeWorkflowInstanceFromIndex(workflowInstanceId, elasticsearchIndex);
     } finally {
       lock.unlock();
     }
@@ -1167,7 +1175,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     try {
       workflowJob = serviceRegistry.getJob(workflowInstanceId);
       workflowJob.setStatus(Status.RUNNING);
-      workflowJob.setPayload(WorkflowParser.toXml(workflowInstance));
+      workflowJob.setPayload(XmlWorkflowParser.toXml(workflowInstance));
       serviceRegistry.updateJob(workflowJob);
 
       Job operationJob = serviceRegistry.getJob(operationJobId);
@@ -1284,7 +1292,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       WorkflowState workflowState = workflowInstance.getState();
       String xml;
       try {
-        xml = WorkflowParser.toXml(workflowInstance);
+        xml = XmlWorkflowParser.toXml(workflowInstance);
       } catch (Exception e) {
         // Can't happen, since we are converting from an in-memory object
         throw new IllegalStateException("In-memory workflow instance could not be serialized", e);
@@ -1367,7 +1375,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       }
 
       try {
-        WorkflowInstance clone = WorkflowParser.parseWorkflowInstance(WorkflowParser.toXml(workflowInstance));
+        WorkflowInstance clone = XmlWorkflowParser.parseWorkflowInstance(XmlWorkflowParser.toXml(workflowInstance));
         fireListeners(originalWorkflowInstance, clone);
       } catch (Exception e) {
         // Can't happen, since we are converting from an in-memory object
@@ -1693,7 +1701,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     // If the first operation is guaranteed to pause, run the job.
     if (job.getArguments().size() > 1 && job.getArguments().get(0) != null) {
       try {
-        WorkflowDefinition workflowDef = WorkflowParser.parseWorkflowDefinition(job.getArguments().get(0));
+        WorkflowDefinition workflowDef = XmlWorkflowParser.parseWorkflowDefinition(job.getArguments().get(0));
         if (workflowDef.getOperations().size() > 0) {
           String firstOperationId = workflowDef.getOperations().get(0).getId();
           WorkflowOperationHandler handler = getWorkflowOperationHandler(firstOperationId);
@@ -1807,7 +1815,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         op = Operation.valueOf(operation);
         switch (op) {
           case START_WORKFLOW:
-            workflowInstance = WorkflowParser.parseWorkflowInstance(job.getPayload());
+            workflowInstance = XmlWorkflowParser.parseWorkflowInstance(job.getPayload());
             logger.debug("Starting new workflow %s", workflowInstance);
             runWorkflow(workflowInstance);
             break;
@@ -2369,7 +2377,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           }
           WorkflowInstance instance;
           try {
-            instance = WorkflowParser.parseWorkflowInstance(workflow);
+            instance = XmlWorkflowParser.parseWorkflowInstance(workflow);
           } catch (WorkflowParsingException e) {
             logger.warn("Skipping restore of workflow. Error parsing: {}", workflow, e);
             continue;
@@ -2424,30 +2432,63 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   /**
    * Remove a workflow instance from the API index.
    *
-   * @param workflowInstance
-   *         the workflowInstance to remove
+   * @param workflowInstanceId
+   *         the identifier of the workflow instance to remove
    * @param index
    *         the index to update
    */
-  private void removeWorkflowInstanceFromIndex(WorkflowInstance workflowInstance, ElasticsearchIndex index) {
-    final long workflowInstanceId = workflowInstance.getId();
-    final String eventId = workflowInstance.getMediaPackage().getIdentifier().toString();
-
-    final String organization = securityService.getOrganization().getId();
+  private void removeWorkflowInstanceFromIndex(long workflowInstanceId, ElasticsearchIndex index) {
+    final String orgId = securityService.getOrganization().getId();
     final User user = securityService.getUser();
 
+    // find events
+    SearchResult<Event> results;
     try {
+      results = index.getByQuery(new EventSearchQuery(orgId, user).withWorkflowId(workflowInstanceId));
+    } catch (SearchIndexException e) {
+      logger.error("Error retrieving the events for workflow instance {} from the {} index.", workflowInstanceId,
+              index.getIndexName(), e);
+      return;
+    }
+
+    if (results.getItems().length == 0) {
+      logger.warn("No events for workflow instance {} found in the {} index.", workflowInstanceId,
+              index.getIndexName());
+      return;
+    }
+
+    // should be only one event, but better safe than sorry
+    for (SearchResultItem<Event> item: results.getItems()) {
+      String eventId = item.getSource().getIdentifier();
       logger.debug("Removing workflow instance {} of event {} from the {} index.", workflowInstanceId, eventId,
               index.getIndexName());
-      index.deleteWorkflow(organization, user, eventId, workflowInstanceId);
-      logger.debug("Workflow instance {} of event {} removed from the {} index.", workflowInstanceId, eventId,
-              index.getIndexName());
-    } catch (NotFoundException e) {
-      logger.warn("Workflow instance {} of event {} not found for removal from the {} index.", workflowInstanceId,
-              eventId, index.getIndexName());
-    } catch (SearchIndexException e) {
-      logger.error("Error removing the workflow instance {} of event {} from the {} index.", workflowInstanceId,
-              eventId, index.getIndexName(), e);
+
+      Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+        if (!eventOpt.isPresent()) {
+          logger.warn("Event {} of workflow instance {} not found in the {} index.", workflowInstanceId,
+                  eventId, index.getIndexName());
+          return Optional.empty();
+        }
+        Event event = eventOpt.get();
+        if (event.getWorkflowId() != null && event.getWorkflowId().equals(workflowInstanceId)) {
+          logger.debug("Workflow {} is the current workflow of event {}. Removing it from event.", eventId,
+                  workflowInstanceId);
+          event.setWorkflowId(null);
+          event.setWorkflowDefinitionId(null);
+          event.setWorkflowState(null);
+          return Optional.of(event);
+        }
+        return Optional.empty();
+      };
+
+      try {
+        index.addOrUpdateEvent(eventId, updateFunction, orgId, user);
+        logger.debug("Workflow instance {} of event {} removed from the {} index.", workflowInstanceId, eventId,
+                index.getIndexName());
+      } catch (SearchIndexException e) {
+        logger.error("Error removing the workflow instance {} of event {} from the {} index.", workflowInstanceId,
+                eventId, index.getIndexName(), e);
+      }
     }
   }
 
@@ -2467,13 +2508,13 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           DublinCoreCatalog episodeDublincoreCatalog, ElasticsearchIndex index) {
     final long workflowInstanceId = workflowInstance.getId();
     final String eventId = workflowInstance.getMediaPackage().getIdentifier().toString();
-    final String organization = securityService.getOrganization().getId();
+    final String orgId = securityService.getOrganization().getId();
     final User user = securityService.getUser();
 
     logger.debug("Updating workflow instance {} of event {} in the {} index.", workflowInstanceId, eventId,
             index.getIndexName());
     Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
-      Event event = eventOpt.orElse(new Event(eventId, organization));
+      Event event = eventOpt.orElse(new Event(eventId, orgId));
       event.setCreator(user.getName());
       event.setWorkflowId(workflowInstanceId);
       event.setWorkflowDefinitionId(workflowInstance.getTemplate());
@@ -2491,7 +2532,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     };
 
     try {
-      index.addOrUpdateEvent(eventId, updateFunction, organization, user);
+      index.addOrUpdateEvent(eventId, updateFunction, orgId, user);
       logger.debug("Workflow instance {} of event {} updated in the {} index.", workflowInstanceId, eventId,
               index.getIndexName());
     } catch (SearchIndexException e) {

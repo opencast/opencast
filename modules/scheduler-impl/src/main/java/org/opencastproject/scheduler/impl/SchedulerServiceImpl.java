@@ -176,8 +176,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(SchedulerServiceImpl.class);
 
-  /** The last modifed cache configuration key */
-  private static final String CFG_KEY_LAST_MODIFED_CACHE_EXPIRE = "last_modified_cache_expire";
+  /** The last modified cache configuration key */
+  private static final String CFG_KEY_LAST_MODIFIED_CACHE_EXPIRE = "last_modified_cache_expire";
 
   /** The maintenance configuration key */
   private static final String CFG_KEY_MAINTENANCE = "maintenance";
@@ -390,7 +390,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   @Override
   public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     if (properties != null) {
-      final Option<Integer> cacheExpireDuration = OsgiUtil.getOptCfg(properties, CFG_KEY_LAST_MODIFED_CACHE_EXPIRE)
+      final Option<Integer> cacheExpireDuration = OsgiUtil.getOptCfg(properties, CFG_KEY_LAST_MODIFIED_CACHE_EXPIRE)
               .bind(Strings.toInt);
       if (cacheExpireDuration.isSome()) {
         lastModifiedCache = CacheBuilder.newBuilder().expireAfterWrite(cacheExpireDuration.get(), TimeUnit.SECONDS)
@@ -868,37 +868,44 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           throws NotFoundException, SchedulerException {
     notEmpty(mediaPackageId, "mediaPackageId");
 
+    boolean notFoundInDatabase = false;
+    boolean notFoundInAssetManager;
     try {
-      // Check if there are properties only from scheduler
-      AQueryBuilder query = assetManager.createQuery();
-      long deletedProperties = 0;
-      Opt<ExtendedEventDto> extEvtOpt = persistence.getEvent(mediaPackageId);
-      if (extEvtOpt.isSome()) {
-        String agentId = extEvtOpt.get().getCaptureAgentId();
-        persistence.deleteEvent(mediaPackageId);
-        if (StringUtils.isNotEmpty(agentId))
-          touchLastEntry(agentId);
+      // Remove from database
+      try {
+        Opt<ExtendedEventDto> extEvtOpt = persistence.getEvent(mediaPackageId);
+        if (extEvtOpt.isSome()) {
+          String agentId = extEvtOpt.get().getCaptureAgentId();
+          persistence.deleteEvent(mediaPackageId);
+          if (StringUtils.isNotEmpty(agentId)) {
+            touchLastEntry(agentId);
+          }
+        } else {
+          notFoundInDatabase = true;
+        }
+      } catch (NotFoundException e) {
+        notFoundInDatabase = true;
       }
 
       // Delete scheduler snapshot
+      AQueryBuilder query = assetManager.createQuery();
       long deletedSnapshots = query.delete(SNAPSHOT_OWNER, query.snapshot())
               .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)))
               .name("delete episode").run();
-
-      if (deletedProperties + deletedSnapshots == 0)
-        throw new NotFoundException();
+      notFoundInAssetManager = deletedSnapshots == 0;
 
       // Update live event
       sendSchedulerUpdate(new SchedulerItemList(mediaPackageId, SchedulerItem.delete()));
 
       // Update API index
-      removeSchedulingFromIndex(mediaPackageId, index);
-
-    } catch (NotFoundException | SchedulerException e) {
-      throw e;
+      removeSchedulingInfoFromIndex(mediaPackageId, index);
     } catch (Exception e) {
       logger.error("Could not remove event '{}' from persistent storage: {}", mediaPackageId, e);
       throw new SchedulerException(e);
+    }
+
+    if (notFoundInDatabase && notFoundInAssetManager) {
+      throw new NotFoundException();
     }
   }
 
@@ -1498,14 +1505,24 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @param mediaPackageId
    * @param index
    */
-  private void removeSchedulingFromIndex(String mediaPackageId, ElasticsearchIndex index) {
-    String organization = getSecurityService().getOrganization().getId();
+  private void removeSchedulingInfoFromIndex(String mediaPackageId, ElasticsearchIndex index) {
+    String orgId = getSecurityService().getOrganization().getId();
     User user = getSecurityService().getUser();
+
+    Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+      if (!eventOpt.isPresent()) {
+        logger.warn("Scheduled recording {} not found for deletion from the {} index.", mediaPackageId,
+                index.getIndexName());
+        return Optional.empty();
+      }
+      Event event = eventOpt.get();
+      event.setAgentId(null);
+      return Optional.of(event);
+    };
+
     try {
-      index.deleteScheduling(organization, user, mediaPackageId);
-      logger.debug("Scheduling information of event {} removed from the {} index.", mediaPackageId, index.getIndexName());
-    } catch (NotFoundException e) {
-      logger.warn("Scheduled recording {} not found for deletion from the {} index.", mediaPackageId,
+      index.addOrUpdateEvent(mediaPackageId, updateFunction, orgId, user);
+      logger.debug("Scheduling information of event {} removed from the {} index.", mediaPackageId,
               index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Failed to delete the scheduling information of event {} from the {} index.", mediaPackageId,

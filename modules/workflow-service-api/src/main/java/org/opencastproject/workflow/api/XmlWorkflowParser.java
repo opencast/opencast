@@ -41,7 +41,7 @@ import javax.xml.bind.Unmarshaller;
 /**
  * Provides a mechanism to un/marshall workflow instances and definitions to/from xml.
  */
-public final class WorkflowParser {
+public final class XmlWorkflowParser {
 
   private static final JAXBContext jaxbContext;
 
@@ -50,14 +50,14 @@ public final class WorkflowParser {
     sb.append("org.opencastproject.mediapackage");
     sb.append(":org.opencastproject.workflow.api");
     try {
-      jaxbContext = JAXBContext.newInstance(sb.toString(), WorkflowParser.class.getClassLoader());
+      jaxbContext = JAXBContext.newInstance(sb.toString(), XmlWorkflowParser.class.getClassLoader());
     } catch (JAXBException e) {
       throw new IllegalStateException(e);
     }
   }
 
   /** Disallow instantiating this class */
-  private WorkflowParser() {
+  private XmlWorkflowParser() {
   }
 
   /**

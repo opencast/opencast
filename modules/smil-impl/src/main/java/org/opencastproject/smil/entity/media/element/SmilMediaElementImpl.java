@@ -42,7 +42,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 /**
  * {@code SmilMediaElemnt} implementation.
  */
-@XmlSeeAlso({SmilMediaAudioImpl.class, SmilMediaVideoImpl.class})
+@XmlSeeAlso({SmilMediaAudioImpl.class, SmilMediaVideoImpl.class, SmilMediaReferenceImpl.class})
 public abstract class SmilMediaElementImpl extends SmilMediaObjectImpl implements SmilMediaElement {
 
   /**

@@ -4,6 +4,31 @@ Changelog
 Opencast 11
 ----------
 
+### Opencast 11.6
+
+*Released on April 20th, 2022*
+
+- [[#3638](https://github.com/opencast/opencast/pull/3638)] -
+  Fix add punctuation and models support to google transcription
+- [[#3633](https://github.com/opencast/opencast/pull/3633)] -
+  allow admin user for node to node communication #3556
+- [[#3631](https://github.com/opencast/opencast/pull/3631)] -
+  Error handling in Vosk module
+- [[#3630](https://github.com/opencast/opencast/pull/3630)] -
+  Fix Vosk Concurrency Problem
+- [[#3605](https://github.com/opencast/opencast/pull/3605)] -
+  fix #3602, Terminate state service, check that host is not in maintenance
+- [[#3586](https://github.com/opencast/opencast/pull/3586)] -
+  Auto-generated series for Capture Agents
+- [[#3567](https://github.com/opencast/opencast/pull/3567)] -
+  Fix workflow definition installation
+- [[#3555](https://github.com/opencast/opencast/pull/3555)] -
+  Rework the userdirectory-brightspace module
+- [[#3550](https://github.com/opencast/opencast/pull/3550)] -
+  Add release notes and changelog for OC 11.5
+- [[#3330](https://github.com/opencast/opencast/pull/3330)] -
+  Removed ManagedService from MediaInspectionService
+
 ### Opencast 11.5
 
 *Released on March 23rd, 2022*
@@ -768,6 +793,18 @@ Opencast 11
 
 Opencast 10
 ----------
+
+### Opencast 10.12
+
+*Released on Apr 19th, 2022*
+
+- [[#3660](https://github.com/opencast/opencast/pull/3660)] -
+  Update Editor to 2022-03-22 and OC Studio to 2022-02-16 for OC 10.x
+- [[#3650](https://github.com/opencast/opencast/pull/3650)] -
+  Fixes admin-ui repeated series name display #3600
+- [[#3626](https://github.com/opencast/opencast/pull/3626)] -
+  Update paella player to paella 6.5.6
+
 
 ### Opencast 10.11
 

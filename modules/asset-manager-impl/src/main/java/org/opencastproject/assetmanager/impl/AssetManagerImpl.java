@@ -538,15 +538,24 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * @param index
    *         The API index to update
    */
-  private void removeEventFromIndex(String eventId, ElasticsearchIndex index) {
-    final String organization = securityService.getOrganization().getId();
+  private void removeArchivedVersionFromIndex(String eventId, ElasticsearchIndex index) {
+    final String orgId = securityService.getOrganization().getId();
     final User user = securityService.getUser();
     logger.debug("Received AssetManager delete episode message {}", eventId);
+
+    Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+      if (!eventOpt.isPresent()) {
+        logger.warn("Event {} not found for deletion", eventId);
+        return Optional.empty();
+      }
+      Event event = eventOpt.get();
+      event.setArchiveVersion(null);
+      return Optional.of(event);
+    };
+
     try {
-      index.deleteAssets(organization, user, eventId);
+      index.addOrUpdateEvent(eventId, updateFunction, orgId, user);
       logger.debug("Event {} removed from the {} index", eventId, index.getIndexName());
-    } catch (NotFoundException e) {
-      logger.warn("Event {} not found for deletion", eventId);
     } catch (SearchIndexException e) {
       logger.error("Error deleting the event {} from the {} index.", eventId, index.getIndexName(), e);
     }
@@ -867,7 +876,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     logger.info("Firing event handlers for event {}", mpId);
     fireEventHandlers(AssetManagerItem.deleteEpisode(mpId, new Date()));
 
-    removeEventFromIndex(mpId, index);
+    removeArchivedVersionFromIndex(mpId, index);
   }
 
   /**

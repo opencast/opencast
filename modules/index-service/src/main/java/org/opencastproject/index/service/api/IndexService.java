@@ -122,8 +122,6 @@ public interface IndexService {
    *
    * @param event
    *          The event to remove.
-   * @param doOnNotFound
-   *      What to do when the event could not be found.
    * @param retractWorkflowId
    *          The id of the workflow to use to retract the event if necessary.
    * @return A result which tells if the event was removed, removal failed, or the event is being retracted and will be removed later.
@@ -134,8 +132,8 @@ public interface IndexService {
    * @throws NotFoundException
    *           If the configured retract workflow cannot be found. This is most likely a configuration issue.
    */
-  EventRemovalResult removeEvent(Event event, Runnable doOnNotFound, String retractWorkflowId)
-      throws UnauthorizedException, WorkflowDatabaseException, NotFoundException;
+  EventRemovalResult removeEvent(Event event, String retractWorkflowId) throws UnauthorizedException,
+          WorkflowDatabaseException, NotFoundException;
 
   /**
    * Removes an event.
@@ -298,19 +296,6 @@ public interface IndexService {
    * @return the common {@link EventCatalogUIAdapter}
    */
   EventCatalogUIAdapter getCommonEventCatalogUIAdapter();
-
-  /**
-   * Get a single series
-   *
-   * @param seriesId
-   *          the series id
-   * @param searchIndex
-   *          the abstract search index
-   * @return a series or none if not found wrapped in an option
-   * @throws SearchIndexException
-   *           Thrown if there is an error when using the search index.
-   */
-  Opt<Series> getSeries(String seriesId, ElasticsearchIndex searchIndex) throws SearchIndexException;
 
   /**
    * Create a new series.

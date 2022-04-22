@@ -62,7 +62,6 @@ import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
-import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowQuery.Sort;
@@ -70,6 +69,7 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStatistics;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
@@ -549,7 +549,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     } catch (Exception e) {
       // Not an ID. Let's try if it's an XML definition
       try {
-        workflowDefinition = WorkflowParser.parseWorkflowDefinition(workflowDefinitionXmlOrId);
+        workflowDefinition = XmlWorkflowParser.parseWorkflowDefinition(workflowDefinitionXmlOrId);
       } catch (WorkflowParsingException wpe) {
         throw new WebApplicationException(wpe, Status.BAD_REQUEST);
       }
@@ -715,7 +715,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   public Response update(@FormParam("workflow") String workflowInstance) throws NotFoundException,
           UnauthorizedException {
     try {
-      WorkflowInstance instance = WorkflowParser.parseWorkflowInstance(workflowInstance);
+      WorkflowInstance instance = XmlWorkflowParser.parseWorkflowInstance(workflowInstance);
       service.update(instance);
       return Response.noContent().build();
     } catch (WorkflowException e) {
