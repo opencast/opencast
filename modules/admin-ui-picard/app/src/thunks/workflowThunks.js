@@ -40,6 +40,17 @@ export const fetchWorkflowDef = (type) => async (dispatch) => {
 
         let workflows = response.workflows;
 
+        /*workflows = workflows.map(workflow => {
+            if (workflow.configuration_panel.length > 0) {
+                return {
+                    ...workflow,
+                    configuration_panel: JSON.parse(workflow.configuration_panel)
+                }
+            } else {
+                return workflow;
+            }
+        });*/
+
         const workflowDef = {
             defaultWorkflowId: response.default_workflow_id,
             workflows: workflows

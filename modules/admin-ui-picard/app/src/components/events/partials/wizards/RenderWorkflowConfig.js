@@ -16,9 +16,9 @@ import {
  */
 const RenderWorkflowConfig = (props) => {
     // Get html for configuration panel
-    const configPanel = JSON.parse(props.configuration_panel);
-    const description = props.description;
-    const displayDescription = props.displayDescription;
+    const configPanel = props.configuration_panel ? props.configuration_panel : [];
+    const description = props.description ? props.description : '';
+    const displayDescription = !!props.displayDescription;
     let formik = props.formik;
 
     let ref = React.useRef();
@@ -46,7 +46,7 @@ const RenderWorkflowConfig = (props) => {
 
   return (
     <>
-      {(displayDescription && description.length) > 0 && (
+      {(displayDescription && description.length > 0) && (
         <div className="collapsible-box" style={descriptionBoxStyle}>
           <div style={descriptionTextStyle}>{description}</div>
         </div>
@@ -103,7 +103,7 @@ const RenderCheckbox = ({ field, key, formik }) => {
       <Field id={uuid}
              className="configField"
              name={'configuration.' + field.name}
-             defaultValue={field.checked}
+             defaultValue={field.value}
              type={field.type}/>
       <label htmlFor={uuid}>{field.label}</label>
       {/* if input has an additional fieldset or further configuration inputs

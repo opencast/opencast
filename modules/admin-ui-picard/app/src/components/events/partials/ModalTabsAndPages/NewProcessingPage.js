@@ -6,11 +6,12 @@ import {connect} from "react-redux";
 import {fetchWorkflowDef} from "../../../../thunks/workflowThunks";
 import {getWorkflowDef} from "../../../../selectors/workflowSelectors";
 import RenderWorkflowConfig from "../wizards/RenderWorkflowConfig";
+import { setDefaultConfig } from '../../../../utils/workflowPanelUtils';
 
 /**
  * This component renders the processing page for new events in the new event wizard.
  */
-const NewProcessingPage = ({ previousPage, nextPage, formik, workflowPanelRef, loadingWorkflowDef, workflowDef }) => {
+const NewProcessingPage = ({ previousPage, nextPage, formik, loadingWorkflowDef, workflowDef }) => {
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -30,48 +31,13 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, workflowPanelRef, l
 
     const setDefaultValues = e => {
       let workflowId = e.target.value;
-      let defaultConfiguration = {};
-      // find configuration panel information about chosen workflow
-      let configPanel = JSON.parse(workflowDef.find(workflow => workflow.id === workflowId).configuration_panel);
-
-      // only set default values if there is an configuration panel
-      if (configPanel.length > 0) {
-        // iterate through all config options and set their defaults
-        configPanel.forEach(configOption => {
-          if (configOption.fieldset) {
-            defaultConfiguration = fillDefaultConfig(configOption.fieldset, defaultConfiguration);
-          }
-        });
-      }
+      // fill values with default configuration of chosen workflow
+      let defaultConfiguration = setDefaultConfig(workflowDef, workflowId);
 
       // set default configuration in formik
       formik.setFieldValue("configuration", defaultConfiguration);
       // set chosen workflow in formik
       formik.setFieldValue("processingWorkflow", workflowId);
-    }
-
-    // fills default configuration with values
-    const fillDefaultConfig = (fieldset, defaultConfiguration) => {
-      // iteration through each input field
-      fieldset.forEach(field => {
-          // set value in default configuration
-          if (field.type !== "radio") {
-            defaultConfiguration[field.name] = field.value;
-          } else {
-            // set only the checked input of radio button as default value
-            if (field.type === "radio" && field.checked) {
-              defaultConfiguration[field.name] = field.value;
-            }
-          }
-
-          // if an input has further configuration than go through fillDefaultConfig again
-          if (field.fieldset) {
-            defaultConfiguration = fillDefaultConfig(field.fieldset, defaultConfiguration);
-          }
-      });
-
-      return defaultConfiguration;
-
     }
 
     return (
@@ -107,9 +73,8 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, workflowPanelRef, l
                                     <div id="new-event-workflow-configuration"
                                          className="checkbox-container obj-container">
                                         {formik.values.processingWorkflow ? (
-                                            <RenderWorkflowConfig displayDescription={true}
+                                            <RenderWorkflowConfig displayDescription
                                                                   workflowId={formik.values.processingWorkflow}
-                                                                  workflowPanelRef={workflowPanelRef}
                                                                   formik={formik} />
                                         ) : null}
                                     </div>

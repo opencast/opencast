@@ -864,7 +864,7 @@ export const fetchWorkflowDetails = (eventId, workflowId) => async (dispatch) =>
     }
 }
 
-const changeWorkflow = (saveWorkflow) => async (dispatch, getState) => {
+const changeWorkflow = () => async (dispatch, getState) => {
     const state = getState();
     const workflow = getWorkflow(state);
 
@@ -873,12 +873,9 @@ const changeWorkflow = (saveWorkflow) => async (dispatch, getState) => {
     } else {
         dispatch(setEventWorkflowConfiguration(getBaseWorkflow(state)));
     }
-    if(saveWorkflow){
-        saveWorkflowConfig();
-    }
 }
 
-export const updateWorkflow = (saveWorkflow, workflowId) => async (dispatch, getState) => {
+export const updateWorkflow = (workflowId) => async (dispatch, getState) => {
     const state = getState();
     const workflowDefinitions = getWorkflowDefinitions(state);
     const workflowDef = workflowDefinitions.find(def => def.id === workflowId);
@@ -887,11 +884,32 @@ export const updateWorkflow = (saveWorkflow, workflowId) => async (dispatch, get
         description: workflowDef.description,
         configuration: workflowDef.configuration
     }));
-    dispatch(changeWorkflow(saveWorkflow));
+    dispatch(changeWorkflow());
 }
 
-const saveWorkflowConfig = () => {
-    //todo
+export const saveWorkflowConfig = (values, eventId) => async (dispatch) => {
+
+    let jsonData = {
+        id: values.workflowDefinition,
+        configuration: values.configuration
+    }
+
+    let data = new URLSearchParams();
+    data.append("configuration", JSON.stringify(jsonData));
+
+    axios.put(`/admin-ng/event/${eventId}/workflows`, data,
+      {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    }).then(response => {
+        logger.info(response);
+        dispatch(removeNotificationWizardForm());
+        dispatch(fetchWorkflows(eventId));
+    }).catch(response => {
+        logger.error(response);
+        dispatch(addNotification('error', 'EVENTS_NOT_UPDATED', -1, null, NOTIFICATION_CONTEXT));
+    });
 }
 
 export const performWorkflowAction = (eventId, workflowId, action, close) => async (dispatch) => {
