@@ -158,7 +158,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.management.ObjectInstance;
-import javax.ws.rs.HEAD;
 
 /**
  * Implements WorkflowService with in-memory data structures to hold WorkflowOperations and WorkflowInstances.

@@ -95,8 +95,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.ws.rs.HEAD;
-
 /**
  * Provides data access to the workflow service through file storage in the workspace, indexed via solr.
  */
