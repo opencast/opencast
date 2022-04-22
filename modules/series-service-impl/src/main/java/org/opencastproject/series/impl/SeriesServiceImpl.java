@@ -324,8 +324,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       return persistence.getAccessControlList(seriesID);
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Failed to execute search query: {}", e.getMessage());
-      throw new SeriesException(e);
+      throw new SeriesException("Failed to execute search query", e);
     }
   }
 
@@ -334,8 +333,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       return persistence.countSeries();
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Failed to execute search query: {}", e.getMessage());
-      throw new SeriesException(e);
+      throw new SeriesException("Failed to execute search query", e);
     }
   }
 
@@ -345,8 +343,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       return persistence.getSeriesProperties(seriesID);
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Failed to get series properties for series with id '{}'", seriesID, e);
-      throw new SeriesException(e);
+      throw new SeriesException(String.format("Failed to get series properties for series with id '%s'", seriesID), e);
     }
   }
 
@@ -356,9 +353,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       return persistence.getSeriesProperty(seriesID, propertyName);
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Failed to get series property for series with series id '{}' and property name '{}'", seriesID,
-              propertyName, e);
-      throw new SeriesException(e);
+      String msg = String.format(
+              "Failed to get series property for series with series id '%s' and property name '%s'",
+              seriesID,
+              propertyName
+      );
+      throw new SeriesException(msg, e);
     }
   }
 
@@ -373,10 +373,13 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
         updateThemePropertyInIndex(seriesID, Optional.ofNullable(propertyValue), elasticsearchIndex);
       }
     } catch (SeriesServiceDatabaseException e) {
-      logger.error(
-              "Failed to get series property for series with series id '{}' and property name '{}' and value '{}'",
-              seriesID, propertyName, propertyValue, e);
-      throw new SeriesException(e);
+      String msg = String.format(
+              "Failed to get series property for series with series id '%s' and property name '%s' and value '%s'",
+              seriesID,
+              propertyName,
+              propertyValue
+      );
+      throw new SeriesException(msg, e);
     }
   }
 
@@ -391,9 +394,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
         updateThemePropertyInIndex(seriesID, Optional.empty(), elasticsearchIndex);
       }
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Failed to delete series property for series with series id '{}' and property name '{}'",
-              seriesID, propertyName, e);
-      throw new SeriesException(e);
+      String msg = String.format(
+              "Failed to delete series property for series with series id '%s' and property name '%s'",
+              seriesID,
+              propertyName
+      );
+      throw new SeriesException(msg, e);
     }
   }
 
