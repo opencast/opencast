@@ -116,7 +116,7 @@ class Item {
           Jsons.p("write", Jsons.arr(canWriteRoles))
       );
 
-      final List<Jsons.Val> creators = Arrays.stream(mp.getCreators())
+      final var creators = Arrays.stream(mp.getCreators())
           .map(creator -> Jsons.v(creator))
           .collect(Collectors.toCollection(ArrayList::new));
 
