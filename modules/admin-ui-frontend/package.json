@@ -61,7 +61,7 @@
     "html-validate": "html-validate 'app/**/*.html'"
   },
   "dependencies": {
-    "coffeescript": "^2.6.1",
+    "coffeescript": "^2.7.0",
     "sass": "^1.50.1"
   },
   "optionalDependencies": {
