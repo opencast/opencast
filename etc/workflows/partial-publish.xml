@@ -29,7 +29,6 @@
       <configurations>
         <configuration key="source-flavor">*/source</configuration>
         <configuration key="target-flavor">*/prepared</configuration>
-        <configuration key="target-tags">editor</configuration>
       </configurations>
     </operation>
 
@@ -40,7 +39,7 @@
       exception-handler-workflow="partial-error"
       description="Selecting audio/video streams for processing">
       <configurations>
-        <configuration key="source-flavor">*/source</configuration>
+        <configuration key="source-flavor">*/prepared</configuration>
         <configuration key="target-flavor">*/work</configuration>
         <configuration key="target-tags">-archive</configuration>
         <configuration key="audio-muxing">duplicate</configuration>
