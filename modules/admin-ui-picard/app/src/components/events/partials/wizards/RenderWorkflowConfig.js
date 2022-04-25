@@ -97,6 +97,7 @@ const renderInputByType = (field, key, formik) => {
 const RenderCheckbox = ({ field, key, formik }) => {
   // id used for Field and label
   const uuid = uuidv4();
+  const disabled = !!field.disabled ? field.disabled : false;
 
   return (
     <li key={key}>
@@ -104,6 +105,7 @@ const RenderCheckbox = ({ field, key, formik }) => {
              className="configField"
              name={'configuration.' + field.name}
              defaultValue={field.value}
+             disabled={disabled}
              type={field.type}/>
       <label htmlFor={uuid}>{field.label}</label>
       {/* if input has an additional fieldset or further configuration inputs
@@ -122,6 +124,7 @@ const RenderCheckbox = ({ field, key, formik }) => {
 const RenderRadio = ({ field, key, formik }) => {
   // id used for Field and label
   const uuid = uuidv4();
+  const disabled = !!field.disabled ? field.disabled : false;
 
   return (
     <li key={key}>
@@ -129,6 +132,7 @@ const RenderRadio = ({ field, key, formik }) => {
              className="configField"
              name={'configuration.' + field.name}
              value={field.value}
+             disabled={disabled}
              type={field.type}/>
       <label htmlFor={uuid}>{field.label}</label>
       {/* if input has an additional fieldset or further configuration inputs
@@ -147,8 +151,9 @@ const RenderRadio = ({ field, key, formik }) => {
 const RenderNumber = ({ field, key, formik }) => {
   // id used for Field and label
   const uuid = uuidv4();
+  const disabled = !!field.disabled ? field.disabled : false;
 
-  // todo: find way to validate that value of number is actually between max and min
+  // validate that value of number is between max and min
   const validate = value => {
     let error;
     if (parseInt(value) > field.max || parseInt(value) < field.min) {
@@ -160,9 +165,10 @@ const RenderNumber = ({ field, key, formik }) => {
   return (
     <li key={key}>
       <Field id={uuid}
-             //validate={validate}
+             validate={validate}
              className="configField"
              name={'configuration.' + field.name}
+             disabled={disabled}
              type={field.type}
              min={field.min}
              max={field.max}/>
@@ -183,12 +189,14 @@ const RenderNumber = ({ field, key, formik }) => {
 const RenderText = ({ field, key, formik }) => {
   // id used for Field and label
   const uuid = uuidv4();
+  const disabled = !!field.disabled ? field.disabled : false;
 
   return (
     <li key={key}>
       <Field id={uuid}
              className="configField"
              name={'configuration.' + field.name}
+             disabled={disabled}
              type={field.type}/>
       <label htmlFor={uuid}>{field.label}</label>
       {/* if input has an additional fieldset or further configuration inputs

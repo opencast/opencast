@@ -261,6 +261,7 @@
               "type": "checkbox",
               "name": "reviewCutting",
               "label": "Review / Cutting",
+              "disabled": false,
               "value": false
             }
           ]
@@ -271,6 +272,7 @@
               "type": "checkbox",
               "name": "mediaModule",
               "label": "Opencast Media Module",
+              "disabled": false,
               "value": true
             },
             {
@@ -1501,6 +1503,7 @@
               "type": "checkbox",
               "name": "flagQuality2160p",
               "label": "2160p resolution (UltraHD)",
+              "disabled": false,
               "value": false
             }
           ]
@@ -1549,14 +1552,15 @@
                         "type": "radio",
                         "name": "searchPublishTyp",
                         "label": "Opencast Media Module",
-                        "value": true,
+                        "value": "ocModule",
                         "checked": true
                       },
                       {
                         "type": "radio",
                         "name": "searchPublishTyp",
                         "label": "AWS",
-                        "value": true,
+                        "value": "aws",
+                        "disabled": true,
                         "checked": false
                       }
                     ]
@@ -1577,6 +1581,7 @@
                     "type": "checkbox",
                     "name": "publishToYouTube",
                     "label": "YouTube",
+                    "disabled": true,
                     "value": false
                   }
                 ]
@@ -1879,6 +1884,7 @@
                   "name": "toggleOcMediaOrAWS",
                   "label": "AWS",
                   "value": "aws",
+                  "disabled": true,
                   "checked": false
                 }
               ]
@@ -1899,6 +1905,7 @@
               "type": "checkbox",
               "name": "youTube",
               "label": "YouTube",
+              "disabled": true,
               "value": true
             }
           ]
@@ -3326,6 +3333,7 @@
               "type": "checkbox",
               "name": "ocMediaModule",
               "label": "Opencast Media Module",
+              "disabled": false,
               "checked": true
             },
             {
@@ -3448,6 +3456,7 @@
               "type": "checkbox",
               "name": "aws",
               "label": "AWS",
+              "disabled": true,
               "value": true
             },
             {
@@ -3472,6 +3481,7 @@
               "type": "checkbox",
               "name": "youTube",
               "label": "YouTube",
+              "disabled": true,
               "value": true
             }
           ]

@@ -9,6 +9,7 @@
             "name": "numberOfEvents",
             "type": "number",
             "label": "Number of Events",
+            "disabled": false,
             "min": "1",
             "max": "25",
             "value": "1"
@@ -28,6 +29,7 @@
            "type": "checkbox",
            "name": "reviewCutting",
            "label": "Review / Cutting",
+           "disabled": false,
            "value": false
          }
        ]
@@ -38,6 +40,7 @@
            "type": "checkbox",
            "name": "mediaModule",
            "label": "Opencast Media Module",
+           "disabled": false,
            "value": true
          },
          {
@@ -95,6 +98,7 @@
            "type": "checkbox",
            "name": "flagQuality2160p",
            "label": "2160p resolution (UltraHD)",
+           "disabled": false,
            "value": false
          }
        ]
@@ -151,6 +155,7 @@
                      "name": "searchPublishTyp",
                      "label": "AWS",
                      "value": "aws",
+                     "disabled": true,
                      "checked": false
                    }
                  ]
@@ -171,6 +176,7 @@
                  "type": "checkbox",
                  "name": "publishToYouTube",
                  "label": "YouTube",
+                 "disabled": true,
                  "value": false
                }
              ]
@@ -226,6 +232,7 @@
                "name": "toggleOcMediaOrAWS",
                "label": "AWS",
                "value": "aws",
+               "disabled": true,
                "checked": false
              }
            ]
@@ -246,6 +253,7 @@
            "type": "checkbox",
            "name": "youTube",
            "label": "YouTube",
+           "disabled": true,
            "value": true
          }
        ]
@@ -292,6 +300,7 @@
            "type": "checkbox",
            "name": "aws",
            "label": "AWS",
+           "disabled": true,
            "value": true
          },
          {
@@ -316,6 +325,7 @@
            "type": "checkbox",
            "name": "youTube",
            "label": "YouTube",
+           "disabled": true,
            "value": true
          }
        ]
