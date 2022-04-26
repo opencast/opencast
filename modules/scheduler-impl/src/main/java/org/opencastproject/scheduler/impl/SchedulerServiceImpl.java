@@ -447,7 +447,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       }
 
       // Load dublincore and acl for update
-      Opt<DublinCoreCatalog> dublinCore = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage);
+      Opt<DublinCoreCatalog> dublinCore = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage)
+          .map(Opt::some).orElse(Opt.none());
       AccessControlList acl = authorizationService.getActiveAcl(mediaPackage).getA();
 
       // Get updated agent properties
@@ -555,9 +556,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
         //Get, or make, the DC catalog
         DublinCoreCatalog dc;
-        Opt<DublinCoreCatalog> dcOpt = DublinCoreUtil.loadEpisodeDublinCore(workspace,
-                templateMp);
-        if (dcOpt.isSome()) {
+        Optional<DublinCoreCatalog> dcOpt = DublinCoreUtil.loadEpisodeDublinCore(workspace, templateMp);
+        if (dcOpt.isPresent()) {
           dc = dcOpt.get();
           dc = (DublinCoreCatalog) dc.clone();
           // make sure to bind the OC_PROPERTY namespace
@@ -591,7 +591,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         cal.setTime(event.getEnd());
         Date endDateTime = cal.getTime();
         // Load dublincore and acl for update
-        Opt<DublinCoreCatalog> dublinCore = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage);
+        Opt<DublinCoreCatalog> dublinCore = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage)
+            .map(Opt::some).orElse(Opt.none());
         AccessControlList acl = authorizationService.getActiveAcl(mediaPackage).getA();
 
         // Get updated agent properties
@@ -772,11 +773,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         }
 
         // Check for dublin core change and send update
-        Opt<DublinCoreCatalog> dublinCoreNew = DublinCoreUtil.loadEpisodeDublinCore(workspace, mpToUpdate);
-        if (dublinCoreNew.isSome() && !DublinCoreUtil.equals(dublinCoreOpt.get(), dublinCoreNew.get())) {
+        Optional<DublinCoreCatalog> dublinCoreNew = DublinCoreUtil.loadEpisodeDublinCore(workspace, mpToUpdate);
+        if (dublinCoreNew.isPresent() && !DublinCoreUtil.equals(dublinCoreOpt.get(), dublinCoreNew.get())) {
           dublinCoreChanged = true;
           propertiesChanged = true;
-          dublinCore = dublinCoreNew;
+          dublinCore = dublinCoreNew.map(Opt::some).orElse(Opt.none());
         }
       }
 

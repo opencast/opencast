@@ -1072,9 +1072,9 @@ public class IndexServiceImpl implements IndexService {
    */
   private DublinCoreCatalog getDublinCoreCatalog(EventHttpServletRequest eventHttpServletRequest) {
     DublinCoreCatalog dc;
-    Opt<DublinCoreCatalog> dcOpt = DublinCoreUtil.loadEpisodeDublinCore(workspace,
+    Optional<DublinCoreCatalog> dcOpt = DublinCoreUtil.loadEpisodeDublinCore(workspace,
             eventHttpServletRequest.getMediaPackage().get());
-    if (dcOpt.isSome()) {
+    if (dcOpt.isPresent()) {
       dc = dcOpt.get();
       // make sure to bind the OC_PROPERTY namespace
       dc.addBindings(XmlNamespaceContext
