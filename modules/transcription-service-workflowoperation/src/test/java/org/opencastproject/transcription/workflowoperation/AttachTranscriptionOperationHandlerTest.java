@@ -128,7 +128,7 @@ public class AttachTranscriptionOperationHandlerTest {
     // Workflow set up
     WorkflowDefinitionImpl def = new WorkflowDefinitionImpl();
     def.setId("DCE-start-transcription");
-    workflowInstance = new WorkflowInstance(def, mediaPackage, null, null, null, null);
+    workflowInstance = new WorkflowInstance(def, mediaPackage, null, null, null);
     workflowInstance.setId(1);
     operation = new WorkflowOperationInstance("attach-transcript", OperationState.RUNNING);
     List<WorkflowOperationInstance> operationList = new ArrayList<WorkflowOperationInstance>();

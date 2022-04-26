@@ -144,7 +144,7 @@ public class EmailTemplateServiceImplTest {
 
     service.setIncidentService(is);
 
-    workflowInstance = new WorkflowInstance(def, null, null, null, null, props);
+    workflowInstance = new WorkflowInstance(def, null, null, null, props);
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowState.RUNNING);
     workflowInstance.setMediaPackage(mp);

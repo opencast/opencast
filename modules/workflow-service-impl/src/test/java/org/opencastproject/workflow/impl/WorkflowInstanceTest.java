@@ -35,6 +35,7 @@ import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.api.YamlWorkflowParser;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.InputStream;
@@ -42,8 +43,6 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import junit.framework.Assert;
 
 public class WorkflowInstanceTest {
   @Test
@@ -62,11 +61,11 @@ public class WorkflowInstanceTest {
 
     Map<String, String> props = new HashMap<String, String>();
     props.put("key1", "value1");
-    WorkflowInstance instance = new WorkflowInstance(def, null, null, null, null, props);
+    WorkflowInstance instance = new WorkflowInstance(def, null, null, null, props);
     Assert.assertEquals(def.getId(), instance.getTemplate());
     Assert.assertEquals("value1", instance.getConfiguration("key1"));
     def.setTitle("a title");
-    instance = new WorkflowInstance(def, null, null, null, null, null);
+  instance = new WorkflowInstance(def, null, null, null, null);
     Assert.assertEquals(def.getTitle(), instance.getTitle());
   }
 

@@ -126,9 +126,6 @@ public class WorkflowInstance {
   @Column(name = "description")
   private String description;
 
-  @Column(name = "parent", nullable = true)
-  private Long parentId;
-
   @Column(name = "creatorId")
   private String creatorName;
 
@@ -218,13 +215,12 @@ public class WorkflowInstance {
    * Constructs a new workflow instance from the given definition, mediapackage, and optional parent workflow ID and
    * properties.
    */
-  public WorkflowInstance(WorkflowDefinition def, MediaPackage mediaPackage, Long parentWorkflowId, User creator,
+  public WorkflowInstance(WorkflowDefinition def, MediaPackage mediaPackage, User creator,
           Organization organization, Map<String, String> properties) {
     this.workflowId = -1; // this should be set by the workflow service once the workflow is persisted
     this.title = def.getTitle();
     this.template = def.getId();
     this.description = def.getDescription();
-    this.parentId = parentWorkflowId;
     this.creatorName = creator != null ? creator.getUsername() : null;
     this.organizationId = organization != null ? organization.getId() : null;
     this.state = WorkflowState.INSTANTIATED;
@@ -233,10 +229,10 @@ public class WorkflowInstance {
     this.mediaPackageId = mediaPackage == null ? null : mediaPackage.getIdentifier().toString();
     this.seriesId = mediaPackage == null ? null : mediaPackage.getSeries();
 
-    this.operations = new ArrayList<WorkflowOperationInstance>();
+    this.operations = new ArrayList<>();
     extend(def);
 
-    this.configurations = new TreeMap<String, String>();
+    this.configurations = new TreeMap<>();
     if (properties != null) {
       for (Map.Entry<String, String> entry : properties.entrySet()) {
         addConfiguration(entry.getKey() , entry.getValue());
@@ -250,7 +246,6 @@ public class WorkflowInstance {
           String template,
           String title,
           String description,
-          Long parentId,
           String creatorName,
           String organizationId,
           Date dateCreated,
@@ -265,7 +260,6 @@ public class WorkflowInstance {
     this.template = template;
     this.title = title;
     this.description = description;
-    this.parentId = parentId;
     this.creatorName = creatorName;
     this.organizationId = organizationId;
     this.dateCreated = dateCreated;
@@ -319,14 +313,6 @@ public class WorkflowInstance {
 
   public void setDescription(String description) {
     this.description = description;
-  }
-
-  public Long getParentId() {
-    return parentId;
-  }
-
-  public void setParentId(Long parentId) {
-    this.parentId = parentId;
   }
 
   public String getCreatorName() {

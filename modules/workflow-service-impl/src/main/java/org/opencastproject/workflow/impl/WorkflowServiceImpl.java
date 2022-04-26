@@ -586,7 +586,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         throw new SecurityException("Current organization is unknown");
 
       WorkflowInstance workflowInstance = new WorkflowInstance(workflowDefinition, sourceMediaPackage,
-              parentWorkflowId, currentUser, organization, properties);
+              currentUser, organization, properties);
       workflowInstance = updateConfiguration(workflowInstance, properties);
 
       // Create and configure the workflow instance

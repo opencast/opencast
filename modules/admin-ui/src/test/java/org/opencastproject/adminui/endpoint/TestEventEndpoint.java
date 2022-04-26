@@ -311,12 +311,12 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     Track mp1Track = mp1.getTrack("publish-track-1");
     ((AbstractStreamImpl) mp1Track.getStreams()[0]).setIdentifier("fortesting");
 
-    final WorkflowInstance workflowInstance1 = new WorkflowInstance(wfD, mp1, 2L, null, null,
+    final WorkflowInstance workflowInstance1 = new WorkflowInstance(wfD, mp1, null, null,
             new HashMap<String, String>());
     final WorkflowInstance workflowInstance2 = new WorkflowInstance(wfD,
-            loadMpFromResource("jobs_mediapackage2"), 2L, null, null, new HashMap<String, String>());
+            loadMpFromResource("jobs_mediapackage2"), null, null, new HashMap<String, String>());
     final WorkflowInstance workflowInstance3 = new WorkflowInstance(wfD,
-            loadMpFromResource("jobs_mediapackage3"), 2L, null, null, new HashMap<String, String>());
+            loadMpFromResource("jobs_mediapackage3"), null, null, new HashMap<String, String>());
 
     workflowInstance1.setId(1);
     workflowInstance2.setId(2);

@@ -62,9 +62,6 @@ public class JaxbWorkflowInstance {
   @XmlElement(name = "description")
   private String description;
 
-  @XmlElement(name = "parent", nillable = true)
-  private Long parentId;
-
   @XmlElement(name = "creator-id", namespace = "http://org.opencastproject.security")
   private String creatorName;
 
@@ -107,7 +104,6 @@ public class JaxbWorkflowInstance {
     this.template = workflow.getTemplate();
     this.title = workflow.getTitle();
     this.description = workflow.getDescription();
-    this.parentId = workflow.getParentId();
     this.creatorName = workflow.getCreatorName();
     this.organizationId = workflow.getOrganizationId();
     this.dateCreated = workflow.getDateCreated();
@@ -116,7 +112,7 @@ public class JaxbWorkflowInstance {
     this.operations = Optional.ofNullable(workflow.getOperations())
             .orElseGet(Collections::emptyList)
             .stream()
-            .map(operation -> new JaxbWorkflowOperationInstance(operation))
+            .map(JaxbWorkflowOperationInstance::new)
             .collect(Collectors.toList());
     if (workflow.getConfigurations() != null) {
       this.configurations = Optional.ofNullable(workflow.getConfigurations().entrySet())
@@ -133,10 +129,10 @@ public class JaxbWorkflowInstance {
   }
 
   public WorkflowInstance toWorkflowInstance() {
-    return new WorkflowInstance(id, state, template, title, description, parentId, creatorName, organizationId, dateCreated,
+    return new WorkflowInstance(id, state, template, title, description, creatorName, organizationId, dateCreated,
             dateCompleted, mediaPackage,
             Optional.ofNullable(operations).orElseGet(Collections::emptyList)
-                    .stream().map(operation -> operation.toWorkflowOperationInstance()).collect(Collectors.toList()),
+                    .stream().map(JaxbWorkflowOperationInstance::toWorkflowOperationInstance).collect(Collectors.toList()),
             Optional.ofNullable(configurations).orElseGet(Collections::emptySet)
                     .stream()
                     .collect(Collectors.toMap(JaxbWorkflowConfiguration::getKey, JaxbWorkflowConfiguration::getValue)),
@@ -153,22 +149,41 @@ public class JaxbWorkflowInstance {
 
     JaxbWorkflowInstance jaxbWorkflow = (JaxbWorkflowInstance) o;
 
-    return new EqualsBuilder().append(id, jaxbWorkflow.id).append(state, jaxbWorkflow.state)
-            .append(template, jaxbWorkflow.template).append(title, jaxbWorkflow.title)
-            .append(description, jaxbWorkflow.description).append(parentId, jaxbWorkflow.parentId).append(parentId, jaxbWorkflow.parentId)
-            .append(creatorName, jaxbWorkflow.creatorName).append(organizationId, jaxbWorkflow.organizationId)
-            .append(dateCreated, jaxbWorkflow.dateCreated).append(dateCompleted, jaxbWorkflow.dateCompleted)
-            .append(mediaPackage, jaxbWorkflow.mediaPackage).append(operations, jaxbWorkflow.operations)
-            .append(configurations, jaxbWorkflow.configurations).append(mediaPackageId, jaxbWorkflow.mediaPackageId)
+    return new EqualsBuilder()
+            .append(id, jaxbWorkflow.id)
+            .append(state, jaxbWorkflow.state)
+            .append(template, jaxbWorkflow.template)
+            .append(title, jaxbWorkflow.title)
+            .append(description, jaxbWorkflow.description)
+            .append(creatorName, jaxbWorkflow.creatorName)
+            .append(organizationId, jaxbWorkflow.organizationId)
+            .append(dateCreated, jaxbWorkflow.dateCreated)
+            .append(dateCompleted, jaxbWorkflow.dateCompleted)
+            .append(mediaPackage, jaxbWorkflow.mediaPackage)
+            .append(operations, jaxbWorkflow.operations)
+            .append(configurations, jaxbWorkflow.configurations)
+            .append(mediaPackageId, jaxbWorkflow.mediaPackageId)
             .append(seriesId, jaxbWorkflow.seriesId)
             .isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).append(id).append(state).append(template).append(title).append(description)
-            .append(parentId).append(creatorName).append(organizationId).append(dateCreated).append(dateCompleted).append(mediaPackage)
-            .append(operations).append(configurations).append(mediaPackageId).append(seriesId)
-            .toHashCode();
+    return new HashCodeBuilder(17, 37)
+        .append(id)
+        .append(state)
+        .append(template)
+        .append(title)
+        .append(description)
+        .append(creatorName)
+        .append(organizationId)
+        .append(dateCreated)
+        .append(dateCompleted)
+        .append(mediaPackage)
+        .append(operations)
+        .append(configurations)
+        .append(mediaPackageId)
+        .append(seriesId)
+        .toHashCode();
   }
 }

@@ -83,7 +83,7 @@ public class GoogleSpeechStartTranscriptionOperationHandlerTest {
     EasyMock.expect(job1.getStatus()).andReturn(Job.Status.FINISHED);
     EasyMock.expect(job1.getDateCreated()).andReturn(new Date());
     EasyMock.expect(job1.getDateStarted()).andReturn(new Date());
-    EasyMock.expect(job1.getQueueTime()).andReturn(new Long(0));
+    EasyMock.expect(job1.getQueueTime()).andReturn(0L);
     EasyMock.replay(job1);
 
     ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
@@ -103,7 +103,7 @@ public class GoogleSpeechStartTranscriptionOperationHandlerTest {
     // Workflow set up
     WorkflowDefinitionImpl def = new WorkflowDefinitionImpl();
     def.setId("google-speech-start-transcription");
-    workflowInstance = new WorkflowInstance(def, mediaPackage, null, null, null, null);
+    workflowInstance = new WorkflowInstance(def, mediaPackage, null, null, null);
     workflowInstance.setId(1);
     operation = new WorkflowOperationInstance("start-transcript", OperationState.RUNNING);
     List<WorkflowOperationInstance> operationList = new ArrayList<WorkflowOperationInstance>();

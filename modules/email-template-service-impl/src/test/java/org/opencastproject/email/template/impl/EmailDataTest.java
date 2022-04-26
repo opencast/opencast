@@ -76,28 +76,28 @@ public class EmailDataTest {
 
     WorkflowDefinitionImpl def = new WorkflowDefinitionImpl();
     def.setId("wfdef");
-    Map<String, String> props = new HashMap<String, String>();
+    Map<String, String> props = new HashMap<>();
     props.put("emailAddress", "user@domain.com");
 
     // Create some incidents
     incident1 = EasyMock.createNiceMock(Incident.class);
-    List<Tuple<String, String>> details = new LinkedList<Tuple<String, String>>();
-    Tuple<String, String> detail = new Tuple<String, String>("detail-type", "error in operation1");
+    List<Tuple<String, String>> details = new LinkedList<>();
+    Tuple<String, String> detail = new Tuple<>("detail-type", "error in operation1");
     details.add(detail);
     EasyMock.expect(incident1.getDetails()).andReturn(details);
 
     incident2 = EasyMock.createNiceMock(Incident.class);
-    details = new LinkedList<Tuple<String, String>>();
-    detail = new Tuple<String, String>("detail-type", "error in operation2");
+    details = new LinkedList<>();
+    detail = new Tuple<>("detail-type", "error in operation2");
     details.add(detail);
     EasyMock.expect(incident2.getDetails()).andReturn(details);
 
     // Link the incident and the subtree
-    incidents = new LinkedList<Incident>();
+    incidents = new LinkedList<>();
     incidents.add(incident1);
     incidents.add(incident2);
 
-    workflowInstance = new WorkflowInstance(def, null, null, null, null, props);
+    workflowInstance = new WorkflowInstance(def, null, null, null, props);
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowState.RUNNING);
     workflowInstance.setMediaPackage(mp);
@@ -105,7 +105,7 @@ public class EmailDataTest {
     failedOperation = new WorkflowOperationInstance("operation1", OperationState.FAILED);
 
     WorkflowOperationInstance operation = new WorkflowOperationInstance("email", OperationState.RUNNING);
-    List<WorkflowOperationInstance> operationList = new ArrayList<WorkflowOperationInstance>();
+    List<WorkflowOperationInstance> operationList = new ArrayList<>();
     operationList.add(failedOperation);
     operationList.add(operation);
     workflowInstance.setOperations(operationList);
