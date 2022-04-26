@@ -19,6 +19,15 @@
         <fieldset>
           <input id="straightToPublishing" name="straightToPublishing" type="checkbox" class="configField" value="true" />
           <label for="straightToPublishing">Straight to publishing</label>
+          <fieldset>
+            <legend>Publish live stream:</legend>
+            <ul>
+              <li>
+                <input id="publishLive" name="publishLive" type="checkbox" class="configField" value="true" />
+                <label for="publishLive">Add live event to Opencast Media Module</label>
+              </li>
+            </ul>
+          </fieldset>
         </fieldset>
       </div>
     ]]>
@@ -37,6 +46,7 @@
       description="Applying default configuration values">
       <configurations>
         <configuration key="straightToPublishing">true</configuration>
+        <configuration key="publishLive">true</configuration>
       </configurations>
     </operation>
 

@@ -17,6 +17,15 @@
       <div id="workflow-configuration">
         <input id="straightToPublishing" name="straightToPublishing" type="checkbox" class="configField" value="true" checked=checked />
         <label for="straightToPublishing">Straight to publishing</label>
+        <fieldset>
+          <legend>Publish live stream:</legend>
+          <ul>
+            <li>
+              <input id="publishLive" name="publishLive" type="checkbox" class="configField" value="true" />
+              <label for="publishLive">Add live event to Opencast Media Module</label>
+            </li>
+          </ul>
+        </fieldset>
       </div>
     ]]>
   </configuration_panel>
@@ -27,6 +36,7 @@
       description="Applying default configuration values">
       <configurations>
         <configuration key="straightToPublishing">true</configuration>
+        <configuration key="publishLive">true</configuration>
       </configurations>
     </operation>
 
