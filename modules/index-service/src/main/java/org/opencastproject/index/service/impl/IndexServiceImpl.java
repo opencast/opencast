@@ -157,6 +157,7 @@ import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -759,9 +760,7 @@ public class IndexServiceImpl implements IndexService {
     try {
       // 1. Check if any active workflows are running for this mediapackage id
       if (workflowService.mediaPackageHasActiveWorkflows(mpId)) {
-        logger.warn("Unable to start new workflow '{}' on archived media package '{}', existing workflow is running",
-                workflowDefId, mediaPackage);
-        throw new IllegalArgumentException("A workflow is already active for mp " + mpId + ", cannot start this workflow.");
+        throw new IllegalArgumentException("Unable to start new workflow '" + workflowDefId + "' on archived media package '" + mediaPackage + "', existing workflow is running");
       }
       // 2. Save the snapshot
       assetManager.takeSnapshot(mediaPackage);
@@ -787,8 +786,6 @@ public class IndexServiceImpl implements IndexService {
       logger.info("Asset update and publish workflow {} scheduled for mp {}",wfId, mpId);
 
     } catch (AssetManagerException e) {
-      logger.warn("Unable to start workflow '{}' on archived media package '{}':",
-              workflowDefId, mediaPackage, e);
       throw new IndexServiceException("Unable to start workflow " + workflowDefId + " on " + mpId);
     } catch (WorkflowDatabaseException e) {
       logger.warn("Unable to load workflow '{}' from workflow service:", wfId, e);
@@ -834,8 +831,7 @@ public class IndexServiceImpl implements IndexService {
       try {
         acl = AccessControlParser.parseAcl(accessJson.toJSONString());
       } catch (Exception e) {
-        logger.warn("Unable to parse access control list: {}", accessJson.toJSONString());
-        throw new IllegalArgumentException("Unable to parse access control list!");
+        throw new IllegalArgumentException("Unable to parse access control list: " + accessJson.toJSONString());
       }
     }
     return acl;
@@ -1054,8 +1050,7 @@ public class IndexServiceImpl implements IndexService {
                 presenterUsernames, eventHttpServletRequest.getMediaPackage().get(), configuration, (Map) caProperties, Opt.none());
         return StringUtils.join(scheduled.keySet(), ",");
       default:
-        logger.warn("Unknown source type {}", type);
-        throw new IllegalArgumentException("Unknown source type");
+        throw new IllegalArgumentException("Unknown source type: " + type);
     }
   }
 
@@ -1231,8 +1226,7 @@ public class IndexServiceImpl implements IndexService {
         }
       } catch (Exception e) {
         // Assuming a parse error versus a file error and logging the error type
-        logger.warn("Unable to process asset metadata {}", assetMetadata.toJSONString(), e);
-        throw new IllegalArgumentException("Unable to parse metadata", e);
+        throw new IllegalArgumentException("Unable to parse metadata: " + assetMetadata.toJSONString(), e);
       }
     }
     return mp;
@@ -1270,17 +1264,15 @@ public class IndexServiceImpl implements IndexService {
         try {
           Optional<WorkflowInstance> workflowInstance = workflowService.
                   getRunningWorkflowInstanceByMediaPackage(event.getIdentifier(), Permissions.Action.WRITE.toString());
-          if (!workflowInstance.isPresent()) {
-            logger.error("No workflow instance for event {} found!", event.getIdentifier());
+          if (workflowInstance.isEmpty()) {
             throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
           }
           WorkflowInstance instance = workflowInstance.get();
           instance.setMediaPackage(mediaPackage);
           updateWorkflowInstance(instance);
         } catch (WorkflowException e) {
-          logger.error("Unable to remove catalog with flavor {} by updating workflow event {} because",
-                  flavor, event.getIdentifier(), e);
-          throw new IndexServiceException("Unable to update workflow event " + event.getIdentifier());
+          throw new IndexServiceException("Unable to remove catalog with flavor '" + flavor
+              + "' by updating workflow event " + event.getIdentifier(), e);
         }
         break;
       case ARCHIVE:
@@ -1288,13 +1280,11 @@ public class IndexServiceImpl implements IndexService {
         break;
       case SCHEDULE:
         try {
-          schedulerService.updateEvent(event.getIdentifier(), Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
-                  Opt.<Set<String>> none(), Opt.some(mediaPackage), Opt.<Map<String, String>> none(),
-                  Opt.<Map<String, String>> none());
+          schedulerService.updateEvent(event.getIdentifier(), Opt.none(), Opt.none(), Opt.none(), Opt.none(),
+              Opt.some(mediaPackage), Opt.none(), Opt.none());
         } catch (SchedulerException e) {
-          logger.error("Unable to remove catalog with flavor {} by updating scheduled event {} because",
-                  flavor, event.getIdentifier(), e);
-          throw new IndexServiceException("Unable to update scheduled event " + event.getIdentifier());
+          throw new IndexServiceException("Unable to remove catalog with flavor " + flavor + " by updating scheduled "
+              + "event " + event.getIdentifier(), e);
         }
         break;
       default:
@@ -1346,17 +1336,15 @@ public class IndexServiceImpl implements IndexService {
         try {
           Optional<WorkflowInstance> workflowInstance = workflowService.
                   getRunningWorkflowInstanceByMediaPackage(event.getIdentifier(), Permissions.Action.WRITE.toString());
-          if (!workflowInstance.isPresent()) {
-            logger.error("No workflow instance for event {} found!", event.getIdentifier());
+          if (workflowInstance.isEmpty()) {
             throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
           }
           WorkflowInstance instance = workflowInstance.get();
           instance.setMediaPackage(mediaPackage);
           updateWorkflowInstance(instance);
         } catch (WorkflowException e) {
-          logger.error("Unable to update workflow event {} with metadata {} because",
-                  id, RestUtils.getJsonStringSilent(MetadataJson.listToJson(metadataList, true)), e);
-          throw new IndexServiceException("Unable to update workflow event " + id);
+          throw new IndexServiceException("Unable to update workflow event " + id + " with metadata "
+              + RestUtils.getJsonStringSilent(MetadataJson.listToJson(metadataList, true)), e);
         }
         break;
       case ARCHIVE:
@@ -1364,16 +1352,15 @@ public class IndexServiceImpl implements IndexService {
         break;
       case SCHEDULE:
         try {
-          schedulerService.updateEvent(id, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(), presenters,
-                  Opt.some(mediaPackage), Opt.<Map<String, String>> none(), Opt.<Map<String, String>> none());
+          schedulerService.updateEvent(id, Opt.none(), Opt.none(), Opt.none(), presenters, Opt.some(mediaPackage),
+              Opt.none(), Opt.none());
         } catch (SchedulerException e) {
-          logger.error("Unable to update scheduled event {} with metadata {} because",
-                  id, RestUtils.getJsonStringSilent(MetadataJson.listToJson(metadataList, true)), e);
-          throw new IndexServiceException("Unable to update scheduled event " + id);
+          throw new IndexServiceException("Unable to update scheduled event " + id + " with metadata "
+              + RestUtils.getJsonStringSilent(MetadataJson.listToJson(metadataList, true)), e);
         }
         break;
       default:
-        logger.error("Unkown event source!");
+        logger.error("Unknown event source!");
     }
     return metadataList;
   }
@@ -1437,7 +1424,6 @@ public class IndexServiceImpl implements IndexService {
         }
         return acl;
       default:
-        logger.error("Unknown event source '{}' unable to update ACL!", getEventSource(event));
         throw new IndexServiceException(
                 String.format("Unable to update the ACL as '%s' is an unknown event source.", getEventSource(event)));
     }
@@ -1607,21 +1593,16 @@ public class IndexServiceImpl implements IndexService {
         try {
           Optional<WorkflowInstance> currentWorkflowInstance = workflowService.
                   getRunningWorkflowInstanceByMediaPackage(event.getIdentifier(), Permissions.Action.READ.toString());
-          if (!currentWorkflowInstance.isPresent()) {
-            logger.error("No workflow instance for event {} found!", event.getIdentifier());
+          if (currentWorkflowInstance.isEmpty()) {
             throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
           }
           return currentWorkflowInstance.get().getMediaPackage();
         } catch (WorkflowDatabaseException e) {
-          logger.error("Unable to get current workflow instance for event with id {} from workflow service",
-                  event.getIdentifier(), e);
-          throw new IndexServiceException(e.getMessage(), e);
+          throw new IndexServiceException("Unable to get current workflow instance for event with id " + event.getIdentifier() + " from workflow service", e);
         } catch (UnauthorizedException e) {
-          logger.error("Not authorized to read mediapackage from workflow", event.getIdentifier(), e);
-          throw new IndexServiceException(e.getMessage(), e);
+          throw new IndexServiceException("Not authorized to read media package " + event.getIdentifier() + " from workflow", e);
         } catch (WorkflowException e) {
-          logger.error("Unable to get event mediapackage {} from WorkflowService because", event.getIdentifier(), e);
-          throw new IndexServiceException(e.getMessage(), e);
+          throw new IndexServiceException("Unable to get event media package " + event.getIdentifier() + " from WorkflowService because", e);
         }
       case ARCHIVE:
         Opt<MediaPackage> mpOpt = assetManager.getMediaPackage(event.getIdentifier());
@@ -1687,16 +1668,12 @@ public class IndexServiceImpl implements IndexService {
         // remove series dublincore from the media package
         for (MediaPackageElement mpe : mp.getElementsByFlavor(MediaPackageElements.SERIES)) {
           mp.remove(mpe);
-          for (String tag : mpe.getTags()) {
-            seriesDcTags.add(tag);
-          }
+          seriesDcTags.addAll(Arrays.asList(mpe.getTags()));
         }
         // remove series ACL from the media package
         for (MediaPackageElement mpe : mp.getElementsByFlavor(MediaPackageElements.XACML_POLICY_SERIES)) {
           mp.remove(mpe);
-          for (String tag : mpe.getTags()) {
-            seriesAclTags.add(tag);
-          }
+          seriesAclTags.addAll(Arrays.asList(mpe.getTags()));
         }
         // remove series extended metadata from the media package
         try {
@@ -1855,11 +1832,10 @@ public class IndexServiceImpl implements IndexService {
   @Override
   public String createSeries(String metadata)
           throws IllegalArgumentException, IndexServiceException, UnauthorizedException {
-    JSONObject metadataJson = null;
+    JSONObject metadataJson;
     try {
       metadataJson = (JSONObject) new JSONParser().parse(metadata);
     } catch (Exception e) {
-      logger.warn("Unable to parse metadata {}", metadata);
       throw new IllegalArgumentException("Unable to parse metadata" + metadata);
     }
 
@@ -1884,8 +1860,7 @@ public class IndexServiceImpl implements IndexService {
     try {
       optionsMap = JSONUtils.toMap(new org.codehaus.jettison.json.JSONObject(options.toJSONString()));
     } catch (JSONException e) {
-      logger.warn("Unable to parse options to map:", e);
-      throw new IllegalArgumentException("Unable to parse options to map");
+      throw new IllegalArgumentException("Unable to parse options to map", e);
     }
 
     DublinCoreCatalog dc = DublinCores.mkOpencastSeries().getCatalog();
@@ -1913,8 +1888,7 @@ public class IndexServiceImpl implements IndexService {
       for (Long id : themeId)
         seriesService.updateSeriesProperty(seriesId, THEME_PROPERTY_NAME, Long.toString(id));
     } catch (Exception e) {
-      logger.error("Unable to create new series:", e);
-      throw new IndexServiceException("Unable to create new series");
+      throw new IndexServiceException("Unable to create new series", e);
     }
 
     updateSeriesMetadata(seriesId, metadataList);
@@ -1965,11 +1939,10 @@ public class IndexServiceImpl implements IndexService {
         updateMediaPackageCommentCatalog(mediaPackage, comments);
         switch (getEventSource(event)) {
           case WORKFLOW:
-            logger.info("Update workflow mediapacakge {} with updated comments catalog.", event.getIdentifier());
+            logger.info("Update workflow media pacakge {} with updated comments catalog.", event.getIdentifier());
             Optional<WorkflowInstance> workflowInstance = workflowService.
                     getRunningWorkflowInstanceByMediaPackage(event.getIdentifier(), Permissions.Action.WRITE.toString());
-            if (!workflowInstance.isPresent()) {
-              logger.error("No workflow instance for event {} found!", event.getIdentifier());
+            if (workflowInstance.isEmpty()) {
               throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
             }
             WorkflowInstance instance = workflowInstance.get();
@@ -1986,7 +1959,7 @@ public class IndexServiceImpl implements IndexService {
                     Opt.some(mediaPackage), Opt.none(), Opt.none());
             break;
           default:
-            logger.error("Unkown event source {}!", event.getSource());
+            logger.error("Unknown event source {}!", event.getSource());
         }
       } catch (Exception e) {
         logger.error("Unable to update event {} comment catalog", event.getIdentifier(), e);
@@ -2055,8 +2028,7 @@ public class IndexServiceImpl implements IndexService {
       if (optSeries.isNone())
         throw new NotFoundException("Cannot find a series with id " + seriesID);
     } catch (SearchIndexException e) {
-      logger.error("Unable to get a series with id {} because:", seriesID, e);
-      throw new IndexServiceException("Cannot use search service to find Series");
+      throw new IndexServiceException("Unable to get a series with id: " + seriesID, e);
     }
   }
 
@@ -2070,8 +2042,7 @@ public class IndexServiceImpl implements IndexService {
     try {
       MetadataJson.fillListFromJson(metadataList, (JSONArray) new JSONParser().parse(metadataJSON));
     } catch (final org.json.simple.parser.ParseException e) {
-      logger.warn("Not able to parse the event metadata {}:", metadataJSON, e);
-      throw new IllegalArgumentException("Not able to parse the event metadata");
+      throw new IllegalArgumentException("Not able to parse the event metadata: " + metadataJSON, e);
     }
 
     updateSeriesMetadata(seriesID, metadataList);
