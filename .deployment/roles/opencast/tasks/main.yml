@@ -80,8 +80,11 @@
   loop:
     - etc/custom.properties
     - etc/org.opencastproject.fsresources.StaticResourceServlet.cfg
+    - etc/org.opencastproject.liveschedule.impl.LiveScheduleServiceImpl.cfg
     - etc/org.apache.karaf.features.cfg
     - etc/security/mh_default_org.xml
+    - etc/workflows/fast.xml
+    - etc/workflows/schedule-and-upload.xml
     - bin/setenv
 
 - name: User Interface Configuration
