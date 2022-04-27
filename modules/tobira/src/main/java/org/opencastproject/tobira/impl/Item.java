@@ -24,6 +24,7 @@ package org.opencastproject.tobira.impl;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_DESCRIPTION;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -75,57 +76,8 @@ class Item {
           .orError(new RuntimeException("Event has no dublin core catalog"))
           .get();
 
-      // Find a suitable thumbnail.
-      // TODO: This certainly has to be improved in the future.
-      final var thumbnail = Arrays.stream(mp.getAttachments())
-          .filter(a -> a.getFlavor().getSubtype().equals("player+preview"))
-          .map(a -> a.getURI().toString())
-          .findFirst()
-          .orElse(null);
-
-      // Obtain JSON array of tracks.
-      final List<Jsons.Val> tracks = Arrays.stream(mp.getTracks())
-          .map(track -> {
-            var videoStreams = TrackSupport.byType(track.getStreams(), VideoStream.class);
-            var resolution = Jsons.NULL;
-            if (videoStreams.length > 0) {
-              final var stream = videoStreams[0];
-              resolution = Jsons.arr(Jsons.v(stream.getFrameWidth()), Jsons.v(stream.getFrameHeight()));
-
-              if (videoStreams.length > 1) {
-                logger.warn(
-                    "Track of event {} has more than one video stream; we will ignore all but the first",
-                    event.getId()
-                );
-              }
-            }
-
-            return Jsons.obj(
-                Jsons.p("uri", track.getURI().toString()),
-                Jsons.p("mimetype", track.getMimeType().toString()),
-                Jsons.p("flavor", track.getFlavor().toString()),
-                Jsons.p("resolution", resolution)
-            );
-          })
-          .collect(Collectors.toCollection(ArrayList::new));
-
       // Figure out whether this is a live event
       final var isLive = Arrays.stream(mp.getTracks()).anyMatch(track -> track.isLive());
-
-      // Assemble ACL
-      final var canReadRoles = new ArrayList<Jsons.Val>();
-      final var canWriteRoles = new ArrayList<Jsons.Val>();
-      for (final var entry: event.getAccessControlList().getEntries()) {
-        if (entry.getAction().equals(Permissions.Action.READ.toString())) {
-          canReadRoles.add(Jsons.v(entry.getRole()));
-        } else if (entry.getAction().equals(Permissions.Action.WRITE.toString())) {
-          canWriteRoles.add(Jsons.v(entry.getRole()));
-        }
-      }
-      final var acl = Jsons.obj(
-          Jsons.p("read", Jsons.arr(canReadRoles)),
-          Jsons.p("write", Jsons.arr(canWriteRoles))
-      );
 
       final var creators = Arrays.stream(mp.getCreators())
           .map(creator -> Jsons.v(creator))
@@ -140,9 +92,9 @@ class Item {
           Jsons.p("created", event.getDcCreated().getTime()),
           Jsons.p("creators", Jsons.arr(creators)),
           Jsons.p("duration", Math.max(0, event.getDcExtent())),
-          Jsons.p("thumbnail", thumbnail),
-          Jsons.p("tracks", Jsons.arr(tracks)),
-          Jsons.p("acl", acl),
+          Jsons.p("thumbnail", findThumbnail(mp)),
+          Jsons.p("tracks", Jsons.arr(assembleTracks(event, mp))),
+          Jsons.p("acl", assembleAcl(event)),
           Jsons.p("isLive", isLive),
           Jsons.p("metadata", dccToMetadata(dcc)),
           Jsons.p("updated", event.getModified().getTime())
@@ -150,7 +102,7 @@ class Item {
     }
   }
 
-
+  /** Assembles the object containing all additional metadata. */
   private static Jsons.Obj dccToMetadata(DublinCoreCatalog dcc) {
     /** Metadata fields from dcterms that we already handle elsewhere. Therefore, we don't need to
       * include them here again. */
@@ -190,6 +142,59 @@ class Item {
         .toArray(Jsons.Prop[]::new);
 
     return Jsons.obj(fields);
+  }
+
+  private static Jsons.Obj assembleAcl(SearchResultItem event) {
+    final var canReadRoles = new ArrayList<Jsons.Val>();
+    final var canWriteRoles = new ArrayList<Jsons.Val>();
+    for (final var entry: event.getAccessControlList().getEntries()) {
+      if (entry.getAction().equals(Permissions.Action.READ.toString())) {
+        canReadRoles.add(Jsons.v(entry.getRole()));
+      } else if (entry.getAction().equals(Permissions.Action.WRITE.toString())) {
+        canWriteRoles.add(Jsons.v(entry.getRole()));
+      }
+    }
+    return Jsons.obj(
+        Jsons.p("read", Jsons.arr(canReadRoles)),
+        Jsons.p("write", Jsons.arr(canWriteRoles))
+    );
+  }
+
+  private static List<Jsons.Val> assembleTracks(SearchResultItem event, MediaPackage mp) {
+    return Arrays.stream(mp.getTracks())
+        .map(track -> {
+          var videoStreams = TrackSupport.byType(track.getStreams(), VideoStream.class);
+          var resolution = Jsons.NULL;
+          if (videoStreams.length > 0) {
+            final var stream = videoStreams[0];
+            resolution = Jsons.arr(Jsons.v(stream.getFrameWidth()), Jsons.v(stream.getFrameHeight()));
+
+            if (videoStreams.length > 1) {
+              logger.warn(
+                  "Track of event {} has more than one video stream; we will ignore all but the first",
+                  event.getId()
+              );
+            }
+          }
+
+          return Jsons.obj(
+              Jsons.p("uri", track.getURI().toString()),
+              Jsons.p("mimetype", track.getMimeType().toString()),
+              Jsons.p("flavor", track.getFlavor().toString()),
+              Jsons.p("resolution", resolution)
+          );
+        })
+        .collect(Collectors.toCollection(ArrayList::new));
+  }
+
+  private static String findThumbnail(MediaPackage mp) {
+    // Find a suitable thumbnail.
+    // TODO: This certainly has to be improved in the future.
+    return Arrays.stream(mp.getAttachments())
+        .filter(a -> a.getFlavor().getSubtype().equals("player+preview"))
+        .map(a -> a.getURI().toString())
+        .findFirst()
+        .orElse(null);
   }
 
   /** Converts a series into the corresponding JSON representation */
