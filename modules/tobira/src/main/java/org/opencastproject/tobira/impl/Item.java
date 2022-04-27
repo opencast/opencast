@@ -134,7 +134,7 @@ class Item {
       this.obj = Jsons.obj(
           Jsons.p("kind", "event"),
           Jsons.p("id", event.getId()),
-          Jsons.p("title", event.getDcTitle()),
+          Jsons.p("title", mp.getTitle()),
           Jsons.p("partOf", event.getDcIsPartOf()),
           Jsons.p("description", event.getDcDescription()),
           Jsons.p("created", event.getDcCreated().getTime()),
