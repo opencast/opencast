@@ -320,7 +320,7 @@ public class EventsEndpoint implements ManagedService {
   public List<EventCatalogUIAdapter> getEventCatalogUIAdapters(String organization) {
     List<EventCatalogUIAdapter> adapters = new ArrayList<>();
     for (EventCatalogUIAdapter adapter : catalogUIAdapters) {
-      if (organization.equals(adapter.getOrganization())) {
+      if (adapter.handlesOrganization(organization)) {
         adapters.add(adapter);
       }
     }

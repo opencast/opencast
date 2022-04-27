@@ -201,6 +201,11 @@ public abstract class ConfigurableDCCatalogUIAdapter implements CatalogUIAdapter
   }
 
   @Override
+  public boolean handlesOrganization(String organization) {
+    return ORGANIZATION_WILDCARD.equals(this.organization) || organization.equals(this.organization);
+  }
+
+  @Override
   public MediaPackageElementFlavor getFlavor() {
     return flavor;
   }

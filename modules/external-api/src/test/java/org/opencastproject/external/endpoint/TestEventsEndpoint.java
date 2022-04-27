@@ -121,6 +121,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
             .anyTimes();
     DublinCoreMetadataCollection collectionMock = EasyMock.createNiceMock(DublinCoreMetadataCollection.class);
     EasyMock.expect(deleteAdapter.getOrganization()).andReturn(defaultOrg.getId()).anyTimes();
+    EasyMock.expect(deleteAdapter.handlesOrganization(EasyMock.eq(defaultOrg.getId()))).andReturn(true).anyTimes();
     EasyMock.expect(deleteAdapter.getFields(EasyMock.anyObject(MediaPackage.class))).andReturn(null).anyTimes();
     EasyMock.expect(deleteAdapter.getUITitle()).andReturn(null).anyTimes();
     EasyMock.replay(deleteAdapter);

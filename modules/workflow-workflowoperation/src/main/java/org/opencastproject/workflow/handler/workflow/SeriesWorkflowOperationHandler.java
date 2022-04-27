@@ -374,7 +374,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
   private static final Fn2<SeriesCatalogUIAdapter, String, Boolean> seriesOrganizationFilter = new Fn2<SeriesCatalogUIAdapter, String, Boolean>() {
     @Override
     public Boolean apply(SeriesCatalogUIAdapter catalogUIAdapter, String organization) {
-      return catalogUIAdapter.getOrganization().equals(organization);
+      return catalogUIAdapter.handlesOrganization(organization);
     }
   };
 

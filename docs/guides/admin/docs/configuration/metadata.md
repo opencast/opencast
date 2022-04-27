@@ -50,12 +50,12 @@ The metadata configuration file format can be logically split up into different 
 
 ### Part 1: General catalog information
 
-|Configuration key|Example                  |Description                                                               |
-|-----------------|-------------------------|--------------------------------------------------------------------------|
-|type             |events                   |Two different types of catalog UI adapters may be configured, such for events and others for series.|
-|organization     |mh_default_org           |A custom catalog definition is mapped 1:1 to an organization and is available to this one organization only.|
-|flavor           |mycompany/episode        |The catalog must be of a certain flavor. For a events catalog, the flavor consists of the form type/subtype whereas for series you only need to define the subtype. Attention: For series catalogs, the type (the part before the slash '/') is used as element type.|
-|title            |My Personal Catalog Name |This is the title that is displayed in the UI. It should be something that is readable by humans.|
+|Configuration key|Example                  | Description                                                                                                                                                                                                                                                           |
+|-----------------|-------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|type             |events                   | Two different types of catalog UI adapters may be configured, such for events and others for series.                                                                                                                                                                  |
+|organization     |mh_default_org           | A custom catalog definition is mapped to an organization (1:1) or all organizations (1:n). To map a catalog to all organizations, use a wildcard as the organization name (`organization=*`). Else, the catalog is only available to the specified organization.      |
+|flavor           |mycompany/episode        | The catalog must be of a certain flavor. For a events catalog, the flavor consists of the form type/subtype whereas for series you only need to define the subtype. Attention: For series catalogs, the type (the part before the slash '/') is used as element type. |
+|title            |My Personal Catalog Name | This is the title that is displayed in the UI. It should be something that is readable by humans.                                                                                                                                                                     |
 
 ### Part 2: XML serialization information
 
