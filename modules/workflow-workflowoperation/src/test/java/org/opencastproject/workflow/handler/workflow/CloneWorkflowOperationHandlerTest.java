@@ -136,13 +136,13 @@ public class CloneWorkflowOperationHandlerTest {
 
     Assert.assertEquals(Action.CONTINUE, result.getAction());
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("targettype/source");
-    Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 2);
+    Assert.assertEquals(2, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
   }
 
   @Test
   public void testWildcardTargetFlavorTypeAndSubtype() throws Exception {
     // operation configuration
-    Map<String, String> configurations = new HashMap<String, String>();
+    Map<String, String> configurations = new HashMap<>();
     configurations.put(CloneWorkflowOperationHandler.OPT_SOURCE_FLAVOR, "*/source");
     configurations.put(CloneWorkflowOperationHandler.OPT_TARGET_FLAVOR, "*/*");
 
@@ -151,11 +151,11 @@ public class CloneWorkflowOperationHandlerTest {
 
     Assert.assertEquals(Action.CONTINUE, result.getAction());
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("presentation/source");
-    Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 2);
+    Assert.assertEquals(2, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
 
 
     newFlavor = MediaPackageElementFlavor.parseFlavor("presenter/source");
-    Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 2);
+    Assert.assertEquals(2, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
   }
 
   @Test
@@ -170,7 +170,7 @@ public class CloneWorkflowOperationHandlerTest {
 
     Assert.assertEquals(Action.CONTINUE, result.getAction());
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("*/target");
-    Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 1);
+    Assert.assertEquals(1, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
   }
 
   @Test
@@ -184,7 +184,7 @@ public class CloneWorkflowOperationHandlerTest {
 
     Assert.assertEquals(Action.SKIP, result.getAction());
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("*/target");
-    Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 0);
+    Assert.assertEquals(0, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
   }
 
 

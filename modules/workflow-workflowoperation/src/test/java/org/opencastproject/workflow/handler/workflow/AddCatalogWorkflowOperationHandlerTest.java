@@ -155,15 +155,16 @@ public class AddCatalogWorkflowOperationHandlerTest {
     operation.setConfiguration("catalog-type-collision-behavior", "keep");
 
     // execution
-    operationHandler.start(instance, null);
     WorkflowOperationResult result = operationHandler.start(instance, null);
+    instance.setMediaPackage(result.getMediaPackage()); // Would usually be done by the workflow service
+    result = operationHandler.start(instance, null);
 
     // checks
     Assert.assertEquals(Action.CONTINUE, result.getAction());
 
     MediaPackage mp = result.getMediaPackage();
 
-    Assert.assertEquals(mp.getCatalogs().length, 2);
+    Assert.assertEquals(2, mp.getCatalogs().length);
   }
 
   @Test
@@ -191,7 +192,8 @@ public class AddCatalogWorkflowOperationHandlerTest {
     operation.setConfiguration("catalog-type-collision-behavior", "fail");
 
     // execution
-    operationHandler.start(instance, null);
+    var result = operationHandler.start(instance, null);
+    instance.setMediaPackage(result.getMediaPackage()); // Would usually be done by the workflow service
     expectedException.expect(WorkflowOperationException.class);
     operationHandler.start(instance, null);
   }

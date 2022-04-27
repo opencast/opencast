@@ -168,7 +168,7 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
       }
     }
 
-    return createResult(workflowInstance.getMediaPackage(), Action.CONTINUE);
+    return createResult(mediaPackage, Action.CONTINUE);
   }
 
   private MediaPackageElement copyElement(MediaPackageElement element) throws WorkflowOperationException {
