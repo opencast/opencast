@@ -151,8 +151,6 @@ public class AddCatalogWorkflowOperationHandler extends AbstractWorkflowOperatio
       mpe.addTag(tag);
     }
 
-    wInst.setMediaPackage(mp);
-
     return createResult(mp, Action.CONTINUE);
   }
 

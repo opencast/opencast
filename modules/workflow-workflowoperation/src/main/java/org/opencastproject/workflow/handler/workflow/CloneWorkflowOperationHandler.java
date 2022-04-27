@@ -117,7 +117,6 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
     // Make sure either one of tags or flavors are provided
     if (sourceTagsOption.isEmpty() && sourceFlavorOptionList.isEmpty()) {
       logger.info("No source tags or flavors have been specified, not matching anything. Operation will be skipped.");
-      workflowInstance.setMediaPackage(mediaPackage);
       return createResult(mediaPackage, Action.SKIP);
     }
 
@@ -148,11 +147,10 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
     // Look for elements matching the tags and the flavor
     Collection<MediaPackageElement> elements = elementSelector.select(mediaPackage, true);
 
-    // Check the the number of element returned
+    // Check the number of element returned
     if (elements.size() == 0) {
       // If no one found, we skip the operation
       logger.debug("No matching elements found, skipping operation.");
-      workflowInstance.setMediaPackage(mediaPackage);
       return createResult(workflowInstance.getMediaPackage(), Action.SKIP);
     } else {
       logger.debug("Copy " + elements.size() + " elements to new flavor: {}", targetFlavorOption);
@@ -170,7 +168,6 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
       }
     }
 
-    workflowInstance.setMediaPackage(mediaPackage);
     return createResult(workflowInstance.getMediaPackage(), Action.CONTINUE);
   }
 
