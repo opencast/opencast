@@ -307,7 +307,6 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
         return skip(workflowInstance, context);
       }
       logger.info("Holding for video edit...");
-      workflowInstance.setMediaPackage(mp);
       return createResult(mp, Action.PAUSE);
     } else {
       logger.debug("Move on, SMIL catalog ({}) already exists for media package '{}'", targetSmilFlavor, mp);
@@ -320,7 +319,7 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
           throws WorkflowOperationException {
     // If we do not hold for trim, we still need to put tracks in the mediapackage with the target flavor
     MediaPackage mp = workflowInstance.getMediaPackage();
-    logger.info("Skip video editor operation for mediapackage {}", mp.getIdentifier().toString());
+    logger.info("Skip video editor operation for mediapackage {}", mp.getIdentifier());
 
     // Get configuration
     // Check which tags have been configured
