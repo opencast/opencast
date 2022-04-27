@@ -16,4 +16,7 @@
     <reference name="seriesService"
                interface="org.opencastproject.series.api.SeriesService"
                bind="setSeriesService"/>
+    <reference name="workspace"
+               interface="org.opencastproject.workspace.api.Workspace"
+               bind="setWorkspace"/>
 </scr:component>
