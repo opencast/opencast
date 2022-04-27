@@ -2,7 +2,7 @@
   "default_workflow_id": null,
   "workflows": [
     {
-      "configuration_panel": [{
+      "configuration_panel_json": [{
         "description": "Insert the number of duplicated events",
         "fieldset": [
           {
@@ -22,7 +22,7 @@
       "title": "Duplicate Event"
     },
     {
-      "configuration_panel": [{
+      "configuration_panel_json": [{
        "legend": "Add a comment that the recording needs:",
        "fieldset": [
          {
@@ -67,7 +67,7 @@
       "title": "Fast Testing Workflow"
     },
     {
-      "configuration_panel": [{
+      "configuration_panel_json": [{
        "legend": "Video Qualities",
        "fieldset": [
          {
@@ -200,7 +200,7 @@
       "title": "Process upon upload and schedule"
     },
     {
-      "configuration_panel": [{
+      "configuration_panel_json": [{
        "legend": "Video Quality",
        "fieldset": [
          {
@@ -264,7 +264,7 @@
       "title": "Publish"
     },
     {
-      "configuration_panel": [{
+      "configuration_panel_json": [{
        "legend": "Update metadata at:",
        "fieldset": [
          {
@@ -287,7 +287,7 @@
       "title": "Republish metadata"
     },
     {
-      "configuration_panel": [{
+      "configuration_panel_json": [{
        "legend": "Retract recording from:",
        "fieldset": [
          {
@@ -336,7 +336,7 @@
       "title": "Retract"
     },
     {
-      "configuration_panel": "",
+      "configuration_panel_json": "",
       "displayOrder": 5,
       "description": "",
       "id": "update-previews",

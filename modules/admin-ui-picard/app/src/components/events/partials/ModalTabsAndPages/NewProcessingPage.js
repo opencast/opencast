@@ -68,7 +68,6 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, loadingWorkflowDef,
                                 )}
 
                                 {/* Configuration panel of selected workflow */}
-                                {/*Todo: Needs to be implemented after adjustments in definition files done*/}
                                 <div className="collapsible-box">
                                     <div id="new-event-workflow-configuration"
                                          className="checkbox-container obj-container">

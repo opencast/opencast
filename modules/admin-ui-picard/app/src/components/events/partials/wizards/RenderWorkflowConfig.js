@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 import {Field} from "formik";
@@ -16,7 +16,7 @@ import {
  */
 const RenderWorkflowConfig = (props) => {
     // Get html for configuration panel
-    const configPanel = props.configuration_panel ? props.configuration_panel : [];
+    const configPanel = props.configuration_panel_json ? props.configuration_panel_json : [];
     const description = props.description ? props.description : '';
     const displayDescription = !!props.displayDescription;
     let formik = props.formik;

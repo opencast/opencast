@@ -307,6 +307,27 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     }
   }
 
+  /**
+   * Returns the workflow configuration panel in JSON for the workflow definition specified by
+   *
+   * @param definitionId
+   * @return config panel in JSON
+   */
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("configurationPanelJson")
+  @RestQuery(name = "configPanelJson", description = "Get the configuration panel for a specific workflow in JSON", returnDescription = "The JSON workflow configuration panel", restParameters = { @RestParameter(name = "definitionId", isRequired = false, description = "The workflow definition identifier", type = STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "The workflow configuration panel.") })
+  public Response getConfigurationPanelJson(@QueryParam("definitionId") String definitionId)
+          throws NotFoundException {
+    try {
+      final WorkflowDefinition def = service.getWorkflowDefinitionById(definitionId);
+      final String out = def.getConfigurationPanelJson();
+      return Response.ok(out).build();
+    } catch (WorkflowDatabaseException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("instances.xml")
