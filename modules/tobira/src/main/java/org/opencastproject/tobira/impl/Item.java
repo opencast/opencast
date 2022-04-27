@@ -26,10 +26,13 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 
 import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.series.api.Series;
 import org.opencastproject.util.Jsons;
+import org.opencastproject.workspace.api.Workspace;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +40,9 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -52,7 +57,7 @@ class Item {
   private Jsons.Val obj;
 
   /** Converts a event into the corresponding JSON representation */
-  Item(SearchResultItem event) {
+  Item(SearchResultItem event, Workspace workspace) {
     this.modifiedDate = event.getModified();
 
     if (event.getDeletionDate() != null) {
@@ -63,6 +68,12 @@ class Item {
       );
     } else {
       final var mp = event.getMediaPackage();
+
+      // Load DC catalog. We error if there is none defined for this event as I can't think of
+      // anything sensible we could do.
+      final var dcc = DublinCoreUtil.loadEpisodeDublinCore(workspace, mp)
+          .orError(new RuntimeException("Event has no dublin core catalog"))
+          .get();
 
       // Find a suitable thumbnail.
       // TODO: This certainly has to be improved in the future.
@@ -133,9 +144,52 @@ class Item {
           Jsons.p("tracks", Jsons.arr(tracks)),
           Jsons.p("acl", acl),
           Jsons.p("isLive", isLive),
+          Jsons.p("metadata", dccToMetadata(dcc)),
           Jsons.p("updated", event.getModified().getTime())
       );
     }
+  }
+
+
+  private static Jsons.Obj dccToMetadata(DublinCoreCatalog dcc) {
+    /** Metadata fields from dcterms that we already handle elsewhere. Therefore, we don't need to
+      * include them here again. */
+    final var ignoredDcFields = Set.of(new String[] {
+        "created", "creator", "title", "extent", "isPartOf", "description", "identifier",
+    });
+
+    final var namespaces = new HashMap<String, ArrayList<Jsons.Prop>>();
+
+    for (final var e : dcc.getValues().entrySet()) {
+      final var key = e.getKey();
+
+      // We special case dcterms here to get a smaller, easier to read JSON. In most cases, this
+      // will be the only namespace.
+      final var ns = key.getNamespaceURI().equals("http://purl.org/dc/terms/")
+          ? "dcterms"
+          : key.getNamespaceURI();
+      final var fields = namespaces.computeIfAbsent(ns, k -> new ArrayList<>());
+
+      // We skip fields that we already include elsewhere.
+      if (ns.equals("dcterms") && ignoredDcFields.contains(key.getLocalName())) {
+        continue;
+      }
+
+      final var values = e.getValue().stream()
+          .map(v -> Jsons.v(v.getValue()))
+          .collect(Collectors.toCollection(ArrayList::new));
+      final var field = Jsons.p(e.getKey().getLocalName(), Jsons.arr(values));
+      fields.add(field);
+    }
+
+    final var fields = namespaces.entrySet().stream()
+        .map(e -> {
+          final var obj = Jsons.obj(e.getValue().toArray(new Jsons.Prop[0]));
+          return Jsons.p(e.getKey(), obj);
+        })
+        .toArray(Jsons.Prop[]::new);
+
+    return Jsons.obj(fields);
   }
 
   /** Converts a series into the corresponding JSON representation */
