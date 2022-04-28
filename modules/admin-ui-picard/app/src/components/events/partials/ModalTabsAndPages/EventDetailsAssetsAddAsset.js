@@ -5,19 +5,20 @@ import Notifications from "../../../shared/Notifications";
 import {style_button_spacing} from "../../../../utils/eventDetailsUtils";
 import {uploadAssetOptions} from "../../../../configs/sourceConfig";
 import {Formik} from "formik";
+import { updateAssets } from '../../../../thunks/eventDetailsThunks';
 
 /**
  * This component manages the add asset sub-tab for assets tab of event details modal
  */
-const EventDetailsAssetsAddAsset = ({ eventId, t, setHierarchy}) => {
+const EventDetailsAssetsAddAsset = ({ eventId, t, setHierarchy, updateAssets }) => {
 
     const openSubTab = (subTabName) => {
         setHierarchy(subTabName);
     }
 
 
-    function saveAssets(values) {
-        //todo: get asset files and other required data and save (endpoint: `/admin-ng/event/${eventId}/assets`)
+    function saveAssets (values) {
+        updateAssets(values, eventId);
     }
 
     const handleChange = (e, formik, assetId) => {
@@ -103,6 +104,7 @@ const EventDetailsAssetsAddAsset = ({ eventId, t, setHierarchy}) => {
                                             <button className="submit"
                                                     style={style_button_spacing}
                                                     type="submit"
+                                                    onClick={() => formik.handleSubmit()}
                                             >
                                                 {t("EVENTS.EVENTS.NEW.UPLOAD_ASSET.ADD")}
                                             </button>
@@ -118,13 +120,9 @@ const EventDetailsAssetsAddAsset = ({ eventId, t, setHierarchy}) => {
     );
 };
 
-// Getting state data out of redux store
-const mapStateToProps = state => ({
-});
-
-
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
+    updateAssets: (values, eventId) => dispatch(updateAssets(values, eventId))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(EventDetailsAssetsAddAsset);
+export default connect(null, mapDispatchToProps)(EventDetailsAssetsAddAsset);

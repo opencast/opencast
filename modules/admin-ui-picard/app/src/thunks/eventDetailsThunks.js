@@ -81,7 +81,7 @@ import {
     transformMetadataCollection,
     transformMetadataForUpdate
 } from "../utils/resourceUtils";
-import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
+import { NOTIFICATION_CONTEXT, WORKFLOW_UPLOAD_ASSETS_NON_TRACK } from '../configs/modalConfig';
 import {
     getBaseWorkflow,
     getCaptureAgents,
@@ -97,6 +97,7 @@ import {getWorkflowDef} from "../selectors/workflowSelectors";
 import {logger} from "../utils/logger";
 import {removeNotificationWizardForm} from "../actions/notificationActions";
 import {calculateDuration} from "../utils/dateUtils";
+import { uploadAssetOptions } from '../configs/sourceConfig';
 
 
 // thunks for metadata
@@ -430,6 +431,40 @@ export const fetchAssetPublicationDetails = (eventId, publicationId) => async (d
         logger.error(e);
         dispatch(loadEventAssetPublicationDetailsFailure());
     }
+}
+
+export const updateAssets = (values, eventId) => async dispatch => {
+    let formData = new FormData();
+
+    let assets = {
+        workflow: WORKFLOW_UPLOAD_ASSETS_NON_TRACK,
+        options: []
+    };
+
+    uploadAssetOptions.forEach(option => {
+        if (!!values[option.id]) {
+           formData.append(option.id + '.0', values[option.id]);
+           assets.options = assets.options.concat(option)
+        }
+    });
+
+    formData.append('metadata', JSON.stringify({
+        assets: assets
+    }));
+
+    axios.post(`/admin-ng/${eventId}/assets`, formData,
+      {
+          headers: {
+              'Content-Type': 'multipart/form-data'
+          }
+      }
+    ).then(response => {
+        logger.info(response);
+        dispatch(addNotification('success', 'EVENTS_UPDATED', null, NOTIFICATION_CONTEXT));
+    }).catch(response => {
+        logger.error(response);
+        dispatch(addNotification('error', 'EVENTS_NOT_UPDATED', null, NOTIFICATION_CONTEXT));
+    })
 }
 
 
