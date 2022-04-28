@@ -92,6 +92,14 @@
                   </div>
                 </div>
               </div>
+              <footer>
+                <a
+                  class="submit"
+                  ng-class="{disabled: metadata.locked || !unsavedChanges([commonMetadataCatalog])}"
+                  ng-click="metadataSave([commonMetadataCatalog])">
+                  {{ "SAVE" | translate}}
+                </a>
+              </footer>
             </div>
           </div>
 
