@@ -93,6 +93,7 @@ class Item {
           Jsons.p("creators", Jsons.arr(creators)),
           Jsons.p("duration", Math.max(0, event.getDcExtent())),
           Jsons.p("thumbnail", findThumbnail(mp)),
+          Jsons.p("timelinePreview", findTimelinePreview(mp)),
           Jsons.p("tracks", Jsons.arr(assembleTracks(event, mp))),
           Jsons.p("acl", assembleAcl(event)),
           Jsons.p("isLive", isLive),
@@ -195,6 +196,38 @@ class Item {
         .map(a -> a.getURI().toString())
         .findFirst()
         .orElse(null);
+  }
+
+  private static Jsons.Val findTimelinePreview(MediaPackage mp) {
+    return Arrays.stream(mp.getAttachments())
+        .filter(a -> a.getFlavor().getSubtype().equals("timeline+preview"))
+        .map(a -> {
+          final var props = a.getProperties();
+          final var imageCountX = props.get("imageSizeX");
+          final var imageCountY = props.get("imageSizeY");
+          final var resolutionX = props.get("resolutionX");
+          final var resolutionY = props.get("resolutionY");
+
+          final var anyNull = imageCountX == null
+              || imageCountY == null
+              || resolutionX == null
+              || resolutionY == null;
+
+          if (anyNull) {
+            return null;
+          }
+
+          return (Jsons.Val) Jsons.obj(
+            Jsons.p("url", a.getURI().toString()),
+            Jsons.p("imageCountX", imageCountX),
+            Jsons.p("imageCountY", imageCountY),
+            Jsons.p("resolutionX", resolutionX),
+            Jsons.p("resolutionY", resolutionY)
+          );
+        })
+        .filter(o -> o != null)
+        .findFirst()
+        .orElse(Jsons.NULL);
   }
 
   /** Converts a series into the corresponding JSON representation */
