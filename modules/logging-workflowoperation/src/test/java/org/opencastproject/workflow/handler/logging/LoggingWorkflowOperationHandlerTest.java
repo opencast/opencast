@@ -37,6 +37,8 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 public class LoggingWorkflowOperationHandlerTest {
 
@@ -59,6 +61,8 @@ public class LoggingWorkflowOperationHandlerTest {
     EasyMock.expect(workflow.getMediaPackage()).andReturn(mediaPackage).anyTimes();
     EasyMock.expect(workflow.getId()).andReturn(1L).anyTimes();
     EasyMock.expect(workflow.getCurrentOperation()).andReturn(instance).anyTimes();
+    EasyMock.expect(workflow.getOperations()).andReturn(List.of(instance)).anyTimes();
+    EasyMock.expect(workflow.getConfigurations()).andReturn(Collections.emptyMap()).anyTimes();
   }
 
   @Test

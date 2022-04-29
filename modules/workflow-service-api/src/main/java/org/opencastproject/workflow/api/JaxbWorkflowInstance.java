@@ -109,20 +109,14 @@ public class JaxbWorkflowInstance {
     this.dateCreated = workflow.getDateCreated();
     this.dateCompleted = workflow.getDateCompleted();
     this.mediaPackage = workflow.getMediaPackage();
-    this.operations = Optional.ofNullable(workflow.getOperations())
-            .orElseGet(Collections::emptyList)
+    this.operations = workflow.getOperations()
             .stream()
             .map(JaxbWorkflowOperationInstance::new)
             .collect(Collectors.toList());
-    if (workflow.getConfigurations() != null) {
-      this.configurations = Optional.ofNullable(workflow.getConfigurations().entrySet())
-              .orElseGet(Collections::emptySet)
-              .stream()
-              .map(config -> new JaxbWorkflowConfiguration(config.getKey(), config.getValue()))
-              .collect(Collectors.toSet());
-    } else {
-      this.configurations = null;
-    }
+    this.configurations = workflow.getConfigurations().entrySet()
+            .stream()
+            .map(config -> new JaxbWorkflowConfiguration(config.getKey(), config.getValue()))
+            .collect(Collectors.toSet());
 
     this.mediaPackageId = mediaPackage == null ? null : mediaPackage.getIdentifier().toString();
     this.seriesId = mediaPackage == null ? null : mediaPackage.getSeries();

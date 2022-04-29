@@ -1922,31 +1922,32 @@ public abstract class AbstractEventEndpoint {
 
       // Retrieve submission date with the workflow instance main job
       Date created = instance.getDateCreated();
-      long executionTime;
 
       Date completed = instance.getDateCompleted();
       if (completed == null)
         completed = new Date();
 
-      executionTime = (completed.getTime() - created.getTime());
+      long executionTime = completed.getTime() - created.getTime();
 
-      List<Field> fields = new ArrayList<>();
-      for (String key : instance.getConfigurationKeys()) {
-        fields.add(f(key, v(instance.getConfiguration(key), Jsons.BLANK)));
-      }
+      var fields = instance.getConfigurations()
+          .entrySet()
+          .stream()
+          .map(e -> f(e.getKey(), v(e.getValue(), Jsons.BLANK)))
+          .collect(Collectors.toList());
 
-      JValue list = obj(f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + instance.getState(), Jsons.BLANK)),
-              f("description", v(instance.getDescription(), Jsons.BLANK)), f("executionTime", v(executionTime, Jsons.BLANK)),
+      return okJson(obj(
+              f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + instance.getState(), Jsons.BLANK)),
+              f("description", v(instance.getDescription(), Jsons.BLANK)),
+              f("executionTime", v(executionTime, Jsons.BLANK)),
               f("wiid", v(instance.getId(), Jsons.BLANK)), f("title", v(instance.getTitle(), Jsons.BLANK)),
-              f("wdid", v(instance.getTemplate(), Jsons.BLANK)), f("configuration", obj(fields)),
-              f("submittedAt", v(created != null ? toUTC(created.getTime()) : "", Jsons.BLANK)),
-              f("creator", v(instance.getCreatorName(), Jsons.BLANK)));
-
-      return okJson(list);
+              f("wdid", v(instance.getTemplate(), Jsons.BLANK)),
+              f("configuration", obj(fields)),
+              f("submittedAt", v(toUTC(created.getTime()), Jsons.BLANK)),
+              f("creator", v(instance.getCreatorName(), Jsons.BLANK))));
     } catch (NotFoundException e) {
       return notFound("Cannot find workflow  %s", workflowId);
     } catch (WorkflowDatabaseException e) {
-      logger.error("Unable to get workflow %s of event %s", workflowId, eventId, e);
+      logger.error("Unable to get workflow {} of event {}", workflowId, eventId, e);
       return serverError();
     } catch (UnauthorizedException e) {
       return forbidden();

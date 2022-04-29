@@ -21,11 +21,11 @@
 
 package org.opencastproject.workflow.api;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -164,26 +164,15 @@ public class WorkflowOperationInstance implements Configurable {
     setSkipCondition(def.getSkipCondition());
     setRetryStrategy(def.getRetryStrategy());
     Set<String> defConfigs = def.getConfigurationKeys();
-    this.configurations = new TreeMap<String, String>();
+    this.configurations = new TreeMap<>();
     if (defConfigs != null) {
       for (String key : defConfigs) {
-        addConfiguration(key, def.getConfiguration(key));
+        configurations.put(key, def.getConfiguration(key));
       }
     }
 
-    switch (retryStrategy) {
-      case RETRY:
-        if (maxAttempts < 2)
-          maxAttempts = 2;
-        break;
-      case HOLD:
-        // Can hold and retry until max-attempts
-        if (maxAttempts < 2)
-          maxAttempts = 2;
-        break;
-      default:
-        // Nothing to do
-        break;
+    if ((retryStrategy == RetryStrategy.RETRY || retryStrategy == RetryStrategy.HOLD) && maxAttempts < 2) {
+      maxAttempts = 2;
     }
   }
 
@@ -358,7 +347,7 @@ public class WorkflowOperationInstance implements Configurable {
     if (key == null)
       return;
     if (configurations == null)
-      configurations = new TreeMap<String, String>();
+      configurations = new TreeMap<>();
 
     configurations.put(key, value);
   }
@@ -370,17 +359,10 @@ public class WorkflowOperationInstance implements Configurable {
    */
   @Override
   public Set<String> getConfigurationKeys() {
-    Set<String> keys = new TreeSet<String>();
-    if (configurations != null && !configurations.isEmpty()) {
-      for (String key : configurations.keySet()) {
-        keys.add(key);
-      }
+    if (configurations == null) {
+      return Collections.emptySet();
     }
-    return keys;
-  }
-
-  private void addConfiguration(String key, String value) {
-    configurations.put(key, value);
+    return configurations.keySet();
   }
 
   /**

@@ -37,16 +37,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -141,7 +140,6 @@ public class WorkflowInstance {
   private Date dateCompleted = null;
 
   @Lob
-  @Basic(fetch = FetchType.LAZY)
   @Column(name = "mediaPackage", length = 16777215)
   private String mediaPackage;
 
@@ -377,11 +375,11 @@ public class WorkflowInstance {
    */
   public List<WorkflowOperationInstance> getOperations() {
     if (operations == null)
-      operations = new ArrayList<WorkflowOperationInstance>();
+      operations = new ArrayList<>();
     if (!initialized)
       init();
 
-    return new ArrayList<WorkflowOperationInstance>(operations);
+    return operations;
   }
 
   /**
@@ -484,6 +482,9 @@ public class WorkflowInstance {
   }
 
   public Map<String, String> getConfigurations() {
+    if (configurations == null) {
+      return Collections.emptyMap();
+    }
     return configurations;
   }
 
@@ -504,13 +505,10 @@ public class WorkflowInstance {
    * @see org.opencastproject.workflow.api.Configurable#getConfigurationKeys()
    */
   public Set<String> getConfigurationKeys() {
-    Set<String> keys = new TreeSet<String>();
-    if (configurations != null && !configurations.isEmpty()) {
-      for (String key : configurations.keySet()) {
-        keys.add(key);
-      }
+    if (configurations == null) {
+      return Collections.emptySet();
     }
-    return keys;
+    return configurations.keySet();
   }
 
   /**
@@ -533,7 +531,7 @@ public class WorkflowInstance {
     if (key == null)
       return;
     if (configurations == null)
-      configurations = new TreeMap<String, String>();
+      configurations = new TreeMap<>();
 
     // Adjust already existing values
     configurations.put(key, value);
