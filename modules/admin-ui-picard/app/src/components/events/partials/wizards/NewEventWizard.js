@@ -207,6 +207,16 @@ const getInitialValues = metadataFields => {
         initialValues[key] = value;
     }
 
+    const defaultDate = new Date();
+
+    // fill times with some default values
+    initialValues['scheduleStartTimeHour'] = (defaultDate.getHours() + 1).toString();
+    initialValues['scheduleStartTimeMinutes'] = '00';
+    initialValues['scheduleDurationHour'] = '00';
+    initialValues['scheduleDurationMinutes'] = '55';
+    initialValues['scheduleEndTimeHour'] = (defaultDate.getHours() + 1).toString();
+    initialValues['scheduleEndTimeMinutes'] = '55';
+
     return initialValues;
 };
 
