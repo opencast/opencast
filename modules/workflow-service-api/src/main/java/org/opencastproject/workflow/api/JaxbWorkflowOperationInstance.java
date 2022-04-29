@@ -89,12 +89,6 @@ public class JaxbWorkflowOperationInstance {
   @XmlElementWrapper(name = "configurations")
   protected Set<JaxbWorkflowConfiguration> configurations;
 
-  @XmlElement(name = "holdurl")
-  protected String holdStateUserInterfaceUrl;
-
-  @XmlElement(name = "hold-action-title")
-  protected String holdActionTitle;
-
   @XmlAttribute(name = "fail-on-error")
   protected boolean failWorkflowOnException;
 
@@ -165,8 +159,6 @@ public class JaxbWorkflowOperationInstance {
     } else {
       this.configurations = null;
     }
-    this.holdStateUserInterfaceUrl = operation.getHoldStateUserInterfaceUrl();
-    this.holdActionTitle = operation.getHoldActionTitle();
     this.failWorkflowOnException = operation.isFailWorkflowOnException();
     this.executeCondition = operation.getExecutionCondition();
     this.skipCondition = operation.getSkipCondition();
@@ -187,7 +179,7 @@ public class JaxbWorkflowOperationInstance {
             Optional.ofNullable(configurations).orElseGet(Collections::emptySet)
                     .stream()
                     .collect(Collectors.toMap(JaxbWorkflowConfiguration::getKey, JaxbWorkflowConfiguration::getValue)),
-            holdStateUserInterfaceUrl, holdActionTitle, failWorkflowOnException, executeCondition,
+            failWorkflowOnException, executeCondition,
             skipCondition, exceptionHandlingWorkflow, abortable, continuable, dateStarted, dateCompleted, timeInQueue, maxAttempts, failedAttempts,
             executionHost, retryStrategy);
   }
@@ -202,25 +194,49 @@ public class JaxbWorkflowOperationInstance {
 
     JaxbWorkflowOperationInstance jaxbWorkflowOperationInstance = (JaxbWorkflowOperationInstance) o;
 
-    return new EqualsBuilder().append(template, jaxbWorkflowOperationInstance.template).append(jobId, jaxbWorkflowOperationInstance.jobId)
-            .append(state, jaxbWorkflowOperationInstance.state).append(description, jaxbWorkflowOperationInstance.description)
-            .append(configurations, jaxbWorkflowOperationInstance.configurations).append(holdStateUserInterfaceUrl, jaxbWorkflowOperationInstance.holdStateUserInterfaceUrl)
-            .append(holdActionTitle, jaxbWorkflowOperationInstance.holdActionTitle).append(failWorkflowOnException, jaxbWorkflowOperationInstance.failWorkflowOnException)
-            .append(executeCondition, jaxbWorkflowOperationInstance.executeCondition).append(skipCondition, jaxbWorkflowOperationInstance.skipCondition)
-            .append(exceptionHandlingWorkflow, jaxbWorkflowOperationInstance.exceptionHandlingWorkflow).append(abortable, jaxbWorkflowOperationInstance.abortable)
-            .append(continuable, jaxbWorkflowOperationInstance.continuable).append(dateStarted, jaxbWorkflowOperationInstance.dateStarted)
-            .append(dateCompleted, jaxbWorkflowOperationInstance.dateCompleted).append(timeInQueue, jaxbWorkflowOperationInstance.timeInQueue)
-            .append(maxAttempts, jaxbWorkflowOperationInstance.maxAttempts).append(failedAttempts, jaxbWorkflowOperationInstance.failedAttempts)
-            .append(executionHost, jaxbWorkflowOperationInstance.executionHost).append(retryStrategy, jaxbWorkflowOperationInstance.retryStrategy)
-            .isEquals();
+    return new EqualsBuilder()
+        .append(template, jaxbWorkflowOperationInstance.template)
+        .append(jobId, jaxbWorkflowOperationInstance.jobId)
+        .append(state, jaxbWorkflowOperationInstance.state)
+        .append(description, jaxbWorkflowOperationInstance.description)
+        .append(configurations, jaxbWorkflowOperationInstance.configurations)
+        .append(failWorkflowOnException, jaxbWorkflowOperationInstance.failWorkflowOnException)
+        .append(executeCondition, jaxbWorkflowOperationInstance.executeCondition)
+        .append(skipCondition, jaxbWorkflowOperationInstance.skipCondition)
+        .append(exceptionHandlingWorkflow, jaxbWorkflowOperationInstance.exceptionHandlingWorkflow)
+        .append(abortable, jaxbWorkflowOperationInstance.abortable)
+        .append(continuable, jaxbWorkflowOperationInstance.continuable)
+        .append(dateStarted, jaxbWorkflowOperationInstance.dateStarted)
+        .append(dateCompleted, jaxbWorkflowOperationInstance.dateCompleted)
+        .append(timeInQueue, jaxbWorkflowOperationInstance.timeInQueue)
+        .append(maxAttempts, jaxbWorkflowOperationInstance.maxAttempts)
+        .append(failedAttempts, jaxbWorkflowOperationInstance.failedAttempts)
+        .append(executionHost, jaxbWorkflowOperationInstance.executionHost)
+        .append(retryStrategy, jaxbWorkflowOperationInstance.retryStrategy)
+        .isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).append(template).append(jobId).append(state).append(description).append(configurations)
-            .append(holdStateUserInterfaceUrl).append(holdActionTitle).append(failWorkflowOnException).append(executeCondition).append(skipCondition).append(exceptionHandlingWorkflow)
-            .append(abortable).append(continuable).append(dateStarted).append(dateCompleted).append(timeInQueue).append(maxAttempts).append(failedAttempts).append(executionHost)
-            .append(retryStrategy)
-            .toHashCode();
+    return new HashCodeBuilder(17, 37)
+        .append(template)
+        .append(jobId)
+        .append(state)
+        .append(description)
+        .append(configurations)
+        .append(failWorkflowOnException)
+        .append(executeCondition)
+        .append(skipCondition)
+        .append(exceptionHandlingWorkflow)
+        .append(abortable)
+        .append(continuable)
+        .append(dateStarted)
+        .append(dateCompleted)
+        .append(timeInQueue)
+        .append(maxAttempts)
+        .append(failedAttempts)
+        .append(executionHost)
+        .append(retryStrategy)
+        .toHashCode();
   }
 }

@@ -82,12 +82,6 @@ public class WorkflowOperationInstance implements Configurable {
   @Column(name = "value_part")
   protected Map<String, String> configurations;
 
-  @Column(name = "holdurl")
-  protected String holdStateUserInterfaceUrl;
-
-  @Column(name = "holdActionTitle")
-  protected String holdActionTitle;
-
   @Column(name = "failOnError")
   protected boolean failWorkflowOnException;
 
@@ -196,8 +190,6 @@ public class WorkflowOperationInstance implements Configurable {
           OperationState state,
           String description,
           Map<String, String> configurations,
-          String holdStateUserInterfaceUrl,
-          String holdActionTitle,
           boolean failWorkflowOnException,
           String executeCondition,
           String skipCondition,
@@ -216,8 +208,6 @@ public class WorkflowOperationInstance implements Configurable {
     this.state = state;
     this.description = description;
     this.configurations = configurations;
-    this.holdStateUserInterfaceUrl = holdStateUserInterfaceUrl;
-    this.holdActionTitle = holdActionTitle;
     this.failWorkflowOnException = failWorkflowOnException;
     this.executeCondition = executeCondition;
     this.skipCondition = skipCondition;
@@ -301,9 +291,7 @@ public class WorkflowOperationInstance implements Configurable {
     Date now = new Date();
     if (OperationState.RUNNING.equals(state)) {
       this.dateStarted = now;
-    } else if (OperationState.FAILED.equals(state)) {
-      this.dateCompleted = now;
-    } else if (OperationState.SUCCEEDED.equals(state)) {
+    } else if (OperationState.FAILED.equals(state) || OperationState.SUCCEEDED.equals(state)) {
       this.dateCompleted = now;
     }
     this.state = state;
@@ -363,35 +351,6 @@ public class WorkflowOperationInstance implements Configurable {
       return Collections.emptySet();
     }
     return configurations.keySet();
-  }
-
-  /**
-   * Gets the URL for the hold state.
-   *
-   * @return the URL of the hold state, if any, for this operation
-   */
-  public String getHoldStateUserInterfaceUrl() {
-    return holdStateUserInterfaceUrl;
-  }
-
-  public void setHoldStateUserInterfaceUrl(String holdStateUserInterfaceUrl) {
-    this.holdStateUserInterfaceUrl = holdStateUserInterfaceUrl;
-  }
-
-  /**
-   * Returns the title for the link to this operations hold state UI, a default String if no title is set.
-   *
-   * @return title to be displayed
-   */
-  public String getHoldActionTitle() {
-    return holdActionTitle;
-  }
-
-  /**
-   * Set the title for the link to this operations hold state UI, a default String if no title is set.
-   */
-  public void setHoldActionTitle(String title) {
-    this.holdActionTitle = title;
   }
 
   /** The workflow to run if an exception is thrown while this operation is running. */

@@ -93,7 +93,6 @@ import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowListener;
 import org.opencastproject.workflow.api.WorkflowOperationDefinition;
 import org.opencastproject.workflow.api.WorkflowOperationDefinitionImpl;
-import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
@@ -1634,18 +1633,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         // Set abortable and continuable to default values
         currentOperation.setContinuable(result.allowsContinue());
         currentOperation.setAbortable(result.allowsAbort());
-
-        ResumableWorkflowOperationHandler resumableHandler = (ResumableWorkflowOperationHandler) handler;
-        try {
-          String url = resumableHandler.getHoldStateUserInterfaceURL(workflow);
-          if (url != null) {
-            String holdActionTitle = resumableHandler.getHoldActionTitle();
-            currentOperation.setHoldActionTitle(holdActionTitle);
-            currentOperation.setHoldStateUserInterfaceUrl(url);
-          }
-        } catch (WorkflowOperationException e) {
-          logger.warn(e, "unable to replace workflow ID in the hold state URL");
-        }
 
         workflow.setState(PAUSED);
         currentOperation.setState(OperationState.PAUSED);
