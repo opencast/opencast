@@ -12,6 +12,9 @@ import { updateAssets } from '../../../../thunks/eventDetailsThunks';
  */
 const EventDetailsAssetsAddAsset = ({ eventId, t, setHierarchy, updateAssets }) => {
 
+    // Get upload assets that are not of type track
+    const uploadAssets = uploadAssetOptions.filter(asset => asset.type !== 'track');
+
     const openSubTab = (subTabName) => {
         setHierarchy(subTabName);
     }
@@ -58,12 +61,12 @@ const EventDetailsAssetsAddAsset = ({ eventId, t, setHierarchy, updateAssets }) 
                                         {/* file select for upload for different types of assets */}
                                         <table className="main-tbl">
                                             <tbody>
-                                                {uploadAssetOptions.length === 0 ? (
+                                                {uploadAssets.length === 0 ? (
                                                     <tr>
                                                         <td>{t('EVENTS.EVENTS.NEW.UPLOAD_ASSET.NO_OPTIONS')}</td>
                                                     </tr>
                                                 ) : (
-                                                    uploadAssetOptions.map((asset, key) => (
+                                                    uploadAssets.map((asset, key) => (
                                                         <tr key={key}>
                                                             <td> {asset.id}
                                                                 <span className="ui-helper-hidden">
