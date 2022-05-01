@@ -13,7 +13,7 @@
     "i18next-browser-languagedetector": "^6.1.4",
     "iframe-resizer": "^4.3.2",
     "query-string": "^7.1.1",
-    "react": "^18.0.0",
+    "react": "^18.1.0",
     "react-bootstrap": "^2.2.3",
     "react-dom": "^18.0.0",
     "react-helmet": "^6.1.0",
