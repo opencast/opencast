@@ -63,7 +63,6 @@ import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
@@ -148,7 +147,7 @@ public class WorkflowInstance {
           orphanRemoval = true,
           fetch = FetchType.LAZY
   )
-  @OrderColumn
+  @OrderColumn(name = "position")
   protected List<WorkflowOperationInstance> operations;
 
   @ElementCollection
@@ -166,9 +165,6 @@ public class WorkflowInstance {
 
   @Column(name = "seriesId", length = 128)
   protected String seriesId;
-
-  @Transient
-  protected boolean initialized = false;
 
   public enum WorkflowState {
     INSTANTIATED, RUNNING, STOPPED, PAUSED, SUCCEEDED, FAILED, FAILING;
@@ -373,11 +369,9 @@ public class WorkflowInstance {
    * @see org.opencastproject.workflow.api.WorkflowInstance#getOperations()
    */
   public List<WorkflowOperationInstance> getOperations() {
-    if (operations == null)
+    if (operations == null) {
       operations = new ArrayList<>();
-    if (!initialized)
-      init();
-
+    }
     return operations;
   }
 
@@ -387,23 +381,10 @@ public class WorkflowInstance {
    * @param workflowOperationInstanceList
    */
   public final void setOperations(List<WorkflowOperationInstance> workflowOperationInstanceList) {
-    for (int i = 0; i < workflowOperationInstanceList.size(); i++) {
-      workflowOperationInstanceList.get(i).setWorkflowInstance(this);
+    for (var workflowOperationInstance : workflowOperationInstanceList) {
+      workflowOperationInstance.setWorkflowInstance(this);
     }
     this.operations = workflowOperationInstanceList;
-    init();
-  }
-
-  protected void init() {
-    if (operations == null || operations.isEmpty())
-      return;
-
-    // Operation's position, so we fix it here
-    for (int i = 0; i < operations.size(); i++) {
-      operations.get(i).setPosition(i);
-    }
-
-    initialized = true;
   }
 
   /**
@@ -514,24 +495,21 @@ public class WorkflowInstance {
 
 
   public void extend(WorkflowDefinition workflowDefinition) {
-    if (!workflowDefinition.getOperations().isEmpty()) {
-      for (WorkflowOperationDefinition entry : workflowDefinition.getOperations()) {
-        operations.add(new WorkflowOperationInstance(entry, -1));
-      }
-      setOperations(operations);
-
-      setTemplate(workflowDefinition.getId());
+    for (var operation : workflowDefinition.getOperations()) {
+      var operationInstance = new WorkflowOperationInstance(operation);
+      operationInstance.setWorkflowInstance(this);
+      operations.add(operationInstance);
     }
+    setTemplate(workflowDefinition.getId());
   }
 
   public void insert(WorkflowDefinition workflowDefinition, WorkflowOperationInstance after) {
-    if (!workflowDefinition.getOperations().isEmpty() && after.getPosition() >= 0) {
-      int offset = 0;
-      for (WorkflowOperationDefinition entry : workflowDefinition.getOperations()) {
-        offset++;
-        operations.add(after.getPosition() + offset, new WorkflowOperationInstance(entry, -1));
-      }
-      setOperations(operations);
+    var index = operations.indexOf(after) + 1;
+    for (var operation : workflowDefinition.getOperations()) {
+      var operationInstance = new WorkflowOperationInstance(operation);
+      operationInstance.setWorkflowInstance(this);
+      operations.add(index, operationInstance);
+      index++;
     }
   }
 }

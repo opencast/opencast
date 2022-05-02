@@ -132,11 +132,10 @@ public final class XmlWorkflowParser {
   public static WorkflowInstance parseWorkflowInstance(InputStream in) throws WorkflowParsingException {
     try {
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      JaxbWorkflowInstance jaxbWorkflow = unmarshaller.unmarshal(XmlSafeParser.parse(in), JaxbWorkflowInstance.class)
-              .getValue();
-      WorkflowInstance workflow = jaxbWorkflow.toWorkflowInstance();
-      workflow.init();
-      return workflow;
+      return unmarshaller
+          .unmarshal(XmlSafeParser.parse(in), JaxbWorkflowInstance.class)
+          .getValue()
+          .toWorkflowInstance();
     } catch (Exception e) {
       throw new WorkflowParsingException(e);
     } finally {

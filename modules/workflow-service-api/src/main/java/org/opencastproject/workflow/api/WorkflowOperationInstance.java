@@ -126,9 +126,6 @@ public class WorkflowOperationInstance implements Configurable {
   @ManyToOne(fetch = FetchType.LAZY)
   private WorkflowInstance instance;
 
-  /** The position of this operation in the workflow instance */
-  protected int position;
-
   /**
    * No-arg constructor needed for JAXB serialization
    */
@@ -142,12 +139,9 @@ public class WorkflowOperationInstance implements Configurable {
    *
    * @param def
    *          the workflow definition
-   * @param position
-   *          the operation's position within the workflow
    */
-  public WorkflowOperationInstance(WorkflowOperationDefinition def, int position) {
+  public WorkflowOperationInstance(WorkflowOperationDefinition def) {
     this();
-    this.position = position;
     setTemplate(def.getId());
     setState(OperationState.INSTANTIATED);
     setDescription(def.getDescription());
@@ -395,21 +389,6 @@ public class WorkflowOperationInstance implements Configurable {
     return dateCompleted;
   }
 
-  /** The position of this workflow operation in the workflow instance */
-  public int getPosition() {
-    return position;
-  }
-
-  /**
-   * Sets the workflow operation's position within the workflow.
-   *
-   * @param position
-   *          the position
-   */
-  public void setPosition(int position) {
-    this.position = position;
-  }
-
   /**
    * Returns either <code>null</code> or <code>true</code> to have the operation executed. Any other value is
    * interpreted as <code>false</code> and will skip the operation.
@@ -571,37 +550,10 @@ public class WorkflowOperationInstance implements Configurable {
   /**
    * {@inheritDoc}
    *
-   * @see java.lang.Object#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    return position;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (o instanceof WorkflowOperationInstance) {
-      WorkflowOperationInstance other = (WorkflowOperationInstance) o;
-      return other.getTemplate().equals(this.getTemplate()) && other.getPosition() == this.position;
-    } else {
-      return false;
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
-    return "operation:'" + template + "', position:" + position + ", state:'" + this.state + "'";
+    return "operation:'" + template +  ", state:'" + this.state + "'";
   }
 }
