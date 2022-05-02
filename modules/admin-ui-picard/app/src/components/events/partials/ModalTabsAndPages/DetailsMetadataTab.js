@@ -13,7 +13,7 @@ import {hasAccess} from "../../../../utils/utils";
 /**
  * This component renders metadata details of a certain event or series
  */
-const DetailsMetadataTab = ({ metadataFields, updateResource, resourceId, buttonLabel, header, editAccessRole, user }) => {
+const DetailsMetadataTab = ({ metadataFields, updateResource, resourceId, header, editAccessRole, user }) => {
     const { t } = useTranslation();
 
     const handleSubmit = values => {
@@ -109,7 +109,7 @@ const DetailsMetadataTab = ({ metadataFields, updateResource, resourceId, button
                                                                 inactive: !checkValidity(formik)
                                                             }
                                                         )}>
-                                                    {t(buttonLabel)}
+                                                    {t('SAVE')}
                                                 </button>
                                                 <button className="cancel"
                                                         onClick={() => formik.resetForm({values: ''})}>

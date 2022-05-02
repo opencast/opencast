@@ -188,7 +188,6 @@ const EventDetails = ({ tabIndex, eventId, close,
                         <DetailsMetadataTab metadataFields={metadata}
                             resourceId={eventId}
                             header={tabs[page].bodyHeaderTranslation}
-                            buttonLabel='SAVE'
                             updateResource={updateMetadata}
                             editAccessRole='ROLE_UI_EVENTS_DETAILS_METADATA_EDIT'/>
                     )}
@@ -197,7 +196,6 @@ const EventDetails = ({ tabIndex, eventId, close,
                             resourceId={eventId}
                             metadata={extendedMetadata}
                             updateResource={updateExtendedMetadata}
-                            buttonLabel='SAVE'
                             editAccessRole='ROLE_UI_EVENTS_DETAILS_METADATA_EDIT'/>
                     )}
                     {page === 2 && (

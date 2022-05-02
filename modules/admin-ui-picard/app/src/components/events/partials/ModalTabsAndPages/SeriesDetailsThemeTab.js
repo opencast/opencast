@@ -74,7 +74,7 @@ const SeriesDetailsThemeTab = ({ theme, seriesId, themeNames, updateTheme, user 
                                                                 inactive: !checkValidity(formik)
                                                             }
                                                         )}>
-                                                    {t('EVENTS.SERIES.DETAILS.METADATA.REPLACE_SERIES_THEME')}
+                                                    {t('SAVE')}
                                                 </button>
                                                 <button onClick={() => formik.resetForm({values: ''})}
                                                         className="cancel">
