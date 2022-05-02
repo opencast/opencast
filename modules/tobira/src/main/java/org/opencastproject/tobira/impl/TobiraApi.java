@@ -32,6 +32,7 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.workspace.api.Workspace;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -62,6 +63,7 @@ public class TobiraApi {
 
   private SearchService searchService;
   private SeriesService seriesService;
+  private Workspace workspace;
 
   @Activate
   public void activate(BundleContext bundleContext) {
@@ -74,6 +76,10 @@ public class TobiraApi {
 
   public void setSeriesService(SeriesService service) {
     this.seriesService = service;
+  }
+
+  public void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
   }
 
   @GET
@@ -128,7 +134,7 @@ public class TobiraApi {
 
     try {
       var json = Harvest.harvest(
-          preferredAmount, new Date(since), searchService, seriesService);
+          preferredAmount, new Date(since), searchService, seriesService, workspace);
 
       return Response.ok()
           .type(APPLICATION_JSON_TYPE)

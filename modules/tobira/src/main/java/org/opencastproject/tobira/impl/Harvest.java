@@ -27,6 +27,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.Jsons;
+import org.opencastproject.workspace.api.Workspace;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,8 @@ final class Harvest {
       int preferredAmount,
       Date since,
       SearchService searchService,
-      SeriesService seriesService
+      SeriesService seriesService,
+      Workspace workspace
   ) throws UnauthorizedException, SeriesException {
     // Retrieve episodes from index.
     //
@@ -133,7 +135,7 @@ final class Harvest {
           final var lastSeriesModifiedDate = rawSeries.get(rawSeries.size() - 1).getModifiedDate();
           return !event.getModified().after(lastSeriesModifiedDate);
         })
-        .map(event -> new Item(event));
+        .map(event -> new Item(event, workspace));
 
     final var seriesItems = rawSeries.stream()
         .limit(preferredAmount)

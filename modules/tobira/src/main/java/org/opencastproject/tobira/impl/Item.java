@@ -24,12 +24,16 @@ package org.opencastproject.tobira.impl;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_DESCRIPTION;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.series.api.Series;
 import org.opencastproject.util.Jsons;
+import org.opencastproject.workspace.api.Workspace;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +41,9 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -52,7 +58,7 @@ class Item {
   private Jsons.Val obj;
 
   /** Converts a event into the corresponding JSON representation */
-  Item(SearchResultItem event) {
+  Item(SearchResultItem event, Workspace workspace) {
     this.modifiedDate = event.getModified();
 
     if (event.getDeletionDate() != null) {
@@ -64,57 +70,14 @@ class Item {
     } else {
       final var mp = event.getMediaPackage();
 
-      // Find a suitable thumbnail.
-      // TODO: This certainly has to be improved in the future.
-      final var thumbnail = Arrays.stream(mp.getAttachments())
-          .filter(a -> a.getFlavor().getSubtype().equals("player+preview"))
-          .map(a -> a.getURI().toString())
-          .findFirst()
-          .orElse(null);
-
-      // Obtain JSON array of tracks.
-      final List<Jsons.Val> tracks = Arrays.stream(mp.getTracks())
-          .map(track -> {
-            var videoStreams = TrackSupport.byType(track.getStreams(), VideoStream.class);
-            var resolution = Jsons.NULL;
-            if (videoStreams.length > 0) {
-              final var stream = videoStreams[0];
-              resolution = Jsons.arr(Jsons.v(stream.getFrameWidth()), Jsons.v(stream.getFrameHeight()));
-
-              if (videoStreams.length > 1) {
-                logger.warn(
-                    "Track of event {} has more than one video stream; we will ignore all but the first",
-                    event.getId()
-                );
-              }
-            }
-
-            return Jsons.obj(
-                Jsons.p("uri", track.getURI().toString()),
-                Jsons.p("mimetype", track.getMimeType().toString()),
-                Jsons.p("flavor", track.getFlavor().toString()),
-                Jsons.p("resolution", resolution)
-            );
-          })
-          .collect(Collectors.toCollection(ArrayList::new));
+      // Load DC catalog. We error if there is none defined for this event as I can't think of
+      // anything sensible we could do.
+      final var dcc = DublinCoreUtil.loadEpisodeDublinCore(workspace, mp)
+          .orError(new RuntimeException("Event has no dublin core catalog"))
+          .get();
 
       // Figure out whether this is a live event
       final var isLive = Arrays.stream(mp.getTracks()).anyMatch(track -> track.isLive());
-
-      // Assemble ACL
-      final var canReadRoles = new ArrayList<Jsons.Val>();
-      final var canWriteRoles = new ArrayList<Jsons.Val>();
-      for (final var entry: event.getAccessControlList().getEntries()) {
-        if (entry.getAction().equals(Permissions.Action.READ.toString())) {
-          canReadRoles.add(Jsons.v(entry.getRole()));
-        } else if (entry.getAction().equals(Permissions.Action.WRITE.toString())) {
-          canWriteRoles.add(Jsons.v(entry.getRole()));
-        }
-      }
-      final var acl = Jsons.obj(
-          Jsons.p("read", Jsons.arr(canReadRoles)),
-          Jsons.p("write", Jsons.arr(canWriteRoles))
-      );
 
       final var creators = Arrays.stream(mp.getCreators())
           .map(creator -> Jsons.v(creator))
@@ -123,19 +86,148 @@ class Item {
       this.obj = Jsons.obj(
           Jsons.p("kind", "event"),
           Jsons.p("id", event.getId()),
-          Jsons.p("title", event.getDcTitle()),
+          Jsons.p("title", mp.getTitle()),
           Jsons.p("partOf", event.getDcIsPartOf()),
           Jsons.p("description", event.getDcDescription()),
           Jsons.p("created", event.getDcCreated().getTime()),
           Jsons.p("creators", Jsons.arr(creators)),
           Jsons.p("duration", Math.max(0, event.getDcExtent())),
-          Jsons.p("thumbnail", thumbnail),
-          Jsons.p("tracks", Jsons.arr(tracks)),
-          Jsons.p("acl", acl),
+          Jsons.p("thumbnail", findThumbnail(mp)),
+          Jsons.p("timelinePreview", findTimelinePreview(mp)),
+          Jsons.p("tracks", Jsons.arr(assembleTracks(event, mp))),
+          Jsons.p("acl", assembleAcl(event)),
           Jsons.p("isLive", isLive),
+          Jsons.p("metadata", dccToMetadata(dcc)),
           Jsons.p("updated", event.getModified().getTime())
       );
     }
+  }
+
+  /** Assembles the object containing all additional metadata. */
+  private static Jsons.Obj dccToMetadata(DublinCoreCatalog dcc) {
+    /** Metadata fields from dcterms that we already handle elsewhere. Therefore, we don't need to
+      * include them here again. */
+    final var ignoredDcFields = Set.of(new String[] {
+        "created", "creator", "title", "extent", "isPartOf", "description", "identifier",
+    });
+
+    final var namespaces = new HashMap<String, ArrayList<Jsons.Prop>>();
+
+    for (final var e : dcc.getValues().entrySet()) {
+      final var key = e.getKey();
+
+      // We special case dcterms here to get a smaller, easier to read JSON. In most cases, this
+      // will be the only namespace.
+      final var ns = key.getNamespaceURI().equals("http://purl.org/dc/terms/")
+          ? "dcterms"
+          : key.getNamespaceURI();
+      final var fields = namespaces.computeIfAbsent(ns, k -> new ArrayList<>());
+
+      // We skip fields that we already include elsewhere.
+      if (ns.equals("dcterms") && ignoredDcFields.contains(key.getLocalName())) {
+        continue;
+      }
+
+      final var values = e.getValue().stream()
+          .map(v -> Jsons.v(v.getValue()))
+          .collect(Collectors.toCollection(ArrayList::new));
+      final var field = Jsons.p(e.getKey().getLocalName(), Jsons.arr(values));
+      fields.add(field);
+    }
+
+    final var fields = namespaces.entrySet().stream()
+        .map(e -> {
+          final var obj = Jsons.obj(e.getValue().toArray(new Jsons.Prop[0]));
+          return Jsons.p(e.getKey(), obj);
+        })
+        .toArray(Jsons.Prop[]::new);
+
+    return Jsons.obj(fields);
+  }
+
+  private static Jsons.Obj assembleAcl(SearchResultItem event) {
+    final var canReadRoles = new ArrayList<Jsons.Val>();
+    final var canWriteRoles = new ArrayList<Jsons.Val>();
+    for (final var entry: event.getAccessControlList().getEntries()) {
+      if (entry.getAction().equals(Permissions.Action.READ.toString())) {
+        canReadRoles.add(Jsons.v(entry.getRole()));
+      } else if (entry.getAction().equals(Permissions.Action.WRITE.toString())) {
+        canWriteRoles.add(Jsons.v(entry.getRole()));
+      }
+    }
+    return Jsons.obj(
+        Jsons.p("read", Jsons.arr(canReadRoles)),
+        Jsons.p("write", Jsons.arr(canWriteRoles))
+    );
+  }
+
+  private static List<Jsons.Val> assembleTracks(SearchResultItem event, MediaPackage mp) {
+    return Arrays.stream(mp.getTracks())
+        .map(track -> {
+          var videoStreams = TrackSupport.byType(track.getStreams(), VideoStream.class);
+          var resolution = Jsons.NULL;
+          if (videoStreams.length > 0) {
+            final var stream = videoStreams[0];
+            resolution = Jsons.arr(Jsons.v(stream.getFrameWidth()), Jsons.v(stream.getFrameHeight()));
+
+            if (videoStreams.length > 1) {
+              logger.warn(
+                  "Track of event {} has more than one video stream; we will ignore all but the first",
+                  event.getId()
+              );
+            }
+          }
+
+          return Jsons.obj(
+              Jsons.p("uri", track.getURI().toString()),
+              Jsons.p("mimetype", track.getMimeType().toString()),
+              Jsons.p("flavor", track.getFlavor().toString()),
+              Jsons.p("resolution", resolution)
+          );
+        })
+        .collect(Collectors.toCollection(ArrayList::new));
+  }
+
+  private static String findThumbnail(MediaPackage mp) {
+    // Find a suitable thumbnail.
+    // TODO: This certainly has to be improved in the future.
+    return Arrays.stream(mp.getAttachments())
+        .filter(a -> a.getFlavor().getSubtype().equals("player+preview"))
+        .map(a -> a.getURI().toString())
+        .findFirst()
+        .orElse(null);
+  }
+
+  private static Jsons.Val findTimelinePreview(MediaPackage mp) {
+    return Arrays.stream(mp.getAttachments())
+        .filter(a -> a.getFlavor().getSubtype().equals("timeline+preview"))
+        .map(a -> {
+          final var props = a.getProperties();
+          final var imageCountX = props.get("imageSizeX");
+          final var imageCountY = props.get("imageSizeY");
+          final var resolutionX = props.get("resolutionX");
+          final var resolutionY = props.get("resolutionY");
+
+          final var anyNull = imageCountX == null
+              || imageCountY == null
+              || resolutionX == null
+              || resolutionY == null;
+
+          if (anyNull) {
+            return null;
+          }
+
+          return (Jsons.Val) Jsons.obj(
+            Jsons.p("url", a.getURI().toString()),
+            Jsons.p("imageCountX", imageCountX),
+            Jsons.p("imageCountY", imageCountY),
+            Jsons.p("resolutionX", resolutionX),
+            Jsons.p("resolutionY", resolutionY)
+          );
+        })
+        .filter(o -> o != null)
+        .findFirst()
+        .orElse(Jsons.NULL);
   }
 
   /** Converts a series into the corresponding JSON representation */
