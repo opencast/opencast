@@ -93,13 +93,15 @@ import {
     getSchedulingSource,
     getWorkflow,
     getWorkflowDefinitions,
-    getWorkflows
+    getWorkflows, getStatistics
 } from "../selectors/eventDetailsSelectors";
 import {fetchWorkflowDef} from "./workflowThunks";
 import {getWorkflowDef} from "../selectors/workflowSelectors";
 import {logger} from "../utils/logger";
 import {removeNotificationWizardForm} from "../actions/notificationActions";
 import {calculateDuration} from "../utils/dateUtils";
+import moment from "moment";
+import {getCurrentLanguageInformation} from "../utils/utils";
 
 
 // thunks for metadata
@@ -1059,16 +1061,184 @@ export const fetchEventPublications = eventId => async dispatch => {
 
 // thunks for statistics
 
-export const fetchStatistics = eventId => async dispatch => {
-    try {
-        dispatch(loadEventStatisticsInProgress());
+const createXAxisTickCallback = (timeMode, dataResolution, language) => {
 
-        const statistics = ['', ''];
+    return (value, index, ticks) => {
+        let formatString = 'L';
+        if (timeMode === 'year') {
+            formatString = 'MMMM';
+        } else if (timeMode === 'month') {
+            formatString = 'dddd, Do';
+        } else {
+            if (dataResolution === 'hourly') {
+                formatString = 'LLL';
+            }
+        }
 
-        dispatch(loadEventStatisticsSuccess(statistics, true));
-
-    } catch (e) {
-        dispatch(loadEventStatisticsFailure());
-        logger.error(e);
+        return moment(value).locale(language.dateLocale.code).format(formatString);
     }
+}
+
+const createTooltipCallback = (chooseMode, dataResolution, language) => {
+    return (tooltipItem) => {
+        const date = tooltipItem.title;
+
+        let formatString;
+        if (chooseMode === 'year') {
+            formatString = 'MMMM YYYY';
+        } else if (chooseMode === 'month') {
+            formatString = 'dddd, MMMM Do, YYYY';
+        } else {
+            if (dataResolution === 'monthly') {
+                formatString = 'MMMM YYYY';
+            } else if (dataResolution === 'yearly') {
+                formatString = 'YYYY';
+            } else if (dataResolution === 'daily') {
+                formatString = 'dddd, MMMM Do, YYYY';
+            } else {
+                formatString = 'dddd, MMMM Do, YYYY HH:mm';
+            }
+        }
+        const finalDate = moment(date).locale(language.dateLocale.code).format(formatString);
+        return finalDate + ': ' + tooltipItem.value;
+    }
+}
+
+export const fetchStatistics = eventId => async (dispatch, getState) => {
+    dispatch(loadEventStatisticsInProgress());
+
+    const state = getState();
+    const statistics = getStatistics(state);
+
+    let params = new URLSearchParams();
+    params.append("resourceType", 'episode');
+
+    axios.get('/admin-ng/statistics/providers.json', {params})
+        .then( response => {
+            const originalDataResolution = 'monthly';
+            const originalTimeMode = 'year';
+            const originalFrom = moment().startOf(originalTimeMode);
+            const originalTo = moment().endOf(originalTimeMode);
+
+            let newStatistics = [];
+            const statisticsValueRequest = [];
+            for(let i = 0; i < response.data.length; i++){
+                if(response.data[i].providerType !== 'timeSeries'){
+                    newStatistics.push({
+                        ...response.data[i],
+
+                    });
+                } else {
+                    let from;
+                    let to;
+                    let timeMode;
+                    let dataResolution;
+
+                    if (statistics.length > i) {
+                        from = statistics[i].from;
+                        to = statistics[i].to;
+                        timeMode = statistics[i].timeMode;
+                        dataResolution = statistics[i].dataResolution;
+                    } else {
+                        from = originalFrom.format('YYYY-MM-DD');
+                        to = originalTo.format('YYYY-MM-DD');
+                        timeMode = originalTimeMode;
+                        dataResolution = originalDataResolution;
+                    }
+
+                    // Get info about the current language and its date locale
+                    const currentLanguage = getCurrentLanguageInformation();
+
+                    let options = {
+                        responsive: true,
+                        legend: {
+                            display: false
+                        },
+                        layout: {
+                            padding: {
+                                top: 20,
+                                left: 20,
+                                right: 20
+                            }
+                        },
+                        scales: {
+                            xAxes: [{
+                                ticks: {
+                                    callback: createXAxisTickCallback(timeMode, dataResolution, currentLanguage)
+                                }
+                            }],
+                            y: {
+                                suggestedMin: 0
+                            }
+                        },
+                        tooltips: {
+                            callbacks: {
+                                label: createTooltipCallback(timeMode, dataResolution, currentLanguage)
+                            }
+                        }
+                    };
+
+                    const csvUrlSearchParams = new URLSearchParams({
+                        dataResolution: dataResolution,
+                        providerId: response.data[i].providerId,
+                        resourceId: eventId,
+                        resourceType: 'episode',
+                        from: moment(from).toJSON(),
+                        to: moment(to).endOf('day').toJSON()
+                    });
+
+                    const csvUrl = '/admin-ng/statistics/export.csv?' + csvUrlSearchParams;
+
+                    newStatistics.push({
+                        ...response.data[i],
+                        from: from,
+                        to: to,
+                        timeMode: timeMode,
+                        dataResolution: dataResolution,
+                        options: options,
+                        csvUrl: csvUrl
+                    });
+
+                    statisticsValueRequest.push({
+                        dataResolution: dataResolution,
+                        from: moment(from),
+                        to: moment(to),
+                        resourceId: eventId,
+                        providerId: response.data[i].providerId
+                    })
+                }
+            }
+
+            const requestHeaders = getHttpHeaders();
+            const requestData = new URLSearchParams({
+                data: JSON.stringify(statisticsValueRequest)
+            })
+
+            axios.post('/admin-ng/statistics/data.json', requestData, requestHeaders)
+                .then(dataResponse => {
+                    for(const statisticsValue of dataResponse.data){
+                        const stat = newStatistics.find(element => element.providerId === statisticsValue.providerId);
+
+                        const statistic = {
+                            ...stat,
+                            values: statisticsValue.values,
+                            labels: statisticsValue.labels,
+                            totalValue: statisticsValue.total
+                        }
+
+                        newStatistics = newStatistics.map(oldStat => oldStat === stat ? statistic : oldStat);
+                        dispatch(loadEventStatisticsSuccess(newStatistics, false));
+                    }
+                })
+                .catch()
+
+        })
+        .catch( response => {
+            dispatch(loadEventStatisticsFailure(true));
+            logger.error(response);
+        });
+}
+
+export const fetchStatisticsValueUpdate = (provider, from, to, dataResolution, timeMode) => async (dispatch, getState) => {
+    return
 }

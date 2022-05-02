@@ -60,6 +60,6 @@ export const getPublications = state => state.eventDetails.publications;
 
 /* selectors for statistics */
 export const hasStatistics = state => state.eventDetails.statistics.length > 0;
-export const getStatistics = state => state.eventDetails.statistics.length;
+export const getStatistics = state => state.eventDetails.statistics;
 export const hasStatisticsError = state => state.eventDetails.hasStatisticsError;
 export const isFetchingStatistics = state => state.eventDetails.fetchingStatisticsInProgress;

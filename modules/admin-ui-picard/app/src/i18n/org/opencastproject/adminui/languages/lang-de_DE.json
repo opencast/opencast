@@ -2131,6 +2131,11 @@
       "NAVIGATION": {
          "ORGANIZATION": "Organisation"
       },
+      "TIME_MODES": {
+         "Year": "Jahr",
+         "Month": "Monat",
+         "Custom": "Benutzerdefiniert"
+      },
       "TITLE": {
          "RANDOM": "Zufallsdaten",
          "VIEWS_SUM": "Zugriffe",

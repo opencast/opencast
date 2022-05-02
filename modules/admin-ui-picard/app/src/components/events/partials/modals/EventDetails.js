@@ -77,7 +77,7 @@ const EventDetails = ({ tabIndex, eventId, close,
             tabNameTranslation: 'EVENTS.EVENTS.DETAILS.TABS.EXTENDED-METADATA',
             accessRole: 'ROLE_UI_EVENTS_DETAILS_METADATA_VIEW',
             name: 'metadata-extended',
-            hidden: !(extendedMetadata.length > 0)
+            hidden: !extendedMetadata || !(extendedMetadata.length > 0)
         },
         {
             tabNameTranslation: 'EVENTS.EVENTS.DETAILS.TABS.PUBLICATIONS',

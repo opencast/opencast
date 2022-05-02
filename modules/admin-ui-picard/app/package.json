@@ -10,6 +10,8 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
+    "chart.js": "2.9.4",
+    "react-chartjs-3": "^2.7.7",
     "array-move": "^3.0.1",
     "axios": "^0.21.1",
     "classnames": "^2.2.6",

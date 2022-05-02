@@ -2131,6 +2131,11 @@
       "NAVIGATION": {
          "ORGANIZATION": "ארגון"
       },
+      "TIME_MODES": {
+         "Year": "Year",
+         "Month": "Month",
+         "Custom": "Custom"
+      },
       "TITLE": {
          "RANDOM": "מידע אקראי",
          "VIEWS_SUM": "מספר צפיות כללי",
