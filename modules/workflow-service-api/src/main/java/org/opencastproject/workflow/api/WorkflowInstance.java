@@ -21,11 +21,10 @@
 
 package org.opencastproject.workflow.api;
 
-import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.FAILED;
 import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.INSTANTIATED;
+import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.PAUSED;
 import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.RETRY;
-import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.SKIPPED;
-import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.SUCCEEDED;
+import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.RUNNING;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageException;
@@ -408,77 +407,30 @@ public class WorkflowInstance {
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the workflow operation that is currently active or next to be executed.
    *
-   * @see org.opencastproject.workflow.api.WorkflowInstance#getCurrentOperation()
+   * @return the current operation
    */
-  public WorkflowOperationInstance getCurrentOperation() throws IllegalStateException {
-    if (!initialized)
+  public WorkflowOperationInstance getCurrentOperation() {
+    if (!initialized) {
       init();
-
-    if (operations == null || operations.isEmpty())
-      throw new IllegalStateException("Workflow " + workflowId + " has no operations");
-
-    WorkflowOperationInstance currentOperation = null;
-
-    // Handle newly instantiated workflows
-    if (INSTANTIATED.equals(operations.get(0).getState()) || RETRY.equals(operations.get(0).getState())) {
-      currentOperation = operations.get(0);
-    } else {
-      WorkflowOperationInstance.OperationState previousState = null;
-
-      int position = 0;
-      while (currentOperation == null && position < operations.size()) {
-
-        WorkflowOperationInstance operation = operations.get(position);
-
-        switch (operation.getState()) {
-          case FAILED:
-            break;
-          case RETRY:
-          case INSTANTIATED:
-            if (SUCCEEDED.equals(previousState) || SKIPPED.equals(previousState) || FAILED.equals(previousState))
-              currentOperation = operation;
-            break;
-          case PAUSED:
-            currentOperation = operation;
-            break;
-          case RUNNING:
-            currentOperation = operation;
-            break;
-          case SKIPPED:
-            break;
-          case SUCCEEDED:
-            break;
-          default:
-            throw new IllegalStateException("Found operation in unknown state '" + operation.getState() + "'");
-        }
-
-        previousState = operation.getState();
-        position++;
-      }
-
-      // If we are at the last operation and there is no more work to do, we're done
-      if (operations.get(operations.size() - 1) == currentOperation) {
-        switch (currentOperation.getState()) {
-          case FAILED:
-          case SKIPPED:
-          case SUCCEEDED:
-            currentOperation = null;
-            break;
-          case INSTANTIATED:
-          case PAUSED:
-          case RUNNING:
-          case RETRY:
-            break;
-          default:
-            throw new IllegalStateException("Found operation in unknown state '" + currentOperation.getState() + "'");
-        }
-      }
-
+    }
+    logger.debug("operations: {}", operations);
+    if (operations == null) {
+      return null;
     }
 
-    return currentOperation;
+    // Find first operation to work on. This should be the first one in state RUNNING; PAUSED, INSTANTIATED or RETRY.
+    // If one is active right now, it should be RUNNING or PAUSED.
+    // If none is active right now, it should be INSTANTIATED or RETRY as this should be the next one being run.
+    var currentStates = List.of(RUNNING, PAUSED, RETRY, INSTANTIATED);
+    for (var operation : operations) {
+      if (currentStates.contains(operation.getState())) {
+        logger.debug("current operation: {}", operation);
+        return operation;
+      }
+    }
+    return null;
   }
 
   public Map<String, String> getConfigurations() {
