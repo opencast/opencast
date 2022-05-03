@@ -93,6 +93,8 @@ export const LOAD_EVENT_WORKFLOW_ERROR_DETAILS_FAILURE = 'LOAD_EVENT_WORKFLOW_ER
 export const LOAD_EVENT_STATISTICS_IN_PROGRESS = 'LOAD_EVENT_STATISTICS_IN_PROGRESS';
 export const LOAD_EVENT_STATISTICS_SUCCESS = 'LOAD_EVENT_STATISTICS_SUCCESS';
 export const LOAD_EVENT_STATISTICS_FAILURE = 'LOAD_EVENT_STATISTICS_FAILURE';
+export const UPDATE_EVENT_STATISTICS_SUCCESS = 'LOAD_EVENT_STATISTICS_SUCCESS';
+export const UPDATE_EVENT_STATISTICS_FAILURE = 'LOAD_EVENT_STATISTICS_FAILURE';
 
 
 // Actions affecting fetching of event details from server
@@ -503,4 +505,15 @@ export const loadEventStatisticsFailure = (hasError) => ({
     payload: {
         hasError
     }
+});
+
+export const updateEventStatisticsSuccess = ( statistics ) => ({
+    type: UPDATE_EVENT_STATISTICS_SUCCESS,
+    payload: {
+        statistics
+    }
+});
+
+export const updateEventStatisticsFailure = () => ({
+    type: UPDATE_EVENT_STATISTICS_FAILURE
 });

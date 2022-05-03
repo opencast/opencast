@@ -75,7 +75,7 @@ import {
     saveEventSchedulingInProgress,
     loadEventStatisticsInProgress,
     loadEventStatisticsSuccess,
-    loadEventStatisticsFailure,
+    loadEventStatisticsFailure, updateEventStatisticsSuccess, updateEventStatisticsFailure,
 } from '../actions/eventDetailsActions';
 import {addNotification} from "./notificationThunks";
 import {
@@ -1061,6 +1061,7 @@ export const fetchEventPublications = eventId => async dispatch => {
 
 // thunks for statistics
 
+/* creates callback function for formatting the labels of the xAxis in a statistics diagram */
 const createXAxisTickCallback = (timeMode, dataResolution, language) => {
 
     return (value, index, ticks) => {
@@ -1070,18 +1071,25 @@ const createXAxisTickCallback = (timeMode, dataResolution, language) => {
         } else if (timeMode === 'month') {
             formatString = 'dddd, Do';
         } else {
-            if (dataResolution === 'hourly') {
+            if (dataResolution === 'yearly') {
+                formatString = 'YYYY';
+            } else if (dataResolution === 'monthly') {
+                    formatString = 'MMMM';
+            } else if (dataResolution === 'daily') {
+                formatString = 'MMMM Do, YYYY';
+            } else if (dataResolution === 'hourly') {
                 formatString = 'LLL';
             }
         }
 
-        return moment(value).locale(language.dateLocale.code).format(formatString);
+        return moment(value).locale(language).format(formatString);
     }
 }
 
+/* creates callback function for the displayed label when hovering over a data point in a statistics diagram */
 const createTooltipCallback = (chooseMode, dataResolution, language) => {
     return (tooltipItem) => {
-        const date = tooltipItem.title;
+        const date = tooltipItem.label;
 
         let formatString;
         if (chooseMode === 'year') {
@@ -1089,32 +1097,87 @@ const createTooltipCallback = (chooseMode, dataResolution, language) => {
         } else if (chooseMode === 'month') {
             formatString = 'dddd, MMMM Do, YYYY';
         } else {
-            if (dataResolution === 'monthly') {
-                formatString = 'MMMM YYYY';
-            } else if (dataResolution === 'yearly') {
+            if (dataResolution === 'yearly') {
                 formatString = 'YYYY';
+            } else if (dataResolution === 'monthly') {
+                    formatString = 'MMMM YYYY';
             } else if (dataResolution === 'daily') {
                 formatString = 'dddd, MMMM Do, YYYY';
             } else {
                 formatString = 'dddd, MMMM Do, YYYY HH:mm';
             }
         }
-        const finalDate = moment(date).locale(language.dateLocale.code).format(formatString);
+        const finalDate = moment(date).locale(language).format(formatString);
         return finalDate + ': ' + tooltipItem.value;
     }
+}
+
+/* creates options for statistics chart */
+const createChartOptions = (timeMode, dataResolution) => {
+
+    // Get info about the current language and its date locale
+    const currentLanguage = getCurrentLanguageInformation().dateLocale.code;
+
+    return {
+        responsive: true,
+        legend: {
+            display: false
+        },
+        layout: {
+            padding: {
+                top: 20,
+                left: 20,
+                right: 20
+            }
+        },
+        scales: {
+            xAxes: [{
+                ticks: {
+                    callback: createXAxisTickCallback(timeMode, dataResolution, currentLanguage)
+                }
+            }],
+            y: {
+                suggestedMin: 0
+            }
+        },
+        tooltips: {
+            callbacks: {
+                label: createTooltipCallback(timeMode, dataResolution, currentLanguage)
+            }
+        }};
+}
+
+/* creates the url for downloading a csv file with current statistics */
+const createDownloadUrl = (eventId, providerId, from, to, dataResolution) => {
+    const csvUrlSearchParams = new URLSearchParams({
+        dataResolution: dataResolution,
+        providerId: providerId,
+        resourceId: eventId,
+        resourceType: 'episode',
+        from: moment(from).toJSON(),
+        to: moment(to).endOf('day').toJSON()
+    });
+
+    return '/admin-ng/statistics/export.csv?' + csvUrlSearchParams;
+
 }
 
 export const fetchStatistics = eventId => async (dispatch, getState) => {
     dispatch(loadEventStatisticsInProgress());
 
+    // get prior statistics
     const state = getState();
     const statistics = getStatistics(state);
 
+    // create url params
     let params = new URLSearchParams();
     params.append("resourceType", 'episode');
 
+    // get the available statistics providers from API
     axios.get('/admin-ng/statistics/providers.json', {params})
         .then( response => {
+
+            // default values to use, when statistics are viewed the first time
             const originalDataResolution = 'monthly';
             const originalTimeMode = 'year';
             const originalFrom = moment().startOf(originalTimeMode);
@@ -1122,18 +1185,23 @@ export const fetchStatistics = eventId => async (dispatch, getState) => {
 
             let newStatistics = [];
             const statisticsValueRequest = [];
+
+            // iterate over statistics providers
             for(let i = 0; i < response.data.length; i++){
+
+                // currently only time series data can be displayed, for other types, add data directly, then continue
                 if(response.data[i].providerType !== 'timeSeries'){
                     newStatistics.push({
-                        ...response.data[i],
-
+                        ...response.data[i]
                     });
-                } else {
+                } else { // case: provider is of type time series
                     let from;
                     let to;
                     let timeMode;
                     let dataResolution;
 
+                    /* if old values for this statistic exist, use old
+                    from (date), to (date), timeMode and dataResolution values, otherwise use defaults */
                     if (statistics.length > i) {
                         from = statistics[i].from;
                         to = statistics[i].to;
@@ -1146,49 +1214,11 @@ export const fetchStatistics = eventId => async (dispatch, getState) => {
                         dataResolution = originalDataResolution;
                     }
 
-                    // Get info about the current language and its date locale
-                    const currentLanguage = getCurrentLanguageInformation();
+                    // create chart options and download url
+                    const options = createChartOptions(timeMode, dataResolution);
+                    const csvUrl = createDownloadUrl(eventId, response.data[i].providerId, from, to, dataResolution);
 
-                    let options = {
-                        responsive: true,
-                        legend: {
-                            display: false
-                        },
-                        layout: {
-                            padding: {
-                                top: 20,
-                                left: 20,
-                                right: 20
-                            }
-                        },
-                        scales: {
-                            xAxes: [{
-                                ticks: {
-                                    callback: createXAxisTickCallback(timeMode, dataResolution, currentLanguage)
-                                }
-                            }],
-                            y: {
-                                suggestedMin: 0
-                            }
-                        },
-                        tooltips: {
-                            callbacks: {
-                                label: createTooltipCallback(timeMode, dataResolution, currentLanguage)
-                            }
-                        }
-                    };
-
-                    const csvUrlSearchParams = new URLSearchParams({
-                        dataResolution: dataResolution,
-                        providerId: response.data[i].providerId,
-                        resourceId: eventId,
-                        resourceType: 'episode',
-                        from: moment(from).toJSON(),
-                        to: moment(to).endOf('day').toJSON()
-                    });
-
-                    const csvUrl = '/admin-ng/statistics/export.csv?' + csvUrlSearchParams;
-
+                    // add provider to statistics list and add statistic settings
                     newStatistics.push({
                         ...response.data[i],
                         from: from,
@@ -1199,46 +1229,119 @@ export const fetchStatistics = eventId => async (dispatch, getState) => {
                         csvUrl: csvUrl
                     });
 
+                    // add settings for this statistic of this event to value request
                     statisticsValueRequest.push({
                         dataResolution: dataResolution,
                         from: moment(from),
-                        to: moment(to),
+                        to: moment(to).endOf('day'),
                         resourceId: eventId,
                         providerId: response.data[i].providerId
-                    })
+                    });
                 }
             }
 
+            // prepare header and data for statistics values request
             const requestHeaders = getHttpHeaders();
             const requestData = new URLSearchParams({
                 data: JSON.stringify(statisticsValueRequest)
-            })
+            });
 
+            // request statistics values from API
             axios.post('/admin-ng/statistics/data.json', requestData, requestHeaders)
                 .then(dataResponse => {
+                    // iterate over value responses
                     for(const statisticsValue of dataResponse.data){
+                        // get the statistic the response is meant for
                         const stat = newStatistics.find(element => element.providerId === statisticsValue.providerId);
 
+                        // add values to statistic
                         const statistic = {
                             ...stat,
                             values: statisticsValue.values,
                             labels: statisticsValue.labels,
                             totalValue: statisticsValue.total
-                        }
+                        };
 
+                        // put updated statistic into statistics list
                         newStatistics = newStatistics.map(oldStat => oldStat === stat ? statistic : oldStat);
+
+                        // put statistics list into redux store
                         dispatch(loadEventStatisticsSuccess(newStatistics, false));
                     }
                 })
-                .catch()
+                .catch(response => {
+                    // put unfinished statistics list into redux store but set flag that an error occurred
+                    dispatch(loadEventStatisticsSuccess(newStatistics, true));
+                    logger.error(response);
+                });
 
         })
         .catch( response => {
+            // getting statistics from API failed
             dispatch(loadEventStatisticsFailure(true));
             logger.error(response);
         });
 }
 
-export const fetchStatisticsValueUpdate = (provider, from, to, dataResolution, timeMode) => async (dispatch, getState) => {
-    return
+export const fetchStatisticsValueUpdate = (eventId, providerId, from, to, dataResolution, timeMode) => async (dispatch, getState) => {
+    // get prior statistics
+    const state = getState();
+    const statistics = getStatistics(state);
+
+    // settings for this statistic of this event for value request
+    const statisticsValueRequest = [{
+        dataResolution: dataResolution,
+        from: moment(from),
+        to: moment(to).endOf('day'),
+        resourceId: eventId,
+        providerId: providerId
+    }];
+
+    // prepare header and data for statistic values request
+    const requestHeaders = getHttpHeaders();
+    const requestData = new URLSearchParams({
+        data: JSON.stringify(statisticsValueRequest)
+    });
+
+    // request statistic values from API
+    axios.post('/admin-ng/statistics/data.json', requestData, requestHeaders)
+        .then(dataResponse => {
+
+            // if only one element is in the response (as expected), get the response
+            if(dataResponse.data.length === 1){
+                const newStatisticData = dataResponse.data[0];
+
+                // get the statistic the response is meant for out of the statistics list
+                const stat = statistics.find(element => element.providerId === providerId);
+
+                // get statistic options and download url for new statistic settings
+                const options = createChartOptions(timeMode, dataResolution);
+                const csvUrl = createDownloadUrl(eventId, providerId, from, to, dataResolution);
+
+                // update statistic
+                const statistic = {
+                    ...stat,
+                    from: from,
+                    to: to,
+                    dataResolution: dataResolution,
+                    timeMode: timeMode,
+                    options: options,
+                    csvUrl: csvUrl,
+                    values: newStatisticData.values,
+                    labels: newStatisticData.labels,
+                    totalValue: newStatisticData.total
+                }
+
+                // put updated statistic into statistics list
+                const newStatistics = statistics.map(oldStat => oldStat === stat ? statistic : oldStat);
+
+                // put updates statistics list into redux store
+                dispatch(updateEventStatisticsSuccess(newStatistics));
+            }
+        })
+        .catch(response => {
+            // getting new statistic values from API failed
+            dispatch(updateEventStatisticsFailure());
+            logger.error(response);
+        });
 }

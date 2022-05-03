@@ -11,7 +11,7 @@ import BarChart from "./BarChart";
 /**
  * This component visualizes statistics with data of type time series
  */
-const TimeSeriesStatistics = ({ t, statTitle, providerId, fromDate, toDate, timeMode, dataResolution,
+const TimeSeriesStatistics = ({ t, eventId, statTitle, providerId, fromDate, toDate, timeMode, dataResolution,
                                   statDescription, onChange, exportUrl, exportFileName, totalValue, sourceData,
                                   chartLabels, chartOptions}) => {
 
@@ -80,6 +80,7 @@ const TimeSeriesStatistics = ({ t, statTitle, providerId, fromDate, toDate, time
     // Get info about the current language and its date locale
     const currentLanguage = getCurrentLanguageInformation();
 
+    // change formik values and get new statistic values from API
     const change = (setFormikValue, timeMode, from, to, dataResolution) => {
         if (timeMode === 'year' || timeMode === 'month') {
             from = moment(from).clone().startOf(timeMode).format('YYYY-MM-DD')
@@ -90,42 +91,51 @@ const TimeSeriesStatistics = ({ t, statTitle, providerId, fromDate, toDate, time
             dataResolution = fixedDataResolutions[timeMode];
         }
 
-        onChange(providerId, from, to, dataResolution, timeMode);
+        onChange(eventId, providerId, from, to, dataResolution, timeMode);
     };
 
+    // change time mode in formik and get new values from API
     const changeTimeMode = async (newTimeMode, setFormikValue, from, to, dataResolution) => {
         setFormikValue('timeMode', newTimeMode);
         change(setFormikValue, newTimeMode, from, to, dataResolution);
     };
 
+    // change custom from date in formik and get new values from API
     const changeFrom = async (newFrom, setFormikValue, timeMode, to, dataResolution) => {
         setFormikValue('fromDate', newFrom);
         change(setFormikValue, timeMode, newFrom, to, dataResolution);
     };
 
+    // change custom to date in formik and get new values from API
     const changeTo = async (newTo, setFormikValue, timeMode, from, dataResolution) => {
         setFormikValue('toDate', newTo);
         change(setFormikValue, timeMode, from, newTo, dataResolution);
     };
 
+    // change custom time granularity in formik and get new values from API
     const changeGranularity = async (granularity, setFormikValue, timeMode, from, to) => {
         setFormikValue('dataResolution', granularity);
         change(setFormikValue, timeMode, from, to, granularity);
     };
 
+    // get localized time
     const localizedMoment = (m) => {
         return moment(m).locale(currentLanguage.dateLocale.code);
     };
-    const selectedName = (from, timeMode) => {
+
+    // format selected time to display as name of timeframe
+    const formatSelectedTimeframeName = (from, timeMode) => {
         return localizedMoment(from).format(formatStrings[timeMode]);
     };
 
+    // change to and from dates in formik to previous timeframe and get new values from API
     const selectPrevious = (setFormikValue, from, timeMode, dataResolution) => {
         const newFrom = moment(from).subtract(1, timeMode + 's').format('YYYY-MM-DD');
         const to = newFrom;
         change(setFormikValue, timeMode, newFrom, to, dataResolution);
     };
 
+    // change to and from dates in formik to next timeframe and get new values from API
     const selectNext = (setFormikValue, from, timeMode, dataResolution) => {
         const newFrom = moment(from).add(1, timeMode + 's').format('YYYY-MM-DD');
         const to = newFrom;
@@ -198,7 +208,7 @@ const TimeSeriesStatistics = ({ t, statTitle, providerId, fromDate, toDate, time
                                            formik.values.timeMode, formik.values.dataResolution)
                                        }
                                 />
-                                <div>{selectedName(formik.values.fromDate, formik.values.timeMode)}</div>
+                                <div>{formatSelectedTimeframeName(formik.values.fromDate, formik.values.timeMode)}</div>
                                 <a className="navigation next"
                                    onClick={() =>
                                        selectNext(formik.setFieldValue, formik.values.fromDate,

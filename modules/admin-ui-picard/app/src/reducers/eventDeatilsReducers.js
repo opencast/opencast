@@ -74,7 +74,7 @@ import {
     SAVE_EVENT_SCHEDULING_FAILURE,
     LOAD_EVENT_STATISTICS_IN_PROGRESS,
     LOAD_EVENT_STATISTICS_FAILURE,
-    LOAD_EVENT_STATISTICS_SUCCESS,
+    LOAD_EVENT_STATISTICS_SUCCESS, UPDATE_EVENT_STATISTICS_SUCCESS, UPDATE_EVENT_STATISTICS_FAILURE,
 } from '../actions/eventDetailsActions';
 
 // Initial state of event details in redux store
@@ -893,6 +893,18 @@ const eventDetails = (state=initialState, action) => {
                 fetchingStatisticsInProgress: false,
                 statistics: [],
                 hasStatisticsError: hasError
+            };
+        }
+        case UPDATE_EVENT_STATISTICS_SUCCESS: {
+            const { statistics } = payload;
+            return {
+                ...state,
+                statistics: statistics
+            };
+        }
+        case UPDATE_EVENT_STATISTICS_FAILURE: {
+            return {
+                ...state
             };
         }
         default:

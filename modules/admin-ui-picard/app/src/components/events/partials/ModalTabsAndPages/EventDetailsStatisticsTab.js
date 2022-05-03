@@ -46,6 +46,7 @@ const EventDetailsStatisticsTab = ({ eventId, header, t,
                                     <div className="obj-container">
                                         <TimeSeriesStatistics
                                             t={t}
+                                            eventId={eventId}
                                             statTitle={t(stat.title)}
                                             providerId={stat.providerId}
                                             fromDate={stat.from}
@@ -86,7 +87,7 @@ const mapStateToProps = state => ({
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    recalculateStatistics: (provider, from, to, dataResolution, timeMode) => dispatch(/*todo: statReusable.recalculate*/fetchStatisticsValueUpdate(provider, from, to, dataResolution, timeMode)),
+    recalculateStatistics: (eventId, providerId, from, to, dataResolution, timeMode) => dispatch(fetchStatisticsValueUpdate(eventId, providerId, from, to, dataResolution, timeMode)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EventDetailsStatisticsTab);
