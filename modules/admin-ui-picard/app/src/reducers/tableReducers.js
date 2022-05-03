@@ -13,7 +13,7 @@ import {
     SET_SORT_BY,
     SET_TOTAL_ITEMS,
     UPDATE_PAGESIZE,
-} from "../actions/tableActions";
+} from '../actions/tableActions';
 
 /*
 Overview of the structure of the data in arrays in state

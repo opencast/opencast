@@ -1,5 +1,10 @@
 import {serversTableConfig} from "../configs/tableConfigs/serversTableConfig";
-import {LOAD_SERVERS_FAILURE, LOAD_SERVERS_IN_PROGRESS, LOAD_SERVERS_SUCCESS} from "../actions/serverActions";
+import {
+    LOAD_SERVERS_FAILURE,
+    LOAD_SERVERS_IN_PROGRESS,
+    LOAD_SERVERS_SUCCESS,
+    SET_SERVER_COLUMNS
+} from '../actions/serverActions';
 
 /**
  * This file contains redux reducer for actions affecting the state of servers
@@ -8,7 +13,7 @@ import {LOAD_SERVERS_FAILURE, LOAD_SERVERS_IN_PROGRESS, LOAD_SERVERS_SUCCESS} fr
 // Fill columns initially with columns defined in serversTableConfig
 const initialColumns = serversTableConfig.columns.map(column =>
     ({
-        name: column.name,
+        ...column,
         deactivated: false
     }));
 
@@ -49,6 +54,13 @@ const servers = (state=initialState, action) =>{
             return {
                 ...state,
                 isLoading: false
+            }
+        }
+        case SET_SERVER_COLUMNS: {
+            const { updatedColumns } = payload;
+            return {
+                ...state,
+                columns: updatedColumns
             }
         }
         default:

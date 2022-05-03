@@ -7,6 +7,10 @@ export const LOAD_SERVERS_IN_PROGRESS = 'LOAD_SERVERS_IN_PROGRESS';
 export const LOAD_SERVERS_SUCCESS = 'LOAD_SERVERS_SUCCESS';
 export const LOAD_SERVERS_FAILURE = 'LOAD_SERVERS_FAILURE';
 
+
+// Constants of action types affecting UI
+export const SET_SERVER_COLUMNS = 'SET_SERVER_COLUMNS';
+
 // Actions affecting fetching servers from server
 
 export const loadServersInProgress = () => ({
@@ -20,4 +24,11 @@ export const loadServersSuccess = servers => ({
 
 export const loadServersFailure = () => ({
     type: LOAD_SERVERS_FAILURE
+});
+
+// Actions affecting UI
+
+export const setServerColumns = updatedColumns => ({
+    type: SET_SERVER_COLUMNS,
+    payload: { updatedColumns }
 });

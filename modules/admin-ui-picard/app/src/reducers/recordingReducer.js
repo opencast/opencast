@@ -2,8 +2,9 @@ import {recordingsTableConfig} from "../configs/tableConfigs/recordingsTableConf
 import {
     LOAD_RECORDINGS_FAILURE,
     LOAD_RECORDINGS_IN_PROGRESS,
-    LOAD_RECORDINGS_SUCCESS
-} from "../actions/recordingActions";
+    LOAD_RECORDINGS_SUCCESS,
+    SET_RECORDINGS_COLUMNS
+} from '../actions/recordingActions';
 
 /**
  * This file contains redux reducer for actions affecting the state of recordings
@@ -12,8 +13,8 @@ import {
 // Fill columns initially with columns defined in recordingsTableConfig
 const initialColumns = recordingsTableConfig.columns.map(column =>
     ({
-    name: column.name,
-    deactivated: false
+        ...column,
+        deactivated: false
     }));
 
 // Initial state of recordings in redux store
@@ -53,6 +54,13 @@ const recordings = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false
+            }
+        }
+        case SET_RECORDINGS_COLUMNS: {
+            const { updatedColumns } = payload;
+            return {
+                ...state,
+                columns: updatedColumns
             }
         }
         default:

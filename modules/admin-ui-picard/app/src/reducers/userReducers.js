@@ -1,5 +1,10 @@
 import {usersTableConfig} from "../configs/tableConfigs/usersTableConfig";
-import {LOAD_USERS_FAILURE, LOAD_USERS_IN_PROGRESS, LOAD_USERS_SUCCESS} from "../actions/userActions";
+import {
+    LOAD_USERS_FAILURE,
+    LOAD_USERS_IN_PROGRESS,
+    LOAD_USERS_SUCCESS,
+    SET_USER_COLUMNS
+} from '../actions/userActions';
 
 /**
  * This file contains redux reducer for actions affecting the state of users
@@ -8,7 +13,7 @@ import {LOAD_USERS_FAILURE, LOAD_USERS_IN_PROGRESS, LOAD_USERS_SUCCESS} from "..
 // Fill columns initially with columns defined in usersTableConfig
 const initialColumns = usersTableConfig.columns.map(column =>
     ({
-        name: column.name,
+        ...column,
         deactivated: false
     }));
 
@@ -49,6 +54,13 @@ const users = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false
+            }
+        }
+        case SET_USER_COLUMNS: {
+            const { updatedColumns } = payload;
+            return {
+                ...state,
+                columns: updatedColumns
             }
         }
         default:

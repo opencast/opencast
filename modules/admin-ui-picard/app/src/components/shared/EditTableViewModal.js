@@ -4,6 +4,11 @@ import arrayMove from "array-move";
 import {useTranslation} from "react-i18next";
 import {connect} from "react-redux";
 import {changeColumnSelection} from "../../thunks/tableThunks";
+import {
+    getActivatedColumns,
+    getDeactivatedColumns,
+    getResourceType
+} from '../../selectors/tableSelectors';
 
 
 /**
@@ -46,13 +51,15 @@ const EditTableViewModal = ({  showModal, handleClose, resource, activeColumns, 
     // save new values of which columns are active or deactivated and apply changes to table
     const save = () => {
         const settings = activeCols.concat(deactivatedCols);
-        changeSelectedColumns({columns: settings});
+        changeSelectedColumns(settings);
+        close();
     };
 
     // reset active and deactivated columns to how they were when the dialogue was opened (used when closing without saving)
     const clearData = () => {
         setActiveColumns(originalActiveColumns);
         setDeactivatedColumns(originalDeactivatedColumns);
+        close();
     };
 
     // change column order based on where column was dragged and dropped
@@ -61,7 +68,6 @@ const EditTableViewModal = ({  showModal, handleClose, resource, activeColumns, 
     };
 
     return (
-        // todo: add hotkeys
         <>
         {showModal && (
             <>
@@ -93,8 +99,7 @@ const EditTableViewModal = ({  showModal, handleClose, resource, activeColumns, 
                                                         <li className="drag-item" key={key}>
                                                             <div
                                                                 className="title">{t(column.label)}</div>
-                                                            <a className="move-item add"
-                                                               onClick={() => changeColumn(column, false)}></a>
+                                                            <a className="move-item add" onClick={() => changeColumn(column, false)}/>
                                                         </li> :
                                                         null
                                                 )
@@ -146,17 +151,13 @@ const EditTableViewModal = ({  showModal, handleClose, resource, activeColumns, 
 
                     <footer>
                         <div className="pull-left">
-                            <button onClick={() => {
-                                clearData();
-                                close();
-                            }} className="cancel active">{t('CANCEL')/*<!--Cancel-->*/}</button>
+                            <button onClick={() => clearData()} className="cancel active">{t('CANCEL')/*<!--Cancel-->*/}</button>
                         </div>
                         <div className="pull-right">
-                            {/* <a ng-click="initialize()" class="cancel" translate="RESET">Reset</a> */}
-                            <button onClick={() => {
-                                save();
-                                close();
-                            }} className="submit active">{t('SAVE')/* Save As Default */}</button>
+                            <button onClick={() => save()}
+                                    className="submit active">
+                                {t('SAVE')/* Save As Default */}
+                            </button>
                         </div>
                     </footer>
                 </section>
@@ -168,14 +169,14 @@ const EditTableViewModal = ({  showModal, handleClose, resource, activeColumns, 
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    resource: state.table.resource,
-    deactivatedColumns: state.table.columns.filter(column => column.deactivated),
-    activeColumns: state.table.columns.filter(column => !column.deactivated)
+    resource: getResourceType(state),
+    deactivatedColumns: getDeactivatedColumns(state),
+    activeColumns: getActivatedColumns(state)
 });
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    changeSelectedColumns: selectedColumns => dispatch(changeColumnSelection(selectedColumns))
+    changeSelectedColumns: updatedColumns => dispatch(changeColumnSelection(updatedColumns))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditTableViewModal);

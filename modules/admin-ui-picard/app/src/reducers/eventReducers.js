@@ -3,7 +3,7 @@ import {
     LOAD_EVENT_METADATA_IN_PROGRESS, LOAD_EVENT_METADATA_SUCCESS,
     LOAD_EVENTS_FAILURE,
     LOAD_EVENTS_IN_PROGRESS,
-    LOAD_EVENTS_SUCCESS,
+    LOAD_EVENTS_SUCCESS, SET_EVENT_COLUMN_DEACTIVATED, SET_EVENT_COLUMNS, SET_EVENT_SELECTED,
     SHOW_ACTIONS_EVENTS
 } from '../actions/eventActions';
 import {eventsTableConfig} from "../configs/tableConfigs/eventsTableConfig";
@@ -15,7 +15,7 @@ import {eventsTableConfig} from "../configs/tableConfigs/eventsTableConfig";
 // Fill columns initially with columns defined in eventsTableConfig
 const initialColumns = eventsTableConfig.columns.map(column =>
     ({
-        name: column.name,
+        ...column,
         deactivated: false
     }));
 
@@ -65,6 +65,28 @@ const events = (state=initialState, action) => {
             return {
                 ...state,
                 showActions: isShowing
+            }
+        }
+        case SET_EVENT_COLUMNS: {
+            const { updatedColumns } = payload;
+            return {
+                ...state,
+                columns: updatedColumns
+            }
+        }
+        case SET_EVENT_SELECTED: {
+            const { id } = payload;
+            return {
+                ...state,
+                rows: state.rows.map(row => {
+                    if (row.id === id) {
+                        return {
+                            ...row,
+                            selected: !row.selected
+                        }
+                    }
+                    return row;
+                })
             }
         }
         case LOAD_EVENT_METADATA_IN_PROGRESS: {

@@ -1,5 +1,10 @@
 import {groupsTableConfig} from "../configs/tableConfigs/groupsTableConfig";
-import {LOAD_GROUPS_FAILURE, LOAD_GROUPS_IN_PROGRESS, LOAD_GROUPS_SUCCESS} from "../actions/groupActions";
+import {
+    LOAD_GROUPS_FAILURE,
+    LOAD_GROUPS_IN_PROGRESS,
+    LOAD_GROUPS_SUCCESS,
+    SET_GROUP_COLUMNS
+} from '../actions/groupActions';
 
 /**
  * This file contains redux reducer for actions affecting the state of groups
@@ -8,7 +13,7 @@ import {LOAD_GROUPS_FAILURE, LOAD_GROUPS_IN_PROGRESS, LOAD_GROUPS_SUCCESS} from 
 // Fill columns initially with columns defined in groupsTableConfig
 const initialColumns = groupsTableConfig.columns.map(column =>
     ({
-        name: column.name,
+        ...column,
         deactivated: false
     }));
 
@@ -49,6 +54,13 @@ const groups = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false
+            }
+        }
+        case SET_GROUP_COLUMNS: {
+            const { updatedColumns } = payload;
+            return {
+                ...state,
+                columns: updatedColumns
             }
         }
         default:
