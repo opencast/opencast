@@ -247,7 +247,14 @@
      "ADOPTER_PROFILE_UPDATED": "Profile information successfully updated.",
      "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
      "ADOPTER_PROFILE_DELETED": "Profile information successfully deleted.",
-     "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!"
+     "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!",
+     "TOBIRA_NO_TITLE": "Page needs a title",
+     "TOBIRA_NO_PATH_SEGMENT": "Page needs a path segment",
+     "TOBIRA_NOT_MOUNTED": "Series could not be mounted in Tobira",
+     "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%\/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
+     "TOBIRA_PATH_SEGMENT_UNIQUE": "The path segment of a page must be unqiue among all its sibling pages.",
+     "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
+     "TOBIRA_SERVER_ERROR":" Error talking to Tobira. Contact your system administrator and/or try again later."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
@@ -1116,6 +1123,20 @@
            "TITLE": "Theme",
            "LABEL": "Please select a theme",
            "EMPTY": "No theme found"
+         },
+         "TOBIRA": {
+           "CAPTION": "Tobira",
+           "DESCRIPTION": "Here you can select where you want the series to show up in the Tobira video portal. You can only select one location here, and it needs to be empty (marked in bold). You can create new pages here, but note that they are only persisted if they are on the path to the selected page.",
+           "SELECT_PAGE": "Select a target page",
+           "PAGE_TITLE": "Page title",
+           "PATH_SEGMENT": "Path segment",
+           "CHILDREN": "Children",
+           "ADD_CHILD": "Add child",
+           "CANCEL": "Cancel",
+           "HOMEPAGE": "Homepage",
+           "SELECTED_PAGE": "Series will be mounted unter the following path",
+           "NO_PAGE_SELECTED": "No page selected. Series will not be mounted in Tobira.",
+           "PATH": "Path"
          },
          "SUMMARY": {
            "CAPTION": "Summary"

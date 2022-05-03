@@ -1829,28 +1829,19 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public String createSeries(String metadata)
+  public String createSeries(JSONObject metadata)
           throws IllegalArgumentException, IndexServiceException, UnauthorizedException {
-    JSONObject metadataJson;
-    try {
-      metadataJson = (JSONObject) new JSONParser().parse(metadata);
-    } catch (Exception e) {
-      throw new IllegalArgumentException("Unable to parse metadata" + metadata, e);
-    }
 
-    if (metadataJson == null)
-      throw new IllegalArgumentException("No metadata set to create series");
-
-    JSONArray seriesMetadataJson = (JSONArray) metadataJson.get("metadata");
+    JSONArray seriesMetadataJson = (JSONArray) metadata.get("metadata");
     if (seriesMetadataJson == null)
       throw new IllegalArgumentException("No metadata field in metadata");
 
-    JSONObject options = (JSONObject) metadataJson.get("options");
+    JSONObject options = (JSONObject) metadata.get("options");
     if (options == null)
       throw new IllegalArgumentException("No options field in metadata");
 
     Opt<Long> themeId = Opt.none();
-    Long theme = (Long) metadataJson.get("theme");
+    Long theme = (Long) metadata.get("theme");
     if (theme != null) {
       themeId = Opt.some(theme);
     }
@@ -1877,7 +1868,7 @@ public class IndexServiceImpl implements IndexService {
       DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata);
     }
 
-    AccessControlList acl = getAccessControlList(metadataJson);
+    AccessControlList acl = getAccessControlList(metadata);
 
     String seriesId;
     try {
