@@ -59,10 +59,20 @@ export const loadEventsIntoTable = () => async (dispatch, getState) => {
     const total = events.total;
 
     const pagination = table.pagination;
-    const resource = events.results.map((result) => {
-        return {
-            ...result,
-            selected: false
+    // check which events are currently selected
+    const resource = events.results.map(result => {
+        const current = table.rows.find(row => row.id === result.id);
+
+        if (!!current && table.resource === 'events') {
+            return {
+                ...result,
+                selected: current.selected
+            }
+        } else {
+            return {
+                ...result,
+                selected: false
+            }
         }
     });
 
@@ -96,10 +106,20 @@ export const loadSeriesIntoTable = () => (dispatch, getState) => {
     const total = series.total;
     const pagination = table.pagination;
 
+    // check which events are currently selected
     const resource = series.results.map((result) => {
-        return {
-            ...result,
-            selected: false
+        const current = table.rows.find(row => row.id === result.id);
+
+        if (!!current && table.resource === 'series') {
+            return {
+                ...result,
+                selected: current.selected
+            }
+        } else {
+            return {
+                ...result,
+                selected: false
+            }
         }
     });
 
