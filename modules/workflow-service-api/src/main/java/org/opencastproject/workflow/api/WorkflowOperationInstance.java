@@ -78,9 +78,9 @@ public class WorkflowOperationInstance implements Configurable {
           name = "oc_workflow_operation_configuration",
           joinColumns = @JoinColumn(name = "workflow_operation_id")
   )
-  @MapKeyColumn(name = "key_part", nullable = false)
+  @MapKeyColumn(name = "configuration_key", nullable = false)
   @Lob
-  @Column(name = "value_part")
+  @Column(name = "configuration_value")
   protected Map<String, String> configurations;
 
   @Column(name = "failOnError")

@@ -286,7 +286,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
     if (instancesInSolr == 0) {
       logger.info("The workflow index is empty, looking for workflows to index");
-      // this may be a new index, so get all of the existing workflows and index them
+      // this may be a new index, so get all existing workflows and index them
       List<WorkflowInstance> workflowInstances;
       try {
         workflowInstances = persistence.getAllWorkflowInstancesOrganizationIndependent();

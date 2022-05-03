@@ -341,13 +341,11 @@ public class WorkflowInstance {
 
   public MediaPackage getMediaPackage()  {
     try {
-      if (mediaPackage == null) {
-        return null;
+      if (mediaPackage != null) {
+        return MediaPackageParser.getFromXml(mediaPackage);
       }
-      return MediaPackageParser.getFromXml(mediaPackage);
     } catch (MediaPackageException e) {
-      // TODO: Error handling
-      logger.error("Error: ", e);
+      logger.error("Error parsing media package in workflow instance", e);
     }
     return null;
   }

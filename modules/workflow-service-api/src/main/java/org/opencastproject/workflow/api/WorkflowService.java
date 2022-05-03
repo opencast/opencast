@@ -344,8 +344,26 @@ public interface WorkflowService {
    */
   Map<String, Map<String, String>> getWorkflowStateMappings();
 
+  /**
+   * Returns if a workflow is active on a given event.
+   *
+   * @param mediaPackageId
+   *          Media package identifier to look for.
+   * @return If a workflow is active on the given event.
+   * @throws WorkflowDatabaseException
+   *          If the data could not be retrieved from the database.
+   */
   boolean mediaPackageHasActiveWorkflows(String mediaPackageId) throws WorkflowDatabaseException;
 
+  /**
+   * Return a list of all workflows run on a specific media package.
+   *
+   * @param mediaPackageId
+   *          Media package identifier to look for.
+   * @return List of run workflows.
+   * @throws WorkflowDatabaseException
+   *          If the data could not be retrieved from the database.
+   */
   List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId) throws WorkflowDatabaseException;
 
   /**
