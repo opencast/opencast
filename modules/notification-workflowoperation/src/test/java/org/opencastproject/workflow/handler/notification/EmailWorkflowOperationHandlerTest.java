@@ -77,7 +77,7 @@ public class EmailWorkflowOperationHandlerTest {
     operationHandler = new EmailWorkflowOperationHandler();
 
     EmailTemplateService emailTemplateService = EasyMock.createMock(EmailTemplateService.class);
-    EasyMock.expect(emailTemplateService.applyTemplate("DCE_workflow_2_body",
+    EasyMock.expect(emailTemplateService.applyTemplate("DCE_workflow_null_body",
             "This is the media package: ${mediaPackage.identifier}", workflowInstance))
             .andReturn("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557");
     EasyMock.expect(emailTemplateService.applyTemplate("template1", null, workflowInstance))

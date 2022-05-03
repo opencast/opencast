@@ -762,11 +762,13 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
     WorkflowOperationInstance operation = workflow.getCurrentOperation();
 
-    if (operation == null)
+    if (operation == null) {
       throw new IllegalStateException("Cannot start a workflow without a current operation");
+    }
 
-    if (operation.getPosition() != 0)
+    if (!operation.equals(workflow.getOperations().get(0))) {
       throw new IllegalStateException("Current operation expected to be first");
+    }
 
     try {
       logger.info("Scheduling workflow %s for execution", workflow.getId());
@@ -811,10 +813,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     WorkflowOperationHandler operationHandler = selectOperationHandler(processingOperation);
     WorkflowOperationWorker worker = new WorkflowOperationWorker(operationHandler, workflow, properties, this);
     workflow = worker.execute();
-
-    // The workflow has been serialized/deserialized in between, so we need to refresh the reference
-    int currentOperationPosition = processingOperation.getPosition();
-    processingOperation = workflow.getOperations().get(currentOperationPosition);
 
     Long currentOperationJobId = processingOperation.getId();
     try {
@@ -1487,18 +1485,19 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    *          the current workflow operation
    * @return the workflow instance
    */
-  protected WorkflowInstance handleOperationException(WorkflowInstance workflow, WorkflowOperationInstance operation) {
-    WorkflowOperationInstance currentOperation = (WorkflowOperationInstance) operation;
+  protected WorkflowInstance handleOperationException(
+      WorkflowInstance workflow,
+      WorkflowOperationInstance currentOperation) {
     int failedAttempt = currentOperation.getFailedAttempts() + 1;
     currentOperation.setFailedAttempts(failedAttempt);
 
     // Operation was aborted by the user, after going into hold state
     if (ERROR_RESOLUTION_HANDLER_ID.equals(currentOperation.getTemplate())
             && OperationState.FAILED.equals(currentOperation.getState())) {
-      int position = currentOperation.getPosition();
+      int position = workflow.getOperations().indexOf(currentOperation);
       // Advance to operation that actually failed
       if (workflow.getOperations().size() > position + 1) { // This should always be true...
-        currentOperation = (WorkflowOperationInstance) workflow.getOperations().get(position + 1);
+        currentOperation = workflow.getOperations().get(position + 1);
         // It's currently in RETRY state, change to FAILED
         currentOperation.setState(OperationState.FAILED);
       }
@@ -1518,10 +1517,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           List<WorkflowOperationInstance> operations = workflow.getOperations();
           WorkflowOperationDefinitionImpl errorResolutionDefinition = new WorkflowOperationDefinitionImpl(
                   ERROR_RESOLUTION_HANDLER_ID, "Error Resolution Operation", "error", false);
-          WorkflowOperationInstance errorResolutionInstance = new WorkflowOperationInstance(
-                  errorResolutionDefinition, currentOperation.getPosition());
+          var errorResolutionInstance = new WorkflowOperationInstance(errorResolutionDefinition);
           errorResolutionInstance.setExceptionHandlingWorkflow(currentOperation.getExceptionHandlingWorkflow());
-          operations.add(currentOperation.getPosition(), errorResolutionInstance);
+          var index = workflow.getOperations().indexOf(currentOperation);
+          operations.add(index, errorResolutionInstance);
           workflow.setOperations(operations);
           break;
         default:
@@ -1611,11 +1610,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     // The action to take
     Action action = result.getAction();
 
-    // Update the workflow configuration. Update the reference to the current operation as well, since the workflow has
-    // been serialized and deserialized in the meantime.
-    int currentOperationPosition = currentOperation.getPosition();
+    // Update the workflow configuration.
     workflow = updateConfiguration(workflow, result.getProperties());
-    currentOperation = (WorkflowOperationInstance) workflow.getOperations().get(currentOperationPosition);
 
     // Adjust workflow statistics
     currentOperation.setTimeInQueue(result.getTimeInQueue());
@@ -1880,7 +1876,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       }
       return null;
     } catch (Exception e) {
-      logger.warn(e, "Exception while accepting job " + job);
+      logger.warn("Exception while accepting job {}", job, e);
       try {
         if (workflowInstance != null) {
           logger.warn("Marking job {} and workflow instance {} as failed", job, workflowInstance);

@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -155,9 +156,9 @@ public class WorkflowInstance {
           name = "oc_workflow_configuration",
           joinColumns = @JoinColumn(name = "workflow_id")
   )
-  @MapKeyColumn(name = "key_part", nullable = false)
+  @MapKeyColumn(name = "configuration_key")
   @Lob
-  @Column(name = "value_part")
+  @Column(name = "configuration_value")
   protected Map<String, String> configurations;
 
   @Column(name = "mediaPackageId", length = 128)
@@ -209,7 +210,7 @@ public class WorkflowInstance {
    * properties.
    */
   public WorkflowInstance(WorkflowDefinition def, MediaPackage mediaPackage, User creator,
-          Organization organization, Map<String, String> properties) {
+          Organization organization, Map<String, String> configuration) {
     this.workflowId = -1; // this should be set by the workflow service once the workflow is persisted
     this.title = def.getTitle();
     this.template = def.getId();
@@ -225,11 +226,9 @@ public class WorkflowInstance {
     this.operations = new ArrayList<>();
     extend(def);
 
-    this.configurations = new TreeMap<>();
-    if (properties != null) {
-      for (Map.Entry<String, String> entry : properties.entrySet()) {
-        addConfiguration(entry.getKey() , entry.getValue());
-      }
+    this.configurations = new HashMap<>();
+    if (configuration != null) {
+      this.configurations.putAll(configuration);
     }
   }
 
@@ -378,7 +377,7 @@ public class WorkflowInstance {
   /**
    * Sets the workflow operations on this workflow instance
    *
-   * @param workflowOperationInstanceList
+   * @param workflowOperationInstanceList List of operations to set.
    */
   public final void setOperations(List<WorkflowOperationInstance> workflowOperationInstanceList) {
     for (var workflowOperationInstance : workflowOperationInstanceList) {
@@ -393,9 +392,6 @@ public class WorkflowInstance {
    * @return the current operation
    */
   public WorkflowOperationInstance getCurrentOperation() {
-    if (!initialized) {
-      init();
-    }
     logger.debug("operations: {}", operations);
     if (operations == null) {
       return null;
@@ -467,10 +463,6 @@ public class WorkflowInstance {
       configurations = new TreeMap<>();
 
     // Adjust already existing values
-    configurations.put(key, value);
-  }
-
-  private void addConfiguration(String key, String value) {
     configurations.put(key, value);
   }
 

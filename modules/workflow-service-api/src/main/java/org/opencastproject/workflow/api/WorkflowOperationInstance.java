@@ -24,6 +24,7 @@ package org.opencastproject.workflow.api;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -291,6 +292,12 @@ public class WorkflowOperationInstance implements Configurable {
     this.state = state;
   }
 
+  /**
+   * Return configuration of this workflow operation as Map.
+   * Guaranteed to be not null
+   *
+   * @return Configuration map
+   */
   public Map<String, String> getConfigurations() {
     return configurations;
   }
@@ -545,6 +552,23 @@ public class WorkflowOperationInstance implements Configurable {
 
   public void setWorkflowInstance(WorkflowInstance instance) {
     this.instance = instance;
+  }
+
+  @Override
+  public int hashCode() {
+    return Long.valueOf(id).hashCode();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o instanceof WorkflowOperationInstance) {
+      WorkflowOperationInstance other = (WorkflowOperationInstance) o;
+      return other.getTemplate().equals(this.getTemplate()) && Objects.equals(other.id, this.id);
+    }
+    return false;
   }
 
   /**

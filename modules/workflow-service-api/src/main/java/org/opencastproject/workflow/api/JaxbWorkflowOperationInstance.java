@@ -87,7 +87,7 @@ public class JaxbWorkflowOperationInstance {
 
   @XmlElement(name = "configuration")
   @XmlElementWrapper(name = "configurations")
-  protected Set<JaxbWorkflowConfiguration> configurations;
+  protected Set<JaxbWorkflowConfiguration> configurations = null;
 
   @XmlAttribute(name = "fail-on-error")
   protected boolean failWorkflowOnException;
@@ -151,13 +151,10 @@ public class JaxbWorkflowOperationInstance {
     this.state = operation.getState();
     this.description = operation.getDescription();
     if (operation.getConfigurations() != null) {
-      this.configurations = Optional.ofNullable(operation.getConfigurations().entrySet())
-              .orElseGet(Collections::emptySet)
-              .stream()
-              .map(config -> new JaxbWorkflowConfiguration(config.getKey(), config.getValue()))
-              .collect(Collectors.toSet());
-    } else {
-      this.configurations = null;
+      this.configurations = operation.getConfigurations().entrySet()
+          .stream()
+          .map(config -> new JaxbWorkflowConfiguration(config.getKey(), config.getValue()))
+          .collect(Collectors.toSet());
     }
     this.failWorkflowOnException = operation.isFailWorkflowOnException();
     this.executeCondition = operation.getExecutionCondition();
