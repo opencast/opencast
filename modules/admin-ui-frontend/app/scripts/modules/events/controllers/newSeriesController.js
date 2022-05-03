@@ -43,7 +43,7 @@ angular.module('adminNg.controllers')
 
     // Post all the information collect by the wizard to create the new series
     $scope.submit = function () {
-      var userdata, metadata = [], options = {}, access, theme, ace;
+      var userdata, metadata = [], options = {}, access, theme, ace, tobiraOptions;
       // assemble the metadata from the two metadata controllers
       pushAllPropertiesIntoArray($scope.states[0].stateController.ud, metadata);
       if ($scope.states[1].name === 'metadata-extended') {
@@ -97,7 +97,7 @@ angular.module('adminNg.controllers')
         }
       };
 
-      // lastly, assemble the theme
+      // assemble the theme
       if ($scope.states[2].name === 'theme') {
         theme = $scope.states[2].stateController.ud.theme;
       }
@@ -108,11 +108,40 @@ angular.module('adminNg.controllers')
         userdata.theme = Number(theme);
       }
 
+      // assemble Tobira data
+      if ($scope.states[3].name === 'tobira') {
+        tobiraOptions = $scope.states[3].stateController.ud;
+      }
+      else if ($scope.states[4].name === 'tobira'){
+        tobiraOptions = $scope.states[4].stateController.ud;
+      }
+      if (angular.isDefined(tobiraOptions)) {
+        var existingPages = [];
+        var newPages = [];
+        angular.forEach(tobiraOptions.breadcrumbs.concat(tobiraOptions.selectedPage), function (page) {
+          if (page.new) {
+            newPages.push({
+              name: page.title,
+              pathSegment: page.segment,
+            });
+          } else {
+            existingPages.push(page);
+          }
+        });
+        userdata.tobira = {
+          parentPagePath: existingPages.pop().path,
+          newPages: newPages,
+        };
+      }
+
       // Disable submit button to avoid multiple submits
       $scope.states[$scope.states.length - 1].stateController.isDisabled = true;
-      SeriesResource.create({}, userdata, function () {
+      SeriesResource.create({}, userdata, function (response) {
         Table.fetch();
         Notifications.add('success', 'SERIES_ADDED');
+        if (userdata.tobira && !response.mounted) {
+          Notifications.add('warning', 'TOBIRA_NOT_MOUNTED');
+        }
 
         // Reset all states
         angular.forEach($scope.states, function(state)  {

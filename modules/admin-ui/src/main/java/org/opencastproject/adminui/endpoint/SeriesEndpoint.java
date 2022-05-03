@@ -31,6 +31,7 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
@@ -51,6 +52,8 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
+import org.opencastproject.adminui.tobira.TobiraException;
+import org.opencastproject.adminui.tobira.TobiraService;
 import org.opencastproject.adminui.util.QueryPreprocessor;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
@@ -122,6 +125,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
@@ -181,6 +185,8 @@ public class SeriesEndpoint {
   public static final String SERIES_HASEVENTS_DELETE_ALLOW_KEY = "series.hasEvents.delete.allow";
   public static final String SERIESTAB_ONLYSERIESWITHWRITEACCESS_KEY = "seriesTab.onlySeriesWithWriteAccess";
   public static final String EVENTSFILTER_ONLYSERIESWITHWRITEACCESS_KEY = "eventsFilter.onlySeriesWithWriteAccess";
+  public static final String TOBIRA_ORIGIN = "tobira.origin";
+  public static final String TOBIRA_TRUSTED_KEY = "tobira.trustedKey";
 
   private SeriesService seriesService;
   private SecurityService securityService;
@@ -232,6 +238,8 @@ public class SeriesEndpoint {
     return aclServiceFactory.serviceFor(securityService.getOrganization());
   }
 
+  private TobiraService tobira = new TobiraService();
+
   @Activate
   protected void activate(ComponentContext cc, Map<String, Object> properties) {
     if (cc != null) {
@@ -263,6 +271,11 @@ public class SeriesEndpoint {
 
     mapValue = properties.get(EVENTSFILTER_ONLYSERIESWITHWRITEACCESS_KEY);
     onlySeriesWithWriteAccessEventsFilter = BooleanUtils.toBoolean(Objects.toString(mapValue, "true"));
+
+    mapValue = properties.get(TOBIRA_ORIGIN);
+    tobira.setOrigin((String) mapValue);
+    mapValue = properties.get(TOBIRA_TRUSTED_KEY);
+    tobira.setTrustedKey((String) mapValue);
 
     logger.info("Configuration updated");
   }
@@ -497,6 +510,52 @@ public class SeriesEndpoint {
     return Response.ok(themesJson.toJSONString()).build();
   }
 
+  @GET
+  @Path("new/tobira/page")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(
+          name = "getTobiraPage",
+          description = "Returns data about the page tree of a connected Tobira instance for use in the series creation wizard",
+          returnDescription = "Information about a given page in Tobira, and its direct children",
+          restParameters = { @RestParameter(
+                          name = "path",
+                          isRequired = true,
+                          type = STRING,
+                          description = "The path of the page you want information about"
+                  ) },
+          responses = {
+                  @RestResponse(
+                          responseCode = SC_OK,
+                          description = "Data about the given page in Tobira. Note that this does not mean the page exists!"),
+                  @RestResponse(
+                          responseCode = SC_NOT_FOUND,
+                          description = "Nonexistent `path`"),
+                  @RestResponse(
+                          responseCode = SC_BAD_REQUEST,
+                          description = "missing `path`"),
+                  @RestResponse(
+                          responseCode = SC_SERVICE_UNAVAILABLE,
+                          description = "Tobira is not configured (correctly)") })
+  public Response getTobiraPage(@QueryParam("path") String path) throws IOException, InterruptedException {
+    if (path == null) {
+      throw new WebApplicationException("`path` missing", BAD_REQUEST);
+    }
+
+    if (!tobira.ready()) {
+      throw new WebApplicationException("Tobira is not configured (correctly)", Status.SERVICE_UNAVAILABLE);
+    }
+
+    try {
+      var page = (JSONObject) tobira.getPage(path).get("page");
+      if (page == null) {
+        throw new WebApplicationException(NOT_FOUND);
+      }
+      return Response.ok(page.toJSONString()).build();
+    } catch (TobiraException e) {
+      throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   @POST
   @Path("new")
   @RestQuery(name = "createNewSeries", description = "Creates a new series by the given metadata as JSON", returnDescription = "The created series id", restParameters = { @RestParameter(name = "metadata", isRequired = true, description = "The metadata as JSON", type = RestParameter.Type.TEXT) }, responses = {
@@ -505,14 +564,57 @@ public class SeriesEndpoint {
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If user doesn't have rights to create the series") })
   public Response createNewSeries(@FormParam("metadata") String metadata) throws UnauthorizedException {
     try {
-      String seriesId = indexService.createSeries(metadata);
+      JSONObject metadataJson;
+      try {
+        metadataJson = (JSONObject) new JSONParser().parse(metadata);
+      } catch (Exception e) {
+        logger.warn("Unable to parse metadata {}", metadata);
+        throw new IllegalArgumentException("Unable to parse metadata " + metadata, e);
+      }
+
+      if (metadataJson == null) {
+        throw new IllegalArgumentException("No metadata set to create series");
+      }
+
+      String seriesId = indexService.createSeries(metadataJson);
+
+      var mounted = mountSeriesInTobira(seriesId, metadataJson);
+
+      var responseObject = new JSONObject();
+      responseObject.put("id", seriesId);
+      responseObject.put("mounted", mounted);
+
       return Response.created(URI.create(UrlSupport.concat(serverUrl, "admin-ng/series/", seriesId, "metadata.json")))
-              .entity(seriesId).build();
+              .entity(responseObject.toString()).build();
     } catch (IllegalArgumentException e) {
       return RestUtil.R.badRequest(e.getMessage());
     } catch (IndexServiceException e) {
       return RestUtil.R.serverError();
     }
+  }
+
+  private boolean mountSeriesInTobira(String seriesId, JSONObject params) {
+    if (!tobira.ready()) {
+      return false;
+    }
+
+    var tobiraParams = params.get("tobira");
+    if (tobiraParams == null) {
+      return false;
+    }
+    if (!(tobiraParams instanceof JSONObject)) {
+      return false;
+    }
+    var tobiraParamsObject = (JSONObject) tobiraParams;
+    tobiraParamsObject.put("seriesId", seriesId);
+
+    try {
+      tobira.mount(tobiraParamsObject);
+    } catch (TobiraException e) {
+      return false;
+    }
+
+    return true;
   }
 
   @DELETE
