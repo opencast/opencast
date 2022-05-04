@@ -840,7 +840,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         workflow.setState(SUCCEEDED);
         for (WorkflowOperationInstance op : workflow.getOperations()) {
           if (op.getState().equals(WorkflowOperationInstance.OperationState.FAILED)) {
-            if (op.isFailWorkflowOnException()) {
+            if (op.isFailOnError()) {
               workflow.setState(FAILED);
               break;
             }
@@ -1114,7 +1114,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       workflowInstance.setState(SUCCEEDED);
       for (WorkflowOperationInstance op : workflowInstance.getOperations()) {
         if (op.getState().equals(WorkflowOperationInstance.OperationState.FAILED)) {
-          if (op.isFailWorkflowOnException()) {
+          if (op.isFailOnError()) {
             workflowInstance.setState(FAILED);
             break;
           }
@@ -1542,7 +1542,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     String errorDefId = currentOperation.getExceptionHandlingWorkflow();
 
     // Adjust the workflow state according to the setting on the operation
-    if (currentOperation.isFailWorkflowOnException()) {
+    if (currentOperation.isFailOnError()) {
       if (StringUtils.isBlank(errorDefId)) {
         workflow.setState(FAILED);
       } else {
@@ -2384,7 +2384,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       List<WorkflowInstance> workflows;
       do {
         try {
-          workflows = persistence.getAllWorkflowInstances(limit, offset);
+          workflows = persistence.getWorkflowInstances(limit, offset);
         } catch (Exception e) {
           logIndexRebuildError(logger.getSlf4jLogger(), index.getIndexName(), total, current, e);
           throw new IndexRebuildException(index.getIndexName(), getService(), e);

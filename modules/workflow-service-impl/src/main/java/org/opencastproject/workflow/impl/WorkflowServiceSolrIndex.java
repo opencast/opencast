@@ -289,6 +289,8 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       // this may be a new index, so get all existing workflows and index them
       List<WorkflowInstance> workflowInstances;
       try {
+        logger.warn("This will cause issues on large systems. But given that this is about to be removed, I ignore "
+          + "this for now. This needs to be fixed for Opencast 12.");
         workflowInstances = persistence.getAllWorkflowInstancesOrganizationIndependent();
       } catch (WorkflowDatabaseException e) {
         throw new IllegalStateException("Unable to fetch workflows from database", e);

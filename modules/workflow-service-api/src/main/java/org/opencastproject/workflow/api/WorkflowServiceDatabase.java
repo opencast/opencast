@@ -68,7 +68,7 @@ public interface WorkflowServiceDatabase {
    * @throws WorkflowDatabaseException
    *           if there is a problem communicating with the underlying data store
    */
-  List<WorkflowInstance> getAllWorkflowInstances(int limit, int offset) throws WorkflowDatabaseException;
+  List<WorkflowInstance> getWorkflowInstances(int limit, int offset) throws WorkflowDatabaseException;
 
   /**
    * Gets all workflow instances for a mediapackage.

@@ -84,7 +84,7 @@ public class WorkflowOperationInstance implements Configurable {
   protected Map<String, String> configurations;
 
   @Column(name = "failOnError")
-  protected boolean failWorkflowOnException;
+  protected boolean failOnError;
 
   @Column(name = "if_condition")
   protected String executeCondition;
@@ -147,7 +147,7 @@ public class WorkflowOperationInstance implements Configurable {
     setState(OperationState.INSTANTIATED);
     setDescription(def.getDescription());
     setMaxAttempts(def.getMaxAttempts());
-    setFailWorkflowOnException(def.isFailWorkflowOnException());
+    setFailOnError(def.isFailWorkflowOnException());
     setExceptionHandlingWorkflow(def.getExceptionHandlingWorkflow());
     setExecutionCondition(def.getExecutionCondition());
     setSkipCondition(def.getSkipCondition());
@@ -185,7 +185,7 @@ public class WorkflowOperationInstance implements Configurable {
           OperationState state,
           String description,
           Map<String, String> configurations,
-          boolean failWorkflowOnException,
+          boolean failOnError,
           String executeCondition,
           String skipCondition,
           String exceptionHandlingWorkflow,
@@ -203,7 +203,7 @@ public class WorkflowOperationInstance implements Configurable {
     this.state = state;
     this.description = description;
     this.configurations = configurations;
-    this.failWorkflowOnException = failWorkflowOnException;
+    this.failOnError = failOnError;
     this.executeCondition = executeCondition;
     this.skipCondition = skipCondition;
     this.exceptionHandlingWorkflow = exceptionHandlingWorkflow;
@@ -367,12 +367,12 @@ public class WorkflowOperationInstance implements Configurable {
    * If true, this workflow will be put into a failed (or failing, if getExceptionHandlingWorkflow() is not null) state
    * when exceptions are thrown during an operation.
    */
-  public boolean isFailWorkflowOnException() {
-    return failWorkflowOnException;
+  public boolean isFailOnError() {
+    return failOnError;
   }
 
-  public void setFailWorkflowOnException(boolean failWorkflowOnException) {
-    this.failWorkflowOnException = failWorkflowOnException;
+  public void setFailOnError(boolean failOnError) {
+    this.failOnError = failOnError;
   }
 
   /**

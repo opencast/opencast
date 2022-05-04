@@ -2055,7 +2055,7 @@ public abstract class AbstractEventEndpoint {
               f("failed_attempts", v(wflOp.getFailedAttempts())),
               f("max_attempts", v(wflOp.getMaxAttempts())),
               f("exception_handler_workflow", v(wflOp.getExceptionHandlingWorkflow(), Jsons.BLANK)),
-              f("fail_on_error", v(wflOp.isFailWorkflowOnException())),
+              f("fail_on_error", v(wflOp.isFailOnError())),
               f("description", v(wflOp.getDescription(), Jsons.BLANK)),
               f("state", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + wflOp.getState(), Jsons.BLANK)),
               f("job", v(wflOp.getId(), Jsons.BLANK)),

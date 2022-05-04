@@ -151,12 +151,12 @@ public class EmailTemplateServiceImplTest {
 
     WorkflowOperationInstance failedOperation1 = new WorkflowOperationInstance("operation1",
             OperationState.FAILED);
-    failedOperation1.setFailWorkflowOnException(true);
+    failedOperation1.setFailOnError(true);
     failedOperation1.setId(1L);
     EasyMock.expect(is.getIncidentsOfJob(1L, true)).andReturn(subtree).anyTimes();
     WorkflowOperationInstance failedOperation2 = new WorkflowOperationInstance("operation2",
             OperationState.FAILED);
-    failedOperation2.setFailWorkflowOnException(false);
+    failedOperation2.setFailOnError(false);
     failedOperation1.setId(2L);
     EasyMock.expect(is.getIncidentsOfJob(2L, true)).andReturn(job1Tree).anyTimes();
     WorkflowOperationInstance operation = new WorkflowOperationInstance("email", OperationState.RUNNING);

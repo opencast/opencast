@@ -587,7 +587,7 @@ public class WorkflowsEndpoint {
     fields.add(f("host", v(woi.getExecutionHost(), BLANK)));
     fields.add(f("if", v(woi.getExecutionCondition(), BLANK)));
     fields.add(f("unless", v(woi.getSkipCondition(), BLANK)));
-    fields.add(f("fail_workflow_on_error", v(woi.isFailWorkflowOnException())));
+    fields.add(f("fail_workflow_on_error", v(woi.isFailOnError())));
     fields.add(f("error_handler_workflow", v(woi.getExceptionHandlingWorkflow(), BLANK)));
     fields.add(f("retry_strategy", v(new RetryStrategy.Adapter().marshal(woi.getRetryStrategy()), BLANK)));
     fields.add(f("max_attempts", v(woi.getMaxAttempts())));

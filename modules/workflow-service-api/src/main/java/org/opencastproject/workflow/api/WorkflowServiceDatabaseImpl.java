@@ -142,9 +142,9 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
   /**
    * {@inheritDoc}
    *
-   * @see WorkflowServiceDatabase#getAllWorkflowInstances(int limit, int offset)
+   * @see WorkflowServiceDatabase#getWorkflowInstances(int limit, int offset)
    */
-  public List<WorkflowInstance> getAllWorkflowInstances(int limit, int offset) throws WorkflowDatabaseException {
+  public List<WorkflowInstance> getWorkflowInstances(int limit, int offset) throws WorkflowDatabaseException {
 
     EntityManager em = null;
     try {

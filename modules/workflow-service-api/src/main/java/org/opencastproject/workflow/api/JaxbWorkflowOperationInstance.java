@@ -90,7 +90,7 @@ public class JaxbWorkflowOperationInstance {
   protected Set<JaxbWorkflowConfiguration> configurations = null;
 
   @XmlAttribute(name = "fail-on-error")
-  protected boolean failWorkflowOnException;
+  protected boolean failOnError;
 
   @XmlAttribute(name = "if")
   protected String executeCondition;
@@ -156,7 +156,7 @@ public class JaxbWorkflowOperationInstance {
           .map(config -> new JaxbWorkflowConfiguration(config.getKey(), config.getValue()))
           .collect(Collectors.toSet());
     }
-    this.failWorkflowOnException = operation.isFailWorkflowOnException();
+    this.failOnError = operation.isFailOnError();
     this.executeCondition = operation.getExecutionCondition();
     this.skipCondition = operation.getSkipCondition();
     this.exceptionHandlingWorkflow = operation.getExceptionHandlingWorkflow();
@@ -176,7 +176,7 @@ public class JaxbWorkflowOperationInstance {
             Optional.ofNullable(configurations).orElseGet(Collections::emptySet)
                     .stream()
                     .collect(Collectors.toMap(JaxbWorkflowConfiguration::getKey, JaxbWorkflowConfiguration::getValue)),
-            failWorkflowOnException, executeCondition,
+        failOnError, executeCondition,
             skipCondition, exceptionHandlingWorkflow, abortable, continuable, dateStarted, dateCompleted, timeInQueue, maxAttempts, failedAttempts,
             executionHost, retryStrategy);
   }
@@ -197,7 +197,7 @@ public class JaxbWorkflowOperationInstance {
         .append(state, jaxbWorkflowOperationInstance.state)
         .append(description, jaxbWorkflowOperationInstance.description)
         .append(configurations, jaxbWorkflowOperationInstance.configurations)
-        .append(failWorkflowOnException, jaxbWorkflowOperationInstance.failWorkflowOnException)
+        .append(failOnError, jaxbWorkflowOperationInstance.failOnError)
         .append(executeCondition, jaxbWorkflowOperationInstance.executeCondition)
         .append(skipCondition, jaxbWorkflowOperationInstance.skipCondition)
         .append(exceptionHandlingWorkflow, jaxbWorkflowOperationInstance.exceptionHandlingWorkflow)
@@ -221,7 +221,7 @@ public class JaxbWorkflowOperationInstance {
         .append(state)
         .append(description)
         .append(configurations)
-        .append(failWorkflowOnException)
+        .append(failOnError)
         .append(executeCondition)
         .append(skipCondition)
         .append(exceptionHandlingWorkflow)

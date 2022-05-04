@@ -118,10 +118,10 @@ public class EmailWorkflowOperationHandlerTest {
     workflowInstance.setMediaPackage(mp);
     WorkflowOperationInstance failedOperation1 = new WorkflowOperationInstance("operation1",
             OperationState.FAILED);
-    failedOperation1.setFailWorkflowOnException(true);
+    failedOperation1.setFailOnError(true);
     WorkflowOperationInstance failedOperation2 = new WorkflowOperationInstance("operation2",
             OperationState.FAILED);
-    failedOperation2.setFailWorkflowOnException(false);
+    failedOperation2.setFailOnError(false);
     operation = new WorkflowOperationInstance("email", OperationState.RUNNING);
     List<WorkflowOperationInstance> operationList = new ArrayList<WorkflowOperationInstance>();
     operationList.add(failedOperation1);
