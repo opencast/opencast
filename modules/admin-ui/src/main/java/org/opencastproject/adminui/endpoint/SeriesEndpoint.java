@@ -968,7 +968,7 @@ public class SeriesEndpoint {
     }
 
     if (!accessControlList.isValid()) {
-      logger.error("POST api/series/{}/access: Invalid series ACL detected", seriesId);
+      logger.debug("POST api/series/{}/access: Invalid series ACL detected", seriesId);
       return badRequest();
     }
 
