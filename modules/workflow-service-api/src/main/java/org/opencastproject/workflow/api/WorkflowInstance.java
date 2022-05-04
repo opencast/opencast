@@ -124,22 +124,22 @@ public class WorkflowInstance {
   @Column(name = "description")
   private String description;
 
-  @Column(name = "creatorId")
+  @Column(name = "creator_id")
   private String creatorName;
 
-  @Column(name = "organizationId")
+  @Column(name = "organization_id")
   private String organizationId;
 
-  @Column(name = "dateCreated")
+  @Column(name = "date_created")
   @Temporal(TemporalType.TIMESTAMP)
   private Date dateCreated = null;
 
-  @Column(name = "dateCompleted")
+  @Column(name = "date_completed")
   @Temporal(TemporalType.TIMESTAMP)
   private Date dateCompleted = null;
 
   @Lob
-  @Column(name = "mediaPackage", length = 16777215)
+  @Column(name = "mediapackage", length = 16777215)
   private String mediaPackage;
 
   @OneToMany(
@@ -161,10 +161,10 @@ public class WorkflowInstance {
   @Column(name = "configuration_value")
   protected Map<String, String> configurations;
 
-  @Column(name = "mediaPackageId", length = 128)
+  @Column(name = "mediapackage_id", length = 128)
   protected String mediaPackageId;
 
-  @Column(name = "seriesId", length = 128)
+  @Column(name = "series_id", length = 128)
   protected String seriesId;
 
   public enum WorkflowState {

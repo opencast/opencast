@@ -83,7 +83,7 @@ public class WorkflowOperationInstance implements Configurable {
   @Column(name = "configuration_value")
   protected Map<String, String> configurations;
 
-  @Column(name = "failOnError")
+  @Column(name = "fail_on_error")
   protected boolean failOnError;
 
   @Column(name = "if_condition")
@@ -92,7 +92,7 @@ public class WorkflowOperationInstance implements Configurable {
   @Column(name = "unless_condition")
   protected String skipCondition;
 
-  @Column(name = "exceptionHandlerWorkflow")
+  @Column(name = "exception_handler_workflow")
   protected String exceptionHandlingWorkflow;
 
   @Column(name = "abortable")
@@ -109,19 +109,19 @@ public class WorkflowOperationInstance implements Configurable {
   @Temporal(TemporalType.TIMESTAMP)
   protected Date dateCompleted;
 
-  @Column(name = "timeInQueue")
+  @Column(name = "time_in_queue")
   protected Long timeInQueue;
 
-  @Column(name = "maxAttempts")
+  @Column(name = "max_attempts")
   protected int maxAttempts;
 
-  @Column(name = "failedAttempts")
+  @Column(name = "failed_attempts")
   protected int failedAttempts;
 
-  @Column(name = "executionHost")
+  @Column(name = "execution_host")
   protected String executionHost;
 
-  @Column(name = "retryStrategy", length = 128)
+  @Column(name = "retry_strategy", length = 128)
   protected RetryStrategy retryStrategy;
 
   @ManyToOne(fetch = FetchType.LAZY)
