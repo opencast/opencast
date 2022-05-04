@@ -585,11 +585,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
       // Get the current user
       User currentUser = securityService.getUser();
-      if (currentUser == null)
-        throw new SecurityException("Current user is unknown");
-
-      if (userDirectoryService.loadUser(currentUser.getUsername()) == null)
-        throw new SecurityException(String.format("Current user '%s' can not be loaded", currentUser.getUsername()));
+      validUserOrThrow(currentUser);
 
       // Get the current organization
       Organization organization = securityService.getOrganization();
@@ -948,6 +944,17 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     } finally {
       lock.unlock();
     }
+  }
+
+  /**
+   * Checks whether user is set and is known to the userDirectoryService
+   */
+  private void validUserOrThrow(User user) {
+      if (user == null)
+        throw new SecurityException("Current user is unknown");
+
+      if (userDirectoryService.loadUser(user.getUsername()) == null)
+        throw new SecurityException(String.format("Current user '%s' can not be loaded", user.getUsername()));
   }
 
   private void removeTempFiles(WorkflowInstance workflowInstance) {
