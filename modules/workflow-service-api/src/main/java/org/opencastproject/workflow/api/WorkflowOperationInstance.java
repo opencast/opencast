@@ -89,9 +89,6 @@ public class WorkflowOperationInstance implements Configurable {
   @Column(name = "if_condition")
   protected String executeCondition;
 
-  @Column(name = "unless_condition")
-  protected String skipCondition;
-
   @Column(name = "exception_handler_workflow")
   protected String exceptionHandlingWorkflow;
 
@@ -150,7 +147,6 @@ public class WorkflowOperationInstance implements Configurable {
     setFailOnError(def.isFailWorkflowOnException());
     setExceptionHandlingWorkflow(def.getExceptionHandlingWorkflow());
     setExecutionCondition(def.getExecutionCondition());
-    setSkipCondition(def.getSkipCondition());
     setRetryStrategy(def.getRetryStrategy());
     Set<String> defConfigs = def.getConfigurationKeys();
     this.configurations = new TreeMap<>();
@@ -187,7 +183,6 @@ public class WorkflowOperationInstance implements Configurable {
           Map<String, String> configurations,
           boolean failOnError,
           String executeCondition,
-          String skipCondition,
           String exceptionHandlingWorkflow,
           Boolean abortable,
           Boolean continuable,
@@ -205,7 +200,6 @@ public class WorkflowOperationInstance implements Configurable {
     this.configurations = configurations;
     this.failOnError = failOnError;
     this.executeCondition = executeCondition;
-    this.skipCondition = skipCondition;
     this.exceptionHandlingWorkflow = exceptionHandlingWorkflow;
     this.abortable = abortable;
     this.continuable = continuable;
@@ -414,26 +408,6 @@ public class WorkflowOperationInstance implements Configurable {
 
   public void setExecutionCondition(String condition) {
     this.executeCondition = condition;
-  }
-
-  /**
-   * Returns either <code>null</code> or <code>true</code> to have the operation skipped. Any other value is interpreted
-   * as <code>false</code> and will execute the operation.
-   * <p>
-   * Usually, this will be a variable name such as <code>${foo}</code>, which will be replaced with its actual value
-   * once the workflow is executed.
-   * <p>
-   * If both <code>getExecuteCondition()</code> and <code>getSkipCondition</code> return a non-null value, the execute
-   * condition takes precedence.
-   *
-   * @return the skip condition.
-   */
-  public String getSkipCondition() {
-    return skipCondition;
-  }
-
-  private void setSkipCondition(String condition) {
-    this.skipCondition = condition;
   }
 
   /**

@@ -95,9 +95,6 @@ public class JaxbWorkflowOperationInstance {
   @XmlAttribute(name = "if")
   protected String executeCondition;
 
-  @XmlAttribute(name = "unless")
-  protected String skipCondition;
-
   @XmlAttribute(name = "exception-handler-workflow")
   protected String exceptionHandlingWorkflow;
 
@@ -158,7 +155,6 @@ public class JaxbWorkflowOperationInstance {
     }
     this.failOnError = operation.isFailOnError();
     this.executeCondition = operation.getExecutionCondition();
-    this.skipCondition = operation.getSkipCondition();
     this.exceptionHandlingWorkflow = operation.getExceptionHandlingWorkflow();
     this.abortable = operation.isAbortable();
     this.continuable = operation.isContinuable();
@@ -177,7 +173,7 @@ public class JaxbWorkflowOperationInstance {
                     .stream()
                     .collect(Collectors.toMap(JaxbWorkflowConfiguration::getKey, JaxbWorkflowConfiguration::getValue)),
         failOnError, executeCondition,
-            skipCondition, exceptionHandlingWorkflow, abortable, continuable, dateStarted, dateCompleted, timeInQueue, maxAttempts, failedAttempts,
+            exceptionHandlingWorkflow, abortable, continuable, dateStarted, dateCompleted, timeInQueue, maxAttempts, failedAttempts,
             executionHost, retryStrategy);
   }
 
@@ -199,7 +195,6 @@ public class JaxbWorkflowOperationInstance {
         .append(configurations, jaxbWorkflowOperationInstance.configurations)
         .append(failOnError, jaxbWorkflowOperationInstance.failOnError)
         .append(executeCondition, jaxbWorkflowOperationInstance.executeCondition)
-        .append(skipCondition, jaxbWorkflowOperationInstance.skipCondition)
         .append(exceptionHandlingWorkflow, jaxbWorkflowOperationInstance.exceptionHandlingWorkflow)
         .append(abortable, jaxbWorkflowOperationInstance.abortable)
         .append(continuable, jaxbWorkflowOperationInstance.continuable)
@@ -223,7 +218,6 @@ public class JaxbWorkflowOperationInstance {
         .append(configurations)
         .append(failOnError)
         .append(executeCondition)
-        .append(skipCondition)
         .append(exceptionHandlingWorkflow)
         .append(abortable)
         .append(continuable)

@@ -95,7 +95,6 @@ public class TestWorkflowsEndpoint extends WorkflowsEndpoint {
     expect(woi2.getState()).andReturn(WorkflowOperationInstance.OperationState.SUCCEEDED);
     expect(woi2.getTimeInQueue()).andReturn(30L);
     expect(woi2.getExecutionHost()).andReturn("http://localhost:8080");
-    expect(woi2.getSkipCondition()).andReturn("${letfail}");
     expect(woi2.isFailOnError()).andReturn(false);
     expect(woi2.getRetryStrategy()).andReturn(RetryStrategy.HOLD);
     expect(woi2.getMaxAttempts()).andReturn(0);
