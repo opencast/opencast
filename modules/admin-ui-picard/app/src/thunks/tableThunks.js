@@ -15,11 +15,10 @@ import {
     selectRow,
     setOffset,
     setPageActive,
-    setPages,
-    loadColumns
+    setPages
 } from "../actions/tableActions";
 import {
-    setEventColumnDeactivated, setEventColumns,
+    setEventColumns,
     showActions as showEventsActions
 } from '../actions/eventActions';
 import { setSeriesColumns, showActions as showSeriesActions } from '../actions/seriesActions';
