@@ -365,11 +365,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
 
-    } catch (WorkflowDatabaseException e) {
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-    } catch (UnauthorizedException e) {
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-    } catch (WorkflowException e) {
+    } catch (UnauthorizedException | WorkflowException e) {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
   }

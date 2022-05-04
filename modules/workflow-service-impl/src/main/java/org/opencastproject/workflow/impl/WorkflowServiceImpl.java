@@ -639,10 +639,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         }
       }
 
-      Map<String, String> wfProperties = new HashMap<>();
-      for (String key : instance.getConfigurationKeys()) {
-        wfProperties.put(key, instance.getConfiguration(key));
-      }
+      Map<String, String> wfProperties = new HashMap<>(instance.getConfigurations());
       final Organization currentOrg = securityService.getOrganization();
       final Function<String, String> systemVariableGetter = key -> {
         if (key.startsWith("org_")) {
@@ -656,7 +653,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
             : componentContext.getBundleContext().getProperty(key);
       };
       if (instance.getOperations().stream().anyMatch(op -> op.getExecutionCondition() != null)) {
-        instance.getOperations().stream().filter(op -> op.getExecutionCondition() != null).forEach(
+        instance.getOperations().stream()
+            .filter(op -> op.getExecutionCondition() != null)
+            .forEach(
                 op -> op.setExecutionCondition(WorkflowConditionInterpreter.replaceVariables(op.getExecutionCondition(),
                         systemVariableGetter,
                         properties, true)));
@@ -667,9 +666,12 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       // This approach is a band-aid to fix configuration values specifically
       // Possible TODO: Make this more elegeant somehow
       for (String configKey : instance.getConfigurationKeys()) {
-              String configValue = WorkflowConditionInterpreter.replaceVariables(instance.getConfiguration(configKey),
-                      systemVariableGetter, wfProperties, false);
-              instance.setConfiguration(configKey, configValue);
+        String configValue = WorkflowConditionInterpreter.replaceVariables(
+            instance.getConfiguration(configKey),
+            systemVariableGetter,
+            wfProperties,
+            false);
+        instance.setConfiguration(configKey, configValue);
       }
       for (WorkflowOperationInstance operationInstance : instance.getOperations()) {
         for (String configKey : operationInstance.getConfigurationKeys()) {

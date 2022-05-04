@@ -23,6 +23,7 @@
 package org.opencastproject.workflow.api;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -67,7 +68,9 @@ public class WorkflowSetImpl implements WorkflowSet {
   }
 
   public WorkflowSetImpl(List<WorkflowInstance> workflows) {
-    this.resultSet = workflows.stream().map(workflow -> new JaxbWorkflowInstance(workflow)).collect(Collectors.toList());
+    this.resultSet = workflows.stream()
+        .map(JaxbWorkflowInstance::new)
+        .collect(Collectors.toList());
   }
 
 
@@ -78,7 +81,12 @@ public class WorkflowSetImpl implements WorkflowSet {
    */
   @Override
   public List<WorkflowInstance> getItems() {
-    return resultSet == null || resultSet.size() == 0 ? new ArrayList<>() : resultSet.stream().map(workflow -> workflow.toWorkflowInstance()).collect(Collectors.toList());
+    if (resultSet == null) {
+      return Collections.emptyList();
+    }
+    return resultSet.stream()
+        .map(JaxbWorkflowInstance::toWorkflowInstance)
+        .collect(Collectors.toList());
   }
 
   /**

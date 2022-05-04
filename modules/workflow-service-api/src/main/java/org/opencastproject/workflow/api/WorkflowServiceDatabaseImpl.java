@@ -269,11 +269,10 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       }
       tx.commit();
     } catch (Exception e) {
-      logger.error("Could not update workflow with ID '{}'", instance.getId(), e);
-      if (tx.isActive()) {
+      if (tx != null && tx.isActive()) {
         tx.rollback();
       }
-      throw new WorkflowDatabaseException(e);
+      throw new WorkflowDatabaseException("Could not update workflow with ID '" + instance.getId() + "'", e);
     } finally {
       if (em != null)
         em.close();
@@ -304,11 +303,10 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       tx.commit();
       logger.debug("Workflow with id {} was deleted.", instance.getId());
     } catch (Exception e) {
-      logger.error("Could not delete workflow with ID '{}'", instance.getId(), e);
-      if (tx.isActive()) {
+      if (tx != null && tx.isActive()) {
         tx.rollback();
       }
-      throw new WorkflowDatabaseException(e);
+      throw new WorkflowDatabaseException("Could not delete workflow with ID '" + instance.getId() + "'", e);
     } finally {
       if (em != null)
         em.close();

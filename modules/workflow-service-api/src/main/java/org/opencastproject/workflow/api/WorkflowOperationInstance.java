@@ -406,7 +406,7 @@ public class WorkflowOperationInstance implements Configurable {
    * If both <code>getExecuteCondition()</code> and <code>getSkipCondition</code> return a non-null value, the execute
    * condition takes precedence.
    *
-   * @return the excecution condition.
+   * @return the execution condition.
    */
   public String getExecutionCondition() {
     return executeCondition;
@@ -426,7 +426,7 @@ public class WorkflowOperationInstance implements Configurable {
    * If both <code>getExecuteCondition()</code> and <code>getSkipCondition</code> return a non-null value, the execute
    * condition takes precedence.
    *
-   * @return the excecution condition.
+   * @return the skip condition.
    */
   public String getSkipCondition() {
     return skipCondition;
