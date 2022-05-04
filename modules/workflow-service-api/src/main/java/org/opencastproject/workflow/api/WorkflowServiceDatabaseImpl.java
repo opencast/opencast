@@ -126,13 +126,9 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
-
-      Query query = em.createNamedQuery("Workflow.findAllOrganizationIndependent");
-
-      List<WorkflowInstance> workflowInstances = query.getResultList();
-      return workflowInstances;
+      return em.createNamedQuery("Workflow.findAllOrganizationIndependent", WorkflowInstance.class).getResultList();
     } catch (Exception e) {
-      throw new WorkflowDatabaseException(e);
+      throw new WorkflowDatabaseException("Error fetching workflows from database", e);
     } finally {
       if (em != null)
         em.close();
@@ -150,7 +146,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
     try {
       em = emf.createEntityManager();
 
-      Query query = em.createNamedQuery("Workflow.findAll", String.class);
+      var query = em.createNamedQuery("Workflow.findAll", WorkflowInstance.class);
 
       String orgId = securityService.getOrganization().getId();
       query.setParameter("organizationId", orgId);
@@ -177,16 +173,15 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
-      Query query = em.createNamedQuery("Workflow.byMediaPackage");
+      var query = em.createNamedQuery("Workflow.byMediaPackage", WorkflowInstance.class);
 
       String orgId = securityService.getOrganization().getId();
       query.setParameter("organizationId", orgId);
       query.setParameter("mediaPackageId", mediaPackageId);
 
-      List<WorkflowInstance> workflowInstances = query.getResultList();
-      return workflowInstances;
+      return query.getResultList();
     } catch (Exception e) {
-      throw new WorkflowDatabaseException(e);
+      throw new WorkflowDatabaseException("Failed to get workflows from database", e);
     } finally {
       if (em != null)
         em.close();
@@ -204,7 +199,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
-      Query query = em.createNamedQuery("Workflow.byMediaPackageAndActive");
+      var query = em.createNamedQuery("Workflow.byMediaPackageAndActive", WorkflowInstance.class);
 
       String orgId = securityService.getOrganization().getId();
       query.setParameter("organizationId", orgId);
@@ -234,7 +229,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
     try {
       em = emf.createEntityManager();
 
-      Query query = em.createNamedQuery("Workflow.countActiveByMediaPackage");
+      var query = em.createNamedQuery("Workflow.countActiveByMediaPackage", Long.class);
 
       String orgId = securityService.getOrganization().getId();
       query.setParameter("organizationId", orgId);
@@ -243,7 +238,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       query.setParameter("stateRunning", WorkflowInstance.WorkflowState.RUNNING);
       query.setParameter("statePaused", WorkflowInstance.WorkflowState.PAUSED);
       query.setParameter("stateFailing", WorkflowInstance.WorkflowState.FAILING);
-      return ((Number) query.getSingleResult()).longValue() > 0;
+      return query.getSingleResult() > 0;
     } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
     } finally {
