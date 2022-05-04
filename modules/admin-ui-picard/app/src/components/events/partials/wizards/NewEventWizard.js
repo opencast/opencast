@@ -118,7 +118,8 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent }) => {
                             {page === 1 && (
                                 <NewMetadataExtendedPage previousPage={previousPage}
                                                          nextPage={nextPage}
-                                                         formik={formik} />
+                                                         formik={formik}
+                                                         header={steps[page].translation} />
                             )}
                             {page === 2 && (
                                 <NewSourcePage previousPage={previousPage}
