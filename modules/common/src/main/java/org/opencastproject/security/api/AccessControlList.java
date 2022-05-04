@@ -69,10 +69,7 @@ public final class AccessControlList {
   }
 
   public boolean isValid() {
-    for (AccessControlEntry entry : entries) {
-      if (!entry.isValid()) return false;
-    }
-    return true;
+    return entries.stream().allMatch(AccessControlEntry::isValid);
   }
 
   /**
