@@ -32,7 +32,7 @@ const fillDefaultConfig = (fieldset, defaultConfiguration) => {
       }
     }
 
-    // if an input has further configuration than go through fillDefaultConfig again
+    // if an input has further configuration then go through fillDefaultConfig again
     if (field.fieldset) {
       defaultConfiguration = fillDefaultConfig(field.fieldset, defaultConfiguration);
     }

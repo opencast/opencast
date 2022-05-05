@@ -125,6 +125,3 @@ export const hasAccess = (role, userInfo) =>  {
 
     return !!(userInfo.isAdmin || userInfo.roles.includes(role));
 }
-
-
-

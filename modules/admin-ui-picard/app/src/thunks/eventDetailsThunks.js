@@ -894,15 +894,12 @@ export const saveWorkflowConfig = (values, eventId) => async (dispatch) => {
         configuration: values.configuration
     }
 
+    let header = getHttpHeaders();
     let data = new URLSearchParams();
     data.append("configuration", JSON.stringify(jsonData));
 
-    axios.put(`/admin-ng/event/${eventId}/workflows`, data,
-      {
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-    }).then(response => {
+
+    axios.put(`/admin-ng/event/${eventId}/workflows`, data, header).then(response => {
         logger.info(response);
         dispatch(removeNotificationWizardForm());
         dispatch(fetchWorkflows(eventId));

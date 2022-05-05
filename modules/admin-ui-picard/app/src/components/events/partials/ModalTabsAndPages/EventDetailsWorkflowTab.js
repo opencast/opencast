@@ -5,11 +5,13 @@ import {
     deleteWorkflow,
     fetchWorkflowDetails,
     fetchWorkflows,
-    performWorkflowAction, saveWorkflowConfig,
+    performWorkflowAction,
+    saveWorkflowConfig,
     updateWorkflow
 } from '../../../../thunks/eventDetailsThunks';
 import {
-    deletingWorkflow, getBaseWorkflow,
+    deletingWorkflow,
+    getBaseWorkflow,
     getWorkflow,
     getWorkflowConfiguration,
     getWorkflowDefinitions,
@@ -79,7 +81,6 @@ const EventDetailsWorkflowTab = ({ eventId, t, close, setHierarchy, baseWorkflow
         changeFormikValue('configuration', currentConfiguration);
         changeFormikValue('workflowDefinition', value);
         updateWorkflow(value);
-
     }
 
 
@@ -381,7 +382,7 @@ const mapStateToProps = state => ({
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadWorkflows: (eventId) => dispatch(fetchWorkflows(eventId)),
-    updateWorkflow: (saveWorkflow, workflow) => dispatch(updateWorkflow(saveWorkflow, workflow)),
+    updateWorkflow: workflow => dispatch(updateWorkflow(workflow)),
     loadWorkflowDetails: (eventId, workflowId) => dispatch(fetchWorkflowDetails(eventId, workflowId)),
     performWorkflowAction: (eventId, workflowId, action, close) => dispatch(performWorkflowAction(eventId, workflowId, action, close)),
     deleteWf: (eventId, workflowId) => dispatch(deleteWorkflow(eventId, workflowId)),

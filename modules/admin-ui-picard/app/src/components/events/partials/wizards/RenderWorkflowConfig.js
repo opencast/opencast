@@ -16,8 +16,8 @@ import {
  */
 const RenderWorkflowConfig = (props) => {
     // Get html for configuration panel
-    const configPanel = props.configuration_panel_json ? props.configuration_panel_json : [];
-    const description = props.description ? props.description : '';
+    const configPanel = !!props.configuration_panel_json ? props.configuration_panel_json : [];
+    const description = !!props.description ? props.description : '';
     const displayDescription = !!props.displayDescription;
     let formik = props.formik;
 
@@ -109,7 +109,7 @@ const RenderCheckbox = ({ field, key, formik }) => {
              type={field.type}/>
       <label htmlFor={uuid}>{field.label}</label>
       {/* if input has an additional fieldset or further configuration inputs
-      than render again by input type*/}
+      then render again by input type*/}
       {(!!field.fieldset && !!formik.values.configuration[field.name]) && (
         <ul className="workflow-configuration-subpanel">
           {field.fieldset?.map((f, keys) => (
@@ -136,7 +136,7 @@ const RenderRadio = ({ field, key, formik }) => {
              type={field.type}/>
       <label htmlFor={uuid}>{field.label}</label>
       {/* if input has an additional fieldset or further configuration inputs
-      than render again by input type*/}
+      then render again by input type*/}
       {(!!field.fieldset && formik.values.configuration[field.name] === field.value) && (
         <ul className="workflow-configuration-subpanel">
           {field.fieldset?.map((f, keys) => (
@@ -174,7 +174,7 @@ const RenderNumber = ({ field, key, formik }) => {
              max={field.max}/>
       <label htmlFor={uuid}>{field.label}</label>
       {/* if input has an additional fieldset or further configuration inputs
-      than render again by input type*/}
+      then render again by input type*/}
       {(!!field.fieldset && !!formik.values.configuration[field.name]) && (
         <ul className="workflow-configuration-subpanel">
           {field.fieldset?.map((f, keys) => (
@@ -200,7 +200,7 @@ const RenderText = ({ field, key, formik }) => {
              type={field.type}/>
       <label htmlFor={uuid}>{field.label}</label>
       {/* if input has an additional fieldset or further configuration inputs
-      than render again by input type*/}
+      then render again by input type*/}
       {(!!field.fieldset && !!formik.values.configuration[field.name]) && (
         <ul className="workflow-configuration-subpanel">
           {field.fieldset?.map((f, keys) => (
