@@ -452,7 +452,7 @@ export const updateAssets = (values, eventId) => async dispatch => {
         assets: assets
     }));
 
-    axios.post(`/admin-ng/${eventId}/assets`, formData,
+    axios.post(`/admin-ng/event/${eventId}/assets`, formData,
       {
           headers: {
               'Content-Type': 'multipart/form-data'
