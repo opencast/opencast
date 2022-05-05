@@ -7,6 +7,13 @@ import {DatePicker} from "@material-ui/pickers";
 import {createTheme, ThemeProvider} from "@material-ui/core";
 import {Field, Formik} from "formik";
 import BarChart from "./BarChart";
+import {
+    availableCustomStatisticDataResolutions,
+    fixedStatisticDataResolutions,
+    statisticDateFormatStrings,
+    statisticTimeModes
+} from "../../configs/statisticsConfig";
+import {localizedMoment} from "../../utils/dateUtils";
 
 /**
  * This component visualizes statistics with data of type time series
@@ -41,41 +48,17 @@ const TimeSeriesStatistics = ({ t, eventId, statTitle, providerId, fromDate, toD
         color: '#666666'
     };
 
-    // available modes of choosing statistic timeframe
-    const timeModes = [
-        {
-            'value': 'year',
-            'translation': 'Year'
-        },
-        {
-            'value': 'month',
-            'translation': 'Month'
-        },
-        {
-            'value': 'custom',
-            'translation': 'Custom'
-        }
-    ];
+// available modes of choosing statistic timeframe
+    const timeModes = statisticTimeModes;
 
     // data resolutions (or time granularity) for statistics with year or month timeframe
-    const fixedDataResolutions = {
-        month: 'daily',
-        year: 'monthly'
-    };
+    const fixedDataResolutions = fixedStatisticDataResolutions;
 
     // available data resolutions (or time granularity) for statistics with custom timeframe
-    const availableCustomDataResolutions = [
-        { label: 'Yearly', value: 'yearly' },
-        { label: 'Monthly', value: 'monthly' },
-        { label: 'Daily', value: 'daily' },
-        { label: 'Hourly', value: 'hourly' }
-    ];
+    const availableCustomDataResolutions = availableCustomStatisticDataResolutions;
 
     // date format strings
-    const formatStrings = {
-        month: 'MMMM YYYY',
-        year: 'YYYY'
-    };
+    const formatStrings = statisticDateFormatStrings;
 
     // Get info about the current language and its date locale
     const currentLanguage = getCurrentLanguageInformation();
@@ -83,8 +66,8 @@ const TimeSeriesStatistics = ({ t, eventId, statTitle, providerId, fromDate, toD
     // change formik values and get new statistic values from API
     const change = (setFormikValue, timeMode, from, to, dataResolution) => {
         if (timeMode === 'year' || timeMode === 'month') {
-            from = moment(from).clone().startOf(timeMode).format('YYYY-MM-DD')
-            to = moment(from).clone().endOf(timeMode).format('YYYY-MM-DD')
+            from = moment(from).clone().startOf(timeMode).format('YYYY-MM-DD');
+            to = moment(from).clone().endOf(timeMode).format('YYYY-MM-DD');
             setFormikValue('fromDate', from);
             setFormikValue('toDate', to);
             setFormikValue('dataResolution', fixedDataResolutions[timeMode]);
@@ -118,14 +101,9 @@ const TimeSeriesStatistics = ({ t, eventId, statTitle, providerId, fromDate, toD
         change(setFormikValue, timeMode, from, to, granularity);
     };
 
-    // get localized time
-    const localizedMoment = (m) => {
-        return moment(m).locale(currentLanguage.dateLocale.code);
-    };
-
     // format selected time to display as name of timeframe
     const formatSelectedTimeframeName = (from, timeMode) => {
-        return localizedMoment(from).format(formatStrings[timeMode]);
+        return localizedMoment(from, currentLanguage).format(formatStrings[timeMode]);
     };
 
     // change to and from dates in formik to previous timeframe and get new values from API

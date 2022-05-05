@@ -30,7 +30,9 @@ import {
     getExtendedMetadata,
     isFetchingMetadata,
     getSchedulingProperties,
-    isFetchingScheduling, hasStatistics, isFetchingStatistics
+    isFetchingScheduling,
+    hasStatistics,
+    isFetchingStatistics
 } from "../../../../selectors/eventDetailsSelectors";
 import {
     fetchMetadata,
