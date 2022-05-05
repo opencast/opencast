@@ -180,16 +180,11 @@ final class WorkflowOperationWorker {
     operation.setExecutionCondition(executionCondition);
     operation.setDescription(WorkflowConditionInterpreter.replaceVariables(
         operation.getDescription(), variables, null, false));
-    logger.error("properties = {}", properties);
-    logger.error("workflow.getConfigurations() = {}", workflow.getConfigurations());
-    logger.error("operation.getConfigurations() = {}", operation.getConfigurations());
     for (var cfg: operation.getConfigurations().entrySet()) {
-      logger.error("config({}) = {}", cfg.getKey(), cfg.getValue());
       var value = WorkflowConditionInterpreter.replaceVariables(
           cfg.getValue(), variables, null, false);
       operation.setConfiguration(cfg.getKey(), value);
     }
-    logger.error("operation.getConfigurations() = {}", operation.getConfigurations());
 
     // Do we need to execute the operation?
     boolean execute = true;
