@@ -259,7 +259,12 @@ public class WorkflowOperationInstance implements Configurable {
     return description;
   }
 
-  private void setDescription(String description) {
+  /**
+   * Set the operation description.
+   *
+   * @param description The new description
+   */
+  public void setDescription(String description) {
     this.description = description;
   }
 

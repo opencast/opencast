@@ -108,7 +108,6 @@ import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateMapping;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.api.XmlWorkflowParser;
-import org.opencastproject.workflow.conditionparser.WorkflowConditionInterpreter;
 import org.opencastproject.workflow.impl.jmx.WorkflowsStatistics;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -632,63 +631,12 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   protected WorkflowInstance updateConfiguration(WorkflowInstance instance, Map<String, String> properties) {
-    try {
-      if (properties != null) {
-        for (Entry<String, String> entry : properties.entrySet()) {
-          instance.setConfiguration(entry.getKey(), entry.getValue());
-        }
+    if (properties != null) {
+      for (Entry<String, String> entry : properties.entrySet()) {
+        instance.setConfiguration(entry.getKey(), entry.getValue());
       }
-
-      Map<String, String> wfProperties = new HashMap<>(instance.getConfigurations());
-      final Organization currentOrg = securityService.getOrganization();
-      final Function<String, String> systemVariableGetter = key -> {
-        if (key.startsWith("org_")) {
-          String value = currentOrg.getProperties().get(key.substring(4));
-          if (value != null) {
-            return value;
-          }
-        }
-        return componentContext == null
-            ? null
-            : componentContext.getBundleContext().getProperty(key);
-      };
-      if (instance.getOperations().stream().anyMatch(op -> op.getExecutionCondition() != null)) {
-        instance.getOperations().stream()
-            .filter(op -> op.getExecutionCondition() != null)
-            .forEach(
-                op -> op.setExecutionCondition(WorkflowConditionInterpreter.replaceVariables(op.getExecutionCondition(),
-                        systemVariableGetter,
-                        properties, true)));
-      }
-
-      // The previous approach was parsing all "$()" strings in a workflow instance (I think)
-      // Except it wasn't, as some "$()" strings remain workflow operations as values (and that is ok?)
-      // This approach is a band-aid to fix configuration values specifically
-      // Possible TODO: Make this more elegeant somehow
-      for (String configKey : instance.getConfigurationKeys()) {
-        String configValue = WorkflowConditionInterpreter.replaceVariables(
-            instance.getConfiguration(configKey),
-            systemVariableGetter,
-            wfProperties,
-            false);
-        instance.setConfiguration(configKey, configValue);
-      }
-      for (WorkflowOperationInstance operationInstance : instance.getOperations()) {
-        for (String configKey : operationInstance.getConfigurationKeys()) {
-          String configValue = WorkflowConditionInterpreter.replaceVariables(
-                  operationInstance.getConfiguration(configKey), systemVariableGetter, wfProperties, false);
-          operationInstance.setConfiguration(configKey, configValue);
-        }
-      }
-
-      // Previous approach
-//      String xml = WorkflowConditionInterpreter.replaceVariables(XmlWorkflowParser.toXml(instance),
-//              systemVariableGetter, wfProperties, false);
-//      return WorkflowParser.parseWorkflowInstance(xml);
-      return instance;
-    } catch (Exception e) {
-      throw new IllegalStateException("Unable to replace workflow instance variables", e);
     }
+    return instance;
   }
 
   /**

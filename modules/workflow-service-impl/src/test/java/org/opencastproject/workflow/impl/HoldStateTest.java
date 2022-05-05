@@ -80,6 +80,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -96,8 +97,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import junit.framework.Assert;
 
 public class HoldStateTest {
   private static final Logger logger = LoggerFactory.getLogger(HoldStateTest.class);
@@ -293,13 +292,14 @@ public class HoldStateTest {
     WorkflowStateListener pauseListener = new WorkflowStateListener(WorkflowState.PAUSED);
     service.addWorkflowListener(pauseListener);
 
-    Map<String, String> initialProps = new HashMap<String, String>();
-    initialProps.put("testproperty", "foo");
+    Map<String, String> initialProps = Map.of("testproperty", "foo");
     synchronized (pauseListener) {
       workflow = service.start(def, mp, initialProps);
       pauseListener.wait();
     }
     service.removeWorkflowListener(pauseListener);
+
+    workflow = service.getWorkflowById(workflow.getId());
 
     // The variable "testproperty" should have been replaced by "foo", but not "anotherproperty"
     Assert.assertEquals("foo", workflow.getOperations().get(0).getConfiguration("testkey"));

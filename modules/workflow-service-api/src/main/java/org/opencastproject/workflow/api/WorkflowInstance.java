@@ -75,8 +75,8 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 @Entity(name = "WorkflowInstance")
 @Access(AccessType.FIELD)
 @Table(name = "oc_workflow", indexes = {
-        @Index(name = "IX_oc_workflow_mediaPackageId", columnList = ("mediaPackageId")),
-        @Index(name = "IX_oc_workflow_seriesId", columnList = ("seriesId")), })
+        @Index(name = "IX_oc_workflow_mediapackage_id", columnList = ("mediapackage_id")),
+        @Index(name = "IX_oc_workflow_series_id", columnList = ("series_id")), })
 @NamedQueries({
         @NamedQuery(
                 name = "Workflow.findAll",
