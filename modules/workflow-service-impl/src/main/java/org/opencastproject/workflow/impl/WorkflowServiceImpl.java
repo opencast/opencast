@@ -1004,11 +1004,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     try {
       WorkflowInstance instance = getWorkflowById(workflowInstanceId);
       WorkflowInstance.WorkflowState state = instance.getState();
-      if (state != WorkflowState.SUCCEEDED && state != WorkflowState.FAILED && state != WorkflowState.STOPPED)
-        if (!force) {
-          throw new WorkflowStateException("Workflow instance with state '" + state + "' cannot be removed. "
-                  + "Only states SUCCEEDED, FAILED & STOPPED are allowed");
-        }
+      if (!state.isTerminated() && !force) {
+        throw new WorkflowStateException("Workflow instance with state '" + state + "' cannot be removed "
+            + "since it is not yet terminated.");
+      }
 
       assertPermission(instance, Permissions.Action.WRITE.toString(), instance.getOrganizationId());
 
