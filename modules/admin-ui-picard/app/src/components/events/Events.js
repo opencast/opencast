@@ -64,6 +64,9 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
     };
 
     const loadSeries = () => {
+        // load filter for series
+        loadingFilters("series");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -84,7 +87,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
         loadEvents().then(r => logger.info(r));
 
         // Load event filters
-        loadingFilters("events");
+        //loadingFilters("events");
 
         // Function for handling clicks outside of an open dropdown menu
         const handleClickOutside = e => {
@@ -190,7 +193,10 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
                     {hasAccess("ROLE_UI_EVENTS_VIEW", user) && (
                         <Link to="/events/events"
                               className={cn({active: true})}
-                              onClick={() => loadEvents()}>
+                              onClick={() => {
+                                  loadingFilters("events");
+                                  loadEvents().then();
+                              }}>
                             {t('EVENTS.EVENTS.NAVIGATION.EVENTS')}
                         </Link>
                     )}

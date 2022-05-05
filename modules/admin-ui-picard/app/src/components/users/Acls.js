@@ -44,6 +44,8 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
     };
 
     const loadUsers = () => {
+        loadingFilters("users");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -55,6 +57,8 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
     };
 
     const loadGroups = () => {
+        loadingFilters("groups");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -70,9 +74,6 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
 
         // Load acls on mount
         loadAcls().then(r => logger.info(r));
-
-        // Load filters
-        loadingFilters('acls');
 
         // Fetch ACLs every minute
         let fetchAclInterval = setInterval(loadAcls, 100000);
@@ -135,7 +136,10 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
                     {hasAccess("ROLE_UI_ACLS_VIEW", user) && (
                         <Link to="/users/acls"
                               className={cn({active: true})}
-                              onClick={() => loadAcls()}>
+                              onClick={() => {
+                                  loadingFilters("acl");
+                                  loadAcls().then();
+                              }}>
                             {t('USERS.NAVIGATION.PERMISSIONS')}
                         </Link>
                     )}

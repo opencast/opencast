@@ -44,6 +44,8 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
     }
 
     const loadUsers = () => {
+        loadingUsers("users");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -55,6 +57,8 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
     }
 
     const loadAcls = () => {
+        loadingAcls("acls");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -70,9 +74,6 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
 
         // Load groups on mount
         loadGroups().then(r => logger.info(r));
-
-        // Load filters
-        loadingFilters('groups');
 
         // Fetch groups every minute
         let fetchGroupsInterval = setInterval(loadGroups, 100000);
@@ -128,7 +129,10 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
                     {hasAccess("ROLE_UI_GROUPS_VIEW", user) && (
                         <Link to="/users/groups"
                               className={cn({active: true})}
-                              onClick={() => loadGroups()}>
+                              onClick={() => {
+                                  loadingFilters("groups");
+                                  loadGroups().then();
+                              }}>
                             {t('USERS.NAVIGATION.GROUPS')}
                         </Link>
                     )}

@@ -33,9 +33,9 @@ export const loadFiltersInProgress = () => ({
     type: LOAD_FILTERS_IN_PROGRESS
 });
 
-export const loadFiltersSuccess = filters => ({
+export const loadFiltersSuccess = (filters, resource) => ({
     type: LOAD_FILTERS_SUCCESS,
-    payload: { filters }
+    payload: { filters, resource }
 });
 
 export const loadFiltersFailure = () => ({

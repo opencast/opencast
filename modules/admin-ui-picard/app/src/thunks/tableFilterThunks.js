@@ -1,15 +1,29 @@
-import {loadFiltersSuccess, loadFiltersFailure, loadFiltersInProgress, loadStats} from '../actions/tableFilterActions';
+import {
+    loadFiltersSuccess,
+    loadFiltersFailure,
+    loadFiltersInProgress,
+    loadStats,
+    editFilterValue
+} from '../actions/tableFilterActions';
 import axios from "axios";
 import {relativeDateSpanToFilterValue} from "../utils/dateUtils";
 import {logger} from "../utils/logger";
+import { setOffset } from '../actions/tableActions';
+import { fetchEvents } from './eventThunks';
 /**
 * This file contains methods/thunks used to query the REST-API of Opencast to get the filters of a certain resource type.
 * This information is used to filter the entries of the table in the main view.
 *
 * */
 // Fetch table filters from opencast instance and transform them for further use
-export const fetchFilters = resource => async dispatch => {
+export const fetchFilters = resource => async (dispatch, getState)=> {
     try {
+        const { tableFilters } = getState();
+
+        if (tableFilters.currentResource === resource) {
+            return;
+        }
+
         dispatch(loadFiltersInProgress());
 
         const data = await axios.get(`/admin-ng/resources/${resource}/filters.json`);
@@ -23,7 +37,7 @@ export const fetchFilters = resource => async dispatch => {
             filter.name = key;
             return filter;
         });
-        dispatch(loadFiltersSuccess(filtersList));
+        dispatch(loadFiltersSuccess(filtersList, resource));
     } catch (e) {
         dispatch(loadFiltersFailure());
         logger.error(e);
@@ -83,6 +97,25 @@ export const fetchStats = () => async dispatch => {
     } catch (e) {
         logger.error(e);
     }
+}
+
+export const setSpecificEventFilter = (filter, filterValue) => async (dispatch, getState) => {
+    await dispatch(fetchFilters("events"));
+
+    const { tableFilters } = getState();
+
+    let filterToChange = tableFilters.data.find(({ name }) => name === filter);
+
+    if (!!filterToChange) {
+        await dispatch(editFilterValue(filterToChange.name, filterValue));
+    }
+
+    dispatch(setOffset(0));
+
+    dispatch(fetchStats());
+
+    dispatch(fetchEvents());
+
 }
 
 // Transform received filter.json to a structure that can be used for filtering

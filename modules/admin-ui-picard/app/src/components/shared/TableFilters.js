@@ -41,11 +41,6 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
     const [startDateTouched, setStartDateTouched] = useState(false);
     const [endDateTouched, setEndDateTouched] = useState(false);
 
-    // Fetching available filters from opencast instance
-    useEffect(() => {
-        loadingFilters(resource);
-    }, []);
-
     // Remove all selected filters, no filter should be "active" anymore
     const removeFilters = async () => {
         removeTextFilter();

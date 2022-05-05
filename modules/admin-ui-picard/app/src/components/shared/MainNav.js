@@ -20,7 +20,7 @@ import {fetchRecordings} from "../../thunks/recordingThunks";
 import {fetchJobs} from "../../thunks/jobThunks";
 import {fetchUsers} from "../../thunks/userThunks";
 import {fetchThemes} from "../../thunks/themeThunks";
-import {fetchStats} from "../../thunks/tableFilterThunks";
+import { fetchFilters, fetchStats } from '../../thunks/tableFilterThunks';
 import {setOffset} from "../../actions/tableActions";
 import {getUserInformation} from "../../selectors/userInfoSelectors";
 import {hasAccess} from "../../utils/utils";
@@ -39,11 +39,14 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
                      loadingStats, loadingRecordings, loadingRecordingsIntoTable, loadingJobs, loadingJobsIntoTable,
                      loadingServers, loadingServersIntoTable, loadingServices, loadingServicesIntoTable,  loadingUsers,
                      loadingUsersIntoTable, loadingGroups, loadingGroupsIntoTable, loadingAcls, loadingAclsIntoTable,
-                     loadingThemes, loadingThemesIntoTable, resetOffset, user }) => {
+                     loadingThemes, loadingThemesIntoTable, resetOffset, user, loadingFilters }) => {
     const { t } = useTranslation();
     let history = useHistory();
 
     const loadEvents = () => {
+
+        loadingFilters("events");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -58,6 +61,8 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
     }
 
     const loadSeries = () => {
+        loadingFilters("series");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -69,6 +74,8 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
     }
 
     const loadRecordings = () => {
+        loadingFilters("recordings");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -80,6 +87,8 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
     }
 
     const loadJobs = () => {
+        loadingFilters("jobs");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -91,6 +100,8 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
     }
 
     const loadServers = () => {
+        loadingFilters("servers");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -102,6 +113,8 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
     }
 
     const loadServices = () => {
+        loadingFilters("services");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -113,6 +126,8 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
     }
 
     const loadUsers = () => {
+        loadingFilters("users");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -124,6 +139,8 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
     }
 
     const loadGroups = () => {
+        loadingFilters("groups");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -135,6 +152,8 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
     }
 
     const loadAcls = () => {
+        loadingFilters("acls");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -146,6 +165,8 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
     }
 
     const loadThemes = () => {
+        loadingFilters("themes");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -284,7 +305,8 @@ const mapDispatchToProps = dispatch => ({
     loadingAclsIntoTable: () => dispatch(loadAclsIntoTable()),
     loadingThemes: () => dispatch(fetchThemes()),
     loadingThemesIntoTable: () => dispatch(loadThemesIntoTable()),
-    resetOffset: () => dispatch(setOffset(0))
+    resetOffset: () => dispatch(setOffset(0)),
+    loadingFilters: resource => dispatch(fetchFilters(resource))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(MainNav);

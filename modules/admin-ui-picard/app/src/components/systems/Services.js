@@ -42,6 +42,8 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
     }
 
     const loadJobs = () => {
+        loadingFilters("jobs");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -53,6 +55,8 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
     }
 
     const loadServers = () => {
+        loadingFilters("servers");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -68,9 +72,6 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
 
         // Load services on mount
         loadServices().then(r => logger.info(r));
-
-        // Load filters
-        loadingFilters('services');
 
         // Fetch services every minute
         let fetchServicesInterval = setInterval(loadServices, 100000);
@@ -110,7 +111,10 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
                     {hasAccess("ROLE_UI_SERVICES_VIEW", user) && (
                         <Link to="/systems/services"
                               className={cn({active: true})}
-                              onClick={() => loadServices()}>
+                              onClick={() => {
+                                  loadingFilters("services");
+                                  loadServices().then();
+                              }}>
                             {t('SYSTEMS.NAVIGATION.SERVICES')}
                         </Link>
                     )}
