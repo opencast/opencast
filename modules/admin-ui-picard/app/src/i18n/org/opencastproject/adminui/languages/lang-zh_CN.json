@@ -2131,6 +2131,11 @@
       "NAVIGATION": {
          "ORGANIZATION": "组织"
       },
+      "TIME_MODES": {
+         "Year": "Year",
+         "Month": "Month",
+         "Custom": "Custom"
+      },
       "TITLE": {
          "RANDOM": "随机数据",
          "VIEWS_SUM": "总查看数",
