@@ -89,6 +89,13 @@ export const LOAD_EVENT_WORKFLOW_ERROR_DETAILS_IN_PROGRESS = 'LOAD_EVENT_WORKFLO
 export const LOAD_EVENT_WORKFLOW_ERROR_DETAILS_SUCCESS = 'LOAD_EVENT_WORKFLOW_ERROR_DETAILS_SUCCESS';
 export const LOAD_EVENT_WORKFLOW_ERROR_DETAILS_FAILURE = 'LOAD_EVENT_WORKFLOW_ERROR_DETAILS_FAILURE';
 
+// Constants of actions types affecting the statistics tab
+export const LOAD_EVENT_STATISTICS_IN_PROGRESS = 'LOAD_EVENT_STATISTICS_IN_PROGRESS';
+export const LOAD_EVENT_STATISTICS_SUCCESS = 'LOAD_EVENT_STATISTICS_SUCCESS';
+export const LOAD_EVENT_STATISTICS_FAILURE = 'LOAD_EVENT_STATISTICS_FAILURE';
+export const UPDATE_EVENT_STATISTICS_SUCCESS = 'LOAD_EVENT_STATISTICS_SUCCESS';
+export const UPDATE_EVENT_STATISTICS_FAILURE = 'LOAD_EVENT_STATISTICS_FAILURE';
+
 
 // Actions affecting fetching of event details from server
 
@@ -478,4 +485,35 @@ export const deleteEventWorkflowSuccess = (workflowsEntries) => ({
 
 export const deleteEventWorkflowFailure = () => ({
     type: DELETE_EVENT_WORKFLOW_FAILURE
+});
+
+// actions for statistics
+export const loadEventStatisticsInProgress = () => ({
+    type: LOAD_EVENT_STATISTICS_IN_PROGRESS
+});
+
+export const loadEventStatisticsSuccess = ( statistics, hasError ) => ({
+    type: LOAD_EVENT_STATISTICS_SUCCESS,
+    payload: {
+        statistics,
+        hasError
+    }
+});
+
+export const loadEventStatisticsFailure = (hasError) => ({
+    type: LOAD_EVENT_STATISTICS_FAILURE,
+    payload: {
+        hasError
+    }
+});
+
+export const updateEventStatisticsSuccess = ( statistics ) => ({
+    type: UPDATE_EVENT_STATISTICS_SUCCESS,
+    payload: {
+        statistics
+    }
+});
+
+export const updateEventStatisticsFailure = () => ({
+    type: UPDATE_EVENT_STATISTICS_FAILURE
 });

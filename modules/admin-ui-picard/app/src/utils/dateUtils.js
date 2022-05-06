@@ -45,3 +45,8 @@ export const calculateDuration = (startDate, endDate) => {
 
     return {durationHours, durationMinutes};
 }
+
+// get localized time
+export const localizedMoment = (m,  currentLanguage) => {
+    return moment(m).locale(currentLanguage.dateLocale.code);
+};

@@ -2131,6 +2131,11 @@
       "NAVIGATION": {
          "ORGANIZATION": "Organisation"
       },
+      "TIME_MODES": {
+         "Year": "Year",
+         "Month": "Month",
+         "Custom": "Custom"
+      },
       "TITLE": {
          "RANDOM": "Données aléatoires",
          "VIEWS_SUM": "Nombre total de vues",

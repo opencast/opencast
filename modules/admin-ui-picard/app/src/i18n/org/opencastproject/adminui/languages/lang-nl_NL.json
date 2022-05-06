@@ -2131,6 +2131,11 @@
       "NAVIGATION": {
          "ORGANIZATION": "Organisatie"
       },
+      "TIME_MODES": {
+         "Year": "Year",
+         "Month": "Month",
+         "Custom": "Custom"
+      },
       "TITLE": {
          "RANDOM": "Willekeurige gegevens",
          "VIEWS_SUM": "Totaal aantal weergaven",
