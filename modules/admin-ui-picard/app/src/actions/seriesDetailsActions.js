@@ -23,6 +23,14 @@ export const SET_SERIES_DETAILS_THEME = 'SET_SERIES_DETAILS_THEME';
 export const SET_SERIES_DETAILS_METADATA = 'SET_SERIES_DETAILS_METADATA';
 export const SET_SERIES_DETAILS_EXTENDED_METADATA = 'SET_SERIES_DETAILS_EXTENDED_METADATA';
 
+// Constants of actions types for fetching statistics of a certain series from server
+export const LOAD_SERIES_STATISTICS_IN_PROGRESS = 'LOAD_SERIES_STATISTICS_IN_PROGRESS';
+export const LOAD_SERIES_STATISTICS_SUCCESS = 'LOAD_SERIES_STATISTICS_SUCCESS';
+export const LOAD_SERIES_STATISTICS_FAILURE = 'LOAD_SERIES_STATISTICS_FAILURE';
+export const UPDATE_SERIES_STATISTICS_SUCCESS = 'LOAD_SERIES_STATISTICS_SUCCESS';
+export const UPDATE_SERIES_STATISTICS_FAILURE = 'LOAD_SERIES_STATISTICS_FAILURE';
+
+
 
 // Actions affecting fetching metadata of a certain series from server
 
@@ -89,4 +97,36 @@ export const setSeriesDetailsMetadata = seriesMetadata => ({
 export const setSeriesDetailsExtendedMetadata = seriesMetadata => ({
     type: SET_SERIES_DETAILS_EXTENDED_METADATA,
     payload: { seriesMetadata }
+});
+
+// Actions affecting fetching statistics of a certain series from server
+
+export const loadSeriesStatisticsInProgress = () => ({
+    type: LOAD_SERIES_STATISTICS_IN_PROGRESS
+});
+
+export const loadSeriesStatisticsSuccess = ( statistics, hasError ) => ({
+    type: LOAD_SERIES_STATISTICS_SUCCESS,
+    payload: {
+        statistics,
+        hasError
+    }
+});
+
+export const loadSeriesStatisticsFailure = (hasError) => ({
+    type: LOAD_SERIES_STATISTICS_FAILURE,
+    payload: {
+        hasError
+    }
+});
+
+export const updateSeriesStatisticsSuccess = ( statistics ) => ({
+    type: UPDATE_SERIES_STATISTICS_SUCCESS,
+    payload: {
+        statistics
+    }
+});
+
+export const updateSeriesStatisticsFailure = () => ({
+    type: UPDATE_SERIES_STATISTICS_FAILURE
 });

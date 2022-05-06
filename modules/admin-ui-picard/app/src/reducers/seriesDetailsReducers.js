@@ -11,9 +11,14 @@ import {
     LOAD_SERIES_DETAILS_THEME_NAMES_IN_PROGRESS,
     LOAD_SERIES_DETAILS_THEME_NAMES_SUCCESS,
     LOAD_SERIES_DETAILS_THEME_SUCCESS,
+    LOAD_SERIES_STATISTICS_FAILURE,
+    LOAD_SERIES_STATISTICS_IN_PROGRESS,
+    LOAD_SERIES_STATISTICS_SUCCESS,
     SET_SERIES_DETAILS_EXTENDED_METADATA,
     SET_SERIES_DETAILS_METADATA,
     SET_SERIES_DETAILS_THEME,
+    UPDATE_SERIES_STATISTICS_FAILURE,
+    UPDATE_SERIES_STATISTICS_SUCCESS,
 } from "../actions/seriesDetailsActions";
 
 // Initial state of series details in redux store
@@ -24,7 +29,10 @@ const initialState = {
     feeds: {},
     acl: {},
     theme: '',
-    themeNames: []
+    themeNames: [],
+    fetchingStatisticsInProgress: false,
+    statistics: [],
+    hasStatisticsError: false
 };
 
 // Reducer for series details
@@ -117,6 +125,42 @@ const seriesDetails = (state=initialState, action) => {
                 ...state,
                 extendedMetadata: seriesMetadata
             }
+        }
+        case LOAD_SERIES_STATISTICS_IN_PROGRESS: {
+            return {
+                ...state,
+                fetchingStatisticsInProgress: true,
+            };
+        }
+        case LOAD_SERIES_STATISTICS_SUCCESS: {
+            const { statistics, hasError } = payload;
+            return {
+                ...state,
+                fetchingStatisticsInProgress: false,
+                statistics: statistics,
+                hasStatisticsError: hasError
+            };
+        }
+        case LOAD_SERIES_STATISTICS_FAILURE: {
+            const { hasError } = payload;
+            return {
+                ...state,
+                fetchingStatisticsInProgress: false,
+                statistics: [],
+                hasStatisticsError: hasError
+            };
+        }
+        case UPDATE_SERIES_STATISTICS_SUCCESS: {
+            const { statistics } = payload;
+            return {
+                ...state,
+                statistics: statistics
+            };
+        }
+        case UPDATE_SERIES_STATISTICS_FAILURE: {
+            return {
+                ...state
+            };
         }
         default:
             return state;

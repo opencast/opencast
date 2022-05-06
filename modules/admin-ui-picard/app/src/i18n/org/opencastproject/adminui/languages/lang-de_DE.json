@@ -2136,6 +2136,12 @@
          "Month": "Monat",
          "Custom": "Benutzerdefiniert"
       },
+      "TIME_GRANULARITIES": {
+         "Yearly": "Jährlich",
+         "Monthly": "Monatlich",
+         "Daily": "Täglich",
+         "Hourly": "Stündlich"
+      },
       "TITLE": {
          "RANDOM": "Zufallsdaten",
          "VIEWS_SUM": "Zugriffe",

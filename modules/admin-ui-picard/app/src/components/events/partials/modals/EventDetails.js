@@ -39,7 +39,7 @@ import {
     updateMetadata,
     updateExtendedMetadata,
     fetchSchedulingInfo,
-    fetchStatistics
+    fetchEventStatistics
 } from "../../../../thunks/eventDetailsThunks";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
@@ -59,9 +59,9 @@ const EventDetails = ({ tabIndex, eventId, close,
 
     useEffect(() => {
         removeNotificationWizardForm();
-        loadMetadata(eventId).then(r => {});
-        loadScheduling(eventId).then(r => {});
-        loadStatistics(eventId).then(r => {});
+        loadMetadata(eventId).then();
+        loadScheduling(eventId).then();
+        loadStatistics(eventId).then();
     }, []);
 
     const [page, setPage] = useState(tabIndex);
@@ -339,33 +339,6 @@ const EventDetails = ({ tabIndex, eventId, close,
                     )}
                 </div>
         </>
-
-    );
-};
-
-const MockDataPage = ({ header, t }) => {
-
-    return (
-        <div className="modal-content">
-            <div className="modal-body">
-                <div className="full-col">
-                    <div className="obj tbl-details">
-                        <header>{t(header)}</header>
-                        <div className="obj-container">
-                            <table className="main-tbl">
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <span>Content coming soon!</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     );
 };
 
@@ -387,7 +360,7 @@ const mapDispatchToProps = dispatch => ({
     updateMetadata: (id, values) => dispatch(updateMetadata(id, values)),
     loadScheduling: (id) => dispatch(fetchSchedulingInfo(id)),
     updateExtendedMetadata: (id, values, catalog) => dispatch(updateExtendedMetadata(id, values, catalog)),
-    loadStatistics: (id) => dispatch(fetchStatistics(id)),
+    loadStatistics: (id) => dispatch(fetchEventStatistics(id)),
     removeNotificationWizardForm: () => dispatch(removeNotificationWizardForm())
 });
 

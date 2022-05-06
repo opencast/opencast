@@ -18,7 +18,7 @@ import {localizedMoment} from "../../utils/dateUtils";
 /**
  * This component visualizes statistics with data of type time series
  */
-const TimeSeriesStatistics = ({ t, eventId, statTitle, providerId, fromDate, toDate, timeMode, dataResolution,
+const TimeSeriesStatistics = ({ t, resourceId, statTitle, providerId, fromDate, toDate, timeMode, dataResolution,
                                   statDescription, onChange, exportUrl, exportFileName, totalValue, sourceData,
                                   chartLabels, chartOptions}) => {
 
@@ -74,7 +74,7 @@ const TimeSeriesStatistics = ({ t, eventId, statTitle, providerId, fromDate, toD
             dataResolution = fixedDataResolutions[timeMode];
         }
 
-        onChange(eventId, providerId, from, to, dataResolution, timeMode);
+        onChange(resourceId, providerId, from, to, dataResolution, timeMode);
     };
 
     // change time mode in formik and get new values from API
@@ -264,7 +264,7 @@ const TimeSeriesStatistics = ({ t, eventId, statTitle, providerId, fromDate, toD
                                             {availableCustomDataResolutions.map((option, key) => (
                                                 <option value={option.value}
                                                         key={key}>
-                                                    {option.label}
+                                                    {t('STATISTICS.TIME_GRANULARITIES.' + option.label)}
                                                 </option>
                                             ))}
                                         </Field>

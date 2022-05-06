@@ -2,7 +2,7 @@ import React from "react";
 import {getStatistics, hasStatisticsError} from "../../../../selectors/eventDetailsSelectors";
 import {connect} from "react-redux";
 import TimeSeriesStatistics from "../../../shared/TimeSeriesStatistics";
-import {fetchStatisticsValueUpdate} from "../../../../thunks/eventDetailsThunks";
+import {fetchEventStatisticsValueUpdate} from "../../../../thunks/eventDetailsThunks";
 
 /**
  * This component manages the statistics tab of the event details modal
@@ -46,7 +46,7 @@ const EventDetailsStatisticsTab = ({ eventId, header, t,
                                     <div className="obj-container">
                                         <TimeSeriesStatistics
                                             t={t}
-                                            eventId={eventId}
+                                            resourceId={eventId}
                                             statTitle={t(stat.title)}
                                             providerId={stat.providerId}
                                             fromDate={stat.from}
@@ -87,7 +87,7 @@ const mapStateToProps = state => ({
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    recalculateStatistics: (eventId, providerId, from, to, dataResolution, timeMode) => dispatch(fetchStatisticsValueUpdate(eventId, providerId, from, to, dataResolution, timeMode)),
+    recalculateStatistics: (eventId, providerId, from, to, dataResolution, timeMode) => dispatch(fetchEventStatisticsValueUpdate(eventId, providerId, from, to, dataResolution, timeMode)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EventDetailsStatisticsTab);
