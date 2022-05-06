@@ -1290,18 +1290,14 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         }
         index(workflowInstance);
       } catch (ServiceRegistryException e) {
-        logger.error(
-                "Update of workflow job %s in the service registry failed, service registry and workflow table may be out of sync",
-                workflowInstance.getId());
-        throw new WorkflowDatabaseException(e);
+        throw new WorkflowDatabaseException("Update of workflow job " + workflowInstance.getId()
+            + " in the service registry failed, service registry and workflow table may be out of sync", e);
       } catch (NotFoundException e) {
-        logger.error("Job for workflow %s not found in service registry", workflowInstance.getId());
-        throw new WorkflowDatabaseException(e);
+        throw new WorkflowDatabaseException("Job for workflow " + workflowInstance.getId()
+            + " not found in service registry", e);
       } catch (Exception e) {
-        logger.error(
-                "Update of workflow job %s in the service registry failed, service registry and workflow table may be out of sync",
-                job.getId());
-        throw new WorkflowException(e);
+        throw new WorkflowException("Update of workflow job " + job.getId() + " in the service registry failed, "
+            + "service registry and workflow table may be out of sync", e);
       }
 
       if (workflowStatsCollect) {
