@@ -225,13 +225,15 @@ const EventDetailsAssetMediaDetails = ({ eventId, t, setHierarchy,
                         </header>
                         <div className="obj-container">
                             <div>
-                                {/*todo: insert video player here. div attributes used in old version:
-                                 data-video-player data-player="{}"
-                                 data-video="media.video"
-                                 data-adapter="html5"
-                                 data-player-ref="player"
-                                 data-controls="true"
-                                 data-sub-controls="false"*/}
+                                {/* video player */}
+                                <div className="video-player">
+                                    <div>
+                                        <video id="player" controls>
+                                            <source src={media.url}
+                                                    type="video/mp4"/>
+                                        </video>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

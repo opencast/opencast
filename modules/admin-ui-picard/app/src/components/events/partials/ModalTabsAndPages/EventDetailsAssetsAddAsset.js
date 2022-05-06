@@ -5,19 +5,23 @@ import Notifications from "../../../shared/Notifications";
 import {style_button_spacing} from "../../../../utils/eventDetailsUtils";
 import {uploadAssetOptions} from "../../../../configs/sourceConfig";
 import {Formik} from "formik";
+import { updateAssets } from '../../../../thunks/eventDetailsThunks';
 
 /**
  * This component manages the add asset sub-tab for assets tab of event details modal
  */
-const EventDetailsAssetsAddAsset = ({ eventId, t, setHierarchy}) => {
+const EventDetailsAssetsAddAsset = ({ eventId, t, setHierarchy, updateAssets }) => {
+
+    // Get upload assets that are not of type track
+    const uploadAssets = uploadAssetOptions.filter(asset => asset.type !== 'track');
 
     const openSubTab = (subTabName) => {
         setHierarchy(subTabName);
     }
 
 
-    function saveAssets(values) {
-        //todo: get asset files and other required data and save (endpoint: `/admin-ng/event/${eventId}/assets`)
+    function saveAssets (values) {
+        updateAssets(values, eventId);
     }
 
     const handleChange = (e, formik, assetId) => {
@@ -57,12 +61,12 @@ const EventDetailsAssetsAddAsset = ({ eventId, t, setHierarchy}) => {
                                         {/* file select for upload for different types of assets */}
                                         <table className="main-tbl">
                                             <tbody>
-                                                {uploadAssetOptions.length === 0 ? (
+                                                {uploadAssets.length === 0 ? (
                                                     <tr>
                                                         <td>{t('EVENTS.EVENTS.NEW.UPLOAD_ASSET.NO_OPTIONS')}</td>
                                                     </tr>
                                                 ) : (
-                                                    uploadAssetOptions.map((asset, key) => (
+                                                    uploadAssets.map((asset, key) => (
                                                         <tr key={key}>
                                                             <td> {asset.id}
                                                                 <span className="ui-helper-hidden">
@@ -103,6 +107,7 @@ const EventDetailsAssetsAddAsset = ({ eventId, t, setHierarchy}) => {
                                             <button className="submit"
                                                     style={style_button_spacing}
                                                     type="submit"
+                                                    onClick={() => formik.handleSubmit()}
                                             >
                                                 {t("EVENTS.EVENTS.NEW.UPLOAD_ASSET.ADD")}
                                             </button>
@@ -118,13 +123,9 @@ const EventDetailsAssetsAddAsset = ({ eventId, t, setHierarchy}) => {
     );
 };
 
-// Getting state data out of redux store
-const mapStateToProps = state => ({
-});
-
-
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
+    updateAssets: (values, eventId) => dispatch(updateAssets(values, eventId))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(EventDetailsAssetsAddAsset);
+export default connect(null, mapDispatchToProps)(EventDetailsAssetsAddAsset);
