@@ -1261,11 +1261,11 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
             throw new IllegalStateException("Found a workflow state that is not handled");
         }
       } catch (ServiceRegistryException e) {
-        logger.error(e, "Unable to read workflow job %s from service registry", workflowInstance.getId());
-        throw new WorkflowDatabaseException(e);
+        throw new WorkflowDatabaseException(
+            "Unable to read workflow job " + workflowInstance.getId() + " from service registry", e);
       } catch (NotFoundException e) {
-        logger.error("Job for workflow %s not found in service registry", workflowInstance.getId());
-        throw new WorkflowDatabaseException(e);
+        throw new WorkflowDatabaseException(
+            "Job for workflow " + workflowInstance.getId() + " not found in service registry", e);
       }
 
       final DublinCoreCatalog episodeDublinCoreCatalog = getEpisodeDublinCoreCatalog(
