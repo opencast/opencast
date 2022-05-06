@@ -962,47 +962,47 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       // First, remove temporary files
       removeTempFiles(instance);
 
-        // Second, remove jobs related to a operation which belongs to the workflow instance
-        List<WorkflowOperationInstance> operations = instance.getOperations();
-        List<Long> jobsToDelete = new ArrayList<>();
-        for (WorkflowOperationInstance op : operations) {
-          if (op.getId() != null) {
-            long workflowOpId = op.getId();
-            if (workflowOpId != workflowInstanceId) {
-              jobsToDelete.add(workflowOpId);
-            }
+      // Second, remove jobs related to operations which belong to the workflow instance
+      List<WorkflowOperationInstance> operations = instance.getOperations();
+      List<Long> jobsToDelete = new ArrayList<>();
+      for (WorkflowOperationInstance op : operations) {
+        if (op.getId() != null) {
+          long workflowOpId = op.getId();
+          if (workflowOpId != workflowInstanceId) {
+            jobsToDelete.add(workflowOpId);
           }
         }
-        try {
-          serviceRegistry.removeJobs(jobsToDelete);
-        } catch (ServiceRegistryException e) {
-          logger.warn("Problems while removing jobs related to workflow operations '%s': %s", jobsToDelete,
-                  e.getMessage());
-        } catch (NotFoundException e) {
-          logger.debug("No jobs related to one of the workflow operations '%s' found in the service registry",
-                  jobsToDelete);
-        }
+      }
+      try {
+        serviceRegistry.removeJobs(jobsToDelete);
+      } catch (ServiceRegistryException e) {
+        logger.warn("Problems while removing jobs related to workflow operations '%s': %s", jobsToDelete,
+                e.getMessage());
+      } catch (NotFoundException e) {
+        logger.debug("No jobs related to one of the workflow operations '%s' found in the service registry",
+                jobsToDelete);
+      }
 
-        // Third, remove workflow instance job itself
-        try {
-          serviceRegistry.removeJobs(Collections.singletonList(workflowInstanceId));
-          removeWorkflowInstanceFromIndex(instance.getId(), elasticsearchIndex);
-        } catch (ServiceRegistryException e) {
-          logger.warn("Problems while removing workflow instance job '%d'", workflowInstanceId, e);
-        } catch (NotFoundException e) {
-          logger.info("No workflow instance job '%d' found in the service registry", workflowInstanceId);
-        }
+      // Third, remove workflow instance job itself
+      try {
+        serviceRegistry.removeJobs(Collections.singletonList(workflowInstanceId));
+        removeWorkflowInstanceFromIndex(instance.getId(), elasticsearchIndex);
+      } catch (ServiceRegistryException e) {
+        logger.warn("Problems while removing workflow instance job '%d'", workflowInstanceId, e);
+      } catch (NotFoundException e) {
+        logger.info("No workflow instance job '%d' found in the service registry", workflowInstanceId);
+      }
 
-        // At last, remove workflow instance from the index
-        try {
-          index.remove(workflowInstanceId);
-        } catch (NotFoundException e) {
-          // This should never happen, because we got workflow instance by querying the index...
-          logger.warn("Workflow instance could not be removed from index", e);
-        }
+      // At last, remove workflow instance from the index
+      try {
+        index.remove(workflowInstanceId);
+      } catch (NotFoundException e) {
+        // This should never happen, because we got workflow instance by querying the index...
+        logger.warn("Workflow instance could not be removed from index", e);
+      }
 
-        //Remove workflow from database
-        persistence.removeFromDatabase(instance);
+      //Remove workflow from database
+      persistence.removeFromDatabase(instance);
     } finally {
       lock.unlock();
     }
