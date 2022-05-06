@@ -27,10 +27,11 @@ const StartTaskSummaryPage = ({ formik, previousPage }) => {
                                         <span>{t('BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.WORKFLOW')}</span>
                                         <p>{formik.values.workflow}</p>
                                     </li>
-                                    {/* todo: implement when backend is updated*/}
                                     <li>
                                         <span>{t('BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.CONFIGURATION')}</span>
-                                        <p>To be implemented</p>
+                                        {Object.keys(formik.values.configuration).map((config, key) => (
+                                          <p>{config} : {formik.values.configuration[config].toString()}</p>
+                                        ))}
                                     </li>
                                 </ul>
                             </div>

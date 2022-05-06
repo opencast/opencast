@@ -97,11 +97,31 @@ export const transformToObjectArray = data => {
 }
 
 /*
+* iterates trough all attributes in an object and switches 'true'- and 'false'-Strings
+* to their corresponding boolean value. All other values stay the same.
+*/
+export const parseBooleanInObject = baseObject => {
+    let parsedObject = {};
+
+    Object.keys(baseObject).forEach(config => {
+        if (baseObject[config] === 'true') {
+            parsedObject[config] = true;
+        } else {
+            if (baseObject[config] === 'false') {
+                parsedObject[config] = false;
+            } else {
+                parsedObject[config] = baseObject[config];
+            }
+        }
+    });
+
+    return parsedObject;
+}
+
+/*
 * checks if an user is admin or has the required role to access an ui element
 */
 export const hasAccess = (role, userInfo) =>  {
 
     return !!(userInfo.isAdmin || userInfo.roles.includes(role));
 }
-
-

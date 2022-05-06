@@ -157,7 +157,7 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
                             </div>
                         </div>
 
-                        {/*Summary processing configuration*/}
+                        {/* Summary processing configuration */}
                         <div className="obj tbl-list">
                             <header className="no-expand">
                                 {t('EVENTS.EVENTS.NEW.PROCESSING.CAPTION')}
@@ -168,11 +168,13 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
                                         <td>{t('EVENTS.EVENTS.NEW.PROCESSING.WORKFLOW')}</td>
                                         <td>{workflowDefinition.title}</td>
                                     </tr>
-                                    {/*todo: repeat entry for each configuration key/value pair*/}
-                                    <tr>
-                                        <td>Configuration key</td>
-                                        <td>Configuration value</td>
-                                    </tr>
+                                    {/* Repeat entry for each configuration key/value pair */}
+                                    {Object.keys(formik.values.configuration).map((config, key) => (
+                                      <tr key={key}>
+                                          <td>{config}</td>
+                                          <td>{formik.values.configuration[config].toString()}</td>
+                                      </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         </div>

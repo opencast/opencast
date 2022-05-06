@@ -6,6 +6,7 @@ import {connect} from "react-redux";
 import {fetchWorkflowDef} from "../../../../thunks/workflowThunks";
 import {getWorkflowDef} from "../../../../selectors/workflowSelectors";
 import RenderWorkflowConfig from "../wizards/RenderWorkflowConfig";
+import { setDefaultConfig } from '../../../../utils/workflowPanelUtils';
 
 /**
  * This component renders the processing page for new events in the new event wizard.
@@ -28,6 +29,17 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, loadingWorkflowDef,
 
     }
 
+    const setDefaultValues = e => {
+      let workflowId = e.target.value;
+      // fill values with default configuration of chosen workflow
+      let defaultConfiguration = setDefaultConfig(workflowDef, workflowId);
+
+      // set default configuration in formik
+      formik.setFieldValue("configuration", defaultConfiguration);
+      // set chosen workflow in formik
+      formik.setFieldValue("processingWorkflow", workflowId);
+    }
+
     return (
         <>
             <div className="modal-content">
@@ -43,6 +55,7 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, loadingWorkflowDef,
                                     <Field tabIndex="99"
                                            as="select"
                                            name="processingWorkflow"
+                                           onChange={e => setDefaultValues(e)}
                                            placeholder={t('EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW')}
                                            style={{width: '100%'}}>
                                         <option value="" />
@@ -55,12 +68,13 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, loadingWorkflowDef,
                                 )}
 
                                 {/* Configuration panel of selected workflow */}
-                                {/*Todo: Needs to be implemented after adjustments in definition files done*/}
                                 <div className="collapsible-box">
                                     <div id="new-event-workflow-configuration"
                                          className="checkbox-container obj-container">
                                         {formik.values.processingWorkflow ? (
-                                            <RenderWorkflowConfig displayDescription={true} workflowId={formik.values.processingWorkflow} />
+                                            <RenderWorkflowConfig displayDescription
+                                                                  workflowId={formik.values.processingWorkflow}
+                                                                  formik={formik} />
                                         ) : null}
                                     </div>
                                 </div>
@@ -95,7 +109,7 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, loadingWorkflowDef,
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    workflowDef: getWorkflowDef(state)
+    workflowDef: getWorkflowDef(state),
 });
 
 const mapDispatchToProps = dispatch => ({
