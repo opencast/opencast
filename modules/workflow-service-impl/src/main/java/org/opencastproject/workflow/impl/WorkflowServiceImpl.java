@@ -1670,32 +1670,26 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     Optional<WorkflowInstance> workflowInstance;
     String mediaPackageId;
 
-    // Fetch all workflows that are running with the current mediapackage
+    // Fetch all workflows that are running with the current media package
     try {
       workflow = getWorkflowById(job.getId());
       mediaPackageId = workflow.getMediaPackage().getIdentifier().toString();
     } catch (NotFoundException e) {
-      logger.error(
-              "Trying to start workflow with id %s but no corresponding instance is available from the workflow service",
-              job.getId());
-      throw new UndispatchableJobException(e);
+      throw new UndispatchableJobException("Trying to start workflow with job id " + job.getId()
+          + " but no corresponding instance is available from the workflow service", e);
     } catch (UnauthorizedException e) {
-      logger.error("Authorization denied while requesting to loading workflow instance %s: %s", job.getId(),
-              e.getMessage());
-      throw new UndispatchableJobException(e);
+      throw new UndispatchableJobException(
+          "Authorization denied while requesting to loading workflow instance. Job: " + job.getId(), e);
     }
 
     try {
       workflowInstance = getRunningWorkflowInstanceByMediaPackage(
               workflow.getMediaPackage().getIdentifier().toString(), Permissions.Action.READ.toString());
     } catch (UnauthorizedException e) {
-      logger.error("Authorization denied while requesting to loading workflow instance %s: %s", job.getId(),
-              e.getMessage());
-      throw new UndispatchableJobException(e);
+      throw new UndispatchableJobException("Authorization denied while requesting to loading workflow instance " + workflow.getId(), e);
     } catch (WorkflowDatabaseException e) {
-      logger.error("An database error occured while checking if a workflow is already active %s: %s", job.getId(),
-              e.getMessage());
-      throw new UndispatchableJobException(e);
+      throw new UndispatchableJobException("An database error occurred while checking if a workflow is already active "
+          + "(job: " + job.getId() + ")", e);
     } catch (WorkflowException e) {
       // Avoid running multiple workflows with same media package id at the same time
       delayWorkflow(workflow, mediaPackageId);
