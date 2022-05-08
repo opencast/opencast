@@ -605,7 +605,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         }
 
         Job job = serviceRegistry.createJob(JOB_TYPE, Operation.START_WORKFLOW.toString(), arguments,
-                Long.toString(workflowInstance.getId()), false, null, WORKFLOW_JOB_LOAD);
+                null, false, null, WORKFLOW_JOB_LOAD);
 
         // Have the workflow take on the job's identity
         workflowInstance.setId(job.getId());

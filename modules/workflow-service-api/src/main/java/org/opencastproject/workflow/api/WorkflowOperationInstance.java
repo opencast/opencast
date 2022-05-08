@@ -122,6 +122,7 @@ public class WorkflowOperationInstance implements Configurable {
   protected RetryStrategy retryStrategy;
 
   @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "workflow_id", nullable = false)
   private WorkflowInstance instance;
 
   /**

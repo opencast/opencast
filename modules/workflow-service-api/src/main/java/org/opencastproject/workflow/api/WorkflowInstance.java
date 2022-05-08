@@ -67,7 +67,7 @@ import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
- * Enitity object for storing workflows in persistence storage. Workflow ID is stored as primary key, DUBLIN_CORE field is
+ * Entity object for storing workflows in persistence storage. Workflow ID is stored as primary key, DUBLIN_CORE field is
  * used to store serialized Dublin core and ACCESS_CONTROL field is used to store information about access control
  * rules.
  *
