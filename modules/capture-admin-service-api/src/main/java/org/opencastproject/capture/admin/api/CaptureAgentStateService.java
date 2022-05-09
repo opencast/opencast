@@ -21,8 +21,6 @@
 
 package org.opencastproject.capture.admin.api;
 
-import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 
 import java.util.Map;
