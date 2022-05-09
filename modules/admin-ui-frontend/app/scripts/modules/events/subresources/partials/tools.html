@@ -44,7 +44,7 @@
         </nav>
         </div>
       -->
-      <div class="video-container">
+      <div class="video-container" ng-controller="EventCtrl">
 
         <div data-video-player
              data-player="player"
@@ -56,7 +56,7 @@
         <div class="tool-tab" ng-if="tab === 'editor' && player.adapter">
           <div data-admin-ng-timeline="" data-video="video" data-player="player"></div>
         </div>
-        <div class="event-container" ng-controller="EventCtrl">
+        <div class="event-container">
           <div>
             <nav class="modal-nav view-controller-secondary">
               <a ng-class="{active: area === 'segments'}"
@@ -92,14 +92,6 @@
                   </div>
                 </div>
               </div>
-              <footer>
-                <a
-                  class="submit"
-                  ng-class="{disabled: metadata.locked || !unsavedChanges([commonMetadataCatalog])}"
-                  ng-click="metadataSave([commonMetadataCatalog])">
-                  {{ "SAVE" | translate}}
-                </a>
-              </footer>
             </div>
           </div>
 
@@ -410,7 +402,7 @@
                       ng-options="workflow.id as workflow.name for workflow in video.workflows | orderBy: 'displayOrder':true" >
               </select>
 
-              <a ng-click="submit()"
+              <a ng-click="submit([commonMetadataCatalog], commonMetadataCatalog)"
                  ng-class="{disabled: activeTransaction || activeSubmission || sanityCheckFlags()}"
                  class="save-and-close-button"
                  translate="{{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' }}">
