@@ -29,6 +29,12 @@ import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
 
 import org.opencastproject.capture.CaptureParameters;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.ingest.impl.jmx.IngestStatistics;
@@ -52,7 +58,6 @@ import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
@@ -70,7 +75,6 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesException;
-import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -314,6 +318,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /** The media inspection service */
   private MediaInspectionService mediaInspectionService = null;
+
+  /** The search index. */
+  private ElasticsearchIndex elasticsearchIndex;
 
   /** The default workflow identifier, if one is configured */
   protected String defaultWorkflowDefinionId;
@@ -1780,6 +1787,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     organizationDirectoryService = organizationDirectory;
   }
 
+  /** OSGi callbacks for setting the API index. */
+  @Reference
+  public void setElasticsearchIndex(ElasticsearchIndex index) {
+    this.elasticsearchIndex = index;
+  }
+
   /**
    * {@inheritDoc}
    *
@@ -2004,34 +2017,35 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
     // Find or create CA series
     String seriesName = captureAgentId + seriesAppendName;
-    SeriesQuery q = new SeriesQuery().setCount(Integer.MAX_VALUE);
-    q.setSeriesTitle(seriesName);
-    DublinCoreCatalogList seriesList = null;
+    SeriesSearchQuery query = new SeriesSearchQuery(securityService.getOrganization().getId(),
+            securityService.getUser());
+    query.withTitle(seriesName);
+
+    SearchResultItem<Series>[] seriesList = null;
     try {
-      seriesList = seriesService.getSeries(q);
-    } catch (SeriesException e) {
+      SearchResult searchResult = elasticsearchIndex.getByQuery(query);
+      seriesList = searchResult.getItems();
+    } catch (SearchIndexException e) {
       logger.error("Exception while searching for series: " + seriesName, e);
       return mp;
-    } catch (UnauthorizedException e) {
-      logger.error("Not authorized to search for series: " + seriesName, e);
-      return mp;
     }
-    DublinCoreCatalog series = null;
-    if (seriesList.size() == 0) {
+    String seriesIdentifier = null;
+    if (seriesList.length == 0) {
       try {
-        series = createSeries(seriesName, roleName);
+        DublinCoreCatalog series = createSeries(seriesName, roleName);
+        seriesIdentifier = series.getFirst(PROPERTY_IDENTIFIER);
       } catch (Exception e) {
         logger.error("Unable to create series {} for event {}", seriesName, mp.getIdentifier(), e);
         return mp;
       }
-    } else if (seriesList.size() == 1) {
-      series = seriesList.getCatalogList().get(0);
+    } else if (seriesList.length == 1) {
+      seriesIdentifier = seriesList[0].getSource().getIdentifier();
     } else {
       logger.error("More than one series with name {} found for event {}", seriesName, mp.getIdentifier());
       return mp;
     }
     // Add the event to CA series
-    mp.setSeries(series.getFirst(PROPERTY_IDENTIFIER));
+    mp.setSeries(seriesIdentifier);
     mp.setSeriesTitle(seriesName);
 
     return mp;

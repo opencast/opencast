@@ -88,7 +88,7 @@ public class SeriesEndpointTest {
     assertEquals("Topic", subjects.get(0));
   }
 
-  /** Unit test for {@link SeriesEndpoint#getSeries(String, String)} */
+  /** Unit test for {@link SeriesEndpoint#getSeries(String, String, Boolean)} */
   @Test
   public void testGetSeriesJson() throws Exception {
     final String response = given().pathParam("seriesId", "4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f")
