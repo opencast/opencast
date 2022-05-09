@@ -27,5 +27,6 @@ These guides will help you if you want to participate in Opencast development.
     * […](modules/index.md)
 * [Configure a Local Cluster for Testing](local-cluster.md)
 * [External API](api/index.md)
+* [Explore H2 Database](explore-h2-database.md)
 * [Project Infrastructure](infrastructure/index.md)
     * [Maven Repository](infrastructure/maven-repository.md)
