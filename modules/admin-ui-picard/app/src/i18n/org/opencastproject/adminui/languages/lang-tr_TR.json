@@ -2131,6 +2131,11 @@
       "NAVIGATION": {
          "ORGANIZATION": "Organizasyon"
       },
+      "TIME_MODES": {
+         "Year": "Year",
+         "Month": "Month",
+         "Custom": "Custom"
+      },
       "TITLE": {
          "RANDOM": "Rastgele Veriler",
          "VIEWS_SUM": "Toplam Görüntülenme Sayısı",

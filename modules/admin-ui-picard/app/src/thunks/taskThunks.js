@@ -4,20 +4,21 @@ import {logger} from "../utils/logger";
 
 export const postTasks = values => async dispatch => {
     let configuration = {};
+    Object.keys(values.configuration).forEach(config => {
+        configuration[config] = String(values.configuration[config])
+    });
 
-    // todo: implement config when backend is updated
+    let workflowConfig = {};
     for (let i = 0; i < values.events.length; i++) {
         if (values.events[i].selected) {
             let eventId = values.events[i].id;
-            configuration[eventId] = {
-                configuration: 'to be Implemented'
-            }
+            workflowConfig[eventId] = configuration
         }
     }
 
     let metadataJson = {
         workflow: values.workflow,
-        configuration: configuration
+        configuration: workflowConfig
     }
 
     let data = new URLSearchParams();

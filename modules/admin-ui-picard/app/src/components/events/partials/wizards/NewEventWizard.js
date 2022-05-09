@@ -29,6 +29,7 @@ const currentLanguage = getCurrentLanguageInformation();
 const NewEventWizard = ({ metadataFields, close, postNewEvent }) => {
 
     const initialValues = getInitialValues(metadataFields);
+    let workflowPanelRef = React.useRef();
 
 
     const [page, setPage] = useState(0);
@@ -91,6 +92,7 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent }) => {
     }
 
     const handleSubmit = (values) => {
+        workflowPanelRef.current?.submitForm();
         const response = postNewEvent(values, metadataFields);
         logger.info(response);
         close();
@@ -133,8 +135,9 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent }) => {
                             )}
                             {page === 4 && (
                                 <NewProcessingPage previousPage={previousPage}
-                                                    nextPage={nextPage}
-                                                    formik={formik} />
+                                                   nextPage={nextPage}
+                                                   workflowPanelRef={workflowPanelRef}
+                                                   formik={formik} />
                             )}
                             {page === 5 && (
                                 <NewAccessPage previousPage={previousPage}

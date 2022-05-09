@@ -72,6 +72,11 @@ import {
     SAVE_EVENT_SCHEDULING_IN_PROGRESS,
     SAVE_EVENT_SCHEDULING_SUCCESS,
     SAVE_EVENT_SCHEDULING_FAILURE,
+    LOAD_EVENT_STATISTICS_IN_PROGRESS,
+    LOAD_EVENT_STATISTICS_SUCCESS,
+    LOAD_EVENT_STATISTICS_FAILURE,
+    UPDATE_EVENT_STATISTICS_SUCCESS,
+    UPDATE_EVENT_STATISTICS_FAILURE,
 } from '../actions/eventDetailsActions';
 
 // Initial state of event details in redux store
@@ -200,7 +205,10 @@ const initialState = {
     fetchingWorkflowErrorDetailsInProgress: false,
     workflowErrorDetails: {},
     loadingPublications: false,
-    publications: []
+    publications: [],
+    fetchingStatisticsInProgress: false,
+    statistics: [],
+    hasStatisticsError: false
 }
 
 // Reducer for event details
@@ -863,6 +871,42 @@ const eventDetails = (state=initialState, action) => {
                 ...state,
                 workflowErrorDetails: emptyErrorDetails,
                 fetchingWorkflowErrorDetailsInProgress: false
+            };
+        }
+        case LOAD_EVENT_STATISTICS_IN_PROGRESS: {
+            return {
+                ...state,
+                fetchingStatisticsInProgress: true,
+            };
+        }
+        case LOAD_EVENT_STATISTICS_SUCCESS: {
+            const { statistics, hasError } = payload;
+            return {
+                ...state,
+                fetchingStatisticsInProgress: false,
+                statistics: statistics,
+                hasStatisticsError: hasError
+            };
+        }
+        case LOAD_EVENT_STATISTICS_FAILURE: {
+            const { hasError } = payload;
+            return {
+                ...state,
+                fetchingStatisticsInProgress: false,
+                statistics: [],
+                hasStatisticsError: hasError
+            };
+        }
+        case UPDATE_EVENT_STATISTICS_SUCCESS: {
+            const { statistics } = payload;
+            return {
+                ...state,
+                statistics: statistics
+            };
+        }
+        case UPDATE_EVENT_STATISTICS_FAILURE: {
+            return {
+                ...state
             };
         }
         default:

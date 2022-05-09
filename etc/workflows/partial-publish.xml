@@ -6,6 +6,7 @@
   <tags/>
   <description/>
   <configuration_panel/>
+  <configuration_panel_json/>
   <operations>
 
     <!-- Fall back to */source if */prepared does not exist -->

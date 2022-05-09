@@ -2,19 +2,20 @@
   "configuration": {
     "publishToYouTube": "false",
     "publishLive": "false",
-    "publishToOaiPmh": "true",
+    "publishToOAIPMH": "true",
     "flagQuality1080p": "false",
-    "publishToEngage": "true",
-    "straightToPublishing": "true",
+    "ocIndex": "true",
     "flagQuality360p": "false",
     "flagQuality480p": "false",
     "publishToSearch": "true",
     "flagForCutting": "false",
     "flagQuality720p": "true",
-    "flagForReview": "false",
+    "flagForReview": "true",
     "flagQuality2160p": "false",
     "publishToApi": "true",
-    "publishToAws": "false"
+    "publishToAws": "false",
+    "holdOrPublishToggle": "publish",
+    "searchPublishTyp": "ocMediaModule"
   },
   "workflowId": "schedule-and-upload"
 }

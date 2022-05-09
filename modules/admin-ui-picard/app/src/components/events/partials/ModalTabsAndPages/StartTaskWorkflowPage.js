@@ -6,6 +6,7 @@ import {fetchWorkflowDef} from "../../../../thunks/workflowThunks";
 import {getWorkflowDef} from "../../../../selectors/workflowSelectors";
 import {connect} from "react-redux";
 import cn from 'classnames';
+import { setDefaultConfig } from '../../../../utils/workflowPanelUtils';
 
 /**
  * This component renders the workflow selection for start task bulk action
@@ -17,6 +18,17 @@ const StartTaskWorkflowPage = ({ formik, previousPage, nextPage, loadingWorkflow
         // Load workflow definitions for selecting
         loadingWorkflowDef();
     }, []);
+
+  const setDefaultValues = e => {
+    let workflowId = e.target.value;
+    // fill values with default configuration of chosen workflow
+    let defaultConfiguration = setDefaultConfig(workflowDef, workflowId);
+
+    // set default configuration in formik
+    formik.setFieldValue("configuration", defaultConfiguration);
+    // set chosen workflow in formik
+    formik.setFieldValue("workflow", workflowId);
+  }
 
     return (
         <>
@@ -30,6 +42,7 @@ const StartTaskWorkflowPage = ({ formik, previousPage, nextPage, loadingWorkflow
                                 {workflowDef.length > 0 && (
                                         <Field tabIndex="99"
                                                 name="workflow"
+                                                onChange={e => setDefaultValues(e)}
                                                 as="select"
                                                 style={{width: '100%'}}>
                                             <option value="" hidden>{t('EVENTS.EVENTS.DETAILS.PUBLICATIONS.SELECT_WORKFLOW')}</option>
@@ -41,10 +54,11 @@ const StartTaskWorkflowPage = ({ formik, previousPage, nextPage, loadingWorkflow
                                 {formik.values.workflow  && (
                                     <>
                                         {/* Configuration panel of selected workflow */}
-                                        {/*Todo: Needs to be implemented after adjustments in definition files done*/}
                                         <div id="new-event-workflow-configuration"
                                              className="checkbox-container obj-container">
-                                            <RenderWorkflowConfig workflowId={formik.values.workflow} />
+                                            <RenderWorkflowConfig displayDescription
+                                                                  workflowId={formik.values.workflow}
+                                                                  formik={formik}/>
                                         </div>
                                     </>
                                 )}

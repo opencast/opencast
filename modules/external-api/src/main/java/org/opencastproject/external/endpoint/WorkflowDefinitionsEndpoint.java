@@ -133,6 +133,7 @@ public class WorkflowDefinitionsEndpoint {
   @RestQuery(name = "getworkflowdefinitions", description = "Returns a list of workflow definition.", returnDescription = "", restParameters = {
           @RestParameter(name = "withoperations", description = "Whether the workflow operations should be included in the response", isRequired = false, type = BOOLEAN),
           @RestParameter(name = "withconfigurationpanel", description = "Whether the workflow configuration panel should be included in the response", isRequired = false, type = BOOLEAN),
+          @RestParameter(name = "withconfigurationpaneljson", description = "Whether the workflow configuration panel in JSON should be included in the response", isRequired = false, type = BOOLEAN),
           @RestParameter(name = "filter", description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form <Filter Name>:<Value to Filter With>.", isRequired = false, type = STRING),
           @RestParameter(name = "sort", description = "Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory.", isRequired = false, type = STRING),
           @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.", isRequired = false, type = INTEGER),
@@ -141,7 +142,8 @@ public class WorkflowDefinitionsEndpoint {
           @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
   public Response getWorkflowDefinitions(@HeaderParam("Accept") String acceptHeader,
           @QueryParam("withoperations") boolean withOperations,
-          @QueryParam("withconfigurationpanel") boolean withConfigurationPanel, @QueryParam("filter") String filter,
+          @QueryParam("withconfigurationpanel") boolean withConfigurationPanel,
+          @QueryParam("withconfigurationpaneljson") boolean withConfigurationPanelJson, @QueryParam("filter") String filter,
           @QueryParam("sort") String sort, @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
     Stream<WorkflowDefinition> workflowDefinitions;
     try {
@@ -220,7 +222,7 @@ public class WorkflowDefinitionsEndpoint {
     }
 
     List<JValue> json = workflowDefinitions.map(
-            wd -> workflowDefinitionToJSON(wd, withOperations, withConfigurationPanel)).collect(Collectors.toList());
+            wd -> workflowDefinitionToJSON(wd, withOperations, withConfigurationPanel, withConfigurationPanelJson)).collect(Collectors.toList());
 
     return ApiResponses.Json.ok(acceptHeader, arr(json));
   }
@@ -230,12 +232,14 @@ public class WorkflowDefinitionsEndpoint {
   @RestQuery(name = "getworkflowdefinition", description = "Returns a single workflow definition.", returnDescription = "", pathParameters = {
           @RestParameter(name = "workflowDefinitionId", description = "The workflow definition id", isRequired = true, type = STRING) }, restParameters = {
           @RestParameter(name = "withoperations", description = "Whether the workflow operations should be included in the response", isRequired = false, type = BOOLEAN),
+          @RestParameter(name = "withconfigurationpaneljson", description = "Whether the workflow configuration panel in JSON should be included in the response", isRequired = false, type = BOOLEAN),
           @RestParameter(name = "withconfigurationpanel", description = "Whether the workflow configuration panel should be included in the response", isRequired = false, type = BOOLEAN) }, responses = {
           @RestResponse(description = "The workflow definition is returned.", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "The specified workflow definition does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getWorkflowDefinition(@HeaderParam("Accept") String acceptHeader,
           @PathParam("workflowDefinitionId") String id, @QueryParam("withoperations") boolean withOperations,
-          @QueryParam("withconfigurationpanel") boolean withConfigurationPanel) throws Exception {
+          @QueryParam("withconfigurationpanel") boolean withConfigurationPanel,
+          @QueryParam("withconfigurationpaneljson") boolean withConfigurationPanelJson) throws Exception {
     WorkflowDefinition wd;
     try {
       wd = workflowService.getWorkflowDefinitionById(id);
@@ -243,11 +247,11 @@ public class WorkflowDefinitionsEndpoint {
       return ApiResponses.notFound("Cannot find workflow definition with id '%s'.", id);
     }
 
-    return ApiResponses.Json.ok(acceptHeader, workflowDefinitionToJSON(wd, withOperations, withConfigurationPanel));
+    return ApiResponses.Json.ok(acceptHeader, workflowDefinitionToJSON(wd, withOperations, withConfigurationPanel, withConfigurationPanelJson));
   }
 
   private JValue workflowDefinitionToJSON(WorkflowDefinition wd, boolean withOperations,
-          boolean withConfigurationPanel) {
+          boolean withConfigurationPanel, boolean withConfigurationPanelJson) {
     List<Field> fields = new ArrayList<>();
 
     fields.add(f("identifier", v(wd.getId())));
@@ -256,6 +260,9 @@ public class WorkflowDefinitionsEndpoint {
     fields.add(f("tags", arr(Arrays.stream(wd.getTags()).map(Jsons::v).collect(Collectors.toList()))));
     if (withConfigurationPanel) {
       fields.add(f("configuration_panel", v(wd.getConfigurationPanel(), BLANK)));
+    }
+    if (withConfigurationPanelJson) {
+      fields.add(f("configuration_panel_json", v(wd.getConfigurationPanelJson(), BLANK)));
     }
     if (withOperations) {
       fields.add(f("operations", arr(wd.getOperations()

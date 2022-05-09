@@ -22,6 +22,7 @@ export const initialFormValuesNewEvents = {
     location: '',
     deviceInputs: [],
     processingWorkflow: '',
+    configuration: {},
     policies: [{
         role: 'ROLE_USER_ADMIN',
         read: true,
@@ -136,7 +137,8 @@ export const initialFormValuesNewUser = {
 // InitialValues of Formik form (others computed dynamically depending on responses from backend)
 export const initialFormValuesStartTask = {
     events: [],
-    workflow: ''
+    workflow: '',
+    configuration: {}
 };
 
 export const initialFormValuesEditScheduledEvents = {
