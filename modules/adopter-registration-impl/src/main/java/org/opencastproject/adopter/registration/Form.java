@@ -25,6 +25,7 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.EqualsUtil;
 
 import java.util.Date;
+import java.util.Objects;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -363,7 +364,7 @@ public class Form implements IForm {
   }
 
   public TERMSOFUSEVERSION getTermsVersionAgreed() {
-    return null == termsVersionAgreed ? termsVersionAgreed : TERMSOFUSEVERSION.PRE_2022;
+    return Objects.requireNonNullElse(termsVersionAgreed, TERMSOFUSEVERSION.PRE_2022);
   }
 
   public void setTermsVersionAgreed(TERMSOFUSEVERSION version) {
