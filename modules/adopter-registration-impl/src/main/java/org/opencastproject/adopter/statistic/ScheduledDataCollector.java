@@ -122,7 +122,7 @@ public class ScheduledDataCollector extends TimerTask {
   private String version;
 
   /** The timer for shutdown uses */
-  private Timer t;
+  private Timer timer;
 
   //================================================================================
   // Scheduler methods
@@ -151,12 +151,12 @@ public class ScheduledDataCollector extends TimerTask {
     this.sender = new Sender(Objects.toString(serverBaseUrl, DEFAULT_STATISTIC_SERVER_ADDRESS));
 
     // Send data now. Repeat every 24h.
-    t = new Timer();
-    t.schedule(this, 0, ONE_DAY_IN_MILLISECONDS);
+    timer = new Timer();
+    timer.schedule(this, 0, ONE_DAY_IN_MILLISECONDS);
   }
 
   public void deactivate() {
-    t.cancel();
+    timer.cancel();
   }
 
   /**
