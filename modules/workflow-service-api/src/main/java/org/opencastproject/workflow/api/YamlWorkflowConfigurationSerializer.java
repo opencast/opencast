@@ -27,18 +27,18 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import java.io.IOException;
 
-public class YamlWorkflowConfigurationSerializer extends StdSerializer<WorkflowConfigurationImpl> {
+public class YamlWorkflowConfigurationSerializer extends StdSerializer<JaxbWorkflowConfiguration> {
 
   public YamlWorkflowConfigurationSerializer() {
     this(null);
   }
 
-  public YamlWorkflowConfigurationSerializer(Class<WorkflowConfigurationImpl> t) {
+  public YamlWorkflowConfigurationSerializer(Class<JaxbWorkflowConfiguration> t) {
     super(t);
   }
 
   @Override
-  public void serialize(WorkflowConfigurationImpl workflowConfiguration, JsonGenerator jsonGenerator,
+  public void serialize(JaxbWorkflowConfiguration workflowConfiguration, JsonGenerator jsonGenerator,
       SerializerProvider serializerProvider) throws IOException {
     jsonGenerator.writeObjectField(workflowConfiguration.getKey(), workflowConfiguration.getValue());
   }

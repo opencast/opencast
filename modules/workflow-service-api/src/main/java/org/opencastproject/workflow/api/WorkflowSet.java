@@ -22,6 +22,8 @@
 
 package org.opencastproject.workflow.api;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
@@ -35,7 +37,7 @@ public interface WorkflowSet {
    *
    * @return Item list.
    */
-  WorkflowInstance[] getItems();
+  List<WorkflowInstance> getItems();
 
   /**
    * Get the total number of items returned

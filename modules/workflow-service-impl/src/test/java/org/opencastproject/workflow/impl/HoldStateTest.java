@@ -21,7 +21,10 @@
 
 package org.opencastproject.workflow.impl;
 
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -64,9 +67,11 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+import org.opencastproject.workflow.api.WorkflowServiceDatabaseImpl;
 import org.opencastproject.workflow.api.WorkflowStateListener;
 import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
+import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
@@ -75,6 +80,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -83,6 +89,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -90,8 +97,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import junit.framework.Assert;
 
 public class HoldStateTest {
   private static final Logger logger = LoggerFactory.getLogger(HoldStateTest.class);
@@ -103,6 +108,7 @@ public class HoldStateTest {
   private MediaPackage mp = null;
   private WorkflowServiceSolrIndex dao = null;
   private SecurityService securityService = null;
+  private Workspace workspace = null;
   private ResumableTestWorkflowOperationHandler holdingOperationHandler;
   private Property property = null;
 
@@ -182,6 +188,13 @@ public class HoldStateTest {
     EasyMock.replay(mds);
     service.addMetadataService(mds);
 
+    workspace = createNiceMock(Workspace.class);
+    expect(workspace.getCollectionContents((String) EasyMock.anyObject())).andReturn(new URI[0]);
+    EasyMock.expect(workspace.read(anyObject()))
+            .andAnswer(() -> getClass().getResourceAsStream("/dc-1.xml")).anyTimes();
+    EasyMock.replay(workspace);
+    service.setWorkspace(workspace);
+
     {
       final AssetManager assetManager = createNiceMock(AssetManager.class);
       property = EasyMock.createMock(Property.class);
@@ -225,6 +238,12 @@ public class HoldStateTest {
     EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
     EasyMock.replay(assetManager, version, snapshot, aRec, p, r, t, selectQuery, query, v);
 
+    WorkflowServiceDatabaseImpl workflowDb = new WorkflowServiceDatabaseImpl();
+    workflowDb.setEntityManagerFactory(newTestEntityManagerFactory(WorkflowServiceDatabaseImpl.PERSISTENCE_UNIT));
+    workflowDb.setSecurityService(securityService);
+    workflowDb.activate(null);
+    service.setPersistence(workflowDb);
+
     dao = new WorkflowServiceSolrIndex();
     dao.solrRoot = sRoot + File.separator + "solr";
     dao.setServiceRegistry(serviceRegistry);
@@ -232,6 +251,7 @@ public class HoldStateTest {
     dao.setSecurityService(securityService);
     dao.setOrgDirectory(organizationDirectoryService);
     dao.setAssetManager(assetManager);
+    dao.setPersistence(workflowDb);
     dao.activate("System Admin");
     service.setDao(dao);
     service.activate(null);
@@ -272,13 +292,14 @@ public class HoldStateTest {
     WorkflowStateListener pauseListener = new WorkflowStateListener(WorkflowState.PAUSED);
     service.addWorkflowListener(pauseListener);
 
-    Map<String, String> initialProps = new HashMap<String, String>();
-    initialProps.put("testproperty", "foo");
+    Map<String, String> initialProps = Map.of("testproperty", "foo");
     synchronized (pauseListener) {
       workflow = service.start(def, mp, initialProps);
       pauseListener.wait();
     }
     service.removeWorkflowListener(pauseListener);
+
+    workflow = service.getWorkflowById(workflow.getId());
 
     // The variable "testproperty" should have been replaced by "foo", but not "anotherproperty"
     Assert.assertEquals("foo", workflow.getOperations().get(0).getConfiguration("testkey"));

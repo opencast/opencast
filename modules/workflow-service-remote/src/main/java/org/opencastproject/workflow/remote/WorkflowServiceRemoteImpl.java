@@ -75,6 +75,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 /**
  * An implementation of the workflow service that communicates with a remote workflow service via HTTP.
@@ -251,7 +252,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     StringBuilder url = new StringBuilder();
     url.append("/instances.xml");
     if (queryStringParams.size() > 0)
-      url.append("?" + URLEncodedUtils.format(queryStringParams, "UTF-8"));
+      url.append("?").append(URLEncodedUtils.format(queryStringParams, "UTF-8"));
 
     HttpGet get = new HttpGet(url.toString());
     HttpResponse response = getResponse(get);
@@ -272,9 +273,62 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstancesForAdministrativeRead(org.opencastproject.workflow.api.WorkflowQuery)
    */
   @Override
-  public WorkflowSet getWorkflowInstancesForAdministrativeRead(WorkflowQuery q) throws WorkflowDatabaseException,
-          UnauthorizedException {
+  public WorkflowSet getWorkflowInstancesForAdministrativeRead(WorkflowQuery q) throws WorkflowDatabaseException {
     return getWorkflowInstances(q);
+  }
+
+  @Override
+  public List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId)
+          throws WorkflowDatabaseException {
+    HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/instances.xml");
+    HttpResponse response = getResponse(get);
+    try {
+      if (response != null)
+        return XmlWorkflowParser.parseWorkflowSet(response.getEntity().getContent()).getItems();
+    } catch (Exception e) {
+      throw new WorkflowDatabaseException(e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new WorkflowDatabaseException("Workflow instances can not be loaded from a remote workflow service");
+  }
+
+  @Override
+  public Optional<WorkflowInstance> getRunningWorkflowInstanceByMediaPackage(String mediaPackageId, String action)
+          throws WorkflowException {
+
+    HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/instances.xml");
+    HttpResponse response = getResponse(get, SC_NOT_FOUND, SC_OK);
+    try {
+      if (response != null) {
+        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+          return Optional.empty();
+        }
+        return Optional.ofNullable(
+                XmlWorkflowParser.parseWorkflowInstance(response.getEntity().getContent())
+        );
+      }
+    } catch (Exception e) {
+      throw new WorkflowDatabaseException(e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new WorkflowDatabaseException("Workflow instances can not be loaded from a remote workflow service");
+  }
+
+  @Override
+  public boolean mediaPackageHasActiveWorkflows(String mediaPackageId) throws WorkflowDatabaseException {
+    HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/hasActiveWorkflows");
+    HttpResponse response = getResponse(get);
+    try {
+      if (response != null)
+        return Boolean.parseBoolean(response.getEntity().getContent().toString());
+    } catch (Exception e) {
+      throw new WorkflowDatabaseException(e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new WorkflowDatabaseException("Workflow instances can not be loaded from a remote workflow service");
   }
 
   /**
@@ -432,9 +486,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
           throw new WorkflowDatabaseException("Unable to parse the response body as a long: " + body);
         }
       }
-    } catch (ParseException e) {
-      throw new WorkflowDatabaseException("Unable to parse the response body");
-    } catch (IOException e) {
+    } catch (ParseException | IOException e) {
       throw new WorkflowDatabaseException("Unable to parse the response body");
     } finally {
       closeConnection(response);
@@ -552,11 +604,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
           return XmlWorkflowParser.parseWorkflowInstance(response.getEntity().getContent());
         }
       }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (IllegalStateException e) {
+    } catch (NotFoundException | UnauthorizedException | IllegalStateException e) {
       throw e;
     } catch (Exception e) {
       throw new WorkflowException(e);

@@ -674,11 +674,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       }
       logger.debug("Deleted all child jobs of job '{}'", jobId);
     } catch (Exception e) {
-      logger.error("Unable to remove child jobs from {}: {}", jobId, e);
       if (tx.isActive()) {
         tx.rollback();
       }
-      throw new ServiceRegistryException(e);
+      throw new ServiceRegistryException("Unable to remove child jobs from " + jobId, e);
     }
   }
 

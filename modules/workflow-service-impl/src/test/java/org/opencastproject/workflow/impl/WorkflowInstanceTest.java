@@ -31,11 +31,11 @@ import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.api.YamlWorkflowParser;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.InputStream;
@@ -44,12 +44,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 public class WorkflowInstanceTest {
   @Test
   public void testWorkflowWithoutOperations() throws Exception {
-    WorkflowInstanceImpl workflow = new WorkflowInstanceImpl();
+    WorkflowInstance workflow = new WorkflowInstance();
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     workflow.setMediaPackage(mp);
     Assert.assertEquals(mp.getIdentifier(), workflow.getMediaPackage().getIdentifier());
@@ -63,17 +61,17 @@ public class WorkflowInstanceTest {
 
     Map<String, String> props = new HashMap<String, String>();
     props.put("key1", "value1");
-    WorkflowInstance instance = new WorkflowInstanceImpl(def, null, null, null, null, props);
+    WorkflowInstance instance = new WorkflowInstance(def, null, null, null, props);
     Assert.assertEquals(def.getId(), instance.getTemplate());
     Assert.assertEquals("value1", instance.getConfiguration("key1"));
     def.setTitle("a title");
-    instance = new WorkflowInstanceImpl(def, null, null, null, null, null);
+  instance = new WorkflowInstance(def, null, null, null, null);
     Assert.assertEquals(def.getTitle(), instance.getTitle());
   }
 
   @Test
   public void testMediaPackageSerializationInWorkflowInstance() throws Exception {
-    WorkflowInstanceImpl workflow = new WorkflowInstanceImpl();
+    WorkflowInstance workflow = new WorkflowInstance();
     MediaPackage src = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     Track track = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
             .elementFromURI(new URI("http://sample"), Track.TYPE, MediaPackageElements.PRESENTER_SOURCE);
@@ -86,7 +84,7 @@ public class WorkflowInstanceTest {
 
   @Test
   public void testMediaPackageDeserialization() throws Exception {
-    WorkflowInstanceImpl workflow = new WorkflowInstanceImpl();
+    WorkflowInstance workflow = new WorkflowInstance();
     String xml = "<mediapackage xmlns=\"http://mediapackage.opencastproject.org\" start=\"2007-12-05T13:40:00\" duration=\"1004400000\"><media><track id=\"track-1\" type=\"presenter/source\"><mimetype>audio/mp3</mimetype><url>http://localhost:8080/workflow/samples/audio.mp3</url><checksum type=\"md5\">950f9fa49caa8f1c5bbc36892f6fd062</checksum><duration>10472</duration><audio><channels>2</channels><bitdepth>0</bitdepth><bitrate>128004.0</bitrate><samplingrate>44100</samplingrate></audio></track><track id=\"track-2\" type=\"presenter/source\"><mimetype>video/quicktime</mimetype><url>http://localhost:8080/workflow/samples/camera.mpg</url><checksum type=\"md5\">43b7d843b02c4a429b2f547a4f230d31</checksum><duration>14546</duration><video><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" /><encoder type=\"H.264\" version=\"7.4\" vendor=\"Apple Inc\" /><resolution>640x480</resolution><scanType type=\"progressive\" /><bitrate>540520</bitrate><frameRate>2</frameRate></video></track></media><metadata><catalog id=\"catalog-1\" type=\"dublincore/episode\"><mimetype>text/xml</mimetype><url>http://localhost:8080/workflow/samples/dc-1.xml</url><checksum type=\"md5\">20e466615251074e127a1627fd0dae3e</checksum></catalog></metadata></mediapackage>";
     MediaPackage src = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().loadFromXml(xml);
     workflow.setMediaPackage(src);
@@ -129,7 +127,7 @@ public class WorkflowInstanceTest {
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     mp.add(track);
 
-    WorkflowInstance workflow = new WorkflowInstanceImpl();
+    WorkflowInstance workflow = new WorkflowInstance();
     workflow.setMediaPackage(mp);
 
     // Marshall the workflow to xml

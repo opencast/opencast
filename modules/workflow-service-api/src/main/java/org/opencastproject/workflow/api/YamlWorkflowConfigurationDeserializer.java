@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
 
-public class YamlWorkflowConfigurationDeserializer extends StdDeserializer<WorkflowConfigurationImpl> {
+public class YamlWorkflowConfigurationDeserializer extends StdDeserializer<JaxbWorkflowConfiguration> {
 
   public YamlWorkflowConfigurationDeserializer() {
     this(null);
@@ -40,7 +40,7 @@ public class YamlWorkflowConfigurationDeserializer extends StdDeserializer<Workf
   }
 
   @Override
-  public WorkflowConfigurationImpl deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
+  public JaxbWorkflowConfiguration deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
           throws IOException, JacksonException {
     ObjectNode jn = jsonParser.getCodec().readTree(jsonParser);
     var fields = jn.fields();
@@ -48,7 +48,7 @@ public class YamlWorkflowConfigurationDeserializer extends StdDeserializer<Workf
     if (fields.hasNext()) {
       var entry = fields.next();
       // only parse first key value pair
-      return new WorkflowConfigurationImpl(entry.getKey(), entry.getValue().asText());
+      return new JaxbWorkflowConfiguration(entry.getKey(), entry.getValue().asText());
     } else {
       return null;
     }

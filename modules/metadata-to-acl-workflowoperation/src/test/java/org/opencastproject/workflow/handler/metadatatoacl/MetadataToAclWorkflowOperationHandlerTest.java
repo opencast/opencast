@@ -32,9 +32,8 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.data.Tuple;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.Capture;
@@ -56,8 +55,8 @@ public class MetadataToAclWorkflowOperationHandlerTest {
     var catalog = CatalogImpl.newInstance();
     catalog.setFlavor(MediaPackageElements.EPISODE);
     mediaPackage.add(catalog);
-    var operation = new WorkflowOperationInstanceImpl("test-id", WorkflowOperationInstance.OperationState.RUNNING);
-    var workflowInstance = new WorkflowInstanceImpl();
+    var operation = new WorkflowOperationInstance("test-id", WorkflowOperationInstance.OperationState.RUNNING);
+    var workflowInstance = new WorkflowInstance();
     workflowInstance.setMediaPackage(mediaPackage);
     workflowInstance.setOperations(Collections.singletonList(operation));
 

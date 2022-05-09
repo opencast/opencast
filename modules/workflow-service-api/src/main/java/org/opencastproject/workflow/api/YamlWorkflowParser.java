@@ -49,8 +49,8 @@ public final class YamlWorkflowParser {
     ObjectMapper om = YAMLMapper.builder().configure(USE_WRAPPER_NAME_AS_PROPERTY_NAME, true).build();
     om.registerModule(new JaxbAnnotationModule());
     SimpleModule sm = new SimpleModule();
-    sm.addDeserializer(WorkflowConfigurationImpl.class, new YamlWorkflowConfigurationDeserializer());
-    sm.addSerializer(WorkflowConfigurationImpl.class, new YamlWorkflowConfigurationSerializer());
+    sm.addDeserializer(JaxbWorkflowConfiguration.class, new YamlWorkflowConfigurationDeserializer());
+    sm.addSerializer(JaxbWorkflowConfiguration.class, new YamlWorkflowConfigurationSerializer());
     om.registerModule(sm);
     mapper = om;
   }
@@ -122,10 +122,9 @@ public final class YamlWorkflowParser {
    * @throws WorkflowParsingException
    *           if creating the workflow instance fails
    */
-  public static WorkflowInstanceImpl parseWorkflowInstance(InputStream in) throws WorkflowParsingException {
+  public static JaxbWorkflowConfiguration parseWorkflowInstance(InputStream in) throws WorkflowParsingException {
     try {
-      WorkflowInstanceImpl workflow = mapper.readValue(in, WorkflowInstanceImpl.class);
-      workflow.init();
+      JaxbWorkflowConfiguration workflow = mapper.readValue(in, JaxbWorkflowConfiguration.class);
       return workflow;
     } catch (Exception e) {
       throw new WorkflowParsingException(e);
@@ -143,7 +142,7 @@ public final class YamlWorkflowParser {
    * @throws WorkflowParsingException
    *           if creating the workflow instance fails
    */
-  public static WorkflowInstanceImpl parseWorkflowInstance(String in) throws WorkflowParsingException {
+  public static JaxbWorkflowConfiguration parseWorkflowInstance(String in) throws WorkflowParsingException {
     try {
       return parseWorkflowInstance(IOUtils.toInputStream(in, "UTF8"));
     } catch (IOException e) {

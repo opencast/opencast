@@ -60,6 +60,7 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.workflow.api.JaxbWorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.XmlWorkflowParser;
 
@@ -899,7 +900,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
         WorkflowInstance workflow = (wdID == null)
             ? ingestService.ingest(mp)
             : ingestService.ingest(mp, wdID, workflowProperties);
-        return Response.ok(workflow).build();
+        return Response.ok(new JaxbWorkflowInstance(workflow)).build();
       }
       return Response.serverError().status(Status.BAD_REQUEST).build();
     } catch (IllegalArgumentException e) {

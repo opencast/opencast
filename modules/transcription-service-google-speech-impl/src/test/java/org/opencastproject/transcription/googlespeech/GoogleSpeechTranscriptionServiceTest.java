@@ -57,7 +57,6 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -582,7 +581,7 @@ public class GoogleSpeechTranscriptionServiceTest {
     EasyMock.expect(wfService.getWorkflowDefinitionById(wfDefId)).andReturn(wfDef);
     List<WorkflowInstance> wfList = new ArrayList<WorkflowInstance>();
     if (wfStarted) {
-      wfList.add(new WorkflowInstanceImpl());
+      wfList.add(new WorkflowInstance());
     }
     Stream<WorkflowInstance> wfListStream = Stream.mk(wfList);
     Workflows wfs = EasyMock.createNiceMock(Workflows.class);

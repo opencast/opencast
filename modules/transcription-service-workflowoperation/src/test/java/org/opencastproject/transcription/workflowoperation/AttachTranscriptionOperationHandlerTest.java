@@ -32,11 +32,9 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.transcription.api.TranscriptionService;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
@@ -130,9 +128,9 @@ public class AttachTranscriptionOperationHandlerTest {
     // Workflow set up
     WorkflowDefinitionImpl def = new WorkflowDefinitionImpl();
     def.setId("DCE-start-transcription");
-    workflowInstance = new WorkflowInstanceImpl(def, mediaPackage, null, null, null, null);
+    workflowInstance = new WorkflowInstance(def, mediaPackage, null, null, null);
     workflowInstance.setId(1);
-    operation = new WorkflowOperationInstanceImpl("attach-transcript", OperationState.RUNNING);
+    operation = new WorkflowOperationInstance("attach-transcript", OperationState.RUNNING);
     List<WorkflowOperationInstance> operationList = new ArrayList<WorkflowOperationInstance>();
     operationList.add(operation);
     workflowInstance.setOperations(operationList);
