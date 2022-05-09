@@ -204,7 +204,7 @@ where operation = 'START_WORKFLOW'
 
 """
 select_workflow_from_job_table = """
-SELECT payload, date_created, date_completed
+SELECT id, payload, date_created, date_completed
 FROM oc_job
 WHERE operation = 'START_WORKFLOW'
 ORDER BY date_created ASC
@@ -221,11 +221,10 @@ operation_id = 0
 for offset in range(0, workflow_count, 100):
     workflow_sql = select_workflow_from_job_table.format(offset)
     workflow_jobs = execute_read_query(connection, workflow_sql)
-    for (payload, date_created, date_completed) in workflow_jobs:
+    for (workflow_id, payload, date_created, date_completed) in workflow_jobs:
         root = ET.fromstring(payload)
 
         # oc_workflow
-        workflow_id = get_attrib_from_node(root, "id")
         workflow_current += 1
         print(f'Migrating workflow {workflow_id} ({workflow_current}/{workflow_count})')
         workflow_operations = []
