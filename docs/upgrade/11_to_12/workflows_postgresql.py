@@ -4,14 +4,11 @@
 #   $ pip install psycopg2-binary
 # Set vars to point to your database
 # Run on commandline: "python3 workflow_db_upgrade.py"
-# Note: You may need to enable password authentication in your pg_hba.conf
 # WARNING: THIS SCRIPT DELETES DATA. CREATE A BACKUP BEFORE RUNNING
 
 # Module Imports
 import psycopg2
-import sys
 import xml.etree.ElementTree as ET
-import distutils.util
 from datetime import datetime
 
 # Vars
@@ -26,402 +23,359 @@ workflow_configuration_table_name = "oc_workflow_configuration"
 workflow_operation_table_name = "oc_workflow_operation"
 workflow_operation_configuration_table_name = "oc_workflow_operation_configuration"
 
+WORKFLOW_NS = "{http://workflow.opencastproject.org}"
+SECURITY_NS = "{http://org.opencastproject.security}"
+MEDIAPACKAGE_NS = '{http://mediapackage.opencastproject.org}'
+
+XML_DECLARATION = "<?xml version='1.0' encoding='UTF-8'?>"
+
+
 # DB functions
 def create_connection(host_name, user_name, user_password, db_name):
-    connection = None
-
-    try:
-        connection = psycopg2.connect(
-            host=host_name,
-            user=user_name,
-            password=user_password,
-            database=db_name
-        )
-        #connection.row_factory = lambda cursor, row: row[0]
-        print("Connection to PostgreSQL DB successful")
-    except psycopg2.DatabaseError as e:
-        print(f"The error '{e}' occurred")
+    connection = psycopg2.connect(
+        host=host_name,
+        user=user_name,
+        password=user_password,
+        database=db_name
+    )
+    print("Connection to database successful")
     return connection
+
 
 def execute_query(connection, query):
     cursor = connection.cursor()
+    cursor.execute(query)
+    connection.commit()
+    print("Query executed successfully")
 
-    try:
-        cursor.execute(query)
-        connection.commit()
-        print("Query executed successfully")
-    except psycopg2.DatabaseError as e:
-        print(f"The error '{e}' occurred")
-
-def execute_query_with_data(connection, query, data):
-    cursor = connection.cursor()
-
-    try:
-        cursor.execute(query, data)
-        connection.commit()
-        print("Query executed successfully")
-    except psycopg2.DatabaseError as e:
-        print(f"The error '{e}' occurred")
 
 def execute_read_query(connection, query):
     cursor = connection.cursor()
-    result = None
-    try:
-        cursor.execute(query)
-        result = cursor.fetchall()
-        # Turn list of tuples into a simple list
-        result = [el[0] for el in result]
-        return result
-    except psycopg2.DatabaseError as e:
-        print(f"The error '{e}' occurred")
+    cursor.execute(query)
+    return cursor.fetchall()
+
 
 def insert_parsed(sql, list_of_lists):
-  vars = []
-  for item in list_of_lists:
-    vars.append(tuple(item))
+    data = []
+    for item in list_of_lists:
+        data.append(tuple(item))
 
-  try:
     cursor = connection.cursor()
-    cursor.executemany(sql, vars)
+    cursor.executemany(sql, data)
     connection.commit()
-  except psycopg2.DatabaseError as e:
-    print(f"The error '{e}' occurred")
+
 
 # XML functions
-def get_node_value(node, name):
-  result = node.find(name)
-  if result == None:
-    return None
-  else:
+def get_node_value(node, name, ns=''):
+    result = node.find(f'{ns}{name}')
+    if result is None:
+        return None
     return result.text
 
+
 def get_attrib_from_node(node, attribute):
-  #result = node.attrib[attribute]
-  result = node.get(attribute)
-  if result == None:
-    return None
-  else:
-    return result
+    return node.get(attribute)
+
 
 def parse_workflow_state(state):
-  states = {
-    "INSTANTIATED": 0,
-    "RUNNING": 1,
-    "STOPPED": 2,
-    "PAUSED": 3,
-    "SUCCEEDED": 4,
-    "FAILED": 5,
-    "FAILING": 6,
-  }
+    states = {
+        "INSTANTIATED": 0,
+        "RUNNING": 1,
+        "STOPPED": 2,
+        "PAUSED": 3,
+        "SUCCEEDED": 4,
+        "FAILED": 5,
+        "FAILING": 6,
+    }
+    return states.get(state)
 
-  return states.get(state, None)
 
 def parse_operation_state(state):
-  states = {
-    "INSTANTIATED": 0,
-    "RUNNING": 1,
-    "PAUSED": 2,
-    "SUCCEEDED": 3,
-    "FAILED": 4,
-    "SKIPPED": 5,
-    "RETRY": 6,
-  }
+    states = {
+        "INSTANTIATED": 0,
+        "RUNNING": 1,
+        "PAUSED": 2,
+        "SUCCEEDED": 3,
+        "FAILED": 4,
+        "SKIPPED": 5,
+        "RETRY": 6,
+    }
+    return states.get(state)
 
-  return states.get(state, None)
 
-### Connect
+def none_safe(value, fn):
+    if value is None:
+        return None
+    return fn(value)
+
+
+def parse_bool(value):
+    if value is None:
+        return None
+    return value.lower() == 'true'
+
+
+# Connect
 print("Creating connection to database...")
 connection = create_connection(host, user, password, database)
 
-# Cleanup artifacts from previous runs of this script
-print("Clearing out potential artifacts from previous runs...")
-delete_workflow_table = f"DROP TABLE IF EXISTS {workflow_table_name} CASCADE"
-delete_workflow_configuration_table = f"DROP TABLE IF EXISTS {workflow_configuration_table_name}"
-delete_workflow_operation_table = f"DROP TABLE IF EXISTS {workflow_operation_table_name} CASCADE"
-delete_workflow_operation_configuration_table = f"DROP TABLE IF EXISTS {workflow_operation_configuration_table_name}"
-execute_query(connection, delete_workflow_table)
-execute_query(connection, delete_workflow_configuration_table)
-execute_query(connection, delete_workflow_operation_table)
-execute_query(connection, delete_workflow_operation_configuration_table)
-
-## Create new tables
+# Create new tables
 #  Currently added indexes:
 #  - Indexes for bidirectional relationships between Workflow <-> Operation <-> Configuration
 #  - mediaPackageId, seriesId for oc_workflow
 print("Create tables...")
 create_workflow_table = f"""
-CREATE TABLE IF NOT EXISTS {workflow_table_name} (
-  id BIGINT PRIMARY KEY,
-  state INT,
-  template VARCHAR(255),
-  title VARCHAR(255),
-  description VARCHAR(255),
-  parent BIGINT,
-  creatorId VARCHAR(255),
-  organizationId VARCHAR(255),
-  dateCreated TIMESTAMP,
-  dateCompleted TIMESTAMP,
-  mediaPackage TEXT,
-  mediaPackageId VARCHAR(128),
-  seriesId VARCHAR(128)
+CREATE TABLE {workflow_table_name} (
+    id bigint PRIMARY KEY,
+    creator_id character varying(255),
+    date_completed timestamp without time zone,
+    date_created timestamp without time zone,
+    description character varying(255),
+    mediapackage text,
+    mediapackage_id character varying(128),
+    organization_id character varying(255),
+    series_id character varying(128),
+    state integer,
+    template character varying(255),
+    title character varying(255)
 )
+"""
+
+create_workflow_table_index_mediapackageId = f"""
+CREATE INDEX ix_oc_workflow_mediapackage_id ON {workflow_table_name} USING btree (mediapackage_id);
+"""
+
+create_workflow_table_index_seriesId = f"""
+CREATE INDEX ix_oc_workflow_series_id ON {workflow_table_name} USING btree (series_id);
 """
 
 create_workflow_configuration_table = f"""
-CREATE TABLE IF NOT EXISTS {workflow_configuration_table_name} (
-  workflow_id BIGINT REFERENCES {workflow_table_name} (id),
-  key_part VARCHAR(255) NOT NULL,
-  value_part TEXT
+CREATE TABLE {workflow_configuration_table_name} (
+    workflow_id bigint REFERENCES {workflow_table_name}(id),
+    configuration_value text,
+    configuration_key character varying(255)
 )
 """
 
-# ??? Missing "executionHistory" maybe?
 create_workflow_operation_table = f"""
-CREATE TABLE IF NOT EXISTS {workflow_operation_table_name} (
-  id BIGSERIAL PRIMARY KEY,
-  template VARCHAR(255),
-  job BIGINT,
-  state INT,
-  description VARCHAR(255),
-  holdurl VARCHAR(255),
-  holdActionTitle VARCHAR(255),
-  failOnError BOOL,
-  if_condition VARCHAR(255),
-  unless_condition VARCHAR(255),
-  exceptionHandlerWorkflow VARCHAR(255),
-  abortable BOOL DEFAULT FALSE,
-  continuable BOOL DEFAULT FALSE,
-  started TIMESTAMP,
-  completed TIMESTAMP,
-  timeInQueue BIGINT,
-  maxAttempts INT,
-  failedAttempts INT DEFAULT 0,
-  executionHost VARCHAR(255),
-  retryStrategy INT,
-  POSITION INT,
-  INSTANCE_id BIGINT REFERENCES {workflow_table_name} (id),
-  operations_ORDER INT
+CREATE TABLE {workflow_operation_table_name} (
+    id bigint PRIMARY KEY,
+    abortable boolean,
+    continuable boolean,
+    completed timestamp without time zone,
+    started timestamp without time zone,
+    description character varying(255),
+    exception_handler_workflow character varying(255),
+    if_condition character varying(255),
+    execution_host character varying(255),
+    fail_on_error boolean,
+    failed_attempts integer,
+    job bigint,
+    max_attempts integer,
+    retry_strategy integer,
+    state integer,
+    template character varying(255),
+    time_in_queue bigint,
+    workflow_id bigint NOT NULL REFERENCES {workflow_table_name}(id),
+    "position" integer
 )
 """
 
 create_workflow_operation_configuration_table = f"""
-CREATE TABLE IF NOT EXISTS {workflow_operation_configuration_table_name} (
-  workflow_operation_id BIGINT REFERENCES {workflow_operation_table_name} (id),
-  key_part VARCHAR(255) NOT NULL,
-  value_part TEXT
+CREATE TABLE {workflow_operation_configuration_table_name} (
+    workflow_operation_id bigint REFERENCES {workflow_operation_table_name}(id),
+    configuration_value text,
+    configuration_key character varying(255) NOT NULL
 )
 """
 
+'''
 execute_query(connection, create_workflow_table)
+execute_query(connection, create_workflow_table_index_mediapackageId)
+execute_query(connection, create_workflow_table_index_seriesId)
 execute_query(connection, create_workflow_configuration_table)
 execute_query(connection, create_workflow_operation_table)
 execute_query(connection, create_workflow_operation_configuration_table)
+'''
 
-create_workflow_table_index_mediapackageId = f"""
-CREATE INDEX ix_oc_workflow_mediapackageid ON {workflow_table_name} (mediaPackageId);
-"""
-create_workflow_table_index_seriesId = f"""
-CREATE INDEX ix_oc_workflow_seriesid ON {workflow_table_name} (seriesId);
-"""
-
-execute_query(connection, create_workflow_table_index_mediapackageId)
-execute_query(connection, create_workflow_table_index_seriesId)
-
-### Get information from database
 print("Collect information from oc_job table...")
-select_payload_from_job_table = """
-SELECT payload FROM oc_job WHERE operation='START_WORKFLOW'
+select_workflow_count = """
+select count(*)
+from oc_job
+where operation = 'START_WORKFLOW'
+
 """
-select_date_created_from_job_table = """
-SELECT date_created FROM oc_job WHERE operation='START_WORKFLOW'
-"""
-select_date_completed_from_job_table = """
-SELECT date_completed FROM oc_job WHERE operation='START_WORKFLOW'
+select_workflow_from_job_table = """
+SELECT payload, date_created, date_completed
+FROM oc_job
+WHERE operation = 'START_WORKFLOW'
+ORDER BY date_created ASC
+LIMIT 100
+OFFSET {0}
 """
 
-payloads = execute_read_query(connection, select_payload_from_job_table)
-date_createds = execute_read_query(connection, select_date_created_from_job_table)
-date_completeds = execute_read_query(connection, select_date_completed_from_job_table)
+workflow_count = execute_read_query(connection, select_workflow_count)[0][0]
+workflow_current = 0
 
-### Parse information from XML
+# Parse information from XML
 print("Put information from oc_job into the new tables...")
-wf_items = []
-wf_config = []
-wf_operation = []
-wf_operation_config = []
-for (payload, date_created, date_completed) in zip(payloads, date_createds, date_completeds):
-  try:
-    root = ET.fromstring(payload)
-  except:
-    print("Payload was not XML, not parsing. Payload: " + payload)
-    continue
+operation_id = 0
+for offset in range(0, workflow_count, 100):
+    workflow_sql = select_workflow_from_job_table.format(offset)
+    workflow_jobs = execute_read_query(connection, workflow_sql)
+    for (payload, date_created, date_completed) in workflow_jobs:
+        root = ET.fromstring(payload)
 
-  ### oc_workflow
-  # Order is important
-  items = []
-  workflow_id = get_attrib_from_node(root, "id")
-  items.append(workflow_id)
-  items.append(parse_workflow_state(get_attrib_from_node(root, "state")))
-  items.append(get_node_value(root, "{http://workflow.opencastproject.org}template"))
-  items.append(get_node_value(root, "{http://workflow.opencastproject.org}title"))
-  items.append(get_node_value(root, "{http://workflow.opencastproject.org}description"))
-  items.append(get_node_value(root, "{http://workflow.opencastproject.org}parent"))
-  items.append(get_node_value(root, "{http://org.opencastproject.security}creator-id"))
-  items.append(get_node_value(root, "{http://org.opencastproject.security}organization-id"))
-  items.append(date_created)
-  items.append(date_completed)
-  if root.find("{http://mediapackage.opencastproject.org}mediapackage"):
-    ET.register_namespace('', 'http://mediapackage.opencastproject.org')
-    items.append(
-      ET.tostring(
-        root.find("{http://mediapackage.opencastproject.org}mediapackage"),
-        encoding="UTF-8", # Fix declaration
-        xml_declaration=True).decode("utf-8"))
-  else:
-    items.append(None)
-  if root.find("{http://mediapackage.opencastproject.org}mediapackage"):
-    items.append(get_attrib_from_node(root.find("{http://mediapackage.opencastproject.org}mediapackage"), "id"))
-  else:
-    items.append(None)
-  items.append(get_node_value(root.find("{http://mediapackage.opencastproject.org}mediapackage"), "{http://mediapackage.opencastproject.org}series"))
+        # oc_workflow
+        workflow_id = get_attrib_from_node(root, "id")
+        workflow_current += 1
+        print(f'Migrating workflow {workflow_id} ({workflow_current}/{workflow_count})')
+        workflow_operations = []
+        workflow_operation_config = []
+        workflow_config = []
+        workflow = [
+            workflow_id,
+            get_node_value(root, 'creator-id', SECURITY_NS),
+            date_completed,
+            date_created,
+            get_node_value(root, 'description', WORKFLOW_NS),
+            get_node_value(root, 'organization-id', SECURITY_NS),
+            parse_workflow_state(get_attrib_from_node(root, "state")),
+            get_node_value(root, 'template', WORKFLOW_NS),
+            get_node_value(root, 'title', WORKFLOW_NS)]
+        ET.register_namespace('', 'http://mediapackage.opencastproject.org')
+        mediapackage = root.find(f"{MEDIAPACKAGE_NS}mediapackage")
+        mediapackage_str = ET.tostring(mediapackage, encoding="UTF-8").decode("utf-8")
+        # ET.tostring(…, xml_declaration=True) requires Python 3.8
+        if not mediapackage_str.startswith(XML_DECLARATION):
+            mediapackage_str = f'{XML_DECLARATION}\n{mediapackage_str}'
+        workflow.append(mediapackage_str)
+        workflow.append(get_attrib_from_node(mediapackage, "id"))
+        workflow.append(get_node_value(mediapackage, f"{MEDIAPACKAGE_NS}series"))
 
-  wf_items.append(items)
+        # oc_workflow_configuration
+        for configuration in root.find(f"{WORKFLOW_NS}configurations"):
+            workflow_config.append([
+                workflow_id,
+                get_attrib_from_node(configuration, "key"),
+                configuration.text])
 
-  ### oc_workflow_configuration
-  for configuration in root.find("{http://workflow.opencastproject.org}configurations"):
-    configs = []
-    configs.append(workflow_id)
-    configs.append(get_attrib_from_node(configuration, "key"))
-    configs.append(configuration.text)
+        # oc_workflow_operation
+        operation_position = 0
+        for operation in root.find(f"{WORKFLOW_NS}operations"):
+            workflow_operations.append([
+                operation_id,
+                parse_bool(get_attrib_from_node(operation, "abortable")),
+                parse_bool(get_attrib_from_node(operation, "continuable")),
+                none_safe(
+                    get_node_value(operation, f"{WORKFLOW_NS}completed"),
+                    lambda x: datetime.fromtimestamp(int(x) / 1000.0)),
+                none_safe(
+                    get_node_value(operation, f"{WORKFLOW_NS}started"),
+                    lambda x: datetime.fromtimestamp(int(x) / 1000.0)),
+                get_attrib_from_node(operation, "description"),
+                get_attrib_from_node(operation, "exception-handler-workflow"),
+                get_attrib_from_node(operation, "if"),
+                get_attrib_from_node(operation, "execution-host"),
+                parse_bool(get_attrib_from_node(operation, "fail-on-error")),
+                get_attrib_from_node(operation, "failed-attempts"),
+                get_attrib_from_node(operation, "job"),
+                get_attrib_from_node(operation, "max-attempts"),
+                {"none": 0, "retry": 1, "hold": 2}.get(
+                    get_attrib_from_node(operation, "retry-strategy")),
+                parse_operation_state(get_attrib_from_node(operation, "state")),
+                get_attrib_from_node(operation, "id"),  # now named template
+                get_node_value(operation, f"{WORKFLOW_NS}time-in-queue"),
+                workflow_id,
+                operation_position])
 
-    wf_config.append(configs)
+            # oc_workflow_operation_configuration
+            for op_config in operation.find("{http://workflow.opencastproject.org}configurations"):
+                workflow_operation_config.append([
+                    operation_id,
+                    get_attrib_from_node(op_config, "key"),
+                    op_config.text])
 
-  ### oc_workflow_operation
-  operation_position = 0
-  for operation in root.find("{http://workflow.opencastproject.org}operations"):
-    operations = []
-    operation_id = get_attrib_from_node(operation, "job")
-    operations.append(operation_id)
-    operations.append(get_attrib_from_node(operation, "id"))
-    operations.append(get_attrib_from_node(operation, "job"))
-    operations.append(parse_operation_state(get_attrib_from_node(operation, "state")))
-    operations.append(get_attrib_from_node(operation, "description"))
-    operations.append(get_node_value(operation, "{http://workflow.opencastproject.org}holdurl"))
-    operations.append(get_node_value(operation, "{http://workflow.opencastproject.org}holdActionTitle"))
-    if get_attrib_from_node(operation, "fail-on-error") == None:
-      operations.append(None)
-    else:
-      operations.append(get_attrib_from_node(operation, "fail-on-error"))
-    operations.append(get_attrib_from_node(operation, "if"))
-    operations.append(get_attrib_from_node(operation, "unless"))
-    operations.append(get_attrib_from_node(operation, "exception-handler-workflow"))
-    if get_attrib_from_node(operation, "abortable") == None:
-      operations.append(None)
-    else:
-      operations.append(get_attrib_from_node(operation, "abortable"))
-    if get_attrib_from_node(operation, "continuable") == None:
-      operations.append(None)
-    else:
-      operations.append(get_attrib_from_node(operation, "continuable"))
-    if get_node_value(operation, "{http://workflow.opencastproject.org}started") == None:
-      operations.append(None)
-    else:
-      operations.append(datetime.fromtimestamp(int(get_node_value(operation, "{http://workflow.opencastproject.org}started")) / 1000.0))
-    if get_node_value(operation, "{http://workflow.opencastproject.org}completed") == None:
-      operations.append(None)
-    else:
-      operations.append(datetime.fromtimestamp(int(get_node_value(operation, "{http://workflow.opencastproject.org}completed")) / 1000.0))
-    operations.append(get_node_value(operation, "{http://workflow.opencastproject.org}time-in-queue"))
-    operations.append(get_attrib_from_node(operation, "max-attempts"))
-    operations.append(get_attrib_from_node(operation, "failed-attempts"))
-    operations.append(get_attrib_from_node(operation, "execution-host"))
-    if get_attrib_from_node(operation, "retry-strategy") == "none":
-      operations.append(0)
-    elif get_attrib_from_node(operation, "retry-strategy") == "retry":
-      operations.append(1)
-    elif get_attrib_from_node(operation, "retry-strategy") == "hold":
-      operations.append(2)
-    else:
-      operations.append(None)
-    operations.append(operation_position)
-    operations.append(workflow_id)
-    operations.append(operation_position)
+            # Generate ID and position for next operation
+            operation_id += 1
+            operation_position += 1
 
-    wf_operation.append(operations)
+        # Insert parsed information into the created tables
+        create_workflow_sql = f"""
+        INSERT INTO {workflow_table_name} (
+            id,
+            creator_id,
+            date_completed,
+            date_created,
+            description,
+            organization_id,
+            state,
+            template,
+            title,
+            mediapackage,
+            mediapackage_id,
+            series_id
+        ) VALUES
+          ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )
+        """
 
-    operation_position += 1
+        create_workflow_configuration_sql = f"""
+        INSERT INTO {workflow_configuration_table_name} (
+            workflow_id,
+            configuration_key,
+            configuration_value)
+        VALUES
+          ( %s, %s, %s )
+        """
 
-    ### oc_workflow_operation_configuration
-    for op_config in operation.find("{http://workflow.opencastproject.org}configurations"):
-      op_configs = []
+        create_workflow_operation_sql = f"""
+        INSERT INTO {workflow_operation_table_name} (
+            id,
+            abortable,
+            continuable,
+            completed,
+            started,
+            description,
+            exception_handler_workflow,
+            if_condition,
+            execution_host,
+            fail_on_error,
+            failed_attempts,
+            job,
+            max_attempts,
+            retry_strategy,
+            state,
+            template,
+            time_in_queue,
+            workflow_id,
+            "position"
+        ) VALUES
+        ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+          %s, %s, %s, %s, %s, %s, %s, %s, %s )
+        """
 
-      op_configs.append(operation_id)
-      op_configs.append(get_attrib_from_node(op_config, "key"))
-      op_configs.append(op_config.text)
+        create_workflow_operation_configuration_sql = f"""
+        INSERT INTO {workflow_operation_configuration_table_name} (
+            workflow_operation_id,
+            configuration_key,
+            configuration_value
+        ) VALUES
+        ( %s, %s, %s )
+        """
 
-      wf_operation_config.append(op_configs)
-
-### Insert parsed information into the created tables
-  create_workflow_sql = f"""
-  INSERT INTO
-    {workflow_table_name} (id, state, template, title, description, parent,
-    creatorId, organizationId, dateCreated, dateCompleted, mediaPackage,
-    mediaPackageId, seriesId)
-  VALUES
-    ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )
-  """
-
-  create_workflow_configuration_sql = f"""
-  INSERT INTO
-    {workflow_configuration_table_name} (workflow_id, key_part, value_part)
-  VALUES
-    ( %s, %s, %s )
-  """
-
-  create_workflow_operation_sql = f"""
-  INSERT INTO
-    {workflow_operation_table_name} (id, template, job, state, description,
-    holdurl, holdActionTitle, failOnError, if_condition, unless_condition,
-    exceptionHandlerWorkflow, abortable, continuable, started, completed,
-    timeInQueue, maxAttempts, failedAttempts, executionHost, retryStrategy,
-    POSITION, INSTANCE_id, operations_ORDER )
-  VALUES
-    ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-      %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-      %s, %s, %s )
-  """
-
-  create_workflow_operation_configuration_sql = f"""
-  INSERT INTO
-    {workflow_operation_configuration_table_name} (workflow_operation_id, key_part, value_part)
-  VALUES
-    ( %s, %s, %s )
-  """
-
-  insert_parsed(create_workflow_sql, wf_items)
-  insert_parsed(create_workflow_configuration_sql, wf_config)
-  insert_parsed(create_workflow_operation_sql, wf_operation)
-  insert_parsed(create_workflow_operation_configuration_sql, wf_operation_config)
-  print(workflow_id)
-  wf_items = []
-  wf_config = []
-  wf_operation = []
-  wf_operation_config = []
+        insert_parsed(create_workflow_sql, [workflow])
+        insert_parsed(create_workflow_configuration_sql, workflow_config)
+        insert_parsed(create_workflow_operation_sql, workflow_operations)
+        insert_parsed(create_workflow_operation_configuration_sql, workflow_operation_config)
 
 
-### Delete workflow information from oc_job
-print("Delete information from oc_job table...")
-### Get information from database
-select_id_from_job_table = """
-SELECT id FROM oc_job WHERE operation='START_WORKFLOW'
-"""
-ids = execute_read_query(connection, select_id_from_job_table)
-
-### Remove workflow XML from oc_job
+# Delete workflow information from oc_job
+print("Delete payloads from oc_job table...")
 sql_update_job_payload_query = """
-UPDATE oc_job SET payload = %s where id = %s
+UPDATE oc_job
+SET payload = NULL
+WHERE operation = 'START_WORKFLOW'
 """
-for id in ids:
-  execute_query_with_data(connection, sql_update_job_payload_query, (id, id))
+execute_query(connection, sql_update_job_payload_query)
 
 print("Update complete!")

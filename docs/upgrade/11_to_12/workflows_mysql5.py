@@ -126,7 +126,7 @@ connection = create_connection(host, user, password, database)
 #  - mediaPackageId, seriesId for oc_workflow
 print("Create tables...")
 create_workflow_table = f"""
-CREATE TABLE `{workflow_table_name}` (
+CREATE TABLE {workflow_table_name} (
   `id` bigint(20) NOT NULL,
   `creator_id` varchar(255) DEFAULT NULL,
   `date_completed` datetime DEFAULT NULL,
@@ -146,7 +146,7 @@ CREATE TABLE `{workflow_table_name}` (
 """
 
 create_workflow_configuration_table = f"""
-CREATE TABLE `{workflow_configuration_table_name}` (
+CREATE TABLE {workflow_configuration_table_name} (
   `workflow_id` bigint(20) DEFAULT NULL,
   `configuration_value` longtext DEFAULT NULL,
   `configuration_key` varchar(255) DEFAULT NULL,
@@ -156,7 +156,7 @@ CREATE TABLE `{workflow_configuration_table_name}` (
 """
 
 create_workflow_operation_table = f"""
-CREATE TABLE `{workflow_operation_table_name}` (
+CREATE TABLE {workflow_operation_table_name} (
   `id` bigint(20) NOT NULL,
   `abortable` tinyint(1) DEFAULT 0,
   `continuable` tinyint(1) DEFAULT 0,
@@ -207,7 +207,7 @@ where operation = 'START_WORKFLOW'
 select_workflow_from_job_table = """
 SELECT payload, date_created, date_completed
 FROM oc_job
-WHERE operation="START_WORKFLOW"
+WHERE operation = 'START_WORKFLOW'
 ORDER BY date_created ASC
 LIMIT 100
 OFFSET {0}
@@ -301,55 +301,52 @@ for offset in range(0, workflow_count, 100):
 
         # Insert parsed information into the created tables
         create_workflow_sql = f"""
-        INSERT INTO
-          `{workflow_table_name}` (
-            `id`,
-            `creator_id`,
-            `date_completed`,
-            `date_created`,
-            `description`,
-            `organization_id`,
-            `state`,
-            `template`,
-            `title`,
-            `mediapackage`,
-            `mediapackage_id`,
-            `series_id`
+        INSERT INTO {workflow_table_name} (
+            id,
+            creator_id,
+            date_completed,
+            date_created,
+            description,
+            organization_id,
+            state,
+            template,
+            title,
+            mediapackage,
+            mediapackage_id,
+            series_id
         ) VALUES
           ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )
         """
 
         create_workflow_configuration_sql = f"""
-        INSERT INTO
-          `{workflow_configuration_table_name}` (
-            `workflow_id`,
-            `configuration_key`,
-            `configuration_value`)
+        INSERT INTO {workflow_configuration_table_name} (
+            workflow_id,
+            configuration_key,
+            configuration_value)
         VALUES
           ( %s, %s, %s )
         """
 
         create_workflow_operation_sql = f"""
-        INSERT INTO
-        `{workflow_operation_table_name}` (
-            `id`,
-            `abortable`,
-            `continuable`,
-            `completed`,
-            `started`,
-            `description`,
-            `exception_handler_workflow`,
-            `if_condition`,
-            `execution_host`,
-            `fail_on_error`,
-            `failed_attempts`,
-            `job`,
-            `max_attempts`,
-            `retry_strategy`,
-            `state`,
-            `template`,
-            `time_in_queue`,
-            `workflow_id`,
+        INSERT INTO {workflow_operation_table_name} (
+            id,
+            abortable,
+            continuable,
+            completed,
+            started,
+            description,
+            exception_handler_workflow,
+            if_condition,
+            execution_host,
+            fail_on_error,
+            failed_attempts,
+            job,
+            max_attempts,
+            retry_strategy,
+            state,
+            template,
+            time_in_queue,
+            workflow_id,
             `position`
         ) VALUES
         ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
@@ -357,11 +354,10 @@ for offset in range(0, workflow_count, 100):
         """
 
         create_workflow_operation_configuration_sql = f"""
-        INSERT INTO
-        `{workflow_operation_configuration_table_name}` (
-            `workflow_operation_id`,
-            `configuration_key`,
-            `configuration_value`
+        INSERT INTO {workflow_operation_configuration_table_name} (
+            workflow_operation_id,
+            configuration_key,
+            configuration_value
         ) VALUES
         ( %s, %s, %s )
         """
@@ -377,7 +373,7 @@ print("Delete payloads from oc_job table...")
 sql_update_job_payload_query = """
 UPDATE oc_job
 SET payload = NULL
-WHERE operation="START_WORKFLOW"
+WHERE operation = 'START_WORKFLOW'
 """
 execute_query(connection, sql_update_job_payload_query)
 
