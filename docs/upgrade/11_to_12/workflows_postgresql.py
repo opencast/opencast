@@ -189,14 +189,12 @@ CREATE TABLE {workflow_operation_configuration_table_name} (
 )
 """
 
-'''
 execute_query(connection, create_workflow_table)
 execute_query(connection, create_workflow_table_index_mediapackageId)
 execute_query(connection, create_workflow_table_index_seriesId)
 execute_query(connection, create_workflow_configuration_table)
 execute_query(connection, create_workflow_operation_table)
 execute_query(connection, create_workflow_operation_configuration_table)
-'''
 
 print("Collect information from oc_job table...")
 select_workflow_count = """
