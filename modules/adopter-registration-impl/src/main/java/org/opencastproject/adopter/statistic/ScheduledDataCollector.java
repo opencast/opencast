@@ -180,8 +180,7 @@ public class ScheduledDataCollector extends TimerTask {
     // so rather than burning time turning various things off (after figuring out what needs to be turned off)
     // we just don't send anything.  By the time we need to update the ToU again this whole thing would need reworking
     // anyway, so we'll run with this for now.
-    if (adopter.isRegistered() && adopter.agreedToPolicy()
-        && adopter.getTermsVersionAgreed() == Form.TERMSOFUSEVERSION.APRIL_2022) {
+    if (adopter.isRegistered() && adopter.getTermsVersionAgreed() == Form.TERMSOFUSEVERSION.APRIL_2022) {
       try {
         String generalDataAsJson = collectGeneralData(adopter);
         sender.sendGeneralData(generalDataAsJson);
