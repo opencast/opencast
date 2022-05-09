@@ -96,13 +96,6 @@ public interface CaptureAgentStateService {
   Map<String, Agent> getKnownAgents();
 
   /**
-   * Returns the list of known agents that a given user and organization is authorized to schedule
-   *
-   * @return A {@link java.util.Map} of name-agent pairs.
-   */
-  Map<String, Agent> getKnownAgents(User u, Organization o);
-
-  /**
    * Returns the list of known agent capabilities.
    *
    * @return A {@link java.util.Properties} of name-value capability pairs.

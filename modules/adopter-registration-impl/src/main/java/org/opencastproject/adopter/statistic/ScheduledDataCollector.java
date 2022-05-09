@@ -262,7 +262,7 @@ public class ScheduledDataCollector extends TimerTask {
       SecurityUtil.runAs(securityService, org, systemAdminUser, () -> {
         //Calculate the number of attached CAs for this org, add it to the total
         long current = statisticData.getCACount();
-        int orgCAs = caStateService.getKnownAgents(systemAdminUser, org).size();
+        int orgCAs = caStateService.getKnownAgents().size();
         statisticData.setCACount(current + orgCAs);
 
         //Calculate the total number of minutes for this org, add it to the total
