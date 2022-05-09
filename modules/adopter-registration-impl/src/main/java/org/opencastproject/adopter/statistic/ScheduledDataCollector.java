@@ -74,6 +74,9 @@ public class ScheduledDataCollector extends TimerTask {
 
   private static final int ONE_DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24;
 
+  /* How many records to get from the search index at once */
+  private static final int SEARCH_ITERATION_SIZE = 100;
+
   //================================================================================
   // OSGi properties
   //================================================================================
@@ -254,7 +257,7 @@ public class ScheduledDataCollector extends TimerTask {
     sq.signURLs(false);
     sq.includeEpisodes(true);
     sq.includeSeries(false);
-    sq.withLimit(10);
+    sq.withLimit(SEARCH_ITERATION_SIZE);
 
     List<Organization> orgs = organizationDirectoryService.getOrganizations();
     statisticData.setTenantCount(orgs.size());
@@ -275,14 +278,14 @@ public class ScheduledDataCollector extends TimerTask {
           do {
             sq.withOffset(offset);
             SearchResult sr = searchService.getForAdministrativeRead(sq);
-            offset += 10;
+            offset += SEARCH_ITERATION_SIZE;
             total = sr.getTotalSize();
             orgDuration = Arrays.stream(sr.getItems())
                                        .map(SearchResultItem::getMediaPackage)
                                        .map(MediaPackage::getDuration)
                                        .mapToLong(Long::valueOf)
                                        .sum() / 1000L;
-          } while (offset + 10 <= total);
+          } while (false); //offset + SEARCH_ITERATION_SIZE <= total);
         } catch (UnauthorizedException e) {
           //This should never happen, but...
           logger.warn("Unable to calculate total minutes, unauthorized");
