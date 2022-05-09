@@ -254,6 +254,7 @@ public class ScheduledDataCollector extends TimerTask {
     sq.signURLs(false);
     sq.includeEpisodes(true);
     sq.includeSeries(false);
+    sq.withLimit(10);
 
     List<Organization> orgs = organizationDirectoryService.getOrganizations();
     statisticData.setTenantCount(orgs.size());
@@ -268,13 +269,20 @@ public class ScheduledDataCollector extends TimerTask {
         //Calculate the total number of minutes for this org, add it to the total
         current = statisticData.getTotalMinutes();
         long orgDuration = 0L;
+        long total = 0;
+        int offset = 0;
         try {
-          SearchResult sr = searchService.getForAdministrativeRead(sq);
-          orgDuration = Arrays.stream(sr.getItems())
-                                     .map(SearchResultItem::getMediaPackage)
-                                     .map(MediaPackage::getDuration)
-                                     .mapToLong(Long::valueOf)
-                                     .sum() / 1000L;
+          do {
+            sq.withOffset(offset);
+            SearchResult sr = searchService.getForAdministrativeRead(sq);
+            offset += 10;
+            total = sr.getTotalSize();
+            orgDuration = Arrays.stream(sr.getItems())
+                                       .map(SearchResultItem::getMediaPackage)
+                                       .map(MediaPackage::getDuration)
+                                       .mapToLong(Long::valueOf)
+                                       .sum() / 1000L;
+          } while (offset + 10 <= total);
         } catch (UnauthorizedException e) {
           //This should never happen, but...
           logger.warn("Unable to calculate total minutes, unauthorized");
