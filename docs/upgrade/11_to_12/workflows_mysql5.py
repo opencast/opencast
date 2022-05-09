@@ -1,4 +1,4 @@
-# Upgrade script for MySQL databases
+# Upgrade script for MariaDB databases
 # Requires Python3 to run
 # Required packages:
 #   $ pip install mysql-connector-python
@@ -26,6 +26,8 @@ workflow_operation_configuration_table_name = "oc_workflow_operation_configurati
 WORKFLOW_NS = "{http://workflow.opencastproject.org}"
 SECURITY_NS = "{http://org.opencastproject.security}"
 MEDIAPACKAGE_NS = '{http://mediapackage.opencastproject.org}'
+
+XML_DECLARATION = "<?xml version='1.0' encoding='UTF-8'?>"
 
 
 # DB functions
@@ -86,8 +88,7 @@ def parse_workflow_state(state):
         "FAILED": 5,
         "FAILING": 6,
     }
-
-    return states.get(state, None)
+    return states.get(state)
 
 
 def parse_operation_state(state):
@@ -100,7 +101,7 @@ def parse_operation_state(state):
         "SKIPPED": 5,
         "RETRY": 6,
     }
-    return states.get(state, None)
+    return states.get(state)
 
 
 def none_safe(value, fn):
@@ -243,10 +244,11 @@ for offset in range(0, workflow_count, 100):
             get_node_value(root, 'title', WORKFLOW_NS)]
         ET.register_namespace('', 'http://mediapackage.opencastproject.org')
         mediapackage = root.find(f"{MEDIAPACKAGE_NS}mediapackage")
-        workflow.append(ET.tostring(
-            mediapackage,
-            encoding="UTF-8",
-            xml_declaration=True).decode("utf-8"))
+        mediapackage_str = ET.tostring(mediapackage, encoding="UTF-8").decode("utf-8")
+        # ET.tostring(…, xml_declaration=True) requires Python 3.8
+        if not mediapackage_str.startswith(XML_DECLARATION):
+            mediapackage_str = f'{XML_DECLARATION}\n{mediapackage_str}'
+        workflow.append(mediapackage_str)
         workflow.append(get_attrib_from_node(mediapackage, "id"))
         workflow.append(get_node_value(mediapackage, f"{MEDIAPACKAGE_NS}series"))
 
