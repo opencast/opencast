@@ -1311,7 +1311,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   public long countWorkflowInstances(WorkflowState state) throws WorkflowDatabaseException {
     try {
       return persistence.countWorkflows(state);
-    } catch (WorkflowServiceDatabaseException e) {
+    } catch (WorkflowDatabaseException e) {
       throw new WorkflowDatabaseException(e);
     }
   }
@@ -1350,7 +1350,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       }
 
       return workflowsWithPermission;
-    } catch (WorkflowServiceDatabaseException e) {
+    } catch (WorkflowDatabaseException e) {
       throw new WorkflowDatabaseException(e);
     }
   }
@@ -1364,9 +1364,34 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   public List<WorkflowInstance> getWorkflowInstancesBySeries(String seriesId) throws WorkflowDatabaseException {
     try {
       return persistence.getWorkflowInstancesBySeries(seriesId);
-    } catch (WorkflowServiceDatabaseException e) {
+    } catch (WorkflowDatabaseException e) {
       throw new WorkflowDatabaseException(e);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workflow.api.WorkflowService#getRunningWorkflowInstanceByMediaPackage(String, String)
+   */
+  @Override
+  public Optional<WorkflowInstance> getRunningWorkflowInstanceByMediaPackage(String mediaPackageId, String action)
+          throws WorkflowException, UnauthorizedException, WorkflowDatabaseException {
+    List<WorkflowInstance> workflowInstances = persistence.getRunningWorkflowInstancesByMediaPackage(mediaPackageId);
+
+    // If there is more than workflow running something is very wrong
+    if (workflowInstances.size() > 1) {
+      throw new WorkflowException("Multiple workflows are active on mediapackage " + mediaPackageId);
+    }
+
+    Optional<WorkflowInstance> optWorkflowInstance = Optional.empty();
+    if (workflowInstances.size() == 1) {
+      WorkflowInstance wfInstance = workflowInstances.get(0);
+      optWorkflowInstance = Optional.of(wfInstance);
+      assertPermission(wfInstance, action, wfInstance.getOrganizationId());
+    }
+
+    return optWorkflowInstance;
   }
 
   /**
@@ -2164,7 +2189,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           cleaningFailed++;
         }
       }
-    } catch (WorkflowServiceDatabaseException e) {
+    } catch (WorkflowDatabaseException e) {
       throw new WorkflowDatabaseException(e);
     }
 

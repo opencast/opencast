@@ -40,8 +40,8 @@ import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowListener;
-import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowService;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -216,7 +216,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     HttpResponse response = getResponse(get);
     try {
       if (response != null)
-        return WorkflowParser.parseWorkflowSet(response.getEntity().getContent()).getItems();
+        return XmlWorkflowParser.parseWorkflowSet(response.getEntity().getContent()).getItems();
     } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
     } finally {

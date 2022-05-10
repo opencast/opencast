@@ -68,7 +68,7 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-import org.opencastproject.workflow.api.WorkflowParser;
+import org.opencastproject.workflow.api.WorkflowServiceDatabaseImpl;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateListener;
 import org.opencastproject.workflow.api.XmlWorkflowParser;
@@ -208,6 +208,12 @@ public class WorkflowServiceImplTest {
             availableProcessors(), Runtime.getRuntime().availableProcessors());
     serviceRegistry.registerService(REMOTE_SERVICE, REMOTE_HOST, "/path", true);
     service.setWorkspace(workspace);
+
+    WorkflowServiceDatabaseImpl workflowDb = new WorkflowServiceDatabaseImpl();
+    workflowDb.setEntityManagerFactory(newTestEntityManagerFactory(WorkflowServiceDatabaseImpl.PERSISTENCE_UNIT));
+    workflowDb.setSecurityService(securityService);
+    workflowDb.activate(null);
+    service.setPersistence(workflowDb);
 
     service.setServiceRegistry(serviceRegistry);
     service.activate(null);

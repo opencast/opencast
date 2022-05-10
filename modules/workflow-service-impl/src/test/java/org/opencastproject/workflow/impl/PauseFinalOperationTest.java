@@ -157,6 +157,12 @@ public class PauseFinalOperationTest {
     EasyMock.replay(assetManager);
     service.setAssetManager(assetManager);
 
+    WorkflowServiceDatabaseImpl workflowDb = new WorkflowServiceDatabaseImpl();
+    workflowDb.setEntityManagerFactory(newTestEntityManagerFactory(WorkflowServiceDatabaseImpl.PERSISTENCE_UNIT));
+    workflowDb.setSecurityService(securityService);
+    workflowDb.activate(null);
+    service.setPersistence(workflowDb);
+
     service.activate(null);
     service.setServiceRegistry(serviceRegistry);
 

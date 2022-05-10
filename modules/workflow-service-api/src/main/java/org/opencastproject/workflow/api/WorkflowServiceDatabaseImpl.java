@@ -169,7 +169,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
    * @see WorkflowServiceDatabase#getWorkflowInstancesForCleanup(WorkflowInstance.WorkflowState state, Date dateCreated)
    */
   public List<WorkflowInstance> getWorkflowInstancesForCleanup(WorkflowInstance.WorkflowState state, Date dateCreated)
-          throws WorkflowServiceDatabaseException {
+          throws WorkflowDatabaseException {
 
     EntityManager em = null;
     try {
@@ -183,7 +183,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
 
       return query.getResultList();
     } catch (Exception e) {
-      throw new WorkflowServiceDatabaseException(e);
+      throw new WorkflowDatabaseException(e);
     } finally {
       if (em != null)
         em.close();
@@ -195,7 +195,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
    *
    * @see WorkflowServiceDatabase#countWorkflows(WorkflowInstance.WorkflowState state)
    */
-  public int countWorkflows(WorkflowInstance.WorkflowState state) throws WorkflowServiceDatabaseException {
+  public int countWorkflows(WorkflowInstance.WorkflowState state) throws WorkflowDatabaseException {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
@@ -210,7 +210,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       return total.intValue();
     } catch (Exception e) {
       logger.error("Could not find number of workflows.", e);
-      throw new WorkflowServiceDatabaseException(e);
+      throw new WorkflowDatabaseException(e);
     } finally {
       if (em != null)
         em.close();
@@ -278,7 +278,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
    *
    * @see WorkflowServiceDatabase#getWorkflowInstancesBySeries(String seriesId)
    */
-  public List<WorkflowInstance> getWorkflowInstancesBySeries(String seriesId) throws WorkflowServiceDatabaseException {
+  public List<WorkflowInstance> getWorkflowInstancesBySeries(String seriesId) throws WorkflowDatabaseException {
 
     EntityManager em = null;
     try {
@@ -291,7 +291,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
 
       return query.getResultList();
     } catch (Exception e) {
-      throw new WorkflowServiceDatabaseException(e);
+      throw new WorkflowDatabaseException(e);
     } finally {
       if (em != null)
         em.close();
