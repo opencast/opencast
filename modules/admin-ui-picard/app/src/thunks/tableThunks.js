@@ -47,7 +47,6 @@ import { setGroupColumns } from '../actions/groupActions';
 import { setACLColumns } from '../actions/aclActions';
 import { setThemeColumns } from '../actions/themeActions';
 import { setServicesColumns } from '../actions/serviceActions';
-import { fetchFilters } from './tableFilterThunks';
 
 /**
  * This file contains methods/thunks used to manage the table in the main view and its state changes
