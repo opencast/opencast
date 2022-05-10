@@ -48,7 +48,7 @@ angular.module('adminNg.controllers')
       if (!angular.isDefined(adopter['termsVersionAgreed']) || $scope.tou['latest'] != adopter['termsVersionAgreed']) {
         $scope.adopter['agreedToPolicy'] = false;
         $scope.registered = false;
-        $scope.state = 'form';
+        $scope.state = 'information';
       }
     });
 
