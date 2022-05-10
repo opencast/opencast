@@ -9,7 +9,7 @@ import {fetchEventStatisticsValueUpdate} from "../../../../thunks/eventDetailsTh
  */
 const EventDetailsStatisticsTab = ({ eventId, header, t,
                                        statistics, hasError,
-                                       recalculateStatistics}) => {
+                                       recalculateStatistics }) => {
 
     /* generates file name for download-link for a statistic */
     const statisticsCsvFileName = (statsTitle) => {

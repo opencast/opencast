@@ -3,8 +3,38 @@ import moment from "moment";
 import {createChartOptions, createDownloadUrl} from "../utils/statisticsUtils";
 import {getHttpHeaders} from "../utils/resourceUtils";
 import {logger} from "../utils/logger";
+import {getStatistics} from "../selectors/statisticsSelectors";
+import {
+    loadStatisticsFailure,
+    loadStatisticsInProgress,
+    loadStatisticsSuccess, setOrganizationId,
+    updateStatisticsFailure, updateStatisticsSuccess
+} from "../actions/statisticsActions";
 
 /* thunks for fetching statistics data */
+
+export const fetchStatisticsPageStatistics = () => async (dispatch) => {
+    // get organization id from API, then get statistics for that organization
+    axios.get('/info/me.json')
+        .then( response => {
+            const organizationId = response.data.org.id;
+
+            dispatch(setOrganizationId(organizationId));
+
+            dispatch(fetchStatistics(organizationId, 'organization', getStatistics, loadStatisticsInProgress,
+                loadStatisticsSuccess, loadStatisticsFailure));
+        })
+        .catch( response => {
+            // getting organization id from API failed
+            dispatch(loadStatisticsFailure(true));
+            logger.error(response);
+        });
+}
+
+export const fetchStatisticsPageStatisticsValueUpdate = (organizationId, providerId, from, to, dataResolution, timeMode) => async (dispatch) => {
+    dispatch(fetchStatisticsValueUpdate(organizationId, 'organization', providerId, from, to, dataResolution, timeMode,
+        getStatistics, updateStatisticsSuccess, updateStatisticsFailure));
+}
 
 export const fetchStatistics = (resourceId, resourceType, getStatistics,
                                 loadStatisticsInProgress, loadStatisticsSuccess, loadStatisticsFailure) =>
@@ -116,7 +146,7 @@ export const fetchStatistics = (resourceId, resourceType, getStatistics,
                         dispatch(loadStatisticsSuccess(newStatistics, false));
                     }
                 })
-                .catch(response => {
+                .catch( response => {
                     // put unfinished statistics list into redux store but set flag that an error occurred
                     dispatch(loadStatisticsSuccess(newStatistics, true));
                     logger.error(response);
@@ -154,7 +184,7 @@ export const fetchStatisticsValueUpdate = (resourceId, resourceType, providerId,
 
     // request statistic values from API
     axios.post('/admin-ng/statistics/data.json', requestData, requestHeaders)
-        .then(dataResponse => {
+        .then( dataResponse => {
 
             // if only one element is in the response (as expected), get the response
             if(dataResponse.data.length === 1){
@@ -188,7 +218,7 @@ export const fetchStatisticsValueUpdate = (resourceId, resourceType, providerId,
                 dispatch(updateStatisticsSuccess(newStatistics));
             }
         })
-        .catch(response => {
+        .catch( response => {
             // getting new statistic values from API failed
             dispatch(updateStatisticsFailure());
             logger.error(response);

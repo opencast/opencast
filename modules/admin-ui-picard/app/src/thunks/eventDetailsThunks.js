@@ -1118,12 +1118,12 @@ export const fetchEventPublications = eventId => async dispatch => {
 
 // thunks for statistics
 
-export const fetchEventStatistics = eventId => async (dispatch, getState) => {
+export const fetchEventStatistics = eventId => async (dispatch) => {
     dispatch(fetchStatistics(eventId, 'episode', getStatistics, loadEventStatisticsInProgress,
         loadEventStatisticsSuccess, loadEventStatisticsFailure));
 }
 
-export const fetchEventStatisticsValueUpdate = (eventId, providerId, from, to, dataResolution, timeMode) => async (dispatch, getState) => {
+export const fetchEventStatisticsValueUpdate = (eventId, providerId, from, to, dataResolution, timeMode) => async (dispatch) => {
     dispatch(fetchStatisticsValueUpdate(eventId, 'episode', providerId, from, to, dataResolution, timeMode,
         getStatistics, updateEventStatisticsSuccess, updateEventStatisticsFailure));
 }

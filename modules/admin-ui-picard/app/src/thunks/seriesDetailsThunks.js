@@ -297,12 +297,12 @@ export const updateSeriesTheme = (id, values) => async (dispatch, getState) => {
 
 // thunks for statistics
 
-export const fetchSeriesStatistics = seriesId => async (dispatch, getState) => {
+export const fetchSeriesStatistics = seriesId => async (dispatch) => {
     dispatch(fetchStatistics(seriesId, 'series', getStatistics, loadSeriesStatisticsInProgress,
         loadSeriesStatisticsSuccess, loadSeriesStatisticsFailure));
 }
 
-export const fetchSeriesStatisticsValueUpdate = (seriesId, providerId, from, to, dataResolution, timeMode) => async (dispatch, getState) => {
+export const fetchSeriesStatisticsValueUpdate = (seriesId, providerId, from, to, dataResolution, timeMode) => async (dispatch) => {
     dispatch(fetchStatisticsValueUpdate(seriesId, 'series', providerId, from, to, dataResolution, timeMode,
         getStatistics, updateSeriesStatisticsSuccess, updateSeriesStatisticsFailure));
 }
