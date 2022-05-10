@@ -373,15 +373,19 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
   }
 
   @Override
-  public Job startTranscription(String mpId, Track track, String language) throws TranscriptionServiceException {
+  public Job startTranscription(String mpId, Track track, String... args) throws TranscriptionServiceException {
     if (!enabled) {
       throw new TranscriptionServiceException(
               "This service is disabled. If you want to enable it, please update the service configuration.");
     }
 
+    if (args.length == 0) {
+      throw new IllegalArgumentException("Additional language argument is required.");
+    }
+
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.StartTranscription.name(),
-              Arrays.asList(mpId, MediaPackageElementParser.getAsXml(track), language));
+              Arrays.asList(mpId, MediaPackageElementParser.getAsXml(track), args[0]));
     } catch (ServiceRegistryException e) {
       throw new TranscriptionServiceException("Unable to create a job", e);
     } catch (MediaPackageException e) {
