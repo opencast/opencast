@@ -150,7 +150,7 @@ public class Controller {
     logger.debug("Saving adopter registration data.");
 
     Form form = new Form(organisationName, departmentName, firstName, lastName, email, country, postalCode, city,
-            street, streetNo, contactMe, agreedToPolicy, allowsErrorReports, allowsStatistics, registered
+            street, streetNo, contactMe, allowsStatistics, allowsErrorReports, agreedToPolicy, registered
     );
     try {
       registrationService.saveFormData(form);
