@@ -367,12 +367,4 @@ public class Form implements IForm {
     return Objects.requireNonNullElse(termsVersionAgreed, TERMSOFUSEVERSION.PRE_2022);
   }
 
-  public void setTermsVersionAgreed(TERMSOFUSEVERSION version) {
-    if (version == null) {
-      this.termsVersionAgreed = TERMSOFUSEVERSION.PRE_2022;
-    } else {
-      this.termsVersionAgreed = version;
-    }
-  }
-
 }
