@@ -118,25 +118,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see WorkflowServiceDatabase#getAllWorkflowInstancesOrganizationIndependent()
-   */
-  public List<WorkflowInstance> getAllWorkflowInstancesOrganizationIndependent() throws WorkflowDatabaseException {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      return em.createNamedQuery("Workflow.findAllOrganizationIndependent", WorkflowInstance.class).getResultList();
-    } catch (Exception e) {
-      throw new WorkflowDatabaseException("Error fetching workflows from database", e);
-    } finally {
-      if (em != null)
-        em.close();
-    }
-  }
-
-  /**
+/**
    * {@inheritDoc}
    *
    * @see WorkflowServiceDatabase#getWorkflowInstances(int limit, int offset)

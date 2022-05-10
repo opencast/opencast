@@ -46,20 +46,7 @@ public interface WorkflowServiceDatabase {
   WorkflowInstance getWorkflow(long workflowId) throws NotFoundException, WorkflowDatabaseException;
 
   /**
-   * Gets all workflow instances.
-   * Unlike other queries this one does NOT care about the current organization, but will really return ALL workflow
-   * instances.
-   * Warning: Potentially very resource intensive. Only used for populating Solr index.
-   *
-   * @return list of all {@link WorkflowInstance}s
-   * @throws WorkflowDatabaseException
-   *           if there is a problem communicating with the underlying data store
-   */
-  List<WorkflowInstance> getAllWorkflowInstancesOrganizationIndependent() throws WorkflowDatabaseException;
-
-  /**
-   * Gets all workflow instances.
-   * Warning: Potentially very resource intensive. Only used for populating Solr index.
+   * Gets workflow instances for current organization.
    *
    * @param limit
    *          max number of workflows to be returned

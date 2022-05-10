@@ -1327,7 +1327,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     try {
       List<WorkflowInstance> workflows = persistence.getWorkflowInstancesByMediaPackage(mediaPackageId);
 
-      // If we have read permission to the mediapackage, return all workflows
+      // If we have read permission to the media package, return all workflows
       boolean authorized = false;
       try {
         authorized = assertMediaPackagePermission(mediaPackageId, Permissions.Action.READ.toString());
