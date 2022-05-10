@@ -28,6 +28,7 @@ import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Manages {@link WorkflowDefinition}s and {@link WorkflowInstance}s.
@@ -91,7 +92,7 @@ public interface WorkflowService {
    *
    * @param query
    *          The query parameters
-   * @return The {@link WorkflowSet} containing the workflow instances matching the query parameters
+   * @return The {@link List<WorkflowInstance>} containing the workflow instances matching the query parameters
    * @throws WorkflowDatabaseException
    *           if there is a problem accessing the workflow instances from persistence
    */
@@ -102,7 +103,7 @@ public interface WorkflowService {
    *
    * @param q
    *          The query parameters
-   * @return The {@link WorkflowSet} containing the workflow instances matching the query parameters
+   * @return The {@link List<WorkflowInstance>} containing the workflow instances matching the query parameters
    * @throws WorkflowDatabaseException
    *           if there is a problem accessing the workflow instances from persistence
    * @throws UnauthorizedException
@@ -342,4 +343,42 @@ public interface WorkflowService {
    * @return All configured workflow state mappings
    */
   Map<String, Map<String, String>> getWorkflowStateMappings();
+
+  /**
+   * Returns if a workflow is active on a given event.
+   *
+   * @param mediaPackageId
+   *          Media package identifier to look for.
+   * @return If a workflow is active on the given event.
+   * @throws WorkflowDatabaseException
+   *          If the data could not be retrieved from the database.
+   */
+  boolean mediaPackageHasActiveWorkflows(String mediaPackageId) throws WorkflowDatabaseException;
+
+  /**
+   * Return a list of all workflows run on a specific media package.
+   *
+   * @param mediaPackageId
+   *          Media package identifier to look for.
+   * @return List of run workflows.
+   * @throws WorkflowDatabaseException
+   *          If the data could not be retrieved from the database.
+   */
+  List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId) throws WorkflowDatabaseException;
+
+  /**
+   * Returns the {@link WorkflowInstance} currently running on the given mediaPackage
+   *
+   * @param mediaPackageId
+   *          the identifier of the mediaPackage
+   * @param action
+   *          necessary permissions for the workflowInstance
+   * @return An {@link Optional} containing the currently running {@link WorkflowInstance}
+   * @throws WorkflowException
+   * @throws WorkflowDatabaseException
+   * @throws UnauthorizedException
+   */
+  Optional<WorkflowInstance> getRunningWorkflowInstanceByMediaPackage(String mediaPackageId, String action)
+          throws WorkflowException, UnauthorizedException, WorkflowDatabaseException;
+
 }

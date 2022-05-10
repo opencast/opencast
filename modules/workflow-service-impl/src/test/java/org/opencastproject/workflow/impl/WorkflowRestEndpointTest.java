@@ -23,29 +23,28 @@
 package org.opencastproject.workflow.impl;
 
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.workflow.api.JaxbWorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.endpoint.WorkflowRestService;
 
 import org.easymock.EasyMock;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 
-import junit.framework.Assert;
-
 public class WorkflowRestEndpointTest {
 
   private WorkflowRestService restService;
-  private WorkflowInstanceImpl workflow;
+  private WorkflowInstance workflow;
 
   @Before
   public void setUp() throws Exception {
     // Create a workflow for the service to return
-    workflow = new WorkflowInstanceImpl();
+    workflow = new WorkflowInstance();
     workflow.setTitle("a workflow instance");
     workflow.setId(1);
 
@@ -78,7 +77,7 @@ public class WorkflowRestEndpointTest {
       // expected
     }
 
-    WorkflowInstance xmlResponse = restService.getWorkflowAsXml(1);
+    JaxbWorkflowInstance xmlResponse = restService.getWorkflowAsXml(1);
     Assert.assertNotNull(xmlResponse);
   }
 }

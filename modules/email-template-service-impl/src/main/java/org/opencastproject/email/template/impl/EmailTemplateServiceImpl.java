@@ -170,7 +170,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     WorkflowOperationInstance op = null;
     for (; i >= 0; i--) {
       op = operations.get(i);
-      if (OperationState.FAILED.equals(op.getState()) && op.isFailWorkflowOnException()) {
+      if (OperationState.FAILED.equals(op.getState()) && op.isFailOnError()) {
         return op;
       }
     }

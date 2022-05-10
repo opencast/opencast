@@ -21,8 +21,11 @@
 
 package org.opencastproject.workflow.impl;
 
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -63,9 +66,11 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+import org.opencastproject.workflow.api.WorkflowServiceDatabaseImpl;
 import org.opencastproject.workflow.api.WorkflowStateListener;
 import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
+import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
@@ -80,6 +85,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -100,6 +106,7 @@ public class CountWorkflowsTest {
   private ResumableWorkflowOperationHandler holdingOperationHandler;
   private ServiceRegistryInMemoryImpl serviceRegistry = null;
   private SecurityService securityService = null;
+  private Workspace workspace = null;
 
   private File sRoot = null;
 
@@ -177,6 +184,13 @@ public class CountWorkflowsTest {
     EasyMock.replay(mds);
     service.addMetadataService(mds);
 
+    workspace = createNiceMock(Workspace.class);
+    expect(workspace.getCollectionContents((String) EasyMock.anyObject())).andReturn(new URI[0]);
+    EasyMock.expect(workspace.read(anyObject()))
+            .andAnswer(() -> getClass().getResourceAsStream("/dc-1.xml")).anyTimes();
+    EasyMock.replay(workspace);
+    service.setWorkspace(workspace);
+
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
             organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
 
@@ -219,6 +233,12 @@ public class CountWorkflowsTest {
     EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
     EasyMock.replay(assetManager, version, snapshot, aRec, p, r, t, selectQuery, query, v);
 
+    WorkflowServiceDatabaseImpl workflowDb = new WorkflowServiceDatabaseImpl();
+    workflowDb.setEntityManagerFactory(newTestEntityManagerFactory(WorkflowServiceDatabaseImpl.PERSISTENCE_UNIT));
+    workflowDb.setSecurityService(securityService);
+    workflowDb.activate(null);
+    service.setPersistence(workflowDb);
+
     dao = new WorkflowServiceSolrIndex();
     dao.setServiceRegistry(serviceRegistry);
     dao.solrRoot = sRoot + File.separator + "solr";
@@ -226,6 +246,7 @@ public class CountWorkflowsTest {
     dao.setSecurityService(securityService);
     dao.setOrgDirectory(organizationDirectoryService);
     dao.setAssetManager(assetManager);
+    dao.setPersistence(workflowDb);
     dao.activate("System Admin");
     service.setDao(dao);
     service.activate(null);

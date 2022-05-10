@@ -25,10 +25,9 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 
 import org.junit.Assert;
@@ -57,9 +56,9 @@ public class TagWorkflowOperationHandlerTest {
 
   @Test
   public void testAllTagsFlavors() throws Exception {
-    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("test", OperationState.INSTANTIATED);
     ops.add(operation);
     instance.setOperations(ops);
     instance.setMediaPackage(mp);
@@ -77,9 +76,9 @@ public class TagWorkflowOperationHandlerTest {
     Assert.assertEquals("tag1", track.getTags()[0]);
     Assert.assertEquals("tag2", track.getTags()[1]);
 
-    instance = new WorkflowInstanceImpl();
+    instance = new WorkflowInstance();
     ops = new ArrayList<WorkflowOperationInstance>();
-    operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    operation = new WorkflowOperationInstance("test", OperationState.INSTANTIATED);
     ops.add(operation);
     instance.setOperations(ops);
     instance.setMediaPackage(resultingMediapackage);
@@ -100,9 +99,9 @@ public class TagWorkflowOperationHandlerTest {
 
   @Test
   public void testTargetFlavourWithTypeWildcard() throws Exception {
-    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("test", OperationState.INSTANTIATED);
     ops.add(operation);
     instance.setOperations(ops);
     instance.setMediaPackage(mp);
@@ -122,9 +121,9 @@ public class TagWorkflowOperationHandlerTest {
 
   @Test
   public void testTargetFlavourWithSubtypeWildcard() throws Exception {
-    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("test", OperationState.INSTANTIATED);
     ops.add(operation);
     instance.setOperations(ops);
     instance.setMediaPackage(mp);
@@ -144,9 +143,9 @@ public class TagWorkflowOperationHandlerTest {
 
   @Test
   public void testTargetFlavourWithTypeAndSubtypeWildcard() throws Exception {
-    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("test", OperationState.INSTANTIATED);
     ops.add(operation);
     instance.setOperations(ops);
     instance.setMediaPackage(mp);

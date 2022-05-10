@@ -103,7 +103,6 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
@@ -310,28 +309,49 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     Track mp1Track = mp1.getTrack("publish-track-1");
     ((AbstractStreamImpl) mp1Track.getStreams()[0]).setIdentifier("fortesting");
 
-    final WorkflowInstanceImpl workflowInstanceImpl1 = new WorkflowInstanceImpl(wfD, mp1, 2L, null, null,
+    final WorkflowInstance workflowInstance1 = new WorkflowInstance(wfD, mp1, null, null,
             new HashMap<String, String>());
-    final WorkflowInstanceImpl workflowInstanceImpl2 = new WorkflowInstanceImpl(wfD,
-            loadMpFromResource("jobs_mediapackage2"), 2L, null, null, new HashMap<String, String>());
-    final WorkflowInstanceImpl workflowInstanceImpl3 = new WorkflowInstanceImpl(wfD,
-            loadMpFromResource("jobs_mediapackage3"), 2L, null, null, new HashMap<String, String>());
+    final WorkflowInstance workflowInstance2 = new WorkflowInstance(wfD,
+            loadMpFromResource("jobs_mediapackage2"), null, null, new HashMap<String, String>());
+    final WorkflowInstance workflowInstance3 = new WorkflowInstance(wfD,
+            loadMpFromResource("jobs_mediapackage3"), null, null, new HashMap<String, String>());
 
-    workflowInstanceImpl1.setId(1);
-    workflowInstanceImpl2.setId(2);
-    workflowInstanceImpl3.setId(3);
-    workflowInstanceImpl1.getOperations().get(0).setId(4L);
-    workflowInstanceImpl1.getOperations().get(1).setId(5L);
+    workflowInstance1.setId(1);
+    workflowInstance2.setId(2);
+    workflowInstance3.setId(3);
+    workflowInstance1.getOperations().get(0).setId(4L);
+    workflowInstance1.getOperations().get(1).setId(5L);
+    workflowInstance1.setDateCreated(dateCreated);
+    workflowInstance2.setDateCreated(dateCreated);
+    workflowInstance3.setDateCreated(dateCreated);
+    workflowInstance1.setDateCompleted(dateCompleted);
+    workflowInstance2.setDateCompleted(dateCompleted);
+    workflowInstance3.setDateCompleted(dateCompleted);
+    workflowInstance1.setCreatorName(userWithPermissions.getName());
 
-    workflowSet.addItem(workflowInstanceImpl1);
-    workflowSet.addItem(workflowInstanceImpl2);
-    workflowSet.addItem(workflowInstanceImpl3);
+    workflowSet.addItem(workflowInstance1);
+    workflowSet.addItem(workflowInstance2);
+    workflowSet.addItem(workflowInstance3);
 
-    workflowSet.setTotalCount(3);
+    List<WorkflowInstance> workflowList = new ArrayList<>();
+    workflowList.add(workflowInstance1);
+    workflowList.add(workflowInstance2);
+    workflowList.add(workflowInstance3);
 
     WorkflowService workflowService = EasyMock.createNiceMock(WorkflowService.class);
     EasyMock.expect(workflowService.getWorkflowDefinitionById(EasyMock.anyString())).andReturn(wfD).anyTimes();
-    EasyMock.expect(workflowService.getWorkflowById(EasyMock.anyLong())).andReturn(workflowInstanceImpl1).anyTimes();
+    EasyMock.expect(workflowService.getWorkflowById(EasyMock.anyLong()))
+              .andAnswer(new IAnswer<WorkflowInstance>() {
+                @Override
+                public WorkflowInstance answer() throws Throwable {
+                  long id = (long) EasyMock.getCurrentArguments()[0];
+                  if (id == 9999L) {
+                    throw new NotFoundException("Workflow 9999 was not found");
+                  } else {
+                    return workflowInstance1;
+                  }
+                }
+              }).anyTimes();
     EasyMock.expect(workflowService.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class)))
             .andAnswer(new IAnswer<WorkflowSet>() {
               @Override
@@ -344,6 +364,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
                 }
               }
             }).anyTimes();
+    EasyMock.expect(workflowService.getWorkflowInstancesByMediaPackage(EasyMock.anyString())).andReturn(workflowList).anyTimes();
     EasyMock.expect(workflowService.listAvailableWorkflowDefinitions()).andReturn(Arrays.asList(wfD, wfD2));
     EasyMock.replay(workflowService);
     env.setWorkflowService(workflowService);

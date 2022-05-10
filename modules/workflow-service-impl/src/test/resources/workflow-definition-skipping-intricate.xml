@@ -5,7 +5,7 @@
   <operations>
     <operation
       id="op1"
-      if="${executecondition} == 'a'"
+      if="'${executecondition}' == 'a'"
       fail-on-error="true"
       description="operation 1"/>
   </operations>

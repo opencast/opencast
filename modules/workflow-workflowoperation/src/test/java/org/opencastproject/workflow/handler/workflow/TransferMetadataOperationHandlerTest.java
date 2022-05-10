@@ -29,10 +29,9 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCores;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -49,15 +48,15 @@ import java.nio.charset.StandardCharsets;
 public class TransferMetadataOperationHandlerTest {
 
   private TransferMetadataWorkflowOperationHandler handler;
-  private WorkflowInstanceImpl instance;
-  private WorkflowOperationInstanceImpl operation;
+  private WorkflowInstance instance;
+  private WorkflowOperationInstance operation;
   private DublinCoreCatalog resultCatalog = null;
 
   @Before
   public void setUp() throws Exception {
     handler = new TransferMetadataWorkflowOperationHandler();
 
-    operation = new WorkflowOperationInstanceImpl("test", WorkflowOperationInstance.OperationState.RUNNING);
+    operation = new WorkflowOperationInstance("test", WorkflowOperationInstance.OperationState.RUNNING);
 
     String dc = IOUtils.toString(getClass().getResourceAsStream("/dublincore.xml"), StandardCharsets.UTF_8);
     Workspace workspace = EasyMock.createMock(Workspace.class);
@@ -75,7 +74,7 @@ public class TransferMetadataOperationHandlerTest {
     Catalog catalog = CatalogImpl.fromURI(new URI("http://example.com"));
     catalog.setFlavor(MediaPackageElementFlavor.parseFlavor("dublincore/episode"));
     mediaPackage.add(catalog);
-    instance = EasyMock.createMock(WorkflowInstanceImpl.class);
+    instance = EasyMock.createMock(WorkflowInstance.class);
     EasyMock.expect(instance.getCurrentOperation()).andReturn(operation).anyTimes();
     EasyMock.expect(instance.getMediaPackage()).andReturn(mediaPackage).anyTimes();
     EasyMock.replay(instance);
