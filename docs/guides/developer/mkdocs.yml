@@ -106,3 +106,4 @@ nav:
    - Data Types: 'api/types.md'
    - Glossary: 'api/glossary.md'
 - Configure a Local Cluster for Testing: local-cluster.md
+- Explore H2 Database: explore-h2-database.md
