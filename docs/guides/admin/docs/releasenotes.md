@@ -43,6 +43,11 @@ API changes
 - [[#2644](https://github.com/opencast/opencast/pull/2644)]: Use millisecond precision in Solr date range queries
 
 
+Additional Notes about 10.13
+----------------------------
+
+This release resolves a few URL signing issues, as well as updating the default Paella configuration file to match Paella 6.5.6.
+
 Additional Notes about 10.12
 ----------------------------
 

@@ -4,6 +4,18 @@ Changelog
 Opencast 10
 ----------
 
+### Opencast 10.13
+
+*Released on May 11th, 2022*
+
+- [[#3684](https://github.com/opencast/opencast/pull/3684)] -
+  Backport matrix room title fixes into 10.x
+- [[#3674](https://github.com/opencast/opencast/pull/3674)] -
+  Avoid rewriteUrls being invoked twice while loading mediapackage.
+- [[#3666](https://github.com/opencast/opencast/pull/3666)] -
+  Update Paella 6.5.6 config.json
+
+
 ### Opencast 10.12
 
 *Released on Apr 19th, 2022*
