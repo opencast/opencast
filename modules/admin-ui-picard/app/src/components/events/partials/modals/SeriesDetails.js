@@ -6,7 +6,9 @@ import {
     getSeriesDetailsExtendedMetadata,
     getSeriesDetailsFeeds,
     getSeriesDetailsMetadata,
-    getSeriesDetailsTheme, getSeriesDetailsThemeNames, hasStatistics
+    getSeriesDetailsTheme,
+    getSeriesDetailsThemeNames,
+    hasStatistics
 } from "../../../../selectors/seriesDetailsSelectors";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 import {

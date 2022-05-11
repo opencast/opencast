@@ -41,7 +41,7 @@ const SeriesDetailsStatisticTab = ({ seriesId, header,
                                     {t(stat.title)}
                                 </header>
 
-                                {(stat.providerType === 'timeSeries')? (
+                                {(stat.providerType === 'timeSeries') ? (
                                     /* visualization of statistic for time series data */
                                     <div className="obj-container">
                                         <TimeSeriesStatistics
@@ -63,7 +63,7 @@ const SeriesDetailsStatisticTab = ({ seriesId, header,
                                             chartOptions={stat.options}
                                         />
                                     </div>
-                                ):(
+                                ) : (
 
                                     /* unsupported type message */
                                     <div className="modal-alert danger">

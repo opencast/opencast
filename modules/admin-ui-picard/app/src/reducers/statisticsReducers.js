@@ -6,12 +6,11 @@ import {
     LOAD_STATISTICS_SUCCESS,
     LOAD_STATISTICS_FAILURE,
     UPDATE_STATISTICS_SUCCESS,
-    UPDATE_STATISTICS_FAILURE, SET_ORGANIZATION_ID,
+    UPDATE_STATISTICS_FAILURE
 } from "../actions/statisticsActions";
 
 // Initial state of series details in redux store
 const initialState = {
-    organizationId: '',
     fetchingStatisticsInProgress: false,
     statistics: [],
     hasStatisticsError: false
@@ -43,13 +42,6 @@ const statistics = (state=initialState, action) => {
                 fetchingStatisticsInProgress: false,
                 statistics: [],
                 hasStatisticsError: hasError
-            };
-        }
-        case SET_ORGANIZATION_ID: {
-            const { organizationId } = payload
-            return {
-                ...state,
-                organizationId: organizationId
             };
         }
         case UPDATE_STATISTICS_SUCCESS: {

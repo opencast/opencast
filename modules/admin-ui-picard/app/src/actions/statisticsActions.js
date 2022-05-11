@@ -6,7 +6,6 @@
 export const LOAD_STATISTICS_IN_PROGRESS = 'LOAD_STATISTICS_IN_PROGRESS';
 export const LOAD_STATISTICS_SUCCESS = 'LOAD_STATISTICS_SUCCESS';
 export const LOAD_STATISTICS_FAILURE = 'LOAD_STATISTICS_FAILURE';
-export const SET_ORGANIZATION_ID = 'SET_ORGANIZATION_ID';
 export const UPDATE_STATISTICS_SUCCESS = 'LOAD_STATISTICS_SUCCESS';
 export const UPDATE_STATISTICS_FAILURE = 'LOAD_STATISTICS_FAILURE';
 
@@ -27,13 +26,6 @@ export const loadStatisticsFailure = (hasError) => ({
     type: LOAD_STATISTICS_FAILURE,
     payload: {
         hasError
-    }
-});
-
-export const setOrganizationId = (organizationId) => ({
-    type: SET_ORGANIZATION_ID,
-    payload: {
-        organizationId
     }
 });
 

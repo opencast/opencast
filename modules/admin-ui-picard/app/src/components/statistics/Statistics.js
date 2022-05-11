@@ -8,28 +8,34 @@ import Footer from "../Footer";
 import MainNav from "../shared/MainNav";
 import TimeSeriesStatistics from "../shared/TimeSeriesStatistics";
 import {
-    getOrganizationId,
     getStatistics,
     hasStatistics,
     hasStatisticsError,
     isFetchingStatistics
 } from "../../selectors/statisticsSelectors";
 import {
+    getOrgId,
+    getUserInformation
+} from "../../selectors/userInfoSelectors";
+import {
     fetchStatisticsPageStatistics,
     fetchStatisticsPageStatisticsValueUpdate
 } from "../../thunks/statisticsThunks";
 import {hasAccess} from "../../utils/utils";
-import {getUserInformation} from "../../selectors/userInfoSelectors";
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
+import {fetchUserInfo} from "../../thunks/userInfoThunks";
 
 const Statistics = ({ organizationId, statistics, isLoadingStatistics, hasStatistics, hasError, user,
-                    loadStatistics, recalculateStatistics }) => {
+                    fetchUserInfo, loadStatistics, recalculateStatistics }) => {
     const { t } = useTranslation();
 
     const [displayNavigation, setNavigation] = useState(false);
 
     useEffect(() => {
-        loadStatistics().then();
+        // fetch user information for organization id, then fetch statistics
+        fetchUserInfo().then(e => {
+            loadStatistics(organizationId).then();
+        });
     }, []);
 
     const toggleNavigation = () => {
@@ -73,14 +79,14 @@ const Statistics = ({ organizationId, statistics, isLoadingStatistics, hasStatis
 
                     {!isLoadingStatistics && (
 
-                        (hasError || !hasStatistics)? (
+                        (hasError || !hasStatistics) ? (
                             /* error message */
                             <div className="obj">
                                 <div className="modal-alert danger">
                                     {t("STATISTICS.NOT_AVAILABLE")}
                                 </div>
                             </div>
-                        ):(
+                        ) : (
 
                             /* iterates over the different available statistics */
                             statistics.map((stat, key) => (
@@ -132,7 +138,7 @@ const Statistics = ({ organizationId, statistics, isLoadingStatistics, hasStatis
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    organizationId: getOrganizationId(state),
+    organizationId: getOrgId(state),
     hasStatistics: hasStatistics(state),
     isLoadingStatistics: isFetchingStatistics(state),
     statistics: getStatistics(state),
@@ -142,7 +148,8 @@ const mapStateToProps = state => ({
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    loadStatistics: () => dispatch(fetchStatisticsPageStatistics()),
+    fetchUserInfo: () => dispatch(fetchUserInfo()),
+    loadStatistics: (organizationId) => dispatch(fetchStatisticsPageStatistics(organizationId)),
     recalculateStatistics: (organizationId, providerId, from, to, dataResolution, timeMode) => dispatch(fetchStatisticsPageStatisticsValueUpdate(organizationId, providerId, from, to, dataResolution, timeMode)),
 });
 

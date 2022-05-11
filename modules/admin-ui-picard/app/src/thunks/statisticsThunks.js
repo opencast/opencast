@@ -7,28 +7,16 @@ import {getStatistics} from "../selectors/statisticsSelectors";
 import {
     loadStatisticsFailure,
     loadStatisticsInProgress,
-    loadStatisticsSuccess, setOrganizationId,
-    updateStatisticsFailure, updateStatisticsSuccess
+    loadStatisticsSuccess,
+    updateStatisticsFailure,
+    updateStatisticsSuccess
 } from "../actions/statisticsActions";
 
 /* thunks for fetching statistics data */
 
-export const fetchStatisticsPageStatistics = () => async (dispatch) => {
-    // get organization id from API, then get statistics for that organization
-    axios.get('/info/me.json')
-        .then( response => {
-            const organizationId = response.data.org.id;
-
-            dispatch(setOrganizationId(organizationId));
-
-            dispatch(fetchStatistics(organizationId, 'organization', getStatistics, loadStatisticsInProgress,
+export const fetchStatisticsPageStatistics = (organizationId) => async (dispatch) => {
+    dispatch(fetchStatistics(organizationId, 'organization', getStatistics, loadStatisticsInProgress,
                 loadStatisticsSuccess, loadStatisticsFailure));
-        })
-        .catch( response => {
-            // getting organization id from API failed
-            dispatch(loadStatisticsFailure(true));
-            logger.error(response);
-        });
 }
 
 export const fetchStatisticsPageStatisticsValueUpdate = (organizationId, providerId, from, to, dataResolution, timeMode) => async (dispatch) => {
