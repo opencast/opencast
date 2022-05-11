@@ -39,9 +39,10 @@ const NewMetadataPage = ({ metadataFields, nextPage, formik, header }) => {
                                                                fieldInfo={field}
                                                                component={RenderMultiField}/>
                                                     ) : (
-                                                        <Field name={field.id}
-                                                               metadataField={field}
-                                                               component={RenderField}/>
+                                                          <Field name={field.id}
+                                                                 metadataField={field}
+                                                                 isFirstField={key === 0}
+                                                                 component={RenderField} />
                                                     )}
 
                                                 </td>

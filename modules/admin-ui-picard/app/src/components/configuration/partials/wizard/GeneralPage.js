@@ -32,6 +32,7 @@ const GeneralPage = ({ formik, nextPage, isEdit }) => {
                                 </label>
                                 <Field name="name"
                                        type="text"
+                                       autoFocus={!isEdit}
                                        placeholder={t('CONFIGURATION.THEMES.DETAILS.GENERAL.NAME') + '...'} />
                             </div>
                             <div className="row">

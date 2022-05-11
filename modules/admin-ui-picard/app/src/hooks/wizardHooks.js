@@ -62,9 +62,9 @@ export const useSelectionChanges = (formik, selectedRows) => {
     return [selectedEvents, allChecked, onChangeSelected, onChangeAllSelected];
 }
 
-export const useClickOutsideField = childRef => {
+export const useClickOutsideField = (childRef, isFirstField) => {
     // Indicator if currently edit mode is activated
-    const [editMode, setEditMode] = useState(false);
+    const [editMode, setEditMode] = useState(isFirstField);
 
     useEffect(() => {
         // Handle click outside the field and leave edit mode

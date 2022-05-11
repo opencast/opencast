@@ -10,9 +10,9 @@ const childRef = React.createRef();
 /**
  * This component renders an editable field for single values depending on the type of the corresponding metadata
  */
-const RenderField = ({ field, metadataField, form, showCheck=false }) => {
+const RenderField = ({ field, metadataField, form, showCheck=false, isFirstField=false }) => {
     // Indicator if currently edit mode is activated
-    const [editMode, setEditMode] = useClickOutsideField(childRef);
+    const [editMode, setEditMode] = useClickOutsideField(childRef, isFirstField);
 
     // Handle key down event and check if pressed key leads to leaving edit mode
     const handleKeyDown = (event, type) => {
@@ -53,6 +53,7 @@ const RenderField = ({ field, metadataField, form, showCheck=false }) => {
                                      text={field.value}
                                      editMode={editMode}
                                      setEditMode={setEditMode}
+                                     isFirst={isFirstField}
                                      showCheck={showCheck}
                                      handleKeyDown={handleKeyDown}/>
             ))}
@@ -62,6 +63,7 @@ const RenderField = ({ field, metadataField, form, showCheck=false }) => {
                                              form={form}
                                              editMode={editMode}
                                              setEditMode={setEditMode}
+                                             isFirst={isFirstField}
                                              showCheck={showCheck}
                                              handleKeyDown={handleKeyDown}/>
             )}
@@ -197,13 +199,13 @@ const EditableSingleSelect = ({ field, metadataField, text, editMode, setEditMod
 };
 
 // Renders editable text area
-const EditableSingleValueTextArea = ({ field, text, editMode, setEditMode, handleKeyDown, form: { initialValues }, showCheck }) => {
+const EditableSingleValueTextArea = ({ field, text, editMode, setEditMode, handleKeyDown, form: { initialValues }, showCheck, isFirst }) => {
     return (
         editMode ? (
             <div onBlur={() => setEditMode(false)}
                  onKeyDown={e => handleKeyDown(e, "textarea")}
                  ref={childRef}>
-                <textarea {...field} className="editable vertical-resize"/>
+                <textarea {...field} autoFocus={isFirst} className="editable vertical-resize"/>
             </div>
         ) : (
             <div onClick={() => setEditMode(true)}>
@@ -218,13 +220,13 @@ const EditableSingleValueTextArea = ({ field, text, editMode, setEditMode, handl
 };
 
 // Renders editable input for single value
-const EditableSingleValue = ({ field, form: { initialValues }, text, editMode, setEditMode, handleKeyDown, showCheck }) => {
+const EditableSingleValue = ({ field, form: { initialValues }, text, editMode, setEditMode, handleKeyDown, showCheck, isFirst }) => {
     return (
         editMode ? (
             <div onBlur={() => setEditMode(false)}
                  onKeyDown={e => handleKeyDown(e, "input")}
                  ref={childRef}>
-                <input {...field} type="text"/>
+                <input {...field} autoFocus={isFirst} type="text"/>
             </div>
         ) : (
             <div onClick={() => setEditMode(true)}>
