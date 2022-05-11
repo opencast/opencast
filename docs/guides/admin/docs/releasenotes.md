@@ -4,7 +4,6 @@
 Opencast 12 is not yet released!
 </div>
 
-
 Release Schedule
 ----------------
 
