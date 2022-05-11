@@ -25,6 +25,7 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_DESCRI
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -33,6 +34,7 @@ import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.series.api.Series;
 import org.opencastproject.util.Jsons;
+import org.opencastproject.util.MimeType;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.slf4j.Logger;
@@ -70,12 +72,6 @@ class Item {
     } else {
       final var mp = event.getMediaPackage();
 
-      // Load DC catalog. We error if there is none defined for this event as I can't think of
-      // anything sensible we could do.
-      final var dcc = DublinCoreUtil.loadEpisodeDublinCore(workspace, mp)
-          .orError(new RuntimeException("Event has no dublin core catalog"))
-          .get();
-
       // Figure out whether this is a live event
       final var isLive = Arrays.stream(mp.getTracks()).anyMatch(track -> track.isLive());
 
@@ -97,42 +93,54 @@ class Item {
           Jsons.p("tracks", Jsons.arr(assembleTracks(event, mp))),
           Jsons.p("acl", assembleAcl(event)),
           Jsons.p("isLive", isLive),
-          Jsons.p("metadata", dccToMetadata(dcc)),
+          Jsons.p("metadata", dccToMetadata(mp, workspace)),
           Jsons.p("updated", event.getModified().getTime())
       );
     }
   }
 
   /** Assembles the object containing all additional metadata. */
-  private static Jsons.Obj dccToMetadata(DublinCoreCatalog dcc) {
+  private static Jsons.Obj dccToMetadata(MediaPackage mp, Workspace workspace) {
     /** Metadata fields from dcterms that we already handle elsewhere. Therefore, we don't need to
       * include them here again. */
     final var ignoredDcFields = Set.of(new String[] {
         "created", "creator", "title", "extent", "isPartOf", "description", "identifier",
     });
 
+
+    final var dccs = Arrays.stream(mp.getElements())
+        .filter(mpe -> {
+          final var isCatalog = mpe.getElementType().equals(MediaPackageElement.Type.Catalog);
+          final var isForEpisode = mpe.getFlavor().getSubtype().equals("episode");
+          final var isXml = mpe.getMimeType().equals(MimeType.mimeType("text", "xml"));
+          return isCatalog && isForEpisode && isXml;
+        })
+        .map(mpe -> DublinCoreUtil.loadDublinCore(workspace, mpe));
+
     final var namespaces = new HashMap<String, ArrayList<Jsons.Prop>>();
 
-    for (final var e : dcc.getValues().entrySet()) {
-      final var key = e.getKey();
+    for (final var dcc : (Iterable<DublinCoreCatalog>) dccs::iterator) {
+      for (final var e : dcc.getValues().entrySet()) {
+        final var key = e.getKey();
 
-      // We special case dcterms here to get a smaller, easier to read JSON. In most cases, this
-      // will be the only namespace.
-      final var ns = key.getNamespaceURI().equals("http://purl.org/dc/terms/")
-          ? "dcterms"
-          : key.getNamespaceURI();
-      final var fields = namespaces.computeIfAbsent(ns, k -> new ArrayList<>());
+        // We special case dcterms here to get a smaller, easier to read JSON. In most cases, this
+        // will be the only namespace.
+        final var ns = key.getNamespaceURI().equals("http://purl.org/dc/terms/")
+            ? "dcterms"
+            : key.getNamespaceURI();
+        final var fields = namespaces.computeIfAbsent(ns, k -> new ArrayList<>());
 
-      // We skip fields that we already include elsewhere.
-      if (ns.equals("dcterms") && ignoredDcFields.contains(key.getLocalName())) {
-        continue;
+        // We skip fields that we already include elsewhere.
+        if (ns.equals("dcterms") && ignoredDcFields.contains(key.getLocalName())) {
+          continue;
+        }
+
+        final var values = e.getValue().stream()
+            .map(v -> Jsons.v(v.getValue()))
+            .collect(Collectors.toCollection(ArrayList::new));
+        final var field = Jsons.p(e.getKey().getLocalName(), Jsons.arr(values));
+        fields.add(field);
       }
-
-      final var values = e.getValue().stream()
-          .map(v -> Jsons.v(v.getValue()))
-          .collect(Collectors.toCollection(ArrayList::new));
-      final var field = Jsons.p(e.getKey().getLocalName(), Jsons.arr(values));
-      fields.add(field);
     }
 
     final var fields = namespaces.entrySet().stream()
