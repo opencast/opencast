@@ -559,6 +559,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   private void triggerEventHandlers(SeriesItem item) {
+    while (updateHandlers.size() != 1) {
+      logger.warn("Expecting 1 handler, but {} are registered.  Waiting 10s then retrying...", updateHandlers.size());
+      try {
+        Thread.sleep(10000L);
+      } catch (InterruptedException e) { /* swallow this, nothing to do */ }
+    }
     for (SeriesUpdateHandler handler : updateHandlers) {
       handler.execute(item);
     }

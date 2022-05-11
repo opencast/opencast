@@ -329,6 +329,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @param list The list of scheduler changes for a mediapackage
    */
   private void sendSchedulerUpdate(SchedulerItemList list) {
+    while (schedulerUpdateHandlers.size() != 1) {
+      logger.warn("Expecting 1 handler, but {} are registered.  Waiting 10s then retrying...", schedulerUpdateHandlers.size());
+      try {
+        Thread.sleep(10000L);
+      } catch (InterruptedException e) { /* swallow this, nothing to do */ }
+    }
     for (SchedulerItem item : list.getItems()) {
       String mpId = list.getId();
       for (SchedulerUpdateHandler handler : this.schedulerUpdateHandlers) {
