@@ -2029,8 +2029,7 @@ public class EventsEndpoint implements ManagedService {
               return RestUtil.R.badRequest(String.format("Could not parse flavor %s; %s", flavorString, e.getMessage()));
             }
           } else if ("overwriteExisting".equals(fieldName)) {
-            String hhh = Streams.asString(item.openStream());
-            overwriteExisting = Boolean.parseBoolean(hhh);
+            overwriteExisting = Boolean.parseBoolean(Streams.asString(item.openStream()));
           }
         } else {
           // Add track with temporary flavor
