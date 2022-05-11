@@ -223,7 +223,7 @@ public class BrightspaceClientImpl implements BrightspaceClient {
   private String composePagedUrl(String bookmark, String brightspaceUserId) {
     String request = GET_COURSES_BY_BRIGHTSPACE_USER_ID.replaceAll("\\{\\S+}", brightspaceUserId);
     if (bookmark != null) {
-      request += "?bookmark=" + bookmark + "&orgUnitTypeId=3";
+      request += "&bookmark=" + bookmark;
     }
     return request;
   }
