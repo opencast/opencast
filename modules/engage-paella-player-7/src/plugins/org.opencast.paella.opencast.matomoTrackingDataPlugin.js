@@ -40,7 +40,7 @@ export default class OpencastMatomoTrackingDataPlugin extends DataPlugin {
     const tracking_client = this.config.tracking_client;
     const site_id = this.config.site_id;
     
-    let Matomo;
+
     let matomoPromise = null;
     const matomoScript = (path) => {
       if (!matomoPromise){
