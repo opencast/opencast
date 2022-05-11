@@ -76,7 +76,7 @@ public interface WorkflowServiceDatabase {
    * @return Amount of workflow instances
    * @throws WorkflowDatabaseException
    */
-  int countWorkflows(WorkflowInstance.WorkflowState state) throws WorkflowDatabaseException;
+  long countWorkflows(WorkflowInstance.WorkflowState state) throws WorkflowDatabaseException;
 
   /**
    * Gets all workflow instances for a mediapackage.
@@ -101,18 +101,10 @@ public interface WorkflowServiceDatabase {
   List<WorkflowInstance> getRunningWorkflowInstancesByMediaPackage(String mediaPackageId) throws WorkflowDatabaseException;
 
   /**
-   * Get all workflow instances belong to a series
-   * @param seriesId The id of the series
-   * @return list of all {@link WorkflowInstance}s for the given series id
-   * @throws WorkflowDatabaseException
-   */
-  List<WorkflowInstance> getWorkflowInstancesBySeries(String seriesId) throws WorkflowDatabaseException;
-
-  /**
-   * Returns true if the mediapackage with the given identifier currently has a workflow running on it.
+   * Returns true if the media package with the given identifier currently has a workflow running on it.
    *
    * @param mediaPackageId
-   *          the mediapackage identifier
+   *          the media package identifier
    * @return true, if a workflow is running; false otherwise
    * @throws WorkflowDatabaseException
    *           if there is a problem communicating with the underlying data store

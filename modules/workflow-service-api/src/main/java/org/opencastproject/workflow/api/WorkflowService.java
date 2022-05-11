@@ -344,13 +344,4 @@ public interface WorkflowService {
   Optional<WorkflowInstance> getRunningWorkflowInstanceByMediaPackage(String mediaPackageId, String action)
           throws WorkflowException, UnauthorizedException, WorkflowDatabaseException;
 
-  /**
-   * Returns all workflows associated with the given series
-   * Only used internally when a series is updated
-   * @param seriesId
-   *          the identifier of the series
-   * @return a {@Link List} of {@Link WorkflowInstance}
-   * @throws WorkflowDatabaseException
-   */
-  List<WorkflowInstance> getWorkflowInstancesBySeries(String seriesId) throws WorkflowDatabaseException;
 }

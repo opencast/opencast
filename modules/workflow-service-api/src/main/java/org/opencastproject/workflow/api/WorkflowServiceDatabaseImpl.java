@@ -118,7 +118,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
     }
   }
 
-/**
+  /**
    * {@inheritDoc}
    *
    * @see WorkflowServiceDatabase#getWorkflowInstances(int limit, int offset)
@@ -138,7 +138,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       logger.debug("Requesting workflows using query: {}", query);
       return query.getResultList();
     } catch (Exception e) {
-      throw new WorkflowDatabaseException(e);
+      throw new WorkflowDatabaseException("Error fetching workflows from database", e);
     } finally {
       if (em != null)
         em.close();
@@ -156,7 +156,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
-      Query query = em.createNamedQuery("Workflow.toCleanup");
+      var query = em.createNamedQuery("Workflow.toCleanup", WorkflowInstance.class);
 
       String orgId = securityService.getOrganization().getId();
       query.setParameter("organizationId", orgId);
@@ -177,22 +177,20 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
    *
    * @see WorkflowServiceDatabase#countWorkflows(WorkflowInstance.WorkflowState state)
    */
-  public int countWorkflows(WorkflowInstance.WorkflowState state) throws WorkflowDatabaseException {
+  public long countWorkflows(WorkflowInstance.WorkflowState state) throws WorkflowDatabaseException {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
 
-      Query query = em.createNamedQuery("Workflow.getCount");
+      var query = em.createNamedQuery("Workflow.getCount", Long.class);
 
       String orgId = securityService.getOrganization().getId();
       query.setParameter("organizationId", orgId);
       query.setParameter("state", state);
 
-      Long total = (Long) query.getSingleResult();
-      return total.intValue();
+      return query.getSingleResult();
     } catch (Exception e) {
-      logger.error("Could not find number of workflows.", e);
-      throw new WorkflowDatabaseException(e);
+      throw new WorkflowDatabaseException("Could not find number of workflows.", e);
     } finally {
       if (em != null)
         em.close();
@@ -245,31 +243,6 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       query.setParameter("stateRunning", WorkflowInstance.WorkflowState.RUNNING);
       query.setParameter("statePaused", WorkflowInstance.WorkflowState.PAUSED);
       query.setParameter("stateFailing", WorkflowInstance.WorkflowState.FAILING);
-
-      return query.getResultList();
-    } catch (Exception e) {
-      throw new WorkflowDatabaseException(e);
-    } finally {
-      if (em != null)
-        em.close();
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see WorkflowServiceDatabase#getWorkflowInstancesBySeries(String seriesId)
-   */
-  public List<WorkflowInstance> getWorkflowInstancesBySeries(String seriesId) throws WorkflowDatabaseException {
-
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query query = em.createNamedQuery("Workflow.bySeries");
-
-      String orgId = securityService.getOrganization().getId();
-      query.setParameter("organizationId", orgId);
-      query.setParameter("seriesId", seriesId);
 
       return query.getResultList();
     } catch (Exception e) {

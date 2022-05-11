@@ -1138,19 +1138,12 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     }
   }
 
-  protected boolean assertMediaPackagePermission(String mediaPackageId, String action) throws UnauthorizedException {
-    User currentUser = securityService.getUser();
-
-    MediaPackage mediapackage;
-    Opt<MediaPackage> assetMediapackage = assetManager.getMediaPackage(mediaPackageId);
-    if (assetMediapackage.isSome()) {
-      mediapackage = assetMediapackage.get();
-      if (currentUser.hasRole(GLOBAL_ADMIN_ROLE)
-              || authorizationService.hasPermission(mediapackage, action)) {
-        return true;
-      } else {
-        throw new UnauthorizedException(currentUser, action);
-      }
+  protected boolean assertMediaPackagePermission(String mediaPackageId, String action) {
+    Opt<MediaPackage> assetMediaPackage = assetManager.getMediaPackage(mediaPackageId);
+    if (assetMediaPackage.isSome()) {
+      var currentUser = securityService.getUser();
+      var mediaPackage = assetMediaPackage.get();
+      return currentUser.hasRole(GLOBAL_ADMIN_ROLE) || authorizationService.hasPermission(mediaPackage, action);
     }
     return false;
   }
@@ -1309,11 +1302,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   public long countWorkflowInstances(WorkflowState state) throws WorkflowDatabaseException {
-    try {
-      return persistence.countWorkflows(state);
-    } catch (WorkflowDatabaseException e) {
-      throw new WorkflowDatabaseException(e);
-    }
+    return persistence.countWorkflows(state);
   }
 
   /**
@@ -1328,14 +1317,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       List<WorkflowInstance> workflows = persistence.getWorkflowInstancesByMediaPackage(mediaPackageId);
 
       // If we have read permission to the media package, return all workflows
-      boolean authorized = false;
-      try {
-        authorized = assertMediaPackagePermission(mediaPackageId, Permissions.Action.READ.toString());
-        if (authorized) {
-          return workflows;
-        }
-      } catch (UnauthorizedException e) {
-        // Ignore
+      if (assertMediaPackagePermission(mediaPackageId, Permissions.Action.READ.toString())) {
+        return workflows;
       }
 
       // If we do not have permission, check for each workflow individually
@@ -1350,20 +1333,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       }
 
       return workflowsWithPermission;
-    } catch (WorkflowDatabaseException e) {
-      throw new WorkflowDatabaseException(e);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstancesBySeries(String)
-   */
-  @Override
-  public List<WorkflowInstance> getWorkflowInstancesBySeries(String seriesId) throws WorkflowDatabaseException {
-    try {
-      return persistence.getWorkflowInstancesBySeries(seriesId);
     } catch (WorkflowDatabaseException e) {
       throw new WorkflowDatabaseException(e);
     }

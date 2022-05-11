@@ -207,25 +207,6 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
   }
 
   @Override
-  public List<WorkflowInstance> getWorkflowInstancesBySeries(String seriesId) throws WorkflowDatabaseException {
-    List<NameValuePair> queryStringParams = new ArrayList<>();
-
-    queryStringParams.add(new BasicNameValuePair("seriesId", seriesId));
-
-    HttpGet get = new HttpGet("/series/" + seriesId + "/instances.xml");
-    HttpResponse response = getResponse(get);
-    try {
-      if (response != null)
-        return XmlWorkflowParser.parseWorkflowSet(response.getEntity().getContent()).getItems();
-    } catch (Exception e) {
-      throw new WorkflowDatabaseException(e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new WorkflowDatabaseException("Workflow instances can not be loaded from a remote workflow service");
-  }
-
-  @Override
   public boolean mediaPackageHasActiveWorkflows(String mediaPackageId) throws WorkflowDatabaseException {
     HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/hasActiveWorkflows");
     HttpResponse response = getResponse(get);
