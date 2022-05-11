@@ -46,12 +46,14 @@ API changes
 Additional Notes about 10.13
 ----------------------------
 
-This release resolves a few URL signing issues, as well as updating the default Paella configuration file to match Paella 6.5.6.
+This release resolves a few URL signing issues, as well as updating the default Paella configuration file to match
+Paella 6.5.6.
 
 Additional Notes about 10.12
 ----------------------------
 
-This release upgrades Paella from 6.4.4 to 6.5.6 to repair HLS functionality.  This release also updates the editor and studio to their latest releases.
+This release upgrades Paella from 6.4.4 to 6.5.6 to repair HLS functionality.  This release also updates the editor and
+studio to their latest releases.
 
 Additional Notes about 10.11
 ----------------------------
