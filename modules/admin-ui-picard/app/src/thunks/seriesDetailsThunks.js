@@ -1,3 +1,7 @@
+import axios from "axios";
+import _ from 'lodash';
+import moment from "moment";
+import {logger} from "../utils/logger";
 import {
     loadSeriesDetailsAclsSuccess,
     loadSeriesDetailsFailure,
@@ -10,24 +14,33 @@ import {
     loadSeriesDetailsThemeSuccess,
     setSeriesDetailsExtendedMetadata,
     setSeriesDetailsMetadata,
-    setSeriesDetailsTheme
+    setSeriesDetailsTheme,
+    loadSeriesStatisticsInProgress,
+    loadSeriesStatisticsSuccess,
+    loadSeriesStatisticsFailure,
+    updateSeriesStatisticsSuccess,
+    updateSeriesStatisticsFailure
 } from "../actions/seriesDetailsActions";
-import axios from "axios";
-import _ from 'lodash';
+import {
+    getSeriesDetailsExtendedMetadata,
+    getSeriesDetailsMetadata,
+    getSeriesDetailsThemeNames,
+    getStatistics
+} from "../selectors/seriesDetailsSelectors";
+import {addNotification} from "./notificationThunks";
 import {
     createPolicy,
+    getHttpHeaders,
     transformMetadataCollection,
     transformMetadataForUpdate
 } from "../utils/resourceUtils";
 import {
-    getSeriesDetailsExtendedMetadata,
-    getSeriesDetailsMetadata,
-    getSeriesDetailsThemeNames
-} from "../selectors/seriesDetailsSelectors";
+    createChartOptions,
+    createDownloadUrl
+} from "../utils/statisticsUtils";
 import {transformToIdValueArray} from "../utils/utils";
-import {addNotification} from "./notificationThunks";
 import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
-import {logger} from "../utils/logger";
+import {fetchStatistics, fetchStatisticsValueUpdate} from "./statisticsThunks";
 
 // fetch metadata of certain series from server
 export const fetchSeriesDetailsMetadata = id => async dispatch => {
@@ -278,4 +291,18 @@ export const updateSeriesTheme = (id, values) => async (dispatch, getState) => {
         .catch(response => {
             logger.error(response);
         });
+}
+
+
+
+// thunks for statistics
+
+export const fetchSeriesStatistics = seriesId => async (dispatch) => {
+    dispatch(fetchStatistics(seriesId, 'series', getStatistics, loadSeriesStatisticsInProgress,
+        loadSeriesStatisticsSuccess, loadSeriesStatisticsFailure));
+}
+
+export const fetchSeriesStatisticsValueUpdate = (seriesId, providerId, from, to, dataResolution, timeMode) => async (dispatch) => {
+    dispatch(fetchStatisticsValueUpdate(seriesId, 'series', providerId, from, to, dataResolution, timeMode,
+        getStatistics, updateSeriesStatisticsSuccess, updateSeriesStatisticsFailure));
 }

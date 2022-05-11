@@ -2136,6 +2136,12 @@
          "Month": "Month",
          "Custom": "Custom"
       },
+      "TIME_GRANULARITIES": {
+         "Yearly": "Yearly",
+         "Monthly": "Monthly",
+         "Daily": "Daily",
+         "Hourly": "Hourly"
+      },
       "TITLE": {
          "RANDOM": "随机数据",
          "VIEWS_SUM": "总查看数",

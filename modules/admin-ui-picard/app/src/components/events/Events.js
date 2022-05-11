@@ -144,7 +144,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 
     const hotKeyHandlers = {
         NEW_EVENT: showNewEventModal
-    }
+    };
 
     return (
         <>
