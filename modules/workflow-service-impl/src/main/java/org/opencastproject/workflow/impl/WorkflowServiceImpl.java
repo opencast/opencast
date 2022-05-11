@@ -113,7 +113,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -129,7 +128,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -163,7 +161,7 @@ import java.util.stream.Collectors;
   immediate = true,
   service = { WorkflowService.class, WorkflowServiceImpl.class, IndexProducer.class }
 )
-public class WorkflowServiceImpl extends AbstractIndexProducer implements WorkflowService, JobProducer, ManagedService {
+public class WorkflowServiceImpl extends AbstractIndexProducer implements WorkflowService, JobProducer {
 
   /** Retry strategy property name */
   private static final String RETRY_STRATEGY = "retryStrategy";
@@ -2018,17 +2016,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Override
   public String getJobType() {
     return JOB_TYPE;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
-   */
-  @Override
-  @SuppressWarnings("rawtypes")
-  public void updated(Dictionary properties) {
-
   }
 
   /**
