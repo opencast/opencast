@@ -314,7 +314,6 @@ export const postNewEvent = (values, metadataInfo) => async dispatch => {
             workflow: values.processingWorkflow,
             configuration: configuration
         },
-        options: {},
         access: access,
         source: source,
         assets: assets

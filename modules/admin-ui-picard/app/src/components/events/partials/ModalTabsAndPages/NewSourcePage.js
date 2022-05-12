@@ -221,10 +221,10 @@ const Upload = ({ formik }) => {
                                     && formik.values.uploadAssetsTrack.map((asset, key) => (
                                         <tr key={key}>
                                             <td>
-                                                <span style={{fontWeight: "bold"}}>{t(asset.translate + ".SHORT")}</span>
+                                                <span style={{fontWeight: "bold"}}>{t(asset.title + ".SHORT", asset['displayOverride.SHORT'])}</span>
                                                 <span
                                                     className="ui-helper-hidden">({asset.type} "{asset.flavorType}/{asset.flavorSubType}")</span>
-                                                <p>{t(asset.translate + ".DETAIL")}</p>
+                                                <p>{t(asset.title + ".DETAIL", asset['displayOverride.DETAIL'])}</p>
                                             </td>
                                             <td>
                                                 <div className="file-upload">
