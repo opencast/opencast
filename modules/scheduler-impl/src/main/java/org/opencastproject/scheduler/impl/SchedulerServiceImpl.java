@@ -335,10 +335,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         Thread.sleep(10000L);
       } catch (InterruptedException e) { /* swallow this, nothing to do */ }
     }
+    String mpid = list.getId();
     for (SchedulerItem item : list.getItems()) {
-      String mpId = list.getId();
       for (SchedulerUpdateHandler handler : this.schedulerUpdateHandlers) {
-        handler.execute(mpId, item);
+        handler.execute(mpid, item);
       }
     }
   }

@@ -47,6 +47,7 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -121,10 +122,17 @@ public abstract class AssetManagerTestBase {
     p2 = new Props(q, "org.opencastproject.service.sub");
   }
 
+  protected AssetManagerImpl makeAssetManager() throws Exception {
+    AssetManagerImpl am = makeAssetManagerWithoutHandlers();
+    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
+    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
+    return am;
+  }
+
   /**
    * Create a new test asset manager.
    */
-  protected AssetManagerImpl makeAssetManager() throws Exception {
+  protected AssetManagerImpl makeAssetManagerWithoutHandlers() throws Exception {
     final Database db = new Database(
             PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT));
 

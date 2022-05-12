@@ -42,14 +42,17 @@ import java.io.Serializable;
  * Test event handlers in the asset manager.
  */
 public class AssetManagerMessagingTest extends AssetManagerTestBase {
-  private AssetManagerUpdateHandler handler;
+  private AssetManagerUpdateHandler handler1;
+  private AssetManagerUpdateHandler handler2;
 
   @Override
   public AssetManagerImpl makeAssetManager() throws Exception {
-    handler = EasyMock.createMock(AssetManagerUpdateHandler.class);
+    handler1 = EasyMock.createMock(AssetManagerUpdateHandler.class);
+    handler2 = EasyMock.createMock(AssetManagerUpdateHandler.class);
 
-    AssetManagerImpl am = super.makeAssetManager();
-    am.addEventHandler(handler);
+    AssetManagerImpl am = super.makeAssetManagerWithoutHandlers();
+    am.addEventHandler(handler1);
+    am.addEventHandler(handler2);
     return am;
   }
 
@@ -140,11 +143,11 @@ public class AssetManagerMessagingTest extends AssetManagerTestBase {
     q = am.createQuery();
     assertThat(q, instanceOf(AQueryBuilderDecorator.class));
     // expect add messages
-    expectObjectMessage(handler, TakeSnapshot.class, mpCount * versionCount);
+    expectObjectMessage(handler1, TakeSnapshot.class, mpCount * versionCount);
     // expect delete messages
-    expectObjectMessage(handler, DeleteSnapshot.class, deleteSnapshotMsgCount);
-    expectObjectMessage(handler, DeleteEpisode.class, deleteEpisodeMsgCount);
-    EasyMock.replay(handler);
+    expectObjectMessage(handler1, DeleteSnapshot.class, deleteSnapshotMsgCount);
+    expectObjectMessage(handler1, DeleteEpisode.class, deleteEpisodeMsgCount);
+    EasyMock.replay(handler1);
     //
     String[] mp = createAndAddMediaPackagesSimple(mpCount, versionCount, versionCount, Opt.<String>none());
     for (String id : mp) {
@@ -154,7 +157,7 @@ public class AssetManagerMessagingTest extends AssetManagerTestBase {
     // run deletion
     deleteQuery.apply(mp);
     // verify "delete" expectation
-    EasyMock.verify(handler);
+    EasyMock.verify(handler1);
   }
 
   private void expectObjectMessage(

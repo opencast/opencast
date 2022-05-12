@@ -29,6 +29,7 @@ import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.message.broker.api.update.SeriesUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
@@ -120,6 +121,7 @@ public class SeriesServiceImplTest {
     seriesService.setPersistence(seriesDatabase);
     seriesService.setSecurityService(securityService);
     seriesService.setElasticsearchIndex(esIndex);
+    seriesService.addMessageHandler(EasyMock.createNiceMock(SeriesUpdateHandler.class));
 
     BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
     EasyMock.expect(bundleContext.getProperty((String) EasyMock.anyObject())).andReturn("System Admin");
