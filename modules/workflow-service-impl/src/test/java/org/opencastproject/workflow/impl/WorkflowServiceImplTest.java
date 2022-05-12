@@ -120,6 +120,19 @@ public class WorkflowServiceImplTest {
 
   @Before
   public void setUp() throws Exception {
+
+    MediaPackageBuilder mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
+    mediaPackageBuilder.setSerializer(new DefaultMediaPackageSerializerImpl(new File("target/test-classes")));
+
+    try (var in = WorkflowServiceImplTest.class.getResourceAsStream("/mediapackage-1.xml")) {
+      mediapackage1 = mediaPackageBuilder.loadFromXml(in);
+    }
+    try (var in = WorkflowServiceImplTest.class.getResourceAsStream("/mediapackage-2.xml")) {
+      mediapackage2 = mediaPackageBuilder.loadFromXml(in);
+    }
+
+    Assert.assertNotNull(mediapackage1.getIdentifier());
+    Assert.assertNotNull(mediapackage2.getIdentifier());
     // create operation handlers for our workflows
     succeedingOperationHandler = new SucceedingWorkflowOperationHandler();
     failingOperationHandler = new FailingWorkflowOperationHandler();
@@ -168,7 +181,7 @@ public class WorkflowServiceImplTest {
       EasyMock.expect(assetManager.selectProperties(EasyMock.anyString(), EasyMock.anyString()))
               .andReturn(Collections.emptyList())
               .anyTimes();
-      EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.none()).anyTimes();
+      EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.some(mediapackage1)).anyTimes();
       EasyMock.expect(assetManager.snapshotExists(EasyMock.anyString())).andReturn(true).anyTimes();
       EasyMock.replay(assetManager);
       service.setAssetManager(assetManager);
@@ -245,18 +258,6 @@ public class WorkflowServiceImplTest {
       pausingWorkflowDefinition = XmlWorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
 
-      MediaPackageBuilder mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
-      mediaPackageBuilder.setSerializer(new DefaultMediaPackageSerializerImpl(new File("target/test-classes")));
-
-      is = WorkflowServiceImplTest.class.getResourceAsStream("/mediapackage-1.xml");
-      mediapackage1 = mediaPackageBuilder.loadFromXml(is);
-      IOUtils.closeQuietly(is);
-
-      is = WorkflowServiceImplTest.class.getResourceAsStream("/mediapackage-2.xml");
-      mediapackage2 = mediaPackageBuilder.loadFromXml(is);
-
-      Assert.assertNotNull(mediapackage1.getIdentifier());
-      Assert.assertNotNull(mediapackage2.getIdentifier());
     } catch (Exception e) {
       Assert.fail(e.getMessage());
     }
@@ -340,21 +341,17 @@ public class WorkflowServiceImplTest {
 
   @Test
   public void testGetWorkflowByEpisodeId() throws Exception {
-    String mediaPackageId = mediapackage1.getIdentifier().toString();
-
     // Ensure that the database doesn't have a workflow instance with this episode
     Assert.assertEquals(0, service.countWorkflowInstances());
-    Assert.assertEquals(0, service.getWorkflowInstancesByMediaPackage(
-            mediapackage1.getIdentifier().toString()).size());
 
     startAndWait(workingDefinition, mediapackage1, WorkflowState.SUCCEEDED);
 
     List<WorkflowInstance> workflowsInDb = service.getWorkflowInstancesByMediaPackage(
-            mediapackage1.getIdentifier().toString());
+        mediapackage1.getIdentifier().toString());
     Assert.assertEquals(1, workflowsInDb.size());
-  }
+}
 
-  protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPackage mp, WorkflowState stateToWaitFor)
+protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPackage mp, WorkflowState stateToWaitFor)
           throws Exception {
     return startAndWait(definition, mp, null, stateToWaitFor);
   }

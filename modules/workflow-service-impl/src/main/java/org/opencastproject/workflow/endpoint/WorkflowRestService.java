@@ -315,6 +315,8 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   public Response getWorkflowsOfMediaPackage(@PathParam("id") String mediaPackageId) {
     try {
       return Response.ok(new WorkflowSetImpl(service.getWorkflowInstancesByMediaPackage(mediaPackageId))).build();
+    } catch (UnauthorizedException e) {
+      return Response.status(Status.FORBIDDEN).build();
     } catch (WorkflowDatabaseException e) {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }

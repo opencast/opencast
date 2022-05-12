@@ -1310,30 +1310,12 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   public List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId)
-          throws WorkflowDatabaseException {
-    try {
-      List<WorkflowInstance> workflows = persistence.getWorkflowInstancesByMediaPackage(mediaPackageId);
-
-      // If we have read permission to the media package, return all workflows
-      if (assertMediaPackagePermission(mediaPackageId, Permissions.Action.READ.toString())) {
-        return workflows;
-      }
-
-      // If we do not have permission, check for each workflow individually
-      List<WorkflowInstance> workflowsWithPermission = new ArrayList<>();
-      for (WorkflowInstance workflow : workflows) {
-        try {
-          assertPermission(workflow, Permissions.Action.READ.toString(), workflow.getOrganizationId());
-          workflowsWithPermission.add(workflow);
-        } catch (UnauthorizedException e) {
-          // Ignore
-        }
-      }
-
-      return workflowsWithPermission;
-    } catch (WorkflowDatabaseException e) {
-      throw new WorkflowDatabaseException(e);
+      throws WorkflowDatabaseException, UnauthorizedException {
+    // If we have read permission to the media package, return all workflows
+    if (!assertMediaPackagePermission(mediaPackageId, Permissions.Action.READ.toString())) {
+      throw new UnauthorizedException("Not allowed to access event");
     }
+    return persistence.getWorkflowInstancesByMediaPackage(mediaPackageId);
   }
 
   /**

@@ -327,7 +327,8 @@ public interface WorkflowService {
    * @return a {@Link List} of {@Link WorkflowInstance}
    * @throws WorkflowDatabaseException
    */
-  List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId) throws WorkflowDatabaseException;
+  List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId)
+          throws WorkflowDatabaseException, UnauthorizedException;
 
   /**
    * Returns the {@link WorkflowInstance} currently running on the given mediaPackage
