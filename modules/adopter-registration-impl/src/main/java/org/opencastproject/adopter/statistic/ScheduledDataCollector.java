@@ -53,6 +53,7 @@ import org.osgi.framework.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -178,6 +179,23 @@ public class ScheduledDataCollector extends TimerTask {
       return;
     }
 
+    if (adopter.shouldDelete()) {
+      //Sanitize the data we're sending to delete things
+      Form f = new Form();
+      f.setAdopterKey(adopter.getAdopterKey());
+      GeneralData gd = new GeneralData(f);
+      gd.setAdopterKey(adopter.getAdopterKey());
+      StatisticData sd = new StatisticData(adopter.getStatisticKey());
+
+      try {
+        sender.deleteStatistics(sd.jsonify());
+        sender.deleteGeneralData(gd.jsonify());
+        adopterFormService.deleteRegistration();
+      } catch (IOException e) {
+        logger.warn("Error occurred while deleting registration data, will retry", e);
+      }
+      return;
+    }
     // Don't send data unless they've agreed to the latest (at time of writing) terms.
     // Pre April 2022 doesn't allow collection of a bunch of things, and doens't allow linking stat data to org
     // so rather than burning time turning various things off (after figuring out what needs to be turned off)

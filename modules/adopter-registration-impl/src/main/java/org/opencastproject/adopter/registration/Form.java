@@ -130,6 +130,10 @@ public class Form implements IForm {
   @Column(name = "terms_version_agreed")
   private TERMSOFUSEVERSION termsVersionAgreed = TERMSOFUSEVERSION.PRE_2022;
 
+  // If this is true, then the next stats send pass should delete the registration, then delete this object.
+  @Column(name = "delete_me")
+  private transient boolean deleteMe = false;
+
 
   //================================================================================
   // Constructor and Methods
@@ -367,4 +371,11 @@ public class Form implements IForm {
     return Objects.requireNonNullElse(termsVersionAgreed, TERMSOFUSEVERSION.PRE_2022);
   }
 
+  public void delete() {
+    this.deleteMe = true;
+  }
+
+  public boolean shouldDelete() {
+    return this.deleteMe;
+  }
 }

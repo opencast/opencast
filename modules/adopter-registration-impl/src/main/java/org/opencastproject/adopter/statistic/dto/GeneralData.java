@@ -40,7 +40,7 @@ public class GeneralData {
 
   /** The unique identification key for an adopter. */
   @SerializedName("adopter_key")
-  private final String adopterKey;
+  private String adopterKey;
 
   /** The organisation of the adopter. */
   @SerializedName("organisation_name")
@@ -127,6 +127,10 @@ public class GeneralData {
 
   public String getAdopterKey() {
     return adopterKey;
+  }
+
+  public void setAdopterKey(String key) {
+    this.adopterKey = key;
   }
 
   public String getOrganisationName() {

@@ -173,7 +173,7 @@ public class Controller {
   public Response deleteRegistrationData() {
     logger.debug("Deleting adopter registration data.");
     try {
-      registrationService.deleteFormData();
+      registrationService.markForDeletion();
       return ok();
     } catch (Exception e) {
       logger.error("Error while deleting adopter registration data.", e);
