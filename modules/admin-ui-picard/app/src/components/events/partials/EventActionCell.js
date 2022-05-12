@@ -7,18 +7,29 @@ import EventDetailsModal from "./modals/EventDetailsModal";
 import EmbeddingCodeModal from "./modals/EmbeddingCodeModal"
 import {getUserInformation} from "../../../selectors/userInfoSelectors";
 import {hasAccess} from "../../../utils/utils";
+import SeriesDetailsModal from "./modals/SeriesDetailsModal";
+import {
+    fetchNamesOfPossibleThemes,
+    fetchSeriesDetailsAcls,
+    fetchSeriesDetailsFeeds,
+    fetchSeriesDetailsMetadata,
+    fetchSeriesDetailsTheme
+} from "../../../thunks/seriesDetailsThunks";
 
 
 
 /**
  * This component renders the action cells of events in the table view
  */
-const EventActionCell = ({ row, deleteEvent, user })  => {
+const EventActionCell = ({ row, deleteEvent, fetchSeriesDetailsMetadata, fetchSeriesDetailsAcls,
+                             fetchSeriesDetailsFeeds, fetchSeriesDetailsTheme, fetchSeriesDetailsThemeNames,
+                             user })  => {
     const { t } = useTranslation();
 
 
     const [displayDeleteConfirmation, setDeleteConfirmation] = useState(false);
     const [displayEventDetailsModal, setEventDetailsModal] = useState(false);
+    const [displaySeriesDetailsModal, setSeriesDetailsModal] = useState(false);
     const [eventDetailsTabIndex, setEventDetailsTabIndex] = useState(0);
     const [displayEmbeddingCodeModal, setEmbeddingCodeModal] = useState(false);
 
@@ -44,6 +55,24 @@ const EventActionCell = ({ row, deleteEvent, user })  => {
 
     const hideEventDetailsModal = () => {
         setEventDetailsModal(false);
+    }
+
+    const showSeriesDetailsModal = () => {
+        setSeriesDetailsModal(true);
+    }
+
+    const hideSeriesDetailsModal = () => {
+        setSeriesDetailsModal(false);
+    }
+
+    const onClickSeriesDetails = async () => {
+        await fetchSeriesDetailsMetadata(row.series.id);
+        await fetchSeriesDetailsAcls(row.series.id);
+        await fetchSeriesDetailsFeeds(row.series.id);
+        await fetchSeriesDetailsTheme(row.series.id);
+        await fetchSeriesDetailsThemeNames();
+
+        showSeriesDetailsModal();
     }
 
     const onClickEventDetails = () => {
@@ -76,6 +105,12 @@ const EventActionCell = ({ row, deleteEvent, user })  => {
                                eventTitle={row.title}
                                eventId={row.id} />
 
+            {displaySeriesDetailsModal && (
+                <SeriesDetailsModal handleClose={hideSeriesDetailsModal}
+                                    seriesId={row.series.id}
+                                    seriesTitle={row.series.title}/>
+            )}
+
             {/* Open event details */}
             {hasAccess("ROLE_UI_EVENTS_DETAILS_VIEW", user) && (
                 <a onClick={() => onClickEventDetails()}
@@ -85,7 +120,6 @@ const EventActionCell = ({ row, deleteEvent, user })  => {
 
             {/* If event belongs to a series then the corresponding series details can be opened */}
             {(!!row.series && hasAccess("ROLE_UI_SERIES_DETAILS_VIEW", user)) && (
-                //{/*TODO: implement and properly call function
                 <a onClick={() => onClickSeriesDetails()}
                    className="more-series"
                    title={t('EVENTS.SERIES.TABLE.TOOLTIP.DETAILS')}/>
@@ -166,12 +200,6 @@ const EventActionCell = ({ row, deleteEvent, user })  => {
     );
 }
 
-//todo: implement!
-const onClickSeriesDetails = () => {
-    console.log("Should open series-details.");
-}
-
-
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     user: getUserInformation(state)
@@ -179,7 +207,12 @@ const mapStateToProps = state => ({
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    deleteEvent: (id) => dispatch(deleteEvent(id))
+    deleteEvent: (id) => dispatch(deleteEvent(id)),
+    fetchSeriesDetailsMetadata: id => dispatch(fetchSeriesDetailsMetadata(id)),
+    fetchSeriesDetailsAcls: id => dispatch(fetchSeriesDetailsAcls(id)),
+    fetchSeriesDetailsFeeds: id => dispatch(fetchSeriesDetailsFeeds(id)),
+    fetchSeriesDetailsTheme: id => dispatch(fetchSeriesDetailsTheme(id)),
+    fetchSeriesDetailsThemeNames: () => dispatch(fetchNamesOfPossibleThemes())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EventActionCell);
