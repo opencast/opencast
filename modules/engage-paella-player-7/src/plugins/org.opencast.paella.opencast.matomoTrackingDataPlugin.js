@@ -39,7 +39,7 @@ export default class OpencastMatomoTrackingDataPlugin extends DataPlugin {
     var server = this.config.server;
     const tracking_client = this.config.tracking_client;
     const site_id = this.config.site_id;
-    
+
 
     let matomoPromise = null;
     const matomoScript = (path) => {
@@ -62,7 +62,7 @@ export default class OpencastMatomoTrackingDataPlugin extends DataPlugin {
     };
 
     if (server.substr(-1) != '/') server += '/';
-    await matomoScript(server + tracking_client + '.js'); 
+    await matomoScript(server + tracking_client + '.js');
     this.player.matomotracker = Matomo.getAsyncTracker( server + tracking_client + '.php', site_id );
     this.player.log.debug('Matomo Analytics Initialized: ' + Matomo.initialized);
   }
