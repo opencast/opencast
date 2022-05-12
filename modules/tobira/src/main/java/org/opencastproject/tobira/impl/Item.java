@@ -45,6 +45,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -110,9 +111,13 @@ class Item {
 
     final var dccs = Arrays.stream(mp.getElements())
         .filter(mpe -> {
-          final var isCatalog = mpe.getElementType().equals(MediaPackageElement.Type.Catalog);
-          final var isForEpisode = mpe.getFlavor().getSubtype().equals("episode");
-          final var isXml = mpe.getMimeType().equals(MimeType.mimeType("text", "xml"));
+          final var flavor = mpe.getFlavor();
+          if (flavor == null) {
+            return false;
+          }
+          final var isForEpisode = Objects.equals(flavor.getSubtype(), "episode");
+          final var isCatalog = Objects.equals(mpe.getElementType(), MediaPackageElement.Type.Catalog);
+          final var isXml = Objects.equals(mpe.getMimeType(), MimeType.mimeType("text", "xml"));
           return isCatalog && isForEpisode && isXml;
         })
         .map(mpe -> DublinCoreUtil.loadDublinCore(workspace, mpe));

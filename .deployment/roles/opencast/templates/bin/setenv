@@ -34,7 +34,7 @@
 # export KARAF_REDIRECT    # Enable/set the std/err redirection when using bin/start
 #
 # Debug options
-# export KARAF_DEBUG       # Enable debug mode
+export KARAF_DEBUG=true       # Enable debug mode
 # export JAVA_DEBUG_PORT   # Set debug port (defaults to 5005)
 
 
