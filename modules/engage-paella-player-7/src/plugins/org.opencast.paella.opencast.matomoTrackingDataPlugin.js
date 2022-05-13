@@ -18,7 +18,7 @@
  * the License.
  *
  */
-import { DataPlugin, Events } from 'paella-core';
+import { DataPlugin, Events, bindEvent } from 'paella-core';
 
 export default class OpencastMatomoTrackingDataPlugin extends DataPlugin {
 
@@ -36,9 +36,12 @@ export default class OpencastMatomoTrackingDataPlugin extends DataPlugin {
   }
 
   async load(){
-    var server = this.config.server;
+    const client_id = this.config.client_id;
+    const heartbeat = this.config.heartbeat;
     const tracking_client = this.config.tracking_client;
+    const server = this.config.server;
     const site_id = this.config.site_id;
+    
 
 
     let matomoPromise = null;
@@ -64,7 +67,16 @@ export default class OpencastMatomoTrackingDataPlugin extends DataPlugin {
     if (server.substr(-1) != '/') server += '/';
     await matomoScript(server + tracking_client + '.js');
     this.player.matomotracker = Matomo.getAsyncTracker( server + tracking_client + '.php', site_id );
-    this.player.log.debug('Matomo Analytics Initialized: ' + Matomo.initialized);
+    //this.player.log.debug('Matomo Analytics Initialized: ' + Matomo.initialized);
+    this.player.matomotracker.client_id = client_id;
+    if (heartbeat && heartbeat > 0) this.player.matomotracker.enableHeartBeatTimer(heartbeat);
+    if (Matomo && Matomo.MediaAnalytics) {
+      bindEvent(this.player, 
+        Events.PLAYER_LOADED,
+        () => {
+          Matomo.MediaAnalytics.scanForMedia();
+        });
+    }
   }
 
   async write(context, { id }, data) {
@@ -114,4 +126,24 @@ export default class OpencastMatomoTrackingDataPlugin extends DataPlugin {
       this.player.log.debug(`Opencast Matomo user log event done: '${ opencastLog.type }'`);
     }
   }
+  
+  registerVisit() {
+    var opencastData,
+        title,
+        event_id,
+        series_title,
+        series_id,
+        presenter,
+        view_mode;
+    
+        opencastData = this.player.videoManifest.metadata;
+        
+
+    
+    
+
+
+
+  }
+
 }
