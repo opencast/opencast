@@ -2761,12 +2761,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
 
     // Sort the list by capacity and distinguish between composer jobs and other jobs
-    if ("org.opencastproject.composer".equals(jobType)) {
-        Collections.sort(filteredList, new LoadComparatorEncoding(systemLoad));
-    }
-    else {
+    if ("org.opencastproject.composer".equals(jobType))
+      Collections.sort(filteredList, new LoadComparatorEncoding(systemLoad));
+    else
       Collections.sort(filteredList, new LoadComparator(systemLoad));
-    }
 
     return filteredList;
   }
