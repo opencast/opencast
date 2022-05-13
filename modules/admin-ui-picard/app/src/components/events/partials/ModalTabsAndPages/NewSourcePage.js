@@ -61,9 +61,8 @@ const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, in
 
             // Prepare start date of event for check
             let startDate = new Date(values.scheduleStartDate);
-            console.log("start date");
-            console.log(startDate);
-            startDate.setHours((values.scheduleStartTimeHour /*- offset*/), values.scheduleStartTimeMinutes, 0, 0);
+            // NOTE: if time zone issues still occur during further testing, try to set times to UTC (-offset)
+            startDate.setHours((values.scheduleStartTimeHour), values.scheduleStartTimeMinutes, 0, 0);
 
             // If start date of event is smaller than today --> Event is in past
             if (startDate < new Date()) {
@@ -79,7 +78,8 @@ const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, in
             } else {
                 endDate = new Date(values.scheduleEndDate);
             }
-            endDate.setHours((values.scheduleEndTimeHour /*- offset*/), values.scheduleEndTimeMinutes, 0, 0);
+            // NOTE: if time zone issues still occur during further testing, try to set times to UTC (-offset)
+            endDate.setHours((values.scheduleEndTimeHour), values.scheduleEndTimeMinutes, 0, 0);
 
             // if start date is higher than end date --> end date is before start date
             if (startDate > endDate) {

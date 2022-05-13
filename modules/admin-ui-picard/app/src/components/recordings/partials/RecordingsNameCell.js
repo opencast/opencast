@@ -33,7 +33,6 @@ const RecordingsNameCell = ({ row, loadingEventsIntoTable, setSpecificEventFilte
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadingEventsIntoTable: () => dispatch(loadEventsIntoTable()),
-    resetTextFilter: () => dispatch(editTextFilter('')),
     setSpecificEventFilter: (filter, filterValue) => dispatch(setSpecificEventFilter(filter, filterValue))
 });
 

@@ -21,7 +21,10 @@ import {
     setEventColumns,
     showActions as showEventsActions
 } from '../actions/eventActions';
-import { setSeriesColumns, showActions as showSeriesActions } from '../actions/seriesActions';
+import {
+    setSeriesColumns,
+    showActions as showSeriesActions
+} from '../actions/seriesActions';
 import {
     getPageOffset,
     getResourceType,

@@ -44,7 +44,7 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
     }
 
     const loadUsers = () => {
-        loadingUsers("users");
+        loadingFilters("users");
 
         // Reset the current page to first page
         resetOffset();
@@ -57,7 +57,7 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
     }
 
     const loadAcls = () => {
-        loadingAcls("acls");
+        loadingFilters("acls");
 
         // Reset the current page to first page
         resetOffset();

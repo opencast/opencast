@@ -118,6 +118,7 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent }) => {
                                                  header={steps[page].translation} />
                             )}
                             {page === 1 && (
+                                // todo: finish implementation when information about endpoints and structure are gathered
                                 <NewMetadataExtendedPage previousPage={previousPage}
                                                          nextPage={nextPage}
                                                          formik={formik}

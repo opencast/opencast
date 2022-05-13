@@ -151,7 +151,10 @@ const EditTableViewModal = ({  showModal, handleClose, resource, activeColumns, 
 
                     <footer>
                         <div className="pull-left">
-                            <button onClick={() => clearData()} className="cancel active">{t('CANCEL')/*<!--Cancel-->*/}</button>
+                            <button onClick={() => clearData()}
+                                    className="cancel active">
+                                {t('CANCEL')/*Cancel*/}
+                            </button>
                         </div>
                         <div className="pull-right">
                             <button onClick={() => save()}

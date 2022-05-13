@@ -5,6 +5,7 @@ import RenderMultiField from '../../../shared/wizard/RenderMultiField';
 import RenderField from '../../../shared/wizard/RenderField';
 import WizardNavigationButtons from '../../../shared/wizard/WizardNavigationButtons';
 
+// todo: finish implementation when information about endpoints and structure are gathered
 const NewMetadataExtendedPage = ({ previousPage, nextPage, formik, header, extendedMetadataFields }) => {
 
   const { t } = useTranslation();

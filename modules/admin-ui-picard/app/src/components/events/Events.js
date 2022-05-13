@@ -86,9 +86,6 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
         // Load events on mount
         loadEvents().then(r => logger.info(r));
 
-        // Load event filters
-        //loadingFilters("events");
-
         // Function for handling clicks outside of an open dropdown menu
         const handleClickOutside = e => {
             if (containerAction.current && !containerAction.current.contains(e.target)) {
