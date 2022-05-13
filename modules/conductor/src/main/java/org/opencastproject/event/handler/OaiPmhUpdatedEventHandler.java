@@ -49,6 +49,9 @@ import com.entwinemedia.fn.data.Opt;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +60,17 @@ import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Set;
 
+@Component(
+    immediate = true,
+    service = {
+        ManagedService.class,
+        OaiPmhUpdatedEventHandler.class
+    },
+    property = {
+        "service.description=OAI-PMH Updated Event Handler",
+        "service.pid=org.opencastproject.event.handler.OaiPmhUpdatedEventHandler"
+    }
+)
 public class OaiPmhUpdatedEventHandler implements ManagedService {
 
   /** The logger */
@@ -97,6 +111,7 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
    * @param bundleContext
    *          the OSGI bundle context
    */
+  @Activate
   protected void activate(BundleContext bundleContext) {
     this.systemAccount = bundleContext.getProperty("org.opencastproject.security.digest.user");
   }
@@ -188,18 +203,22 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
     }
   }
 
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
+  @Reference
   public void setOaiPmhPersistence(OaiPmhDatabase oaiPmhPersistence) {
     this.oaiPmhPersistence = oaiPmhPersistence;
   }
 
+  @Reference
   public void setOaiPmhPublicationService(OaiPmhPublicationService oaiPmhPublicationService) {
     this.oaiPmhPublicationService = oaiPmhPublicationService;
   }
 
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

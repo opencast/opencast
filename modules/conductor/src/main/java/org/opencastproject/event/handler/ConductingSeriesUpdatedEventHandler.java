@@ -28,6 +28,10 @@ import org.opencastproject.message.broker.api.series.SeriesItem;
 import org.opencastproject.security.api.SecurityService;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +46,15 @@ import java.util.concurrent.FutureTask;
  * Very simple approach to serialize the work of all three dependend update handlers. Todo: Merge all handlers into one
  * to avoid unnecessary distribution updates etc.
  */
+@Component(
+    immediate = true,
+    service = {
+        ConductingSeriesUpdatedEventHandler.class
+    },
+    property = {
+        "service.description=Conducting event handler for series events"
+    }
+)
 public class ConductingSeriesUpdatedEventHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(ConductingSeriesUpdatedEventHandler.class);
@@ -61,12 +74,14 @@ public class ConductingSeriesUpdatedEventHandler {
 
   private MessageWatcher messageWatcher;
 
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating {}", ConductingSeriesUpdatedEventHandler.class.getName());
     messageWatcher = new MessageWatcher();
     singleThreadExecutor.execute(messageWatcher);
   }
 
+  @Deactivate
   public void deactivate(ComponentContext cc) {
     logger.info("Deactivating {}", ConductingSeriesUpdatedEventHandler.class.getName());
     if (messageWatcher != null) {
@@ -127,26 +142,31 @@ public class ConductingSeriesUpdatedEventHandler {
   }
 
   /** OSGi DI callback. */
+  @Reference
   public void setAssetManagerUpdatedEventHandler(AssetManagerUpdatedEventHandler h) {
     this.assetManagerUpdatedEventHandler = h;
   }
 
   /** OSGi DI callback. */
+  @Reference
   public void setSeriesUpdatedEventHandler(SeriesUpdatedEventHandler h) {
     this.seriesUpdatedEventHandler = h;
   }
 
   /** OSGi DI callback. */
+  @Reference
   public void setWorkflowPermissionsUpdatedEventHandler(WorkflowPermissionsUpdatedEventHandler h) {
     this.workflowPermissionsUpdatedEventHandler = h;
   }
 
   /** OSGi DI callback. */
+  @Reference
   public void setMessageReceiver(MessageReceiver messageReceiver) {
     this.messageReceiver = messageReceiver;
   }
 
   /** OSGi DI callback. */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
