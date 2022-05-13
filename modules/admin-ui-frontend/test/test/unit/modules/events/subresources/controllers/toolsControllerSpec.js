@@ -1,5 +1,5 @@
 describe('Tools Edit controller', function () {
-    var $scope, $controller, $parentScope, $location, $httpBackend, Notifications;
+    var $scope, $q, $controller, $parentScope, $location, $httpBackend, Notifications;
 
     beforeEach(module('adminNg'));
     beforeEach(module(function ($provide) {
@@ -25,6 +25,8 @@ describe('Tools Edit controller', function () {
 
         $parentScope = $rootScope.$new();
         $scope = $parentScope.$new();
+        var catalog = {fields: [{ dirty: false }]};
+        $scope.catalogs = [catalog];
 
         $controller('ToolsCtrl', { $scope: $scope });
     }));
@@ -58,7 +60,7 @@ describe('Tools Edit controller', function () {
 
         it('saves the cutting state', function () {
             $httpBackend.expectPOST('/admin-ng/tools/5681/editor.json').respond(201);
-            $scope.submit();
+            $scope.submit($scope.catalogs, $scope.catalogs[0]);
             $httpBackend.flush();
         });
 
@@ -68,7 +70,7 @@ describe('Tools Edit controller', function () {
             });
 
             it('shows a notification when saving', function () {
-                $scope.submit();
+                $scope.submit($scope.catalogs, $scope.catalogs[0]);
                 $httpBackend.flush();
 
                 expect(Notifications.add).toHaveBeenCalledWith('success', jasmine.any(String));
@@ -76,7 +78,7 @@ describe('Tools Edit controller', function () {
 
             it('shows a notification when saving and processing', function () {
                 $scope.video.workflow = 'some-workflow';
-                $scope.submit();
+                $scope.submit($scope.catalogs, $scope.catalogs[0]);
                 $httpBackend.flush();
 
                 expect(Notifications.add).toHaveBeenCalledWith('success', jasmine.any(String));
@@ -84,7 +86,7 @@ describe('Tools Edit controller', function () {
 
             it('redirects to the events list', function () {
                 $scope.video.workflow = 'some-workflow';
-                $scope.submit();
+                $scope.submit($scope.catalogs, $scope.catalogs[0]);
                 $httpBackend.flush();
 
                 expect($location.url).toHaveBeenCalledWith('/events/events');
@@ -97,7 +99,7 @@ describe('Tools Edit controller', function () {
             });
 
             it('shows a notification', function () {
-                $scope.submit();
+                $scope.submit($scope.catalogs, $scope.catalogs[0]);
                 $httpBackend.flush();
 
                 expect(Notifications.add).toHaveBeenCalledWith('error', jasmine.any(String));

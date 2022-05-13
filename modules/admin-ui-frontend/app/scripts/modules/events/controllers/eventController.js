@@ -29,12 +29,14 @@ angular.module('adminNg.controllers')
   'EventPublicationsResource', 'EventSchedulingResource','NewEventProcessingResource', 'CaptureAgentsResource',
   'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService', 'UploadAssetOptions',
   'EventUploadAssetResource', 'Table', 'SchedulingHelperService', 'StatisticsReusable', 'Modal', '$translate',
+  'MetadataSaveService',
   function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource,
     EventAssetCatalogsResource, CommentResource, EventWorkflowsResource, EventWorkflowActionResource,
     EventWorkflowDetailsResource, ResourcesListResource, RolesResource, EventAccessResource,
     EventPublicationsResource, EventSchedulingResource, NewEventProcessingResource, CaptureAgentsResource,
     ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService, UploadAssetOptions,
-    EventUploadAssetResource, Table, SchedulingHelperService, StatisticsReusable, Modal, $translate) {
+    EventUploadAssetResource, Table, SchedulingHelperService, StatisticsReusable, Modal, $translate,
+    MetadataSaveService) {
 
     var metadataChangedFns = {},
         me = this,
@@ -786,37 +788,10 @@ angular.module('adminNg.controllers')
     };
 
     $scope.metadataSave = function (catalogs) {
-      var catalogsWithUnsavedChanges = catalogs.filter(function(catalog) {
-        return catalog.fields.some(function(field) {
-          return field.dirty === true;
-        });
-      });
-
-      catalogsWithUnsavedChanges.forEach(function(catalog) {
-        // don't send collections
-        catalog.fields.forEach(function(field) {
-          if (Object.prototype.hasOwnProperty.call(field, 'collection')) {
-            field.collection = [];
-          }
-        });
-
-        EventMetadataResource.save({ id: $scope.resourceId }, catalog,  function () {
-          var notificationContext = catalog === $scope.commonMetadataCatalog ? 'events-metadata-common'
-            : 'events-metadata-extended';
-          Notifications.add('info', 'SAVED_METADATA', notificationContext, 1200);
-
-          // Unmark entries
-          angular.forEach(catalog.fields, function (entry) {
-            entry.dirty = false;
-            // new original value
-            if (entry.value instanceof Array) {
-              entry.oldValue = entry.value.slice(0);
-            } else {
-              entry.oldValue = entry.value;
-            }
-          });
-        });
-      });
+      return MetadataSaveService.save(
+        catalogs,
+        $scope.commonMetadataCatalog,
+        $scope.resourceId);
     };
 
     $scope.components = ResourcesListResource.get({ resource: 'components' });
