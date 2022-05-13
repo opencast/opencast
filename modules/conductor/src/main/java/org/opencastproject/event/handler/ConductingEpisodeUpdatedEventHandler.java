@@ -25,22 +25,37 @@ import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * This handler listens for changes to episodes. Whenever a change is done, this is propagated to OAI-PMH.
  */
+@Component(
+    immediate = true,
+    service = {
+        AssetManagerUpdateHandler.class
+    },
+    property = {
+        "service.description=Conducting event handler for recording events",
+    }
+)
 public class ConductingEpisodeUpdatedEventHandler implements AssetManagerUpdateHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(ConductingEpisodeUpdatedEventHandler.class);
 
   private OaiPmhUpdatedEventHandler oaiPmhUpdatedEventHandler;
 
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating {}", ConductingEpisodeUpdatedEventHandler.class.getName());
   }
 
+  @Deactivate
   public void deactivate(ComponentContext cc) {
     logger.info("Deactivating {}", ConductingEpisodeUpdatedEventHandler.class.getName());
   }
@@ -63,6 +78,7 @@ public class ConductingEpisodeUpdatedEventHandler implements AssetManagerUpdateH
   /**
    * OSGi DI callback.
    */
+  @Reference
   public void setOaiPmhUpdatedEventHandler(OaiPmhUpdatedEventHandler h) {
     this.oaiPmhUpdatedEventHandler = h;
   }

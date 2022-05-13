@@ -422,7 +422,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   }
 
   @Override
-  public Job startTranscription(String mpId, Track track, String language) {
+  public Job startTranscription(String mpId, Track track, String... args) {
     throw new UnsupportedOperationException("Not supported.");
   }
 
