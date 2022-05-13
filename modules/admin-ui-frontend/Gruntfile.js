@@ -106,7 +106,6 @@ module.exports = function (grunt) {
           debug: false,
           proxyPort: '<%= proxyPort %>',
           middleware: proxyMiddleware(grunt, appConfig.app)
-        }
         },
         proxies: [{
           context: '/admin-ng',
@@ -133,7 +132,8 @@ module.exports = function (grunt) {
           host: 'localhost',
           port: '<%= proxyPort %>',
           https: false
-        }],
+        }]
+      },
       test: {
         options: {
           port: 9001,
