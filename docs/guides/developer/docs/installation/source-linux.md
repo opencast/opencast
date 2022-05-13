@@ -186,27 +186,6 @@ You can now install needed packages:
 $ brew install maven ffmpeg nodejs
 ```
 
-### ActiveMQ with Homebrew
-
-Homebrew offers you an ActiveMQ Package. Please decide, if you want to use Homebrew for ActiveMQ or if you want to follow the general guide below and run it by downloading the binaries. If you want continue you can install ActiveMQ by
-
-```sh
-$ brew install activemq
-```
-
-Remember to copy the activemq.xml like mentioned below in the right directory. You have to find the right folder for that operation, Homebrew will put the ActiveMQ files in a different location. You could find it by
-
-```sh
-$ sudo find / -name activemq.xml
-````
-
-After changing the configuration file you can list and start or stop you services with
-
-```sh
-$ brew services list
-$ brew services start activemq
-```
-
 ### Git Bash Completion
 
 In macOS you can not complete or suggest half typed commands with your Tab Key (like you probably know from linux). If you want to use bash completion, you have to install it by
@@ -232,39 +211,6 @@ Then add following line to the bash_profile in home
 Finally apply your changes with
 
     $ source /usr/local/etc/bash_completion.d/git-completion.bash
-
-
-Install and Configure ActiveMQ
-------------------------------
-
-Download the current version from https://activemq.apache.org/components/classic/download
-
-Extract and copy it to a directory, in this case you could use the opt directory.
-
-    $ sudo tar -zxvf apache-activemq-*-bin.tar.gz -C /opt
-    $ cd /opt && sudo mv apache-activemq-*/ activemq
-
-Copy the preconfigured XML from your opencast directory into your ActiveMQ configuration.
-In this example you have following folder structure:
-
-- ~/Projects/opencast
-- /opt/activemq
-
-With that folder structure you could use following command:
-
-    $ cd && cd Projects && sudo cp opencast/docs/scripts/activemq/activemq.xml /opt/activemq/conf/activemq.xml
-
-If your folder structure is different from that example or you do decide to put it somewhere else, you should copy and replace the preconfigured XML from
-
-- /location/to/your/opencast/docs/scripts/activemq/activemq.xml
-
-into
-
-- /location/to/your/activemq/conf/activemq.xml
-
-You can start your ActiveMQ instance with:
-
-    $ sudo ./location/to/your/activemq/bin/activemq start
 
 
 ## Build and Start Opencast
@@ -320,10 +266,6 @@ To fix an npm access error ([example](https://stackoverflow.com/questions/161510
 ### JDK Version
 
 Some IDEs attempt to use the most recent version of the JDK. Make sure that your IDE is configured to use JDK 1.8.0.
-
-### Waiting for ActiveMQ
-
-Opencast requires ActiveMQ to be both running and properly configured, otherwise it will wait forever to connect. See [here](#install-and-configure-activemq) for details on how to configure ActiveMQ. Make sure, that ActiveMQ runs without errors and with the right JAVA_HOME Variable (explained [here](#set-the-javahome-variable)).
 
 ### Slow IDEA Fix
 

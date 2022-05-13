@@ -19,28 +19,10 @@
  *
  */
 
-package org.opencastproject.message.broker.api;
+package org.opencastproject.message.broker.api.update;
 
-import java.io.Serializable;
+import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 
-public interface MessageSender extends MessageBrokerConnector {
-
-  /**
-   * The types of message destinations there are to send to.
-   */
-  enum DestinationType {
-    Queue, Topic
-  };
-
-  /**
-   * Send a message asynchronously with a {@link Serializable} object.
-   *
-   * @param destinationId
-   *          The id of the destination location.
-   * @param type
-   *          The type of the destination.
-   * @param object
-   *          The serializable object to send.
-   */
-  void sendObjectMessage(String destinationId, DestinationType type, Serializable object);
+public interface AssetManagerUpdateHandler {
+  void execute(AssetManagerItem messageItem);
 }

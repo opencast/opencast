@@ -19,10 +19,9 @@ might be necessary to install [`docker-compose`](https://docs.docker.com/compose
 Opencast is packaged into multiple distributions. There is a separate Docker image for each distribution. Simple
 installations can use the all-in-one distribution.
 
-Opencast requires a database and a message broker (Apache ActiveMQ). We currently support H2 or MySQL/MariaDB databases.
+Opencast requires a database. We currently support H2 or MySQL/MariaDB databases.
 The Docker Hub repository has official Docker images for MySQL and MariaDB. H2 is already integrated into Opencast so
-that no database container is needed. There are multiple 3rd-party Docker images for ActiveMQ; this guide uses
-`webcenter/activemq`.
+that no database container is needed.
 
 `docker-compose` can be used to configure, start and connect all services automatically. The [opencast-docker
 repository](https://github.com/opencast/opencast-docker/tree/master/docker-compose) contains multiple configuration
@@ -45,25 +44,6 @@ $ curl -o docker-compose.yml <URL>
 
 You might want to edit the compose file and add extra volumes to include custom configurations or workflows (see
 [compose file reference](https://docs.docker.com/compose/compose-file/)).
-
-The compose files assume that the ActiveMQ configuration is located at `./assets/activemq.xml`. You can download the
-file from the repository:
-
-```sh
-$ mkdir assets
-$ curl -o assets/activemq.xml https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/assets/activemq.xml
-```
-
-Alternatively, you can use the Docker images to generate the file. This has the advantage that the correct version is
-always used:
-
-```sh
-$ mkdir assets
-
-$ docker run -it --rm \
-    quay.io/opencast/allinone:<version> \
-    app:print:activemq.xml > assets/activemq.xml
-```
 
 At this point you are ready to start Opencast with the `up` command:
 

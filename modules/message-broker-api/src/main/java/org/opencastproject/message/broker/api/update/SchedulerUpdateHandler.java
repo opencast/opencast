@@ -19,22 +19,10 @@
  *
  */
 
-package org.opencastproject.message.broker.api;
+package org.opencastproject.message.broker.api.update;
 
-public interface MessageBrokerConnector {
+import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
 
-  /**
-   * Return if there is a connection to the message broker.
-   *
-   * @return If the connection to the message broker is active.
-   */
-  boolean isConnected();
-
-  /**
-   * Try reconnecting if there was no reconnection attempt in the immediate past.
-   *
-   * @return If the re-connection attempt was successful.
-   */
-  boolean reconnect();
-
+public interface SchedulerUpdateHandler {
+  void execute(String mpId, SchedulerItem schedulerItem);
 }

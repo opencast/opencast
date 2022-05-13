@@ -55,10 +55,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public abstract class AssetManagerItem implements MessageItem, Serializable {
   private static final long serialVersionUID = 5440420510139202434L;
 
-  public static final String ASSETMANAGER_QUEUE_PREFIX = "ASSETMANAGER.";
-
-  public static final String ASSETMANAGER_QUEUE = ASSETMANAGER_QUEUE_PREFIX + "QUEUE";
-
   public enum Type {
     Update, Delete
   }

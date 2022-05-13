@@ -90,8 +90,8 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.identifier.IdImpl;
-import org.opencastproject.message.broker.api.BaseMessage;
-import org.opencastproject.message.broker.api.MessageSender;
+import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
+import org.opencastproject.message.broker.api.update.SchedulerUpdateHandler;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCores;
@@ -206,6 +206,7 @@ public class SchedulerServiceImplTest {
   private AssetManager assetManager;
   private static OrganizationDirectoryService orgDirectoryService;
   private SecurityService securityService;
+  private static SchedulerUpdateHandler handler;
 
   private User currentUser = new JaxbUser("admin", "provider", new DefaultOrganization(),
       new JaxbRole("admin", new DefaultOrganization(), "test"));
@@ -232,10 +233,6 @@ public class SchedulerServiceImplTest {
     wfPropertiesUpdated.put("skip", "true");
 
     workspace = new UnitTestWorkspace();
-
-    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
-
-    final BaseMessage baseMessageMock = EasyMock.createNiceMock(BaseMessage.class);
 
     AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
     acl = new AccessControlList(new AccessControlEntry("ROLE_ADMIN", "write", true),
@@ -271,14 +268,15 @@ public class SchedulerServiceImplTest {
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
 
-    EasyMock.replay(messageSender, baseMessageMock, authorizationService, index, result,
+    handler = EasyMock.createNiceMock(SchedulerUpdateHandler.class);
+
+    EasyMock.replay(authorizationService, index, result, handler,
             extendedAdapter, episodeAdapter, orgDirectoryService, componentContext, bundleContext);
 
     schedSvc = new SchedulerServiceImpl();
 
     schedSvc.setAuthorizationService(authorizationService);
     schedSvc.setWorkspace(workspace);
-    schedSvc.setMessageSender(messageSender);
     schedSvc.addCatalogUIAdapter(episodeAdapter);
     schedSvc.addCatalogUIAdapter(extendedAdapter);
     schedSvc.setOrgDirectoryService(orgDirectoryService);
@@ -317,6 +315,8 @@ public class SchedulerServiceImplTest {
     assetManager = mkAssetManager();
     schedSvc.setAssetManager(assetManager);
 
+    schedSvc.addSchedulerUpdateHandler(handler);
+
     schedSvc.lastModifiedCache.invalidateAll();
   }
 
@@ -324,6 +324,7 @@ public class SchedulerServiceImplTest {
   public void tearDown() throws Exception {
     workspace.clean();
     schedulerDatabase = null;
+    schedSvc.removeSchedulerUpdateHandler(handler);
   }
 
   @AfterClass
@@ -1699,9 +1700,6 @@ public class SchedulerServiceImplTest {
             .anyTimes();
     EasyMock.replay(authorizationService);
 
-    MessageSender ms = EasyMock.createNiceMock(MessageSender.class);
-    EasyMock.replay(ms);
-
     ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(java.util.function.Function.class),
             EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
@@ -1714,8 +1712,9 @@ public class SchedulerServiceImplTest {
     am.setAssetStore(mkAssetStore());
     am.setAuthorizationService(authorizationService);
     am.setSecurityService(securityService);
-    am.setMessageSender(ms);
     am.setIndex(esIndex);
+    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
+    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
     return am;
   }
 

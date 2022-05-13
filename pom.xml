@@ -165,7 +165,6 @@
     <module>modules/lti</module>
     <module>modules/mattermost-notification-workflowoperation</module>
     <module>modules/message-broker-api</module>
-    <module>modules/message-broker-impl</module>
     <module>modules/metadata-api</module>
     <module>modules/metadata-to-acl-workflowoperation</module>
     <module>modules/metadata</module>
@@ -812,11 +811,6 @@
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
         <version>3.1.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-client</artifactId>
-        <version>5.16.2</version>
       </dependency>
       <dependency>
         <groupId>org.apache.geronimo.specs</groupId>

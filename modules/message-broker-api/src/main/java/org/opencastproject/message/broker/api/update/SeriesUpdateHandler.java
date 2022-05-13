@@ -19,37 +19,10 @@
  *
  */
 
-package org.opencastproject.message.broker.impl;
+package org.opencastproject.message.broker.api.update;
 
-import javax.jms.MessageProducer;
-import javax.jms.Session;
+import org.opencastproject.message.broker.api.series.SeriesItem;
 
-/**
- * A mock class of {@link MessagerSenderImpl} to be used in unit tests.
- */
-public class MockMessageSender extends MessageSenderImpl {
-
-  private final Session session;
-  private final MessageProducer producer;
-
-  MockMessageSender(Session session, MessageProducer producer) {
-    this.session = session;
-    this.producer = producer;
-  }
-
-  @Override
-  public boolean isConnected() {
-    return true;
-  }
-
-  @Override
-  protected Session getSession() {
-    return session;
-  }
-
-  @Override
-  protected MessageProducer getMessageProducer() {
-    return producer;
-  }
-
+public interface SeriesUpdateHandler {
+  void execute(SeriesItem seriesItem);
 }

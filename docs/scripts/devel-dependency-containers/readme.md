@@ -29,12 +29,3 @@ podman-compose -f docker-compose-postgresql.yml up -d
 
 No persistence for any data is configured so that you always start with a clean system for development and testing.
 
-
-SELinux
--------
-
-Make sure to label the ActiveMQ configuration file for container usage:
-
-```sh
-chcon -Rt container_file_t ../activemq/activemq.xml
-```
