@@ -2136,6 +2136,12 @@
          "Month": "Month",
          "Custom": "Custom"
       },
+      "TIME_GRANULARITIES": {
+         "Yearly": "Yearly",
+         "Monthly": "Monthly",
+         "Daily": "Daily",
+         "Hourly": "Hourly"
+      },
       "TITLE": {
          "RANDOM": "Datos Aleatorios",
          "VIEWS_SUM": "Número Total de Visualizacións",

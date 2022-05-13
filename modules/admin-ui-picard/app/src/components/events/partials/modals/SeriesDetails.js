@@ -1,28 +1,39 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
+import {connect} from "react-redux";
 import {useTranslation} from "react-i18next";
 import cn from 'classnames';
 import {
     getSeriesDetailsExtendedMetadata,
     getSeriesDetailsFeeds,
     getSeriesDetailsMetadata,
-    getSeriesDetailsTheme, getSeriesDetailsThemeNames
+    getSeriesDetailsTheme,
+    getSeriesDetailsThemeNames,
+    hasStatistics
 } from "../../../../selectors/seriesDetailsSelectors";
-import {connect} from "react-redux";
-import {updateExtendedSeriesMetadata, updateSeriesMetadata} from "../../../../thunks/seriesDetailsThunks";
+import {getUserInformation} from "../../../../selectors/userInfoSelectors";
+import {
+    fetchSeriesStatistics,
+    updateExtendedSeriesMetadata,
+    updateSeriesMetadata
+} from "../../../../thunks/seriesDetailsThunks";
+import {hasAccess} from "../../../../utils/utils";
 import SeriesDetailsAccessTab from "../ModalTabsAndPages/SeriesDetailsAccessTab";
 import SeriesDetailsThemeTab from "../ModalTabsAndPages/SeriesDetailsThemeTab";
 import SeriesDetailsStatisticTab from "../ModalTabsAndPages/SeriesDetailsStatisticTab";
 import SeriesDetailsFeedsTab from "../ModalTabsAndPages/SeriesDetailsFeedsTab";
 import DetailsMetadataTab from "../ModalTabsAndPages/DetailsMetadataTab";
-import {hasAccess} from "../../../../utils/utils";
-import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 import DetailsExtendedMetadataTab from "../ModalTabsAndPages/DetailsExtendedMetadataTab";
 
 /**
  * This component manages the tabs of the series details modal
  */
-const SeriesDetails = ({ seriesId, metadataFields, extendedMetadata, feeds, theme, themeNames, updateSeries, updateExtendedMetadata, user }) => {
+const SeriesDetails = ({ seriesId, metadataFields, extendedMetadata, feeds, theme, themeNames, hasStatistics, user,
+                           updateSeries, updateExtendedMetadata, loadStatistics }) => {
     const { t } = useTranslation();
+
+    useEffect(() => {
+        loadStatistics(seriesId).then();
+    }, []);
 
     const [page, setPage] = useState(0);
 
@@ -37,7 +48,7 @@ const SeriesDetails = ({ seriesId, metadataFields, extendedMetadata, feeds, them
             tabNameTranslation: 'EVENTS.SERIES.DETAILS.TABS.EXTENDED_METADATA',
             accessRole: 'ROLE_UI_SERIES_DETAILS_METADATA_VIEW',
             name: 'extended-metadata',
-            hidden: !(extendedMetadata.length > 0)
+            hidden: !extendedMetadata || !(extendedMetadata.length > 0)
         },
         {
             tabNameTranslation: 'EVENTS.SERIES.DETAILS.TABS.PERMISSIONS',
@@ -53,7 +64,7 @@ const SeriesDetails = ({ seriesId, metadataFields, extendedMetadata, feeds, them
             tabNameTranslation: 'EVENTS.SERIES.DETAILS.TABS.STATISTICS',
             accessRole: 'ROLE_UI_SERIES_DETAILS_STATISTICS_VIEW',
             name: 'statistics',
-            hidden: true
+            hidden: !hasStatistics
         },
         {
             tabNameTranslation: 'Feeds',
@@ -133,7 +144,8 @@ const SeriesDetails = ({ seriesId, metadataFields, extendedMetadata, feeds, them
                                            seriesId={seriesId} />
                 )}
                 {page === 4 && (
-                    <SeriesDetailsStatisticTab />
+                    <SeriesDetailsStatisticTab seriesId={seriesId}
+                                               header={tabs[page].tabNameTranslation} />
                 )}
                 {page === 5 && (
                     <SeriesDetailsFeedsTab feeds={feeds}/>
@@ -149,13 +161,15 @@ const mapStateToProps = state => ({
     feeds: getSeriesDetailsFeeds(state),
     theme: getSeriesDetailsTheme(state),
     themeNames: getSeriesDetailsThemeNames(state),
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    hasStatistics: hasStatistics(state),
 });
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     updateSeries: (id, values) => dispatch(updateSeriesMetadata(id, values)),
-    updateExtendedMetadata: (id, values, catalog) => dispatch(updateExtendedSeriesMetadata(id, values, catalog))
+    updateExtendedMetadata: (id, values, catalog) => dispatch(updateExtendedSeriesMetadata(id, values, catalog)),
+    loadStatistics: (id) => dispatch(fetchSeriesStatistics(id)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SeriesDetails);

@@ -28,6 +28,7 @@ import groupDetails from "./reducers/groupDetailsReducer";
 import aclDetails from "./reducers/aclDetailsReducer";
 import themeDetails from "./reducers/themeDetailsReducer";
 import userInfo from "./reducers/userInfoReducer";
+import statistics from "./reducers/statisticsReducers";
 
 /**
  * This File contains the configuration for the store used by the reducers all over the app
@@ -58,7 +59,8 @@ const reducers = {
     userDetails,
     groupDetails,
     aclDetails,
-    userInfo
+    userInfo,
+    statistics
 };
 
 // Configuration for persisting store

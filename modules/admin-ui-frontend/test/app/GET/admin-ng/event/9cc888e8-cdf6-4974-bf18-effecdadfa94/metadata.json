@@ -92,9 +92,12 @@
         "readOnly": false,
         "id": "isPartOf",
         "label": "EVENTS.EVENTS.DETAILS.METADATA.SERIES",
-        "collection": {},
+        "collection": {
+          "Opencast Series DublinCore": "9cc888e8-cdf6-4974-bf18-effecdadfa94",
+          "Mock Series": "edf05757-34b1-42b8-8821-e3302b663972"
+        },
         "type": "text",
-        "value": "",
+        "value": "edf05757-34b1-42b8-8821-e3302b663972",
         "required": false
       },
       {
