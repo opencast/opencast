@@ -43,7 +43,7 @@ const NewAssetUploadPage = ({ previousPage, nextPage , formik }) => {
                                         ) : (
                                             uploadAssets.map((asset, key) => (
                                                 <tr key={key}>
-                                                    <td> {asset.id}
+                                                    <td> {t(asset.title)}
                                                         <span className="ui-helper-hidden">
                                                             ({asset.type} "{asset.flavorType}//{asset.flavorSubType}")
                                                         </span>

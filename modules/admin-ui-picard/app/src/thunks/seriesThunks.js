@@ -101,7 +101,7 @@ export const postNewSeries = (values, metadataInfo) => async dispatch => {
     if (values.theme !== '') {
         jsonData = {
             ...jsonData,
-            theme: values.theme
+            theme: parseInt(values.theme)
         };
     }
 

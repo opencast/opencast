@@ -14,13 +14,16 @@ import Services from "./components/systems/Services";
 import Groups from "./components/users/Groups";
 import Acls from "./components/users/Acls";
 import {fetchOcVersion, fetchUserInfo} from "./thunks/userInfoThunks";
+import { fetchFilters } from './thunks/tableFilterThunks';
 
-function App({ loadingUserInfo, loadingOcVersion }) {
+function App({ loadingUserInfo, loadingOcVersion, loadingFilters }) {
     useEffect(() => {
        // Load information about current user on mount
        loadingUserInfo();
        // Load information about current opencast version on mount
        loadingOcVersion();
+       // Load initial filters for event table view
+       loadingFilters("events");
     }, []);
 
   return (
@@ -69,7 +72,8 @@ function App({ loadingUserInfo, loadingOcVersion }) {
 
 const mapDispatchToProps = dispatch => ({
     loadingUserInfo: () => dispatch(fetchUserInfo()),
-    loadingOcVersion: () => dispatch(fetchOcVersion())
+    loadingOcVersion: () => dispatch(fetchOcVersion()),
+    loadingFilters: resource => dispatch(fetchFilters(resource))
 });
 
 export default connect(null, mapDispatchToProps)(App);

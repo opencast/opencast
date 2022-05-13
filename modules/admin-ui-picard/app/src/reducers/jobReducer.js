@@ -1,5 +1,10 @@
 import {jobsTableConfig} from "../configs/tableConfigs/jobsTableConfig";
-import {LOAD_JOBS_FAILURE, LOAD_JOBS_IN_PROGRESS, LOAD_JOBS_SUCCESS} from "../actions/jobActions";
+import {
+    LOAD_JOBS_FAILURE,
+    LOAD_JOBS_IN_PROGRESS,
+    LOAD_JOBS_SUCCESS,
+    SET_JOB_COLUMNS
+} from '../actions/jobActions';
 
 /**
  * This file contains redux reducer for actions affecting the state of jobs
@@ -8,7 +13,7 @@ import {LOAD_JOBS_FAILURE, LOAD_JOBS_IN_PROGRESS, LOAD_JOBS_SUCCESS} from "../ac
 // Fill columns initially with columns defined in jobsTableConfig
 const initialColumns = jobsTableConfig.columns.map(column =>
     ({
-        name: column.name,
+        ...column,
         deactivated: false
     }));
 
@@ -49,6 +54,13 @@ const jobs = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false
+            }
+        }
+        case SET_JOB_COLUMNS: {
+            const { updatedColumns } = payload;
+            return {
+                ...state,
+                columns: updatedColumns
             }
         }
         default:

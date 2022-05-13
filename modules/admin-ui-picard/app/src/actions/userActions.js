@@ -7,6 +7,9 @@ export const LOAD_USERS_IN_PROGRESS = 'LOAD_USERS_IN_PROGRESS';
 export const LOAD_USERS_SUCCESS = 'LOAD_USERS_SUCCESS';
 export const LOAD_USERS_FAILURE = 'LOAD_USERS_FAILURE';
 
+// Constants of action types affecting UI
+export const SET_USER_COLUMNS = 'SET_USER_COLUMNS';
+
 // Actions affecting fetching users from server
 
 export const loadUsersInProgress = () => ({
@@ -20,4 +23,11 @@ export const loadUsersSuccess = users => ({
 
 export const loadUsersFailure = () => ({
     type: LOAD_USERS_FAILURE
+});
+
+// Action affecting UI
+
+export const setUserColumns = updatedColumns => ({
+    type: SET_USER_COLUMNS,
+    payload: { updatedColumns }
 });

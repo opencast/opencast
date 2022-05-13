@@ -2,8 +2,8 @@ import React, {useEffect} from "react";
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import Notifications from "../../../shared/Notifications";
-import {DatePicker} from "@material-ui/pickers";
-import {getTimezoneOffset} from "../../../../utils/utils";
+import {MuiPickersUtilsProvider, DatePicker} from "@material-ui/pickers";
+import { getCurrentLanguageInformation, getTimezoneOffset } from '../../../../utils/utils';
 import {createMuiTheme, ThemeProvider} from "@material-ui/core";
 import {Field, FieldArray} from "formik";
 import RenderField from "../../../shared/wizard/RenderField";
@@ -16,6 +16,7 @@ import {checkForConflicts} from "../../../../thunks/eventThunks";
 import {sourceMetadata} from "../../../../configs/sourceConfig";
 import {hours, minutes, NOTIFICATION_CONTEXT, weekdays} from "../../../../configs/modalConfig";
 import {logger} from "../../../../utils/logger";
+import DateFnsUtils from '@date-io/date-fns';
 
 
 // Style to bring date picker pop up to front
@@ -60,7 +61,8 @@ const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, in
 
             // Prepare start date of event for check
             let startDate = new Date(values.scheduleStartDate);
-            startDate.setHours((values.scheduleStartTimeHour - offset), values.scheduleStartTimeMinutes, 0, 0);
+            // NOTE: if time zone issues still occur during further testing, try to set times to UTC (-offset)
+            startDate.setHours((values.scheduleStartTimeHour), values.scheduleStartTimeMinutes, 0, 0);
 
             // If start date of event is smaller than today --> Event is in past
             if (startDate < new Date()) {
@@ -76,7 +78,8 @@ const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, in
             } else {
                 endDate = new Date(values.scheduleEndDate);
             }
-            endDate.setHours((values.scheduleEndTimeHour - offset), values.scheduleEndTimeMinutes, 0, 0);
+            // NOTE: if time zone issues still occur during further testing, try to set times to UTC (-offset)
+            endDate.setHours((values.scheduleEndTimeHour), values.scheduleEndTimeMinutes, 0, 0);
 
             // if start date is higher than end date --> end date is before start date
             if (startDate > endDate) {
@@ -218,10 +221,10 @@ const Upload = ({ formik }) => {
                                     && formik.values.uploadAssetsTrack.map((asset, key) => (
                                         <tr key={key}>
                                             <td>
-                                                <span style={{fontWeight: "bold"}}>{t(asset.translate + ".SHORT")}</span>
+                                                <span style={{fontWeight: "bold"}}>{t(asset.title + ".SHORT", asset['displayOverride.SHORT'])}</span>
                                                 <span
                                                     className="ui-helper-hidden">({asset.type} "{asset.flavorType}/{asset.flavorSubType}")</span>
-                                                <p>{t(asset.translate + ".DETAIL")}</p>
+                                                <p>{t(asset.title + ".DETAIL", asset['displayOverride.DETAIL'])}</p>
                                             </td>
                                             <td>
                                                 <div className="file-upload">
@@ -289,6 +292,8 @@ const Upload = ({ formik }) => {
 const Schedule = ({ formik, inputDevices }) => {
     const { t } = useTranslation();
 
+    const currentLanguage = getCurrentLanguageInformation();
+
     const renderInputDeviceOptions = () => {
         if (!!formik.values.location) {
             let inputDevice = inputDevices.find(({ Name }) => Name === formik.values.location);
@@ -317,12 +322,14 @@ const Schedule = ({ formik, inputDevices }) => {
                             <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE')} <i className="required">*</i></td>
                             <td>
                                 <ThemeProvider theme={theme}>
-                                    <DatePicker name="scheduleStartDate"
-                                                value={formik.values.scheduleStartDate}
-                                                onChange={value =>
-                                                    formik.setFieldValue("scheduleStartDate", value)
-                                                }
-                                                tabIndex="4"/>
+                                    <MuiPickersUtilsProvider utils={DateFnsUtils} locale={currentLanguage.dateLocale}>
+                                        <DatePicker name="scheduleStartDate"
+                                                    value={formik.values.scheduleStartDate}
+                                                    onChange={value =>
+                                                      formik.setFieldValue("scheduleStartDate", value)
+                                                    }
+                                                    tabIndex="4"/>
+                                    </MuiPickersUtilsProvider>
                                 </ThemeProvider>
                             </td>
                         </tr>
@@ -360,111 +367,136 @@ const Schedule = ({ formik, inputDevices }) => {
                             <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_TIME')} <i className="required">*</i></td>
                             <td>
                                 {/* one options for each entry in hours*/}
-                                <Field tabIndex="5"
-                                       as="select"
-                                       name="scheduleStartTimeHour"
-                                       placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
-                                    <option value="" />
-                                    {hours.map((i, key) => (
-                                        <option key={key}
-                                                value={i.value}>
-                                            {i.value}
-                                        </option>
-                                    ))}
-                                </Field>
+                                <div className="chosen-container chosen-container-single">
+                                    <Field className="chosen-single"
+                                           tabIndex="5"
+                                           as="select"
+                                           name="scheduleStartTimeHour"
+                                           placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
+                                        <option value="" />
+                                        {hours.map((i, key) => (
+                                          <option key={key}
+                                                  value={i.value}>
+                                              {i.value}
+                                          </option>
+                                        ))}
+                                    </Field>
+                                </div>
+
                                 {/* one options for each entry in minutes*/}
-                                <Field tabIndex="6"
-                                       as="select"
-                                       name="scheduleStartTimeMinutes"
-                                       placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
-                                    <option value=""/>
-                                    {minutes.map((i, key) => (
-                                        <option key={key}
-                                                value={i.value}>
-                                            {i.value}
-                                        </option>
-                                    ))}
-                                </Field>
+                                <div className="chosen-container chosen-container-single">
+                                    <Field className="chosen-single"
+                                           tabIndex="6"
+                                           as="select"
+                                           name="scheduleStartTimeMinutes"
+                                           placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
+                                        <option value=""/>
+                                        {minutes.map((i, key) => (
+                                          <option key={key}
+                                                  value={i.value}>
+                                              {i.value}
+                                          </option>
+                                        ))}
+                                    </Field>
+                                </div>
                             </td>
                         </tr>
                         <tr>
                             <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.DURATION')} <i className="required">*</i></td>
                             <td>
                                 {/* one options for each entry in hours*/}
-                                <Field tabIndex="7"
-                                       as="select"
-                                       name="scheduleDurationHour"
-                                       placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
-                                    <option value="" />
-                                    {hours.map((i, key) => (
-                                        <option value={i.value}
-                                                key={key}>
-                                            {i.value}
-                                        </option>
-                                    ))}
-                                </Field>
+                                <div className="chosen-container chosen-container-single">
+                                    <Field className="chosen-single"
+                                           tabIndex="7"
+                                           as="select"
+                                           name="scheduleDurationHour"
+                                           placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
+                                        <option value="" />
+                                        {hours.map((i, key) => (
+                                          <option value={i.value}
+                                                  key={key}>
+                                              {i.value}
+                                          </option>
+                                        ))}
+                                    </Field>
+                                </div>
+
                                 {/* one options for each entry in minutes*/}
-                                <Field tabIndex="8"
-                                       as="select"
-                                       name="scheduleDurationMinutes"
-                                       placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
-                                    <option value=""/>
-                                    {minutes.map((i, key) => (
-                                        <option key={key}
-                                                value={i.value}>
-                                            {i.value}
-                                        </option>
-                                    ))}
-                                </Field>
+                                <div className="chosen-container chosen-container-single">
+                                    <Field className="chosen-single"
+                                           tabIndex="8"
+                                           as="select"
+                                           name="scheduleDurationMinutes"
+                                           placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
+                                        <option value=""/>
+                                        {minutes.map((i, key) => (
+                                          <option key={key}
+                                                  value={i.value}>
+                                              {i.value}
+                                          </option>
+                                        ))}
+                                    </Field>
+                                </div>
+
                             </td>
                         </tr>
                         <tr>
                             <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_TIME')} <i className="required">*</i></td>
                             <td>
                                 {/* one options for each entry in hours*/}
-                                <Field tabIndex="9"
-                                       as="select"
-                                       name="scheduleEndTimeHour"
-                                       placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
-                                    <option value="" />
-                                    {hours.map((i, key) => (
-                                        <option key={key}
-                                                value={i.value}>
-                                            {i.value}
-                                        </option>
-                                    ))}
-                                </Field>
+                                <div className="chosen-container chosen-container-single">
+                                    <Field className="chosen-single"
+                                           tabIndex="9"
+                                           as="select"
+                                           name="scheduleEndTimeHour"
+                                           placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
+                                        <option value="" />
+                                        {hours.map((i, key) => (
+                                          <option key={key}
+                                                  value={i.value}>
+                                              {i.value}
+                                          </option>
+                                        ))}
+                                    </Field>
+                                </div>
+
                                 {/* one options for each entry in minutes*/}
-                                <Field tabIndex="10"
-                                       as="select"
-                                       name="scheduleEndTimeMinutes"
-                                       placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
-                                    <option value=""/>
-                                    {minutes.map((i, key) => (
-                                        <option key={key}
-                                                value={i.value}>
-                                            {i.value}
-                                        </option>
-                                    ))}
-                                </Field>
+                                <div className="chosen-container chosen-container-single">
+                                    <Field className="chosen-single"
+                                           tabIndex="10"
+                                           as="select"
+                                           name="scheduleEndTimeMinutes"
+                                           placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
+                                        <option value=""/>
+                                        {minutes.map((i, key) => (
+                                          <option key={key}
+                                                  value={i.value}>
+                                              {i.value}
+                                          </option>
+                                        ))}
+                                    </Field>
+                                </div>
                             </td>
                         </tr>
                         <tr>
                             <td>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')} <i className="required">*</i></td>
                             {/* one options for each capture agents that has input options */}
                             <td>
-                                <select placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}
-                                        tabIndex="11"
-                                        onChange={e => {
-                                            formik.setFieldValue("location", e.target.value);
-                                            formik.setFieldValue("deviceInputs", []);
-                                        }}
-                                        name="location">
-                                    <option value=""/>
-                                    {inputDevices.map((inputDevice, key) => (
-                                        <option key={key} value={inputDevice.Name}>{inputDevice.Name}</option>
-                                    ))}
-                                </select>
+                                <div className="chosen-container chosen-container-single">
+                                    <select placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}
+                                            tabIndex="11"
+                                            className="chosen-single"
+                                            onChange={e => {
+                                                formik.setFieldValue("location", e.target.value);
+                                                formik.setFieldValue("deviceInputs", []);
+                                            }}
+                                            name="location">
+                                        <option value=""/>
+                                        {inputDevices.map((inputDevice, key) => (
+                                          <option key={key} value={inputDevice.Name}>{inputDevice.Name}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </td>
                         </tr>
                         <tr>

@@ -15,11 +15,16 @@ import {
     selectRow,
     setOffset,
     setPageActive,
-    setPages,
-    loadColumns
+    setPages
 } from "../actions/tableActions";
-import {showActions as showEventsActions} from "../actions/eventActions";
-import {showActions as showSeriesActions} from "../actions/seriesActions";
+import {
+    setEventColumns,
+    showActions as showEventsActions
+} from '../actions/eventActions';
+import {
+    setSeriesColumns,
+    showActions as showSeriesActions
+} from '../actions/seriesActions';
 import {
     getPageOffset,
     getResourceType,
@@ -37,6 +42,14 @@ import {fetchUsers} from "./userThunks";
 import {fetchGroups} from "./groupThunks";
 import {fetchAcls} from "./aclThunks";
 import {fetchThemes} from "./themeThunks";
+import { setRecordingsColumns } from '../actions/recordingActions';
+import { setJobColumns } from '../actions/jobActions';
+import { setServerColumns } from '../actions/serverActions';
+import { setUserColumns } from '../actions/userActions';
+import { setGroupColumns } from '../actions/groupActions';
+import { setACLColumns } from '../actions/aclActions';
+import { setThemeColumns } from '../actions/themeActions';
+import { setServicesColumns } from '../actions/serviceActions';
 
 /**
  * This file contains methods/thunks used to manage the table in the main view and its state changes
@@ -48,10 +61,20 @@ export const loadEventsIntoTable = () => async (dispatch, getState) => {
     const total = events.total;
 
     const pagination = table.pagination;
-    const resource = events.results.map((result) => {
-        return {
-            ...result,
-            selected: false
+    // check which events are currently selected
+    const resource = events.results.map(result => {
+        const current = table.rows.find(row => row.id === result.id);
+
+        if (!!current && table.resource === 'events') {
+            return {
+                ...result,
+                selected: current.selected
+            }
+        } else {
+            return {
+                ...result,
+                selected: false
+            }
         }
     });
 
@@ -60,7 +83,7 @@ export const loadEventsIntoTable = () => async (dispatch, getState) => {
     let tableData = {
         resource: "events",
         rows: resource,
-        columns: table.columns,
+        columns: events.columns,
         multiSelect: table.multiSelect,
         pages: pages,
         sortBy: table.sortBy,
@@ -68,19 +91,10 @@ export const loadEventsIntoTable = () => async (dispatch, getState) => {
     };
 
     if (table.resource !== 'events') {
-        const c = eventsTableConfig.columns;
-        const columns = c.map(column => {
-            const col = events.columns.find(co => co.name === column.name);
-            return {
-                ...column,
-                deactivated: col.deactivated
-            }
-        })
         const multiSelect = eventsTableConfig.multiSelect;
 
         tableData = {
             ...tableData,
-            columns: columns,
             sortBy: "title",
             multiSelect: multiSelect
         }
@@ -94,10 +108,20 @@ export const loadSeriesIntoTable = () => (dispatch, getState) => {
     const total = series.total;
     const pagination = table.pagination;
 
+    // check which events are currently selected
     const resource = series.results.map((result) => {
-        return {
-            ...result,
-            selected: false
+        const current = table.rows.find(row => row.id === result.id);
+
+        if (!!current && table.resource === 'series') {
+            return {
+                ...result,
+                selected: current.selected
+            }
+        } else {
+            return {
+                ...result,
+                selected: false
+            }
         }
     });
 
@@ -107,7 +131,7 @@ export const loadSeriesIntoTable = () => (dispatch, getState) => {
     let tableData = {
         resource: "series",
         rows: resource,
-        columns: table.columns,
+        columns: series.columns,
         multiSelect: table.multiSelect,
         pages: pages,
         sortBy: table.sortBy,
@@ -115,19 +139,10 @@ export const loadSeriesIntoTable = () => (dispatch, getState) => {
     };
 
     if (table.resource !== 'series') {
-        const c = seriesTableConfig.columns;
-        const columns = c.map(column => {
-            const col = series.columns.find(co => co.name === column.name);
-            return {
-                ...column,
-                deactivated: col.deactivated
-            }
-        });
         const multiSelect = seriesTableConfig.multiSelect;
 
         tableData = {
             ...tableData,
-            columns: columns,
             sortBy: "title",
             multiSelect: multiSelect
         }
@@ -145,7 +160,7 @@ export const loadRecordingsIntoTable = () => (dispatch, getState) => {
 
     let tableData = {
         resource: "recordings",
-        columns: table.columns,
+        columns: recordings.columns,
         multiSelect: table.multiSelect,
         pages: pages,
         sortBy: table.sortBy,
@@ -154,20 +169,10 @@ export const loadRecordingsIntoTable = () => (dispatch, getState) => {
     }
 
     if (table.resource !== "recordings") {
-        const c = recordingsTableConfig.columns;
-        const columns = c.map(column => {
-            const col = recordings.columns.find(co => co.name === column.name);
-            return {
-                ...column,
-                deactivated : col.deactivated
-            }
-        });
-
         const multiSelect = recordingsTableConfig.multiSelect;
 
         tableData = {
             ...tableData,
-            columns: columns,
             sortBy: "status",
             multiSelect: multiSelect
         }
@@ -187,7 +192,7 @@ export const loadJobsIntoTable = () => (dispatch, getState) => {
     let tableData = {
         resource: "jobs",
         rows: resource,
-        columns: table.columns,
+        columns: jobs.columns,
         multiSelect: table.multiSelect,
         pages: pages,
         sortBy: table.sortBy,
@@ -195,20 +200,10 @@ export const loadJobsIntoTable = () => (dispatch, getState) => {
     };
 
     if (table.resource !== 'jobs') {
-        const c = jobsTableConfig.columns;
-        const columns = c.map(column => {
-            const col = jobs.columns.find(co => co.name === column.name);
-            return {
-                ...column,
-                deactivated: col.deactivated
-            }
-        });
-
         const multiSelect = jobsTableConfig.multiSelect;
 
         tableData = {
             ...tableData,
-            columns: columns,
             sortBy: "id",
             multiSelect: multiSelect
         };
@@ -227,7 +222,7 @@ export const loadServersIntoTable = () => (dispatch, getState) => {
     let tableData = {
         resource: "servers",
         rows: resource,
-        columns: table.columns,
+        columns: servers.columns,
         multiSelect: table.multiSelect,
         pages: pages,
         sortBy: table.sortBy,
@@ -235,20 +230,10 @@ export const loadServersIntoTable = () => (dispatch, getState) => {
     };
 
     if (table.resource !== 'servers') {
-        const c = serversTableConfig.columns;
-        const columns = c.map(column => {
-            const col = servers.columns.find(co => co.name === column.name);
-            return {
-                ...column,
-                deactivated: col.deactivated
-            }
-        });
-
         const multiSelect = serversTableConfig.multiSelect;
 
         tableData = {
             ...tableData,
-            columns: columns,
             sortBy: "online",
             multiSelect: multiSelect
         };
@@ -270,26 +255,16 @@ export const loadServicesIntoTable = () => (dispatch, getState) => {
         pages: pages,
         totalItems: total,
         resource: "services",
-        columns: table.columns,
+        columns: services.columns,
         multiSelect: table.multiSelect,
         sortBy: table.sortBy
     }
 
     if (table.resource !== 'services') {
-        const c = servicesTableConfig.columns;
-        const columns = c.map(column => {
-            const col = services.columns.find(co => co.name === column.name);
-            return {
-                ...column,
-                deactivated: col.deactivated
-            }
-        });
-
         const multiSelect = servicesTableConfig.multiSelect;
 
         tableData = {
             ...tableData,
-            columns: columns,
             sortBy: "status",
             multiSelect: multiSelect
         };
@@ -309,7 +284,7 @@ export const loadUsersIntoTable = () => (dispatch, getState) => {
     let tableData = {
         resource: "users",
         rows: resource,
-        columns: table.columns,
+        columns: users.columns,
         multiSelect: table.multiSelect,
         pages: pages,
         sortBy: table.sortBy,
@@ -317,20 +292,11 @@ export const loadUsersIntoTable = () => (dispatch, getState) => {
     };
 
     if (table.resource !== 'users') {
-        const c = usersTableConfig.columns;
-        const columns = c.map(column => {
-            const col = users.columns.find(co => co.name === column.name);
-            return {
-                ...column,
-                deactivated: col.deactivated
-            }
-        });
 
         const multiSelect = usersTableConfig.multiSelect;
 
         tableData = {
             ...tableData,
-            columns: columns,
             sortBy: "name",
             multiSelect: multiSelect
         };
@@ -349,7 +315,7 @@ export const loadGroupsIntoTable = () => (dispatch, getState) => {
     let tableData = {
         resource: "groups",
         rows: resource,
-        columns: table.columns,
+        columns: groups.columns,
         multiSelect: table.multiSelect,
         pages: pages,
         sortBy: table.sortBy,
@@ -357,20 +323,11 @@ export const loadGroupsIntoTable = () => (dispatch, getState) => {
     };
 
     if (table.resource !== 'groups') {
-        const c = groupsTableConfig.columns;
-        const columns = c.map(column => {
-            const col = groups.columns.find(co => co.name === column.name);
-            return {
-                ...column,
-                deactivated: col.deactivated
-            }
-        });
 
         const multiSelect = groupsTableConfig.multiSelect;
 
         tableData = {
             ...tableData,
-            columns: columns,
             sortBy: "name",
             multiSelect: multiSelect
         };
@@ -389,7 +346,7 @@ export const loadAclsIntoTable = () => (dispatch, getState) => {
     let tableData = {
         resource: "acls",
         rows: resource,
-        columns: table.columns,
+        columns: acls.columns,
         multiSelect: table.multiSelect,
         pages: pages,
         sortBy: table.sortBy,
@@ -397,19 +354,9 @@ export const loadAclsIntoTable = () => (dispatch, getState) => {
     };
 
     if (table.resource !== 'acls') {
-        const c = aclsTableConfig.columns;
-        const columns = c.map(column => {
-            const col = acls.columns.find(co => co.name === column.name);
-            return {
-                ...column,
-                deactivated: col.deactivated
-            }
-        });
-
         const multiSelect = aclsTableConfig.multiSelect;
         tableData = {
             ...tableData,
-            columns: columns,
             sortBy: "name",
             multiSelect: multiSelect
         };
@@ -428,7 +375,7 @@ export const loadThemesIntoTable = () => (dispatch, getState) => {
     let tableData = {
         resource: "themes",
         rows: resource,
-        columns: table.columns,
+        columns: themes.columns,
         multiSelect: table.multiSelect,
         pages: pages,
         sortBy: table.sortBy,
@@ -436,20 +383,11 @@ export const loadThemesIntoTable = () => (dispatch, getState) => {
     };
 
     if (table.resource !== 'themes') {
-        const c = themesTableConfig.columns;
-        const columns = c.map(column => {
-            const col = themes.columns.find(co => co.name === column.name);
-            return {
-                ...column,
-                deactivated: col.deactivated
-            }
-        });
 
         const multiSelect = themesTableConfig.multiSelect;
 
         tableData = {
             ...tableData,
-            columns: columns,
             sortBy: "name",
             multiSelect: multiSelect
         };
@@ -628,28 +566,75 @@ export const changeAllSelected = selected => (dispatch, getState) => {
 }
 
 // Select certain columns
-export const changeColumnSelection = (id, selected) => (dispatch, getState) => {
-
-    dispatch(loadColumns(id, selected));
+export const changeColumnSelection = updatedColumns => async (dispatch, getState) => {
 
     const state = getState();
 
     // eslint-disable-next-line default-case
     switch (getResourceType(state)) {
         case 'events': {
+            await dispatch(setEventColumns(updatedColumns));
+
             if (getSelectedRows(state).length > 0) {
                 dispatch(showEventsActions(true));
             } else {
                 dispatch(showEventsActions(false));
             }
+
+            dispatch(loadEventsIntoTable());
+
             break;
         }
         case 'series': {
+            await dispatch(setSeriesColumns(updatedColumns));
+
             if (getSelectedRows(state).length > 0) {
                 dispatch(showSeriesActions(true));
             } else {
                 dispatch(showSeriesActions(false));
             }
+
+            dispatch(loadSeriesIntoTable());
+            break;
+        }
+        case 'recordings': {
+            await dispatch(setRecordingsColumns(updatedColumns));
+            dispatch(loadRecordingsIntoTable());
+            break;
+        }
+        case 'jobs': {
+            await dispatch(setJobColumns(updatedColumns));
+            dispatch(loadJobsIntoTable());
+            break;
+        }
+        case 'servers': {
+            await dispatch(setServerColumns(updatedColumns));
+            dispatch(loadServersIntoTable());
+            break;
+        }
+        case 'services': {
+            await dispatch(setServicesColumns(updatedColumns));
+            dispatch(loadServicesIntoTable());
+            break;
+        }
+        case 'users': {
+            await dispatch(setUserColumns(updatedColumns));
+            dispatch(loadUsersIntoTable());
+            break;
+        }
+        case 'groups': {
+            await dispatch(setGroupColumns(updatedColumns));
+            dispatch(loadGroupsIntoTable());
+            break;
+        }
+        case 'acls': {
+            await dispatch(setACLColumns(updatedColumns));
+            dispatch(loadAclsIntoTable());
+            break;
+        }
+        case 'themes': {
+            await dispatch(setThemeColumns(updatedColumns));
+            dispatch(loadThemesIntoTable());
             break;
         }
     }

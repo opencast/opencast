@@ -3,16 +3,14 @@ import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import Notifications from "../../../shared/Notifications";
 import {
+    checkAcls,
     fetchAclActions,
     fetchAclTemplateById,
     fetchAclTemplates,
     fetchRolesWithTarget
-} from "../../../../thunks/aclThunks";
+} from '../../../../thunks/aclThunks';
 import {Field, FieldArray} from "formik";
 import {connect} from "react-redux";
-import {addNotification} from "../../../../thunks/notificationThunks";
-import {removeNotificationWizardAccess} from "../../../../actions/notificationActions";
-import {NOTIFICATION_CONTEXT_ACCESS} from "../../../../configs/modalConfig";
 import RenderMultiField from "../../../shared/wizard/RenderMultiField";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 import {hasAccess} from "../../../../utils/utils";
@@ -20,8 +18,7 @@ import {hasAccess} from "../../../../utils/utils";
 /**
  * This component renders the access page for new events and series in the wizards.
  */
-const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, removeNotificationWizardAccess,
-                           editAccessRole, user }) => {
+const NewAccessPage = ({ previousPage, nextPage, formik, editAccessRole, user, checkAcls }) => {
     const { t } = useTranslation();
 
     // States containing response from server concerning acl templates, actions and roles
@@ -51,47 +48,7 @@ const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
         const template =  await fetchAclTemplateById(e.target.value);
 
         formik.setFieldValue('policies', template);
-        checkPolicies();
-    }
-
-    // check if all policies provided by the user have valid read/write rights
-    const checkPolicies = () => {
-
-        // Remove old notifications of context event-access
-        // Helps to prevent multiple notifications for same problem
-        removeNotificationWizardAccess();
-
-        const policies = formik.values.policies;
-        let check = true;
-        let bothRights = false;
-
-        for (let i = 0; policies.length > i; i++) {
-            // check if a role is chosen
-            if (policies[i].role === '') {
-                check = false;
-            }
-
-            // check if there is at least one policy with read and write rights
-            if (policies[i].read && policies[i].write) {
-                bothRights = true;
-            }
-
-            // check if each policy has read or write right (at least one checkbox should be checked)
-            if (!policies[i].read && !policies[i].write) {
-                check = false;
-            }
-        }
-
-        if (!check) {
-            addNotification('warning','INVALID_ACL_RULES', -1, null, NOTIFICATION_CONTEXT_ACCESS);
-        }
-
-        if (!bothRights) {
-            addNotification('warning','MISSING_ACL_RULES', -1, null, NOTIFICATION_CONTEXT_ACCESS);
-            check = false;
-        }
-
-        return check;
+        await checkAcls(formik.values.policies);
     }
 
 
@@ -257,7 +214,7 @@ const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                                                                                             write: false,
                                                                                             actions: []
                                                                                         });
-                                                                                        checkPolicies();
+                                                                                        checkAcls(formik.values.policies);
                                                                                     }}>
                                                                                         + {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.NEW')}
                                                                                     </a>
@@ -288,8 +245,8 @@ const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                                 inactive: !(formik.dirty && formik.isValid)
                             })}
                         disabled={!(formik.dirty && formik.isValid)}
-                        onClick={() => {
-                            if(checkPolicies()) {
+                        onClick={async () => {
+                            if(await checkAcls(formik.values.policies)) {
                                 nextPage(formik.values);
                             }
                         }}
@@ -310,8 +267,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    addNotification: (type, key, duration, parameter, context) => dispatch(addNotification(type, key, duration, parameter, context)),
-    removeNotificationWizardAccess: () => dispatch(removeNotificationWizardAccess())
+    checkAcls: acls => dispatch(checkAcls(acls))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(NewAccessPage);

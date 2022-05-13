@@ -29,6 +29,7 @@ const AclMetadataPage = ({ nextPage, formik, isEdit }) => {
                                                         <Field className="hidden-input"
                                                                name="name"
                                                                tabIndex="1"
+                                                               autoFocus={!isEdit}
                                                                placeholder={t('USERS.ACLS.NEW.METADATA.NAME.PLACEHOLDER')}/>
                                                     </td>
                                                 </tr>

@@ -42,6 +42,8 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
     }
 
     const loadServers = () => {
+        loadingFilters("servers");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -53,6 +55,8 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
     }
 
     const loadServices = () => {
+        loadingFilters("services");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -68,9 +72,6 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
 
         // Load jobs on mount
         loadJobs().then(r => logger.info(r));
-
-        // Load filters
-        loadingFilters('jobs');
 
         // Fetch jobs every minute
         let fetchJobInterval = setInterval(loadJobs, 100000);
@@ -93,11 +94,13 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
                          toggleMenu={toggleNavigation} />
 
                 <nav>
-                    {/*todo: with role*/}
                     {hasAccess("ROLE_UI_JOBS_VIEW", user) && (
                         <Link to="/systems/jobs"
                               className={cn({active: true})}
-                              onClick={() => loadJobs()}>
+                              onClick={() => {
+                                  loadingFilters("jobs");
+                                  loadJobs().then();
+                              }}>
                             {t('SYSTEMS.NAVIGATION.JOBS')}
                         </Link>
                     )}

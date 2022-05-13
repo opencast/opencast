@@ -21,6 +21,7 @@ const GroupMetadataPage = ({ nextPage, formik, isEdit }) => {
                            <label>{t('USERS.GROUPS.DETAILS.FORM.NAME')}<i className="required">*</i></label>
                             <Field tabIndex="1"
                                    type="text"
+                                   autoFocus={!isEdit}
                                    placeholder={t('USERS.GROUPS.DETAILS.FORM.NAME')}
                                    name="name"/>
                         </div>

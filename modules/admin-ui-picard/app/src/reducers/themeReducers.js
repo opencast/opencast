@@ -1,5 +1,10 @@
 import {themesTableConfig} from "../configs/tableConfigs/themesTableConfig";
-import {LOAD_THEMES_FAILURE, LOAD_THEMES_IN_PROGRESS, LOAD_THEMES_SUCCESS} from "../actions/themeActions";
+import {
+    LOAD_THEMES_FAILURE,
+    LOAD_THEMES_IN_PROGRESS,
+    LOAD_THEMES_SUCCESS,
+    SET_THEME_COLUMNS
+} from '../actions/themeActions';
 
 /**
  * This file contains redux reducer for actions affecting the state of themes
@@ -8,7 +13,7 @@ import {LOAD_THEMES_FAILURE, LOAD_THEMES_IN_PROGRESS, LOAD_THEMES_SUCCESS} from 
 // Fill columns initially with columns defined in themesTableConfig
 const initialColumns = themesTableConfig.columns.map(column =>
     ({
-        name: column.name,
+        ...column,
         deactivated: false
     }));
 
@@ -49,6 +54,13 @@ const themes = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false
+            }
+        }
+        case SET_THEME_COLUMNS: {
+            const { updatedColumns } = payload;
+            return {
+                ...state,
+                columns: updatedColumns
             }
         }
         default:

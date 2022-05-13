@@ -9,6 +9,8 @@ export const LOAD_SERIES_FAILURE = 'LOAD_SERIES_FAILURE';
 
 // Constant of actions types affecting UI
 export const SHOW_ACTIONS_SERIES = 'SHOW_ACTIONS_SERIES';
+export const SET_SERIES_COLUMNS = 'SET_SERIES_COLUMNS';
+export const SET_SERIES_SELECTED = 'SET_SERIES_SELECTED';
 
 // Constants of action types affecting fetching of series metadata from server
 export const LOAD_SERIES_METADATA_IN_PROGRESS = 'LOAD_SERIES_METADATA_IN_PROGRESS';
@@ -41,6 +43,16 @@ export const loadSeriesFailure = () => ({
 export const showActions = isShowing => ({
     type: SHOW_ACTIONS_SERIES,
     payload: { isShowing }
+});
+
+export const setSeriesColumns = updatedColumns => ({
+    type: SET_SERIES_COLUMNS,
+    payload: { updatedColumns }
+});
+
+export const setSeriesSelected = id => ({
+    type: SET_SERIES_SELECTED,
+    payload: { id }
 });
 
 // Actions affecting fetching of series metadata from server

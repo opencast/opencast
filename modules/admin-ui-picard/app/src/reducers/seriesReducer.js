@@ -5,9 +5,14 @@ import {
     LOAD_SERIES_METADATA_FAILURE,
     LOAD_SERIES_METADATA_IN_PROGRESS,
     LOAD_SERIES_METADATA_SUCCESS,
-    LOAD_SERIES_SUCCESS, LOAD_SERIES_THEMES_FAILURE, LOAD_SERIES_THEMES_IN_PROGRESS, LOAD_SERIES_THEMES_SUCCESS,
+    LOAD_SERIES_SUCCESS,
+    LOAD_SERIES_THEMES_FAILURE,
+    LOAD_SERIES_THEMES_IN_PROGRESS,
+    LOAD_SERIES_THEMES_SUCCESS,
+    SET_SERIES_COLUMNS,
+    SET_SERIES_SELECTED,
     SHOW_ACTIONS_SERIES
-} from "../actions/seriesActions";
+} from '../actions/seriesActions';
 
 /**
  * This file contains redux reducer for actions affecting the state of series
@@ -16,7 +21,7 @@ import {
 // Fill columns initially with columns defined in seriesTableConfig
 const initialColumns = seriesTableConfig.columns.map(column =>
     ({
-        name: column.name,
+        ...column,
         deactivated: false
     }));
 
@@ -68,6 +73,28 @@ const series = (state=initialState, action) => {
             return {
                 ...state,
                 showActions: isShowing
+            }
+        }
+        case SET_SERIES_COLUMNS: {
+            const { updatedColumns } = payload;
+            return {
+                ...state,
+                columns: updatedColumns
+            }
+        }
+        case SET_SERIES_SELECTED: {
+            const { id } = payload;
+            return {
+                ...state,
+                rows: state.rows.map(row => {
+                    if (row.id === id) {
+                        return {
+                            ...row,
+                            selected: !row.selected
+                        }
+                    }
+                    return row;
+                })
             }
         }
         case LOAD_SERIES_METADATA_IN_PROGRESS: {

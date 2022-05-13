@@ -13,7 +13,7 @@ import {useTranslation} from "react-i18next";
 /**
  * This component renders metadata details of a certain event or series
  */
-const DetailsExtendedMetadataTab = ({ resourceId, editAccessRole, metadata, buttonLabel, updateResource,
+const DetailsExtendedMetadataTab = ({ resourceId, editAccessRole, metadata, updateResource,
                                              user }) => {
     const { t } = useTranslation();
 
@@ -117,7 +117,7 @@ const DetailsExtendedMetadataTab = ({ resourceId, editAccessRole, metadata, butt
                                                                 inactive: !checkValidity(formik)
                                                             }
                                                         )}>
-                                                    {t(buttonLabel)}
+                                                    {t('SAVE')}
                                                 </button>
                                                 <button className="cancel"
                                                         onClick={() => formik.resetForm({values: ''})}>

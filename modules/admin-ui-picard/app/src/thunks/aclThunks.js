@@ -4,6 +4,8 @@ import {getURLParams, prepareAccessPolicyRulesForPost, transformAclTemplatesResp
 import {transformToIdValueArray} from "../utils/utils";
 import {addNotification} from "./notificationThunks";
 import {logger} from "../utils/logger";
+import { NOTIFICATION_CONTEXT_ACCESS } from '../configs/modalConfig';
+import { removeNotificationWizardAccess } from '../actions/notificationActions';
 
 // fetch acls from server
 export const fetchAcls = () => async (dispatch, getState) => {
@@ -110,4 +112,42 @@ export const deleteAcl = id => async dispatch => {
         // add error notification
         dispatch(addNotification('error', 'ACL_NOT_DELETED'));
     })
+}
+
+export const checkAcls = acls => async dispatch =>{
+
+    // Remove old notifications of context event-access
+    // Helps to prevent multiple notifications for same problem
+    dispatch(removeNotificationWizardAccess());
+
+    let check = true;
+    let bothRights = false;
+
+    for (let i = 0; acls.length > i; i++) {
+        // check if a role is chosen
+        if (acls[i].role === '') {
+            check = false;
+        }
+
+        // check if there is at least one policy with read and write rights
+        if (acls[i].read && acls[i].write) {
+            bothRights = true;
+        }
+
+        // check if each policy has read or write right (at least one checkbox should be checked)
+        if (!acls[i].read && !acls[i].write) {
+            check = false;
+        }
+    }
+
+    if (!check) {
+        dispatch(addNotification('warning','INVALID_ACL_RULES', -1, null, NOTIFICATION_CONTEXT_ACCESS));
+    }
+
+    if (!bothRights) {
+        dispatch(addNotification('warning','MISSING_ACL_RULES', -1, null, NOTIFICATION_CONTEXT_ACCESS));
+        check = false;
+    }
+
+    return check;
 }

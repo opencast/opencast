@@ -124,7 +124,6 @@ const SeriesDetails = ({ seriesId, metadataFields, extendedMetadata, feeds, them
                     <DetailsMetadataTab metadataFields={metadataFields}
                                         resourceId={seriesId}
                                         header={tabs[page].tabNameTranslation}
-                                        buttonLabel='EVENTS.SERIES.DETAILS.METADATA.REPLACE_SERIES_METADATA'
                                         updateResource={updateSeries}
                                         editAccessRole='ROLE_UI_SERIES_DETAILS_METADATA_EDIT'/>
                 )}
@@ -133,7 +132,6 @@ const SeriesDetails = ({ seriesId, metadataFields, extendedMetadata, feeds, them
                             resourceId={seriesId}
                             metadata={extendedMetadata}
                             updateResource={updateExtendedMetadata}
-                            buttonLabel='EVENTS.SERIES.DETAILS.METADATA.REPLACE_SERIES_METADATA'
                             editAccessRole='ROLE_UI_SERIES_DETAILS_METADATA_EDIT'/>
                 )}
                 {page === 2 && (

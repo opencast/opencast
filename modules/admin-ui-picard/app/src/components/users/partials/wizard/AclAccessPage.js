@@ -5,22 +5,20 @@ import {connect} from "react-redux";
 import {Field, FieldArray} from "formik";
 import Notifications from "../../../shared/Notifications";
 import RenderMultiField from "../../../shared/wizard/RenderMultiField";
-import {NOTIFICATION_CONTEXT_ACCESS} from "../../../../configs/modalConfig";
 import {
+    checkAcls,
     fetchAclActions,
     fetchAclTemplateById,
     fetchAclTemplates,
     fetchRolesWithTarget
-} from "../../../../thunks/aclThunks";
-import {addNotification} from "../../../../thunks/notificationThunks";
-import {removeNotificationWizardAccess} from "../../../../actions/notificationActions";
+} from '../../../../thunks/aclThunks';
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 import {hasAccess} from "../../../../utils/utils";
 
 /**
  * This component renders the access policy page in the new ACL wizard and in the ACL details modal
  */
-const AclAccessPage = ({ previousPage, nextPage, formik, addNotification, removeNotificationWizardAccess, isEdit, user }) => {
+const AclAccessPage = ({ previousPage, nextPage, formik, isEdit, user, checkAcls }) => {
     const { t } = useTranslation();
 
     const [aclTemplates, setAclTemplates] = useState([]);
@@ -51,47 +49,7 @@ const AclAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
         const template =  await fetchAclTemplateById(e.target.value);
 
         formik.setFieldValue('acls', template);
-        checkAcls();
-    }
-
-    // check if all acls provided by the user have valid read/write rights
-    const checkAcls = () => {
-
-        // Remove old notifications of context event-access
-        // Helps to prevent multiple notifications for same problem
-        removeNotificationWizardAccess();
-
-        const acls = formik.values.acls;
-        let check = true;
-        let bothRights = false;
-
-        for (let i = 0; acls.length > i; i++) {
-            // check if a role is chosen
-            if (acls[i].role === '') {
-                check = false;
-            }
-
-            // check if there is at least one policy with read and write rights
-            if (acls[i].read && acls[i].write) {
-                bothRights = true;
-            }
-
-            // check if each policy has read or write right (at least one checkbox should be checked)
-            if (!acls[i].read && !acls[i].write) {
-                check = false;
-            }
-        }
-
-        if (!check) {
-            addNotification('warning','INVALID_ACL_RULES', -1, null, NOTIFICATION_CONTEXT_ACCESS);
-        }
-
-        if (!bothRights) {
-            addNotification('warning','MISSING_ACL_RULES', -1, null, NOTIFICATION_CONTEXT_ACCESS);
-            check = false;
-        }
-
-        return check;
+        await checkAcls(formik.values.acls);
     }
 
     return (
@@ -269,7 +227,7 @@ const AclAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                                                                                                 write: false,
                                                                                                 actions: []
                                                                                             });
-                                                                                            checkAcls();
+                                                                                            checkAcls(formik.values.acls);
                                                                                         }}> + {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.NEW')}</a>
                                                                                     </td>
                                                                                 </tr>
@@ -301,8 +259,8 @@ const AclAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                                         inactive: !(formik.dirty && formik.isValid)
                                     })}
                                 disabled={!(formik.dirty && formik.isValid)}
-                                onClick={() => {
-                                    if(checkAcls()) {
+                                onClick={async () => {
+                                    if(await checkAcls(formik.values.acls)) {
                                         nextPage(formik.values);
                                     }
                                 }}
@@ -326,8 +284,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    addNotification: (type, key, duration, parameter, context) => dispatch(addNotification(type, key, duration, parameter, context)),
-    removeNotificationWizardAccess: () => dispatch(removeNotificationWizardAccess())
+    checkAcls: acls => dispatch(checkAcls(acls))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AclAccessPage);

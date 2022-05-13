@@ -20,6 +20,7 @@ const NewUserGeneralTab = ({ formik }) => {
                         <label>{t('USERS.USERS.DETAILS.FORM.USERNAME')}<i className="required">*</i></label>
                         <Field type="text"
                                name="username"
+                               autoFocus
                                className={cn({error: formik.touched.username && formik.errors.username})}
                                placeholder={t('USERS.USERS.DETAILS.FORM.USERNAME') + '...'}/>
                     </div>

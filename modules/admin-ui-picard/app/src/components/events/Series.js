@@ -46,6 +46,8 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
     const [displayDeleteSeriesModal, setDeleteSeriesModal] = useState(false);
 
     const loadEvents = () => {
+        loadingFilters("events");
+
         // Reset the current page to first page
         resetOffset();
 
@@ -76,8 +78,6 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
         // Load series on mount
         loadSeries().then(r => logger.info(r));
 
-        // Load series filters
-        loadingFilters("series");
 
         // Function for handling clicks outside of an dropdown menu
         const handleClickOutside = e => {
@@ -165,7 +165,10 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
                     {hasAccess("ROLE_UI_SERIES_VIEW", user) && (
                         <Link to="/events/series"
                               className={cn({active: true})}
-                              onClick={() => loadSeries()}>
+                              onClick={() => {
+                                  loadingFilters("series")
+                                  loadSeries().then();
+                              }}>
                             {t('EVENTS.EVENTS.NAVIGATION.SERIES')}
                         </Link>
                     )}
@@ -196,7 +199,6 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
                             )}
                         </div>
                         {/* Include filters component */}
-                        {/* Todo: fetch actual filters for series */}
                         <TableFilters loadResource={loadingSeries}
                                       loadResourceIntoTable={loadingSeriesIntoTable}
                                       resource={'series'} />

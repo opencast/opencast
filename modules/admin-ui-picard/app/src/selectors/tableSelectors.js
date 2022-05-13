@@ -15,6 +15,8 @@ export const getResourceType = state => state.table.resource;
 export const getTableSorting = state => state.table.sortBy;
 export const getTableDirection = state => state.table.reverse;
 export const getTable = state => state.table;
+export const getDeactivatedColumns = state => state.table.columns.filter(column => column.deactivated);
+export const getActivatedColumns = state => state.table.columns.filter(column => !column.deactivated)
 
 export const getSelectedRows = createSelector(
     getTableRows,

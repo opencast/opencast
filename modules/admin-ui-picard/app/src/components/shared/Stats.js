@@ -16,16 +16,16 @@ const Stats = ({ loadingStats, stats, filterMap, editFilterValue, loadEvents, lo
     const { t } = useTranslation();
 
     // Filter with value of clicked status
-    const showStatsFilter = stats => {
+    const showStatsFilter = async stats => {
             let filterValue;
-            stats.filters.forEach(f => {
+            await stats.filters.forEach(f => {
                 let filter = filterMap.find(({ name }) => name === f.name);
                 filterValue = f.value
                 if (!!filter) {
-                    editFilterValue(filter.name, filterValue);
+                  editFilterValue(filter.name, filterValue);
                 }
             })
-            loadEvents();
+            await loadEvents();
             loadEventsIntoTable();
     }
 

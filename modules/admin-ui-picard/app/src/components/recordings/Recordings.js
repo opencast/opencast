@@ -42,9 +42,6 @@ const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings,
         // Load recordings on mount
         loadRecordings().then(r => logger.info(r));
 
-        // Load filters
-        loadingFilters('recordings');
-
     }, []);
 
     const toggleNavigation = () => {
@@ -64,7 +61,10 @@ const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings,
                     {hasAccess("ROLE_UI_LOCATIONS_VIEW", user) && (
                         <Link to="/recordings/recordings"
                               className={cn({active: true})}
-                              onClick={() => loadRecordings()} >
+                              onClick={() => {
+                                  loadingFilters("recordings");
+                                  loadRecordings().then();
+                              }} >
                             {t('RECORDINGS.NAVIGATION.LOCATIONS')}
                         </Link>
                     )}

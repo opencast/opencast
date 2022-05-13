@@ -9,13 +9,14 @@ import {getAclDetails} from "../../../../selectors/aclDetailsSelectors";
 import {updateAclDetails} from "../../../../thunks/aclDetailsThunks";
 import {NewAclSchema} from "../../../../utils/validate";
 import ModalNavigation from "../../../shared/modals/ModalNavigation";
+import { checkAcls } from '../../../../thunks/aclThunks';
 
 
 
 /**
  * This component manages the pages of the acl details modal
  */
-const AclDetails = ({close, aclDetails, updateAclDetails}) => {
+const AclDetails = ({close, aclDetails, updateAclDetails, checkAcls}) => {
     const { t } = useTranslation();
 
     const [page, setPage] = useState(0);
@@ -79,7 +80,11 @@ const AclDetails = ({close, aclDetails, updateAclDetails}) => {
                                 inactive: !(formik.dirty && formik.isValid)})
                             }
                                     disabled={!(formik.dirty && formik.isValid)}
-                                    onClick={() => formik.handleSubmit()}
+                                    onClick={async () => {
+                                        if (await checkAcls(formik.values.acls)) {
+                                            formik.handleSubmit();
+                                        }
+                                    }}
                                     type="submit">
                                 {t('SUBMIT')}
                             </button>
@@ -103,7 +108,8 @@ const mapStateToProps = state => ({
 
 // mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    updateAclDetails: (values, aclId) => dispatch(updateAclDetails(values, aclId))
+    updateAclDetails: (values, aclId) => dispatch(updateAclDetails(values, aclId)),
+    checkAcls: acls => dispatch(checkAcls(acls))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AclDetails);

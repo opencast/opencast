@@ -21,6 +21,7 @@ import {
 // Initial state of table filters in redux store
 const initialState = {
     isLoading: false,
+    currentResource: '',
     data: [],
     filterProfiles: [],
     textFilter: '',
@@ -40,10 +41,11 @@ const tableFilters = (state = initialState, action) => {
             };
         }
         case LOAD_FILTERS_SUCCESS: {
-            const { filters } = payload;
+            const { filters, resource } = payload;
             return {
                 ...state,
                 isLoading: false,
+                currentResource: resource,
                 data: filters
             };
         }
