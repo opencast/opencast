@@ -2139,6 +2139,12 @@
       "Month": "Month",
       "Custom": "Custom"
     },
+    "TIME_GRANULARITIES": {
+      "Yearly": "Yearly",
+      "Monthly": "Monthly",
+      "Daily": "Daily",
+      "Hourly": "Hourly"
+    },
     "TITLE": {
       "RANDOM": "Random Data",
       "VIEWS_SUM": "Total Number of Views",

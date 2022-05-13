@@ -1,4 +1,5 @@
 import moment from "moment";
+import "moment/min/locales.min"
 import {getCurrentLanguageInformation} from "./utils";
 
 /**
@@ -7,50 +8,65 @@ import {getCurrentLanguageInformation} from "./utils";
 
 /* creates callback function for formatting the labels of the xAxis in a statistics diagram */
 const createXAxisTickCallback = (timeMode, dataResolution, language) => {
+    let formatString = 'L';
+    if (timeMode === 'year') {
+        formatString = 'MMMM';
+    } else if (timeMode === 'month') {
+        formatString = 'dddd, Do';
+    } else {
+        if (dataResolution === 'yearly') {
+            formatString = 'YYYY';
+        } else if (dataResolution === 'monthly') {
+            formatString = 'MMMM';
+        } else if (dataResolution === 'daily') {
+            if(language === 'en-US' || language === 'en-GB'){
+                formatString = 'MMMM Do, YYYY';
+            } else {
+                formatString = 'Do MMMM YYYY';
+            }
+        } else if (dataResolution === 'hourly') {
+            formatString = 'LLL';
+        }
+    }
 
     return (value, index, ticks) => {
-        let formatString = 'L';
-        if (timeMode === 'year') {
-            formatString = 'MMMM';
-        } else if (timeMode === 'month') {
-            formatString = 'dddd, Do';
-        } else {
-            if (dataResolution === 'yearly') {
-                formatString = 'YYYY';
-            } else if (dataResolution === 'monthly') {
-                formatString = 'MMMM';
-            } else if (dataResolution === 'daily') {
-                formatString = 'MMMM Do, YYYY';
-            } else if (dataResolution === 'hourly') {
-                formatString = 'LLL';
-            }
-        }
-
         return moment(value).locale(language).format(formatString);
     }
 }
 
 /* creates callback function for the displayed label when hovering over a data point in a statistics diagram */
-const createTooltipCallback = (chooseMode, dataResolution, language) => {
-    return (tooltipItem) => {
-        const date = tooltipItem.label;
-
-        let formatString;
-        if (chooseMode === 'year') {
-            formatString = 'MMMM YYYY';
-        } else if (chooseMode === 'month') {
+const createTooltipCallback = (timeMode, dataResolution, language) => {
+    let formatString;
+    if (timeMode === 'year') {
+        formatString = 'MMMM YYYY';
+    } else if (timeMode === 'month') {
+        if(language === 'en-US' || language === 'en-GB'){
             formatString = 'dddd, MMMM Do, YYYY';
         } else {
-            if (dataResolution === 'yearly') {
-                formatString = 'YYYY';
-            } else if (dataResolution === 'monthly') {
-                formatString = 'MMMM YYYY';
-            } else if (dataResolution === 'daily') {
+            formatString = 'dddd, Do MMMM YYYY';
+        }
+    } else {
+        if (dataResolution === 'yearly') {
+            formatString = 'YYYY';
+        } else if (dataResolution === 'monthly') {
+            formatString = 'MMMM YYYY';
+        } else if (dataResolution === 'daily') {
+            if(language === 'en-US' || language === 'en-GB'){
                 formatString = 'dddd, MMMM Do, YYYY';
             } else {
+                formatString = 'dddd, Do MMMM YYYY';
+            }
+        } else {
+            if(language === 'en-US' || language === 'en-GB'){
                 formatString = 'dddd, MMMM Do, YYYY HH:mm';
+            } else {
+                formatString = 'dddd, Do MMMM YYYY, HH:mm';
             }
         }
+    }
+
+    return (tooltipItem) => {
+        const date = tooltipItem.label;
         const finalDate = moment(date).locale(language).format(formatString);
         return finalDate + ': ' + tooltipItem.value;
     }
@@ -92,12 +108,12 @@ export const createChartOptions = (timeMode, dataResolution) => {
 }
 
 /* creates the url for downloading a csv file with current statistics */
-export const createDownloadUrl = (eventId, providerId, from, to, dataResolution) => {
+export const createDownloadUrl = (resourceId, resourceType, providerId, from, to, dataResolution) => {
     const csvUrlSearchParams = new URLSearchParams({
         dataResolution: dataResolution,
         providerId: providerId,
-        resourceId: eventId,
-        resourceType: 'episode',
+        resourceId: resourceId,
+        resourceType: resourceType,
         from: moment(from).toJSON(),
         to: moment(to).endOf('day').toJSON()
     });
