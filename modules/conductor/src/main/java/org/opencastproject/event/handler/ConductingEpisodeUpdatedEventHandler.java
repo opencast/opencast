@@ -28,6 +28,10 @@ import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.security.api.SecurityService;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +44,15 @@ import java.util.concurrent.FutureTask;
 /**
  * This handler listens for changes to episodes. Whenever a change is done, this is propagated to OAI-PMH.
  */
+@Component(
+    immediate = true,
+    service = {
+        ConductingEpisodeUpdatedEventHandler.class
+    },
+    property = {
+        "service.description=Conducting event handler for recording events",
+    }
+)
 public class ConductingEpisodeUpdatedEventHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(ConductingEpisodeUpdatedEventHandler.class);
@@ -54,12 +67,14 @@ public class ConductingEpisodeUpdatedEventHandler {
 
   private MessageWatcher messageWatcher;
 
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating {}", ConductingEpisodeUpdatedEventHandler.class.getName());
     messageWatcher = new MessageWatcher();
     singleThreadExecutor.execute(messageWatcher);
   }
 
+  @Deactivate
   public void deactivate(ComponentContext cc) {
     logger.info("Deactivating {}", ConductingEpisodeUpdatedEventHandler.class.getName());
     if (messageWatcher != null) {
@@ -120,6 +135,7 @@ public class ConductingEpisodeUpdatedEventHandler {
   /**
    * OSGi DI callback.
    */
+  @Reference
   public void setOaiPmhUpdatedEventHandler(OaiPmhUpdatedEventHandler h) {
     this.oaiPmhUpdatedEventHandler = h;
   }
@@ -127,6 +143,7 @@ public class ConductingEpisodeUpdatedEventHandler {
   /**
    * OSGi DI callback.
    */
+  @Reference
   public void setMessageReceiver(MessageReceiver messageReceiver) {
     this.messageReceiver = messageReceiver;
   }
@@ -134,6 +151,7 @@ public class ConductingEpisodeUpdatedEventHandler {
   /**
    * OSGi DI callback.
    */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
