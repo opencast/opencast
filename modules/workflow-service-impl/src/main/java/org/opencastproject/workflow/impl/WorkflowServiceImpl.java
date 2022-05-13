@@ -1141,7 +1141,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     if (assetMediaPackage.isSome()) {
       var currentUser = securityService.getUser();
       var mediaPackage = assetMediaPackage.get();
-      return currentUser.hasRole(GLOBAL_ADMIN_ROLE) || authorizationService.hasPermission(mediaPackage, action);
+      return currentUser.hasRole(GLOBAL_ADMIN_ROLE)
+          || currentUser.hasRole(securityService.getOrganization().getAdminRole())
+          || authorizationService.hasPermission(mediaPackage, action);
     }
     return false;
   }
