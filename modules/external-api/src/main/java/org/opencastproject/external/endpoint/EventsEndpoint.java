@@ -2040,8 +2040,9 @@ public class EventsEndpoint implements ManagedService {
         }
       }
       // correct the flavor of the new attachment
-      Track[] elArray = mp.getTracks(tmpFlavor);
-      elArray[0].setFlavor(newFlavor);
+      for (Track track : mp.getTracks(tmpFlavor)) {
+        track.setFlavor(newFlavor);
+      }
       logger.debug("Updated asset {} {}", tmpFlavor, newFlavor);
 
       try {
