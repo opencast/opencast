@@ -24,6 +24,13 @@ jobs:
         with:
           node-version: 16.x
 
+      - name: update engage-ui test libraries
+        working-directory: modules/engage-ui
+        run: |
+          npm update --save --dev eslint eslint-plugin-header
+          npm audit fix || true
+          git add package.json package-lock.json
+
       - name: update all engage-theodul-* libraries (they only have tests)
         working-directory: modules/
         run: |

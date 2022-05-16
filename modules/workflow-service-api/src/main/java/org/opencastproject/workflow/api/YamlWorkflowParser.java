@@ -21,43 +21,42 @@
 
 package org.opencastproject.workflow.api;
 
+import static com.fasterxml.jackson.databind.MapperFeature.USE_WRAPPER_NAME_AS_PROPERTY_NAME;
+
 import org.opencastproject.util.IoSupport;
-import org.opencastproject.util.XmlSafeParser;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 
 /**
  * Provides a mechanism to un/marshall workflow instances and definitions to/from xml.
  */
-public final class WorkflowParser {
+public final class YamlWorkflowParser {
 
-  private static final JAXBContext jaxbContext;
+  private static final ObjectMapper mapper;
 
   static {
-    StringBuilder sb = new StringBuilder();
-    sb.append("org.opencastproject.mediapackage");
-    sb.append(":org.opencastproject.workflow.api");
-    try {
-      jaxbContext = JAXBContext.newInstance(sb.toString(), WorkflowParser.class.getClassLoader());
-    } catch (JAXBException e) {
-      throw new IllegalStateException(e);
-    }
+    ObjectMapper om = YAMLMapper.builder().configure(USE_WRAPPER_NAME_AS_PROPERTY_NAME, true).build();
+    om.registerModule(new JaxbAnnotationModule());
+    SimpleModule sm = new SimpleModule();
+    sm.addDeserializer(JaxbWorkflowConfiguration.class, new YamlWorkflowConfigurationDeserializer());
+    sm.addSerializer(JaxbWorkflowConfiguration.class, new YamlWorkflowConfigurationSerializer());
+    om.registerModule(sm);
+    mapper = om;
   }
 
   /** Disallow instantiating this class */
-  private WorkflowParser() {
+  private YamlWorkflowParser() {
   }
 
   /**
@@ -68,14 +67,9 @@ public final class WorkflowParser {
    */
   public static List<WorkflowDefinition> parseWorkflowDefinitions(InputStream in) throws WorkflowParsingException {
     try {
-      Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      WorkflowDefinitionImpl[] impls = unmarshaller.unmarshal(XmlSafeParser.parse(in), WorkflowDefinitionImpl[].class)
-              .getValue();
-      List<WorkflowDefinition> list = new ArrayList<WorkflowDefinition>();
-      for (WorkflowDefinitionImpl impl : impls) {
-        list.add(impl);
-      }
-      return list;
+      WorkflowDefinitionImpl[] impls = mapper.readValue(in, WorkflowDefinitionImpl[].class);
+
+      return new ArrayList<>(Arrays.asList(impls));
     } catch (Exception e) {
       throw new WorkflowParsingException(e);
     } finally {
@@ -94,8 +88,7 @@ public final class WorkflowParser {
    */
   public static WorkflowDefinition parseWorkflowDefinition(InputStream in) throws WorkflowParsingException {
     try {
-      Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(XmlSafeParser.parse(in), WorkflowDefinitionImpl.class).getValue();
+      return mapper.readValue(in,  WorkflowDefinitionImpl.class);
     } catch (Exception e) {
       throw new WorkflowParsingException(e);
     } finally {
@@ -129,12 +122,9 @@ public final class WorkflowParser {
    * @throws WorkflowParsingException
    *           if creating the workflow instance fails
    */
-  public static WorkflowInstanceImpl parseWorkflowInstance(InputStream in) throws WorkflowParsingException {
+  public static JaxbWorkflowConfiguration parseWorkflowInstance(InputStream in) throws WorkflowParsingException {
     try {
-      Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      WorkflowInstanceImpl workflow = unmarshaller.unmarshal(XmlSafeParser.parse(in), WorkflowInstanceImpl.class)
-              .getValue();
-      workflow.init();
+      JaxbWorkflowConfiguration workflow = mapper.readValue(in, JaxbWorkflowConfiguration.class);
       return workflow;
     } catch (Exception e) {
       throw new WorkflowParsingException(e);
@@ -152,7 +142,7 @@ public final class WorkflowParser {
    * @throws WorkflowParsingException
    *           if creating the workflow instance fails
    */
-  public static WorkflowInstanceImpl parseWorkflowInstance(String in) throws WorkflowParsingException {
+  public static JaxbWorkflowConfiguration parseWorkflowInstance(String in) throws WorkflowParsingException {
     try {
       return parseWorkflowInstance(IOUtils.toInputStream(in, "UTF8"));
     } catch (IOException e) {
@@ -171,8 +161,7 @@ public final class WorkflowParser {
    */
   public static WorkflowStatistics parseWorkflowStatistics(InputStream in) throws WorkflowParsingException {
     try {
-      Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(XmlSafeParser.parse(in), WorkflowStatistics.class).getValue();
+      return mapper.readValue(in, WorkflowStatistics.class);
     } catch (Exception e) {
       throw new WorkflowParsingException(e);
     } finally {
@@ -191,8 +180,7 @@ public final class WorkflowParser {
    */
   public static WorkflowSet parseWorkflowSet(InputStream in) throws WorkflowParsingException {
     try {
-      Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(XmlSafeParser.parse(in), WorkflowSetImpl.class).getValue();
+      return mapper.readValue(in, WorkflowSetImpl.class);
     } catch (Exception e) {
       throw new WorkflowParsingException(e);
     } finally {
@@ -200,27 +188,22 @@ public final class WorkflowParser {
     }
   }
 
-  public static String toXml(WorkflowInstance workflowInstance) throws WorkflowParsingException {
+  public static String toYaml(WorkflowInstance workflowInstance) throws WorkflowParsingException {
     try {
-      Marshaller marshaller = jaxbContext.createMarshaller();
-      Writer writer = new StringWriter();
-      marshaller.marshal(workflowInstance, writer);
-      return writer.toString();
-    } catch (Exception e) {
-      throw new WorkflowParsingException(e);
-    }
-
-  }
-
-  public static String toXml(WorkflowDefinition workflowDefinition) throws WorkflowParsingException {
-    try {
-      Marshaller marshaller = jaxbContext.createMarshaller();
-      Writer writer = new StringWriter();
-      marshaller.marshal(workflowDefinition, writer);
-      return writer.toString();
+      return mapper.writeValueAsString(workflowInstance);
     } catch (Exception e) {
       throw new WorkflowParsingException(e);
     }
   }
+
+  public static String toYaml(WorkflowDefinition workflowDefinition) throws WorkflowParsingException {
+    try {
+      return mapper.writeValueAsString(workflowDefinition);
+    } catch (Exception e) {
+      throw new WorkflowParsingException(e);
+    }
+  }
+
+
 
 }

@@ -30,8 +30,9 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowIdentifier;
-import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowStateMapping;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
+import org.opencastproject.workflow.api.YamlWorkflowParser;
 
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
@@ -198,7 +199,12 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
    */
   public WorkflowDefinition parseWorkflowDefinitionFile(File artifact) {
     try (InputStream stream = new FileInputStream(artifact)) {
-      WorkflowDefinition def = WorkflowParser.parseWorkflowDefinition(stream);
+      WorkflowDefinition def;
+      if (artifact.getName().endsWith(".yml") || artifact.getName().endsWith(".yaml")) {
+        def = YamlWorkflowParser.parseWorkflowDefinition(stream);
+      } else {
+        def = XmlWorkflowParser.parseWorkflowDefinition(stream);
+      }
       if (def.getOperations().size() == 0)
         logger.warn("Workflow '{}' has no operations", def.getId());
       if (def.getOrganization() != null && !organizationExists(def.getOrganization())) {
@@ -286,7 +292,8 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
    * @see org.apache.felix.fileinstall.ArtifactListener#canHandle(java.io.File)
    */
   public boolean canHandle(File artifact) {
-    return "workflows".equals(artifact.getParentFile().getName()) && artifact.getName().endsWith(".xml");
+    return "workflows".equals(artifact.getParentFile().getName())
+        && (artifact.getName().endsWith(".xml") || artifact.getName().endsWith(".yml") || artifact.getName().endsWith(".yaml"));
   }
 
 }

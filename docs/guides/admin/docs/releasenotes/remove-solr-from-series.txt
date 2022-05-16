@@ -1,0 +1,12 @@
+The Series Service does not require a Solr Index anymore, simplifying the installation of Opencast.
+
+API changes
+-----------
+- [[#3204](https://github.com/opencast/opencast/pull/3204)] - Remove fulltext search query from series endpoint.
+Add the query to the External API.
+
+Optional: Delete Series Service Solr Index
+-----------------------
+Starting with Opencast 12, the Series Service does not store data in its Solr Index anymore. Therefore, the index can
+be deleted to save on disk space (Although in most cases that won't be more than a few megabyte). Unless you setup Solr
+yourself, the index can likely be found under `/var/lib/opencast/solr-indexes/series/`.

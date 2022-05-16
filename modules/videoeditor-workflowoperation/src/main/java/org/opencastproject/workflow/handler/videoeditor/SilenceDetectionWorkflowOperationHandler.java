@@ -138,7 +138,7 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
         exportSegmentsDuration = BooleanUtils.toBoolean(exportSegmentsDurationString);
       } catch (IllegalArgumentException e) {
         exportSegmentsDuration = false;
-        logger.warn("Unable to parse %s option value %s. Deactivating export of workflow properties.",
+        logger.warn("Unable to parse {} option value {}. Deactivating export of workflow properties.",
                 EXPORT_SEGMENTS_DURATION, exportSegmentsDurationString);
       }
     }
@@ -261,7 +261,7 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
                 "Failed to get smil from silence detection job for track %s", sourceTrack.getIdentifier()));
       }
     }
-    logger.debug("Finished silence detection workflow operation for mediapackage {}", mp.getIdentifier().toString());
+    logger.debug("Finished silence detection workflow operation for media package {}", mp.getIdentifier());
     return createResult(mp, exportWorkflowProperties, Action.CONTINUE, 0);
   }
 

@@ -63,7 +63,7 @@ import org.opencastproject.util.persistencefn.PersistenceUtil;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -110,11 +110,11 @@ public class TestTasksEndpoint extends TasksEndpoint {
     wfD3.setTitle("Hidden");
     wfD3.setId("hidden");
 
-    WorkflowInstanceImpl wI1 = new WorkflowInstanceImpl();
+    WorkflowInstance wI1 = new WorkflowInstance();
     wI1.setTitle(wfD.getTitle());
     wI1.setTemplate(wfD.getId());
     wI1.setId(5);
-    WorkflowInstanceImpl wI2 = new WorkflowInstanceImpl();
+    WorkflowInstance wI2 = new WorkflowInstance();
     wI2.setTitle(wfD2.getTitle());
     wI2.setTemplate(wfD2.getId());
     wI2.setId(10);

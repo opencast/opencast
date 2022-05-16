@@ -109,7 +109,7 @@ public class StartWorkflowWorkflowOperationHandler extends AbstractWorkflowOpera
     }
     final String configuredMediaPackageIDs = mediaPackageIDs;
     final String configuredWorkflowDefinition = trimToEmpty(operation.getConfiguration(WORKFLOW_DEFINITION));
-    final Boolean failOnError = operation.isFailWorkflowOnException();
+    final Boolean failOnError = operation.isFailOnError();
     // Get workflow parameter
     final Map<String, String> properties = new HashMap<>();
     for (String key : operation.getConfigurationKeys()) {

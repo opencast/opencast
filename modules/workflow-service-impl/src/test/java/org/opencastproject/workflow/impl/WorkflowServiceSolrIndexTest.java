@@ -22,6 +22,7 @@
 package org.opencastproject.workflow.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobImpl;
@@ -36,11 +37,12 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.PathSupport;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
-import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
+import org.opencastproject.workflow.api.WorkflowServiceDatabaseImpl;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
@@ -76,13 +78,13 @@ public class WorkflowServiceSolrIndexTest {
     // Create a job with a workflow as its payload
     List<Job> jobs = new ArrayList<>();
     Job job = new JobImpl();
-    WorkflowInstanceImpl workflow = new WorkflowInstanceImpl();
+    WorkflowInstance workflow = new WorkflowInstance();
     workflow.setId(123);
     workflow.setCreatorName(securityService.getUser().getName());
     workflow.setOrganizationId(securityService.getOrganization().getId());
     workflow.setState(WorkflowState.INSTANTIATED);
     workflow.setMediaPackage(MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
-    String jobPayload = WorkflowParser.toXml(workflow);
+    String jobPayload = XmlWorkflowParser.toXml(workflow);
     job.setPayload(jobPayload);
     job.setOrganization(securityService.getOrganization().getId());
     jobs.add(job);
@@ -99,12 +101,18 @@ public class WorkflowServiceSolrIndexTest {
     MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
     EasyMock.replay(messageSender);
 
+    WorkflowServiceDatabaseImpl workflowDb = new WorkflowServiceDatabaseImpl();
+    workflowDb.setEntityManagerFactory(newTestEntityManagerFactory(WorkflowServiceDatabaseImpl.PERSISTENCE_UNIT));
+    workflowDb.setSecurityService(securityService);
+    workflowDb.activate(null);
+
     // Now create the dao
     dao = new WorkflowServiceSolrIndex();
     dao.solrRoot = PathSupport.concat("target", Long.toString(System.currentTimeMillis()));
     dao.setServiceRegistry(serviceRegistry);
     dao.setSecurityService(securityService);
     dao.setOrgDirectory(orgDirectroy);
+    dao.setPersistence(workflowDb);
     dao.activate("System Admin");
   }
 

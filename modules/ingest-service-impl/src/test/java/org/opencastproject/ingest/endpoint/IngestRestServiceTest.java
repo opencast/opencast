@@ -30,7 +30,7 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.identifier.IdImpl;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 
 import org.apache.commons.fileupload.MockHttpServletRequest;
 import org.apache.commons.io.FileUtils;
@@ -225,7 +225,7 @@ public class IngestRestServiceTest {
 
     IngestService ingestService = EasyMock.createNiceMock(IngestService.class);
     EasyMock.expect(ingestService.addZippedMediaPackage(EasyMock.anyObject(InputStream.class), EasyMock.anyString(),
-            EasyMock.capture(workflowConfigCapture))).andReturn(new WorkflowInstanceImpl());
+            EasyMock.capture(workflowConfigCapture))).andReturn(new WorkflowInstance());
     EasyMock.replay(ingestService);
     restService.setIngestService(ingestService);
 
@@ -246,7 +246,7 @@ public class IngestRestServiceTest {
     EasyMock.expect(ingestService.createMediaPackage())
             .andReturn(MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
     EasyMock.expect(ingestService.ingest(EasyMock.anyObject(MediaPackage.class), EasyMock.anyString(),
-            EasyMock.capture(workflowConfigCapture))).andReturn(new WorkflowInstanceImpl());
+            EasyMock.capture(workflowConfigCapture))).andReturn(new WorkflowInstance());
     EasyMock.replay(ingestService);
     restService.setIngestService(ingestService);
 
@@ -396,13 +396,13 @@ public class IngestRestServiceTest {
               EasyMock.anyObject(Map.class), EasyMock.anyLong()))
               .andAnswer(() -> {
                 limitVerifier.callback();
-                return new WorkflowInstanceImpl();
+                return new WorkflowInstance();
               }).anyTimes();
       EasyMock.expect(ingestService.addZippedMediaPackage(EasyMock.anyObject(InputStream.class), EasyMock.anyString(),
               EasyMock.anyObject(Map.class)))
               .andAnswer(() -> {
                 limitVerifier.callback();
-                return new WorkflowInstanceImpl();
+                return new WorkflowInstance();
               }).anyTimes();
     } catch (Exception e) {
       Assert.fail("Threw exception " + e.getMessage());

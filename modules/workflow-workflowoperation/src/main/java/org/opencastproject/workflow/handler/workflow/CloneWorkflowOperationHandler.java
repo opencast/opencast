@@ -147,7 +147,7 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
     // Look for elements matching the tags and the flavor
     Collection<MediaPackageElement> elements = elementSelector.select(mediaPackage, true);
 
-    // Check the the number of element returned
+    // Check the number of element returned
     if (elements.size() == 0) {
       // If no one found, we skip the operation
       logger.debug("No matching elements found, skipping operation.");
@@ -168,7 +168,7 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
       }
     }
 
-    return createResult(workflowInstance.getMediaPackage(), Action.CONTINUE);
+    return createResult(mediaPackage, Action.CONTINUE);
   }
 
   private MediaPackageElement copyElement(MediaPackageElement element) throws WorkflowOperationException {

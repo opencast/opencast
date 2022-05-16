@@ -21,14 +21,25 @@
 
 package org.opencastproject.workflow.api;
 
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-/**
- * A configuration value for workflow operations.
- */
-@XmlJavaTypeAdapter(WorkflowConfigurationImpl.Adapter.class)
-public interface WorkflowConfiguration {
-  String getKey();
+import java.io.IOException;
 
-  String getValue();
+public class YamlWorkflowConfigurationSerializer extends StdSerializer<JaxbWorkflowConfiguration> {
+
+  public YamlWorkflowConfigurationSerializer() {
+    this(null);
+  }
+
+  public YamlWorkflowConfigurationSerializer(Class<JaxbWorkflowConfiguration> t) {
+    super(t);
+  }
+
+  @Override
+  public void serialize(JaxbWorkflowConfiguration workflowConfiguration, JsonGenerator jsonGenerator,
+      SerializerProvider serializerProvider) throws IOException {
+    jsonGenerator.writeObjectField(workflowConfiguration.getKey(), workflowConfiguration.getValue());
+  }
 }

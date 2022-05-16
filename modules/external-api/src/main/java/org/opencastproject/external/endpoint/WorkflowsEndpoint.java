@@ -61,7 +61,6 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStateException;
 
 import com.entwinemedia.fn.data.Opt;
@@ -82,7 +81,6 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -318,15 +316,15 @@ public class WorkflowsEndpoint {
     }
 
     // Get results
-    WorkflowSet workflowInstances;
+    List<WorkflowInstance> workflowInstances;
     try {
-      workflowInstances = workflowService.getWorkflowInstances(query);
+      workflowInstances = workflowService.getWorkflowInstances(query).getItems();
     } catch (Exception e) {
       logger.error("The workflow service was not able to get the workflow instances", e);
       return ApiResponses.serverError("Could not retrieve workflow instances, reason: '%s'", e.getMessage());
     }
 
-    List<JValue> json = Arrays.stream(workflowInstances.getItems())
+    List<JValue> json = workflowInstances.stream()
                               .map(wi -> workflowInstanceToJSON(wi, withOperations, withConfiguration))
                               .collect(Collectors.toList());
 
@@ -588,8 +586,7 @@ public class WorkflowsEndpoint {
     fields.add(f("time_in_queue", v(woi.getTimeInQueue(), ZERO)));
     fields.add(f("host", v(woi.getExecutionHost(), BLANK)));
     fields.add(f("if", v(woi.getExecutionCondition(), BLANK)));
-    fields.add(f("unless", v(woi.getSkipCondition(), BLANK)));
-    fields.add(f("fail_workflow_on_error", v(woi.isFailWorkflowOnException())));
+    fields.add(f("fail_workflow_on_error", v(woi.isFailOnError())));
     fields.add(f("error_handler_workflow", v(woi.getExceptionHandlingWorkflow(), BLANK)));
     fields.add(f("retry_strategy", v(new RetryStrategy.Adapter().marshal(woi.getRetryStrategy()), BLANK)));
     fields.add(f("max_attempts", v(woi.getMaxAttempts())));

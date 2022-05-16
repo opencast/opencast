@@ -41,11 +41,11 @@ import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowService;
 
@@ -63,8 +63,8 @@ public class StartWorkflowWorkflowOperationHandlerTest {
   private StartWorkflowWorkflowOperationHandler operationHandler;
   private AssetManager assetManager;
   private WorkflowService workflowService;
-  private WorkflowOperationInstanceImpl operation;
-  private WorkflowInstanceImpl workflowInstance;
+  private WorkflowOperationInstance operation;
+  private WorkflowInstance workflowInstance;
   private static final String MP_ID = "c3066908-39e3-44b1-842a-9ae93ef8d314";
   private static final String WD_ID = "test-workflow";
 
@@ -81,16 +81,16 @@ public class StartWorkflowWorkflowOperationHandlerTest {
     operationHandler.setAssetManager(assetManager);
     operationHandler.setWorkflowService(workflowService);
 
-    operation = new WorkflowOperationInstanceImpl("op", OperationState.RUNNING);
+    operation = new WorkflowOperationInstance("op", OperationState.RUNNING);
     operation.setTemplate("start-workflow");
     operation.setState(OperationState.RUNNING);
     operation.setConfiguration(MEDIA_PACKAGE_ID, MP_ID);
     operation.setConfiguration(WORKFLOW_DEFINITION, WD_ID);
     operation.setConfiguration("workflowConfigurations", "true");
     operation.setConfiguration("key", "value");
-    operation.setFailWorkflowOnException(true);
+    operation.setFailOnError(true);
 
-    workflowInstance = new WorkflowInstanceImpl();
+    workflowInstance = new WorkflowInstance();
     workflowInstance.setMediaPackage(MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
     workflowInstance.setState(WorkflowState.RUNNING);
     workflowInstance.setOperations(Lists.newArrayList(operation));

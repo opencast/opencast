@@ -58,6 +58,9 @@ public final class WorkflowConditionInterpreter {
    */
   public static String replaceVariables(String source, Function<String, String> systemPropertyGetter,
           Map<String, String> properties, boolean quoteStrings) {
+    if (source == null) {
+      return null;
+    }
     Matcher matcher = PROPERTY_PATTERN.matcher(source);
     StringBuilder result = new StringBuilder();
     int cursor = 0;
