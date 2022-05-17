@@ -6,7 +6,7 @@ import i18n from "../i18n/i18n";
 import languages from "../i18n/languages";
 import opencastLogo from '../img/opencast-white.svg';
 import {fetchHealthStatus} from "../thunks/healthThunks";
-import {getHealthStatus} from "../selectors/healthSelectors";
+import { getErrorCount, getHealthStatus } from '../selectors/healthSelectors';
 import {getCurrentLanguageInformation, hasAccess} from "../utils/utils";
 import {logger} from "../utils/logger";
 import {getOrgProperties, getUserInformation} from "../selectors/userInfoSelectors";
@@ -52,7 +52,8 @@ function logout() {
 /**
  * Component that renders the header and the navigation in the upper right corner.
  */
-const Header = ({ loadingHealthStatus, healthStatus, user, orgProperties, resetOffset, loadingServices, loadingServicesIntoTable }) => {
+const Header = ({ loadingHealthStatus, healthStatus, errorCounter, user, orgProperties, resetOffset,
+    loadingServices, loadingServicesIntoTable }) => {
     const { t } = useTranslation();
     // State for opening (true) and closing (false) the dropdown menus for language, notification, help and user
     const [displayMenuLang, setMenuLang] = useState(false);
@@ -186,7 +187,9 @@ const Header = ({ loadingHealthStatus, healthStatus, user, orgProperties, resetO
                     <div className="nav-dd info-dd" id="info-dd" title={t('SYSTEM_NOTIFICATIONS')} ref={containerNotify}>
                         <div onClick={() => setMenuNotify(!displayMenuNotify)}>
                             <i className="fa fa-bell" aria-hidden="true"/>
-                            <span id="error-count" className="badge" >{healthStatus.numErr}</span>
+                            {errorCounter !== 0 &&(
+                              <span id="error-count" className="badge" >{errorCounter}</span>
+                            )}
                             {/* Click on the bell icon, a dropdown menu with all services in serviceList and their status opens */}
                             {displayMenuNotify && (
                                 <MenuNotify healthStatus={healthStatus}
@@ -359,6 +362,7 @@ const MenuUser = () => {
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     healthStatus: getHealthStatus(state),
+    errorCounter: getErrorCount(state),
     user: getUserInformation(state),
     orgProperties: getOrgProperties(state)
 });
