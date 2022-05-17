@@ -39,9 +39,9 @@ export default class OpencastMatomoTrackingDataPlugin extends DataPlugin {
     const client_id = this.config.client_id;
     const heartbeat = this.config.heartbeat;
     const tracking_client = this.config.tracking_client;
-    const server = this.config.server;
+    var server = this.config.server;
     const site_id = this.config.site_id;
-    
+
 
 
     let matomoPromise = null;
@@ -71,7 +71,7 @@ export default class OpencastMatomoTrackingDataPlugin extends DataPlugin {
     this.player.matomotracker.client_id = client_id;
     if (heartbeat && heartbeat > 0) this.player.matomotracker.enableHeartBeatTimer(heartbeat);
     if (Matomo && Matomo.MediaAnalytics) {
-      bindEvent(this.player, 
+      bindEvent(this.player,
         Events.PLAYER_LOADED,
         () => {
           Matomo.MediaAnalytics.scanForMedia();
@@ -126,24 +126,17 @@ export default class OpencastMatomoTrackingDataPlugin extends DataPlugin {
       this.player.log.debug(`Opencast Matomo user log event done: '${ opencastLog.type }'`);
     }
   }
-  
-  registerVisit() {
-    var opencastData,
-        title,
-        event_id,
-        series_title,
-        series_id,
-        presenter,
-        view_mode;
-    
-        opencastData = this.player.videoManifest.metadata;
-        
 
-    
-    
+  // registerVisit() {
+  //   var opencastData,
+  //       title,
+  //       event_id,
+  //       series_title,
+  //       series_id,
+  //       presenter,
+  //       view_mode;
 
-
-
-  }
+  //       opencastData = this.player.videoManifest.metadata;
+  //  }
 
 }
