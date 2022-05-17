@@ -13,12 +13,11 @@ List of Available Plugins
       the player. It's kept for a few legacy use-cases.
 - opencast-plugin-player-theodul
     - Alternative player for Opencast.
-- opencast-plugin-transcription-amberscript
+- opencast-plugin-transcription-services
     - Support for the Amberscript transcription service
-- opencast-plugin-transcription-google-speech
     - Support for the Google cloud transcription service
-- opencast-plugin-transcription-ibm-watson
     - Support for the IBM cloud transcription service
+    - Support for the Microsoft Azure cloud transcription service
 - opencast-plugin-userdirectory-brightspace
     - Module allowing Opencast to look up users in a Brightspace LMS
 - opencast-plugin-userdirectory-canvas

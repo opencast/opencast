@@ -677,38 +677,17 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-canvas/${project.version}</bundle>
   </feature>
 
-  <feature name="opencast-plugin-transcription-google-speech" version="${project.version}">
+  <feature name="opencast-plugin-transcription-services" version="${project.version}">
     <conditional>
       <condition>opencast-allinone</condition>
       <condition>opencast-admin</condition>
       <condition>opencast-adminpresentation</condition>
     </conditional>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-amberscript/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-google-speech-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-persistence/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-workflowoperation/${project.version}</bundle>
-  </feature>
-
-  <feature name="opencast-plugin-transcription-ibm-watson" version="${project.version}">
-    <conditional>
-      <condition>opencast-allinone</condition>
-      <condition>opencast-admin</condition>
-      <condition>opencast-adminpresentation</condition>
-    </conditional>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-ibm-watson-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-persistence/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-workflowoperation/${project.version}</bundle>
-  </feature>
-
-  <feature name="opencast-plugin-transcription-amberscript" version="${project.version}">
-    <conditional>
-      <condition>opencast-allinone</condition>
-      <condition>opencast-admin</condition>
-      <condition>opencast-adminpresentation</condition>
-    </conditional>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-amberscript/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-microsoft-azure/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-persistence/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-workflowoperation/${project.version}</bundle>
   </feature>
