@@ -66,23 +66,6 @@ public class WorkflowsEndpointTest {
 
   // GET /
 
-  @Test
-  public void testGetWorkflows() throws Exception {
-    final String response = given().queryParam("withoperations", "true")
-                                   .queryParam("withconfiguration", "true")
-                                   .expect()
-                                   .statusCode(SC_OK)
-                                   .when()
-                                   .get(env.host("/"))
-                                   .asString();
-
-    final JSONArray json = (JSONArray) parser.parse(response);
-    assertEquals(2, json.size());
-
-    assertRunningWorkflow((JSONObject) json.get(0));
-    assertStoppedWorkflow((JSONObject) json.get(1));
-  }
-
   private void assertRunningWorkflow(JSONObject wi) {
     assertEquals(RUNNING_WORKFLOW_ID, wi.get("identifier"));
     assertEquals("Running Workflow", wi.get("title"));

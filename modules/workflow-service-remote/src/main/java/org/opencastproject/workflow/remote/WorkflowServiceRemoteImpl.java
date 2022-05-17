@@ -34,18 +34,13 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.SolrUtils;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowListener;
-import org.opencastproject.workflow.api.WorkflowQuery;
-import org.opencastproject.workflow.api.WorkflowQuery.QueryTerm;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workflow.api.WorkflowSet;
-import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.api.XmlWorkflowParser;
 
 import org.apache.commons.io.IOUtils;
@@ -172,111 +167,6 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     throw new WorkflowDatabaseException("Unable to connect to a remote workflow service");
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowService
-   *      #getWorkflowInstances(org.opencastproject.workflow.api.WorkflowQuery)
-   */
-  @Override
-  public WorkflowSet getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException {
-    List<NameValuePair> queryStringParams = new ArrayList<>();
-
-    if (query.getText() != null)
-      queryStringParams.add(new BasicNameValuePair("q", query.getText()));
-
-    if (query.getStates() != null) {
-      for (QueryTerm stateQueryTerm : query.getStates()) {
-        String value = stateQueryTerm.isInclude() ? stateQueryTerm.getValue() : "-" + stateQueryTerm.getValue();
-        queryStringParams.add(new BasicNameValuePair("state", value));
-      }
-    }
-
-    if (query.getCurrentOperations() != null) {
-      for (QueryTerm opQueryTerm : query.getCurrentOperations()) {
-        String value = opQueryTerm.isInclude() ? opQueryTerm.getValue() : "-" + opQueryTerm.getValue();
-        queryStringParams.add(new BasicNameValuePair("op", value));
-      }
-    }
-
-    if (query.getSeriesId() != null)
-      queryStringParams.add(new BasicNameValuePair("seriesId", query.getSeriesId()));
-
-    if (query.getSeriesTitle() != null)
-      queryStringParams.add(new BasicNameValuePair("seriesTitle", query.getSeriesTitle()));
-
-    if (query.getMediaPackageId() != null)
-      queryStringParams.add(new BasicNameValuePair("mp", query.getMediaPackageId()));
-
-    if (query.getWorkflowDefinitionId() != null)
-      queryStringParams.add(new BasicNameValuePair("workflowdefinition", query.getWorkflowDefinitionId()));
-
-    if (query.getFromDate() != null)
-      queryStringParams.add(new BasicNameValuePair("fromdate", SolrUtils.serializeDate(query.getFromDate())));
-
-    if (query.getToDate() != null)
-      queryStringParams.add(new BasicNameValuePair("todate", SolrUtils.serializeDate(query.getToDate())));
-
-    if (query.getCreator() != null)
-      queryStringParams.add(new BasicNameValuePair("creator", query.getCreator()));
-
-    if (query.getContributor() != null)
-      queryStringParams.add(new BasicNameValuePair("contributor", query.getContributor()));
-
-    if (query.getLanguage() != null)
-      queryStringParams.add(new BasicNameValuePair("language", query.getLanguage()));
-
-    if (query.getLicense() != null)
-      queryStringParams.add(new BasicNameValuePair("license", query.getLicense()));
-
-    if (query.getTitle() != null)
-      queryStringParams.add(new BasicNameValuePair("title", query.getTitle()));
-
-    if (query.getSubject() != null)
-      queryStringParams.add(new BasicNameValuePair("subject", query.getSubject()));
-
-    if (query.getSort() != null) {
-      String sort = query.getSort().toString();
-      if (!query.isSortAscending()) {
-        sort += "_DESC";
-      }
-      queryStringParams.add(new BasicNameValuePair("sort", sort));
-    }
-
-    if (query.getStartPage() > 0)
-      queryStringParams.add(new BasicNameValuePair("startPage", Long.toString(query.getStartPage())));
-
-    if (query.getCount() > 0)
-      queryStringParams.add(new BasicNameValuePair("count", Long.toString(query.getCount())));
-
-    StringBuilder url = new StringBuilder();
-    url.append("/instances.xml");
-    if (queryStringParams.size() > 0)
-      url.append("?").append(URLEncodedUtils.format(queryStringParams, "UTF-8"));
-
-    HttpGet get = new HttpGet(url.toString());
-    HttpResponse response = getResponse(get);
-    try {
-      if (response != null)
-        return XmlWorkflowParser.parseWorkflowSet(response.getEntity().getContent());
-    } catch (Exception e) {
-      throw new WorkflowDatabaseException(e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new WorkflowDatabaseException("Workflow instances can not be loaded from a remote workflow service");
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstancesForAdministrativeRead(org.opencastproject.workflow.api.WorkflowQuery)
-   */
-  @Override
-  public WorkflowSet getWorkflowInstancesForAdministrativeRead(WorkflowQuery q) throws WorkflowDatabaseException {
-    return getWorkflowInstances(q);
-  }
-
   @Override
   public List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId)
           throws WorkflowDatabaseException {
@@ -329,26 +219,6 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
       closeConnection(response);
     }
     throw new WorkflowDatabaseException("Workflow instances can not be loaded from a remote workflow service");
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowService#getStatistics()
-   */
-  @Override
-  public WorkflowStatistics getStatistics() throws WorkflowDatabaseException {
-    HttpGet get = new HttpGet("/statistics.xml");
-    HttpResponse response = getResponse(get);
-    try {
-      if (response != null)
-        return XmlWorkflowParser.parseWorkflowStatistics(response.getEntity().getContent());
-    } catch (Exception e) {
-      throw new WorkflowDatabaseException("Unable to load workflow statistics", e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new WorkflowDatabaseException("Unable to connect to a remote workflow service");
   }
 
   /**
@@ -451,22 +321,19 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
    */
   @Override
   public long countWorkflowInstances() throws WorkflowDatabaseException {
-    return countWorkflowInstances(null, null);
+    return countWorkflowInstances(null);
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowService#countWorkflowInstances(org.opencastproject.workflow.api.WorkflowInstance.WorkflowState,
-   *      java.lang.String)
+   * @see org.opencastproject.workflow.api.WorkflowService#countWorkflowInstances(org.opencastproject.workflow.api.WorkflowInstance.WorkflowState)
    */
   @Override
-  public long countWorkflowInstances(WorkflowState state, String operation) throws WorkflowDatabaseException {
+  public long countWorkflowInstances(WorkflowState state) throws WorkflowDatabaseException {
     List<NameValuePair> queryStringParams = new ArrayList<>();
     if (state != null)
       queryStringParams.add(new BasicNameValuePair("state", state.toString()));
-    if (operation != null)
-      queryStringParams.add(new BasicNameValuePair("operation", operation));
 
     StringBuilder url = new StringBuilder("/count");
     if (queryStringParams.size() > 0) {

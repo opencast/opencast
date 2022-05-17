@@ -28,7 +28,6 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
-import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
@@ -46,7 +45,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.LocalHashMap;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
@@ -62,15 +60,10 @@ import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
-import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowParsingException;
-import org.opencastproject.workflow.api.WorkflowQuery;
-import org.opencastproject.workflow.api.WorkflowQuery.Sort;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowSetImpl;
 import org.opencastproject.workflow.api.WorkflowStateException;
-import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
@@ -89,7 +82,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -215,33 +207,17 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.TEXT_PLAIN)
   @Path("/count")
-  @RestQuery(name = "count", description = "Returns the number of workflow instances in a specific state and operation", returnDescription = "Returns the number of workflow instances in a specific state and operation", restParameters = {
-          @RestParameter(name = "state", isRequired = false, description = "The workflow state", type = STRING),
-          @RestParameter(name = "operation", isRequired = false, description = "The current operation", type = STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "The number of workflow instances.") })
+  @RestQuery(name = "count", description = "Returns the number of workflow instances in a specific state", returnDescription = "Returns the number of workflow instances in a specific state", restParameters = {
+          @RestParameter(name = "state", isRequired = false, description = "The workflow state", type = STRING)},
+          responses = { @RestResponse(responseCode = SC_OK, description = "The number of workflow instances.") })
   public Response getCount(@QueryParam("state") WorkflowInstance.WorkflowState state,
           @QueryParam("operation") String operation) {
     try {
-      Long count = service.countWorkflowInstances(state, operation);
+      Long count = service.countWorkflowInstances(state);
       return Response.ok(count).build();
     } catch (WorkflowDatabaseException e) {
       throw new WebApplicationException(e);
     }
-  }
-
-  @GET
-  @Produces(MediaType.TEXT_XML)
-  @Path("/statistics.xml")
-  @RestQuery(name = "statisticsasxml", description = "Returns the workflow statistics as XML", returnDescription = "An XML representation of the workflow statistics.", responses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the workflow statistics.") })
-  public WorkflowStatistics getStatisticsAsXml() throws WorkflowDatabaseException {
-    return service.getStatistics();
-  }
-
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("/statistics.json")
-  @RestQuery(name = "statisticsasjson", description = "Returns the workflow statistics as JSON", returnDescription = "A JSON representation of the workflow statistics.", responses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the workflow statistics.") })
-  public WorkflowStatistics getStatisticsAsJson() throws WorkflowDatabaseException {
-    return getStatisticsAsXml();
   }
 
   @GET
@@ -339,7 +315,8 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   public Response getWorkflowsOfMediaPackage(@PathParam("id") String mediaPackageId) {
     try {
       return Response.ok(new WorkflowSetImpl(service.getWorkflowInstancesByMediaPackage(mediaPackageId))).build();
-
+    } catch (UnauthorizedException e) {
+      return Response.status(Status.FORBIDDEN).build();
     } catch (WorkflowDatabaseException e) {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
@@ -352,220 +329,22 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           returnDescription = "Returns the currentworkflow that are associated with the media package as JSON.",
           pathParameters = {
                   @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING) },
-        responses = {
+          responses = {
                   @RestResponse(responseCode = SC_OK, description = "Returns the workflows for a media package."),
                   @RestResponse(responseCode = SC_NOT_FOUND, description = "Current workflow not found.") })
   public Response getRunningWorkflowOfMediaPackage(@PathParam("id") String mediaPackageId) {
     try {
       Optional<WorkflowInstance> optWorkflowInstance = service.
-        getRunningWorkflowInstanceByMediaPackage(mediaPackageId, Permissions.Action.READ.toString());
+              getRunningWorkflowInstanceByMediaPackage(mediaPackageId, Permissions.Action.READ.toString());
       if (optWorkflowInstance.isPresent()) {
         return Response.ok(new JaxbWorkflowInstance(optWorkflowInstance.get())).build();
       } else {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
 
-    } catch (UnauthorizedException | WorkflowException e) {
+    } catch (WorkflowException | UnauthorizedException e) {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
-  }
-
-  @GET
-  @Produces(MediaType.TEXT_XML)
-  @Path("instances.xml")
-  @RestQuery(name = "workflowsasxml", description = "List all workflow instances matching the query parameters", returnDescription = "An XML representation of the set of workflows matching these query parameters", restParameters = {
-          @RestParameter(name = "state", isRequired = false, description = "Filter results by workflows' current state", type = STRING),
-          @RestParameter(name = "q", isRequired = false, description = "Filter results by free text query", type = STRING),
-          @RestParameter(name = "seriesId", isRequired = false, description = "Filter results by series identifier", type = STRING),
-          @RestParameter(name = "seriesTitle", isRequired = false, description = "Filter results by series title", type = STRING),
-          @RestParameter(name = "creator", isRequired = false, description = "Filter results by the mediapackage's creator", type = STRING),
-          @RestParameter(name = "contributor", isRequired = false, description = "Filter results by the mediapackage's contributor", type = STRING),
-          @RestParameter(name = "fromdate", isRequired = false, description = "Filter results by workflow start date.", type = STRING),
-          @RestParameter(name = "todate", isRequired = false, description = "Filter results by workflow start date.", type = STRING),
-          @RestParameter(name = "language", isRequired = false, description = "Filter results by mediapackage's language.", type = STRING),
-          @RestParameter(name = "license", isRequired = false, description = "Filter results by mediapackage's license.", type = STRING),
-          @RestParameter(name = "title", isRequired = false, description = "Filter results by mediapackage's title.", type = STRING),
-          @RestParameter(name = "subject", isRequired = false, description = "Filter results by mediapackage's subject.", type = STRING),
-          @RestParameter(name = "workflowdefinition", isRequired = false, description = "Filter results by workflow definition.", type = STRING),
-          @RestParameter(name = "mp", isRequired = false, description = "Filter results by mediapackage identifier.", type = STRING),
-          @RestParameter(name = "op", isRequired = false, description = "Filter results by workflows' current operation.", type = STRING),
-          @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
-                  + "of the following: DATE_CREATED, TITLE, SERIES_TITLE, SERIES_ID, MEDIA_PACKAGE_ID, WORKFLOW_DEFINITION_ID, CREATOR, "
-                  + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = STRING),
-          @RestParameter(name = "startPage", isRequired = false, description = "The paging offset", type = INTEGER),
-          @RestParameter(name = "count", isRequired = false, description = "The number of results to return.", type = INTEGER),
-          @RestParameter(name = "compact", isRequired = false, description = "Whether to return a compact version of "
-                  + "the workflow instance, with mediapackage elements, workflow and workflow operation configurations and "
-                  + "non-current operations removed.", type = STRING)},
-      responses = {
-          @RestResponse(responseCode = SC_OK, description = "An XML representation of the workflow set."),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Invalid data was provided in the request.") })
-// CHECKSTYLE:OFF
-  // The number of method parameters is too large for checkstyle's taste, but we need to handle many potential query
-  // parameters. CXF provides a bean approach to accepting many parameters, but it is not part of the JAX-RS spec.
-  // So for now, we disable checkstyle here.
-  public Response getWorkflowsAsXml(@QueryParam("state") List<String> states, @QueryParam("q") String text,
-          @QueryParam("seriesId") String seriesId, @QueryParam("seriesTitle") String seriesTitle,
-          @QueryParam("creator") String creator, @QueryParam("contributor") String contributor,
-          @QueryParam("fromdate") String fromDate, @QueryParam("todate") String toDate,
-          @QueryParam("language") String language, @QueryParam("license") String license,
-          @QueryParam("title") String title, @QueryParam("subject") String subject,
-          @QueryParam("workflowdefinition") String workflowDefinitionId, @QueryParam("mp") String mediapackageId,
-          @QueryParam("op") List<String> currentOperations, @QueryParam("sort") String sort,
-          @QueryParam("startPage") int startPage, @QueryParam("count") int count, @QueryParam("compact") boolean compact)
-          throws Exception {
-    // CHECKSTYLE:ON
-    if (count < 1)
-      count = DEFAULT_LIMIT;
-
-    WorkflowQuery q = new WorkflowQuery();
-    q.withCount(count);
-    q.withStartPage(startPage);
-    if (states != null && states.size() > 0) {
-      try {
-        for (String state : states) {
-          if (StringUtils.isBlank(state)) {
-            continue;
-          }
-          if (state.startsWith(NEGATE_PREFIX)) {
-            q.withoutState(WorkflowState.valueOf(state.substring(1).toUpperCase()));
-          } else {
-            q.withState(WorkflowState.valueOf(state.toUpperCase()));
-          }
-        }
-      } catch (IllegalArgumentException e) {
-        logger.debug("Unknown workflow state.", e);
-      }
-    }
-
-    q.withText(text);
-    q.withSeriesId(seriesId);
-    q.withSeriesTitle(seriesTitle);
-    q.withSubject(subject);
-    q.withMediaPackage(mediapackageId);
-    q.withCreator(creator);
-    q.withContributor(contributor);
-    try {
-      q.withDateAfter(SolrUtils.parseDate(fromDate));
-      q.withDateBefore(SolrUtils.parseDate(toDate));
-    } catch (ParseException e) {
-      return Response
-          .status(Status.BAD_REQUEST)
-          .entity("Invalid date format")
-          .build();
-    }
-    q.withLanguage(language);
-    q.withLicense(license);
-    q.withTitle(title);
-    q.withWorkflowDefintion(workflowDefinitionId);
-
-    if (currentOperations != null && currentOperations.size() > 0) {
-      for (String op : currentOperations) {
-        if (StringUtils.isBlank(op)) {
-          continue;
-        }
-        if (op.startsWith(NEGATE_PREFIX)) {
-          q.withoutCurrentOperation(op.substring(1));
-        } else {
-          q.withCurrentOperation(op);
-        }
-      }
-    }
-
-    if (StringUtils.isNotBlank(sort)) {
-      // Parse the sort field and direction
-      Sort sortField = null;
-      if (sort.endsWith(DESCENDING_SUFFIX)) {
-        String enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
-        try {
-          sortField = Sort.valueOf(enumKey);
-          q.withSort(sortField, false);
-        } catch (IllegalArgumentException e) {
-          logger.debug("No sort enum matches '{}'", enumKey);
-        }
-      } else {
-        try {
-          sortField = Sort.valueOf(sort);
-          q.withSort(sortField);
-        } catch (IllegalArgumentException e) {
-          logger.debug("No sort enum matches '{}'", sort);
-        }
-      }
-    }
-
-    WorkflowSet set = service.getWorkflowInstances(q);
-
-    // Marshalling of a full workflow takes a long time. Therefore, we strip everything that's not needed.
-    if (compact) {
-      for (WorkflowInstance instance : set.getItems()) {
-
-        // Remove all operations but the current one
-        WorkflowOperationInstance currentOperation = instance.getCurrentOperation();
-        List<WorkflowOperationInstance> operations = instance.getOperations();
-        operations.clear(); // instance.getOperations() is a copy
-        if (currentOperation != null) {
-          for (String key : currentOperation.getConfigurationKeys()) {
-            currentOperation.removeConfiguration(key);
-          }
-          operations.add(currentOperation);
-        }
-        instance.setOperations(operations);
-
-        // Remove all mediapackage elements (but keep the duration)
-        MediaPackage mediaPackage = instance.getMediaPackage();
-        Long duration = instance.getMediaPackage().getDuration();
-        for (MediaPackageElement element : mediaPackage.elements()) {
-          mediaPackage.remove(element);
-        }
-        mediaPackage.setDuration(duration);
-      }
-    }
-
-    return Response.ok(set).build();
-  }
-
-  // CHECKSTYLE:OFF (The number of method parameters is large because we need to handle many potential query parameters)
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("instances.json")
-  @RestQuery(name = "workflowsasjson", description = "List all workflow instances matching the query parameters", returnDescription = "A JSON representation of the set of workflows matching these query parameters", restParameters = {
-          @RestParameter(name = "state", isRequired = false, description = "Filter results by workflows' current state", type = STRING),
-          @RestParameter(name = "q", isRequired = false, description = "Filter results by free text query", type = STRING),
-          @RestParameter(name = "seriesId", isRequired = false, description = "Filter results by series identifier", type = STRING),
-          @RestParameter(name = "seriesTitle", isRequired = false, description = "Filter results by series title", type = STRING),
-          @RestParameter(name = "creator", isRequired = false, description = "Filter results by the mediapackage's creator", type = STRING),
-          @RestParameter(name = "contributor", isRequired = false, description = "Filter results by the mediapackage's contributor", type = STRING),
-          @RestParameter(name = "fromdate", isRequired = false, description = "Filter results by workflow start date.", type = STRING),
-          @RestParameter(name = "todate", isRequired = false, description = "Filter results by workflow start date.", type = STRING),
-          @RestParameter(name = "language", isRequired = false, description = "Filter results by mediapackage's language.", type = STRING),
-          @RestParameter(name = "license", isRequired = false, description = "Filter results by mediapackage's license.", type = STRING),
-          @RestParameter(name = "title", isRequired = false, description = "Filter results by mediapackage's title.", type = STRING),
-          @RestParameter(name = "subject", isRequired = false, description = "Filter results by mediapackage's subject.", type = STRING),
-          @RestParameter(name = "workflowdefinition", isRequired = false, description = "Filter results by workflow definition.", type = STRING),
-          @RestParameter(name = "mp", isRequired = false, description = "Filter results by mediapackage identifier.", type = STRING),
-          @RestParameter(name = "op", isRequired = false, description = "Filter results by workflows' current operation.", type = STRING),
-          @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
-                  + "of the following: DATE_CREATED, TITLE, SERIES_TITLE, SERIES_ID, MEDIA_PACKAGE_ID, WORKFLOW_DEFINITION_ID, CREATOR, "
-                  + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = STRING),
-          @RestParameter(name = "startPage", isRequired = false, description = "The paging offset", type = INTEGER),
-          @RestParameter(name = "count", isRequired = false, description = "The number of results to return.", type = INTEGER),
-          @RestParameter(name = "compact", isRequired = false, description = "Whether to return a compact version of "
-                  + "the workflow instance, with mediapackage elements, workflow and workflow operation configurations and "
-                  + "non-current operations removed.", type = STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the workflow set.") })
-  public Response getWorkflowsAsJson(@QueryParam("state") List<String> states, @QueryParam("q") String text,
-          @QueryParam("seriesId") String seriesId, @QueryParam("seriesTitle") String seriesTitle,
-          @QueryParam("creator") String creator, @QueryParam("contributor") String contributor,
-          @QueryParam("fromdate") String fromDate, @QueryParam("todate") String toDate,
-          @QueryParam("language") String language, @QueryParam("license") String license,
-          @QueryParam("title") String title, @QueryParam("subject") String subject,
-          @QueryParam("workflowdefinition") String workflowDefinitionId, @QueryParam("mp") String mediapackageId,
-          @QueryParam("op") List<String> currentOperations, @QueryParam("sort") String sort,
-          @QueryParam("startPage") int startPage, @QueryParam("count") int count, @QueryParam("compact") boolean compact)
-          throws Exception {
-    // CHECKSTYLE:ON
-    return getWorkflowsAsXml(states, text, seriesId, seriesTitle, creator, contributor, fromDate, toDate, language,
-            license, title, subject, workflowDefinitionId, mediapackageId, currentOperations, sort, startPage, count,
-            compact);
   }
 
   @GET

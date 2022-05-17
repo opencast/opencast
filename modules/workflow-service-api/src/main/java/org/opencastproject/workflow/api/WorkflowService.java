@@ -88,31 +88,6 @@ public interface WorkflowService {
           UnauthorizedException;
 
   /**
-   * Finds workflow instances based on the specified query.
-   *
-   * @param query
-   *          The query parameters
-   * @return The {@link List<WorkflowInstance>} containing the workflow instances matching the query parameters
-   * @throws WorkflowDatabaseException
-   *           if there is a problem accessing the workflow instances from persistence
-   */
-  WorkflowSet getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException;
-
-  /**
-   * Finds workflow instances based on the specified query for administrative access.
-   *
-   * @param q
-   *          The query parameters
-   * @return The {@link List<WorkflowInstance>} containing the workflow instances matching the query parameters
-   * @throws WorkflowDatabaseException
-   *           if there is a problem accessing the workflow instances from persistence
-   * @throws UnauthorizedException
-   *           if the user does not own an administrative role
-   */
-  WorkflowSet getWorkflowInstancesForAdministrativeRead(WorkflowQuery q) throws WorkflowDatabaseException,
-          UnauthorizedException;
-
-  /**
    * Creates a new workflow instance and starts the workflow.
    *
    * @param workflowDefinition
@@ -178,27 +153,16 @@ public interface WorkflowService {
   long countWorkflowInstances() throws WorkflowDatabaseException;
 
   /**
-   * Gets the total number of workflows that have been created to date and that match all of the specified criterias
-   * such as the workflow state or the current operation, both of which might be <code>null</code>.
+   * Gets the total number of workflows that have been created to date and that match the workflow state
+   * which might be <code>null</code>.
    *
    * @param state
    *          the workflow state
-   * @param operation
-   *          the current operation identifier
    * @return The number of workflow instances, regardless of their state
    * @throws WorkflowDatabaseException
    *           if there is a problem accessing the workflow instances in persistence
    */
-  long countWorkflowInstances(WorkflowState state, String operation) throws WorkflowDatabaseException;
-
-  /**
-   * Returns the statistics for the workflow service.
-   *
-   * @return workflow service statistics
-   * @throws WorkflowDatabaseException
-   *           if there is a problem accessing the workflow instances in persistence
-   */
-  WorkflowStatistics getStatistics() throws WorkflowDatabaseException;
+  long countWorkflowInstances(WorkflowState state) throws WorkflowDatabaseException;
 
   /**
    * Stops a running workflow instance.
@@ -345,26 +309,26 @@ public interface WorkflowService {
   Map<String, Map<String, String>> getWorkflowStateMappings();
 
   /**
-   * Returns if a workflow is active on a given event.
+   * Checks if there is at least one workflow currently running on the given mediapackage
    *
    * @param mediaPackageId
-   *          Media package identifier to look for.
-   * @return If a workflow is active on the given event.
+   *          the identifier of the mediapackage
+   * @return Whether there is a workflow active on the mediapackage
    * @throws WorkflowDatabaseException
-   *          If the data could not be retrieved from the database.
    */
   boolean mediaPackageHasActiveWorkflows(String mediaPackageId) throws WorkflowDatabaseException;
 
   /**
-   * Return a list of all workflows run on a specific media package.
+   * Returns all workflows associated with the given mediapackage
+   * Current user needs permission to the mediapackage
    *
    * @param mediaPackageId
-   *          Media package identifier to look for.
-   * @return List of run workflows.
+   *          the identifier of the mediapackage
+   * @return a {@Link List} of {@Link WorkflowInstance}
    * @throws WorkflowDatabaseException
-   *          If the data could not be retrieved from the database.
    */
-  List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId) throws WorkflowDatabaseException;
+  List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId)
+          throws WorkflowDatabaseException, UnauthorizedException;
 
   /**
    * Returns the {@link WorkflowInstance} currently running on the given mediaPackage

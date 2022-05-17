@@ -57,11 +57,6 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-solr</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-kernel</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -192,7 +187,6 @@
               org.opencastproject.workflow.api;version=${project.version},
               org.opencastproject.rest;version=${project.version},
               org.opencastproject.mediapackage;version=${project.version},
-              org.opencastproject.message.broker.api.index;version=${project.version},
               org.opencastproject.workspace.api;version=${project.version},
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,

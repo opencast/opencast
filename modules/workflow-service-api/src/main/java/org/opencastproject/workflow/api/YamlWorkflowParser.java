@@ -151,25 +151,6 @@ public final class YamlWorkflowParser {
   }
 
   /**
-   * Loads workflow statistics from the given input stream.
-   *
-   * @param in
-   *          the input stream
-   * @return the workflow statistics
-   * @throws WorkflowParsingException
-   *           if creating the workflow statistics fails
-   */
-  public static WorkflowStatistics parseWorkflowStatistics(InputStream in) throws WorkflowParsingException {
-    try {
-      return mapper.readValue(in, WorkflowStatistics.class);
-    } catch (Exception e) {
-      throw new WorkflowParsingException(e);
-    } finally {
-      IoSupport.closeQuietly(in);
-    }
-  }
-
-  /**
    * Loads a set of workflow instances from the given input stream.
    *
    * @param in

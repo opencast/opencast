@@ -51,7 +51,6 @@ public class ConductingSeriesUpdatedEventHandler implements SeriesUpdateHandler 
 
   private AssetManagerUpdatedEventHandler assetManagerUpdatedEventHandler;
   private SeriesUpdatedEventHandler seriesUpdatedEventHandler;
-  private WorkflowPermissionsUpdatedEventHandler workflowPermissionsUpdatedEventHandler;
 
 
   @Activate
@@ -73,7 +72,6 @@ public class ConductingSeriesUpdatedEventHandler implements SeriesUpdateHandler 
                  || SeriesItem.Type.Delete.equals(seriesItem.getType())) {
       seriesUpdatedEventHandler.handleEvent(seriesItem);
       assetManagerUpdatedEventHandler.handleEvent(seriesItem);
-      workflowPermissionsUpdatedEventHandler.handleEvent(seriesItem);
     }
   }
 
@@ -87,11 +85,5 @@ public class ConductingSeriesUpdatedEventHandler implements SeriesUpdateHandler 
   @Reference
   public void setSeriesUpdatedEventHandler(SeriesUpdatedEventHandler h) {
     this.seriesUpdatedEventHandler = h;
-  }
-
-  /** OSGi DI callback. */
-  @Reference
-  public void setWorkflowPermissionsUpdatedEventHandler(WorkflowPermissionsUpdatedEventHandler h) {
-    this.workflowPermissionsUpdatedEventHandler = h;
   }
 }

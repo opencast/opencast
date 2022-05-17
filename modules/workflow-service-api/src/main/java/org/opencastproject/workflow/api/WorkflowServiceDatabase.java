@@ -23,6 +23,7 @@ package org.opencastproject.workflow.api;
 
 import org.opencastproject.util.NotFoundException;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -45,20 +46,7 @@ public interface WorkflowServiceDatabase {
   WorkflowInstance getWorkflow(long workflowId) throws NotFoundException, WorkflowDatabaseException;
 
   /**
-   * Gets all workflow instances.
-   * Unlike other queries this one does NOT care about the current organization, but will really return ALL workflow
-   * instances.
-   * Warning: Potentially very resource intensive. Only used for populating Solr index.
-   *
-   * @return list of all {@link WorkflowInstance}s
-   * @throws WorkflowDatabaseException
-   *           if there is a problem communicating with the underlying data store
-   */
-  List<WorkflowInstance> getAllWorkflowInstancesOrganizationIndependent() throws WorkflowDatabaseException;
-
-  /**
-   * Gets all workflow instances.
-   * Warning: Potentially very resource intensive. Only used for populating Solr index.
+   * Gets workflow instances for current organization.
    *
    * @param limit
    *          max number of workflows to be returned
@@ -71,10 +59,30 @@ public interface WorkflowServiceDatabase {
   List<WorkflowInstance> getWorkflowInstances(int limit, int offset) throws WorkflowDatabaseException;
 
   /**
+   * Gets all workflow instances previous to the specified date
+   *
+   * @param state Only returns workflows currently in the given state
+   * @param dateCreated Only returns workflows created prior to the given date
+   * @return list of the {@link WorkflowInstance}s
+   * @throws WorkflowDatabaseException
+   */
+  List<WorkflowInstance> getWorkflowInstancesForCleanup(WorkflowInstance.WorkflowState state, Date dateCreated)
+          throws WorkflowDatabaseException;
+
+  /**
+   * Gets the amount of workflow instances.
+   *
+   * @param state Only counts workflows currently in the given state
+   * @return Amount of workflow instances
+   * @throws WorkflowDatabaseException
+   */
+  long countWorkflows(WorkflowInstance.WorkflowState state) throws WorkflowDatabaseException;
+
+  /**
    * Gets all workflow instances for a mediapackage.
    *
    * @param mediaPackageId
-   *          the mediapackage id
+   *          the media package id
    * @return list of all {@link WorkflowInstance}s for the given mediapackage id
    * @throws WorkflowDatabaseException
    *           if there is a problem communicating with the underlying data store
@@ -93,10 +101,10 @@ public interface WorkflowServiceDatabase {
   List<WorkflowInstance> getRunningWorkflowInstancesByMediaPackage(String mediaPackageId) throws WorkflowDatabaseException;
 
   /**
-   * Returns true if the mediapackage with the given identifier currently has a workflow running on it.
+   * Returns true if the media package with the given identifier currently has a workflow running on it.
    *
    * @param mediaPackageId
-   *          the mediapackage identifier
+   *          the media package identifier
    * @return true, if a workflow is running; false otherwise
    * @throws WorkflowDatabaseException
    *           if there is a problem communicating with the underlying data store

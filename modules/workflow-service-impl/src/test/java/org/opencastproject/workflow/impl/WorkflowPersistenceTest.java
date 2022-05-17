@@ -21,7 +21,6 @@
 
 package org.opencastproject.workflow.impl;
 
-import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.security.api.DefaultOrganization;
@@ -36,8 +35,6 @@ import org.opencastproject.workflow.api.WorkflowServiceDatabaseImpl;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.List;
 
 /**
  * Tests persistence: storing, retrieving and removing.
@@ -80,16 +77,5 @@ public class WorkflowPersistenceTest {
   public void testDeleting() throws Exception {
     workflowDatabase.updateInDatabase(workflowInstance1);
     workflowDatabase.removeFromDatabase(workflowInstance1);
-  }
-
-  @Test
-  public void testRetrieving() throws Exception {
-    workflowDatabase.updateInDatabase(workflowInstance1);
-
-    List workflows = workflowDatabase.getAllWorkflowInstancesOrganizationIndependent();
-    assertTrue("Exactly one workflow should be returned", workflows.size() == 1);
-    workflowDatabase.removeFromDatabase(workflowInstance1);
-    workflows = workflowDatabase.getAllWorkflowInstancesOrganizationIndependent();
-    assertTrue("Exactly zero workflows should be returned", workflows.isEmpty());
   }
 }

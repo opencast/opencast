@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -120,24 +121,6 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
   /**
    * {@inheritDoc}
    *
-   * @see WorkflowServiceDatabase#getAllWorkflowInstancesOrganizationIndependent()
-   */
-  public List<WorkflowInstance> getAllWorkflowInstancesOrganizationIndependent() throws WorkflowDatabaseException {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      return em.createNamedQuery("Workflow.findAllOrganizationIndependent", WorkflowInstance.class).getResultList();
-    } catch (Exception e) {
-      throw new WorkflowDatabaseException("Error fetching workflows from database", e);
-    } finally {
-      if (em != null)
-        em.close();
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see WorkflowServiceDatabase#getWorkflowInstances(int limit, int offset)
    */
   public List<WorkflowInstance> getWorkflowInstances(int limit, int offset) throws WorkflowDatabaseException {
@@ -155,7 +138,59 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       logger.debug("Requesting workflows using query: {}", query);
       return query.getResultList();
     } catch (Exception e) {
+      throw new WorkflowDatabaseException("Error fetching workflows from database", e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see WorkflowServiceDatabase#getWorkflowInstancesForCleanup(WorkflowInstance.WorkflowState state, Date dateCreated)
+   */
+  public List<WorkflowInstance> getWorkflowInstancesForCleanup(WorkflowInstance.WorkflowState state, Date dateCreated)
+          throws WorkflowDatabaseException {
+
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      var query = em.createNamedQuery("Workflow.toCleanup", WorkflowInstance.class);
+
+      String orgId = securityService.getOrganization().getId();
+      query.setParameter("organizationId", orgId);
+      query.setParameter("state", state);
+      query.setParameter("dateCreated", dateCreated);
+
+      return query.getResultList();
+    } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see WorkflowServiceDatabase#countWorkflows(WorkflowInstance.WorkflowState state)
+   */
+  public long countWorkflows(WorkflowInstance.WorkflowState state) throws WorkflowDatabaseException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+
+      var query = em.createNamedQuery("Workflow.getCount", Long.class);
+
+      String orgId = securityService.getOrganization().getId();
+      query.setParameter("organizationId", orgId);
+      query.setParameter("state", state);
+
+      return query.getSingleResult();
+    } catch (Exception e) {
+      throw new WorkflowDatabaseException("Could not find number of workflows.", e);
     } finally {
       if (em != null)
         em.close();

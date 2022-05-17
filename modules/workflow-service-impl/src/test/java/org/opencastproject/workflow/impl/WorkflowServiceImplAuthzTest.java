@@ -23,7 +23,6 @@ package org.opencastproject.workflow.impl;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createNiceMock;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
@@ -62,14 +61,11 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -95,16 +91,9 @@ public class WorkflowServiceImplAuthzTest {
 
   private WorkflowServiceImpl service = null;
   private WorkflowDefinitionScanner scanner = null;
-  private WorkflowServiceSolrIndex dao = null;
   private Workspace workspace = null;
   private ServiceRegistryInMemoryImpl serviceRegistry = null;
   private SecurityService securityService = null;
-
-  private File sRoot = null;
-
-  protected static final String getStorageRoot() {
-    return "." + File.separator + "target" + File.separator + System.currentTimeMillis();
-  }
 
   private static class Responder<A> implements IAnswer<A> {
     private A response;
@@ -245,18 +234,6 @@ public class WorkflowServiceImplAuthzTest {
     service.setPersistence(workflowDb);
 
     // Search Index
-    sRoot = new File(getStorageRoot());
-    FileUtils.forceMkdir(sRoot);
-    dao = new WorkflowServiceSolrIndex();
-    dao.setServiceRegistry(serviceRegistry);
-    dao.setAuthorizationService(authzService);
-    dao.setSecurityService(securityService);
-    dao.setOrgDirectory(organizationDirectoryService);
-    dao.solrRoot = sRoot + File.separator + "solr." + System.currentTimeMillis();
-    dao.setPersistence(workflowDb);
-    dao.activate("System Admin");
-    service.setDao(dao);
-
     SearchResult result = EasyMock.createNiceMock(SearchResult.class);
 
     final ElasticsearchIndex index = EasyMock.createNiceMock(ElasticsearchIndex.class);
@@ -268,13 +245,6 @@ public class WorkflowServiceImplAuthzTest {
 
     // Activate
     service.activate(null);
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    serviceRegistry.deactivate();
-    dao.deactivate();
-    service.deactivate();
   }
 
   @Test
@@ -293,7 +263,6 @@ public class WorkflowServiceImplAuthzTest {
             .andReturn(true).anyTimes();
     EasyMock.replay(authzService);
     service.setAuthorizationService(authzService);
-    dao.setAuthorizationService(authzService);
 
     // Create the workflow and its dependent object graph
     WorkflowDefinitionImpl def = new WorkflowDefinitionImpl();
@@ -308,7 +277,6 @@ public class WorkflowServiceImplAuthzTest {
     // Ensure that this instructor can access the workflow
     try {
       service.getWorkflowById(workflow.getId());
-      assertEquals(1, service.countWorkflowInstances());
     } catch (Exception e) {
       fail(e.getMessage());
     }
@@ -317,7 +285,6 @@ public class WorkflowServiceImplAuthzTest {
     userResponder.setResponse(DEFAULT_ORG_ADMIN);
     try {
       service.getWorkflowById(workflow.getId());
-      assertEquals(1, service.countWorkflowInstances());
     } catch (Exception e) {
       fail(e.getMessage());
     }
@@ -326,7 +293,6 @@ public class WorkflowServiceImplAuthzTest {
     userResponder.setResponse(globalAdmin);
     try {
       service.getWorkflowById(workflow.getId());
-      assertEquals(1, service.countWorkflowInstances());
     } catch (Exception e) {
       fail(e.getMessage());
     }
@@ -336,7 +302,6 @@ public class WorkflowServiceImplAuthzTest {
     userResponder.setResponse(instructor2);
     try {
       service.getWorkflowById(workflow.getId());
-      assertEquals(1, service.countWorkflowInstances());
     } catch (Exception e) {
       fail(e.getMessage());
     }
@@ -352,7 +317,6 @@ public class WorkflowServiceImplAuthzTest {
     } catch (Exception e) {
       // expected
     }
-    assertEquals(0, service.countWorkflowInstances());
   }
 
   @Test
@@ -365,7 +329,6 @@ public class WorkflowServiceImplAuthzTest {
             .andReturn(false).anyTimes();
     EasyMock.replay(authzService);
     service.setAuthorizationService(authzService);
-    dao.setAuthorizationService(authzService);
 
     // Create the workflow and its dependent object graph
     WorkflowDefinitionImpl def = new WorkflowDefinitionImpl();
@@ -380,7 +343,6 @@ public class WorkflowServiceImplAuthzTest {
     // Ensure that this instructor can access the workflow
     try {
       service.getWorkflowById(workflow.getId());
-      assertEquals(1, service.countWorkflowInstances());
     } catch (Exception e) {
       fail(e.getMessage());
     }
@@ -389,7 +351,6 @@ public class WorkflowServiceImplAuthzTest {
     userResponder.setResponse(DEFAULT_ORG_ADMIN);
     try {
       service.getWorkflowById(workflow.getId());
-      assertEquals(1, service.countWorkflowInstances());
     } catch (Exception e) {
       fail(e.getMessage());
     }
@@ -398,7 +359,6 @@ public class WorkflowServiceImplAuthzTest {
     userResponder.setResponse(globalAdmin);
     try {
       service.getWorkflowById(workflow.getId());
-      assertEquals(1, service.countWorkflowInstances());
     } catch (Exception e) {
       fail(e.getMessage());
     }
@@ -411,7 +371,6 @@ public class WorkflowServiceImplAuthzTest {
     } catch (UnauthorizedException e) {
       // expected
     }
-    assertEquals(0, service.countWorkflowInstances());
 
     // Ensure the instructor from a different org can not see the workflow, even though they share a role
     organizationResponder.setResponse(otherOrganization);
@@ -422,7 +381,6 @@ public class WorkflowServiceImplAuthzTest {
     } catch (Exception e) {
       // expected
     }
-    assertEquals(0, service.countWorkflowInstances());
   }
 
 }

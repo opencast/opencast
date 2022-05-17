@@ -7,4 +7,3 @@ WorkflowOperationDefinitionImpl
 WorkflowOperationResultImpl
 WorkflowSetImpl
 WorkflowStateMappingImpl
-WorkflowStatistics

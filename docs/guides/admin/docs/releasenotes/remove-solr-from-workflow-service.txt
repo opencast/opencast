@@ -1,0 +1,12 @@
+Improvements
+------------
+
+- The Workflow Service does not require a Solr Index anymore, simplifying the installation of Opencast.
+
+API Changes
+-----------
+
+- The `tasks.json` endpoint has been removed from the admin interface job endpoint
+- An endpoint to check for active workflows on a mediapackage has been added to the workflow service
+- The endpoint to search through workflows has been removed from the workflow service
+- Important: The endpoint for querying workflows has been removed from the External API
