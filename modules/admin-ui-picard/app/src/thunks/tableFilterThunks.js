@@ -10,6 +10,7 @@ import {relativeDateSpanToFilterValue} from "../utils/dateUtils";
 import {logger} from "../utils/logger";
 import { setOffset } from '../actions/tableActions';
 import { fetchEvents } from './eventThunks';
+import { fetchServices } from './serviceThunks';
 /**
 * This file contains methods/thunks used to query the REST-API of Opencast to get the filters of a certain resource type.
 * This information is used to filter the entries of the table in the main view.
@@ -116,6 +117,22 @@ export const setSpecificEventFilter = (filter, filterValue) => async (dispatch, 
 
     dispatch(fetchEvents());
 
+}
+
+export const setSpecificServiceFilter = (filter, filterValue) => async (dispatch, getState) => {
+    await dispatch(fetchFilters("services"));
+
+    const { tableFilters } = getState();
+
+    let filterToChange = tableFilters.data.find(({ name }) => name === filter);
+
+    if (!!filterToChange) {
+        await dispatch(editFilterValue(filterToChange.name, filterValue));
+    }
+
+    dispatch(setOffset(0));
+
+    dispatch(fetchServices());
 }
 
 // Transform received filter.json to a structure that can be used for filtering

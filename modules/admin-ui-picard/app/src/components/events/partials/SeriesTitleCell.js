@@ -2,7 +2,6 @@ import React from "react";
 import {useTranslation} from "react-i18next";
 import {connect} from "react-redux";
 import { loadEventsIntoTable } from '../../../thunks/tableThunks';
-import { editTextFilter } from '../../../actions/tableFilterActions';
 import { setSpecificEventFilter } from '../../../thunks/tableFilterThunks';
 import Link  from 'react-router-dom/Link';
 

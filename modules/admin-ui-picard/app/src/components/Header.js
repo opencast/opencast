@@ -12,13 +12,12 @@ import {logger} from "../utils/logger";
 import {getOrgProperties, getUserInformation} from "../selectors/userInfoSelectors";
 import axios from "axios";
 import RegistrationModal from "./shared/RegistrationModal";
-import {setOffset} from "../actions/tableActions";
 import { loadServicesIntoTable} from "../thunks/tableThunks";
-import {fetchServices} from "../thunks/serviceThunks";
 import {studioURL} from "../configs/generalConfig";
 import HotKeyCheatSheet from "./shared/HotKeyCheatSheet";
 import {GlobalHotKeys} from "react-hotkeys";
 import {availableHotkeys} from "../configs/hotkeysConfig";
+import { setSpecificServiceFilter } from '../thunks/tableFilterThunks';
 
 
 // Get code, flag and name of the current language
@@ -52,8 +51,8 @@ function logout() {
 /**
  * Component that renders the header and the navigation in the upper right corner.
  */
-const Header = ({ loadingHealthStatus, healthStatus, errorCounter, user, orgProperties, resetOffset,
-    loadingServices, loadingServicesIntoTable }) => {
+const Header = ({ loadingHealthStatus, healthStatus, errorCounter, user, orgProperties,
+    setSpecificServiceFilter, loadingServicesIntoTable }) => {
     const { t } = useTranslation();
     // State for opening (true) and closing (false) the dropdown menus for language, notification, help and user
     const [displayMenuLang, setMenuLang] = useState(false);
@@ -79,12 +78,9 @@ const Header = ({ loadingHealthStatus, healthStatus, errorCounter, user, orgProp
         setRegistrationModal(false);
     }
 
-    const redirectToServices = () => {
-        // Reset the current page to first page
-        resetOffset();
-
-        // Fetching services from server
-        loadingServices();
+    const redirectToServices = async () => {
+        // set the action filter value of services to true
+        setSpecificServiceFilter('actions', 'true');
 
         // Load services into table
         loadingServicesIntoTable();
@@ -370,9 +366,8 @@ const mapStateToProps = state => ({
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadingHealthStatus: () => dispatch(fetchHealthStatus()),
-    resetOffset: () => dispatch(setOffset(0)),
-    loadingServices: () => dispatch(fetchServices()),
-    loadingServicesIntoTable: () => dispatch(loadServicesIntoTable())
+    loadingServicesIntoTable: () => dispatch(loadServicesIntoTable()),
+    setSpecificServiceFilter: (filter, filterValue) => dispatch(setSpecificServiceFilter(filter, filterValue))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);
