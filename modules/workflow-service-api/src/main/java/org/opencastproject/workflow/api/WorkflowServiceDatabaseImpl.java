@@ -172,7 +172,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
     }
   }
 
-  /**
+    /**
    * {@inheritDoc}
    *
    * @see WorkflowServiceDatabase#countWorkflows(WorkflowInstance.WorkflowState state)
@@ -191,6 +191,56 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       return query.getSingleResult();
     } catch (Exception e) {
       throw new WorkflowDatabaseException("Could not find number of workflows.", e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see WorkflowServiceDatabase#getLatestWorkflowInstances(int limit, long token)
+   */
+  public List<WorkflowInstance> getLatestWorkflowInstances(int limit, long token) throws WorkflowDatabaseException {
+
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+
+      var query = em.createNamedQuery("Workflow.findLatest", WorkflowInstance.class);
+
+      String orgId = securityService.getOrganization().getId();
+      query.setParameter("organizationId", orgId);
+      query.setParameter("startToken", token);
+      query.setMaxResults(limit);
+      logger.debug("Requesting latest workflows using query: {}", query);
+      return query.getResultList();
+    } catch (Exception e) {
+      throw new WorkflowDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+    /**
+   * {@inheritDoc}
+   *
+   * @see WorkflowServiceDatabase#countMediaPackages()
+   */
+  public int countMediaPackages() throws WorkflowDatabaseException {
+
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+
+      var query = em.createNamedQuery("Workflow.countLatest", Long.class);
+      logger.debug("Counting latest workflows using query: {}", query);
+      final Number countResult = query.getSingleResult();
+      return countResult.intValue();
+    } catch (Exception e) {
+      throw new WorkflowDatabaseException(e);
     } finally {
       if (em != null)
         em.close();
