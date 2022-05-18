@@ -968,6 +968,11 @@ public class SeriesEndpoint {
       return badRequest();
     }
 
+    if (!accessControlList.isValid()) {
+      logger.debug("POST api/series/{}/access: Invalid series ACL detected", seriesId);
+      return badRequest();
+    }
+
     Optional<Series> series = searchIndex.getSeries(seriesId, securityService.getOrganization().getId(), securityService.getUser());
     if (series.isEmpty())
       return notFound("Cannot find a series with id {}", seriesId);

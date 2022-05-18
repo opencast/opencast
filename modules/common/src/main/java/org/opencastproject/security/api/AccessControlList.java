@@ -68,6 +68,10 @@ public final class AccessControlList {
     return entries;
   }
 
+  public boolean isValid() {
+    return entries.stream().allMatch(AccessControlEntry::isValid);
+  }
+
   /**
    * {@inheritDoc}
    *
