@@ -4,6 +4,32 @@ Changelog
 Opencast 11
 ----------
 
+### Opencast 11.7
+
+*Released on May 18th, 2022*
+
+- [[#3716](https://github.com/opencast/opencast/pull/3716)] -
+  Add missing tags in encode WOH
+- [[#3715](https://github.com/opencast/opencast/pull/3715)] -
+  Unbreak the metadata editor included with the video editor and save events as
+  well as the video editor state when save is pressed
+- [[#3708](https://github.com/opencast/opencast/pull/3708)] -
+  partial-publish workflow fix
+- [[#3707](https://github.com/opencast/opencast/pull/3707)] -
+  Out of video image extraction should not fail
+- [[#3688](https://github.com/opencast/opencast/pull/3688)] -
+  Add release notes and changelog for OC 11.6
+- [[#3682](https://github.com/opencast/opencast/pull/3682)] -
+  Make creation of default External API group configurable
+- [[#3680](https://github.com/opencast/opencast/pull/3680)] -
+  Acl null-checks for `/api/series/{seriesId}/acl` endpoint
+- [[#3679](https://github.com/opencast/opencast/pull/3679)] -
+  Don't store invalid ACLs submitted to api-endpoint
+- [[#3661](https://github.com/opencast/opencast/pull/3661)] -
+  Check if user can be loaded before starting the workflow
+- [[#3635](https://github.com/opencast/opencast/pull/3635)] -
+  Fix bug with adding a series when a deleted one still lingers
+
 ### Opencast 11.6
 
 *Released on April 20th, 2022*
