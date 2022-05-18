@@ -106,9 +106,7 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
         }
         if (startDateTouched && endDateTouched) {
             let filter = filterMap.find(({ name }) => name === selectedFilter);
-            // Todo: better way to save the period
-            // Todo: maybe need action for this
-            editFilterValue(filter.name, startDate.toDateString());
+            editFilterValue(filter.name, startDate.toISOString() + '/' + endDate.toISOString());
             setFilterSelector(false);
             removeSelectedFilter();
         }
@@ -214,9 +212,9 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
                                                             (
                                                                 <span>
                                                                     <span>
-                                                                        {/*todo: format date range*/}
                                                                         {t(filter.label).substr(0, 40)}:
-                                                                        {t('dateFormats.date.short', {date: new Date(filter.value)})}
+                                                                        {t('dateFormats.date.short', {date: new Date(filter.value.split('/')[0])})}-
+                                                                        {t('dateFormats.date.short', {date: new Date(filter.value.split('/')[1])})}
                                                                     </span>
                                                                 </span>
                                                             ) : null
