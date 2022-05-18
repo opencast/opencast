@@ -19,6 +19,8 @@ Opencast 11
   Out of video image extraction should not fail
 - [[#3688](https://github.com/opencast/opencast/pull/3688)] -
   Add release notes and changelog for OC 11.6
+- [[#3682](https://github.com/opencast/opencast/pull/3682)] -
+  Make creation of default External API group configurable
 - [[#3680](https://github.com/opencast/opencast/pull/3680)] -
   Acl null-checks for `/api/series/{seriesId}/acl` endpoint
 - [[#3679](https://github.com/opencast/opencast/pull/3679)] -

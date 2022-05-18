@@ -104,6 +104,8 @@ Additional Notes about 11.7
       (cf. [[#3661](https://github.com/opencast/opencast/pull/3661)]).
     - The metadata in the video editor can now be saved individually
       (cf. [[#3715](https://github.com/opencast/opencast/pull/3715)]).
+    - Make creation of default external API group configurable
+      (cf. [[#3682](https://github.com/opencast/opencast/pull/3682)]).
 
 Additional Notes about 11.6
 ---------------------------
