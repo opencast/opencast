@@ -11,6 +11,8 @@ const childRef = React.createRef();
  * This component renders an editable field for single values depending on the type of the corresponding metadata
  */
 const RenderField = ({ field, metadataField, form, showCheck=false, isFirstField=false }) => {
+    const { t } = useTranslation();
+
     // Indicator if currently edit mode is activated
     const [editMode, setEditMode] = useClickOutsideField(childRef, isFirstField);
 
@@ -25,6 +27,26 @@ const RenderField = ({ field, metadataField, form, showCheck=false, isFirstField
         }
     };
 
+    // checks, if a String is proper JSON
+    const isJson = text => {
+        try {
+            const json = JSON.parse(text);
+            const type = Object.prototype.toString.call(json);
+            return type === '[object Object]' || type === '[object Array]';
+        } catch (e) {
+            return false;
+        }
+    }
+
+    const getCollectionFieldName = metadataField => {
+        try {
+            const collectionField = metadataField.collection.find(element => element.value === field.value);
+            return collectionField.name;
+        } catch (e) {
+            return '';
+        }
+    }
+
     return (
         // Render editable field depending on type of metadata field
         // (types: see metadata.json retrieved from backend)
@@ -37,8 +59,21 @@ const RenderField = ({ field, metadataField, form, showCheck=false, isFirstField
                                          form={form}
                                          showCheck={showCheck}/>
             )}
-            {((metadataField.type === "text" && !!metadataField.collection && metadataField.collection.length !== 0) ||
-                metadataField.type === "ordered_text") ? (
+            {(metadataField.type === "text" && !!metadataField.collection && metadataField.collection.length > 0) &&
+                <EditableSingleSelect metadataField={metadataField}
+                                      field={field}
+                                      form={form}
+                                      text={
+                                        isJson(getCollectionFieldName(metadataField)) ?
+                                            (t(JSON.parse(getCollectionFieldName(metadataField)).label)) :
+                                            (t(getCollectionFieldName(metadataField)))
+                                      }
+                                      editMode={editMode}
+                                      setEditMode={setEditMode}
+                                      showCheck={showCheck}
+                                      handleKeyDown={handleKeyDown}/>
+            }
+            {(metadataField.type === "ordered_text") && (
                 <EditableSingleSelect metadataField={metadataField}
                                       field={field}
                                       form={form}
@@ -47,7 +82,8 @@ const RenderField = ({ field, metadataField, form, showCheck=false, isFirstField
                                       setEditMode={setEditMode}
                                       showCheck={showCheck}
                                       handleKeyDown={handleKeyDown}/>
-            ) : (metadataField.type === "text" && (
+            )}
+            {(metadataField.type === "text" && !(!!metadataField.collection && metadataField.collection.length !== 0)) && (
                 <EditableSingleValue field={field}
                                      form={form}
                                      text={field.value}
@@ -56,7 +92,7 @@ const RenderField = ({ field, metadataField, form, showCheck=false, isFirstField
                                      isFirst={isFirstField}
                                      showCheck={showCheck}
                                      handleKeyDown={handleKeyDown}/>
-            ))}
+            )}
             {metadataField.type === "text_long" && (
                 <EditableSingleValueTextArea field={field}
                                              text={field.value}
@@ -187,7 +223,7 @@ const EditableSingleSelect = ({ field, metadataField, text, editMode, setEditMod
             ) : (
              <div onClick={() => setEditMode(true)}>
                  <span className="editable preserve-newlines">
-                     {text || t('SELECT_NO_OPTION_SELECTED')}
+                     { text || t('SELECT_NO_OPTION_SELECTED')}
                  </span>
                  <i className="edit fa fa-pencil-square"/>
                  {showCheck && (
