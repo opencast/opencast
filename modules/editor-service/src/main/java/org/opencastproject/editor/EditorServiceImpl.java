@@ -718,7 +718,7 @@ public class EditorServiceImpl implements EditorService {
       return new TrackData(track.getFlavor().getType(), track.getFlavor().getSubtype(), audio, video, uri,
                         track.getIdentifier());
     }).collect(Collectors.toList());
-    
+
     List<String> waveformList = Arrays.stream(internalPub.getAttachments())
             .filter(this::elementHasWaveformFlavor)
             .map(Attachment::getURI).map(this::signIfNecessary)
