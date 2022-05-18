@@ -45,9 +45,11 @@ public final class EditingData {
   private final SeriesData series;
   @SerializedName(WORKFLOW_ACTIVE)
   private final Boolean workflowActive;
+  private final List<String> waveformURIs;
 
   public EditingData(List<SegmentData> segments, List<TrackData> tracks, List<WorkflowData> workflows, Long duration,
-          String title, String recordingStartDate, String seriesId, String seriesName, Boolean workflowActive) {
+          String title, String recordingStartDate, String seriesId, String seriesName, Boolean workflowActive,
+          List<String> waveformURIs) {
     this.segments = segments;
     this.tracks = tracks;
     this.workflows = workflows;
@@ -56,6 +58,7 @@ public final class EditingData {
     this.date = recordingStartDate;
     this.series = new SeriesData(seriesId, seriesName);
     this.workflowActive = workflowActive;
+    this.waveformURIs = waveformURIs;
   }
 
   public static EditingData parse(String json) {
