@@ -78,6 +78,33 @@ API changes
 - [[#3002](https://github.com/opencast/opencast/pull/3002)] - Sign publication URL of events in External API
 - [[#3148](https://github.com/opencast/opencast/pull/3148)] - Allow empty track duration
 
+Additional Notes about 11.7
+---------------------------
+
+- Security fixes:
+    - This release fixes the issue that users can pass URLs from other tenants to the ingest service which will check
+      only against the other organization but not against the one currently active. This allows users to easily ingest
+      media from other tenants (cf.
+      [[GHSA-qm6v-cg9v-53j3](https://github.com/opencast/opencast/security/advisories/GHSA-qm6v-cg9v-53j3)]).
+- Bug fixes:
+    - Series only being marked as deleted without actually being removed
+      (cf. [[#3635](https://github.com/opencast/opencast/pull/3635)]).
+    - Invalid ACLs submitted to api-endpoint being stored
+      (cf. [[#3679](https://github.com/opencast/opencast/pull/3679)]).
+    - Possible race condition when updating ACLs of newly created series
+      (cf. [[#3680](https://github.com/opencast/opencast/pull/3680)]).
+    - Failing video image extraction when the video track is shorter than the audio track
+      (cf. [[#3707](https://github.com/opencast/opencast/pull/3707)]).
+    - Fallback tracks not being used in the `partial-publish` workflow
+      (cf. [[#3708](https://github.com/opencast/opencast/pull/3708)]).
+    - Missing tags when encoding multiple qualities with the encode WOH
+      (cf. [[#3639](https://github.com/opencast/opencast/pull/3639)]).
+- New features and updates:
+    - Check if user can be loaded before starting a workflow
+      (cf. [[#3661](https://github.com/opencast/opencast/pull/3661)]).
+    - The metadata in the video editor can now be saved individually
+      (cf. [[#3715](https://github.com/opencast/opencast/pull/3715)]).
+
 Additional Notes about 11.6
 ---------------------------
 
