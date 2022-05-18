@@ -4,6 +4,14 @@
 Opencast 12 is not yet released!
 </div>
 
+
+Major Changes, New Features, …
+------------------------------
+
+<div class=warn>
+Go through patches and look at notes in `releasenotes` folder.
+</div>
+
 Release Schedule
 ----------------
 
