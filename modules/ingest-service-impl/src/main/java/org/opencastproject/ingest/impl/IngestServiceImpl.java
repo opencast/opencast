@@ -129,7 +129,6 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -137,7 +136,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import javax.management.ObjectInstance;
 
@@ -1568,16 +1566,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     try {
       if (uri.toString().startsWith("http")) {
         HttpGet get = new HttpGet(uri);
-        List<String> clusterUrls = new LinkedList<>();
-        try {
-          // Note that we are not checking ports here.
-          clusterUrls = organizationDirectoryService.getOrganization(uri.toURL()).getServers()
-                          .keySet()
-                          .stream()
-                          .collect(Collectors.toUnmodifiableList());
-        } catch (NotFoundException e) {
-          logger.warn("Unable to determine cluster members, will not be able to authenticate any downloads from them", e);
-        }
+        var clusterUrls = securityService.getOrganization().getServers().keySet();
 
         if (uri.toString().matches(downloadSource)) {
           //NB: We're creating a new client here with *different* auth than the system auth creds
