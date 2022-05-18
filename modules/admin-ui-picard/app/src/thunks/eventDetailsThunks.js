@@ -131,12 +131,14 @@ export const fetchMetadata = (eventId) => async (dispatch) => {
             if(catalog.locked !== undefined){
                 let fields = [];
 
-                for(const field in catalog.fields) {
-                    fields.push({
+                for(const field of catalog.fields) {
+                    const adaptedField = {
                         ...field,
                         locked: catalog.locked,
                         readOnly: true
-                    })
+                    };
+
+                    fields.push(adaptedField)
                 }
                 transformedCatalog = {
                     ...catalog,
