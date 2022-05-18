@@ -216,7 +216,7 @@ public class ComposerServiceTest {
     // Create and populate the composer service
     composerService = new ComposerServiceImpl() {
       @Override
-      protected List<Track> inspect(Job job, List<URI> uris) throws EncoderException {
+      protected List<Track> inspect(Job job, List<URI> uris, List<List<String>> tags) throws EncoderException {
         final var result = new ArrayList<Track>(uris.size());
         for (URI uri: uris) {
           result.add(inspectedTrack);
