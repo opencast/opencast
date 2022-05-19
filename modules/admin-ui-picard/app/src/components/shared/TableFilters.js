@@ -25,10 +25,9 @@ import {GlobalHotKeys} from "react-hotkeys";
 /**
  * This component renders the table filters in the upper right corner of the table
  */
-const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, secondFilter,
-                          onChangeTextFilter, removeTextFilter, editSelectedFilter, removeSelectedFilter,
-                          removeSecondFilter, resetFilterMap, editFilterValue,
-                          loadResource, loadResourceIntoTable, resource }) => {
+const TableFilters = ({filterMap, textFilter, selectedFilter, secondFilter, onChangeTextFilter,
+    removeTextFilter, editSelectedFilter, removeSelectedFilter, removeSecondFilter, resetFilterMap,
+    editFilterValue, loadResource, loadResourceIntoTable, resource }) => {
     const { t } = useTranslation();
 
     // Variables for showing different dialogs depending on what was clicked
@@ -38,8 +37,6 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
     // Variables containing selected start date and end date for date filter
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date());
-    const [startDateTouched, setStartDateTouched] = useState(false);
-    const [endDateTouched, setEndDateTouched] = useState(false);
 
     // Remove all selected filters, no filter should be "active" anymore
     const removeFilters = async () => {
@@ -94,17 +91,15 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
     }
 
     // Set the sate of startDate and endDate picked with datepicker
-    // Todo: not working correctly: you need to pick the second date twice before the value of the filter is set
-    // todo: get rid of bug described before
-    const handleDatepickerChange = (date, isStart) => {
+    const handleDatepickerChange = (date, isStart=false) => {
         if (isStart) {
             setStartDate(date);
-            setStartDateTouched(true);
         } else {
             setEndDate(date);
-            setEndDateTouched(true);
         }
-        if (startDateTouched && endDateTouched) {
+
+        // When both dates set, then set the value for this filter
+        if (!isStart) {
             let filter = filterMap.find(({ name }) => name === selectedFilter);
             editFilterValue(filter.name, startDate.toISOString() + '/' + endDate.toISOString());
             setFilterSelector(false);
@@ -353,7 +348,7 @@ const FilterSwitch = ({filterMap, selectedFilter, handleChange, startDate, endDa
                             value={endDate}
                             disableToolbar
                             format="dd/MM/yyyy"
-                            onChange={(date) => handleDate(date, false)}
+                            onChange={(date) => handleDate(date)}
                         />
                     </MuiPickersUtilsProvider>
                 </div>
@@ -377,7 +372,6 @@ const mapDispatchToProps = dispatch => ({
     removeSelectedFilter: () => dispatch(removeSelectedFilter()),
     editSecondFilter: filter => dispatch(editSecondFilter(filter)),
     removeSecondFilter: () => dispatch(removeSecondFilter()),
-    loadingFilters: resource => dispatch(fetchFilters(resource)),
     resetFilterMap: () => dispatch(resetFilterValues()),
     editFilterValue: (filterName, value) => dispatch(editFilterValue(filterName, value))
 });
