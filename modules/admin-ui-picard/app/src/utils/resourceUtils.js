@@ -219,6 +219,16 @@ export const prepareSeriesMetadataFieldsForPost = (metadataInfo, values) => {
     return metadataFields;
 }
 
+// returns the name for a field value from the collection
+export const getMetadataCollectionFieldName = (metadataField, field) => {
+    try {
+        const collectionField = metadataField.collection.find(element => element.value === field.value);
+        return collectionField.name;
+    } catch (e) {
+        return '';
+    }
+}
+
 // Prepare rules of access policies for post of new events or series
 export const prepareAccessPolicyRulesForPost = policies => {
 

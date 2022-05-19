@@ -7,8 +7,9 @@ import RenderMultiField from "../../../shared/wizard/RenderMultiField";
 import RenderField from "../../../shared/wizard/RenderField";
 import {connect} from "react-redux";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
-import {hasAccess} from "../../../../utils/utils";
+import {hasAccess, isJson} from "../../../../utils/utils";
 import {useTranslation} from "react-i18next";
+import {getMetadataCollectionFieldName} from "../../../../utils/resourceUtils";
 
 /**
  * This component renders metadata details of a certain event or series
@@ -81,7 +82,15 @@ const DetailsExtendedMetadataTab = ({ resourceId, editAccessRole, metadata, upda
                                                     {(field.readOnly || !hasAccess(editAccessRole, user)) ? (
 
                                                         // non-editable field if readOnly is set or user doesn't have edit access rights
-                                                        <td>{field.value}</td>
+                                                        (!!field.collection && field.collection.length !== 0) ? (
+                                                            <td>
+                                                                {isJson(getMetadataCollectionFieldName(field, field)) ?
+                                                                    (t(JSON.parse(getMetadataCollectionFieldName(field, field)).label)) :
+                                                                    (t(getMetadataCollectionFieldName(field, field)))}
+                                                            </td>
+                                                        ) : (
+                                                            <td>{field.value}</td>
+                                                        )
                                                     ) : (
                                                         <td className="editable ng-isolated-scope">
                                                             {/* Render single value or multi value editable input */}

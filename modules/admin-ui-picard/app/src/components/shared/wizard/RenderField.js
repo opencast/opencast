@@ -4,6 +4,8 @@ import {DateTimePicker} from "@material-ui/pickers";
 import {createMuiTheme, ThemeProvider} from "@material-ui/core";
 import cn from "classnames";
 import {useClickOutsideField} from "../../../hooks/wizardHooks";
+import {isJson} from "../../../utils/utils";
+import {getMetadataCollectionFieldName} from "../../../utils/resourceUtils";
 
 
 const childRef = React.createRef();
@@ -27,26 +29,6 @@ const RenderField = ({ field, metadataField, form, showCheck=false, isFirstField
         }
     };
 
-    // checks, if a String is proper JSON
-    const isJson = text => {
-        try {
-            const json = JSON.parse(text);
-            const type = Object.prototype.toString.call(json);
-            return type === '[object Object]' || type === '[object Array]';
-        } catch (e) {
-            return false;
-        }
-    }
-
-    const getCollectionFieldName = metadataField => {
-        try {
-            const collectionField = metadataField.collection.find(element => element.value === field.value);
-            return collectionField.name;
-        } catch (e) {
-            return '';
-        }
-    }
-
     return (
         // Render editable field depending on type of metadata field
         // (types: see metadata.json retrieved from backend)
@@ -64,9 +46,9 @@ const RenderField = ({ field, metadataField, form, showCheck=false, isFirstField
                                       field={field}
                                       form={form}
                                       text={
-                                        isJson(getCollectionFieldName(metadataField)) ?
-                                            (t(JSON.parse(getCollectionFieldName(metadataField)).label)) :
-                                            (t(getCollectionFieldName(metadataField)))
+                                        isJson(getMetadataCollectionFieldName(metadataField, field)) ?
+                                            (t(JSON.parse(getMetadataCollectionFieldName(metadataField, field)).label)) :
+                                            (t(getMetadataCollectionFieldName(metadataField, field)))
                                       }
                                       editMode={editMode}
                                       setEditMode={setEditMode}

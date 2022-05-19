@@ -125,3 +125,14 @@ export const hasAccess = (role, userInfo) =>  {
 
     return !!(userInfo.isAdmin || userInfo.roles.includes(role));
 }
+
+// checks, if a String is proper JSON
+export const isJson = text => {
+    try {
+        const json = JSON.parse(text);
+        const type = Object.prototype.toString.call(json);
+        return type === '[object Object]' || type === '[object Array]';
+    } catch (e) {
+        return false;
+    }
+}
