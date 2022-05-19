@@ -18,7 +18,7 @@
  * the License.
  *
  */
-import { DataPlugin, Events, bindEvent, Paella } from 'paella-core';
+import { DataPlugin, Events, bindEvent } from 'paella-core';
 
 export default class OpencastMatomoTrackingDataPlugin extends DataPlugin {
 
@@ -72,7 +72,7 @@ export default class OpencastMatomoTrackingDataPlugin extends DataPlugin {
     if (heartbeat && heartbeat > 0) this.player.matomotracker.enableHeartBeatTimer(heartbeat);
     if (Matomo && Matomo.MediaAnalytics) {
       bindEvent(this.player,
-        Events.PLAYER_LOADED,
+        Events.STREAM_LOADED,
         () => {
           Matomo.MediaAnalytics.scanForMedia();
         });
@@ -82,72 +82,52 @@ export default class OpencastMatomoTrackingDataPlugin extends DataPlugin {
 
   async write(context, { id }, data) {
     const currentTime = await this.player.videoContainer.currentTime();
-    const playing = !(await this.player.videoContainer.paused());
     this.player.log.debug(`Logging event for video id ${ id } at time: ${ currentTime }`);
-
-
-    const opencastLog = {
-      id,
-      type: data.event.substr(0,128),
-      in: Math.round(currentTime),
-      out: Math.round(currentTime),
-      playing
-    };
 
     switch (data.event) {
     case Events.PLAY:
-      this.player.matomotracker.trackEvent("Player.Controls", "Play", this.loadTitle());
+      this.player.matomotracker.trackEvent('Player.Controls', 'Play', this.loadTitle());
       break;
     case Events.PAUSE:
-      this.player.matomotracker.trackEvent("Player.Controls", "Pause", this.loadTitle());
+      this.player.matomotracker.trackEvent('Player.Controls', 'Pause', this.loadTitle());
       break;
     case Events.ENDED:
-      this.player.matomotracker.trackEvent("Player.Status", "Ended", this.loadTitle());
+      this.player.matomotracker.trackEvent('Player.Status', 'Ended', this.loadTitle());
       break;
     case (Events.FULLSCREEN_CHANGED):
       if (data.params.status == true){
-        this.player.matomotracker.trackEvent("Player.View", "Fullscreen", this.loadTitle());
+        this.player.matomotracker.trackEvent('Player.View', 'Fullscreen', this.loadTitle());
       } else {
-        this.player.matomotracker.trackEvent("Player.View", "ExitFullscreen", this.loadTitle());
+        this.player.matomotracker.trackEvent('Player.View', 'ExitFullscreen', this.loadTitle());
       }
       break;
     case Events.PLAYER_LOADED:
-      this.player.matomotracker.trackEvent("Player.Status", "LoadComplete", this.loadTitle());
+      this.player.matomotracker.trackEvent('Player.Status', 'LoadComplete', this.loadTitle());
       break;
     case Events.SHOW_POPUP:
-      this.player.matomotracker.trackEvent("Player.PopUp", "Show", data.params.plugin);
+      this.player.matomotracker.trackEvent('Player.PopUp', 'Show', data.params.plugin.name);
       break;
     case Events.HIDE_POPUP:
-      this.player.matomotracker.trackEvent("Player.PopUp", "Hide", data.params.plugin);
-      break;  
+      this.player.matomotracker.trackEvent('Player.PopUp', 'Hide', data.params.plugin.name);
+      break;
     case Events.SEEK:
-      this.player.matomotracker.trackEvent("Player.Controls", "Seek", Math.round(data.params.newTime));
+      this.player.matomotracker.trackEvent('Player.Controls', 'Seek', Math.round(data.params.newTime));
       break;
     case Events.VOLUME_CHANGED:
-      this.player.matomotracker.trackEvent("Player.Settings", "Volume", data.params.volume);
+      this.player.matomotracker.trackEvent('Player.Settings', 'Volume', data.params.volume);
       break;
     case Events.RESIZE_END:
-      this.player.matomotracker.trackEvent("Player.View", "Resize", `${ data.params.size.w }x${ data.params.size.h }`);
+      this.player.matomotracker.trackEvent('Player.View', 'Resize', `${ data.params.size.w }x${ data.params.size.h }`);
       break;
-    case Events.PLAYBACK_RATE_CHANGED:
-      this.player.matomotracker.trackEvent("Player.Controls", "PlaybackRate", data.params.newPlaybackRate);
+    case Events.CAPTIONS_CHANGED:
+      this.player.matomotracker.trackEvent('Player.Captions', 'Enabled', data);
       break;
-    
-    case Events.BUTTON_PRESS:
-      opencastLog.type += '-' + data.plugin;
-      break;
-    default:
-      opencastLog.type += params;
-    }
 
-    const params = (new URLSearchParams(opencastLog)).toString();
-    const requestUrl = `/usertracking/?_method=PUT&${ params }`;
-    const result = await fetch(requestUrl);
-    if (!result.ok) {
-      this.player.log.error('Error in user data log');
-    }
-    else {
-      this.player.log.debug(`Opencast Matomo user log event done: '${ opencastLog.type }'`);
+    // Bug: Playback rate can't be triggered
+    case Events.PLAYBACK_RATE_CHANGED:
+      this.player.log.info('Playbackrate changed!');
+      this.player.matomotracker.trackEvent('Player.Controls', 'PlaybackRate', data.params.newPlaybackRate);
+      break;
     }
   }
 
@@ -157,39 +137,41 @@ export default class OpencastMatomoTrackingDataPlugin extends DataPlugin {
         eventId,
         seriesTitle,
         seriesId,
-        presenter,
+        presenter;
 
-        opencastData = this.player.videoManifest.metadata;
+    opencastData = this.player.videoManifest.metadata;
 
-        if (opencastData.UID != undefined && opencastData.title != undefined){
-          title = opencastData.title;
-          eventId = opencastData.UID;
-          presenter = opencastData.presenters
-          this.player.matomotracker.setCustomVariable (5, "client",
-            (this.player.matomotracker.client_id || "Paella Opencast")); 
-          Matomo.MediaAnalytics.setMediaTitleFallback(function (mediaElement) {return title;});
-        }
-
-        if (opencastData != undefined){
-          seriesId = opencastData.series;
-          seriesTitle = opencastData.seriestitle
-        }
-
-        if (title) this.player.matomotracker.setCustomVariable(1, "event", title + " (" + eventId + ")");
-        if (seriesTitle) this.player.matomotracker.setCustomVariable(2, "series" + seriesTitle + " (" + seriesId + ")");
-        if (presenter) this.player.matomotracker.setCustomVariable(3, "presenter", presenter);
-        if (title && presenter){
-          this.player.matomotracker.setDocumentTitle(title + " - " + (presenter || "Unknown"));
-          this.player.matomotracker.trackPageView(title + " - " + (presenter || "Unknown"));
-        } else{
-          this.player.matomotracker.trackPageView();
-        };
+    if (opencastData.UID != undefined && opencastData.title != undefined){
+      title = opencastData.title;
+      eventId = opencastData.UID;
+      presenter = opencastData.presenters;
+      this.player.matomotracker.setCustomVariable (5, 'client',
+        (this.player.matomotracker.client_id || 'Paella Opencast'));
+      /* eslint-disable no-unused-vars */
+      Matomo.MediaAnalytics.setMediaTitleFallback(function (mediaElement) {return title;});
+      /* eslint-disable no-unused-vars */
     }
 
-    loadTitle() {
-      var title = this.player.videoManifest.metadata.title;
-      return title;
+    if (opencastData != undefined){
+      seriesId = opencastData.series;
+      seriesTitle = opencastData.seriestitle;
     }
+
+    if (title) this.player.matomotracker.setCustomVariable(1, 'event', title + ' (' + eventId + ')');
+    if (seriesTitle) this.player.matomotracker.setCustomVariable(2, 'series' + seriesTitle + ' (' + seriesId + ')');
+    if (presenter) this.player.matomotracker.setCustomVariable(3, 'presenter', presenter);
+    if (title && presenter){
+      this.player.matomotracker.setDocumentTitle(title + ' - ' + (presenter || 'Unknown'));
+      this.player.matomotracker.trackPageView(title + ' - ' + (presenter || 'Unknown'));
+    } else{
+      this.player.matomotracker.trackPageView();
+    }
+  }
+
+  loadTitle() {
+    var title = this.player.videoManifest.metadata.title;
+    return title;
+  }
 
 
 }

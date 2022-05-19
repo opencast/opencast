@@ -286,7 +286,7 @@
         },
 
         "org.opencast.paella.opencast.userTrackingDataPlugin" :{
-            "enabled": true,
+            "enabled": false,
             "context": [
                 "userTracking"
             ]
