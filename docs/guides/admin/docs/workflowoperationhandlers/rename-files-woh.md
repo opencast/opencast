@@ -34,6 +34,7 @@ You can use the following placeholders in your replacement pattern:
 - `#{flavor.type}`
 - `#{flavor.subtype}`
 - `#{video.width}`
+- `#{video.height}`
 - `#{episode...}`
 - `#{series...}`
 

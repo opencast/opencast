@@ -178,7 +178,19 @@ public class RenameFilesWorkflowOperationHandler extends AbstractWorkflowOperati
         .map(VideoStream::getFrameWidth)
         .map(Object::toString)
         .orElse("");
+    // Placeholder resolution width
     placeholders.put("#{video.width}", width);
+
+    var height = Arrays.stream(element.getStreams())
+            .filter(h -> h instanceof VideoStream)
+            .map(h -> (VideoStream) h)
+            .findFirst()
+            .map(VideoStream::getFrameHeight)
+            .map(Object::toString)
+            .orElse("");
+    //Placeholder resolution height
+    placeholders.put("#{video.height}", height);
+
 
     // file placeholders
     placeholders.put("#{file.extension}", FilenameUtils.getExtension(element.getURI().toString()));
