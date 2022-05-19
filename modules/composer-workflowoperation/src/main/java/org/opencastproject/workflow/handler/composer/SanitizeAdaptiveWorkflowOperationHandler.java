@@ -57,7 +57,7 @@ import java.util.TreeMap;
 import java.util.function.Function;
 
 /**
- * The <tt></tt> operation will make sure that media where hls playlists and video track come in separate files
+ * The <code></code> operation will make sure that media where hls playlists and video track come in separate files
  * will have appropriately references prior to further processing such as inspection.
  */
 public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOperationHandler {

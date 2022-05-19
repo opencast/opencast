@@ -219,6 +219,7 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo,
   private void tryUnregisterServlet() {
     if (serviceRegistration != null) {
       serviceRegistration.unregister();
+      serviceRegistration = null;
     }
   }
 

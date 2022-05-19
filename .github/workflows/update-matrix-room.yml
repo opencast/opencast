@@ -1,0 +1,27 @@
+on:
+  push:
+    tags:
+      - '*.*'
+
+name: Update Matrix Room Description
+jobs:
+  build:
+    name: Update Matrix Room
+    runs-on: ubuntu-latest
+    steps:
+      - name: update room description
+        env:
+          MATRIX_PASS: ${{ secrets.MATRIX_BOT_PASS }}
+          MATRIX_USER: ${{ secrets.MATRIX_BOT_USER }}
+          URL_LOGIN: 'https://matrix.org/_matrix/client/r0/login'
+          URL_LOGOUT: 'https://matrix.org/_matrix/client/r0/logout'
+          URL_TOPIC: 'https://matrix-client.matrix.org/_matrix/client/r0/rooms/!HBsLKoOIEEOkxAeQvC%3Amatrix.org/state/m.room.topic/'
+        run: |
+          TAGS="$(curl https://api.github.com/repos/opencast/opencast/releases | jq -r '.[].tag_name')"
+          MAJOR="$(echo "$TAGS" | sed 's/\..*$//' | sort -h | tail -n1)"
+          STABLE="$(echo "$TAGS" | sort -h | tail -n1)"
+          LEGACY="$(echo "$TAGS" | grep -v "^${MAJOR}" | sort -h | tail -n1)"
+          TOPIC='{"topic":"opencast.org\n–\nLatest releases: '"$STABLE, $LEGACY"'\n–\nJoin the technical meeting: Tuesday, 3:15 pm UTC at meet.opencast.video (p: welcome)"}'
+          TOKEN="$(curl -s -XPOST -d '{"type":"m.login.password", "user":"'"$MATRIX_USER"'", "password":"'"$MATRIX_PASS"'", "initial_device_display_name":"GitHub Actions"}' "$URL_LOGIN" | jq -r .access_token)"
+          curl -s -XPUT -d "${TOPIC}" "${URL_TOPIC}?access_token=${TOKEN}"
+          curl -s -XPOST "${URL_LOGOUT}?access_token=${TOKEN}"

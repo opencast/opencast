@@ -5,25 +5,6 @@
   <description>Cleanup after a processing failure</description>
   <operations>
 
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    <!-- Mark as failed                                                    -->
-    <!--                                                                   -->
-    <!-- Mark recording as failed,                               -->
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
-    <!-- Mark the recording for review -->
-
-    <operation
-      id="comment"
-      fail-on-error="false"
-      description="Mark the recording for review because of a failure">
-      <configurations>
-        <configuration key="description">Processing failed</configuration>
-        <configuration key="reason">EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.PROCESSING_FAILURE</configuration>
-        <configuration key="action">create</configuration>
-      </configurations>
-    </operation>
-
     <!-- Archive the current state of the media package -->
 
     <operation
@@ -32,6 +13,7 @@
       description="Preserve the current recording state">
       <configurations>
         <configuration key="source-flavors">*/source,dublincore/*,security/*</configuration>
+        <configuration key="source-tags">archive</configuration>
       </configurations>
     </operation>
 
@@ -42,12 +24,13 @@
       fail-on-error="false"
       description="Cleaning up">
       <configurations>
+        <!-- On systems with shared workspace or working file repository -->
+        <!-- you want to set this option to false. -->
         <configuration key="delete-external">true</configuration>
-        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
+        <!-- ACLs are required again when working through ActiveMQ messages -->
         <configuration key="preserve-flavors">security/*</configuration>
       </configurations>
     </operation>
 
   </operations>
-
 </definition>

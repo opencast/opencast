@@ -82,8 +82,11 @@ define(["backbone", "engage/core"], function(Backbone, Engage) {
                             if (mediaPackage.dcTitle) {
                                 model.attributes.title = mediaPackage.dcTitle;
                             }
-                            if (mediaPackage.dcCreator) {
-                                model.attributes.creator = mediaPackage.dcCreator;
+                            if (mediaPackage.mediapackage.creators) {
+                                model.attributes.creator = (Array.isArray(mediaPackage.mediapackage.creators.creator)
+                                    ? mediaPackage.mediapackage.creators.creator
+                                    : [mediaPackage.mediapackage.creators.creator])
+                                    .join(', ');
                             }
                             if (mediaPackage.dcCreated) {
                                 model.attributes.date = mediaPackage.dcCreated;

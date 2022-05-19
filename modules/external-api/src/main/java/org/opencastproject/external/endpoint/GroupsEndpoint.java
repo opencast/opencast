@@ -37,10 +37,10 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_6_0;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.common.ApiVersion;
-import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.security.api.SecurityService;
@@ -90,7 +90,7 @@ import javax.ws.rs.core.Response;
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
-            ApiMediaType.VERSION_1_6_0 })
+            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0 })
 @RestService(name = "externalapigroups", title = "External API Groups Service", notes = {}, abstractText = "Provides resources and operations related to the groups")
 public class GroupsEndpoint {
 
@@ -98,13 +98,13 @@ public class GroupsEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(GroupsEndpoint.class);
 
   /* OSGi service references */
-  private ExternalIndex externalIndex;
+  private ElasticsearchIndex elasticsearchIndex;
   private JpaGroupRoleProvider jpaGroupRoleProvider;
   private SecurityService securityService;
 
   /** OSGi DI */
-  void setExternalIndex(ExternalIndex externalIndex) {
-    this.externalIndex = externalIndex;
+  void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
+    this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /** OSGi DI. */

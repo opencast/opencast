@@ -30,9 +30,9 @@ import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntity
 
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentReply;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -58,7 +58,8 @@ public class EventCommentDatabaseImplTest {
   private static final User USER = new JaxbUser("wilfried.meyer", "matterhorn", new DefaultOrganization());
 
   private static final String EVENT_1_ID = "1";
-  private static final EventComment COMMENT_1 = EventComment.create(none(Long.class), EVENT_1_ID, ORGANIZATION.getId(), "test", USER);
+  private static final EventComment COMMENT_1
+      = EventComment.create(none(Long.class), EVENT_1_ID, ORGANIZATION.getId(), "test", USER);
 
   private EventCommentDatabaseServiceImpl persistence;
 
@@ -87,27 +88,18 @@ public class EventCommentDatabaseImplTest {
     EasyMock.expect(result.getItems()).andReturn(new SearchResultItem[]{ resultItem }).anyTimes();
     EasyMock.replay(result);
 
-    AbstractSearchIndex adminUiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
-    EasyMock.expect(adminUiIndex.getIndexName()).andReturn("adminui").anyTimes();
-    EasyMock.expect(adminUiIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
-    EasyMock.expect(adminUiIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
+    ElasticsearchIndex index = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    EasyMock.expect(index.getIndexName()).andReturn("adminui").anyTimes();
+    EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
+    EasyMock.expect(index.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
             EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.of(event)).atLeastOnce();
-    EasyMock.replay(adminUiIndex);
-
-    AbstractSearchIndex externalApiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
-    EasyMock.expect(externalApiIndex.getIndexName()).andReturn("externalapi").anyTimes();
-    EasyMock.expect(externalApiIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).
-            anyTimes();
-    EasyMock.expect(externalApiIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
-            EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.of(event)).atLeastOnce();
-    EasyMock.replay(externalApiIndex);
+    EasyMock.replay(index);
 
     persistence = new EventCommentDatabaseServiceImpl();
     persistence.setEntityManagerFactory(newTestEntityManagerFactory(PERSISTENCE_UNIT));
     persistence.setUserDirectoryService(userDirectoryService);
     persistence.setSecurityService(securityService);
-    persistence.setAdminUiIndex(adminUiIndex);
-    persistence.setExternalApiIndex(externalApiIndex);
+    persistence.setIndex(index);
     persistence.activate(null);
   }
 

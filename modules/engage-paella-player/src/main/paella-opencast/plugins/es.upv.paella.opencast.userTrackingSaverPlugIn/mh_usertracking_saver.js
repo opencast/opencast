@@ -23,7 +23,7 @@ paella.addPlugin(function() {
     getName() { return 'es.upv.paella.opencast.userTrackingSaverPlugIn'; }
 
     checkEnabled(onSuccess) {
-      paella.ajax.get({url:'/usertracking/detailenabled'},
+      paella.utils.ajax.get({url:'/usertracking/detailenabled'},
         function(data, contentType, returnCode) {
           if (data == 'true') {
             onSuccess(true);
@@ -47,7 +47,6 @@ paella.addPlugin(function() {
       })
       .then((paused) => {
         var opencastLog = {
-          _method: 'PUT',
           'id': paella.player.videoIdentifier,
           'type': undefined,
           'in': videoCurrentTime,
@@ -84,7 +83,7 @@ paella.addPlugin(function() {
           break;
         }
         opencastLog.type = opencastLog.type.substr(0, 128);
-        paella.ajax.get( {url: '/usertracking/', params: opencastLog});
+        paella.utils.ajax.put( {url: '/usertracking/', params: opencastLog});
       });
     }
   };

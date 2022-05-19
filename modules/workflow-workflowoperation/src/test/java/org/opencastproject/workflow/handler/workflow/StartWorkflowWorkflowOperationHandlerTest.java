@@ -88,6 +88,7 @@ public class StartWorkflowWorkflowOperationHandlerTest {
     operation.setConfiguration(WORKFLOW_DEFINITION, WD_ID);
     operation.setConfiguration("workflowConfigurations", "true");
     operation.setConfiguration("key", "value");
+    operation.setFailWorkflowOnException(true);
 
     workflowInstance = new WorkflowInstanceImpl();
     workflowInstance.setMediaPackage(MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());

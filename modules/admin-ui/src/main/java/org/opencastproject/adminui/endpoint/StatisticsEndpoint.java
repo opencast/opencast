@@ -27,10 +27,10 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.impl.ProviderQuery;
 import org.opencastproject.adminui.impl.RawProviderQuery;
-import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.series.Series;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
@@ -56,6 +56,8 @@ import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,6 +84,15 @@ import javax.ws.rs.core.Response;
     + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
     + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
     + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+        immediate = true,
+        service = StatisticsEndpoint.class,
+        property = {
+                "service.description=Admin UI - Statistics Endpoint",
+                "opencast.service.type=org.opencastproject.adminui.StatisticsEndpoint",
+                "opencast.service.path=/admin-ng/statistics",
+        }
+)
 public class StatisticsEndpoint {
 
   /** The logging facility */
@@ -91,26 +102,31 @@ public class StatisticsEndpoint {
 
   private SecurityService securityService;
   private IndexService indexService;
-  private AdminUISearchIndex searchIndex;
+  private ElasticsearchIndex searchIndex;
   private StatisticsService statisticsService;
   private StatisticsExportService statisticsExportService;
 
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
-  public void setSearchIndex(AdminUISearchIndex searchIndex) {
+  @Reference
+  public void setSearchIndex(ElasticsearchIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 
+  @Reference
   public void setStatisticsService(StatisticsService statisticsService) {
     this.statisticsService = statisticsService;
   }
 
+  @Reference
   public void setStatisticsExportService(StatisticsExportService statisticsExportService) {
     this.statisticsExportService = statisticsExportService;
   }

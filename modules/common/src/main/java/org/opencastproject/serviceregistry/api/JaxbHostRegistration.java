@@ -128,6 +128,11 @@ public class JaxbHostRegistration implements HostRegistration {
     this.maintenanceMode = hostRegistration.isMaintenanceMode();
   }
 
+  @Override
+  public Long getId() {
+    return (long) baseUrl.hashCode();
+  }
+
   /**
    * {@inheritDoc}
    *

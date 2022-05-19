@@ -72,9 +72,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
@@ -93,6 +94,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -105,6 +107,9 @@ public class IngestServiceImplTest {
   private WorkflowService workflowService = null;
   private WorkflowInstance workflowInstance = null;
   private WorkingFileRepository wfr = null;
+  private CloseableHttpResponse httpResponse = null;
+  private CloseableHttpClient credClient = null;
+  private CloseableHttpClient noCredClient = null;
   private static URI baseDir;
   private static URI urlTrack;
   private static URI urlTrack1;
@@ -145,10 +150,14 @@ public class IngestServiceImplTest {
 
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
   @Before
   public void setUp() throws Exception {
+    //This looks dumb, but is required so we can override things in testAuthWhitelist
+    setupService();
+  }
 
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  private void setupService() throws Exception {
     schedulerMediaPackage = MediaPackageParser
             .getFromXml(IOUtils.toString(getClass().getResourceAsStream("/source-manifest.xml"), "UTF-8"));
 
@@ -234,6 +243,8 @@ public class IngestServiceImplTest {
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
     EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject())).andReturn(organization)
             .anyTimes();
+    EasyMock.expect(organizationDirectoryService.getOrganization((URL) EasyMock.anyObject())).andReturn(organization)
+            .anyTimes();
     EasyMock.replay(organizationDirectoryService);
 
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
@@ -256,7 +267,7 @@ public class IngestServiceImplTest {
     EasyMock.expect(contentDispositionHeader.getValue()).andReturn("attachment; filename=fname.mp4").anyTimes();
     EasyMock.replay(contentDispositionHeader);
 
-    HttpResponse httpResponse = EasyMock.createMock(HttpResponse.class);
+    httpResponse = EasyMock.createMock(CloseableHttpResponse.class);
     EasyMock.expect(httpResponse.getStatusLine()).andReturn(statusLine).anyTimes();
     EasyMock.expect(httpResponse.getFirstHeader("Content-Disposition")).andReturn(contentDispositionHeader).anyTimes();
     EasyMock.expect(httpResponse.getEntity()).andReturn(entity).anyTimes();
@@ -289,14 +300,36 @@ public class IngestServiceImplTest {
             }).anyTimes();
     EasyMock.replay(mediaInspectionService);
 
-    class MockedIngestServicve extends IngestServiceImpl {
-      protected TrustedHttpClient createStandaloneHttpClient(String user, String password) {
-        return httpClient;
-      }
-    }
+    if (null == service) {
+      service = new IngestServiceImpl() {
 
-    service = new MockedIngestServicve();
+        //These are overriden so that we get mock requests, not *actual* requests
+        @Override
+        protected CloseableHttpClient getAuthedHttpClient() {
+          CloseableHttpClient client = EasyMock.createMock(CloseableHttpClient.class);
+          try {
+            EasyMock.expect(client.execute((HttpGet) EasyMock.anyObject())).andReturn(httpResponse).anyTimes();
+            client.close();
+            EasyMock.expectLastCall().once();
+          } catch (Exception e) { }
+          EasyMock.replay(client);
+          return client;
+        }
+        @Override
+        protected CloseableHttpClient getNoAuthHttpClient() {
+          CloseableHttpClient client = EasyMock.createMock(CloseableHttpClient.class);
+          try {
+            EasyMock.expect(client.execute((HttpGet) EasyMock.anyObject())).andReturn(httpResponse).anyTimes();
+            client.close();
+            EasyMock.expectLastCall().once();
+          } catch (Exception e) { }
+          EasyMock.replay(client);
+          return client;
+        }
+      };
+    }
     service.setHttpClient(httpClient);
+    service.setOrganizationDirectoryService(organizationDirectoryService);
     service.setWorkingFileRepository(wfr);
     service.setWorkflowService(workflowService);
     service.setSecurityService(securityService);
@@ -308,6 +341,10 @@ public class IngestServiceImplTest {
     service.setServiceRegistry(serviceRegistry);
     service.defaultWorkflowDefinionId = "sample";
     serviceRegistry.registerService(service);
+    Dictionary<String, String> p = new Hashtable<>();
+    p.put(IngestServiceImpl.DOWNLOAD_SOURCE, "http://localhost.*|http://www.test.com/.*");
+    service.updated(p);
+    service.testMode = true;
   }
 
   @After
@@ -384,7 +421,7 @@ public class IngestServiceImplTest {
     try {
       mediaPackage = service.addTrack(URI.create("http://www.test.com/testfile"), null, mediaPackage);
     } catch (Exception e) {
-      Assert.fail("Unable to read content dispostion filename!");
+      Assert.fail("Unable to read content dispostion filename: " + e.getMessage());
     }
 
     try {
@@ -394,6 +431,76 @@ public class IngestServiceImplTest {
       Assert.assertNotNull(e);
     }
   }
+
+  private void testAuthWhitelist(String url, String regex, boolean shouldFail, boolean shouldSendAuth, boolean shouldTouchMocks) throws Exception {
+    credClient = EasyMock.createNiceMock(CloseableHttpClient.class);
+    noCredClient = EasyMock.createNiceMock(CloseableHttpClient.class);
+
+    //There's one case (accessing the filesystem) where we *don't* expect the mocks to be used
+    if (shouldTouchMocks) {
+      if (shouldSendAuth) {
+        EasyMock.expect(credClient.execute(EasyMock.anyObject())).andReturn(httpResponse).once();
+        credClient.close();
+        EasyMock.expectLastCall().once();
+      } else {
+        EasyMock.expect(noCredClient.execute(EasyMock.anyObject())).andReturn(httpResponse).once();
+        noCredClient.close();
+        EasyMock.expectLastCall().once();
+      }
+    }
+    EasyMock.replay(noCredClient, credClient);
+
+    //Recreate the service so we use our own, custom mocks
+    service = new IngestServiceImpl() {
+      @Override
+      protected CloseableHttpClient getAuthedHttpClient() {
+        return credClient;
+      }
+
+      @Override
+      protected CloseableHttpClient getNoAuthHttpClient() {
+        return noCredClient;
+      }
+    };
+    setupService();
+
+    MediaPackage mediaPackage = service.createMediaPackage();
+
+    Dictionary<String, String> props = new Hashtable<>();
+    props.put(IngestServiceImpl.DOWNLOAD_SOURCE, regex);
+    service.updated(props);
+
+    try {
+      service.addTrack(URI.create(url), null, mediaPackage);
+    } catch (IOException e) {
+      if (!shouldFail) {
+        Assert.fail("Should not have failed!");
+      }
+    }
+    EasyMock.verify(credClient, noCredClient);
+    EasyMock.reset(credClient, noCredClient);
+  }
+
+  @Test
+  public void testAuthWhitelist() throws Exception {
+    //Test fetching something from something known to be inside the cluster.  This should use the default service-wide trusted client
+    testAuthWhitelist("http://localhost/testfile", "", false, true, false);
+
+    //Clear the whitelist, this should *never* send digest auth when fetching files
+    testAuthWhitelist("http://www.example.org/testfile", "", false, false, true);
+    //Non-matching regex
+    testAuthWhitelist("http://www.example.org/testfile", "http://localhost.*", true, false, true);
+    //Matching regex
+    testAuthWhitelist("http://www.example.org/testfile", "http://localhost.*|http://www.example.org/.*", false, true, true);
+
+    //Local filesystem should be actively rejected.  This file needs to *not* be in the resources directory (look in the impl for why), and needs to be readable by the user running the test
+    //NB: This is a horrible, horrible hack, but it's the only way I can think of to get *out* of test-classes.  If you try and ../ your way up above that getResource NPEs, as expected.
+    testAuthWhitelist(getClass().getResource("./../../../../").toURI().resolve("../../pom.xml").toString(), ".*", true, false, false);
+    //Test to ensure we can't use '..' to get around filters.  Removing the ".." works as expected, see below
+    testAuthWhitelist(getClass().getResource("./../impl/IngestServiceImplTest.class").toURI().toString(), ".*", true, false, false);
+    testAuthWhitelist(getClass().getResource("./IngestServiceImplTest.class").toURI().toString(), ".*", false, false, false);
+  }
+
 
   @Test
   public void testSmilCreation() throws Exception {

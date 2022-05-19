@@ -28,6 +28,7 @@ import org.opencastproject.feed.api.Feed;
 import org.opencastproject.feed.api.FeedGenerator;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -77,7 +78,7 @@ import javax.ws.rs.core.Variant;
  *     http://localhost/feeds/Atom/1.0/favorites
  * </pre>
  *
- * which would indicate a requeste to an atom 1.0 feed with <tt>favourites</tt> being the query.
+ * which would indicate a requeste to an atom 1.0 feed with <code>favourites</code> being the query.
  *
  * The servlet returns a HTTP status 200 with the feed data.
  * If the feed could not be found because the query is unknown a HTTP error 404 is returned
@@ -321,6 +322,10 @@ public class FeedServiceImpl {
    */
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  public void setProfilesReadyIndicator(ReadinessIndicator readyIndicator) {
+    //Only activate service if ReadinessIndicator is registered.
   }
 
 }

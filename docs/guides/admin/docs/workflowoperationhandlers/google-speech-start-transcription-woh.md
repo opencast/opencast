@@ -21,7 +21,7 @@ text.
 ```xml
     <!--  Encode audio to flac -->
     <operation
-      id="compose"
+      id="encode"
       fail-on-error="true"
       exception-handler-workflow="partial-error"
       description="Extract audio for transcript generation">

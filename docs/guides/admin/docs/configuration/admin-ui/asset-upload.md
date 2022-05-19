@@ -77,7 +77,7 @@ predefined catalog and attachment examples are commented out in the properties f
 to make them upload options in the Admin UI. The default workflow `publish-uploaded-assets` will automatically distribute,
 publish, and archive uploaded assets on existing events.
 
-    # Attachments and catalogs upload options are for new and existing events.
+    # Asset upload options are for new and existing events.
     # Only one file can be uploaded for each of these options, the uploaded file replaces existing elements of the same
     # type and flavor in the mediapackage.
     # EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CAPTIONS_DFXP={"id":"catalog_captions_dfxp", "type": "catalog",

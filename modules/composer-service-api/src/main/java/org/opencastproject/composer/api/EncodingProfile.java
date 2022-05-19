@@ -163,7 +163,7 @@ public interface EncodingProfile {
    * no such key was defined.
    * <p>
    * Note that <code>key</code> must not contain the media format prefix, so if
-   * the configured entry was <tt>mediaformat.format.xyz.test</tt>, then the key
+   * the configured entry was <code>mediaformat.format.xyz.test</code>, then the key
    * to access the value must simply be <code>test</code>.
    * </p>
    *

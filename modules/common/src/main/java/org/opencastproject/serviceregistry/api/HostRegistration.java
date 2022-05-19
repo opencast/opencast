@@ -27,6 +27,13 @@ package org.opencastproject.serviceregistry.api;
 public interface HostRegistration {
 
   /**
+   * Returns an identifier for this host.
+   *
+   * @return Host identifier
+   */
+  Long getId();
+
+  /**
    * @return the baseUrl for this host
    */
   String getBaseUrl();

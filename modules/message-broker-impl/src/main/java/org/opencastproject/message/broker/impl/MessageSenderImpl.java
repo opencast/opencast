@@ -44,12 +44,12 @@ import javax.jms.Session;
  * A class built to send JMS messages through ActiveMQ.
  */
 @Component(
-  property = {
-    "service.description=Message Broker Sender",
-    "service.pid=org.opencastproject.message.broker.impl.MessageSenderImpl"
-  },
-  immediate = true,
-  service = { MessageSender.class }
+    property = {
+        "service.description=Message Broker Sender",
+        "service.pid=org.opencastproject.message.broker.impl.MessageSenderImpl"
+    },
+    immediate = true,
+    service = { MessageSender.class }
 )
 public class MessageSenderImpl extends MessageBaseFacility implements MessageSender {
 
@@ -83,8 +83,9 @@ public class MessageSenderImpl extends MessageBaseFacility implements MessageSen
         Session session = getSession();
         // This shouldn't happen after a connection has been successfully
         // established at least once, but better be safe than sorry.
-        if (session == null)
+        if (session == null) {
           return;
+        }
         // Create a message or use the provided one.
         Message message = session.createObjectMessage(
                 new BaseMessage(securityService.getOrganization(), securityService.getUser(), object));

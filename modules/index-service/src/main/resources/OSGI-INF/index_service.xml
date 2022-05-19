@@ -25,11 +25,6 @@
              cardinality="1..1"
              policy="static"
              bind="setCaptureAgentStateService"/>
-  <reference name="CommonEventCatalogUIAdapter"
-             interface="org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter"
-             cardinality="1..1"
-             policy="static"
-             bind="setCommonEventCatalogUIAdapter"/>
   <reference name="EventCatalogUIAdapter"
              interface="org.opencastproject.metadata.dublincore.EventCatalogUIAdapter"
              cardinality="0..n"
@@ -66,11 +61,6 @@
              cardinality="1..1"
              policy="static"
              bind="setSecurityService"/>
-  <reference name="CommonSeriesCatalogUIAdapter"
-             interface="org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter"
-             cardinality="1..1"
-             policy="static"
-             bind="setCommonSeriesCatalogUIAdapter"/>
   <reference name="SeriesCatalogUIAdapter"
              interface="org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter"
              cardinality="0..n"

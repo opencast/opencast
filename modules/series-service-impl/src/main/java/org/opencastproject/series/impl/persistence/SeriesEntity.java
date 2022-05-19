@@ -22,6 +22,7 @@
 package org.opencastproject.series.impl.persistence;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -35,12 +36,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
 /**
@@ -49,17 +53,39 @@ import javax.persistence.UniqueConstraint;
  * rules.
  *
  */
-@Entity(name = "SeriesEntity") @IdClass(SeriesEntityId.class)
+@Entity(name = "SeriesEntity")
+@IdClass(SeriesEntityId.class)
 @Access(AccessType.FIELD)
-@Table(name = "oc_series")
+@Table(name = "oc_series",
+    indexes = {
+        @Index(name = "IX_oc_series_modified_date", columnList = ("modified_date")),
+    }
+)
 @NamedQueries({
-    @NamedQuery(name = "Series.findAll", query = "select s from SeriesEntity s"),
-    @NamedQuery(name = "Series.getCount", query = "select COUNT(s) from SeriesEntity s"),
+    @NamedQuery(
+        name = "Series.findAll",
+        query = "select s from SeriesEntity s where s.deletionDate is null"
+    ),
+    @NamedQuery(
+        name = "Series.getCount",
+        query = "select COUNT(s) from SeriesEntity s where s.deletionDate is null"
+    ),
     @NamedQuery(
         name = "seriesById",
         query = "select s from SeriesEntity as s where s.seriesId=:seriesId and s.organization=:organization"
     ),
-    @NamedQuery(name = "allSeriesInOrg", query = "select s from SeriesEntity as s where s.organization=:organization")
+    @NamedQuery(
+        name = "Series.getAllModifiedSince",
+        query = "select s from SeriesEntity as s "
+            + "where s.modifiedDate >= :since and s.organization=:organization "
+            + "order by s.modifiedDate asc"
+    ),
+    @NamedQuery(
+        name = "Series.getAllModifiedInRange",
+        query = "select s from SeriesEntity as s "
+            + "where s.modifiedDate >= :from and s.modifiedDate < :to and s.organization=:organization "
+            + "order by s.modifiedDate asc"
+    ),
 })
 public class SeriesEntity {
 
@@ -83,6 +109,14 @@ public class SeriesEntity {
   @Lob
   @Column(name = "access_control", length = 65535)
   protected String accessControl;
+
+  @Column(name = "modified_date", nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  protected Date modifiedDate = new Date();
+
+  @Column(name = "deletion_date")
+  @Temporal(TemporalType.TIMESTAMP)
+  protected Date deletionDate = null;
 
   @Lob
   @ElementCollection(targetClass = String.class)
@@ -186,6 +220,26 @@ public class SeriesEntity {
    */
   public void setOrganization(String organization) {
     this.organization = organization;
+  }
+
+  public Date getModifiedDate() {
+    return this.modifiedDate;
+  }
+
+  public void setModifiedDate(Date date) {
+    this.modifiedDate = date;
+  }
+
+  public Date getDeletionDate() {
+    return this.deletionDate;
+  }
+
+  public void setDeletionDate(Date date) {
+    this.deletionDate = date;
+  }
+
+  public boolean isDeleted() {
+    return this.deletionDate != null;
   }
 
   public Map<String, String> getProperties() {

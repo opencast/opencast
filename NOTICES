@@ -795,7 +795,7 @@ authorization-xacml
   net.sf.saxon                           Saxon-HE                                         Mozilla Public License Version 2.0
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.jboss.security                     jboss-xacml                                      lgpl
-  org.osgi                               org.osgi.compendium                              Apache License, Version 2.0
+  org.osgi                               osgi.cmpn                                        Apache License, Version 2.0
 
 
 caption-impl
@@ -1531,7 +1531,7 @@ publication-service-youtube-v3
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
-  org.osgi                               org.osgi.compendium                              Apache License, Version 2.0
+  org.osgi                               osgi.cmpn                                        Apache License, Version 2.0
   jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
   org.apache.felix                       org.apache.felix.http.bundle                     -
   org.slf4j                              slf4j-api                                        MIT License

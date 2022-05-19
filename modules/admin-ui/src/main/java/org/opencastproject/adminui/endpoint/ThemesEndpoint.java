@@ -38,16 +38,16 @@ import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.adminui.util.QueryPreprocessor;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.series.Series;
-import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
-import org.opencastproject.elasticsearch.index.theme.IndexTheme;
-import org.opencastproject.elasticsearch.index.theme.ThemeIndexSchema;
-import org.opencastproject.elasticsearch.index.theme.ThemeSearchQuery;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
+import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
+import org.opencastproject.elasticsearch.index.objects.theme.ThemeIndexSchema;
+import org.opencastproject.elasticsearch.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.resources.list.query.ThemesListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.security.api.SecurityService;
@@ -81,6 +81,9 @@ import com.entwinemedia.fn.data.json.Jsons;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,6 +117,15 @@ import javax.ws.rs.core.Response.Status;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+        immediate = true,
+        service = ThemesEndpoint.class,
+        property = {
+                "service.description=Admin UI - Themes Endpoint",
+                "opencast.service.type=org.opencastproject.adminui.ThemesEndpoint",
+                "opencast.service.path=/admin-ng/themes",
+        }
+)
 public class ThemesEndpoint {
 
   /** The logging facility */
@@ -126,7 +138,7 @@ public class ThemesEndpoint {
   private SecurityService securityService;
 
   /** The admin UI search index */
-  private AdminUISearchIndex searchIndex;
+  private ElasticsearchIndex searchIndex;
 
   /** The series service */
   private SeriesService seriesService;
@@ -138,35 +150,42 @@ public class ThemesEndpoint {
   private StaticFileRestService staticFileRestService;
 
   /** OSGi callback for the themes service database. */
+  @Reference
   public void setThemesServiceDatabase(ThemesServiceDatabase themesServiceDatabase) {
     this.themesServiceDatabase = themesServiceDatabase;
   }
 
   /** OSGi callback for the security service. */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI. */
-  public void setIndex(AdminUISearchIndex index) {
+  @Reference
+  public void setIndex(ElasticsearchIndex index) {
     this.searchIndex = index;
   }
 
   /** OSGi DI. */
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
   /** OSGi DI. */
+  @Reference
   public void setStaticFileService(StaticFileService staticFileService) {
     this.staticFileService = staticFileService;
   }
 
   /** OSGi DI. */
+  @Reference
   public void setStaticFileRestService(StaticFileRestService staticFileRestService) {
     this.staticFileRestService = staticFileRestService;
   }
 
+  @Activate
   public void activate(BundleContext bundleContext) {
     logger.info("Activate themes endpoint");
   }

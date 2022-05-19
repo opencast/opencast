@@ -30,7 +30,6 @@ import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
@@ -46,7 +45,7 @@ import io.restassured.http.ContentType;
 
 public class WorkflowsEndpointTest {
 
-  private static final RestServiceTestEnv env = testEnvForClasses(localhostRandomPort(), TestWorkflowsEndpoint.class);
+  private static final RestServiceTestEnv env = testEnvForClasses(TestWorkflowsEndpoint.class);
 
   private static final JSONParser parser = new JSONParser();
 

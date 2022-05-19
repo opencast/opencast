@@ -179,16 +179,20 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
   public void updated(String pid, Dictionary properties) throws ConfigurationException {
     logger.debug("updated MoodleUserProviderFactory");
 
-    String adminUserName = StringUtils.trimToNull(bundleContext.getProperty(SecurityConstants.GLOBAL_ADMIN_USER_PROPERTY));
+    String adminUserName = StringUtils.trimToNull(
+        bundleContext.getProperty(SecurityConstants.GLOBAL_ADMIN_USER_PROPERTY)
+    );
 
     String organization = (String) properties.get(ORGANIZATION_KEY);
-    if (StringUtils.isBlank(organization))
+    if (StringUtils.isBlank(organization)) {
       throw new ConfigurationException(ORGANIZATION_KEY, "is not set");
+    }
 
     String urlStr = (String) properties.get(MOODLE_URL_KEY);
     URI url;
-    if (StringUtils.isBlank(urlStr))
+    if (StringUtils.isBlank(urlStr)) {
       throw new ConfigurationException(MOODLE_URL_KEY, "is not set");
+    }
     try {
       url = new URI(urlStr);
     } catch (URISyntaxException e) {
@@ -196,8 +200,9 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
     }
 
     String token = (String) properties.get(MOODLE_TOKEN_KEY);
-    if (StringUtils.isBlank(token))
+    if (StringUtils.isBlank(token)) {
       throw new ConfigurationException(MOODLE_TOKEN_KEY, "is not set");
+    }
 
     final String groupRolesStr = (String) properties.get(GROUP_ROLES_KEY);
     final boolean groupRoles = BooleanUtils.toBoolean(groupRolesStr);
@@ -211,24 +216,27 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
 
     int cacheSize = 1000;
     try {
-      if (properties.get(CACHE_SIZE) != null)
+      if (properties.get(CACHE_SIZE) != null) {
         cacheSize = Integer.parseInt(properties.get(CACHE_SIZE).toString());
+      }
     } catch (NumberFormatException e) {
       logger.warn("{} could not be loaded, default value is used: {}", CACHE_SIZE, cacheSize);
     }
 
     int cacheExpiration = 60;
     try {
-      if (properties.get(CACHE_EXPIRATION) != null)
+      if (properties.get(CACHE_EXPIRATION) != null) {
         cacheExpiration = Integer.parseInt(properties.get(CACHE_EXPIRATION).toString());
+      }
     } catch (NumberFormatException e) {
       logger.warn("{} could not be loaded, default value is used: {}", CACHE_EXPIRATION, cacheExpiration);
     }
 
     // Now that we have everything we need, go ahead and activate a new provider, removing an old one if necessary
     ServiceRegistration existingRegistration = providerRegistrations.remove(pid);
-    if (existingRegistration != null)
+    if (existingRegistration != null) {
       existingRegistration.unregister();
+    }
 
     Organization org;
     try {

@@ -115,6 +115,31 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
     throw new SearchException("Unable to remove " + mediaPackageId + " from a remote search service");
   }
 
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.search.api.SearchService#deleteSeries(java.lang.String)
+   */
+  @Override
+  public Job deleteSeries(String seriesId) throws SearchException {
+    HttpDelete del = new HttpDelete("/deleteSeries/" + seriesId);
+    HttpResponse response = getResponse(del);
+    try {
+      if (response != null) {
+        Job job = JobParser.parseJob(response.getEntity().getContent());
+        logger.info("Removing Series '{}' from a remote search service", seriesId);
+        return job;
+      }
+    } catch (Exception e) {
+      throw new SearchException("Unable to remove " + seriesId + " from a remote search service", e);
+    } finally {
+      closeConnection(response);
+    }
+
+    throw new SearchException("Unable to remove " + seriesId + " from a remote search service");
+  }
+
   /**
    * {@inheritDoc}
    *

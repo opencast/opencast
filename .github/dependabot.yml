@@ -18,13 +18,8 @@ updates:
 - package-ecosystem: npm
   directory: "/modules/lti"
   schedule:
-    interval: weekly
+    interval: monthly
   open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: typescript
-    versions:
-    - ">= 4.a"
-    - "< 5"
 - package-ecosystem: npm
   directory: "/modules/runtime-info-ui-ng"
   schedule:

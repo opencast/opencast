@@ -21,7 +21,7 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.security.api.SecurityService;
@@ -29,7 +29,6 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaUser;
-import org.opencastproject.util.data.Option;
 
 import org.easymock.EasyMock;
 import org.junit.Assert;
@@ -38,6 +37,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +45,7 @@ import java.util.Map;
 public class ContributorsListProviderTest {
 
   private static final String ORG_ID = "org-id";
-  private AbstractSearchIndex searchIndex;
+  private ElasticsearchIndex searchIndex;
   private UserDirectoryService userDirectoryService;
   private ContributorsListProvider contributorsListProvider;
   private SecurityService securityService;
@@ -118,8 +118,8 @@ public class ContributorsListProviderTest {
     contributors.add("User 1");
     contributors.add("User 5");
 
-    searchIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
-    EasyMock.expect(searchIndex.getTermsForField(EasyMock.anyString(), EasyMock.anyObject(Option.class)))
+    searchIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    EasyMock.expect(searchIndex.getTermsForField(EasyMock.anyString(), EasyMock.anyObject(String.class)))
             .andReturn(contributors).anyTimes();
 
     contributorsListProvider = new ContributorsListProvider();
@@ -152,6 +152,28 @@ public class ContributorsListProviderTest {
   }
 
   @Test
+  public void testUsernamesListWithExcludeUserProvider() {
+    Map<String, Object> configuration = new HashMap<>();
+    configuration.put("exclude.user.provider", "provider1");
+    contributorsListProvider.modified(configuration);
+
+    Map<String, String> list = contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, null);
+
+    Assert.assertFalse(list.containsKey(user1.getUsername()));
+    Assert.assertFalse(list.containsKey(user2.getUsername()));
+    Assert.assertFalse(list.containsKey(user3.getUsername()));
+
+    Assert.assertTrue(list.containsValue(user1.getName()));
+    Assert.assertFalse(list.containsValue(user2.getName()));
+    Assert.assertFalse(list.containsValue(user3.getUsername()));
+
+    Assert.assertTrue(list.containsKey("User 5"));
+    Assert.assertTrue(list.containsValue("User 5"));
+
+    Assert.assertEquals(2, list.size());
+  }
+
+  @Test
   public void testListSimple() throws ListProviderException {
     Map<String, String> list = contributorsListProvider.getList(ContributorsListProvider.DEFAULT, null);
 
@@ -165,6 +187,25 @@ public class ContributorsListProviderTest {
     Assert.assertTrue(list.containsValue("User 5"));
 
     Assert.assertEquals(3, list.size());
+  }
+
+  @Test
+  public void testListSimpleWithExcludeUserProvider() {
+    Map<String, Object> configuration = new HashMap<>();
+    configuration.put("exclude.user.provider", "provider1");
+    contributorsListProvider.modified(configuration);
+
+    Map<String, String> list = contributorsListProvider.getList(ContributorsListProvider.DEFAULT, null);
+
+    Assert.assertTrue(list.containsKey(user1.getName()));
+    Assert.assertTrue(list.containsValue("User 1"));
+    Assert.assertFalse(list.containsKey(user2.getName()));
+    Assert.assertFalse(list.containsKey(user3.getName()));
+
+    Assert.assertTrue(list.containsKey("User 5"));
+    Assert.assertTrue(list.containsValue("User 5"));
+
+    Assert.assertEquals(2, list.size());
   }
 
   @Test

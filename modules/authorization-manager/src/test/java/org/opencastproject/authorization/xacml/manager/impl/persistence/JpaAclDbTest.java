@@ -42,64 +42,67 @@ import org.junit.Test;
 
 /** Tests for {@link JpaAclDb}. */
 public final class JpaAclDbTest {
+
+  private JpaAclDb db;
   @Test
   public void testProvider() {
-    //
+
+    db = new JpaAclDb();
+    db.setEntityManagerFactory(PersistenceUtil.newTestEntityManagerFactory(
+            "org.opencastproject.authorization.xacml.manager"));
+
     // add ACL to org1
     final AccessControlList publicAcl = acl(entry("anonymous", "read", true));
-    final Option<ManagedAcl> acl = p.createAcl(org1, publicAcl, "public");
+    final Option<ManagedAcl> acl = db.createAcl(org1, publicAcl, "public");
     assertTrue(acl.isSome());
-    assertTrue(p.getAcl(org1, acl.get().getId()).isSome());
+    assertTrue(db.getAcl(org1, acl.get().getId()).isSome());
     // ACL should not be visible for org2
-    assertTrue(p.getAcl(org2, acl.get().getId()).isNone());
+    assertTrue(db.getAcl(org2, acl.get().getId()).isNone());
     // create duplicate which should be denied
-    assertTrue(p.createAcl(org1, publicAcl, "public").isNone());
+    assertTrue(db.createAcl(org1, publicAcl, "public").isNone());
     //
     // add another ACL to org1
-    p.createAcl(org1, acl(entries("instructor", tuple("read", true), tuple("write", true))), "instructor");
-    assertEquals(2, p.getAcls(org1).size());
+    db.createAcl(org1, acl(entries("instructor", tuple("read", true), tuple("write", true))), "instructor");
+    assertEquals(2, db.getAcls(org1).size());
     // org2 should still have no ACLs
-    assertEquals(0, p.getAcls(org2).size());
+    assertEquals(0, db.getAcls(org2).size());
     //
     // add same ACL to org2
-    p.createAcl(org2, publicAcl, "public");
-    assertEquals(1, p.getAcls(org2).size());
-    assertEquals(2, p.getAcls(org1).size());
+    db.createAcl(org2, publicAcl, "public");
+    assertEquals(1, db.getAcls(org2).size());
+    assertEquals(2, db.getAcls(org1).size());
     //
     // update
     final ManagedAcl org1Acl = acl.get();
     // update with new ACL
-    assertTrue(p.updateAcl(
+    assertTrue(db.updateAcl(
         new ManagedAclImpl(org1Acl.getId(), org1Acl.getName(), org1Acl.getOrganizationId(),
             acl(entry("anonymous", "write", true)))
     ));
-    assertEquals("write", p.getAcl(org1, org1Acl.getId()).get().getAcl().getEntries().get(0).getAction());
+    assertEquals("write", db.getAcl(org1, org1Acl.getId()).get().getAcl().getEntries().get(0).getAction());
     // update with new name
     final ManagedAcl org1AclUpdated
         = new ManagedAclImpl(org1Acl.getId(), "public2", org1Acl.getOrganizationId(), org1Acl.getAcl());
-    assertTrue(p.updateAcl(org1AclUpdated));
-    assertEquals("public2", p.getAcl(org1, org1AclUpdated.getId()).get().getName());
+    assertTrue(db.updateAcl(org1AclUpdated));
+    assertEquals("public2", db.getAcl(org1, org1AclUpdated.getId()).get().getName());
     // try to update a non-existing ACL
-    assertFalse(p.updateAcl(new ManagedAclImpl(27427492384723L, "public2", org1.getId(), org1Acl.getAcl())));
-    assertEquals(2, p.getAcls(org1).size());
+    assertFalse(db.updateAcl(new ManagedAclImpl(27427492384723L, "public2", org1.getId(), org1Acl.getAcl())));
+    assertEquals(2, db.getAcls(org1).size());
     // update without any update
-    assertTrue(p.updateAcl(org1AclUpdated));
-    assertEquals(2, p.getAcls(org1).size());
+    assertTrue(db.updateAcl(org1AclUpdated));
+    assertEquals(2, db.getAcls(org1).size());
     // try to update an ACL of a different org
-    assertFalse(p.updateAcl(new ManagedAclImpl(org1Acl.getId(), "bla", org2.getId(), org1Acl.getAcl())));
+    assertFalse(db.updateAcl(new ManagedAclImpl(org1Acl.getId(), "bla", org2.getId(), org1Acl.getAcl())));
     //
     // delete
-    assertTrue(p.deleteAcl(org1, org1Acl.getId()));
-    assertEquals(1, p.getAcls(org1).size());
+    assertTrue(db.deleteAcl(org1, org1Acl.getId()));
+    assertEquals(1, db.getAcls(org1).size());
     // try to delete a non-existing ACL
-    assertFalse(p.deleteAcl(org1, 894892374923L));
+    assertFalse(db.deleteAcl(org1, 894892374923L));
     // try to delete an ACL of a different org
-    assertFalse(p.deleteAcl(org2, org1Acl.getId()));
-    assertEquals(1, p.getAcls(org2).size());
+    assertFalse(db.deleteAcl(org2, org1Acl.getId()));
+    assertEquals(1, db.getAcls(org2).size());
   }
-
-  private static final JpaAclDb p
-      = new JpaAclDb(PersistenceUtil.newTestPersistenceEnv("org.opencastproject.authorization.xacml.manager"));
 
   private static final Organization org1 = new DefaultOrganization();
   private static final Organization org2 = new JaxbOrganization("Entwine");

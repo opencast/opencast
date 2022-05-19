@@ -1,0 +1,56 @@
+on:
+  push:
+    tags:
+      - '*.*'
+
+name: Create new release
+jobs:
+  build:
+    name: Create release from tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+
+      - name: setup java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: install dependencies
+        run: |
+          sudo apt update -q
+          sudo apt install -y -q \
+            bzip2 \
+            gzip \
+            tar \
+            unzip
+
+      - name: build opencast
+        run: |
+          mvn clean install \
+            --batch-mode \
+            -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+            -Dhttp.keepAlive=false \
+            -Dmaven.wagon.http.pool=false \
+            -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 \
+            -DskipTests \
+            -Dcheckstyle.skip=true
+
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
+      - name: create new release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/opencast-dist-*.tar.gz
+          draft: true
+          fail_on_unmatched_files: true
+          name: Opencast ${{ steps.get_version.outputs.VERSION }}
+          body: |
+            This release …
+            For further information, please take a look at:
+
+            - [Release notes](#)
+            - [Changelog](#)

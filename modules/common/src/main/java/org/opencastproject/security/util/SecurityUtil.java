@@ -25,8 +25,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ANONYMOUS_USERNAME;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.security.api.JaxbOrganization;
@@ -41,14 +39,13 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 /** Opencast security helpers. */
@@ -143,20 +140,16 @@ public final class SecurityUtil {
   /**
    * Get a user and an organization. Only returns something if both elements can be determined.
    */
-  public static Option<Tuple<User, Organization>> getUserAndOrganization(SecurityService sec,
+  public static Optional<Tuple<User, Organization>> getUserAndOrganization(SecurityService sec,
           OrganizationDirectoryService orgDir, String orgId, UserDirectoryService userDir, String userId) {
     final Organization prevOrg = sec.getOrganization();
     try {
       final Organization org = orgDir.getOrganization(orgId);
       sec.setOrganization(org);
-      return option(userDir.loadUser(userId)).fmap(new Function<User, Tuple<User, Organization>>() {
-        @Override
-        public Tuple<User, Organization> apply(User user) {
-          return tuple(user, org);
-        }
-      });
+      return Optional.ofNullable(userDir.loadUser(userId))
+              .map(user -> tuple(user, org));
     } catch (NotFoundException e) {
-      return none();
+      return Optional.empty();
     } finally {
       sec.setOrganization(prevOrg);
     }
@@ -164,7 +157,11 @@ public final class SecurityUtil {
 
   /** Extract hostname and port number from a URL. */
   public static Tuple<String, Integer> hostAndPort(URL url) {
-    return tuple(StringUtils.strip(url.getHost(), "/"), url.getPort());
+    int port = url.getPort();
+    if (port < 0) {
+      port = url.getDefaultPort();
+    }
+    return tuple(StringUtils.strip(url.getHost(), "/"), port);
   }
 
   /**

@@ -169,33 +169,6 @@ public class AwsS3DistributionServiceRemoteImpl extends RemoteBase implements Aw
   }
 
   @Override
-  public Job restore(String channelId, MediaPackage mediaPackage, String elementId, String fileName)
-          throws DistributionException {
-    logger.info("Restoring {} from {}@{}", elementId, channelId, distributionChannel);
-    final HttpPost req = post("/restore", param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),
-            param(PARAM_ELEMENT_ID, elementId), param(PARAM_CHANNEL_ID, channelId), param(PARAM_FILENAME, fileName));
-    for (Job job : join(runRequest(req, jobFromHttpResponse))) {
-      return job;
-    }
-    throw new DistributionException(format("Unable to restore element '%s' of "
-            + "mediapackage '%s' using a remote destribution service proxy", elementId, mediaPackage.getIdentifier()
-            .toString()));
-  }
-
-  @Override
-  public Job restore(String channelId, MediaPackage mediaPackage, String elementId) throws DistributionException {
-    logger.info("Restoring {} from {}@{}", elementId, channelId, distributionChannel);
-    final HttpPost req = post("/restore", param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),
-            param(PARAM_ELEMENT_ID, elementId), param(PARAM_CHANNEL_ID, channelId));
-    for (Job job : join(runRequest(req, jobFromHttpResponse))) {
-      return job;
-    }
-    throw new DistributionException(format("Unable to restore element '%s' of "
-            + "mediapackage '%s' using a remote destribution service proxy", elementId, mediaPackage.getIdentifier()
-            .toString()));
-  }
-
-  @Override
   public Job distribute(String pubChannelId, MediaPackage mediaPackage, Set<String> downloadIds,
       boolean checkAvailability, boolean preserveReference) throws DistributionException, MediaPackageException {
     throw new UnsupportedOperationException("Not supported yet.");

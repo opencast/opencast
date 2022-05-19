@@ -32,7 +32,6 @@ import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
@@ -55,7 +54,7 @@ public class SeriesEndpointTest {
   private static final String APP_V1_0_0_XML = "application/v1.0.0+xml";
 
   /** The REST test environment */
-  private static final RestServiceTestEnv env = testEnvForClasses(localhostRandomPort(), TestSeriesEndpoint.class);
+  private static final RestServiceTestEnv env = testEnvForClasses(TestSeriesEndpoint.class);
 
   /** The json parser */
   private static final JSONParser parser = new JSONParser();

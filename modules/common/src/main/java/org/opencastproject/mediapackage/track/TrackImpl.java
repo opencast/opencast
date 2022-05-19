@@ -32,6 +32,8 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.MimeType;
+import org.opencastproject.util.MimeTypes;
+import org.opencastproject.util.UnknownFileTypeException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -117,6 +119,11 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
    */
   TrackImpl(MediaPackageElementFlavor flavor, URI uri) {
     super(Type.Track, flavor, uri);
+    if (uri != null) {
+      try {
+        this.setMimeType(MimeTypes.fromURI(uri));
+      } catch (UnknownFileTypeException e) { }
+    }
   }
 
   /**

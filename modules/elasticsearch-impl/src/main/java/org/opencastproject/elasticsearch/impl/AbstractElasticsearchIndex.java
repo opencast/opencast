@@ -22,9 +22,14 @@
 
 package org.opencastproject.elasticsearch.impl;
 
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
 import org.opencastproject.elasticsearch.api.SearchIndex;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchMetadata;
 import org.opencastproject.elasticsearch.api.SearchQuery;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.util.requests.SortCriterion;
 
 import org.apache.commons.io.IOUtils;
@@ -37,13 +42,14 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.bulk.BulkItemResponse;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.support.WriteRequest;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
@@ -53,16 +59,21 @@ import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
+import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.script.Script;
+import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.ScriptSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
-import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +87,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
 /**
  * A search index implementation based on ElasticSearch.
@@ -116,17 +127,18 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   /** Identifier of the root entry */
   private static final String ROOT_ID = "root";
 
-  /** Type of the document containing the index version information */
-  private static final String VERSION_TYPE = "version";
-
   /** The index identifier */
-  private String index = null;
+  private String indexIdentifier = null;
+  private static final String INDEX_IDENTIFIER_PROPERTY = "index.identifier";
+  private static final String DEFAULT_INDEX_IDENTIFIER = "opencast";
+
+  /** The index name */
+  private String indexName = null;
+  private static final String INDEX_NAME_PROPERTY = "index.name";
+  private static final String DEFAULT_INDEX_NAME = "Elasticsearch";
 
   /** The high level client */
   private RestHighLevelClient client = null;
-
-  /** List of sites with prepared index */
-  private final List<String> preparedIndices = new ArrayList<>();
 
   /** The version number */
   private int indexVersion = -1;
@@ -160,27 +172,45 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   /**
    * OSGi callback to activate this component instance.
    *
-   * @param ctx
-   *          the component context
+   * @param properties
+   *          The configuration
+   * @param bundleContext
+   *          the bundle context
    * @throws ComponentException
    *           if the search index cannot be initialized
    */
-  public void activate(ComponentContext ctx) throws ComponentException {
-    indexSettingsPath = StringUtils.trimToNull(ctx.getBundleContext().getProperty("karaf.etc"));
+  public void activate(Map<String, Object> properties, BundleContext bundleContext) throws ComponentException {
+    indexIdentifier = StringUtils.defaultIfBlank((String) properties
+            .get(INDEX_IDENTIFIER_PROPERTY), DEFAULT_INDEX_IDENTIFIER);
+    logger.info("Index identifier set to {}.", indexIdentifier);
+
+    indexSettingsPath = StringUtils.trimToNull(bundleContext.getProperty("karaf.etc"));
     if (indexSettingsPath == null) {
       throw new ComponentException("Could not determine Karaf configuration path");
     }
     externalServerHostname = StringUtils
-            .defaultIfBlank(ctx.getBundleContext().getProperty(ELASTICSEARCH_SERVER_HOSTNAME_KEY),
+            .defaultIfBlank(bundleContext.getProperty(ELASTICSEARCH_SERVER_HOSTNAME_KEY),
                     ELASTICSEARCH_SERVER_HOSTNAME_DEFAULT);
     externalServerScheme = StringUtils
-            .defaultIfBlank(ctx.getBundleContext().getProperty(ELASTICSEARCH_SERVER_SCHEME_KEY),
+            .defaultIfBlank(bundleContext.getProperty(ELASTICSEARCH_SERVER_SCHEME_KEY),
                     ELASTICSEARCH_SERVER_SCHEME_DEFAULT);
     externalServerPort = Integer.parseInt(StringUtils
-            .defaultIfBlank(ctx.getBundleContext().getProperty(ELASTICSEARCH_SERVER_PORT_KEY),
+            .defaultIfBlank(bundleContext.getProperty(ELASTICSEARCH_SERVER_PORT_KEY),
                     ELASTICSEARCH_SERVER_PORT_DEFAULT + ""));
-    username = StringUtils.trimToNull(ctx.getBundleContext().getProperty(ELASTICSEARCH_USERNAME_KEY));
-    password = StringUtils.trimToNull(ctx.getBundleContext().getProperty(ELASTICSEARCH_PASSWORD_KEY));
+    username = StringUtils.trimToNull(bundleContext.getProperty(ELASTICSEARCH_USERNAME_KEY));
+    password = StringUtils.trimToNull(bundleContext.getProperty(ELASTICSEARCH_PASSWORD_KEY));
+  }
+
+  /**
+   * OSGi callback for configuration changes.
+   *
+   * @param properties
+   *          The configuration
+   */
+  public void modified(Map<String, Object> properties) {
+    indexName = StringUtils.defaultIfBlank((String) properties.get(INDEX_NAME_PROPERTY),
+            DEFAULT_INDEX_NAME);
+    logger.info("Index name set to {}.", indexName);
   }
 
   @Override
@@ -192,14 +222,12 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   public void clear() throws IOException {
     try {
       final DeleteIndexRequest request = new DeleteIndexRequest(
-              Arrays.stream(getDocumentTypes()).map(this::getIndexName).toArray(String[]::new));
+              Arrays.stream(getDocumentTypes()).map(this::getSubIndexIdentifier).toArray(String[]::new));
       final AcknowledgedResponse delete = client.indices().delete(request, RequestOptions.DEFAULT);
       if (!delete.isAcknowledged()) {
         logger.error("Index '{}' could not be deleted", getIndexName());
       }
-      preparedIndices
-              .removeAll(Arrays.stream(getDocumentTypes()).map(this::getIndexName).collect(Collectors.toList()));
-      createIndex(getIndexName());
+      createIndex();
     } catch (ElasticsearchException exception) {
       if (exception.status() == RestStatus.NOT_FOUND) {
         logger.error("Cannot clear non-existing index '{}'", exception.getIndex().getName());
@@ -212,43 +240,97 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   /**
    * Posts the input document to the search index.
    *
-   * @param documents
-   *          the input documents
+   * @param maxRetryAttempts
+   *          How often to retry update in case of ElasticsearchStatusException
+   * @param retryWaitingPeriod
+   *          How long to wait (in ms) between retries
+   * @param document
+   *          The Elasticsearch document
    * @return the query response
-   * @throws SearchIndexException
-   *           if posting to the index fails
+   *
+   * @throws IOException
+   *         If updating the index fails
+   * @throws InterruptedException
+   *         If waiting during retry is interrupted
    */
-  protected BulkResponse update(ElasticsearchDocument... documents) throws SearchIndexException {
+  protected IndexResponse update(int maxRetryAttempts, int retryWaitingPeriod, ElasticsearchDocument document)
+          throws IOException, InterruptedException {
 
-    final BulkRequest bulkRequest = new BulkRequest().setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
-    for (ElasticsearchDocument doc : documents) {
-      bulkRequest.add(new IndexRequest(getIndexName(doc.getType())).id(doc.getUID()).source(doc));
-    }
+    final IndexRequest indexRequest = new IndexRequest(getSubIndexIdentifier(document.getType())).id(document.getUID())
+            .source(document).setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
 
-    try {
-      final BulkResponse bulkResponse = client.bulk(bulkRequest, RequestOptions.DEFAULT);
+    IndexResponse indexResponse = null;
+    int retryAttempts = 0;
+    do {
+      try {
+        indexResponse = client.index(indexRequest, RequestOptions.DEFAULT);
+      } catch (ElasticsearchStatusException e) {
+        retryAttempts++;
 
-      // Check for errors
-      if (bulkResponse.hasFailures()) {
-        for (BulkItemResponse item : bulkResponse) {
-          if (item.isFailed()) {
-            logger.warn("Error updating {}: {}", item, item.getFailureMessage());
-            throw new SearchIndexException(item.getFailureMessage());
+        if (retryAttempts <= maxRetryAttempts) {
+          logger.warn("Could not update documents in index {} because of {}, retrying in {} ms.", getIndexName(),
+                  e.getMessage(), retryWaitingPeriod);
+          if (retryWaitingPeriod > 0) {
+            Thread.sleep(retryWaitingPeriod);
           }
+        } else {
+          logger.error("Could not update documents in index {} because of {}, not retrying.", getIndexName(),
+                  e.getMessage());
+          throw e;
         }
       }
+    } while (indexResponse == null);
 
-      return bulkResponse;
-    } catch (Throwable t) {
-      throw new SearchIndexException("Cannot update documents in index " + getIndexName(), t);
-    }
+    return indexResponse;
+  }
+
+  /**
+   * Delete document from index.
+   *
+   * @param type
+   *         The type of document we want to delete
+   * @param id
+   *         The identifier of the document
+   * @return
+   *         The delete response
+   *
+   * @throws IOException
+   *         If deleting from the index fails
+   * @throws InterruptedException
+   *         If waiting during retry is interrupted
+   */
+  protected DeleteResponse delete(String type, String id, int maxRetryAttempts, int retryWaitingPeriod)
+          throws IOException, InterruptedException {
+    final DeleteRequest deleteRequest = new DeleteRequest(getSubIndexIdentifier(type), id).setRefreshPolicy(
+            WriteRequest.RefreshPolicy.IMMEDIATE);
+    DeleteResponse deleteResponse = null;
+    int retryAttempts = 0;
+    do {
+      try {
+        deleteResponse = getClient().delete(deleteRequest, RequestOptions.DEFAULT);
+      } catch (ElasticsearchStatusException e) {
+        retryAttempts++;
+
+        if (retryAttempts <= maxRetryAttempts) {
+          logger.warn("Could not remove documents from index {} because of {}, retrying in {} ms.", getIndexName(),
+                  e.getMessage(), retryWaitingPeriod);
+          if (retryWaitingPeriod > 0) {
+            Thread.sleep(retryWaitingPeriod);
+          }
+        } else {
+          logger.error("Could not remove documents from index {} because of {}, not retrying.", getIndexName(),
+                  e.getMessage());
+          throw e;
+        }
+      }
+    } while (deleteResponse == null);
+
+    return deleteResponse;
   }
 
   /**
    * Initializes an Elasticsearch node for the given index.
    *
-   * @param index
-   *          the index identifier
    * @param version
    *          the index version
    * @throws SearchIndexException
@@ -258,12 +340,8 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    * @throws IllegalArgumentException
    *           if the index identifier is blank.
    */
-  protected void init(String index, int version) throws IOException, IllegalArgumentException, SearchIndexException {
-    if (StringUtils.isBlank(index)) {
-      throw new IllegalArgumentException("Search index identifier must be set");
-    }
-
-    this.index = index;
+  protected void init(int version)
+          throws IOException, IllegalArgumentException, SearchIndexException {
     this.indexVersion = version;
 
     if (client == null) {
@@ -281,7 +359,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     }
 
     // Create the index
-    createIndex(index);
+    createIndex();
   }
 
   /**
@@ -297,19 +375,21 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   }
 
   /**
-   * Prepares Elasticsearch index to store data for the types (or mappings) as returned by {@link #getDocumentTypes()}.
+   * Prepares index to store data for the types (or mappings) as returned by {@link #getDocumentTypes()}.
    *
-   * @param idx
-   *          the index name
    *
    * @throws SearchIndexException
    *           if index and type creation fails
    * @throws IOException
    *           if loading of the type definitions fails
    */
-  private void createIndex(String idx) throws SearchIndexException, IOException {
+  private void createIndex() throws SearchIndexException, IOException {
+    if (StringUtils.isBlank(this.indexIdentifier)) {
+      throw new IllegalArgumentException("Search index identifier must be set");
+    }
+
     for (String type : getDocumentTypes()) {
-      createSubIndex(type, getIndexName(type));
+      createSubIndex(type, getSubIndexIdentifier(type));
     }
   }
 
@@ -360,12 +440,10 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
       logger.debug("Index version of site '{}' is {}", idxName, indexVersion);
       client.index(indexRequest, RequestOptions.DEFAULT);
     }
-
-    preparedIndices.add(idxName);
   }
 
   /**
-   * Load resources from active index class resources if they exist or fall back to this classes resources as default.
+   * Load resources from active index class resources if they exist or fall back to these classes resources as default.
    *
    * @return the string containing the resource
    * @throws IOException
@@ -403,7 +481,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
         .trackTotalHits(true);
 
     // Create the actual search query
-    logger.debug("Searching for {}", searchSource.toString());
+    logger.debug("Searching for {}", searchSource);
 
     // Make sure all fields are being returned
     if (query.getFields().length > 0) {
@@ -459,7 +537,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
           break;
       }
     }
-    return new SearchRequest(Arrays.stream(query.getTypes()).map(this::getIndexName).toArray(String[]::new))
+    return new SearchRequest(Arrays.stream(query.getTypes()).map(this::getSubIndexIdentifier).toArray(String[]::new))
             .searchType(SearchType.QUERY_THEN_FETCH).preference("_local").source(searchSource);
   }
 
@@ -469,7 +547,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    * @return the index name
    */
   public String getIndexName() {
-    return index;
+    return indexName;
   }
 
   /*
@@ -488,12 +566,139 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    *          The type to get the sub index for.
    * @return the index name
    */
-  public String getIndexName(String type) {
-    return getIndexName() + "_" + type;
+  protected String getSubIndexIdentifier(String type) {
+    return this.indexIdentifier + "_" + type;
   }
 
   protected RestHighLevelClient getClient() {
     return client;
   }
 
+  /**
+   * Execute a query on the index.
+   *
+   * @param query
+   *          The query to use to find the results
+   * @param request
+   *          The builder to use to create the query.
+   * @param toSearchResult
+   *          The function to convert the results to a {@link SearchResult}
+   * @param maxRetryAttempts
+   *          How often to retry query in case of ElasticsearchStatusException
+   * @param retryWaitingPeriod
+   *          How long to wait (in ms) between retries
+   * @return A {@link SearchResult} containing the relevant objects.
+   *
+   * @throws IOException
+   *         If querying the index fails
+   * @throws InterruptedException
+   *         If waiting during retry is interrupted
+   */
+  protected <T> SearchResult<T> executeQuery(SearchQuery query, SearchRequest request,
+          Function<SearchMetadataCollection, T> toSearchResult, int maxRetryAttempts, int retryWaitingPeriod)
+          throws IOException, InterruptedException {
+    // Execute the query and try to get hold of a query response
+    SearchResponse searchResponse = null;
+    int retryAttempts = 0;
+    do {
+      try {
+        searchResponse = getClient().search(request, RequestOptions.DEFAULT);
+      } catch (ElasticsearchStatusException e) {
+        retryAttempts++;
+
+        if (retryAttempts <= maxRetryAttempts) {
+          logger.warn("Could not query documents from index {} because of {}, retrying in {} ms.", getIndexName(),
+                  e.getMessage(), retryWaitingPeriod);
+          if (retryWaitingPeriod > 0) {
+            Thread.sleep(retryWaitingPeriod);
+          }
+        } else {
+          logger.error("Could not query documents from index {} because of {}, not retrying.", getIndexName(),
+                  e.getMessage());
+          throw e;
+        }
+      }
+    } while (searchResponse == null);
+
+    // Create and configure the query result
+    long hits = getTotalHits(searchResponse.getHits());
+    long size = searchResponse.getHits().getHits().length;
+    SearchResultImpl<T> result = new SearchResultImpl<>(query, hits, size);
+    result.setSearchTime(searchResponse.getTook().millis());
+
+    // Walk through response and create new items with title, creator, etc:
+    for (SearchHit doc : searchResponse.getHits()) {
+
+      // Wrap the search resulting metadata
+      SearchMetadataCollection metadata = new SearchMetadataCollection(doc.getType());
+      metadata.setIdentifier(doc.getId());
+
+      for (DocumentField field : doc.getFields().values()) {
+        String name = field.getName();
+        SearchMetadata<Object> m = new SearchMetadataImpl<>(name);
+        // TODO: Add values with more care (localized, correct type etc.)
+
+        // Add the field values
+        if (field.getValues().size() > 1) {
+          for (Object v : field.getValues()) {
+            m.addValue(v);
+          }
+        } else {
+          m.addValue(field.getValue());
+        }
+
+        // Add the metadata
+        metadata.add(m);
+      }
+
+      // Get the score for this item
+      float score = doc.getScore();
+
+      // Have the serializer in charge create a type-specific search result
+      // item
+      try {
+        T document = toSearchResult.apply(metadata);
+        SearchResultItem<T> item = new SearchResultItemImpl<>(score, document);
+        result.addResultItem(item);
+      } catch (Throwable t) {
+        logger.warn("Error during search result serialization: '{}'. Skipping this search result.", t.getMessage());
+        size--;
+      }
+    }
+
+    // Set the number of resulting documents
+    result.setDocumentCount(size);
+
+    return result;
+  }
+
+  /**
+   * Returns all the known terms for a field (aka facets).
+   *
+   * @param field
+   *          the field name
+   * @param type
+   *          the document type
+   * @return the list of terms
+   */
+  public List<String> getTermsForField(String field, String type) {
+    final String facetName = "terms";
+    final AggregationBuilder aggBuilder = AggregationBuilders.terms(facetName).field(field);
+    final SearchSourceBuilder searchSource = new SearchSourceBuilder().aggregation(aggBuilder);
+    final SearchRequest searchRequest = new SearchRequest(this.getSubIndexIdentifier(type)).source(searchSource);
+    try {
+      final SearchResponse response = getClient().search(searchRequest, RequestOptions.DEFAULT);
+
+      final List<String> terms = new ArrayList<>();
+      final Terms aggs = response.getAggregations().get(facetName);
+
+      for (Terms.Bucket bucket : aggs.getBuckets()) {
+        terms.add(bucket.getKey().toString());
+      }
+
+      return terms;
+    } catch (IOException e) {
+      return chuck(e);
+    }
+  }
 }

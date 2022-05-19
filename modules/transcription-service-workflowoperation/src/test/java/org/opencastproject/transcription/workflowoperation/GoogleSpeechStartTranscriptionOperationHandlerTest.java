@@ -74,7 +74,8 @@ public class GoogleSpeechStartTranscriptionOperationHandlerTest {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
     // Media package set up
-    URI mediaPackageURI = GoogleSpeechStartTranscriptionOperationHandlerTest.class.getResource("/mp_google.xml").toURI();
+    URI mediaPackageURI = GoogleSpeechStartTranscriptionOperationHandlerTest.class.getResource("/mp_google.xml")
+        .toURI();
     mediaPackage = builder.loadFromXml(mediaPackageURI.toURL().openStream());
 
     // Service registry set up
@@ -94,8 +95,11 @@ public class GoogleSpeechStartTranscriptionOperationHandlerTest {
     // Transcription service set up
     service = EasyMock.createStrictMock(TranscriptionService.class);
     capturedTrack = Capture.newInstance();
-    EasyMock.expect(service.startTranscription(EasyMock.anyObject(String.class), EasyMock.capture(capturedTrack), EasyMock.anyObject(String.class)))
-            .andReturn(null);
+    EasyMock
+        .expect(service.startTranscription(
+            EasyMock.anyObject(String.class), EasyMock.capture(capturedTrack), EasyMock.anyObject(String.class))
+        )
+        .andReturn(null);
     EasyMock.replay(service);
 
     // Workflow set up
@@ -147,7 +151,8 @@ public class GoogleSpeechStartTranscriptionOperationHandlerTest {
   public void testStartDontSkipFlavor() throws Exception {
     operation.setConfiguration(GoogleSpeechStartTranscriptionOperationHandler.SOURCE_TAG, "transcript");
     // Make sure operation will NOT be skipped if media package does NOT contain the flavor passed
-    operation.setConfiguration(GoogleSpeechStartTranscriptionOperationHandler.SKIP_IF_FLAVOR_EXISTS, "captions/timedtext");
+    operation.setConfiguration(
+        GoogleSpeechStartTranscriptionOperationHandler.SKIP_IF_FLAVOR_EXISTS, "captions/timedtext");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
     Assert.assertEquals(Action.CONTINUE, result.getAction());

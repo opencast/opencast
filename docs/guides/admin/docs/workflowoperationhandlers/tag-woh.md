@@ -1,13 +1,17 @@
-# TagWorkflowOperation
+# Tag Workflow Operation
+
+ID: `tag`
 
 ## Description
-With the TagWorkflowOperationHandler it's possible to select various media package elements and then modify their tag
-set and / or set their flavor.
+
+With the tag operation, it's possible to select various media package elements and then modify their tags
+and/or their flavor.
 
 So for example it's possible to pick up elements like the dublin core catalogs that have been added to the media package
 at the beginning of the workflow and tag them, so they can be picked up by operations later on.
 
 ## Parameter Table
+
 Tags and flavors can be used in combination.
 
 |configuration keys|example|description|default value|
@@ -20,27 +24,39 @@ Tags and flavors can be used in combination.
 
 ### Target Tags Example
 
-|Target-Tags|Preexisting Tags|Resulting Tags|
-|-----------|----------------|--------------|
-|rss|engage|rss|
-|+rss|engage|engage,rss|
-|-rss|engage,rss|engage|
-|tagged,+rss|engage|tagged|
-|-rss,+tagged|engage,rss|engage,tagged|
+|Target-Tags |Preexisting Tags|Resulting Tags|
+|------------|----------------|--------------|
+|rss         |engage          |rss           |
+|+rss        |engage          |engage,rss    |
+|-rss        |engage,rss      |engage        |
+|tagged,+rss |engage          |tagged        |
+|-rss,+tagged|engage,rss      |engage,tagged |
 
 ## Operation Example
 
-    <operation
-      id="tag"
-      max-attempts="2"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Tagging media package elements">
-      <configurations>
-        <configuration key="source-tags">engage,atom,publish</configuration>
-        <configuration key="source-flavors">presentation/trimmed</configuration>
-        <configuration key="target-tags">-atom,+rss</configuration>
-        <configuration key="target-flavor">presentation/tagged</configuration>
-        <configuration key="copy">true</configuration>
-      </configurations>
-    </operation>
+```xml
+<operation
+  id="tag"
+  description="Tagging media package elements">
+  <configurations>
+    <configuration key="source-tags">engage,atom,publish</configuration>
+    <configuration key="source-flavors">presentation/trimmed</configuration>
+    <configuration key="target-tags">-atom,+rss</configuration>
+    <configuration key="target-flavor">presentation/tagged</configuration>
+    <configuration key="copy">true</configuration>
+  </configurations>
+</operation>
+```
+
+You can also use `tag` to just modify flavors (`*/source` will not be present any longer):
+
+```xml
+<operation
+  id="tag"
+  description="Changing flavor of source elements">
+  <configurations>
+    <configuration key="source-flavors">*/source</configuration>
+    <configuration key="target-flavor">*/delivery</configuration>
+  </configurations>
+</operation>
+```

@@ -37,6 +37,11 @@ echo "# Running upgrade scripts"
 
 echo "$versions" | while read -r line; do
   dir="$(echo "$line" | cut -d' ' -f2)"
-  echo "mysql -u root $remote octest < $dir/mysql5.sql"
-  mysql -u root $remote octest < "$dir/mysql5.sql"
+  script="$dir/mysql5.sql"
+  if [ -f "$script" ]; then
+    echo "mysql -u root $remote octest < $script"
+    mysql -u root $remote octest < "$script"
+  else
+    echo "$script doesn't exist."
+  fi
 done

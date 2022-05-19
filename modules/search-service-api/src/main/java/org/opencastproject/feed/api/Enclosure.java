@@ -25,7 +25,7 @@ package org.opencastproject.feed.api;
 /**
  * An enclose is an optional part of a feed entry.
  * <p>
- * Note that this interface is heavily inspired and backed by the excellent rss/atom feed library <tt>Rome</tt>
+ * Note that this interface is heavily inspired and backed by the excellent rss/atom feed library <code>Rome</code>
  * (http://https://rome.dev.java.net).
  */
 public interface Enclosure {

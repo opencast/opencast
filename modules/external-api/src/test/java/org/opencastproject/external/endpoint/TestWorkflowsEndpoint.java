@@ -30,7 +30,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isNull;
 import static org.easymock.EasyMock.replay;
 
-import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.identifier.IdImpl;

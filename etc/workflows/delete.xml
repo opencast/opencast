@@ -6,36 +6,48 @@
   <tags>
     <tag>delete</tag>
   </tags>
-  <description>This workflow is used to retract all publications of an event upon deletion</description>
+  <description>This workflow is used by the Admin UI to retract all publications of an event upon deletion</description>
+  <state-mappings>
+    <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.DELETING</state-mapping>
+    <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.DELETING</state-mapping>
+  </state-mappings>
   <operations>
-
-    <!-- Make sure the workflow contains at least a default configuration -->
-
-    <operation
-      id="defaults"
-      description="Applying default configuration values">
-      <configurations>
-        <configuration key="retractFromEngage">true</configuration>
-        <configuration key="retractFromAws">true</configuration>
-        <configuration key="retractFromApi">true</configuration>
-        <configuration key="retractPreview">true</configuration>
-        <configuration key="retractFromYouTube">false</configuration>
-      </configurations>
-    </operation>
 
     <operation
       id="include"
       description="Retract the recording">
       <configurations>
-        <configuration key="workflow-id">partial-retract</configuration>
+        <configuration key="workflow-id">retract</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="retract-configure"
+      exception-handler-workflow="partial-error"
+      description="Retract from internal publication channel">
+      <configurations>
+        <configuration key="channel-id">internal</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="snapshot"
+      exception-handler-workflow="partial-error"
+      description="Archiving state of retracted recording">
+    </operation>
+
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Remove temporary processing artifacts">
+      <configurations>
+        <!-- On systems with shared workspace or working file repository -->
+        <!-- you want to set this option to false. -->
+        <configuration key="delete-external">true</configuration>
+        <!-- ACLs are required again when working through ActiveMQ messages -->
+        <configuration key="preserve-flavors">security/*</configuration>
       </configurations>
     </operation>
 
   </operations>
-
-  <state-mappings>
-    <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.DELETING</state-mapping>
-    <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.DELETING</state-mapping>
-  </state-mappings>
-
 </definition>

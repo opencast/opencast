@@ -41,10 +41,10 @@ Please make sure to install the following dependencies.
 
 Required:
 
-    java-1.11.0-openjdk-devel.x86_64 / openjdk-11-jdk
+    java-11-openjdk-devel / openjdk-11-jdk
     ffmpeg >= 3.2.4
-    maven >= 3.1
-    python >= 2.6
+    maven >= 3.6
+    python >= 2.7
     unzip
     gcc-c++
     tar

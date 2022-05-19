@@ -88,15 +88,22 @@ public class XACMLSecurityTest {
     Workspace workspace = EasyMock.createMock(Workspace.class);
     final Capture<InputStream> in = EasyMock.newCapture();
     final Capture<URI> uri = EasyMock.newCapture();
-    EasyMock.expect(workspace.put(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString(),
-            EasyMock.capture(in))).andAnswer(() -> {
-        final File file = testFolder.newFile();
-        FileOutputStream out = new FileOutputStream(file);
-        IOUtils.copyLarge(in.getValue(), out);
-        IOUtils.closeQuietly(out);
-        IOUtils.closeQuietly(in.getValue());
-        return file.toURI();
-      }).anyTimes();
+    EasyMock
+        .expect(workspace.put(
+            EasyMock.anyString(),
+            EasyMock.anyString(),
+            EasyMock.anyString(),
+            EasyMock.capture(in)
+        ))
+        .andAnswer(() -> {
+          final File file = testFolder.newFile();
+          FileOutputStream out = new FileOutputStream(file);
+          IOUtils.copyLarge(in.getValue(), out);
+          IOUtils.closeQuietly(out);
+          IOUtils.closeQuietly(in.getValue());
+          return file.toURI();
+        })
+        .anyTimes();
     EasyMock.expect(workspace.get(EasyMock.capture(uri), EasyMock.captureBoolean(EasyMock.newCapture())))
             .andAnswer(() -> {
               File dest = testFolder.newFile();

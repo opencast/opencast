@@ -26,7 +26,7 @@
     <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
                cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
     <reference name="profilesReadyIndicator" policy="static" cardinality="1..1"
-               interface="org.opencastproject.util.ReadinessIndicator" target="(artifact=dictionary)"/>
+               interface="org.opencastproject.util.ReadinessIndicator" target="(artifact=dictionary)" bind="setReadinessIndicator"/>
   </scr:component>
 
   <scr:component name="org.opencastproject.textanalyzer.impl.endpoint.TextAnalysisRestEndpoint" immediate="false"

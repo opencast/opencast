@@ -46,12 +46,12 @@ import javax.jms.Session;
  * A class to receive messages from a ActiveMQ Message Broker.
  */
 @Component(
-  property = {
-    "service.description=Message Broker Receiver",
-    "service.pid=org.opencastproject.message.broker.impl.MessageReceiverImpl"
-  },
-  immediate = true,
-  service = { MessageReceiver.class }
+    property = {
+        "service.description=Message Broker Receiver",
+        "service.pid=org.opencastproject.message.broker.impl.MessageReceiverImpl"
+    },
+    immediate = true,
+    service = { MessageReceiver.class }
 )
 public class MessageReceiverImpl extends MessageBaseFacility implements MessageReceiver {
 
@@ -113,8 +113,9 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
     MessageConsumer consumer = null;
     try {
       consumer = createConsumer(destinationId, type);
-      if (consumer != null)
-          return consumer.receive();
+      if (consumer != null) {
+        return consumer.receive();
+      }
       logger.trace("Consumer could not be created.");
       return null;
     } finally {

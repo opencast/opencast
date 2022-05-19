@@ -24,6 +24,7 @@ angular.module('adminNg.controllers')
 .controller('TouchCtrl', ['$scope', '$document',
   function ($scope, $document) {
     $scope.openPopup = function(id) {
+      $scope.clearPopup();
       var popup = angular.element(document.getElementById(id));
       popup.toggle('is-hidden');
     };

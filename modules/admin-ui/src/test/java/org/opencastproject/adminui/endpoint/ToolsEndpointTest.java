@@ -210,14 +210,14 @@ public class ToolsEndpointTest {
     endpoint.setSmilService(smilService);
 
     AdminUIConfiguration adminUIConfiguration = new AdminUIConfiguration();
-    Hashtable<String, String> dictionary = new Hashtable<>();
+    Hashtable<String, Object> dictionary = new Hashtable<>();
     dictionary.put(AdminUIConfiguration.OPT_PREVIEW_SUBTYPE, "preview");
     dictionary.put(AdminUIConfiguration.OPT_WAVEFORM_SUBTYPE, "waveform");
     dictionary.put(AdminUIConfiguration.OPT_SMIL_CATALOG_FLAVOR, "smil/cutting");
     dictionary.put(AdminUIConfiguration.OPT_SMIL_SILENCE_FLAVOR, "*/silence");
-    adminUIConfiguration.updated(dictionary);
-    endpoint.setAdminUIConfiguration(adminUIConfiguration);
 
+    adminUIConfiguration.modified(dictionary);
+    endpoint.setAdminUIConfiguration(adminUIConfiguration);
   }
 
   /** Test method for {@link ToolsEndpoint#getSegmentsFromSmil(Smil)} */

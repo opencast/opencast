@@ -25,7 +25,7 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.ARecord;
-import org.opencastproject.assetmanager.impl.TieredStorageAssetManagerJobProducer;
+import org.opencastproject.assetmanager.impl.AssetManagerJobProducer;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
@@ -48,13 +48,13 @@ public class AssetManagerStorageMoveOperationHandler extends AbstractWorkflowOpe
   private static final String LATEST = "latest" ;
 
   /** The asset manager. */
-  private TieredStorageAssetManagerJobProducer tsamjp;
+  private AssetManagerJobProducer tsamjp;
 
   /** The archive */
   private AssetManager assetManager;
 
   /** OSGi DI */
-  public void setJobProducer(TieredStorageAssetManagerJobProducer tsamjp) {
+  public void setJobProducer(AssetManagerJobProducer tsamjp) {
     this.tsamjp = tsamjp;
   }
 

@@ -3,7 +3,7 @@
                name="org.opencastproject.lti.LtiServiceGuiEndpoint"
                immediate="true">
   <implementation class="org.opencastproject.lti.LtiServiceGuiEndpoint"/>
-  <property name="service.description" value="LTI Service"/>
+  <property name="service.description" value="LTI Service GUI"/>
   <property name="opencast.service.type" value="org.opencastproject.lti.service.remote"/>
   <property name="opencast.service.path" value="/lti-service-gui"/>
   <service>

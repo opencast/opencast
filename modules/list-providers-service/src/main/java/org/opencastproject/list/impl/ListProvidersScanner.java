@@ -181,8 +181,9 @@ public class ListProvidersScanner implements ArtifactInstaller {
 
   private static Properties readProperties(File file) throws IOException {
     Properties properties = new Properties();
-    InputStreamReader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
-    properties.load(reader);
+    try (InputStreamReader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
+      properties.load(reader);
+    }
     return properties;
   }
 

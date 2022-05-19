@@ -4,7 +4,6 @@
                immediate="true">
   <implementation class="org.opencastproject.lti.service.impl.LtiServiceImpl"/>
   <property name="service.description" value="LTI Service"/>
-  <property name="opencast.service.type" value="org.opencastproject.lti.service"/>
   <service>
     <!-- expose interface for MH REST publisher! -->
     <provide interface="org.opencastproject.lti.service.api.LtiService"/>
@@ -26,7 +25,7 @@
              interface="org.opencastproject.security.api.SecurityService"
              bind="setSecurityService"/>
   <reference name="search-index"
-             interface="org.opencastproject.external.index.ExternalIndex"
+             interface="org.opencastproject.elasticsearch.index.ElasticsearchIndex"
              bind="setSearchIndex"/>
   <reference name="asset-manager"
              interface="org.opencastproject.assetmanager.api.AssetManager"

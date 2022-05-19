@@ -20,15 +20,13 @@
  */
 package org.opencastproject.assetmanager.impl.endpoint;
 
-import static org.apache.commons.io.FilenameUtils.getBaseName;
-import static org.opencastproject.assetmanager.impl.AbstractAssetManager.getFileNameFromUrn;
 import static org.opencastproject.util.MimeTypeUtil.Fns.suffix;
 import static org.opencastproject.util.OsgiUtil.getComponentContextProperty;
 import static org.opencastproject.util.OsgiUtil.getContextProperty;
 import static org.opencastproject.util.UrlSupport.uri;
 
 import org.opencastproject.assetmanager.api.Snapshot;
-import org.opencastproject.assetmanager.impl.AbstractAssetManager;
+import org.opencastproject.assetmanager.impl.AssetManagerImpl;
 import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.security.api.Organization;
@@ -100,7 +98,7 @@ public class OsgiEndpointHttpAssetProvider implements HttpAssetProvider {
   }
 
   @Override public Snapshot prepareForDelivery(final Snapshot snapshot) {
-    return AbstractAssetManager.rewriteUris(snapshot, new Fn<MediaPackageElement, URI>() {
+    return AssetManagerImpl.rewriteUris(snapshot, new Fn<MediaPackageElement, URI>() {
       @Override public URI apply(MediaPackageElement mpe) {
         return createUriFor(mpe, snapshot);
       }
@@ -108,7 +106,13 @@ public class OsgiEndpointHttpAssetProvider implements HttpAssetProvider {
   }
 
   private URI createUriFor(MediaPackageElement mpe, Snapshot snapshot) {
-    String baseName = getBaseName(getFileNameFromUrn(mpe).getOr(mpe.getElementType().toString()));
+    Opt<String> fileNameOpt = AssetManagerImpl.getFileNameFromUrn(mpe);
+    String fileName;
+    if (fileNameOpt.isSome()) {
+      fileName = fileNameOpt.get();
+    } else {
+      fileName = mpe.getElementType().toString() + "." + mimeTypeToSuffix(Opt.nul(mpe.getMimeType()));
+    }
 
     // the returned uri must match the path of the {@link #getAsset} method
     return uri(calcServerUrl(snapshot.getOrganizationId().toString()),
@@ -117,7 +121,7 @@ public class OsgiEndpointHttpAssetProvider implements HttpAssetProvider {
                mpe.getMediaPackage().getIdentifier().toString(),
                mpe.getIdentifier(),
                snapshot.getVersion().toString(),
-               baseName + "." + mimeTypeToSuffix(Opt.nul(mpe.getMimeType())));
+               fileName);
   }
 
   /** Get a file name suffix for the given MIME type. */

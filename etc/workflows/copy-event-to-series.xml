@@ -33,8 +33,10 @@
         fail-on-error="false"
         description="Remove temporary processing artifacts">
       <configurations>
+        <!-- On systems with shared workspace or working file repository -->
+        <!-- you want to set this option to false. -->
         <configuration key="delete-external">true</configuration>
-        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
+        <!-- ACLs are required again when working through ActiveMQ messages -->
         <configuration key="preserve-flavors">security/*</configuration>
       </configurations>
     </operation>

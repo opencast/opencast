@@ -50,6 +50,9 @@ public interface RestConstants {
   /** The bundle header used to find the static resource classpath */
   String HTTP_CLASSPATH = "Http-Classpath";
 
+  /** The bundle header used to redirect to welcome file */
+  String HTTP_SPA_REDIRECT = "Http-Spa-Redirect";
+
   /** The bundle header used to find the static resource welcome file */
   String HTTP_WELCOME = "Http-Welcome";
 

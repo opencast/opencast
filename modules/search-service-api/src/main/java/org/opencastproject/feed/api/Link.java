@@ -25,7 +25,7 @@ package org.opencastproject.feed.api;
 /**
  * Links are used to add references to external entities.
  * <p>
- * Note that this interface is heavily inspired and backed by the excellent rss/atom feed library <tt>Rome</tt>
+ * Note that this interface is heavily inspired and backed by the excellent rss/atom feed library <code>Rome</code>
  * (http://https://rome.dev.java.net).
  */
 public interface Link {

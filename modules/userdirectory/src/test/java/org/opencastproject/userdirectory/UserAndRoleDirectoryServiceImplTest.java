@@ -138,10 +138,12 @@ public class UserAndRoleDirectoryServiceImplTest {
     EasyMock.expect(otherOrgRoleProvider.getRolesForUser((String) EasyMock.anyObject())).andReturn(rolesForUser2)
             .anyTimes();
 
-    EasyMock.expect(otherOrgRoleProvider.findRoles("%", Role.Target.ALL, 0, 0)).andReturn(roles2.iterator())
-            .anyTimes();
-    EasyMock.expect(otherOrgRoleProvider.findRoles("%2012%", Role.Target.ALL, 0, 0)).andReturn(new ArrayList<Role>().iterator())
-            .anyTimes();
+    EasyMock.expect(otherOrgRoleProvider.findRoles("%", Role.Target.ALL, 0, 0))
+        .andReturn(roles2.iterator())
+        .anyTimes();
+    EasyMock.expect(otherOrgRoleProvider.findRoles("%2012%", Role.Target.ALL, 0, 0))
+        .andReturn(new ArrayList<Role>().iterator())
+        .anyTimes();
 
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();

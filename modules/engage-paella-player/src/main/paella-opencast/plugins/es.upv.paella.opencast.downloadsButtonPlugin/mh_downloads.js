@@ -25,7 +25,7 @@ class DownloadTrack {
       throw 'No audio and video';
     }
     this.flavor = ocTrack.type;
-    this.mimetype = paella.dictionary.translate(ocTrack.mimetype);
+    this.mimetype = paella.utils.dictionary.translate(ocTrack.mimetype);
     this.url = ocTrack.url;
     if (ocTrack.audio) {
       this.type = 'audio';
@@ -55,7 +55,7 @@ paella.addPlugin(function() {
     getSubclass() { return 'downloadsButton'; }
     getName() { return 'es.upv.paella.opencast.downloadsButtonPlugin'; }
     getIndex() { return 1000; }
-    getDefaultToolTip() { return paella.dictionary.translate('Downloads'); }
+    getDefaultToolTip() { return paella.utils.dictionary.translate('Downloads'); }
     getAlignment() { return 'right'; }
     getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
     getIconClass() { return 'icon-folder-download'; }
@@ -91,7 +91,7 @@ paella.addPlugin(function() {
           onSuccess(true);
         })
         .catch(function(error) {
-          base.log.error('opencast downloads button plugin disabled: ' + error);
+          paella.log.error('opencast downloads button plugin disabled: ' + error);
           onSuccess(false);
         });
       }
@@ -155,7 +155,7 @@ paella.addPlugin(function() {
 
       if (self._episode === undefined || self._tracks.length < 1) {
         container.innerHTML = '<div class="downloadsItemContainer"><p class="noTracks">'
-                                + paella.dictionary.translate('No downloads available') + '</p></div';
+                                + paella.utils.dictionary.translate('No downloads available') + '</p></div';
       } else {
         let trackTypes = ['video', 'audio'];
         let flavors = new Set(self._tracks.map(track => track.flavor));
@@ -204,7 +204,7 @@ paella.addPlugin(function() {
                 if ('video' === track.type) {
                   let videoFormatElement = document.createElement('span');
                   videoFormatElement.className = 'downloadsButtonItemLinkSpanFormat';
-                  videoFormatElement.innerText = `[${paella.dictionary.translate(mimetype)}]`;
+                  videoFormatElement.innerText = `[${paella.utils.dictionary.translate(mimetype)}]`;
                   a.appendChild(videoFormatElement);
 
                   let videoResolutionElement = document.createElement('span');
@@ -214,7 +214,7 @@ paella.addPlugin(function() {
                 } else if ('audio' === track.type) {
                   let audioFormatElement = document.createElement('span');
                   audioFormatElement.className = 'downloadsButtonItemLinkSpanFormat';
-                  audioFormatElement.innerText = `[${paella.dictionary.translate(mimetype)}]`;
+                  audioFormatElement.innerText = `[${paella.utils.dictionary.translate(mimetype)}]`;
                   a.appendChild(audioFormatElement);
 
                   let audioBitrateElement = document.createElement('span');

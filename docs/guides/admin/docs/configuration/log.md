@@ -1,30 +1,30 @@
-Log
-===
+Logging
+=======
 
-The settings for logging can be found in:
+The settings for logging can be found in `etc/org.ops4j.pax.logging.cfg`.
 
-    .../etc/org.ops4j.pax.logging.cfg
+Each Log4J appender can be configured in a similar fashion to the Graylog example down below.
+The following requirements have to be met:
 
-Each Log4J appender can be configured in a similar fashion to the graylog example down below. The following
-requirements have to be met:
-* It needs to be a Log4J appender
-* The used bundle needs to be a fragment-bundle
+- It needs to be a Log4J appender
+- The used bundle needs to be a fragment-bundle
 
 Graylog
 -------
 
-To have all log data available and accessible in one central location one can use graylog. A guide to install
-graylog can be found [here](http://docs.graylog.org/en/stable/).
+To have all log data available and accessible in one central location one can use Graylog.
+A guide to install Graylog can be found [in Graylog's documentation](https://docs.graylog.org/docs/installing).
 
 
-Add gelfj-X.X.X.jar (works up to version 1.1.14) to the appropriate folder in the karaf system folder (e.g. `/system/org/graylog2/gelfj/X.X.X/gelfj-X.X.X.jar`)
+Add `gelfj-X.X.X.jar` (works up to version 1.1.14) to the appropriate folder in the Karaf system folder
+(e.g. `/system/org/graylog2/gelfj/X.X.X/gelfj-X.X.X.jar`)
 The directory has the same structure as a maven repository!
 
 It is important that the appender jar is a valid fragment-bundle of `org.ops4j.pax.logging.pax-logging-service`.
 
-That means the jar MANIFEST.MF must contain this section `Fragment-Host: org.ops4j.pax.logging.pax-logging-service`.
+That means the jar's `MANIFEST.MF` must contain this section `Fragment-Host: org.ops4j.pax.logging.pax-logging-service`.
 
-Add the following line at the beginning of the startup.properties file:
+Add the following line at the beginning of the `startup.properties` file:
 
 ```
 mvn\:org.graylog2/gelfj/X.X.X = 7
@@ -60,8 +60,7 @@ Add the new appender to the rootLogger
 log4j.rootLogger=WARN, stdout, osgi:*, gelfasync
 ```
 
-Example Configuration
----------------------
+### Example Configuration
 
 ```
 # Define the GELF destination
@@ -77,5 +76,4 @@ log4j.appender.gelf.includeLocation=true
 log4j.appender.gelf.additionalFields={'environment': 'OPENCAST-TEST-ENV', 'application': 'OC-ADMIN'}
 ```
 
-You can find further GELF appender documentation [here](https://github.com/t0xa/gelfj).
-
+You can find further GELF appender documentation [in the gelfj GitHub repository](https://github.com/t0xa/gelfj).

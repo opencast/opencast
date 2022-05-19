@@ -31,6 +31,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +43,13 @@ import java.io.File;
 /**
  * Service that registers the static resources required by the Theodul player with an optional local override directory.
  */
+@Component(
+    property = {
+        "service.description=Service that registers static resources for the Theodul player"
+    },
+    immediate = true,
+    service = TheodulCoreStaticResources.class
+)
 public class TheodulCoreStaticResources {
 
   // property key for configuration of override path
@@ -60,11 +71,13 @@ public class TheodulCoreStaticResources {
 
   private ServiceRegistration registrationStaticResources;
 
+  @Activate
   public void activate(BundleContext bc) throws Exception {
     logger.info("Starting Theodul Core Bundle.");
     registerStaticResources(getOverrideDir(bc), bc);
   }
 
+  @Deactivate
   public void deactivate(BundleContext bc) throws Exception {
     logger.info("Stopping Theodul Core Bundle.");
     unregisterStaticResources(bc);
@@ -81,8 +94,7 @@ public class TheodulCoreStaticResources {
     if (StringUtils.trimToNull(path) == null) {
       path = DEFAULT_OVERRIDE_DIR;
     }
-    File dir = new File(path);
-    return dir;
+    return new File(path);
   }
 
   private void registerStaticResources(File overrideDir, BundleContext bc) {
@@ -108,5 +120,10 @@ public class TheodulCoreStaticResources {
 
   private void unregisterStaticResources(BundleContext bc) {
     registrationStaticResources.unregister();
+  }
+
+  @Reference
+  private void setRestPublisher(RestPublisher publisher) {
+    // we just want the binding
   }
 }

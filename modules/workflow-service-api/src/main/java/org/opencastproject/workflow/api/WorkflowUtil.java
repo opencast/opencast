@@ -34,10 +34,9 @@ public final class WorkflowUtil {
    *          The workflow state to check.
    * @return True if the workflow is currently active, not stopped or failed.
    */
+  @Deprecated
   public static boolean isActive(WorkflowState workflowState) {
-    return WorkflowState.INSTANTIATED.equals(workflowState)
-            || WorkflowState.RUNNING.equals(workflowState)
-            || WorkflowState.PAUSED.equals(workflowState);
+    return !workflowState.isTerminated();
   }
 
   /**
@@ -48,8 +47,10 @@ public final class WorkflowUtil {
    * @return True if the workflow is currently active, not stopped or failed.
    */
   public static boolean isActive(String workflowState) {
-    return WorkflowState.INSTANTIATED.toString().equalsIgnoreCase(workflowState)
-        || WorkflowState.RUNNING.toString().equalsIgnoreCase(workflowState)
-        || WorkflowState.PAUSED.toString().equalsIgnoreCase(workflowState);
+    if (workflowState == null || workflowState.isBlank()) {
+      return false;
+    } else {
+      return !WorkflowState.valueOf(workflowState).isTerminated();
+    }
   }
 }

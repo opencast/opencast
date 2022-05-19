@@ -40,15 +40,40 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity(name = "HostRegistration")
 @Access(AccessType.FIELD)
-@Table(name = "oc_host_registration", indexes = {
-    @Index(name = "IX_oc_host_registration_online", columnList = ("online")),
-    @Index(name = "IX_oc_host_registration_active", columnList = ("active"))
-  }, uniqueConstraints = @UniqueConstraint(columnNames = "host"))
+@Table(
+    name = "oc_host_registration",
+    indexes = {
+        @Index(name = "IX_oc_host_registration_online", columnList = ("online")),
+        @Index(name = "IX_oc_host_registration_active", columnList = ("active")),
+    },
+    uniqueConstraints = @UniqueConstraint(columnNames = "host")
+)
 @NamedQueries({
-        @NamedQuery(name = "HostRegistration.getMaxLoad", query = "SELECT sum(hr.maxLoad) FROM HostRegistration hr where hr.active = true"),
-        @NamedQuery(name = "HostRegistration.getMaxLoadByHostName", query = "SELECT hr.maxLoad FROM HostRegistration hr where hr.baseUrl = :host and hr.active = true"),
-  @NamedQuery(name = "HostRegistration.byHostName", query = "SELECT hr from HostRegistration hr where hr.baseUrl = :host"),
-  @NamedQuery(name = "HostRegistration.getAll", query = "SELECT hr FROM HostRegistration hr where hr.active = true") })
+    @NamedQuery(
+        name = "HostRegistration.getMaxLoad",
+        query = "SELECT sum(hr.maxLoad) FROM HostRegistration hr where hr.active = true"
+    ),
+    @NamedQuery(
+        name = "HostRegistration.getMaxLoadByHostName",
+        query = "SELECT hr.maxLoad FROM HostRegistration hr "
+            + "where hr.baseUrl = :host and hr.active = true"
+    ),
+    @NamedQuery(
+        name = "HostRegistration.byHostName",
+        query = "SELECT hr from HostRegistration hr where hr.baseUrl = :host"
+    ),
+    @NamedQuery(
+        name = "HostRegistration.jobStatistics",
+        query = "select j.processorServiceRegistration.hostRegistration.id, j.status, count(j) "
+            + "from Job j "
+            + "where j.status in :status "
+            + "group by j.processorServiceRegistration.hostRegistration.id, j.status"
+    ),
+    @NamedQuery(
+        name = "HostRegistration.getAll",
+        query = "SELECT hr FROM HostRegistration hr where hr.active = true"
+    ),
+})
 public class HostRegistrationJpaImpl implements HostRegistration {
 
   @Id
@@ -92,8 +117,16 @@ public class HostRegistrationJpaImpl implements HostRegistration {
   public HostRegistrationJpaImpl() {
   }
 
-  public HostRegistrationJpaImpl(String baseUrl, String address, String nodeName, long memory, int cores, float maxLoad, boolean online,
-          boolean maintenance) {
+  public HostRegistrationJpaImpl(
+      String baseUrl,
+      String address,
+      String nodeName,
+      long memory,
+      int cores,
+      float maxLoad,
+      boolean online,
+      boolean maintenance
+  ) {
     this.baseUrl = baseUrl;
     this.ipAddress = address;
     this.nodeName = nodeName;
@@ -105,6 +138,7 @@ public class HostRegistrationJpaImpl implements HostRegistration {
     this.active = true;
   }
 
+  @Override
   public Long getId() {
     return id;
   }
@@ -210,8 +244,9 @@ public class HostRegistrationJpaImpl implements HostRegistration {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof HostRegistration))
+    if (!(obj instanceof HostRegistration)) {
       return false;
+    }
     HostRegistration registration = (HostRegistration) obj;
     return baseUrl.equals(registration.getBaseUrl());
   }

@@ -21,7 +21,9 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-import org.opencastproject.index.service.api.EventIndex;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
@@ -42,7 +44,6 @@ public class EventsListProvider implements ResourceListProvider {
   public static final String PRESENTERS_TECHNICAL = PROVIDER_PREFIX + ".PRESENTERS_TECHNICAL";
   public static final String SUBJECT = PROVIDER_PREFIX + ".SUBJECT";
   public static final String LOCATION = PROVIDER_PREFIX + ".LOCATION";
-  public static final String START_DATE = PROVIDER_PREFIX + ".START_DATE";
   public static final String PROGRESS = PROVIDER_PREFIX + ".PROGRESS";
   public static final String STATUS = PROVIDER_PREFIX + ".STATUS";
   public static final String COMMENTS = PROVIDER_PREFIX + ".COMMENTS";
@@ -57,13 +58,13 @@ public class EventsListProvider implements ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(EventsListProvider.class);
 
-  private EventIndex index;
+  private ElasticsearchIndex index;
 
   protected void activate(BundleContext bundleContext) {
     logger.info("Events list provider activated!");
   }
 
-  public void setIndex(EventIndex index) {
+  public void setIndex(ElasticsearchIndex index) {
     this.index = index;
   }
 
@@ -77,19 +78,19 @@ public class EventsListProvider implements ResourceListProvider {
     Map<String, String> list = new HashMap<String, String>();
 
     if (CONTRIBUTORS.equals(listName)) {
-      for (String contributor : index.getEventContributors())
+      for (String contributor : index.getTermsForField(EventIndexSchema.CONTRIBUTOR, Event.DOCUMENT_TYPE))
         list.put(contributor, contributor);
     } else if (PRESENTERS_BIBLIOGRAPHIC.equals(listName)) {
-      for (String presenter : index.getEventPresenters())
+      for (String presenter : index.getTermsForField(EventIndexSchema.PRESENTER, Event.DOCUMENT_TYPE))
         list.put(presenter, presenter);
     } else if (PRESENTERS_TECHNICAL.equals(listName)) {
-      for (String presenter : index.getEventTechnicalPresenters())
+      for (String presenter : index.getTermsForField(EventIndexSchema.TECHNICAL_PRESENTERS, Event.DOCUMENT_TYPE))
         list.put(presenter, presenter);
     } else if (LOCATION.equals(listName)) {
-      for (String location : index.getEventLocations())
+      for (String location : index.getTermsForField(EventIndexSchema.LOCATION, Event.DOCUMENT_TYPE))
         list.put(location, location);
     } else if (SUBJECT.equals(listName)) {
-      for (String subject : index.getEventSubjects())
+      for (String subject : index.getTermsForField(EventIndexSchema.SUBJECT, Event.DOCUMENT_TYPE))
         list.put(subject, subject);
     } else if (PROGRESS.equals(listName)) {
       for (WorkflowState progress : WorkflowState.values())
@@ -109,7 +110,7 @@ public class EventsListProvider implements ResourceListProvider {
       for (Comments comments : Comments.values())
         list.put(comments.toString(), "FILTERS.EVENTS.COMMENTS." + comments.toString());
     } else if (PUBLISHER.equals(listName)) {
-      for (String publisher : index.getEventPublishers())
+      for (String publisher : index.getTermsForField(EventIndexSchema.PUBLISHER, Event.DOCUMENT_TYPE))
         list.put(publisher, publisher);
     }
 

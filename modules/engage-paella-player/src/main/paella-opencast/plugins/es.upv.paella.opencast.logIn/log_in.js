@@ -32,7 +32,7 @@ paella.addPlugin(function() {
     getIconClass() { return 'icon-user'; }
     getAlignment() { return 'right'; }
     getIndex() {return 10;}
-    getDefaultToolTip() { return base.dictionary.translate('Log in'); }
+    getDefaultToolTip() { return paella.utils.dictionary.translate('Log in'); }
 
     checkEnabled(onSuccess) {
       paella.initDelegate.initParams.accessControl.userData()

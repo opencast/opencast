@@ -26,7 +26,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
@@ -47,8 +46,8 @@ import java.io.IOException;
 import io.restassured.http.ContentType;
 
 public class CaptureAgentsEndpointTest {
-  private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestCaptureAgentsEndpoint.class);
-  private JSONParser parser = new JSONParser();
+  private static final RestServiceTestEnv rt = testEnvForClasses(TestCaptureAgentsEndpoint.class);
+  private final JSONParser parser = new JSONParser();
 
   private JSONObject getCaptureAgent(String name, JSONArray captureAgents) {
     JSONObject result = null;

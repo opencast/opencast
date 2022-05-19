@@ -27,7 +27,6 @@ import static org.junit.Assert.assertThat;
 import static org.opencastproject.external.endpoint.TestCaptureAgentsEndpoint.UNKNOWN_AGENT;
 import static org.opencastproject.external.endpoint.TestCaptureAgentsEndpoint.loadAgents;
 import static org.opencastproject.external.endpoint.TestCaptureAgentsEndpoint.toJson;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.capture.admin.api.Agent;
@@ -46,7 +45,7 @@ import java.util.List;
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class CaptureAgentsEndpointTest {
-  private static final RestServiceTestEnv env = testEnvForClasses(localhostRandomPort(), TestCaptureAgentsEndpoint.class);
+  private static final RestServiceTestEnv env = testEnvForClasses(TestCaptureAgentsEndpoint.class);
 
   private static List<Agent> allAgents;
 

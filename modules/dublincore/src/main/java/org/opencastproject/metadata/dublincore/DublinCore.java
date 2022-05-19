@@ -52,7 +52,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * <a href="http://dublincore.org/documents/dc-xml-guidelines/">http://dublincore.org/documents/dc-xml-guidelines/</a>
  * Section 5 for further information.
  * <p>
- * <h3>Current limitations</h3>
+ * <h2>Current limitations</h2>
  * <ul>
  * <li>This interface assumes that Dublin Core metadata is stored as XML. According to the Dublin Core specification
  * this is not necessary.

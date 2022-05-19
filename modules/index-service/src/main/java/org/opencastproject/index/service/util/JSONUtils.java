@@ -169,8 +169,6 @@ public final class JSONUtils {
    *          The {@link ResourceListQuery}
    * @param listProvidersService
    *          The {@link ListProvidersService} to get the possible values
-   * @param org
-   *          The {@link Organization}
    * @param series
    *          The Series with write access
    * @return
@@ -178,14 +176,11 @@ public final class JSONUtils {
    *           if the possible values can not be retrieved correctly from the list provider.
    */
   public static JValue filtersToJSONSeriesWriteAccess(ResourceListQuery query, ListProvidersService listProvidersService,
-          Organization org, Map<String, String> series) throws ListProviderException {
+          Map<String, String> series) throws ListProviderException {
 
-    List<Field> filtersJSON = new ArrayList<Field>();
-    List<Field> fields = null;
-    List<ResourceListFilter<?>> filters = query.getAvailableFilters();
-
-    for (ResourceListFilter<?> filter : filters) {
-      fields = new ArrayList<Field>();
+    List<Field> filtersJSON = new ArrayList<>();
+    for (ResourceListFilter<?> filter : query.getAvailableFilters()) {
+      List<Field> fields = new ArrayList<>();
 
       fields.add(f("type", v(filter.getSourceType().toString().toLowerCase())));
       fields.add(f("label", v(filter.getLabel())));

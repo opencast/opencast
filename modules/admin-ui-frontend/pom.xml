@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>10-SNAPSHOT</version>
+    <version>11-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -44,8 +44,9 @@
                 </goals>
                 <phase>initialize</phase>
                 <configuration>
-                  <executable>node_modules/.bin/bower</executable>
+                  <executable>npx</executable>
                   <arguments>
+                    <argument>bower</argument>
                     <argument>--allow-root</argument>
                     <argument>install</argument>
                   </arguments>
@@ -56,17 +57,18 @@
                 <goals>
                   <goal>exec</goal>
                 </goals>
-                <phase>compile</phase>
+                <phase>initialize</phase>
                 <configuration>
-                  <executable>node_modules/grunt-cli/bin/grunt</executable>
+                  <executable>npx</executable>
                   <arguments>
+                    <argument>grunt</argument>
                     <argument>build</argument>
                     <argument>--skipTests=${skipTests}</argument>
                   </arguments>
                 </configuration>
               </execution>
               <execution>
-                <id>esline</id>
+                <id>eslint</id>
                 <goals>
                   <goal>exec</goal>
                 </goals>
@@ -189,14 +191,6 @@
             <Http-Alias>/admin-ng</Http-Alias>
             <Http-Classpath>/webapp</Http-Classpath>
             <Http-Welcome>index.html</Http-Welcome>
-<!--            <Import-Package>
-              net.fortuna.ical4j.*,
-              org.opencastproject.index.service.message,
-              org.opencastproject.adminui.index,
-              javax.ws.rs;version=2.0.1,
-              javax.ws.rs.core;version=2.0.1,
-              *
-            </Import-Package>-->
             <Private-Package>
               webapp.*
             </Private-Package>

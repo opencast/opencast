@@ -39,7 +39,7 @@ migrations. For that, the following steps might help.
    depends on `org.opencastproject.solr.dir` and `org.opencastproject.search.solr.dir`
 7. Rebuild the Solr indices by re-starting your Opencast node running the search service (usually presentation).
 8. Rebuild the Elasticsearch indices using the REST endpoint listed in the docs:
-   https://admin.opencast.example.com/docs.html?path=/admin-ng/index
+   https://admin.opencast.example.com/docs.html?path=/index
 
 Note: If the solr index does not repopulate by itself please check if your nodes are still in maintenance mode and
 reactivate them.

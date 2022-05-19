@@ -138,7 +138,7 @@ public final class MimeTypes {
     @Override
     public Opt<MimeType> apply(String name) {
       try {
-        return Opt.some(fromString(name));
+        return Opt.some(parseMimeType(name));
       } catch (Exception e) {
         return Opt.none();
       }

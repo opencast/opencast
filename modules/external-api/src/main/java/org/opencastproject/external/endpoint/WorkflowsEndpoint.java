@@ -34,11 +34,11 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.common.ApiVersion;
-import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -102,7 +102,8 @@ import javax.ws.rs.core.Response;
 
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
-            ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0 })
+            ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
+            ApiMediaType.VERSION_1_7_0 })
 @RestService(name = "externalapiworkflowinstances", title = "External API Workflow Instances Service", notes = {},
              abstractText = "Provides resources and operations related to the workflow instances")
 public class WorkflowsEndpoint {
@@ -114,7 +115,7 @@ public class WorkflowsEndpoint {
 
   /* OSGi service references */
   private WorkflowService workflowService;
-  private ExternalIndex externalIndex;
+  private ElasticsearchIndex elasticsearchIndex;
   private IndexService indexService;
 
   /** OSGi DI */
@@ -123,8 +124,8 @@ public class WorkflowsEndpoint {
   }
 
   /** OSGi DI */
-  public void setExternalIndex(ExternalIndex externalIndex) {
-    this.externalIndex = externalIndex;
+  public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
+    this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /** OSGi DI */
@@ -342,7 +343,7 @@ public class WorkflowsEndpoint {
 
     try {
       // Media Package
-      Opt<Event> event = indexService.getEvent(eventId, externalIndex);
+      Opt<Event> event = indexService.getEvent(eventId, elasticsearchIndex);
       if (event.isNone()) {
         return ApiResponses.notFound("Cannot find an event with id '%s'.", eventId);
       }

@@ -115,7 +115,9 @@ angular.module('adminNg.controllers')
     }
 
     AdopterRegistrationResource.get({}, function(adopter) {
-      if(adopter.dateModified == null) {
+      // We exclude localhost to not show this to developers all the time.
+      // We wouldn't get proper data from such instances anyway.
+      if(adopter.dateModified == null && window.location.hostname != 'localhost') {
         ResourceModal.show('registration-modal');
         return;
       }

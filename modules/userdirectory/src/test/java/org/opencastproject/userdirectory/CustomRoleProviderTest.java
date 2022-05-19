@@ -82,7 +82,9 @@ public class CustomRoleProviderTest {
     assertEquals(1, IteratorUtils.toList(customRoleProvider.findRoles("123_Learner", Role.Target.ACL, 0, 2)).size());
     assertEquals(1, IteratorUtils.toList(customRoleProvider.findRoles("123_Instructor", Role.Target.ACL, 0, 2)).size());
     assertEquals(1, IteratorUtils.toList(customRoleProvider.findRoles("456_Learner%", Role.Target.ACL, 0, 2)).size());
-    assertEquals(1, IteratorUtils.toList(customRoleProvider.findRoles("1b1b6e5d-34ac-4370-9b20-8d649df9878c_Instructor", Role.Target.ACL, 0, 2)).size());
+    assertEquals(1, IteratorUtils.toList(
+        customRoleProvider.findRoles("1b1b6e5d-34ac-4370-9b20-8d649df9878c_Instructor", Role.Target.ACL, 0, 2)
+    ).size());
 
     // Role does not exist
     assertEquals(0, IteratorUtils.toList(customRoleProvider.findRoles("unknown%", Role.Target.ACL, 0, 1)).size());

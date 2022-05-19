@@ -11,9 +11,13 @@ Once version 7.0 releases, version 5.x will no longer be supported, but 6.x will
 
 ```mermaid
 gantt
-    title Support of Opencast 5 and 6
+    title Example: Support of Opencast 5 and 6
     dateFormat  YYYY-MM-DD
     axisFormat  %Y-%m
+
+    section Opencast 4
+    Earlier 4.x …    :done, 2018-06-12, 2018-10-30
+    Opencast 4.5     :done, 2018-12-10
 
     section Opencast 5
     Opencast 5.0     :2018-06-12, 2018-09-03
@@ -32,6 +36,10 @@ gantt
     Opencast 6.5     :2019-08-02
     Opencast 6.6     :2019-08-12
     Opencast 6.7     :2019-12-17
+
+    section Opencast 7
+    Opencast 7.0     :done, 2019-06-13, 2019-07-09
+    Later 7.x …      :done, 2019-12-17
 ```
 
 The chart above shows the releases of Opencast 5 and 6 which overlap in a period of six month.

@@ -42,24 +42,12 @@ angular.module('adminNg.controllers')
         label: 'SYSTEMS.SERVERS.TABLE.CORES',
         sortable: true
       }, {
-        name:  'completed',
-        label: 'SYSTEMS.SERVERS.TABLE.COMPLETED',
-        sortable: true
-      }, {
         name:  'running',
         label: 'SYSTEMS.SERVERS.TABLE.RUNNING',
         sortable: true
       }, {
         name:  'queued',
         label: 'SYSTEMS.SERVERS.TABLE.QUEUED',
-        sortable: true
-      }, {
-        name:  'meanRunTime',
-        label: 'SYSTEMS.SERVERS.TABLE.MEAN_RUN_TIME',
-        sortable: true
-      }, {
-        name:  'meanQueueTime',
-        label: 'SYSTEMS.SERVERS.TABLE.MEAN_QUEUE_TIME',
         sortable: true
       }, {
         name:     'maintenance',

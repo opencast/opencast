@@ -48,9 +48,12 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +78,15 @@ import javax.ws.rs.core.Response;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+        immediate = true,
+        service = ListProvidersEndpoint.class,
+        property = {
+                "service.description=Admin UI - Resource List Provider Endpoint",
+                "opencast.service.type=org.opencastproject.adminui.ListProvidersEndpoint",
+                "opencast.service.path=/admin-ng/resources",
+        }
+)
 public class ListProvidersEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(ListProvidersEndpoint.class);
@@ -91,23 +103,29 @@ public class ListProvidersEndpoint {
   /** This regex is used to reduce the users in the filter selectbox.
    * The filter is located in the top right corner in the admin ui. */
   private static final String PROP_KEY_USER_FILTER_REGEX = "org.opencastproject.adminui.filter.user.regex";
+  private static final String PROP_KEY_USER_FILTER_REGEX_DEFAULT = ".*";
 
   protected void activate(BundleContext bundleContext) {
     logger.info("Activate list provider service");
-    JSONUtils.setUserRegex(bundleContext.getProperty(PROP_KEY_USER_FILTER_REGEX));
+    JSONUtils.setUserRegex(StringUtils.defaultIfBlank(
+            bundleContext.getProperty(PROP_KEY_USER_FILTER_REGEX),
+            PROP_KEY_USER_FILTER_REGEX_DEFAULT));
   }
 
   /** OSGi callback for series services. */
+  @Reference
   public void setListProvidersService(ListProvidersService listProvidersService) {
     this.listProvidersService = listProvidersService;
   }
 
   /** OSGi callback for sercurity service. */
+  @Reference
   public void setSecurityService(SecurityService securitySerivce) {
     this.securityService = securitySerivce;
   }
 
   /** OSGi callback for series end point. */
+  @Reference
   public void setSeriesEndpoint(SeriesEndpoint seriesEndpoint) {
     this.seriesEndpoint = seriesEndpoint;
   }
@@ -201,7 +219,7 @@ public class ListProvidersEndpoint {
   public Response getFilters(@PathParam("page") final String page, @Context HttpHeaders headers)
           throws ListProviderException {
 
-    ResourceListQuery query = new ResourceListQueryImpl();
+    ResourceListQuery query;
 
     if ("series".equals(page)) {
       query = new SeriesListQuery();
@@ -232,7 +250,7 @@ public class ListProvidersEndpoint {
       if ("events".equals(page) && seriesEndpoint.getOnlySeriesWithWriteAccessEventsFilter()) {
         Map<String, String> seriesWriteAccess = seriesEndpoint.getUserSeriesByAccess(true);
         return RestUtils.okJson(JSONUtils.filtersToJSONSeriesWriteAccess(query, listProvidersService,
-                securityService.getOrganization(), seriesWriteAccess));
+                seriesWriteAccess));
       } else {
         return RestUtils.okJson(JSONUtils.filtersToJSON(query, listProvidersService, securityService.getOrganization()));
       }

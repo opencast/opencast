@@ -50,18 +50,21 @@ public final class UserDirectoryUtils {
    */
   public static boolean isCurrentUserAuthorizedHandleRoles(SecurityService securityService, Set<Role> roles) {
     User user = securityService.getUser();
-    if (user == null)
+    if (user == null) {
       return false;
+    }
 
     Organization org = user.getOrganization();
 
     for (Role role : roles) {
-      if (StringUtils.equals(SecurityConstants.GLOBAL_ADMIN_ROLE, role.getName()))
+      if (StringUtils.equals(SecurityConstants.GLOBAL_ADMIN_ROLE, role.getName())) {
         return user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE);
+      }
 
-      if (org != null && StringUtils.equals(org.getAdminRole(), role.getName()))
+      if (org != null && StringUtils.equals(org.getAdminRole(), role.getName())) {
         return user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE)
                 || user.hasRole(org.getAdminRole());
+      }
     }
     return true;
   }

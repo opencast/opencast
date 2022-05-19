@@ -24,7 +24,9 @@ import org.opencastproject.editor.api.EditingData;
 import org.opencastproject.editor.api.EditorService;
 import org.opencastproject.editor.api.EditorServiceException;
 import org.opencastproject.editor.api.ErrorStatus;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -33,12 +35,21 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+@Component(
+    property = {
+        "service.description=Editor Service Remote Proxy"
+    },
+    immediate = true,
+    service = EditorService.class
+)
 public class EditorServiceRemoteImpl extends RemoteBase implements EditorService {
   private static final Logger logger = LoggerFactory.getLogger(EditorServiceRemoteImpl.class);
   public static final String EDIT_SUFFIX = "/edit.json";
@@ -131,5 +142,15 @@ public class EditorServiceRemoteImpl extends RemoteBase implements EditorService
       default:
         throw new EditorServiceException("Editor Remote call failed", ErrorStatus.UNKNOWN);
     }
+  }
+
+  @Reference
+  public void setTrustedHttpClient(TrustedHttpClient client) {
+    this.client = client;
+  }
+
+  @Reference
+  public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
+    this.remoteServiceManager = remoteServiceManager;
   }
 }

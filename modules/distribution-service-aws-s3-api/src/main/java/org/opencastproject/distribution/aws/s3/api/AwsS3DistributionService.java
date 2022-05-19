@@ -20,14 +20,7 @@
  */
 package org.opencastproject.distribution.aws.s3.api;
 
-import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DownloadDistributionService;
-import org.opencastproject.job.api.Job;
-import org.opencastproject.mediapackage.MediaPackage;
 
 public interface AwsS3DistributionService extends DownloadDistributionService {
-
-  Job restore(String channelId, MediaPackage mediaPackage, String elementId) throws DistributionException;
-  Job restore(String channelId, MediaPackage mediaPackage, String elementId, String filename)
-          throws DistributionException;
 }

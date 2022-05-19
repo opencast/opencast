@@ -136,7 +136,12 @@ public class GoogleSpeechTranscriptionServiceStorage {
    * @param accessToken
    * @throws java.io.IOException
    */
-  public void deleteGoogleStorageFile(CloseableHttpClient httpClient, String bucket, String objectName, String accessToken) throws IOException {
+  public void deleteGoogleStorageFile(
+      CloseableHttpClient httpClient,
+      String bucket,
+      String objectName,
+      String accessToken
+  ) throws IOException {
     CloseableHttpResponse response = null;
     try {
       HttpDelete httpdelete = new HttpDelete(GOOGLE_STORAGE_MEDIA + String.format("%s/o/%s", bucket, objectName));

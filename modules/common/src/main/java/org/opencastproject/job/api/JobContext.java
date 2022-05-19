@@ -28,20 +28,6 @@ import java.util.Map;
  */
 public interface JobContext {
 
-  // /**
-  // * Returns the identifier of the parent job or <code>null</code> if there is no parent job.
-  // *
-  // * @return the parent job identifier
-  // */
-  // Long getParentJobId();
-  //
-  // /**
-  // * Returns the user that is associated with the job.
-  // *
-  // * @return the user id
-  // */
-  // String getUserId();
-
   /**
    * Gets the job context identifier.
    *

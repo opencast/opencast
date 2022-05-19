@@ -6,6 +6,10 @@ on:
       - develop
       - 'r/*.x'
 
+concurrency:
+  group: crowdin-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy-translation-keys:
     if: github.repository_owner == 'opencast'

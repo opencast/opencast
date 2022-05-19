@@ -20,15 +20,14 @@ Watch for announcements on list or just check which versions are available in th
 Currently Supported
 -------------------
 
-* Debian 9 and newer amd64
-* Ubuntu 18.04 amd64
+* Debian 10 and newer amd64
+* Ubuntu 18.04 and newer amd64
 
 
 Supported JDKs
 --------------
 
-For Opencast 9 we support JDK 8 and JDK 11, however Opencast 10 will drop support for JDK 8.  We strongly encourage you
-to use JDK 11 for Opencast 9.
+For Opencast 10 and newer we support JDK 11 only.
 
 
 Activate Repository
@@ -42,13 +41,13 @@ First you have to install the necessary repositories so that your package manage
 
 * Add Opencast repository:
 
-        echo "deb https://pkg.opencast.org/debian 9.x stable" | sudo tee /etc/apt/sources.list.d/opencast.list
+        echo "deb https://pkg.opencast.org/debian {{ opencast_major_version() }}.x stable" | sudo tee /etc/apt/sources.list.d/opencast.list
 
     It might take some time after the release of a new Opencast version before the Debs are moved to the stable
     repository. If you need the new release prior to its promotion to stable you can use the testing repository.
     Note that the testing repository is an additional repository and still requires the stable repository to be active.
 
-        echo "deb https://pkg.opencast.org/debian 9.x stable testing" | sudo tee /etc/apt/sources.list.d/opencast.list
+        echo "deb https://pkg.opencast.org/debian {{ opencast_major_version()}}.x stable testing" | sudo tee /etc/apt/sources.list.d/opencast.list
 
 * Add the repository key to your apt keyring:
 
@@ -100,19 +99,26 @@ If you wish to use the upstream Elasticsearch repository directly be aware that 
 versions with the same major and minor version values.  That is, if our 9.x repository has Elasticsearch 7.9.2 then
 Opencast only formally supports Elasticsearch versions starting with 7.9.
 
+The default Elasticsearch configuration should work for Opencast out of the box, however there is one change you should make.
+[Log4Shell](https://nvd.nist.gov/vuln/detail/CVE-2021-44228) affects Elasticsearch, and you should mitigate this by adding a
+file at `/etc/elasticsearch/jvm.options.d/log4shell.options` with the content:
+
+```
+-Dlog4j2.formatMsgNoLookups=true
+```
+
+This applies a mitigation for the security issue.  Once applied, you should restart Elasticsearch.
+
+
 
 Install Opencast
 ------------------
-
-For this guide we will be installing the latest released version of Opencast 9.x, however if you wish to install another
-version please change the name accordingly.
-
 
 ### Basic Installation
 
 For a basic installation (All-In-One) just run:
 
-    apt-get install opencast-9-allinone elasticsearch-oss activemq-dist
+    apt-get install opencast-{{ opencast_major_version() }}-allinone elasticsearch-oss activemq-dist
 
 This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.  Note
 that while the repository provides a packaged version of FFmpeg, your distribution may have a version which is
@@ -153,8 +159,9 @@ Some available distributions are:
 * opencast-X-worker
 
 …where `X` stands for a specific Opencast version. These packages will install the latest release for a given version,
-so opencast-8-admin will install the admin profile for Opencast 8.x (currently 8.9). Once Opencast 8.10 has been packaged
-and made available your system will automatically update to Opencast 8.10 using the standard `apt-get` tools.
+so opencast-{{ opencast_major_version() }}-admin will install the admin profile for Opencast {{ opencast_major_version() }}.x.
+Once an update to Opencast {{ opencast_major_version() }} has been released an `apt-get update` followed by `apt-get upgrade`
+will upgrade you to the latest Opencast {{ opencast_major_version() }} release.
 
 To list all available packages and versions, use:
 
@@ -167,9 +174,9 @@ Point Revisions (Experts only)
 If for some reason you wish to install a specific point revision of Opencast, and the repository still hosts that point
 revision, you can select it by adding it, and the packaging build, to your `apt-get install` line.  For example:
 
-    apt-get install opencast-8-admin=8.9-2
+    apt-get install opencast-{{ opencast_major_version() }}-admin={{ opencast_major_version() }}.0-2
 
-Installs an Opencast 8.9 admin node, using the second build of that series.  Not all series have more than a single build,
+Installs an Opencast {{ opencast_major_version() }}.0 admin node, using the second build of that series.  Not all series have more than a single build,
 and older point revisions may be removed once superceded, so please explore the repository prior to attempting this.
 
 
@@ -186,6 +193,9 @@ You can install all necessary 3rd-Party-Tools for Opencast like this:
 
 Upgrading Major Versions
 ------------------------
+
+Note: All upgrade between major versions are required.  If you want to upgrade Opencast 8 to Opencast 10 you have to
+first upgrade to Opencast 9.
 
 While these packages will automatically upgrade you to the latest point version in a release series, they do not
 automatically upgrade you to the latest major version. In other words, if you install `opencast-9-admin` you get the

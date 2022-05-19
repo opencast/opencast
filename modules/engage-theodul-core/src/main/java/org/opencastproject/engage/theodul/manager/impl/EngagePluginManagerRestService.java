@@ -27,6 +27,9 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,15 +57,26 @@ import javax.ws.rs.core.Response;
             + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
     }
 )
+@Component(
+    property = {
+        "service.description=Engage Plugin Manager REST Endpoint",
+        "opencast.service.type=org.opencastproject.engage.plugin.manager",
+        "opencast.service.path=/engage/theodul/manager"
+    },
+    immediate = true,
+    service = EngagePluginManagerRestService.class
+)
 public class EngagePluginManagerRestService {
 
   private static final Logger log = LoggerFactory.getLogger(EngagePluginManagerRestService.class);
   private EngagePluginManager manager;
 
+  @Reference
   protected void setPluginManager(EngagePluginManager manager) {
     this.manager = manager;
   }
 
+  @Activate
   protected void activate() {
     log.info("Activated.");
   }

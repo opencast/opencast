@@ -477,15 +477,16 @@ public class RestPublisher implements RestConstants {
       String classpath = bundle.getHeaders().get(RestConstants.HTTP_CLASSPATH);
       String alias = bundle.getHeaders().get(RestConstants.HTTP_ALIAS);
       String welcomeFile = bundle.getHeaders().get(RestConstants.HTTP_WELCOME);
+      // Always false if not set to true
+      boolean spaRedirect = Boolean.parseBoolean(bundle.getHeaders().get(RestConstants.HTTP_SPA_REDIRECT));
 
       if (classpath != null && alias != null) {
         Dictionary<String, String> props = new Hashtable<>();
         props.put(SharedHttpContext.ALIAS, alias);
         props.put(SharedHttpContext.CONTEXT_ID, RestConstants.HTTP_CONTEXT_ID);
         props.put(SharedHttpContext.SHARED, "true");
-
         StaticResource servlet = new StaticResource(new StaticResourceClassLoader(bundle), classpath, alias,
-                welcomeFile);
+                welcomeFile, spaRedirect);
 
         // We use the newly added bundle's context to register this service, so when that bundle shuts down, it brings
         // down this servlet with it

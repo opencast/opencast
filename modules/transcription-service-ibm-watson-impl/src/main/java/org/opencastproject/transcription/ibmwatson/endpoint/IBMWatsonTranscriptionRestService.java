@@ -51,8 +51,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@RestService(name = "IBMWatsonTranscriptionRestService", title = "Transcription Service REST Endpoint (uses IBM Watson services)", abstractText = "Uses external service to generate transcriptions of recordings.", notes = {
-        "All paths above are relative to the REST endpoint base (something like http://your.server/transcription)" })
+@RestService(
+    name = "IBMWatsonTranscriptionRestService",
+    title = "Transcription Service REST Endpoint (uses IBM Watson services)",
+    abstractText = "Uses external service to generate transcriptions of recordings.",
+    notes = {
+        "All paths above are relative to the REST endpoint base (something like http://your.server/transcription)",
+    }
+)
 public class IBMWatsonTranscriptionRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -90,10 +96,23 @@ public class IBMWatsonTranscriptionRestService extends AbstractJobProducerEndpoi
   @GET
   @Path("results")
   @Produces(MediaType.TEXT_PLAIN)
-  @RestQuery(name = "results", description = "Called by the speech-to-text service when registering the callback url", returnDescription = "Echo the string sent.", restParameters = {
-          @RestParameter(name = "challenge_string", description = "String to be echoed in the response body", isRequired = true, type = Type.STRING) }, responses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "If no errors"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, description = "An error occurred") })
+  @RestQuery(
+      name = "results",
+      description = "Called by the speech-to-text service when registering the callback url",
+      returnDescription = "Echo the string sent.",
+      restParameters = {
+          @RestParameter(
+              name = "challenge_string",
+              description = "String to be echoed in the response body",
+              isRequired = true,
+              type = Type.STRING
+          ),
+      },
+      responses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "If no errors"),
+          @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, description = "An error occurred"),
+      }
+  )
   // GET /transcripts/watson/results?challenge_string=51WRISEyAbuJq5fE HTTP/1.1" 302 5 "-" "Jersey/2.22.1 (Apache
   // HttpClient 4.5)"
   public Response checkCallbackUrl(@QueryParam("challenge_string") String challengeString,
@@ -118,8 +137,14 @@ public class IBMWatsonTranscriptionRestService extends AbstractJobProducerEndpoi
   @POST
   @Path("results")
   @Produces(MediaType.TEXT_PLAIN)
-  @RestQuery(name = "results", description = "Called by the speech-to-text service to report status.", returnDescription = "", responses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Got notification!") })
+  @RestQuery(
+      name = "results",
+      description = "Called by the speech-to-text service to report status.",
+      returnDescription = "",
+      responses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Got notification!"),
+      }
+  )
   public Response reportStatus(String body) {
     logger.trace("Body is: " + body);
 
@@ -132,10 +157,11 @@ public class IBMWatsonTranscriptionRestService extends AbstractJobProducerEndpoi
       String event = (String) jsonObj.get("event");
       logger.info("Transcription notification for mp {} is {}", mpId, event);
 
-      if (IBMWatsonTranscriptionService.JobEvent.COMPLETED_WITH_RESULTS.equals(event))
+      if (IBMWatsonTranscriptionService.JobEvent.COMPLETED_WITH_RESULTS.equals(event)) {
         service.transcriptionDone(mpId, jsonObj);
-      else if (IBMWatsonTranscriptionService.JobEvent.FAILED.equals(event))
+      } else if (IBMWatsonTranscriptionService.JobEvent.FAILED.equals(event)) {
         service.transcriptionError(mpId, jsonObj);
+      }
 
       // return Response.ok().build();
       return Response.ok().type(MediaType.APPLICATION_JSON).build();

@@ -17,7 +17,11 @@ There is a set of so-called user interface roles, each of them providing access 
 administrative user interface. Those roles can be easily identified by their name prefix `ROLE_UI`.
 
 __Important__ `ROLE_ADMIN` implicitly provides full access to the user interface. When working with role-based
-visibility, users (and the groups they belong to) may not have `ROLE_ADMIN` therefore.
+visibility, users (and the groups they belong to) may not have `ROLE_ADMIN` therefore. Similarly,
+`ROLE_CAPTURE_AGENT` provides write access to events the user having the role would usually have no write access
+to. This is the role automatically attached to users used by capture agents. They need this special priviledge
+to ingest to events which another user has created. In general, it's not a good idea to re-use this role for
+regular users.
 
 
 ## User Interface Roles

@@ -5,6 +5,7 @@
   <url>http://publications.com/videos/1/index.html</url>
   <media>
     <track id="t-1">
+      <mimetype>video/mp4</mimetype>
       <tags/>
       <url>http://publications.com/video.mp4</url>
       <live>false</live>

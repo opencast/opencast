@@ -38,9 +38,9 @@ paella.addPlugin(function() {
       else {
         var episodeId = paella.utils.parameters.get('id');
 
-        paella.ajax.get({url:'/search/episode.json', params:{id:episodeId, q:text, limit:1000}},
+        paella.utils.ajax.get({url:'/search/episode.json', params:{id:episodeId, q:text, limit:1000}},
           function(data, contentType, returnCode) {
-            paella.debug.log('Searching episode=' + episodeId + ' q=' + text);
+            paella.log.debug('Searching episode=' + episodeId + ' q=' + text);
             var segmentsAvailable = (data !== undefined) && (data['search-results'] !== undefined) &&
                         (data['search-results'].result !== undefined) &&
                         (data['search-results'].result.segments !== undefined) &&
@@ -67,7 +67,7 @@ paella.addPlugin(function() {
               next(false, searchResult);
             }
             else {
-              paella.debug.log('No Revelance');
+              paella.log.debug('No Revelance');
               next(false, []);
             }
           },

@@ -29,7 +29,6 @@ import static org.opencastproject.job.api.AbstractJobProducer.ACCEPT_JOB_LOADS_E
 import static org.opencastproject.job.api.AbstractJobProducer.DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING;
 import static org.opencastproject.job.api.Job.FailureReason.DATA;
 import static org.opencastproject.job.api.Job.Status.FAILED;
-import static org.opencastproject.job.jpa.JpaJob.fnToJob;
 import static org.opencastproject.security.api.SecurityConstants.ORGANIZATION_HEADER;
 import static org.opencastproject.security.api.SecurityConstants.USER_HEADER;
 import static org.opencastproject.serviceregistry.api.ServiceState.ERROR;
@@ -49,6 +48,7 @@ import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.HostRegistration;
+import org.opencastproject.serviceregistry.api.HostStatistics;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.Incidents;
 import org.opencastproject.serviceregistry.api.JaxbServiceStatistics;
@@ -204,7 +204,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   static final long MIN_DISPATCH_INTERVAL = 1;
 
   /** Default delay between job dispatching attempts, in seconds */
-  static final long DEFAULT_DISPATCH_INTERVAL = 5;
+  static final long DEFAULT_DISPATCH_INTERVAL = 2;
 
   /** Default delay before starting job dispatching, in seconds */
   static final long DEFAULT_DISPATCH_START_DELAY = 60;
@@ -219,14 +219,24 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Default setting on service statistics retrieval */
   static final int DEFAULT_SERVICE_STATISTICS_MAX_JOB_AGE = 14;
 
-  /** Default value for {@link #maxAttemptsBeforeErrorState} */
-  private static final int MAX_FAILURE_BEFORE_ERROR_STATE = 10;
-
   /** The configuration key for setting {@link #maxAttemptsBeforeErrorState} */
-  private static final String MAX_ATTEMPTS_CONFIG_KEY = "max.attempts";
+  static final String MAX_ATTEMPTS_CONFIG_KEY = "max.attempts";
 
-  /** Number of failed jobs on a service before to set it in error state */
-  protected int maxAttemptsBeforeErrorState = MAX_FAILURE_BEFORE_ERROR_STATE;
+  /** The configuration key for setting {@link #noErrorStateServiceTypes} */
+  static final String NO_ERROR_STATE_SERVICE_TYPES_CONFIG_KEY = "no.error.state.service.types";
+
+  /** Default value for {@link #maxAttemptsBeforeErrorState} */
+  private static final int DEFAULT_MAX_ATTEMPTS_BEFORE_ERROR_STATE = 10;
+
+  /** Default value for {@link #errorStatesEnabled} */
+  private static final boolean DEFAULT_ERROR_STATES_ENABLED = true;
+
+  /** Number of failed jobs on a service before to set it in error state. -1 will disable error states completely. */
+  protected int maxAttemptsBeforeErrorState = DEFAULT_MAX_ATTEMPTS_BEFORE_ERROR_STATE;
+  private boolean errorStatesEnabled = DEFAULT_ERROR_STATES_ENABLED;
+
+  /** Services for which error state is disabled */
+  private List<String> noErrorStateServiceTypes = new ArrayList();
 
   /** Default delay between checking if hosts are still alive in seconds * */
   static final long DEFAULT_HEART_BEAT = 60;
@@ -731,14 +741,32 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     logger.info("Updating service registry properties");
 
+    maxAttemptsBeforeErrorState = DEFAULT_MAX_ATTEMPTS_BEFORE_ERROR_STATE;
+    errorStatesEnabled = DEFAULT_ERROR_STATES_ENABLED;
     String maxAttempts = StringUtils.trimToNull((String) properties.get(MAX_ATTEMPTS_CONFIG_KEY));
     if (maxAttempts != null) {
       try {
         maxAttemptsBeforeErrorState = Integer.parseInt(maxAttempts);
-        logger.info("Set max attempts before error state to {}", maxAttempts);
+        if (maxAttemptsBeforeErrorState < 0) {
+          errorStatesEnabled = false;
+          logger.info("Error states of services disabled");
+        } else {
+          errorStatesEnabled = true;
+          logger.info("Set max attempts before error state to {}", maxAttempts);
+        }
       } catch (NumberFormatException e) {
         logger.warn("Can not set max attempts before error state to {}. {} must be an integer", maxAttempts,
                 MAX_ATTEMPTS_CONFIG_KEY);
+      }
+    }
+
+    noErrorStateServiceTypes = new ArrayList();
+    String noErrorStateServiceTypesStr = StringUtils.trimToNull((String) properties.get(
+            NO_ERROR_STATE_SERVICE_TYPES_CONFIG_KEY));
+    if (noErrorStateServiceTypesStr != null) {
+      noErrorStateServiceTypes = Arrays.asList(noErrorStateServiceTypesStr.split("\\s*,\\s*"));
+      if (!noErrorStateServiceTypes.isEmpty()) {
+        logger.info("Set service types without error state to {}", String.join(", ", noErrorStateServiceTypes));
       }
     }
 
@@ -950,10 +978,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
     logger.debug("Current host load: {}, job load cache size: {}", format("%.1f", localSystemLoad), jobCache.size());
 
-    if (jobCache.isEmpty() && Math.abs(localSystemLoad) > 0.01f) {
-      logger.warn("No jobs in the job load cache, but load is {}: setting job load to 0",
-              format("%.2f", localSystemLoad));
-      localSystemLoad = 0;
+    if (jobCache.isEmpty()) {
+      if (Math.abs(localSystemLoad) > 0.0000001F) {
+        logger.warn("No jobs in the job load cache, but load is {}: setting job load to 0", localSystemLoad);
+      }
+      localSystemLoad = 0.0F;
     }
   }
 
@@ -973,15 +1002,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       logger.warn("Can not set the job URI", e);
     }
     return job;
-  }
-
-  private Fn<JpaJob, JpaJob> fnSetJobUri() {
-    return new Fn<JpaJob, JpaJob>() {
-      @Override
-      public JpaJob apply(JpaJob job) {
-        return setJobUri(job);
-      }
-    };
   }
 
   /**
@@ -1670,6 +1690,32 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
   }
 
+  @Override
+  public HostStatistics getHostStatistics() {
+    HostStatistics statistics = new HostStatistics();
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      List<Object[]> results = em.createNamedQuery("HostRegistration.jobStatistics", Object[].class)
+          .setParameter("status", Arrays.asList(Status.QUEUED.ordinal(), Status.RUNNING.ordinal()))
+          .getResultList();
+      for (Object[] row: results) {
+        final long host = ((Number) row[0]).longValue();
+        final int status = ((Number) row[1]).intValue();
+        final long count = ((Number) row[2]).longValue();
+        if (status == Status.RUNNING.ordinal()) {
+          statistics.addRunning(host, count);
+        } else {
+          statistics.addQueued(host, count);
+        }
+      }
+    } finally {
+      if (em != null)
+        em.close();
+    }
+    return statistics;
+  }
+
   /**
    * Gets all host registrations
    *
@@ -1714,16 +1760,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       if (jobs.size() == 0) {
         jobs = getChildren(em, id);
       }
-      return $(jobs).sort(new Comparator<JpaJob>() {
-        @Override
-        public int compare(JpaJob job1, JpaJob job2) {
-          if (job1.getDateCreated() == null || job2.getDateCreated() == null) {
-            return 0;
-          } else {
-            return job1.getDateCreated().compareTo(job2.getDateCreated());
-          }
-        }
-      }).map(fnSetJobUri()).map(fnToJob()).toList();
+      return jobs.stream()
+          .map(this::setJobUri)
+          .map(JpaJob::toJob)
+          .collect(Collectors.toList());
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     } finally {
@@ -1774,7 +1814,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         setJobUri(job);
       }
 
-      return $(jobs).map(fnToJob()).toList();
+      return jobs.stream()
+          .map(JpaJob::toJob)
+          .collect(Collectors.toList());
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     } finally {
@@ -2526,7 +2568,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         }
 
         // The current service already is in WARNING state and max attempts is reached
-        else if (getHistorySize(currentService) >= maxAttemptsBeforeErrorState) {
+        else if (errorStatesEnabled && !noErrorStateServiceTypes.contains(currentService.getServiceType())
+                && getHistorySize(currentService) >= maxAttemptsBeforeErrorState) {
           logger.info("State set to ERROR for current service {} on host {}", currentService.getServiceType(),
                   currentService.getHost());
           currentService.setServiceState(ERROR, job.toJob().getSignature());

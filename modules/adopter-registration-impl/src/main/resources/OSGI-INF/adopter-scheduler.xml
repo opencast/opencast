@@ -21,7 +21,7 @@
 
   <reference name="asset-manager"
              interface="org.opencastproject.assetmanager.api.AssetManager"
-             policy="dynamic" bind="setAssetManager"/>
+             bind="setAssetManager"/>
 
   <reference name="series-service"
              interface="org.opencastproject.series.api.SeriesService"

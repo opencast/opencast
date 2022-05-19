@@ -28,7 +28,7 @@ import org.opencastproject.assetmanager.api.query.ASelectQuery;
 
 import org.junit.Test;
 
-public class ASelectQueryDecoratorTest extends AbstractAssetManagerTestBase {
+public class ASelectQueryDecoratorTest extends AssetManagerTestBase {
   /**
    * Test that returned queries are also decorated.
    */

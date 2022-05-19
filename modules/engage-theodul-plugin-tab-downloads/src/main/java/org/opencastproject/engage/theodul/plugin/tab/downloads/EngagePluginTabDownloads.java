@@ -53,8 +53,9 @@ public class EngagePluginTabDownloads extends AbstractEngagePlugin {
   }
 
   @Reference
-  protected void setPluginManager(EngagePluginManager pm) {
-    super.setPluginManager(pm);
+  @Override
+  protected void setPluginManager(final EngagePluginManager pluginManager) {
+    this.pluginManager = pluginManager;
   }
 
 }

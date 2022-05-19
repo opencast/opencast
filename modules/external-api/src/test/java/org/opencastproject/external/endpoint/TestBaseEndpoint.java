@@ -27,7 +27,6 @@ import static org.opencastproject.systems.OpencastConstants.ADMIN_DOC_URL_ORG_PR
 import static org.opencastproject.systems.OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY;
 import static org.opencastproject.systems.OpencastConstants.FEED_URL_ORG_PROPERTY;
 
-import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
@@ -49,7 +48,7 @@ public class TestBaseEndpoint extends BaseEndpoint {
   public TestBaseEndpoint() {
 
     // Prepare mocked organization properties
-    Map<String, String> orgProperties = new HashMap<String, String>();
+    Map<String, String> orgProperties = new HashMap<>();
     orgProperties.put(FEED_URL_ORG_PROPERTY, "https://feeds.opencast.org");
     orgProperties.put(ADMIN_DOC_URL_ORG_PROPERTY, "https://documentation.opencast.org");
     orgProperties.put(EXTERNAL_API_URL_ORG_PROPERTY, "https://api.opencast.org");
@@ -89,7 +88,6 @@ public class TestBaseEndpoint extends BaseEndpoint {
     replay(org, roleStudent, roleUser, user, securityService);
 
     setSecurityService(securityService);
-    setExternalIndex(new ExternalIndex());
   }
 
 }

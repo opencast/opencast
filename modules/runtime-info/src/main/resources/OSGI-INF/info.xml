@@ -15,5 +15,5 @@
   <reference name="service-registry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
              bind="setServiceRegistry" />
   <reference name="userid-role-provider" interface="org.opencastproject.userdirectory.UserIdRoleProvider"
-             cardinality="0..1" policy="dynamic" bind="setUserIdRoleProvider"/>
+             cardinality="0..1" policy="dynamic" bind="setUserIdRoleProvider" unbind="unsetUserIdRoleProvider"/>
 </scr:component>

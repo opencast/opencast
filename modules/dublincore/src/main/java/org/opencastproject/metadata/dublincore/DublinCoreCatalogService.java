@@ -129,16 +129,16 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
           for (DublinCoreValue creator : dc.get(DublinCore.PROPERTY_CREATOR)) {
             creators.add(creator.getValue());
           }
-          metadata.setCreators(creators.toArray(new String[creators.size()]));
+          metadata.setCreators(creators.toArray(new String[0]));
         }
 
         // Contributor
         if (dc.hasValue(DublinCore.PROPERTY_CONTRIBUTOR)) {
-          List<String> contributors = new ArrayList<String>();
+          List<String> contributors = new ArrayList<>();
           for (DublinCoreValue contributor : dc.get(DublinCore.PROPERTY_CONTRIBUTOR)) {
             contributors.add(contributor.getValue());
           }
-          metadata.setContributors(contributors.toArray(new String[contributors.size()]));
+          metadata.setContributors(contributors.toArray(new String[0]));
         }
 
         // Subject

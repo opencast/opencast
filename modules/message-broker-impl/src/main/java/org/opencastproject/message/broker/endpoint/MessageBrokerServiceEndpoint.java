@@ -39,19 +39,18 @@ import javax.ws.rs.core.Response;
 
 @Path("/")
 @RestService(
-  name = "messagebrokerservice",
-  title = "Message Broker Service",
-  abstractText = "Handles publishers and subscribers connecting to message brokers",
-  notes = {})
+    name = "messagebrokerservice",
+    title = "Message Broker Service",
+    abstractText = "Handles publishers and subscribers connecting to message brokers",
+    notes = {})
 @Component(
-  property = {
-    "service.description=Message Broker REST Endpoint",
-    "opencast.service.type=org.opencastproject.message.broker.endpoint",
-    "opencast.service.path=/broker"
-  },
-  immediate = true,
-  // expose interface for MH REST publisher!
-  service = { MessageBrokerServiceEndpoint.class }
+    property = {
+        "service.description=Message Broker REST Endpoint",
+        "opencast.service.type=org.opencastproject.message.broker.endpoint",
+        "opencast.service.path=/broker"
+    },
+    immediate = true,
+    service = { MessageBrokerServiceEndpoint.class }
 )
 public class MessageBrokerServiceEndpoint {
 
@@ -71,17 +70,18 @@ public class MessageBrokerServiceEndpoint {
   @GET
   @Path("status")
   @RestQuery(
-    name = "status",
-    description = "Return status of message broker",
-    returnDescription = "Return status of message broker",
-    responses = {
+      name = "status",
+      description = "Return status of message broker",
+      returnDescription = "Return status of message broker",
+      responses = {
       @RestResponse(
-        responseCode = SC_NO_CONTENT,
-        description = "Connection to message broker ok"),
+          responseCode = SC_NO_CONTENT,
+          description = "Connection to message broker ok"),
       @RestResponse(
-        responseCode = SC_SERVICE_UNAVAILABLE,
-        description = "Not connected to message broker")
-    })
+          responseCode = SC_SERVICE_UNAVAILABLE,
+          description = "Not connected to message broker")
+      }
+  )
   public Response getStatus() {
     if (messageReceiver.isConnected() && messageSender.isConnected()) {
       return Response.status(SC_NO_CONTENT).build();

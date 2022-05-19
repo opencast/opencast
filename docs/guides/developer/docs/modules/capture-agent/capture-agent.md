@@ -56,8 +56,17 @@ Authentication
 
 Opencast supports two types of authentication which can be used by capture agents:
 
-- (Backend) HTTP Digest authentication which is historically used for machine-to-machine communication.
-- (General) HTTP Basic (or session-based) authentication used for both front-end users and integrations.
+- HTTP Basic authentication used for both front-end users and integrations.
+- HTTP Digest authentication which is historically used for machine-to-machine communication.
+
+Generally, we recommend using HTTP Basic authentication since it's easier for adopters to manage capture agent users via
+the admin interface and does not rely on hidden users while being less complicated at the same time.
+
+HTTP Basic authentication can be used with users defined via web-interface or via any regular user provider. A request
+using HTTP Basic does not need to specify any additional headers:
+
+    curl -u admin:opencast https://develop.opencast.org/info/me.json
+
 
 HTTP Digest authentication is the legacy option for capture agents. It is still widely used today and will continue to
 be supported. HTTP Digest is more complicated and has the disadvantage that users need to be specified separately in the
@@ -68,14 +77,6 @@ When using HTTP Digest authentication, you need to send the additional header `X
 
     curl --digest -u opencast_system_account:CHANGE_ME -H "X-Requested-Auth: Digest" \
       https://develop.opencast.org/info/me.json
-
-HTTP Basic authentication can be used with users defined via web-interface or via any regular user provider. A request
-using HTTP Basic does not need to specify any additional headers:
-
-    curl -u admin:opencast https://develop.opencast.org/info/me.json
-
-Generally, we recommend using HTTP Basic authentication since it's easier for adopters to manage capture agent users via
-the admin interface and does not rely on hidden users while being less complicated at the same time.
 
 Whatever authentication method you choose to implement – maybe even both, allowing users to choose for themselves –
 please clearly specify what authentication you expect since users have to provide different types of users which can
@@ -154,11 +155,12 @@ interface of a capture agent.
 
 ### Setting Agent Capabilities
 
-Additional to registering, the agent may set its capabilities allowing users to select possible inputs in the user
-interface of Opencast when scheduling events. The configuration may be set as XML or JSON representation of a Java
-properties file and can be set via an HTTP POST request to:
+Additional to registering, the agent may optionally set its capabilities allowing users to select possible inputs in the
+user interface of Opencast when scheduling events. Capabilities can be set via an HTTP POST request to:
 
     /capture-admin/agents/$AGENT_NAME/configuration
+
+For more details about this process, take a look at the [Capture Agent Input Selection guide](capture-agent-input.md).
 
 
 ### Getting the Calendar/Schedule

@@ -22,7 +22,7 @@ package org.opencastproject.assetmanager.storage.impl.fs;
 
 import static org.opencastproject.util.IoSupport.file;
 
-import org.opencastproject.assetmanager.impl.storage.AssetStore;
+import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.workspace.api.Workspace;
 

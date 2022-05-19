@@ -22,6 +22,7 @@
 package org.opencastproject.uiconfig;
 
 import static org.opencastproject.uiconfig.UIConfigRest.UI_CONFIG_FOLDER_PROPERTY;
+import static org.opencastproject.uiconfig.UIConfigRest.X_ACCEL_REDIRECT_PROPERTY;
 
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
@@ -35,12 +36,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.component.ComponentContext;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
@@ -52,7 +54,7 @@ public class UIConfigTest {
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     // create the needed mocks
     Organization organization = EasyMock.createMock(Organization.class);
     EasyMock.expect(organization.getId()).andReturn("org1").anyTimes();
@@ -69,49 +71,40 @@ public class UIConfigTest {
 
   @Test
   public void testActivate() throws Exception {
+    Map<String, String> properties = EasyMock.createMock(Map.class);
+    EasyMock.expect(properties.get(UI_CONFIG_FOLDER_PROPERTY)).andReturn(null).times(2);
+    EasyMock.expect(properties.get(UI_CONFIG_FOLDER_PROPERTY)).andReturn("/xy").once();
+    EasyMock.expect(properties.get(X_ACCEL_REDIRECT_PROPERTY)).andReturn(null).once();
+    EasyMock.expect(properties.get(X_ACCEL_REDIRECT_PROPERTY)).andReturn("/xy").once();
+
     BundleContext bundleContext = EasyMock.createMock(BundleContext.class);
-    EasyMock.expect(bundleContext.getProperty(UI_CONFIG_FOLDER_PROPERTY)).andReturn(null).times(2);
-    EasyMock.expect(bundleContext.getProperty(UI_CONFIG_FOLDER_PROPERTY)).andReturn("/xy").once();
     EasyMock.expect(bundleContext.getProperty("karaf.etc")).andReturn(null).once();
     EasyMock.expect(bundleContext.getProperty("karaf.etc")).andReturn("/xy").once();
 
-    ComponentContext componentContext = EasyMock.createMock(ComponentContext.class);
-    EasyMock.expect(componentContext.getBundleContext()).andReturn(bundleContext).anyTimes();
+    EasyMock.replay(bundleContext, properties);
 
-    EasyMock.replay(bundleContext, componentContext);
-
-    try {
-      uiConfigRest.activate(componentContext);
-      Assert.fail();
-    } catch (ConfigurationException e) {
-      // config and default are null. We expect this to fail
-    }
+    // Config and default are null. We expect this to fail
+    Assert.assertThrows(ConfigurationException.class, () -> {
+      uiConfigRest.activate(bundleContext, properties);
+    });
 
     // Providing proper configuration now. This should work
-    uiConfigRest.activate(componentContext);
-    uiConfigRest.activate(componentContext);
+    uiConfigRest.activate(bundleContext, properties);
+    uiConfigRest.activate(bundleContext, properties);
   }
 
   @Test
   public void testGetFile() throws Exception {
     final File testDir = temporaryFolder.newFolder();
-    BundleContext bundleContext = EasyMock.createMock(BundleContext.class);
-    EasyMock.expect(bundleContext.getProperty(UI_CONFIG_FOLDER_PROPERTY)).andReturn(testDir.getAbsolutePath()).once();
 
-    ComponentContext componentContext = EasyMock.createMock(ComponentContext.class);
-    EasyMock.expect(componentContext.getBundleContext()).andReturn(bundleContext).anyTimes();
+    // configure service
+    uiConfigRest.activate(null, Collections.singletonMap(UI_CONFIG_FOLDER_PROPERTY, testDir.getAbsolutePath()));
 
-    EasyMock.replay(bundleContext, componentContext);
-
-    uiConfigRest.activate(componentContext);
-
-    // test non-existing file
-    try {
+    // Test non-existing file
+    // We expect this to not be found
+    Assert.assertThrows(NotFoundException.class, () -> {
       uiConfigRest.getConfigFile("player", "config.json");
-      Assert.fail();
-    } catch (NotFoundException e) {
-      // We expect this to not be found
-    }
+    });
 
     // test existing file
     File target = Paths.get(testDir.getAbsolutePath(), "org1", "player", "config.json").toFile();
@@ -120,12 +113,24 @@ public class UIConfigTest {
     Response response = uiConfigRest.getConfigFile("player", "config.json");
     Assert.assertEquals(200, response.getStatus());
 
-    // test path traversal
-    try {
+    // Test path traversal
+    // we expect access to be denied
+    Assert.assertThrows(AccessDeniedException.class, () -> {
       uiConfigRest.getConfigFile("../player", "config.json");
-      Assert.fail();
-    } catch (AccessDeniedException e) {
-      // we expect access to be denied
-    }
+    });
+  }
+
+  @Test
+  public void testXAccel() throws Exception {
+    // configure service
+    uiConfigRest.activate(null, Map.of(
+        UI_CONFIG_FOLDER_PROPERTY, temporaryFolder.newFolder().getAbsolutePath(),
+        X_ACCEL_REDIRECT_PROPERTY, "/test"));
+
+    // Test response. It doesn't matter if the file exists since we rely on the reverse proxy to complain.
+    // The code will fall back to the default organization due to the files non-existence.
+    Response response = uiConfigRest.getConfigFile("player", "config.json");
+    Assert.assertEquals(204, response.getStatus());
+    Assert.assertEquals("/test/mh_default_org/player/config.json", response.getHeaderString(X_ACCEL_REDIRECT_PROPERTY));
   }
 }

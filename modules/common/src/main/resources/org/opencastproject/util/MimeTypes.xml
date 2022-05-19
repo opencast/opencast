@@ -392,12 +392,17 @@
   <MimeType>
     <Type>video/mp4</Type>
     <Description>MPEG-4 media</Description>
-    <Extensions>mp4,mp4v,m4v</Extensions>
+    <Extensions>mp4,mp4v,m4v,cmfv</Extensions>
   </MimeType>
   <MimeType>
     <Type>audio/mp4</Type>
     <Description>MPEG-4 media</Description>
-    <Extensions>mp4,mp4a,m4a</Extensions>
+    <Extensions>mp4,mp4a,m4a,cmfa</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>application/mp4</Type>
+    <Description>MPEG-4 media</Description>
+    <Extensions>cmft</Extensions>
   </MimeType>
   <MimeType>
     <Type>video/mpeg</Type>
@@ -433,6 +438,11 @@
     <Type>video/webm</Type>
     <Description>WebM video</Description>
     <Extensions>webm</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>image/webp</Type>
+    <Description>WebP image</Description>
+    <Extensions>webp</Extensions>
   </MimeType>
   <MimeType>
     <Type>video/x-dv</Type>
@@ -498,5 +508,15 @@
     <Type>video/x-nut</Type>
     <Description>NUT</Description>
     <Extensions>nut</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>text/x-ass</Type>
+    <Description>Advanced SubStation Alpha</Description>
+    <Extensions>ass,ssa</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>video/x-trec</Type>
+    <Description>Camtasia TREC video</Description>
+    <Extensions>trec</Extensions>
   </MimeType>
 </MimeTypes>

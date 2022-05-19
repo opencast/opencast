@@ -11,7 +11,7 @@
     <title>Opencast Documentation</title>
 
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="js/bootstrap/css/bootstrap.min.css">
   </head>
 
   <body>
@@ -41,7 +41,7 @@
                 <li role="presentation">
                   <a role="menuitem"
                      tabindex="-1"
-                     href="http://docs.opencast.org/{{ version['branch'] }}/admin"
+                     href="//docs.opencast.org/{{ version['branch'] }}/admin"
                      style="display: flex; justify-content: space-between;">
                     <span>{{ version['name'] }}</span>
                     {%- if version['attribute'] -%}
@@ -66,7 +66,7 @@
                 <li role="presentation">
                   <a role="menuitem"
                      tabindex="-1"
-                     href="http://docs.opencast.org/{{ version['branch'] }}/developer"
+                     href="//docs.opencast.org/{{ version['branch'] }}/developer"
                      style="display: flex; justify-content: space-between;">
                     <span>{{ version['name'] }}</span>
                     {%- if version['attribute'] -%}
@@ -77,6 +77,23 @@
               {% endfor %}
             </ul>
           </div>
+        </div>
+      </div>
+
+      <hr>
+
+      <h3>
+        <span class="glyphicon glyphicon-education" aria-hidden="true"></span>
+        Learn
+      </h3>
+      <div class="row">
+        <div class="col-md-6">
+          <h4>Webinars</h4>
+          <p>Our webinars range from how to use basic tools to highly technical topics.
+            Upcoming webinars are announced on the mailing list and on the website.
+            Take a look at <a href="https://video.ethz.ch/events/opencast/webinars.html">
+            the list of previously recorded webinars</a>.
+          </p>
         </div>
       </div>
 
@@ -124,7 +141,7 @@
           <p>Our weekly open meeting of developers and dev-ops takes place on
           <a href="https://opencast.blindsidenetworks.net">meet.opencast.video</a> (room 1, p: welcome) on every
           Tuesday at
-          <a href="http://arewemeetingyet.com/UTC/2019-02-26/15:00/w/Opencast's%20Technical%20Meeting#eyJ1cmwiOiJodHRwczovL29wZW5jYXN0LmJsaW5kc2lkZW5ldHdvcmtzLm5ldCJ9">
+          <a href="https://arewemeetingyet.com/UTC/2019-02-26/15:00/w/Opencast's%20Technical%20Meeting#eyJ1cmwiOiJodHRwczovL29wZW5jYXN0LmJsaW5kc2lkZW5ldHdvcmtzLm5ldCJ9">
             3pm UTC</a>.</p>
         </div>
         <div class="col-md-6">
@@ -148,7 +165,7 @@
         <div class="col-md-6">
           <h4>Code</h4>
           <p>You can find the codebase of Opencast in the Git repository hosted at
-          <a href="https://github.com/opencast/opencast">github.com/opencast/opencast</a>. Feel free to fork to project
+          <a href="https://github.com/opencast/opencast">github.com/opencast/opencast</a>. Feel free to fork the project
           and open pull requests. If you need help or more information, please do not hesitate to ask any question on
           the developers list.</p>
         </div>
@@ -165,7 +182,7 @@
         <div class="col-md-6">
           <h4>Translations</h4>
           <p>You can help translating Opencast to your language on
-          <a href=https://crowdin.com/project/opencast-community>crowdin.com/project/opencast-community</a>.
+          <a href=https://crowdin.com/profile/opencast>crowdin.com/profile/opencast</a>.
           Simply request to join the project on Crowdin and start translating.  If you are interested in translating a
           language which is not a target language right now, please ask on the developers list and we will add the
           language.</p>
@@ -187,11 +204,9 @@
 
     </div> <!-- /container -->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.2.0/anchor.js"></script>
-    <script type=application/javascript>
-        anchors.add();
-    </script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap/js/bootstrap.min.js"></script>
+    <script src="js/anchor.min.js"></script>
+    <script src="js/docs.js"></script>
   </body>
 </html>

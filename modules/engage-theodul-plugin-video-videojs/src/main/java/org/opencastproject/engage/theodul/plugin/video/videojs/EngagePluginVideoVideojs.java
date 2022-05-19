@@ -22,19 +22,39 @@
 package org.opencastproject.engage.theodul.plugin.video.videojs;
 
 import org.opencastproject.engage.theodul.api.AbstractEngagePlugin;
+import org.opencastproject.engage.theodul.api.EngagePlugin;
+import org.opencastproject.engage.theodul.api.EngagePluginManager;
 
-import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Path;
 
 @Path("/")
+@Component(
+    property = {
+        "opencast.engage.plugin.name=EngagePluginVideoVideoJS",
+        "opencast.engage.plugin.description=Videodisplay plugin which uses videoJS",
+        "opencast.engage.plugin.rest=false"
+    },
+    immediate = true,
+    service = EngagePlugin.class
+)
 public class EngagePluginVideoVideojs extends AbstractEngagePlugin {
 
   private static final Logger log = LoggerFactory.getLogger(EngagePluginVideoVideojs.class);
 
-  protected void activate(ComponentContext cc) {
+  @Activate
+  protected void activate() {
     log.info("Activated engage plugin: Videojs.");
+  }
+
+  @Override
+  @Reference
+  protected void setPluginManager(final EngagePluginManager pluginManager) {
+    this.pluginManager = pluginManager;
   }
 }

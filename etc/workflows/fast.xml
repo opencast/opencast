@@ -9,38 +9,24 @@
   </tags>
   <displayOrder>100</displayOrder>
   <description>
-    A minimal workflow that transcodes the media into distribution formats, then
-    sends the resulting distribution files, along with their associated metadata,
-    to the distribution channels.
+    A minimal workflow that transcodes media into distribution formats,
+    then publishes the resulting distribution files, along with their associated metadata.
   </description>
-
   <configuration_panel>
     <![CDATA[
       <div id="workflow-configuration">
-        <input id="publish" name="publish" type="checkbox" class="configField" value="true" checked=checked />
-        <label for="publish">Publish media directly</label>
+        <input id="straightToPublishing" name="straightToPublishing" type="checkbox" class="configField" value="true" checked=checked />
+        <label for="straightToPublishing">Straight to publishing</label>
       </div>
     ]]>
   </configuration_panel>
-
   <operations>
 
     <operation
       id="defaults"
       description="Applying default configuration values">
       <configurations>
-        <configuration key="publish">true</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Set publication variables for compatibility with the publish workflow -->
-
-    <operation
-      id="defaults"
-      if="${publish}"
-      description="Applying configuration values for publish workflow">
-      <configurations>
-        <configuration key="publishToMediaModule">true</configuration>
+        <configuration key="straightToPublishing">true</configuration>
       </configurations>
     </operation>
 
@@ -88,12 +74,12 @@
     <!-- skip this when manually uploaded */search+preview -->
     <operation
       id="image"
-      if="${publish}"
+      if="${straightToPublishing}"
       fail-on-error="true"
       exception-handler-workflow="partial-error"
       description="Creating Engage search result thumbnails">
       <configurations>
-        <configuration key="source-flavor">*/preview</configuration>
+        <configuration key="source-flavor">*/source</configuration>
         <configuration key="target-flavor">*/search+preview</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">search-cover.http</configuration>
@@ -105,12 +91,12 @@
 
     <operation
       id="image"
-      if="${publish}"
+      if="${straightToPublishing}"
       fail-on-error="true"
       exception-handler-workflow="partial-error"
       description="Creating Engage player preview image">
       <configurations>
-        <configuration key="source-flavor">*/preview</configuration>
+        <configuration key="source-flavor">*/source</configuration>
         <configuration key="target-flavor">*/player+preview</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">player-preview.http</configuration>
@@ -122,12 +108,12 @@
 
     <operation
       id="segment-video"
-      if="${publish}"
+      if="${straightToPublishing}"
       fail-on-error="false"
       exception-handler-workflow="partial-error"
       description="Detecting slide transitions in presentation track">
       <configurations>
-        <configuration key="source-flavor">presentation/preview</configuration>
+        <configuration key="source-flavor">presentation/source</configuration>
         <configuration key="target-tags">engage-download</configuration>
       </configurations>
     </operation>
@@ -136,47 +122,16 @@
 
     <operation
       id="segmentpreviews"
-      if="${publish}"
+      if="${straightToPublishing}"
       fail-on-error="false"
       exception-handler-workflow="partial-error"
       description="Creating presentation segments preview image">
       <configurations>
-        <configuration key="source-flavor">presentation/preview</configuration>
+        <configuration key="source-flavor">presentation/source</configuration>
         <configuration key="target-flavor">presentation/segment+preview</configuration>
-        <configuration key="reference-flavor">presentation/preview</configuration>
         <configuration key="reference-tags">engage-download</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">player-slides.http</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Generate timeline preview images -->
-
-    <operation
-      id="timelinepreviews"
-      if="${publish}"
-      fail-on-error="false"
-      exception-handler-workflow="partial-error"
-      description="Creating timeline preview images">
-      <configurations>
-        <configuration key="source-flavor">*/preview</configuration>
-        <configuration key="target-flavor">*/timeline+preview</configuration>
-        <configuration key="target-tags">engage-download</configuration>
-        <configuration key="image-count">100</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Extract text form slide preview images -->
-
-    <operation
-      id="extract-text"
-      if="${publish}"
-      fail-on-error="false"
-      exception-handler-workflow="partial-error"
-      description="Extracting text from presentation segments">
-      <configurations>
-        <configuration key="source-flavor">presentation/preview</configuration>
-        <configuration key="target-tags">engage-download</configuration>
       </configurations>
     </operation>
 
@@ -189,7 +144,7 @@
       <configurations>
         <configuration key="download-source-flavors">*/preview</configuration>
         <configuration key="channel-id">internal</configuration>
-        <configuration key="url-pattern">http://localhost:8080/admin-ng/index.html#/events/events/${event_id}/tools/playback</configuration>
+        <configuration key="url-pattern">${org_org_opencastproject_admin_ui_url!'http://localhost:8080'}/admin-ng/index.html#/events/events/${event_id}/tools/editor</configuration>
         <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
@@ -198,7 +153,7 @@
 
     <operation
       id="publish-engage"
-      if="${publish}"
+      if="${straightToPublishing}"
       max-attempts="2"
       fail-on-error="true"
       exception-handler-workflow="partial-error"
@@ -206,7 +161,6 @@
       <configurations>
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
         <configuration key="download-source-tags">engage-download</configuration>
-        <configuration key="streaming-source-tags">engage-streaming</configuration>
         <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
@@ -230,13 +184,13 @@
       fail-on-error="false"
       description="Cleaning up">
       <configurations>
+        <!-- On systems with shared workspace or working file repository -->
+        <!-- you want to set this option to false. -->
         <configuration key="delete-external">true</configuration>
-        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
+        <!-- ACLs are required again when working through ActiveMQ messages -->
         <configuration key="preserve-flavors">security/*</configuration>
       </configurations>
     </operation>
 
   </operations>
-
 </definition>
-

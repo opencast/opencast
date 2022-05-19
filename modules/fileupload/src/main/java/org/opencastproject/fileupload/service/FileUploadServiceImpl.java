@@ -261,9 +261,9 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
   private void storeJob(FileUploadJob job) throws FileUploadException {
     try {
       synchronized (this) {
-          logger.debug("Attempting to store job {}", job.getId());
-          File jobFile = ensureExists(getJobFile(job.getId()));
-          jobMarshaller.marshal(job, jobFile);
+        logger.debug("Attempting to store job {}", job.getId());
+        File jobFile = ensureExists(getJobFile(job.getId()));
+        jobMarshaller.marshal(job, jobFile);
       }
     } catch (Exception e) {
       throw fileUploadException(Severity.error, "Failed to write job file.", e);
@@ -289,12 +289,6 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     }
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.fileupload.api.FileUploadService#acceptChunk(org.opencastproject.fileupload.api.job.FileUploadJob
-   *      job, long chunk, InputStream content)
-   */
   @Override
   public void acceptChunk(FileUploadJob job, long chunkNumber, InputStream content) throws FileUploadException {
     // job already completed?
@@ -406,12 +400,6 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     removeFromCache(job);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.fileupload.api.FileUploadService#getPayload(org.opencastproject.fileupload.api.job.FileUploadJob
-   *      job)
-   */
   @Override
   public InputStream getPayload(FileUploadJob job) throws FileUploadException {
     // job not locked?

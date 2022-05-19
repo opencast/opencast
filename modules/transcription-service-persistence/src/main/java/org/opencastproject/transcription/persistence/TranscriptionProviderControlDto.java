@@ -41,8 +41,15 @@ import javax.persistence.Table;
 @Entity(name = "TranscriptionProvider")
 @Table(name = "oc_transcription_service_provider")
 @NamedQueries({
-  @NamedQuery(name = "TranscriptionProvider.findProviderById", query = "SELECT c FROM TranscriptionProvider c WHERE c.id= :id"),
-  @NamedQuery(name = "TranscriptionProvider.findIdByProvider", query = "SELECT c FROM TranscriptionProvider c WHERE c.provider= :provider")})
+    @NamedQuery(
+        name = "TranscriptionProvider.findProviderById",
+        query = "SELECT c FROM TranscriptionProvider c WHERE c.id= :id"
+    ),
+    @NamedQuery(
+        name = "TranscriptionProvider.findIdByProvider",
+        query = "SELECT c FROM TranscriptionProvider c WHERE c.provider= :provider"
+    ),
+})
 public class TranscriptionProviderControlDto implements Serializable {
 
   @Id
@@ -79,7 +86,8 @@ public class TranscriptionProviderControlDto implements Serializable {
   /**
    * Store new provider
    */
-  public static TranscriptionProviderControlDto storeProvider(EntityManager em, String provider) throws TranscriptionDatabaseException {
+  public static TranscriptionProviderControlDto storeProvider(EntityManager em, String provider)
+          throws TranscriptionDatabaseException {
     TranscriptionProviderControlDto dto = new TranscriptionProviderControlDto(provider);
     EntityTransaction tx = em.getTransaction();
     try {

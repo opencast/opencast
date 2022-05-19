@@ -289,8 +289,9 @@ public class SchedulerItem implements Serializable {
     this.type = Type.UpdatePresenters;
   }
   public DublinCoreCatalog getEvent() {
-    if (StringUtils.isBlank(event))
+    if (StringUtils.isBlank(event)) {
       return null;
+    }
 
     return DublinCoreXmlFormat.readOpt(event).orNull();
   }
@@ -345,8 +346,9 @@ public class SchedulerItem implements Serializable {
    */
   private String serializeProperties(Map<String, String> caProperties) {
     StringBuilder wfPropertiesString = new StringBuilder();
-    for (Map.Entry<String, String> entry : caProperties.entrySet())
+    for (Map.Entry<String, String> entry : caProperties.entrySet()) {
       wfPropertiesString.append(entry.getKey() + "=" + entry.getValue() + "\n");
+    }
     return wfPropertiesString.toString();
   }
 

@@ -81,11 +81,21 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
    *          Maps the ldap assignments to additional groups.
    *          Key and value are expected to be uppercase if the bool uppercase is set.
    */
-  public OpencastLdapAuthoritiesPopulator(String attributeNames, String prefix, String[] aExcludedPrefixes,
-          String groupCheckPrefix, boolean applyAttributesAsRoles, boolean applyAttributesAsGroups,
-          Map<String, String[]> ldapAssignmentRoleMap, Map<String, String[]> ldapAssignmentGroupMap, boolean uppercase,
-          Organization organization, SecurityService securityService,JpaGroupRoleProvider groupRoleProvider,
-          String... additionalAuthorities) {
+  public OpencastLdapAuthoritiesPopulator(
+      String attributeNames,
+      String prefix,
+      String[] aExcludedPrefixes,
+      String groupCheckPrefix,
+      boolean applyAttributesAsRoles,
+      boolean applyAttributesAsGroups,
+      Map<String, String[]> ldapAssignmentRoleMap,
+      Map<String, String[]> ldapAssignmentGroupMap,
+      boolean uppercase,
+      Organization organization,
+      SecurityService securityService,
+      JpaGroupRoleProvider groupRoleProvider,
+      String... additionalAuthorities
+  ) {
 
     logger.debug("Creating new instance");
 
@@ -106,8 +116,9 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
     this.attributeNames = new HashSet<>();
     for (String attributeName : attributeNames.split(",")) {
       String temp = attributeName.trim();
-      if (!temp.isEmpty())
+      if (!temp.isEmpty()) {
         this.attributeNames.add(temp);
+      }
     }
     if (this.attributeNames.size() == 0) {
       throw new IllegalArgumentException("At least one valid attribute must be provided");
@@ -126,25 +137,28 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
     this.groupRoleProvider = groupRoleProvider;
 
     this.uppercase = uppercase;
-    if (uppercase)
+    if (uppercase) {
       logger.debug("Roles will be converted to uppercase");
-    else
+    } else {
       logger.debug("Roles will NOT be converted to uppercase");
+    }
 
     this.prefix = roleCleanUpperCase(prefix, uppercase);
     logger.debug("Role prefix set to: {}", this.prefix);
 
-    if (aExcludedPrefixes != null)
+    if (aExcludedPrefixes != null) {
       for (String origExcludedPrefix : aExcludedPrefixes) {
         String excludedPrefix;
-        if (uppercase)
+        if (uppercase) {
           excludedPrefix = StringUtils.trimToEmpty(origExcludedPrefix).toUpperCase();
-        else
+        } else {
           excludedPrefix = StringUtils.trimToEmpty(origExcludedPrefix);
+        }
         if (!excludedPrefix.isEmpty()) {
           excludedPrefixes.add(excludedPrefix);
         }
       }
+    }
 
     if (groupCheckPrefix == null) {
       throw new IllegalArgumentException("The parameter groupCheckPrefix cannot be null");
@@ -165,12 +179,13 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
       this.ldapAssignmentGroupMap = ldapAssignmentGroupMap;
     }
 
-    if (additionalAuthorities == null)
+    if (additionalAuthorities == null) {
       this.additionalAuthorities = new String[0];
-    else
+    } else {
       this.additionalAuthorities = Arrays.stream(additionalAuthorities)
               .map(x -> roleCleanUpperCase(x, uppercase))
               .toArray(String[]::new);
+    }
 
     if (logger.isDebugEnabled()) {
       StringBuilder additionalAuthoritiesAsStr = new StringBuilder();
@@ -232,7 +247,9 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
           logger.debug("Could not find any attribute named '{}' in user '{}'", attributeName, userData.getDn());
         }
       } catch (ClassCastException e) {
-        logger.error("Specified attribute containing user roles ('{}') was not of expected type String", attributeName, e);
+        logger.error(
+            "Specified attribute containing user roles ('{}') was not of expected type String",
+            attributeName, e);
       }
     }
 
@@ -354,8 +371,9 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
     if (values != null) {
       Organization org = securityService.getOrganization();
       if (!organization.equals(org)) {
-        throw new SecurityException(String.format("Current request belongs to the organization \"%s\". Expected \"%s\"",
-                org.getId(), organization.getId()));
+        throw new SecurityException(String.format(
+            "Current request belongs to the organization \"%s\". Expected \"%s\"",
+            org.getId(), organization.getId()));
       }
 
       for (String value : values) {
@@ -374,10 +392,11 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
         if (!authority.isEmpty()) {
           // Check if this role is a group role and assign the groups appropriately
           List<Role> groupRoles;
-          if (groupRoleProvider != null && addAsGroup)
+          if (groupRoleProvider != null && addAsGroup) {
             groupRoles = groupRoleProvider.getRolesForGroup(authority);
-          else
+          } else {
             groupRoles = Collections.emptyList();
+          }
 
           // Try to add the prefix if appropriate
           String prefix = this.prefix;
@@ -391,8 +410,9 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
                   break;
                 }
               }
-              if (hasExcludePrefix)
+              if (hasExcludePrefix) {
                 prefix = "";
+              }
             }
           }
           else {

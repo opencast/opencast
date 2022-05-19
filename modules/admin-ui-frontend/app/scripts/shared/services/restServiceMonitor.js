@@ -61,24 +61,32 @@ function monitorService($http, $location, $translate, Storage) {
           services.service[LATEST_VERSION_NAME].docs_url =
             'https://docs.opencast.org/r/' + parseInt(latest_version) + '.x/admin/';
 
+          // Check if this is the latest major.minor version available
           if (parseFloat(my_version) >= parseFloat(latest_version)
              || (parseInt(my_version) == parseInt(latest_version) && my_version.endsWith('SNAPSHOT'))) {
             services.service[LATEST_VERSION_NAME].status = OK;
             services.service[LATEST_VERSION_NAME].error = false;
+
+          // Check if this is the latest major but not the latest minor version
           } else if (parseInt(my_version) == parseInt(latest_version)) {
             $translate('UPDATE.MINOR').then(function(translation) {
-              services.service[LATEST_VERSION_NAME].status = translation;
+              Monitoring.setWarning(LATEST_VERSION_NAME, translation);
             }).catch(angular.noop);
-            services.service[LATEST_VERSION_NAME].error = true;
+
+          // Check if this is still supported even though it is not the latest major version
           } else if (parseInt(latest_version) - parseInt(my_version) < 2) {
             $translate('UPDATE.MAJOR').then(function(translation) {
-              Monitoring.setError(LATEST_VERSION_NAME, translation);
+              Monitoring.setWarning(LATEST_VERSION_NAME, translation);
             }).catch(angular.noop);
+
+          // This version is no longer supported
           } else {
             $translate('UPDATE.UNSUPPORTED', {'version': my_version}).then(function(translation) {
               Monitoring.setError(LATEST_VERSION_NAME, translation);
             }).catch(angular.noop);
           }
+
+        // Couldn't determine this Opencast's version or what the latest version is
         } else {
           $translate('UPDATE.UNDETERMINED').then(function(translation) {
             Monitoring.setWarning(LATEST_VERSION_NAME, translation);

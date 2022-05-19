@@ -20,7 +20,7 @@ module.exports = function (grunt) {
   require('time-grunt')(grunt);
 
   // Require sass implementation
-  const sass = require('node-sass');
+  const sass = require('sass');
 
   // Automatically load required Grunt tasks
   require('jit-grunt')(grunt, {

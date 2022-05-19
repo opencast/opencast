@@ -25,7 +25,6 @@ import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.test.rest.NotFoundExceptionMapper;
@@ -51,7 +50,8 @@ import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class ThemesEndpointTest {
   private static final Logger logger = LoggerFactory.getLogger(ThemesEndpointTest.class);
-  private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestThemesEndpoint.class,
+  private static final RestServiceTestEnv rt = testEnvForClasses(
+          TestThemesEndpoint.class,
           NotFoundExceptionMapper.class);
   /** A parser for handling JSON documents inside the body of a request. */
   private final JSONParser parser = new JSONParser();

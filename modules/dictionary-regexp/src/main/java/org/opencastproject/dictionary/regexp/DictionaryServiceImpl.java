@@ -33,7 +33,6 @@ import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -79,12 +78,6 @@ public class DictionaryServiceImpl implements DictionaryService, ManagedService 
   public synchronized void updated(Dictionary<String, ?> properties) {
     if (properties != null && properties.get(PATTERN_CONFIG_KEY) != null) {
       String pattern = properties.get(PATTERN_CONFIG_KEY).toString();
-      /* Fix special characters */
-      try {
-        pattern = new String(pattern.getBytes("ISO-8859-1"), "UTF-8");
-      } catch (UnsupportedEncodingException e) {
-        logger.warn("Error decoding pattern string");
-      }
       logger.info("Setting pattern for regexp based DictionaryService to '{}'", pattern);
       setPattern(pattern);
     }

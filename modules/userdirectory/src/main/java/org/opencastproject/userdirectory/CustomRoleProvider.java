@@ -58,11 +58,11 @@ import java.util.regex.PatternSyntaxException;
  * An in-memory role provider containing administratively-defined custom roles
  */
 @Component(
-  property = {
-    "service.description=Provides custom roles"
-  },
-  immediate = true,
-  service = { RoleProvider.class }
+    property = {
+        "service.description=Provides custom roles"
+    },
+    immediate = true,
+    service = { RoleProvider.class }
 )
 public class CustomRoleProvider implements RoleProvider {
 
@@ -122,9 +122,9 @@ public class CustomRoleProvider implements RoleProvider {
     }
 
     if (rolematch != null) {
-        logger.info("CustomRoleProvider activated, {} custom role(s), custom role pattern {}", roles.size(), rolePattern);
+      logger.info("CustomRoleProvider activated, {} custom role(s), custom role pattern {}", roles.size(), rolePattern);
     } else {
-        logger.info("CustomRoleProvider activated, {} custom role(s)", roles.size());
+      logger.info("CustomRoleProvider activated, {} custom role(s)", roles.size());
     }
   }
 
@@ -151,8 +151,9 @@ public class CustomRoleProvider implements RoleProvider {
    */
   @Override
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
-    if (query == null)
+    if (query == null) {
       throw new IllegalArgumentException("Query must be set");
+    }
 
     Organization organization = securityService.getOrganization();
 
@@ -161,10 +162,10 @@ public class CustomRoleProvider implements RoleProvider {
       String exactQuery = StringUtils.removeEnd(query, "%");
       Matcher m = rolematch.matcher(exactQuery);
       if (m.matches()) {
-          List<Role> roles = new LinkedList<Role>();
-          JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
-          roles.add(new JaxbRole(exactQuery, jaxbOrganization, "Custom Role", Role.Type.EXTERNAL));
-          return roles.iterator();
+        List<Role> roles = new LinkedList<Role>();
+        JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
+        roles.add(new JaxbRole(exactQuery, jaxbOrganization, "Custom Role", Role.Type.EXTERNAL));
+        return roles.iterator();
       }
     }
 

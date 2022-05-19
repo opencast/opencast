@@ -1021,6 +1021,20 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   }
 
   @Override
+  public HostStatistics getHostStatistics() {
+    HostStatistics statistics = new HostStatistics();
+    for (Map.Entry<ServiceRegistrationInMemoryImpl, Set<Job>> entry: jobHosts.entrySet()) {
+      final ServiceRegistrationInMemoryImpl service = entry.getKey();
+      final long queued = entry.getValue().stream().filter(job -> job.getStatus() == Status.QUEUED).count();
+      final long running = entry.getValue().stream().filter(job -> job.getStatus() == Status.RUNNING).count();
+      final long host = service.host.hashCode();
+      statistics.addQueued(host, statistics.queuedJobs(host) + queued);
+      statistics.addRunning(host, statistics.runningJobs(host) + running);
+    }
+    return statistics;
+  }
+
+  @Override
   public HostRegistration getHostRegistration(String hostname) throws ServiceRegistryException {
     for (HostRegistration host:  this.getHostRegistrations()) {
       if (host.getBaseUrl().equalsIgnoreCase(hostname)) {

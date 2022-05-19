@@ -23,7 +23,6 @@ package org.opencastproject.adminui.endpoint;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
@@ -47,7 +46,7 @@ import io.restassured.http.ContentType;
 
 public class SeriesEndpointTest {
 
-  private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestSeriesEndpoint.class);
+  private static final RestServiceTestEnv rt = testEnvForClasses(TestSeriesEndpoint.class);
 
   private JSONParser parser;
 

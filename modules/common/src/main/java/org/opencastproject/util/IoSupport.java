@@ -273,35 +273,6 @@ public final class IoSupport {
     });
   }
 
-  /** Load a text file from the class path using the class loader of the given class. */
-  public static Option<String> loadTxtFromClassPath(final String resource, final Class<?> clazz) {
-    return withResource(clazz.getResourceAsStream(resource), new Function<InputStream, Option<String>>() {
-      @Override
-      public Option<String> apply(InputStream is) {
-        try {
-          return some(IOUtils.toString(is));
-        } catch (Exception e) {
-          logger.warn("Cannot load resource " + resource + " from classpath");
-          return none();
-        }
-      }
-    });
-  }
-
-  /**
-   * Handle a stream inside <code>f</code> and ensure that <code>s</code> gets closed properly.
-   *
-   * @deprecated use {@link #withResource(java.io.Closeable, org.opencastproject.util.data.Function)} instead
-   */
-  @Deprecated
-  public static <A> A withStream(InputStream s, Function<InputStream, A> f) {
-    try {
-      return f.apply(s);
-    } finally {
-      IoSupport.closeQuietly(s);
-    }
-  }
-
   /**
    * Handle a closeable resource inside <code>f</code> and ensure it gets closed properly.
    */

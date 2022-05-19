@@ -22,19 +22,39 @@
 package org.opencastproject.engage.theodul.plugin.controls;
 
 import org.opencastproject.engage.theodul.api.AbstractEngagePlugin;
+import org.opencastproject.engage.theodul.api.EngagePlugin;
+import org.opencastproject.engage.theodul.api.EngagePluginManager;
 
-import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Path;
 
+@Component(
+    property = {
+        "opencast.engage.plugin.name=EngagePluginControls",
+        "opencast.engage.plugin.description=Simple implementation of a control bar",
+        "opencast.engage.plugin.rest=false"
+    },
+    immediate = true,
+    service = EngagePlugin.class
+)
 @Path("/")
 public class EngagePluginControls extends AbstractEngagePlugin {
 
   private static final Logger log = LoggerFactory.getLogger(EngagePluginControls.class);
 
-  protected void activate(ComponentContext cc) {
+  @Activate
+  protected void activate() {
     log.info("Activated engage plugin: Controls.");
+  }
+
+  @Override
+  @Reference
+  protected void setPluginManager(final EngagePluginManager pluginManager) {
+    this.pluginManager = pluginManager;
   }
 }

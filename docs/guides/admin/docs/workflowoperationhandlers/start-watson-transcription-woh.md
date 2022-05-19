@@ -19,7 +19,7 @@ text.
 <!-- Extract audio from video in ogg/opus format -->
 
 <operation
-  id="compose"
+  id="encode"
   fail-on-error="true"
   exception-handler-workflow="partial-error"
   description="Extract audio for transcript generation">

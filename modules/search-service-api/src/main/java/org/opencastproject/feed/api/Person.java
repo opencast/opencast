@@ -25,7 +25,7 @@ package org.opencastproject.feed.api;
 /**
  * This interface provides the methods for defining a person object contained in a feed like authors and contributors.
  * <p>
- * Note that this interface is heavily inspired and backed by the excellent rss/atom feed library <tt>Rome</tt>
+ * Note that this interface is heavily inspired and backed by the excellent rss/atom feed library <code>Rome</code>
  * (http://https://rome.dev.java.net).
  */
 public interface Person {

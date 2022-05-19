@@ -15,7 +15,7 @@ Accessing The Editor
 You can access the editor by providing an event identifier to the web interface like this:
 
 ```
-/editor-ui/index.html?mediaPackageId=<ID>
+/editor-ui/index.html?id=<ID>
 ```
 
 

@@ -362,7 +362,7 @@ public interface SchedulerService {
    * @param captureDeviceID
    *          capture device ID for which conflicting events are searched for
    * @param startDate
-   *          start date of of conflicting period
+   *          start date of conflicting period
    * @param endDate
    *          end date of conflicting period
    * @return a {@link MediaPackage} list of all conflicting events

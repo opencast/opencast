@@ -62,6 +62,10 @@ public class AQueryBuilderDecorator implements AQueryBuilder {
     return delegate.mediaPackageId(mpId);
   }
 
+  @Override public Field<String> mediapackageId() {
+    return delegate.mediapackageId();
+  }
+
   @Override public Field<String> seriesId() {
     return delegate.seriesId();
   }

@@ -41,7 +41,7 @@ if [ "$PROGNAME" = "start-opencast" ] && [ "$nargs" -eq "0" ]; then
       return 0;
     fi
     if [ -d /proc/net ] ; then
-      if cat /proc/net/tcp* | awk '{print $2, $3, $4}' | grep " 0[1A]$" | grep -q "$hexPort"; then
+      if cat /proc/net/tcp* | awk '{print $2, $4}' | grep " 0[1A]$" | grep -q "$hexPort"; then
         return 1;
       fi
     else

@@ -167,9 +167,9 @@ public class Activator implements BundleActivator {
       throw new RuntimeException("Unable to verify SQL credentials have required permissions!", e);
     } finally {
       try {
-        statement.executeQuery("DROP TABLE " + tableName + ";");
+        statement.executeUpdate("DROP TABLE " + tableName + ";");
       } catch (Exception e) {
-        logger.warn("Unable to delete temp table {}, please remove this yourself!", tableName);
+        logger.warn("Unable to delete temp table {}, please remove this yourself!", tableName, e);
       }
     }
 

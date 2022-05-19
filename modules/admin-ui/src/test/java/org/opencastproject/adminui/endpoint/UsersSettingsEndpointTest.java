@@ -24,7 +24,6 @@ package org.opencastproject.adminui.endpoint;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
@@ -51,7 +50,7 @@ import io.restassured.http.ContentType;
 
 public class UsersSettingsEndpointTest {
   private static final Logger logger = LoggerFactory.getLogger(UsersSettingsEndpointTest.class);
-  private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestUserSettingsEndpoint.class);
+  private static final RestServiceTestEnv rt = testEnvForClasses(TestUserSettingsEndpoint.class);
 
   private JSONParser parser;
 

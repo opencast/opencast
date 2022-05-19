@@ -26,7 +26,8 @@ import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.opencastproject.authorization.xacml.manager.impl.Util.getManagedAcl;
+import static org.opencastproject.authorization.xacml.manager.util.Util.getManagedAcl;
+import static org.opencastproject.authorization.xacml.manager.util.Util.toAcl;
 import static org.opencastproject.util.RestUtil.R.conflict;
 import static org.opencastproject.util.RestUtil.R.noContent;
 import static org.opencastproject.util.RestUtil.R.notFound;
@@ -44,13 +45,15 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AccessControlUtil;
+import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function;
@@ -61,12 +64,13 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 
+import com.entwinemedia.fn.data.Opt;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -83,15 +87,11 @@ public abstract class AbstractAclServiceRestEndpoint {
 
   protected abstract AclServiceFactory getAclServiceFactory();
 
-  protected abstract String getEndpointBaseUrl();
-
   protected abstract SecurityService getSecurityService();
-
-  protected abstract AuthorizationService getAuthorizationService();
 
   protected abstract AssetManager getAssetManager();
 
-  protected abstract SeriesService getSeriesService();
+  protected abstract AuthorizationService getAuthorizationService();
 
   @GET
   @Path("/acl/{aclId}")
@@ -307,26 +307,27 @@ public abstract class AbstractAclServiceRestEndpoint {
   @POST
   @Path("/apply/episode/{episodeId}")
   @RestQuery(
-      name = "applyAclToEpisode",
-      description = "Immediate application of an ACL to an episode",
-      returnDescription = "Status code",
-      pathParameters = {
-          @RestParameter(name = "episodeId", isRequired = true, description = "The episode ID", type = STRING)
-      },
-      restParameters = {
-          @RestParameter(
-              name = "aclId",
-              isRequired = false,
-              description = "The ID of the ACL to apply. If missing the episode ACL will be "
-                  + "deleted to fall back to the series ACL",
-              type = INTEGER
-          )
-      },
-      responses = {
-          @RestResponse(responseCode = SC_OK, description = "The ACL has been successfully applied"),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL or the episode has not been found"),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Internal error")
-      }
+          name = "applyAclToEpisode",
+          description = "Immediate application of an ACL to an episode (Attention: This endpoint is deprecated and "
+                  + " will be removed in future versions!)",
+          returnDescription = "Status code",
+          pathParameters = {
+                  @RestParameter(name = "episodeId", isRequired = true, description = "The episode ID", type = STRING)
+          },
+          restParameters = {
+                  @RestParameter(
+                          name = "aclId",
+                          isRequired = false,
+                          description = "The ID of the ACL to apply. If missing the episode ACL will be "
+                                  + "deleted to fall back to the series ACL",
+                          type = INTEGER
+                  )
+          },
+          responses = {
+                  @RestResponse(responseCode = SC_OK, description = "The ACL has been successfully applied"),
+                  @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL or the episode has not been found"),
+                  @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Internal error")
+          }
   )
   public Response applyAclToEpisode(@PathParam("episodeId") String episodeId, @FormParam("aclId") Long aclId) {
     final AclService aclService = aclService();
@@ -335,67 +336,41 @@ public abstract class AbstractAclServiceRestEndpoint {
       return notFound();
     }
     try {
-      if (aclService.applyAclToEpisode(episodeId, Options.join(macl))) {
+      Option<AccessControlList> aclOpt = Options.join(macl).map(toAcl);
+      Opt<MediaPackage> mediaPackage = getAssetManager().getMediaPackage(episodeId);
+      // the episode service is the source of authority for the retrieval of media packages
+      if (mediaPackage.isSome()) {
+        MediaPackage episodeSvcMp = mediaPackage.get();
+        aclOpt.fold(new Option.EMatch<AccessControlList>() {
+          // set the new episode ACL
+          @Override
+          public void esome(final AccessControlList acl) {
+            // update in episode service
+            try {
+              MediaPackage mp = getAuthorizationService().setAcl(episodeSvcMp, AclScope.Episode, acl).getA();
+              getAssetManager().takeSnapshot(mp);
+            } catch (MediaPackageException e) {
+              logger.error("Error getting ACL from media package", e);
+            }
+          }
+
+          // if none EpisodeACLTransition#isDelete returns true so delete the episode ACL
+          @Override
+          public void enone() {
+            // update in episode service
+            MediaPackage mp = getAuthorizationService().removeAcl(episodeSvcMp, AclScope.Episode);
+            getAssetManager().takeSnapshot(mp);
+          }
+
+        });
         return ok();
-      } else {
-        return notFound();
       }
-    } catch (AclServiceException e) {
+      // not found
+      return notFound();
+    } catch (Exception e) {
       logger.error("Error applying acl to episode {}", episodeId);
       return serverError();
     }
-  }
-
-  @POST
-  @Path("/apply/series/{seriesId}")
-  @RestQuery(
-      name = "applyAclToSeries",
-      description = "Immediate application of an ACL to a series",
-      returnDescription = "Status code",
-      pathParameters = {
-          @RestParameter(name = "seriesId", isRequired = true, description = "The series ID", type = STRING)
-      },
-      restParameters = {
-          @RestParameter(
-              name = "aclId",
-              isRequired = true,
-              description = "The ID of the ACL to apply",
-              type = INTEGER
-          ),
-          @RestParameter(
-              name = "override",
-              isRequired = false,
-              defaultValue = "false",
-              description = "If true the series ACL will take precedence over any existing episode ACL",
-              type = STRING
-          )
-      },
-      responses = {
-          @RestResponse(responseCode = SC_OK, description = "The ACL has been successfully applied"),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL or the series has not been found"),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Internal error")
-      }
-  )
-  public Response applyAclToSeries(
-      @PathParam("seriesId") String seriesId,
-      @FormParam("aclId") long aclId,
-      @DefaultValue("false") @FormParam("override") boolean override
-  ) {
-    final AclService aclService = aclService();
-    for (ManagedAcl macl : aclService.getAcl(aclId)) {
-      try {
-        if (aclService.applyAclToSeries(seriesId, macl, override)) {
-          return ok();
-        } else {
-          return notFound();
-        }
-      } catch (AclServiceException e) {
-        logger.error("Error applying acl to series {}", seriesId);
-        return serverError();
-      }
-    }
-    // acl not found
-    return notFound();
   }
 
   private static final Function<String, AccessControlList> parseAcl = new Function<String, AccessControlList>() {

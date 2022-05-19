@@ -4,7 +4,7 @@
     {
       "configuration_panel": "\n    \n      <div id=\"workflow-configuration\">\n        <fieldset>\n          <input\n            id=\"numberOfEvents\"\n            name=\"numberOfEvents\"\n            type=\"number\"\n            class=\"configField\"\n            onkeypress=\"return event.charCode > 47\"\n            oninput=\"checkValueInBounds()\"\n            min=\"1\"\n            value=\"1\"\n            max=\"25\"\n            />\n          <label for=\"numberOfEvents\">Number of Events</label>\n        </fieldset>\n      </div>\n\n      <script type=\"text/javascript\">\n        function checkValueInBounds() {\n          var value = $('#numberOfEvents').val();\n          var max = $('#numberOfEvents').attr('max');\n          var min = $('#numberOfEvents').attr('min');\n          if (parseInt(value) < parseInt(min)) $('#numberOfEvents').val(min);\n          if (parseInt(value) > parseInt(max)) $('#numberOfEvents').val(max);\n        }\n      </script>\n    \n  ",
       "displayOrder": 10,
-      "description": "",
+      "description": "This is a test workflow defined in the frontend mockup.\n It is not loaded from the system, nor does it represent one of the actual default workflows",
       "id": "duplicate-event",
       "title": "Duplicate Event"
     },

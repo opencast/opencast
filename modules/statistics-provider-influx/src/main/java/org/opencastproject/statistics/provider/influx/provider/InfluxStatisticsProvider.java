@@ -101,7 +101,12 @@ public abstract class InfluxStatisticsProvider implements StatisticsProvider {
     }
   }
 
-  protected static List<Tuple<Instant, Instant>> getPeriods(final Instant from, final Instant to, DataResolution resolution, ZoneId zoneId) {
+  protected static List<Tuple<Instant, Instant>> getPeriods(
+      final Instant from,
+      final Instant to,
+      DataResolution resolution,
+      ZoneId zoneId
+  ) {
     switch (resolution) {
       case MONTHLY:
         return getMonthPeriods(getMonths(from, to, zoneId), from, to);
@@ -128,7 +133,8 @@ public abstract class InfluxStatisticsProvider implements StatisticsProvider {
     final List<Tuple<Instant, Instant>> result = new ArrayList<>();
     for (Year year : years) {
       final Instant start = year.atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC);
-      final Instant end = year.atMonthDay(MonthDay.of(12, 31)).atTime(23, 59, 59, 1_000_000_000 - 1).toInstant(ZoneOffset.UTC);
+      final Instant end = year.atMonthDay(MonthDay.of(12, 31))
+          .atTime(23, 59, 59, 1_000_000_000 - 1).toInstant(ZoneOffset.UTC);
       result.add(new Tuple<>(Ordering.natural().max(start, from), Ordering.natural().min(end, to)));
     }
     return result;
@@ -151,7 +157,8 @@ public abstract class InfluxStatisticsProvider implements StatisticsProvider {
     final List<Year> years = new ArrayList<>();
     while (!localStart.isAfter(localEnd)) {
       years.add(Year.from(localStart));
-      localStart = localStart.plusYears(1).withMonth(1).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+      localStart = localStart.plusYears(1).withMonth(1)
+          .withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
     }
     return years;
   }

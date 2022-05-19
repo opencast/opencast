@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Feed entries are the child elements of an rrs/atom feed.
  * <p>
- * Note that this interface is heavily inspired and backed by the excellent rss/atom feed library <tt>Rome</tt>
+ * Note that this interface is heavily inspired and backed by the excellent rss/atom feed library <code>Rome</code>
  * (http://rome.dev.java.net).
  */
 public interface FeedEntry {

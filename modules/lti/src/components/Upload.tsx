@@ -35,6 +35,8 @@ interface UploadState {
     readonly metadata: MetadataResult | "error" | undefined;
     readonly presenterFile?: Blob;
     readonly captionFile?: Blob;
+    readonly captionFormat?: string;
+    readonly captionLanguage?: string;
     readonly copyState: "success" | "error" | "pending" | "none";
     readonly copySeries?: OptionType;
     readonly uploadProgress: number;
@@ -156,6 +158,8 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
             this.state.eventId,
             this.state.presenterFile,
             this.state.captionFile,
+            this.state.captionFormat,
+            this.state.captionLanguage,
             this.setUploadProgress = this.setUploadProgress.bind(this)
         ).then((_) => {
             if (!isMetadata(this.state.metadata))
@@ -181,10 +185,41 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
         });
     }
 
-    onCaptionFileChange(newFile: Blob) {
+    onCaptionFileChange(newFile: Blob | File) {
+        let captionFormat: string | undefined = undefined
+        if(newFile.type === 'text/vtt') {
+            captionFormat = 'vtt';
+        } else {
+            if(newFile instanceof File){
+                captionFormat = newFile.name !== '' ? newFile.name.substring(newFile.name.lastIndexOf('.') + 1) : undefined;
+                if(captionFormat === 'dfxp') {
+                    const fileReader = new FileReader();
+                    fileReader.onloadend = (e) =>
+                    {
+                        if(e.target?.result !== null && typeof e.target?.result === 'string'){
+                            const parser = new DOMParser();
+                            const xml = parser.parseFromString(e.target.result, 'text/xml');
+                            const lang = xml.querySelector('tt')?.getAttribute('xml:lang');
+                            if(lang !== null && lang !== undefined) {
+                                this.onCaptionLanguageChange(lang);
+                            }
+                        }
+                    }
+                    fileReader.readAsText(newFile);
+                }
+            }
+        }
         this.setState({
             ...this.state,
-            captionFile: newFile
+            captionFile: newFile,
+            captionFormat: captionFormat
+        });
+    }
+
+    onCaptionLanguageChange(language: string){
+        this.setState({
+            ...this.state,
+            captionLanguage: language
         });
     }
 
@@ -279,6 +314,8 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
                 onDataChange={this.onDataChange.bind(this)}
                 onPresenterFileChange={this.onPresenterFileChange.bind(this)}
                 onCaptionFileChange={this.onCaptionFileChange.bind(this)}
+                onCaptionLanguageChange={this.onCaptionLanguageChange.bind(this)}
+                captionFormat={this.state.captionFormat}
                 onSubmit={this.onSubmit.bind(this)}
                 hasSubmit={this.state.metadata.edited.locked === undefined}
                 pending={this.state.uploadState === "pending"} />
@@ -306,7 +343,7 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
                 </>
             }
             { this.state.uploadProgress > 0 && <ProgressBar className="my-2" now={this.state.uploadProgress} label={`${this.state.uploadProgress}%`} />}
-            <h2>{this.props.t("LTI.CURRENT_JOBS")}</h2>
+            <h2 className="mt-4">{this.props.t("LTI.CURRENT_JOBS")}</h2>
             <JobList seriesId={this.state.metadata.seriesId} />
         </>;
     }

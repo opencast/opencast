@@ -31,27 +31,24 @@ such, we welcome and value committers both in the traditional sense (e.g. progra
 The committer body is the group of individuals who drive, manage, and govern the product. They make releases, set
 policy, and determine the both the quality and feature-set of Opencast.
 
-Responsibilities of a committer
+
+Responsibilities of a Committer
 -------------------------------
 
 Committers responsibilities are centered around two key principles, that there is a commitment to excellence and
 success, and that there is a commitment to being active and involved. These commitments are demonstrated through
 activities such as:
 
-* Being involved in quality assurance of the source code, documentation, designs, and other project pieces.
-* Being active and engaging in the broader community, including supporting adopters and providing prompt feedback.
-* Knowing when a change is beyond your ability and asking for help.
-* Keeping informed of project governance and direction.
+* Contributing to the source code and doocumentation of Opencast
+* Being involved in quality assurance of the source code,
+  documentation, designs, and other project pieces.
+* Being active and engaging in the broader community, including
+  supporting adopters and providing feedback.
 * Fostering a collegial environment between the group of committers.
-* Ensuring that incoming code adheres to our [license](license.md) requirements. Minor patches can be accepted
-  without concern, but the main reviewer *must* ensure that a CLA (and CCLA) is in place prior to merging in the
-  contribution.
-* 20% of the time a committer invests to the project is to be allocated for general purposes, i.e. work not directly
-  associated with the committer's individual or institutional concerns.
 
-All committers must signed a ICLA. The privileges and rights of being a committer do not come into effect until an ICLA
-has been received and processed. The ICLA, as well as the list of ICLA signatories, can be found
-[here](http://licensing.apereo.org/). Your employer will also need to sign a CCLA as well.
+All committers must have a signed [ICLA on file with Apereo](http://licensing.apereo.org/).
+If you make contributions on behalf of your employer, he should also sign a CCLA.
+
 
 How do I become a committer?
 ----------------------------
@@ -74,3 +71,59 @@ Committer status can be lost through any of the methods below:
 * *Revocation of Commit Privileges*: A committer may make a proposal to remove an individual from the committer body.
   Discussion and voting happen on the confidential committers mailing list, and the committer in question is not
   entitled to a vote (though they do get to participate in the discussion).
+
+List of Committers
+------------------
+
+The current list of committers in aplhabetical order:
+
+<ul>
+<li><a href=https://github.com/Arnei><img style="width: 40px; margin: 0"
+ src=https://avatars.githubusercontent.com/u/14070005?u=6e73d565059359edfca6ec780d0263e9c2a01668&v=4
+ /> Arnei</a></li>
+<li><a href=https://github.com/CGreweling><img style="width: 40px; margin: 0"
+ src=https://avatars.githubusercontent.com/u/3499600?u=27138059f4750ec5ce6ea6f4e80d08443b75367a&v=4
+ /> CGreweling</a></li>
+<li><a href=https://github.com/gregorydlogan><img style="width: 40px; margin: 0"
+ src=https://avatars.githubusercontent.com/u/5639561?u=3980a41f51a9b4fcaa988a80e561de14913d062d&v=4
+ /> gregorydlogan</a></li>
+<li><a href=https://github.com/JamesUoM><img style="width: 40px; margin: 0"
+ src=https://avatars.githubusercontent.com/u/2952979?u=b192e1a3272c7a1264365cc591d893829b186dcf&v=4
+ /> JamesUoM</a></li>
+<li><a href=https://github.com/JulianKniephoff><img style="width: 40px; margin: 0"
+ src=https://avatars.githubusercontent.com/u/123272?v=4
+ /> JulianKniephoff</a></li>
+<li><a href=https://github.com/karendolan><img style="width: 40px; margin: 0"
+ src=https://avatars.githubusercontent.com/u/1331728?u=636e1f73f13acf3faf48c5127d1c72dbaef6c71f&v=4
+ /> karendolan</a></li>
+<li><a href=https://github.com/KatrinIhler><img style="width: 40px; margin: 0"
+ src=https://avatars.githubusercontent.com/u/11960278?u=9faf9a88d3097c7864dc80f799b9845bc09d7026&v=4
+ /> KatrinIhler</a></li>
+<li><a href=https://github.com/lkiesow><img style="width: 40px; margin: 0"
+ src=https://avatars.githubusercontent.com/u/1008395?u=9f82bb48d2d8f88f6c41ef382e41aae132d894e6&v=4
+ /> lkiesow</a></li>
+<li><a href=https://github.com/mliradelc><img style="width: 40px; margin: 0"
+ src=https://avatars.githubusercontent.com/u/8040628?u=d5028c1e9214b6cee0374a6651f8947e55bc546f&v=4
+ /> mliradelc</a></li>
+<li><a href=https://github.com/mtneug><img style="width: 40px; margin: 0"
+ src=https://avatars.githubusercontent.com/u/3051721?u=2c323b5e247fc422dd4d97976f1d513c401dd512&v=4
+ /> mtneug</a></li>
+<li><a href=https://github.com/rrolf><img style="width: 40px; margin: 0"
+ src=https://avatars.githubusercontent.com/u/1894165?u=b854d241d81a504b9f692b8086ff15097c6c333e&v=4
+ /> rrolf</a></li>
+<li><a href=https://github.com/rute-santos><img style="width: 40px; margin: 0"
+ src=https://avatars.githubusercontent.com/u/9451622?u=a240189b32811b984d04939ee82e456aaa68eb59&v=4
+ /> rute-santos</a></li>
+<li><a href=https://github.com/smarquard><img style="width: 40px; margin: 0"
+ src=https://avatars.githubusercontent.com/u/5888197?u=71bbc5d122a4175f8954502c280afc0a3c575e59&v=4
+ /> smarquard</a></li>
+<li><a href=https://github.com/ts23><img style="width: 40px; margin: 0"
+ src=https://avatars.githubusercontent.com/u/3940856?v=4
+ /> ts23</a></li>
+<li><a href=https://github.com/turro><img style="width: 40px; margin: 0"
+ src=https://avatars.githubusercontent.com/u/3541284?u=c9b1c8c7d2d674a3bc633c3f026a3b09e9131ae6&v=4
+ /> turro</a></li>
+<li><a href=https://github.com/wsmirnow><img style="width: 40px; margin: 0"
+ src=https://avatars.githubusercontent.com/u/26736?u=ac49366f1834d1b32c6e0c0f330cc2ec4b640e04&v=4
+ /> wsmirnow</a></li>
+</ul>

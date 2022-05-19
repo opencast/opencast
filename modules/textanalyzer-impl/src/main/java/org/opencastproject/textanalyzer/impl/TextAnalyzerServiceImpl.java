@@ -52,6 +52,7 @@ import org.opencastproject.textextractor.api.TextExtractor;
 import org.opencastproject.textextractor.api.TextExtractorException;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.osgi.service.cm.ConfigurationException;
@@ -428,5 +429,9 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
     analysisJobLoad = LoadUtil.getConfiguredLoadValue(properties, ANALYSIS_JOB_LOAD_KEY, DEFAULT_ANALYSIS_JOB_LOAD,
             serviceRegistry);
+  }
+
+  public void setReadinessIndicator(ReadinessIndicator readinessIndicator) {
+    //Only activate service if ReadinessIndicator is registered.
   }
 }

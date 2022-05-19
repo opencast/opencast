@@ -53,7 +53,7 @@ public final class SeriesItem implements MessageItem, Serializable {
   private final String overrideEpisodeAcl;
 
   public enum Type {
-    UpdateCatalog, UpdateElement, UpdateAcl, UpdateProperty, Delete
+    UpdateCatalog, UpdateElement, UpdateAcl, Delete
   };
 
   /**
@@ -94,19 +94,6 @@ public final class SeriesItem implements MessageItem, Serializable {
 
   /**
    * @param seriesId
-   *          The unique id for the series to update.
-   * @param propertyName
-   *          the property name
-   * @param propertyValue
-   *          the property value
-   * @return Builds {@link SeriesItem} for updating a series property.
-   */
-  public static SeriesItem updateProperty(String seriesId, String propertyName, String propertyValue) {
-    return new SeriesItem(Type.UpdateProperty, seriesId, null, null, propertyName, propertyValue, null, null, null);
-  }
-
-  /**
-   * @param seriesId
    *          The unique id of the series to delete.
    * @return Builds {@link SeriesItem} for deleting a series.
    */
@@ -142,8 +129,9 @@ public final class SeriesItem implements MessageItem, Serializable {
    */
   private SeriesItem(Type type, String seriesId, DublinCoreCatalog series, String acl, String propertyName,
           String propertyValue, String elementType, String element, Boolean overrideEpisodeAcl) {
-    if (seriesId != null && series != null && !seriesId.equals(series.getFirst(DublinCore.PROPERTY_IDENTIFIER)))
+    if (seriesId != null && series != null && !seriesId.equals(series.getFirst(DublinCore.PROPERTY_IDENTIFIER))) {
       throw new IllegalStateException("Provided series ID and dublincore series ID does not match");
+    }
 
     this.type = type;
     if (series != null) {
@@ -155,12 +143,13 @@ public final class SeriesItem implements MessageItem, Serializable {
     } else {
       this.series = null;
     }
-    if (seriesId != null)
+    if (seriesId != null) {
       this.seriesId = seriesId;
-    else if (series != null)
+    } else if (series != null) {
       this.seriesId = series.getFirst(DublinCore.PROPERTY_IDENTIFIER);
-    else
+    } else {
       throw new IllegalStateException("Neither series nor series ID is provided");
+    }
     this.acl = acl;
     this.propertyName = propertyName;
     this.propertyValue = propertyValue;

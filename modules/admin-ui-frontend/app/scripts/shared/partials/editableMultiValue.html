@@ -6,7 +6,7 @@
   </ul>
 
   <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-focus="enterEditMode()" tabindex="{{ params.tabindex }}"></i>
-  <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
+  <i class="changed fa fa-check" ng-show="!editMode" ng-class="{ saved: params.saved, dirty: params.dirty }"></i>
 
   <div class="editable-select" ng-if="editMode">
     <input type="text" ng-model="data.value"

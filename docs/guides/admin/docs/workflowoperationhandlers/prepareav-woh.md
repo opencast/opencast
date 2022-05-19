@@ -20,10 +20,10 @@ in the pipeline (encoding to flash, mjpeg etc.).
 |------------------|-------|-----------|
 |source-flavor|presenter/source|Specifies which media should be processed.|
 |target-flavor|presenter/work|Specifies the flavor the new files will get.|
-|mux-encoding-profile    |mux-av.prepared    |The encoding profile to use for media that needs to be muxed (default is 'mux-av.work')|
-|audio-video-encoding-profile    |av.prepared    |The encoding profile to use for media that is audio-video already and needs to be re-encodend (default is av.work)     |
-|video-encoding-profile    |video-only.prepared    |The encoding profile to use for media that is only video and needs to be re-encodend (default is video-only.work)     |
-|audio-encoding-profile    |audio-only.prepared    |The encoding profile to use for media that is only audio and needs to be re-encodend (default is audio-only.work)     |
+|mux-encoding-profile    |mux-av.copy    |The encoding profile to use for media that needs to be muxed (default is 'mux-av.copy')|
+|audio-video-encoding-profile    |av.copy    |The encoding profile to use for media that is audio-video already and needs to be re-encodend (default is av.copy)     |
+|video-encoding-profile    |video-only.copy    |The encoding profile to use for media that is only video and needs to be re-encodend (default is video-only.copy)     |
+|audio-encoding-profile    |audio-only.copy    |The encoding profile to use for media that is only audio and needs to be re-encodend (default is audio-only.copy)     |
 |rewrite    |true    |Should files be rewritten     |
 |audio-muxing-source-flavors|presentation/source,presentation/\*,\*/\*    |If there is no matching flavor to mux, search for a track with audio that can be muxed by going from left to right through this comma-separated list of source flavors|
 

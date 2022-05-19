@@ -64,22 +64,29 @@ import javax.ws.rs.core.Response;
  * A REST EndPoint for JpaGroupRoleProvider.
  */
 @Path("/")
-@RestService(name = "groups", title = "Internal group manager", abstractText = "This service offers the ability to manage the groups for internal accounts.", notes = {
+@RestService(
+    name = "groups",
+    title = "Internal group manager",
+    abstractText = "This service offers the ability to manage the groups for internal accounts.",
+    notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-        "If the service is down or not working it will return a status 503, this means the the underlying service is "
-                + "not working and is either restarting or has failed",
-                "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-                        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                        + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+        "If the service is down or not working it will return a status 503, this means the the "
+            + "underlying service is not working and is either restarting or has failed",
+        "A status code 500 means a general failure has occurred which is not recoverable and was "
+            + "not anticipated. In other words, there is a bug! You should file an error report "
+            + "with your server logs from the time when the error occurred: "
+            + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
+    }
+)
 @Component(
-  property = {
-    "service.description=Group Role REST EndPoint",
-    "opencast.service.type=org.opencastproject.userdirectory.endpoint.GroupRoleEndpoint",
-    "opencast.service.jobproducer=false",
-    "opencast.service.path=/groups"
-  },
-  immediate = false,
-  service = { GroupRoleEndpoint.class }
+    property = {
+        "service.description=Group Role REST EndPoint",
+        "opencast.service.type=org.opencastproject.userdirectory.endpoint.GroupRoleEndpoint",
+        "opencast.service.jobproducer=false",
+        "opencast.service.path=/groups"
+    },
+    immediate = false,
+    service = { GroupRoleEndpoint.class }
 )
 public class GroupRoleEndpoint {
 
@@ -109,12 +116,42 @@ public class GroupRoleEndpoint {
   @GET
   @Produces({ MediaType.TEXT_XML, MediaType.APPLICATION_JSON })
   @Path("groups.{format:xml|json}")
-  @RestQuery(name = "allgroup", description = "Returns a list of groups", returnDescription = "Returns a JSON or XML representation of the list of groups available the current user's organization", pathParameters = {
-          @RestParameter(description = "The output format (json or xml) of the response body.", isRequired = true, name = "format", type = RestParameter.Type.STRING) }, restParameters = {
-          @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "The groups.") })
-  public Response getGroupsAsJsonOrXml(@PathParam("format") String format, @QueryParam("limit") int limit,
-          @QueryParam("offset") int offset) {
+  @RestQuery(
+      name = "allgroup",
+      description = "Returns a list of groups",
+      returnDescription = "Returns a JSON or XML representation of the list of groups available "
+          + "the current user's organization",
+      pathParameters = {
+          @RestParameter(
+              name = "format",
+              description = "The output format (json or xml) of the response body.",
+              isRequired = true,
+              type = RestParameter.Type.STRING
+          )
+      },
+      restParameters = {
+          @RestParameter(
+              name = "limit",
+              defaultValue = "100",
+              description = "The maximum number of items to return per page.",
+              isRequired = false,
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              name = "offset",
+              defaultValue = "0",
+              description = "The page number.",
+              isRequired = false,
+              type = RestParameter.Type.STRING
+          )
+      },
+      responses = { @RestResponse(responseCode = SC_OK, description = "The groups.") }
+  )
+  public Response getGroupsAsJsonOrXml(
+      @PathParam("format") String format,
+      @QueryParam("limit") int limit,
+      @QueryParam("offset") int offset
+  ) {
     try {
       final String type = "json".equals(format) ? MediaType.APPLICATION_JSON : MediaType.APPLICATION_XML;
       JaxbGroupList list = jpaGroupRoleProvider.getGroups(limit, offset);
@@ -127,12 +164,37 @@ public class GroupRoleEndpoint {
 
   @DELETE
   @Path("{id}")
-  @RestQuery(name = "removegroup", description = "Remove a group", returnDescription = "Return no content", pathParameters = {
-          @RestParameter(name = "id", description = "The group identifier", isRequired = true, type = Type.STRING) }, responses = {
-          @RestResponse(responseCode = SC_OK, description = "Group deleted"),
-          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to remove a group with the admin role."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found."),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "An internal server error occured.") })
+  @RestQuery(
+      name = "removegroup",
+      description = "Remove a group",
+      returnDescription = "Return no content",
+      pathParameters = {
+          @RestParameter(
+              name = "id",
+              description = "The group identifier",
+              isRequired = true,
+              type = Type.STRING
+          ),
+      },
+      responses = {
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "Group deleted"
+          ),
+          @RestResponse(
+              responseCode = SC_FORBIDDEN,
+              description = "Not enough permissions to remove a group with the admin role."
+          ),
+          @RestResponse(
+              responseCode = SC_NOT_FOUND,
+              description = "Group not found."
+          ),
+          @RestResponse(
+              responseCode = SC_INTERNAL_SERVER_ERROR,
+              description = "An internal server error occured."
+          ),
+      }
+  )
   public Response removeGroup(@PathParam("id") String groupId) {
     try {
       jpaGroupRoleProvider.removeGroup(groupId);
@@ -148,17 +210,61 @@ public class GroupRoleEndpoint {
 
   @POST
   @Path("")
-  @RestQuery(name = "createGroup", description = "Add a group", returnDescription = "Return the status codes", restParameters = {
-          @RestParameter(name = "name", description = "The group name", isRequired = true, type = Type.STRING),
-          @RestParameter(name = "description", description = "The group description", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "roles", description = "A comma seperated string of additional group roles", isRequired = false, type = Type.TEXT),
-          @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = false, type = Type.TEXT) }, responses = {
-                  @RestResponse(responseCode = SC_CREATED, description = "Group created"),
-                  @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long"),
-                  @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to create a group with the admin role."),
-                  @RestResponse(responseCode = SC_CONFLICT, description = "An group with this name already exists.") })
-  public Response createGroup(@FormParam("name") String name, @FormParam("description") String description,
-          @FormParam("roles") String roles, @FormParam("users") String users) {
+  @RestQuery(
+      name = "createGroup",
+      description = "Add a group",
+      returnDescription = "Return the status codes",
+      restParameters = {
+          @RestParameter(
+              name = "name",
+              description = "The group name",
+              isRequired = true,
+              type = Type.STRING
+          ),
+          @RestParameter(
+              name = "description",
+              description = "The group description",
+              isRequired = false,
+              type = Type.STRING
+          ),
+          @RestParameter(
+              name = "roles",
+              description = "A comma seperated string of additional group roles",
+              isRequired = false,
+              type = Type.TEXT
+          ),
+          @RestParameter(
+              name = "users",
+              description = "A comma seperated string of group members",
+              isRequired = false,
+              type = Type.TEXT
+          ),
+      },
+      responses = {
+          @RestResponse(
+              responseCode = SC_CREATED,
+              description = "Group created"
+          ),
+          @RestResponse(
+              responseCode = SC_BAD_REQUEST,
+              description = "Name too long"
+          ),
+          @RestResponse(
+              responseCode = SC_FORBIDDEN,
+              description = "Not enough permissions to create a group with the admin role."
+          ),
+          @RestResponse(
+              responseCode = SC_CONFLICT,
+              description = "An group with this name already exists."
+          ),
+      }
+  )
+  public Response createGroup(
+      @FormParam("name") String name,
+      @FormParam("description") String description,
+      @FormParam("roles") String roles,
+      @FormParam("users") String users
+  ) {
     try {
       jpaGroupRoleProvider.createGroup(name, description, roles, users);
     } catch (IllegalArgumentException e) {
@@ -174,18 +280,65 @@ public class GroupRoleEndpoint {
 
   @PUT
   @Path("{id}")
-  @RestQuery(name = "updateGroup", description = "Update a group", returnDescription = "Return the status codes", pathParameters = { @RestParameter(name = "id", description = "The group identifier", isRequired = true, type = Type.STRING) }, restParameters = {
-          @RestParameter(name = "name", description = "The group name", isRequired = true, type = Type.STRING),
-          @RestParameter(name = "description", description = "The group description", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "roles", description = "A comma seperated string of additional group roles", isRequired = false, type = Type.TEXT),
-          @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = true, type = Type.TEXT) }, responses = {
-          @RestResponse(responseCode = SC_OK, description = "Group updated"),
-          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to update a group with the admin role."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found"),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long") })
-  public Response updateGroup(@PathParam("id") String groupId, @FormParam("name") String name,
-          @FormParam("description") String description, @FormParam("roles") String roles,
-          @FormParam("users") String users) throws NotFoundException {
+  @RestQuery(
+      name = "updateGroup",
+      description = "Update a group",
+      returnDescription = "Return the status codes",
+      pathParameters = {
+          @RestParameter(name = "id", description = "The group identifier", isRequired = true, type = Type.STRING),
+      },
+      restParameters = {
+          @RestParameter(
+              name = "name",
+              description = "The group name",
+              isRequired = true,
+              type = Type.STRING
+          ),
+          @RestParameter(
+              name = "description",
+              description = "The group description",
+              isRequired = false,
+              type = Type.STRING
+          ),
+          @RestParameter(
+              name = "roles",
+              description = "A comma seperated string of additional group roles",
+              isRequired = false,
+              type = Type.TEXT
+          ),
+          @RestParameter(
+              name = "users",
+              description = "A comma seperated string of group members",
+              isRequired = true,
+              type = Type.TEXT
+          ),
+      },
+      responses = {
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "Group updated"
+          ),
+          @RestResponse(
+              responseCode = SC_FORBIDDEN,
+              description = "Not enough permissions to update a group with the admin role."
+          ),
+          @RestResponse(
+              responseCode = SC_NOT_FOUND,
+              description = "Group not found"
+          ),
+          @RestResponse(
+              responseCode = SC_BAD_REQUEST,
+              description = "Name too long"
+          ),
+      }
+  )
+  public Response updateGroup(
+      @PathParam("id") String groupId,
+      @FormParam("name") String name,
+      @FormParam("description") String description,
+      @FormParam("roles") String roles,
+      @FormParam("users") String users
+  ) throws NotFoundException {
     try {
       jpaGroupRoleProvider.updateGroup(groupId, name, description, roles, users);
     } catch (IllegalArgumentException e) {
@@ -200,8 +353,8 @@ public class GroupRoleEndpoint {
   /**
    * Borrowed from FileUploadRestService.java
    *
-   * Builds an error message in case of an unexpected error in an endpoint method, includes the exception type and
-   * message if existing.
+   * Builds an error message in case of an unexpected error in an endpoint
+   * method, includes the exception type and message if existing.
    *
    * TODO append stack trace
    *

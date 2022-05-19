@@ -41,7 +41,6 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TEMPOR
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TYPE;
 import static org.opencastproject.util.data.Collections.head;
-import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
@@ -102,6 +101,12 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
     this.serializer = serializer;
   }
 
+  public void unsetMediaPackageSerializer(MediaPackageSerializer serializer) {
+    if (this.serializer == serializer) {
+      this.serializer = null;
+    }
+  }
+
   public void activate(@SuppressWarnings("rawtypes") Map properties) {
     logger.debug("activate()");
     if (properties != null) {
@@ -124,16 +129,11 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
    */
   @Override
   public StaticMetadata getMetadata(final MediaPackage mp) {
-    return mlist(list(mp.getCatalogs(DublinCoreCatalog.ANY_DUBLINCORE)))
-            .find(flavorPredicate(MediaPackageElements.EPISODE))
-            .flatMap(loader)
-            .map(new Function<DublinCoreCatalog, StaticMetadata>() {
-              @Override
-              public StaticMetadata apply(DublinCoreCatalog episode) {
-                return newStaticMetadataFromEpisode(episode);
-              }
-            })
-            .getOrElse((StaticMetadata) null);
+    Catalog[] catalogs = mp.getCatalogs(MediaPackageElements.EPISODE);
+    if (catalogs.length > 0) {
+      return newStaticMetadataFromEpisode(DublinCoreUtil.loadDublinCore(workspace, catalogs[0]));
+    }
+    return null;
   }
 
   private static StaticMetadata newStaticMetadataFromEpisode(DublinCoreCatalog episode) {

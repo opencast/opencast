@@ -25,7 +25,6 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_ACCEPTABLE;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 import static org.opencastproject.util.DateTimeSupport.fromUTC;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
@@ -47,7 +46,7 @@ public class SecurityEndpointTest {
   private static final String APP_V1_0_0_XML = "application/v1.0.0+xml";
 
   /** The REST test environment */
-  private static final RestServiceTestEnv env = testEnvForClasses(localhostRandomPort(), TestSecurityEndpoint.class);
+  private static final RestServiceTestEnv env = testEnvForClasses(TestSecurityEndpoint.class);
 
   /** The json parser */
   private static final JSONParser parser = new JSONParser();

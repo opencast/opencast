@@ -184,3 +184,8 @@ The effects of this limitation are small, because the `retract-engage` workflow 
 Mediapackage and because partial retractions seem to have little to no practical application. These can however be
 performed by calling the corresponding REST endpoints. In such cases, users are encouraged to use the recommended
 method above.
+
+## Stream Security in Wowza
+
+Please refer to Stream security topic.
+

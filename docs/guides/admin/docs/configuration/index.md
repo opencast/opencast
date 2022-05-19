@@ -29,6 +29,7 @@ General Configuration
     - [Brightspace User Provider](security.user.brightspace.md)
     - [Canvas LMS User Provider](security.user.canvas.md)
     - [Authentication and Authorization Infrastructure (AAI)](security.aai.md)
+    - [JWT-based Authentication and Authorization (e.g. for OIDC)](security.jwt.md)
     - [Access Control Lists](acl.md)
     - [Stream Security](stream-security.md)
 - [Serving Static Files](serving-static-files.md)

@@ -302,10 +302,10 @@ public class PartialImportWorkflowOperationHandlerTest {
 
     ComposerService composerService = EasyMock.createMock(ComposerService.class);
     EasyMock.expect(
-            composerService.concat(encodingProfile.getIdentifier(), Dimension.dimension(101, 50), false,
+            composerService.concat(encodingProfile.getIdentifier(), Dimension.dimension(101, 50), true,
                     tracks.toArray(new Track[tracks.size()]))).andReturn(null).once();
     EasyMock.expect(
-            composerService.concat(encodingProfile.getIdentifier(), Dimension.dimension(100, 50), false,
+            composerService.concat(encodingProfile.getIdentifier(), Dimension.dimension(100, 50), true,
                     tracks.toArray(new Track[tracks.size()]))).andReturn(null).once();
     EasyMock.replay(composerService);
 

@@ -57,6 +57,9 @@ public class StaticResource extends HttpServlet {
   /** The welcome file to redirect to, if only the alias is specified in the request */
   protected String welcomeFile = null;
 
+  /** The enable spa redirect flag */
+  protected boolean spaRedirect = false;
+
   /** The classloader to use to search for the static resources. */
   protected ClassLoader classloader = null;
 
@@ -71,10 +74,27 @@ public class StaticResource extends HttpServlet {
    *          the default welcome file
    */
   public StaticResource(ClassLoader classloader, String classpath, String alias, String welcomeFile) {
+    this(classloader, classpath, alias, welcomeFile, false);
+  }
+
+  /**
+   * Constructs a static resources.
+   *
+   * @param classpath
+   *          the classpath to the static resources
+   * @param alias
+   *          the URL alias
+   * @param welcomeFile
+   *          the default welcome file
+   * @param spaRedirect
+   *          enable spa redirects
+   */
+  public StaticResource(ClassLoader classloader, String classpath, String alias, String welcomeFile, boolean spaRedirect) {
     this.classpath = classpath;
     this.alias = alias;
     this.welcomeFile = welcomeFile;
     this.classloader = classloader;
+    this.spaRedirect = spaRedirect;
   }
 
   /**
@@ -150,32 +170,35 @@ public class StaticResource extends HttpServlet {
     // Try to load the resource from the classloader
     URL url = classloader.getResource(classpathToResource);
 
+    // Support SPA path locations
+    if (spaRedirect && url == null) {
+      String spaRedirect = classpath + "/" + welcomeFile;
+      logger.trace("using fallback {}", spaRedirect);
+      url = classloader.getResource(spaRedirect);
+    }
+
     if (url == null) {
       resp.sendError(404);
       return;
     }
+
     logger.debug("opening url {} {}", classpathToResource, url);
-    InputStream in = null;
-    try {
-      in = url.openStream();
+    try (InputStream in = url.openStream()) {
       String md5 = DigestUtils.md5Hex(in);
       if (md5.equals(req.getHeader("If-None-Match"))) {
         resp.setStatus(304);
         return;
       }
       resp.setHeader("ETag", md5);
-    } finally {
-      IOUtils.closeQuietly(in);
     }
+
     String contentType = MimeTypes.getMimeType(url.getPath());
     if (!MimeTypes.DEFAULT_TYPE.equals(contentType)) {
       resp.setHeader("Content-Type", contentType);
     }
-    try {
-      in = url.openStream();
+
+    try (InputStream in = url.openStream()) {
       IOUtils.copy(in, resp.getOutputStream());
-    } finally {
-      IOUtils.closeQuietly(in);
     }
   }
 }

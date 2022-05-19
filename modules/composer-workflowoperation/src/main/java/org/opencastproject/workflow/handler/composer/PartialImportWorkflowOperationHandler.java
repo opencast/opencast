@@ -109,7 +109,6 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String PREENCODE_ENCODING_PROFILE = "preencode-encoding-profile";
 
   private static final String FORCE_ENCODING = "force-encoding";
-  private static final String PREENCODE_ENCODING = "preencode-encoding";
   private static final String REQUIRED_EXTENSIONS = "required-extensions";
   private static final String ENFORCE_DIVISIBLE_BY_TWO = "enforce-divisible-by-two";
 
@@ -209,7 +208,6 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     final boolean forceEncoding = BooleanUtils.toBoolean(getOptConfig(operation, FORCE_ENCODING).getOr("false"));
     final boolean forceDivisible = BooleanUtils.toBoolean(getOptConfig(operation, ENFORCE_DIVISIBLE_BY_TWO).getOr("false"));
     final List<String> requiredExtensions = getRequiredExtensions(operation);
-    final boolean preencodeEncoding = BooleanUtils.toBoolean(getOptConfig(operation, PREENCODE_ENCODING).getOr("false"));
     final String preencodeEncodingProfile = getConfig(operation, PREENCODE_ENCODING_PROFILE);
 
     //
@@ -219,6 +217,12 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
       logger.warn("No presenter and presentation flavor has been set.");
       return createResult(mediaPackage, Action.SKIP);
     }
+
+    final EncodingProfile preencodeProfile = composerService.getProfile(preencodeEncodingProfile);
+    if (preencodeProfile == null) {
+      throw new WorkflowOperationException("Preencode encoding profile '" + preencodeEncodingProfile + "' was not found");
+    }
+
     final EncodingProfile concatProfile = composerService.getProfile(concatEncodingProfile);
     if (concatProfile == null) {
       throw new WorkflowOperationException("Concat encoding profile '" + concatEncodingProfile + "' was not found");
@@ -255,15 +259,9 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
       originalTracks.add(t);
     }
 
-    // Optionally encode all tracks to avoid any errors later on
-    if (preencodeEncoding) {
-      final EncodingProfile preencodeProfile = composerService.getProfile(preencodeEncodingProfile);
-      if (preencodeProfile == null) {
-        throw new WorkflowOperationException("Preencode encoding profile '" + preencodeEncodingProfile + "' was not found");
-      }
-      logger.info("Starting preencoding");
-      originalTracks = preencode(preencodeProfile, originalTracks);
-    }
+    // Encode all tracks to same format to enable use of ffmpeg concat-demuxer
+    logger.info("Starting preencoding");
+    originalTracks = preencode(preencodeProfile, originalTracks);
 
 
     // flavor_type -> job
@@ -544,10 +542,9 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
           throws MediaPackageException, EncoderException {
     final Dimension dim = determineDimension(tracks, forceDivisible);
     if (outputFramerate > 0.0) {
-      return composerService.concat(profile.getIdentifier(), dim, outputFramerate, false, Collections.toArray(Track.class, tracks));
+      return composerService.concat(profile.getIdentifier(), dim, outputFramerate, true, Collections.toArray(Track.class, tracks));
     } else {
-      return composerService.concat(profile.getIdentifier(), dim, false, Collections.toArray(Track.class, tracks));
-    }
+      return composerService.concat(profile.getIdentifier(), dim, true, Collections.toArray(Track.class, tracks));    }
   }
 
   /**

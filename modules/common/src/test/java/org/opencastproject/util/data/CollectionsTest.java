@@ -32,8 +32,6 @@ import static org.opencastproject.util.data.Arrays.array;
 import static org.opencastproject.util.data.Collections.appendTo;
 import static org.opencastproject.util.data.Collections.concat;
 import static org.opencastproject.util.data.Collections.filter;
-import static org.opencastproject.util.data.Collections.flatMap;
-import static org.opencastproject.util.data.Collections.foldl;
 import static org.opencastproject.util.data.Collections.head;
 import static org.opencastproject.util.data.Collections.iterator;
 import static org.opencastproject.util.data.Collections.join;
@@ -76,23 +74,6 @@ public class CollectionsTest {
   }
 
   @Test
-  public void testFlatMap() {
-    List<String> list = newTestList();
-    Collection<String> mapped = flatMap(list, new Function<String, Collection<String>>() {
-      @Override
-      public Collection<String> apply(String s) {
-        return list(">", s);
-      }
-    });
-    assertSame(mapped.getClass(), list.getClass());
-    assertEquals(2, list.size());
-    assertEquals(4, mapped.size());
-    assertTrue(mapped.contains(">"));
-    assertTrue(mapped.contains("one"));
-    assertTrue(mapped.contains("two"));
-  }
-
-  @Test
   public void testFilter() {
     List<String> list = newTestList();
     Collection<String> filtered = filter(list, new Predicate<String>() {
@@ -124,30 +105,6 @@ public class CollectionsTest {
     assertTrue(head(list).fold(match));
     List<String> empty = list();
     assertFalse(head(empty).fold(match));
-  }
-
-  @Test
-  public void testFoldl() {
-    List<Integer> ints = list(1, 2, 3, 4);
-    assertTrue(10 == foldl(ints, 0, new Function2<Integer, Integer, Integer>() {
-      @Override
-      public Integer apply(Integer a, Integer b) {
-        return a + b;
-      }
-    }));
-    List<String> strings = list("vaughn", "bodé", "andré", "franquin");
-    assertTrue(23 == foldl(strings, 0, new Function2<Integer, String, Integer>() {
-      @Override
-      public Integer apply(Integer a, String s) {
-        return a + s.length();
-      }
-    }));
-    assertTrue(5 == foldl(java.util.Collections.<Integer>emptyList(), 5, new Function2<Integer, Integer, Integer>() {
-      @Override
-      public Integer apply(Integer a, Integer b) {
-        return a + b;
-      }
-    }));
   }
 
   @Test

@@ -70,7 +70,6 @@ import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.Fx;
 import com.entwinemedia.fn.P2;
 import com.entwinemedia.fn.Prelude;
-import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.StreamFold;
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.fns.Strings;
@@ -164,22 +163,16 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
         return handler.createResult(mp, Action.SKIP);
       }
       // start image extraction jobs
-      final List<Extraction> extractions = $(cfg.sourceTracks).bind(new Fn<Track, Stream<Extraction>>() {
-        @Override public Stream<Extraction> apply(final Track t) {
-          final List<MediaPosition> p = limit(t, cfg.positions);
-          if (p.size() != cfg.positions.size()) {
-            logger.warn("Could not apply all configured positions to track " + t);
-          } else {
-            logger.info("Extracting images from {} at position {}", t, $(p).mkString(", "));
+      final List<Extraction> extractions = cfg.sourceTracks.stream().flatMap(track -> {
+          final List<MediaPosition> positions = limit(track, cfg.positions);
+          if (positions.size() != cfg.positions.size()) {
+            logger.warn("Could not apply all configured positions to track {}", track);
           }
+          logger.info("Extracting images from {} at position {}", track, positions);
           // create one extraction per encoding profile
-          return $(cfg.profiles).map(new Fn<EncodingProfile, Extraction>() {
-            @Override public Extraction apply(EncodingProfile profile) {
-              return new Extraction(extractImages(t, profile, p), t, profile, p);
-            }
-          });
-        }
-      }).toList();
+          return cfg.profiles.stream()
+                  .map(profile -> new Extraction(extractImages(track, profile, positions), track, profile, positions));
+        }).collect(Collectors.toList());
       final List<Job> extractionJobs = concatJobs(extractions);
       final JobBarrier.Result extractionResult = JobUtil.waitForJobs(handler.serviceRegistry, extractionJobs);
       if (extractionResult.isSuccess()) {

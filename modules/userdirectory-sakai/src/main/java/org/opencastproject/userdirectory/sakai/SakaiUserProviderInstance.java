@@ -138,8 +138,18 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
    * @param cacheExpiration
    *          the number of minutes to cache users
    */
-  public SakaiUserProviderInstance(String pid, Organization organization, String url, String userName, String password,
-          String sitePattern, String userPattern, Set<String> instructorRoles, int cacheSize, int cacheExpiration) {
+  public SakaiUserProviderInstance(
+      String pid,
+      Organization organization,
+      String url,
+      String userName,
+      String password,
+      String sitePattern,
+      String userPattern,
+      Set<String> instructorRoles,
+      int cacheSize,
+      int cacheExpiration
+  ) {
 
     this.organization = organization;
     this.sakaiUrl = url;
@@ -154,13 +164,13 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
 
     // Setup the caches
     cache = CacheBuilder.newBuilder().maximumSize(cacheSize).expireAfterWrite(cacheExpiration, TimeUnit.MINUTES)
-            .build(new CacheLoader<String, Object>() {
-              @Override
-              public Object load(String id) throws Exception {
-                User user = loadUserFromSakai(id);
-                return user == null ? nullToken : user;
-              }
-            });
+        .build(new CacheLoader<String, Object>() {
+          @Override
+          public Object load(String id) throws Exception {
+            User user = loadUserFromSakai(id);
+            return user == null ? nullToken : user;
+          }
+        });
 
     registerMBean(pid);
   }
@@ -306,16 +316,23 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
       for (String r : sakaiRoles) {
         roles.add(new JaxbRole(r, jaxbOrganization, "Sakai external role", Role.Type.EXTERNAL));
 
-        if (r.endsWith(LTI_INSTRUCTOR_ROLE))
+        if (r.endsWith(LTI_INSTRUCTOR_ROLE)) {
           isInstructor = true;
+        }
       }
 
       // Group role for all Sakai users
       roles.add(new JaxbRole(Group.ROLE_PREFIX + "SAKAI", jaxbOrganization, "Sakai Users", Role.Type.EXTERNAL_GROUP));
 
       // Group role for Sakai users who are an instructor in one more sites
-      if (isInstructor)
-        roles.add(new JaxbRole(Group.ROLE_PREFIX + "SAKAI_INSTRUCTOR", jaxbOrganization, "Sakai Instructors", Role.Type.EXTERNAL_GROUP));
+      if (isInstructor) {
+        roles.add(new JaxbRole(
+            Group.ROLE_PREFIX + "SAKAI_INSTRUCTOR",
+            jaxbOrganization,
+            "Sakai Instructors",
+            Role.Type.EXTERNAL_GROUP
+        ));
+      }
 
       logger.debug("Returning JaxbRoles: " + roles);
 
@@ -338,37 +355,37 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
    */
   private boolean verifySakaiUser(String userId) {
 
-      logger.debug("verifySakaiUser({})", userId);
+    logger.debug("verifySakaiUser({})", userId);
 
-      try {
-        if ((userPattern != null) && !userId.matches(userPattern)) {
-          logger.debug("verify user {} failed regexp {}", userId, userPattern);
-          return false;
-        }
-      } catch (PatternSyntaxException e) {
-        logger.warn("Invalid regular expression for user pattern {} - disabling checks", userPattern);
-        userPattern = null;
+    try {
+      if ((userPattern != null) && !userId.matches(userPattern)) {
+        logger.debug("verify user {} failed regexp {}", userId, userPattern);
+        return false;
       }
+    } catch (PatternSyntaxException e) {
+      logger.warn("Invalid regular expression for user pattern {} - disabling checks", userPattern);
+      userPattern = null;
+    }
 
-      int code;
+    int code;
 
-      try {
-          // This webservice does not require authentication
-          URL url = new URL(sakaiUrl + "/direct/user/" + userId + "/exists");
+    try {
+      // This webservice does not require authentication
+      URL url = new URL(sakaiUrl + "/direct/user/" + userId + "/exists");
 
-          HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-          connection.setRequestMethod("GET");
-          connection.setRequestProperty("User-Agent", OC_USERAGENT);
+      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+      connection.setRequestMethod("GET");
+      connection.setRequestProperty("User-Agent", OC_USERAGENT);
 
-          connection.connect();
-          code = connection.getResponseCode();
-      } catch (Exception e) {
-          logger.warn("Exception verifying Sakai user " + userId + " at " + sakaiUrl + ": " + e.getMessage());
-          return false;
-      }
+      connection.connect();
+      code = connection.getResponseCode();
+    } catch (Exception e) {
+      logger.warn("Exception verifying Sakai user " + userId + " at " + sakaiUrl + ": " + e.getMessage());
+      return false;
+    }
 
-      // HTTP OK 200 for site exists, return false for everything else (typically 404 not found)
-      return (code == 200);
+    // HTTP OK 200 for site exists, return false for everything else (typically 404 not found)
+    return (code == 200);
   }
 
   /*
@@ -377,39 +394,39 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
    */
   private boolean verifySakaiSite(String siteId) {
 
-      // We could additionally cache positive and negative siteId lookup results here
+    // We could additionally cache positive and negative siteId lookup results here
 
-      logger.debug("verifySakaiSite(" + siteId + ")");
+    logger.debug("verifySakaiSite(" + siteId + ")");
 
-      try {
-        if ((sitePattern != null) && !siteId.matches(sitePattern)) {
-          logger.debug("verify site {} failed regexp {}", siteId, sitePattern);
-          return false;
-        }
-      } catch (PatternSyntaxException e) {
-        logger.warn("Invalid regular expression for site pattern {} - disabling checks", sitePattern);
-        sitePattern = null;
+    try {
+      if ((sitePattern != null) && !siteId.matches(sitePattern)) {
+        logger.debug("verify site {} failed regexp {}", siteId, sitePattern);
+        return false;
       }
+    } catch (PatternSyntaxException e) {
+      logger.warn("Invalid regular expression for site pattern {} - disabling checks", sitePattern);
+      sitePattern = null;
+    }
 
-      int code;
+    int code;
 
-      try {
-          // This webservice does not require authentication
-          URL url = new URL(sakaiUrl + "/direct/site/" + siteId + "/exists");
+    try {
+      // This webservice does not require authentication
+      URL url = new URL(sakaiUrl + "/direct/site/" + siteId + "/exists");
 
-          HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-          connection.setRequestMethod("GET");
-          connection.setRequestProperty("User-Agent", OC_USERAGENT);
+      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+      connection.setRequestMethod("GET");
+      connection.setRequestProperty("User-Agent", OC_USERAGENT);
 
-          connection.connect();
-          code = connection.getResponseCode();
-      } catch (Exception e) {
-          logger.warn("Exception verifying Sakai site " + siteId + " at " + sakaiUrl + ": " + e.getMessage());
-          return false;
-      }
+      connection.connect();
+      code = connection.getResponseCode();
+    } catch (Exception e) {
+      logger.warn("Exception verifying Sakai site " + siteId + " at " + sakaiUrl + ": " + e.getMessage());
+      return false;
+    }
 
-      // HTTP OK 200 for site exists, return false for everything else (typically 404 not found)
-      return (code == 200);
+    // HTTP OK 200 for site exists, return false for everything else (typically 404 not found)
+    return (code == 200);
   }
 
   private String[] getRolesFromSakai(String userId) {
@@ -457,7 +474,12 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
       // if the return is 404 it means the user wasn't found
       logger.debug("user id " + userId + " not found on " + sakaiUrl);
     } catch (Exception e) {
-      logger.warn("Exception getting site/role membership for Sakai user {} at {}: {}", userId, sakaiUrl, e.getMessage());
+      logger.warn(
+          "Exception getting site/role membership for Sakai user {} at {}: {}",
+          userId,
+          sakaiUrl,
+          e.getMessage()
+      );
     }
 
     return null;
@@ -544,8 +566,9 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
    * @return
    */
   private static String getTagValue(String sTag, Element eElement) {
-    if (eElement.getElementsByTagName(sTag) == null)
+    if (eElement.getElementsByTagName(sTag) == null) {
       return null;
+    }
 
     NodeList nlList = eElement.getElementsByTagName(sTag).item(0).getChildNodes();
     Node nValue = nlList.item(0);
@@ -555,8 +578,9 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
   @Override
   public Iterator<User> findUsers(String query, int offset, int limit) {
 
-    if (query == null)
+    if (query == null) {
       throw new IllegalArgumentException("Query must be set");
+    }
 
     if (query.endsWith("%")) {
       query = query.substring(0, query.length() - 1);
@@ -598,92 +622,102 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
 
   // RoleProvider methods
 
-   @Override
-   public List<Role> getRolesForUser(String userName) {
+  @Override
+  public List<Role> getRolesForUser(String userName) {
 
-      List<Role> roles = new LinkedList<Role>();
+    List<Role> roles = new LinkedList<Role>();
 
-      // Don't answer for admin, anonymous or empty user
-      if ("admin".equals(userName) || "".equals(userName) || "anonymous".equals(userName)) {
-         logger.debug("we don't answer for: " + userName);
-         return roles;
-      }
+    // Don't answer for admin, anonymous or empty user
+    if ("admin".equals(userName) || "".equals(userName) || "anonymous".equals(userName)) {
+      logger.debug("we don't answer for: " + userName);
+      return roles;
+    }
 
-      logger.debug("getRolesForUser(" + userName + ")");
+    logger.debug("getRolesForUser(" + userName + ")");
 
-      User user = loadUser(userName);
-      if (user != null) {
-        logger.debug("Returning cached roleset for {}", userName);
-        return new ArrayList<Role>(user.getRoles());
-      }
+    User user = loadUser(userName);
+    if (user != null) {
+      logger.debug("Returning cached roleset for {}", userName);
+      return new ArrayList<Role>(user.getRoles());
+    }
 
-     // Not found
-     logger.debug("Return empty roleset for {} - not found on Sakai");
-     return new LinkedList<Role>();
-   }
+    // Not found
+    logger.debug("Return empty roleset for {} - not found on Sakai");
+    return new LinkedList<Role>();
+  }
 
-   @Override
-   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
+  @Override
+  public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
 
-     // We search for SITEID, SITEID_Learner, SITEID_Instructor
+    // We search for SITEID, SITEID_Learner, SITEID_Instructor
 
-     logger.debug("findRoles(query=" + query + " offset=" + offset + " limit=" + limit + ")");
+    logger.debug("findRoles(query=" + query + " offset=" + offset + " limit=" + limit + ")");
 
-     // Don't return roles for users or groups
-     if (target == Role.Target.USER) {
-        return Collections.emptyIterator();
-     }
+    // Don't return roles for users or groups
+    if (target == Role.Target.USER) {
+      return Collections.emptyIterator();
+    }
 
-     boolean exact = true;
-     boolean ltirole = false;
+    boolean exact = true;
+    boolean ltirole = false;
 
-     if (query.endsWith("%")) {
-       exact = false;
-       query = query.substring(0, query.length() - 1);
-     }
+    if (query.endsWith("%")) {
+      exact = false;
+      query = query.substring(0, query.length() - 1);
+    }
 
-     if (query.isEmpty()) {
-        return Collections.emptyIterator();
-     }
+    if (query.isEmpty()) {
+      return Collections.emptyIterator();
+    }
 
-     // Verify that role name ends with LTI_LEARNER_ROLE or LTI_INSTRUCTOR_ROLE
-     if (exact && !query.endsWith("_" + LTI_LEARNER_ROLE) && !query.endsWith("_" + LTI_INSTRUCTOR_ROLE)) {
-        return Collections.emptyIterator();
-     }
+    // Verify that role name ends with LTI_LEARNER_ROLE or LTI_INSTRUCTOR_ROLE
+    if (exact && !query.endsWith("_" + LTI_LEARNER_ROLE) && !query.endsWith("_" + LTI_INSTRUCTOR_ROLE)) {
+      return Collections.emptyIterator();
+    }
 
-     String sakaiSite = null;
+    String sakaiSite = null;
 
-     if (query.endsWith("_" + LTI_LEARNER_ROLE)) {
-       sakaiSite = query.substring(0, query.lastIndexOf("_" + LTI_LEARNER_ROLE));
-       ltirole = true;
-     } else if (query.endsWith("_" + LTI_INSTRUCTOR_ROLE)) {
-       sakaiSite = query.substring(0, query.lastIndexOf("_" + LTI_INSTRUCTOR_ROLE));
-       ltirole = true;
-     }
+    if (query.endsWith("_" + LTI_LEARNER_ROLE)) {
+      sakaiSite = query.substring(0, query.lastIndexOf("_" + LTI_LEARNER_ROLE));
+      ltirole = true;
+    } else if (query.endsWith("_" + LTI_INSTRUCTOR_ROLE)) {
+      sakaiSite = query.substring(0, query.lastIndexOf("_" + LTI_INSTRUCTOR_ROLE));
+      ltirole = true;
+    }
 
-     if (!ltirole) {
-       sakaiSite = query;
-     }
+    if (!ltirole) {
+      sakaiSite = query;
+    }
 
-     if (!verifySakaiSite(sakaiSite)) {
-        return Collections.emptyIterator();
-     }
+    if (!verifySakaiSite(sakaiSite)) {
+      return Collections.emptyIterator();
+    }
 
-     // Roles list
-     List<Role> roles = new LinkedList<Role>();
+    // Roles list
+    List<Role> roles = new LinkedList<Role>();
 
-     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
+    JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
 
-     if (ltirole) {
-       // Query is for a Site ID and an LTI role (Instructor/Learner)
-       roles.add(new JaxbRole(query, jaxbOrganization, "Sakai Site Role", Role.Type.EXTERNAL));
-     } else {
-       // Site ID - return both roles
-       roles.add(new JaxbRole(sakaiSite + "_" + LTI_INSTRUCTOR_ROLE, jaxbOrganization, "Sakai Site Instructor Role", Role.Type.EXTERNAL));
-       roles.add(new JaxbRole(sakaiSite + "_" + LTI_LEARNER_ROLE, jaxbOrganization, "Sakai Site Learner Role", Role.Type.EXTERNAL));
-     }
+    if (ltirole) {
+      // Query is for a Site ID and an LTI role (Instructor/Learner)
+      roles.add(new JaxbRole(query, jaxbOrganization, "Sakai Site Role", Role.Type.EXTERNAL));
+    } else {
+      // Site ID - return both roles
+      roles.add(new JaxbRole(
+          sakaiSite + "_" + LTI_INSTRUCTOR_ROLE,
+          jaxbOrganization,
+          "Sakai Site Instructor Role",
+          Role.Type.EXTERNAL
+      ));
+      roles.add(new JaxbRole(
+          sakaiSite + "_" + LTI_LEARNER_ROLE,
+          jaxbOrganization,
+          "Sakai Site Learner Role",
+          Role.Type.EXTERNAL
+      ));
+    }
 
-     return roles.iterator();
-   }
+    return roles.iterator();
+  }
 
 }

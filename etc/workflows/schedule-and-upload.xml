@@ -9,175 +9,36 @@
   </tags>
   <displayOrder>1000</displayOrder>
   <description>
-    A complex workflow, showcasing most of Opencast's features.
-  </description>
+    The default workflow for processing media.
 
+    If straight to publishing is checked, then the uploaded media will be published without cutting.
+  </description>
   <configuration_panel>
     <![CDATA[
       <div id="workflow-configuration">
-
         <fieldset>
-          <legend>Video Qualities</legend>
-          <ul>
-            <li>
-              <input id="flagQuality360p" name="flagQuality360p" type="checkbox" class="configField" value="false" />
-              <label for="flagQuality360p">360p resolution</label>
-            </li>
-            <li>
-              <input id="flagQuality480p" name="flagQuality480p" type="checkbox" class="configField" value="false" />
-              <label for="flagQuality480p">480p resolution</label>
-            </li>
-            <li>
-              <input id="flagQuality720p" name="flagQuality720p" type="checkbox" class="configField" value="true" checked="checked"/>
-              <label for="flagQuality720p">720p resolution (HDready)</label>
-            </li>
-            <li>
-              <input id="flagQuality1080p" name="flagQuality1080p" type="checkbox" class="configField" value="false" />
-              <label for="flagQuality1080p">1080p resolution (FullHD)</label>
-            </li>
-            <li>
-              <input id="flagQuality2160p" name="flagQuality2160p" type="checkbox" class="configField" value="false" />
-              <label for="flagQuality2160p">2160p resolution (UltraHD)</label>
-            </li>
-          </ul>
+          <input id="straightToPublishing" name="straightToPublishing" type="checkbox" class="configField" value="true" />
+          <label for="straightToPublishing">Straight to publishing</label>
         </fieldset>
-        <fieldset>
-          <legend>Add a comment that the recording needs:</legend>
-          <ul>
-            <li>
-              <input id="flagForCutting" name="flagForCutting" type="checkbox" class="configField" value="true" />
-              <label for="flagForCutting">Cutting</label>
-            </li>
-            <li>
-              <input id="flagForReview" name="flagForReview" type="checkbox" class="configField" value="true" />
-              <label for="flagForReview">Review</label>
-            </li>
-          </ul>
-        </fieldset>
-        <fieldset>
-          <legend>After upload and ingest:</legend>
-          <ul>
-            <li>
-              <input id="holdOrPublishToggle_hold" type="radio" name="holdOrPublishToggle" value="hold" />
-              <label for="holdOrPublishToggle_hold">Hold</label>
-            </li>
-            <li>
-              <input id="holdOrPublishToggle_publish" type="radio" name="holdOrPublishToggle" value="publish" checked="checked" />
-              <label for="holdOrPublishToggle_publish">Publish right away to</label>
-              <ul id="publicationConfigurationPanel" class="workflow-configuration-subpanel">
-                <li>
-                  <input id="publishToSearch" name="publishToSearch" type="checkbox" checked="checked" class="configField" value="true" />
-                  <label for="publishToSearch">Opencast Index</label>
-                  <fieldset>
-                    <ul id="searchConfigurationPanel" class="workflow-configuration-subpanel">
-                      <li>
-                        <input id="publishToEngage" name="searchPublishType" type="radio" checked="checked" class="configField" value="true" />
-                        <label for="publishToEngage">Opencast Media Module</label>
-                      </li>
-                      <li>
-                        <input id="publishToAws" name="searchPublishType" type="radio" class="configField" value="true"/>
-                        <label for="publishToAws">AWS</label>
-                      </li>
-                    </ul>
-                  </fieldset>
-                </li>
-                <li>
-                  <input id="publishToApi" name="publishToApi" type="checkbox" checked="checked" class="configField" value="true" />
-                  <label for="publishToApi">External Applications</label>
-                </li>
-                <li>
-                  <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
-                  <label for="publishToYouTube">YouTube</label>
-                </li>
-              </ul>
-            </li>
-          </ul>
-          <!-- Place to keep the hold vs. publication state -->
-          <input type="hidden" id="straightToPublishing" class="configField" value="true" />
-        </fieldset>
-        <fieldset>
-          <legend>Publish live stream:</legend>
-            <ul>
-              <li>
-                <input id="publishLive" name="publishLive" type="checkbox" class="configField" value="false" />
-                <label for=publishLive>Add live event to Opencast Media Module</label>
-              </li>
-            </ul>
-          </fieldset>
       </div>
-
-      <!-- Show or hide the hold and publication configuration panel -->
-      <script type="text/javascript">
-        $('input[name="holdOrPublishToggle"]').change(function(){
-            var show = $(this).val() == 'publish';
-            $('#publicationConfigurationPanel').toggle(show);
-            $('#straightToPublishing').val(show);
-            // Trigger update of the schedule's workflow config
-            $('#straightToPublishing').change();
-        });
-
-        <!-- called on loading an exisiting event -->
-        $('#straightToPublishing').bind('updateConfigUI', function() {
-            var publish = $(this).val().toLowerCase() === 'true';
-            $('#publicationConfigurationPanel').toggle(publish);
-            $('#holdOrPublishToggle_' + (publish ? 'publish':'hold')).prop('checked', 'checked');
-        });
-
-        <!-- Remove the line below if you wish to publish to AWS S3 -->
-        $('#publishToAws').prop('disabled', true);
-        <!-- Remove the line above if you wish to publish to AWS S3 -->
-
-        awsWasDisabled = $('#publishToAws').prop('disabled');
-        awsWasChecked = $('#publishToAws').prop('checked');
-        engageWasChecked = $('#publishToEngage').prop('checked');
-
-        $('input[name="publishToSearch"]').change(function(){
-            if ($(this).is(':checked')) {
-              $('#publishToAws').prop('checked', awsWasChecked);
-              $('#publishToEngage').prop('checked', engageWasChecked);
-              $('#publishToAws').prop('disabled', awsWasDisabled);
-              $('#publishToEngage').prop('disabled', false);
-            } else if (!$(this).is(':checked')) {
-              awsWasChecked = $('#publishToAws').prop('checked');
-              engageWasChecked = $('#publishToEngage').prop('checked');
-
-              $('#publishToAws').prop('disabled', true);
-              $('#publishToEngage').prop('disabled', true);
-              $('#publishToAws').prop('checked', false);
-              $('#publishToEngage').prop('checked', false);
-            }
-        });
-      </script>
     ]]>
   </configuration_panel>
-
   <operations>
 
-    <!-- Apply the default workflow configuration -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Apply default workflow properties                                 -->
+    <!--                                                                   -->
+    <!-- The worklfow properties are simplified for a better               -->
+    <!-- user experience, please preconfigure your defaults here.          -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
     <operation
       id="defaults"
       description="Applying default configuration values">
       <configurations>
         <configuration key="straightToPublishing">true</configuration>
-        <configuration key="flagForCutting">false</configuration>
-        <configuration key="flagForReview">false</configuration>
-        <configuration key="flagQuality360p">false</configuration>
-        <configuration key="flagQuality480p">false</configuration>
-        <configuration key="flagQuality720p">true</configuration>
-        <configuration key="flagQuality1080p">false</configuration>
-        <configuration key="flagQuality2160p">false</configuration>
-        <configuration key="publishToEngage">true</configuration>
-        <configuration key="publishToApi">true</configuration>
-        <configuration key="publishToYouTube">false</configuration>
-        <configuration key="publishToAws">false</configuration>
-        <configuration key="uploadedSearchPreview">false</configuration>
-        <configuration key="publishLive">false</configuration>
-        <configuration key="thumbnailType">0</configuration>
-        <configuration key="thumbnailPosition">1</configuration>
       </configurations>
     </operation>
-
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Prepare asset                                                     -->
@@ -208,44 +69,6 @@
       </configurations>
     </operation>
 
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    <!-- Prepare the work media                                            -->
-    <!--                                                                   -->
-    <!-- Ensure the work media is in a format that allows Opencast to do   -->
-    <!-- its work. This includes potentially rewriting the container and   -->
-    <!-- making sure that the audio track is part of each video track.     -->
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
-    <!-- Prepare presenter track -->
-
-    <operation
-        id="prepare-av"
-        exception-handler-workflow="partial-error"
-        description="Preparing presenter (camera) audio and video work versions">
-      <configurations>
-        <configuration key="source-flavor">presenter/source</configuration>
-        <configuration key="target-flavor">presenter/prepared</configuration>
-        <configuration key="target-tags">archive</configuration>
-        <configuration key="rewrite">false</configuration>
-        <configuration key="audio-muxing-source-flavors">*/?,*/*</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Prepare presentation track -->
-
-    <operation
-        id="prepare-av"
-        exception-handler-workflow="partial-error"
-        description="Preparing presentation (screen) audio and video work version">
-      <configurations>
-        <configuration key="source-flavor">presentation/source</configuration>
-        <configuration key="target-flavor">presentation/prepared</configuration>
-        <configuration key="rewrite">false</configuration>
-        <configuration key="target-tags">archive</configuration>
-        <configuration key="audio-muxing-source-flavors">*/?,*/*</configuration>
-      </configurations>
-    </operation>
-
     <!-- Create preview artifacts -->
 
     <operation
@@ -256,7 +79,7 @@
       </configurations>
     </operation>
 
-    <!-- Archive with previews generated -->
+    <!-- Archive generated preview assets -->
 
     <operation
       id="snapshot"
@@ -277,7 +100,7 @@
 
     <operation
       id="comment"
-      if="${flagForCutting}"
+      if="NOT ${straightToPublishing}"
       description="Mark the recording for cutting">
       <configurations>
         <configuration key="description">Recording has not been cut yet.</configuration>
@@ -286,27 +109,12 @@
       </configurations>
     </operation>
 
-    <!-- Mark the recording for review -->
-
-    <operation
-      id="comment"
-      if="${flagForReview}"
-      description="Mark the recording for review">
-      <configurations>
-        <configuration key="description">Recording has not been reviewed yet.</configuration>
-        <configuration key="reason">EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.REVIEW</configuration>
-        <configuration key="action">create</configuration>
-      </configurations>
-    </operation>
-
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Publish                                                           -->
     <!--                                                                   -->
-    <!-- Encode and publish the recording to the selected publication      -->
-    <!-- channels, unless review for cutting has been selected.            -->
+    <!-- Encode and publish the recording to the predefined                -->
+    <!-- publication channels.                                             -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
-    <!-- Encode and publish -->
 
     <operation
       id="include"
@@ -316,13 +124,6 @@
         <configuration key="workflow-id">partial-publish</configuration>
       </configurations>
     </operation>
-
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    <!-- Archive                                                           -->
-    <!--                                                                   -->
-    <!-- Download from external ingest nodes, tag, inspect and and prepare -->
-    <!-- source recording and metadata catalogs.                           -->
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
     <!-- Archive the recording -->
 
@@ -338,16 +139,17 @@
     <!-- Clean up work artifacts -->
 
     <operation
-        id="cleanup"
-        fail-on-error="false"
-        description="Remove temporary processing artifacts">
+      id="cleanup"
+      fail-on-error="false"
+      description="Remove temporary processing artifacts">
       <configurations>
+        <!-- On systems with shared workspace or working file repository -->
+        <!-- you want to set this option to false. -->
         <configuration key="delete-external">true</configuration>
-        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
+        <!-- ACLs are required again when working through ActiveMQ messages -->
         <configuration key="preserve-flavors">security/*</configuration>
       </configurations>
     </operation>
 
   </operations>
-
 </definition>

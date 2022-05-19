@@ -11,9 +11,8 @@
                cardinality="1..1" policy="static" bind="setSecurityService"/>
     <reference name="message-broker-receiver" interface="org.opencastproject.message.broker.api.MessageReceiver"
                cardinality="1..1" policy="static" bind="setMessageReceiver"/>
-    <reference name="oaiPmhUpdatedEventHandler"
-               interface="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler"
-               cardinality="1..1" policy="dynamic" bind="setOaiPmhUpdatedEventHandler"/>
+    <reference name="oaiPmhUpdatedEventHandler" interface="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler"
+               bind="setOaiPmhUpdatedEventHandler"/>
   </scr:component>
   <scr:component name="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler"
                  immediate="true" activate="activate">

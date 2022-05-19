@@ -47,7 +47,6 @@ public class GroupsListQuery extends ResourceListQueryImpl {
 
   public GroupsListQuery() {
     super();
-    this.availableFilters.add(createNameFilter(Option.<String> none()));
   }
 
   /**

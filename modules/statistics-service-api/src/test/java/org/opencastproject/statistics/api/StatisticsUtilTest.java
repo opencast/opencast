@@ -67,11 +67,13 @@ public class StatisticsUtilTest {
   @Test
   public void testGetBucketsHourly() {
     // Tests with pre-picked valid data
-    new HashMap<Instant, Instant>() {{
-      put(Instant.parse("2019-10-28T17:00:00.000Z"), Instant.parse("2020-01-02T11:30:00.000Z"));
-      put(Instant.parse("2019-03-30T17:00:00.000Z"), Instant.parse("2019-04-01T00:00:00.000Z"));
-      put(Instant.parse("2019-10-27T00:00:00.000Z"), Instant.parse("2019-10-28T00:00:00.000Z"));
-    }}.forEach(this::testGetBucketsHourly);
+    new HashMap<Instant, Instant>() {
+        {
+          put(Instant.parse("2019-10-28T17:00:00.000Z"), Instant.parse("2020-01-02T11:30:00.000Z"));
+          put(Instant.parse("2019-03-30T17:00:00.000Z"), Instant.parse("2019-04-01T00:00:00.000Z"));
+          put(Instant.parse("2019-10-27T00:00:00.000Z"), Instant.parse("2019-10-28T00:00:00.000Z"));
+        }
+    }.forEach(this::testGetBucketsHourly);
 
     // Tests with random input
     for (int i = 0; i < repetitions / 24; i++) {
@@ -112,11 +114,13 @@ public class StatisticsUtilTest {
   @Test
   public void testGetBucketsDaily() {
     // Tests with pre-picked valid data
-    new HashMap<Instant, Instant>() {{
-      put(Instant.parse("2019-10-28T17:00:00.000Z"), Instant.parse("2020-01-02T11:30:00.000Z"));
-      put(Instant.parse("2019-03-30T17:00:00.000Z"), Instant.parse("2019-04-01T00:00:00.000Z"));
-      put(Instant.parse("2019-10-27T00:00:00.000Z"), Instant.parse("2019-10-28T00:00:00.000Z"));
-    }}.forEach(this::testGetBucketsDaily);
+    new HashMap<Instant, Instant>() {
+        {
+          put(Instant.parse("2019-10-28T17:00:00.000Z"), Instant.parse("2020-01-02T11:30:00.000Z"));
+          put(Instant.parse("2019-03-30T17:00:00.000Z"), Instant.parse("2019-04-01T00:00:00.000Z"));
+          put(Instant.parse("2019-10-27T00:00:00.000Z"), Instant.parse("2019-10-28T00:00:00.000Z"));
+        }
+    }.forEach(this::testGetBucketsDaily);
 
     // Tests with random input
     for (int i = 0; i < repetitions; i++) {
@@ -159,11 +163,13 @@ public class StatisticsUtilTest {
   @Test
   public void testGetBucketsWeekly() {
     // Tests with pre-picked valid data
-    new HashMap<Instant, Instant>() {{
-      put(Instant.parse("2019-10-28T17:00:00.000Z"), Instant.parse("2020-01-02T11:30:00.000Z"));
-      put(Instant.parse("2019-03-30T17:00:00.000Z"), Instant.parse("2019-04-01T00:00:00.000Z"));
-      put(Instant.parse("2019-01-01T00:00:00.000Z"), Instant.parse("2019-12-31T23:59:59.999Z"));
-    }}.forEach(this::testGetBucketsWeekly);
+    new HashMap<Instant, Instant>() {
+        {
+          put(Instant.parse("2019-10-28T17:00:00.000Z"), Instant.parse("2020-01-02T11:30:00.000Z"));
+          put(Instant.parse("2019-03-30T17:00:00.000Z"), Instant.parse("2019-04-01T00:00:00.000Z"));
+          put(Instant.parse("2019-01-01T00:00:00.000Z"), Instant.parse("2019-12-31T23:59:59.999Z"));
+        }
+    }.forEach(this::testGetBucketsWeekly);
 
     // Tests with random input
     for (int i = 0; i < repetitions; i++) {
@@ -219,11 +225,13 @@ public class StatisticsUtilTest {
   @Test
   public void testGetBucketsMonthly() {
     // Tests with pre-picked valid data
-    new HashMap<Instant, Instant>() {{
-      put(Instant.parse("2019-05-28T17:00:00.000Z"), Instant.parse("2020-01-02T11:30:00.000Z"));
-      put(Instant.parse("2019-02-01T00:00:00.000Z"), Instant.parse("2019-04-30T23:59:59.999Z"));
-      put(Instant.parse("2019-10-27T00:00:00.000Z"), Instant.parse("2019-10-28T00:00:00.000Z"));
-    }}.forEach(this::testGetBucketsMonthly);
+    new HashMap<Instant, Instant>() {
+        {
+          put(Instant.parse("2019-05-28T17:00:00.000Z"), Instant.parse("2020-01-02T11:30:00.000Z"));
+          put(Instant.parse("2019-02-01T00:00:00.000Z"), Instant.parse("2019-04-30T23:59:59.999Z"));
+          put(Instant.parse("2019-10-27T00:00:00.000Z"), Instant.parse("2019-10-28T00:00:00.000Z"));
+        }
+    }.forEach(this::testGetBucketsMonthly);
 
     // Tests with random input
     for (int i = 0; i < repetitions; i++) {
@@ -268,11 +276,13 @@ public class StatisticsUtilTest {
   @Test
   public void testGetBucketsYearly() {
     // Tests with pre-picked valid data
-    new HashMap<Instant, Instant>() {{
-      put(Instant.parse("2018-10-28T17:00:00.000Z"), Instant.parse("2020-01-02T11:30:00.000Z"));
-      put(Instant.parse("2019-01-01T00:00:00.000Z"), Instant.parse("2019-12-31T23:59:59.999Z"));
-      put(Instant.parse("2019-10-27T00:00:00.000Z"), Instant.parse("2029-10-28T00:00:00.000Z"));
-    }}.forEach(this::testGetBucketsYearly);
+    new HashMap<Instant, Instant>() {
+        {
+          put(Instant.parse("2018-10-28T17:00:00.000Z"), Instant.parse("2020-01-02T11:30:00.000Z"));
+          put(Instant.parse("2019-01-01T00:00:00.000Z"), Instant.parse("2019-12-31T23:59:59.999Z"));
+          put(Instant.parse("2019-10-27T00:00:00.000Z"), Instant.parse("2029-10-28T00:00:00.000Z"));
+        }
+    }.forEach(this::testGetBucketsYearly);
 
     // Tests with random input
     for (int i = 0; i < repetitions; i++) {

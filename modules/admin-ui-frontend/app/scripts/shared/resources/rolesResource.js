@@ -39,7 +39,9 @@ angular.module('adminNg.resources')
 
         var roleNames = [];
         angular.forEach(data, function (role) {
-          roleNames.push(role.name);
+          if (roleNames.indexOf(role.name) === -1) {
+            roleNames.push(role.name);
+          }
         });
 
         return roleNames;

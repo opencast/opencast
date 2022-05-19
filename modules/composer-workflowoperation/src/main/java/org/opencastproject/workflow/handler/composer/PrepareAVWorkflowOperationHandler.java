@@ -47,9 +47,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
- * The <tt>prepare media</tt> operation will make sure that media where audio and video track come in separate files
+ * The <code>prepare media</code> operation will make sure that media where audio and video track come in separate files
  * will be muxed prior to further processing.
  */
 public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
@@ -59,16 +60,16 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
   private static final String QUESTION_MARK = "?";
 
   /** Name of the 'encode to a/v prepared copy' encoding profile */
-  public static final String PREPARE_AV_PROFILE = "av.prepared";
+  public static final String PREPARE_AV_PROFILE = "av.copy";
 
   /** Name of the muxing encoding profile */
-  public static final String MUX_AV_PROFILE = "mux-av.prepared";
+  public static final String MUX_AV_PROFILE = "mux-av.copy";
 
   /** Name of the 'encode to audio only prepared copy' encoding profile */
-  public static final String PREPARE_AONLY_PROFILE = "audio-only.prepared";
+  public static final String PREPARE_AONLY_PROFILE = "audio-only.copy";
 
   /** Name of the 'encode to video only prepared copy' encoding profile */
-  public static final String PREPARE_VONLY_PROFILE = "video-only.prepared";
+  public static final String PREPARE_VONLY_PROFILE = "video-only.copy";
 
   /** Name of the 'rewrite' configuration key */
   public static final String OPT_REWRITE = "rewrite";
@@ -145,7 +146,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
 
     // Read the configuration properties
     MediaPackageElementFlavor sourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
-    String targetTrackTags = tagsAndFlavors.getTargetTags().toString();
+    List<String> targetTrackTags = tagsAndFlavors.getTargetTags();
     MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
     String muxEncodingProfileName = StringUtils.trimToNull(operation.getConfiguration("mux-encoding-profile"));
     String audioVideoEncodingProfileName = StringUtils.trimToNull(operation.getConfiguration("audio-video-encoding-profile"));
