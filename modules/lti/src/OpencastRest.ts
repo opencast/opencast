@@ -204,8 +204,9 @@ export async function searchEpisode(
         urlSuffix += "&sname=" + seriesName;
     if (episodeId !== undefined)
         urlSuffix += "&id=" + episodeId;
-    const url = `${hostAndPort()}/search/episode.json?limit=${limit}&offset=${offset}${urlSuffix}`;
-    const response = await axios.get<any>(url);
+    if (query !== undefined)
+        urlSuffix += "&q=" + query;
+    const response = await axios.get<any>(`${hostAndPort()}/search/${series ? 'series' : 'episode'}.json?limit=${limit}&offset=${offset}${urlSuffix}`);
     const resultsRaw = response.data["search-results"]["result"];
     const results = Array.isArray(resultsRaw) ? resultsRaw : resultsRaw !== undefined ? [resultsRaw] : [];
     return {
