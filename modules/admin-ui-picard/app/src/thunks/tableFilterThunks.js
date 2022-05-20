@@ -69,6 +69,8 @@ export const fetchStats = () => async dispatch => {
 
                 if (Object.prototype.hasOwnProperty.call(value, 'relativeDateSpan')) {
                     value = relativeDateSpanToFilterValue(value.relativeDateSpan.from, value.relativeDateSpan.to, value.relativeDateSpan.unit);
+                    // set date span as filter value
+                    statsResponse[i].filters[j].value = value;
                 }
                 filter.push(name + ':' + value);
             }

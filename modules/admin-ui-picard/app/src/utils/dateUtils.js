@@ -1,4 +1,4 @@
-import moment from "moment";
+import moment from 'moment';
 
 /**
  * This File contains methods concerning dates
@@ -9,7 +9,7 @@ export const relativeToAbsoluteDate = (relative, type, from) => {
     let localMoment = moment();
 
     let absolute;
-    if (from === true) {
+    if (from) {
         absolute = localMoment.startOf(type);
     } else {
         absolute = localMoment.endOf(type);
@@ -25,7 +25,7 @@ export const relativeDateSpanToFilterValue = (fromRelativeDate, toRelativeDate, 
     let fromAbsoluteDate = relativeToAbsoluteDate(fromRelativeDate, type, true);
     let toAbsoluteDate = relativeToAbsoluteDate(toRelativeDate, type, false);
 
-    return fromAbsoluteDate.toISOString() + '/' + toAbsoluteDate.toISOString();
+    return (fromAbsoluteDate.toISOString() + '/' + toAbsoluteDate.toISOString()).toString();
 };
 
 // creates a date object from a date, hour and minute
