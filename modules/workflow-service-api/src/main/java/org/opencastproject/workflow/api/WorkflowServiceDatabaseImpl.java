@@ -172,7 +172,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
     }
   }
 
-    /**
+  /**
    * {@inheritDoc}
    *
    * @see WorkflowServiceDatabase#countWorkflows(WorkflowInstance.WorkflowState state)

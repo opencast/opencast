@@ -96,7 +96,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
         ),
         @NamedQuery(
                 name = "Workflow.countLatest",
-                query = "SELECT COUNT(DISTINCT mediapackage_id) FROM oc_workflow"
+                query = "SELECT COUNT(DISTINCT w.mediaPackageId) FROM WorkflowInstance w"
         ),
         @NamedQuery(
                 name = "Workflow.findAllOrganizationIndependent",
