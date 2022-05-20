@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {connect} from "react-redux";
-import {HashRouter, Route, Switch} from "react-router-dom";
+import { HashRouter, Redirect, Route, Switch } from 'react-router-dom';
 import './App.scss';
 import Events from "./components/events/Events";
 import Recordings from "./components/recordings/Recordings";
@@ -29,9 +29,9 @@ function App({ loadingUserInfo, loadingOcVersion, loadingFilters }) {
   return (
           <HashRouter>
               <Switch>
-                  <Route exact path={"/"}>
-                      <Events />
-                  </Route>
+                  <Route exact
+                         path={"/"}
+                         render={() => <Redirect to={"/events/events"}/>}/>
                   <Route exact path={"/events/events"}>
                       <Events />
                   </Route>

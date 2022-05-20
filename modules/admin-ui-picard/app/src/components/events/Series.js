@@ -1,10 +1,9 @@
 import React, {useEffect, useState} from "react";
 import MainNav from "../shared/MainNav";
-import Link from "react-router-dom/Link";
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import {connect} from "react-redux";
-import {withRouter} from "react-router-dom";
+import {withRouter, Link} from "react-router-dom";
 import TableFilters from "../shared/TableFilters";
 import Table from "../shared/Table";
 import Notifications from "../shared/Notifications";

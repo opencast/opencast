@@ -2,8 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {useTranslation} from "react-i18next";
 import cn from 'classnames';
 import {connect} from "react-redux";
-import Link from "react-router-dom/Link";
-import {withRouter} from "react-router-dom";
+import {withRouter, Link} from "react-router-dom";
 import TableFilters from "../shared/TableFilters";
 import MainNav from "../shared/MainNav";
 import Stats from "../shared/Stats";
@@ -19,7 +18,7 @@ import {fetchEventMetadata, fetchEvents} from "../../thunks/eventThunks";
 import {loadEventsIntoTable, loadSeriesIntoTable} from "../../thunks/tableThunks";
 import {fetchSeries} from "../../thunks/seriesThunks";
 import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
-import {getTotalEvents, isLoading, isShowActions} from "../../selectors/eventSelectors";
+import {getTotalEvents, isShowActions} from "../../selectors/eventSelectors";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
@@ -40,8 +39,9 @@ const containerAction = React.createRef();
  * This component renders the table view of events
  */
 const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loadingSeries,
-                        loadingSeriesIntoTable, loadingFilters, loadingStats, loadingEventMetadata, resetTextFilter,
-                    resetOffset, user, setShowActions }) => {
+    loadingSeriesIntoTable, loadingFilters, loadingStats, loadingEventMetadata, resetTextFilter,
+    resetOffset, user, setShowActions }) => {
+
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
@@ -281,7 +281,6 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 const mapStateToProps = state => ({
     events: getTotalEvents(state),
     showActions: isShowActions(state),
-    isLoadingEvents: isLoading(state),
     user: getUserInformation(state)
 });
 

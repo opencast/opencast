@@ -6,7 +6,6 @@ import {
     loadStatusInProgress, resetNumError,
     setError
 } from "../actions/healthActions";
-import {getErrorStatus} from "../selectors/healthSelectors";
 import {logger} from "../utils/logger";
 
 
@@ -98,8 +97,6 @@ export const fetchHealthStatus = () => async dispatch => {
                       }
                       dispatch(loadHealthStatus(healthStatus));
                   } else {
-                      console.log("response health");
-                      console.log(response);
                       healthStatus = {
                           name: BACKEND_NAMES,
                           status: ERROR,
