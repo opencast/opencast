@@ -99,11 +99,11 @@ Additional Notes about 11.7
       (cf. [[#3708](https://github.com/opencast/opencast/pull/3708)]).
     - Missing tags when encoding multiple qualities with the encode WOH
       (cf. [[#3639](https://github.com/opencast/opencast/pull/3639)]).
+    - The metadata in the video editor can now be changed and saved again
+      (cf. [[#3715](https://github.com/opencast/opencast/pull/3715)]).
 - New features and updates:
     - Check if user can be loaded before starting a workflow
       (cf. [[#3661](https://github.com/opencast/opencast/pull/3661)]).
-    - The metadata in the video editor can now be saved individually
-      (cf. [[#3715](https://github.com/opencast/opencast/pull/3715)]).
     - Make creation of default external API group configurable
       (cf. [[#3682](https://github.com/opencast/opencast/pull/3682)]).
 
