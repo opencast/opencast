@@ -23,7 +23,6 @@ package org.opencastproject.assetmanager.storage.impl.fs;
 import static org.opencastproject.util.IoSupport.file;
 
 import org.opencastproject.assetmanager.api.storage.AssetStore;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 
 @Component(
     property = {
@@ -100,9 +100,9 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
       if (storageDir == null) {
         throw new IllegalArgumentException("Storage directory must be set");
       }
-      rootDirectory = PathSupport.concat(storageDir, DEFAULT_STORE_DIRECTORY);
+      rootDirectory = Paths.get(storageDir, DEFAULT_STORE_DIRECTORY).toFile().getAbsolutePath();
     }
     mkDirs(file(rootDirectory));
-    logger.info("Start asset manager files system store at " + rootDirectory);
+    logger.info("Start asset manager files system store at {}", rootDirectory);
   }
 }
