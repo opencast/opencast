@@ -1,6 +1,7 @@
 // Todo: Read true values from ./etc/listproviders/event.asset.options.properties
 // Todo: Filter type track out of options when using in new Event wizard
-export const uploadAssetOptions = [
+
+/*export const uploadAssetOptions = [
     {
         "id":"catalog_captions_dfxp",
         "type":"catalog",
@@ -105,7 +106,7 @@ export const uploadAssetOptions = [
         "title":"EVENTS.EVENTS.NEW.SOURCE.UPLOAD.AUDIO_ONLY",
         "showAs":"source"
     }
-];
+];*/
 
 /* additional metadata that user should provide for new events
  * UPLOAD, SCHEDULE_SINGLE, SCHEDULE_MULTIPLE signal in which case the additional metadata is required/should be provided

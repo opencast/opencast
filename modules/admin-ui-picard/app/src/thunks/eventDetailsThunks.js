@@ -1,5 +1,4 @@
 import axios from "axios";
-import moment from "moment";
 import {
     loadEventPoliciesInProgress,
     loadEventPoliciesSuccess,
@@ -103,12 +102,8 @@ import {
     getStatistics
 } from "../selectors/eventDetailsSelectors";
 import {getWorkflowDef} from "../selectors/workflowSelectors";
-import {
-    createChartOptions,
-    createDownloadUrl
-} from "../utils/statisticsUtils";
+import {getAssetUploadOptions} from "../selectors/eventSelectors";
 import {calculateDuration} from "../utils/dateUtils";
-import { uploadAssetOptions } from '../configs/sourceConfig';
 import {logger} from "../utils/logger";
 
 
@@ -447,7 +442,11 @@ export const fetchAssetPublicationDetails = (eventId, publicationId) => async (d
     }
 }
 
-export const updateAssets = (values, eventId) => async dispatch => {
+export const updateAssets = (values, eventId) => async (dispatch, getState) => {
+    // get asset upload options from redux store
+    const state = getState();
+    const uploadAssetOptions = getAssetUploadOptions(state);
+
     let formData = new FormData();
 
     let assets = {

@@ -31,6 +31,7 @@ import {hasAccess} from "../../utils/utils";
 import {showActions} from "../../actions/eventActions";
 import {GlobalHotKeys} from "react-hotkeys";
 import {availableHotkeys} from "../../configs/hotkeysConfig";
+import {fetchAssetUploadOptions} from "../../thunks/assetsThunks";
 
 
 // References for detecting a click outside of the container of the dropdown menu
@@ -40,7 +41,7 @@ const containerAction = React.createRef();
  * This component renders the table view of events
  */
 const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loadingSeries,
-                        loadingSeriesIntoTable, loadingFilters, loadingStats, loadingEventMetadata, resetTextFilter,
+                        loadingSeriesIntoTable, loadingFilters, loadingStats, loadingEventMetadata, resetTextFilter, fetchAssetUploadOptions,
                     resetOffset, user, setShowActions }) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
@@ -118,6 +119,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 
     const showNewEventModal = async () => {
         await loadingEventMetadata();
+        fetchAssetUploadOptions();
 
         setNewEventModal(true);
     }
@@ -296,7 +298,8 @@ const mapDispatchToProps = dispatch => ({
     loadingEventMetadata: () => dispatch(fetchEventMetadata()),
     resetTextFilter: () => dispatch(editTextFilter('')),
     resetOffset: () => dispatch(setOffset(0)),
-    setShowActions: isShowing => dispatch(showActions(isShowing))
+    setShowActions: isShowing => dispatch(showActions(isShowing)),
+    fetchAssetUploadOptions: () => dispatch(fetchAssetUploadOptions()),
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Events));
