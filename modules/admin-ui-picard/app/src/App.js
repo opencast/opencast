@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {connect} from "react-redux";
-import { HashRouter, Redirect, Route, Switch } from 'react-router-dom';
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import './App.scss';
 import Events from "./components/events/Events";
 import Recordings from "./components/recordings/Recordings";
@@ -28,46 +28,36 @@ function App({ loadingUserInfo, loadingOcVersion, loadingFilters }) {
 
   return (
           <HashRouter>
-              <Switch>
-                  <Route exact
-                         path={"/"}
-                         render={() => <Redirect to={"/events/events"}/>}/>
-                  <Route exact path={"/events/events"}>
-                      <Events />
-                  </Route>
-                  <Route exact path={"/events/series"}>
-                      <Series />
-                  </Route>
-                  <Route exact path={"/recordings/recordings"}>
-                      <Recordings />
-                  </Route>
-                  <Route exact path={"/systems/jobs"}>
-                      <Jobs />
-                  </Route>
-                  <Route exact path={"/systems/servers"}>
-                      <Servers />
-                  </Route>
-                  <Route exact path={"/systems/services"}>
-                      <Services />
-                  </Route>
-                  <Route exact path={"/users/users"}>
-                      <Users />
-                  </Route>
-                  <Route exact path={"/users/groups"}>
-                      <Groups />
-                  </Route>
-                  <Route exact path={"/users/acls"}>
-                      <Acls />
-                  </Route>
-                  <Route exact path={"/configuration/themes"}>
-                      <Themes />
-                  </Route>
-                  <Route exact path={"/statistics/organization"}>
-                      <Statistics />
-                  </Route>
-              </Switch>
+              <Routes>
+                  <Route path={"/"} element={<Events />} />
+
+                  <Route path={"/events/events"} element={<Events />} />
+
+                  <Route path={"/events/series"} element={<Series />} />
+
+                  <Route path={"/recordings/recordings"} element={<Recordings />} />
+
+                  <Route path={"/systems/jobs"} element={<Jobs />} />
+
+                  <Route path={"/systems/servers"} element={<Servers />} />
+
+                  <Route path={"/systems/services"} element={<Services />} />
+
+                  <Route path={"/users/users"} element={<Users />} />
+
+                  <Route path={"/users/groups"} element={<Groups />} />
+
+                  <Route path={"/users/acls"} element={<Acls />} />
+
+                  <Route path={"/configuration/themes"} element={<Themes />} />
+
+                  <Route path={"/statistics/organization"} element={<Statistics />} />
+
+                  <Route path={"*"}
+                         render={() => <Navigate to={"/events/events"} replace />} />
+              </Routes>
           </HashRouter>
-  );
+  )
 }
 
 const mapDispatchToProps = dispatch => ({

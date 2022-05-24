@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from "react";
 import MainNav from "../shared/MainNav";
 import {useTranslation} from "react-i18next";
-import Link from "react-router-dom/Link";
-import {withRouter} from "react-router-dom";
+import { Link } from "react-router-dom";
 import {connect} from "react-redux";
 import cn from 'classnames';
 import TableFilters from "../shared/TableFilters";
@@ -106,4 +105,4 @@ const mapDispatchToProps = dispatch => ({
     resetTextFilter: () => dispatch(editTextFilter(''))
 });
 
-export default withRouter(connect(mapStateToProps,mapDispatchToProps)(Recordings));
+export default connect(mapStateToProps,mapDispatchToProps)(Recordings);

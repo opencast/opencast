@@ -1,9 +1,8 @@
 import React, {useEffect, useState} from "react";
-import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import {useTranslation} from "react-i18next";
 import MainNav from "../shared/MainNav";
-import Link from "react-router-dom/Link";
+import { Link } from "react-router-dom";
 import cn from "classnames";
 import TableFilters from "../shared/TableFilters";
 import Table from "../shared/Table";
@@ -186,4 +185,4 @@ const mapDispatchToProps = dispatch => ({
     resetOffset: () => dispatch(setOffset(0))
 });
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Groups));
+export default connect(mapStateToProps, mapDispatchToProps)(Groups);

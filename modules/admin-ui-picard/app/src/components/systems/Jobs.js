@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from "react";
-import Link from "react-router-dom/Link";
+import { Link } from "react-router-dom";
 import {useTranslation} from "react-i18next";
-import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import cn from 'classnames';
 import TableFilters from "../shared/TableFilters";
@@ -161,4 +160,4 @@ const mapDispatchToProps = dispatch => ({
     resetOffset: () => dispatch(setOffset(0))
 });
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Jobs));
+export default connect(mapStateToProps, mapDispatchToProps)(Jobs);

@@ -94,12 +94,6 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
         updatePages();
     }
 
-    // Apply a column template and render corresponding components
-    const applyColumnTemplate = (row, column) => {
-        let Template = templateMap[column.template];
-        return <Template row={row} />
-    }
-
     // Navigation to previous page possible?
     const isNavigatePrevious = () => {
         return pageOffset > 0;
@@ -226,7 +220,9 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
                                         : (!!column.template && !column.deactivated) ?
                                             // if column has a template then apply it
                                             <td key={key}>
-                                                {applyColumnTemplate(row, column)}
+                                                <ColumnTemplate row={row}
+                                                                column={column}
+                                                                templateMap={templateMap}/>
                                             </td>
                                             : (!column.deactivated) ?
                                                 <td/> :
@@ -352,6 +348,12 @@ const useSortRows = (resources, config = null) => {
     };
 
     return { resources: sortedResources, requestSort, sortConfig };
+}
+
+// Apply a column template and render corresponding components
+const ColumnTemplate = ({row, column, templateMap}) => {
+    let Template = templateMap[column.template];
+    return <Template row={row} />
 }
 
 // Getting state data out of redux store

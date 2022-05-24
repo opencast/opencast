@@ -3,7 +3,7 @@ import {useTranslation} from "react-i18next";
 import {connect} from "react-redux";
 import { loadEventsIntoTable } from '../../../thunks/tableThunks';
 import { setSpecificEventFilter } from '../../../thunks/tableFilterThunks';
-import Link  from 'react-router-dom/Link';
+import { Link }  from 'react-router-dom';
 
 /**
  * This component renders the title cells of series in the table view

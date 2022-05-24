@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {connect} from "react-redux";
-import Link from "react-router-dom/Link";
+import { Link } from "react-router-dom";
 import i18n from "../i18n/i18n";
 import languages from "../i18n/languages";
 import opencastLogo from '../img/opencast-white.svg';

@@ -236,4 +236,4 @@ const mapDispatchToProps = dispatch => ({
     setShowActions: isShowing => dispatch(showActions(isShowing))
 });
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Series));
+export default connect(mapStateToProps, mapDispatchToProps)(Series);

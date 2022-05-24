@@ -1,7 +1,6 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
-import {useHistory} from "react-router-dom";
-import Link from "react-router-dom/Link";
+import { Link, useNavigate } from 'react-router-dom';
 import {connect} from "react-redux";
 import {
     loadAclsIntoTable,
@@ -41,7 +40,7 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
                      loadingUsersIntoTable, loadingGroups, loadingGroupsIntoTable, loadingAcls, loadingAclsIntoTable,
                      loadingThemes, loadingThemesIntoTable, resetOffset, user, loadingFilters }) => {
     const { t } = useTranslation();
-    let history = useHistory();
+    let navigate = useNavigate();
 
     const loadEvents = () => {
 
@@ -178,11 +177,11 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
     }
 
     const hotkeyLoadEvents = () => {
-        history.push('/events/events');
+        navigate('/events/events');
     }
 
     const hotkeyLoadSeries = () => {
-        history.push('/events/series');
+        navigate('/events/series');
     }
 
     const hotKeyHandlers = {
