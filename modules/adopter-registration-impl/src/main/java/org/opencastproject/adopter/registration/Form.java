@@ -132,7 +132,7 @@ public class Form implements IForm {
 
   // If this is true, then the next stats send pass should delete the registration, then delete this object.
   @Column(name = "delete_me")
-  private transient boolean deleteMe = false;
+  private boolean deleteMe = false;
 
 
   //================================================================================
@@ -190,6 +190,7 @@ public class Form implements IForm {
       this.registered = f.registered;
     }
     this.dateModified = new Date();
+    this.deleteMe = f.deleteMe;
   }
 
   @Override
