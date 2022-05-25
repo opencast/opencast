@@ -53,7 +53,7 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent, uploadAssetOption
         {
             translation: 'EVENTS.EVENTS.NEW.UPLOAD_ASSET.CAPTION',
             name: 'upload-asset',
-            hidden: false
+            hidden: (uploadAssetOptions.filter(asset => asset.type !== 'track').length === 0)
         },
         {
             translation: 'EVENTS.EVENTS.NEW.PROCESSING.CAPTION',

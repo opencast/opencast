@@ -3,7 +3,7 @@ import {getAssetUploadOptions} from "../selectors/eventSelectors";
 import {
     loadAssetUploadOptionsFailure,
     loadAssetUploadOptionsInProgress,
-    loadAssetUploadOptionsSuccess
+    loadAssetUploadOptionsSuccess, setAssetUploadWorkflow
 } from "../actions/assetActions";
 import {logger} from "../utils/logger";
 
@@ -42,8 +42,8 @@ export const fetchAssetUploadOptions = () => async (dispatch, getState) => {
 
                             assetUploadOptions.push(option);
                         } else if(optionKey.indexOf(workflowPrefix) >= 0) {
-                            // todo: find out, what to do with this
                             const workflow = optionJson;
+                            dispatch(setAssetUploadWorkflow(workflow));
                         }
                     }
                 }

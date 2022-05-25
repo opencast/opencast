@@ -102,7 +102,7 @@ import {
     getStatistics
 } from "../selectors/eventDetailsSelectors";
 import {getWorkflowDef} from "../selectors/workflowSelectors";
-import {getAssetUploadOptions} from "../selectors/eventSelectors";
+import {getAssetUploadOptions, getAssetUploadWorkflow} from "../selectors/eventSelectors";
 import {calculateDuration} from "../utils/dateUtils";
 import {logger} from "../utils/logger";
 
@@ -446,11 +446,12 @@ export const updateAssets = (values, eventId) => async (dispatch, getState) => {
     // get asset upload options from redux store
     const state = getState();
     const uploadAssetOptions = getAssetUploadOptions(state);
+    const uploadAssetWorkflow = getAssetUploadWorkflow(state)
 
     let formData = new FormData();
 
     let assets = {
-        workflow: WORKFLOW_UPLOAD_ASSETS_NON_TRACK,
+        workflow: uploadAssetWorkflow,
         options: []
     };
 

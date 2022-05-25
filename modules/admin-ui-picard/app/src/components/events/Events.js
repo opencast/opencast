@@ -19,7 +19,7 @@ import {fetchEventMetadata, fetchEvents} from "../../thunks/eventThunks";
 import {loadEventsIntoTable, loadSeriesIntoTable} from "../../thunks/tableThunks";
 import {fetchSeries} from "../../thunks/seriesThunks";
 import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
-import {getTotalEvents, isLoading, isShowActions} from "../../selectors/eventSelectors";
+import {getTotalEvents, isFetchingAssetUploadOptions, isLoading, isShowActions} from "../../selectors/eventSelectors";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
@@ -42,7 +42,7 @@ const containerAction = React.createRef();
  */
 const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loadingSeries,
                         loadingSeriesIntoTable, loadingFilters, loadingStats, loadingEventMetadata, resetTextFilter, fetchAssetUploadOptions,
-                    resetOffset, user, setShowActions }) => {
+                    resetOffset, setShowActions, user, isFetchingAssetUploadOptions }) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
@@ -119,7 +119,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 
     const showNewEventModal = async () => {
         await loadingEventMetadata();
-        fetchAssetUploadOptions();
+        await fetchAssetUploadOptions();
 
         setNewEventModal(true);
     }
@@ -162,10 +162,12 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
                     )}
                 </div>
 
-                {/* Display modal for new event if add event button is clicked */}
-                <NewResourceModal showModal={displayNewEventModal}
-                                  handleClose={hideNewEventModal}
-                                  resource={"events"} />
+                {/* Display modal for new event if add event button is clicked */
+                !isFetchingAssetUploadOptions && (
+                    <NewResourceModal showModal={displayNewEventModal}
+                                      handleClose={hideNewEventModal}
+                                      resource={"events"} />
+                )}
 
                 {/* Display bulk actions modal if one is chosen from dropdown */}
                 {displayDeleteModal && (
@@ -284,7 +286,8 @@ const mapStateToProps = state => ({
     events: getTotalEvents(state),
     showActions: isShowActions(state),
     isLoadingEvents: isLoading(state),
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    isFetchingAssetUploadOptions: isFetchingAssetUploadOptions(state)
 });
 
 // Mapping actions to dispatch
