@@ -575,6 +575,9 @@
   <feature name="opencast-ingest" version="${project.version}">
     <feature start-level="80">opencast-core</feature>
 
+    <bundle start-level="82">mvn:org.opencastproject/opencast-elasticsearch-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-elasticsearch-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-elasticsearch-index/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-remote/${project.version}</bundle>
