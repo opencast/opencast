@@ -125,7 +125,7 @@ public class Sender {
   private void send(String json, String urlSuffix, String method) throws IOException {
     URL url = new URL(baseUrl + urlSuffix);
     HttpURLConnection con = (HttpURLConnection) url.openConnection();
-    con.setRequestMethod("POST");
+    con.setRequestMethod(method);
     con.setRequestProperty("Content-Type", "application/json; utf-8");
     con.setRequestProperty("Accept", "application/json");
     con.setDoOutput(true);
