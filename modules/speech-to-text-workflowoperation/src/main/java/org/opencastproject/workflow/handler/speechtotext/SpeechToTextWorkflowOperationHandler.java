@@ -83,6 +83,9 @@ public class SpeechToTextWorkflowOperationHandler extends AbstractWorkflowOperat
   /** Property name for configuring the place where the subtitles shall be appended. */
   private static final String TARGET_ELEMENT = "target-element";
 
+  /** Language placeholder */
+  private static final String PLACEHOLDER_LANG = "#{lang}";
+
   private enum AppendSubtitleAs {
     attachment, track
   }
@@ -200,6 +203,10 @@ public class SpeechToTextWorkflowOperationHandler extends AbstractWorkflowOperat
         subtitleMediaPackageElement.setURI(uri);
       }
       MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor().applyTo(track.getFlavor());
+      targetFlavor = new MediaPackageElementFlavor(
+          targetFlavor.getType(),
+          targetFlavor.getSubtype().replace(PLACEHOLDER_LANG, languageCode)
+      );
       subtitleMediaPackageElement.setFlavor(targetFlavor);
 
       List<String> targetTags = tagsAndFlavors.getTargetTags();

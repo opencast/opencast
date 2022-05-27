@@ -13,13 +13,14 @@ only [Vosk](https://alphacephei.com/vosk/) available as STT Engine. The subtitle
 Parameter Table
 ---------------
 
-|configuration keys|required|description                                                                      |
-|------------------|--------|---------------------------------------------------------------------------------|
-|source-flavor     |yes     |The source media package to use                                                  |
-|target-flavor     |yes     |Flavor of the produced subtitle file                                             |
-|target-element    |no      |Define where to append the subtitles file. Possibilities are: as a 'track' or as an 'attachment'. The default is "attachment".|
-|language-code     |no      |The language of the video or audio source (default is "eng). It has to match the name of the language model directory. See 'vosk-cli'.|
-|target-tags       |no      |Tags for the subtitle file                                                       |
+|configuration keys|required| description                                                                                                                             |
+|------------------|--------|-----------------------------------------------------------------------------------------------------------------------------------------|
+|source-flavor     |yes     | The source media package to use                                                                                                         |
+|target-flavor     |yes     | Flavor of the produced subtitle file. The subflavor supports the language-code placeholder `#{lang}`                                    |
+|target-element    |no      | Define where to append the subtitles file. Possibilities are: as a 'track' or as an 'attachment'. The default is "attachment".          |
+|language-code     |no      | The language of the video or audio source (default is "eng"). It has to match the name of the language model directory. See 'vosk-cli'. |
+|language-fallback |no      | The fallback value if the dublin core/media package language field is not present. (default is "eng")                                   |
+|target-tags       |no      | Tags for the subtitle file                                                                                                              |
 
 
 Requirements
