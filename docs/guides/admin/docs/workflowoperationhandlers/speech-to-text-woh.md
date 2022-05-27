@@ -49,4 +49,15 @@ for the `language-code` field.
     <configuration key="language-code">eng</configuration>
   </configurations>
 </operation>
+
+<operation
+    id="speechtotext"
+    description="Generates subtitles for video and audio files, derive language-code from metadata">
+    <configurations>
+      <configuration key="source-flavor">*/source</configuration>
+      <configuration key="target-flavor">captions/vtt+#{lang}</configuration>
+      <configuration key="target-element">attachment</configuration>
+      <configuration key="target-tags">archive,subtitle,engage-download</configuration>
+    </configurations>
+</operation>
 ```

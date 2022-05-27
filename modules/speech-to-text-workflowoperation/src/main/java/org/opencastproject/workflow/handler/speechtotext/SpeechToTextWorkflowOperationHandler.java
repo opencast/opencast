@@ -77,6 +77,9 @@ public class SpeechToTextWorkflowOperationHandler extends AbstractWorkflowOperat
   /** Speech to Text language configuration property name. */
   private static final String LANGUAGE_CODE = "language-code";
 
+  /** Speech to Text language fallback configuration property name. */
+  private static final String LANGUAGE_FALLBACK = "language-fallback";
+
   /** Property name for configuring the place where the subtitles shall be appended. */
   private static final String TARGET_ELEMENT = "target-element";
 
@@ -281,7 +284,7 @@ public class SpeechToTextWorkflowOperationHandler extends AbstractWorkflowOperat
 
     if (language.isEmpty()) {
       // default value when nothing worked
-      language = "eng";
+      language = StringUtils.defaultIfBlank(operation.getConfiguration(LANGUAGE_FALLBACK), "eng");
     }
 
     return language;
