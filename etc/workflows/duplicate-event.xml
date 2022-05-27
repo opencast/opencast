@@ -12,18 +12,48 @@
     <![CDATA[
       <div id="workflow-configuration">
         <fieldset>
-          <input
-            id="numberOfEvents"
-            name="numberOfEvents"
-            type="number"
-            class="configField"
-            onkeypress="return event.charCode > 47"
-            oninput="checkValueInBounds()"
-            min="1"
-            value="1"
-            max="25"
+          <br/>
+          <div>
+            <label for="mpTitle" style="width: 150px;" >Title of Duplicate:</label>
+            <input id="mpTitle" name="mpTitle" type="text" style="width: 400px;" value=" " class="configField" />
+          </div>
+          <br/>
+          <div>
+            <label for="seriesId" style="width: 150px;" >Series Id:</label>
+            <input id="seriesId" name="seriesId" type="text" maxlength="255" style="width: 400px;" value=" " class="configField" />
+          </div>
+          <br/>
+          <div>
+            <label for="startDate" style="width: 150px;">StartDate (YYYY-MM-DD):</label>
+            <input id="startDate" name="startDate" type="text" style="width: 200px;" value=" " class="configField" />
+          </div>
+          <div>
+            <label for="startTime" style="width: 150px;">startTime (HH:MM:SS):</label>
+            <input id="startTime" name="startTime" type="text" style="width: 200px;" value=" " class="configField" />
+          </div>
+          <br/>
+          <br/>
+          <div>
+            <label for="numberOfEvents" style="width: 150px;">Number of Events</label>
+            <input
+              id="numberOfEvents"
+              name="numberOfEvents"
+              type="number"
+              class="configField"
+              onkeypress="return event.charCode > 47"
+              oninput="checkValueInBounds()"
+              min="1"
+              value="1"
+              max="25"
             />
-          <label for="numberOfEvents">Number of Events</label>
+          </div>
+          <br/>
+          <div>
+            <fieldset>
+              <input id="noCopySuffix" name="noCopySuffix" type="checkbox" class="configField" value="false" />
+              <label for="noCopySuffix">Do not use copy suffix</label>
+            </fieldset>
+          </div>
         </fieldset>
       </div>
 
@@ -53,8 +83,12 @@
       <configurations>
         <configuration key="source-flavors">*/*</configuration>
         <configuration key="number-of-events">${numberOfEvents}</configuration>
+        <configuration key="set-series-id">${seriesId}</configuration>
+        <configuration key="set-title">${mpTitle}</configuration>
+        <configuration key="set-start-date-time">${startDate} ${startTime}</configuration>
         <configuration key="target-tags"></configuration>
         <configuration key="property-namespaces">org.opencastproject.assetmanager.security,org.opencastproject.workflow.configuration</configuration>
+        <configuration key="no-suffix">${noCopySuffix}</configuration>
         <configuration key="copy-number-prefix">copy</configuration>
       </configurations>
     </operation>

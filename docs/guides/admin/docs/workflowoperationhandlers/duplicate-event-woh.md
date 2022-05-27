@@ -16,8 +16,8 @@ For each duplicated event the new media package ID is stored as a workflow prope
 
 |Name                                    |Example                                                             |Description                                    |
 |----------------------------------------|--------------------------------------------------------------------|-----------------------------------------------|
-|duplicate\_media\_package\_*number*\_id |`duplicate_media_package_1_id=e72f2265-472a-49ae-bc04-8301d94b4b1a` |Media package ID of the duplicated event       | \*
-|duplicate\_media\_package\_ids          |`duplicate_media_package_ids=e72f2265-472a-49ae-bc04-8301d94b4b1a, a32e2265-472a-49ae-bc04-8351d94b4b1c` | comma separated list of Media package IDs of the duplicated event |
+|duplicate_media_package_*number*_id     |`duplicate_media_package_1_id=e72f2265-472a-49ae-bc04-8301d94b4b1a` |Media package ID of the duplicated event       | \*
+|duplicate_media_package_ids             |`duplicate_media_package_ids=e72f2265-472a-49ae-bc04-8301d94b4b1a, a32e2265-472a-49ae-bc04-8351d94b4b1c` | comma separated list of Media package IDs of the duplicated event |
 
 \* will be deprecated
 
@@ -33,6 +33,10 @@ Parameter Table
 |copy-number-prefix   |`copy`                                     |The prefix used for the number of the copy which is appended to the title of the new event.     |
 |number-of-events     |`2`                                        |How many events to create.|
 |max-number-of-events |`1000`                                     |How many events are allowed to be created at maximum.|
+|no-suffix            |`true`                                     |Boolean to decide if the number suffix (`copy #`) is not attached (true ... no attachment, false ...`copy #` is attached) |
+|set-series-id        |`3547a900-e0ee-4e3f-9e67-2157cd42c700`     |Id of the series the copied events should be added to |
+|set-title            |`copy of mediapackage`                     |Title of the newly created events. If `no-suffix` is set to `false` a `copy #` will be attached |
+|set-start-date-time  |`2021-12-02 22:22:22`                      |Date and time to be set on the newly created events.|
 
 
 Operation Example
@@ -47,7 +51,11 @@ Operation Example
         <configuration key="source-flavors">*/*</configuration>
         <configuration key="number-of-events">${numberOfEvents}</configuration>
         <configuration key="max-number-of-events">1000</configuration>
-        <configuration key="target-tags"></configuration>
+        <configuration key="target-tags"></configuration> 
+        <configuration key="no-suffix">false</configuration
+        <configuration key="set-series-id">${seriesId}</configuration>
+        <configuration key="set-title">${mpTitle}</configuration>
+        <configuration key="set-start-date-time">${startDate} ${startTime}</configuration>
         <configuration key="property-namespaces">
           org.opencastproject.assetmanager.security
         </configuration>
