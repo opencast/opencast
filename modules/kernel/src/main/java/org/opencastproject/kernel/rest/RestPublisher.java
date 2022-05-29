@@ -62,6 +62,10 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.BundleTracker;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
@@ -229,6 +233,16 @@ public class RestPublisher implements RestConstants {
     jaxRsTracker.close();
     bundleTracker.close();
     busServiceRegistration.unregister();
+  }
+
+  @Reference(policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.OPTIONAL)
+  public void bindHttpService(HttpService httpService) {
+    logger.debug("HttpService registered");
+    rewire();
+  }
+
+  public void unbindHttpService(HttpService httpService) {
+    logger.debug("HttpService unregistered");
   }
 
   protected class OsgiCxfEndpointComparator implements ResourceComparator {
