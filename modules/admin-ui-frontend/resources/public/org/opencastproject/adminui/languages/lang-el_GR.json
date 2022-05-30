@@ -619,7 +619,7 @@
             "NOCONTENT": "Δεν υπάρχουν διαθέσιμα δεδομένα",
             "PUBLISHED": "Δημοσιευμένο",
             "WEEKDAY": "Ημέρες εβδομάδας",
-            "ADMINUI_NOTES": "Notes",
+            "ADMINUI_NOTES": "Σημειώσεις",
             "TOOLTIP": {
                "ASSETS": "Άνοιγμα λεπτομερειών αντικιεμένων",
                "START": "Φίλτρο για αυτήν την ημερομηνία έναρξης",
@@ -909,7 +909,7 @@
                   "WRONG_SERIES_PUBLICATION": "Λάρθςο σειρά ή κανάλι δημοσίευσης",
                   "WRONG_WORKFLOW": "Λάθος ροής εργασίας",
                   "PROCESSING_FAILURE": "Αποτυχία επεξεργασίας",
-                  "ADMINUI_NOTES": "Notes in Admin UI"
+                  "ADMINUI_NOTES": "Σημειώσεις στο Admin UI"
                }
             },
             "STATISTICS": {
