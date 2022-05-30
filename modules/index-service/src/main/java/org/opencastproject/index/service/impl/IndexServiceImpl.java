@@ -1835,7 +1835,7 @@ public class IndexServiceImpl implements IndexService {
     try {
       metadataJson = (JSONObject) new JSONParser().parse(metadata);
     } catch (Exception e) {
-      throw new IllegalArgumentException("Unable to parse metadata" + metadata);
+      throw new IllegalArgumentException("Unable to parse metadata" + metadata, e);
     }
 
     if (metadataJson == null)
