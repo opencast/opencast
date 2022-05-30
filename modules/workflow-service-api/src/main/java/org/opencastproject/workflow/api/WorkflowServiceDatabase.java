@@ -78,19 +78,15 @@ public interface WorkflowServiceDatabase {
    */
   long countWorkflows(WorkflowInstance.WorkflowState state) throws WorkflowDatabaseException;
 
-  /**
-   * Gets latest workflow instances for all events.
-   * Selects workflows which haven't been finished (DateCompleted IS NULL) or greatest DateCompleted
+    /**
+   * Gets workflow index data for all events.
+   * Selects only workflow id, state, mediapackage id and organization id
    *
-   * @param limit
-   *          max number of workflows to be returned
-   * @param offset
-   *          only return workflows from this point onwards
-   * @return list of all {@link WorkflowInstance}s
+   * @return list of all {@link WorkflowIndexData}s
    * @throws WorkflowDatabaseException
    *           if there is a problem communicating with the underlying data store
    */
-  List<WorkflowInstance> getLatestWorkflowInstances(int limit, long token) throws WorkflowDatabaseException;
+  List<WorkflowIndexData> getWorkflowIndexData() throws WorkflowDatabaseException;
 
   /**
    * Returns the number of events workflows have been run on.

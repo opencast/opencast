@@ -37,7 +37,6 @@ import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventIndexUtils;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
@@ -46,20 +45,15 @@ import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobProducer;
-import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.metadata.api.MediaPackageMetadata;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.metadata.api.MetadataService;
 import org.opencastproject.metadata.api.util.MediaPackageMetadataSupport;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -86,6 +80,7 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowIdentifier;
+import org.opencastproject.workflow.api.WorkflowIndexData;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowListener;
@@ -1243,10 +1238,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
             "Job for workflow " + workflowInstance.getId() + " not found in service registry", e);
       }
 
-      final DublinCoreCatalog episodeDublinCoreCatalog = getEpisodeDublinCoreCatalog(
-              workflowInstance.getMediaPackage());
-      final AccessControlList accessControlList = authorizationService.getActiveAcl(updatedMediaPackage).getA();
-
       // Update both workflow and workflow job
       try {
         //Update the database
@@ -1260,8 +1251,14 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         // updates for running operations since we updated the metadata right before these operations and will do so
         // again right after those operations.
         if (op == null || op.getState() != OperationState.RUNNING) {
-          updateWorkflowInstanceInIndex(workflowInstance, accessControlList, episodeDublinCoreCatalog,
-                  elasticsearchIndex);
+          // Collect necessary information only for index update
+          long id = workflowInstance.getId();
+          int state = workflowInstance.getState().ordinal();
+          String mpId = workflowInstance.getMediaPackage().getIdentifier().toString();
+          String orgId = workflowInstance.getOrganizationId().toString();
+
+          WorkflowIndexData latestWorkflow = new WorkflowIndexData(id, state, mpId, orgId);
+          updateWorkflowInstanceInIndex(latestWorkflow, elasticsearchIndex);
         }
       } catch (ServiceRegistryException e) {
         throw new WorkflowDatabaseException("Update of workflow job " + workflowInstance.getId()
@@ -2163,66 +2160,44 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       logIndexRebuildError(logger.getSlf4jLogger(), index.getIndexName(), e);
       throw new IndexRebuildException(index.getIndexName(), getService(), e);
     }
-    final int limit = 1000;
 
     if (total > 0) {
       logIndexRebuildBegin(logger.getSlf4jLogger(), index.getIndexName(), total, "workflows");
-      int current = 0;
-      long token = 0;
-      List<WorkflowInstance> workflows;
-      do {
-        try {
-          workflows = persistence.getLatestWorkflowInstances(limit, token);
-        } catch (Exception e) {
-          logIndexRebuildError(logger.getSlf4jLogger(), index.getIndexName(), total, current, e);
-          throw new IndexRebuildException(index.getIndexName(), getService(), e);
-        }
-        logger.debug("Got {} workflows for re-indexing", workflows.size());
-        int indexLast = workflows.size() - 1;
-        token = workflows.get(indexLast).getId();
+      List<WorkflowIndexData> workflowIndexData;
 
-        for (WorkflowInstance instance : workflows) {
+      try {
+        workflowIndexData = persistence.getWorkflowIndexData();
+      } catch (WorkflowDatabaseException e) {
+        logIndexRebuildError(logger.getSlf4jLogger(), index.getIndexName(), e);
+        throw new IndexRebuildException(index.getIndexName(), getService(), e);
+      }
+
+      Map<String, WorkflowIndexData> latestWorkflows = new HashMap<>();
+      for (WorkflowIndexData data : workflowIndexData) {
+        latestWorkflows.put(data.getMediaPackageId(), data);
+      }
+
+      int current = 0;
+      do {
+        logger.debug("Got {} workflows for re-indexing", latestWorkflows.size());
+        for (WorkflowIndexData data : latestWorkflows.values()) {
           current += 1;
           Organization organization = null;
           try {
-            organization = organizationDirectoryService.getOrganization(instance.getOrganizationId());
+            organization = organizationDirectoryService.getOrganization(data.getOrganizationId());
           } catch (NotFoundException e) {
-            logger.error("Found workflow with non-existing organization {}", instance.getOrganizationId());
+            logger.error("Found workflow with non-existing organization {}", data.getOrganizationId());
             continue;
-          }
-
-          // get metadata for index update
-          final DublinCoreCatalog episodeDublinCoreCatalog = getEpisodeDublinCoreCatalog(instance.getMediaPackage());
-
-          // get acl for active workflows.
-          // don't try this for terminated workflows since the ACLs are no longer in the working file repository and
-          // they will be overwritten later in the re-indexing process by ACLs from the asset manager anyway.
-          final AccessControlList accessControlList;
-          if (instance.getState().isTerminated()) {
-            accessControlList = new AccessControlList();
-          } else {
-            accessControlList = authorizationService.getActiveAcl(instance.getMediaPackage()).getA();
           }
 
           SecurityUtil.runAs(securityService, organization,
                   SecurityUtil.createSystemUser(componentContext, organization), () -> {
-                    updateWorkflowInstanceInIndex(instance, accessControlList, episodeDublinCoreCatalog, index);
+                    updateWorkflowInstanceInIndex(data, index);
                   });
           logIndexRebuildProgress(logger.getSlf4jLogger(), index.getIndexName(), total, current);
         }
       } while (current < total);
     }
-  }
-
-  private DublinCoreCatalog getEpisodeDublinCoreCatalog(MediaPackage mediaPackage) {
-    for (Catalog catalog: mediaPackage.getCatalogs(MediaPackageElements.EPISODE)) {
-      try {
-        return DublinCoreUtil.loadDublinCore(workspace, catalog);
-      } catch (Exception e) {
-        logger.warn("Unable to load dublin core catalog for event '{}'", mediaPackage.getIdentifier(), e);
-      }
-    }
-    return null;
   }
 
   @Override
@@ -2296,19 +2271,15 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   /**
    * Update a workflow instance in the API index.
    *
-   * @param workflowInstance
-   *         the workflowInstance to update
-   * @param accessControlList
-   *         the ACL of the event
-   * @param episodeDublincoreCatalog
-   *         the episode dublincore catalog of the event
+   * @param latestWorkflow
+   *         the workflowIndexData to update
    * @param index
    *         the index to update
    */
-  private void updateWorkflowInstanceInIndex(WorkflowInstance workflowInstance, AccessControlList accessControlList,
-          DublinCoreCatalog episodeDublincoreCatalog, ElasticsearchIndex index) {
-    final long workflowInstanceId = workflowInstance.getId();
-    final String eventId = workflowInstance.getMediaPackage().getIdentifier().toString();
+  private void updateWorkflowInstanceInIndex(WorkflowIndexData latestWorkflow, ElasticsearchIndex index) {
+    final long workflowInstanceId = latestWorkflow.getId();
+    final WorkflowState workflowState = WorkflowState.values()[latestWorkflow.getState()];
+    final String eventId = latestWorkflow.getMediaPackageId();
     final String orgId = securityService.getOrganization().getId();
     final User user = securityService.getUser();
 
@@ -2316,19 +2287,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
             index.getIndexName());
     Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
       Event event = eventOpt.orElse(new Event(eventId, orgId));
-      event.setCreator(user.getName());
       event.setWorkflowId(workflowInstanceId);
-      event.setWorkflowDefinitionId(workflowInstance.getTemplate());
-      event.setWorkflowState(workflowInstance.getState());
-      event.setAccessPolicy(AccessControlParser.toJsonSilent(accessControlList));
-
-      // Update metadata
-      if (episodeDublincoreCatalog != null) {
-        event = EventIndexUtils.updateEvent(event, episodeDublincoreCatalog);
-      }
-
-      // update publications
-      event = EventIndexUtils.updateEvent(event, workflowInstance.getMediaPackage());
+      event.setWorkflowState(workflowState);
       return Optional.of(event);
     };
 
