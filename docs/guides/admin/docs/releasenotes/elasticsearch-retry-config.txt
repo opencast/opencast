@@ -1,6 +1,0 @@
-In case a request to Elasticsearch fails because of an ElasticsearchStatusException, you can now configure Opencast to
-try again. For this, set max.retry.attempts in `org.opencastproject.elasticsearch.index.ElasticsearchIndex.cfg` to
-something higher than 0. Set retry.waiting.period to a time period in ms to wait between retries (default: 1 second) so
-you don't overwhelm Elasticsearch. Both parameters can be configured separately for read-only actions and those that
-also update or delete, since arguably the success of the latter is more important. Changing this config does not require
-a restart of Opencast. See our [Elasticsearch docs](../configuration/elasticsearch.md) for more details.
