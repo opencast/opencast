@@ -3,7 +3,6 @@
 
   <i class="edit fa fa-pencil-square" ng-show="!editMode && collection.length != 0" ng-focus="enterEditMode()"
      tabindex="{{ collection.length != 0 ? params.tabindex : -1 }}"></i>
-  <i class="changed fa fa-check" ng-show="!editMode" ng-class="{ saved: params.saved, dirty: params.dirty }"></i>
 
   <div class="editable-select" ng-if="editMode" ng-keyup="keyUp($event)" ng-mousedown="$event.stopPropagation()"
        ng-click="$event.stopPropagation()">
