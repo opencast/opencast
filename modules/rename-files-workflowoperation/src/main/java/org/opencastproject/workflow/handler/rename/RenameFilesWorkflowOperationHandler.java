@@ -23,9 +23,10 @@ package org.opencastproject.workflow.handler.rename;
 
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.util.NotFoundException;
@@ -166,9 +167,30 @@ public class RenameFilesWorkflowOperationHandler extends AbstractWorkflowOperati
    *          Current media package
    * @return Map of placeholders.
    */
-  private Map<String, String> placeholders(MediaPackage mediaPackage, MediaPackageElement element) {
+  private Map<String, String> placeholders(MediaPackage mediaPackage, Track element) {
 
     var placeholders = new HashMap<String, String>();
+
+    var width = Arrays.stream(element.getStreams())
+        .filter(s -> s instanceof VideoStream)
+        .map(s -> (VideoStream) s)
+        .findFirst()
+        .map(VideoStream::getFrameWidth)
+        .map(Object::toString)
+        .orElse("");
+    // Placeholder resolution width
+    placeholders.put("#{video.width}", width);
+
+    var height = Arrays.stream(element.getStreams())
+            .filter(h -> h instanceof VideoStream)
+            .map(h -> (VideoStream) h)
+            .findFirst()
+            .map(VideoStream::getFrameHeight)
+            .map(Object::toString)
+            .orElse("");
+    //Placeholder resolution height
+    placeholders.put("#{video.height}", height);
+
 
     // file placeholders
     placeholders.put("#{file.extension}", FilenameUtils.getExtension(element.getURI().toString()));
