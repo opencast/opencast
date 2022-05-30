@@ -191,7 +191,6 @@ public class RenameFilesWorkflowOperationHandler extends AbstractWorkflowOperati
     //Placeholder resolution height
     placeholders.put("#{video.height}", height);
 
-
     // file placeholders
     placeholders.put("#{file.extension}", FilenameUtils.getExtension(element.getURI().toString()));
     placeholders.put("#{file.basename}", FilenameUtils.getBaseName(element.getURI().toString()));
