@@ -129,7 +129,7 @@
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "Αυτή η σειρά περιέχει εκδηλώσεις. Η διαγραφή της σειράς δεν θα διαγράψει τις εκδηλώσεις.",
          "EVENT_WILL_BE_GONE": "Εάν συνεχίσετε, η εκδήλωση θα διαγραφεί αμετάκλητα.",
-         "UNSAVED_CHANGES": "You have unsaved changes. If you continue, those changes will be discarded. Are you sure that you want to continue?"
+         "UNSAVED_CHANGES": "Έχετε μη αποθηκευμένες αλλαγές. Αν συνεχίσετε, αυτές οι αλλαγές θα απορριφθούν. Είστε βέβαιοι ότι θέλετε να συνεχίσετε?"
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Αυτή η σειρά δεν μπορεί να διαγραφεί, καθώς εξακολουθεί να περιέχει εκδηλώσεις."
@@ -206,7 +206,7 @@
       "INVALID_ACL_RULES": "Οι κανόνες πρέπει να περιέχουν έναν έγκυρο ρόλο και δικαίωμα(τα) ανάγνωσης ή/και εγγραφής.",
       "MISSING_ACL_RULES": "Απαιτείται τουλάχιστον ένας ρόλος με δικαιώματα ανάγνωσης και εγγραφής!",
       "SAVED_ACL_RULES": "Οι κανόνες πρόσβασης έχουν αποθηκευτεί.",
-      "SAVED_METADATA": "The metadata has been saved.",
+      "SAVED_METADATA": "Τα μεταδεδομένα έχουν αποθηκευτεί.",
       "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "Οι υπάρχουσες εκδηλώσεις σε αυτή τη σειρά θα πρέπει να επεξεργαστών ξάνα",
       "SERIES_ACL_LOCKED": "Η επεξεργασία την πολιτικών πρόσβαησς δεν επιτρέπεται όταν εκτελούνται εργασίες σε μία εκδήλωση που αποτελεί μέρος της σειράς",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "Η πολιτική πρόσβασης απαιτεί τουλάχιστον ένα ρόλο με δικαιώματα ανάγνωσης και εγγραφής.",
@@ -621,7 +621,7 @@
             "NOCONTENT": "Δεν υπάρχουν διαθέσιμα δεδομένα",
             "PUBLISHED": "Δημοσιευμένο",
             "WEEKDAY": "Ημέρες εβδομάδας",
-            "ADMINUI_NOTES": "Notes",
+            "ADMINUI_NOTES": "Σημειώσεις",
             "TOOLTIP": {
                "ASSETS": "Άνοιγμα λεπτομερειών αντικιεμένων",
                "START": "Φίλτρο για αυτήν την ημερομηνία έναρξης",
@@ -911,7 +911,7 @@
                   "WRONG_SERIES_PUBLICATION": "Λάρθςο σειρά ή κανάλι δημοσίευσης",
                   "WRONG_WORKFLOW": "Λάθος ροής εργασίας",
                   "PROCESSING_FAILURE": "Αποτυχία επεξεργασίας",
-                  "ADMINUI_NOTES": "Notes in Admin UI"
+                  "ADMINUI_NOTES": "Σημειώσεις στο Admin UI"
                }
             },
             "STATISTICS": {
@@ -1303,12 +1303,12 @@
                "ADD": "Προσθήκη ρόλου"
             },
             "STRENGTH": {
-               "BAD": "Bad password",
-               "VERYWEAK": "Very weak password",
-               "WEAK": "Weak password",
-               "GOOD": "Good password",
-               "STRONG": "Strong password",
-               "VERYSTRONG": "Very strong password"
+               "BAD": "Εσφαλμένος κωδικός πρόσβασης",
+               "VERYWEAK": "Πολύ επισφαλής κωδικός πρόσβασης",
+               "WEAK": "Επισφαλής κωδικός πρόσβασης.",
+               "GOOD": "Καλός κωδικός πρόσβασης",
+               "STRONG": "Ισχυρός κωδικός πρόσβασης",
+               "VERYSTRONG": "Πού ισχυρός κωδικός πρόσβασης"
             }
          }
       },
