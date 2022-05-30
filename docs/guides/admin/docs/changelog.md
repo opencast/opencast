@@ -196,6 +196,12 @@ Opencast 11
 
 *Released on December 15th, 2021*
 
+- [[#2949](https://github.com/opencast/opencast/pull/2949)] -
+  Encode username before useing it in CanvasUserRoleProvider
+- [[#2591](https://github.com/opencast/opencast/pull/2591)] -
+  Remove automatic handling of HLS bitrate ladder
+- [[#2559](https://github.com/opencast/opencast/pull/2559)] -
+  Allow proper mapping of tenant hostnames to URLs
 - [[#3263](https://github.com/opencast/opencast/pull/3263)] -
   Remove chinese traditional
 - [[#3264](https://github.com/opencast/opencast/pull/3264)] -
