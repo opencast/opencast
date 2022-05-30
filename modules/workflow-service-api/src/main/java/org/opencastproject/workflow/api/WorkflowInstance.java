@@ -82,18 +82,6 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
                 name = "Workflow.findAll",
                 query = "select w from WorkflowInstance w where w.organizationId=:organizationId order by w.dateCreated"
         ),
-        // Finding the latest or active workflow for all events
-        @NamedQuery(
-                name = "Workflow.findLatest",
-                query = "SELECT w FROM WorkflowInstance w "
-                      + "WHERE "
-                      + "w.organizationId=:organizationId AND "
-                      + "w.dateCreated = (SELECT MAX(w2.dateCreated) "
-                      + "FROM WorkflowInstance w2 "
-                      + "WHERE w2.mediaPackageId = w.mediaPackageId AND "
-                      + "w2.workflowId>:startToken) "
-                      + "ORDER BY w.workflowId ASC"
-        ),
         @NamedQuery(
                 name = "Workflow.countLatest",
                 query = "SELECT COUNT(DISTINCT w.mediaPackageId) FROM WorkflowInstance w"
