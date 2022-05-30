@@ -3,7 +3,7 @@ import MainNav from "../shared/MainNav";
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import {connect} from "react-redux";
-import {withRouter, Link} from "react-router-dom";
+import { Link, useLocation } from 'react-router-dom';
 import TableFilters from "../shared/TableFilters";
 import Table from "../shared/Table";
 import Notifications from "../shared/Notifications";
@@ -16,7 +16,7 @@ import {fetchEvents} from "../../thunks/eventThunks";
 import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
 import {getTotalSeries, isShowActions} from "../../selectors/seriesSeletctor";
 import {editTextFilter} from "../../actions/tableFilterActions";
-import {setOffset} from "../../actions/tableActions";
+import { isTableLoading, setOffset } from '../../actions/tableActions';
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 import {logger} from "../../utils/logger";
 import Header from "../Header";
@@ -26,7 +26,6 @@ import {hasAccess} from "../../utils/utils";
 import {showActions} from "../../actions/seriesActions";
 import {availableHotkeys} from "../../configs/hotkeysConfig";
 import {GlobalHotKeys} from "react-hotkeys";
-
 
 
 // References for detecting a click outside of the container of the dropdown menu
@@ -43,6 +42,9 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewSeriesModal, setNewSeriesModal] = useState(false);
     const [displayDeleteSeriesModal, setDeleteSeriesModal] = useState(false);
+
+    let location = useLocation();
+
 
     const loadEvents = () => {
         loadingFilters("events");
@@ -69,14 +71,14 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
     }
 
     useEffect( () => {
+
         resetTextFilter();
 
         // disable actions button
         setShowActions(false);
 
-        // Load series on mount
+        // Load events on mount
         loadSeries().then(r => logger.info(r));
-
 
         // Function for handling clicks outside of an dropdown menu
         const handleClickOutside = e => {
@@ -96,7 +98,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
             window.removeEventListener('mousedown', handleClickOutside);
             clearInterval(fetchSeriesInterval);
         }
-    }, []);
+    }, [location.hash]);
 
     const toggleNavigation = () => {
         setNavigation(!displayNavigation);
@@ -211,7 +213,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
             </div>
             <Footer />
         </>
-    )
+    );
 }
 
 // Getting state data out of redux store

@@ -80,7 +80,7 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
         return () => {
             window.removeEventListener('mousedown', handleClickOutside);
         }
-    }, []);
+    });
 
     // Select or deselect all rows on a page
     const onChangeAllSelected = e => {
@@ -186,7 +186,6 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
                 </thead>
                 <tbody>
                 {(table.loading && rows.length === 0) ? (
-                    // todo: put Loading in Redux state of table
                     <tr>
                         <td colSpan={table.columns.length} style={loadingTdStyle}>
                             <i className="fa fa-spinner fa-spin fa-2x fa-fw"/>
@@ -198,6 +197,7 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
                         <td colSpan={table.columns.length}>{t('TABLE_NO_RESULT')}</td>
                     </tr>
                 ) : (
+                  !table.loading &&
                     //Repeat for each row in table.rows
                     resources.map((row, key) => (
                             <tr key={key}>
@@ -217,7 +217,8 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
                                         <td key={key}>
                                             {t(row[column.name])}
                                         </td>
-                                        : (!!column.template && !column.deactivated) ?
+                                        : (!!column.template && !column.deactivated
+                                          && !!templateMap[column.template]) ?
                                             // if column has a template then apply it
                                             <td key={key}>
                                                 <ColumnTemplate row={row}
@@ -314,8 +315,6 @@ const getDirectAccessiblePages = (pages, pagination) => {
         }
         directAccessible.push(pageToPush);
     }
-
-    //todo: in old code is here something with maxLabel (Check if this is also needed)
 
     return directAccessible;
 }

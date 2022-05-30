@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {connect} from "react-redux";
-import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import './App.scss';
 import Events from "./components/events/Events";
 import Recordings from "./components/recordings/Recordings";
@@ -24,34 +24,34 @@ function App({ loadingUserInfo, loadingOcVersion, loadingFilters }) {
        loadingOcVersion();
        // Load initial filters for event table view
        loadingFilters("events");
-    }, []);
+    }, [loadingFilters, loadingOcVersion, loadingUserInfo]);
 
   return (
           <HashRouter>
               <Routes>
-                  <Route path={"/"} element={<Events />} />
+                  <Route exact path={"/"} element={<Events />} />
 
-                  <Route path={"/events/events"} element={<Events />} />
+                  <Route exact path={"/events/events"} element={<Events />} />
 
-                  <Route path={"/events/series"} element={<Series />} />
+                  <Route exact path={"/events/series"} element={<Series />} />
 
-                  <Route path={"/recordings/recordings"} element={<Recordings />} />
+                  <Route exact path={"/recordings/recordings"} element={<Recordings />} />
 
-                  <Route path={"/systems/jobs"} element={<Jobs />} />
+                  <Route exact path={"/systems/jobs"} element={<Jobs />} />
 
-                  <Route path={"/systems/servers"} element={<Servers />} />
+                  <Route exact path={"/systems/servers"} element={<Servers />} />
 
-                  <Route path={"/systems/services"} element={<Services />} />
+                  <Route exact path={"/systems/services"} element={<Services />} />
 
-                  <Route path={"/users/users"} element={<Users />} />
+                  <Route exact path={"/users/users"} element={<Users />} />
 
-                  <Route path={"/users/groups"} element={<Groups />} />
+                  <Route exact path={"/users/groups"} element={<Groups />} />
 
-                  <Route path={"/users/acls"} element={<Acls />} />
+                  <Route exact path={"/users/acls"} element={<Acls />} />
 
-                  <Route path={"/configuration/themes"} element={<Themes />} />
+                  <Route exact path={"/configuration/themes"} element={<Themes />} />
 
-                  <Route path={"/statistics/organization"} element={<Statistics />} />
+                  <Route exact path={"/statistics/organization"} element={<Statistics />} />
 
                   <Route path={"*"}
                          render={() => <Navigate to={"/events/events"} replace />} />

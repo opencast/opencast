@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {useTranslation} from "react-i18next";
 import cn from 'classnames';
 import {connect} from "react-redux";
-import {withRouter, Link} from "react-router-dom";
+import { Link, useLocation} from 'react-router-dom';
 import TableFilters from "../shared/TableFilters";
 import MainNav from "../shared/MainNav";
 import Stats from "../shared/Stats";
@@ -20,7 +20,7 @@ import {fetchSeries} from "../../thunks/seriesThunks";
 import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
 import {getTotalEvents, isShowActions} from "../../selectors/eventSelectors";
 import {editTextFilter} from "../../actions/tableFilterActions";
-import {setOffset} from "../../actions/tableActions";
+import { setOffset } from '../../actions/tableActions';
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 import {logger} from "../../utils/logger";
 import Header from "../Header";
@@ -51,6 +51,9 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
     const [displayEditScheduledEventsModal, setEditScheduledEventsModal] = useState(false);
     const [displayEditMetadataEventsModal, setEditMetadataEventsModal] = useState(false);
 
+    let location = useLocation();
+
+
     const loadEvents = async () => {
         // Fetching stats from server
         loadingStats();
@@ -78,6 +81,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
     }
 
     useEffect(() => {
+
         resetTextFilter();
 
         // disable actions button
@@ -105,7 +109,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
         }
 
 
-    }, []);
+    }, [location.hash]);
 
     const toggleNavigation = () => {
         setNavigation(!displayNavigation);
@@ -153,10 +157,10 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
             <section className="action-nav-bar">
                 <div className="btn-group">
                     {hasAccess("ROLE_UI_EVENTS_CREATE", user) && (
-                        <button className="add" onClick={() => showNewEventModal()}>
-                            <i className="fa fa-plus" />
-                            <span>{t('EVENTS.EVENTS.ADD_EVENT')}</span>
-                        </button>
+                      <button className="add" onClick={() => showNewEventModal()}>
+                          <i className="fa fa-plus" />
+                          <span>{t('EVENTS.EVENTS.ADD_EVENT')}</span>
+                      </button>
                     )}
                 </div>
 
@@ -167,19 +171,19 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 
                 {/* Display bulk actions modal if one is chosen from dropdown */}
                 {displayDeleteModal && (
-                    <DeleteEventsModal close={hideDeleteModal}/>
+                  <DeleteEventsModal close={hideDeleteModal}/>
                 )}
 
                 {displayStartTaskModal && (
-                    <StartTaskModal close={hideStartTaskModal}/>
+                  <StartTaskModal close={hideStartTaskModal}/>
                 )}
 
                 {displayEditScheduledEventsModal && (
-                    <EditScheduledEventsModal  close={hideEditScheduledEventsModal}/>
+                  <EditScheduledEventsModal  close={hideEditScheduledEventsModal}/>
                 )}
 
                 {displayEditMetadataEventsModal && (
-                    <EditMetadataEventsModal close={hideEditMetadataEventsModal}/>
+                  <EditMetadataEventsModal close={hideEditMetadataEventsModal}/>
                 )}
 
                 {/* Include Burger-button menu */}
@@ -188,29 +192,29 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 
                 <nav>
                     {hasAccess("ROLE_UI_EVENTS_VIEW", user) && (
-                        <Link to="/events/events"
-                              className={cn({active: true})}
-                              onClick={() => {
-                                  loadingFilters("events");
-                                  loadEvents().then();
-                              }}>
-                            {t('EVENTS.EVENTS.NAVIGATION.EVENTS')}
-                        </Link>
+                      <Link to="/events/events"
+                            className={cn({active: true})}
+                            onClick={() => {
+                                loadingFilters("events");
+                                loadEvents().then();
+                            }}>
+                          {t('EVENTS.EVENTS.NAVIGATION.EVENTS')}
+                      </Link>
                     )}
                     {hasAccess("ROLE_UI_SERIES_VIEW", user) && (
-                        <Link to="/events/series"
-                              className={cn({active: false})}
-                              onClick={() => loadSeries()}>
-                            {t('EVENTS.EVENTS.NAVIGATION.SERIES')}
-                        </Link>
+                      <Link to="/events/series"
+                            className={cn({active: false})}
+                            onClick={() => loadSeries()}>
+                          {t('EVENTS.EVENTS.NAVIGATION.SERIES')}
+                      </Link>
                     )}
                 </nav>
 
                 {/* Include status bar component*/}
                 {hasAccess("ROLE_UI_EVENTS_COUNTERS_VIEW", user) && (
-                    <div className="stats-container">
-                        <Stats />
-                    </div>
+                  <div className="stats-container">
+                      <Stats />
+                  </div>
                 )}
 
             </section>
@@ -227,37 +231,37 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
                             <span>{t('BULK_ACTIONS.CAPTION')}</span>
                             {/* show dropdown if actions is clicked*/}
                             { displayActionMenu && (
-                                <ul className="dropdown-ul">
-                                    {hasAccess("ROLE_UI_EVENTS_DELETE", user) && (
-                                        <li>
-                                            <a onClick={() => setDeleteModal(true)}>
-                                                {t('BULK_ACTIONS.DELETE.EVENTS.CAPTION')}
-                                            </a>
-                                        </li>
-                                    )}
-                                    {hasAccess("ROLE_UI_TASKS_CREATE", user) && (
-                                        <li>
-                                            <a onClick={() => setStartTaskModal(true)}>
-                                                {t('BULK_ACTIONS.SCHEDULE_TASK.CAPTION')}
-                                            </a>
-                                        </li>
-                                    )}
-                                    {(hasAccess("ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT", user)
-                                        && hasAccess("ROLE_UI_EVENTS_DETAILS_METADATA_EDIT", user)) && (
-                                        <li>
-                                            <a onClick={() => setEditScheduledEventsModal(true)}>
-                                                {t('BULK_ACTIONS.EDIT_EVENTS.CAPTION')}
-                                            </a>
-                                        </li>
-                                    )}
-                                    {hasAccess("ROLE_UI_EVENTS_DETAILS_METADATA_EDIT", user) && (
-                                        <li>
-                                            <a onClick={() => setEditMetadataEventsModal(true)}>
-                                                {t('BULK_ACTIONS.EDIT_EVENTS_METADATA.CAPTION')}
-                                            </a>
-                                        </li>
-                                    )}
-                                </ul>
+                              <ul className="dropdown-ul">
+                                  {hasAccess("ROLE_UI_EVENTS_DELETE", user) && (
+                                    <li>
+                                        <a onClick={() => setDeleteModal(true)}>
+                                            {t('BULK_ACTIONS.DELETE.EVENTS.CAPTION')}
+                                        </a>
+                                    </li>
+                                  )}
+                                  {hasAccess("ROLE_UI_TASKS_CREATE", user) && (
+                                    <li>
+                                        <a onClick={() => setStartTaskModal(true)}>
+                                            {t('BULK_ACTIONS.SCHEDULE_TASK.CAPTION')}
+                                        </a>
+                                    </li>
+                                  )}
+                                  {(hasAccess("ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT", user)
+                                    && hasAccess("ROLE_UI_EVENTS_DETAILS_METADATA_EDIT", user)) && (
+                                    <li>
+                                        <a onClick={() => setEditScheduledEventsModal(true)}>
+                                            {t('BULK_ACTIONS.EDIT_EVENTS.CAPTION')}
+                                        </a>
+                                    </li>
+                                  )}
+                                  {hasAccess("ROLE_UI_EVENTS_DETAILS_METADATA_EDIT", user) && (
+                                    <li>
+                                        <a onClick={() => setEditMetadataEventsModal(true)}>
+                                            {t('BULK_ACTIONS.EDIT_EVENTS_METADATA.CAPTION')}
+                                        </a>
+                                    </li>
+                                  )}
+                              </ul>
                             )}
                         </div>
 
