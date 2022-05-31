@@ -71,7 +71,7 @@ public class PublicationChannelToWorkspace extends AbstractWorkflowOperationHand
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
       throws WorkflowOperationException {
 
-    logger.info("Running get Publicationchannel to workspace for medipackage {}", workflowInstance.getId());
+    logger.info("Copying artifacts from published media package {} to workspace", workflowInstance.getId());
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
 
     WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
@@ -83,19 +83,9 @@ public class PublicationChannelToWorkspace extends AbstractWorkflowOperationHand
     List <String> configuredTargetTags = tagsAndFlavors.getTargetTags();
     String publicationChannel = StringUtils
         .trimToEmpty(currentOperation.getConfiguration(OPT_SOURCE_PUBLICATION_CHANNEL));
-    String configuredTargetTagsAsString =  String.join(",", configuredTargetTags);
-
     if (publicationChannel.isEmpty()) {
-      logger.error("No source publication-channel set. Operation will be skipped.");
-      return createResult(mediaPackage, Action.SKIP);
-    }
-    if (configuredSourceFlavors.isEmpty()) {
-      logger.error("No source flavor set. Operation will be skipped.");
-      return createResult(mediaPackage, Action.SKIP);
-    }
-    if (configuredSourceTags.isEmpty()) {
-      logger.error("No source Tag set. Operation will be skipped.");
-      return createResult(mediaPackage, Action.SKIP);
+      logger.error("No source publication-channel set.");
+      throw new WorkflowOperationException("No source Publication channel set.");
     }
 
     Optional<Publication> publication = Arrays.stream(mediaPackage.getPublications())
@@ -104,6 +94,7 @@ public class PublicationChannelToWorkspace extends AbstractWorkflowOperationHand
 
       Collection<MediaPackageElement> tracks =  new ArrayList<MediaPackageElement>();
 
+      //get tracks from publicationchannel with tags and flavors
       Arrays.stream(publication.get().getTracks())
           .filter(element -> element.containsTag(configuredSourceTags))
           .filter(Objects::nonNull)
@@ -113,10 +104,15 @@ public class PublicationChannelToWorkspace extends AbstractWorkflowOperationHand
           .filter(Objects::nonNull)
           .forEach(element -> tracks.add(element));
 
-      tracks.stream().forEach(element -> element.addTag(configuredTargetTagsAsString));
-      tracks.stream().forEach(mediaPackageElement -> mediaPackage.add(mediaPackageElement));
+      if (!configuredTargetTags.isEmpty()) {
+        tracks.stream().forEach(track -> {
+          configuredTargetTags.stream().forEach(targetTag -> track.addTag(targetTag.toString()));
+        });
+      }
+      tracks.stream().forEach(track -> mediaPackage.add(track));
     }
 
+    //get attachements from publicationchannel with tags and flavors
     if (publication.get().getAttachments().length >= 0) {
       Collection<MediaPackageElement> attachments = new ArrayList<MediaPackageElement>();
       Arrays.stream(publication.get().getAttachments())
@@ -128,10 +124,15 @@ public class PublicationChannelToWorkspace extends AbstractWorkflowOperationHand
           .filter(Objects::nonNull)
           .forEach(element -> attachments.add(element));
 
-      attachments.stream().forEach(element -> element.addTag(configuredTargetTagsAsString));
-      attachments.stream().forEach(mediaPackageElement -> mediaPackage.add(mediaPackageElement));
+      if (!configuredTargetTags.isEmpty()) {
+        attachments.stream().forEach(attachment -> {
+          configuredTargetTags.stream().forEach(targetTag -> attachment.addTag(targetTag.toString()));
+        });
+      }
+      attachments.stream().forEach(attachment -> mediaPackage.add(attachment));
     }
 
+    //get catalogs from publicationchannel with tags and flavors
     if (publication.get().getCatalogs().length >= 0) {
       Collection<MediaPackageElement> catalogs = new ArrayList<MediaPackageElement>();
       Arrays.stream(publication.get().getCatalogs())
@@ -143,8 +144,12 @@ public class PublicationChannelToWorkspace extends AbstractWorkflowOperationHand
           .filter(Objects::nonNull)
           .forEach(element -> catalogs.add(element));
 
-      catalogs.stream().forEach(mediaPackageElement -> mediaPackageElement.addTag(configuredTargetTagsAsString));
-      catalogs.stream().forEach(mediaPackageElement -> mediaPackage.add(mediaPackageElement));
+      if (!configuredTargetTags.isEmpty()) {
+        catalogs.stream().forEach(catalog -> {
+          configuredTargetTags.stream().forEach(targetTag -> catalog.addTag(targetTag.toString()));
+        });
+      }
+      catalogs.stream().forEach(catalog -> mediaPackage.add(catalog));
     }
 
     return createResult(mediaPackage, Action.CONTINUE, 0);
