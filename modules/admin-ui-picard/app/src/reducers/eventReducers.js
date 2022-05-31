@@ -13,7 +13,8 @@ import {eventsTableConfig} from "../configs/tableConfigs/eventsTableConfig";
 import {
     LOAD_ASSET_UPLOAD_OPTIONS_IN_PROGRESS,
     LOAD_ASSET_UPLOAD_OPTIONS_SUCCESS,
-    LOAD_ASSET_UPLOAD_OPTIONS_FAILURE, SET_ASSET_UPLOAD_WORKFLOW,
+    LOAD_ASSET_UPLOAD_OPTIONS_FAILURE,
+    SET_ASSET_UPLOAD_WORKFLOW,
 } from "../actions/assetActions";
 
 /**

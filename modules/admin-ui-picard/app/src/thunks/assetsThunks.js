@@ -3,14 +3,15 @@ import {getAssetUploadOptions} from "../selectors/eventSelectors";
 import {
     loadAssetUploadOptionsFailure,
     loadAssetUploadOptionsInProgress,
-    loadAssetUploadOptionsSuccess, setAssetUploadWorkflow
+    loadAssetUploadOptionsSuccess,
+    setAssetUploadWorkflow
 } from "../actions/assetActions";
 import {logger} from "../utils/logger";
 
 // thunks for assets, especially for getting asset options
 
 export const fetchAssetUploadOptions = () => async (dispatch, getState) => {
-    // get
+    // get old asset upload options
     const state = getState();
     const assetUploadOptions = getAssetUploadOptions(state);
 
@@ -18,19 +19,23 @@ export const fetchAssetUploadOptions = () => async (dispatch, getState) => {
     const assetPrefix = 'EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION';
     const workflowPrefix = 'EVENTS.EVENTS.NEW.UPLOAD_ASSET.WORKFLOWDEFID';
 
+    // only fetch asset upload options, if they haven't been fetched yet
     if(!(assetUploadOptions.length !== 0 && assetUploadOptions.length !== 0)){
         dispatch(loadAssetUploadOptionsInProgress());
 
-        // request  from API
+        // request asset upload options from API
         axios.get('/admin-ng/resources/eventUploadAssetOptions.json')
             .then( dataResponse => {
                 const assetUploadOptions = [];
 
+                // iterate over response and only use non-comment lines
                 for(const [optionKey, optionJson] of Object.entries(dataResponse.data)){
                     if (optionKey.charAt(0) !== '$') {
                         const isSourceOption = (optionKey.indexOf(sourcePrefix) >= 0);
                         const isAssetOption = (optionKey.indexOf(assetPrefix) >= 0);
 
+                        // if the line is a source upload option or additional asset upload option,
+                        // format it and add to upload options list
                         if(isSourceOption || isAssetOption){
                             let option = JSON.parse(optionJson);
 
@@ -42,8 +47,8 @@ export const fetchAssetUploadOptions = () => async (dispatch, getState) => {
 
                             assetUploadOptions.push(option);
                         } else if(optionKey.indexOf(workflowPrefix) >= 0) {
-                            const workflow = optionJson;
-                            dispatch(setAssetUploadWorkflow(workflow));
+                            // if the line is the upload asset workflow id, set the asset upload workflow
+                            dispatch(setAssetUploadWorkflow(optionJson));
                         }
                     }
                 }
@@ -51,7 +56,7 @@ export const fetchAssetUploadOptions = () => async (dispatch, getState) => {
                 dispatch(loadAssetUploadOptionsSuccess(assetUploadOptions));
             })
             .catch( response => {
-                // getting  from API failed
+                // getting asset upload options from API failed
                 dispatch(loadAssetUploadOptionsFailure());
                 logger.error(response);
             });

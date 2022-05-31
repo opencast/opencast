@@ -19,7 +19,12 @@ import {fetchEventMetadata, fetchEvents} from "../../thunks/eventThunks";
 import {loadEventsIntoTable, loadSeriesIntoTable} from "../../thunks/tableThunks";
 import {fetchSeries} from "../../thunks/seriesThunks";
 import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
-import {getTotalEvents, isFetchingAssetUploadOptions, isLoading, isShowActions} from "../../selectors/eventSelectors";
+import {
+    getTotalEvents,
+    isFetchingAssetUploadOptions,
+    isLoading,
+    isShowActions
+} from "../../selectors/eventSelectors";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
@@ -41,7 +46,7 @@ const containerAction = React.createRef();
  * This component renders the table view of events
  */
 const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loadingSeries,
-                        loadingSeriesIntoTable, loadingFilters, loadingStats, loadingEventMetadata, resetTextFilter, fetchAssetUploadOptions,
+                    loadingSeriesIntoTable, loadingFilters, loadingStats, loadingEventMetadata, resetTextFilter, fetchAssetUploadOptions,
                     resetOffset, setShowActions, user, isFetchingAssetUploadOptions }) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);

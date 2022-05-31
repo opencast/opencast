@@ -205,7 +205,7 @@ const EditableSingleSelect = ({ field, metadataField, text, editMode, setEditMod
             ) : (
              <div onClick={() => setEditMode(true)}>
                  <span className="editable preserve-newlines">
-                     { text || t('SELECT_NO_OPTION_SELECTED')}
+                     { text || t('SELECT_NO_OPTION_SELECTED') }
                  </span>
                  <i className="edit fa fa-pencil-square"/>
                  {showCheck && (
