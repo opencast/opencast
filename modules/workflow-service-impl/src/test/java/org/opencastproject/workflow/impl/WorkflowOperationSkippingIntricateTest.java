@@ -251,10 +251,8 @@ public final class WorkflowOperationSkippingIntricateTest {
     WorkflowStateListener stateListener = new WorkflowStateListener(WorkflowState.SUCCEEDED);
     service.addWorkflowListener(stateListener);
     WorkflowInstance instance;
-    synchronized (stateListener) {
-      instance = service.start(definition, mp, properties);
-      stateListener.wait();
-    }
+    instance = service.start(definition, mp, properties);
+    Thread.sleep(100);
     service.removeWorkflowListener(stateListener);
 
     return instance;

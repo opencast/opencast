@@ -185,10 +185,8 @@ public class PauseFinalOperationTest {
     // Start a new workflow, and wait for it to pause
     WorkflowStateListener pauseListener = new WorkflowStateListener(WorkflowState.PAUSED);
     service.addWorkflowListener(pauseListener);
-    synchronized (pauseListener) {
-      workflow = service.start(def, mp, null);
-      pauseListener.wait();
-    }
+    workflow = service.start(def, mp, null);
+    Thread.sleep(100);
     service.removeWorkflowListener(pauseListener);
 
     // Ensure that "start" was called on the first operation handler, but not resume
@@ -201,10 +199,8 @@ public class PauseFinalOperationTest {
     // Resume the workflow
     WorkflowStateListener succeedListener = new WorkflowStateListener(WorkflowState.SUCCEEDED);
     service.addWorkflowListener(succeedListener);
-    synchronized (succeedListener) {
-      service.resume(workflow.getId());
-      succeedListener.wait();
-    }
+    service.resume(workflow.getId());
+    Thread.sleep(100);
     service.removeWorkflowListener(succeedListener);
 
     Assert.assertEquals(WorkflowState.SUCCEEDED, service.getWorkflowById(workflow.getId()).getState());

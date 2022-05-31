@@ -361,14 +361,12 @@ protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPack
     WorkflowStateListener stateListener = new WorkflowStateListener(stateToWaitFor);
     service.addWorkflowListener(stateListener);
     WorkflowInstance instance = null;
-    synchronized (stateListener) {
-      if (parentId == null) {
-        instance = service.start(definition, mp);
-      } else {
-        instance = service.start(definition, mp, parentId, Collections.emptyMap());
-      }
-      stateListener.wait();
+    if (parentId == null) {
+      instance = service.start(definition, mp);
+    } else {
+      instance = service.start(definition, mp, parentId, Collections.emptyMap());
     }
+    Thread.sleep(100);
     service.removeWorkflowListener(stateListener);
 
     return instance;
@@ -381,10 +379,8 @@ protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPack
     Map<String, String> props = new HashMap<String, String>();
     props.put("retryStrategy", retryStrategy);
     WorkflowInstance wfInstance = null;
-    synchronized (stateListener) {
-      wfInstance = service.resume(instance.getId(), props);
-      stateListener.wait();
-    }
+    wfInstance = service.resume(instance.getId(), props);
+    Thread.sleep(100);
     service.removeWorkflowListener(stateListener);
 
     return wfInstance;
@@ -617,9 +613,7 @@ protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPack
     }
 
     while (stateListener.countStateChanges() < count) {
-      synchronized (stateListener) {
-        stateListener.wait();
-      }
+      Thread.sleep(100);
     }
 
     Assert.assertEquals(count, service.countWorkflowInstances());
