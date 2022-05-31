@@ -366,7 +366,7 @@ protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPack
     } else {
       instance = service.start(definition, mp, parentId, Collections.emptyMap());
     }
-    Thread.sleep(100);
+    Thread.sleep(1000);
     service.removeWorkflowListener(stateListener);
 
     return instance;
@@ -380,7 +380,7 @@ protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPack
     props.put("retryStrategy", retryStrategy);
     WorkflowInstance wfInstance = null;
     wfInstance = service.resume(instance.getId(), props);
-    Thread.sleep(100);
+    Thread.sleep(1000);
     service.removeWorkflowListener(stateListener);
 
     return wfInstance;
@@ -613,7 +613,7 @@ protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPack
     }
 
     while (stateListener.countStateChanges() < count) {
-      Thread.sleep(100);
+      Thread.sleep(1000);
     }
 
     Assert.assertEquals(count, service.countWorkflowInstances());

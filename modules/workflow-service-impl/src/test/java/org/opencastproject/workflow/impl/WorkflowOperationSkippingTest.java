@@ -252,7 +252,7 @@ public class WorkflowOperationSkippingTest {
     service.addWorkflowListener(stateListener);
     WorkflowInstance instance = null;
     instance = service.start(definition, mp, properties);
-    Thread.sleep(100);
+    Thread.sleep(1000);
     service.removeWorkflowListener(stateListener);
 
     return instance;
