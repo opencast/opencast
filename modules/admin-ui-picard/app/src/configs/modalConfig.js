@@ -23,7 +23,7 @@ export const initialFormValuesNewEvents = {
     deviceInputs: [],
     processingWorkflow: '',
     configuration: {},
-    policies: [{
+    acls: [{
         role: 'ROLE_USER_ADMIN',
         read: true,
         write: true,
@@ -74,7 +74,7 @@ export const WORKFLOW_UPLOAD_ASSETS_NON_TRACK = 'publish-uploaded-assets';
 // All fields for new series form that are fix and not depending on response of backend
 // InitialValues of Formik form (others computed dynamically depending on responses from backend)
 export const initialFormValuesNewSeries = {
-    policies: [{
+    acls: [{
         role: 'ROLE_USER_ADMIN',
         read: true,
         write: true,

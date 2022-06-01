@@ -19,7 +19,7 @@ const NewGroupWizard = ({ close, postNewGroup }) => {
 
     const initialValues = initialFormValuesNewGroup;
 
-    const [snapshot, page, nextPage, previousPage] = usePageFunctions(0, initialValues);
+    const [snapshot, page, nextPage, previousPage, setPage] = usePageFunctions(0, initialValues);
 
     // Caption of steps used by Stepper
     const steps = [
@@ -49,35 +49,39 @@ const NewGroupWizard = ({ close, postNewGroup }) => {
 
     return (
         <>
-            {/* Stepper that shows each step of wizard as header */}
-            <WizardStepper steps={steps} page={page}/>
-
             {/* Initialize overall form */}
             <Formik initialValues={snapshot}
                     validationSchema={currentValidationSchema}
                     onSubmit={values => handleSubmit(values)}>
                 {/* Render wizard pages depending on current value of page variable */}
                 {formik => (
-                    <div>
-                        {page === 0 && (
+                  <>
+                      {/* Stepper that shows each step of wizard as header */}
+                      <WizardStepper steps={steps}
+                                     page={page}
+                                     setPage={setPage}
+                                     formik={formik}/>
+                      <div>
+                          {page === 0 && (
                             <GroupMetadataPage formik={formik}
                                                nextPage={nextPage}/>
-                        )}
-                        {page === 1 && (
+                          )}
+                          {page === 1 && (
                             <GroupRolesPage formik={formik}
                                             nextPage={nextPage}
                                             previousPage={previousPage}/>
-                        )}
-                        {page === 2 && (
+                          )}
+                          {page === 2 && (
                             <GroupUsersPage formik={formik}
                                             nextPage={nextPage}
                                             previousPage={previousPage}/>
-                        )}
-                        {page === 3 && (
+                          )}
+                          {page === 3 && (
                             <NewGroupSummaryPage formik={formik}
                                                  previousPage={previousPage}/>
-                        )}
-                    </div>
+                          )}
+                      </div>
+                  </>
                 )}
             </Formik>
         </>

@@ -14,7 +14,7 @@ export const usePageFunctions = (initialPage, initialValues) => {
         setPage(page - 1);
     }
 
-    return [snapshot, page, nextPage, previousPage];
+    return [snapshot, page, nextPage, previousPage, setPage];
 }
 
 export const useSelectionChanges = (formik, selectedRows) => {

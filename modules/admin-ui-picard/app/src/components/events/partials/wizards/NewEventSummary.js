@@ -180,7 +180,7 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
                         </div>
 
                         {/*Summary access configuration*/}
-                        <AccessSummaryTable policies={formik.values.policies}
+                        <AccessSummaryTable policies={formik.values.acls}
                                             header={'EVENTS.EVENTS.NEW.ACCESS.CAPTION'}/>
                     </div>
                 </div>
