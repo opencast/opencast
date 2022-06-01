@@ -1,13 +1,14 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
 import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
-import {uploadAssetOptions} from "../../../../configs/sourceConfig";
+import {connect} from "react-redux";
+import {getAssetUploadOptions} from "../../../../selectors/eventSelectors";
 
 /**
  * This component renders the asset upload page of the new event wizard
  * (only if its not set hidden (see newEventWizardConfig) or user chose UPLOAD as source mode)
  */
-const NewAssetUploadPage = ({ previousPage, nextPage , formik }) => {
+const NewAssetUploadPage = ({ previousPage, nextPage , formik, uploadAssetOptions}) => {
     const { t } = useTranslation();
 
     // Get upload assets that are not of type track
@@ -43,7 +44,7 @@ const NewAssetUploadPage = ({ previousPage, nextPage , formik }) => {
                                         ) : (
                                             uploadAssets.map((asset, key) => (
                                                 <tr key={key}>
-                                                    <td> {t(asset.title)}
+                                                    <td> {!!asset.displayOverride ? t(asset.displayOverride) : t(asset.title)}
                                                         <span className="ui-helper-hidden">
                                                             ({asset.type} "{asset.flavorType}//{asset.flavorSubType}")
                                                         </span>
@@ -93,4 +94,10 @@ const NewAssetUploadPage = ({ previousPage, nextPage , formik }) => {
 
 }
 
-export default NewAssetUploadPage;
+
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    uploadAssetOptions: getAssetUploadOptions(state),
+});
+
+export default  connect(mapStateToProps)(NewAssetUploadPage);

@@ -19,13 +19,14 @@ import {
 import {getWorkflow} from "../../../../selectors/eventDetailsSelectors";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 import {hasAccess} from "../../../../utils/utils";
+import {isFetchingAssetUploadOptions} from "../../../../selectors/eventSelectors";
 
 /**
  * This component manages the main assets tab of event details modal
  */
 const EventDetailsAssetsTab = ({ eventId, t, setHierarchy,
                                fetchAssets, fetchAttachments, fetchCatalogs, fetchMedia, fetchPublications,
-                               assets, transactionsReadOnly, uploadAssetOptions, isFetching, user}) => {
+                               assets, transactionsReadOnly, uploadAssetOptions, isFetching, isFetchingAssetUploadOptions, user}) => {
 
     useEffect(() => {
         removeNotificationWizardForm();
@@ -69,7 +70,12 @@ const EventDetailsAssetsTab = ({ eventId, t, setHierarchy,
                                             <th> {t("EVENTS.EVENTS.DETAILS.ASSETS.TYPE") /* Type */ }</th>
                                             <th> {t("EVENTS.EVENTS.DETAILS.ASSETS.SIZE") /* Size */ }</th>
                                             <th className="medium">
-                                                {(!!uploadAssetOptions && !transactionsReadOnly && hasAccess("ROLE_UI_EVENTS_DETAILS_ASSETS_EDIT", user)) && (
+                                                {( (!isFetchingAssetUploadOptions)
+                                                        && (!!uploadAssetOptions)
+                                                        && (uploadAssetOptions.filter(asset => asset.type !== 'track').length > 0)
+                                                        && (!transactionsReadOnly)
+                                                        && hasAccess("ROLE_UI_EVENTS_DETAILS_ASSETS_EDIT", user))
+                                                    && (
                                                     <a className="details-link"
                                                        onClick={() => openSubTab('add-asset', 'newassetupload', false, true)}
                                                     >
@@ -155,7 +161,8 @@ const mapStateToProps = state => ({
     transactionsReadOnly: isTransactionReadOnly(state),
     uploadAssetOptions: getUploadAssetOptions(state),
     assetUploadWorkflowDefId: getWorkflow(state).id,
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    isFetchingAssetUploadOptions: isFetchingAssetUploadOptions(state)
 });
 
 // Mapping actions to dispatch

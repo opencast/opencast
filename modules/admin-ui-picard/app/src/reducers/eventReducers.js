@@ -10,6 +10,12 @@ import {
     SHOW_ACTIONS_EVENTS
 } from '../actions/eventActions';
 import {eventsTableConfig} from "../configs/tableConfigs/eventsTableConfig";
+import {
+    LOAD_ASSET_UPLOAD_OPTIONS_IN_PROGRESS,
+    LOAD_ASSET_UPLOAD_OPTIONS_SUCCESS,
+    LOAD_ASSET_UPLOAD_OPTIONS_FAILURE,
+    SET_ASSET_UPLOAD_WORKFLOW,
+} from "../actions/assetActions";
 
 /**
  * This file contains redux reducer for actions affecting the state of events
@@ -32,7 +38,10 @@ const initialState = {
     results: [],
     columns: initialColumns,
     showActions: false,
-    metadata: {}
+    metadata: {},
+    isFetchingAssetUploadOptions: false,
+    uploadAssetOptions: [],
+    uploadAssetWorkflow: ''
 }
 
 // Reducer for events
@@ -110,6 +119,33 @@ const events = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false
+            }
+        }
+        case LOAD_ASSET_UPLOAD_OPTIONS_IN_PROGRESS: {
+            return {
+                ...state,
+                isFetchingAssetUploadOptions: true
+            }
+        }
+        case LOAD_ASSET_UPLOAD_OPTIONS_SUCCESS: {
+            const { assetUploadOptions } = payload;
+            return {
+                ...state,
+                isFetchingAssetUploadOptions: false,
+                uploadAssetOptions: assetUploadOptions
+            }
+        }
+        case LOAD_ASSET_UPLOAD_OPTIONS_FAILURE: {
+            return {
+                ...state,
+                isFetchingAssetUploadOptions: false
+            }
+        }
+        case SET_ASSET_UPLOAD_WORKFLOW: {
+            const { workflow } = payload;
+            return {
+                ...state,
+                uploadAssetWorkflow: workflow
             }
         }
         default:

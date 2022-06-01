@@ -1,19 +1,18 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
-import {getEventMetadata} from "../../../../selectors/eventSelectors";
+import {getAssetUploadOptions, getEventMetadata} from "../../../../selectors/eventSelectors";
 import {connect} from "react-redux";
 import {getWorkflowDef} from "../../../../selectors/workflowSelectors";
 import MetadataSummaryTable from "./summaryTables/MetadataSummaryTable";
 import MetadataExtendedSummaryTable from "./summaryTables/MetadataExtendedSummaryTable";
 import AccessSummaryTable from "./summaryTables/AccessSummaryTable";
 import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
-import {uploadAssetOptions} from "../../../../configs/sourceConfig";
 
 /**
  * This component renders the summary page for new events in the new event wizard.
  */
 const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUploadHidden,
-                             metadataEvents, workflowDef }) => {
+                             metadataEvents, workflowDef, uploadAssetOptions }) => {
     const { t } = useTranslation();
 
     // Get upload assets that are not of type track
@@ -26,7 +25,7 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
         if (!!fieldValue) {
             uploadAssetsNonTrack = uploadAssetsNonTrack.concat({
                 name: uploadAssetsOptionsNonTrack[i].id,
-                translate: uploadAssetsOptionsNonTrack[i].translate,
+                translate: !!uploadAssetsOptionsNonTrack[i].displayOverride ? t(uploadAssetsOptionsNonTrack[i].displayOverride) : t(uploadAssetsOptionsNonTrack[i].title),
                 type:uploadAssetsOptionsNonTrack[i].type,
                 flavorType: uploadAssetsOptionsNonTrack[i].flavorType,
                 flavorSubType: uploadAssetsOptionsNonTrack[i].flavorSubType,
@@ -67,7 +66,7 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
                                             {uploadAssetsNonTrack.map((asset, key) => (
                                                 <tr key={key}>
                                                     <td>
-                                                        {asset.name}
+                                                        {asset.translate}
                                                         <span className="ui-helper-hidden">
                                                             ({asset.type} "{asset.flavorType}//{asset.flavorSubType}")
                                                         </span>
@@ -94,7 +93,7 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
                                             {formik.values.uploadAssetsTrack.map((asset, key) => (
                                                 !!asset.file ? (
                                                     <tr key={key}>
-                                                        <td>{t(asset.translate + ".SHORT")}
+                                                        <td>{t(asset.title + ".SHORT", asset['displayOverride.SHORT'])}
                                                             <span className="ui-helper-hidden">
                                                             ({asset.type} "{asset.flavorType}//{asset.flavorSubType}")
                                                         </span>
@@ -196,7 +195,8 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
 
 const mapStateToProps = state => ({
     metadataEvents: getEventMetadata(state),
-    workflowDef: getWorkflowDef(state)
+    workflowDef: getWorkflowDef(state),
+    uploadAssetOptions: getAssetUploadOptions(state),
 })
 
 export default connect(mapStateToProps)(NewEventSummary);

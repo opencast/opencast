@@ -1,5 +1,4 @@
 import axios from "axios";
-import moment from "moment";
 import {
     loadEventPoliciesInProgress,
     loadEventPoliciesSuccess,
@@ -103,12 +102,8 @@ import {
     getStatistics
 } from "../selectors/eventDetailsSelectors";
 import {getWorkflowDef} from "../selectors/workflowSelectors";
-import {
-    createChartOptions,
-    createDownloadUrl
-} from "../utils/statisticsUtils";
+import {getAssetUploadOptions, getAssetUploadWorkflow} from "../selectors/eventSelectors";
 import {calculateDuration} from "../utils/dateUtils";
-import { uploadAssetOptions } from '../configs/sourceConfig';
 import {logger} from "../utils/logger";
 
 
@@ -131,12 +126,14 @@ export const fetchMetadata = (eventId) => async (dispatch) => {
             if(catalog.locked !== undefined){
                 let fields = [];
 
-                for(const field in catalog.fields) {
-                    fields.push({
+                for(const field of catalog.fields) {
+                    const adaptedField = {
                         ...field,
                         locked: catalog.locked,
                         readOnly: true
-                    })
+                    };
+
+                    fields.push(adaptedField)
                 }
                 transformedCatalog = {
                     ...catalog,
@@ -445,11 +442,16 @@ export const fetchAssetPublicationDetails = (eventId, publicationId) => async (d
     }
 }
 
-export const updateAssets = (values, eventId) => async dispatch => {
+export const updateAssets = (values, eventId) => async (dispatch, getState) => {
+    // get asset upload options from redux store
+    const state = getState();
+    const uploadAssetOptions = getAssetUploadOptions(state);
+    const uploadAssetWorkflow = getAssetUploadWorkflow(state)
+
     let formData = new FormData();
 
     let assets = {
-        workflow: WORKFLOW_UPLOAD_ASSETS_NON_TRACK,
+        workflow: uploadAssetWorkflow,
         options: []
     };
 

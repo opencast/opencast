@@ -44,6 +44,7 @@ import {
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 import EventDetailsStatisticsTab from "../ModalTabsAndPages/EventDetailsStatisticsTab";
+import {fetchAssetUploadOptions} from "../../../../thunks/assetsThunks";
 
 
 // Get info about the current language and its date locale
@@ -54,7 +55,7 @@ const currentLanguage = getCurrentLanguageInformation();
  */
 const EventDetails = ({ tabIndex, eventId, close,
                           metadata, extendedMetadata, isLoadingMetadata, hasSchedulingProperties, isLoadingScheduling, hasStatistics, isLoadingStatistics,
-                          loadMetadata, updateMetadata, updateExtendedMetadata, loadScheduling, loadStatistics, removeNotificationWizardForm, user }) => {
+                          loadMetadata, updateMetadata, updateExtendedMetadata, loadScheduling, loadStatistics, fetchAssetUploadOptions, removeNotificationWizardForm, user }) => {
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -62,6 +63,7 @@ const EventDetails = ({ tabIndex, eventId, close,
         loadMetadata(eventId).then();
         loadScheduling(eventId).then();
         loadStatistics(eventId).then();
+        fetchAssetUploadOptions().then();
     }, []);
 
     const [page, setPage] = useState(tabIndex);
@@ -359,6 +361,7 @@ const mapDispatchToProps = dispatch => ({
     loadScheduling: (id) => dispatch(fetchSchedulingInfo(id)),
     updateExtendedMetadata: (id, values, catalog) => dispatch(updateExtendedMetadata(id, values, catalog)),
     loadStatistics: (id) => dispatch(fetchEventStatistics(id)),
+    fetchAssetUploadOptions: () => dispatch(fetchAssetUploadOptions()),
     removeNotificationWizardForm: () => dispatch(removeNotificationWizardForm())
 });
 
