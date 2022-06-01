@@ -192,7 +192,7 @@ public class PauseWorkflowTest {
     WorkflowStateListener pauseListener = new WorkflowStateListener(WorkflowState.PAUSED);
     service.addWorkflowListener(pauseListener);
     workflow = service.start(def, mp, null);
-    Thread.sleep(1000);
+    WorkflowTestSupport.poll(pauseListener, 1);
 
     // Ensure that the first operation handler was called, but not the second
     Assert.assertTrue(firstHandler.isStarted());
@@ -207,7 +207,7 @@ public class PauseWorkflowTest {
 
     service.addWorkflowListener(pauseListener);
     service.resume(workflow.getId(), properties);
-    Thread.sleep(1000);
+    WorkflowTestSupport.poll(pauseListener, 3);
     service.removeWorkflowListener(pauseListener);
 
     // The handler should have picked up the properties

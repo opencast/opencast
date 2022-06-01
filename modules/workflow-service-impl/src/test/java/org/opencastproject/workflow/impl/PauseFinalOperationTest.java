@@ -186,7 +186,7 @@ public class PauseFinalOperationTest {
     WorkflowStateListener pauseListener = new WorkflowStateListener(WorkflowState.PAUSED);
     service.addWorkflowListener(pauseListener);
     workflow = service.start(def, mp, null);
-    Thread.sleep(1000);
+    WorkflowTestSupport.poll(pauseListener, 1);
     service.removeWorkflowListener(pauseListener);
 
     // Ensure that "start" was called on the first operation handler, but not resume
@@ -200,7 +200,7 @@ public class PauseFinalOperationTest {
     WorkflowStateListener succeedListener = new WorkflowStateListener(WorkflowState.SUCCEEDED);
     service.addWorkflowListener(succeedListener);
     service.resume(workflow.getId());
-    Thread.sleep(1000);
+    WorkflowTestSupport.poll(succeedListener, 1);
     service.removeWorkflowListener(succeedListener);
 
     Assert.assertEquals(WorkflowState.SUCCEEDED, service.getWorkflowById(workflow.getId()).getState());

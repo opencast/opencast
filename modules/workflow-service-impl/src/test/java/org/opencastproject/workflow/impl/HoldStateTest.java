@@ -221,7 +221,7 @@ public class HoldStateTest {
 
     Map<String, String> initialProps = Map.of("testproperty", "foo");
     workflow = service.start(def, mp, initialProps);
-    Thread.sleep(1000);
+    WorkflowTestSupport.poll(pauseListener, 1);
     service.removeWorkflowListener(pauseListener);
 
     workflow = service.getWorkflowById(workflow.getId());
@@ -238,7 +238,7 @@ public class HoldStateTest {
     WorkflowStateListener succeedListener = new WorkflowStateListener(WorkflowState.SUCCEEDED);
     service.addWorkflowListener(succeedListener);
     service.resume(workflow.getId(), resumeProps);
-    Thread.sleep(1000);
+    WorkflowTestSupport.poll(succeedListener, 1);
     service.removeWorkflowListener(succeedListener);
 
     Assert.assertEquals("Workflow expected to succeed", 1, succeedListener.countStateChanges(WorkflowState.SUCCEEDED));
@@ -261,14 +261,14 @@ public class HoldStateTest {
     WorkflowStateListener pauseListener = new WorkflowStateListener(WorkflowState.PAUSED);
     service.addWorkflowListener(pauseListener);
     workflow = service.start(def, mp);
-    Thread.sleep(1000);
+    WorkflowTestSupport.poll(pauseListener, 1);
 
     // Simulate a user resuming the workflow, but the handler still keeps the workflow in a hold state
     holdingOperationHandler.setResumeAction(Action.PAUSE);
 
     // Resume the workflow again. It should quickly reenter the paused state
     service.resume(workflow.getId());
-    Thread.sleep(1000);
+    WorkflowTestSupport.poll(pauseListener, 2);
 
     // remove the pause listener
     service.removeWorkflowListener(pauseListener);
@@ -282,7 +282,7 @@ public class HoldStateTest {
     WorkflowStateListener succeedListener = new WorkflowStateListener(WorkflowState.SUCCEEDED, WorkflowState.FAILED);
     service.addWorkflowListener(succeedListener);
     service.resume(workflow.getId());
-    Thread.sleep(1000);
+    WorkflowTestSupport.poll(succeedListener, 1);
     service.removeWorkflowListener(succeedListener);
 
     Assert.assertEquals(WorkflowState.SUCCEEDED, service.getWorkflowById(workflow.getId()).getState());

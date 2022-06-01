@@ -252,7 +252,7 @@ public final class WorkflowOperationSkippingIntricateTest {
     service.addWorkflowListener(stateListener);
     WorkflowInstance instance;
     instance = service.start(definition, mp, properties);
-    Thread.sleep(1000);
+    WorkflowTestSupport.poll(stateListener, 1);
     service.removeWorkflowListener(stateListener);
 
     return instance;
