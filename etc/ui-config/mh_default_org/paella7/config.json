@@ -272,7 +272,24 @@
 
         "es.upv.paella.userEventTracker": {
             "enabled": true,
-            "context": "userTracking"
+            "context": "userTracking",
+            "events": [
+                "PLAY",
+	            "PAUSE",
+	            "STOP",
+	            "ENDED",
+	            "SEEK",
+	            "FULLSCREEN_CHANGED",
+	            "VOLUME_CHANGED",
+	            "TIMEUPDATE",
+	            "CAPTIONS_CHANGED",
+	            "BUTTON_PRESS",
+	            "SHOW_POPUP",
+	            "HIDE_POPUP",
+	            "LAYOUT_CHANGED",
+	            "PLAYBACK_RATE_CHANGED",
+                "RESIZE_END"
+            ]
         },
 
         "es.upv.paella.debug.userTrackingDataPlugin": {
