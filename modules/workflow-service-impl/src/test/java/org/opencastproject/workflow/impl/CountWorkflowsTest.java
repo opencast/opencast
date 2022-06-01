@@ -209,13 +209,11 @@ public class CountWorkflowsTest {
     Map<String, String> initialProps = new HashMap<String, String>();
     initialProps.put("testproperty", "foo");
     WorkflowInstance workflow1 = null;
-    synchronized (listener) {
-      workflow1 = service.start(def, mp, initialProps);
-      listener.wait();
-      mp.setIdentifier(IdImpl.fromUUID());
-      service.start(def, mp, initialProps);
-      listener.wait();
-    }
+    workflow1 = service.start(def, mp, initialProps);
+    WorkflowTestSupport.poll(listener, 1);
+    mp.setIdentifier(IdImpl.fromUUID());
+    service.start(def, mp, initialProps);
+    WorkflowTestSupport.poll(listener, 2);
     service.removeWorkflowListener(listener);
 
     // Test for two paused workflows in "op1"
@@ -226,10 +224,8 @@ public class CountWorkflowsTest {
     // Continue one of the two workflows, waiting for success
     listener = new WorkflowStateListener(WorkflowState.SUCCEEDED);
     service.addWorkflowListener(listener);
-    synchronized (listener) {
-      service.resume(workflow1.getId());
-      listener.wait();
-    }
+    service.resume(workflow1.getId());
+    WorkflowTestSupport.poll(listener, 1);
     service.removeWorkflowListener(listener);
 
     // Make sure one workflow is still on hold, the other is finished.
