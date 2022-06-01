@@ -220,10 +220,8 @@ public class HoldStateTest {
     service.addWorkflowListener(pauseListener);
 
     Map<String, String> initialProps = Map.of("testproperty", "foo");
-    synchronized (pauseListener) {
-      workflow = service.start(def, mp, initialProps);
-      pauseListener.wait();
-    }
+    workflow = service.start(def, mp, initialProps);
+    WorkflowTestSupport.poll(pauseListener, 1);
     service.removeWorkflowListener(pauseListener);
 
     workflow = service.getWorkflowById(workflow.getId());
@@ -239,10 +237,8 @@ public class HoldStateTest {
 
     WorkflowStateListener succeedListener = new WorkflowStateListener(WorkflowState.SUCCEEDED);
     service.addWorkflowListener(succeedListener);
-    synchronized (succeedListener) {
-      service.resume(workflow.getId(), resumeProps);
-      succeedListener.wait();
-    }
+    service.resume(workflow.getId(), resumeProps);
+    WorkflowTestSupport.poll(succeedListener, 1);
     service.removeWorkflowListener(succeedListener);
 
     Assert.assertEquals("Workflow expected to succeed", 1, succeedListener.countStateChanges(WorkflowState.SUCCEEDED));
@@ -264,19 +260,15 @@ public class HoldStateTest {
 
     WorkflowStateListener pauseListener = new WorkflowStateListener(WorkflowState.PAUSED);
     service.addWorkflowListener(pauseListener);
-    synchronized (pauseListener) {
-      workflow = service.start(def, mp);
-      pauseListener.wait();
-    }
+    workflow = service.start(def, mp);
+    WorkflowTestSupport.poll(pauseListener, 1);
 
     // Simulate a user resuming the workflow, but the handler still keeps the workflow in a hold state
     holdingOperationHandler.setResumeAction(Action.PAUSE);
 
     // Resume the workflow again. It should quickly reenter the paused state
-    synchronized (pauseListener) {
-      service.resume(workflow.getId());
-      pauseListener.wait();
-    }
+    service.resume(workflow.getId());
+    WorkflowTestSupport.poll(pauseListener, 2);
 
     // remove the pause listener
     service.removeWorkflowListener(pauseListener);
@@ -289,10 +281,8 @@ public class HoldStateTest {
 
     WorkflowStateListener succeedListener = new WorkflowStateListener(WorkflowState.SUCCEEDED, WorkflowState.FAILED);
     service.addWorkflowListener(succeedListener);
-    synchronized (succeedListener) {
-      service.resume(workflow.getId());
-      succeedListener.wait();
-    }
+    service.resume(workflow.getId());
+    WorkflowTestSupport.poll(succeedListener, 1);
     service.removeWorkflowListener(succeedListener);
 
     Assert.assertEquals(WorkflowState.SUCCEEDED, service.getWorkflowById(workflow.getId()).getState());
