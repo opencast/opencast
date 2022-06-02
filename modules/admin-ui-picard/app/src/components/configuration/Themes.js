@@ -47,7 +47,7 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters,
         loadingFilters('themes');
 
         // Fetch themes every minute
-        let fetchThemesInterval = setInterval(loadThemes, 100000);
+        let fetchThemesInterval = setInterval(loadThemes, 5000);
 
         return () => clearInterval(fetchThemesInterval);
 

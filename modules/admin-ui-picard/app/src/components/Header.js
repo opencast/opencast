@@ -80,7 +80,7 @@ const Header = ({ loadingHealthStatus, healthStatus, errorCounter, user, orgProp
 
     const redirectToServices = async () => {
         // set the action filter value of services to true
-        setSpecificServiceFilter('actions', 'true');
+        await setSpecificServiceFilter('actions', 'true');
 
         // Load services into table
         loadingServicesIntoTable();
@@ -121,7 +121,7 @@ const Header = ({ loadingHealthStatus, healthStatus, errorCounter, user, orgProp
         // Fetching health status information at mount
         loadHealthStatus().then(r => logger.info(r));
         // Fetch health status every minute
-        setInterval(loadingHealthStatus, 100000);
+        setInterval(loadingHealthStatus, 5000);
 
         // Event listener for handle a click outside of dropdown menu
         window.addEventListener('mousedown', handleClickOutside);

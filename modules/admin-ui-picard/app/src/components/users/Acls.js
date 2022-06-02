@@ -75,7 +75,7 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
         loadAcls().then(r => logger.info(r));
 
         // Fetch ACLs every minute
-        let fetchAclInterval = setInterval(loadAcls, 100000);
+        let fetchAclInterval = setInterval(loadAcls, 5000);
 
         return () => clearInterval(fetchAclInterval);
 

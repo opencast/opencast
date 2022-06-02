@@ -11,9 +11,9 @@ import { connect } from 'react-redux';
 const RecordingsNameCell = ({ row, loadingEventsIntoTable, setSpecificEventFilter }) => {
     const { t } = useTranslation();
 
-    const redirectToEvents = locationName => {
+    const redirectToEvents = async locationName => {
         // set the location filter value of events to location name
-        setSpecificEventFilter('location', locationName);
+        await setSpecificEventFilter('location', locationName);
 
         // redirect to tables
         loadingEventsIntoTable();

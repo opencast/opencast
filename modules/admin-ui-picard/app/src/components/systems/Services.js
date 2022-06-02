@@ -73,7 +73,7 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
         loadServices().then(r => logger.info(r));
 
         // Fetch services every minute
-        let fetchServicesInterval = setInterval(loadServices, 100000);
+        let fetchServicesInterval = setInterval(loadServices, 5000);
 
         return () => clearInterval(fetchServicesInterval);
 

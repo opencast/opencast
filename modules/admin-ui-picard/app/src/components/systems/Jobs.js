@@ -73,7 +73,7 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
         loadJobs().then(r => logger.info(r));
 
         // Fetch jobs every minute
-        let fetchJobInterval = setInterval(loadJobs, 100000);
+        let fetchJobInterval = setInterval(loadJobs, 5000);
 
         return () => clearInterval(fetchJobInterval);
 

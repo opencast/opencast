@@ -14,13 +14,12 @@ const EventsDateCell = ({ row, filterMap, editFilterValue, loadEvents,
     const { t } = useTranslation();
 
     // Filter with value of current cell
-    const addFilter = date => {
+    const addFilter = async date => {
 
         let filter = filterMap.find(({ name }) => name === "startDate");
         if (!!filter) {
-            // Todo: Currently only startDate considered
-            editFilterValue(filter.name, date);
-            loadEvents();
+            await editFilterValue(filter.name, date + '/' + date);
+            await loadEvents();
             loadEventsIntoTable();
         }
 

@@ -76,7 +76,7 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
         loadUsers().then(r => logger.info(r));
 
         // Fetch users every minute
-        let fetchUsersInterval = setInterval(loadUsers, 100000);
+        let fetchUsersInterval = setInterval(loadUsers, 5000);
 
         return () => clearInterval(fetchUsersInterval);
 

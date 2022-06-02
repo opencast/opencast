@@ -75,7 +75,7 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
         loadGroups().then(r => logger.info(r));
 
         // Fetch groups every minute
-        let fetchGroupsInterval = setInterval(loadGroups, 100000);
+        let fetchGroupsInterval = setInterval(loadGroups, 5000);
 
         return () => clearInterval(fetchGroupsInterval);
 

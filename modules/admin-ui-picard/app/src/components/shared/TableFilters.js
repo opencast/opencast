@@ -4,7 +4,6 @@ import {connect} from 'react-redux';
 import {DatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import {getFilters, getSecondFilter, getSelectedFilter, getTextFilter} from '../../selectors/tableFilterSelectors';
-import {fetchFilters} from '../../thunks/tableFilterThunks';
 import {
     editFilterValue,
     editSecondFilter,
@@ -16,7 +15,6 @@ import {
     resetFilterValues
 } from '../../actions/tableFilterActions';
 import TableFilterProfiles from "./TableFilterProfiles";
-
 import {getCurrentLanguageInformation} from "../../utils/utils";
 import {availableHotkeys} from "../../configs/hotkeysConfig";
 import {GlobalHotKeys} from "react-hotkeys";
@@ -91,7 +89,7 @@ const TableFilters = ({filterMap, textFilter, selectedFilter, secondFilter, onCh
     }
 
     // Set the sate of startDate and endDate picked with datepicker
-    const handleDatepickerChange = (date, isStart=false) => {
+    const handleDatepickerChange = async (date, isStart=false) => {
         if (isStart) {
             setStartDate(date);
         } else {
@@ -104,6 +102,9 @@ const TableFilters = ({filterMap, textFilter, selectedFilter, secondFilter, onCh
             editFilterValue(filter.name, startDate.toISOString() + '/' + endDate.toISOString());
             setFilterSelector(false);
             removeSelectedFilter();
+            // Reload of resource
+            await loadResource();
+            loadResourceIntoTable();
         }
 
     };

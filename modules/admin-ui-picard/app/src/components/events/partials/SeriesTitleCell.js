@@ -11,9 +11,9 @@ import { Link }  from 'react-router-dom';
 const SeriesTitleCell = ({ row, loadingEventsIntoTable, setSpecificEventFilter }) => {
     const { t } = useTranslation();
 
-    const redirectToEvents = async seriesTitle => {
+    const redirectToEvents = async seriesId => {
         // set the series filter value of events to series title
-        setSpecificEventFilter('series', seriesTitle);
+        await setSpecificEventFilter('series', seriesId);
 
         // redirect to tables
         loadingEventsIntoTable();
@@ -23,7 +23,7 @@ const SeriesTitleCell = ({ row, loadingEventsIntoTable, setSpecificEventFilter }
         <Link to="/events/events"
               className="crosslink"
               title={t('EVENTS.SERIES.TABLE.TOOLTIP.SERIES')}
-              onClick={() => redirectToEvents(row.title)}>
+              onClick={() => redirectToEvents(row.id)}>
             {row.title}
         </Link>
     )

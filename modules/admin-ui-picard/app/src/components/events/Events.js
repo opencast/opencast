@@ -98,7 +98,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
         }
 
         // Fetch events every minute
-        let fetchEventsInterval = setInterval(loadEvents, 100000);
+        let fetchEventsInterval = setInterval(loadEvents, 5000);
 
         // Event listener for handle a click outside of dropdown menu
         window.addEventListener('mousedown', handleClickOutside);

@@ -73,7 +73,7 @@ const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilt
         loadServers().then(r => logger.info(r));
 
         // Fetch servers every minute
-        let fetchServersInterval = setInterval(loadServers, 100000);
+        let fetchServersInterval = setInterval(loadServers, 5000);
 
         return () => clearInterval(fetchServersInterval);
 

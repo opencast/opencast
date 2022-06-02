@@ -88,7 +88,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
         }
 
         // Fetch series every minute
-        let fetchSeriesInterval = setInterval(loadSeries, 100000);
+        let fetchSeriesInterval = setInterval(loadSeries, 5000);
 
 
         // Event listener for handle a click outside of dropdown menu
