@@ -44,8 +44,8 @@
     <echo>Enabling job dispatching</echo>
     <replaceregexp
       file="target/classes/etc/org.opencastproject.serviceregistry.impl.JobDispatcher.cfg"
-      match="^# dispatch.enabled=false$"
-      replace="dispatch.enabled=true"
+      match="^#dispatch.interval=0$"
+      replace="dispatch.interval=2"
       byline="true" />
   </target>
 </project>

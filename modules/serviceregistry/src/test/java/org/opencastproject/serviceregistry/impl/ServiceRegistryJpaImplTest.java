@@ -243,8 +243,7 @@ public class ServiceRegistryJpaImplTest {
     // Setup the job dispatcher
     ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
     Dictionary<String, Object> jdProps = new Hashtable<>();
-    //jdProps.setProperty(JobDispatcher.OPT_DISPATCHINTERVAL, ""+DISPATCH_START_DELAY);
-    jdProps.put(JobDispatcher.OPT_DISPATCHENABLED, "false");
+    jdProps.put(JobDispatcher.OPT_DISPATCHINTERVAL, "0");
     EasyMock.expect(cc.getProperties()).andReturn(jdProps).anyTimes();
     EasyMock.replay(cc);
     jobDispatcher = new JobDispatcher();

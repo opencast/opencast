@@ -97,9 +97,6 @@ public class JobDispatcher {
   /** JPA persistence unit name */
   public static final String PERSISTENCE_UNIT = "org.opencastproject.common";
 
-  /** Configuration key to enable dispatch. */
-  protected  static final String OPT_DISPATCHENABLED = "dispatch.enabled";
-
   /** Configuration key for the dispatch interval, in seconds */
   protected static final String OPT_DISPATCHINTERVAL = "dispatch.interval";
 
@@ -107,7 +104,7 @@ public class JobDispatcher {
   static final long MIN_DISPATCH_INTERVAL = 1;
 
   /** Default delay between job dispatching attempts, in seconds */
-  static final long DEFAULT_DISPATCH_INTERVAL = 2;
+  static final long DEFAULT_DISPATCH_INTERVAL = 0;
 
   private static final Logger logger = LoggerFactory.getLogger(JobDispatcher.class);
 
@@ -192,9 +189,6 @@ public class JobDispatcher {
 
     logger.info("Updating job dipatcher properties");
 
-    // NB: Read the javadoc for Boolean.valueOf.  This basically defaults to false.
-    boolean enableDispatch = Boolean.valueOf(StringUtils.trimToNull((String) properties.get(OPT_DISPATCHENABLED)));
-
     long dispatchInterval = DEFAULT_DISPATCH_INTERVAL;
     String dispatchIntervalString = StringUtils.trimToNull((String) properties.get(OPT_DISPATCHINTERVAL));
     if (StringUtils.isNotBlank(dispatchIntervalString)) {
@@ -222,7 +216,7 @@ public class JobDispatcher {
     }
 
     // Schedule the job dispatching.
-    if (enableDispatch && dispatchInterval > 0) {
+    if (dispatchInterval > 0) {
       logger.info("Job dispatching is enabled");
       logger.debug("Starting job dispatching at a custom interval of {}s", dispatchInterval);
       jdfuture = scheduledExecutor.scheduleWithFixedDelay(getJobDispatcherRunnable(), dispatchDelay, dispatchInterval,
