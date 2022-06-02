@@ -35,13 +35,11 @@ public final class WorkflowTestSupport {
    * Wait up to 1000ms for the number of changes to be right
    */
   public static void poll(WorkflowStateListener listener, int changes) throws Exception {
-    int counter = 5000 / WAITTIME;
-    while (listener.countStateChanges() != changes && counter > 0) {
+    for (int counter = 5000 / WAITTIME; listener.countStateChanges() != changes && counter > 0; counter--) {
       Thread.sleep(WAITTIME);
-      counter --;
     }
     if (listener.countStateChanges() != changes) {
-      throw new RuntimeException(String.format("Listener did not have the correct number (%s) of events inside of 1000ms, got %s instead", changes, listener.countStateChanges()));
+      throw new RuntimeException(String.format("Listener did not have the correct number (%s) of events inside of %s ms, got %s instead", changes, WAITTIME, listener.countStateChanges()));
     }
   }
 }

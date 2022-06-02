@@ -207,7 +207,12 @@ public class PauseWorkflowTest {
 
     service.addWorkflowListener(pauseListener);
     service.resume(workflow.getId(), properties);
-    WorkflowTestSupport.poll(pauseListener, 3);
+    WorkflowTestSupport.poll(pauseListener, 1);
+    //Workflow takes some time internally, so poll until things match, or we time out (and the assert fails below)
+    // sleep time, and counter size are set arbitrarily.  Should be large enough to work, but not force a huge wait
+    for (int counter = 0; counter < 100 && !properties.equals(firstHandler.getProperties()); counter++) {
+      Thread.sleep(100);
+    }
     service.removeWorkflowListener(pauseListener);
 
     // The handler should have picked up the properties
