@@ -200,14 +200,16 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
   /**
    * {@inheritDoc}
    *
-   * @see WorkflowServiceDatabase#getWorkflowIndexData()
+   * @see WorkflowServiceDatabase#getWorkflowIndexData(int limit, int offset)
    */
-  public List<WorkflowIndexData> getWorkflowIndexData() throws WorkflowDatabaseException {
+  public List<WorkflowIndexData> getWorkflowIndexData(int limit, int offset) throws WorkflowDatabaseException {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
 
-      var nativeQuery = em.createNamedQuery("WorkflowIndexData.getAll",WorkflowIndexData.class);
+      var nativeQuery = em.createNamedQuery("WorkflowIndexData.getAll", WorkflowIndexData.class);
+      nativeQuery.setMaxResults(limit);
+      nativeQuery.setFirstResult(offset);
       return nativeQuery.getResultList();
     } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
