@@ -78,15 +78,19 @@ public interface WorkflowServiceDatabase {
    */
   long countWorkflows(WorkflowInstance.WorkflowState state) throws WorkflowDatabaseException;
 
-    /**
+  /**
    * Gets workflow index data for all events.
    * Selects only workflow id, state, mediapackage id and organization id
    *
-   * @return list of all {@link WorkflowIndexData}s
+   * @param limit
+   *          max number of data objects to be returned
+   * @param offset
+   *          only return data from this point onwards
+   * @return list of {@link WorkflowIndexData}s
    * @throws WorkflowDatabaseException
    *           if there is a problem communicating with the underlying data store
    */
-  List<WorkflowIndexData> getWorkflowIndexData() throws WorkflowDatabaseException;
+  List<WorkflowIndexData> getWorkflowIndexData(int limit, int offset) throws WorkflowDatabaseException;
 
   /**
    * Returns the number of events workflows have been run on.

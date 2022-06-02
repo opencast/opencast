@@ -39,7 +39,7 @@ import javax.persistence.Table;
 @NamedNativeQueries({
         @NamedNativeQuery(
                 name = "WorkflowIndexData.getAll",
-                query = "SELECT id, state, mediapackage_id, organization_id FROM oc_workflow ORDER BY date_created ASC",
+                query = "SELECT id, state, mediapackage_id, organization_id FROM oc_workflow ORDER BY mediapackage_id, id DESC",
                 resultSetMapping = "DataResult"
         ),
 })
@@ -51,7 +51,7 @@ import javax.persistence.Table;
                         fields = {
                                   @FieldResult(name = "id",column = "id"),
                                   @FieldResult(name = "state", column = "state"),
-                                  @FieldResult(name = "mediaPackageId", column = "mediaPackage_id"),
+                                  @FieldResult(name = "mediaPackageId", column = "mediapackage_id"),
                                   @FieldResult(name = "organizationId", column = "organization_id")
                         }
                 )
