@@ -2156,11 +2156,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
   @Override
   public void repopulate(final ElasticsearchIndex index) throws IndexRebuildException {
-    final String startWorkflow = Operation.START_WORKFLOW.toString();
     final int total;
     try {
-      total = serviceRegistry.getJobCount(startWorkflow);
-    } catch (ServiceRegistryException e) {
+      total = persistence.countMediaPackages();
+    } catch (WorkflowDatabaseException e) {
       logIndexRebuildError(logger.getSlf4jLogger(), index.getIndexName(), e);
       throw new IndexRebuildException(index.getIndexName(), getService(), e);
     }
@@ -2169,17 +2168,18 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     if (total > 0) {
       logIndexRebuildBegin(logger.getSlf4jLogger(), index.getIndexName(), total, "workflows");
       int current = 0;
-      int offset = 0;
+      long token = 0;
       List<WorkflowInstance> workflows;
       do {
         try {
-          workflows = persistence.getWorkflowInstances(limit, offset);
+          workflows = persistence.getLatestWorkflowInstances(limit, token);
         } catch (Exception e) {
           logIndexRebuildError(logger.getSlf4jLogger(), index.getIndexName(), total, current, e);
           throw new IndexRebuildException(index.getIndexName(), getService(), e);
         }
         logger.debug("Got {} workflows for re-indexing", workflows.size());
-        offset += limit;
+        int indexLast = workflows.size() - 1;
+        token = workflows.get(indexLast).getId();
 
         for (WorkflowInstance instance : workflows) {
           current += 1;
