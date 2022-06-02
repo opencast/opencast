@@ -21,7 +21,6 @@
 
 package org.opencastproject.serviceregistry.impl;
 
-import static com.entwinemedia.fn.Stream.$;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.opencastproject.security.api.SecurityConstants.ORGANIZATION_HEADER;
 import static org.opencastproject.security.api.SecurityConstants.USER_HEADER;
@@ -42,10 +41,6 @@ import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.serviceregistry.impl.jpa.ServiceRegistrationJpaImpl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
-
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -78,6 +73,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiPredicate;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -380,7 +378,9 @@ public class JobDispatcher {
         // Start dispatching
         try {
           List<ServiceRegistration> services = serviceRegistry.getServiceRegistrations(em);
-          List<HostRegistration> hosts = Stream.$(serviceRegistry.getHostRegistrations(em)).filter(filterOutPriorityHosts._2(job.getId())).toList();
+          List<HostRegistration> hosts = serviceRegistry.getHostRegistrations(em).stream()
+                                           .filter(el -> filterOutPriorityHosts.test(el, job.getId()))
+                                           .collect(Collectors.toList());
           List<ServiceRegistration> candidateServices = null;
 
           // Depending on whether this running job is trying to reach out to other services or whether this is an
@@ -477,7 +477,11 @@ public class JobDispatcher {
       boolean triedDispatching = false;
 
       boolean jobLoadExceedsMaximumLoads = false;
-      final Float highestMaxLoad = $(services).map(toHostRegistration).map(toMaxLoad).sort(sortFloatValuesDesc).head2();
+      final Float highestMaxLoad = services.stream()
+                                           .map(toHostRegistration)
+                                           .map(toMaxLoad)
+                                           .sorted(sortFloatValuesDesc)
+                                           .findFirst().get();
       if (job.getJobLoad() > highestMaxLoad) {
         // None of the available hosts is able to accept the job because the largest max load value is less than this job's load value
         jobLoadExceedsMaximumLoads = true;
@@ -612,9 +616,9 @@ public class JobDispatcher {
       }
     }
 
-    private final Fn2<HostRegistration, Long, Boolean> filterOutPriorityHosts = new Fn2<HostRegistration, Long, Boolean>() {
+    private final BiPredicate<HostRegistration, Long> filterOutPriorityHosts = new BiPredicate<HostRegistration, Long>() {
       @Override
-      public Boolean apply(HostRegistration host, Long jobId) {
+      public boolean test(HostRegistration host, Long jobId) {
         if (dispatchPriorityList.values().contains(host.getBaseUrl()) && !host.getBaseUrl().equals(dispatchPriorityList.get(jobId))) {
           return false;
         }
@@ -622,14 +626,14 @@ public class JobDispatcher {
       }
     };
 
-    private final Fn<ServiceRegistration, HostRegistration> toHostRegistration = new Fn<ServiceRegistration, HostRegistration>() {
+    private final Function<ServiceRegistration, HostRegistration> toHostRegistration = new Function<ServiceRegistration, HostRegistration>() {
       @Override
       public HostRegistration apply(ServiceRegistration s) {
         return ((ServiceRegistrationJpaImpl) s).getHostRegistration();
       }
     };
 
-    private final Fn<HostRegistration, Float> toMaxLoad = new Fn<HostRegistration, Float>() {
+    private final Function<HostRegistration, Float> toMaxLoad = new Function<HostRegistration, Float>() {
       @Override
       public Float apply(HostRegistration h) {
         return h.getMaxLoad();
