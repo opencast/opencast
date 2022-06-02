@@ -117,7 +117,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   private String systemUserName;
 
   /** The API index */
-  private ElasticsearchIndex elasticsearchIndex;
+  private ElasticsearchIndex index;
 
   private AclServiceFactory aclServiceFactory;
 
@@ -158,7 +158,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   /** OSGi callbacks for setting the API index. */
   @Reference
   public void setElasticsearchIndex(ElasticsearchIndex index) {
-    this.elasticsearchIndex = index;
+    this.index = index;
   }
 
   @Reference
@@ -198,7 +198,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
         logger.debug("Updating series {}", id);
         // update API index
-        updateSeriesMetadataInIndex(id, elasticsearchIndex, dublinCore);
+        updateSeriesMetadataInIndex(id, dublinCore);
 
         // Make sure store to persistence comes after index, return value can be null
         DublinCoreCatalog updated = persistence.storeSeries(dublinCore);
@@ -253,11 +253,11 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       try {
         updated = persistence.storeSeriesAccessControl(seriesId, accessControl);
         //update API index
-        updateSeriesAclInIndex(seriesId, elasticsearchIndex, accessControl);
+        updateSeriesAclInIndex(seriesId, accessControl);
         // still sent for other asynchronous updates
         triggerEventHandlers(SeriesItem.updateAcl(seriesId, accessControl, overrideEpisodeAcl));
       } catch (SeriesServiceDatabaseException e) {
-        logger.error("Could not update series {} with access control rules: {}", seriesId, e.getMessage());
+        logger.error("Could not update series {} with access control rules", seriesId, e);
         throw new SeriesException(e);
       }
       return updated;
@@ -288,7 +288,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       persistence.deleteSeries(seriesID);
       // remove from API index
-      removeSeriesFromIndex(seriesID, elasticsearchIndex);
+      removeSeriesFromIndex(seriesID);
       // still sent for other asynchronous updates
       triggerEventHandlers(SeriesItem.delete(seriesID));
     } catch (SeriesServiceDatabaseException e1) {
@@ -375,7 +375,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
       // update API index
       if (propertyName.equals(THEME_PROPERTY_NAME)) {
-        updateThemePropertyInIndex(seriesID, Optional.ofNullable(propertyValue), elasticsearchIndex);
+        updateThemePropertyInIndex(seriesID, Optional.ofNullable(propertyValue));
       }
     } catch (SeriesServiceDatabaseException e) {
       String msg = String.format(
@@ -396,7 +396,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
       // update API index
       if (propertyName.equals(THEME_PROPERTY_NAME)) {
-        updateThemePropertyInIndex(seriesID, Optional.empty(), elasticsearchIndex);
+        updateThemePropertyInIndex(seriesID, Optional.empty());
       }
     } catch (SeriesServiceDatabaseException e) {
       String msg = String.format(
@@ -500,7 +500,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   @Override
-  public void repopulate(final ElasticsearchIndex index) throws IndexRebuildException {
+  public void repopulate() throws IndexRebuildException {
     try {
       List<SeriesEntity> databaseSeries = persistence.getAllSeries();
       final int total = databaseSeries.size();
@@ -545,7 +545,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                   }
 
                   // do the actual index update
-                  updateSeriesInIndex(seriesId, index, organization.getId(),
+                  updateSeriesInIndex(seriesId, organization.getId(),
                           updateFunctions.toArray(new Function[0]));
 
                 });
@@ -583,7 +583,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    * @param index
    *          The API index to update
    */
-  private void removeSeriesFromIndex(String seriesId, ElasticsearchIndex index) {
+  private void removeSeriesFromIndex(String seriesId) {
     String orgId = securityService.getOrganization().getId();
     logger.debug("Removing series {} from the {} index.", seriesId, index.getIndexName());
 
@@ -605,13 +605,13 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    * @param dc
    *          The dublin core catalog
    */
-  private void updateSeriesMetadataInIndex(String seriesId, ElasticsearchIndex index, DublinCoreCatalog dc) {
+  private void updateSeriesMetadataInIndex(String seriesId, DublinCoreCatalog dc) {
     String orgId = securityService.getOrganization().getId();
     logger.debug("Updating metadata of series {} in the {} index.", seriesId, index.getIndexName());
 
     // update series
     Function<Optional<Series>, Optional<Series>> updateFunction = getMetadataUpdateFunction(seriesId, dc, orgId);
-    updateSeriesInIndex(seriesId, index, orgId, updateFunction);
+    updateSeriesInIndex(seriesId, orgId, updateFunction);
   }
 
   /**
@@ -662,11 +662,11 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    * @param acl
    *          The acl to update
    */
-  private void updateSeriesAclInIndex(String seriesId, ElasticsearchIndex index, AccessControlList acl) {
+  private void updateSeriesAclInIndex(String seriesId, AccessControlList acl) {
     String orgId = securityService.getOrganization().getId();
     logger.debug("Updating ACL of series {} in the {} index.", seriesId, index.getIndexName());
     Function<Optional<Series>, Optional<Series>> updateFunction = getAclUpdateFunction(seriesId, acl, orgId);
-    updateSeriesInIndex(seriesId, index, orgId, updateFunction);
+    updateSeriesInIndex(seriesId, orgId, updateFunction);
   }
 
   /**
@@ -706,13 +706,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    * @param index
    *          The API index to update
    */
-  private void updateThemePropertyInIndex(String seriesId, Optional<String> propertyValueOpt,
-          ElasticsearchIndex index) {
+  private void updateThemePropertyInIndex(String seriesId, Optional<String> propertyValueOpt) {
     String orgId = securityService.getOrganization().getId();
     logger.debug("Updating theme property of series {} in the {} index.", seriesId, index.getIndexName());
     Function<Optional<Series>, Optional<Series>> updateFunction =
             getThemePropertyUpdateFunction(seriesId, propertyValueOpt, orgId);
-    updateSeriesInIndex(seriesId, index, orgId, updateFunction);
+    updateSeriesInIndex(seriesId, orgId, updateFunction);
   }
 
   /**
@@ -746,14 +745,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    *          The series id
    * @param updateFunctions
    *          The function(s) to do the actual updating
-   * @param index
-   *          The API index to update
    * @param orgId
    *          The id of the current organization
    * @return the updated series (optional)
    */
   @SafeVarargs
-  private final Optional<Series> updateSeriesInIndex(String seriesId, ElasticsearchIndex index, String orgId,
+  private  Optional<Series> updateSeriesInIndex(String seriesId, String orgId,
           Function<Optional<Series>, Optional<Series>>... updateFunctions) {
     User user = securityService.getUser();
     Function<Optional<Series>, Optional<Series>> updateFunction = Arrays.stream(updateFunctions)

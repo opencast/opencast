@@ -483,9 +483,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
               Opt.some(endDateTime), Opt.some(captureAgentId), Opt.some(finalCaProperties));
 
       // Update API index
-      updateEventInIndex(mediaPackageId, index, Opt.some(acl), dublinCore, Opt.some(startDateTime),
-              Opt.some(endDateTime), Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties),
-              Opt.none());
+      updateEventInIndex(mediaPackageId, Opt.some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
+          Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties), Opt.none());
 
       // Update last modified
       touchLastEntry(captureAgentId);
@@ -630,7 +629,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                 Opt.some(captureAgentId), Opt.some(finalCaProperties));
 
         // Update API index
-        updateEventInIndex(mediaPackageId, index, some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
+        updateEventInIndex(mediaPackageId, some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
                 Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties), Opt.none());
 
         scheduledEvents.put(mediaPackageId, event);
@@ -823,7 +822,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
               finalCaProperties);
 
       // Update API index
-      updateEventInIndex(mpId, index, acl, dublinCore, startDateTime, endDateTime, userIds, Opt.some(agentId),
+      updateEventInIndex(mpId, acl, dublinCore, startDateTime, endDateTime, userIds, Opt.some(agentId),
               finalCaProperties, Opt.none());
 
       // Update last modified
@@ -833,9 +832,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           touchLastEntry(agent);
         }
       }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (SchedulerException e) {
+    } catch (NotFoundException | SchedulerException e) {
       throw e;
     } catch (Exception e) {
       throw new SchedulerException(e);
@@ -905,7 +902,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       sendSchedulerUpdate(new SchedulerItemList(mediaPackageId, SchedulerItem.delete()));
 
       // Update API index
-      removeSchedulingInfoFromIndex(mediaPackageId, index);
+      removeSchedulingInfoFromIndex(mediaPackageId);
     } catch (Exception e) {
       logger.error("Could not remove event '{}' from persistent storage: {}", mediaPackageId, e);
       throw new SchedulerException(e);
@@ -1300,7 +1297,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                 .updateRecordingStatus(r.getState(), r.getLastCheckinTime()))));
 
         // Update API index
-        updateEventInIndex(r.getID(), index, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none(),
+        updateEventInIndex(r.getID(), Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none(),
                 Opt.none(), Opt.none(), Opt.some(r.getState()));
       } else {
         logger.debug("Recording state not changed");
@@ -1360,7 +1357,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       sendSchedulerUpdate(new SchedulerItemList(id, SchedulerItem.deleteRecordingState()));
 
       // Update API index
-      removeRecordingStatusFromIndex(id, index);
+      removeRecordingStatusFromIndex(id);
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1423,7 +1420,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @param properties
    * @param recordingStatus
    */
-  private void updateEventInIndex(String mediaPackageId, ElasticsearchIndex index, Opt<AccessControlList> acl,
+  private void updateEventInIndex(String mediaPackageId, Opt<AccessControlList> acl,
           Opt<DublinCoreCatalog> dublinCore, Opt<Date> startTime, Opt<Date> endTime, Opt<Set<String>> presenters,
           Opt<String> agentId, Opt<Map<String, String>> properties, Opt<String> recordingStatus) {
 
@@ -1487,7 +1484,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @param mediaPackageId
    * @param index
    */
-  private void removeRecordingStatusFromIndex(String mediaPackageId, ElasticsearchIndex index) {
+  private void removeRecordingStatusFromIndex(String mediaPackageId) {
     String organization = getSecurityService().getOrganization().getId();
     User user = getSecurityService().getUser();
 
@@ -1512,12 +1509,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @param mediaPackageId
    * @param index
    */
-  private void removeSchedulingInfoFromIndex(String mediaPackageId, ElasticsearchIndex index) {
+  private void removeSchedulingInfoFromIndex(String mediaPackageId) {
     String orgId = getSecurityService().getOrganization().getId();
     User user = getSecurityService().getUser();
 
     Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
-      if (!eventOpt.isPresent()) {
+      if (eventOpt.isEmpty()) {
         logger.warn("Scheduled recording {} not found for deletion from the {} index.", mediaPackageId,
                 index.getIndexName());
         return Optional.empty();
@@ -1720,7 +1717,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   @Override
-  public void repopulate(final ElasticsearchIndex index) throws IndexRebuildException {
+  public void repopulate() throws IndexRebuildException {
     final int[] current = {0};
     final int total;
     try {
@@ -1757,7 +1754,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
             final Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(snapshot);
 
-            updateEventInIndex(mpId, index, acl, dublinCore, Opt.some(event.getStartDate()),
+            updateEventInIndex(mpId, acl, dublinCore, Opt.some(event.getStartDate()),
                     Opt.some(event.getEndDate()), Opt.some(presenters), Opt.some(event.getCaptureAgentId()),
                     Opt.some(caMetadata), Opt.nul(event.getRecordingState()));
             logIndexRebuildProgress(logger, index.getIndexName(), total, current[0]);
