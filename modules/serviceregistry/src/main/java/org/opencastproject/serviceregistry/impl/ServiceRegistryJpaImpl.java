@@ -21,7 +21,6 @@
 
 package org.opencastproject.serviceregistry.impl;
 
-import static com.entwinemedia.fn.Stream.$;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.job.api.AbstractJobProducer.ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY;
@@ -64,8 +63,6 @@ import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.util.jmx.JmxUtil;
 
-import com.entwinemedia.fn.Fn;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.http.HttpResponse;
@@ -104,6 +101,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.management.ObjectInstance;
@@ -2618,7 +2616,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           List<ServiceRegistration> serviceRegistrations, List<HostRegistration> hostRegistrations,
           final SystemLoad systemLoad) {
 
-    final List<String> hostBaseUrls = $(hostRegistrations).map(toBaseUrl).toList();
+    final List<String> hostBaseUrls = hostRegistrations.stream()
+                                                       .map(toBaseUrl)
+                                                       .collect(Collectors.toUnmodifiableList());
     final List<ServiceRegistration> filteredList = new ArrayList<ServiceRegistration>();
 
     for (ServiceRegistration service : serviceRegistrations) {
@@ -2702,7 +2702,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           List<ServiceRegistration> serviceRegistrations, List<HostRegistration> hostRegistrations,
           final SystemLoad systemLoad) {
 
-    final List<String> hostBaseUrls = $(hostRegistrations).map(toBaseUrl).toList();
+    final List<String> hostBaseUrls = hostRegistrations.stream()
+                                                       .map(toBaseUrl)
+                                                       .collect(Collectors.toUnmodifiableList());
     final List<ServiceRegistration> filteredList = new ArrayList<ServiceRegistration>();
 
     logger.debug("Finding services to dispatch job of type {}", jobType);
@@ -2790,7 +2792,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
   }
 
-  private final Fn<HostRegistration, String> toBaseUrl = new Fn<HostRegistration, String>() {
+  private final Function<HostRegistration, String> toBaseUrl = new Function<HostRegistration, String>() {
     @Override
     public String apply(HostRegistration h) {
       return h.getBaseUrl();

@@ -21,7 +21,6 @@
 
 package org.opencastproject.serviceregistry.impl;
 
-import static com.entwinemedia.fn.Stream.$;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.data.Arrays.mkString;
@@ -55,9 +54,6 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.persistence.PersistenceEnv;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Stream;
-
 import org.apache.commons.lang3.StringUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
@@ -68,6 +64,7 @@ import org.junit.Test;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -241,29 +238,29 @@ public class JobTest {
     job5 = serviceRegistry.updateJob(job5);
 
     // Search children by root job
-    final Stream<Job> rootChildren = $(serviceRegistry.getChildJobs(rootJob.getId()));
-    assertEquals(6, rootChildren.getSizeHint());
-    assertTrue(rootChildren.exists(matchesId(job)));
-    assertTrue(rootChildren.exists(matchesId(job1)));
-    assertTrue(rootChildren.exists(matchesId(job2)));
-    assertTrue(rootChildren.exists(matchesId(job3)));
-    assertTrue(rootChildren.exists(matchesId(job4)));
-    assertTrue(rootChildren.exists(matchesId(job5)));
+    final List<Job> rootChildren = serviceRegistry.getChildJobs(rootJob.getId());
+    assertEquals(6, rootChildren.size());
+    assertTrue(rootChildren.stream().anyMatch(matchesId(job)));
+    assertTrue(rootChildren.stream().anyMatch(matchesId(job1)));
+    assertTrue(rootChildren.stream().anyMatch(matchesId(job2)));
+    assertTrue(rootChildren.stream().anyMatch(matchesId(job3)));
+    assertTrue(rootChildren.stream().anyMatch(matchesId(job4)));
+    assertTrue(rootChildren.stream().anyMatch(matchesId(job5)));
 
     // Search children
-    final Stream<Job> jobChildren = $(serviceRegistry.getChildJobs(job.getId()));
-    assertEquals(5, jobChildren.getSizeHint());
-    assertTrue(jobChildren.exists(matchesId(job1)));
-    assertTrue(jobChildren.exists(matchesId(job2)));
-    assertTrue(jobChildren.exists(matchesId(job3)));
-    assertTrue(jobChildren.exists(matchesId(job4)));
-    assertTrue(jobChildren.exists(matchesId(job5)));
+    final List<Job> jobChildren = serviceRegistry.getChildJobs(job.getId());
+    assertEquals(5, jobChildren.size());
+    assertTrue(jobChildren.stream().anyMatch(matchesId(job1)));
+    assertTrue(jobChildren.stream().anyMatch(matchesId(job2)));
+    assertTrue(jobChildren.stream().anyMatch(matchesId(job3)));
+    assertTrue(jobChildren.stream().anyMatch(matchesId(job4)));
+    assertTrue(jobChildren.stream().anyMatch(matchesId(job5)));
   }
 
-  private static Fn<Job, Boolean> matchesId(final Job j) {
-    return new Fn<Job, Boolean>() {
+  private static Predicate<Job> matchesId(final Job j) {
+    return new Predicate<Job>() {
       @Override
-      public Boolean apply(Job job) {
+      public boolean test(Job job) {
         return job.getId() == j.getId();
       }
     };
