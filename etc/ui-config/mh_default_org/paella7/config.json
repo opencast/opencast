@@ -153,6 +153,13 @@
             "side": "right",
             "groupName": "toolsGroup",
             "description": "See more tools",
+            "order": 20
+        },
+
+        "es.upv.paella.findCaptionsPlugin": {
+            "enabled": true,
+            "side": "right",
+            "description": "Search in captions",
             "order": 10
         },
 
