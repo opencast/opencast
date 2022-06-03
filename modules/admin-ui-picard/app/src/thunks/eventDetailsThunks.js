@@ -87,7 +87,7 @@ import {
     transformMetadataCollection,
     transformMetadataForUpdate
 } from "../utils/resourceUtils";
-import { NOTIFICATION_CONTEXT, WORKFLOW_UPLOAD_ASSETS_NON_TRACK } from '../configs/modalConfig';
+import { NOTIFICATION_CONTEXT } from '../configs/modalConfig';
 import {fetchWorkflowDef} from "./workflowThunks";
 import {fetchStatistics, fetchStatisticsValueUpdate} from "./statisticsThunks";
 import {

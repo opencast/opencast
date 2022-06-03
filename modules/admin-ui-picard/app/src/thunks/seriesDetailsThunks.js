@@ -1,6 +1,5 @@
 import axios from "axios";
 import _ from 'lodash';
-import moment from "moment";
 import {logger} from "../utils/logger";
 import {
     loadSeriesDetailsAclsSuccess,
@@ -30,14 +29,9 @@ import {
 import {addNotification} from "./notificationThunks";
 import {
     createPolicy,
-    getHttpHeaders,
     transformMetadataCollection,
     transformMetadataForUpdate
 } from "../utils/resourceUtils";
-import {
-    createChartOptions,
-    createDownloadUrl
-} from "../utils/statisticsUtils";
 import {transformToIdValueArray} from "../utils/utils";
 import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
 import {fetchStatistics, fetchStatisticsValueUpdate} from "./statisticsThunks";

@@ -61,9 +61,9 @@ export const loadSeriesMetadataInProgress = () => ({
     type: LOAD_SERIES_IN_PROGRESS
 });
 
-export const loadSeriesMetadataSuccess = metadata => ({
+export const loadSeriesMetadataSuccess = ( metadata, extendedMetadata ) => ({
     type: LOAD_SERIES_METADATA_SUCCESS,
-    payload: { metadata }
+    payload: { metadata, extendedMetadata }
 });
 
 export const loadSeriesMetadataFailure = () => ({

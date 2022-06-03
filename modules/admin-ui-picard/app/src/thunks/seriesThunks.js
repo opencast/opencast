@@ -10,7 +10,9 @@ import {
     loadSeriesThemesSuccess
 } from "../actions/seriesActions";
 import {
-    getURLParams, prepareAccessPolicyRulesForPost,
+    getURLParams,
+    prepareAccessPolicyRulesForPost,
+    prepareSeriesExtendedMetadataFieldsForPost,
     prepareSeriesMetadataFieldsForPost,
     transformMetadataCollection
 } from "../utils/resourceUtils";
@@ -48,9 +50,19 @@ export const fetchSeriesMetadata = () => async dispatch => {
        let data = await axios.get('/admin-ng/series/new/metadata');
        const response = await data.data;
 
-        const metadata = transformMetadataCollection(response[0]);
+        const mainCatalog = 'dublincore/series';
+        let usualMetadata = {};
+        const extendedMetadata = [];
 
-       dispatch(loadSeriesMetadataSuccess(metadata));
+        for(const metadataCatalog of response){
+            if(metadataCatalog.flavor === mainCatalog){
+                usualMetadata = transformMetadataCollection({...metadataCatalog});
+            } else {
+                extendedMetadata.push(transformMetadataCollection({...metadataCatalog}));
+            }
+        }
+
+       dispatch(loadSeriesMetadataSuccess(usualMetadata, extendedMetadata));
     } catch (e) {
         dispatch(loadSeriesFailure());
         logger.error(e);
@@ -77,11 +89,13 @@ export const fetchSeriesThemes = () => async dispatch => {
 };
 
 // post new series to backend
-export const postNewSeries = (values, metadataInfo) => async dispatch => {
+export const postNewSeries = (values, metadataInfo, extendedMetadata) => async dispatch => {
 
-    let metadataFields, metadata, access;
+    let metadataFields, extendedMetadataFields, metadata, access;
 
+    // prepare metadata provided by user
     metadataFields = prepareSeriesMetadataFieldsForPost(metadataInfo.fields, values);
+    extendedMetadataFields = prepareSeriesExtendedMetadataFieldsForPost(extendedMetadata, values);
 
     // metadata for post request
     metadata = [{
@@ -89,6 +103,10 @@ export const postNewSeries = (values, metadataInfo) => async dispatch => {
         title: metadataInfo.title,
         fields: metadataFields
     }];
+
+    for(const entry of extendedMetadataFields){
+        metadata.push(entry);
+    }
 
     access = prepareAccessPolicyRulesForPost(values.policies);
 

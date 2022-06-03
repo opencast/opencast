@@ -11,6 +11,7 @@ import {
 import {
     getURLParams,
     prepareAccessPolicyRulesForPost,
+    prepareExtendedMetadataFieldsForPost,
     prepareMetadataFieldsForPost,
     transformMetadataCollection
 } from "../utils/resourceUtils";
@@ -74,9 +75,19 @@ export const fetchEventMetadata = () => async dispatch => {
         let data = await axios.get('/admin-ng/event/new/metadata');
         const response = await data.data;
 
-        const metadata = transformMetadataCollection(response[0]);
+        const mainCatalog = 'dublincore/episode';
+        let usualMetadata = {};
+        const extendedMetadata = [];
 
-        dispatch(loadEventMetadataSuccess(metadata));
+        for(const metadataCatalog of response){
+            if(metadataCatalog.flavor === mainCatalog){
+                usualMetadata = transformMetadataCollection({...metadataCatalog});
+            } else {
+                extendedMetadata.push(transformMetadataCollection({...metadataCatalog}));
+            }
+        }
+
+        dispatch(loadEventMetadataSuccess(usualMetadata, extendedMetadata));
     } catch (e) {
         dispatch(loadEventMetadataFailure());
         logger.error(e);
@@ -197,17 +208,18 @@ export const checkForConflicts =  async (startDate, endDate, duration, device) =
 }
 
 // post new event to backend
-export const postNewEvent = (values, metadataInfo) => async (dispatch, getState) => {
+export const postNewEvent = (values, metadataInfo, extendedMetadata) => async (dispatch, getState) => {
     // get asset upload options from redux store
     const state = getState();
     const uploadAssetOptions = getAssetUploadOptions(state);
 
     let formData = new FormData();
-    let metadataFields, metadata, source, access, assets;
+    let metadataFields, extendedMetadataFields, metadata, source, access, assets;
     let configuration = {};
 
     // prepare metadata provided by user
     metadataFields = prepareMetadataFieldsForPost(metadataInfo.fields, values);
+    extendedMetadataFields = prepareExtendedMetadataFieldsForPost(extendedMetadata, values);
 
     // if source mode is UPLOAD than also put metadata fields of that in metadataFields
     if(values.sourceMode === "UPLOAD") {
@@ -311,6 +323,10 @@ export const postNewEvent = (values, metadataInfo) => async (dispatch, getState)
     Object.keys(values.configuration).forEach(config => {
         configuration[config] = String(values.configuration[config])
     });
+
+    for(const entry of extendedMetadataFields){
+        metadata.push(entry);
+    }
 
     formData.append('metadata', JSON.stringify({
         metadata: metadata,

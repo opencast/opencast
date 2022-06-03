@@ -39,6 +39,7 @@ const initialState = {
     columns: initialColumns,
     showActions: false,
     metadata: {},
+    extendedMetadata: [],
     isFetchingAssetUploadOptions: false,
     uploadAssetOptions: [],
     uploadAssetWorkflow: ''
@@ -108,17 +109,19 @@ const events = (state=initialState, action) => {
             }
         }
         case LOAD_EVENT_METADATA_SUCCESS: {
-            const { metadata } = payload;
+            const { usualMetadata, extendedMetadata } = payload;
             return {
                 ...state,
                 isLoading: false,
-                metadata: metadata
+                metadata: usualMetadata,
+                extendedMetadata: extendedMetadata
             }
         }
         case LOAD_EVENT_METADATA_FAILURE: {
             return {
                 ...state,
-                isLoading: false
+                isLoading: false,
+                extendedMetadata: []
             }
         }
         case LOAD_ASSET_UPLOAD_OPTIONS_IN_PROGRESS: {

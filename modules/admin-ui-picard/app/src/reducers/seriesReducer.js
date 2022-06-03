@@ -36,6 +36,7 @@ const initialState = {
     offset: 0,
     limit: 0,
     metadata: {},
+    extendedMetadata: [],
     themes: {}
 }
 
@@ -104,17 +105,19 @@ const series = (state=initialState, action) => {
             }
         }
         case LOAD_SERIES_METADATA_SUCCESS: {
-            const { metadata } = payload;
+            const { metadata, extendedMetadata } = payload;
             return {
                 ...state,
                 isLoading: false,
-                metadata: metadata
+                metadata: metadata,
+                extendedMetadata: extendedMetadata
             }
         }
         case LOAD_SERIES_METADATA_FAILURE: {
             return {
                 ...state,
-                isLoading: false
+                isLoading: false,
+                extendedMetadata: []
             }
         }
         case LOAD_SERIES_THEMES_IN_PROGRESS: {

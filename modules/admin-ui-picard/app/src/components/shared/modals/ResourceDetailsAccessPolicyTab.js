@@ -13,7 +13,6 @@ import {addNotification} from "../../../thunks/notificationThunks";
 import {NOTIFICATION_CONTEXT} from "../../../configs/modalConfig";
 import {removeNotificationWizardForm} from "../../../actions/notificationActions";
 import {createPolicy, prepareAccessPolicyRulesForPost} from "../../../utils/resourceUtils";
-import {getPolicies} from "../../../selectors/eventDetailsSelectors";
 import {getUserInformation} from "../../../selectors/userInfoSelectors";
 import {hasAccess} from "../../../utils/utils";
 
@@ -63,7 +62,7 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                 fetchTransactionResult.active !== undefined ?
                     setTransactions({read_only: fetchTransactionResult.active})
                     : setTransactions({read_only: true});
-                if (fetchTransactionResult.active == undefined || fetchTransactionResult.active) {
+                if (fetchTransactionResult.active === undefined || fetchTransactionResult.active) {
                     addNotification('warning', 'ACTIVE_TRANSACTION', -1, null, NOTIFICATION_CONTEXT);
                 }
             }

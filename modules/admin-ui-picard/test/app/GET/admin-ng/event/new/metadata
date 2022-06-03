@@ -130,5 +130,57 @@
             "required":false
          }
       ]
+   },
+   {
+      "flavor": "dublincore/extended-1",
+      "title" : "EVENTS.EVENTS.DETAILS.CATALOG.EXTENDED-1",
+      "fields": [
+         {
+            "id": "title",
+            "label": "EVENTS.EVENTS.DETAILS.METADATA.VISIBILITY",
+            "value": "",
+            "type": "text",
+            "readOnly": false
+         }, {
+            "id": "uid",
+            "label": "EVENTS.EVENTS.DETAILS.METADATA.PUBLIC",
+            "value": "",
+            "type": "text",
+            "readOnly": true
+         }, {
+            "id": "iid",
+            "label": "EVENTS.EVENTS.DETAILS.METADATA.PUBLIC",
+            "value": "Lectures",
+            "type": "text_long",
+            "readOnly": false
+         }
+      ]
+   },
+   {
+      "flavor": "dublincore/extended-2",
+      "title" : "EVENTS.EVENTS.DETAILS.CATALOG.EXTENDED-2",
+      "fields": [
+         {
+            "id": "title",
+            "label": "EVENTS.EVENTS.DETAILS.METADATA.OS",
+            "value": "",
+            "type": "text",
+            "readOnly": false
+         },
+         {
+            "id": "public",
+            "label": "EVENTS.EVENTS.DETAILS.METADATA.PUBLIC",
+            "value": "true",
+            "type": "boolean",
+            "readOnly": false
+         },
+         {
+            "id": "public",
+            "label": "EVENTS.EVENTS.DETAILS.METADATA.PUBLIC",
+            "value": "true",
+            "type": "boolean",
+            "readOnly": true
+         }
+      ]
    }
 ]

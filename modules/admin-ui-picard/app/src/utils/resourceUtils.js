@@ -88,6 +88,36 @@ export const buildGroupBody = values => {
     return data;
 }
 
+// get initial metadata field values for formik in create resources wizards
+export const getInitialMetadataFieldValues = (metadataFields, extendedMetadata) => {
+    let initialValues = {};
+
+    if (!!metadataFields.fields && metadataFields.fields.length > 0) {
+        metadataFields.fields.forEach(field => {
+            initialValues[field.id] = field.value;
+        });
+    }
+
+    if(extendedMetadata.length > 0){
+        for(const metadataCatalog of extendedMetadata){
+            if (!!metadataCatalog.fields && metadataCatalog.fields.length > 0) {
+                metadataCatalog.fields.forEach(field => {
+                    let value = field.value
+                    if (value === 'true') {
+                        value = true;
+                    } else if (value === 'false') {
+                        value = false;
+                    }
+
+                    initialValues[metadataCatalog.flavor + '_' + field.id] = value;
+                });
+            }
+        }
+    }
+
+    return initialValues;
+}
+
 // transform collection of metadata into object with name and value
 export const transformMetadataCollection = (metadata, noField) => {
     if (noField) {
@@ -150,7 +180,7 @@ export const transformMetadataForUpdate = (catalog, values) => {
 }
 
 // Prepare metadata for post of new events or series
-export const prepareMetadataFieldsForPost = (metadataInfo, values) => {
+export const prepareMetadataFieldsForPost = (metadataInfo, values, formikIdPrefix = '') => {
     let metadataFields = [];
 
     // fill metadataField with field information send by server previously and values provided by user
@@ -159,7 +189,7 @@ export const prepareMetadataFieldsForPost = (metadataInfo, values) => {
         let fieldValue = {
             id: metadataInfo[i].id,
             type: metadataInfo[i].type,
-            value: values[metadataInfo[i].id],
+            value: values[formikIdPrefix + metadataInfo[i].id],
             tabindex: i + 1,
             $$hashKey: "object:123"
         };
@@ -175,20 +205,40 @@ export const prepareMetadataFieldsForPost = (metadataInfo, values) => {
     return metadataFields;
 }
 
-export const prepareSeriesMetadataFieldsForPost = (metadataInfo, values) => {
+// Prepare extended metadata for post of new events or series
+export const prepareExtendedMetadataFieldsForPost = (extendedMetadata, values) => {
+    const extendedMetadataFields = [];
+
+    for(const catalog of extendedMetadata){
+        const catalogPrefix = catalog.flavor + '_';
+        const metadataFields = prepareMetadataFieldsForPost(catalog.fields, values, catalogPrefix);
+
+        // Todo: What is hashkey?
+        const metadataCatalog = {
+            flavor: catalog.flavor,
+            title: catalog.title,
+            fields: metadataFields,
+            $$hashKey: "object:123"
+        };
+
+        extendedMetadataFields.push(metadataCatalog);
+    }
+
+    return extendedMetadataFields;
+}
+
+export const prepareSeriesMetadataFieldsForPost = (metadataInfo, values, formikIdPrefix = '') => {
     let metadataFields = [];
 
     // fill metadataField with field information sent by server previously and values provided by user
-    // Todo: What is hashkey?
     for (let i = 0; metadataInfo.length > i; i++) {
         let fieldValue = {
             readOnly: metadataInfo[i].readOnly,
             id: metadataInfo[i].id,
             label: metadataInfo[i].label,
             type: metadataInfo[i].type,
-            value: values[metadataInfo[i].id],
-            tabindex: i + 1,
-            $$hashKey: "object:123"
+            value: values[formikIdPrefix + metadataInfo[i].id],
+            tabindex: i + 1
         };
         if (!!metadataInfo[i].translatable) {
             fieldValue = {
@@ -202,21 +252,48 @@ export const prepareSeriesMetadataFieldsForPost = (metadataInfo, values) => {
                 collection: [],
             };
         }
+        if (!!metadataInfo[i].required) {
+            fieldValue = {
+                ...fieldValue,
+                required: metadataInfo[i].required,
+            };
+        }
         if (metadataInfo[i].type === 'mixed_text') {
             fieldValue = {
                 ...fieldValue,
-                presentableValue: values[metadataInfo[i].id].join()
+                presentableValue: values[formikIdPrefix + metadataInfo[i].id].join()
             };
         } else {
             fieldValue = {
                 ...fieldValue,
-                presentableValue: values[metadataInfo[i].id]
+                presentableValue: values[formikIdPrefix + metadataInfo[i].id]
             };
         }
         metadataFields = metadataFields.concat(fieldValue);
     }
 
     return metadataFields;
+}
+
+// Prepare extended metadata for post of new events or series
+export const prepareSeriesExtendedMetadataFieldsForPost = (extendedMetadata, values) => {
+    const extendedMetadataFields = [];
+
+    for(const catalog of extendedMetadata){
+        const catalogPrefix = catalog.flavor + '_';
+        const metadataFields = prepareSeriesMetadataFieldsForPost(catalog.fields, values, catalogPrefix);
+
+        // Todo: What is hashkey?
+        const metadataCatalog = {
+            flavor: catalog.flavor,
+            title: catalog.title,
+            fields: metadataFields
+        };
+
+        extendedMetadataFields.push(metadataCatalog);
+    }
+
+    return extendedMetadataFields;
 }
 
 // returns the name for a field value from the collection

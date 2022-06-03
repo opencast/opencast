@@ -1,6 +1,10 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
-import {getAssetUploadOptions, getEventMetadata} from "../../../../selectors/eventSelectors";
+import {
+    getAssetUploadOptions,
+    getEventMetadata,
+    getExtendedEventMetadata
+} from "../../../../selectors/eventSelectors";
 import {connect} from "react-redux";
 import {getWorkflowDef} from "../../../../selectors/workflowSelectors";
 import MetadataSummaryTable from "./summaryTables/MetadataSummaryTable";
@@ -12,7 +16,7 @@ import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButt
  * This component renders the summary page for new events in the new event wizard.
  */
 const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUploadHidden,
-                             metadataEvents, workflowDef, uploadAssetOptions }) => {
+                             metadataEvents, extendedMetadata, workflowDef, uploadAssetOptions }) => {
     const { t } = useTranslation();
 
     // Get upload assets that are not of type track
@@ -48,9 +52,11 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
                                               header={'EVENTS.EVENTS.NEW.METADATA.CAPTION'}/>
 
                         {/*Summary metadata extended*/}
-                        {/*todo: metadata extended not implemented yet, so there are no values provided by user yet*/}
                         {!metaDataExtendedHidden ? (
-                            <MetadataExtendedSummaryTable header={'EVENTS.EVENTS.NEW.METADATA_EXTENDED.CAPTION'}/>
+                            <MetadataExtendedSummaryTable extendedMetadata={extendedMetadata}
+                                                          formikValues={formik.values}
+                                                          formikInitialValues={formik.initialValues}
+                                                          header={'EVENTS.EVENTS.NEW.METADATA_EXTENDED.CAPTION'}/>
                         ): null}
 
                         {/*Summary upload assets*/}
@@ -193,8 +199,10 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
     )
 }
 
+// Getting state data out of redux store
 const mapStateToProps = state => ({
     metadataEvents: getEventMetadata(state),
+    extendedMetadata: getExtendedEventMetadata(state),
     workflowDef: getWorkflowDef(state),
     uploadAssetOptions: getAssetUploadOptions(state),
 })

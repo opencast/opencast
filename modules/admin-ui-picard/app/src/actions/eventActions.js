@@ -55,9 +55,9 @@ export const loadEventMetadataInProgress = () => ({
     type: LOAD_EVENT_METADATA_IN_PROGRESS
 });
 
-export const loadEventMetadataSuccess = metadata => ({
+export const loadEventMetadataSuccess = ( usualMetadata, extendedMetadata ) => ({
     type: LOAD_EVENT_METADATA_SUCCESS,
-    payload: { metadata }
+    payload: { usualMetadata, extendedMetadata }
 });
 
 export const loadEventMetadataFailure = () => ({

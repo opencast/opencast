@@ -95,10 +95,7 @@ const RenderField = ({ field, metadataField, form, showCheck=false, isFirstField
             )}
             {metadataField.type === "boolean" && (
                 <EditableBooleanValue field={field}
-                                      text={field.value}
                                       form={form}
-                                      editMode={editMode}
-                                      setEditMode={setEditMode}
                                       showCheck={showCheck}
                                       handleKeyDown={handleKeyDown}/>
             )}
@@ -107,23 +104,17 @@ const RenderField = ({ field, metadataField, form, showCheck=false, isFirstField
 };
 
 // Renders editable field for a boolean value
-const EditableBooleanValue = ({ field, text, editMode, setEditMode, handleKeyDown, form: { initialValues }, showCheck }) => {
+const EditableBooleanValue = ({ field, handleKeyDown, form: { initialValues }, showCheck }) => {
     return (
-        editMode ? (
-            <div onBlur={() => setEditMode(false)}
-                 onKeyDown={e => handleKeyDown(e, "input")}
-                 ref={childRef}>
-                <input type="checkbox" {...field}/>
-            </div>
-        ) : (
-            <div onClick={() => setEditMode(true)}>
-                <span className="editable preserve-newlines" >{text || ''}</span>
-                <i className="edit fa fa-pencil-square"/>
-                {showCheck && (
-                    <i className={cn("saved fa fa-check", { active: (initialValues[field.name] !== field.value) })}/>
-                )}
-            </div>
-        )
+        <div
+             onKeyDown={e => handleKeyDown(e, "input")}
+             ref={childRef}>
+            <input type="checkbox" checked={field.value} {...field}/>
+            <i className="edit fa fa-pencil-square"/>
+            {showCheck && (
+                <i className={cn("saved fa fa-check", { active: (initialValues[field.name] !== field.value) })}/>
+            )}
+        </div>
 
     );
 };
