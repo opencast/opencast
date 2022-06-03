@@ -22,13 +22,14 @@ import Header from "../Header";
 import Footer from "../Footer";
 import {getUserInformation} from "../../selectors/userInfoSelectors";
 import {hasAccess} from "../../utils/utils";
+import { getCurrentFilterResource } from '../../selectors/tableFilterSelectors';
 
 /**
  * This component renders the table view of services
  */
 const Services = ({ loadingServices, loadingServicesIntoTable, services, loadingFilters,
                       loadingJobs, loadingJobsIntoTable, loadingServers,
-                      loadingServersIntoTable, resetTextFilter, resetOffset, user }) => {
+                      loadingServersIntoTable, resetTextFilter, resetOffset, user, currentFilterType }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
 
@@ -41,8 +42,6 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
     }
 
     const loadJobs = () => {
-        loadingFilters("jobs");
-
         // Reset the current page to first page
         resetOffset();
 
@@ -54,8 +53,6 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
     }
 
     const loadServers = () => {
-        loadingFilters("servers");
-
         // Reset the current page to first page
         resetOffset();
 
@@ -67,6 +64,10 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
     }
 
     useEffect(() => {
+        if ("services" !== currentFilterType) {
+            loadingFilters("services");
+        }
+
         resetTextFilter();
 
         // Load services on mount
@@ -110,10 +111,7 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
                     {hasAccess("ROLE_UI_SERVICES_VIEW", user) && (
                         <Link to="/systems/services"
                               className={cn({active: true})}
-                              onClick={() => {
-                                  loadingFilters("services");
-                                  loadServices().then();
-                              }}>
+                              onClick={() => loadServices()}>
                             {t('SYSTEMS.NAVIGATION.SERVICES')}
                         </Link>
                     )}
@@ -143,7 +141,8 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     services: getTotalServices(state),
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    currentFilterType: getCurrentFilterResource(state)
 });
 
 // Mapping actions to dispatch

@@ -30,6 +30,7 @@ import {hasAccess} from "../../utils/utils";
 import {showActions} from "../../actions/eventActions";
 import {GlobalHotKeys} from "react-hotkeys";
 import {availableHotkeys} from "../../configs/hotkeysConfig";
+import { getCurrentFilterResource } from '../../selectors/tableFilterSelectors';
 
 
 // References for detecting a click outside of the container of the dropdown menu
@@ -40,7 +41,7 @@ const containerAction = React.createRef();
  */
 const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loadingSeries,
     loadingSeriesIntoTable, loadingFilters, loadingStats, loadingEventMetadata, resetTextFilter,
-    resetOffset, user, setShowActions }) => {
+    resetOffset, user, setShowActions, currentFilterType }) => {
 
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
@@ -67,9 +68,6 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
     };
 
     const loadSeries = () => {
-        // load filter for series
-        loadingFilters("series");
-
         // Reset the current page to first page
         resetOffset();
 
@@ -81,6 +79,10 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
     }
 
     useEffect(() => {
+
+        if ("events" !== currentFilterType) {
+            loadingFilters("events");
+        }
 
         resetTextFilter();
 
@@ -194,10 +196,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
                     {hasAccess("ROLE_UI_EVENTS_VIEW", user) && (
                       <Link to="/events/events"
                             className={cn({active: true})}
-                            onClick={() => {
-                                loadingFilters("events");
-                                loadEvents().then();
-                            }}>
+                            onClick={() => loadEvents()}>
                           {t('EVENTS.EVENTS.NAVIGATION.EVENTS')}
                       </Link>
                     )}
@@ -285,7 +284,8 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 const mapStateToProps = state => ({
     events: getTotalEvents(state),
     showActions: isShowActions(state),
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    currentFilterType: getCurrentFilterResource(state)
 });
 
 // Mapping actions to dispatch

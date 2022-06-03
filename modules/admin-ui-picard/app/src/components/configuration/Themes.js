@@ -20,11 +20,14 @@ import Header from "../Header";
 import Footer from "../Footer";
 import {getUserInformation} from "../../selectors/userInfoSelectors";
 import {hasAccess} from "../../utils/utils";
+import { getCurrentFilterResource } from '../../selectors/tableFilterSelectors';
 
 /**
  * This component renders the table view of events
  */
-const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters, resetTextFilter, user }) => {
+const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters, resetTextFilter,
+    user, currentFilterType }) => {
+
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewThemesModal, setNewThemesModal] = useState(false);
@@ -38,13 +41,14 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters,
     };
 
     useEffect(() => {
+        if ("themes" !== currentFilterType) {
+            loadingFilters("themes");
+        }
+
         resetTextFilter();
 
         // Load themes on mount
         loadThemes().then(r => logger.info(r));
-
-        // Load filters
-        loadingFilters('themes');
 
         // Fetch themes every minute
         let fetchThemesInterval = setInterval(loadThemes, 5000);
@@ -122,7 +126,8 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters,
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     themes: getTotalThemes(state),
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    currentFilterType: getCurrentFilterResource(state)
 });
 
 // Mapping actions to dispatch

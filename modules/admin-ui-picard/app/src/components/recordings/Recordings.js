@@ -19,11 +19,13 @@ import Header from "../Header";
 import Footer from "../Footer";
 import {getUserInformation} from "../../selectors/userInfoSelectors";
 import {hasAccess} from "../../utils/utils";
+import { getCurrentFilterResource } from '../../selectors/tableFilterSelectors';
 
 /**
  * This component renders the table view of recordings
  */
-const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings, loadingFilters, resetTextFilter, user }) => {
+const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings, loadingFilters,
+    resetTextFilter, user, currentFilterType }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
 
@@ -36,6 +38,11 @@ const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings,
     }
 
     useEffect(() => {
+
+        if ("recordings" !== currentFilterType) {
+            loadingFilters("recordings");
+        }
+
         resetTextFilter();
 
         // Load recordings on mount
@@ -60,10 +67,7 @@ const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings,
                     {hasAccess("ROLE_UI_LOCATIONS_VIEW", user) && (
                         <Link to="/recordings/recordings"
                               className={cn({active: true})}
-                              onClick={() => {
-                                  loadingFilters("recordings");
-                                  loadRecordings().then();
-                              }} >
+                              onClick={() => loadRecordings()} >
                             {t('RECORDINGS.NAVIGATION.LOCATIONS')}
                         </Link>
                     )}
@@ -94,7 +98,8 @@ const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings,
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     recordings: getTotalRecordings(state),
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    currentFilterType: getCurrentFilterResource(state)
 });
 
 // Mapping actions to dispatch

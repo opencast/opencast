@@ -12,17 +12,17 @@ const RecordingsNameCell = ({ row, loadingEventsIntoTable, setSpecificEventFilte
     const { t } = useTranslation();
 
     const redirectToEvents = async locationName => {
+        // redirect to tables
+        await loadingEventsIntoTable();
+
         // set the location filter value of events to location name
         await setSpecificEventFilter('location', locationName);
-
-        // redirect to tables
-        loadingEventsIntoTable();
     }
 
     return (
         <Link to="/events/events"
               className="crosslink"
-              onClick={() => redirectToEvents(row.Name)}
+              onClick={async () => await redirectToEvents(row.Name)}
               title={t('RECORDINGS.RECORDINGS.TABLE.TOOLTIP.NAME')}>
             {row.Name}
         </Link>

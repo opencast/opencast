@@ -1,9 +1,15 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
 import {connect} from 'react-redux';
 import {DatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
-import {getFilters, getSecondFilter, getSelectedFilter, getTextFilter} from '../../selectors/tableFilterSelectors';
+import {
+    getCurrentFilterResource,
+    getFilters,
+    getSecondFilter,
+    getSelectedFilter,
+    getTextFilter
+} from '../../selectors/tableFilterSelectors';
 import {
     editFilterValue,
     editSecondFilter,
@@ -18,6 +24,8 @@ import TableFilterProfiles from "./TableFilterProfiles";
 import {getCurrentLanguageInformation} from "../../utils/utils";
 import {availableHotkeys} from "../../configs/hotkeysConfig";
 import {GlobalHotKeys} from "react-hotkeys";
+import { getResourceType } from '../../selectors/tableSelectors';
+import { fetchFilters } from '../../thunks/tableFilterThunks';
 
 
 /**
@@ -25,7 +33,7 @@ import {GlobalHotKeys} from "react-hotkeys";
  */
 const TableFilters = ({filterMap, textFilter, selectedFilter, secondFilter, onChangeTextFilter,
     removeTextFilter, editSelectedFilter, removeSelectedFilter, removeSecondFilter, resetFilterMap,
-    editFilterValue, loadResource, loadResourceIntoTable, resource }) => {
+    editFilterValue, loadResource, loadResourceIntoTable, resource}) => {
     const { t } = useTranslation();
 
     // Variables for showing different dialogs depending on what was clicked
@@ -362,7 +370,9 @@ const mapStateToProps = state => ({
     textFilter: getTextFilter(state),
     filterMap: getFilters(state),
     selectedFilter: getSelectedFilter(state),
-    secondFilter: getSecondFilter(state)
+    secondFilter: getSecondFilter(state),
+    resourceType: getResourceType(state),
+    filterResourceType: getCurrentFilterResource(state)
 });
 
 // Mapping actions to dispatch
@@ -374,7 +384,8 @@ const mapDispatchToProps = dispatch => ({
     editSecondFilter: filter => dispatch(editSecondFilter(filter)),
     removeSecondFilter: () => dispatch(removeSecondFilter()),
     resetFilterMap: () => dispatch(resetFilterValues()),
-    editFilterValue: (filterName, value) => dispatch(editFilterValue(filterName, value))
+    editFilterValue: (filterName, value) => dispatch(editFilterValue(filterName, value)),
+    loadingFilters: resource => dispatch(fetchFilters(resource)),
 });
 
 

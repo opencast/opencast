@@ -63,7 +63,7 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
     const [showPageSizes, setShowPageSizes] = useState(false);
     const [displayEditTableViewModal, setEditTableViewModal] = useState(false);
 
-    const {resources, requestSort, sortConfig } = useSortRows(rows);
+    const { resources, requestSort, sortConfig } = useSortRows(rows);
 
 
     useEffect(() => {

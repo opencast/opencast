@@ -23,13 +23,14 @@ import Header from "../Header";
 import Footer from "../Footer";
 import {getUserInformation} from "../../selectors/userInfoSelectors";
 import {hasAccess} from "../../utils/utils";
+import { getCurrentFilterResource } from '../../selectors/tableFilterSelectors';
 
 /**
  * This component renders the table view of groups
  */
 const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
                     loadingUsers, loadingUsersIntoTable, loadingAcls,
-                    loadingAclsIntoTable, resetTextFilter, resetOffset, user }) => {
+                    loadingAclsIntoTable, resetTextFilter, resetOffset, user, currentFilterType }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewGroupModal, setNewGroupModal] = useState(false);
@@ -43,8 +44,6 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
     }
 
     const loadUsers = () => {
-        loadingFilters("users");
-
         // Reset the current page to first page
         resetOffset();
 
@@ -56,8 +55,6 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
     }
 
     const loadAcls = () => {
-        loadingFilters("acls");
-
         // Reset the current page to first page
         resetOffset();
 
@@ -69,6 +66,10 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
     }
 
     useEffect(() => {
+        if ("groups" !== currentFilterType) {
+            loadingFilters("groups");
+        }
+
         resetTextFilter();
 
         // Load groups on mount
@@ -128,10 +129,7 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
                     {hasAccess("ROLE_UI_GROUPS_VIEW", user) && (
                         <Link to="/users/groups"
                               className={cn({active: true})}
-                              onClick={() => {
-                                  loadingFilters("groups");
-                                  loadGroups().then();
-                              }}>
+                              onClick={() => loadGroups()}>
                             {t('USERS.NAVIGATION.GROUPS')}
                         </Link>
                     )}
@@ -169,7 +167,8 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     groups: getTotalGroups(state),
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    currentFilterType: getCurrentFilterResource(state)
 });
 
 // Mapping actions to dispatch

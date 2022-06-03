@@ -79,11 +79,11 @@ const Header = ({ loadingHealthStatus, healthStatus, errorCounter, user, orgProp
     }
 
     const redirectToServices = async () => {
+        // Load services into table
+        await loadingServicesIntoTable();
+
         // set the action filter value of services to true
         await setSpecificServiceFilter('actions', 'true');
-
-        // Load services into table
-        loadingServicesIntoTable();
     }
 
     const showHotKeyCheatSheet = () => {
@@ -268,7 +268,7 @@ const MenuNotify = ({ healthStatus, redirectToServices }) => {
             {healthStatus.map((service, key) => (
                 <li key={key}>
                     {!!service.status && (
-                        <Link to="/systems/services" onClick={() => redirectToServices()}>
+                        <Link to="/systems/services" onClick={async () => await redirectToServices()}>
                             <span> {service.name} </span>
                             {service.error ? (
                                 <span className="ng-multi-value ng-multi-value-red">{service.status}</span>

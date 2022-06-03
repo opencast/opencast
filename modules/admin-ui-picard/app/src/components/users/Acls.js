@@ -23,13 +23,14 @@ import Header from "../Header";
 import Footer from "../Footer";
 import {hasAccess} from "../../utils/utils";
 import {getUserInformation} from "../../selectors/userInfoSelectors";
+import { getCurrentFilterResource } from '../../selectors/tableFilterSelectors';
 
 /**
  * This component renders the table view of acls
  */
 const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
                   loadingUsers, loadingUsersIntoTable, loadingGroups,
-                  loadingGroupsIntoTable, resetTextFilter, resetOffset, user }) => {
+                  loadingGroupsIntoTable, resetTextFilter, resetOffset, user, currentFilterType }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewAclModal, setNewAclModal] = useState(false);
@@ -43,8 +44,6 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
     };
 
     const loadUsers = () => {
-        loadingFilters("users");
-
         // Reset the current page to first page
         resetOffset();
 
@@ -56,8 +55,6 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
     };
 
     const loadGroups = () => {
-        loadingFilters("groups");
-
         // Reset the current page to first page
         resetOffset();
 
@@ -69,6 +66,10 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
     };
 
     useEffect(() => {
+        if ("acls" !== currentFilterType) {
+            loadingFilters("acls");
+        }
+
         resetTextFilter();
 
         // Load acls on mount
@@ -135,10 +136,7 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
                     {hasAccess("ROLE_UI_ACLS_VIEW", user) && (
                         <Link to="/users/acls"
                               className={cn({active: true})}
-                              onClick={() => {
-                                  loadingFilters("acl");
-                                  loadAcls().then();
-                              }}>
+                              onClick={() => loadAcls()}>
                             {t('USERS.NAVIGATION.PERMISSIONS')}
                         </Link>
                     )}
@@ -168,7 +166,8 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     acls: getTotalAcls(state),
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    currentFilterType: getCurrentFilterResource(state)
 });
 
 // Mapping actions to dispatch

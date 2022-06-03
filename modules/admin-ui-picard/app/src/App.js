@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {connect} from "react-redux";
-import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import './App.scss';
 import Events from "./components/events/Events";
 import Recordings from "./components/recordings/Recordings";
@@ -14,17 +14,14 @@ import Services from "./components/systems/Services";
 import Groups from "./components/users/Groups";
 import Acls from "./components/users/Acls";
 import {fetchOcVersion, fetchUserInfo} from "./thunks/userInfoThunks";
-import { fetchFilters } from './thunks/tableFilterThunks';
 
-function App({ loadingUserInfo, loadingOcVersion, loadingFilters }) {
+function App({ loadingUserInfo, loadingOcVersion }) {
     useEffect(() => {
        // Load information about current user on mount
        loadingUserInfo();
        // Load information about current opencast version on mount
        loadingOcVersion();
-       // Load initial filters for event table view
-       loadingFilters("events");
-    }, [loadingFilters, loadingOcVersion, loadingUserInfo]);
+    }, [loadingOcVersion, loadingUserInfo]);
 
   return (
           <HashRouter>
@@ -62,8 +59,7 @@ function App({ loadingUserInfo, loadingOcVersion, loadingFilters }) {
 
 const mapDispatchToProps = dispatch => ({
     loadingUserInfo: () => dispatch(fetchUserInfo()),
-    loadingOcVersion: () => dispatch(fetchOcVersion()),
-    loadingFilters: resource => dispatch(fetchFilters(resource))
+    loadingOcVersion: () => dispatch(fetchOcVersion())
 });
 
 export default connect(null, mapDispatchToProps)(App);

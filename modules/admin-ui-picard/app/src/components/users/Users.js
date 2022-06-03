@@ -29,7 +29,7 @@ import {hasAccess} from "../../utils/utils";
  */
 const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
                    loadingGroups, loadingGroupsIntoTable, loadingAcls,
-                   loadingAclsIntoTable, resetTextFilter, resetOffset, user }) => {
+                   loadingAclsIntoTable, resetTextFilter, resetOffset, user, currentFilterType }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewUserModal, setNewUserModal] = useState(false);
@@ -44,8 +44,6 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
     }
 
     const loadGroups = () => {
-        loadingFilters("groups");
-
         // Reset the current page to first page
         resetOffset();
 
@@ -57,8 +55,6 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
     }
 
     const loadAcls = () => {
-        loadingFilters("acls");
-
         // Reset the current page to first page
         resetOffset();
 
@@ -70,6 +66,11 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
     }
 
     useEffect(() => {
+
+        if ("users" !== currentFilterType) {
+            loadingFilters("users");
+        }
+
         resetTextFilter();
 
         // Load users on mount
@@ -122,10 +123,7 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
                     {hasAccess("ROLE_UI_USERS_VIEW", user) && (
                         <Link to="/users/users"
                               className={cn({active: true})}
-                              onClick={() => {
-                                  loadingFilters("users");
-                                  loadUsers().then();
-                              }}>
+                              onClick={() => loadUsers()}>
                             {t('USERS.NAVIGATION.USERS')}
                         </Link>
                     )}

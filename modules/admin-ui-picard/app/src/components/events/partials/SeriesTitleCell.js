@@ -12,18 +12,18 @@ const SeriesTitleCell = ({ row, loadingEventsIntoTable, setSpecificEventFilter }
     const { t } = useTranslation();
 
     const redirectToEvents = async seriesId => {
+        // redirect to tables
+        await loadingEventsIntoTable();
+
         // set the series filter value of events to series title
         await setSpecificEventFilter('series', seriesId);
-
-        // redirect to tables
-        loadingEventsIntoTable();
     }
 
     return (
         <Link to="/events/events"
               className="crosslink"
               title={t('EVENTS.SERIES.TABLE.TOOLTIP.SERIES')}
-              onClick={() => redirectToEvents(row.id)}>
+              onClick={async () => await redirectToEvents(row.id)}>
             {row.title}
         </Link>
     )
