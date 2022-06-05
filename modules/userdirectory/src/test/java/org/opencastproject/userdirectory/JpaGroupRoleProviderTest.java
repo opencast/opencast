@@ -58,9 +58,6 @@ public class JpaGroupRoleProviderTest {
   public ExpectedException thrown = ExpectedException.none();
 
   private JpaGroupRoleProvider provider = null;
-
-  private JpaUserAndRoleProvider userProvider = null;
-
   private static JpaOrganization org1 = new JpaOrganization("org1", "org1", "localhost", 80, "admin", "anon", null);
   private static JpaOrganization org2 = new JpaOrganization("org2", "org2", "127.0.0.1", 80, "admin", "anon", null);
 
@@ -86,6 +83,7 @@ public class JpaGroupRoleProviderTest {
     provider.setSecurityService(securityService);
     provider.setEntityManagerFactory(newTestEntityManagerFactory(JpaUserAndRoleProvider.PERSISTENCE_UNIT));
     provider.activate(null);
+
   }
 
   @Test

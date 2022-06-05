@@ -314,13 +314,17 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
    *          the user's organization
    *
    */
-  public void removeMemberFromAllGroups(String userName, String orgId) throws UnauthorizedException {
+  public void removeMemberFromAllGroups(String userName, String orgId) {
     // List of the user's groups
     List<JpaGroup> membership = UserDirectoryPersistenceUtil.findGroupsByUser(userName, orgId, emf);
     for (JpaGroup group : membership) {
-      logger.debug("Removing user {} from group {}", userName, group.getRole());
-      group.getMembers().remove(userName);
-      addGroup(group);
+      try {
+        logger.debug("Removing user {} from group {}", userName, group.getRole());
+        group.getMembers().remove(userName);
+        addGroup(group);
+      } catch (UnauthorizedException e) {
+        logger.warn("Unauthorized to add or remove user {} from group {}", userName, group.getRole(), e);
+      }
     }
   }
 
