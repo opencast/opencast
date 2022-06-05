@@ -306,6 +306,25 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
   }
 
   /**
+   * Removes a user from all groups
+   *
+   * @param userName
+   *          the username
+   * @param orgId
+   *          the user's organization
+   *
+   */
+  public void removeMemberFromAllGroups(String userName, String orgId) throws UnauthorizedException {
+    // List of the user's groups
+    List<JpaGroup> membership = UserDirectoryPersistenceUtil.findGroupsByUser(userName, orgId, emf);
+    for (JpaGroup group : membership) {
+      logger.debug("Removing user {} from group {}", userName, group.getRole());
+      group.getMembers().remove(userName);
+      addGroup(group);
+    }
+  }
+
+  /**
    * Loads a group from persistence
    *
    * @param groupId
