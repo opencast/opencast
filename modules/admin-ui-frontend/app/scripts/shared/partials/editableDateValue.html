@@ -1,4 +1,7 @@
-<div ng-click="enterEditMode()" ng-form="innerForm">
+<div ng-click="enterEditMode()"
+     ng-form="innerForm"
+     ng-class="{ dirty: params.dirty }">
+
   &nbsp;<span ng-show="!editMode">{{ params.value | localizeDate:'dateTime'  }}</span>
   <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-focus="enterEditMode()" tabindex="{{ params.tabindex }}"></i>
 
