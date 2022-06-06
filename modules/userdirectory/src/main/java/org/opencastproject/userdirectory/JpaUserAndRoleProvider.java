@@ -493,7 +493,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     }
 
     // Remove the user's group membership
-    groupRoleProvider.updateGroupMembershipFromRoles(username, orgId, new ArrayList<String>());
+    groupRoleProvider.removeMemberFromAllGroups(username, orgId);
 
     // Remove the user
     UserDirectoryPersistenceUtil.deleteUser(username, orgId, emf);
