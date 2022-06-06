@@ -29,12 +29,6 @@ import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
 
 import org.opencastproject.capture.CaptureParameters;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.ingest.impl.jmx.IngestStatistics;
@@ -318,7 +312,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   private MediaInspectionService mediaInspectionService = null;
 
   /** The search index. */
-  private ElasticsearchIndex elasticsearchIndex;
 
   /** The default workflow identifier, if one is configured */
   protected String defaultWorkflowDefinionId;
@@ -1776,12 +1769,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     organizationDirectoryService = organizationDirectory;
   }
 
-  /** OSGi callbacks for setting the API index. */
-  @Reference
-  public void setElasticsearchIndex(ElasticsearchIndex index) {
-    this.elasticsearchIndex = index;
-  }
-
   /**
    * {@inheritDoc}
    *
@@ -1980,7 +1967,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   }
 
   private MediaPackage checkForCASeries(MediaPackage mp, String seriesAppendName) {
-    //Check for mediapackage id and CA series appendix set
+    //Check for media package id and CA series appendix set
     if (mp == null || seriesAppendName == null) {
       logger.debug("No series name provided");
       return mp;
@@ -2002,47 +1989,37 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
 
     String roleName = SecurityUtil.getCaptureAgentRole(captureAgentId);
-    logger.debug("CA Rolename: " + roleName);
+    logger.debug("Capture agent role name: {}", roleName);
 
     // Find or create CA series
+    String seriesId = captureAgentId.replaceAll("[^\\w-_.:;()]+", "_");
     String seriesName = captureAgentId + seriesAppendName;
-    SeriesSearchQuery query = new SeriesSearchQuery(securityService.getOrganization().getId(),
-            securityService.getUser());
-    query.withTitle(seriesName);
 
-    SearchResultItem<Series>[] seriesList = null;
     try {
-      SearchResult searchResult = elasticsearchIndex.getByQuery(query);
-      seriesList = searchResult.getItems();
-    } catch (SearchIndexException e) {
-      logger.error("Exception while searching for series: " + seriesName, e);
-      return mp;
-    }
-    String seriesIdentifier = null;
-    if (seriesList.length == 0) {
+      seriesService.getSeries(seriesId);
+    } catch (NotFoundException nfe) {
       try {
-        DublinCoreCatalog series = createSeries(seriesName, roleName);
-        seriesIdentifier = series.getFirst(PROPERTY_IDENTIFIER);
+        createSeries(seriesId, seriesName, roleName);
       } catch (Exception e) {
-        logger.error("Unable to create series {} for event {}", seriesName, mp.getIdentifier(), e);
+        logger.error("Unable to create series {} for event {}", seriesName, mp, e);
         return mp;
       }
-    } else if (seriesList.length == 1) {
-      seriesIdentifier = seriesList[0].getSource().getIdentifier();
-    } else {
-      logger.error("More than one series with name {} found for event {}", seriesName, mp.getIdentifier());
+    } catch (SeriesException | UnauthorizedException e) {
+      logger.error("Exception while searching for series {}", seriesName, e);
       return mp;
     }
+
     // Add the event to CA series
-    mp.setSeries(seriesIdentifier);
+    mp.setSeries(seriesId);
     mp.setSeriesTitle(seriesName);
 
     return mp;
   }
 
-  private DublinCoreCatalog createSeries(String seriesName, String roleName) throws SeriesException, UnauthorizedException, NotFoundException {
+  private DublinCoreCatalog createSeries(String seriesId, String seriesName, String roleName)
+      throws SeriesException, UnauthorizedException, NotFoundException {
     DublinCoreCatalog dc = DublinCores.mkOpencastSeries().getCatalog();
-    dc.set(PROPERTY_IDENTIFIER, UUID.randomUUID().toString());
+    dc.set(PROPERTY_IDENTIFIER, seriesId);
     dc.set(PROPERTY_TITLE, seriesName);
     dc.set(DublinCore.PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(new Date(), Precision.Second));
     // set series name
@@ -2052,7 +2029,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     AccessControlEntry aceRead = new AccessControlEntry(roleName, Permissions.Action.READ.toString(), true);
     AccessControlEntry aceWrite = new AccessControlEntry(roleName, Permissions.Action.WRITE.toString(), true);
     AccessControlList acl = new AccessControlList(aceRead, aceWrite);
-    String seriesId = createdSeries.getFirst(PROPERTY_IDENTIFIER);
     seriesService.updateAccessControl(seriesId, acl);
     logger.info("Created capture agent series with name {} and id {}", seriesName, seriesId);
 
