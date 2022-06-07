@@ -486,6 +486,13 @@
     <property name="loginFormUrl" value="/admin-ng/login.html" />
   </bean>
 
+  <!-- Redirect unauthenticated requests to custom login url with configurable redirect query parameter
+       Example: http://localhost/Shibboleth.sso/Login?target=<RELATIVE_REQUEST_URL> -->
+  <!--bean id="userEntryPoint" class="org.opencastproject.kernel.security.RedirectQueryParamAuthenticationEntryPoint">
+    <constructor-arg index="0" value="/Shibboleth.sso/Login" />
+    <constructor-arg index="1" value="target" />
+  </bean-->
+
   <!-- Returns a 401 request for authentication via digest auth -->
   <bean id="digestEntryPoint" class="org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint">
     <property name="realmName" value="Opencast" />
