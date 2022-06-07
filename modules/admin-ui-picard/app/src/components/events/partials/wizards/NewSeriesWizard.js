@@ -23,6 +23,7 @@ const NewSeriesWizard = ({ metadataFields, close, postNewSeries }) => {
 
     const [page, setPage] = useState(0);
     const [snapshot, setSnapshot] = useState(initialValues);
+    const [pageCompleted, setPageCompleted] = useState({});
 
     // Caption of steps used by Stepper
     const steps = [{
@@ -48,6 +49,12 @@ const NewSeriesWizard = ({ metadataFields, close, postNewSeries }) => {
 
     const nextPage = values => {
         setSnapshot(values);
+
+        // set page as completely fill out
+        let updatedPageCompleted = pageCompleted;
+        updatedPageCompleted[page] = true;
+        setPageCompleted(updatedPageCompleted);
+
         if (steps[page + 1].hidden) {
             setPage(page + 2);
         } else {
@@ -84,6 +91,8 @@ const NewSeriesWizard = ({ metadataFields, close, postNewSeries }) => {
                       <WizardStepper steps={steps}
                                      page={page}
                                      setPage={setPage}
+                                     completed={pageCompleted}
+                                     setCompleted={setPageCompleted}
                                      formik={formik}
                                      hasAccessPage />
                       <div>

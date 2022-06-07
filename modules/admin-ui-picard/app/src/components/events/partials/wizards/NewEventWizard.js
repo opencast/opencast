@@ -34,6 +34,7 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent }) => {
 
     const [page, setPage] = useState(0);
     const [snapshot, setSnapshot] = useState(initialValues);
+    const [pageCompleted, setPageCompleted] = useState({});
 
     // Caption of steps used by Stepper
     const steps = [
@@ -74,6 +75,12 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent }) => {
 
     const nextPage = values => {
         setSnapshot(values);
+
+        // set page as completely fill out
+        let updatedPageCompleted = pageCompleted;
+        updatedPageCompleted[page] = true;
+        setPageCompleted(updatedPageCompleted);
+
         if (steps[page + 1].hidden) {
             setPage(page + 2);
         } else {
@@ -112,6 +119,8 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent }) => {
                           <WizardStepperEvent steps={steps}
                                               page={page}
                                               setPage={setPage}
+                                              completed={pageCompleted}
+                                              setCompleted={setPageCompleted}
                                               formik={formik}/>
                           <div>
                               {page === 0 && (

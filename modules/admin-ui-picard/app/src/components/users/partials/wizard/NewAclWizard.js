@@ -18,7 +18,8 @@ import AclAccessPage from "./AclAccessPage";
 const NewAclWizard = ({ close, postNewAcl }) => {
     const initialValues = initialFormValuesNewAcl;
 
-    const [snapshot, page, nextPage, previousPage, setPage] = usePageFunctions(0, initialValues);
+    const [snapshot, page, nextPage, previousPage, setPage,
+        pageCompleted, setPageCompleted] = usePageFunctions(0, initialValues);
 
     const steps = [
         {
@@ -57,6 +58,8 @@ const NewAclWizard = ({ close, postNewAcl }) => {
                       <WizardStepper steps={steps}
                                      page={page}
                                      setPage={setPage}
+                                     completed={pageCompleted}
+                                     setCompleted={setPageCompleted}
                                      formik={formik}
                                      hasAccessPage />
                       <div>

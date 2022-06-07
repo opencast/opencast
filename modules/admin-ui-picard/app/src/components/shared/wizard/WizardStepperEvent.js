@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from 'react';
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import { Step, StepButton, StepLabel, Stepper } from '@material-ui/core';
@@ -9,10 +9,13 @@ import { connect } from 'react-redux';
 import { checkConflicts } from '../../../thunks/eventThunks';
 
 
-const WizardStepperEvent = ({ steps, page, setPage, formik, checkAcls, checkConflicts }) => {
+const WizardStepperEvent = ({ steps, page, setPage, formik, checkAcls, checkConflicts,
+  completed, setCompleted }) => {
   const { t } = useTranslation();
 
   const classes = useStepperStyle();
+
+
 
   const handleOnClick = async key => {
     if (steps[page].name === "source") {
@@ -32,6 +35,9 @@ const WizardStepperEvent = ({ steps, page, setPage, formik, checkAcls, checkConf
     }
 
     if (formik.isValid) {
+      let updatedCompleted = completed;
+      updatedCompleted[page] = true;
+      setCompleted(updatedCompleted);
       setPage(key);
     }
   }
@@ -46,7 +52,7 @@ const WizardStepperEvent = ({ steps, page, setPage, formik, checkAcls, checkConf
              className={cn("step-by-step", classes.root)}>
       {steps.map((label, key) => (
         !label.hidden ? (
-          <Step key={label.translation}>
+          <Step key={label.translation} completed={completed[key]}>
             <StepButton onClick={() => handleOnClick(key)} disabled={disabled}>
               <StepLabel StepIconComponent={CustomStepIcon}>{t(label.translation)}</StepLabel>
             </StepButton>

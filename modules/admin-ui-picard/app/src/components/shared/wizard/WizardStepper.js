@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from 'react';
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import { Step, StepButton, StepLabel, Stepper } from '@material-ui/core';
@@ -10,7 +10,8 @@ import { connect } from 'react-redux';
 /**
  * This components renders the stepper navigation of new resource wizards
  */
-const WizardStepper = ({ steps, page, setPage, formik, hasAccessPage=false, checkAcls }) => {
+const WizardStepper = ({ steps, page, setPage, formik, hasAccessPage=false, checkAcls,
+    completed, setCompleted }) => {
     const { t } = useTranslation();
 
     const classes = useStepperStyle();
@@ -25,6 +26,9 @@ const WizardStepper = ({ steps, page, setPage, formik, hasAccessPage=false, chec
         }
 
         if (formik.isValid) {
+            let updatedCompleted = completed;
+            updatedCompleted[page] = true;
+            setCompleted(updatedCompleted);
             setPage(key);
         }
     }
@@ -39,7 +43,7 @@ const WizardStepper = ({ steps, page, setPage, formik, hasAccessPage=false, chec
                  className={cn("step-by-step", classes.root)}>
             {steps.map((label, key) => (
                 !label.hidden ? (
-                    <Step key={label.translation}>
+                    <Step key={label.translation} completed={completed[key]}>
                         <StepButton onClick={() => handleOnClick(key)} disabled={disabled}>
                             <StepLabel StepIconComponent={CustomStepIcon}>{t(label.translation)}</StepLabel>
                         </StepButton>

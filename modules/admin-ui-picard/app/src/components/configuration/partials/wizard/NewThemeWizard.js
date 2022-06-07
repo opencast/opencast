@@ -19,7 +19,8 @@ const NewThemeWizard = ({ close, postNewTheme }) => {
 
     const initialValues = initialFormValuesNewThemes;
 
-    const [snapshot, page, nextPage, previousPage, setPage] = usePageFunctions(0, initialValues);
+    const [snapshot, page, nextPage, previousPage, setPage,
+        pageCompleted, setPageCompleted] = usePageFunctions(0, initialValues);
 
     // Caption of steps used by Stepper
     const steps = [
@@ -71,6 +72,8 @@ const NewThemeWizard = ({ close, postNewTheme }) => {
                       <WizardStepper steps={steps}
                                      page={page}
                                      setPage={setPage}
+                                     completed={pageCompleted}
+                                     setCompleted={setPageCompleted}
                                      formik={formik} />
                       <div>
                           {page === 0 && (
