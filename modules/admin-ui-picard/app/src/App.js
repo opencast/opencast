@@ -54,7 +54,7 @@ function App({ loadingUserInfo, loadingOcVersion }) {
                          render={() => <Navigate to={"/events/events"} replace />} />
               </Routes>
           </HashRouter>
-  )
+  );
 }
 
 const mapDispatchToProps = dispatch => ({
