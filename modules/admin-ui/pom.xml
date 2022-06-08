@@ -391,6 +391,7 @@
               org.opencastproject.adminui.endpoint;version=${project.version},
               org.opencastproject.adminui.exception;version=${project.version},
               org.opencastproject.adminui.impl;version=${project.version},
+              org.opencastproject.adminui.tobira;version=${project.version},
               org.opencastproject.adminui.userdirectory;version=${project.version},
               org.opencastproject.adminui.usersettings;version=${project.version},
               org.opencastproject.adminui.usersettings.persistence;version=${project.version},

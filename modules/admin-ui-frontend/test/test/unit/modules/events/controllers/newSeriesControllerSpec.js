@@ -36,6 +36,7 @@ describe('New Series Controller', function () {
             $httpBackend.whenGET('/admin-ng/acl/roles.json').respond('[]');
             $httpBackend.whenGET('/admin-ng/resources/components.json').respond('{}');
             $httpBackend.whenGET('/admin-ng/series/new/themes').respond('{}');
+            $httpBackend.whenGET('/admin-ng/series/new/tobira/page?path=%2F').respond('{}');
             $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
 
             Modal.$scope = { close: jasmine.createSpy() };
@@ -51,6 +52,9 @@ describe('New Series Controller', function () {
             }, {
                 name: 'theme',
                 stateController: { ud: { theme: '2' } }
+            }, {
+                name: 'tobira',
+                stateController: { ud: undefined }
             }];
         });
 
