@@ -121,6 +121,20 @@ const TableFilters = ({filterMap, textFilter, selectedFilter, secondFilter, onCh
         REMOVE_FILTERS: removeFilters
     }
 
+    const renderBlueBox = filter => {
+        let valueLabel = filter.options.find(opt => opt.value === filter.value).label;
+        return (
+            <span>
+                {t(filter.label).substr(0, 40)}:
+                {(filter.translatable) ? (
+                    t(valueLabel).substr(0, 40)
+                ) : (
+                    valueLabel.substr(0, 40)
+                )}
+            </span>
+        )
+    }
+
     return (
         <>
             <GlobalHotKeys keyMap={availableHotkeys.general} handlers={hotKeyHandlers}/>
@@ -202,16 +216,8 @@ const TableFilters = ({filterMap, textFilter, selectedFilter, secondFilter, onCh
                                                 {
                                                     // Use different representation of name and value depending on type of filter
                                                     filter.type === 'select' ?
-                                                        (
-                                                            <span>
-                                                                {t(filter.label).substr(0, 40)}:
-                                                                {(filter.translatable) ? (
-                                                                    t(filter.value).substr(0, 40)
-                                                                ) : (
-                                                                    filter.value.substr(0, 40)
-                                                                )}
-                                                            </span>
-                                                        ) :
+                                                            renderBlueBox(filter)
+                                                        :
                                                         filter.type === 'period' ?
                                                             (
                                                                 <span>
