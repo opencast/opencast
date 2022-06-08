@@ -181,6 +181,23 @@ angular.module('adminNg.services')
         }
       }).catch(angular.noop);
 
+      this.filterUserRoles = function (item) {
+        if (!item) {
+          return true;
+        }
+        return !item.includes(me.roleUserPrefix);
+      };
+
+      this.userToStringForDetails = function (user) {
+        if (!user) {
+          return undefined;
+        }
+        var n = user.name ? user.name : user.username;
+        var e = user.email ? '<' + user.email + '>' : '';
+
+        return n + ' ' + e;
+      };
+
       this.setMetadata = function (metadata) {
         me.metadata = metadata;
       };

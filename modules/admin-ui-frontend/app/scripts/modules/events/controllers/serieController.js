@@ -26,8 +26,8 @@ angular.module('adminNg.controllers')
   'SeriesThemeResource', 'SeriesTobiraResource', 'ResourcesListResource', 'RolesResource', 'UserResource',
   'UsersResource', 'Notifications', 'AuthService', 'StatisticsReusable', '$http', 'Modal', '$translate',
   function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource,
-    SeriesTobiraResource, ResourcesListResource, RolesResource, UserResource, UsersResource,
-    Notifications, AuthService, StatisticsReusable, $http, Modal, $translate) {
+    SeriesTobiraResource, ResourcesListResource, RolesResource, UserResource, UsersResource, Notifications,
+    AuthService, StatisticsReusable, $http, Modal, $translate) {
 
     var metadataChangedFns = {}, aclNotification,
         me = this,
@@ -406,8 +406,8 @@ angular.module('adminNg.controllers')
           if (angular.isDefined(data.series_access)) {
             var json = angular.fromJson(data.series_access.acl);
             changePolicies(json.acl.ace, true);
-            $scope.baseAclId = data.series_access.current_acl.toString();
             getCurrentPolicies();
+            $scope.baseAclId = data.series_access.current_acl.toString();
 
             $scope.aclLocked = data.series_access.locked;
 

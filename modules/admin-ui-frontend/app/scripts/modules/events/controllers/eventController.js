@@ -475,6 +475,7 @@ angular.module('adminNg.controllers')
               changePolicies(json.acl.ace, true);
               $scope.baseAclId = data.episode_access.current_acl.toString();
               getCurrentPolicies();
+              $scope.baseAclId = data.episode_access.current_acl.toString();
             }
           });
 
@@ -731,7 +732,7 @@ angular.module('adminNg.controllers')
           remainingACEs.push({role: policy.role, action: 'write', allow: true});
         }
         for (const action of policy.actions.value) {
-          remainingACEs.push({role: policy.role, action: action, allow: true})
+          remainingACEs.push({role: policy.role, action: action, allow: true});
         }
       });
 

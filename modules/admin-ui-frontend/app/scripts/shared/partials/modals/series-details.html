@@ -370,7 +370,6 @@
                                     ng-disabled="(tab == 'permissions') && (!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked)"
                                     data-width="'360px'"
                                     ng-model="policy.role"
-                                    ng-change="accessChanged(policy.role)"
                                     ng-options="role as role for role in roles | filter: filterUserRoles"
                                     call-on-search="getMatchingRoles"
                                     placeholder-text-single="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.LABEL' | translate }}'"
@@ -380,13 +379,11 @@
                           <td class="fit text-center">
                             <input type="checkbox"
                                    ng-model="policy.read"
-                                   ng-change="accessSave()"
                                    ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked || aclCreateDefaults['read_readonly']"/>
                           </td>
                           <td class="fit text-center">
                             <input type="checkbox"
                                    ng-model="policy.write"
-                                   ng-change="accessSave()"
                                    ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked || aclCreateDefaults['write_readonly']"/>
                           </td>
                           <td class="fit editable" ng-if="hasActions">

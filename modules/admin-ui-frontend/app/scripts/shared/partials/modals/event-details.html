@@ -589,7 +589,10 @@
                   </table>
                 </div>
               </div>
+<<<<<<< HEAD
 
+=======
+>>>>>>> dd63060d27 (3 & 67 Simplified ACL View & new Template Behavior (PR 4487))
               <div class="obj-container" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_USER_ROLES_VIEW')">
                 <div class="obj tbl-list">
                   <header translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.USERS">
@@ -632,7 +635,6 @@
                                   ng-disabled="((tab == 'access') && !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT'))"
                                   data-width="'360px'"
                                   ng-model="policy.role"
-                                  ng-change="accessChanged(policy.role)"
                                   ng-options="user.userRole as userToStringForDetails(user) for user in users"
                                   call-on-search="getMatchingUsers"
                                   placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.USERS.LABEL' | translate }}'"
@@ -645,18 +647,15 @@
                         <td class="fit text-center">
                           <input type="checkbox"
                                  ng-model="policy.read"
-                                 ng-change="accessSave()"
                                  ng-disabled="(transactions.read_only) || !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT') || aclCreateDefaults['read_readonly']"/>
                         </td>
                         <td class="fit text-center">
                           <input type="checkbox"
                                  ng-model="policy.write"
-                                 ng-change="accessSave()"
                                  ng-disabled="(transactions.read_only) || !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT') || aclCreateDefaults['write_readonly']"/>
                         </td>
                         <td class="fit editable" ng-if="hasActions">
                           <div ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT') && !transactions.read_only"
-                               save="accessSave"
                                admin-ng-editable-multi-select
                                mixed="false"
                                params="policy.actions"
@@ -682,18 +681,15 @@
                         <td class="fit text-center">
                           <input type="checkbox"
                                  ng-model="policy.read"
-                                 ng-change="accessSave()"
                                  ng-disabled="true"/>
                         </td>
                         <td class="fit text-center">
                           <input type="checkbox"
                                  ng-model="policy.write"
-                                 ng-change="accessSave()"
                                  ng-disabled="true"/>
                         </td>
                         <td class="fit editable" ng-if="hasActions">
                           <div ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT') && !transactions.read_only"
-                               save="accessSave"
                                admin-ng-editable-multi-select
                                mixed="false"
                                params="policy.actions"
@@ -756,7 +752,6 @@
                                     ng-disabled="((tab == 'access') && !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT'))"
                                     data-width="'360px'"
                                     ng-model="policy.role"
-                                    ng-change="accessChanged(policy.role)"
                                     ng-options="role as role for role in roles | filter: filterUserRoles"
                                     call-on-search="getMatchingRoles"
                                     placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL' | translate }}'"
@@ -769,18 +764,15 @@
                           <td class="fit text-center">
                             <input type="checkbox"
                                    ng-model="policy.read"
-                                   ng-change="accessSave()"
                                    ng-disabled="(transactions.read_only) || !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT') || aclCreateDefaults['read_readonly']"/>
                           </td>
                           <td class="fit text-center">
                             <input type="checkbox"
                                    ng-model="policy.write"
-                                   ng-change="accessSave()"
                                    ng-disabled="(transactions.read_only) || !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT') || aclCreateDefaults['write_readonly']"/>
                           </td>
                           <td class="fit editable" ng-if="hasActions">
                             <div ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT') && !transactions.read_only"
-                                 save="accessSave"
                                  admin-ng-editable-multi-select mixed="false"
                                  params="policy.actions"
                                  collection="actions">
@@ -814,10 +806,10 @@
               </div>
               <footer>
                 <a ng-click="accessSave(policy)"
-                  class="submit">
+                   class="submit">
                   {{ "SAVE" | translate}}
                 </a>
-            </footer>
+              </footer>
             </div>
           </li>
         </ul>
