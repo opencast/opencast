@@ -878,11 +878,22 @@
              "ADDITIONAL_ACTIONS" : "Additional Actions",
              "ACTION": "Actions",
              "NEW": "New policy",
-             "DETAILS": "Details"
+             "NEW_USER": "New user",
+             "DETAILS": "Non-user roles",
+             "USER": "User",
+             "USERS": "Users who are authorized for the event",
+             "HELP": {
+               "READ": "By setting read rights, the event becomes visible for the selected user",
+               "WRITE": "By setting write rights, the selected user can edit the event"
+             }
            },
            "ROLES": {
               "LABEL": "Select a role",
               "EMPTY": "No role found"
+           },
+           "USERS": {
+             "LABEL": "Select a user",
+             "EMPTY": "No user found"
            }
          },
          "COMMENTS": {
@@ -1100,12 +1111,23 @@
              "ADDITIONAL_ACTIONS" : "Additional Actions",
              "ACTION": "Actions",
              "NEW": "New policy",
-             "DETAILS": "Details"
+             "NEW_USER": "New user",
+             "DETAILS": "Non-user roles",
+             "USER": "User",
+             "USERS": "Users who are authorized for the event",
+             "HELP": {
+               "READ": "By setting read rights, the event becomes visible for the selected user",
+               "WRITE": "By setting write rights, the selected user can edit the event"
+             }
            },
            "ROLES": {
               "LABEL": "Select a role",
               "EMPTY": "No role found"
-           }
+            },
+            "USERS": {
+              "LABEL": "Select a user",
+              "EMPTY": "No user found"
+            }
          },
          "THEME": {
            "CAPTION": "Theme",
@@ -1163,16 +1185,27 @@
              "ADDITIONAL_ACTIONS" : "Additional Actions",
              "ACTION"      : "Actions",
              "NEW"         : "New policy",
-             "DETAILS"     : "Details",
+             "DETAILS": "Non-user roles",
              "REPLACE_EVENT_ACLS": "Update event permissions",
              "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect",
              "LOAD_MORE_LIMIT": "policies shown.",
-             "LOAD_MORE_LINK": "Load more"
+             "LOAD_MORE_LINK": "Load more",
+             "NEW_USER": "New user",
+             "USER": "User",
+             "USERS": "Users who are authorized for the event",
+             "HELP": {
+               "READ": "By setting read rights, the event becomes visible for the selected user",
+               "WRITE": "By setting write rights, the selected user can edit the event"
+             }
            },
            "ROLES": {
               "LABEL": "Select a role",
               "EMPTY": "No role found"
-           }
+            },
+            "USERS": {
+              "LABEL": "Select a user",
+              "EMPTY": "No user found"
+            }
          },
          "METADATA": {
            "TITLE":          "Title",
@@ -1403,13 +1436,24 @@
              "ADDITIONAL_ACTIONS" : "Additional Actions",
              "ACTION"      : "Actions",
              "NEW"         : "New policy",
-             "DETAILS"     : "Details",
-             "DESCRIPTION" : "Please choose a pre-configured set of policies or add custom policies below"
+             "DETAILS": "Non-user roles",
+             "DESCRIPTION" : "Please choose a pre-configured set of policies or add custom policies below",
+             "NEW_USER": "New user",
+             "USER": "User",
+             "USERS": "Users who are authorized for the event",
+             "HELP": {
+               "READ": "By setting read rights, the event becomes visible for the selected user",
+               "WRITE": "By setting write rights, the selected user can edit the event"
+             }
            },
            "ROLES": {
               "LABEL": "Select a role",
               "EMPTY": "No role found"
-           }
+            },
+            "USERS": {
+              "LABEL": "Select a user",
+              "EMPTY": "No user found"
+            }
          }
         },
         "DETAILS": {
@@ -1441,13 +1485,24 @@
              "ADDITIONAL_ACTIONS" : "Additional Actions",
              "ACTION"      : "Actions",
              "NEW"         : "New policy",
-             "DETAILS"     : "Details",
-             "DESCRIPTION" : "Please choose a pre-configured set of policies or add custom policies below"
+             "DETAILS": "Non-user roles",
+             "DESCRIPTION" : "Please choose a pre-configured set of policies or add custom policies below",
+             "NEW_USER": "New user",
+             "USER": "User",
+             "USERS": "Users who are authorized for the event",
+             "HELP": {
+               "READ": "By setting read rights, the event becomes visible for the selected user",
+               "WRITE": "By setting write rights, the selected user can edit the event"
+             }
            },
            "ROLES": {
               "LABEL": "Select a role",
               "EMPTY": "No role found"
-           }
+            },
+            "USERS": {
+              "LABEL": "Select a user",
+              "EMPTY": "No user found"
+            }
          }
        }
      }

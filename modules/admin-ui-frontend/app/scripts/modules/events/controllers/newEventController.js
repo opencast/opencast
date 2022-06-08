@@ -100,7 +100,7 @@ angular.module('adminNg.controllers')
             }
           }
         } else if (state.stateController.isAccessState) {
-          angular.forEach(state.stateController.ud.policies, function (policy) {
+          angular.forEach(state.stateController.getAllPolicies(), function (policy) {
             if (angular.isDefined(policy.role)) {
               if (policy.read) {
                 ace.push({

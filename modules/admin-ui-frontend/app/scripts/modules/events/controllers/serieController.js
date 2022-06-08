@@ -23,24 +23,26 @@
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
 .controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource',
-  'SeriesThemeResource', 'ResourcesListResource', 'RolesResource', 'Notifications', 'AuthService',
-  'StatisticsReusable', '$http', 'Modal', '$translate',
+  'SeriesThemeResource', 'ResourcesListResource', 'RolesResource', 'UserResource', 'UsersResource',
+  'Notifications', 'AuthService', 'StatisticsReusable', '$http', 'Modal', '$translate',
   function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource,
-    ResourcesListResource, RolesResource, Notifications, AuthService, StatisticsReusable, $http, Modal, $translate) {
+    ResourcesListResource, RolesResource, UserResource, UsersResource,
+    Notifications, AuthService, StatisticsReusable, $http, Modal, $translate) {
 
     var metadataChangedFns = {}, aclNotification,
         me = this,
         NOTIFICATION_CONTEXT = 'series-acl',
         mainCatalog = 'dublincore/series', fetchChildResources,
-        createPolicy = function (role) {
+        createPolicy = function (role, read, write) {
           return {
             role  : role,
-            read  : false,
-            write : false,
+            read  : read !== undefined ? read : true,
+            write : write !== undefined ? write : false,
             actions : {
               name : 'series-acl-actions',
               value : []
-            }
+            },
+            user: undefined,
           };
         },
         changePolicies = function (access, loading) {
@@ -60,7 +62,22 @@ angular.module('adminNg.controllers')
 
           $scope.policies = [];
           angular.forEach(newPolicies, function (policy) {
-            $scope.policies.push(policy);
+            if (!policy.role.startsWith($scope.roleUserPrefix)) {
+              $scope.policies.push(policy);
+            }
+          });
+
+          $scope.policiesUser = [];
+          angular.forEach(newPolicies, function (policy) {
+            if (policy.role.startsWith($scope.roleUserPrefix)) {
+              var id = policy.role.split($scope.roleUserPrefix).pop().toLowerCase();
+
+              UserResource.get({ username: id }).$promise.then(function (data) {
+                policy.user = data;
+              })
+
+              $scope.policiesUser.push(policy);
+            }
           });
 
           if (loading) {
@@ -89,15 +106,47 @@ angular.module('adminNg.controllers')
       this.baseAclId = '';
     };
 
+    $scope.filterUserRoles = function (item) {
+      if (!item) {
+        return true
+      }
+      return !item.includes($scope.roleUserPrefix)
+    };
+
+    $scope.userToStringForDetails = function (user) {
+      if (!user) {
+        return undefined;
+      }
+      var n = user.name ? user.name : user.username;
+      var e = user.email ? '<' + user.email + '>' : "";
+
+      return n + ' ' + e;
+    }
+
+    $scope.getAllPolicies = function () {
+      return [].concat($scope.policies, $scope.policiesUser)
+    }
+
     $scope.addPolicy = function () {
       $scope.policies.push(createPolicy());
       $scope.validAcl = false;
     };
 
-    $scope.deletePolicy = function (policyToDelete) {
+    // E.g. model === $scope.policies
+    $scope.addPolicy = function (model) {
+      model.push(createPolicy(
+        undefined,
+        $scope.aclCreateDefaults["read_enabled"],
+        $scope.aclCreateDefaults["write_enabled"]
+      ));
+      model.validAcl = false;
+    };
+
+    // E.g. model === $scope.policies
+    $scope.deletePolicy = function (model, policyToDelete) {
       var index;
 
-      angular.forEach($scope.policies, function (policy, idx) {
+      angular.forEach(model, function (policy, idx) {
         if (policy.role === policyToDelete.role &&
                 policy.write === policyToDelete.write &&
                 policy.read === policyToDelete.read) {
@@ -106,7 +155,7 @@ angular.module('adminNg.controllers')
       });
 
       if (angular.isDefined(index)) {
-        $scope.policies.splice(index, 1);
+        model.splice(index, 1);
       }
 
       $scope.accessSave();
@@ -114,6 +163,16 @@ angular.module('adminNg.controllers')
 
     $scope.getMatchingRoles = function (value) {
       RolesResource.queryNameOnly({query: value, target: 'ACL'}).$promise.then(function (data) {
+        angular.forEach(data, function(newRole) {
+          if ($scope.roles.indexOf(newRole) == -1) {
+            $scope.roles.unshift(newRole);
+          }
+        });
+      });
+    };
+
+    $scope.getMatchingUsers = function (value) {
+      UsersResource.query({query: value}).$promise.then(function (data) {
         angular.forEach(data, function(newRole) {
           if ($scope.roles.indexOf(newRole) == -1) {
             $scope.roles.unshift(newRole);
@@ -220,8 +279,28 @@ angular.module('adminNg.controllers')
       });
       $scope.aclLocked = false,
 
-      $scope.selectedTheme = {};
+      $scope.aclCreateDefaults = {};
+      $scope.aclCreateDefaults = ResourcesListResource.get({ resource: 'ACL.DEFAULTS'}, function(data) {
+        angular.forEach(data, function (value, key) {
+          if (key.charAt(0) !== '$') {
+            $scope.aclCreateDefaults[key] = value
+          }
+        });
 
+        $scope.aclCreateDefaults["read_enabled"] = $scope.aclCreateDefaults["read_enabled"] !== undefined
+          ? ($scope.aclCreateDefaults["read_enabled"].toLowerCase() === "true") : true
+        $scope.aclCreateDefaults["write_enabled"] = $scope.aclCreateDefaults["write_enabled"] !== undefined
+          ? ($scope.aclCreateDefaults["write_enabled"].toLowerCase() === "true") : false
+        $scope.aclCreateDefaults["read_readonly"] = $scope.aclCreateDefaults["read_readonly"] !== undefined
+          ? ($scope.aclCreateDefaults["read_readonly"].toLowerCase() === "true") : true
+        $scope.aclCreateDefaults["write_readonly"] = $scope.aclCreateDefaults["write_readonly"] !== undefined
+          ? ($scope.aclCreateDefaults["write_readonly"].toLowerCase() === "true") : false
+        $scope.roleUserPrefix = $scope.aclCreateDefaults["role_user_prefix"] !== undefined
+          ? $scope.aclCreateDefaults["role_user_prefix"]
+          : "ROLE_USER_"
+      });
+
+      $scope.selectedTheme = {};
       $scope.updateSelectedThemeDescripton = function () {
         if(angular.isDefined($scope.themeDescriptions)) {
           $scope.selectedTheme.description = $scope.themeDescriptions[$scope.selectedTheme.id];
@@ -253,28 +332,40 @@ angular.module('adminNg.controllers')
       $scope.roles = RolesResource.queryNameOnly({limit: -1, target: 'ACL'});
 
       $scope.access = SeriesAccessResource.get({ id: id }, function (data) {
-        if (angular.isDefined(data.series_access)) {
-          var json = angular.fromJson(data.series_access.acl);
-          changePolicies(json.acl.ace, true);
+        $scope.aclCreateDefaults.$promise.then(function () {
+          if (angular.isDefined(data.series_access)) {
+            var json = angular.fromJson(data.series_access.acl);
+            changePolicies(json.acl.ace, true);
 
-          $scope.aclLocked = data.series_access.locked;
+            $scope.aclLocked = data.series_access.locked;
 
-          if ($scope.aclLocked) {
-            aclNotification = Notifications.add('warning', 'SERIES_ACL_LOCKED', 'series-acl-' + id, -1);
-          } else if (aclNotification) {
-            Notifications.remove(aclNotification, 'series-acl');
-          }
+            if ($scope.aclLocked) {
+              aclNotification = Notifications.add('warning', 'SERIES_ACL_LOCKED', 'series-acl-' + id, -1);
+            } else if (aclNotification) {
+              Notifications.remove(aclNotification, 'series-acl');
+            }
 
-          $scope.roles.$promise.then(function () {
-            angular.forEach(data.series_access.privileges, function(value, key) {
-              if ($scope.roles.indexOf(key) == -1) {
-                $scope.roles.push(key);
-              }
+            $scope.roles.$promise.then(function () {
+              angular.forEach(data.series_access.privileges, function(value, key) {
+                if ($scope.roles.indexOf(key) == -1) {
+                  $scope.roles.push(key);
+                }
+              });
             });
-          });
-        }
+          }
+        })
       });
     };
+
+    $scope.users = UsersResource.query({limit: 2147483647})
+    $scope.users.$promise.then(function () {
+      var newUsers = []
+      angular.forEach($scope.users.rows, function(user) {
+          user.userRole = $scope.roleUserPrefix + user.username.replace(/\W/g, '').toUpperCase()
+          newUsers.push(user)
+      })
+      $scope.users = newUsers
+    })
 
     $scope.statReusable = null;
 
@@ -434,7 +525,7 @@ angular.module('adminNg.controllers')
       $scope.validAcl = false;
       override = override === true || $scope.updateMode === 'always';
 
-      angular.forEach($scope.policies, function (policy) {
+      angular.forEach($scope.getAllPolicies(), function (policy) {
         rulesValid = false;
 
         if (policy.read && policy.write) {

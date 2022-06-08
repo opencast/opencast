@@ -29,14 +29,14 @@ angular.module('adminNg.controllers')
   'EventPublicationsResource', 'EventSchedulingResource','NewEventProcessingResource', 'CaptureAgentsResource',
   'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService', 'UploadAssetOptions',
   'EventUploadAssetResource', 'Table', 'SchedulingHelperService', 'StatisticsReusable', 'Modal', '$translate',
-  'MetadataSaveService',
+  'MetadataSaveService', 'UserResource', 'UsersResource',
   function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource,
     EventAssetCatalogsResource, CommentResource, EventWorkflowsResource, EventWorkflowActionResource,
     EventWorkflowDetailsResource, ResourcesListResource, RolesResource, EventAccessResource,
     EventPublicationsResource, EventSchedulingResource, NewEventProcessingResource, CaptureAgentsResource,
     ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService, UploadAssetOptions,
     EventUploadAssetResource, Table, SchedulingHelperService, StatisticsReusable, Modal, $translate,
-    MetadataSaveService) {
+    MetadataSaveService, UserResource, UsersResource) {
 
     var metadataChangedFns = {},
         me = this,
@@ -46,15 +46,16 @@ angular.module('adminNg.controllers')
         idConfigElement = '#event-workflow-configuration',
         workflowConfigEl = angular.element(idConfigElement),
         baseWorkflow,
-        createPolicy = function (role) {
+        createPolicy = function (role, read, write) {
           return {
             role  : role,
-            read  : false,
-            write : false,
+            read  : read !== undefined ? read : true,
+            write : write !== undefined ? write : false,
             actions : {
               name : 'event-acl-actions',
               value : []
-            }
+            },
+            user: undefined,
           };
         },
         findWorkflow = function (id) {
@@ -188,7 +189,7 @@ angular.module('adminNg.controllers')
 
           // add policy to allow ROLE_USER_* to read and write
           var userRole = Object.keys($scope.roles).filter(function(role){
-            return role.startsWith('ROLE_USER_') && role != 'ROLE_USER_ADMIN';
+            return role.startsWith($scope.roleUserPrefix) && role != 'ROLE_USER_ADMIN';
           });
           if (angular.isDefined(userRole) && userRole.length == 1){
             userRole = userRole[0];
@@ -201,7 +202,22 @@ angular.module('adminNg.controllers')
 
           $scope.policies = [];
           angular.forEach(newPolicies, function (policy) {
-            $scope.policies.push(policy);
+            if (!policy.role.startsWith($scope.roleUserPrefix)) {
+              $scope.policies.push(policy);
+            }
+          });
+
+          $scope.policiesUser = [];
+          angular.forEach(newPolicies, function (policy) {
+            if (policy.role.startsWith($scope.roleUserPrefix)) {
+              var id = policy.role.split($scope.roleUserPrefix).pop().toLowerCase();
+
+              UserResource.get({ username: id }).$promise.then(function (data) {
+                policy.user = data;
+              })
+
+              $scope.policiesUser.push(policy);
+            }
           });
 
           if (!loading) {
@@ -376,6 +392,27 @@ angular.module('adminNg.controllers')
             });
           });
 
+          $scope.aclCreateDefaults = {};
+          ResourcesListResource.get({ resource: 'ACL.DEFAULTS'}, function(data) {
+            angular.forEach(data, function (value, key) {
+              if (key.charAt(0) !== '$') {
+                $scope.aclCreateDefaults[key] = value
+              }
+            });
+
+            $scope.aclCreateDefaults["read_enabled"] = $scope.aclCreateDefaults["read_enabled"] !== undefined
+              ? ($scope.aclCreateDefaults["read_enabled"].toLowerCase() === "true") : true
+            $scope.aclCreateDefaults["write_enabled"] = $scope.aclCreateDefaults["write_enabled"] !== undefined
+              ? ($scope.aclCreateDefaults["write_enabled"].toLowerCase() === "true") : false
+            $scope.aclCreateDefaults["read_readonly"] = $scope.aclCreateDefaults["read_readonly"] !== undefined
+              ? ($scope.aclCreateDefaults["read_readonly"].toLowerCase() === "true") : true
+            $scope.aclCreateDefaults["write_readonly"] = $scope.aclCreateDefaults["write_readonly"] !== undefined
+              ? ($scope.aclCreateDefaults["write_readonly"].toLowerCase() === "true") : false
+            $scope.roleUserPrefix = $scope.aclCreateDefaults["role_user_prefix"] !== undefined
+              ? $scope.aclCreateDefaults["role_user_prefix"]
+              : "ROLE_USER_"
+          });
+
           $scope.assets = EventAssetsResource.get({ id: id });
 
           $scope.setWorkflowDefinitions = function (workflowDefinitions) {
@@ -444,6 +481,16 @@ angular.module('adminNg.controllers')
           });
 
           $scope.comments = CommentResource.query({ resource: 'event', resourceId: id, type: 'comments' });
+
+          $scope.users = UsersResource.query({limit: 2147483647})
+          $scope.users.$promise.then(function () {
+            var newUsers = []
+            angular.forEach($scope.users.rows, function(user) {
+                user.userRole = $scope.roleUserPrefix + user.username.replace(/\W/g, '').toUpperCase()
+                newUsers.push(user)
+            })
+            $scope.users = newUsers
+          })
         },
         tzOffset = (new Date()).getTimezoneOffset() / -60;
 
@@ -451,6 +498,16 @@ angular.module('adminNg.controllers')
 
     $scope.getMatchingRoles = function (value) {
       RolesResource.queryNameOnly({query: value, target: 'ACL'}).$promise.then(function (data) {
+        angular.forEach(data, function(newRole) {
+          if ($scope.roles.indexOf(newRole) == -1) {
+            $scope.roles.unshift(newRole);
+          }
+        });
+      });
+    };
+
+    $scope.getMatchingUsers = function (value) {
+      UsersResource.query({query: value}).$promise.then(function (data) {
         angular.forEach(data, function(newRole) {
           if ($scope.roles.indexOf(newRole) == -1) {
             $scope.roles.unshift(newRole);
@@ -599,7 +656,29 @@ angular.module('adminNg.controllers')
          */
 
     $scope.policies = [];
+    $scope.policiesUser = [];
     $scope.baseAcl = {};
+
+    $scope.filterUserRoles = function (item) {
+      if (!item) {
+        return true
+      }
+      return !item.includes($scope.roleUserPrefix)
+    };
+
+    $scope.userToStringForDetails = function (user) {
+      if (!user) {
+        return undefined;
+      }
+      var n = user.name ? user.name : user.username;
+      var e = user.email ? '<' + user.email + '>' : "";
+
+      return n + ' ' + e;
+    }
+
+    $scope.getAllPolicies = function () {
+      return [].concat($scope.policies, $scope.policiesUser)
+    }
 
     $scope.changeBaseAcl = function () {
       $scope.baseAcl = EventAccessResource.getManagedAcl({id: this.baseAclId}, function () {
@@ -608,14 +687,20 @@ angular.module('adminNg.controllers')
       this.baseAclId = '';
     };
 
-    $scope.addPolicy = function () {
-      $scope.policies.push(createPolicy());
+    // E.g. model === $scope.policies
+    $scope.addPolicy = function (model) {
+      model.push(createPolicy(
+        undefined,
+        $scope.aclCreateDefaults["read_enabled"],
+        $scope.aclCreateDefaults["write_enabled"]
+      ));
     };
 
-    $scope.deletePolicy = function (policyToDelete) {
+    // E.g. model === $scope.policies
+    $scope.deletePolicy = function (model, policyToDelete) {
       var index;
 
-      angular.forEach($scope.policies, function (policy, idx) {
+      angular.forEach(model, function (policy, idx) {
         if (policy.role === policyToDelete.role &&
                     policy.write === policyToDelete.write &&
                     policy.read === policyToDelete.read) {
@@ -624,7 +709,7 @@ angular.module('adminNg.controllers')
       });
 
       if (angular.isDefined(index)) {
-        $scope.policies.splice(index, 1);
+        model.splice(index, 1);
       }
 
       $scope.accessSave();
@@ -880,7 +965,7 @@ angular.module('adminNg.controllers')
           hasRights = false,
           rulesValid = false;
 
-      angular.forEach($scope.policies, function (policy) {
+      angular.forEach($scope.getAllPolicies(), function (policy) {
         rulesValid = false;
 
         if (policy.read && policy.write) {

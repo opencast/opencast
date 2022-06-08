@@ -95,31 +95,33 @@ For the *Playback/Editor* tool, further access can be provided:
 
 There are quite a number of roles to provide selective access to the tabs offered by the *Event Details* modal:
 
-|Role                                     |User Interface                           |
-|-----------------------------------------|-----------------------------------------|
-|ROLE_UI_EVENTS_DETAILS_METADATA_VIEW     |Display tab *Metadata*                   |
-|ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW       |Display tab *Assets*                     |
-|ROLE_UI_EVENTS_DETAILS_PUBLICATIONS_VIEW |Display tab *Publications*               |
-|ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW    |Display tab *Workflows*                  |
-|ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW   |Display tab *Scheduling*                 |
-|ROLE_UI_EVENTS_DETAILS_ACL_VIEW          |Display tab *Access Policy*              |
-|ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW     |Display tab *Comments*                   |
-|ROLE_UI_EVENTS_DETAILS_STATISTICS_VIEW   |Display tab *Statistics*                 |
+|Role                                           |User Interface                                 |
+|-----------------------------------------------|-----------------------------------------------|
+|ROLE_UI_EVENTS_DETAILS_METADATA_VIEW           |Display tab *Metadata*                         |
+|ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW             |Display tab *Assets*                           |
+|ROLE_UI_EVENTS_DETAILS_PUBLICATIONS_VIEW       |Display tab *Publications*                     |
+|ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW          |Display tab *Workflows*                        |
+|ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW         |Display tab *Scheduling*                       |
+|ROLE_UI_EVENTS_DETAILS_ACL_VIEW                |Display tab *Access Policy*                    |
+|ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW           |Display tab *Comments*                         |
+|ROLE_UI_EVENTS_DETAILS_STATISTICS_VIEW         |Display tab *Statistics*                       |
 
 For the individual tabs, it is possible to further provide access:
 
-|Role                                    |User Interface                           |
-|----------------------------------------|-----------------------------------------|
-|ROLE_UI_EVENTS_DETAILS_METADATA_EDIT    |Allow the user to edit *Metadata*        |
-|ROLE_UI_EVENTS_DETAILS_ACL_EDIT         |Allow the user to edit *Access Policy*   |
-|ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT   |Allow the user to edit *Workflows*       |
-|ROLE_UI_EVENTS_DETAILS_WORKFLOWS_DELETE |Allow the user to delete *Workflows*     |
-|ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT  |Allow the user to edit *Scheduling*      |
-|ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE  |Allow the user to create comments        |
-|ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE  |Allow the user to delete comments        |
-|ROLE_UI_EVENTS_DETAILS_COMMENTS_EDIT    |Allow the user to edit comments          |
-|ROLE_UI_EVENTS_DETAILS_COMMENTS_REPLY   |Allow the user to reply to comments      |
-|ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE |Allow the user to resolve comments       |
+|Role                                           |User Interface                                 |
+|-----------------------------------------------|-----------------------------------------------|
+|ROLE_UI_EVENTS_DETAILS_METADATA_EDIT           |Allow the user to edit *Metadata*              |
+|ROLE_UI_EVENTS_DETAILS_ACL_USER_ROLES_VIEW     |Display user roles in *Access Policy*          |
+|ROLE_UI_EVENTS_DETAILS_ACL_NONUSER_ROLES_VIEW  |Display non user roles in *Access Policy*      |
+|ROLE_UI_EVENTS_DETAILS_ACL_EDIT                |Allow the user to edit *Access Policy*         |
+|ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT          |Allow the user to edit *Workflows*             |
+|ROLE_UI_EVENTS_DETAILS_WORKFLOWS_DELETE        |Allow the user to delete *Workflows*           |
+|ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT         |Allow the user to edit *Scheduling*            |
+|ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE         |Allow the user to create comments              |
+|ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE         |Allow the user to delete comments              |
+|ROLE_UI_EVENTS_DETAILS_COMMENTS_EDIT           |Allow the user to edit comments                |
+|ROLE_UI_EVENTS_DETAILS_COMMENTS_REPLY          |Allow the user to reply to comments            |
+|ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE        |Allow the user to resolve comments             |
 
 ### Recordings: Series
 

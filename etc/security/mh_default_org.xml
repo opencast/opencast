@@ -78,6 +78,8 @@
     <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/errors/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW"/>
     <sec:intercept-url pattern="/admin-ng/event/*/workflows/*" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW"/>
     <sec:intercept-url pattern="/admin-ng/event/*/access.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ACL_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/event/*/access.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ACL_USER_ROLES_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/event/*/access.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ACL_NONUSER_ROLES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/*" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/groups/groups.json" method="GET" access="ROLE_ADMIN, ROLE_UI_GROUPS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/groups/*" method="GET" access="ROLE_ADMIN, ROLE_UI_GROUPS_EDIT" />

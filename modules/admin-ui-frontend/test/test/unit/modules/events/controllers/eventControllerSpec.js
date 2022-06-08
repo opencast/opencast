@@ -53,6 +53,7 @@ describe('Event controller', function () {
             .respond(JSON.stringify(getJSONFixture('admin-ng/resources/eventUploadAssetOptions.json')));
         $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/ACL.ACTIONS.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/resources/ACL.DEFAULTS.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNELS.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/acl/roles.json?target=ACL&limit=-1').respond('[]');
         $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNELS.json').respond('{}');
