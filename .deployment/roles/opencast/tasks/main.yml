@@ -79,6 +79,7 @@
     mode: '0644'
   loop:
     - etc/custom.properties
+    - etc/org.opencastproject.adminui.endpoint.SeriesEndpoint.cfg
     - etc/org.opencastproject.fsresources.StaticResourceServlet.cfg
     - etc/org.opencastproject.liveschedule.impl.LiveScheduleServiceImpl.cfg
     - etc/org.apache.karaf.features.cfg
