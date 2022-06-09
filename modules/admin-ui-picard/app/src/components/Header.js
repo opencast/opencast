@@ -1,24 +1,23 @@
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {connect} from "react-redux";
-import Link from "react-router-dom/Link";
+import { Link } from "react-router-dom";
 import i18n from "../i18n/i18n";
 import languages from "../i18n/languages";
 import opencastLogo from '../img/opencast-white.svg';
 import {fetchHealthStatus} from "../thunks/healthThunks";
-import {getHealthStatus} from "../selectors/healthSelectors";
+import { getErrorCount, getHealthStatus } from '../selectors/healthSelectors';
 import {getCurrentLanguageInformation, hasAccess} from "../utils/utils";
 import {logger} from "../utils/logger";
 import {getOrgProperties, getUserInformation} from "../selectors/userInfoSelectors";
 import axios from "axios";
 import RegistrationModal from "./shared/RegistrationModal";
-import {setOffset} from "../actions/tableActions";
 import { loadServicesIntoTable} from "../thunks/tableThunks";
-import {fetchServices} from "../thunks/serviceThunks";
 import {studioURL} from "../configs/generalConfig";
 import HotKeyCheatSheet from "./shared/HotKeyCheatSheet";
 import {GlobalHotKeys} from "react-hotkeys";
 import {availableHotkeys} from "../configs/hotkeysConfig";
+import { setSpecificServiceFilter } from '../thunks/tableFilterThunks';
 
 
 // Get code, flag and name of the current language
@@ -52,7 +51,8 @@ function logout() {
 /**
  * Component that renders the header and the navigation in the upper right corner.
  */
-const Header = ({ loadingHealthStatus, healthStatus, user, orgProperties, resetOffset, loadingServices, loadingServicesIntoTable }) => {
+const Header = ({ loadingHealthStatus, healthStatus, errorCounter, user, orgProperties,
+    setSpecificServiceFilter, loadingServicesIntoTable }) => {
     const { t } = useTranslation();
     // State for opening (true) and closing (false) the dropdown menus for language, notification, help and user
     const [displayMenuLang, setMenuLang] = useState(false);
@@ -78,15 +78,12 @@ const Header = ({ loadingHealthStatus, healthStatus, user, orgProperties, resetO
         setRegistrationModal(false);
     }
 
-    const redirectToServices = () => {
-        // Reset the current page to first page
-        resetOffset();
-
-        // Fetching services from server
-        loadingServices();
-
+    const redirectToServices = async () => {
         // Load services into table
-        loadingServicesIntoTable();
+        await loadingServicesIntoTable();
+
+        // set the action filter value of services to true
+        await setSpecificServiceFilter('actions', 'true');
     }
 
     const showHotKeyCheatSheet = () => {
@@ -124,7 +121,7 @@ const Header = ({ loadingHealthStatus, healthStatus, user, orgProperties, resetO
         // Fetching health status information at mount
         loadHealthStatus().then(r => logger.info(r));
         // Fetch health status every minute
-        setInterval(loadingHealthStatus, 100000);
+        setInterval(loadingHealthStatus, 5000);
 
         // Event listener for handle a click outside of dropdown menu
         window.addEventListener('mousedown', handleClickOutside);
@@ -186,7 +183,9 @@ const Header = ({ loadingHealthStatus, healthStatus, user, orgProperties, resetO
                     <div className="nav-dd info-dd" id="info-dd" title={t('SYSTEM_NOTIFICATIONS')} ref={containerNotify}>
                         <div onClick={() => setMenuNotify(!displayMenuNotify)}>
                             <i className="fa fa-bell" aria-hidden="true"/>
-                            <span id="error-count" className="badge" >{healthStatus.numErr}</span>
+                            {errorCounter !== 0 &&(
+                              <span id="error-count" className="badge" >{errorCounter}</span>
+                            )}
                             {/* Click on the bell icon, a dropdown menu with all services in serviceList and their status opens */}
                             {displayMenuNotify && (
                                 <MenuNotify healthStatus={healthStatus}
@@ -269,7 +268,7 @@ const MenuNotify = ({ healthStatus, redirectToServices }) => {
             {healthStatus.map((service, key) => (
                 <li key={key}>
                     {!!service.status && (
-                        <Link to="/systems/services" onClick={() => redirectToServices()}>
+                        <Link to="/systems/services" onClick={async () => await redirectToServices()}>
                             <span> {service.name} </span>
                             {service.error ? (
                                 <span className="ng-multi-value ng-multi-value-red">{service.status}</span>
@@ -359,6 +358,7 @@ const MenuUser = () => {
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     healthStatus: getHealthStatus(state),
+    errorCounter: getErrorCount(state),
     user: getUserInformation(state),
     orgProperties: getOrgProperties(state)
 });
@@ -366,9 +366,8 @@ const mapStateToProps = state => ({
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadingHealthStatus: () => dispatch(fetchHealthStatus()),
-    resetOffset: () => dispatch(setOffset(0)),
-    loadingServices: () => dispatch(fetchServices()),
-    loadingServicesIntoTable: () => dispatch(loadServicesIntoTable())
+    loadingServicesIntoTable: () => dispatch(loadServicesIntoTable()),
+    setSpecificServiceFilter: (filter, filterValue) => dispatch(setSpecificServiceFilter(filter, filterValue))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);

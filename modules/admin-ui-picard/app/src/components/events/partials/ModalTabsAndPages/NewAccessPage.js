@@ -47,8 +47,8 @@ const NewAccessPage = ({ previousPage, nextPage, formik, editAccessRole, user, c
         // fetch information about chosen template from backend
         const template =  await fetchAclTemplateById(e.target.value);
 
-        formik.setFieldValue('policies', template);
-        await checkAcls(formik.values.policies);
+        formik.setFieldValue('acls', template);
+        await checkAcls(formik.values.acls);
     }
 
 
@@ -112,7 +112,7 @@ const NewAccessPage = ({ previousPage, nextPage, formik, editAccessRole, user, c
                                             </div>
                                         </div>
 
-                                        {/* Area for editing policies */}
+                                        {/* Area for editing acls */}
                                         <div className="obj-container">
                                             <div className="obj tbl-list">
                                                 <header>
@@ -142,18 +142,18 @@ const NewAccessPage = ({ previousPage, nextPage, formik, editAccessRole, user, c
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            {/*Add fieldArray/row for each policy in policies field*/}
-                                                            <FieldArray name="policies">
+                                                            {/*Add fieldArray/row for each policy in acls field*/}
+                                                            <FieldArray name="acls">
                                                                 {({ insert, remove, push }) => (
                                                                     <>
                                                                         {roles.length > 0 ? (
-                                                                            formik.values.policies.length > 0 &&
-                                                                                    formik.values.policies.map((policy, index) => (
+                                                                            formik.values.acls.length > 0 &&
+                                                                                    formik.values.acls.map((policy, index) => (
                                                                                         <tr key={index}>
 
                                                                                             <td>
                                                                                                 <Field style={{width: '360px'}}
-                                                                                                       name={`policies.${index}.role`}
+                                                                                                       name={`acls.${index}.role`}
                                                                                                        as="select"
                                                                                                        placeholder={t('EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL')}>
                                                                                                     {roles.length > 0 && (
@@ -169,8 +169,8 @@ const NewAccessPage = ({ previousPage, nextPage, formik, editAccessRole, user, c
                                                                                                 </Field>
                                                                                             </td>
                                                                                             {/* Checkboxes for  policy.read and policy.write*/}
-                                                                                            <td className="fit text-center"><Field type="checkbox" name={`policies.${index}.read`}/></td>
-                                                                                            <td className="fit text-center"><Field type="checkbox" name={`policies.${index}.write`}/></td>
+                                                                                            <td className="fit text-center"><Field type="checkbox" name={`acls.${index}.read`}/></td>
+                                                                                            <td className="fit text-center"><Field type="checkbox" name={`acls.${index}.write`}/></td>
                                                                                             {/* Show only if policy has actions*/}
                                                                                             {aclActions.length > 0 && (
                                                                                                 <td className="fit editable">
@@ -178,13 +178,13 @@ const NewAccessPage = ({ previousPage, nextPage, formik, editAccessRole, user, c
                                                                                                         <Field
                                                                                                             fieldInfo={
                                                                                                                 {
-                                                                                                                    id: `policies.${index}.actions`,
+                                                                                                                    id: `acls.${index}.actions`,
                                                                                                                     type: 'mixed_text',
                                                                                                                     collection: aclActions
                                                                                                                 }
                                                                                                             }
                                                                                                             onlyCollectionValues
-                                                                                                            name={`policies.${index}.actions`}
+                                                                                                            name={`acls.${index}.actions`}
                                                                                                             component={RenderMultiField}/>
                                                                                                     </div>
                                                                                                 </td>
@@ -214,7 +214,7 @@ const NewAccessPage = ({ previousPage, nextPage, formik, editAccessRole, user, c
                                                                                             write: false,
                                                                                             actions: []
                                                                                         });
-                                                                                        checkAcls(formik.values.policies);
+                                                                                        checkAcls(formik.values.acls);
                                                                                     }}>
                                                                                         + {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.NEW')}
                                                                                     </a>
@@ -246,7 +246,7 @@ const NewAccessPage = ({ previousPage, nextPage, formik, editAccessRole, user, c
                             })}
                         disabled={!(formik.dirty && formik.isValid)}
                         onClick={async () => {
-                            if(await checkAcls(formik.values.policies)) {
+                            if(await checkAcls(formik.values.acls)) {
                                 nextPage(formik.values);
                             }
                         }}

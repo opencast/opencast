@@ -1,12 +1,11 @@
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import MainNav from "../shared/MainNav";
-import Link from "react-router-dom/Link";
+import { Link } from "react-router-dom";
 import cn from 'classnames';
 import TableFilters from "../shared/TableFilters";
 import Table from "../shared/Table";
 import {fetchFilters} from "../../thunks/tableFilterThunks";
-import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import {themesTemplateMap} from "../../configs/tableConfigs/themesTableConfig";
 import {getTotalThemes} from "../../selectors/themeSelectors";
@@ -21,11 +20,14 @@ import Header from "../Header";
 import Footer from "../Footer";
 import {getUserInformation} from "../../selectors/userInfoSelectors";
 import {hasAccess} from "../../utils/utils";
+import { getCurrentFilterResource } from '../../selectors/tableFilterSelectors';
 
 /**
  * This component renders the table view of events
  */
-const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters, resetTextFilter, user }) => {
+const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters, resetTextFilter,
+    user, currentFilterType }) => {
+
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewThemesModal, setNewThemesModal] = useState(false);
@@ -39,16 +41,17 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters,
     };
 
     useEffect(() => {
+        if ("themes" !== currentFilterType) {
+            loadingFilters("themes");
+        }
+
         resetTextFilter();
 
         // Load themes on mount
         loadThemes().then(r => logger.info(r));
 
-        // Load filters
-        loadingFilters('themes');
-
         // Fetch themes every minute
-        let fetchThemesInterval = setInterval(loadThemes, 100000);
+        let fetchThemesInterval = setInterval(loadThemes, 5000);
 
         return () => clearInterval(fetchThemesInterval);
 
@@ -123,7 +126,8 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters,
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     themes: getTotalThemes(state),
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    currentFilterType: getCurrentFilterResource(state)
 });
 
 // Mapping actions to dispatch
@@ -134,4 +138,4 @@ const mapDispatchToProps = dispatch => ({
     resetTextFilter: () => dispatch(editTextFilter(''))
 });
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Themes));
+export default connect(mapStateToProps, mapDispatchToProps)(Themes);

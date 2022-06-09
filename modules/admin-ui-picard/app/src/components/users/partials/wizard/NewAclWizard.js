@@ -18,7 +18,8 @@ import AclAccessPage from "./AclAccessPage";
 const NewAclWizard = ({ close, postNewAcl }) => {
     const initialValues = initialFormValuesNewAcl;
 
-    const [snapshot, page, nextPage, previousPage] = usePageFunctions(0, initialValues);
+    const [snapshot, page, nextPage, previousPage, setPage,
+        pageCompleted, setPageCompleted] = usePageFunctions(0, initialValues);
 
     const steps = [
         {
@@ -46,30 +47,37 @@ const NewAclWizard = ({ close, postNewAcl }) => {
 
     return (
         <>
-            {/* Stepper that shows each step of wizard as header */}
-            <WizardStepper steps={steps} page={page}/>
-
             {/* Initialize overall form */}
             <Formik initialValues={snapshot}
                     validationSchema={currentValidationSchema}
                     onSubmit={values => handleSubmit(values)}>
                 {/* Render wizard pages depending on current value of page variable */}
                 {formik => (
-                    <div>
-                        {page === 0 && (
+                  <>
+                      {/* Stepper that shows each step of wizard as header */}
+                      <WizardStepper steps={steps}
+                                     page={page}
+                                     setPage={setPage}
+                                     completed={pageCompleted}
+                                     setCompleted={setPageCompleted}
+                                     formik={formik}
+                                     hasAccessPage />
+                      <div>
+                          {page === 0 && (
                             <AclMetadataPage formik={formik}
                                              nextPage={nextPage}/>
-                        )}
-                        {page === 1 && (
+                          )}
+                          {page === 1 && (
                             <AclAccessPage formik={formik}
-                                              nextPage={nextPage}
-                                              previousPage={previousPage}/>
-                        )}
-                        {page === 2 && (
+                                           nextPage={nextPage}
+                                           previousPage={previousPage}/>
+                          )}
+                          {page === 2 && (
                             <NewAclSummaryPage formik={formik}
                                                previousPage={previousPage}/>
-                        )}
-                    </div>
+                          )}
+                      </div>
+                  </>
                 )}
             </Formik>
         </>

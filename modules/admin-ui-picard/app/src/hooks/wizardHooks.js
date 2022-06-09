@@ -3,9 +3,16 @@ import {useEffect, useState} from "react";
 export const usePageFunctions = (initialPage, initialValues) => {
     const [page, setPage] = useState(initialPage);
     const [snapshot, setSnapshot] = useState(initialValues);
+    const [pageCompleted, setPageCompleted] = useState({});
 
     const nextPage = values => {
         setSnapshot(values);
+
+        // set page as completely filled out
+        let updatedPageCompleted = pageCompleted;
+        updatedPageCompleted[page] = true;
+        setPageCompleted(updatedPageCompleted);
+
         setPage(page + 1);
     }
 
@@ -14,7 +21,7 @@ export const usePageFunctions = (initialPage, initialValues) => {
         setPage(page - 1);
     }
 
-    return [snapshot, page, nextPage, previousPage];
+    return [snapshot, page, nextPage, previousPage, setPage, pageCompleted, setPageCompleted];
 }
 
 export const useSelectionChanges = (formik, selectedRows) => {

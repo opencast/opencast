@@ -23,6 +23,7 @@ const NewSeriesWizard = ({ metadataFields, close, postNewSeries }) => {
 
     const [page, setPage] = useState(0);
     const [snapshot, setSnapshot] = useState(initialValues);
+    const [pageCompleted, setPageCompleted] = useState({});
 
     // Caption of steps used by Stepper
     const steps = [{
@@ -48,6 +49,12 @@ const NewSeriesWizard = ({ metadataFields, close, postNewSeries }) => {
 
     const nextPage = values => {
         setSnapshot(values);
+
+        // set page as completely filled out
+        let updatedPageCompleted = pageCompleted;
+        updatedPageCompleted[page] = true;
+        setPageCompleted(updatedPageCompleted);
+
         if (steps[page + 1].hidden) {
             setPage(page + 2);
         } else {
@@ -73,44 +80,51 @@ const NewSeriesWizard = ({ metadataFields, close, postNewSeries }) => {
 
     return (
         <>
-            {/* Stepper that shows each step of wizard as header */}
-            <WizardStepper steps={steps} page={page}/>
-
             {/* Initialize overall form */}
             <Formik initialValues={snapshot}
                     validationSchema={currentValidationSchema}
                     onSubmit={values => handleSubmit(values)}>
                 {/* Render wizard pages depending on current value of page variable */}
                 {formik => (
-                    <div>
-                        {page === 0 && (
+                  <>
+                      {/* Stepper that shows each step of wizard as header */}
+                      <WizardStepper steps={steps}
+                                     page={page}
+                                     setPage={setPage}
+                                     completed={pageCompleted}
+                                     setCompleted={setPageCompleted}
+                                     formik={formik}
+                                     hasAccessPage />
+                      <div>
+                          {page === 0 && (
                             <NewMetadataPage nextPage={nextPage}
                                              formik={formik}
                                              metadataFields={metadataFields}
                                              header={steps[page].translation}/>
-                        )}
-                        {page === 1 && (
+                          )}
+                          {page === 1 && (
                             <NewMetadataExtendedPage nextPage={nextPage}
                                                      previousPage={previousPage}
                                                      formik={formik} />
-                        )}
-                        {page === 2 && (
+                          )}
+                          {page === 2 && (
                             <NewAccessPage nextPage={nextPage}
                                            previousPage={previousPage}
                                            formik={formik}
                                            editAccessRole="ROLE_UI_SERIES_DETAILS_ACL_EDIT"/>
-                        )}
-                        {page === 3 && (
+                          )}
+                          {page === 3 && (
                             <NewThemePage nextPage={nextPage}
                                           previousPage={previousPage}
                                           formik={formik}/>
-                        )}
-                        {page === 4 && (
+                          )}
+                          {page === 4 && (
                             <NewSeriesSummary previousPage={previousPage}
                                               formik={formik}
                                               metaDataExtendedHidden={steps[1].hidden}/>
-                        )}
-                    </div>
+                          )}
+                      </div>
+                  </>
                 )}
             </Formik>
         </>

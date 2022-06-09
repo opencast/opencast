@@ -90,7 +90,7 @@ export const postNewSeries = (values, metadataInfo) => async dispatch => {
         fields: metadataFields
     }];
 
-    access = prepareAccessPolicyRulesForPost(values.policies);
+    access = prepareAccessPolicyRulesForPost(values.acls);
 
     let jsonData = {
             metadata: metadata,

@@ -1,10 +1,9 @@
 import React, {useEffect, useState} from "react";
 import MainNav from "../shared/MainNav";
-import Link from "react-router-dom/Link";
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import {connect} from "react-redux";
-import {withRouter} from "react-router-dom";
+import { Link, useLocation } from 'react-router-dom';
 import TableFilters from "../shared/TableFilters";
 import Table from "../shared/Table";
 import Notifications from "../shared/Notifications";
@@ -17,7 +16,7 @@ import {fetchEvents} from "../../thunks/eventThunks";
 import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
 import {getTotalSeries, isShowActions} from "../../selectors/seriesSeletctor";
 import {editTextFilter} from "../../actions/tableFilterActions";
-import {setOffset} from "../../actions/tableActions";
+import { setOffset } from '../../actions/tableActions';
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 import {logger} from "../../utils/logger";
 import Header from "../Header";
@@ -27,7 +26,7 @@ import {hasAccess} from "../../utils/utils";
 import {showActions} from "../../actions/seriesActions";
 import {availableHotkeys} from "../../configs/hotkeysConfig";
 import {GlobalHotKeys} from "react-hotkeys";
-
+import { getCurrentFilterResource } from '../../selectors/tableFilterSelectors';
 
 
 // References for detecting a click outside of the container of the dropdown menu
@@ -38,16 +37,17 @@ const containerAction = React.createRef();
  */
 const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEvents, loadingEventsIntoTable,
                     series, loadingFilters, loadingStats, loadingSeriesMetadata, loadingSeriesThemes, resetTextFilter,
-                    resetOffset, user, setShowActions }) => {
+                    resetOffset, user, setShowActions, currentFilterType }) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewSeriesModal, setNewSeriesModal] = useState(false);
     const [displayDeleteSeriesModal, setDeleteSeriesModal] = useState(false);
 
-    const loadEvents = () => {
-        loadingFilters("events");
+    let location = useLocation();
 
+
+    const loadEvents = () => {
         // Reset the current page to first page
         resetOffset();
 
@@ -70,14 +70,18 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
     }
 
     useEffect( () => {
+
+        if ("series" !== currentFilterType) {
+            loadingFilters("series");
+        }
+
         resetTextFilter();
 
         // disable actions button
         setShowActions(false);
 
-        // Load series on mount
+        // Load events on mount
         loadSeries().then(r => logger.info(r));
-
 
         // Function for handling clicks outside of an dropdown menu
         const handleClickOutside = e => {
@@ -87,7 +91,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
         }
 
         // Fetch series every minute
-        let fetchSeriesInterval = setInterval(loadSeries, 100000);
+        let fetchSeriesInterval = setInterval(loadSeries, 5000);
 
 
         // Event listener for handle a click outside of dropdown menu
@@ -97,7 +101,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
             window.removeEventListener('mousedown', handleClickOutside);
             clearInterval(fetchSeriesInterval);
         }
-    }, []);
+    }, [location.hash]);
 
     const toggleNavigation = () => {
         setNavigation(!displayNavigation);
@@ -165,10 +169,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
                     {hasAccess("ROLE_UI_SERIES_VIEW", user) && (
                         <Link to="/events/series"
                               className={cn({active: true})}
-                              onClick={() => {
-                                  loadingFilters("series")
-                                  loadSeries().then();
-                              }}>
+                              onClick={() => loadSeries()}>
                             {t('EVENTS.EVENTS.NAVIGATION.SERIES')}
                         </Link>
                     )}
@@ -212,14 +213,15 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
             </div>
             <Footer />
         </>
-    )
+    );
 }
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     series: getTotalSeries(state),
     showActions: isShowActions(state),
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    currentFilterType: getCurrentFilterResource(state)
 });
 
 // Mapping actions to dispatch
@@ -237,4 +239,4 @@ const mapDispatchToProps = dispatch => ({
     setShowActions: isShowing => dispatch(showActions(isShowing))
 });
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Series));
+export default connect(mapStateToProps, mapDispatchToProps)(Series);
