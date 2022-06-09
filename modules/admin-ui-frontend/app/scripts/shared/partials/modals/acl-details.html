@@ -100,7 +100,7 @@
                     <!-- Details -->
                   </header>
                   <div class="obj-container">
-                    <table class="main-tbl">
+                    <table class="main-tbl" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_USER_ROLES_VIEW')">
                       <thead>
                         <tr>
                           <th translate="USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.USER">
@@ -168,7 +168,7 @@
                       <!-- Details -->
                     </header>
                     <div class="obj-container">
-                      <table class="main-tbl">
+                      <table class="main-tbl" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_NONUSER_ROLES_VIEW')">
                         <thead>
                           <tr>
                             <th translate="USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.ROLE">
