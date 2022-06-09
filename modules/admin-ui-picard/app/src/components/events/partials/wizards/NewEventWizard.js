@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Formik} from "formik";
 import NewEventSummary from "./NewEventSummary";
-import {getEventMetadata} from "../../../../selectors/eventSelectors";
+import {getAssetUploadOptions, getEventMetadata} from "../../../../selectors/eventSelectors";
 import {connect} from "react-redux";
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
@@ -13,7 +13,7 @@ import NewMetadataPage from "../ModalTabsAndPages/NewMetadataPage";
 import NewAccessPage from "../ModalTabsAndPages/NewAccessPage";
 import NewProcessingPage from "../ModalTabsAndPages/NewProcessingPage";
 import NewSourcePage from "../ModalTabsAndPages/NewSourcePage";
-import {sourceMetadata, uploadAssetOptions} from "../../../../configs/sourceConfig";
+import {sourceMetadata} from "../../../../configs/sourceConfig";
 import {initialFormValuesNewEvents} from "../../../../configs/modalConfig";
 import {NewEventSchema} from "../../../../utils/validate";
 import {logger} from "../../../../utils/logger";
@@ -26,9 +26,9 @@ const currentLanguage = getCurrentLanguageInformation();
 /**
  * This component manages the pages of the new event wizard and the submission of values
  */
-const NewEventWizard = ({ metadataFields, close, postNewEvent }) => {
+const NewEventWizard = ({ metadataFields, close, postNewEvent, uploadAssetOptions }) => {
 
-    const initialValues = getInitialValues(metadataFields);
+    const initialValues = getInitialValues(metadataFields, uploadAssetOptions);
     let workflowPanelRef = React.useRef();
 
 
@@ -54,7 +54,7 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent }) => {
         {
             translation: 'EVENTS.EVENTS.NEW.UPLOAD_ASSET.CAPTION',
             name: 'upload-asset',
-            hidden: false
+            hidden: (uploadAssetOptions.filter(asset => asset.type !== 'track').length === 0)
         },
         {
             translation: 'EVENTS.EVENTS.NEW.PROCESSING.CAPTION',
@@ -175,7 +175,7 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent }) => {
 };
 
 // Transform all initial values needed from information provided by backend
-const getInitialValues = metadataFields => {
+const getInitialValues = (metadataFields, uploadAssetOptions) => {
     // Transform metadata fields provided by backend (saved in redux)
     let initialValues = {};
 
@@ -240,7 +240,8 @@ const getInitialValues = metadataFields => {
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    metadataFields: getEventMetadata(state)
+    metadataFields: getEventMetadata(state),
+    uploadAssetOptions: getAssetUploadOptions(state),
 });
 
 const mapDispatchToProps = dispatch => ({

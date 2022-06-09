@@ -4,6 +4,8 @@ import {DateTimePicker} from "@material-ui/pickers";
 import {createMuiTheme, ThemeProvider} from "@material-ui/core";
 import cn from "classnames";
 import {useClickOutsideField} from "../../../hooks/wizardHooks";
+import {isJson} from "../../../utils/utils";
+import {getMetadataCollectionFieldName} from "../../../utils/resourceUtils";
 
 
 const childRef = React.createRef();
@@ -11,6 +13,8 @@ const childRef = React.createRef();
  * This component renders an editable field for single values depending on the type of the corresponding metadata
  */
 const RenderField = ({ field, metadataField, form, showCheck=false, isFirstField=false }) => {
+    const { t } = useTranslation();
+
     // Indicator if currently edit mode is activated
     const [editMode, setEditMode] = useClickOutsideField(childRef, isFirstField);
 
@@ -37,8 +41,21 @@ const RenderField = ({ field, metadataField, form, showCheck=false, isFirstField
                                          form={form}
                                          showCheck={showCheck}/>
             )}
-            {((metadataField.type === "text" && !!metadataField.collection && metadataField.collection.length !== 0) ||
-                metadataField.type === "ordered_text") ? (
+            {(metadataField.type === "text" && !!metadataField.collection && metadataField.collection.length > 0) &&
+                <EditableSingleSelect metadataField={metadataField}
+                                      field={field}
+                                      form={form}
+                                      text={
+                                        isJson(getMetadataCollectionFieldName(metadataField, field)) ?
+                                            (t(JSON.parse(getMetadataCollectionFieldName(metadataField, field)).label)) :
+                                            (t(getMetadataCollectionFieldName(metadataField, field)))
+                                      }
+                                      editMode={editMode}
+                                      setEditMode={setEditMode}
+                                      showCheck={showCheck}
+                                      handleKeyDown={handleKeyDown}/>
+            }
+            {(metadataField.type === "ordered_text") && (
                 <EditableSingleSelect metadataField={metadataField}
                                       field={field}
                                       form={form}
@@ -47,7 +64,8 @@ const RenderField = ({ field, metadataField, form, showCheck=false, isFirstField
                                       setEditMode={setEditMode}
                                       showCheck={showCheck}
                                       handleKeyDown={handleKeyDown}/>
-            ) : (metadataField.type === "text" && (
+            )}
+            {(metadataField.type === "text" && !(!!metadataField.collection && metadataField.collection.length !== 0)) && (
                 <EditableSingleValue field={field}
                                      form={form}
                                      text={field.value}
@@ -56,7 +74,7 @@ const RenderField = ({ field, metadataField, form, showCheck=false, isFirstField
                                      isFirst={isFirstField}
                                      showCheck={showCheck}
                                      handleKeyDown={handleKeyDown}/>
-            ))}
+            )}
             {metadataField.type === "text_long" && (
                 <EditableSingleValueTextArea field={field}
                                              text={field.value}
@@ -187,7 +205,7 @@ const EditableSingleSelect = ({ field, metadataField, text, editMode, setEditMod
             ) : (
              <div onClick={() => setEditMode(true)}>
                  <span className="editable preserve-newlines">
-                     {text || t('SELECT_NO_OPTION_SELECTED')}
+                     { text || t('SELECT_NO_OPTION_SELECTED') }
                  </span>
                  <i className="edit fa fa-pencil-square"/>
                  {showCheck && (

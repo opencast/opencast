@@ -3,14 +3,14 @@ import {connect} from "react-redux";
 import EventDetailsTabHierarchyNavigation from "./EventDetailsTabHierarchyNavigation";
 import Notifications from "../../../shared/Notifications";
 import {style_button_spacing} from "../../../../utils/eventDetailsUtils";
-import {uploadAssetOptions} from "../../../../configs/sourceConfig";
 import {Formik} from "formik";
 import { updateAssets } from '../../../../thunks/eventDetailsThunks';
+import {getAssetUploadOptions} from "../../../../selectors/eventSelectors";
 
 /**
  * This component manages the add asset sub-tab for assets tab of event details modal
  */
-const EventDetailsAssetsAddAsset = ({ eventId, t, setHierarchy, updateAssets }) => {
+const EventDetailsAssetsAddAsset = ({ eventId, t, setHierarchy, updateAssets, uploadAssetOptions }) => {
 
     // Get upload assets that are not of type track
     const uploadAssets = uploadAssetOptions.filter(asset => asset.type !== 'track');
@@ -68,7 +68,7 @@ const EventDetailsAssetsAddAsset = ({ eventId, t, setHierarchy, updateAssets }) 
                                                 ) : (
                                                     uploadAssets.map((asset, key) => (
                                                         <tr key={key}>
-                                                            <td> {asset.id}
+                                                            <td> {!!asset.displayOverride ? t(asset.displayOverride) : t(asset.title)}
                                                                 <span className="ui-helper-hidden">
                                                                     ({asset.type} "{asset.flavorType}//{asset.flavorSubType}")
                                                                 </span>
@@ -123,9 +123,15 @@ const EventDetailsAssetsAddAsset = ({ eventId, t, setHierarchy, updateAssets }) 
     );
 };
 
+
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    uploadAssetOptions: getAssetUploadOptions(state),
+});
+
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     updateAssets: (values, eventId) => dispatch(updateAssets(values, eventId))
 });
 
-export default connect(null, mapDispatchToProps)(EventDetailsAssetsAddAsset);
+export default connect(mapStateToProps, mapDispatchToProps)(EventDetailsAssetsAddAsset);

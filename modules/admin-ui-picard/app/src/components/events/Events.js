@@ -18,7 +18,12 @@ import {fetchEventMetadata, fetchEvents} from "../../thunks/eventThunks";
 import {loadEventsIntoTable, loadSeriesIntoTable} from "../../thunks/tableThunks";
 import {fetchSeries} from "../../thunks/seriesThunks";
 import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
-import {getTotalEvents, isShowActions} from "../../selectors/eventSelectors";
+import {
+    getTotalEvents,
+    isFetchingAssetUploadOptions,
+    isLoading,
+    isShowActions
+} from "../../selectors/eventSelectors";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import { setOffset } from '../../actions/tableActions';
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
@@ -31,6 +36,8 @@ import {showActions} from "../../actions/eventActions";
 import {GlobalHotKeys} from "react-hotkeys";
 import {availableHotkeys} from "../../configs/hotkeysConfig";
 import { getCurrentFilterResource } from '../../selectors/tableFilterSelectors';
+import {fetchAssetUploadOptions} from "../../thunks/assetsThunks";
+
 
 
 // References for detecting a click outside of the container of the dropdown menu
@@ -40,8 +47,8 @@ const containerAction = React.createRef();
  * This component renders the table view of events
  */
 const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loadingSeries,
-    loadingSeriesIntoTable, loadingFilters, loadingStats, loadingEventMetadata, resetTextFilter,
-    resetOffset, user, setShowActions, currentFilterType }) => {
+    loadingSeriesIntoTable, loadingFilters, loadingStats, loadingEventMetadata, resetTextFilter, fetchAssetUploadOptions,
+    resetOffset, setShowActions, user, isFetchingAssetUploadOptions, currentFilterType }) => {
 
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
@@ -124,6 +131,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 
     const showNewEventModal = async () => {
         await loadingEventMetadata();
+        await fetchAssetUploadOptions();
 
         setNewEventModal(true);
     }
@@ -166,10 +174,12 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
                     )}
                 </div>
 
-                {/* Display modal for new event if add event button is clicked */}
-                <NewResourceModal showModal={displayNewEventModal}
-                                  handleClose={hideNewEventModal}
-                                  resource={"events"} />
+                {/* Display modal for new event if add event button is clicked */
+                !isFetchingAssetUploadOptions && (
+                    <NewResourceModal showModal={displayNewEventModal}
+                                      handleClose={hideNewEventModal}
+                                      resource={"events"} />
+                )}
 
                 {/* Display bulk actions modal if one is chosen from dropdown */}
                 {displayDeleteModal && (
@@ -285,7 +295,10 @@ const mapStateToProps = state => ({
     events: getTotalEvents(state),
     showActions: isShowActions(state),
     user: getUserInformation(state),
-    currentFilterType: getCurrentFilterResource(state)
+    currentFilterType: getCurrentFilterResource(state),
+    isLoadingEvents: isLoading(state),
+    isFetchingAssetUploadOptions: isFetchingAssetUploadOptions(state)
+
 });
 
 // Mapping actions to dispatch
@@ -299,7 +312,8 @@ const mapDispatchToProps = dispatch => ({
     loadingEventMetadata: () => dispatch(fetchEventMetadata()),
     resetTextFilter: () => dispatch(editTextFilter('')),
     resetOffset: () => dispatch(setOffset(0)),
-    setShowActions: isShowing => dispatch(showActions(isShowing))
+    setShowActions: isShowing => dispatch(showActions(isShowing)),
+    fetchAssetUploadOptions: () => dispatch(fetchAssetUploadOptions()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Events);

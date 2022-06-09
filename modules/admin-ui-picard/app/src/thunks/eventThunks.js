@@ -15,10 +15,11 @@ import {
     transformMetadataCollection
 } from "../utils/resourceUtils";
 import {getTimezoneOffset, makeTwoDigits} from "../utils/utils";
-import {sourceMetadata, uploadAssetOptions} from "../configs/sourceConfig";
+import {sourceMetadata} from "../configs/sourceConfig";
 import {NOTIFICATION_CONTEXT, weekdays, WORKFLOW_UPLOAD_ASSETS_NON_TRACK} from "../configs/modalConfig";
-import {addNotification} from "./notificationThunks";
 import {logger} from "../utils/logger";
+import {addNotification} from "./notificationThunks";
+import {getAssetUploadOptions} from "../selectors/eventSelectors";
 
 
 
@@ -196,7 +197,10 @@ export const checkForConflicts =  async (startDate, endDate, duration, device) =
 }
 
 // post new event to backend
-export const postNewEvent = (values, metadataInfo) => async dispatch => {
+export const postNewEvent = (values, metadataInfo) => async (dispatch, getState) => {
+    // get asset upload options from redux store
+    const state = getState();
+    const uploadAssetOptions = getAssetUploadOptions(state);
 
     let formData = new FormData();
     let metadataFields, metadata, source, access, assets;
