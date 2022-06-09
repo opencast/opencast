@@ -98,16 +98,17 @@ const TableFilters = ({filterMap, textFilter, selectedFilter, secondFilter, onCh
 
     // Set the sate of startDate and endDate picked with datepicker
     const handleDatepickerChange = async (date, isStart=false) => {
+
         if (isStart) {
-            setStartDate(date);
+            await setStartDate(date);
         } else {
-            setEndDate(date);
+            await setEndDate(date);
         }
 
         // When both dates set, then set the value for this filter
         if (!isStart) {
             let filter = filterMap.find(({ name }) => name === selectedFilter);
-            editFilterValue(filter.name, startDate.toISOString() + '/' + endDate.toISOString());
+            await editFilterValue(filter.name, startDate.toISOString() + '/' + date.toISOString());
             setFilterSelector(false);
             removeSelectedFilter();
             // Reload of resource

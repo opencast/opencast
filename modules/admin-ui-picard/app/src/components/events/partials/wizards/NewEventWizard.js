@@ -76,7 +76,7 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent }) => {
     const nextPage = values => {
         setSnapshot(values);
 
-        // set page as completely fill out
+        // set page as completely filled out
         let updatedPageCompleted = pageCompleted;
         updatedPageCompleted[page] = true;
         setPageCompleted(updatedPageCompleted);

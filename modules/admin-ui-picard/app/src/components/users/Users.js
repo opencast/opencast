@@ -23,6 +23,7 @@ import Header from "../Header";
 import Footer from "../Footer";
 import {getUserInformation} from "../../selectors/userInfoSelectors";
 import {hasAccess} from "../../utils/utils";
+import { getCurrentFilterResource } from '../../selectors/tableFilterSelectors';
 
 /**
  * This component renders the table view of users
@@ -167,7 +168,8 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     users: getTotalUsers(state),
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    currentFilterType: getCurrentFilterResource(state)
 });
 
 // Mapping actions to dispatch

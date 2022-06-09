@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import { Step, StepButton, StepLabel, Stepper } from '@material-ui/core';
@@ -9,8 +9,9 @@ import { connect } from 'react-redux';
 import { checkConflicts } from '../../../thunks/eventThunks';
 
 
-const WizardStepperEvent = ({ steps, page, setPage, formik, checkAcls, checkConflicts,
-  completed, setCompleted }) => {
+const WizardStepperEvent = ({ steps, page, setPage, formik, completed, setCompleted, checkAcls,
+  checkConflicts }) => {
+
   const { t } = useTranslation();
 
   const classes = useStepperStyle();
@@ -29,7 +30,7 @@ const WizardStepperEvent = ({ steps, page, setPage, formik, checkAcls, checkConf
       return;
     }
 
-    let aclCheck =  await checkAcls(formik.values.acls);
+    let aclCheck = await checkAcls(formik.values.acls);
     if (!aclCheck) {
       return;
     }

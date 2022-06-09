@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import { Step, StepButton, StepLabel, Stepper } from '@material-ui/core';
@@ -10,8 +10,9 @@ import { connect } from 'react-redux';
 /**
  * This components renders the stepper navigation of new resource wizards
  */
-const WizardStepper = ({ steps, page, setPage, formik, hasAccessPage=false, checkAcls,
-    completed, setCompleted }) => {
+const WizardStepper = ({ steps, page, setPage, formik, checkAcls, completed, setCompleted,
+    hasAccessPage=false }) => {
+
     const { t } = useTranslation();
 
     const classes = useStepperStyle();
