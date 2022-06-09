@@ -10,8 +10,8 @@ import { connect } from 'react-redux';
 /**
  * This components renders the stepper navigation of new resource wizards
  */
-const WizardStepper = ({ steps, page, setPage, formik, checkAcls, completed, setCompleted,
-    hasAccessPage=false }) => {
+const WizardStepper = ({ steps, page, setPage, formik, completed, setCompleted,
+    hasAccessPage=false, checkAcls }) => {
 
     const { t } = useTranslation();
 

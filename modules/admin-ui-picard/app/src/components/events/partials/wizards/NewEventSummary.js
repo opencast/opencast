@@ -38,6 +38,7 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
     // Get additional information about chosen workflow definition
     const workflowDefinition = workflowDef.find(workflow => workflow.id === formik.values.processingWorkflow);
 
+
     return(
         <>
             <div className="modal-content">
@@ -166,7 +167,7 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
                                 <tbody>
                                     <tr>
                                         <td>{t('EVENTS.EVENTS.NEW.PROCESSING.WORKFLOW')}</td>
-                                        <td>{!!workflowDefinition ? workflowDef.title : ""}</td>
+                                        <td>{!!workflowDefinition ? workflowDefinition.title : ""}</td>
                                     </tr>
                                     {/* Repeat entry for each configuration key/value pair */}
                                     {Object.keys(formik.values.configuration).map((config, key) => (
