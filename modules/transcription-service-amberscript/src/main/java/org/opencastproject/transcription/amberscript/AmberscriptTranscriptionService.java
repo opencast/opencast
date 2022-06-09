@@ -39,6 +39,7 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
@@ -152,6 +153,12 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     StartTranscription
   }
 
+  // Enum for configuring which metadata field shall be used
+  // for determining the number of speakers of an event
+  private enum SpeakerMetadataField {
+    creator, contributor, both
+  }
+
   // service configuration keys
   private static final String ENABLED_CONFIG = "enabled";
   private static final String LANGUAGE = "language";
@@ -161,6 +168,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
   private static final String DISPATCH_WORKFLOW_INTERVAL_CONFIG = "workflow.dispatch.interval";
   private static final String MAX_PROCESSING_TIME_CONFIG = "max.overdue.time";
   private static final String CLEANUP_RESULTS_DAYS_CONFIG = "cleanup.results.days";
+  private static final String SPEAKER_METADATA_FIELD = "speaker.metadata.field";
   private static final String LANGUAGE_FROM_DUBLINCORE = "language.from.dublincore";
   private static final String LANGUAGE_CODE_MAP = "language.code.map";
 
@@ -173,6 +181,8 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
   private long workflowDispatchIntervalSeconds = 60;
   private long maxProcessingSeconds = 8 * 24 * 60 * 60; // maximum runtime for jobType perfect is 8 days
   private int cleanupResultDays = 7;
+  private final int defaultNumberOfSpeakers = 1;
+  private SpeakerMetadataField speakerMetadataField = SpeakerMetadataField.creator;
 
   /**
    * Contains mappings from several possible ways of writing a language name/code to the
@@ -265,6 +275,18 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     }
     logger.info("Cleanup result files after {} days.", cleanupResultDays);
 
+    Option<String> numberOfSpeakersOpt = OsgiUtil.getOptCfg(cc.getProperties(), SPEAKER_METADATA_FIELD);
+    if (numberOfSpeakersOpt.isSome()) {
+      try {
+        speakerMetadataField = SpeakerMetadataField.valueOf(numberOfSpeakersOpt.get());
+      } catch (IllegalArgumentException e) {
+        logger.warn("Value '{}' is invalid for configuration '{}'. Using default: '{}'.",
+            numberOfSpeakersOpt.get(), SPEAKER_METADATA_FIELD, speakerMetadataField);
+      }
+    }
+    logger.info("Default metadata field for calculating the amount of speakers is set to '{}'.", speakerMetadataField);
+
+
     Option<String> languageFromDublinCoreOpt = OsgiUtil.getOptCfg(cc.getProperties(), LANGUAGE_FROM_DUBLINCORE);
     if (languageFromDublinCoreOpt.isSome()) {
       try {
@@ -355,16 +377,43 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
       jobType = getAmberscriptJobType();
     }
 
+    int numberOfSpeakers = defaultNumberOfSpeakers;
+    Set<String> speakers = new HashSet<>();
+    for (Catalog catalog : track.getMediaPackage().getCatalogs(MediaPackageElements.EPISODE)) {
+      try (InputStream in = workspace.read(catalog.getURI())) {
+        DublinCoreCatalog dublinCatalog = DublinCores.read(in);
+        if (speakerMetadataField.equals(SpeakerMetadataField.creator)
+            || speakerMetadataField.equals(SpeakerMetadataField.both)) {
+          dublinCatalog.get(DublinCore.PROPERTY_CREATOR).stream()
+              .map(DublinCoreValue::getValue).forEach(speakers::add);
+        }
+        if (speakerMetadataField.equals(SpeakerMetadataField.contributor)
+            || speakerMetadataField.equals(SpeakerMetadataField.both)) {
+          dublinCatalog.get(DublinCore.PROPERTY_CONTRIBUTOR).stream()
+              .map(DublinCoreValue::getValue).forEach(speakers::add);
+        }
+
+      } catch (IOException | NotFoundException e) {
+        logger.error(String.format("Unable to load dublin core catalog for event '%s'",
+            track.getMediaPackage().getIdentifier()), e);
+      }
+    }
+
+    if (speakers.size() > 1) {
+      numberOfSpeakers = speakers.size();
+    }
+
     if (!enabled) {
       throw new TranscriptionServiceException("AmberScript Transcription Service disabled."
               + " If you want to enable it, please update the service configuration.");
     }
 
-    logger.info("New transcription job for mpId '{}' language '{}' JobType '{}'.", mpId, language, jobType);
+    logger.info("New transcription job for mpId '{}' language '{}' JobType '{}' Speakers '{}'.",
+        mpId, language, jobType, numberOfSpeakers);
 
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.StartTranscription.name(),
-              Arrays.asList(mpId, MediaPackageElementParser.getAsXml(track), language, jobType));
+      return serviceRegistry.createJob(JOB_TYPE, Operation.StartTranscription.name(), Arrays.asList(
+          mpId, MediaPackageElementParser.getAsXml(track), language, jobType, Integer.toString(numberOfSpeakers)));
     } catch (ServiceRegistryException e) {
       throw new TranscriptionServiceException("Unable to create a job", e);
     } catch (MediaPackageException e) {
@@ -432,7 +481,8 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
         Track track = (Track) MediaPackageElementParser.getFromXml(arguments.get(1));
         String languageCode = arguments.get(2);
         String jobtype = arguments.get(3);
-        createRecognitionsJob(mpId, track, languageCode, jobtype);
+        String numberOfSpeakers = arguments.get(4);
+        createRecognitionsJob(mpId, track, languageCode, jobtype, numberOfSpeakers);
         break;
       default:
         throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
@@ -440,7 +490,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     return result;
   }
 
-  void createRecognitionsJob(String mpId, Track track, String languageCode, String jobtype)
+  void createRecognitionsJob(String mpId, Track track, String languageCode, String jobtype, String numberOfSpeakers)
           throws TranscriptionServiceException, IOException {
     // Timeout 3 hours (needs to include the time for the remote service to
     // fetch the media URL before sending final response)
@@ -448,7 +498,8 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     CloseableHttpResponse response = null;
 
     String submitUrl = BASE_URL + "/jobs/upload-media?transcriptionType=transcription&jobType="
-            + jobtype + "&language=" + languageCode + "&apiKey=" + clientKey;
+            + jobtype + "&language=" + languageCode + "&apiKey=" + clientKey
+            + "&numberOfSpeakers=" + numberOfSpeakers;
 
     try {
       FileBody fileBody = new FileBody(workspace.get(track.getURI()), ContentType.DEFAULT_BINARY);
