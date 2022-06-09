@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
 import ConfirmModal from "../../shared/ConfirmModal";
-import {deleteSeries} from "../../../thunks/seriesThunks";
+import {checkForEventsDeleteSeriesModal, deleteSeries} from "../../../thunks/seriesThunks";
 import {connect} from "react-redux";
 import SeriesDetailsModal from "./modals/SeriesDetailsModal";
 import {
@@ -11,12 +11,14 @@ import {
 } from "../../../thunks/seriesDetailsThunks";
 import {getUserInformation} from "../../../selectors/userInfoSelectors";
 import {hasAccess} from "../../../utils/utils";
+import {getSeriesHasEvents, isSeriesDeleteAllowed} from "../../../selectors/seriesSeletctor";
 
 /**
  * This component renders the action cells of series in the table view
  */
-const SeriesActionsCell = ({ row, deleteSeries, fetchSeriesDetailsMetadata, fetchSeriesDetailsAcls,
-                               fetchSeriesDetailsFeeds, fetchSeriesDetailsTheme, fetchSeriesDetailsThemeNames, user }) => {
+const SeriesActionsCell = ({ row, deleteSeries, fetchSeriesDetailsMetadata, fetchSeriesDetailsAcls, checkDeleteAllowed,
+                               fetchSeriesDetailsFeeds, fetchSeriesDetailsTheme, fetchSeriesDetailsThemeNames,
+                               user, deleteAllowed, hasEvents }) => {
     const { t } = useTranslation();
 
     const [displayDeleteConfirmation, setDeleteConfirmation] = useState(false);
@@ -24,6 +26,12 @@ const SeriesActionsCell = ({ row, deleteSeries, fetchSeriesDetailsMetadata, fetc
 
     const hideDeleteConfirmation = () => {
         setDeleteConfirmation(false);
+    };
+
+    const showDeleteConfirmation = async () => {
+        await checkDeleteAllowed(row.id);
+
+        setDeleteConfirmation(true);
     };
 
     const deletingSeries = id => {
@@ -61,7 +69,7 @@ const SeriesActionsCell = ({ row, deleteSeries, fetchSeriesDetailsMetadata, fetc
 
             {/* delete series */}
             {hasAccess("ROLE_UI_SERIES_DELETE", user) && (
-                <a onClick={() => setDeleteConfirmation(true)}
+                <a onClick={() => showDeleteConfirmation()}
                    className="remove"
                    title={t('EVENTS.SERIES.TABLE.TOOLTIP.DELETE')}/>
             )}
@@ -71,7 +79,12 @@ const SeriesActionsCell = ({ row, deleteSeries, fetchSeriesDetailsMetadata, fetc
                               resourceName={row.title}
                               resourceType="SERIES"
                               resourceId={row.id}
-                              deleteMethod={deletingSeries}/>
+                              deleteMethod={deletingSeries}
+                              deleteAllowed={deleteAllowed}
+                              showCautionMessage={hasEvents}
+                              deleteNotAllowedMessage={'CONFIRMATIONS.ERRORS.SERIES_HAS_EVENT'} /* The highlighted series cannot be deleted as they still contain events */
+                              deleteWithCautionMessage={'CONFIRMATIONS.WARNINGS.SERIES_HAS_EVENTS'} /* This series does contain events. Deleting the series will not delete the events. */
+                />
             )}
         </>
     )
@@ -79,7 +92,9 @@ const SeriesActionsCell = ({ row, deleteSeries, fetchSeriesDetailsMetadata, fetc
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    deleteAllowed: isSeriesDeleteAllowed(state),
+    hasEvents: getSeriesHasEvents(state)
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -88,7 +103,8 @@ const mapDispatchToProps = dispatch => ({
     fetchSeriesDetailsAcls: id => dispatch(fetchSeriesDetailsAcls(id)),
     fetchSeriesDetailsFeeds: id => dispatch(fetchSeriesDetailsFeeds(id)),
     fetchSeriesDetailsTheme: id => dispatch(fetchSeriesDetailsTheme(id)),
-    fetchSeriesDetailsThemeNames: () => dispatch(fetchNamesOfPossibleThemes())
+    fetchSeriesDetailsThemeNames: () => dispatch(fetchNamesOfPossibleThemes()),
+    checkDeleteAllowed: id => dispatch(checkForEventsDeleteSeriesModal(id))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SeriesActionsCell);

@@ -7,7 +7,8 @@ import {
     loadSeriesSuccess,
     loadSeriesThemesFailure,
     loadSeriesThemesInProgress,
-    loadSeriesThemesSuccess
+    loadSeriesThemesSuccess,
+    setSeriesDeletionAllowed
 } from "../actions/seriesActions";
 import {
     getURLParams,
@@ -140,8 +141,20 @@ export const postNewSeries = (values, metadataInfo, extendedMetadata) => async d
         logger.error(response);
         dispatch(addNotification('error', 'SERIES_NOT_SAVED'));
     });
-
 };
+
+// check for events of the series and if deleting the series if it has events is allowed
+export const checkForEventsDeleteSeriesModal = id => async dispatch => {
+    const hasEventsRequest = await axios.get(`/admin-ng/series/${id}/hasEvents.json`);
+    const hasEventsResponse = await hasEventsRequest.data;
+    const hasEvents = hasEventsResponse.hasEvents;
+
+    const deleteWithEventsAllowedRequest = await axios.get('/admin-ng/series/configuration.json');
+    const deleteWithEventsAllowedResponse = await deleteWithEventsAllowedRequest.data;
+    const deleteWithEventsAllowed = deleteWithEventsAllowedResponse.deleteSeriesWithEventsAllowed;
+
+    dispatch(setSeriesDeletionAllowed((!hasEvents || deleteWithEventsAllowed), hasEvents));
+}
 
 // delete series with provided id
 export const deleteSeries = id => async dispatch => {

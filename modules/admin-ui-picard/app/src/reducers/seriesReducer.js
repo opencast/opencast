@@ -10,6 +10,7 @@ import {
     LOAD_SERIES_THEMES_IN_PROGRESS,
     LOAD_SERIES_THEMES_SUCCESS,
     SET_SERIES_COLUMNS,
+    SET_SERIES_DELETION_ALLOWED,
     SET_SERIES_SELECTED,
     SHOW_ACTIONS_SERIES
 } from '../actions/seriesActions';
@@ -37,7 +38,9 @@ const initialState = {
     limit: 0,
     metadata: {},
     extendedMetadata: [],
-    themes: {}
+    themes: {},
+    deletionAllowed: true,
+    hasEvents: false
 }
 
 // Reducer for series
@@ -96,6 +99,14 @@ const series = (state=initialState, action) => {
                     }
                     return row;
                 })
+            }
+        }
+        case SET_SERIES_DELETION_ALLOWED: {
+            const { deletionAllowed, hasEvents } = payload;
+            return {
+                ...state,
+                deletionAllowed: deletionAllowed,
+                hasEvents: hasEvents
             }
         }
         case LOAD_SERIES_METADATA_IN_PROGRESS: {
