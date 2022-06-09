@@ -47,7 +47,7 @@ angular.module('adminNg.services')
           var currentUserPolicy = createPolicy(AuthService.getUserRole());
           currentUserPolicy.read = true;
           currentUserPolicy.write = true;
-          currentUserPolicy.userRole = currentUserPolicy.role
+          currentUserPolicy.userRole = currentUserPolicy.role;
           policies.push(currentUserPolicy);
         }
         return policies;
@@ -101,7 +101,7 @@ angular.module('adminNg.services')
 
             UserResource.get({ username: id }).$promise.then(function (data) {
               policy.user = data;
-            })
+            });
 
             me.ud.policiesUser.push(policy);
           }
@@ -126,7 +126,7 @@ angular.module('adminNg.services')
         if (!me.hasRights) {
           if (!angular.isUndefined(me.notificationRights)) {
             Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);
-          }changePolicies
+          }
           me.notificationRights = Notifications.add('warning', 'MISSING_ACL_RULES', NOTIFICATION_CONTEXT);
         } else if (!angular.isUndefined(me.notificationRights)) {
           Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);
@@ -149,9 +149,9 @@ angular.module('adminNg.services')
 
       this.filterUserRoles = function (item) {
         if (!item) {
-          return true
+          return true;
         }
-        return !item.includes(me.roleUserPrefix)
+        return !item.includes(me.roleUserPrefix);
       };
 
       this.userToStringForDetails = function (user) {
@@ -159,10 +159,10 @@ angular.module('adminNg.services')
           return undefined;
         }
         var n = user.name ? user.name : user.username;
-        var e = user.email ? '<' + user.email + '>' : "";
+        var e = user.email ? '<' + user.email + '>' : '';
 
         return n + ' ' + e;
-      }
+      };
 
       this.setMetadata = function (metadata) {
         me.metadata = metadata;
@@ -217,7 +217,7 @@ angular.module('adminNg.services')
 
               UserResource.get({ username: id }).$promise.then(function (data) {
                 policy.user = data;
-              })
+              });
 
               me.ud.policiesUser.push(policy);
             }
@@ -228,19 +228,19 @@ angular.module('adminNg.services')
       };
 
       this.getAllPolicies = function () {
-        return [].concat(me.ud.policies, me.ud.policiesUser)
-      }
+        return [].concat(me.ud.policies, me.ud.policiesUser);
+      };
 
       // E.g. model === $scope.policies
       this.addPolicy = function (model) {
         model.push(createPolicy(
           undefined,
-          me.aclCreateDefaults["read_enabled"],
-          me.aclCreateDefaults["write_enabled"]
+          me.aclCreateDefaults['read_enabled'],
+          me.aclCreateDefaults['write_enabled']
         ));
       };
 
-    // E.g. model === $scope.policies
+      // E.g. model === $scope.policies
       this.deletePolicy = function (model, policyToDelete) {
         var index;
 
@@ -295,34 +295,34 @@ angular.module('adminNg.services')
       ResourcesListResource.get({ resource: 'ACL.DEFAULTS'}, function(data) {
         angular.forEach(data, function (value, key) {
           if (key.charAt(0) !== '$') {
-            me.aclCreateDefaults[key] = value
+            me.aclCreateDefaults[key] = value;
           }
         });
 
-        me.aclCreateDefaults["read_enabled"] = me.aclCreateDefaults["read_enabled"] !== undefined
-          ? (me.aclCreateDefaults["read_enabled"].toLowerCase() === "true") : true
-        me.aclCreateDefaults["write_enabled"] = me.aclCreateDefaults["write_enabled"] !== undefined
-          ? (me.aclCreateDefaults["write_enabled"].toLowerCase() === "true") : false
-        me.aclCreateDefaults["read_readonly"] = me.aclCreateDefaults["read_readonly"] !== undefined
-          ? (me.aclCreateDefaults["read_readonly"].toLowerCase() === "true") : true
-        me.aclCreateDefaults["write_readonly"] = me.aclCreateDefaults["write_readonly"] !== undefined
-          ? (me.aclCreateDefaults["write_readonly"].toLowerCase() === "true") : false
-        me.roleUserPrefix = me.aclCreateDefaults["role_user_prefix"] !== undefined
-          ? me.aclCreateDefaults["role_user_prefix"]
-          : "ROLE_USER_"
+        me.aclCreateDefaults['read_enabled'] = me.aclCreateDefaults['read_enabled'] !== undefined
+          ? (me.aclCreateDefaults['read_enabled'].toLowerCase() === 'true') : true;
+        me.aclCreateDefaults['write_enabled'] = me.aclCreateDefaults['write_enabled'] !== undefined
+          ? (me.aclCreateDefaults['write_enabled'].toLowerCase() === 'true') : false;
+        me.aclCreateDefaults['read_readonly'] = me.aclCreateDefaults['read_readonly'] !== undefined
+          ? (me.aclCreateDefaults['read_readonly'].toLowerCase() === 'true') : true;
+        me.aclCreateDefaults['write_readonly'] = me.aclCreateDefaults['write_readonly'] !== undefined
+          ? (me.aclCreateDefaults['write_readonly'].toLowerCase() === 'true') : false;
+        me.roleUserPrefix = me.aclCreateDefaults['role_user_prefix'] !== undefined
+          ? me.aclCreateDefaults['role_user_prefix']
+          : 'ROLE_USER_';
       });
 
       me.roles = RolesResource.queryNameOnly({limit: -1, target: 'ACL'});
 
-      me.users = UsersResource.query({limit: 2147483647})
+      me.users = UsersResource.query({limit: 2147483647});
       me.users.$promise.then(function () {
-        var newUsers = []
+        var newUsers = [];
         angular.forEach(me.users.rows, function(user) {
-            user.userRole = me.roleUserPrefix + user.username.replace(/\W/g, '').toUpperCase()
-            newUsers.push(user)
-        })
-        me.users = newUsers
-      })
+          user.userRole = me.roleUserPrefix + user.username.replace(/\W/g, '').toUpperCase();
+          newUsers.push(user);
+        });
+        me.users = newUsers;
+      });
 
       this.getMatchingRoles = function (value) {
         RolesResource.queryNameOnly({query: value, target: 'ACL'}).$promise.then(function (data) {

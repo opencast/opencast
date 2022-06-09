@@ -74,7 +74,7 @@ angular.module('adminNg.controllers')
 
               UserResource.get({ username: id }).$promise.then(function (data) {
                 policy.user = data;
-              })
+              });
 
               $scope.policiesUser.push(policy);
             }
@@ -108,9 +108,9 @@ angular.module('adminNg.controllers')
 
     $scope.filterUserRoles = function (item) {
       if (!item) {
-        return true
+        return true;
       }
-      return !item.includes($scope.roleUserPrefix)
+      return !item.includes($scope.roleUserPrefix);
     };
 
     $scope.userToStringForDetails = function (user) {
@@ -118,14 +118,14 @@ angular.module('adminNg.controllers')
         return undefined;
       }
       var n = user.name ? user.name : user.username;
-      var e = user.email ? '<' + user.email + '>' : "";
+      var e = user.email ? '<' + user.email + '>' : '';
 
       return n + ' ' + e;
-    }
+    };
 
     $scope.getAllPolicies = function () {
-      return [].concat($scope.policies, $scope.policiesUser)
-    }
+      return [].concat($scope.policies, $scope.policiesUser);
+    };
 
     $scope.addPolicy = function () {
       $scope.policies.push(createPolicy());
@@ -136,8 +136,8 @@ angular.module('adminNg.controllers')
     $scope.addPolicy = function (model) {
       model.push(createPolicy(
         undefined,
-        $scope.aclCreateDefaults["read_enabled"],
-        $scope.aclCreateDefaults["write_enabled"]
+        $scope.aclCreateDefaults['read_enabled'],
+        $scope.aclCreateDefaults['write_enabled']
       ));
       model.validAcl = false;
     };
@@ -283,21 +283,21 @@ angular.module('adminNg.controllers')
       $scope.aclCreateDefaults = ResourcesListResource.get({ resource: 'ACL.DEFAULTS'}, function(data) {
         angular.forEach(data, function (value, key) {
           if (key.charAt(0) !== '$') {
-            $scope.aclCreateDefaults[key] = value
+            $scope.aclCreateDefaults[key] = value;
           }
         });
 
-        $scope.aclCreateDefaults["read_enabled"] = $scope.aclCreateDefaults["read_enabled"] !== undefined
-          ? ($scope.aclCreateDefaults["read_enabled"].toLowerCase() === "true") : true
-        $scope.aclCreateDefaults["write_enabled"] = $scope.aclCreateDefaults["write_enabled"] !== undefined
-          ? ($scope.aclCreateDefaults["write_enabled"].toLowerCase() === "true") : false
-        $scope.aclCreateDefaults["read_readonly"] = $scope.aclCreateDefaults["read_readonly"] !== undefined
-          ? ($scope.aclCreateDefaults["read_readonly"].toLowerCase() === "true") : true
-        $scope.aclCreateDefaults["write_readonly"] = $scope.aclCreateDefaults["write_readonly"] !== undefined
-          ? ($scope.aclCreateDefaults["write_readonly"].toLowerCase() === "true") : false
-        $scope.roleUserPrefix = $scope.aclCreateDefaults["role_user_prefix"] !== undefined
-          ? $scope.aclCreateDefaults["role_user_prefix"]
-          : "ROLE_USER_"
+        $scope.aclCreateDefaults['read_enabled'] = $scope.aclCreateDefaults['read_enabled'] !== undefined
+          ? ($scope.aclCreateDefaults['read_enabled'].toLowerCase() === 'true') : true;
+        $scope.aclCreateDefaults['write_enabled'] = $scope.aclCreateDefaults['write_enabled'] !== undefined
+          ? ($scope.aclCreateDefaults['write_enabled'].toLowerCase() === 'true') : false;
+        $scope.aclCreateDefaults['read_readonly'] = $scope.aclCreateDefaults['read_readonly'] !== undefined
+          ? ($scope.aclCreateDefaults['read_readonly'].toLowerCase() === 'true') : true;
+        $scope.aclCreateDefaults['write_readonly'] = $scope.aclCreateDefaults['write_readonly'] !== undefined
+          ? ($scope.aclCreateDefaults['write_readonly'].toLowerCase() === 'true') : false;
+        $scope.roleUserPrefix = $scope.aclCreateDefaults['role_user_prefix'] !== undefined
+          ? $scope.aclCreateDefaults['role_user_prefix']
+          : 'ROLE_USER_';
       });
 
       $scope.selectedTheme = {};
@@ -353,19 +353,19 @@ angular.module('adminNg.controllers')
               });
             });
           }
-        })
+        });
       });
     };
 
-    $scope.users = UsersResource.query({limit: 2147483647})
+    $scope.users = UsersResource.query({limit: 2147483647});
     $scope.users.$promise.then(function () {
-      var newUsers = []
+      var newUsers = [];
       angular.forEach($scope.users.rows, function(user) {
-          user.userRole = $scope.roleUserPrefix + user.username.replace(/\W/g, '').toUpperCase()
-          newUsers.push(user)
-      })
-      $scope.users = newUsers
-    })
+        user.userRole = $scope.roleUserPrefix + user.username.replace(/\W/g, '').toUpperCase();
+        newUsers.push(user);
+      });
+      $scope.users = newUsers;
+    });
 
     $scope.statReusable = null;
 
