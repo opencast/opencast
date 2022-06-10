@@ -27,16 +27,16 @@ angular.module('adminNg.controllers')
   'EventAssetCatalogsResource', 'CommentResource', 'EventWorkflowsResource', 'EventWorkflowActionResource',
   'EventWorkflowDetailsResource', 'ResourcesListResource', 'RolesResource', 'EventAccessResource',
   'EventPublicationsResource', 'EventSchedulingResource','NewEventProcessingResource', 'CaptureAgentsResource',
-  'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService', 'UploadAssetOptions',
-  'EventUploadAssetResource', 'Table', 'SchedulingHelperService', 'StatisticsReusable', 'Modal', '$translate',
-  'MetadataSaveService',
+  'ConflictCheckResource', 'UserResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService',
+  'UploadAssetOptions', 'EventUploadAssetResource', 'Table', 'SchedulingHelperService', 'StatisticsReusable', 'Modal',
+  '$translate', 'MetadataSaveService',
   function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource,
     EventAssetCatalogsResource, CommentResource, EventWorkflowsResource, EventWorkflowActionResource,
     EventWorkflowDetailsResource, ResourcesListResource, RolesResource, EventAccessResource,
     EventPublicationsResource, EventSchedulingResource, NewEventProcessingResource, CaptureAgentsResource,
-    ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService, UploadAssetOptions,
-    EventUploadAssetResource, Table, SchedulingHelperService, StatisticsReusable, Modal, $translate,
-    MetadataSaveService) {
+    ConflictCheckResource, UserResource, Language, JsHelper, $sce, $timeout, EventHelperService,
+    UploadAssetOptions, EventUploadAssetResource, Table, SchedulingHelperService, StatisticsReusable, Modal,
+    $translate, MetadataSaveService) {
 
     var metadataChangedFns = {},
         me = this,
@@ -1031,6 +1031,17 @@ angular.module('adminNg.controllers')
       var currentWorkflow = $scope.workflows.entries[$scope.workflows.entries.length - 1];
       return currentWorkflow.id === workflowId;
     };
+
+    // Fetch additional user information
+    $scope.getUserDetails = function (username) {
+      if (username && ! $scope.creator) {
+        $scope.creator = UserResource.get({ username: username });
+        return $scope.creator
+      }
+      if ($scope.creator) {
+        return $scope.creator
+      }
+    }
 
     $scope.$on('$destroy', function () {
       cleanupScopeResources();
