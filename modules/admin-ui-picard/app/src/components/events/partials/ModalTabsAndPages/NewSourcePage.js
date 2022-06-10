@@ -3,7 +3,7 @@ import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import Notifications from "../../../shared/Notifications";
 import {MuiPickersUtilsProvider, DatePicker} from "@material-ui/pickers";
-import { getCurrentLanguageInformation, getTimezoneOffset } from '../../../../utils/utils';
+import {getCurrentLanguageInformation, getTimezoneOffset, hasAccess, hasOrgAdminAccess} from '../../../../utils/utils';
 import {createMuiTheme, ThemeProvider} from "@material-ui/core";
 import {Field, FieldArray} from "formik";
 import RenderField from "../../../shared/wizard/RenderField";
@@ -17,6 +17,7 @@ import {sourceMetadata} from "../../../../configs/sourceConfig";
 import {hours, minutes, NOTIFICATION_CONTEXT, weekdays} from "../../../../configs/modalConfig";
 import {logger} from "../../../../utils/logger";
 import DateFnsUtils from '@date-io/date-fns';
+import {getOrgAdminRole, getUserInformation} from "../../../../selectors/userInfoSelectors";
 
 
 // Style to bring date picker pop up to front
@@ -33,11 +34,9 @@ const theme = createMuiTheme({
 /**
  * This component renders the source page for new events in the new event wizard.
  */
-const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, inputDevices, addNotification,
+const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, inputDevices, user, addNotification,
                             removeNotificationWizardForm }) => {
     const { t } = useTranslation();
-
-
 
     useEffect(() => {
         // Load recordings that can be used for input
@@ -109,7 +108,25 @@ const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, in
         removeNotificationWizardForm();
     }
 
+    const hasAnyDeviceAccess = (user) => {
+        if(hasOrgAdminAccess(user)){
+            return true;
+        } else {
+            for(const device of inputDevices){
+                const inputDeviceAccessRole = 'ROLE_CAPTURE_AGENT_' + device.id.replace(/[^a-zA-Z0-9_]/g, '').toUpperCase();
+                if(hasAccess(inputDeviceAccessRole, user)){
+                    return true;
+                }
+            }
 
+            return false;
+        }
+
+    }
+
+    const scheduleOptionAvailable = () => {
+        return ((!loadingInputDevices) && (inputDevices.length > 0) && (hasAnyDeviceAccess(user)));
+    }
 
     return(
         <>
@@ -123,33 +140,46 @@ const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, in
                             {/* Radio buttons for choosing source mode */}
                             <div className="obj-container">
                                 <ul>
-                                    <li>
-                                        <label>
-                                            <Field type="radio"
-                                                   name="sourceMode"
-                                                   className="source-toggle"
-                                                   value="UPLOAD"/>
-                                            <span>{t('EVENTS.EVENTS.NEW.SOURCE.UPLOAD.CAPTION')}</span>
-                                        </label>
-                                    </li>
-                                    <li>
-                                        <label>
-                                            <Field type="radio"
-                                                   name="sourceMode"
-                                                   className="source-toggle"
-                                                   value="SCHEDULE_SINGLE"/>
-                                            <span>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_SINGLE.CAPTION')}</span>
-                                        </label>
-                                    </li>
-                                    <li>
-                                        <label>
-                                            <Field type="radio"
-                                                   name="sourceMode"
-                                                   className="source-toggle"
-                                                   value="SCHEDULE_MULTIPLE"/>
-                                            <span>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.CAPTION')}</span>
-                                        </label>
-                                    </li>
+                                    {scheduleOptionAvailable() ? (
+                                        <li>
+                                            <label>
+                                                <span>{t('EVENTS.EVENTS.NEW.SOURCE.UPLOAD.CAPTION')}</span>
+                                            </label>
+                                        </li>
+                                    ) : (
+                                        <li>
+                                            <label>
+                                                <Field type="radio"
+                                                       name="sourceMode"
+                                                       className="source-toggle"
+                                                       value="UPLOAD"/>
+                                                <span>{t('EVENTS.EVENTS.NEW.SOURCE.UPLOAD.CAPTION')}</span>
+                                            </label>
+                                        </li>
+                                    )}
+                                    {scheduleOptionAvailable() && (
+                                        <>
+                                            <li>
+                                                <label>
+                                                    <Field type="radio"
+                                                           name="sourceMode"
+                                                           className="source-toggle"
+                                                           value="SCHEDULE_SINGLE"/>
+                                                    <span>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_SINGLE.CAPTION')}</span>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label>
+                                                    <Field type="radio"
+                                                           name="sourceMode"
+                                                           className="source-toggle"
+                                                           value="SCHEDULE_MULTIPLE"/>
+                                                    <span>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.CAPTION')}</span>
+                                                </label>
+                                            </li>
+                                        </>
+                                    )}
+
                                 </ul>
                             </div>
                         </div>
@@ -158,7 +188,7 @@ const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, in
                         {formik.values.sourceMode === 'UPLOAD' && (
                             <Upload formik={formik}/>
                         )}
-                        {(formik.values.sourceMode === 'SCHEDULE_SINGLE' ||
+                        {scheduleOptionAvailable() && (formik.values.sourceMode === 'SCHEDULE_SINGLE' ||
                             formik.values.sourceMode === 'SCHEDULE_MULTIPLE') && (
                             <Schedule formik={formik}
                                       inputDevices={inputDevices} />
@@ -517,6 +547,7 @@ const Schedule = ({ formik, inputDevices }) => {
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     inputDevices: getRecordings(state),
+    user: getUserInformation(state)
 });
 
 // Mapping actions to dispatch
