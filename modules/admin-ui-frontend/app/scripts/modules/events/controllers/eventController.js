@@ -1036,12 +1036,12 @@ angular.module('adminNg.controllers')
     $scope.getUserDetails = function (username) {
       if (username && ! $scope.creator) {
         $scope.creator = UserResource.get({ username: username });
-        return $scope.creator
+        return $scope.creator;
       }
       if ($scope.creator) {
-        return $scope.creator
+        return $scope.creator;
       }
-    }
+    };
 
     $scope.$on('$destroy', function () {
       cleanupScopeResources();
