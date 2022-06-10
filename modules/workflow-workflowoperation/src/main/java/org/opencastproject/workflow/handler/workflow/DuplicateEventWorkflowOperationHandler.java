@@ -73,6 +73,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -246,7 +247,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
 
     SeriesInformation series = null;
     AccessControlList seriesAccessControl = null;
-    if (!seriesId.isEmpty() && !seriesId.startsWith("${")) {
+    if (!seriesId.isEmpty() && !seriesId.startsWith("${") && !seriesId.endsWith("}")) {
       try {
         final DublinCoreCatalog dc = seriesService.getSeries(seriesId);
         series = new SeriesInformation(seriesId, dc, dc.get(DublinCore.PROPERTY_TITLE).get(0).getValue());
@@ -328,7 +329,6 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     for (int i = 0; i < numberOfEvents; i++) {
       final List<URI> temporaryFiles = new ArrayList<>();
       MediaPackage newMp = null;
-      final Date startDate;
       try {
         String newMpId = workflowInstance.getConfiguration("newMpId");
         if (newMpId == null) {
@@ -341,15 +341,15 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
         } else {
           useTitle = title;
         }
-        final String newTitle = noSuffix
-            ? useTitle
-            : String.format("%s (%s %d)", useTitle, copyNumberPrefix, i + 1);
+        if (!noSuffix) {
+          useTitle = String.format("%s (%s %d)", useTitle, copyNumberPrefix, i + 1);
+        }
         Date mpDate = mediaPackage.getDate();
         String date = new SimpleDateFormat("yyyy-MM-dd").format(mpDate);
         String time = new SimpleDateFormat("HH:mm:ss").format(mpDate);
         if (!startDateString.isEmpty()) {
           String [] dt = startDateString.trim().split("\\s+");
-          if (dt.length >= 2) {
+          if (dt.length == 2) {
             if (!dt[0].startsWith("${")) {
               date = dt[0];
             }
@@ -360,13 +360,13 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
         }
         try {
           mpDate = ADMIN_UI_DATE_FORMAT.parse(date + " " + time);
+          logger.info("Setting StartDate to {}", mpDate);
         } catch (ParseException ex) {
-          logger.info("{} could not be parsed as Date", date + " " + time);
+          logger.error("Could not parse as date time: " + date + " and " + time);
+          throw new WorkflowOperationException(ex);
         }
-        logger.info("setting StartDate to {}", mpDate.toString());
-        startDate = mpDate;
 
-        newMp = copyMediaPackage(mediaPackage, series, newMpId, newTitle, startDate);
+        newMp = copyMediaPackage(mediaPackage, series, newMpId, useTitle, mpDate);
 
         if (series != null) {
           URI newSeriesURI = null;
@@ -394,7 +394,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
         // Create and add new episode dublin core with changed title
         newMp = copyDublinCore(mediaPackage, originalEpisodeDc[0],
               newMp, series, removeTags, addTags, overrideTags,
-              temporaryFiles, startDate);
+              temporaryFiles, mpDate);
 
         // Clone regular elements
         for (final MediaPackageElement e : elements) {
@@ -571,10 +571,12 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     final DublinCoreCatalog destinationDublinCore = DublinCoreUtil.loadEpisodeDublinCore(workspace, source).get();
     destinationDublinCore.setIdentifier(null);
     destinationDublinCore.setURI(sourceDublinCore.getURI());
-    destinationDublinCore.set(DublinCore.PROPERTY_CREATED, OpencastMetadataCodec.encodeDate(creationDate,Precision.Second));
+    destinationDublinCore.set(DublinCore.PROPERTY_CREATED, OpencastMetadataCodec.encodeDate(creationDate, Precision.Second));
     destinationDublinCore.set(DublinCore.PROPERTY_TITLE, destination.getTitle());
-    DublinCoreValue eventTime = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(creationDate, creationDate), Precision.Second);
-    destinationDublinCore.set(DublinCore.PROPERTY_TEMPORAL, eventTime);
+    if (StringUtils.isNotBlank(destinationDublinCore.getFirst(DublinCore.PROPERTY_TEMPORAL))) {
+      DublinCoreValue eventTime = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(creationDate, creationDate), Precision.Second);
+      destinationDublinCore.set(DublinCore.PROPERTY_TEMPORAL, eventTime);
+    }
     if (series != null) {
       destinationDublinCore.set(DublinCore.PROPERTY_IS_PART_OF, series.id);
     }

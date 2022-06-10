@@ -36,7 +36,7 @@ Parameter Table
 |no-suffix            |`true`                                     |Boolean to decide if the number suffix (`copy #`) is not attached (true ... no attachment, false ...`copy #` is attached) |
 |set-series-id        |`3547a900-e0ee-4e3f-9e67-2157cd42c700`     |Id of the series the copied events should be added to |
 |set-title            |`copy of mediapackage`                     |Title of the newly created events. If `no-suffix` is set to `false` a `copy #` will be attached |
-|set-start-date-time  |`2021-12-02 22:22:22`                      |Date and time to be set on the newly created events.|
+|set-start-date-time  |`2021-12-02 22:22:22`  or `2021-12-02 22:22`  |Date and time to be set on the newly created events.|
 
 
 Operation Example
