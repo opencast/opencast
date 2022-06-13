@@ -115,7 +115,7 @@ angular.module('adminNg.controllers')
       else if ($scope.states[4].name === 'tobira'){
         tobiraOptions = $scope.states[4].stateController.ud;
       }
-      if (angular.isDefined(tobiraOptions.selectedPage)) {
+      if (tobiraOptions.selectedPage) {
         var existingPages = [];
         var newPages = [];
         angular.forEach(tobiraOptions.breadcrumbs.concat(tobiraOptions.selectedPage), function (page) {
