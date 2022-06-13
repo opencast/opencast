@@ -1,24 +1,23 @@
-import React, {useState} from "react";
-import {Formik} from "formik";
-import NewEventSummary from "./NewEventSummary";
-import {getAssetUploadOptions, getEventMetadata} from "../../../../selectors/eventSelectors";
-import {connect} from "react-redux";
-import {MuiPickersUtilsProvider} from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
-import {getCurrentLanguageInformation} from "../../../../utils/utils";
-import NewAssetUploadPage from "../ModalTabsAndPages/NewAssetUploadPage";
-import NewMetadataExtendedPage from "../ModalTabsAndPages/NewMetadataExtendedPage";
-import {postNewEvent} from "../../../../thunks/eventThunks";
-import NewMetadataPage from "../ModalTabsAndPages/NewMetadataPage";
-import NewAccessPage from "../ModalTabsAndPages/NewAccessPage";
-import NewProcessingPage from "../ModalTabsAndPages/NewProcessingPage";
-import NewSourcePage from "../ModalTabsAndPages/NewSourcePage";
-import {sourceMetadata} from "../../../../configs/sourceConfig";
-import {initialFormValuesNewEvents} from "../../../../configs/modalConfig";
-import {NewEventSchema} from "../../../../utils/validate";
-import {logger} from "../../../../utils/logger";
+import React, { useEffect, useState } from 'react';
+import { Formik } from 'formik';
+import NewEventSummary from './NewEventSummary';
+import { getAssetUploadOptions, getEventMetadata } from '../../../../selectors/eventSelectors';
+import { connect } from 'react-redux';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
+import { getCurrentLanguageInformation } from '../../../../utils/utils';
+import NewAssetUploadPage from '../ModalTabsAndPages/NewAssetUploadPage';
+import NewMetadataExtendedPage from '../ModalTabsAndPages/NewMetadataExtendedPage';
+import { postNewEvent } from '../../../../thunks/eventThunks';
+import NewMetadataPage from '../ModalTabsAndPages/NewMetadataPage';
+import NewAccessPage from '../ModalTabsAndPages/NewAccessPage';
+import NewProcessingPage from '../ModalTabsAndPages/NewProcessingPage';
+import NewSourcePage from '../ModalTabsAndPages/NewSourcePage';
+import { sourceMetadata } from '../../../../configs/sourceConfig';
+import { initialFormValuesNewEvents } from '../../../../configs/modalConfig';
+import { NewEventSchema } from '../../../../utils/validate';
+import { logger } from '../../../../utils/logger';
 import WizardStepperEvent from '../../../shared/wizard/WizardStepperEvent';
-
 
 // Get info about the current language and its date locale
 const currentLanguage = getCurrentLanguageInformation();
@@ -113,60 +112,68 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent, uploadAssetOption
                         validationSchema={currentValidationSchema}
                         onSubmit={values => handleSubmit(values)}>
                     {/* Render wizard pages depending on current value of page variable */}
-                    {formik => (
-                      <>
-                          {/* Stepper that shows each step of wizard as header */}
-                          <WizardStepperEvent steps={steps}
-                                              page={page}
-                                              setPage={setPage}
-                                              completed={pageCompleted}
-                                              setCompleted={setPageCompleted}
-                                              formik={formik}/>
-                          <div>
-                              {page === 0 && (
-                                <NewMetadataPage nextPage={nextPage}
-                                                 formik={formik}
-                                                 metadataFields={metadataFields}
-                                                 header={steps[page].translation} />
-                              )}
-                              {page === 1 && (
-                                // todo: finish implementation when information about endpoints and structure are gathered
-                                <NewMetadataExtendedPage previousPage={previousPage}
-                                                         nextPage={nextPage}
-                                                         formik={formik}
-                                                         header={steps[page].translation} />
-                              )}
-                              {page === 2 && (
-                                <NewSourcePage previousPage={previousPage}
-                                               nextPage={nextPage}
-                                               formik={formik} />
-                              )}
-                              {page === 3  && (
-                                <NewAssetUploadPage previousPage={previousPage}
-                                                    nextPage={nextPage}
-                                                    formik={formik} />
-                              )}
-                              {page === 4 && (
-                                <NewProcessingPage previousPage={previousPage}
+                    {formik => {
+
+                        // eslint-disable-next-line react-hooks/rules-of-hooks
+                        useEffect(() => {
+                            formik.validateForm();
+                        }, [page]);
+
+                        return (
+                          <>
+                              {/* Stepper that shows each step of wizard as header */}
+                              <WizardStepperEvent steps={steps}
+                                                  page={page}
+                                                  setPage={setPage}
+                                                  completed={pageCompleted}
+                                                  setCompleted={setPageCompleted}
+                                                  formik={formik}/>
+                              <div>
+                                  {page === 0 && (
+                                    <NewMetadataPage nextPage={nextPage}
+                                                     formik={formik}
+                                                     metadataFields={metadataFields}
+                                                     header={steps[page].translation}/>
+                                  )}
+                                  {page === 1 && (
+                                    // todo: finish implementation when information about endpoints and structure are gathered
+                                    <NewMetadataExtendedPage previousPage={previousPage}
+                                                             nextPage={nextPage}
+                                                             formik={formik}
+                                                             header={steps[page].translation}/>
+                                  )}
+                                  {page === 2 && (
+                                    <NewSourcePage previousPage={previousPage}
                                                    nextPage={nextPage}
-                                                   workflowPanelRef={workflowPanelRef}
-                                                   formik={formik} />
-                              )}
-                              {page === 5 && (
-                                <NewAccessPage previousPage={previousPage}
-                                               nextPage={nextPage}
-                                               formik={formik}
-                                               editAccessRole='ROLE_UI_SERIES_DETAILS_ACL_EDIT' />
-                              )}
-                              {page === 6 && (
-                                <NewEventSummary previousPage={previousPage}
-                                                 formik={formik}
-                                                 metaDataExtendedHidden={steps[1].hidden}
-                                                 assetUploadHidden={steps[3].hidden} />
-                              )}
-                          </div>
-                      </>
-                    )}
+                                                   formik={formik}/>
+                                  )}
+                                  {page === 3 && (
+                                    <NewAssetUploadPage previousPage={previousPage}
+                                                        nextPage={nextPage}
+                                                        formik={formik}/>
+                                  )}
+                                  {page === 4 && (
+                                    <NewProcessingPage previousPage={previousPage}
+                                                       nextPage={nextPage}
+                                                       workflowPanelRef={workflowPanelRef}
+                                                       formik={formik}/>
+                                  )}
+                                  {page === 5 && (
+                                    <NewAccessPage previousPage={previousPage}
+                                                   nextPage={nextPage}
+                                                   formik={formik}
+                                                   editAccessRole="ROLE_UI_SERIES_DETAILS_ACL_EDIT"/>
+                                  )}
+                                  {page === 6 && (
+                                    <NewEventSummary previousPage={previousPage}
+                                                     formik={formik}
+                                                     metaDataExtendedHidden={steps[1].hidden}
+                                                     assetUploadHidden={steps[3].hidden}/>
+                                  )}
+                              </div>
+                          </>
+                        );
+                    }}
                 </Formik>
             </MuiPickersUtilsProvider>
         </>
