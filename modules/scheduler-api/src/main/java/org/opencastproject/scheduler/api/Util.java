@@ -45,7 +45,7 @@ import java.util.TimeZone;
 
 public final class Util {
   /** The minimum separation between one event ending and the next starting */
-  public static final int EVENT_MINIMUM_SEPARATION_MILLISECONDS = 60 * 1000;
+  public static final int EVENT_MINIMUM_SEPARATION_MILLISECONDS = 0;
 
   private static final Logger logger = LoggerFactory.getLogger(Util.class);
   private static final TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();

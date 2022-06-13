@@ -200,22 +200,17 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
   /**
    * {@inheritDoc}
    *
-   * @see WorkflowServiceDatabase#getLatestWorkflowInstances(int limit, long token)
+   * @see WorkflowServiceDatabase#getWorkflowIndexData(int limit, int offset)
    */
-  public List<WorkflowInstance> getLatestWorkflowInstances(int limit, long token) throws WorkflowDatabaseException {
-
+  public List<WorkflowIndexData> getWorkflowIndexData(int limit, int offset) throws WorkflowDatabaseException {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
 
-      var query = em.createNamedQuery("Workflow.findLatest", WorkflowInstance.class);
-
-      String orgId = securityService.getOrganization().getId();
-      query.setParameter("organizationId", orgId);
-      query.setParameter("startToken", token);
-      query.setMaxResults(limit);
-      logger.debug("Requesting latest workflows using query: {}", query);
-      return query.getResultList();
+      var nativeQuery = em.createNamedQuery("WorkflowIndexData.getAll", WorkflowIndexData.class);
+      nativeQuery.setMaxResults(limit);
+      nativeQuery.setFirstResult(offset);
+      return nativeQuery.getResultList();
     } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
     } finally {

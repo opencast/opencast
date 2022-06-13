@@ -34,6 +34,7 @@ import com.google.common.cache.LoadingCache;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSBindingFactory;
@@ -61,6 +62,10 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.BundleTracker;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
@@ -142,6 +147,11 @@ public class RestPublisher implements RestConstants {
   /** The JAX-RS Server */
   private Server server;
 
+  /** The CXF Bus */
+  private Bus bus;
+
+  private ServiceRegistration<Bus> busServiceRegistration;
+
   /** The map of JAX-RS resource providers */
   private Map<ServiceReference<?>, ResourceProvider> resourceProviders = new ConcurrentHashMap<>();
 
@@ -200,6 +210,10 @@ public class RestPublisher implements RestConstants {
       }
     });
 
+    this.bus = BusFactory.getDefaultBus();
+
+    busServiceRegistration = componentContext.getBundleContext().registerService(Bus.class, bus, new Hashtable<>());
+
     try {
       jaxRsTracker = new JaxRsServiceTracker();
       bundleTracker = new StaticResourceBundleTracker(componentContext.getBundleContext());
@@ -218,6 +232,17 @@ public class RestPublisher implements RestConstants {
     logger.debug("deactivate()");
     jaxRsTracker.close();
     bundleTracker.close();
+    busServiceRegistration.unregister();
+  }
+
+  @Reference(policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.OPTIONAL)
+  public void bindHttpService(HttpService httpService) {
+    logger.debug("HttpService registered");
+    rewire();
+  }
+
+  public void unbindHttpService(HttpService httpService) {
+    logger.debug("HttpService unregistered");
   }
 
   protected class OsgiCxfEndpointComparator implements ResourceComparator {
@@ -280,6 +305,7 @@ public class RestPublisher implements RestConstants {
     }
 
     RestServlet cxf = new RestServlet();
+    cxf.setBus(bus);
     try {
       Dictionary<String, Object> props = new Hashtable<>();
       props.put(SharedHttpContext.ALIAS, servicePath);
@@ -314,36 +340,13 @@ public class RestPublisher implements RestConstants {
 
     // Was initialization successful
     if (!cxf.isInitialized()) {
-      logger.error("Whiteboard implemenation failed to pick up REST endpoint declaration {}", serviceType);
+      logger.error("Whiteboard implementation failed to pick up REST endpoint declaration {}", serviceType);
       return;
     }
 
     resourceProviders.put(ref, new SingletonResourceProvider(service));
 
-    // Set up cxf
-    Bus bus = cxf.getBus();
-    JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-    sf.setBus(bus);
-    sf.setProviders(providers);
-
-    // Set the service class
-    sf.setResourceProviders(new ArrayList<>(resourceProviders.values()));
-    sf.setResourceComparator(new OsgiCxfEndpointComparator());
-
-    sf.setAddress("/");
-
-    BindingFactoryManager manager = sf.getBus().getExtension(BindingFactoryManager.class);
-    JAXRSBindingFactory factory = new JAXRSBindingFactory();
-    factory.setBus(sf.getBus());
-    manager.registerBindingFactory(JAXRSBindingFactory.JAXRS_BINDING_ID, factory);
-
-    if (server != null) {
-      logger.debug("Destroying JAX-RS server");
-      server.stop();
-      server.destroy();
-    }
-
-    server = sf.create();
+    rewire();
 
     logger.info("Registered REST endpoint at " + servicePath);
     if (service instanceof RestEndpoint) {
@@ -365,6 +368,41 @@ public class RestPublisher implements RestConstants {
     if (reg != null) {
       reg.unregister();
     }
+
+    rewire();
+  }
+
+  private synchronized void rewire() {
+
+    if (resourceProviders.isEmpty()) {
+      logger.debug("No resource classes skip JAX-RS server recreation");
+      return;
+    }
+
+    // Set up cxf
+    JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+    sf.setBus(bus);
+    sf.setProviders(providers);
+
+    // Set the service class
+    sf.setResourceProviders(new ArrayList<>(resourceProviders.values()));
+    sf.setResourceComparator(new OsgiCxfEndpointComparator());
+
+    sf.setAddress("/");
+
+    sf.setProperties(new HashMap<>());
+    BindingFactoryManager manager = sf.getBus().getExtension(BindingFactoryManager.class);
+    JAXRSBindingFactory factory = new JAXRSBindingFactory();
+    factory.setBus(bus);
+    manager.registerBindingFactory(JAXRSBindingFactory.JAXRS_BINDING_ID, factory);
+
+    if (server != null) {
+      logger.debug("Destroying JAX-RS server");
+      server.stop();
+      server.destroy();
+    }
+
+    server = sf.create();
   }
 
   /**
@@ -551,12 +589,18 @@ public class RestPublisher implements RestConstants {
      * Default constructor needed by Jetty
      */
     public RestServlet() {
+
     }
 
     @Override
     public void init(ServletConfig servletConfig) throws ServletException {
       super.init(servletConfig);
       initialized = true;
+    }
+
+    @Override
+    public void destroyBus() {
+      // Do not destroy bus if servlet gets unregistered
     }
 
     @Override

@@ -1,8 +1,10 @@
-<div ng-form="innerForm">
+<div ng-form="innerForm"
+     ng-class="{ dirty: params.dirty }">
   <i class="edit fa fa-pencil-square"></i>
-  <i class="changed fa fa-check" ng-class="{ saved: params.saved, dirty: params.dirty }"></i>
 
   <input type="checkbox"
-         ng-model="params.value" ng-change="submit()"
-                                 ng-required="params.required" name="{{ params.name }}"/>
+         ng-model="params.value"
+         ng-change="submit()"
+         ng-required="params.required"
+         name="{{ params.name }}"/>
 </div>
