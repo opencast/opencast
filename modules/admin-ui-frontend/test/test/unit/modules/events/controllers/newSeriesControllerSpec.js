@@ -54,7 +54,7 @@ describe('New Series Controller', function () {
                 stateController: { ud: { theme: '2' } }
             }, {
                 name: 'tobira',
-                stateController: { ud: undefined }
+                stateController: { ud: {} }
             }];
         });
 
