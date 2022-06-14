@@ -4,6 +4,16 @@ Changelog
 Opencast 10
 ----------
 
+### Opencast 10.14
+
+*Released on June 14th, 2022*
+
+- [[#3634](https://github.com/opencast/opencast/pull/3634)] -
+  Update adopter registration code
+- [[#3781](https://github.com/opencast/opencast/pull/3781)] -
+  Add Placeholders for Video Resolution to Rename-Files
+
+
 ### Opencast 10.13
 
 *Released on May 11th, 2022*

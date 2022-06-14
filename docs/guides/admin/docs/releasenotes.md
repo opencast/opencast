@@ -43,6 +43,12 @@ API changes
 - [[#2644](https://github.com/opencast/opencast/pull/2644)]: Use millisecond precision in Solr date range queries
 
 
+Additional Notes about 10.14
+----------------------------
+
+This release adds plaholder support in video filenames for the rename-files operation, as well as an updated Terms
+of Use.  This will trigger the registration screen again for your admin user.
+
 Additional Notes about 10.13
 ----------------------------
 
