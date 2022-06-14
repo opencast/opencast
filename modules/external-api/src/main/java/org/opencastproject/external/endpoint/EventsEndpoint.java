@@ -112,6 +112,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workflow.api.WorkflowService;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
@@ -245,6 +246,7 @@ public class EventsEndpoint implements ManagedService {
   private UrlSigningService urlSigningService;
   private SchedulerService schedulerService;
   private CaptureAgentStateService agentStateService;
+  private WorkflowService workflowService;
 
   /** OSGi DI */
   @Reference
@@ -326,6 +328,13 @@ public class EventsEndpoint implements ManagedService {
   public void setAgentStateService(CaptureAgentStateService agentStateService) {
     this.agentStateService = agentStateService;
   }
+
+  /** OSGi DI */
+  @Reference
+  public void setWorkflowService(WorkflowService workflowService) {
+    this.workflowService = workflowService;
+  }
+
 
   private List<EventCatalogUIAdapter> getEventCatalogUIAdapters() {
     return new ArrayList<>(getEventCatalogUIAdapters(getSecurityService().getOrganization().getId()));
@@ -2005,6 +2014,14 @@ public class EventsEndpoint implements ManagedService {
         return ApiResponses.notFound(String.format("Unable to find event with id '%s'", id));
       }
       MediaPackage mp = indexService.getEventMediapackage(event.get());
+
+      try {
+        if (workflowService.mediaPackageHasActiveWorkflows(mp.getIdentifier().toString())) {
+          return RestUtil.R.conflict(String.format("Cannot update while a workflow is running on event '%s'", id));
+        }
+      } catch (WorkflowDatabaseException e) {
+        return RestUtil.R.serverError();
+      }
 
       if (!ServletFileUpload.isMultipartContent(request)) {
         throw new IllegalArgumentException("No multipart content");

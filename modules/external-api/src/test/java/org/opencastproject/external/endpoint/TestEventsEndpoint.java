@@ -56,6 +56,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
+import org.opencastproject.workflow.api.WorkflowService;
 
 import com.entwinemedia.fn.data.Opt;
 
@@ -149,6 +150,8 @@ public class TestEventsEndpoint extends EventsEndpoint {
 
     AssetManager assetManager = EasyMock.createMock(AssetManager.class);
 
+    WorkflowService workflowService = EasyMock.createNiceMock(WorkflowService.class);
+
     /**
      * Delete Metadata external service mocking
      */
@@ -240,6 +243,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
             (MediaPackageElementFlavor) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject()))
             .andReturn(mpUpdated);
     EasyMock.expect(assetManager.takeSnapshot(EasyMock.capture(capturedMediaPackage))).andReturn(EasyMock.createNiceMock(Snapshot.class));
+    EasyMock.expect(workflowService.mediaPackageHasActiveWorkflows(mp.getIdentifier().toString())).andReturn(false).anyTimes();
 
     /**
      * Get event metadata external service mocking
@@ -301,13 +305,14 @@ public class TestEventsEndpoint extends EventsEndpoint {
 
 
     // Replay all mocks
-    EasyMock.replay(deleteMetadataMP, indexService, schedulerService, ingestService, assetManager, noPublicationsMP, twoPublicationsMP);
+    EasyMock.replay(deleteMetadataMP, indexService, schedulerService, ingestService, assetManager, workflowService, noPublicationsMP, twoPublicationsMP);
 
     setElasticsearchIndex(elasticsearchIndex);
     setIndexService(indexService);
     setSchedulerService(schedulerService);
     setIngestService(ingestService);
     setAssetManager(assetManager);
+    setWorkflowService(workflowService);
     setupSecurityService();
     setupEventCatalogUIAdapters();
     Properties properties = new Properties();
