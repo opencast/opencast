@@ -1517,8 +1517,7 @@
               <tr>
                 <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTER"><!-- Submitter--></td>
                 <td>
-                  {{ getUserDetails(subNavData.creator).name }}
-                  <span ng-if="getUserDetails(subNavData.creator).email">{{'&lt;' + getUserDetails(subNavData.creator).email + '&gt;' }}</span>
+                  {{ subNavData.creator }}
                 </td>
               </tr>
               <tr>
