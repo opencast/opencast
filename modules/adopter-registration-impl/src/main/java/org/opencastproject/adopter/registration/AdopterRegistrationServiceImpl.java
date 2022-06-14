@@ -70,7 +70,13 @@ public class AdopterRegistrationServiceImpl implements Service {
   }
 
   @Override
-  public void deleteFormData() {
+  public void markForDeletion() {
+    Form form = ((Form) formRepository.getForm());
+    form.delete();
+    formRepository.save(form);
+  }
+
+  public void deleteRegistration() {
     formRepository.delete();
   }
 
