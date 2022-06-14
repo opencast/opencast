@@ -18,29 +18,17 @@
  * the License.
  *
  */
+'use strict';
 
-package org.opencastproject.adopter.registration;
-
-/**
- * API for the Adopter Statistics Registrations.
- */
-public interface Service {
-
-  /**
-   * Saves the submitted registration form.
-   * @param form The adopter registration form.
-   */
-  void saveFormData(IForm form);
-
-  /**
-   * Loads the adopter registration form.
-   * @return The adopter registration form.
-   */
-  IForm retrieveFormData();
-
-  /** Marks the adopter registration for deletion */
-  void markForDeletion();
-
-  /** Deletes teh local copy of the registration data */
-  void deleteRegistration();
-}
+angular.module('adminNg.resources')
+.factory('TermsOfUseResource', ['$resource', function ($resource) {
+  return $resource('/admin-ng/adopter/latestToU', {}, {
+    get: {
+      method: 'GET',
+      headers: {'Content-Type': 'text/plain'},
+      transformResponse: function (data) {
+        return {'latest': data};
+      }
+    }
+  });
+}]);

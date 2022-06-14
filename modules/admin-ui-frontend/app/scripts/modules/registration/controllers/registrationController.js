@@ -23,14 +23,15 @@
 // Controller for creating a new event. This is a wizard, so it implements a state machine design pattern.
 angular.module('adminNg.controllers')
 .controller('RegistrationCtrl', ['$scope', '$timeout', 'Table', 'AdopterRegistrationStates',
-  'AdopterRegistrationResource', 'CountryResource', 'NewEventStates', 'NewEventResource', 'EVENT_TAB_CHANGE',
-  'Notifications', 'Modal', 'AuthService',
-  function ($scope, $timeout, Table, AdopterRegistrationStates, AdopterRegistrationResource, CountryResource,
-    NewEventStates, NewEventResource, EVENT_TAB_CHANGE, Notifications, Modal, AuthService) {
+  'AdopterRegistrationResource', 'TermsOfUseResource', 'CountryResource', 'NewEventStates', 'NewEventResource',
+  'EVENT_TAB_CHANGE', 'Notifications', 'Modal', 'AuthService',
+  function ($scope, $timeout, Table, AdopterRegistrationStates, AdopterRegistrationResource, TermsOfUseResource,
+    CountryResource, NewEventStates, NewEventResource, EVENT_TAB_CHANGE, Notifications, Modal, AuthService) {
 
     $scope.state = AdopterRegistrationStates.getInitialState($scope.$parent.resourceId);
     $scope.states = AdopterRegistrationStates.get($scope.$parent.resourceId);
     $scope.countries = CountryResource.getCountries();
+    $scope.tou = TermsOfUseResource.get();
     $scope.adopter = new AdopterRegistrationResource();
 
     document.getElementById('help-dd').classList.remove('active');
@@ -44,6 +45,10 @@ angular.module('adminNg.controllers')
         }
         $scope.adopter[field] = adopter[field];
       }
+      if (!angular.isDefined(adopter['termsVersionAgreed']) || $scope.tou['latest'] != adopter['termsVersionAgreed']) {
+        $scope.adopter['agreedToPolicy'] = false;
+        $scope.registered = false;
+      }
     });
 
 
@@ -52,6 +57,10 @@ angular.module('adminNg.controllers')
         if ($scope.adopterRegistrationForm.$invalid || !$scope.adopter.agreedToPolicy) {
           return;
         }
+      }
+      // NB: Deliberately choosing a different value to denote confirmation
+      if ($scope.state === 'delete_submit' && inputAction === 0) {
+        $scope.close();
       }
 
       $scope.state = $scope.states[$scope.state]['nextState'][inputAction];
