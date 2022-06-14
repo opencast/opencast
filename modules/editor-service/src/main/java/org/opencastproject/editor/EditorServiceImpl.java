@@ -44,6 +44,7 @@ import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.util.EventUtils;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -156,11 +157,13 @@ public class EditorServiceImpl implements EditorService {
   private String previewVideoSubtype;
   private String previewTag;
   private String previewSubtype;
+  private String waveformSubtype;
   private MediaPackageElementFlavor smilSilenceFlavor;
   private ElasticsearchIndex searchIndex;
 
   private static final String DEFAULT_PREVIEW_SUBTYPE = "prepared";
   private static final String DEFAULT_PREVIEW_TAG = "editor";
+  private static final String DEFAULT_WAVEFORM_SUBTYPE = "waveform";
   private static final String DEFAULT_SMIL_CATALOG_FLAVOR = "smil/cutting";
   private static final String DEFAULT_SMIL_CATALOG_TAGS = "archive";
   private static final String DEFAULT_SMIL_SILENCE_FLAVOR = "*/silence";
@@ -168,6 +171,7 @@ public class EditorServiceImpl implements EditorService {
 
   public static final String OPT_PREVIEW_SUBTYPE = "preview.subtype";
   public static final String OPT_PREVIEW_TAG = "preview.tag";
+  public static final String OPT_WAVEFORM_SUBTYPE = "waveform.subtype";
   public static final String OPT_SMIL_CATALOG_FLAVOR = "smil.catalog.flavor";
   public static final String OPT_SMIL_CATALOG_TAGS = "smil.catalog.tags";
   public static final String OPT_SMIL_SILENCE_FLAVOR = "smil.silence.flavor";
@@ -245,6 +249,10 @@ public class EditorServiceImpl implements EditorService {
     return previewTag;
   }
 
+  private String getWaveformSubtype() {
+    return waveformSubtype;
+  }
+
   @Activate
   @Modified
   public void activate(ComponentContext cc) {
@@ -262,6 +270,10 @@ public class EditorServiceImpl implements EditorService {
     // Preview subtype
     previewSubtype = Objects.toString(properties.get(OPT_PREVIEW_SUBTYPE), DEFAULT_PREVIEW_SUBTYPE);
     logger.debug("Preview subtype configuration set to '{}'", previewSubtype);
+
+    // Waveform subtype
+    waveformSubtype = Objects.toString(properties.get(OPT_WAVEFORM_SUBTYPE), DEFAULT_WAVEFORM_SUBTYPE);
+    logger.debug("Waveform subtype configuration set to '{}'", waveformSubtype);
 
     // SMIL catalog flavor
     smilCatalogFlavor = MediaPackageElementFlavor.parseFlavor(
@@ -294,6 +306,11 @@ public class EditorServiceImpl implements EditorService {
   private Boolean elementHasPreviewFlavor(MediaPackageElement element) {
     return element.getFlavor() != null
             && getPreviewSubtype().equals(element.getFlavor().getSubtype());
+  }
+
+  private Boolean elementHasWaveformFlavor(MediaPackageElement element) {
+    return element.getFlavor() != null
+            && getWaveformSubtype().equals(element.getFlavor().getSubtype());
   }
 
   private String signIfNecessary(final URI uri) {
@@ -702,8 +719,13 @@ public class EditorServiceImpl implements EditorService {
                         track.getIdentifier());
     }).collect(Collectors.toList());
 
+    List<String> waveformList = Arrays.stream(internalPub.getAttachments())
+            .filter(this::elementHasWaveformFlavor)
+            .map(Attachment::getURI).map(this::signIfNecessary)
+            .collect(Collectors.toList());
+
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
-            event.getSeriesId(), event.getSeriesName(), workflowActive);
+            event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList);
   }
 
 
