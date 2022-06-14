@@ -150,7 +150,7 @@ public class Controller {
     logger.debug("Saving adopter registration data.");
 
     Form form = new Form(organisationName, departmentName, firstName, lastName, email, country, postalCode, city,
-            street, streetNo, contactMe, agreedToPolicy, allowsErrorReports, allowsStatistics, registered
+            street, streetNo, contactMe, allowsStatistics, allowsErrorReports, agreedToPolicy, registered
     );
     try {
       registrationService.saveFormData(form);
@@ -173,12 +173,20 @@ public class Controller {
   public Response deleteRegistrationData() {
     logger.debug("Deleting adopter registration data.");
     try {
-      registrationService.deleteFormData();
+      registrationService.markForDeletion();
       return ok();
     } catch (Exception e) {
       logger.error("Error while deleting adopter registration data.", e);
       return serverError();
     }
+  }
+
+
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("latestToU")
+  public String getLatestTermsofUse() {
+    return Form.getLatestTermsOfUse().name();
   }
 
 

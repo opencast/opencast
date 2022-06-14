@@ -377,6 +377,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     EntityManager em = null;
     User user = securityService.getUser();
     Organization org = securityService.getOrganization();
+
     String orgAdmin = org.getAdminRole();
     Set<Role> roles = user.getRoles();
     try {
