@@ -58,6 +58,10 @@ angular.module('adminNg.controllers')
           return;
         }
       }
+      // NB: Deliberately choosing a different value to denote confirmation
+      if ($scope.state === 'delete_submit' && inputAction === 0) {
+        $scope.close();
+      }
 
       $scope.state = $scope.states[$scope.state]['nextState'][inputAction];
       if($scope.state === 'close'){

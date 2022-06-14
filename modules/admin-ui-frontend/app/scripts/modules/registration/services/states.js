@@ -37,7 +37,7 @@ angular.module('adminNg.services')
               'back': false,
               'skip': true,
               'close': true,
-              'submitButtonText': 'ADOPTER_REGISTRATION.MODAL.CONTINUE'
+              'submitButtonText': 'WIZARD.NEXT_STEP'
             }
           },
           'form': {
@@ -55,7 +55,7 @@ angular.module('adminNg.services')
               'skip': false,
               'close': true,
               'delete': false,
-              'submitButtonText': 'SUBMIT'
+              'submitButtonText': 'WIZARD.CREATE'
             }
           },
           'save': {
@@ -95,7 +95,7 @@ angular.module('adminNg.services')
               'back': true,
               'skip': false,
               'close': true,
-              'submitButtonText': 'CONFIRM'
+              'submitButtonText': 'WIZARD.DELETE'
             }
           },
           'delete': {
@@ -108,7 +108,7 @@ angular.module('adminNg.services')
               'back': false,
               'skip': false,
               'close': false,
-              'submitButtonText': null
+              'submitButtonText': 'WIZARD.DELETE'
             }
           },
           'thank_you': {
