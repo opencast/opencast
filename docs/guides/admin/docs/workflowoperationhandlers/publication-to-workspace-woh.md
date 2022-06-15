@@ -8,9 +8,9 @@ With this workflow one can copy or manipulate published elements without re-enco
 |Configuration Key  |Example           |Description                                           |
 |-------------------|------------------|------------------------------------------------------|
 |publication-channel|engage-player     |the publication-channel for example interal or engage-player or oaipmh   |
-|source-flavors     |presenter/delivery|the "," seperatated source flavor list to move        |
-|source-tags        |engage-download   |the "," seperated source tag list to move             | 
-|target-tags        |archive           |the "," seperated of tags to add to the moved elements| 
+|source-flavors     |presenter/delivery|the "," separated source flavor list to move        |
+|source-tags        |engage-download   |the "," separated source tag list to move             | 
+|target-tags        |archive           |the "," separated list of tags to add to the moved elements| 
 
 
 
