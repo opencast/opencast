@@ -16,34 +16,66 @@ const WizardStepperEvent = ({ steps, page, setPage, formik, completed, setComple
 
   const classes = useStepperStyle();
 
-
-
   const handleOnClick = async key => {
-    if (steps[page].name === "source") {
-      let dateCheck = await checkConflicts(formik.values);
-      if (!dateCheck) {
+
+    if (isNextOrPrevious(key)) {
+
+      if (steps[page].name === "source") {
+        let dateCheck = await checkConflicts(formik.values);
+        if (!dateCheck) {
+          return;
+        }
+      }
+
+      if (steps[page].name === "processing" && !formik.values.processingWorkflow) {
         return;
       }
-    }
 
-    if (steps[page].name === "processing" && !formik.values.processingWorkflow) {
-      return;
-    }
+      let aclCheck = await checkAcls(formik.values.acls);
+      if (!aclCheck) {
+        return;
+      }
 
-    let aclCheck = await checkAcls(formik.values.acls);
-    if (!aclCheck) {
-      return;
-    }
-
-    if (formik.isValid) {
-      let updatedCompleted = completed;
-      updatedCompleted[page] = true;
-      setCompleted(updatedCompleted);
-      setPage(key);
+      if (formik.isValid) {
+        let updatedCompleted = completed;
+        updatedCompleted[page] = true;
+        setCompleted(updatedCompleted);
+        await setPage(key);
+      }
     }
   }
 
   const disabled = !(formik.dirty && formik.isValid);
+
+  const isNextOrPrevious = key => {
+    console.log("key")
+    console.log(key)
+
+    console.log("next and previous step")
+    console.log(steps[page-1])
+    console.log(steps[page+1])
+
+    if (!!steps[page + 1].hidden) {
+      if (key === page + 2) {
+        console.log("1")
+        return true;
+      }
+    } else if (!!steps[page - 1].hidden) {
+      if (key === page - 2) {
+        console.log("2")
+        return true;
+      }
+    } else if (key === page - 1) {
+      console.log("3")
+      return true;
+    } else if (key === page + 1) {
+      console.log("5")
+      return true;
+    }
+
+    console.log("4")
+    return false;
+  }
 
   return (
     <Stepper activeStep={page}

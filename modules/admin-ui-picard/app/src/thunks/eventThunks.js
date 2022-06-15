@@ -266,11 +266,11 @@ export const postNewEvent = (values, metadataInfo) => async (dispatch, getState)
             }
         }
 
-        if (values.sourceMode === 'MULTIPLE_SCHEDULE') {
+        if (values.sourceMode === 'SCHEDULE_MULTIPLE') {
 
             // assemble an iCalendar RRULE (repetition instruction) for the given user input
             let rRule = 'FREQ=WEEKLY;BYDAY=' + values.repeatOn.join(',')
-                + ';BYHOUR='+startDate.getUTCHours() + ';BYMINUTE'+startDate.getUTCMinutes();
+                + ';BYHOUR='+startDate.getUTCHours() + ';BYMINUTE='+startDate.getUTCMinutes();
 
             source.metadata = {
                 ...source.metadata,
