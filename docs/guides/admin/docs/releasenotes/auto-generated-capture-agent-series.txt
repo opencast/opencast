@@ -1,2 +1,0 @@
-Identifiers for auto-generated capture series are now generated slightly different. This may cause new series to be
-generated for capture agents in some cases.
