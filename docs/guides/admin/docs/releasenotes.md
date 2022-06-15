@@ -78,6 +78,13 @@ API changes
 - [[#3002](https://github.com/opencast/opencast/pull/3002)] - Sign publication URL of events in External API
 - [[#3148](https://github.com/opencast/opencast/pull/3148)] - Allow empty track duration
 
+Additional Notes about 11.8
+---------------------------
+
+- Bug fixes:
+    - Users being removed from groups when not having the primary group role
+      (cf. [[#3672](https://github.com/opencast/opencast/pull/3672)]).
+
 Additional Notes about 11.7
 ---------------------------
 
