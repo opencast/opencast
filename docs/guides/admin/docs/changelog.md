@@ -48,6 +48,8 @@ Dependabot's changes are excluded from this log.
   Send waveform URIs to new editor
 - [[#3775](https://github.com/opencast/opencast/pull/3775)] -
   Indexing only latest workflows for all events
+- [[#3554](https://github.com/opencast/opencast/pull/3554)] -
+  Copy Mediapackage elements from the publication to mediapackage
 - [[#1370](https://github.com/opencast/opencast/pull/1370)] -
   Fix Conflict Detection
 - [[#3766](https://github.com/opencast/opencast/pull/3766)] -
