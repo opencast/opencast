@@ -293,7 +293,7 @@
         },
 
         "org.opencast.paella.opencast.matomoTrackingDataPlugin" :{
-            "enabled": true,
+            "enabled": false,
             "client_id": "Paella Player 7",
             "heartbeat": 30,
             "server": "https://demo.matomo.cloud/",
