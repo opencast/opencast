@@ -46,6 +46,7 @@ describe('Application controller', function () {
                    });
         $httpBackend.whenGET('/services/health.json').respond('{}');
         $httpBackend.whenGET('modules/events/partials/index.html').respond('');
+        $httpBackend.whenGET('/admin-ng/adopter/latestToU').respond('test');
         $httpBackend.whenGET('shared/partials/modals/registration-modal.html').respond('');
 
         $scope = $rootScope.$new();
