@@ -50,7 +50,9 @@ import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,6 +148,7 @@ public class ScheduledDataCollector extends TimerTask {
    * activate parameter at OSGi component declaration.
    * @param ctx OSGi component context
    */
+  @Activate
   public void activate(BundleContext ctx) {
     logger.info("Activating adopter statistic scheduler.");
     this.defaultOrganization = new DefaultOrganization();
@@ -168,6 +171,7 @@ public class ScheduledDataCollector extends TimerTask {
     timer.schedule(this, 0, ONE_DAY_IN_MILLISECONDS);
   }
 
+  @Deactivate
   public void deactivate() {
     timer.cancel();
   }
@@ -341,6 +345,7 @@ public class ScheduledDataCollector extends TimerTask {
     this.serviceRegistry = serviceRegistry;
   }
 
+  @Reference
   public void setCaptureAdminService(CaptureAgentStateService stateService) {
     this.caStateService = stateService;
   }
@@ -357,6 +362,7 @@ public class ScheduledDataCollector extends TimerTask {
     this.seriesService = seriesService;
   }
 
+  @Reference
   public void setSearchService(SearchService searchService) {
     this.searchService = searchService;
   }
@@ -374,6 +380,7 @@ public class ScheduledDataCollector extends TimerTask {
   }
 
   /** OSGi callback for setting the org directory service. */
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService orgDirServ) {
     this.organizationDirectoryService = orgDirServ;
   }
