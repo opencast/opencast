@@ -1165,6 +1165,7 @@
            "EVENTS":      "Events",
            "PERMISSIONS": "Access policy",
            "THEME": "Theme",
+           "TOBIRA": "Tobira",
            "STATISTICS": "Statistics"
          },
          "ACCESS": {
@@ -1209,6 +1210,11 @@
            "LANGUAGE":       "Language",
            "LICENSE":        "License",
            "DESCRIPTION":    "Description"
+         },
+         "TOBIRA": {
+           "HOMEPAGE": "(Homepage)",
+           "NOT_MOUNTED": "This series is not included on any page",
+           "PAGES": "Pages in Tobira that include this series"
          },
          "EVENTS": {
            "TITLE":     "Title",
