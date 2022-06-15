@@ -3,15 +3,17 @@
 Features
 --------
 
-- Opencast 12 ships Paella Player 6.5.6. Paella 7 supporting CSS customization
+- Opencast 12 ships Paella Player 6.5.6 as its new default player.
+- Paella Player 7 supporting new features like CSS customization is now included and
   [can be configured as an alternative player](modules/paella.player7/configuration.md).
 - Upgrade the [Standalone Video Editor](modules/editor.md) to
   [version 2022-06-15](https://github.com/opencast/opencast-editor/releases/tag/2022-06-15).
 - Upgrade [Opencast Studio](modules/studio.md) to
   [version 2022-06-15](https://github.com/elan-ev/opencast-studio/releases/tag/2022-06-15)
   coming with plenty new accessibility features.
-- You can now define workflows in YAML. An [example workflow written in YAML](https://github.com/opencast/opencast/blob/r/12.x/etc/workflows/fast.yaml) is
-  provided. [Documentation is available](configuration/workflow.md#using-yaml-files-with-workflows).
+- You can now define workflows in YAML. An
+  [example workflow written in YAML](https://github.com/opencast/opencast/blob/r/12.x/etc/workflows/fast.yaml) is provided.
+  [Documentation is available](configuration/workflow.md#using-yaml-files-with-workflows).
 
 Improvements
 ------------
@@ -32,10 +34,11 @@ Improvements
   installation of Opencast.
 - The Workflow Service does not require a Solr Index anymore, simplifying the
   installation of Opencast.
-- Workflows' data is now atomically stored in the database instead of XML.
-  [[#3376](https://github.com/opencast/opencast/pull/3376)]
-- You can now specify a fallback language and use a placeholder in the [Speech to Text Workflow Operation Handler](workflowoperationhandlers/speech-to-text-woh.md).
-- Improved performance when rebuilding the Elastic Search Event Index. [[#3775](https://github.com/opencast/opencast/pull/3775)]
+- Workflows' data is now atomically stored in the database instead of XML to
+  improve access speed. [[#3376](https://github.com/opencast/opencast/pull/3376)]
+- You can now specify a fallback language and use a placeholder in the Vosk-based
+  [Speech to Text Workflow Operation Handler](workflowoperationhandlers/speech-to-text-woh.md).
+- Improved performance when rebuilding the Elasticsearch event index. [[#3775](https://github.com/opencast/opencast/pull/3775)]
 - Documentation for developers and testers has been added explaining how to
   [explore Opencast's H2 database](https://docs.opencast.org/r/12.x/developer/explore-h2-database/).
 
