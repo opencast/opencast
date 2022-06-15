@@ -41,6 +41,14 @@
        with-role="ROLE_UI_SERIES_DETAILS_THEMES_VIEW">
       <!-- Theme -->
     </a>
+    <a ng-click="openTab('tobira')"
+       ng-if="tobiraData"
+       data-modal-tab="tobira"
+       ng-class="{ active: tab == 'tobira' }"
+       translate="EVENTS.SERIES.DETAILS.TABS.TOBIRA"
+       with-role="ROLE_UI_SERIES_DETAILS_TOBIRA_VIEW">
+      <!-- Tobira -->
+    </a>
     <a ng-click="openTab('statistics')"
        data-modal-tab="statistics"
        ng-class="{ active: tab == 'statistics' }"
@@ -367,6 +375,46 @@
                 <p ng-if="selectedTheme.description">{{ selectedTheme.description }}</p>
               </li>
             </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tobira view -->
+  <div class="modal-content" data-modal-tab-content="tobira" ng-if="tobiraData">
+    <div class="modal-body">
+      <div data-admin-ng-notifications="" context="series-tobira"></div>
+      <div class="full-col">
+        <div class="obj tbl-list">
+          <header translate="EVENTS.SERIES.DETAILS.TOBIRA.PAGES"></header>
+          <div class="obj-container">
+            <table class="main-tbl">
+              <tbody>
+                <tr ng-if="!tobiraData.hostPages || tobiraData.hostPages.length === 0">
+                  <td class="tobira-not-mounted" translate="EVENTS.SERIES.DETAILS.TOBIRA.NOT_MOUNTED"></td>
+                </tr>
+                <tr ng-repeat="hostPage in tobiraData.hostPages">
+                  <td>
+                    <a href="{{tobiraData.baseURL}}{{hostPage.path}}" ng-switch="hostPage.path === '/'">
+                      <div ng-switch-when="false">
+                        <span class="tobira-page-separator">/</span>
+                        <span ng-repeat="ancestor in hostPage.ancestors">
+                          {{ancestor.title}}
+                          <span class="tobira-page-separator">/</span>
+                        </span>
+                      </div>
+                      <span class="tobira-leaf-page">
+                        <span ng-switch-when="false">
+                          {{hostPage.title}}
+                        </span>
+                        <span ng-switch-when="true" translate="EVENTS.SERIES.DETAILS.TOBIRA.HOMEPAGE"></span>
+                      </span>
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

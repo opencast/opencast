@@ -60,6 +60,21 @@ public final class TobiraService {
             Map.of("path", path));
   }
 
+  public JSONObject getHostPages(String seriesId) throws TobiraException {
+    return (JSONObject) request(
+            "query AdminUIHostPages($seriesId: String!) {"
+                    + "  series: seriesByOpencastId(id: $seriesId) {"
+                    + "    hostPages: hostRealms {"
+                    + "      title: name"
+                    + "      path"
+                    + "      ancestors { title: name }"
+                    + "    }"
+                    + "  }"
+                    + "}",
+            Map.of("seriesId", seriesId))
+            .get("series");
+  }
+
   public void mount(Map<String, Object> variables) throws TobiraException {
     request(
             "mutation AdminUIMountSeries($seriesId: String!, $parentPagePath: String!, $newPages: [RealmSpecifier!]!) {"
@@ -104,7 +119,12 @@ public final class TobiraService {
     }
   }
 
+  public String getOrigin() {
+    return origin;
+  }
+
   public void setOrigin(String origin) {
+    this.origin = origin;
     if (origin == null) {
       this.endpoint = null;
     } else {
@@ -112,6 +132,7 @@ public final class TobiraService {
         this.endpoint = new URI(origin).resolve("/graphql");
       } catch (URISyntaxException e) {
         logger.error("Invalid Tobira origin {}", origin, e);
+        this.origin = null;
         this.endpoint = null;
       }
     }
@@ -121,6 +142,7 @@ public final class TobiraService {
     this.trustedKey = trustedKey;
   }
 
+  private String origin;
   private URI endpoint;
   private String trustedKey;
 

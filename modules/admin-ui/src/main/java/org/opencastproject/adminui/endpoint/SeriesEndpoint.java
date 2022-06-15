@@ -1047,6 +1047,44 @@ public class SeriesEndpoint {
     }
   }
 
+  @GET
+  @Path("{seriesId}/tobira/pages")
+  @RestQuery(
+          name = "getSeriesHostPages",
+          description = "Returns the pages of a connected Tobira instance that contain the given series",
+          returnDescription = "The Tobira pages that contain the given series",
+          pathParameters = { @RestParameter(
+                  name = "seriesId",
+                  isRequired = true,
+                  description = "The series identifier",
+                  type = STRING) },
+          responses = {
+                  @RestResponse(
+                          responseCode = SC_OK,
+                          description = "The Tobira pages containing the given series"),
+                  @RestResponse(
+                          responseCode = SC_NOT_FOUND,
+                          description = "Tobira doesn't know about the given series"),
+                  @RestResponse(
+                          responseCode = SC_SERVICE_UNAVAILABLE,
+                          description = "Tobira is not configured (correctly)") })
+public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
+    if (!tobira.ready()) {
+      throw new WebApplicationException("Tobira is not configured (properly)", Status.SERVICE_UNAVAILABLE);
+    }
+
+    try {
+      var seriesData = tobira.getHostPages(seriesId);
+      if (seriesData == null) {
+        throw new WebApplicationException(NOT_FOUND);
+      }
+      seriesData.put("baseURL", tobira.getOrigin());
+      return Response.ok(seriesData.toJSONString()).build();
+    } catch (TobiraException e) {
+      throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   @POST
   @Path("/{seriesId}/access")
   @RestQuery(name = "applyAclToSeries", description = "Immediate application of an ACL to a series", returnDescription = "Status code", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series ID", type = STRING) }, restParameters = {
