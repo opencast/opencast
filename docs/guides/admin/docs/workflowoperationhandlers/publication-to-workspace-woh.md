@@ -1,8 +1,8 @@
 # PublicationToWorkspaceWorkflowOperationHandler
 
 ## Description
-The PublicationToWorkspaceWorkflowOperationHandler can be used to copy the content form publication channels to workspace.
-Wit this Workflow one can copy or maipulate published elements without reencoding.
+The PublicationToWorkspaceWorkflowOperationHandler can be used to copy the content from publication channels to workspace.
+With this workflow one can copy or manipulate published elements without re-encoding.
 ## Parameter Table
 
 |Configuration Key  |Example           |Description                                           |
