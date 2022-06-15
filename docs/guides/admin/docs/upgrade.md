@@ -29,7 +29,7 @@ Back-up your database before starting the migration.
 
 To start the migration, first make sure you have Python ≥ 3.6 installed on your system.
 You can run these scripts from any of your systems as long as it can establish a connection to your database.
-You only have to run these scripts once
+You only have to run these scripts once.
 
 To upgrade, choose the script for the database type you are running,
 either `workflows_postgresql.py` or `workflows_mariadb.py`
