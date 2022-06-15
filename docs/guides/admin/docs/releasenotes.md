@@ -14,6 +14,8 @@ Features
 - You can now define workflows in YAML. An
   [example workflow written in YAML](https://github.com/opencast/opencast/blob/r/12.x/etc/workflows/fast.yaml) is provided.
   [Documentation is available](configuration/workflow.md#using-yaml-files-with-workflows).
+- A new workflow operation handler [allows you to copy media package elements from existing publications
+  ](https://github.com/opencast/opencast/pull/3554)
 
 Improvements
 ------------
