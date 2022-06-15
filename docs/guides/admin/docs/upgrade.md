@@ -7,7 +7,7 @@ please refer to [older release notes](https://docs.opencast.org).
 
 1. Stop your current Opencast instance
 2. Replace Opencast with the new version
-3. Read the release notes (especially the section of behaviour changes)
+3. Read the [release notes](releasenotes.md) (especially the section of behaviour changes)
 4. Review the configuration changes and adjust your configuration accordingly
 5. [Migrate the database](#database-migration)
 6. [Update MariaDB connection configuration](#mariadb-connection-configuration)
