@@ -168,6 +168,19 @@ Dependabot's changes are excluded from this log.
 Opencast 11
 ----------
 
+### Opencast 11.8
+
+*Released on June 15th, 2022*
+
+- [[#3808](https://github.com/opencast/opencast/pull/3808)] -
+  Add missing PRs to OC11 changelog
+- [[#3785](https://github.com/opencast/opencast/pull/3785)] -
+  Clarify that #3715 was a fix in the release notes
+- [[#3777](https://github.com/opencast/opencast/pull/3777)] -
+  Add changelog and release notes for OC 11.7
+- [[#3672](https://github.com/opencast/opencast/pull/3672)] -
+  Disable group removement upon missing group roles
+
 ### Opencast 11.7
 
 *Released on May 18th, 2022*
