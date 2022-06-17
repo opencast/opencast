@@ -155,6 +155,7 @@
 
     <!-- UCT -->
     <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-sakai/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-brightspace/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-allinone" version="${project.version}">
