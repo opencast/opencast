@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.PatternSyntaxException;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServer;
@@ -78,6 +79,9 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
   private final Set<String> instructorRoles;
   private final Set<String> ignoredUsernames;
 
+  /** Regular expression for matching valid users */
+  private String userPattern;
+
   /**
    * Constructs a Brighspace user provider with the needed settings
    *
@@ -94,7 +98,8 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
       int cacheSize,
       int cacheExpiration,
       Set instructorRoles,
-      Set ignoredUsernames
+      Set ignoredUsernames,
+      String userPattern
   ) {
 
     this.pid = pid;
@@ -102,6 +107,7 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
     this.organization = organization;
     this.instructorRoles = instructorRoles;
     this.ignoredUsernames = ignoredUsernames;
+    this.userPattern = userPattern;
 
     logger.info("Creating new BrightspaceUserProviderInstance(pid={}, url={}, cacheSize={}, cacheExpiration={}, "
                   + "InstructorRoles={}, ignoredUserNames={})", pid, client.getURL(), cacheSize, cacheExpiration,
@@ -175,8 +181,21 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
    */
   @Override
   public User loadUser(String userName) {
+
+    logger.debug("loadUser {}", userName);
+
+    try {
+      if ((userPattern != null) && !userName.matches(userPattern)) {
+        logger.debug("load user {} failed regexp {}", userName, userPattern);
+        return null;
+      }
+    } catch (PatternSyntaxException e) {
+      logger.warn("Invalid regular expression for user pattern {} - disabling checks", userPattern);
+      userPattern = null;
+    }
+
     this.loadUserRequests.incrementAndGet();
-    logger.debug("getting user from cache");
+    logger.debug("getting user {} from cache", userName);
 
     try {
       Object user = this.cache.getUnchecked(userName);

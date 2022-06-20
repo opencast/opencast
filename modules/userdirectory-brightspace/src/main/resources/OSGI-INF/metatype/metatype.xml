@@ -16,7 +16,9 @@
             default=""/>
         <AD name="Brightspace system user key" id="org.opencastproject.userdirectory.brightspace.systemuser.key" required="true" type="String"
             default=""/>
-        <AD name="Cache size" id="org.opencastproject.userdirectory.brightspace.cache.size" required="false" type="Integer"
+	<AD name="Brightspace username pattern (regular expression)" id="org.opencastproject.userdirectory.brightspace.user.pattern" required="false" type="String"
+            default=""/>
+	<AD name="Cache size" id="org.opencastproject.userdirectory.brightspace.cache.size" required="false" type="Integer"
             default="1000"/>
         <AD name="Cache expiration (minutes)" id="org.opencastproject.userdirectory.brightspace.cache.expiration"
             required="false" type="Integer" default="60"/>

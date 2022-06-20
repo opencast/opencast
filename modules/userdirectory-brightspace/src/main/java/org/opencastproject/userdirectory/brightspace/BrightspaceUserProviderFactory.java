@@ -91,6 +91,9 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
   private static final String IGNORED_USERNAMES_KEY = "org.opencastproject.userdirectory.brightspace.ignored.usernames";
   private static final String DEFAULT_IGNORED_USERNAMES = "admin,anonymous";
 
+  /** The key to look up the regular expression used to validate users */
+  private static final String USER_PATTERN_KEY = "org.opencastproject.userdirectory.brightspace.user.pattern";
+
   protected BundleContext bundleContext;
   private Map<String, ServiceRegistration> providerRegistrations = new ConcurrentHashMap<>();
   private OrganizationDirectoryService orgDirectory;
@@ -155,6 +158,8 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
     final String applicationId = (String) properties.get(BRIGHTSPACE_APP_ID);
     final String applicationKey = (String) properties.get(BRIGHTSPACE_APP_KEY);
 
+    String userPattern = (String) properties.get(USER_PATTERN_KEY);
+
     String cacheSizeStr = (String) properties.get(CACHE_SIZE_KEY);
     if (StringUtils.isBlank(cacheSizeStr)) {
       cacheSize = DEFAULT_CACHE_SIZE_VALUE;
@@ -210,7 +215,7 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
         = new BrightspaceClientImpl(urlStr, applicationId, applicationKey, systemUserId, systemUserKey);
     BrightspaceUserProviderInstance provider
         = new BrightspaceUserProviderInstance(pid, clientImpl, org, cacheSize, cacheExpiration  ,
-            instructorRoles, ignoredUsernames);
+            instructorRoles, ignoredUsernames, userPattern);
     this.providerRegistrations
         .put(pid, this.bundleContext.registerService(UserProvider.class.getName(), provider, null));
     this.providerRegistrations
