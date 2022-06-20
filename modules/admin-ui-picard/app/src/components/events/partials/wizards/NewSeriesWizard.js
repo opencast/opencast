@@ -40,8 +40,8 @@ const NewSeriesWizard = ({ metadataFields, close, postNewSeries }) => {
         translation: 'EVENTS.SERIES.NEW.THEME.CAPTION',
         name: 'theme'
     }, {
-            translation: 'EVENTS.SERIES.NEW.SUMMARY.CAPTION',
-            name: 'summary'
+        translation: 'EVENTS.SERIES.NEW.SUMMARY.CAPTION',
+        name: 'summary'
     }];
 
     // Validation schema of current page

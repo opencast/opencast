@@ -19,22 +19,36 @@ const WizardStepper = ({ steps, page, setPage, formik, completed, setCompleted,
 
     const handleOnClick = async key => {
 
-        if(hasAccessPage) {
-            let check =  await checkAcls(formik.values.acls);
-            if (!check) {
-                return;
+        if (isSummaryReachable(key)) {
+            if(hasAccessPage) {
+                let check =  await checkAcls(formik.values.acls);
+                if (!check) {
+                    return;
+                }
+            }
+
+            if (formik.isValid) {
+                let updatedCompleted = completed;
+                updatedCompleted[page] = true;
+                setCompleted(updatedCompleted);
+                setPage(key);
             }
         }
 
-        if (formik.isValid) {
-            let updatedCompleted = completed;
-            updatedCompleted[page] = true;
-            setCompleted(updatedCompleted);
-            setPage(key);
-        }
     }
 
     const disabled = !(formik.dirty && formik.isValid);
+
+    const isSummaryReachable = key => {
+
+        if (steps[key].name === "summary") {
+            const visibleSteps = steps.filter(step => !step.hidden);
+
+            return Object.keys(completed).length === (visibleSteps.length - 2);
+        }
+
+        return true;
+    }
 
     return (
         <Stepper activeStep={page}

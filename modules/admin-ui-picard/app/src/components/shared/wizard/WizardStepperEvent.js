@@ -18,7 +18,7 @@ const WizardStepperEvent = ({ steps, page, setPage, formik, completed, setComple
 
   const handleOnClick = async key => {
 
-    if (isNextOrPrevious(key)) {
+    if (isSummaryReachable(key)) {
 
       if (steps[page].name === "source") {
         let dateCheck = await checkConflicts(formik.values);
@@ -47,34 +47,15 @@ const WizardStepperEvent = ({ steps, page, setPage, formik, completed, setComple
 
   const disabled = !(formik.dirty && formik.isValid);
 
-  const isNextOrPrevious = key => {
-    console.log("key")
-    console.log(key)
+  const isSummaryReachable = key => {
 
-    console.log("next and previous step")
-    console.log(steps[page-1])
-    console.log(steps[page+1])
+    if (steps[key].name === "summary") {
+      const visibleSteps = steps.filter(step => !step.hidden);
 
-    if (!!steps[page + 1].hidden) {
-      if (key === page + 2) {
-        console.log("1")
-        return true;
-      }
-    } else if (!!steps[page - 1].hidden) {
-      if (key === page - 2) {
-        console.log("2")
-        return true;
-      }
-    } else if (key === page - 1) {
-      console.log("3")
-      return true;
-    } else if (key === page + 1) {
-      console.log("5")
-      return true;
+      return Object.keys(completed).length === (visibleSteps.length - 2);
     }
 
-    console.log("4")
-    return false;
+    return true;
   }
 
   return (
