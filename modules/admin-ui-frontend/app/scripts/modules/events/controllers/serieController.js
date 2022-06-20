@@ -23,10 +23,11 @@
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
 .controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource',
-  'SeriesThemeResource', 'ResourcesListResource', 'RolesResource', 'Notifications', 'AuthService',
-  'StatisticsReusable', '$http', 'Modal', '$translate',
+  'SeriesThemeResource', 'SeriesTobiraResource', 'ResourcesListResource', 'RolesResource', 'Notifications',
+  'AuthService', 'StatisticsReusable', '$http', 'Modal', '$translate',
   function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource,
-    ResourcesListResource, RolesResource, Notifications, AuthService, StatisticsReusable, $http, Modal, $translate) {
+    SeriesTobiraResource, ResourcesListResource, RolesResource, Notifications, AuthService, StatisticsReusable, $http,
+    Modal, $translate) {
 
     var metadataChangedFns = {}, aclNotification,
         me = this,
@@ -248,6 +249,16 @@ angular.module('adminNg.controllers')
             $scope.updateSelectedThemeDescripton();
           });
         });
+      });
+
+      Notifications.removeAll('series-tobira');
+      SeriesTobiraResource.get({ id: id }, function (tobiraData) {
+        $scope.tobiraData = tobiraData;
+      }, function (response) {
+        if (response.status === 500) {
+          Notifications.add('error', 'TOBIRA_SERVER_ERROR', 'series-tobira', -1);
+        }
+        $scope.tobiraData = {};
       });
 
       $scope.roles = RolesResource.queryNameOnly({limit: -1, target: 'ACL'});
