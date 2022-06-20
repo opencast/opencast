@@ -235,8 +235,8 @@
                     <th translate="EVENTS.SERIES.NEW.TOBIRA.PATH_SEGMENT">
                       <!-- Path segment -->
                     </th>
-                    <th class="medium" translate="EVENTS.SERIES.NEW.TOBIRA.CHILDREN">
-		      <!-- Children -->
+                    <th class="medium" translate="EVENTS.SERIES.NEW.TOBIRA.SUBPAGES">
+                      <!-- Subpages -->
                     </th>
                     <th ng-if="wizard.step.editing" class="tiny"></th>
                   </tr>
@@ -254,7 +254,7 @@
                       </code>
                     </td>
                     <td>
-                      <a ng-if="!page.new || wizard.step.isValid()" class="details-link" translate="EVENTS.SERIES.NEW.TOBIRA.CHILDREN" ng-click="wizard.step.goto(page)"><!-- Child --></a>
+                      <a ng-if="!page.new || wizard.step.isValid()" class="details-link" translate="EVENTS.SERIES.NEW.TOBIRA.SUBPAGES" ng-click="wizard.step.goto(page)"><!-- Subpages --></a>
                     </td>
                     <td ng-if="wizard.step.editing">
                       <a ng-if="page.new" ng-click="wizard.step.select(null)" title="{{ 'EVENTS.SERIES.NEW.TOBIRA.CANCEL' | translate }}" class="remove"></a>
@@ -262,7 +262,7 @@
                   </tr>
                   <tr ng-if="!wizard.step.editing">
                     <td colspan="3">
-                      <a ng-click="wizard.step.addChild()" translate="EVENTS.SERIES.NEW.TOBIRA.ADD_CHILD"><!-- Add child --></a>
+                      <a ng-click="wizard.step.addChild()" translate="EVENTS.SERIES.NEW.TOBIRA.ADD_SUBPAGE"><!-- Add subpage --></a>
                     </td>
                   </tr>
                 </tbody>
