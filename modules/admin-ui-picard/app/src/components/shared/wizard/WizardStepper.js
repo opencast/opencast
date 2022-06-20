@@ -44,7 +44,7 @@ const WizardStepper = ({ steps, page, setPage, formik, completed, setCompleted,
         if (steps[key].name === "summary") {
             const visibleSteps = steps.filter(step => !step.hidden);
 
-            return Object.keys(completed).length === (visibleSteps.length - 2);
+            return Object.keys(completed).length >= (visibleSteps.length - 2);
         }
 
         return true;
