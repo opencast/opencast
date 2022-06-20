@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useEffect, useState } from 'react';
 import {connect} from "react-redux";
 import {Formik} from "formik";
 import {useTranslation} from "react-i18next";
@@ -56,30 +56,38 @@ const NewUserWizard = ({ close, usernames, postNewUser }) => {
                     onSubmit={values => handleSubmit(values)}>
 
                 {/* Render wizard tabs depending on current value of tab variable */}
-                {formik => (
-                    <>
-                        {tab === 0 && (
-                            <NewUserGeneralTab formik={formik}/>
-                        )}
-                        {tab === 1 && (
-                            <UserRolesTab formik={formik}/>
-                        )}
+                {formik => {
 
-                        {/* Navigation buttons and validation */}
-                        <footer>
-                            <button className={cn("submit", {
-                                active: (formik.dirty && formik.isValid),
-                                inactive: !(formik.dirty && formik.isValid)})}
-                                    disabled={!(formik.dirty && formik.isValid)}
-                                    onClick={() => formik.handleSubmit()}>
-                                {t('SUBMIT')}
-                            </button>
-                            <button className="cancel" onClick={() => close()}>
-                                {t('CANCEL')}
-                            </button>
-                        </footer>
-                    </>
-                )}
+                    // eslint-disable-next-line react-hooks/rules-of-hooks
+                    useEffect(() => {
+                        formik.validateForm();
+                    }, [tab]);
+
+                    return (
+                      <>
+                          {tab === 0 && (
+                            <NewUserGeneralTab formik={formik}/>
+                          )}
+                          {tab === 1 && (
+                            <UserRolesTab formik={formik}/>
+                          )}
+
+                          {/* Navigation buttons and validation */}
+                          <footer>
+                              <button className={cn("submit", {
+                                  active: (formik.dirty && formik.isValid),
+                                  inactive: !(formik.dirty && formik.isValid)})}
+                                      disabled={!(formik.dirty && formik.isValid)}
+                                      onClick={() => formik.handleSubmit()}>
+                                  {t('SUBMIT')}
+                              </button>
+                              <button className="cancel" onClick={() => close()}>
+                                  {t('CANCEL')}
+                              </button>
+                          </footer>
+                      </>
+                    )
+                }}
             </Formik>
         </>
     )

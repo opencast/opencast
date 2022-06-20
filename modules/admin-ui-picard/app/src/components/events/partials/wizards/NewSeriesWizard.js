@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useEffect, useState } from 'react';
 import {Formik} from "formik";
 import NewThemePage from "../ModalTabsAndPages/NewThemePage";
 import NewSeriesSummary from "./NewSeriesSummary";
@@ -85,47 +85,55 @@ const NewSeriesWizard = ({ metadataFields, close, postNewSeries }) => {
                     validationSchema={currentValidationSchema}
                     onSubmit={values => handleSubmit(values)}>
                 {/* Render wizard pages depending on current value of page variable */}
-                {formik => (
-                  <>
-                      {/* Stepper that shows each step of wizard as header */}
-                      <WizardStepper steps={steps}
-                                     page={page}
-                                     setPage={setPage}
-                                     completed={pageCompleted}
-                                     setCompleted={setPageCompleted}
-                                     formik={formik}
-                                     hasAccessPage />
-                      <div>
-                          {page === 0 && (
-                            <NewMetadataPage nextPage={nextPage}
+                {formik => {
+
+                    // eslint-disable-next-line react-hooks/rules-of-hooks
+                    useEffect(() => {
+                        formik.validateForm();
+                    }, [page]);
+
+                    return (
+                      <>
+                        {/* Stepper that shows each step of wizard as header */}
+                        <WizardStepper steps={steps}
+                                       page={page}
+                                       setPage={setPage}
+                                       completed={pageCompleted}
+                                       setCompleted={setPageCompleted}
+                                       formik={formik}
+                                       hasAccessPage />
+                        <div>
+                            {page === 0 && (
+                              <NewMetadataPage nextPage={nextPage}
+                                               formik={formik}
+                                               metadataFields={metadataFields}
+                                               header={steps[page].translation}/>
+                            )}
+                            {page === 1 && (
+                              <NewMetadataExtendedPage nextPage={nextPage}
+                                                       previousPage={previousPage}
+                                                       formik={formik} />
+                            )}
+                            {page === 2 && (
+                              <NewAccessPage nextPage={nextPage}
+                                             previousPage={previousPage}
                                              formik={formik}
-                                             metadataFields={metadataFields}
-                                             header={steps[page].translation}/>
-                          )}
-                          {page === 1 && (
-                            <NewMetadataExtendedPage nextPage={nextPage}
-                                                     previousPage={previousPage}
-                                                     formik={formik} />
-                          )}
-                          {page === 2 && (
-                            <NewAccessPage nextPage={nextPage}
-                                           previousPage={previousPage}
-                                           formik={formik}
-                                           editAccessRole="ROLE_UI_SERIES_DETAILS_ACL_EDIT"/>
-                          )}
-                          {page === 3 && (
-                            <NewThemePage nextPage={nextPage}
-                                          previousPage={previousPage}
-                                          formik={formik}/>
-                          )}
-                          {page === 4 && (
-                            <NewSeriesSummary previousPage={previousPage}
-                                              formik={formik}
-                                              metaDataExtendedHidden={steps[1].hidden}/>
-                          )}
-                      </div>
-                  </>
-                )}
+                                             editAccessRole="ROLE_UI_SERIES_DETAILS_ACL_EDIT"/>
+                            )}
+                            {page === 3 && (
+                              <NewThemePage nextPage={nextPage}
+                                            previousPage={previousPage}
+                                            formik={formik}/>
+                            )}
+                            {page === 4 && (
+                              <NewSeriesSummary previousPage={previousPage}
+                                                formik={formik}
+                                                metaDataExtendedHidden={steps[1].hidden}/>
+                            )}
+                        </div>
+                    </>
+                    )
+                }}
             </Formik>
         </>
     );

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from 'react';
 import {Formik} from "formik";
 import {connect} from "react-redux";
 import GeneralPage from "./GeneralPage";
@@ -66,48 +66,57 @@ const NewThemeWizard = ({ close, postNewTheme }) => {
                     validationSchema={currentValidationSchema}
                     onSubmit={values => handleSubmit(values)}>
                 {/* Render wizard pages depending on current value of page variable */}
-                {formik => (
-                  <>
-                      {/* Stepper that shows each step of wizard as header */}
-                      <WizardStepper steps={steps}
-                                     page={page}
-                                     setPage={setPage}
-                                     completed={pageCompleted}
-                                     setCompleted={setPageCompleted}
-                                     formik={formik} />
-                      <div>
-                          {page === 0 && (
-                            <GeneralPage formik={formik}
-                                         nextPage={nextPage}/>
-                          )}
-                          {page === 1 && (
-                            <BumperPage formik={formik}
-                                        nextPage={nextPage}
-                                        previousPage={previousPage}/>
-                          )}
-                          {page === 2 && (
-                            <BumperPage formik={formik}
-                                        nextPage={nextPage}
-                                        previousPage={previousPage}
-                                        isTrailer/>
-                          )}
-                          {page === 3 && (
-                            <TitleSlidePage formik={formik}
+                {formik => {
+
+                    // eslint-disable-next-line react-hooks/rules-of-hooks
+                    useEffect(() => {
+                        formik.validateForm();
+                    }, [page]);
+
+
+                    return (
+                      <>
+                          {/* Stepper that shows each step of wizard as header */}
+                          <WizardStepper steps={steps}
+                                         page={page}
+                                         setPage={setPage}
+                                         completed={pageCompleted}
+                                         setCompleted={setPageCompleted}
+                                         formik={formik} />
+                          <div>
+                              {page === 0 && (
+                                <GeneralPage formik={formik}
+                                             nextPage={nextPage}/>
+                              )}
+                              {page === 1 && (
+                                <BumperPage formik={formik}
                                             nextPage={nextPage}
                                             previousPage={previousPage}/>
-                          )}
-                          {page === 4 && (
-                            <WatermarkPage formik={formik}
-                                           nextPage={nextPage}
-                                           previousPage={previousPage}/>
-                          )}
-                          {page === 5 && (
-                            <ThemeSummaryPage formik={formik}
-                                              previousPage={previousPage}/>
-                          )}
-                      </div>
-                  </>
-                )}
+                              )}
+                              {page === 2 && (
+                                <BumperPage formik={formik}
+                                            nextPage={nextPage}
+                                            previousPage={previousPage}
+                                            isTrailer/>
+                              )}
+                              {page === 3 && (
+                                <TitleSlidePage formik={formik}
+                                                nextPage={nextPage}
+                                                previousPage={previousPage}/>
+                              )}
+                              {page === 4 && (
+                                <WatermarkPage formik={formik}
+                                               nextPage={nextPage}
+                                               previousPage={previousPage}/>
+                              )}
+                              {page === 5 && (
+                                <ThemeSummaryPage formik={formik}
+                                                  previousPage={previousPage}/>
+                              )}
+                          </div>
+                      </>
+                    )
+                }}
             </Formik>
         </>
     );

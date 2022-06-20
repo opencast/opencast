@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from 'react';
 import {connect} from "react-redux";
 import {Formik} from "formik";
 import WizardStepper from "../../../shared/wizard/WizardStepper";
@@ -52,33 +52,41 @@ const NewAclWizard = ({ close, postNewAcl }) => {
                     validationSchema={currentValidationSchema}
                     onSubmit={values => handleSubmit(values)}>
                 {/* Render wizard pages depending on current value of page variable */}
-                {formik => (
-                  <>
-                      {/* Stepper that shows each step of wizard as header */}
-                      <WizardStepper steps={steps}
-                                     page={page}
-                                     setPage={setPage}
-                                     completed={pageCompleted}
-                                     setCompleted={setPageCompleted}
-                                     formik={formik}
-                                     hasAccessPage />
-                      <div>
-                          {page === 0 && (
-                            <AclMetadataPage formik={formik}
-                                             nextPage={nextPage}/>
-                          )}
-                          {page === 1 && (
-                            <AclAccessPage formik={formik}
-                                           nextPage={nextPage}
-                                           previousPage={previousPage}/>
-                          )}
-                          {page === 2 && (
-                            <NewAclSummaryPage formik={formik}
+                {formik => {
+
+                    // eslint-disable-next-line react-hooks/rules-of-hooks
+                    useEffect(() => {
+                        formik.validateForm();
+                    }, [page]);
+
+                    return (
+                      <>
+                          {/* Stepper that shows each step of wizard as header */}
+                          <WizardStepper steps={steps}
+                                         page={page}
+                                         setPage={setPage}
+                                         completed={pageCompleted}
+                                         setCompleted={setPageCompleted}
+                                         formik={formik}
+                                         hasAccessPage />
+                          <div>
+                              {page === 0 && (
+                                <AclMetadataPage formik={formik}
+                                                 nextPage={nextPage}/>
+                              )}
+                              {page === 1 && (
+                                <AclAccessPage formik={formik}
+                                               nextPage={nextPage}
                                                previousPage={previousPage}/>
-                          )}
-                      </div>
-                  </>
-                )}
+                              )}
+                              {page === 2 && (
+                                <NewAclSummaryPage formik={formik}
+                                                   previousPage={previousPage}/>
+                              )}
+                          </div>
+                      </>
+                    )
+                }}
             </Formik>
         </>
     );
