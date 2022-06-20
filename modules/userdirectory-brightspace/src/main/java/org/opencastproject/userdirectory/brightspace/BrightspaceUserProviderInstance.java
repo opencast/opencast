@@ -283,8 +283,8 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
         brightspaceUser = this.client.findUser(username);
 
         if (brightspaceUser != null) {
-          logger.info("Retrieved user {}", brightspaceUser.getUserId());
           String brightspaceUserId = brightspaceUser.getUserId();
+          logger.info("Retrieved Brightspace user {} with id {}", username, brightspaceUserId);
 
           List<String> roleList = client.getRolesFromBrightspace(brightspaceUserId, instructorRoles);
           logger.debug("Brightspace user {} with id {} with roles: {}", username, brightspaceUserId, roleList);
@@ -316,7 +316,8 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
           return null;
         }
       } catch (BrightspaceClientException e) {
-        logger.error("A Brightspace API error ( {} ) occurred, user {} could not be retrieved", e, username);
+        logger.warn("Username {} could not be retrieved from Brightspace", username);
+        logger.debug("Brightspace API error: {}", e);
         return null;
       } finally {
         currentThread.setContextClassLoader(originalClassloader);
