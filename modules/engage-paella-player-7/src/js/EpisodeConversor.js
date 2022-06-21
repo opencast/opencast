@@ -59,7 +59,8 @@ const g_streamTypes = [
     getSourceData: (track) => {
       const src = track.url;
       const mimetype = track.mimetype;
-      return { src, mimetype };
+      const master = track.master;
+      return { src, mimetype, master };
     }
   },
   {
@@ -186,14 +187,19 @@ function getStreams(episode, config) {
     track = [track];
   }
 
-  const sources = [];
+  let sources = [];
 
   track.forEach(track => {
     const sourceData = getSourceData(track, config);
     sourceData && sources.push(sourceData);
   });
 
-  return mergeSources(sources, config);
+  const hasMaster = sources.find((x)=> x.type == 'hls' && x.source.master==true);
+  if (hasMaster) {
+    sources = sources.filter((x)=> x.type == 'hls' ? x.source.master==true : true)
+  }
+  const streams = mergeSources(sources, config);
+  return streams;
 }
 
 function processSegments(episode, manifest) {
