@@ -1119,7 +1119,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     restParameters = {
       @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) },
     responses = {
-      @RestResponse(description = "Returns the media package", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "Returns the workflow instance", responseCode = HttpServletResponse.SC_OK),
       @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) },
     returnDescription = "")
   public Response ingest(@Context HttpServletRequest request, @PathParam("wdID") String wdID) {
@@ -1141,7 +1141,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       @RestParameter(description = "Workflow definition id", isRequired = false, name = WORKFLOW_DEFINITION_ID_PARAM, type = RestParameter.Type.STRING),
       @RestParameter(description = "The workflow instance ID to associate this ingest with scheduled events.", isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING) },
     responses = {
-      @RestResponse(description = "Returns the media package", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "Returns the workflow instance", responseCode = HttpServletResponse.SC_OK),
       @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) },
     returnDescription = "")
   public Response ingest(@Context HttpServletRequest request) {
