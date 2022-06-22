@@ -152,6 +152,7 @@ nav:
    - Transcripts (AmberScript): 'modules/amberscripttranscripts.md'
    - Transcripts (Google Speech): 'modules/googlespeechtranscripts.md'
    - Transcripts (IBM Watson): 'modules/watsontranscripts.md'
+   - Transcripts (Microsoft Azure): 'modules/microsoftazuretranscripts.md'
    - Video Editor:
       - Setup: 'modules/videoeditor.setup.md'
       - Architecture: 'modules/videoeditor.architecture.md'
@@ -209,6 +210,8 @@ nav:
    - Mattermost Notification Module: 'workflowoperationhandlers/notification.md'
    - Metadata to ACL: 'workflowoperationhandlers/metadata-to-acl.md'
    - Move Storage: 'workflowoperationhandlers/move-storage-woh.md'
+   - Microsoft Azure Attach Transcription: 'workflowoperationhandlers/microsoft-azure-attach-transcription-woh.md'
+   - Microsoft Azure Start Transcription: 'workflowoperationhandlers/microsoft-azure-start-transcription-woh.md'
    - Multiencode: 'workflowoperationhandlers/multiencode-woh.md'
    - Normalize Audio: 'workflowoperationhandlers/normalizeaudio-woh.md'
    - Partial Import: 'workflowoperationhandlers/partial-import-woh.md'
