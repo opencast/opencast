@@ -36,7 +36,7 @@ const NewThemePage = ({ formik, nextPage, previousPage, seriesThemes }) => {
                                                            as="select"
                                                            placeholder={t('EVENTS.SERIES.NEW.THEME.LABEL')}
                                                            style={{width: '100%'}}>
-                                                        <option value=""/>
+                                                        <option value=''>{t('EVENTS.SERIES.NEW.THEME.LABEL')}</option>
                                                         {seriesThemes.map((theme, key) => (
                                                             <option value={theme.id}
                                                                     key={key}>{theme.name}</option>

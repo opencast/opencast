@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Formik} from "formik";
 import {useTranslation} from "react-i18next";
 import {initialFormValuesEditScheduledEvents} from "../../../../configs/modalConfig";
@@ -10,16 +10,25 @@ import {updateScheduledEventsBulk} from "../../../../thunks/eventThunks";
 import {connect} from "react-redux";
 import {usePageFunctions} from "../../../../hooks/wizardHooks";
 import {logger} from "../../../../utils/logger";
+import {fetchRecordings} from "../../../../thunks/recordingThunks";
+import {getRecordings} from "../../../../selectors/recordingSelectors";
+import {getUserInformation} from "../../../../selectors/userInfoSelectors";
+import {filterDevicesForAccess} from "../../../../utils/resourceUtils";
 
 /**
  * This component manages the pages of the edit scheduled bulk action
  */
-const EditScheduledEventsModal = ({ close, updateScheduledEventsBulk }) => {
+const EditScheduledEventsModal = ({ close, updateScheduledEventsBulk, loadingInputDevices, inputDevices, user }) => {
     const { t } = useTranslation();
 
     const initialValues = initialFormValuesEditScheduledEvents;
 
     const [snapshot, page, nextPage, previousPage] = usePageFunctions(0, initialValues);
+
+    useEffect(() => {
+        // Load recordings that can be used for input
+        loadingInputDevices();
+    }, []);
 
     const steps = [
         {
@@ -70,7 +79,8 @@ const EditScheduledEventsModal = ({ close, updateScheduledEventsBulk }) => {
                             {page === 1 && (
                                 <EditScheduledEventsEditPage formik={formik}
                                                              nextPage={nextPage}
-                                                             previousPage={previousPage}/>
+                                                             previousPage={previousPage}
+                                                             inputDevices={filterDevicesForAccess(user, inputDevices)}/>
                             )}
                             {page === 2 && (
                                 <EditScheduledEventsSummaryPage formik={formik}
@@ -84,9 +94,16 @@ const EditScheduledEventsModal = ({ close, updateScheduledEventsBulk }) => {
     );
 };
 
-// Mapping actions to dispatch
-const mapDispatchToProps = dispatch => ({
-    updateScheduledEventsBulk: values => dispatch(updateScheduledEventsBulk(values))
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    inputDevices: getRecordings(state),
+    user: getUserInformation(state)
 });
 
-export default connect(null, mapDispatchToProps)(EditScheduledEventsModal);
+// Mapping actions to dispatch
+const mapDispatchToProps = dispatch => ({
+    updateScheduledEventsBulk: values => dispatch(updateScheduledEventsBulk(values)),
+    loadingInputDevices: () => dispatch(fetchRecordings("inputs")),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditScheduledEventsModal);

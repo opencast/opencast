@@ -64,6 +64,14 @@ const EditScheduledEventsSummaryPage = ({ previousPage, formik }) => {
                     next: event.changedLocation
                 });
             }
+            /* the following six lines can be commented in, when the possibility of a selection of individual inputs is desired and the backend has been adapted to support it
+            if (isArrayChanged(event.deviceInputs.split(','), event.changedDeviceInputs)){
+                eventChanges.changes.push({
+                    type: 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.INPUTS',
+                    previous: event.deviceInputs,
+                    next: event.changedDeviceInputs.join(',')
+                });
+            }*/
             if (isChanged(event.weekday, event.changedWeekday)) {
                 eventChanges.changes.push({
                     type: 'EVENTS.EVENTS.TABLE.WEEKDAY',
@@ -91,6 +99,22 @@ const EditScheduledEventsSummaryPage = ({ previousPage, formik }) => {
     // Compare two values
     const isChanged = (oldValue, newValue) => {
         return oldValue !== newValue;
+    };
+
+    // Compare two arrays
+    const isArrayChanged = (oldArray, newArray) => {
+        if (newArray.length !== oldArray.length) {
+            return true;
+        }
+
+        const sortedNewArray = [...newArray].sort();
+        const sortedOldArray = [...oldArray].sort();
+        for (let i = 0; i < sortedNewArray.length; i++){
+            if (sortedNewArray[i] !== sortedOldArray[i]) {
+                return true;
+            }
+        }
+        return false;
     };
 
     return (

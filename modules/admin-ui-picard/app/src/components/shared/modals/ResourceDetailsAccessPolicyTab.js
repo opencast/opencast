@@ -181,11 +181,11 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                     {/* Notifications */}
                     <Notifications context="not_corner"/>
 
-                    {!loading && (
+                    {!loading && !!policies && (
                         <ul>
                             <li>
                                 <Formik
-                                    initialValues={{policies: [...policies], template: ""}}
+                                    initialValues={{policies: (policies.length > 0) ? [...policies] : [], template: ''}}
                                     enableReinitialize
                                     validate={values => validateFormik(values)}
                                     onSubmit={(values, actions) =>
@@ -221,8 +221,8 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                                                                 /* dropdown for selecting a policy template */
                                                                                 <Field className="chosen-single chosen-default"
                                                                                        style={{width: '200px'}}
-                                                                                       name={"template"}
-                                                                                       as="select"
+                                                                                       name={'template'}
+                                                                                       as='select'
                                                                                        onChange={event => handleTemplateChange(event.target.value, formik.setFieldValue)}
                                                                                 >
                                                                                     {(aclTemplates && aclTemplates.length > 0) ? (

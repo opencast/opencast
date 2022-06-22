@@ -306,11 +306,10 @@ export const loadEventSchedulingInProgress = () => ({
     type: LOAD_EVENT_SCHEDULING_IN_PROGRESS
 });
 
-export const loadEventSchedulingSuccess = ( source, captureAgents ) => ({
+export const loadEventSchedulingSuccess = ( source ) => ({
     type: LOAD_EVENT_SCHEDULING_SUCCESS,
     payload: {
-        source,
-        captureAgents
+        source
     }
 });
 

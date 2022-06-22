@@ -8,8 +8,8 @@ const RecordingsStatusCell = ({ row }) => {
     const { t } = useTranslation();
 
     return (
-        <span data-status={row.Status}>
-            {t(row.Status)}
+        <span data-status={row.status}>
+            {t(row.status)}
         </span>
     )
 

@@ -126,13 +126,6 @@ export const hasAccess = (role, userInfo) =>  {
     return !!(userInfo.isAdmin || userInfo.roles.includes(role));
 }
 
-/*
-* checks if an user is admin or has the required role to access an ui element
-*/
-export const hasOrgAdminAccess = (userInfo) =>  {
-    return (!!userInfo.org.adminRole) ? userInfo.roles.includes(userInfo.org.adminRole) : false;
-}
-
 // checks, if a String is proper JSON
 export const isJson = text => {
     try {

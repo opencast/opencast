@@ -1,5 +1,6 @@
 import {getFilters, getTextFilter} from "../selectors/tableFilterSelectors";
 import {getPageLimit, getPageOffset, getTableDirection, getTableSorting} from "../selectors/tableSelectors";
+import {hasAccess, hasOrgAdminAccess} from "./utils";
 
 /**
  * This file contains methods that are needed in more than one resource thunk
@@ -405,6 +406,39 @@ export const transformAclTemplatesResponse = acl => {
     }
 
     return template;
+}
+
+// filter devices, so that only devices for which the user has access rights are left
+export const filterDevicesForAccess = (user, inputDevices) => {
+    if(user.isOrgAdmin){
+            return inputDevices;
+    } else {
+        const devicesWithAccessRights = [];
+        for(const device of inputDevices){
+            console.log(device)
+            const inputDeviceAccessRole = 'ROLE_CAPTURE_AGENT_' + device.id.replace(/[^a-zA-Z0-9_]/g, '').toUpperCase();
+            if(hasAccess(inputDeviceAccessRole, user)){
+                devicesWithAccessRights.push(device);
+            }
+        }
+
+        return devicesWithAccessRights;
+    }
+}
+
+// returns, whether user has access rights for any inputDevices
+export const hasAnyDeviceAccess = (user, inputDevices) => {
+    return filterDevicesForAccess(user, inputDevices).length > 0;
+}
+
+// returns, whether user has access rights for a specific inputDevice
+export const hasDeviceAccess = (user, deviceId) => {
+    if(user.isOrgAdmin){
+            return true;
+    } else {
+        const inputDeviceAccessRole = 'ROLE_CAPTURE_AGENT_' + deviceId.replace(/[^a-zA-Z0-9_]/g, '').toUpperCase();
+        return hasAccess(inputDeviceAccessRole, user);
+    }
 }
 
 // build body for post/put request in theme context

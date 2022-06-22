@@ -58,7 +58,7 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, loadingWorkflowDef,
                                            onChange={e => setDefaultValues(e)}
                                            placeholder={t('EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW')}
                                            style={{width: '100%'}}>
-                                        <option value="" />
+                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW')}</option>
                                         {workflowDef.map((workflow, key)=> (
                                             <option key={key} value={workflow.id}>{workflow.title}</option>
                                         ))}

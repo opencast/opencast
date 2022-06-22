@@ -26,7 +26,7 @@ const RecordingsActionCell = ({ row, deleteRecording, fetchRecordingDetails, use
     };
 
     const showRecordingDetails = async () => {
-        await fetchRecordingDetails(row.Name);
+        await fetchRecordingDetails(row.name);
 
         setRecordingDetails(true);
     };
@@ -46,7 +46,7 @@ const RecordingsActionCell = ({ row, deleteRecording, fetchRecordingDetails, use
 
             {displayRecordingDetails && (
                 <RecordingDetailsModal close={hideRecordingDetails}
-                                       recordingId={row.Name} />
+                                       recordingId={row.name} />
             )}
 
             {/* delete location/recording */}
@@ -58,9 +58,9 @@ const RecordingsActionCell = ({ row, deleteRecording, fetchRecordingDetails, use
 
             {displayDeleteConfirmation && (
                 <ConfirmModal close={hideDeleteConfirmation}
-                              resourceName={row.Name}
+                              resourceName={row.name}
                               resourceType="LOCATION"
-                              resourceId={row.Name}
+                              resourceId={row.name}
                               deleteMethod={deletingRecording}/>
             )}
         </>

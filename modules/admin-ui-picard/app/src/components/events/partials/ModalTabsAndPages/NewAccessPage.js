@@ -89,7 +89,7 @@ const NewAccessPage = ({ previousPage, nextPage, formik, editAccessRole, user, c
                                                                                 style={{width: '200px'}}
                                                                                 onChange={e => handleTemplateChange(e)}
                                                                                 placeholder={t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL')}>
-                                                                            <option value=""/>
+                                                                            <option value=''>{t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL')}</option>
                                                                             {aclTemplates.map((template, key) => (
                                                                                 <option value={template.id}
                                                                                         key={key}>{template.value}</option>
@@ -158,7 +158,7 @@ const NewAccessPage = ({ previousPage, nextPage, formik, editAccessRole, user, c
                                                                                                        placeholder={t('EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL')}>
                                                                                                     {roles.length > 0 && (
                                                                                                         <>
-                                                                                                            <option value="" />
+                                                                                                            <option value='' hidden>{t('EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL')}</option>
                                                                                                             {roles.map((role, key) => (
                                                                                                                 <option value={role.name}
                                                                                                                         key={key}>{role.name}</option>

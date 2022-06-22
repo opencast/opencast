@@ -272,7 +272,7 @@ export const postNewEvent = (values, metadataInfo, extendedMetadata) => async (d
             metadata: {
                 start: startDate,
                 device: values.location,
-                inputs: values.deviceInputs.join(', '),
+                inputs: values.deviceInputs.join(','),
                 end: endDate,
                 duration: duration.toString()
             }
@@ -431,7 +431,7 @@ export const fetchScheduling = async events => {
             location: data[i].agentConfiguration['event.location'],
             changedLocation: data[i].agentConfiguration['event.location'],
             deviceInputs: data[i].agentConfiguration['capture.device.names'],
-            changedDeviceInputs: [],
+            changedDeviceInputs: data[i].agentConfiguration['capture.device.names'].split(','),
             startTimeHour: makeTwoDigits(startDate.getHours()),
             changedStartTimeHour: makeTwoDigits(startDate.getHours()),
             startTimeMinutes: makeTwoDigits(startDate.getMinutes()),
@@ -538,6 +538,9 @@ export const updateScheduledEventsBulk = values => async dispatch => {
                 },
                 weekday: eventChanges.changedWeekday,
                 agentId: eventChanges.changedLocation
+                // the following two lines can be commented in, when the possibility of a selection of individual inputs is desired and the backend has been adapted to support it (the word inputs may have to be replaced accordingly)
+                //,
+                //inputs: eventChanges.changedDeviceInputs.join(',')
             }
         });
     }

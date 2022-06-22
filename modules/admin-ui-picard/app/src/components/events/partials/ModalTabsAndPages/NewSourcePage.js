@@ -3,7 +3,7 @@ import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import Notifications from "../../../shared/Notifications";
 import {MuiPickersUtilsProvider, DatePicker} from "@material-ui/pickers";
-import {getCurrentLanguageInformation, getTimezoneOffset, hasAccess, hasOrgAdminAccess} from '../../../../utils/utils';
+import {getCurrentLanguageInformation, getTimezoneOffset} from '../../../../utils/utils';
 import {createMuiTheme, ThemeProvider} from "@material-ui/core";
 import {Field, FieldArray} from "formik";
 import RenderField from "../../../shared/wizard/RenderField";
@@ -17,7 +17,8 @@ import {sourceMetadata} from "../../../../configs/sourceConfig";
 import {hours, minutes, NOTIFICATION_CONTEXT, weekdays} from "../../../../configs/modalConfig";
 import {logger} from "../../../../utils/logger";
 import DateFnsUtils from '@date-io/date-fns';
-import {getOrgAdminRole, getUserInformation} from "../../../../selectors/userInfoSelectors";
+import {getUserInformation} from "../../../../selectors/userInfoSelectors";
+import {filterDevicesForAccess, hasAnyDeviceAccess} from "../../../../utils/resourceUtils";
 
 
 // Style to bring date picker pop up to front
@@ -108,24 +109,8 @@ const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, in
         removeNotificationWizardForm();
     }
 
-    const hasAnyDeviceAccess = (user) => {
-        if(hasOrgAdminAccess(user)){
-            return true;
-        } else {
-            for(const device of inputDevices){
-                const inputDeviceAccessRole = 'ROLE_CAPTURE_AGENT_' + device.id.replace(/[^a-zA-Z0-9_]/g, '').toUpperCase();
-                if(hasAccess(inputDeviceAccessRole, user)){
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-    }
-
     const scheduleOptionAvailable = () => {
-        return ((!loadingInputDevices) && (inputDevices.length > 0) && (hasAnyDeviceAccess(user)));
+        return ((inputDevices.length > 0) && (hasAnyDeviceAccess(user, inputDevices)));
     }
 
     return(
@@ -143,16 +128,16 @@ const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, in
                                     {scheduleOptionAvailable() ? (
                                         <li>
                                             <label>
+                                                <Field type="radio"
+                                                       name="sourceMode"
+                                                       className="source-toggle"
+                                                       value="UPLOAD"/>
                                                 <span>{t('EVENTS.EVENTS.NEW.SOURCE.UPLOAD.CAPTION')}</span>
                                             </label>
                                         </li>
                                     ) : (
                                         <li>
                                             <label>
-                                                <Field type="radio"
-                                                       name="sourceMode"
-                                                       className="source-toggle"
-                                                       value="UPLOAD"/>
                                                 <span>{t('EVENTS.EVENTS.NEW.SOURCE.UPLOAD.CAPTION')}</span>
                                             </label>
                                         </li>
@@ -191,7 +176,7 @@ const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, in
                         {scheduleOptionAvailable() && (formik.values.sourceMode === 'SCHEDULE_SINGLE' ||
                             formik.values.sourceMode === 'SCHEDULE_MULTIPLE') && (
                             <Schedule formik={formik}
-                                      inputDevices={inputDevices} />
+                                      inputDevices={filterDevicesForAccess(user, inputDevices)} />
                         )}
                     </div>
                 </div>
@@ -326,7 +311,7 @@ const Schedule = ({ formik, inputDevices }) => {
 
     const renderInputDeviceOptions = () => {
         if (!!formik.values.location) {
-            let inputDevice = inputDevices.find(({ Name }) => Name === formik.values.location);
+            let inputDevice = inputDevices.find(({ name }) => name === formik.values.location);
             return (
                 inputDevice.inputs.map((input, key) => (
                         <label key={key}>
@@ -403,7 +388,7 @@ const Schedule = ({ formik, inputDevices }) => {
                                            as="select"
                                            name="scheduleStartTimeHour"
                                            placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
-                                        <option value="" />
+                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}</option>
                                         {hours.map((i, key) => (
                                           <option key={key}
                                                   value={i.value}>
@@ -420,7 +405,7 @@ const Schedule = ({ formik, inputDevices }) => {
                                            as="select"
                                            name="scheduleStartTimeMinutes"
                                            placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
-                                        <option value=""/>
+                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}</option>
                                         {minutes.map((i, key) => (
                                           <option key={key}
                                                   value={i.value}>
@@ -441,7 +426,7 @@ const Schedule = ({ formik, inputDevices }) => {
                                            as="select"
                                            name="scheduleDurationHour"
                                            placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
-                                        <option value="" />
+                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}</option>
                                         {hours.map((i, key) => (
                                           <option value={i.value}
                                                   key={key}>
@@ -458,7 +443,7 @@ const Schedule = ({ formik, inputDevices }) => {
                                            as="select"
                                            name="scheduleDurationMinutes"
                                            placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
-                                        <option value=""/>
+                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}</option>
                                         {minutes.map((i, key) => (
                                           <option key={key}
                                                   value={i.value}>
@@ -480,7 +465,7 @@ const Schedule = ({ formik, inputDevices }) => {
                                            as="select"
                                            name="scheduleEndTimeHour"
                                            placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
-                                        <option value="" />
+                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}</option>
                                         {hours.map((i, key) => (
                                           <option key={key}
                                                   value={i.value}>
@@ -497,7 +482,7 @@ const Schedule = ({ formik, inputDevices }) => {
                                            as="select"
                                            name="scheduleEndTimeMinutes"
                                            placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
-                                        <option value=""/>
+                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}</option>
                                         {minutes.map((i, key) => (
                                           <option key={key}
                                                   value={i.value}>
@@ -521,9 +506,11 @@ const Schedule = ({ formik, inputDevices }) => {
                                                 formik.setFieldValue("deviceInputs", []);
                                             }}
                                             name="location">
-                                        <option value=""/>
+                                        <option value='' hidden>
+                                            {t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}
+                                        </option>
                                         {inputDevices.map((inputDevice, key) => (
-                                          <option key={key} value={inputDevice.Name}>{inputDevice.Name}</option>
+                                          <option key={key} value={inputDevice.name}>{inputDevice.name}</option>
                                         ))}
                                     </select>
                                 </div>

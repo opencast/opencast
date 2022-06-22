@@ -92,7 +92,6 @@ import {fetchWorkflowDef} from "./workflowThunks";
 import {fetchStatistics, fetchStatisticsValueUpdate} from "./statisticsThunks";
 import {
     getBaseWorkflow,
-    getCaptureAgents,
     getMetadata,
     getExtendedMetadata,
     getSchedulingSource,
@@ -105,6 +104,8 @@ import {getWorkflowDef} from "../selectors/workflowSelectors";
 import {getAssetUploadOptions, getAssetUploadWorkflow} from "../selectors/eventSelectors";
 import {calculateDuration} from "../utils/dateUtils";
 import {logger} from "../utils/logger";
+import {fetchRecordings} from "./recordingThunks";
+import {getRecordings} from "../selectors/recordingSelectors";
 
 
 // thunks for metadata
@@ -642,7 +643,7 @@ export const deleteCommentReply = (eventId, commentId, replyId) => async () => {
 
 // thunks for scheduling
 
-export const fetchSchedulingInfo = (eventId) => async (dispatch) => {
+export const fetchSchedulingInfo = (eventId) => async (dispatch, getState) => {
     try {
         dispatch(loadEventSchedulingInProgress())
 
@@ -651,48 +652,35 @@ export const fetchSchedulingInfo = (eventId) => async (dispatch) => {
         const schedulingResponse = await schedulingRequest.data;
 
         // get data from API about capture agents
-        const captureAgentsRequest = await axios.get(`/admin-ng/capture-agents/agents.json`);
-        const captureAgentsResponse = await captureAgentsRequest.data;
+        await dispatch(fetchRecordings('inputs'));
+
+        const state = getState();
+        const captureAgents = getRecordings(state);
 
         const startDate = new Date(schedulingResponse.start);
         const endDate = new Date(schedulingResponse.end);
         const {durationHours, durationMinutes} = calculateDuration(startDate, endDate);
 
-        let captureAgents = [];
         let device = {
             id: '',
             name: '',
             inputs: []
         };
 
-        for(const agent of captureAgentsResponse.results){
-            const transformedAgent = {
-                id: agent.Name,
-                name: agent.Name,
-                status: agent.Status,
-                updated: agent.Update,
-                inputs: agent.inputs,
-                roomId: agent.roomId,
-                type: "LOCATION",
-                removable: ('AGENTS.STATUS.OFFLINE' === agent.Status || 'AGENTS.STATUS.UNKNOWN' === agent.Status)
-            };
+        const agent = captureAgents.find(agent => agent.id === schedulingResponse.agentId);
+        if(!!agent){
+            let inputMethods = [];
 
-            captureAgents.push(transformedAgent);
-
-            if(transformedAgent.id === schedulingResponse.agentId){
-                let inputMethods = [];
-
-                if (schedulingResponse.agentConfiguration['capture.device.names'] !== undefined) {
-                    const inputs = schedulingResponse.agentConfiguration['capture.device.names'].split(',');
-                    for(const input of inputs) {
-                        inputMethods.push(input);
-                    }
+            if (schedulingResponse.agentConfiguration['capture.device.names'] !== undefined) {
+                const inputs = schedulingResponse.agentConfiguration['capture.device.names'].split(',');
+                for(const input of inputs) {
+                    inputMethods.push(input);
                 }
-                device = {
-                    ...transformedAgent,
-                    inputMethods: inputMethods
-                };
             }
+            device = {
+                ...agent,
+                inputMethods: inputMethods
+            };
         }
 
         const source = {
@@ -715,7 +703,7 @@ export const fetchSchedulingInfo = (eventId) => async (dispatch) => {
             device: {...device}
         }
 
-        dispatch(loadEventSchedulingSuccess(source, captureAgents));
+        dispatch(loadEventSchedulingSuccess(source));
     } catch (e) {
         logger.error(e);
         dispatch(loadEventSchedulingFailure());
@@ -784,16 +772,15 @@ export const saveSchedulingInfo = (eventId, values, startDate, endDate) => async
 
     const state = getState();
     const oldSource = getSchedulingSource(state);
-    const captureAgents = getCaptureAgents(state);
+    const captureAgents = getRecordings(state);
     let device = {};
 
-    for(const agent of captureAgents){
-        if(agent.id === values.captureAgent){
-            device = {
-                ...agent,
-                inputMethods: values.inputs
-            };
-        }
+    const agent = captureAgents.find(agent => agent.id === values.captureAgent);
+    if(!!agent){
+        device = {
+            ...agent,
+            inputMethods: values.inputs
+        };
     }
 
     const source = {

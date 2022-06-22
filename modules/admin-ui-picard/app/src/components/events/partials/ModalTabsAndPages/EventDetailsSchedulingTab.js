@@ -1,19 +1,27 @@
-import React, {useEffect, useState} from "react";
-import Notifications from "../../../shared/Notifications";
+import React, {useEffect} from "react";
 import {connect} from "react-redux";
+import cn from "classnames";
+import _ from 'lodash';
+import {DatePicker} from "@material-ui/pickers";
+import {createTheme, ThemeProvider} from "@material-ui/core";
+import {MuiPickersUtilsProvider} from "@material-ui/pickers";
+import DateFnsUtils from "@date-io/date-fns";
+import {Field, Formik} from "formik";
+import Notifications from "../../../shared/Notifications";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 import {
     checkConflicts,
     saveSchedulingInfo
 } from "../../../../thunks/eventDetailsThunks";
+import {addNotification} from "../../../../thunks/notificationThunks";
 import {
-    getCaptureAgents,
     getSchedulingConflicts,
     getSchedulingProperties,
     getSchedulingSource,
     isCheckingConflicts
 } from "../../../../selectors/eventDetailsSelectors";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
+import {getRecordings} from "../../../../selectors/recordingSelectors";
 import {
     getCurrentLanguageInformation,
     getTimezoneOffset,
@@ -26,14 +34,7 @@ import {
     calculateDuration,
     makeDate
 } from "../../../../utils/dateUtils";
-import {DatePicker} from "@material-ui/pickers";
-import {createTheme, ThemeProvider} from "@material-ui/core";
-import {Field, Formik} from "formik";
-import cn from "classnames";
-import _ from 'lodash';
-import {MuiPickersUtilsProvider} from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
-import {addNotification} from "../../../../thunks/notificationThunks";
+import {filterDevicesForAccess, hasDeviceAccess} from "../../../../utils/resourceUtils";
 import {NOTIFICATION_CONTEXT} from "../../../../configs/modalConfig";
 
 /**
@@ -72,16 +73,9 @@ const EventDetailsSchedulingTab = ({ eventId, t,
         }
     });
 
-    const hasCurrentAgentAccess = (agentId) => {
-        let transformedId = agentId;
-        transformedId = transformedId.replace(/[^a-zA-Z0-9_]/g, '').toUpperCase();
-        const roleToCheck = 'ROLE_CAPTURE_AGENT_' + transformedId;
-        return hasAccess(roleToCheck, user);
-    }
-
     // Variable and function for checking access rights
     const hasAccessRole = hasAccess("ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT", user);
-    const accessAllowed = (agentId) => {return (!checkingConflicts)  && hasCurrentAgentAccess(agentId)};
+    const accessAllowed = (agentId) => {return (!checkingConflicts)  && hasDeviceAccess(user, agentId)};
 
     // sets the duration in the formik
     const setDuration = (startDate, endDate, setFieldValue) => {
@@ -240,25 +234,26 @@ const EventDetailsSchedulingTab = ({ eventId, t,
     };
 
     // finds the inputs to be displayed in the formik
-    const getInputs = (deviceId) => {
+    const getInputs = deviceId => {
         if(deviceId === source.device.id) {
             return source.device.inputs;
         } else {
-            for(const agent of captureAgents){
+            for(const agent of filterDevicesForAccess(user, captureAgents)){
                 if(agent.id === deviceId){
                     return agent.inputs;
                 }
             }
+            return [];
         }
     }
 
     // changes the inputs in the formik
     const changeInputs = (deviceId, setFieldValue) => {
-        setFieldValue("captureAgent", deviceId);
-        setFieldValue("inputs", []);
+        setFieldValue('captureAgent', deviceId);
+        setFieldValue('inputs', []);
     }
     const filterCaptureAgents = (agent) => {
-        return agent.id === source.agentId || hasCurrentAgentAccess(agent.id);
+        return agent.id === source.agentId || hasDeviceAccess(user, agent.id);
     }
 
     // checks validity of the formik form
@@ -307,7 +302,7 @@ const EventDetailsSchedulingTab = ({ eventId, t,
             scheduleEndHour: makeTwoDigits(source.end.hour),
             scheduleEndMinute: makeTwoDigits(source.end.minute),
             captureAgent: source.device.name,
-            inputs: Array.from(source.device.inputMethods)
+            inputs: !!source.device.inputMethods? Array.from(source.device.inputMethods) : []
         };
     }
 
@@ -573,7 +568,7 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                                         placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION')}
                                                                     >
                                                                         <option value="" hidden/>
-                                                                        {captureAgents.filter(a => filterCaptureAgents(a)).map((ca, key) => (
+                                                                        {filterDevicesForAccess(user, captureAgents).filter(a => filterCaptureAgents(a)).map((ca, key) => (
                                                                             <option value={ca.name}
                                                                                     key={key}>
                                                                                 {ca.name}
@@ -594,25 +589,26 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                     <tr>
                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.INPUTS')}</td>
                                                         <td>
-                                                            {(hasAccessRole && accessAllowed(formik.values.captureAgent))? (
-
-                                                                /*checkboxes for available inputs*/
-                                                                getInputs(formik.values.captureAgent).map((inputMethod, key) => (
-                                                                    <label key={key}>
-                                                                        <Field name="inputs"
-                                                                               type="checkbox"
-                                                                               value={inputMethod.id}
-                                                                        />
-                                                                        {t(inputMethod.value)}
-                                                                    </label>
-                                                                ))
-                                                            ):(
-                                                                formik.values.inputs.map((input, key) => (
-                                                                    <span key={key}>
+                                                            {!!formik.values.captureAgent && !!getInputs(formik.values.captureAgent) && getInputs(formik.values.captureAgent).length > 0 && (
+                                                                (hasAccessRole && accessAllowed(formik.values.captureAgent))? (
+                                                                    /*checkboxes for available inputs*/
+                                                                    getInputs(formik.values.captureAgent).map((inputMethod, key) => (
+                                                                        <label key={key}>
+                                                                            <Field name="inputs"
+                                                                                   type="checkbox"
+                                                                                   value={inputMethod.id}
+                                                                            />
+                                                                            {t(inputMethod.value)}
+                                                                        </label>
+                                                                    ))
+                                                                ):(
+                                                                    formik.values.inputs.map((input, key) => (
+                                                                        <span key={key}>
                                                                         {t(getInputs(formik.values.captureAgent).find(agent => (agent.id === input)).value)}
-                                                                        <br/>
+                                                                            <br/>
                                                                     </span>
-                                                                ))
+                                                                    ))
+                                                                )
                                                             )}
                                                         </td>
                                                     </tr>
@@ -665,7 +661,7 @@ const mapStateToProps = state => ({
     source: getSchedulingSource(state),
     conflicts: getSchedulingConflicts(state),
     checkingConflicts: isCheckingConflicts(state),
-    captureAgents: getCaptureAgents(state)
+    captureAgents: getRecordings(state)
 });
 
 // Mapping actions to dispatch
