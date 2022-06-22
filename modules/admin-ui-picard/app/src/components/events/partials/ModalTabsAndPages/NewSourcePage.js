@@ -143,7 +143,7 @@ const Upload = ({ formik }) => {
         if (e.target.files.length === 0) {
             formik.setFieldValue(assetId, null);
         } else {
-            formik.setFieldValue(assetId, e.target.files[0]);
+            formik.setFieldValue(assetId, e.target.files);
         }
     }
 
@@ -173,12 +173,13 @@ const Upload = ({ formik }) => {
                                                            accept={asset.accept}
                                                            onChange={e => handleChange(e, `uploadAssetsTrack.${key}.file`)}
                                                            type="file"
+                                                           multiple={asset.multiple}
                                                            name={`uploadAssetsTrack.${key}.file`}
                                                            tabIndex=""/>
                                                     {/* Show name of file that is uploaded */}
                                                     {formik.values.uploadAssetsTrack[key].file && (
                                                         <span className="ui-helper">
-                                                            {formik.values.uploadAssetsTrack[key].file.name.substr(0, 50)}
+                                                            {formik.values.uploadAssetsTrack[key].file[0].name.substr(0, 50)}
                                                         </span>
                                                     )}
                                                 </div>

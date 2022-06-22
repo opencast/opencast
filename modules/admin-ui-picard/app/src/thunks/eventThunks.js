@@ -292,7 +292,14 @@ export const postNewEvent = (values, metadataInfo) => async (dispatch, getState)
         if (uploadAssetOptions[i].type === 'track' && values.sourceMode === 'UPLOAD') {
             let asset = values.uploadAssetsTrack.find(asset => asset.id === uploadAssetOptions[i].id);
             if (!!asset.file) {
-                formData.append(asset.id + '.0', asset.file);
+                if (asset.multiple) {
+                    for (let j = 0; asset.file.length > j; j++) {
+                        formData.append(asset.id + '.' + j, asset.file[j]);
+                    }
+
+                } else {
+                    formData.append(asset.id + '.0', asset.file[0]);
+                }
             }
             assets.options = assets.options.concat(uploadAssetOptions[i]);
         } else {
