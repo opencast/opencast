@@ -194,9 +194,9 @@ function getStreams(episode, config) {
     sourceData && sources.push(sourceData);
   });
 
-  const hasMaster = sources.find((x)=> x.type == 'hls' && x.source.master==true);
+  const hasMaster = sources.find((x)=> x.type == 'hls' && x.source.master == true);
   if (hasMaster) {
-    sources = sources.filter((x)=> x.type == 'hls' ? x.source.master==true : true)
+    sources = sources.filter((x)=> x.type == 'hls' ? x.source.master == true : true);
   }
   const streams = mergeSources(sources, config);
   return streams;
