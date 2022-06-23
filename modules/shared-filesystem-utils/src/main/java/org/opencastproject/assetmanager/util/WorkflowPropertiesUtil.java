@@ -35,13 +35,17 @@ import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
+import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -49,13 +53,19 @@ import java.util.stream.Collectors;
  * properties)
  */
 public final class WorkflowPropertiesUtil {
+  private static final Set<MediaPackageElementFlavor> SECURITY_FLAVORS = new HashSet<>(
+          Arrays.asList(XACML_POLICY_EPISODE, XACML_POLICY_SERIES));
+
   private WorkflowPropertiesUtil() {
   }
 
   /**
    * Retrieve latest properties for a set of event ids
-   * @param assetManager The Asset Manager to use
-   * @param eventIds Collection of event IDs (can be a set, but doesn't have to be)
+   *
+   * @param assetManager
+   *          The Asset Manager to use
+   * @param eventIds
+   *          Collection of event IDs (can be a set, but doesn't have to be)
    * @return A map mapping event IDs to key value pairs (which are themselves maps) representing the properties
    */
   public static Map<String, Map<String, String>> getLatestWorkflowPropertiesForEvents(final AssetManager assetManager,
@@ -78,55 +88,61 @@ public final class WorkflowPropertiesUtil {
 
   /**
    * Retrieve the latest properties for a single media package
-   * @param assetManager The Asset Manager to use
-   * @param mediaPackageId The media package to query
+   *
+   * @param assetManager
+   *          The Asset Manager to use
+   * @param mediaPackageId
+   *          The media package to query
    * @return A list of properties represented by a Map
    */
   public static Map<String, String> getLatestWorkflowProperties(final AssetManager assetManager,
           final String mediaPackageId) {
-    return assetManager.selectProperties(mediaPackageId, WORKFLOW_PROPERTIES_NAMESPACE)
-            .parallelStream()
-            .collect(Collectors.toMap(
-                    p -> p.getId().getName(),
-                    p -> p.getValue().get(Value.STRING)));
+    return assetManager.selectProperties(mediaPackageId, WORKFLOW_PROPERTIES_NAMESPACE).parallelStream()
+            .collect(Collectors.toMap(p -> p.getId().getName(), p -> p.getValue().get(Value.STRING)));
   }
 
   /**
    * Store selected properties for a media package
-   * @param assetManager The Asset Manager to use
-   * @param mediaPackage The media package to store properties relative to
-   * @param properties A list of properties represented by a Map
+   *
+   * @param assetManager
+   *          The Asset Manager to use
+   * @param mediaPackage
+   *          The media package to store properties relative to
+   * @param properties
+   *          A list of properties represented by a Map
    */
   public static void storeProperties(final AssetManager assetManager, final MediaPackage mediaPackage,
           final Map<String, String> properties) {
 
     // Properties can only be created if a snapshot exists. Hence, we create a snapshot if there is none right now.
-    // Although, to avoid lots of potentially slow IO operations, we archive an empty media package.
+    // Although, to avoid lots of potentially slow IO operations, we archive a slimmer version of the media package,
+    // containing only metadata and security attachments.
     if (!assetManager.snapshotExists(mediaPackage.getIdentifier().toString())) {
-      MediaPackage simplifiedMediaPackage = new MediaPackageBuilderImpl().createNew(mediaPackage.getIdentifier());
-      for (Catalog catalog: mediaPackage.getCatalogs()) {
-        simplifiedMediaPackage.add(catalog);
+      MediaPackage simplifiedMediaPackage = (MediaPackage) mediaPackage.clone();
+      for (MediaPackageElement element : mediaPackage.getElements()) {
+        if (element instanceof Catalog) {
+          continue;
+        }
+        if (element instanceof Attachment && SECURITY_FLAVORS.contains(element.getFlavor())) {
+          continue;
+        }
+        simplifiedMediaPackage.remove(element);
       }
-      for (Attachment attachment: mediaPackage.getAttachments(XACML_POLICY_EPISODE)) {
-        simplifiedMediaPackage.add(attachment);
-      }
-      for (Attachment attachment: mediaPackage.getAttachments(XACML_POLICY_SERIES)) {
-        simplifiedMediaPackage.add(attachment);
-      }
+
       assetManager.takeSnapshot(DEFAULT_OWNER, simplifiedMediaPackage);
     }
 
     // Store all properties
     for (final Map.Entry<String, String> entry : properties.entrySet()) {
-      final PropertyId propertyId = PropertyId
-              .mk(mediaPackage.getIdentifier().toString(), WORKFLOW_PROPERTIES_NAMESPACE, entry.getKey());
+      final PropertyId propertyId = PropertyId.mk(mediaPackage.getIdentifier().toString(),
+              WORKFLOW_PROPERTIES_NAMESPACE, entry.getKey());
       final Property property = Property.mk(propertyId, Value.mk(entry.getValue()));
       assetManager.setProperty(property);
     }
   }
 
-  public static void storeProperty(final AssetManager assetManager, final MediaPackage mediaPackage,
-          final String name, final String value) {
+  public static void storeProperty(final AssetManager assetManager, final MediaPackage mediaPackage, final String name,
+          final String value) {
     storeProperties(assetManager, mediaPackage, Collections.singletonMap(name, value));
   }
 }
