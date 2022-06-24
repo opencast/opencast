@@ -23,6 +23,7 @@ package org.opencastproject.search.impl;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -30,6 +31,9 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSerializer;
 import org.opencastproject.metadata.api.StaticMetadataService;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreUtil;
+import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
@@ -68,6 +72,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.elasticsearch.ElasticsearchStatusException;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.osgi.framework.ServiceException;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -87,16 +99,24 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * A Solr-based {@link SearchService} implementation.
@@ -111,6 +131,10 @@ import java.util.regex.Pattern;
 )
 public final class SearchServiceImpl extends AbstractJobProducer implements SearchService, ManagedService,
     StaticFileAuthorization {
+
+  public enum IndexEntryType {
+    Episode, Series
+  }
 
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
@@ -156,6 +180,8 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   private SolrRequester solrRequester;
 
   private SolrIndexManager indexManager;
+
+  private ElasticsearchIndex elasticsearchIndex;
 
   private List<StaticMetadataService> mdServices = new ArrayList<StaticMetadataService>();
 
@@ -273,6 +299,35 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
     String systemUserName = cc.getBundleContext().getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
     populateIndex(systemUserName);
+
+    createIndex();
+  }
+
+  private void createIndex() {
+    var idxName = "opencast_search";
+    var mapping = "";
+    try (var in = this.getClass().getResourceAsStream("/search-mapping.json")) {
+      mapping = IOUtils.toString(in, StandardCharsets.UTF_8);
+    } catch (IOException e) {
+      throw new SearchException("Could not read mapping.", e);
+    }
+    try {
+      logger.debug("Trying to create index for '{}'", idxName);
+      var request = new CreateIndexRequest(idxName)
+          .mapping(mapping, XContentType.JSON);
+      var response = elasticsearchIndex.getClient().indices().create(request, RequestOptions.DEFAULT);
+      if (!response.isAcknowledged()) {
+        throw new SearchException("Unable to create index for '" + idxName + "'");
+      }
+    } catch (ElasticsearchStatusException e) {
+      if (e.getDetailedMessage().contains("already_exists_exception")) {
+        logger.info("Detected existing index '{}'", idxName);
+      } else {
+        throw e;
+      }
+    } catch (IOException e) {
+      throw new SearchException(e);
+    }
   }
 
   /**
@@ -281,6 +336,11 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   @Deactivate
   public void deactivate() {
     SolrServerFactory.shutdown(solrServer);
+  }
+
+  @Reference
+  public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
+    this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /**
@@ -384,6 +444,34 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   }
 
   /**
+   * Simplify ACL structure, so we can easily search by action.
+   * @param acl The access control List to restructure
+   * @return Restructured ACL
+   */
+  Map<String, Set<String>> searchableAcl(AccessControlList acl) {
+    var result = new HashMap<String, Set<String>>();
+    for (var entry: acl.getEntries()) {
+      var action = entry.getAction();
+      if (!result.containsKey(action)) {
+        result.put(action, new HashSet<>());
+      }
+      result.get(action).add(entry.getRole());
+    }
+    return  result;
+  }
+
+  public SearchResponse search(SearchSourceBuilder searchSource) throws SearchException {
+    SearchRequest searchRequest = new SearchRequest("opencast_search");
+    logger.debug("Sending for query: {}", searchSource.query());
+    searchRequest.source(searchSource);
+    try {
+      return elasticsearchIndex.getClient().search(searchRequest, RequestOptions.DEFAULT);
+    } catch (IOException e) {
+      throw new SearchException(e);
+    }
+  }
+
+  /**
    * Immediately adds the mediapackage to the search index.
    *
    * @param mediaPackage
@@ -410,6 +498,39 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     logger.debug("Updating series with merged access control list: {}", seriesAcl);
 
     Date now = new Date();
+
+    // Elasticsearch
+
+    var metadata = new HashMap<String, List<String>>();
+    var dublinCore = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage)
+        .map(DublinCoreCatalog::getValues)
+        .orElse(Collections.emptyMap());
+    for (var entry : dublinCore.entrySet()){
+      var key = entry.getKey().getLocalName();
+      var values = entry.getValue().stream()
+          .map(DublinCoreValue::getValue)
+          .collect(Collectors.toList());
+      metadata.put(key, values);
+    }
+    Map<String, Object> data = Map.of(
+        "id", mediaPackageId,
+        "media_package", MediaPackageParser.getAsXml(mediaPackage),
+        "org", getSecurityService().getOrganization().getId(),
+        "dc", metadata,
+        "modified", DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now()),
+        "acl", searchableAcl(acl),
+        "type", IndexEntryType.Episode.name()
+    );
+    var request = new IndexRequest("opencast_search");
+    request.id(mediaPackageId);
+    request.source(data);
+    try {
+      elasticsearchIndex.getClient().index(request, RequestOptions.DEFAULT);
+    } catch (IOException e) {
+      throw new SearchException(e);
+    }
+
+    // Solr
 
     try {
       if (indexManager.add(mediaPackage, acl, seriesAcl, now)) {

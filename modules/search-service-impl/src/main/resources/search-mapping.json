@@ -1,0 +1,78 @@
+{
+  "properties": {
+    "acl": {
+      "properties": {
+        "read": {
+          "type": "keyword"
+        },
+        "write": {
+          "type": "keyword"
+        }
+      }
+    },
+    "dc": {
+      "properties": {
+        "created": {
+          "type": "date"
+        },
+        "creator": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "extent": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "identifier": {
+          "type": "keyword"
+        },
+        "isPartOf": {
+          "type": "keyword"
+        },
+        "temporal": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "title": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        }
+      }
+    },
+    "id": {
+      "type": "keyword"
+    },
+    "media_package": {
+      "type": "text"
+    },
+    "modified": {
+      "type": "date"
+    },
+    "org": {
+      "type": "keyword"
+    },
+    "type": {
+      "type": "keyword"
+    }
+  }
+}

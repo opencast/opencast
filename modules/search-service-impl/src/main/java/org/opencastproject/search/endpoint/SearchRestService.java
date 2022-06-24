@@ -33,6 +33,8 @@ import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchResultImpl;
 import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.impl.SearchServiceImpl;
+import org.opencastproject.security.api.SecurityConstants;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.SolrUtils;
@@ -41,16 +43,24 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.google.gson.Gson;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -105,6 +115,10 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
   /** The service registry */
   private ServiceRegistry serviceRegistry;
+
+  private SecurityService securityService;
+
+  private final Gson gson = new Gson();
 
   private static final String SAMPLE_MEDIA_PACKAGE = "<mediapackage xmlns=\"http://mediapackage.opencastproject.org\""
       + "start=\"2007-12-05T13:40:00\" duration=\"1004400000\">\n"
@@ -515,7 +529,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       } else {
         if (result.getTotalSize() > 1) {
           logger.debug("Retrieved {} series with sname parameter {}, we only expect a single series to be returned",
-                        result.getTotalSize(), seriesName);
+              result.getTotalSize(), seriesName);
           return Response.status(Response.Status.BAD_REQUEST)
               .entity("more than one series matches given series name")
               .build();
@@ -562,6 +576,156 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     }
 
     return rb.build();
+  }
+
+  // CHECKSTYLE:OFF
+  @GET
+  @Path("event.json")
+  @Produces( MediaType.APPLICATION_JSON )
+  @RestQuery(
+      name = "search_episodes",
+      description = "Search for episodes matching the query parameters.",
+      restParameters = {
+          @RestParameter(
+              name = "id",
+              isRequired = false,
+              type = RestParameter.Type.STRING,
+              description = "The ID of the single episode to be returned, if it exists."
+          ),
+          @RestParameter(
+              name = "q",
+              isRequired = false,
+              type = RestParameter.Type.STRING,
+              description = "Any episode that matches this free-text query."
+          ),
+          @RestParameter(
+              name = "sid",
+              isRequired = false,
+              type = RestParameter.Type.STRING,
+              description = "Any episode that belongs to specified series id."
+          ),
+          @RestParameter(
+              name = "sname",
+              isRequired = false,
+              type = RestParameter.Type.STRING,
+              description = "Any episode that belongs to specified series name (note that the "
+                  + "specified series name must be unique)."
+          ),
+          @RestParameter(
+              name = "sort",
+              isRequired = false,
+              type = RestParameter.Type.STRING,
+              description = "The sort order.  May include any of the following: "
+                  + "DATE_CREATED, DATE_MODIFIED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
+                  + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER. "
+                  + "Add '_DESC' to reverse the sort order (e.g. TITLE_DESC)."
+          ),
+          @RestParameter(
+              name = "limit",
+              isRequired = false,
+              type = RestParameter.Type.INTEGER,
+              defaultValue = "20",
+              description = "The maximum number of items to return per page."
+          ),
+          @RestParameter(
+              name = "offset",
+              isRequired = false,
+              type = RestParameter.Type.INTEGER,
+              defaultValue = "0",
+              description = "The page number."
+          ),
+          @RestParameter(
+              name = "sign",
+              type = RestParameter.Type.BOOLEAN,
+              isRequired = false,
+              defaultValue = "true",
+              description = "If results are to be signed"
+          )
+      },
+      responses = {
+          @RestResponse(
+              description = "The request was processed successfully.",
+              responseCode = HttpServletResponse.SC_OK
+          )
+      },
+      returnDescription = "The search results, formatted as xml or json."
+  )
+  public Response getEpisodes(
+      @QueryParam("id") String id,
+      @QueryParam("q") String text,
+      @QueryParam("sid") String seriesId,
+      @QueryParam("sname") String seriesName, // TODO
+      @QueryParam("sort") String sort,
+      @QueryParam("limit") String limit,
+      @QueryParam("offset") String offset,
+      @QueryParam("sign") String sign
+  ) throws SearchException, UnauthorizedException {
+    // CHECKSTYLE:ON
+
+    // There can only be one, sid or sname
+    if (StringUtils.isNoneEmpty(seriesName, seriesId)) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("invalid request, both 'sid' and 'sname' specified")
+          .build();
+    }
+    final var signURLs = BooleanUtils.toBoolean(Objects.toString(sign, "true"));
+    final var org = securityService.getOrganization().getId();
+    final var type = SearchServiceImpl.IndexEntryType.Episode.name();
+
+    var query = QueryBuilders.boolQuery()
+        .must(QueryBuilders.termQuery("org", org))
+        .must(QueryBuilders.termQuery("type", type));
+
+    if (StringUtils.isNotEmpty(id)) {
+      query.must(QueryBuilders.idsQuery().addIds(id));
+    }
+
+    if (StringUtils.isNotEmpty(seriesId)) {
+      query.must(QueryBuilders.termQuery("dc.isPartOf", seriesId));
+    }
+
+    if (StringUtils.isNotEmpty(text)) {
+      query.must(QueryBuilders.multiMatchQuery(text,
+          "dc.abstract",
+          "dc.contributor",
+          "dc.creator",
+          "dc.description",
+          "dc.publisher",
+          "dc.subject",
+          "dc.title"));
+    }
+
+    var user = securityService.getUser();
+    var orgAdminRole = securityService.getOrganization().getAdminRole();
+    if (!user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) && !user.hasRole(orgAdminRole)) {
+      var roleQuery = QueryBuilders.boolQuery();
+      for (var role: user.getRoles()) {
+        roleQuery.should(QueryBuilders.termQuery("acl.read", role.getName()));
+      }
+      query.must(roleQuery);
+    }
+
+    logger.debug("limit: {}, offset: {}", limit, offset);
+
+    var size = NumberUtils.toInt(limit, 20);
+    var from = NumberUtils.toInt(offset) * size;
+    if (size < 0 || from < 0) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("Limit and offset may not be negative.")
+          .build();
+    }
+    var searchSource = new SearchSourceBuilder()
+        .query(query)
+        .from(from)
+        .size(size);
+
+    var result = Arrays.stream(searchService.search(searchSource)
+        .getHits()
+        .getHits())
+        .map(SearchHit::getSourceAsMap)
+        .collect(Collectors.toList());
+
+    return Response.ok(gson.toJson(result)).build();
   }
 
   @GET
@@ -698,6 +862,11 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
   @Reference
   public void setSearchService(SearchServiceImpl searchService) {
     this.searchService = searchService;
+  }
+
+  @Reference
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   /**

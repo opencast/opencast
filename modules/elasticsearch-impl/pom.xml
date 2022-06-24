@@ -113,6 +113,11 @@
       <version>${lucene.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-queries</artifactId>
+      <version>${lucene.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.carrotsearch</groupId>
       <artifactId>hppc</artifactId>
       <version>0.8.1</version>
@@ -151,6 +156,7 @@
             <ignoredUnusedDeclaredDependency>org.elasticsearch.plugin:rank-eval-client</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpasyncclient</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-join</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-queries</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-queryparser</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>com.carrotsearch:hppc</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
@@ -177,6 +183,7 @@
               !com.fasterxml.jackson.dataformat.smile,
               !com.fasterxml.jackson.dataformat.xml.*,
               !com.fasterxml.jackson.dataformat.yaml.*,
+              !com.google.common.*,
               !com.lmax.disruptor.*,
               !com.sun.jna.*,
               !com.sun.management*,
@@ -195,12 +202,14 @@
               !org.jctools.queues.*,
               !org.locationtech.jts.geom.*,
               !org.locationtech.spatial4j.*,
+              !org.tartarus.*,
               !org.zeromq.*,
               !com.github.mustachejava.*,
               *
             </Import-Package>
             <Export-Package>
               org.apache.logging.log4j*,
+              org.apache.lucene.*,
               org.opencastproject.elasticsearch.impl;version=${project.version}
             </Export-Package>
             <Embed-Dependency>
@@ -212,6 +221,7 @@
               lang-mustache-client,
               lucene-core,
               lucene-join,
+              lucene-queries,
               lucene-queryparser,
               rank-eval-client,
               httpasyncclient,
