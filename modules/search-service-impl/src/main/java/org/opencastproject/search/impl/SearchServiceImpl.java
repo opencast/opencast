@@ -53,6 +53,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
+import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -73,6 +74,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.elasticsearch.ElasticsearchStatusException;
+import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -471,6 +473,19 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     }
   }
 
+  private Map<String, List<String>> mapDublinCore(DublinCoreCatalog dublinCoreCatalog) {
+    var metadata = new HashMap<String, List<String>>();
+    for (var entry : dublinCoreCatalog.getValues().entrySet()){
+      var key = entry.getKey().getLocalName();
+      var values = entry.getValue().stream()
+          .map(DublinCoreValue::getValue)
+          .collect(Collectors.toList());
+      metadata.put(key, values);
+    }
+    return metadata;
+
+  }
+
   /**
    * Immediately adds the mediapackage to the search index.
    *
@@ -479,7 +494,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * @throws SearchException
    *           if the media package cannot be added to the search index
    * @throws IllegalArgumentException
-   *           if the mediapackage is <code>null</code>
+   *           if the media package is <code>null</code>
    * @throws UnauthorizedException
    *           if the user does not have the rights to add the mediapackage
    */
@@ -501,17 +516,9 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
     // Elasticsearch
 
-    var metadata = new HashMap<String, List<String>>();
-    var dublinCore = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage)
-        .map(DublinCoreCatalog::getValues)
+    var metadata = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage)
+        .map(this::mapDublinCore)
         .orElse(Collections.emptyMap());
-    for (var entry : dublinCore.entrySet()){
-      var key = entry.getKey().getLocalName();
-      var values = entry.getValue().stream()
-          .map(DublinCoreValue::getValue)
-          .collect(Collectors.toList());
-      metadata.put(key, values);
-    }
     Map<String, Object> data = Map.of(
         "id", mediaPackageId,
         "media_package", MediaPackageParser.getAsXml(mediaPackage),
@@ -521,13 +528,40 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
         "acl", searchableAcl(acl),
         "type", IndexEntryType.Episode.name()
     );
-    var request = new IndexRequest("opencast_search");
-    request.id(mediaPackageId);
-    request.source(data);
     try {
+      var request = new IndexRequest("opencast_search");
+      request.id(mediaPackageId);
+      request.source(data);
       elasticsearchIndex.getClient().index(request, RequestOptions.DEFAULT);
     } catch (IOException e) {
       throw new SearchException(e);
+    }
+
+    // Elasticsearch series
+    for (var seriesId: metadata.getOrDefault("isPartOf", Collections.emptyList())) {
+      try {
+        var series = mapDublinCore(seriesService.getSeries(seriesId));
+        var seriesAcl2 = persistence.getAccessControlLists(seriesId, mediaPackageId).stream() //TODO: rename
+            .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
+        Map<String, Object> seriesData = Map.of(
+            "id", seriesId,
+            "org", getSecurityService().getOrganization().getId(),
+            "dc", series,
+            "modified", DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now()),
+            "acl", searchableAcl(seriesAcl2),
+            "type", IndexEntryType.Series.name()
+        );
+        try {
+          var request = new IndexRequest("opencast_search");
+          request.id(seriesId);
+          request.source(seriesData);
+          elasticsearchIndex.getClient().index(request, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+          throw new SearchException(e);
+        }
+      } catch (NotFoundException | SeriesException e) {
+        logger.warn("Could not get series {} from series service. Skipping its publication", seriesId);
+      }
     }
 
     // Solr
@@ -582,12 +616,21 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * Immediately removes the given mediapackage from the search service.
    *
    * @param mediaPackageId
-   *          the mediapackage
+   *          the media package identifier
    * @return <code>true</code> if the mediapackage was deleted
    * @throws SearchException
    *           if deletion failed
    */
   public boolean deleteSynchronously(final String mediaPackageId) throws SearchException {
+
+    // TODO: Permission checks
+    try {
+      var deleteRequest = new DeleteRequest("opencast_search", mediaPackageId);
+      elasticsearchIndex.getClient().delete(deleteRequest, RequestOptions.DEFAULT);
+    } catch (IOException e) {
+      throw new SearchException("Could not delete episode " + mediaPackageId + " from index", e);
+    }
+
     SearchResult result;
     try {
       result = solrRequester.getForWrite(new SearchQuery().withId(mediaPackageId));
@@ -644,6 +687,13 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * @throws SearchException
    */
   public boolean deleteSeriesSynchronously(String seriesId) throws SearchException {
+    try {
+      var deleteRequest = new DeleteRequest("opencast_search", seriesId);
+      elasticsearchIndex.getClient().delete(deleteRequest, RequestOptions.DEFAULT);
+    } catch (IOException e) {
+      throw new SearchException("Could not delete series " + seriesId + " from index", e);
+    }
+
     SearchResult result;
     try {
       SearchQuery searchQuery = new SearchQuery();

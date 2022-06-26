@@ -249,6 +249,119 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
   }
 
   @GET
+  @Path("s.json")
+  @Produces( MediaType.APPLICATION_JSON )
+  @RestQuery(
+      name = "get_series",
+      description = "Search for series matching the query parameters.",
+      restParameters = {
+          @RestParameter(
+              name = "id",
+              isRequired = false,
+              type = RestParameter.Type.STRING,
+              description = "The series ID. If the additional boolean parameter \"episodes\" is \"true\", "
+                  + "the result set will include this series episodes."
+          ),
+          @RestParameter(
+              name = "q",
+              isRequired = false,
+              type = RestParameter.Type.STRING,
+              description = "Any series that matches this free-text query."
+          ),
+          @RestParameter(
+              name = "sort",
+              isRequired = false,
+              type = RestParameter.Type.STRING,
+              description = "The sort order.  May include any of the following: "
+                  + "DATE_CREATED, DATE_MODIFIED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
+                  + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER. "
+                  + "Add '_DESC' to reverse the sort order (e.g. TITLE_DESC)."
+          ),
+          @RestParameter(
+              name = "limit",
+              isRequired = false,
+              type = RestParameter.Type.INTEGER,
+              defaultValue = "20",
+              description = "The maximum number of items to return per page."
+          ),
+          @RestParameter(
+              name = "offset",
+              isRequired = false,
+              type = RestParameter.Type.INTEGER,
+              defaultValue = "0",
+              description = "The page number."
+          )
+      },
+      responses = {
+          @RestResponse(
+              description = "The request was processed successfully.",
+              responseCode = HttpServletResponse.SC_OK
+          )
+      },
+      returnDescription = "The search results, formatted as XML or JSON."
+  )
+  public Response getSeries(
+      @QueryParam("id")       String  id,
+      @QueryParam("q")        String  text,
+      @QueryParam("sort")     String  sort,
+      @QueryParam("limit")    String  limit,
+      @QueryParam("offset")   String  offset
+  ) throws SearchException, UnauthorizedException {
+
+    final var org = securityService.getOrganization().getId();
+    final var type = SearchServiceImpl.IndexEntryType.Series.name();
+    final var query = QueryBuilders.boolQuery()
+        .must(QueryBuilders.termQuery("org", org))
+        .must(QueryBuilders.termQuery("type", type));
+
+    if (StringUtils.isNotEmpty(id)) {
+      query.must(QueryBuilders.idsQuery().addIds(id));
+    }
+
+    if (StringUtils.isNotEmpty(text)) {
+      query.must(QueryBuilders.multiMatchQuery(text,
+          "dc.abstract",
+          "dc.contributor",
+          "dc.creator",
+          "dc.description",
+          "dc.publisher",
+          "dc.subject",
+          "dc.title"));
+    }
+
+    var user = securityService.getUser();
+    var orgAdminRole = securityService.getOrganization().getAdminRole();
+    if (!user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) && !user.hasRole(orgAdminRole)) {
+      var roleQuery = QueryBuilders.boolQuery();
+      for (var role: user.getRoles()) {
+        roleQuery.should(QueryBuilders.termQuery("acl.read", role.getName()));
+      }
+      query.must(roleQuery);
+    }
+
+    var size = NumberUtils.toInt(limit, 20);
+    var from = NumberUtils.toInt(offset) * size;
+    if (size < 0 || from < 0) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("Limit and offset may not be negative.")
+          .build();
+    }
+    var searchSource = new SearchSourceBuilder()
+        .query(query)
+        .from(from)
+        .size(size);
+
+    var result = Arrays.stream(searchService.search(searchSource)
+            .getHits()
+            .getHits())
+        .map(SearchHit::getSourceAsMap)
+        .collect(Collectors.toList());
+
+    return Response.ok(gson.toJson(result)).build();
+
+  }
+
+  @GET
   @Path("series.{format:xml|json}")
   @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
   @RestQuery(
@@ -578,7 +691,6 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     return rb.build();
   }
 
-  // CHECKSTYLE:OFF
   @GET
   @Path("event.json")
   @Produces( MediaType.APPLICATION_JSON )
@@ -655,12 +767,11 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       @QueryParam("q") String text,
       @QueryParam("sid") String seriesId,
       @QueryParam("sname") String seriesName, // TODO
-      @QueryParam("sort") String sort,
+      @QueryParam("sort") String sort, // TODO
       @QueryParam("limit") String limit,
       @QueryParam("offset") String offset,
-      @QueryParam("sign") String sign
+      @QueryParam("sign") String sign // TODO
   ) throws SearchException, UnauthorizedException {
-    // CHECKSTYLE:ON
 
     // There can only be one, sid or sname
     if (StringUtils.isNoneEmpty(seriesName, seriesId)) {
