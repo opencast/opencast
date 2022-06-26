@@ -21,6 +21,7 @@
 
 package org.opencastproject.themes;
 
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.elasticsearch.api.SearchResult;
@@ -80,6 +81,7 @@ public class ThemesServiceDatabaseTest {
 
     themesDatabase = new ThemesServiceDatabaseImpl();
     themesDatabase.setEntityManagerFactory(newEntityManagerFactory(ThemesServiceDatabaseImpl.PERSISTENCE_UNIT));
+    themesDatabase.setDBSessionFactory(getDbSessionFactory());
     themesDatabase.setSecurityService(securityService);
     themesDatabase.setUserDirectoryService(userDirectoryService);
     themesDatabase.setIndex(index);

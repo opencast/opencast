@@ -23,6 +23,7 @@ package org.opencastproject.serviceregistry.impl;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.job.api.Job;
@@ -72,6 +73,7 @@ public class ServiceRegistrationTest {
   public void setUp() throws Exception {
     serviceRegistry = new ServiceRegistryJpaImpl();
     serviceRegistry.setEntityManagerFactory(newEntityManagerFactory(ServiceRegistryJpaImpl.PERSISTENCE_UNIT));
+    serviceRegistry.setDBSessionFactory(getDbSessionFactory());
     serviceRegistry.activate(null);
 
     Organization organization = new DefaultOrganization();
@@ -117,7 +119,7 @@ public class ServiceRegistrationTest {
   public void testServiceRegistrationsByLoad() throws Exception {
     List<ServiceRegistration> services = serviceRegistry.getServiceRegistrations();
     List<HostRegistration> hosts = serviceRegistry.getHostRegistrations();
-    SystemLoad hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager());
+    SystemLoad hostLoads = serviceRegistry.getHostLoadsQuery().apply(serviceRegistry.emf.createEntityManager());
     List<ServiceRegistration> availableServices = serviceRegistry.getServiceRegistrationsByLoad(JOB_TYPE_1, services,
             hosts, hostLoads);
 
@@ -131,7 +133,7 @@ public class ServiceRegistrationTest {
     job = serviceRegistry.updateJob(job);
 
     // Recalculate the number of available services
-    hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager());
+    hostLoads = serviceRegistry.getHostLoadsQuery().apply(serviceRegistry.emf.createEntityManager());
     availableServices = serviceRegistry.getServiceRegistrationsByLoad(JOB_TYPE_1, services, hosts, hostLoads);
 
     // Since the host load is not taken into account, still all tree services should show up
@@ -149,7 +151,7 @@ public class ServiceRegistrationTest {
   public void testHostCapacity() throws Exception {
     List<ServiceRegistration> services = serviceRegistry.getServiceRegistrations();
     List<HostRegistration> hosts = serviceRegistry.getHostRegistrations();
-    SystemLoad hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager());
+    SystemLoad hostLoads = serviceRegistry.getHostLoadsQuery().apply(serviceRegistry.emf.createEntityManager());
     List<ServiceRegistration> availableServices = serviceRegistry.getServiceRegistrationsWithCapacity(JOB_TYPE_1,
             services, hosts, hostLoads);
 
@@ -163,7 +165,7 @@ public class ServiceRegistrationTest {
     job = serviceRegistry.updateJob(job);
 
     // Recalculate the number of available services
-    hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager());
+    hostLoads = serviceRegistry.getHostLoadsQuery().apply(serviceRegistry.emf.createEntityManager());
     availableServices = serviceRegistry.getServiceRegistrationsWithCapacity(JOB_TYPE_1, services, hosts, hostLoads);
 
     // Since host 1 is now maxed out, only two more services should show up

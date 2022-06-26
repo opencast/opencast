@@ -24,6 +24,7 @@ package org.opencastproject.search.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.security.api.Permissions.Action.READ;
 import static org.opencastproject.security.api.Permissions.Action.WRITE;
@@ -201,8 +202,9 @@ public class SearchServiceImplTest {
     // Persistence storage
     searchDatabase = new SearchServiceDatabaseImpl();
     searchDatabase.setEntityManagerFactory(emf);
-    searchDatabase.activate(null);
+    searchDatabase.setDBSessionFactory(getDbSessionFactory());
     searchDatabase.setSecurityService(securityService);
+    searchDatabase.activate(null);
 
     // search service
     service = new SearchServiceImpl();

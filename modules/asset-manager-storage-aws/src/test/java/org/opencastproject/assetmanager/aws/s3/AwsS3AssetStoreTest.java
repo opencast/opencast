@@ -21,6 +21,7 @@
 
 package org.opencastproject.assetmanager.aws.s3;
 
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
@@ -91,6 +92,7 @@ public class AwsS3AssetStoreTest {
 
     database = new AwsAssetDatabaseImpl();
     database.setEntityManagerFactory(newEntityManagerFactory(AwsAssetDatabaseImpl.PERSISTENCE_UNIT));
+    database.setDBSessionFactory(getDbSessionFactory());
     database.activate(cc);
 
     uri = getClass().getClassLoader().getResource(FILE_NAME).toURI();

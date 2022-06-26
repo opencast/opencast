@@ -26,7 +26,8 @@ import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.workflow.api.WorkflowOperationResult.Action.CONTINUE;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
@@ -223,7 +224,8 @@ public class WorkflowServiceImplTest {
     service.setWorkspace(workspace);
 
     WorkflowServiceDatabaseImpl workflowDb = new WorkflowServiceDatabaseImpl();
-    workflowDb.setEntityManagerFactory(newTestEntityManagerFactory(WorkflowServiceDatabaseImpl.PERSISTENCE_UNIT));
+    workflowDb.setEntityManagerFactory(newEntityManagerFactory(WorkflowServiceDatabaseImpl.PERSISTENCE_UNIT));
+    workflowDb.setDBSessionFactory(getDbSessionFactory());
     workflowDb.setSecurityService(securityService);
     workflowDb.activate(null);
     service.setPersistence(workflowDb);
@@ -237,7 +239,7 @@ public class WorkflowServiceImplTest {
       WorkflowDefinition exceptionHandler = XmlWorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
 
-      /* The exception handler workflow definition needs to be registered as the reference to it in 
+      /* The exception handler workflow definition needs to be registered as the reference to it in
          workflow-definition-3 will be checked */
       scanner.putWorkflowDefinition(
               new WorkflowIdentifier("exception-handler", securityService.getOrganization().getId()), exceptionHandler);

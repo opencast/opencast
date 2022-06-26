@@ -20,6 +20,7 @@
  */
 package org.opencastproject.transcription.ibmwatson;
 
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -195,6 +196,7 @@ public class IBMWatsonTranscriptionServiceTest {
       }
     };
     database.setEntityManagerFactory(newEntityManagerFactory("org.opencastproject.transcription.persistence"));
+    database.setDBSessionFactory(getDbSessionFactory());
     database.activate(null);
 
     httpClient = EasyMock.createNiceMock(CloseableHttpClient.class);

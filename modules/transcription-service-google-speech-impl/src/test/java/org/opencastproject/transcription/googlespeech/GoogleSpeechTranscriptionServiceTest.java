@@ -20,6 +20,7 @@
  */
 package org.opencastproject.transcription.googlespeech;
 
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -189,6 +190,7 @@ public class GoogleSpeechTranscriptionServiceTest {
       }
     };
     database.setEntityManagerFactory(newEntityManagerFactory("org.opencastproject.transcription.persistence"));
+    database.setDBSessionFactory(getDbSessionFactory());
     database.activate(null);
 
     httpClient = EasyMock.createNiceMock(CloseableHttpClient.class);

@@ -32,6 +32,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newDBSession;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_AVAILABLE;
@@ -316,6 +317,7 @@ public class SchedulerServiceImplTest {
     schedulerDatabase = new SchedulerServiceDatabaseImpl();
     EntityManagerFactory emf = newEntityManagerFactory(SchedulerServiceDatabaseImpl.PERSISTENCE_UNIT);
     schedulerDatabase.setEntityManagerFactory(emf);
+    schedulerDatabase.setDBSessionFactory(getDbSessionFactory());
     schedulerDatabase.setSecurityService(securityService);
     schedulerDatabase.activate(null);
     schedSvc.setPersistence(schedulerDatabase);

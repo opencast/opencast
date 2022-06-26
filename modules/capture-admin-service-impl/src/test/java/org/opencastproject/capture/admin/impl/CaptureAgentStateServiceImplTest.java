@@ -30,6 +30,7 @@ import static org.opencastproject.capture.admin.api.AgentState.IDLE;
 import static org.opencastproject.capture.admin.api.AgentState.OFFLINE;
 import static org.opencastproject.capture.admin.api.AgentState.UNKNOWN;
 import static org.opencastproject.capture.admin.api.AgentState.UPLOADING;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.capture.CaptureParameters;
@@ -92,9 +93,9 @@ public class CaptureAgentStateServiceImplTest {
   }
 
   private void setupService() throws Exception {
-
     service = new CaptureAgentStateServiceImpl();
     service.setEntityManagerFactory(newEntityManagerFactory(CaptureAgentStateServiceImpl.PERSISTENCE_UNIT));
+    service.setDBSessionFactory(getDbSessionFactory());
 
     DefaultOrganization organization = new DefaultOrganization();
 

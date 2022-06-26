@@ -27,7 +27,7 @@ import static org.easymock.EasyMock.getCurrentArguments;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
+import static org.opencastproject.db.DBTestEnv.newDBSession;
 import static org.opencastproject.metadata.dublincore.EncodingSchemeUtils.encodeDate;
 import static org.opencastproject.security.util.SecurityUtil.createSystemUser;
 import static org.opencastproject.util.data.Collections.nil;
@@ -35,6 +35,7 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
 import static org.xmlmatchers.XmlMatchers.hasXPath;
 import static org.xmlmatchers.xpath.XpathReturnType.returningANumber;
 
+import org.opencastproject.db.DBSession;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.metadata.dublincore.Precision;
@@ -64,7 +65,6 @@ import java.io.FileInputStream;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.EntityManagerFactory;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
@@ -267,11 +267,11 @@ public class OaiPmhRepositoryPersistenceTest {
       }).anyTimes();
       EasyMock.replay(workspace);
       // oai-pmh database
-      final EntityManagerFactory emf = newEntityManagerFactory(OaiPmhDatabaseImpl.PERSISTENCE_UNIT_NAME);
+      final DBSession dbSession = newDBSession(OaiPmhDatabaseImpl.PERSISTENCE_UNIT_NAME);
       final AbstractOaiPmhDatabase db = new AbstractOaiPmhDatabase() {
         @Override
-        public EntityManagerFactory getEmf() {
-          return emf;
+        public DBSession getDBSession() {
+          return dbSession;
         }
 
         @Override
@@ -283,7 +283,6 @@ public class OaiPmhRepositoryPersistenceTest {
         public Workspace getWorkspace() {
           return workspace;
         }
-
       };
       for (MediaPackage mp : mps)
         db.store(mp, REPOSITORY_ID);

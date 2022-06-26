@@ -21,6 +21,7 @@
 
 package org.opencastproject.scheduler.impl.persistence;
 
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.security.api.DefaultOrganization;
@@ -59,8 +60,8 @@ public class SchedulerServiceDatabaseImplTest {
     EasyMock.replay(securityService);
 
     schedulerDatabase = new SchedulerServiceDatabaseImpl();
-    schedulerDatabase
-        .setEntityManagerFactory(newEntityManagerFactory(SchedulerServiceDatabaseImpl.PERSISTENCE_UNIT));
+    schedulerDatabase.setEntityManagerFactory(newEntityManagerFactory(SchedulerServiceDatabaseImpl.PERSISTENCE_UNIT));
+    schedulerDatabase.setDBSessionFactory(getDbSessionFactory());
     schedulerDatabase.setSecurityService(securityService);
     schedulerDatabase.activate(null);
   }

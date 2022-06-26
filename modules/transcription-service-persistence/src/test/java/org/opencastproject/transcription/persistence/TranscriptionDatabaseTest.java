@@ -20,6 +20,7 @@
  */
 package org.opencastproject.transcription.persistence;
 
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.junit.After;
@@ -60,6 +61,7 @@ public class TranscriptionDatabaseTest {
       }
     };
     database.setEntityManagerFactory(newEntityManagerFactory("org.opencastproject.transcription.persistence"));
+    database.setDBSessionFactory(getDbSessionFactory());
     database.activate(null);
   }
 

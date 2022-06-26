@@ -21,6 +21,10 @@
 
 package org.opencastproject.themes.persistence;
 
+import static org.opencastproject.db.Queries.namedQuery;
+
+import org.opencastproject.db.DBSession;
+import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
@@ -38,6 +42,7 @@ import org.opencastproject.themes.ThemesServiceDatabase;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -49,13 +54,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 
 /**
  * Implements {@link ThemesServiceDatabase}. Defines permanent storage for themes.
@@ -76,6 +78,10 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
 
   /** Factory used to create {@link EntityManager}s for transactions */
   protected EntityManagerFactory emf;
+
+  protected DBSessionFactory dbSessionFactory;
+
+  protected DBSession db;
 
   /** The security service */
   protected SecurityService securityService;
@@ -101,12 +107,18 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for themes");
     this.cc = cc;
+    db = dbSessionFactory.createSession(emf);
   }
 
   /** OSGi DI */
   @Reference(target = "(osgi.unit.name=org.opencastproject.themes)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
+  }
+
+  @Reference
+  public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
+    this.dbSessionFactory = dbSessionFactory;
   }
 
   /**
@@ -145,93 +157,66 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
 
   @Override
   public Theme getTheme(long id) throws ThemesServiceDatabaseException, NotFoundException {
-    EntityManager em = null;
     try {
-      em = emf.createEntityManager();
-      ThemeDto themeDto = getThemeDto(id, em);
-      if (themeDto == null) {
-        throw new NotFoundException("No theme with id=" + id + " exists");
-      }
-
-      return themeDto.toTheme(userDirectoryService);
+      return db.exec(getThemeDtoQuery(id))
+          .map(t -> t.toTheme(userDirectoryService))
+          .orElseThrow(() -> new NotFoundException("No theme with id=" + id + " exists"));
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
       logger.error("Could not get theme", e);
       throw new ThemesServiceDatabaseException(e);
-    } finally {
-      if (em != null) {
-        em.close();
-      }
     }
   }
 
   private List<Theme> getThemes() throws ThemesServiceDatabaseException {
-    EntityManager em = null;
     try {
-      em = emf.createEntityManager();
       String orgId = securityService.getOrganization().getId();
-      TypedQuery<ThemeDto> q = em.createNamedQuery("Themes.findByOrg", ThemeDto.class).setParameter("org", orgId);
-      List<ThemeDto> themeDtos = q.getResultList();
-
-      List<Theme> themes = new ArrayList<>();
-      for (ThemeDto themeDto : themeDtos) {
-        themes.add(themeDto.toTheme(userDirectoryService));
-      }
-      return themes;
+      return db.exec(namedQuery.findAll(
+          "Themes.findByOrg",
+              ThemeDto.class,
+              Pair.of("org", orgId)
+          )).stream()
+          .map(t -> t.toTheme(userDirectoryService))
+          .collect(Collectors.toList());
     } catch (Exception e) {
       logger.error("Could not get themes", e);
       throw new ThemesServiceDatabaseException(e);
-    } finally {
-      if (em != null) {
-        em.close();
-      }
     }
   }
 
   @Override
-  public Theme updateTheme(Theme theme) throws ThemesServiceDatabaseException {
-    EntityManager em = null;
-    EntityTransaction tx = null;
+  public Theme updateTheme(final Theme theme) throws ThemesServiceDatabaseException {
     try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
+      Theme newTheme = db.execTxChecked(em -> {
+        ThemeDto themeDto = null;
+        if (theme.getId().isSome()) {
+          themeDto = getThemeDtoQuery(theme.getId().get()).apply(em).orElse(null);
+        }
 
-      ThemeDto themeDto = null;
-      if (theme.getId().isSome()) {
-        themeDto = getThemeDto(theme.getId().get(), em);
-      }
+        if (themeDto == null) {
+          // no theme stored, create new entity
+          themeDto = new ThemeDto();
+          themeDto.setOrganization(securityService.getOrganization().getId());
+          updateTheme(theme, themeDto);
+          em.persist(themeDto);
+        } else {
+          updateTheme(theme, themeDto);
+          em.merge(themeDto);
+        }
 
-      if (themeDto == null) {
-        // no theme stored, create new entity
-        themeDto = new ThemeDto();
-        themeDto.setOrganization(securityService.getOrganization().getId());
-        updateTheme(theme, themeDto);
-        em.persist(themeDto);
-      } else {
-        updateTheme(theme, themeDto);
-        em.merge(themeDto);
-      }
-      tx.commit();
-      theme = themeDto.toTheme(userDirectoryService);
+        return themeDto.toTheme(userDirectoryService);
+      });
 
       // update the elasticsearch indices
       String orgId = securityService.getOrganization().getId();
       User user = securityService.getUser();
-      updateThemeInIndex(theme, orgId, user);
+      updateThemeInIndex(newTheme, orgId, user);
 
-      return theme;
+      return newTheme;
     } catch (Exception e) {
       logger.error("Could not update theme {}", theme, e);
-      if (tx.isActive()) {
-        tx.rollback();
-      }
       throw new ThemesServiceDatabaseException(e);
-    } finally {
-      if (em != null) {
-        em.close();
-      }
     }
   }
 
@@ -261,19 +246,12 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
 
   @Override
   public void deleteTheme(long id) throws ThemesServiceDatabaseException, NotFoundException {
-    EntityManager em = null;
-    EntityTransaction tx = null;
     try {
-      em = emf.createEntityManager();
-      ThemeDto themeDto = getThemeDto(id, em);
-      if (themeDto == null) {
-        throw new NotFoundException("No theme with id=" + id + " exists");
-      }
-
-      tx = em.getTransaction();
-      tx.begin();
-      em.remove(themeDto);
-      tx.commit();
+      db.execTxChecked(em -> {
+        ThemeDto themeDto = getThemeDtoQuery(id).apply(em)
+            .orElseThrow(() -> new NotFoundException("No theme with id=" + id + " exists"));
+        namedQuery.remove(themeDto).accept(em);
+      });
 
       // update the elasticsearch indices
       String organization = securityService.getOrganization().getId();
@@ -282,33 +260,22 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
       throw e;
     } catch (Exception e) {
       logger.error("Could not delete theme '{}'", id, e);
-      if (tx != null && tx.isActive()) {
-        tx.rollback();
-      }
       throw new ThemesServiceDatabaseException(e);
-    } finally {
-      if (em != null) {
-        em.close();
-      }
     }
   }
 
   @Override
   public int countThemes() throws ThemesServiceDatabaseException {
-    EntityManager em = null;
     try {
-      em = emf.createEntityManager();
       String orgId = securityService.getOrganization().getId();
-      Query q = em.createNamedQuery("Themes.count").setParameter("org", orgId);
-      Number countResult = (Number) q.getSingleResult();
-      return countResult.intValue();
+      return db.exec(namedQuery.find(
+          "Themes.count",
+          Number.class,
+          Pair.of("org", orgId)
+      )).intValue();
     } catch (Exception e) {
       logger.error("Could not count themes", e);
       throw new ThemesServiceDatabaseException(e);
-    } finally {
-      if (em != null) {
-        em.close();
-      }
     }
   }
 
@@ -317,18 +284,16 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    *
    * @param id
    *          the theme identifier
-   * @param em
-   *          an open entity manager
-   * @return the theme entity, or null if not found
+   * @return a query function returning an optional theme entity
    */
-  private ThemeDto getThemeDto(long id, EntityManager em) {
+  private Function<EntityManager, Optional<ThemeDto>> getThemeDtoQuery(long id) {
     String orgId = securityService.getOrganization().getId();
-    Query q = em.createNamedQuery("Themes.findById").setParameter("id", id).setParameter("org", orgId);
-    try {
-      return (ThemeDto) q.getSingleResult();
-    } catch (NoResultException e) {
-      return null;
-    }
+    return namedQuery.findOpt(
+        "Themes.findById",
+        ThemeDto.class,
+        Pair.of("id", id),
+        Pair.of("org", orgId)
+    );
   }
 
   @Override
@@ -398,8 +363,6 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    * Update the theme in the ElasticSearch index.
    *  @param theme
    *           the theme to update
-   * @param index
-   *           the index to update
    * @param orgId
    *           the organization the theme belongs to
    * @param user

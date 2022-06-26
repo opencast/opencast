@@ -24,11 +24,11 @@ package org.opencastproject.event.comment.persistence;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.event.comment.persistence.EventCommentDatabaseServiceImpl.PERSISTENCE_UNIT;
 import static org.opencastproject.util.data.Option.none;
 
-import org.opencastproject.db.DBSessionFactoryImpl;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
@@ -98,7 +98,7 @@ public class EventCommentDatabaseImplTest {
 
     persistence = new EventCommentDatabaseServiceImpl();
     persistence.setEntityManagerFactory(newEntityManagerFactory(PERSISTENCE_UNIT));
-    persistence.setDBSessionFactory(new DBSessionFactoryImpl());
+    persistence.setDBSessionFactory(getDbSessionFactory());
     persistence.setUserDirectoryService(userDirectoryService);
     persistence.setSecurityService(securityService);
     persistence.setIndex(index);

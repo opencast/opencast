@@ -21,6 +21,7 @@
 
 package org.opencastproject.kernel.security.persistence;
 
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.kernel.security.persistence.OrganizationDatabaseImpl.PERSISTENCE_UNIT;
 
@@ -66,6 +67,7 @@ public class OrganizationPersistenceTest {
 
     organizationDatabase = new OrganizationDatabaseImpl();
     organizationDatabase.setEntityManagerFactory(newEntityManagerFactory(PERSISTENCE_UNIT));
+    organizationDatabase.setDBSessionFactory(getDbSessionFactory());
     organizationDatabase.setSecurityService(securityService);
     organizationDatabase.activate(null);
   }

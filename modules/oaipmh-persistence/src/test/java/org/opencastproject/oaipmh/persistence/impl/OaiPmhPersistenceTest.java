@@ -20,6 +20,7 @@
  */
 package org.opencastproject.oaipmh.persistence.impl;
 
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.oaipmh.persistence.QueryBuilder.query;
 import static org.opencastproject.oaipmh.persistence.QueryBuilder.queryRepo;
@@ -87,6 +88,7 @@ public class OaiPmhPersistenceTest {
 
     oaiPmhDatabase = new OaiPmhDatabaseImpl();
     oaiPmhDatabase.setEntityManagerFactory(newEntityManagerFactory(OaiPmhDatabaseImpl.PERSISTENCE_UNIT_NAME));
+    oaiPmhDatabase.setDBSessionFactory(getDbSessionFactory());
     oaiPmhDatabase.setSecurityService(securityService);
     oaiPmhDatabase.setWorkspace(workspace);
     oaiPmhDatabase.activate(null);

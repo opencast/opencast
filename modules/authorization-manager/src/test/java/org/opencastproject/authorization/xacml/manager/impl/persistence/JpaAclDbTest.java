@@ -24,6 +24,7 @@ package org.opencastproject.authorization.xacml.manager.impl.persistence;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.security.api.AccessControlUtil.acl;
 import static org.opencastproject.security.api.AccessControlUtil.entries;
@@ -32,7 +33,6 @@ import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
-import org.opencastproject.db.DBSessionFactoryImpl;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
@@ -54,7 +54,7 @@ public final class JpaAclDbTest {
 
     db = new JpaAclDb();
     db.setEntityManagerFactory(emf);
-    db.setDBSessionFactory(new DBSessionFactoryImpl());
+    db.setDBSessionFactory(getDbSessionFactory());
     db.activate();
 
     // add ACL to org1

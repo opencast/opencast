@@ -20,6 +20,9 @@
  */
 package org.opencastproject.transcription.persistence;
 
+import org.opencastproject.db.DBSession;
+import org.opencastproject.db.DBSessionFactory;
+
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -27,12 +30,11 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.spi.PersistenceProvider;
 
 @Component(
     immediate = true,
@@ -50,14 +52,13 @@ public class TranscriptionDatabaseImpl implements TranscriptionDatabase {
   private static final Logger logger = LoggerFactory.getLogger(TranscriptionDatabaseImpl.class);
 
   /**
-   * Persistence provider set by OSGi
-   */
-  private PersistenceProvider persistenceProvider;
-
-  /**
    * Factory used to create entity managers for transactions
    */
   protected EntityManagerFactory emf;
+
+  protected DBSessionFactory dbSessionFactory;
+
+  protected DBSession db;
 
   private final long noProviderId = -1;
 
@@ -67,6 +68,7 @@ public class TranscriptionDatabaseImpl implements TranscriptionDatabase {
   @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for transcription service");
+    db = dbSessionFactory.createSession(emf);
   }
 
   @Reference(target = "(osgi.unit.name=org.opencastproject.transcription.persistence)")
@@ -74,21 +76,21 @@ public class TranscriptionDatabaseImpl implements TranscriptionDatabase {
     this.emf = emf;
   }
 
-  /**
-   * OSGi callback to set persistence provider.
-   */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
+  @Reference
+  public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
+    this.dbSessionFactory = dbSessionFactory;
   }
 
   public TranscriptionJobControl storeJobControl(String mpId, String trackId, String jobId, String jobStatus,
           long trackDuration, Date dateExpected, String provider) throws TranscriptionDatabaseException {
     long providerId = getProviderId(provider);
     if (providerId != noProviderId) {
-      TranscriptionJobControlDto dto = TranscriptionJobControlDto.store(emf.createEntityManager(), mpId, trackId, jobId,
-              jobStatus, trackDuration, dateExpected, providerId);
-      if (dto != null) {
-        return dto.toTranscriptionJobControl();
+      try {
+        return db.execTx(TranscriptionJobControlDto.storeQuery(mpId, trackId, jobId, jobStatus, trackDuration,
+                dateExpected, providerId))
+            .toTranscriptionJobControl();
+      } catch (Exception e) {
+        throw new TranscriptionDatabaseException(e);
       }
     }
     return null;
@@ -96,93 +98,107 @@ public class TranscriptionDatabaseImpl implements TranscriptionDatabase {
 
   @Override
   public TranscriptionProviderControl storeProviderControl(String provider) throws TranscriptionDatabaseException {
-    TranscriptionProviderControlDto dto
-        = TranscriptionProviderControlDto.storeProvider(emf.createEntityManager(), provider);
-    if (dto != null) {
+    try {
+      TranscriptionProviderControlDto dto = db.execTx(TranscriptionProviderControlDto.storeProviderQuery(provider));
       logger.info("Transcription provider '{}' stored", provider);
       return dto.toTranscriptionProviderControl();
+    } catch (Exception e) {
+      throw new TranscriptionDatabaseException(e);
     }
-    logger.warn("Unable to store transcription provider '{}'", provider);
-    return null;
   }
 
   @Override
   public void deleteJobControl(String jobId) throws TranscriptionDatabaseException {
-    TranscriptionJobControlDto.delete(emf.createEntityManager(), jobId);
+    try {
+      db.execTx(TranscriptionJobControlDto.delete(jobId));
+    } catch (Exception e) {
+      throw new TranscriptionDatabaseException(e);
+    }
   }
 
   @Override
   public void updateJobControl(String jobId, String jobStatus) throws TranscriptionDatabaseException {
-    TranscriptionJobControlDto.updateStatus(emf.createEntityManager(), jobId, jobStatus);
+    try {
+      db.execTx(TranscriptionJobControlDto.updateStatusQuery(jobId, jobStatus));
+    } catch (Exception e) {
+      throw new TranscriptionDatabaseException(e);
+    }
   }
 
   @Override
   public TranscriptionJobControl findByJob(String jobId) throws TranscriptionDatabaseException {
-    TranscriptionJobControlDto dto = TranscriptionJobControlDto.findByJob(emf.createEntityManager(), jobId);
-    if (dto != null) {
-      return dto.toTranscriptionJobControl();
+    try {
+      return db.exec(TranscriptionJobControlDto.findByJobQuery(jobId))
+          .map(TranscriptionJobControlDto::toTranscriptionJobControl)
+          .orElse(null);
+    } catch (Exception e) {
+      throw new TranscriptionDatabaseException(e);
     }
-    return null;
   }
 
   @Override
   public List<TranscriptionJobControl> findByMediaPackage(String mpId) throws TranscriptionDatabaseException {
-    List<TranscriptionJobControlDto> list = TranscriptionJobControlDto.findByMediaPackage(emf.createEntityManager(),
-            mpId);
-    List<TranscriptionJobControl> resultList = new ArrayList<TranscriptionJobControl>();
-    for (TranscriptionJobControlDto dto : list) {
-      resultList.add(dto.toTranscriptionJobControl());
+    try {
+      return db.exec(TranscriptionJobControlDto.findByMediaPackageQuery(mpId)).stream()
+          .map(TranscriptionJobControlDto::toTranscriptionJobControl)
+          .collect(Collectors.toList());
+    } catch (Exception e) {
+      throw new TranscriptionDatabaseException(e);
     }
-    return resultList;
   }
 
   @Override
   public List<TranscriptionJobControl> findByStatus(String... status) throws TranscriptionDatabaseException {
-    List<TranscriptionJobControlDto> list = TranscriptionJobControlDto.findByStatus(emf.createEntityManager(), status);
-    List<TranscriptionJobControl> resultList = new ArrayList<TranscriptionJobControl>();
-    for (TranscriptionJobControlDto dto : list) {
-      resultList.add(dto.toTranscriptionJobControl());
+    try {
+      return db.exec(TranscriptionJobControlDto.findByStatusQuery(status)).stream()
+          .map(TranscriptionJobControlDto::toTranscriptionJobControl)
+          .collect(Collectors.toList());
+    } catch (Exception e) {
+      throw new TranscriptionDatabaseException(e);
     }
-    return resultList;
   }
 
   @Override
   public List<TranscriptionJobControl> findByMediaPackageTrackAndStatus(String mpId, String trackId, String... status)
           throws TranscriptionDatabaseException {
-    List<TranscriptionJobControlDto> list = TranscriptionJobControlDto
-            .findByMediaPackageTrackAndStatus(emf.createEntityManager(), mpId, trackId, status);
-    List<TranscriptionJobControl> resultList = new ArrayList<TranscriptionJobControl>();
-    for (TranscriptionJobControlDto dto : list) {
-      resultList.add(dto.toTranscriptionJobControl());
+    try {
+      return db.exec(TranscriptionJobControlDto.findByMediaPackageTrackAndStatusQuery(mpId, trackId, status)).stream()
+          .map(TranscriptionJobControlDto::toTranscriptionJobControl)
+          .collect(Collectors.toList());
+    } catch (Exception e) {
+      throw new TranscriptionDatabaseException(e);
     }
-    return resultList;
   }
 
   @Override
   public TranscriptionProviderControl findIdByProvider(String provider) throws TranscriptionDatabaseException {
-    TranscriptionProviderControlDto dtoProvider
-        = TranscriptionProviderControlDto.findIdByProvider(emf.createEntityManager(), provider);
-    if (dtoProvider != null) {
-      return dtoProvider.toTranscriptionProviderControl();
-    } else {
+    try {
+      TranscriptionProviderControl tpc = db.exec(TranscriptionProviderControlDto.findIdByProviderQuery(provider))
+          .map(TranscriptionProviderControlDto::toTranscriptionProviderControl)
+          .orElse(null);
+      if (tpc != null) {
+        return tpc;
+      }
+
       // store provider and retrieve id
       TranscriptionProviderControl dto = storeProviderControl(provider);
-      if (dto != null) {
-        dtoProvider = TranscriptionProviderControlDto.findIdByProvider(emf.createEntityManager(), provider);
-        return dtoProvider.toTranscriptionProviderControl();
-      }
-      return null; // not found
+      return db.exec(TranscriptionProviderControlDto.findIdByProviderQuery(provider))
+          .map(TranscriptionProviderControlDto::toTranscriptionProviderControl)
+          .orElse(null);
+    } catch (Exception e) {
+      throw new TranscriptionDatabaseException(e);
     }
   }
 
   @Override
   public TranscriptionProviderControl findProviderById(Long id) throws TranscriptionDatabaseException {
-    TranscriptionProviderControlDto dtoProvider
-        = TranscriptionProviderControlDto.findProviderById(emf.createEntityManager(), id);
-    if (dtoProvider != null) {
-      return dtoProvider.toTranscriptionProviderControl();
+    try {
+      return db.exec(TranscriptionProviderControlDto.findProviderByIdQuery(id))
+          .map(TranscriptionProviderControlDto::toTranscriptionProviderControl)
+          .orElse(null);
+    } catch (Exception e) {
+      throw new TranscriptionDatabaseException(e);
     }
-    return null;
   }
 
   private long getProviderId(String provider) throws TranscriptionDatabaseException {

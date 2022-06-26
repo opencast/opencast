@@ -24,6 +24,7 @@ package org.opencastproject.userdirectory.endpoint;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.security.api.Group;
@@ -35,7 +36,6 @@ import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
-import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Collections;
 
@@ -66,12 +66,12 @@ public class GroupRoleEndpointTest {
 
     provider = new JpaGroupRoleProvider();
     provider.setSecurityService(securityService);
-    provider.setEntityManagerFactory(newEntityManagerFactory(JpaUserAndRoleProvider.PERSISTENCE_UNIT));
+    provider.setEntityManagerFactory(newEntityManagerFactory(JpaGroupRoleProvider.PERSISTENCE_UNIT));
+    provider.setDBSessionFactory(getDbSessionFactory());
     provider.activate(null);
 
     endpoint = new GroupRoleEndpoint();
     endpoint.setJpaGroupRoleProvider(provider);
-
   }
 
   @Test

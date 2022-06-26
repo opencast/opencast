@@ -21,6 +21,7 @@
 
 package org.opencastproject.search.impl.persistence;
 
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.mediapackage.MediaPackage;
@@ -84,6 +85,7 @@ public class SearchServicePersistenceTest {
 
     searchDatabase = new SearchServiceDatabaseImpl();
     searchDatabase.setEntityManagerFactory(emf);
+    searchDatabase.setDBSessionFactory(getDbSessionFactory());
     searchDatabase.setSecurityService(securityService);
     searchDatabase.activate(null);
 

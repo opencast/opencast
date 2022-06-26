@@ -27,6 +27,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.metadata.dublincore.DublinCore;
@@ -81,6 +82,7 @@ public class SeriesServicePersistenceTest {
 
     seriesDatabase = new SeriesServiceDatabaseImpl();
     seriesDatabase.setEntityManagerFactory(newEntityManagerFactory(SeriesServiceDatabaseImpl.PERSISTENCE_UNIT));
+    seriesDatabase.setDBSessionFactory(getDbSessionFactory());
     DublinCoreCatalogService dcService = new DublinCoreCatalogService();
     seriesDatabase.setDublinCoreService(dcService);
     seriesDatabase.setSecurityService(securityService);

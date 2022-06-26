@@ -21,6 +21,7 @@
 
 package org.opencastproject.assetmanager.aws.persistence;
 
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.assetmanager.api.storage.StoragePath;
@@ -72,6 +73,7 @@ public class AwsAssetDatabaseImplTest {
 
     database = new AwsAssetDatabaseImpl();
     database.setEntityManagerFactory(newEntityManagerFactory(AwsAssetDatabaseImpl.PERSISTENCE_UNIT));
+    database.setDBSessionFactory(getDbSessionFactory());
     database.activate(cc);
   }
 

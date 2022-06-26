@@ -25,6 +25,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.util.data.Collections.list;
 
@@ -104,10 +105,11 @@ public class SeriesServiceImplTest {
 
     seriesDatabase = new SeriesServiceDatabaseImpl();
     seriesDatabase.setEntityManagerFactory(newEntityManagerFactory(SeriesServiceDatabaseImpl.PERSISTENCE_UNIT));
+    seriesDatabase.setDBSessionFactory(getDbSessionFactory());
     dcService = new DublinCoreCatalogService();
     seriesDatabase.setDublinCoreService(dcService);
-    seriesDatabase.activate(null);
     seriesDatabase.setSecurityService(securityService);
+    seriesDatabase.activate(null);
 
     root = PathSupport.concat("target", Long.toString(currentTime));
 
