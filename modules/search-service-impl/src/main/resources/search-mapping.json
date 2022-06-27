@@ -54,6 +54,10 @@
       "type": "keyword"
     },
     "media_package": {
+      "type": "object",
+      "enabled": false
+    },
+    "media_package_xml": {
       "type": "text"
     },
     "modified": {

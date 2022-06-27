@@ -59,7 +59,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -273,10 +275,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               name = "sort",
               isRequired = false,
               type = RestParameter.Type.STRING,
-              description = "The sort order.  May include any of the following: "
-                  + "DATE_CREATED, DATE_MODIFIED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
-                  + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER. "
-                  + "Add '_DESC' to reverse the sort order (e.g. TITLE_DESC)."
+              description = "The sort order.  May include any of the following dublin core metadata: "
+              + "title, contributor, creator, modified. "
+              + "Add ' asc' or ' desc' to specify the sort order (e.g. 'title desc')."
           ),
           @RestParameter(
               name = "limit",
@@ -352,13 +353,33 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         .from(from)
         .size(size);
 
+    if (StringUtils.isNotEmpty(sort)) {
+      var sortParam = StringUtils.split(sort);
+      var validSort = Arrays.asList("title", "contributor", "creator", "modified").contains(sortParam[0]);
+      var validOrder = sortParam.length < 2 || Arrays.asList("asc", "desc").contains(sortParam[1]);
+      if (sortParam.length > 2 || !validSort || !validOrder) {
+        return Response.status(Response.Status.BAD_REQUEST)
+            .entity("Invalid sort parameter")
+            .build();
+      }
+      var order = SortOrder.fromString(sortParam.length > 1 ? sortParam[1] : "asc");
+      searchSource.sort("dc." + sortParam[0], order);
+    }
+
     var result = Arrays.stream(searchService.search(searchSource)
             .getHits()
             .getHits())
         .map(SearchHit::getSourceAsMap)
+        .peek(hit -> hit.remove("type"))
         .collect(Collectors.toList());
 
-    return Response.ok(gson.toJson(result)).build();
+    var total = 0; // TODO (conflicts with Solr): hits.getTotalHits().value;
+    var json = gson.toJsonTree(Map.of(
+        "offset", offset,
+        "total", total,
+        "result", result,
+        "limit", limit));
+    return Response.ok(gson.toJson(json)).build();
 
   }
 
@@ -737,7 +758,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               isRequired = false,
               type = RestParameter.Type.INTEGER,
               defaultValue = "20",
-              description = "The maximum number of items to return per page."
+              description = "The maximum number of items to return per page. Limited to 250 for non-admins."
           ),
           @RestParameter(
               name = "offset",
@@ -832,7 +853,8 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
     var user = securityService.getUser();
     var orgAdminRole = securityService.getOrganization().getAdminRole();
-    if (!user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) && !user.hasRole(orgAdminRole)) {
+    var admin = user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) || user.hasRole(orgAdminRole);
+    if (!admin) {
       var roleQuery = QueryBuilders.boolQuery();
       for (var role: user.getRoles()) {
         roleQuery.should(QueryBuilders.termQuery("acl.read", role.getName()));
@@ -849,6 +871,12 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           .entity("Limit and offset may not be negative.")
           .build();
     }
+    if (!admin && size > 250) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("Only admins are allowed to request more than 250 items.")
+          .build();
+    }
+
     var searchSource = new SearchSourceBuilder()
         .query(query)
         .from(from)
@@ -871,9 +899,17 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         .getHits()
         .getHits())
         .map(SearchHit::getSourceAsMap)
+        .peek(hit -> hit.remove("media_package_xml"))
+        .peek(hit -> hit.remove("type"))
         .collect(Collectors.toList());
+    var total = 0; // TODO (conflicts with Solr): hits.getTotalHits().value;
+    var json = gson.toJsonTree(Map.of(
+        "offset", offset,
+        "total", total,
+        "result", result,
+        "limit", limit));
 
-    return Response.ok(gson.toJson(result)).build();
+    return Response.ok(gson.toJson(json)).build();
   }
 
   @GET

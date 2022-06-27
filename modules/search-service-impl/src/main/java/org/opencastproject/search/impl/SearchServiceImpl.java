@@ -66,6 +66,7 @@ import org.opencastproject.workspace.api.Workspace;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.gson.Gson;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -516,12 +517,14 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
     // Elasticsearch
 
+    var gson = new Gson(); // TODO: make field
     var metadata = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage)
         .map(this::mapDublinCore)
         .orElse(Collections.emptyMap());
     metadata.put("modified", Collections.singletonList(DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now())));
     Map<String, Object> data = Map.of(
-        "media_package", MediaPackageParser.getAsXml(mediaPackage),
+        "media_package", gson.fromJson(MediaPackageParser.getAsJSON(mediaPackage), Map.class),
+        "media_package_xml", MediaPackageParser.getAsXml(mediaPackage),
         "org", getSecurityService().getOrganization().getId(),
         "dc", metadata,
         "acl", searchableAcl(acl),
