@@ -12,7 +12,7 @@
 
 			var search = {};
 			window.location.search.slice(1).split("&").forEach(function (x) {
-				var p = x.split("=");
+				var p = x.split(/=(.*)/);
 				search[p[0]] = p[1];
 			});
 
