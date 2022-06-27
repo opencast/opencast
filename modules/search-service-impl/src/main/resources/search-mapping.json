@@ -16,19 +16,15 @@
           "type": "date"
         },
         "contributor": {
-          "type": "keyword"
+          "type": "keyword",
+          "copy_to": "fulltext"
         },
         "creator": {
-          "type": "keyword"
+          "type": "keyword",
+          "copy_to": "fulltext"
         },
         "extent": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "ignore_above": 256
-            }
-          }
+          "type": "text"
         },
         "identifier": {
           "type": "keyword"
@@ -37,16 +33,27 @@
           "type": "keyword"
         },
         "temporal": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "ignore_above": 256
-            }
-          }
+          "type": "text"
         },
         "title": {
-          "type": "keyword"
+          "type": "keyword",
+          "copy_to": "fulltext"
+        },
+        "publisher": {
+          "type": "keyword",
+          "copy_to": "fulltext"
+        },
+        "subject": {
+          "type": "keyword",
+          "copy_to": "fulltext"
+        },
+        "description": {
+          "type": "keyword",
+          "copy_to": "fulltext"
+        },
+        "abstract": {
+          "type": "keyword",
+          "copy_to": "fulltext"
         }
       }
     },
@@ -68,6 +75,9 @@
     },
     "type": {
       "type": "keyword"
+    },
+    "fulltext": {
+      "type": "text"
     }
   }
 }

@@ -321,14 +321,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     }
 
     if (StringUtils.isNotEmpty(text)) {
-      query.must(QueryBuilders.multiMatchQuery(text,
-          "dc.abstract",
-          "dc.contributor",
-          "dc.creator",
-          "dc.description",
-          "dc.publisher",
-          "dc.subject",
-          "dc.title"));
+      query.must(QueryBuilders.matchQuery("fulltext", text));
     }
 
     var user = securityService.getUser();
@@ -841,14 +834,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     }
 
     if (StringUtils.isNotEmpty(text)) {
-      query.must(QueryBuilders.multiMatchQuery(text,
-          "dc.abstract",
-          "dc.contributor",
-          "dc.creator",
-          "dc.description",
-          "dc.publisher",
-          "dc.subject",
-          "dc.title"));
+      query.must(QueryBuilders.matchQuery("fulltext", text));
     }
 
     var user = securityService.getUser();
