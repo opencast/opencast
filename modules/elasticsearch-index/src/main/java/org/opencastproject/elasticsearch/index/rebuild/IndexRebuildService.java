@@ -193,7 +193,7 @@ public class IndexRebuildService implements BundleActivator {
 
     IndexProducer indexProducer = indexProducers.get(service);
     logger.info("Starting to rebuild the {} index from service '{}'", index.getIndexName(), service);
-    indexProducer.repopulate(index);
+    indexProducer.repopulate();
     logger.info("Finished to rebuild the {} index from service '{}'", index.getIndexName(), service);
   }
 
