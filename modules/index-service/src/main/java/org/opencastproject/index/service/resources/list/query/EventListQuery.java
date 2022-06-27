@@ -90,6 +90,7 @@ public class EventListQuery extends ResourceListQueryImpl {
   public EventListQuery() {
     super();
     this.availableFilters.add(createSeriesFilter(Option.none()));
+    this.availableFilters.add(createPresentersFilter(Option.none()));
     this.availableFilters.add(createLocationFilter(Option.none()));
     this.availableFilters.add(createAgentFilter(Option.none()));
     this.availableFilters.add(createStartDateFilter(Option.none()));
