@@ -25,7 +25,9 @@ import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageImpl;
+import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
@@ -59,7 +61,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -867,13 +871,32 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       searchSource.sort("dc." + sortParam[0], order);
     }
 
-    var result = Arrays.stream(searchService.search(searchSource)
-        .getHits()
-        .getHits())
+    var hits = searchService.search(searchSource).getHits();
+    var total = 0; // TODO (conflicts with Solr): hits.getTotalHits().value;
+    var results = Arrays.stream(hits.getHits())
         .map(SearchHit::getSourceAsMap)
         .collect(Collectors.toList());
 
-    return Response.ok(gson.toJson(result)).build();
+    var json = gson.toJsonTree(Map.of(
+        "offset", offset,
+        "total", total,
+        "result", Collections.emptyList(),
+        "limit", limit));
+    var jsonResults = json.getAsJsonObject().getAsJsonArray("result");
+    for (var result: results) {
+      try {
+        var mediaPackage = MediaPackageParser.getFromXml(result.get("media_package").toString());
+        var mediaPackageJson = MediaPackageParser.getAsJSON(mediaPackage);
+        result.remove("media_package");
+        var jsonResult = gson.toJsonTree(result);
+        jsonResult.getAsJsonObject().addProperty("media_package", mediaPackageJson);
+        jsonResults.add(jsonResult);
+      } catch (MediaPackageException e) {
+        // TODO
+      }
+    }
+
+    return Response.ok(gson.toJson(json)).build();
   }
 
   @GET
