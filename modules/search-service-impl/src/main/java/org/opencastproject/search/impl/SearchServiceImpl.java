@@ -519,12 +519,11 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     var metadata = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage)
         .map(this::mapDublinCore)
         .orElse(Collections.emptyMap());
+    metadata.put("modified", Collections.singletonList(DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now())));
     Map<String, Object> data = Map.of(
-        "id", mediaPackageId,
         "media_package", MediaPackageParser.getAsXml(mediaPackage),
         "org", getSecurityService().getOrganization().getId(),
         "dc", metadata,
-        "modified", DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now()),
         "acl", searchableAcl(acl),
         "type", IndexEntryType.Episode.name()
     );
@@ -541,13 +540,12 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     for (var seriesId: metadata.getOrDefault("isPartOf", Collections.emptyList())) {
       try {
         var series = mapDublinCore(seriesService.getSeries(seriesId));
+        series.put("modified", Collections.singletonList(DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now())));
         var seriesAcl2 = persistence.getAccessControlLists(seriesId, mediaPackageId).stream() //TODO: rename
             .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
         Map<String, Object> seriesData = Map.of(
-            "id", seriesId,
             "org", getSecurityService().getOrganization().getId(),
             "dc", series,
-            "modified", DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now()),
             "acl", searchableAcl(seriesAcl2),
             "type", IndexEntryType.Series.name()
         );

@@ -15,14 +15,11 @@
         "created": {
           "type": "date"
         },
+        "contributor": {
+          "type": "keyword"
+        },
         "creator": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "ignore_above": 256
-            }
-          }
+          "type": "keyword"
         },
         "extent": {
           "type": "text",
@@ -49,13 +46,7 @@
           }
         },
         "title": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "ignore_above": 256
-            }
-          }
+          "type": "keyword"
         }
       }
     },

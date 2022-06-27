@@ -51,6 +51,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -727,10 +728,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               name = "sort",
               isRequired = false,
               type = RestParameter.Type.STRING,
-              description = "The sort order.  May include any of the following: "
-                  + "DATE_CREATED, DATE_MODIFIED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
-                  + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER. "
-                  + "Add '_DESC' to reverse the sort order (e.g. TITLE_DESC)."
+              description = "The sort order.  May include any of the following dublin core metadata: "
+                  + "title, contributor, creator, modified. "
+                  + "Add ' asc' or ' desc' to specify the sort order (e.g. 'title desc')."
           ),
           @RestParameter(
               name = "limit",
@@ -750,7 +750,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               name = "sign",
               type = RestParameter.Type.BOOLEAN,
               isRequired = false,
-              defaultValue = "true",
+              defaultValue = "false",
               description = "If results are to be signed"
           )
       },
@@ -767,7 +767,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       @QueryParam("q") String text,
       @QueryParam("sid") String seriesId,
       @QueryParam("sname") String seriesName, // TODO
-      @QueryParam("sort") String sort, // TODO
+      @QueryParam("sort") String sort,
       @QueryParam("limit") String limit,
       @QueryParam("offset") String offset,
       @QueryParam("sign") String sign // TODO
@@ -783,6 +783,19 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     final var org = securityService.getOrganization().getId();
     final var type = SearchServiceImpl.IndexEntryType.Episode.name();
 
+    List <String> series = Collections.emptyList();
+    if (StringUtils.isNotEmpty(seriesName)) {
+      var seriesSearchSource = new SearchSourceBuilder().query(QueryBuilders.boolQuery()
+          .must(QueryBuilders.termQuery("org", org))
+          .must(QueryBuilders.termQuery("type", SearchServiceImpl.IndexEntryType.Series))
+          .must(QueryBuilders.termQuery("dc.title", seriesName)));
+      series = Arrays.stream(searchService.search(seriesSearchSource)
+          .getHits()
+          .getHits())
+          .map(h -> h.field("dc.identifier").getValues().get(0).toString())
+          .collect(Collectors.toList());
+    }
+
     var query = QueryBuilders.boolQuery()
         .must(QueryBuilders.termQuery("org", org))
         .must(QueryBuilders.termQuery("type", type));
@@ -792,7 +805,18 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     }
 
     if (StringUtils.isNotEmpty(seriesId)) {
-      query.must(QueryBuilders.termQuery("dc.isPartOf", seriesId));
+      series = Collections.singletonList(seriesId);
+    }
+    if (series.size() > 0) {
+      if (series.size() == 1) {
+        query.must(QueryBuilders.termQuery("dc.isPartOf", series.get(0)));
+      } else {
+        var seriesQuery = QueryBuilders.boolQuery();
+        for (var sid : series) {
+          seriesQuery.should(QueryBuilders.termQuery("dc.isPartOf", sid));
+        }
+        query.must(seriesQuery);
+      }
     }
 
     if (StringUtils.isNotEmpty(text)) {
@@ -829,6 +853,19 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         .query(query)
         .from(from)
         .size(size);
+
+    if (StringUtils.isNotEmpty(sort)) {
+      var sortParam = StringUtils.split(sort);
+      var validSort = Arrays.asList("title", "contributor", "creator", "modified").contains(sortParam[0]);
+      var validOrder = sortParam.length < 2 || Arrays.asList("asc", "desc").contains(sortParam[1]);
+      if (sortParam.length > 2 || !validSort || !validOrder) {
+        return Response.status(Response.Status.BAD_REQUEST)
+            .entity("Invalid sort parameter")
+            .build();
+      }
+      var order = SortOrder.fromString(sortParam.length > 1 ? sortParam[1] : "asc");
+      searchSource.sort("dc." + sortParam[0], order);
+    }
 
     var result = Arrays.stream(searchService.search(searchSource)
         .getHits()
