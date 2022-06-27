@@ -53,11 +53,11 @@
     "id": {
       "type": "keyword"
     },
-    "media_package": {
+    "mediapackage": {
       "type": "object",
       "enabled": false
     },
-    "media_package_xml": {
+    "mediapackage_xml": {
       "type": "text"
     },
     "modified": {

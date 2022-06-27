@@ -525,8 +525,8 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     metadata.put("modified", Collections.singletonList(DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now())));
     var mediaPackageJson = gson.fromJson(MediaPackageParser.getAsJSON(mediaPackage), Map.class).get("mediapackage");
     Map<String, Object> data = Map.of(
-        "media_package", mediaPackageJson,
-        "media_package_xml", MediaPackageParser.getAsXml(mediaPackage),
+        "mediapackage", mediaPackageJson,
+        "mediapackage_xml", MediaPackageParser.getAsXml(mediaPackage),
         "org", getSecurityService().getOrganization().getId(),
         "dc", metadata,
         "acl", searchableAcl(acl),

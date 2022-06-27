@@ -899,7 +899,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         .getHits()
         .getHits())
         .map(SearchHit::getSourceAsMap)
-        .peek(hit -> hit.remove("media_package_xml"))
+        .peek(hit -> hit.remove("mediapackage_xml"))
         .peek(hit -> hit.remove("type"))
         .collect(Collectors.toList());
     var total = 0; // TODO (conflicts with Solr): hits.getTotalHits().value;
