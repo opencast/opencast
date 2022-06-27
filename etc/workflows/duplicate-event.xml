@@ -9,29 +9,24 @@
   <description/>
   <displayOrder>10</displayOrder>
   <configuration_panel>
-    <![CDATA[
+<![CDATA[
       <div id="workflow-configuration">
         <fieldset>
           <br/>
           <div>
-            <label for="mpTitle" style="width: 150px;" >Title of Duplicate:</label>
+            <label for="mpTitle" style="width: 150px;">Title of Duplicate:</label>
             <input id="mpTitle" name="mpTitle" type="text" style="width: 400px;" value=" " class="configField" />
           </div>
           <br/>
           <div>
-            <label for="seriesId" style="width: 150px;" >Series Id:</label>
+            <label for="seriesId" style="width: 150px;">Series Id:</label>
             <input id="seriesId" name="seriesId" type="text" maxlength="255" style="width: 400px;" value=" " class="configField" />
           </div>
           <br/>
           <div>
-            <label for="startDate" style="width: 150px;">StartDate (YYYY-MM-DD):</label>
-            <input id="startDate" name="startDate" type="text" style="width: 200px;" value=" " class="configField" />
+            <label for="startDateTime" style="width: 150px;">Date time:</label>
+            <input id="startDateTime" name="startDateTime" type="datetime-local" style="width: 300px;" class="configField" required />
           </div>
-          <div>
-            <label for="startTime" style="width: 150px;">startTime (HH:MM:SS):</label>
-            <input id="startTime" name="startTime" type="text" style="width: 200px;" value=" " class="configField" />
-          </div>
-          <br/>
           <br/>
           <div>
             <label for="numberOfEvents" style="width: 150px;">Number of Events</label>
@@ -65,6 +60,28 @@
           if (parseInt(value) < parseInt(min)) $('#numberOfEvents').val(min);
           if (parseInt(value) > parseInt(max)) $('#numberOfEvents').val(max);
         }
+
+        $.fn.setNow = function (onlyBlank) {
+          var now = new Date($.now()), year, month, date, hours, minutes, seconds, formattedDateTime;
+          year = now.getFullYear();
+          month = now.getMonth().toString().length === 1 ? '0' + (now.getMonth() + 1).toString() : now.getMonth() + 1;
+          date = now.getDate().toString().length === 1 ? '0' + (now.getDate()).toString() : now.getDate();
+          hours = now.getHours().toString().length === 1 ? '0' + now.getHours().toString() : now.getHours();
+          minutes = now.getMinutes().toString().length === 1 ? '0' + now.getMinutes().toString() : now.getMinutes();
+          seconds = now.getSeconds().toString().length === 1 ? '0' + now.getSeconds().toString() : now.getSeconds();
+          formattedDateTime = year + '-' + month + '-' + date + 'T' + hours + ':' + minutes + ':' + seconds;
+
+          if ((onlyBlank === true) && $(this).val()) {
+            return this;
+          }
+          $(this).val(formattedDateTime);
+          return this;
+        }
+
+        $(function () {
+            $('input[type="datetime-local"]').setNow();
+        });
+        
       </script>
     ]]>
   </configuration_panel>
@@ -85,7 +102,7 @@
         <configuration key="number-of-events">${numberOfEvents}</configuration>
         <configuration key="set-series-id">${seriesId}</configuration>
         <configuration key="set-title">${mpTitle}</configuration>
-        <configuration key="set-start-date-time">${startDate} ${startTime}</configuration>
+        <configuration key="set-start-date-time">${startDateTime}</configuration>
         <configuration key="target-tags"></configuration>
         <configuration key="property-namespaces">org.opencastproject.assetmanager.security,org.opencastproject.workflow.configuration</configuration>
         <configuration key="no-suffix">${noCopySuffix}</configuration>

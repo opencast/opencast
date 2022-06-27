@@ -118,7 +118,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
   private static final String PLUS = "+";
   private static final String MINUS = "-";
 
-  private static final DateFormat ADMIN_UI_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+  private static final DateFormat ADMIN_UI_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
   /** Name of the configuration option that provides the source flavors we are looking for */
   public static final String SOURCE_FLAVORS_PROPERTY = "source-flavors";
@@ -336,36 +336,29 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
         }
         // Clone the media package (without its elements)
         String useTitle;
-        if (title.isEmpty() || (title.startsWith("${") && title.endsWith("}"))) {
-          useTitle = mediaPackage.getTitle();
+        if (title.isEmpty() || (title.startsWith("${") && (title.endsWith("}")))) {
+          final DublinCoreCatalog dublinCore = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage).get();
+          useTitle = dublinCore.getFirst(DublinCore.PROPERTY_TITLE);
         } else {
           useTitle = title;
         }
         if (!noSuffix) {
           useTitle = String.format("%s (%s %d)", useTitle, copyNumberPrefix, i + 1);
         }
-        Date mpDate = mediaPackage.getDate();
-        String date = new SimpleDateFormat("yyyy-MM-dd").format(mpDate);
-        String time = new SimpleDateFormat("HH:mm:ss").format(mpDate);
-        if (!startDateString.isEmpty()) {
-          String [] dt = startDateString.trim().split("\\s+");
-          if (dt.length == 2) {
-            if (!dt[0].startsWith("${")) {
-              date = dt[0];
-            }
-            if (!dt[1].startsWith("${")) {
-              time = (dt[1].split(":").length == 2) ? dt[1] + ":00" : dt[1];
-            }
+        Date mpDate;
+        if (!startDateString.isEmpty() || (!startDateString.startsWith("${") && (!startDateString.endsWith("}")))) {
+          try {
+            mpDate = ADMIN_UI_DATE_FORMAT.parse(startDateString);
+            logger.info("Setting StartDate to {}", mpDate);
+          } catch (ParseException ex) {
+            logger.warn("Could not parse: {} as date time", startDateString);
+            mpDate = mediaPackage.getDate();
+            logger.warn("Using original event date {} as default", mpDate);
           }
+        } else {
+          mpDate = mediaPackage.getDate();
+          logger.warn("No date set, using original event date {} as default", mpDate);
         }
-        try {
-          mpDate = ADMIN_UI_DATE_FORMAT.parse(date + " " + time);
-          logger.info("Setting StartDate to {}", mpDate);
-        } catch (ParseException ex) {
-          logger.error("Could not parse as date time: " + date + " and " + time);
-          throw new WorkflowOperationException(ex);
-        }
-
         newMp = copyMediaPackage(mediaPackage, series, newMpId, useTitle, mpDate);
 
         if (series != null) {
