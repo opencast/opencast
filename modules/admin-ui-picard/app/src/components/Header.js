@@ -41,7 +41,8 @@ function changeLanguage(code) {
 function logout() {
     axios.get('/j_spring_security_logout')
         .then(response => {
-            logger.info("Successful logout");
+            logger.info(response);
+            window.location.reload();
         })
         .catch(response => {
             logger.error(response);
