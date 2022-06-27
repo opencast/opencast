@@ -160,6 +160,8 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   /** The key to look for in the service configuration file to override the {@link DEFAULT_ADD_JOB_LOAD} */
   public static final String ADD_JOB_LOAD_KEY = "job.load.add";
 
+  public static final String INDEX_NAME = "opencast_search";
+
   /** The key to look for in the service configuration file to override the {@link DEFAULT_DELETE_JOB_LOAD} */
   public static final String DELETE_JOB_LOAD_KEY = "job.load.delete";
 
@@ -307,7 +309,6 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   }
 
   private void createIndex() {
-    var idxName = "opencast_search";
     var mapping = "";
     try (var in = this.getClass().getResourceAsStream("/search-mapping.json")) {
       mapping = IOUtils.toString(in, StandardCharsets.UTF_8);
@@ -315,16 +316,16 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
       throw new SearchException("Could not read mapping.", e);
     }
     try {
-      logger.debug("Trying to create index for '{}'", idxName);
-      var request = new CreateIndexRequest(idxName)
+      logger.debug("Trying to create index for '{}'", INDEX_NAME);
+      var request = new CreateIndexRequest(INDEX_NAME)
           .mapping(mapping, XContentType.JSON);
       var response = elasticsearchIndex.getClient().indices().create(request, RequestOptions.DEFAULT);
       if (!response.isAcknowledged()) {
-        throw new SearchException("Unable to create index for '" + idxName + "'");
+        throw new SearchException("Unable to create index for '" + INDEX_NAME + "'");
       }
     } catch (ElasticsearchStatusException e) {
       if (e.getDetailedMessage().contains("already_exists_exception")) {
-        logger.info("Detected existing index '{}'", idxName);
+        logger.info("Detected existing index '{}'", INDEX_NAME);
       } else {
         throw e;
       }
@@ -464,7 +465,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   }
 
   public SearchResponse search(SearchSourceBuilder searchSource) throws SearchException {
-    SearchRequest searchRequest = new SearchRequest("opencast_search");
+    SearchRequest searchRequest = new SearchRequest(INDEX_NAME);
     logger.debug("Sending for query: {}", searchSource.query());
     searchRequest.source(searchSource);
     try {
@@ -522,8 +523,9 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
         .map(this::mapDublinCore)
         .orElse(Collections.emptyMap());
     metadata.put("modified", Collections.singletonList(DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now())));
+    var mediaPackageJson = gson.fromJson(MediaPackageParser.getAsJSON(mediaPackage), Map.class).get("mediapackage");
     Map<String, Object> data = Map.of(
-        "media_package", gson.fromJson(MediaPackageParser.getAsJSON(mediaPackage), Map.class),
+        "media_package", mediaPackageJson,
         "media_package_xml", MediaPackageParser.getAsXml(mediaPackage),
         "org", getSecurityService().getOrganization().getId(),
         "dc", metadata,
@@ -531,7 +533,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
         "type", IndexEntryType.Episode.name()
     );
     try {
-      var request = new IndexRequest("opencast_search");
+      var request = new IndexRequest(INDEX_NAME);
       request.id(mediaPackageId);
       request.source(data);
       elasticsearchIndex.getClient().index(request, RequestOptions.DEFAULT);
@@ -553,7 +555,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
             "type", IndexEntryType.Series.name()
         );
         try {
-          var request = new IndexRequest("opencast_search");
+          var request = new IndexRequest(INDEX_NAME);
           request.id(seriesId);
           request.source(seriesData);
           elasticsearchIndex.getClient().index(request, RequestOptions.DEFAULT);
@@ -626,7 +628,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
     // TODO: Permission checks
     try {
-      var deleteRequest = new DeleteRequest("opencast_search", mediaPackageId);
+      var deleteRequest = new DeleteRequest(INDEX_NAME, mediaPackageId);
       elasticsearchIndex.getClient().delete(deleteRequest, RequestOptions.DEFAULT);
     } catch (IOException e) {
       throw new SearchException("Could not delete episode " + mediaPackageId + " from index", e);
@@ -689,7 +691,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    */
   public boolean deleteSeriesSynchronously(String seriesId) throws SearchException {
     try {
-      var deleteRequest = new DeleteRequest("opencast_search", seriesId);
+      var deleteRequest = new DeleteRequest(INDEX_NAME, seriesId);
       elasticsearchIndex.getClient().delete(deleteRequest, RequestOptions.DEFAULT);
     } catch (IOException e) {
       throw new SearchException("Could not delete series " + seriesId + " from index", e);
