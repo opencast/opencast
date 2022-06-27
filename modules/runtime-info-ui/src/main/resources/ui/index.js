@@ -26,24 +26,24 @@ $(document).ready(function () {
     var capt = false;
     var confMon = false;
     $.each(data, function (section) {
-      if ('rest' == section) {
+      if ('rest' === section) {
         $.each(data.rest, function (i) {
           var col = $('#docs1');
           var pathToDocs = data.rest[i].docs.replace(/^.*\/\/[^/]+/, '');
           col.append('<li>' + data.rest[i].description + ' <a href="' + pathToDocs + '">Docs</a></li>');
-          if (data.rest[i].description.toLowerCase() == 'Capture REST Endpoint'.toLowerCase()) {
+          if (data.rest[i].description.toLowerCase() === 'Capture REST Endpoint'.toLowerCase()) {
             $('#col3m').append('<br /><a class="redbutton" id="captureLink" href="/capture">Go to Capture</a>');
             capt = true;
-          } else if (data.rest[i].description.toLowerCase() == 'Confidence Monitoring REST Endpoint'.toLowerCase()) {
+          } else if (data.rest[i].description.toLowerCase() === 'Confidence Monitoring REST Endpoint'.toLowerCase()) {
             $('#col4m').append('<br /><a class="redbutton" id="confidenceMonitoringLink" '
               + 'href="/confidence-monitoring">Go to Confidence Monitoring</a>');
             confMon = true;
           }
         });
-      } else if ('engage' == section) {
+      } else if ('engage' === section) {
         $('#engagelink').attr('href', data.engage + '/engage/ui');
-      } else if ('admin' == section) {
-        $('#adminlink').attr('href', data.admin + '/admin-ng/index.html');
+      } else if ('admin' === section) {
+        $('#adminlink').attr('href', data.admin + '/admin-ui/index.html');
       }
     });
     if (capt) {
@@ -111,6 +111,16 @@ $(document).ready(function () {
         $buildNumber.before('Build number' + (buildNumbers.length > 1 ? 's: ' : ': '));
         checkAndDisplay(buildNumbers, $buildNumber);
       }
+    }
+  });
+
+  $.ajax({
+    url: '/admin-ui/index.html',
+    type: 'HEAD',
+    error: function () {
+    },
+    success: function () {
+      window.location.replace('/admin-ui/index.html');
     }
   });
 });
