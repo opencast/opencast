@@ -875,12 +875,23 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "DETAILS": "Details"
+                  "NEW_USER": "Neuer Nutzer",
+                  "DETAILS": "Nicht-Nutzer Rollen",
+                  "USER": "Nutzer",
+                  "USERS": "Für das Video nicht authorisierte Nutzer",
+                  "HELP": {
+                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Nutzer das Video zu sehen",
+                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Nutzer das Video zu bearbeiten"
+                  }
                },
                "ROLES": {
                   "LABEL": "Rolle auswählen",
                   "EMPTY": "Keine Rolle gefunden"
-               }
+                },
+                "USERS": {
+                  "LABEL": "Wähle einen Nutzer",
+                  "EMPTY": "Kein Nutzer gefunden"
+                }
             },
             "COMMENTS": {
                "CAPTION": "Kommentare",
@@ -1097,12 +1108,23 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "DETAILS": "Details"
+                  "NEW_USER": "Neuer Nutzer",
+                  "DETAILS": "Nicht-Nutzer Rollen",
+                  "USER": "Nutzer",
+                  "USERS": "Für die Serie nicht authorisierte Nutzer",
+                  "HELP": {
+                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Nutzer die Serie zu sehen",
+                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Nutzer die Serie zu bearbeiten"
+                  }
                },
                "ROLES": {
                   "LABEL": "Rolle auswählen",
                   "EMPTY": "Keine Rolle gefunden"
-               }
+                },
+                "USERS": {
+                  "LABEL": "Wähle einen Nutzer",
+                  "EMPTY": "Kein Nutzer gefunden"
+                }
             },
             "THEME": {
                "CAPTION": "Branding",
@@ -1160,16 +1182,27 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "DETAILS": "Details",
+                  "DETAILS": "Nicht-Nutzer Rollen",
                   "REPLACE_EVENT_ACLS": "Zugriffsrechte des Videos aktualisieren",
                   "REPLACE_EVENT_ACLS_HINT": "Sicherstellen, dass alle Videos dieser Serie genau diese Zugriffsrechte haben",
                   "LOAD_MORE_LIMIT": "angezeigte Richtlinien.",
-                  "LOAD_MORE_LINK": "Mehr laden"
+                  "LOAD_MORE_LINK": "Mehr laden",
+                  "NEW_USER": "Neuer Nutzer",
+                  "USER": "Nutzer",
+                  "USERS": "Für die Serie nicht authorisierte Nutzer",
+                  "HELP": {
+                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Nutzer die Serie zu sehen",
+                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Nutzer die Serie zu bearbeiten"
+                  }
                },
                "ROLES": {
                   "LABEL": "Rolle auswählen",
                   "EMPTY": "Keine Rolle gefunden"
-               }
+               },
+               "USERS": {
+                "LABEL": "Wähle einen Nutzer",
+                "EMPTY": "Kein Nutzer gefunden"
+              }
             },
             "METADATA": {
                "TITLE": "Titel",
@@ -1400,13 +1433,24 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "DETAILS": "Details",
-                  "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu"
+                  "DETAILS": "Nicht-Nutzer Rollen",
+                  "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu",
+                  "NEW_USER": "Neuer Nutzer",
+                  "USER": "Nutzer",
+                  "USERS": "Für die Richtlinie nicht authorisierte Nutzer",
+                  "HELP": {
+                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Nutzer die Richtlinie zu sehen",
+                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Nutzer die Richtlinie zu bearbeiten"
+                  }
                },
                "ROLES": {
                   "LABEL": "Rolle auswählen",
                   "EMPTY": "Keine Rolle gefunden"
-               }
+               },
+               "USERS": {
+                "LABEL": "Wähle einen Nutzer",
+                "EMPTY": "Kein Nutzer gefunden"
+              }
             }
          },
          "DETAILS": {
@@ -1438,13 +1482,24 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "DETAILS": "Details",
-                  "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu"
+                  "DETAILS": "Nicht-Nutzer Rollen",
+                  "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu",
+                  "NEW_USER": "Neuer Nutzer",
+                  "USER": "Nutzer",
+                  "USERS": "Für die Richtlinie nicht authorisierte Nutzer",
+                  "HELP": {
+                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Nutzer die Richtlinie zu sehen",
+                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Nutzer die Richtlinie zu bearbeiten"
+                  }
                },
                "ROLES": {
                   "LABEL": "Rolle auswählen",
                   "EMPTY": "Keine Rolle gefunden"
-               }
+               },
+               "USERS": {
+                "LABEL": "Wähle einen Nutzer",
+                "EMPTY": "Kein Nutzer gefunden"
+              }
             }
          }
       }
