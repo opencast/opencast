@@ -223,20 +223,16 @@ public final class AccessControlParser {
     JSONObject json = new JSONObject();
     JSONObject jsonAcl = new JSONObject();
     List<AccessControlEntry> entries = acl.getEntries();
-    int numEntries = entries.size();
-    switch (numEntries) {
-      case 0:
-        break;
-      default:
-        JSONArray jsonEntryArray = new JSONArray();
-        jsonAcl.put(ACE, jsonEntryArray);
-        for (AccessControlEntry entry : entries) {
-          JSONObject jsonEntry = new JSONObject();
-          jsonEntry.put(ACTION, entry.getAction());
-          jsonEntry.put(ROLE, entry.getRole());
-          jsonEntry.put(ALLOW, entry.isAllow());
-          jsonEntryArray.add(jsonEntry);
-        }
+    if (entries.size() > 0) {
+      JSONArray jsonEntryArray = new JSONArray();
+      jsonAcl.put(ACE, jsonEntryArray);
+      for (AccessControlEntry entry : entries) {
+        JSONObject jsonEntry = new JSONObject();
+        jsonEntry.put(ACTION, entry.getAction());
+        jsonEntry.put(ROLE, entry.getRole());
+        jsonEntry.put(ALLOW, entry.isAllow());
+        jsonEntryArray.add(jsonEntry);
+      }
     }
     json.put(ACL, jsonAcl);
     return json.toJSONString();
