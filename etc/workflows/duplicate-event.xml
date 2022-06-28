@@ -81,7 +81,7 @@
         $(function () {
             $('input[type="datetime-local"]').setNow();
         });
-        
+
       </script>
     ]]>
   </configuration_panel>
