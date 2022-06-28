@@ -1114,10 +1114,10 @@
              "NEW_USER": "New user",
              "DETAILS": "Non-user roles",
              "USER": "User",
-             "USERS": "Users who are authorized for the event",
+             "USERS": "Users who are authorized for the series",
              "HELP": {
-               "READ": "By setting read rights, the event becomes visible for the selected user",
-               "WRITE": "By setting write rights, the selected user can edit the event"
+               "READ": "By setting read rights, the series becomes visible for the selected user",
+               "WRITE": "By setting write rights, the selected user can edit the series"
              }
            },
            "ROLES": {
@@ -1192,10 +1192,10 @@
              "LOAD_MORE_LINK": "Load more",
              "NEW_USER": "New user",
              "USER": "User",
-             "USERS": "Users who are authorized for the event",
+             "USERS": "Users who are authorized for the series",
              "HELP": {
-               "READ": "By setting read rights, the event becomes visible for the selected user",
-               "WRITE": "By setting write rights, the selected user can edit the event"
+               "READ": "By setting read rights, the series becomes visible for the selected user",
+               "WRITE": "By setting write rights, the selected user can edit the series"
              }
            },
            "ROLES": {
@@ -1440,10 +1440,10 @@
              "DESCRIPTION" : "Please choose a pre-configured set of policies or add custom policies below",
              "NEW_USER": "New user",
              "USER": "User",
-             "USERS": "Users who are authorized for the event",
+             "USERS": "Users who are authorized for the access policy",
              "HELP": {
-               "READ": "By setting read rights, the event becomes visible for the selected user",
-               "WRITE": "By setting write rights, the selected user can edit the event"
+               "READ": "By setting read rights, the access policy becomes visible for the selected user",
+               "WRITE": "By setting write rights, the selected user can edit the access policy"
              }
            },
            "ROLES": {
@@ -1489,10 +1489,10 @@
              "DESCRIPTION" : "Please choose a pre-configured set of policies or add custom policies below",
              "NEW_USER": "New user",
              "USER": "User",
-             "USERS": "Users who are authorized for the event",
+             "USERS": "Users who are authorized for the access policy",
              "HELP": {
-               "READ": "By setting read rights, the event becomes visible for the selected user",
-               "WRITE": "By setting write rights, the selected user can edit the event"
+               "READ": "By setting read rights, the access policy becomes visible for the selected user",
+               "WRITE": "By setting write rights, the selected user can edit the access policy"
              }
            },
            "ROLES": {

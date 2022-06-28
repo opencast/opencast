@@ -535,35 +535,35 @@
 
             <div class="obj-container">
               <div class="obj tbl-list">
-                <header translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.USERS">
+                <header translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.USERS">
                   <!-- Details -->
                 </header>
                 <div class="obj-container">
                   <table class="main-tbl" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_USER_ROLES_VIEW')">
                     <thead>
                       <tr>
-                        <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.USER">
+                        <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.USER">
                           <!-- User -->
                         </th>
                         <th class="fit">
                           <!-- Read -->
-                          {{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.READ' | translate }}
-                          <span title="{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.HELP.READ' | translate}}"
+                          {{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.READ' | translate }}
+                          <span title="{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.HELP.READ' | translate}}"
                                 class="fa fa-question-circle">
                           </span>
                         </th>
                         <th class="fit">
                           <!-- Write -->
-                          {{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.WRITE' | translate }}
-                          <span title="{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.HELP.WRITE' | translate}}"
+                          {{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.WRITE' | translate }}
+                          <span title="{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.HELP.WRITE' | translate}}"
                                 class="fa fa-question-circle">
                           </span>
                         </th>
-                        <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS"
+                        <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS"
                             class="fit" ng-if="wizard.step.hasActions">
                           <!-- Additional Actions -->
                         </th>
-                        <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ACTION" class="fit">
+                        <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.ACTION" class="fit">
                           <!-- Action -->
                         </th>
                       </tr>
@@ -576,8 +576,8 @@
                                   ng-model="policy.role"
                                   ng-options="user.userRole as wizard.step.userToStringForDetails(user) for user in wizard.step.users"
                                   call-on-search="wizard.step.getMatchingUsers"
-                                  placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.ACCESS.USERS.LABEL' | translate }}'"
-                                  no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.USERS.EMPTY' | translate }}'">
+                                  placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.USERS.LABEL' | translate }}'"
+                                  no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.USERS.EMPTY' | translate }}'">
                             <option value=""></option>
                           </select>
                         </td>
@@ -593,7 +593,7 @@
                         </td>
                       </tr>
                       <tr ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')">
-                        <td colspan="5"><a ng-click="wizard.step.addPolicy(wizard.step.ud.policiesUser)">+ {{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.NEW_USER' | translate }}</a></td>
+                        <td colspan="5"><a ng-click="wizard.step.addPolicy(wizard.step.ud.policiesUser)">+ {{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.NEW_USER' | translate }}</a></td>
                         <tr>
                         </tr>
                     </tbody>
@@ -603,27 +603,27 @@
             </div>
             <div class="obj-container">
               <div class="obj tbl-list">
-                <header translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.DETAILS">
+                <header translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.DETAILS">
                   <!-- Details -->
                 </header>
                 <div class="obj-container">
                   <table class="main-tbl" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_NONUSER_ROLES_VIEW')">
                     <thead>
                       <tr>
-                        <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ROLE">
+                        <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.ROLE">
                           <!-- Role -->
                         </th>
-                        <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.READ" class="fit">
+                        <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.READ" class="fit">
                           <!-- Read -->
                         </th>
-                        <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.WRITE" class="fit">
+                        <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.WRITE" class="fit">
                           <!-- Write -->
                         </th>
-                        <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS"
+                        <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS"
                             class="fit" ng-if="wizard.step.hasActions">
                           <!-- Additional Actions -->
                         </th>
-                        <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ACTION" class="fit">
+                        <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.ACTION" class="fit">
                           <!-- Action -->
                         </th>
                       </tr>
@@ -636,8 +636,8 @@
                                   ng-model="policy.role"
                                   ng-options="role as role for role in wizard.step.roles | filter: wizard.step.filterUserRoles"
                                   call-on-search="wizard.step.getMatchingRoles"
-                                  placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL' | translate }}'"
-                                  no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.EMPTY' | translate }}'">
+                                  placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL' | translate }}'"
+                                  no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'">
                             <option value=""></option>
                           </select>
                         </td>
@@ -653,7 +653,7 @@
                         </td>
                       </tr>
                       <tr ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')">
-                        <td colspan="5"><a ng-click="wizard.step.addPolicy(wizard.step.ud.policies)">+ {{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
+                        <td colspan="5"><a ng-click="wizard.step.addPolicy(wizard.step.ud.policies)">+ {{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
                         <tr>
                         </tr>
                     </tbody>
