@@ -57,8 +57,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -197,11 +195,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
             .map(Pattern::compile);
     var dateFormatter = Optional.ofNullable(properties.get(INBOX_DATETIME_FORMAT))
             .map(Objects::toString)
-            .map(s -> new DateTimeFormatterBuilder().appendPattern(s)
-                    .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
-                    .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-                    .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
-                    .toFormatter())
+            .map(DateTimeFormatter::ofPattern)
             .orElse(DateTimeFormatter.ISO_DATE_TIME);
     var ffprobe = BooleanUtils.toBoolean((String) properties.get(INBOX_METADATA_FFPROBE))
             ? Objects.toString(cc.getBundleContext().getProperty(FFPROBE_BINARY_CONFIG), FFPROBE_BINARY_DEFAULT)
