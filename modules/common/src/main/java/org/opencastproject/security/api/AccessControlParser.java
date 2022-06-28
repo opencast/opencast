@@ -227,14 +227,6 @@ public final class AccessControlParser {
     switch (numEntries) {
       case 0:
         break;
-      case 1:
-        AccessControlEntry singleEntry = entries.get(0);
-        JSONObject singleJsonEntry = new JSONObject();
-        jsonAcl.put(ACE, singleJsonEntry);
-        singleJsonEntry.put(ACTION, singleEntry.getAction());
-        singleJsonEntry.put(ROLE, singleEntry.getRole());
-        singleJsonEntry.put(ALLOW, singleEntry.isAllow());
-        break;
       default:
         JSONArray jsonEntryArray = new JSONArray();
         jsonAcl.put(ACE, jsonEntryArray);
