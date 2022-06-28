@@ -74,6 +74,12 @@ angular.module('adminNg.controllers')
 
               UserResource.get({ username: id }).$promise.then(function (data) {
                 policy.user = data;
+              }).catch(function() {
+                // User does not exist, remove associated policy from list
+                var index = $scope.policiesUser.indexOf(policy);
+                if (index !== -1) {
+                  $scope.policiesUser.splice(index, 1);
+                }
               });
 
               $scope.policiesUser.push(policy);
