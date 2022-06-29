@@ -155,8 +155,7 @@ angular.module('adminNg.services')
         });
       });
 
-      me.aclCreateDefaults = {};
-      ResourcesListResource.get({ resource: 'ACL.DEFAULTS'}, function(data) {
+      me.aclCreateDefaults = ResourcesListResource.get({ resource: 'ACL.DEFAULTS'}, function(data) {
         angular.forEach(data, function (value, key) {
           if (key.charAt(0) !== '$') {
             me.aclCreateDefaults[key] = value;
@@ -178,12 +177,14 @@ angular.module('adminNg.services')
 
       me.users = UsersResource.query({limit: 2147483647});
       me.users.$promise.then(function () {
-        var newUsers = [];
-        angular.forEach(me.users.rows, function(user) {
-          user.userRole = me.roleUserPrefix + user.username.replace(/\W/g, '').toUpperCase();
-          newUsers.push(user);
+        me.aclCreateDefaults.$promise.then(function () {
+          var newUsers = [];
+          angular.forEach(me.users.rows, function(user) {
+            user.userRole = me.roleUserPrefix + user.username.replace(/\W/g, '').toUpperCase();
+            newUsers.push(user);
+          });
+          me.users = newUsers;
         });
-        me.users = newUsers;
       });
 
       this.getMatchingRoles = function (value) {
