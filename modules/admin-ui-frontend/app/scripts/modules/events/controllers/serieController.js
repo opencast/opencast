@@ -111,7 +111,7 @@ angular.module('adminNg.controllers')
     $scope.not = function(func) {
       return function (item) {
         return !func(item);
-      }
+      };
     };
 
     $scope.userExists = function (policy) {
