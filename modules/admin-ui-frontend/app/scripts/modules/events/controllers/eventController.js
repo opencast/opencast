@@ -215,11 +215,7 @@ angular.module('adminNg.controllers')
               UserResource.get({ username: id }).$promise.then(function (data) {
                 policy.user = data;
               }).catch(function() {
-                // User does not exist, remove associated policy from list
-                var index = $scope.policiesUser.indexOf(policy);
-                if (index !== -1) {
-                  $scope.policiesUser.splice(index, 1);
-                }
+                policy.userDoesNotExist = id;
               });
 
               $scope.policiesUser.push(policy);
@@ -664,6 +660,19 @@ angular.module('adminNg.controllers')
     $scope.policies = [];
     $scope.policiesUser = [];
     $scope.baseAcl = {};
+
+    $scope.not = function(func) {
+      return function (item) {
+        return !func(item);
+      }
+    };
+
+    $scope.userExists = function (policy) {
+      if (policy.userDoesNotExist === undefined) {
+        return true;
+      }
+      return false;
+    };
 
     $scope.filterUserRoles = function (item) {
       if (!item) {

@@ -625,7 +625,7 @@
                       </tr>
                       </thead>
                       <tbody>
-                      <tr ng-repeat="policy in policiesUser">
+                      <tr ng-repeat="policy in policiesUser  | filter: userExists">
                         <td ng-show="!transactions.read_only">
                           <select chosen
                                   pre-select-from="users"
@@ -653,6 +653,43 @@
                                  ng-model="policy.write"
                                  ng-change="accessSave()"
                                  ng-disabled="(transactions.read_only) || !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT') || aclCreateDefaults['write_readonly']"/>
+                        </td>
+                        <td class="fit editable" ng-if="hasActions">
+                          <div ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT') && !transactions.read_only"
+                               save="accessSave"
+                               admin-ng-editable-multi-select
+                               mixed="false"
+                               params="policy.actions"
+                               collection="actions">
+                          </div>
+                          <div ng-if="((!$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')) || transactions.read_only)"
+                               ng-repeat="customAction in policy.actions.value">
+                            {{ customAction }}
+                          </div>
+                        </td>
+                        <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"
+                            class="fit">
+                          <a ng-show="!transactions.read_only"
+                             ng-click="deletePolicy(policiesUser, policy)"
+                             class="remove"></a>
+                        </td>
+                      </tr>
+                      <!-- Another loop specifically to show user roles for which no user exists -->
+                      <tr ng-repeat="policy in policiesUser | filter: not(userExists)">
+                        <td>
+                          <p>{{'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.NONEXISTANT_USER' | translate}}: {{policy.userDoesNotExist}}</p>
+                        </td>
+                        <td class="fit text-center">
+                          <input type="checkbox"
+                                 ng-model="policy.read"
+                                 ng-change="accessSave()"
+                                 ng-disabled="true"/>
+                        </td>
+                        <td class="fit text-center">
+                          <input type="checkbox"
+                                 ng-model="policy.write"
+                                 ng-change="accessSave()"
+                                 ng-disabled="true"/>
                         </td>
                         <td class="fit editable" ng-if="hasActions">
                           <div ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT') && !transactions.read_only"

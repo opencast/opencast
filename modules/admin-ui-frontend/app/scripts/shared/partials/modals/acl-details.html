@@ -129,7 +129,7 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr ng-repeat="policy in policiesUser">
+                        <tr ng-repeat="policy in policiesUser | filter: userExists">
                           <td>
                             <select chosen
                                     pre-select-from="users"
@@ -151,10 +151,24 @@
                           <td class="fit" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"><a ng-click="deletePolicy(policiesUser, policy)" class="remove"></a>
                           </td>
                         </tr>
+                        <!-- Another loop specifically to show user roles for which no user exists -->
+                        <tr ng-repeat="policy in policiesUser | filter: not(userExists)">
+                          <td>
+                            <p>{{'USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.NONEXISTANT_USER' | translate}}: {{policy.userDoesNotExist}}</p>
+                          </td>
+                          <td class="fit"><input type="checkbox" ng-model="policy.read" ng-disabled="true"/></td>
+                          <td class="fit"><input type="checkbox" ng-model="policy.write" ng-disabled="true"/></td>
+                          <td class="fit editable" ng-if="hasActions">
+                            <div ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')" save="save" admin-ng-editable-multi-select mixed="false" params="policy.actions" collection="actions"></div>
+                            <div ng-if="(!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT'))" ng-repeat="customAction in policy.actions.value">{{ customAction }}</div>
+                          </td>
+                          <td class="fit" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"><a ng-click="deletePolicy(policiesUser, policy)" class="remove"></a>
+                          </td>
+                        </tr>
                         <tr ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')" >
                           <td colspan="5"><a ng-click="addPolicy(policiesUser)">+ {{ 'USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.NEW_USER' | translate }}</a></td>
                           <tr>
-                          </tr>
+                        </tr>
                       </tbody>
                     </table>
                   </div>
