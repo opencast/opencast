@@ -294,7 +294,6 @@ angular.module('adminNg.controllers')
       });
       $scope.aclLocked = false,
 
-      $scope.aclCreateDefaults = {};
       $scope.aclCreateDefaults = ResourcesListResource.get({ resource: 'ACL.DEFAULTS'}, function(data) {
         angular.forEach(data, function (value, key) {
           if (key.charAt(0) !== '$') {
@@ -374,12 +373,14 @@ angular.module('adminNg.controllers')
 
     $scope.users = UsersResource.query({limit: 2147483647});
     $scope.users.$promise.then(function () {
-      var newUsers = [];
-      angular.forEach($scope.users.rows, function(user) {
-        user.userRole = $scope.roleUserPrefix + user.username.replace(/\W/g, '').toUpperCase();
-        newUsers.push(user);
+      $scope.aclCreateDefaults.$promise.then(function () {
+        var newUsers = [];
+        angular.forEach($scope.users.rows, function(user) {
+          user.userRole = $scope.roleUserPrefix + user.username.replace(/\W/g, '').toUpperCase();
+          newUsers.push(user);
+        });
+        $scope.users = newUsers;
       });
-      $scope.users = newUsers;
     });
 
     $scope.statReusable = null;

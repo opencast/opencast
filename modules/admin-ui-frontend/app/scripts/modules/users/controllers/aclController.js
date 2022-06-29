@@ -180,7 +180,6 @@ angular.module('adminNg.controllers')
       //NB: roles is updated in both the functions for $scope.acl (MH-11716) and $scope.roles (MH-11715, MH-11717)
       $scope.roles = RolesResource.queryNameOnly({limit: -1, target: 'ACL'});
 
-      $scope.aclCreateDefaults = {};
       $scope.aclCreateDefaults = ResourcesListResource.get({ resource: 'ACL.DEFAULTS'}, function(data) {
         angular.forEach(data, function (value, key) {
           if (key.charAt(0) !== '$') {
@@ -234,12 +233,14 @@ angular.module('adminNg.controllers')
 
       $scope.users = UsersResource.query({limit: 2147483647});
       $scope.users.$promise.then(function () {
-        var newUsers = [];
-        angular.forEach($scope.users.rows, function(user) {
-          user.userRole = $scope.roleUserPrefix + user.username.replace(/\W/g, '').toUpperCase();
-          newUsers.push(user);
+        $scope.aclCreateDefaults.$promise.then(function () {
+          var newUsers = [];
+          angular.forEach($scope.users.rows, function(user) {
+            user.userRole = $scope.roleUserPrefix + user.username.replace(/\W/g, '').toUpperCase();
+            newUsers.push(user);
+          });
+          $scope.users = newUsers;
         });
-        $scope.users = newUsers;
       });
     };
 
