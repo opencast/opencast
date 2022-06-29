@@ -21,11 +21,13 @@
 
 package org.opencastproject.search.endpoint;
 
+import org.opencastproject.job.api.JobProducer;
+import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.impl.SearchServiceImpl;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -84,15 +86,19 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Search REST Endpoint",
         "opencast.service.type=org.opencastproject.search",
-        "opencast.service.path=/search"
+        "opencast.service.path=/search",
+        "opencast.service.jobproducer=true"
     }
 )
-public class SearchRestService {
+public class SearchRestService extends AbstractJobProducerEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(SearchRestService.class);
 
   /** The search service */
   protected SearchServiceImpl searchService;
+
+  /** The service registry */
+  private ServiceRegistry serviceRegistry;
 
   private SecurityService securityService;
 
@@ -155,7 +161,7 @@ public class SearchRestService {
       @QueryParam("sort")     String  sort,
       @QueryParam("limit")    String  limit,
       @QueryParam("offset")   String  offset
-  ) throws SearchException, UnauthorizedException {
+  ) throws SearchException {
 
     final var org = securityService.getOrganization().getId();
     final var type = SearchServiceImpl.IndexEntryType.Series.name();
@@ -224,7 +230,7 @@ public class SearchRestService {
   }
 
   @GET
-  @Path("event.json")
+  @Path("episode.json")
   @Produces( MediaType.APPLICATION_JSON )
   @RestQuery(
       name = "search_episodes",
@@ -302,7 +308,7 @@ public class SearchRestService {
       @QueryParam("limit") String limit,
       @QueryParam("offset") String offset,
       @QueryParam("sign") String sign // TODO
-  ) throws SearchException, UnauthorizedException {
+  ) throws SearchException {
 
     // There can only be one, sid or sname
     if (StringUtils.isNoneEmpty(seriesName, seriesId)) {
@@ -416,6 +422,14 @@ public class SearchRestService {
   }
 
   /**
+   * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getService()
+   */
+  @Override
+  public JobProducer getService() {
+    return searchService;
+  }
+
+  /**
    * Callback from OSGi to set the search service implementation.
    *
    * @param searchService
@@ -424,6 +438,16 @@ public class SearchRestService {
   @Reference
   public void setSearchService(SearchServiceImpl searchService) {
     this.searchService = searchService;
+  }
+
+  @Reference
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = serviceRegistry;
+  }
+
+  @Override
+  public ServiceRegistry getServiceRegistry() {
+    return serviceRegistry;
   }
 
   @Reference
