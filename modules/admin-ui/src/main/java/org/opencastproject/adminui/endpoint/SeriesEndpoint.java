@@ -543,7 +543,9 @@ public class SeriesEndpoint {
     }
 
     if (!tobira.ready()) {
-      throw new WebApplicationException("Tobira is not configured (correctly)", Status.SERVICE_UNAVAILABLE);
+      return Response.status(Status.SERVICE_UNAVAILABLE)
+              .entity("Tobira is not configured (correctly)")
+              .build();
     }
 
     try {
@@ -1070,7 +1072,9 @@ public class SeriesEndpoint {
                           description = "Tobira is not configured (correctly)") })
 public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
     if (!tobira.ready()) {
-      throw new WebApplicationException("Tobira is not configured (properly)", Status.SERVICE_UNAVAILABLE);
+      return Response.status(Status.SERVICE_UNAVAILABLE)
+              .entity("Tobira is not configured (correctly)")
+              .build();
     }
 
     try {
