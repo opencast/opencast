@@ -235,7 +235,8 @@
       "ADOPTER_PROFILE_UPDATED": "Les informations de profil ont été mises à jour avec succès.",
       "ADOPTER_PROFILE_NOT_UPDATED": "Oups ! Impossible de mettre à jour les informations de profil. Veuillez réessayer !",
       "ADOPTER_PROFILE_DELETED": "Les informations de profil ont bien été supprimées.",
-      "ADOPTER_PROFILE_NOT_DELETED": "Oups ! Impossible de supprimer les informations de profil. Veuillez réessayer !"
+      "ADOPTER_PROFILE_NOT_DELETED": "Oups ! Impossible de supprimer les informations de profil. Veuillez réessayer !",
+      "PROBLEM_ON_START": "A error occurred on start up. Please contact your OpenCast admin"
    },
    "BULK_ACTIONS": {
       "CAPTION": "Actions",

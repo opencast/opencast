@@ -235,7 +235,8 @@
       "ADOPTER_PROFILE_UPDATED": "资料已更新",
       "ADOPTER_PROFILE_NOT_UPDATED": "哎呀！无法更新资料信息。请重试！",
       "ADOPTER_PROFILE_DELETED": "成功删除资料信息",
-      "ADOPTER_PROFILE_NOT_DELETED": "哎呀！无法删除资料信息。请重试！"
+      "ADOPTER_PROFILE_NOT_DELETED": "哎呀！无法删除资料信息。请重试！",
+      "PROBLEM_ON_START": "A error occurred on start up. Please contact your OpenCast admin"
    },
    "BULK_ACTIONS": {
       "CAPTION": "操作",

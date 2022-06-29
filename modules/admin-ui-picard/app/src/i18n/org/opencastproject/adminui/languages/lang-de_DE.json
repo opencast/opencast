@@ -235,7 +235,8 @@
       "ADOPTER_PROFILE_UPDATED": "Profil-Informationen erfolgreich aktualisiert.",
       "ADOPTER_PROFILE_NOT_UPDATED": "Hoppla! Profil-Informationen konnten nicht aktualisiert werden. Bitte versuchen Sie es erneut!",
       "ADOPTER_PROFILE_DELETED": "Profil-Informationen erfolgreich gelöscht.",
-      "ADOPTER_PROFILE_NOT_DELETED": "Hoppla! Profil-Informationen konnten nicht gelöscht werden. Bitte versuchen Sie es erneut!"
+      "ADOPTER_PROFILE_NOT_DELETED": "Hoppla! Profil-Informationen konnten nicht gelöscht werden. Bitte versuchen Sie es erneut!",
+      "PROBLEM_ON_START": "Beim Laden ist ein Fehler aufgetreten. Bitte den OpenCast-Admin kontaktieren"
    },
    "BULK_ACTIONS": {
       "CAPTION": "Aktionen",

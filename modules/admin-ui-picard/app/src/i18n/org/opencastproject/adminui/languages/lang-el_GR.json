@@ -235,7 +235,8 @@
       "ADOPTER_PROFILE_UPDATED": "Οι πληροφορίες προφίλ ενημερώθηκαν επιτυχώς.",
       "ADOPTER_PROFILE_NOT_UPDATED": "Δεν ήταν δυνατή η ενημέρωση των πληροφοριών προφίλ.  Παρακαλώ προσπαθησε ξανά!",
       "ADOPTER_PROFILE_DELETED": "Οι πληροφορίες προφίλ διαγράφηκαν με επιτυχία.",
-      "ADOPTER_PROFILE_NOT_DELETED": " Δεν ήταν δυνατή η διαγραφή πληροφοριών προφίλ. Παρακαλώ προσπαθησε ξανα!"
+      "ADOPTER_PROFILE_NOT_DELETED": " Δεν ήταν δυνατή η διαγραφή πληροφοριών προφίλ. Παρακαλώ προσπαθησε ξανα!",
+      "PROBLEM_ON_START": "A error occurred on start up. Please contact your OpenCast admin"
    },
    "BULK_ACTIONS": {
       "CAPTION": "Ενέργειες",
