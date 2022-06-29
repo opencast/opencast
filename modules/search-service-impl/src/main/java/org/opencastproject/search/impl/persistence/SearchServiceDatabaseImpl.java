@@ -26,7 +26,6 @@ import static org.opencastproject.security.api.Permissions.Action.READ;
 import static org.opencastproject.security.api.Permissions.Action.WRITE;
 
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
@@ -310,27 +309,21 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getMediaPackages(String)
+   * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getSeries(String)
    */
   @Override
-  public Collection<MediaPackage> getMediaPackages(final String seriesId)
-          throws SearchServiceDatabaseException {
-    List<MediaPackage> episodes = new ArrayList<>();
-    EntityManager em = emf.createEntityManager();
-    TypedQuery<SearchEntity> q = em.createNamedQuery("Search.findBySeriesId", SearchEntity.class)
-        .setParameter("seriesId", seriesId);
+  public Collection<SearchEntity> getSeries(final String seriesId) {
+    EntityManager em = null;
     try {
-      for (SearchEntity entity: q.getResultList()) {
-        if (entity.getMediaPackageXML() != null) {
-          episodes.add(MediaPackageParser.getFromXml(entity.getMediaPackageXML()));
-        }
-      }
-    } catch (MediaPackageException e) {
-      throw new SearchServiceDatabaseException(e);
+      em = emf.createEntityManager();
+      TypedQuery<SearchEntity> q = em.createNamedQuery("Search.findBySeriesId", SearchEntity.class)
+          .setParameter("seriesId", seriesId);
+      return q.getResultList();
     } finally {
-      em.close();
+      if (em != null) {
+        em.close();
+      }
     }
-    return episodes;
   }
 
   /**
@@ -402,7 +395,8 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
    * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getMediaPackage(String)
    */
   @Override
-  public MediaPackage getMediaPackage(String mediaPackageId) throws NotFoundException, SearchServiceDatabaseException {
+  public MediaPackage getMediaPackage(String mediaPackageId)
+      throws NotFoundException, SearchServiceDatabaseException, UnauthorizedException {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {
@@ -427,7 +421,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         }
       }
       return MediaPackageParser.getFromXml(episodeEntity.getMediaPackageXML());
-    } catch (NotFoundException e) {
+    } catch (NotFoundException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
       logger.error("Could not get episode {} from database: {} ", mediaPackageId, e.getMessage());

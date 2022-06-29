@@ -32,11 +32,6 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-solr</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-dublincore</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -48,16 +43,6 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-workspace-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-metadata-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-mpeg7</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -78,44 +63,12 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>jakarta.xml.bind</groupId>
-      <artifactId>jakarta.xml.bind-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>jakarta.ws.rs</groupId>
       <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
       <artifactId>osgi.cmpn</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.rometools</groupId>
-      <artifactId>rome</artifactId>
-      <version>1.7.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.rometools</groupId>
-      <artifactId>rome-modules</artifactId>
-      <version>1.7.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.rometools</groupId>
-      <artifactId>rome-utils</artifactId>
-      <version>1.7.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jdom</groupId>
-      <artifactId>jdom2</artifactId>
-      <version>2.0.6</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -186,9 +139,6 @@
         <extensions>true</extensions>
         <configuration>
           <ignoredUnusedDeclaredDependencies>
-            <!-- Feed generation runtime dependencies; JDOM is a ROME dependency -->
-            <ignoredUnusedDeclaredDependency>com.rometools:rome-utils</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.jdom:jdom2</ignoredUnusedDeclaredDependency>
             <!-- provide logger and database for testing -->
             <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>com.h2database:h2</ignoredUnusedDeclaredDependency>
@@ -210,17 +160,9 @@
               *
             </Import-Package>
             <Export-Package>
-              org.opencastproject.feed.impl.*;version=${project.version},
               org.opencastproject.search.impl.*;version=${project.version},
               org.opencastproject.search.endpoint;version=${project.version}
             </Export-Package>
-            <Embed-Dependency>
-              rome;inline=true,
-              rome-modules;inline=true,
-              rome-utils;inline=true,
-              jdom2;inline=true,
-              itunes;inline=true
-            </Embed-Dependency>
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

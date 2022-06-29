@@ -79,18 +79,17 @@ public interface SearchServiceDatabase {
    * @throws SearchServiceDatabaseException
    *           if there is a problem communicating with the underlying data store
    */
-  MediaPackage getMediaPackage(String mediaPackageId) throws NotFoundException, SearchServiceDatabaseException;
+  MediaPackage getMediaPackage(String mediaPackageId)
+      throws NotFoundException, SearchServiceDatabaseException, UnauthorizedException;
 
   /**
    * Gets media packages from a specific series
    *
-   * @param seriesId
-   *          the series identifier
+   * @param seriesId the series identifier
    * @return collection of media packages
-   * @throws SearchServiceDatabaseException
-   *           if there is a problem communicating with the underlying data store
+   * @throws SearchServiceDatabaseException if there is a problem communicating with the underlying data store
    */
-  Collection<MediaPackage> getMediaPackages(String seriesId) throws SearchServiceDatabaseException;
+  Collection<SearchEntity> getSeries(String seriesId) throws SearchServiceDatabaseException;
 
   /**
    * Retrieves ACL for episode with given ID.

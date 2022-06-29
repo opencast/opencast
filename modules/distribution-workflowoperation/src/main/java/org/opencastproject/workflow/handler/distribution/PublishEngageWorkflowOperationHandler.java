@@ -48,8 +48,6 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.search.api.SearchException;
-import org.opencastproject.search.api.SearchQuery;
-import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -652,23 +650,13 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     }
   }
 
-  protected MediaPackage getDistributedMediapackage(String mediaPackageID) throws WorkflowOperationException {
-    MediaPackage mediaPackage = null;
-    SearchQuery query = new SearchQuery().withId(mediaPackageID);
-    query.includeEpisodes(true);
-    query.includeSeries(false);
-    SearchResult result = searchService.getByQuery(query);
-    if (result.size() == 0) {
-      logger.info("The search service doesn't know mediapackage {}.", mediaPackageID);
-      return mediaPackage; // i.e. null
-    } else if (result.size() > 1) {
-      logger.warn("More than one mediapackage with id {} returned from search service", mediaPackageID);
-      throw new WorkflowOperationException("More than one mediapackage with id " + mediaPackageID + " found");
-    } else {
-      // else, merge the new with the existing (new elements will overwrite existing elements)
-      mediaPackage = result.getItems()[0].getMediaPackage();
+  protected MediaPackage getDistributedMediaPackage(String mediaPackageID) throws UnauthorizedException {
+    try {
+      return searchService.get(mediaPackageID);
+    } catch (NotFoundException e) {
+      logger.info("The search service doesn't know media package {}.", mediaPackageID);
+      return null;
     }
-    return mediaPackage;
   }
 
 
@@ -682,9 +670,13 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    */
   protected MediaPackage merge(MediaPackage mediaPackageForSearch, List<MediaPackageElementFlavor> forceFlavors)
           throws WorkflowOperationException {
-    return mergePackages(mediaPackageForSearch,
-            getDistributedMediapackage(mediaPackageForSearch.toString()),
-            forceFlavors);
+    try {
+      return mergePackages(mediaPackageForSearch,
+              getDistributedMediaPackage(mediaPackageForSearch.toString()),
+              forceFlavors);
+    } catch (UnauthorizedException e) {
+      throw new WorkflowOperationException(e);
+    }
   }
 
   /**
@@ -744,10 +736,10 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @throws WorkflowOperationException
    */
   private void retractFromEngage(MediaPackage mediaPackage) throws WorkflowOperationException {
-    List<Job> jobs = new ArrayList<Job>();
-    Set<String> elementIds = new HashSet<String>();
+    List<Job> jobs = new ArrayList<>();
+    Set<String> elementIds = new HashSet<>();
     try {
-      MediaPackage distributedMediaPackage = getDistributedMediapackage(mediaPackage.toString());
+      MediaPackage distributedMediaPackage = getDistributedMediaPackage(mediaPackage.toString());
       if (distributedMediaPackage != null) {
 
         for (MediaPackageElement element : distributedMediaPackage.getElements()) {
