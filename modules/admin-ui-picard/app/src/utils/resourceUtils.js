@@ -415,7 +415,6 @@ export const filterDevicesForAccess = (user, inputDevices) => {
     } else {
         const devicesWithAccessRights = [];
         for(const device of inputDevices){
-            console.log(device)
             const inputDeviceAccessRole = 'ROLE_CAPTURE_AGENT_' + device.id.replace(/[^a-zA-Z0-9_]/g, '').toUpperCase();
             if(hasAccess(inputDeviceAccessRole, user)){
                 devicesWithAccessRights.push(device);

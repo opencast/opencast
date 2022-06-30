@@ -302,7 +302,7 @@ const EventDetailsSchedulingTab = ({ eventId, t,
             scheduleEndHour: makeTwoDigits(source.end.hour),
             scheduleEndMinute: makeTwoDigits(source.end.minute),
             captureAgent: source.device.name,
-            inputs: !!source.device.inputMethods? Array.from(source.device.inputMethods) : []
+            inputs: !!source.device.inputMethods ? Array.from(source.device.inputMethods) : []
         };
     }
 

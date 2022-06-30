@@ -82,7 +82,7 @@ const SeriesActionsCell = ({ row, deleteSeries, fetchSeriesDetailsMetadata, fetc
                               deleteMethod={deletingSeries}
                               deleteAllowed={deleteAllowed}
                               showCautionMessage={hasEvents}
-                              deleteNotAllowedMessage={'CONFIRMATIONS.ERRORS.SERIES_HAS_EVENT'} /* The highlighted series cannot be deleted as they still contain events */
+                              deleteNotAllowedMessage={'CONFIRMATIONS.ERRORS.SERIES_HAS_EVENTS'} /* The highlighted series cannot be deleted as they still contain events */
                               deleteWithCautionMessage={'CONFIRMATIONS.WARNINGS.SERIES_HAS_EVENTS'} /* This series does contain events. Deleting the series will not delete the events. */
                 />
             )}

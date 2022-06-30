@@ -56,7 +56,7 @@ const NewMetadataExtendedPage = ({ previousPage, nextPage, formik, extendedMetad
                                                         ) : (
                                                             <Field name={catalog.flavor + '_' + field.id}
                                                                    metadataField={field}
-                                                                   isFirstField={key === 0}
+                                                                   isFirstField={(index === 0) && (key === 0)}
                                                                    component={RenderField}/>
                                                         )}
                                                     </td>
@@ -73,7 +73,8 @@ const NewMetadataExtendedPage = ({ previousPage, nextPage, formik, extendedMetad
             </div>
 
             {/* Button for navigation to next page */}
-            <WizardNavigationButtons nextPage={nextPage}
+            <WizardNavigationButtons noValidation
+                                     nextPage={nextPage}
                                      previousPage={previousPage}
                                      formik={formik}/>
         </>

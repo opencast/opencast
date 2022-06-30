@@ -77,18 +77,18 @@ export const fetchEventMetadata = () => async dispatch => {
         const response = await data.data;
 
         const mainCatalog = 'dublincore/episode';
-        let usualMetadata = {};
+        let metadata = {};
         const extendedMetadata = [];
 
         for(const metadataCatalog of response){
             if(metadataCatalog.flavor === mainCatalog){
-                usualMetadata = transformMetadataCollection({...metadataCatalog});
+                metadata = transformMetadataCollection({...metadataCatalog});
             } else {
                 extendedMetadata.push(transformMetadataCollection({...metadataCatalog}));
             }
         }
 
-        dispatch(loadEventMetadataSuccess(usualMetadata, extendedMetadata));
+        dispatch(loadEventMetadataSuccess(metadata, extendedMetadata));
     } catch (e) {
         dispatch(loadEventMetadataFailure());
         logger.error(e);

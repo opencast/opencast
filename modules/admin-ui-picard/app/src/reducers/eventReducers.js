@@ -117,11 +117,11 @@ const events = (state=initialState, action) => {
             }
         }
         case LOAD_EVENT_METADATA_SUCCESS: {
-            const { usualMetadata, extendedMetadata } = payload;
+            const { metadata, extendedMetadata } = payload;
             return {
                 ...state,
                 isLoading: false,
-                metadata: usualMetadata,
+                metadata: metadata,
                 extendedMetadata: extendedMetadata
             }
         }

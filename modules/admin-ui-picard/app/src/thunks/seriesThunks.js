@@ -52,18 +52,18 @@ export const fetchSeriesMetadata = () => async dispatch => {
        const response = await data.data;
 
         const mainCatalog = 'dublincore/series';
-        let usualMetadata = {};
+        let metadata = {};
         const extendedMetadata = [];
 
         for(const metadataCatalog of response){
             if(metadataCatalog.flavor === mainCatalog){
-                usualMetadata = transformMetadataCollection({...metadataCatalog});
+                metadata = transformMetadataCollection({...metadataCatalog});
             } else {
                 extendedMetadata.push(transformMetadataCollection({...metadataCatalog}));
             }
         }
 
-       dispatch(loadSeriesMetadataSuccess(usualMetadata, extendedMetadata));
+       dispatch(loadSeriesMetadataSuccess(metadata, extendedMetadata));
     } catch (e) {
         dispatch(loadSeriesFailure());
         logger.error(e);

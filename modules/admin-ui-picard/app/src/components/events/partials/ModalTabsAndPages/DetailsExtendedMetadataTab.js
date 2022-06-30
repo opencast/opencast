@@ -8,7 +8,7 @@ import RenderMultiField from "../../../shared/wizard/RenderMultiField";
 import RenderField from "../../../shared/wizard/RenderField";
 import {connect} from "react-redux";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
-import {hasAccess, isJson} from "../../../../utils/utils";
+import {hasAccess, isJson, parseValueForBooleanStrings} from "../../../../utils/utils";
 import {getMetadataCollectionFieldName} from "../../../../utils/resourceUtils";
 
 /**
@@ -29,12 +29,7 @@ const DetailsExtendedMetadataTab = ({ resourceId, editAccessRole, metadata, upda
         // Transform metadata fields and their values provided by backend (saved in redux)
         if (!!metadataCatalog.fields && metadataCatalog.fields.length > 0) {
             metadataCatalog.fields.forEach(field => {
-                let value = field.value
-                if (value === 'true') {
-                    value = true;
-                } else if (value === 'false') {
-                    value = false;
-                }
+                let value = parseValueForBooleanStrings(field.value);
                 initialValues[field.id] = value;
             });
         }

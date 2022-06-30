@@ -104,22 +104,6 @@ const EditScheduledEventsSummaryPage = ({ previousPage, formik, seriesOptions })
         return oldValue !== newValue;
     };
 
-    // Compare two arrays
-    const isArrayChanged = (oldArray, newArray) => {
-        if (newArray.length !== oldArray.length) {
-            return true;
-        }
-
-        const sortedNewArray = [...newArray].sort();
-        const sortedOldArray = [...oldArray].sort();
-        for (let i = 0; i < sortedNewArray.length; i++){
-            if (sortedNewArray[i] !== sortedOldArray[i]) {
-                return true;
-            }
-        }
-        return false;
-    };
-
     return (
         <>
             <div className="modal-content active">

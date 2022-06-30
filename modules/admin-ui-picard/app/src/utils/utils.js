@@ -72,6 +72,28 @@ export const transformToIdValueArray = data => {
     });
 }
 
+
+
+/*
+ * Compare two arrays
+ * returns true, if content of sorted arrays is the same,
+ * returns false if length or at least one entry is different
+ */
+const isArrayChanged = (oldArray, newArray) => {
+    if (newArray.length !== oldArray.length) {
+        return true;
+    }
+
+    const sortedNewArray = [...newArray].sort();
+    const sortedOldArray = [...oldArray].sort();
+    for (let i = 0; i < sortedNewArray.length; i++){
+        if (sortedNewArray[i] !== sortedOldArray[i]) {
+            return true;
+        }
+    }
+    return false;
+};
+
 /*
  * transforms an object of form { id1: object1, id2: object2 }
  * to [
@@ -104,18 +126,25 @@ export const parseBooleanInObject = baseObject => {
     let parsedObject = {};
 
     Object.keys(baseObject).forEach(config => {
-        if (baseObject[config] === 'true') {
-            parsedObject[config] = true;
-        } else {
-            if (baseObject[config] === 'false') {
-                parsedObject[config] = false;
-            } else {
-                parsedObject[config] = baseObject[config];
-            }
-        }
+        parsedObject[config] = parseValueForBooleanStrings(baseObject[config]);
     });
 
     return parsedObject;
+}
+
+/*
+* switches 'true'- and 'false'-Strings
+* to their corresponding boolean value. All other kinds of values stay the same.
+*/
+export const parseValueForBooleanStrings = value => {
+    let parsedValue = value;
+    if (parsedValue === 'true') {
+        parsedValue = true;
+    } else if (parsedValue === 'false') {
+        parsedValue = false;
+    }
+
+    return parsedValue;
 }
 
 /*

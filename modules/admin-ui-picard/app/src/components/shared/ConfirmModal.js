@@ -26,7 +26,7 @@ const ConfirmModal = ({ close, resourceType, resourceName, resourceId, deleteMet
                 {deleteAllowed ? (
                     <div>
                         {showCautionMessage && (
-                            <div ng-if="hasEvents && deleteSeriesWithEventsAllowed" className="modal-alert warning">
+                            <div className="modal-alert warning">
                                 <p>
                                     {t(deleteWithCautionMessage)}
                                 </p>
