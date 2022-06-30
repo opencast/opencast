@@ -3,7 +3,7 @@ import axios from "axios";
 import {
     loadEventMetadataFailure,
     loadEventMetadataInProgress,
-    loadEventMetadataSuccess,
+    loadEventMetadataSuccess, loadEventSchedulingFailure, loadEventSchedulingInProgress, loadEventSchedulingSuccess,
     loadEventsFailure,
     loadEventsInProgress,
     loadEventsSuccess
@@ -20,7 +20,8 @@ import {sourceMetadata} from "../configs/sourceConfig";
 import {NOTIFICATION_CONTEXT, weekdays, WORKFLOW_UPLOAD_ASSETS_NON_TRACK} from "../configs/modalConfig";
 import {logger} from "../utils/logger";
 import {addNotification} from "./notificationThunks";
-import {getAssetUploadOptions} from "../selectors/eventSelectors";
+import {getAssetUploadOptions, getSchedulingEditedEvents} from "../selectors/eventSelectors";
+import {fetchSeriesOptions} from "./seriesThunks";
 
 
 
@@ -402,51 +403,69 @@ export const deleteMultipleEvent = events => async dispatch => {
 };
 
 // fetch scheduling info for events
-export const fetchScheduling = async events => {
-    let formData = new FormData();
+export const fetchScheduling = (events, fetchNewScheduling, setFormikValue) => async (dispatch, getState) => {
+    dispatch(loadEventSchedulingInProgress());
 
-    for (let i = 0; i < events.length; i++) {
-        if (events[i].selected) {
-            formData.append('eventIds', events[i].id);
-        }
-    }
-
-    formData.append('ignoreNonScheduled', true);
-
-    const response = await axios.post('/admin-ng/event/scheduling.json', formData);
-
-    let data = await response.data;
-
-    // transform data for further use
     let editedEvents = [];
-    for (let i = 0; i < data.length; i++) {
-        let startDate = new Date(data[i].start);
-        let endDate = new Date(data[i].end);
-        let event = {
-            eventId: data[i].eventId,
-            title: data[i].agentConfiguration['event.title'],
-            changedTitle: data[i].agentConfiguration['event.title'],
-            series: data[i].agentConfiguration['event.series'],
-            changedSeries: data[i].agentConfiguration['event.series'],
-            location: data[i].agentConfiguration['event.location'],
-            changedLocation: data[i].agentConfiguration['event.location'],
-            deviceInputs: data[i].agentConfiguration['capture.device.names'],
-            changedDeviceInputs: data[i].agentConfiguration['capture.device.names'].split(','),
-            startTimeHour: makeTwoDigits(startDate.getHours()),
-            changedStartTimeHour: makeTwoDigits(startDate.getHours()),
-            startTimeMinutes: makeTwoDigits(startDate.getMinutes()),
-            changedStartTimeMinutes: makeTwoDigits(startDate.getMinutes()),
-            endTimeHour: makeTwoDigits(endDate.getHours()),
-            changedEndTimeHour: makeTwoDigits(endDate.getHours()),
-            endTimeMinutes: makeTwoDigits(endDate.getMinutes()),
-            changedEndTimeMinutes: makeTwoDigits(endDate.getMinutes()),
-            weekday: weekdays[startDate.getDay()].name,
-            changedWeekday: weekdays[startDate.getDay()].name
+
+    // Only load schedule info about event, when not loaded before
+    if(fetchNewScheduling){
+        let formData = new FormData();
+
+        for (let i = 0; i < events.length; i++) {
+            if (events[i].selected) {
+                formData.append('eventIds', events[i].id);
+            }
         }
-        editedEvents.push(event);
+
+        formData.append('ignoreNonScheduled', true);
+
+        try {
+            const response = await axios.post('/admin-ng/event/scheduling.json', formData);
+
+            let data = await response.data;
+
+            // transform data for further use
+            for (let i = 0; i < data.length; i++) {
+                let startDate = new Date(data[i].start);
+                let endDate = new Date(data[i].end);
+                let event = {
+                    eventId: data[i].eventId,
+                    title: data[i].agentConfiguration['event.title'],
+                    changedTitle: data[i].agentConfiguration['event.title'],
+                    series: !!data[i].agentConfiguration['event.series'] ? data[i].agentConfiguration['event.series'] : '',
+                    changedSeries: !!data[i].agentConfiguration['event.series'] ? data[i].agentConfiguration['event.series'] : '',
+                    location: data[i].agentConfiguration['event.location'],
+                    changedLocation: data[i].agentConfiguration['event.location'],
+                    deviceInputs: data[i].agentConfiguration['capture.device.names'],
+                    changedDeviceInputs: data[i].agentConfiguration['capture.device.names'].split(','),
+                    startTimeHour: makeTwoDigits(startDate.getHours()),
+                    changedStartTimeHour: makeTwoDigits(startDate.getHours()),
+                    startTimeMinutes: makeTwoDigits(startDate.getMinutes()),
+                    changedStartTimeMinutes: makeTwoDigits(startDate.getMinutes()),
+                    endTimeHour: makeTwoDigits(endDate.getHours()),
+                    changedEndTimeHour: makeTwoDigits(endDate.getHours()),
+                    endTimeMinutes: makeTwoDigits(endDate.getMinutes()),
+                    changedEndTimeMinutes: makeTwoDigits(endDate.getMinutes()),
+                    weekday: weekdays[(startDate.getDay() + 6) % 7].name,
+                    changedWeekday: weekdays[(startDate.getDay() + 6) % 7].name
+                }
+                editedEvents.push(event);
+            }
+        } catch (e) {
+            dispatch(loadEventSchedulingFailure());
+            logger.error(e);
+        }
+    } else {
+        const state = getState();
+        editedEvents = getSchedulingEditedEvents(state);
     }
 
-    return editedEvents;
+    const responseSeriesOptions = await fetchSeriesOptions();
+
+    setFormikValue('editedEvents', editedEvents);
+
+    dispatch(loadEventSchedulingSuccess( editedEvents, responseSeriesOptions ));
 };
 
 // check if there are any scheduling conflicts with other events
@@ -509,11 +528,20 @@ export const updateScheduledEventsBulk = values => async dispatch => {
             events: [eventChanges.eventId],
             metadata: {
                 flavor: originalEvent.flavor,
-                title: originalEvent.title,
+                title: 'EVENTS.EVENTS.DETAILS.CATALOG.EPISODE',
                 fields: [
                     {
+                        id: 'title',
+                        label: 'EVENTS.EVENTS.DETAILS.METADATA.TITLE',
+                        readOnly: false,
+                        required: false,
+                        type: 'text',
+                        value: eventChanges.changedTitle,
+                        // todo: what is hashkey?
+                        $$hashKey: 'object:1588'
+                    },
+                    {
                         id: 'isPartOf',
-                        // todo: maybe change this; dunno if considered in backend
                         collection: {},
                         label: 'EVENTS.EVENTS.DETAILS.METADATA.SERIES',
                         readOnly: false,

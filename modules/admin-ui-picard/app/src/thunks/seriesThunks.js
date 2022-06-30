@@ -198,7 +198,12 @@ export const fetchSeriesOptions = async () => {
 
     const response = await data.data;
 
-    return transformToIdValueArray(response);
+    const seriesCollection = [];
+    for (const series of transformToIdValueArray(response)) {
+        seriesCollection.push({value: series.id, name: series.value});
+    }
+
+    return seriesCollection;
 };
 
 // Check if a series has events

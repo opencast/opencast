@@ -172,28 +172,28 @@ const EditableSingleSelect = ({ field, metadataField, text, editMode, setEditMod
                  ref={childRef}>
                 <select {...field}
                         data-width="'250px'">
-                    {(metadataField.value === "" && !metadataField.required) && (
+                    {(metadataField.value === '' || !metadataField.required) && (
                         <option value="">{t('SELECT_NO_OPTION_SELECTED')}</option>
                     )}
-                    {(metadataField.id === "language") ? (
+                    {(metadataField.id === 'language') ? (
                         metadataField.collection.map((item, key) => (
                                 <option key={key} value={item.value}>{t(item.name)}</option>
                         ))
                     ) : (
                         // if selection of series then use item name as option label else use item value
-                        metadataField.id === "isPartOf" ? (
+                        metadataField.id === 'isPartOf' ? (
                             metadataField.collection.map((item, key) => (
                                 <option key={key} value={item.value}>{item.name}</option>
                             ))
-                            ) : (
+                        ) : (
                             metadataField.collection.map((item, key) => (
-                                <option key={key}>{item.value}</option>
+                                <option key={key} value={item.value}>{item.value}</option>
                             ))
                         )
                     )}
                 </select>
             </div>
-            ) : (
+        ) : (
              <div onClick={() => setEditMode(true)}>
                  <span className="editable preserve-newlines">
                      { text || t('SELECT_NO_OPTION_SELECTED') }

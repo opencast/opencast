@@ -2,6 +2,9 @@ import {
     LOAD_EVENT_METADATA_FAILURE,
     LOAD_EVENT_METADATA_IN_PROGRESS,
     LOAD_EVENT_METADATA_SUCCESS,
+    LOAD_BULK_UPDATE_EVENT_SCHEDULING_IN_PROGRESS,
+    LOAD_BULK_UPDATE_EVENT_SCHEDULING_SUCCESS,
+    LOAD_BULK_UPDATE_EVENT_SCHEDULING_FAILURE,
     LOAD_EVENTS_FAILURE,
     LOAD_EVENTS_IN_PROGRESS,
     LOAD_EVENTS_SUCCESS,
@@ -42,7 +45,12 @@ const initialState = {
     extendedMetadata: [],
     isFetchingAssetUploadOptions: false,
     uploadAssetOptions: [],
-    uploadAssetWorkflow: ''
+    uploadAssetWorkflow: '',
+    schedulingInfo: {
+        isLoading: false,
+        editedEvents: [],
+        seriesOptions: []
+    }
 }
 
 // Reducer for events
@@ -122,6 +130,36 @@ const events = (state=initialState, action) => {
                 ...state,
                 isLoading: false,
                 extendedMetadata: []
+            }
+        }
+        case LOAD_BULK_UPDATE_EVENT_SCHEDULING_IN_PROGRESS: {
+            return {
+                ...state,
+                schedulingInfo: {
+                    ...state.schedulingInfo,
+                    isLoading: true
+                }
+            }
+        }
+        case LOAD_BULK_UPDATE_EVENT_SCHEDULING_SUCCESS: {
+            const { editedEvents, seriesOptions } = payload;
+            return {
+                ...state,
+                schedulingInfo: {
+                    isLoading: false,
+                    editedEvents: editedEvents,
+                    seriesOptions: seriesOptions
+                }
+            }
+        }
+        case LOAD_BULK_UPDATE_EVENT_SCHEDULING_FAILURE: {
+            return {
+                ...state,
+                schedulingInfo: {
+                    ...state.schedulingInfo,
+                    isLoading: false,
+                    editedEvents: []
+                }
             }
         }
         case LOAD_ASSET_UPLOAD_OPTIONS_IN_PROGRESS: {

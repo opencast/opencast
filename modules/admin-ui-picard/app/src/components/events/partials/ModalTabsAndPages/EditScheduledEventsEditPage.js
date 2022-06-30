@@ -8,44 +8,29 @@ import RenderField from "../../../shared/wizard/RenderField";
 import {getTimezoneOffset, hasAccess} from "../../../../utils/utils";
 import {hours, minutes, NOTIFICATION_CONTEXT, weekdays} from "../../../../configs/modalConfig";
 import {checkForSchedulingConflicts, fetchScheduling} from "../../../../thunks/eventThunks";
-import {fetchSeriesOptions} from "../../../../thunks/seriesThunks";
 import {addNotification} from "../../../../thunks/notificationThunks";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
+import {
+    getSchedulingSeriesOptions,
+    isLoadingScheduling
+} from "../../../../selectors/eventSelectors";
 
 /**
  * This component renders the edit page for scheduled events of the corresponding bulk action
  */
 const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevices,
                                          checkForSchedulingConflicts, addNotification,
-                                         removeNotificationWizardForm, user }) => {
+                                         removeNotificationWizardForm, fetchSchedulingData,
+                                         loading, seriesOptions, user }) => {
     const { t } = useTranslation();
 
     // conflicts with other events
     const [conflicts, setConflicts] = useState([]);
-    // loading flag
-    const [loading, setLoading] = useState(false);
-    // Options for series dropdown
-    const [seriesOptions, setSeriesOptions] = useState([]);
 
     useEffect(() => {
         // Fetch data about series and schedule info of chosen events from backend
-        async function fetchData() {
-
-            setLoading(true);
-            const responseSeriesOptions = await fetchSeriesOptions();
-            setSeriesOptions(responseSeriesOptions);
-
-            // Only load schedule info about event, when not loaded before
-            if (formik.values.editedEvents.length === 0) {
-                let initialData = await fetchScheduling(formik.values.events);
-                formik.setFieldValue('editedEvents', initialData);
-            }
-
-            setLoading(false);
-        }
-
-        fetchData();
+        fetchSchedulingData(formik.values.events, (formik.values.editedEvents.length === 0), formik.setFieldValue);
     }, []);
 
     // Render input device options of currently chosen input device
@@ -134,7 +119,9 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                             <FieldArray name="editedEvents">
                                 {({ insert, remove, push }) => (
                                     <>
-                                        {formik.values.editedEvents.map((event, key) => (
+                                        {/*todo: in old UI this was grouped by weekday, which is also stated in the description in the div above
+                                        now there isn't any grouping and there is one div per event -> find out, if that is okay and adapt again if necessary */
+                                            formik.values.editedEvents.map((event, key) => (
                                             <div className="obj tbl-details">
                                                 <header>
                                                     {event.title}
@@ -165,7 +152,9 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                             <Field name={`editedEvents.${key}.changedSeries`}
                                                                                    metadataField={{
                                                                                        type: 'text',
-                                                                                       collection: seriesOptions
+                                                                                       collection: seriesOptions,
+                                                                                       id: 'isPartOf',
+                                                                                       required: (formik.values.editedEvents[key].series !== '')
                                                                                    }}
                                                                                    component={RenderField}/>
                                                                         </td>
@@ -325,14 +314,17 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    loading: isLoadingScheduling(state),
+    seriesOptions: getSchedulingSeriesOptions(state)
 });
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     checkForSchedulingConflicts: events => dispatch(checkForSchedulingConflicts(events)),
     addNotification: (type, key, duration, parameter, context) => dispatch(addNotification(type, key, duration, parameter, context)),
-    removeNotificationWizardForm: () => dispatch(removeNotificationWizardForm())
+    removeNotificationWizardForm: () => dispatch(removeNotificationWizardForm()),
+    fetchSchedulingData: (events, fetchNewScheduling, setFieldValue) => dispatch(fetchScheduling(events, fetchNewScheduling, setFieldValue))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditScheduledEventsEditPage);

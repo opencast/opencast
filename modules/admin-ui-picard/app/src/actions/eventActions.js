@@ -17,6 +17,12 @@ export const LOAD_EVENT_METADATA_IN_PROGRESS = 'LOAD_EVENT_METADATA_IN_PROGRESS'
 export const LOAD_EVENT_METADATA_SUCCESS = 'LOAD_EVENT_METADATA_SUCCESS';
 export const LOAD_EVENT_METADATA_FAILURE = 'LOAD_EVENT_METADATA_FAILURE';
 
+// Constants of action types affecting fetching of event scheduling information from server
+export const LOAD_BULK_UPDATE_EVENT_SCHEDULING_IN_PROGRESS = 'LOAD_BULK_UPDATE_EVENT_SCHEDULING_IN_PROGRESS';
+export const LOAD_BULK_UPDATE_EVENT_SCHEDULING_SUCCESS = 'LOAD_BULK_UPDATE_EVENT_SCHEDULING_SUCCESS';
+export const LOAD_BULK_UPDATE_EVENT_SCHEDULING_FAILURE = 'LOAD_BULK_UPDATE_EVENT_SCHEDULING_FAILURE';
+
+
 // Actions affecting fetching of events from server
 
 export const loadEventsInProgress = () => ({
@@ -62,4 +68,19 @@ export const loadEventMetadataSuccess = ( usualMetadata, extendedMetadata ) => (
 
 export const loadEventMetadataFailure = () => ({
     type: LOAD_EVENT_METADATA_FAILURE
+});
+
+// Actions affecting fetching of event scheduling information from server
+
+export const loadEventSchedulingInProgress = () => ({
+    type: LOAD_BULK_UPDATE_EVENT_SCHEDULING_IN_PROGRESS
+});
+
+export const loadEventSchedulingSuccess = ( editedEvents, seriesOptions ) => ({
+    type: LOAD_BULK_UPDATE_EVENT_SCHEDULING_SUCCESS,
+    payload: { editedEvents, seriesOptions }
+});
+
+export const loadEventSchedulingFailure = () => ({
+    type: LOAD_BULK_UPDATE_EVENT_SCHEDULING_FAILURE
 });
