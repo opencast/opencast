@@ -188,7 +188,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     }
 
     var size = NumberUtils.toInt(limit, 20);
-    var from = NumberUtils.toInt(offset) * size;
+    var from = NumberUtils.toInt(offset);
     if (size < 0 || from < 0) {
       return Response.status(Response.Status.BAD_REQUEST)
           .entity("Limit and offset may not be negative.")
@@ -221,10 +221,10 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
     var total = 0; // TODO (conflicts with Solr): hits.getTotalHits().value;
     var json = gson.toJsonTree(Map.of(
-        "offset", offset,
+        "offset", from,
         "total", total,
         "result", result,
-        "limit", limit));
+        "limit", size));
     return Response.ok(gson.toJson(json)).build();
 
   }
@@ -374,7 +374,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     logger.debug("limit: {}, offset: {}", limit, offset);
 
     var size = NumberUtils.toInt(limit, 20);
-    var from = NumberUtils.toInt(offset) * size;
+    var from = NumberUtils.toInt(offset);
     if (size < 0 || from < 0) {
       return Response.status(Response.Status.BAD_REQUEST)
           .entity("Limit and offset may not be negative.")
@@ -404,19 +404,18 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       searchSource.sort("dc." + sortParam[0], order);
     }
 
-    var result = Arrays.stream(searchService.search(searchSource)
-        .getHits()
-        .getHits())
+    var hits = searchService.search(searchSource).getHits();
+    var result = Arrays.stream(hits.getHits())
         .map(SearchHit::getSourceAsMap)
         .peek(hit -> hit.remove("mediapackage_xml"))
         .peek(hit -> hit.remove("type"))
         .collect(Collectors.toList());
-    var total = 0; // TODO (conflicts with Solr): hits.getTotalHits().value;
+    var total = hits.getTotalHits().value;
     var json = gson.toJsonTree(Map.of(
-        "offset", offset,
+        "offset", from,
         "total", total,
         "result", result,
-        "limit", limit));
+        "limit", size));
 
     return Response.ok(gson.toJson(json)).build();
   }
