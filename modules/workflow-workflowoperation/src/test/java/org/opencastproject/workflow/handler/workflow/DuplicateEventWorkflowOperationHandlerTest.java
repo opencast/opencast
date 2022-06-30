@@ -38,6 +38,8 @@ import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkfl
 import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler
     .PROPERTY_NAMESPACES_PROPERTY;
 import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler
+    .SET_TITLE;
+import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler
     .SOURCE_FLAVORS_PROPERTY;
 import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler
     .SOURCE_TAGS_PROPERTY;
@@ -146,6 +148,7 @@ public class DuplicateEventWorkflowOperationHandlerTest {
     configurations.put(MAX_NUMBER_PROPERTY, "" + 10);
     configurations.put(PROPERTY_NAMESPACES_PROPERTY, "org.opencastproject.assetmanager.security");
     configurations.put(COPY_NUMBER_PREFIX_PROPERTY, "copy");
+    configurations.put(SET_TITLE, "copied_event_title");
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
@@ -153,7 +156,7 @@ public class DuplicateEventWorkflowOperationHandlerTest {
     Assert.assertEquals(Action.CONTINUE, result.getAction());
     Assert.assertEquals(numCopies, clonedMediaPackages.getValues().size());
     for (int i = 1; i <= numCopies; i++) {
-      final String expectedTitle = mp.getTitle()
+      final String expectedTitle = "copied_event_title"
           + " (" + configurations.get(COPY_NUMBER_PREFIX_PROPERTY) + " " + i + ")";
       Assert.assertEquals(expectedTitle, clonedMediaPackages.getValues().get(i - 1).getTitle());
     }
@@ -173,6 +176,7 @@ public class DuplicateEventWorkflowOperationHandlerTest {
     configurations.put(MAX_NUMBER_PROPERTY, "" + 10);
     configurations.put(PROPERTY_NAMESPACES_PROPERTY, "org.opencastproject.assetmanager.security");
     configurations.put(COPY_NUMBER_PREFIX_PROPERTY, "copy");
+    configurations.put(SET_TITLE, "copied_event_title");
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
@@ -194,6 +198,7 @@ public class DuplicateEventWorkflowOperationHandlerTest {
     configurations.put(MAX_NUMBER_PROPERTY, "" + 10);
     configurations.put(PROPERTY_NAMESPACES_PROPERTY, "org.opencastproject.assetmanager.security");
     configurations.put(COPY_NUMBER_PREFIX_PROPERTY, "copy");
+    configurations.put(SET_TITLE, "copied_event_title");
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
