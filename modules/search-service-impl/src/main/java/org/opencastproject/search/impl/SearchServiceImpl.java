@@ -282,7 +282,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   private Map<String, List<String>> mapDublinCore(DublinCoreCatalog dublinCoreCatalog) {
     var metadata = new HashMap<String, List<String>>();
-    for (var entry : dublinCoreCatalog.getValues().entrySet()){
+    for (var entry : dublinCoreCatalog.getValues().entrySet()) {
       var key = entry.getKey().getLocalName();
       var values = entry.getValue().stream()
           .map(DublinCoreValue::getValue)

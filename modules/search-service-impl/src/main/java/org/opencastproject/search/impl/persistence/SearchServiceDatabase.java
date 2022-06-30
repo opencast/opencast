@@ -80,7 +80,7 @@ public interface SearchServiceDatabase {
    *           if there is a problem communicating with the underlying data store
    */
   MediaPackage getMediaPackage(String mediaPackageId)
-      throws NotFoundException, SearchServiceDatabaseException, UnauthorizedException;
+          throws NotFoundException, SearchServiceDatabaseException, UnauthorizedException;
 
   /**
    * Gets media packages from a specific series

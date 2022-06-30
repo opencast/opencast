@@ -106,7 +106,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
   @GET
   @Path("series.json")
-  @Produces( MediaType.APPLICATION_JSON )
+  @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(
       name = "get_series",
       description = "Search for series matching the query parameters.",
@@ -231,7 +231,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
   @GET
   @Path("episode.json")
-  @Produces( MediaType.APPLICATION_JSON )
+  @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(
       name = "search_episodes",
       description = "Search for episodes matching the query parameters.",

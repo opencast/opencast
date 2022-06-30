@@ -396,7 +396,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
    */
   @Override
   public MediaPackage getMediaPackage(String mediaPackageId)
-      throws NotFoundException, SearchServiceDatabaseException, UnauthorizedException {
+          throws NotFoundException, SearchServiceDatabaseException, UnauthorizedException {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {
