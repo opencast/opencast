@@ -19,23 +19,15 @@
  *
  */
 
-package org.opencastproject.elasticsearch.index.rebuild;
+package org.opencastproject.userdirectory.brightspace.client;
 
-/**
- * This service handles data that's added to an ElasticSearch index.
- */
-public interface IndexProducer {
+public class BrightspaceNotFoundException extends Exception {
 
-  /**
-   * Re-add all data of this service to the index.
-   */
-  void repopulate() throws IndexRebuildException;
+  public BrightspaceNotFoundException(String s) {
+    super(s);
+  }
 
-  /**
-   * Get the service that implements IndexProducer.
-   *
-   * @return service
-   *           The service that implements IndexProducer.
-   */
-  IndexRebuildService.Service getService();
+  public BrightspaceNotFoundException(String s, Throwable throwable) {
+    super(s, throwable);
+  }
 }

@@ -162,9 +162,14 @@ public class ListProvidersServiceImpl implements ListProvidersService {
       for (Map.Entry<String,String> entry : list.entrySet()) {
         int repeated = Collections.frequency(list.values(), entry.getValue());
         if (repeated > 1) {
+          String newSeriesName = null;
           //If a series name is repeated, will add the first 7 characters of the series ID to the display name on the
           //admin-ui
-          String newSeriesName = entry.getValue() + " " + "(ID: " + entry.getKey().substring(0, 7) + "...)";
+          try {
+            newSeriesName = entry.getValue() + " " + "(ID: " + entry.getKey().substring(0, 7) + "...)";
+          } catch (StringIndexOutOfBoundsException e) {
+            newSeriesName = entry.getValue() + " " + "(ID: " + entry.getKey() + ")";
+          }
           logger.debug(String.format("Repeated series title \"%s\" found, changing to \"%s\" for admin-ui display",
               entry.getValue(), newSeriesName));
           list.put(entry.getKey(), newSeriesName);

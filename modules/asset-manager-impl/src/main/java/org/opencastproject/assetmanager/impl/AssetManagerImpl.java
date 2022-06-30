@@ -414,7 +414,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           snapshot.getMediaPackage().getIdentifier(), snapshot.getVersion());
       fireEventHandlers(mkTakeSnapshotMessage(snapshot));
 
-      updateEventInIndex(snapshot, index);
+      updateEventInIndex(snapshot);
 
       return snapshot;
     }
@@ -480,7 +480,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * @param index
    *         The API index to update
    */
-  private void updateEventInIndex(Snapshot snapshot, ElasticsearchIndex index) {
+  private void updateEventInIndex(Snapshot snapshot) {
     final MediaPackage mp = snapshot.getMediaPackage();
     String eventId = mp.getIdentifier().toString();
     final String organization = securityService.getOrganization().getId();
@@ -538,13 +538,13 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * @param index
    *         The API index to update
    */
-  private void removeArchivedVersionFromIndex(String eventId, ElasticsearchIndex index) {
+  private void removeArchivedVersionFromIndex(String eventId) {
     final String orgId = securityService.getOrganization().getId();
     final User user = securityService.getUser();
     logger.debug("Received AssetManager delete episode message {}", eventId);
 
     Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
-      if (!eventOpt.isPresent()) {
+      if (eventOpt.isEmpty()) {
         logger.warn("Event {} not found for deletion", eventId);
         return Optional.empty();
       }
@@ -876,7 +876,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     logger.info("Firing event handlers for event {}", mpId);
     fireEventHandlers(AssetManagerItem.deleteEpisode(mpId, new Date()));
 
-    removeArchivedVersionFromIndex(mpId, index);
+    removeArchivedVersionFromIndex(mpId);
   }
 
   /**
@@ -889,7 +889,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
-  public void repopulate(final ElasticsearchIndex index) throws IndexRebuildException {
+  public void repopulate() throws IndexRebuildException {
     final Organization org = securityService.getOrganization();
     final User user = (org != null ? securityService.getUser() : null);
     try {
@@ -915,7 +915,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           for (Snapshot snapshot : byOrg.get(orgId)) {
             current += 1;
             try {
-              updateEventInIndex(snapshot, index);
+              updateEventInIndex(snapshot);
             } catch (Throwable t) {
               logSkippingElement(logger, "event", snapshot.getMediaPackage().getIdentifier().toString(), org, t);
             }

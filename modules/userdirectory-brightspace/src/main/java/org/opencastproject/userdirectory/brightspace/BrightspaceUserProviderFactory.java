@@ -157,17 +157,17 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
 
     String cacheSizeStr = (String) properties.get(CACHE_SIZE_KEY);
     if (StringUtils.isBlank(cacheSizeStr)) {
-      int cacheSize = DEFAULT_CACHE_SIZE_VALUE;
+      cacheSize = DEFAULT_CACHE_SIZE_VALUE;
     } else {
-      int cacheSize = NumberUtils.toInt(cacheSizeStr);
+      cacheSize = NumberUtils.toInt(cacheSizeStr);
     }
 
 
     String cacheExpirationStr = (String) properties.get(CACHE_EXPIRATION_KEY);
     if (StringUtils.isBlank(cacheExpirationStr)) {
-      int cacheExpiration = DEFAULT_CACHE_EXPIRATION_VALUE;
+      cacheExpiration = DEFAULT_CACHE_EXPIRATION_VALUE;
     } else {
-      int cacheExpiration = NumberUtils.toInt(cacheExpirationStr);
+      cacheExpiration = NumberUtils.toInt(cacheExpirationStr);
     }
 
     String rolesStr = (String) properties.get(BRIGHTSPACE_INSTRUCTOR_ROLES_KEY);

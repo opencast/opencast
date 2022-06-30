@@ -231,7 +231,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   private final Striped<Lock> mediaPackageLocks = Striped.lazyWeakLock(1024);
 
   /** The Elasticsearch indices */
-  private ElasticsearchIndex elasticsearchIndex;
+  private ElasticsearchIndex index;
 
   /**
    * Constructs a new workflow service impl, with a priority-sorted map of metadata services
@@ -940,8 +940,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       try {
         serviceRegistry.removeJobs(jobsToDelete);
       } catch (ServiceRegistryException e) {
-        logger.warn("Problems while removing jobs related to workflow operations '%s': %s", jobsToDelete,
-                e.getMessage());
+        logger.warn("Problems while removing jobs related to workflow operations '%s'", jobsToDelete, e);
       } catch (NotFoundException e) {
         logger.debug("No jobs related to one of the workflow operations '%s' found in the service registry",
                 jobsToDelete);
@@ -950,7 +949,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       // Third, remove workflow instance job itself
       try {
         serviceRegistry.removeJobs(Collections.singletonList(workflowInstanceId));
-        removeWorkflowInstanceFromIndex(instance.getId(), elasticsearchIndex);
+        removeWorkflowInstanceFromIndex(instance.getId());
       } catch (ServiceRegistryException e) {
         logger.warn("Problems while removing workflow instance job '%d'", workflowInstanceId, e);
       } catch (NotFoundException e) {
@@ -1256,7 +1255,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           String mpId = workflowInstance.getMediaPackage().getIdentifier().toString();
           String orgId = workflowInstance.getOrganizationId();
 
-          updateWorkflowInstanceInIndex(id, state, mpId, orgId, elasticsearchIndex);
+          updateWorkflowInstanceInIndex(id, state, mpId, orgId);
         }
       } catch (ServiceRegistryException e) {
         throw new WorkflowDatabaseException("Update of workflow job " + workflowInstance.getId()
@@ -1973,7 +1972,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Reference
   public void setIndex(ElasticsearchIndex index) {
-    this.elasticsearchIndex = index;
+    this.index = index;
   }
 
   /**
@@ -2150,7 +2149,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   @Override
-  public void repopulate(final ElasticsearchIndex index) throws IndexRebuildException {
+  public void repopulate() throws IndexRebuildException {
     final int total;
     try {
       total = persistence.countMediaPackages();
@@ -2185,7 +2184,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
             if (currentMediapackageId.equals(lastMediapackageId)) {
               continue;
             }
-            updateWorkflowInstanceInIndex(data.getId(), data.getState(), data.getMediaPackageId(), data.getOrganizationId(), index);
+            updateWorkflowInstanceInIndex(data.getId(), data.getState(), data.getMediaPackageId(), data.getOrganizationId());
 
             current += 1;
             lastMediapackageId = currentMediapackageId;
@@ -2209,7 +2208,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param index
    *         the index to update
    */
-  private void removeWorkflowInstanceFromIndex(long workflowInstanceId, ElasticsearchIndex index) {
+  private void removeWorkflowInstanceFromIndex(long workflowInstanceId) {
     final String orgId = securityService.getOrganization().getId();
     final User user = securityService.getUser();
 
@@ -2278,7 +2277,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param index
    *         the index to update
    */
-  private void updateWorkflowInstanceInIndex(long id, int state, String mpId, String orgId, ElasticsearchIndex index) {
+  private void updateWorkflowInstanceInIndex(long id, int state, String mpId, String orgId) {
     final WorkflowState workflowState = WorkflowState.values()[state];
     final User user = securityService.getUser();
 

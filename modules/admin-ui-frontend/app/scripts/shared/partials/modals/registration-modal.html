@@ -308,7 +308,7 @@
          ng-form="adopterRegistrationForm"
          ng-class="{inactive: !adopter.agreedToPolicy}"
          ng-click="nextState(1)"
-         translate="{{states[state]['buttons']['submitButtonText']}}"></a>
+         translate="{{!registered ? states[state]['buttons']['submitButtonText'] : 'WIZARD.UPDATE' }}"></a>
       <a ng-show="state != 'form' && state != 'delete_submit'"
          class="submit"
          ng-form="adopterRegistrationForm"

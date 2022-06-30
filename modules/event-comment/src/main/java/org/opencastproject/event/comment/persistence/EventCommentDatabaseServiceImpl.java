@@ -399,11 +399,11 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     String organization = securityService.getOrganization().getId();
     User user = securityService.getUser();
 
-    updateIndex(eventId, !comments.isEmpty(), hasOpenComments, needsCutting, organization, user, index);
+    updateIndex(eventId, !comments.isEmpty(), hasOpenComments, needsCutting, organization, user);
   }
 
   private void updateIndex(String eventId, boolean hasComments, boolean hasOpenComments, boolean needsCutting,
-          String organization, User user, ElasticsearchIndex index) {
+          String organization, User user) {
     logger.debug("Updating comment status of event {} in the {} index.", eventId, index.getIndexName());
     if (!hasComments && hasOpenComments) {
       throw new IllegalStateException(
@@ -416,7 +416,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     }
 
     Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
-      if (!eventOpt.isPresent()) {
+      if (eventOpt.isEmpty()) {
         logger.debug("Event {} not found for comment status updating", eventId);
         return Optional.empty();
       }
@@ -449,7 +449,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   };
 
   @Override
-  public void repopulate(final ElasticsearchIndex index) throws IndexRebuildException {
+  public void repopulate() throws IndexRebuildException {
     try {
       final int total = countComments();
       final int[] current = new int[1];
@@ -467,8 +467,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
                       boolean hasOpenComments = !Stream.$(comments).filter(filterOpenComments).toList().isEmpty();
                       boolean needsCutting = !Stream.$(comments).filter(filterNeedsCuttingComment).toList().isEmpty();
 
-                      updateIndex(eventId, !comments.isEmpty(), hasOpenComments, needsCutting, orgId, systemUser,
-                              index);
+                      updateIndex(eventId, !comments.isEmpty(), hasOpenComments, needsCutting, orgId, systemUser);
                       current[0] += comments.size();
                       logIndexRebuildProgress(logger, index.getIndexName(), total, current[0]);
                     } catch (Throwable t) {
