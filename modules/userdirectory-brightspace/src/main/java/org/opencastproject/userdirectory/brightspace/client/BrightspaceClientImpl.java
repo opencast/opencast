@@ -84,14 +84,17 @@ public class BrightspaceClientImpl implements BrightspaceClient {
 
   public BrightspaceUser findUser(String userName) throws BrightspaceClientException {
     String request = GET_USER_BY_USERNAME + userName;
-    String response = httpGetRequest(request);
-    logger.debug(response);
 
     try {
+      String response = httpGetRequest(request);
+      logger.debug(response);
+
       BrightspaceUser brightspaceUser = objectMapper
               .readerFor(BrightspaceUser.class)
               .readValue(response);
       return brightspaceUser;
+    } catch (BrightspaceNotFoundException nfe) {
+      return null;
     } catch (IOException e) {
       logger.debug(e.toString());
       throw new BrightspaceClientException(UNEXPECTED_JSON_RESPONSE, e);
@@ -137,12 +140,14 @@ public class BrightspaceClientImpl implements BrightspaceClient {
 
   @Override
   public List<BrightspaceUser> findAllUsers() throws BrightspaceClientException {
-    String response = httpGetRequest(GET_ALL_USERS);
     try {
+      String response = httpGetRequest(GET_ALL_USERS);
       UsersResponse usersResponse = objectMapper.readValue(response, UsersResponse.class);
       return usersResponse.getItems();
     } catch (IOException e) {
       throw new BrightspaceClientException(UNEXPECTED_JSON_RESPONSE, e);
+    } catch (BrightspaceNotFoundException nfe) {
+      throw new BrightspaceClientException(UNEXPECTED_JSON_RESPONSE, nfe);
     }
 
   }
@@ -151,14 +156,21 @@ public class BrightspaceClientImpl implements BrightspaceClient {
     return this.url;
   }
 
-  private String httpGetRequest(String request) throws BrightspaceClientException {
+  private String httpGetRequest(String request) throws BrightspaceClientException, BrightspaceNotFoundException {
     URL url = createUrl(request);
 
-    HttpsURLConnection urlConnection = (HttpsURLConnection) getURLConnection(url);
-    try (InputStream inputStream = urlConnection.getInputStream()) {
+    try {
+      HttpsURLConnection urlConnection = (HttpsURLConnection) getURLConnection(url);
+
+      if (urlConnection.getResponseCode() == 404) {
+        logger.debug("Not found, 404 response");
+        throw new BrightspaceNotFoundException("not found");
+      }
+
+      InputStream inputStream = urlConnection.getInputStream();
       return readInputStream(inputStream);
     } catch (IOException io) {
-      logger.error("error in brightspace data fetching", io);
+      logger.warn("error in brightspace data fetching", io);
       throw new BrightspaceClientException("could not read response");
     }
   }
@@ -211,19 +223,22 @@ public class BrightspaceClientImpl implements BrightspaceClient {
   }
 
   private OrgUnitResponse findOrgUnitPage(String request) throws BrightspaceClientException {
-    String response = httpGetRequest(request);
     try {
+      String response = httpGetRequest(request);
       return objectMapper.readValue(response, OrgUnitResponse.class);
     } catch (IOException e) {
       logger.error(UNEXPECTED_JSON_RESPONSE);
       throw new BrightspaceClientException(UNEXPECTED_JSON_RESPONSE, e);
+    } catch (BrightspaceNotFoundException nfe) {
+      logger.error(UNEXPECTED_JSON_RESPONSE);
+      throw new BrightspaceClientException(UNEXPECTED_JSON_RESPONSE, nfe);
     }
   }
 
   private String composePagedUrl(String bookmark, String brightspaceUserId) {
     String request = GET_COURSES_BY_BRIGHTSPACE_USER_ID.replaceAll("\\{\\S+}", brightspaceUserId);
     if (bookmark != null) {
-      request += "?bookmark=" + bookmark + "&orgUnitTypeId=3";
+      request += "&bookmark=" + bookmark;
     }
     return request;
   }
