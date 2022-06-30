@@ -201,14 +201,12 @@ angular.module('adminNg.services')
             rulesValid = true;
 
         angular.forEach(me.ud.policies, function (policy) {
-          rulesValid = false;
-
           if (policy.read && policy.write) {
             hasRights = true;
           }
 
-          if ((policy.read || policy.write || policy.actions.value.length > 0) && !angular.isUndefined(policy.role)) {
-            rulesValid = true;
+          if (!(policy.read || policy.write || policy.actions.value.length > 0) || angular.isUndefined(policy.role)) {
+            rulesValid = false;
           }
         });
 
