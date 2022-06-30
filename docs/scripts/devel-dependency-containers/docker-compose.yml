@@ -1,11 +1,16 @@
 version: '2'
 services:
   elasticsearch:
-    container_name: opencast-elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
+    container_name: opencast-opensearch
+    image: opensearchproject/opensearch:1
     ports:
       - 127.0.0.1:9200:9200
       - 127.0.0.1:9300:9300
     environment:
-      discovery.type: single-node
-      ES_JAVA_OPTS: '-Dlog4j2.formatMsgNoLookups=true'
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-node1
+      - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      - "DISABLE_INSTALL_DEMO_CONFIG=true" # disables execution of install_demo_configuration.sh bundled with security plugin, which installs demo certificates and security configurations to OpenSearch
+      - "DISABLE_SECURITY_PLUGIN=true" # disables security plugin entirely in OpenSearch by setting plugins.security.disabled: true in opensearch.yml
+      - "discovery.type=single-node" # disables bootstrap checks that are enabled when network.host is set to a non-loopback address
