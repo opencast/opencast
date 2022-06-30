@@ -26,12 +26,14 @@ import static org.opencastproject.security.api.Permissions.Action.READ;
 import static org.opencastproject.security.api.Permissions.Action.WRITE;
 
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AccessControlParsingException;
 import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -54,6 +56,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -61,6 +65,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.Predicate;
 
 /**
  * Implements {@link SearchServiceDatabase}. Defines permanent storage for series.
@@ -326,6 +331,86 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
     }
   }
 
+  @Override
+  public Collection<MediaPackage> search(String seriesId, String seriesName, String text, String sort,
+      boolean ascending, int limit, int offset) {
+    EntityManager em = emf.createEntityManager();
+    var criteriaBuilder = em.getCriteriaBuilder();
+    var criteriaQuery = criteriaBuilder.createQuery(SearchEntity.class);
+    var root = criteriaQuery.from(SearchEntity.class);
+    criteriaQuery.select(root);
+
+    var predicates = new ArrayList<Predicate>();
+    var org = securityService.getOrganization();
+    predicates.add(criteriaBuilder.equal(root.get("organization"), org));
+
+    predicates.add(criteriaBuilder.isNull(root.get("deletionDate")));
+
+    if (Objects.nonNull(seriesId)) {
+      predicates.add(criteriaBuilder.equal(root.get("seriesId"), seriesId));
+    }
+
+    if (Objects.nonNull(text)) {
+      predicates.add(criteriaBuilder.like(root.get("mediaPackageXML"), "%" + text + "%"));
+    }
+
+    var user = securityService.getUser();
+    if (!user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) && !user.hasRole(org.getAdminRole())) {
+      predicates.add(criteriaBuilder.or(user.getRoles().stream()
+          .map(role -> "%<role>" + role.getName() + "</role>%")
+          .map(like -> criteriaBuilder.like(root.get("accessControl"), like))
+          .toArray(Predicate[]::new)));
+    }
+
+    sort = Objects.toString(sort, "creationDate");
+    var order = ascending
+        ? criteriaBuilder.asc(root.get(sort))
+        : criteriaBuilder.desc(root.get(sort));
+
+    criteriaQuery.where(predicates.toArray(new Predicate[0]))
+        .orderBy(order);
+
+    var query = em.createQuery(criteriaQuery)
+        .setMaxResults(limit)
+        .setFirstResult(offset);
+    logger.debug("Search query: {}", query);
+
+    return query.getResultList().stream()
+        .map(this::safeParseMediaPackage)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
+  }
+
+  private MediaPackage safeParseMediaPackage(SearchEntity entity) {
+    try {
+      return MediaPackageParser.getFromXml(entity.getMediaPackageXML());
+    } catch (MediaPackageException e) {
+      logger.warn("Invalid media package XML found in search service on episode {}. Check this entry.",
+          entity.getMediaPackageId());
+      return null;
+    }
+  }
+
+  boolean isAuthorized(SearchEntity entity) {
+    var user = securityService.getUser();
+    var org = securityService.getOrganization();
+
+    if (user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) || user.hasRole(org.getAdminRole())) {
+      return true;
+    }
+
+    if (entity.getAccessControl() == null) {
+      return false;
+    }
+
+    try {
+      var acl = AccessControlParser.parseAcl(entity.getAccessControl());
+      return AccessControlUtil.isAuthorized(acl, user, org, READ.toString());
+    } catch (IOException | AccessControlParsingException e) {
+      return false;
+    }
+  }
+
   /**
    * {@inheritDoc}
    *
@@ -353,6 +438,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         searchEntity.setAccessControl(AccessControlParser.toXml(acl));
         searchEntity.setModificationDate(now);
         searchEntity.setSeriesId(mediaPackage.getSeries());
+        searchEntity.setCreationDate(mediaPackage.getDate());
         em.persist(searchEntity);
       } else {
         // Ensure this user is allowed to update this media package
@@ -373,12 +459,13 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         entity.setModificationDate(now);
         entity.setDeletionDate(null);
         entity.setSeriesId(mediaPackage.getSeries());
+        entity.setCreationDate(mediaPackage.getDate());
         em.merge(entity);
       }
       tx.commit();
     } catch (Exception e) {
-      logger.error("Could not update media package: {}", e.getMessage());
-      if (tx.isActive()) {
+      logger.error("Could not update media package:", e);
+      if (tx != null && tx.isActive()) {
         tx.rollback();
       }
       throw new SearchServiceDatabaseException(e);

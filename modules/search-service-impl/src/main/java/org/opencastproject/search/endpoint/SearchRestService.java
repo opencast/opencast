@@ -22,11 +22,13 @@
 package org.opencastproject.search.endpoint;
 
 import org.opencastproject.job.api.JobProducer;
+import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.impl.SearchServiceImpl;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -35,24 +37,15 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import com.google.gson.Gson;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.SortOrder;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -101,6 +94,8 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
   private ServiceRegistry serviceRegistry;
 
   private SecurityService securityService;
+
+  private SeriesService seriesService;
 
   private final Gson gson = new Gson();
 
@@ -163,67 +158,10 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       @QueryParam("offset")   String  offset
   ) throws SearchException {
 
-    final var org = securityService.getOrganization().getId();
-    final var type = SearchServiceImpl.IndexEntryType.Series.name();
-    final var query = QueryBuilders.boolQuery()
-        .must(QueryBuilders.termQuery("org", org))
-        .must(QueryBuilders.termQuery("type", type));
-
-    if (StringUtils.isNotEmpty(id)) {
-      query.must(QueryBuilders.idsQuery().addIds(id));
-    }
-
-    if (StringUtils.isNotEmpty(text)) {
-      query.must(QueryBuilders.matchQuery("fulltext", text));
-    }
-
-    var user = securityService.getUser();
-    var orgAdminRole = securityService.getOrganization().getAdminRole();
-    if (!user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) && !user.hasRole(orgAdminRole)) {
-      var roleQuery = QueryBuilders.boolQuery();
-      for (var role: user.getRoles()) {
-        roleQuery.should(QueryBuilders.termQuery("acl.read", role.getName()));
-      }
-      query.must(roleQuery);
-    }
-
-    var size = NumberUtils.toInt(limit, 20);
-    var from = NumberUtils.toInt(offset) * size;
-    if (size < 0 || from < 0) {
-      return Response.status(Response.Status.BAD_REQUEST)
-          .entity("Limit and offset may not be negative.")
-          .build();
-    }
-    var searchSource = new SearchSourceBuilder()
-        .query(query)
-        .from(from)
-        .size(size);
-
-    if (StringUtils.isNotEmpty(sort)) {
-      var sortParam = StringUtils.split(sort);
-      var validSort = Arrays.asList("title", "contributor", "creator", "modified").contains(sortParam[0]);
-      var validOrder = sortParam.length < 2 || Arrays.asList("asc", "desc").contains(sortParam[1]);
-      if (sortParam.length > 2 || !validSort || !validOrder) {
-        return Response.status(Response.Status.BAD_REQUEST)
-            .entity("Invalid sort parameter")
-            .build();
-      }
-      var order = SortOrder.fromString(sortParam.length > 1 ? sortParam[1] : "asc");
-      searchSource.sort("dc." + sortParam[0], order);
-    }
-
-    var result = Arrays.stream(searchService.search(searchSource)
-            .getHits()
-            .getHits())
-        .map(SearchHit::getSourceAsMap)
-        .peek(hit -> hit.remove("type"))
-        .collect(Collectors.toList());
-
-    var total = 0; // TODO (conflicts with Solr): hits.getTotalHits().value;
     var json = gson.toJsonTree(Map.of(
         "offset", offset,
-        "total", total,
-        "result", result,
+        "total", 0,
+        "result", Collections.emptyList(),
         "limit", limit));
     return Response.ok(gson.toJson(json)).build();
 
@@ -316,65 +254,16 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           .entity("invalid request, both 'sid' and 'sname' specified")
           .build();
     }
-    final var signURLs = BooleanUtils.toBoolean(Objects.toString(sign, "true"));
-    final var org = securityService.getOrganization().getId();
-    final var type = SearchServiceImpl.IndexEntryType.Episode.name();
-
-    List <String> series = Collections.emptyList();
-    if (StringUtils.isNotEmpty(seriesName)) {
-      var seriesSearchSource = new SearchSourceBuilder().query(QueryBuilders.boolQuery()
-          .must(QueryBuilders.termQuery("org", org))
-          .must(QueryBuilders.termQuery("type", SearchServiceImpl.IndexEntryType.Series))
-          .must(QueryBuilders.termQuery("dc.title", seriesName)));
-      series = Arrays.stream(searchService.search(seriesSearchSource)
-          .getHits()
-          .getHits())
-          .map(h -> h.field("dc.identifier").getValues().get(0).toString())
-          .collect(Collectors.toList());
-    }
-
-    var query = QueryBuilders.boolQuery()
-        .must(QueryBuilders.termQuery("org", org))
-        .must(QueryBuilders.termQuery("type", type));
 
     if (StringUtils.isNotEmpty(id)) {
-      query.must(QueryBuilders.idsQuery().addIds(id));
-    }
-
-    if (StringUtils.isNotEmpty(seriesId)) {
-      series = Collections.singletonList(seriesId);
-    }
-    if (series.size() > 0) {
-      if (series.size() == 1) {
-        query.must(QueryBuilders.termQuery("dc.isPartOf", series.get(0)));
-      } else {
-        var seriesQuery = QueryBuilders.boolQuery();
-        for (var sid : series) {
-          seriesQuery.should(QueryBuilders.termQuery("dc.isPartOf", sid));
-        }
-        query.must(seriesQuery);
-      }
-    }
-
-    if (StringUtils.isNotEmpty(text)) {
-      query.must(QueryBuilders.matchQuery("fulltext", text));
+      // TODO: searchService.get(id);
     }
 
     var user = securityService.getUser();
-    var orgAdminRole = securityService.getOrganization().getAdminRole();
-    var admin = user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) || user.hasRole(orgAdminRole);
-    if (!admin) {
-      var roleQuery = QueryBuilders.boolQuery();
-      for (var role: user.getRoles()) {
-        roleQuery.should(QueryBuilders.termQuery("acl.read", role.getName()));
-      }
-      query.must(roleQuery);
-    }
-
-    logger.debug("limit: {}, offset: {}", limit, offset);
-
+    var org = securityService.getOrganization();
+    var admin = user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) || user.hasRole(org.getAdminRole());
     var size = NumberUtils.toInt(limit, 20);
-    var from = NumberUtils.toInt(offset) * size;
+    var from = NumberUtils.toInt(offset);
     if (size < 0 || from < 0) {
       return Response.status(Response.Status.BAD_REQUEST)
           .entity("Limit and offset may not be negative.")
@@ -386,39 +275,41 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           .build();
     }
 
-    var searchSource = new SearchSourceBuilder()
-        .query(query)
-        .from(from)
-        .size(size);
-
-    if (StringUtils.isNotEmpty(sort)) {
-      var sortParam = StringUtils.split(sort);
-      var validSort = Arrays.asList("title", "contributor", "creator", "modified").contains(sortParam[0]);
-      var validOrder = sortParam.length < 2 || Arrays.asList("asc", "desc").contains(sortParam[1]);
-      if (sortParam.length > 2 || !validSort || !validOrder) {
-        return Response.status(Response.Status.BAD_REQUEST)
-            .entity("Invalid sort parameter")
-            .build();
-      }
-      var order = SortOrder.fromString(sortParam.length > 1 ? sortParam[1] : "asc");
-      searchSource.sort("dc." + sortParam[0], order);
+    var sortMapping = Map.of(
+        "created", "creationDate",
+        "modified", "modificationDate");
+    sort = StringUtils.defaultIfBlank(sort, "created");
+    var sortParam = StringUtils.split(sort);
+    var ascending = sortParam.length < 2 || sortParam[1].equals("asc");
+    if (!sortMapping.containsKey(sortParam[0])) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("Invalid sort parameter: " + sortParam[0])
+          .build();
     }
+    sort = sortMapping.get(sortParam[0]);
 
-    var result = Arrays.stream(searchService.search(searchSource)
-        .getHits()
-        .getHits())
-        .map(SearchHit::getSourceAsMap)
-        .peek(hit -> hit.remove("mediapackage_xml"))
-        .peek(hit -> hit.remove("type"))
-        .collect(Collectors.toList());
-    var total = 0; // TODO (conflicts with Solr): hits.getTotalHits().value;
-    var json = gson.toJsonTree(Map.of(
-        "offset", offset,
-        "total", total,
-        "result", result,
-        "limit", limit));
+    var result = searchService.search(
+            StringUtils.trimToNull(seriesId),
+            StringUtils.trimToNull(seriesName),
+            StringUtils.trimToNull(text),
+            sort,
+            ascending,
+            size,
+            from).stream()
+        .map(MediaPackageParser::getAsJSON)
+        .reduce((mp1, mp2) -> mp1 + "," + mp2)
+        .orElse("");
 
-    return Response.ok(gson.toJson(json)).build();
+    var total = 0;
+
+    var body = String.format("{"
+            + "\"offset\": %s,"
+            + "\"limit\": %s,"
+            + "\"total\": %s,"
+            + "\"result\": [%s]}",
+        from, size, total, result);
+
+    return Response.ok(body).build();
   }
 
   /**

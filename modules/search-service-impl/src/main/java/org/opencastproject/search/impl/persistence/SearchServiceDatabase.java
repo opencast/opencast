@@ -160,6 +160,9 @@ public interface SearchServiceDatabase {
   void deleteMediaPackage(String mediaPackageId, Date deletionDate) throws SearchServiceDatabaseException,
           NotFoundException;
 
+  Collection<MediaPackage> search(String seriesId, String seriesName, String text, String sort, boolean ascending,
+      int limit, int offset);
+
   /**
    * Store (or update) media package.
    *

@@ -23,14 +23,12 @@ package org.opencastproject.search.impl;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchService;
@@ -45,7 +43,6 @@ import org.opencastproject.security.api.StaticFileAuthorization;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -57,19 +54,8 @@ import org.opencastproject.workspace.api.Workspace;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.gson.Gson;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.elasticsearch.ElasticsearchStatusException;
-import org.elasticsearch.action.delete.DeleteRequest;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -78,10 +64,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -129,8 +111,6 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   public static final String ADD_JOB_LOAD_KEY = "job.load.add";
 
-  public static final String INDEX_NAME = "opencast_search";
-
   public static final String DELETE_JOB_LOAD_KEY = "job.load.delete";
 
   /** The load introduced on the system by creating an add job */
@@ -143,10 +123,6 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   private enum Operation {
     Add, Delete
   }
-
-  private final Gson gson = new Gson();
-
-  private ElasticsearchIndex elasticsearchIndex;
 
   private SeriesService seriesService;
 
@@ -204,38 +180,6 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   @Activate
   public void activate(final ComponentContext cc) throws IllegalStateException {
     super.activate(cc);
-    createIndex();
-  }
-
-  private void createIndex() {
-    var mapping = "";
-    try (var in = this.getClass().getResourceAsStream("/search-mapping.json")) {
-      mapping = IOUtils.toString(in, StandardCharsets.UTF_8);
-    } catch (IOException e) {
-      throw new SearchException("Could not read mapping.", e);
-    }
-    try {
-      logger.debug("Trying to create index for '{}'", INDEX_NAME);
-      var request = new CreateIndexRequest(INDEX_NAME)
-          .mapping(mapping, XContentType.JSON);
-      var response = elasticsearchIndex.getClient().indices().create(request, RequestOptions.DEFAULT);
-      if (!response.isAcknowledged()) {
-        throw new SearchException("Unable to create index for '" + INDEX_NAME + "'");
-      }
-    } catch (ElasticsearchStatusException e) {
-      if (e.getDetailedMessage().contains("already_exists_exception")) {
-        logger.info("Detected existing index '{}'", INDEX_NAME);
-      } else {
-        throw e;
-      }
-    } catch (IOException e) {
-      throw new SearchException(e);
-    }
-  }
-
-  @Reference
-  public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
-    this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /**
@@ -269,15 +213,9 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     return  result;
   }
 
-  public SearchResponse search(SearchSourceBuilder searchSource) throws SearchException {
-    SearchRequest searchRequest = new SearchRequest(INDEX_NAME);
-    logger.debug("Sending for query: {}", searchSource.query());
-    searchRequest.source(searchSource);
-    try {
-      return elasticsearchIndex.getClient().search(searchRequest, RequestOptions.DEFAULT);
-    } catch (IOException e) {
-      throw new SearchException(e);
-    }
+  public Collection<MediaPackage> search(String seriesId, String seriesName, String text, String sort,
+      boolean ascending, int limit, int offset) {
+    return persistence.search(seriesId, seriesName, text, sort, ascending, limit, offset);
   }
 
   private Map<String, List<String>> mapDublinCore(DublinCoreCatalog dublinCoreCatalog) {
@@ -308,10 +246,9 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   public void addSynchronously(MediaPackage mediaPackage)
           throws SearchException, IllegalArgumentException, UnauthorizedException, SearchServiceDatabaseException {
     if (mediaPackage == null) {
-      throw new IllegalArgumentException("Unable to add a null mediapackage");
+      throw new IllegalArgumentException("Unable to add a null media package");
     }
-    var mediaPackageId = mediaPackage.getIdentifier().toString();
-    logger.debug("Attempting to add media package {} to search index", mediaPackageId);
+    logger.debug("Attempting to add media package {} to search index", mediaPackage);
     var acl = authorizationService.getActiveAcl(mediaPackage).getA();
     var now = new Date();
 
@@ -319,56 +256,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
       persistence.storeMediaPackage(mediaPackage, acl, now);
     } catch (SearchServiceDatabaseException e) {
       throw new SearchException(
-          String.format("Could not store media package to search database %s", mediaPackageId), e);
-    }
-
-    // Elasticsearch
-    var metadata = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage)
-        .map(this::mapDublinCore)
-        .orElse(Collections.emptyMap());
-    metadata.put("modified", Collections.singletonList(DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now())));
-    var mediaPackageJson = gson.fromJson(MediaPackageParser.getAsJSON(mediaPackage), Map.class).get("mediapackage");
-    Map<String, Object> data = Map.of(
-        "mediapackage", mediaPackageJson,
-        "mediapackage_xml", MediaPackageParser.getAsXml(mediaPackage),
-        "org", getSecurityService().getOrganization().getId(),
-        "dc", metadata,
-        "acl", searchableAcl(acl),
-        "type", IndexEntryType.Episode.name()
-    );
-    try {
-      var request = new IndexRequest(INDEX_NAME);
-      request.id(mediaPackageId);
-      request.source(data);
-      elasticsearchIndex.getClient().index(request, RequestOptions.DEFAULT);
-    } catch (IOException e) {
-      throw new SearchException(e);
-    }
-
-    // Elasticsearch series
-    for (var seriesId: metadata.getOrDefault("isPartOf", Collections.emptyList())) {
-      try {
-        var series = mapDublinCore(seriesService.getSeries(seriesId));
-        series.put("modified", Collections.singletonList(DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now())));
-        var seriesAcl = persistence.getAccessControlLists(seriesId, mediaPackageId).stream()
-            .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
-        Map<String, Object> seriesData = Map.of(
-            "org", getSecurityService().getOrganization().getId(),
-            "dc", series,
-            "acl", searchableAcl(seriesAcl),
-            "type", IndexEntryType.Series.name()
-        );
-        try {
-          var request = new IndexRequest(INDEX_NAME);
-          request.id(seriesId);
-          request.source(seriesData);
-          elasticsearchIndex.getClient().index(request, RequestOptions.DEFAULT);
-        } catch (IOException e) {
-          throw new SearchException(e);
-        }
-      } catch (NotFoundException | SeriesException e) {
-        logger.warn("Could not get series {} from series service. Skipping its publication", seriesId);
-      }
+          String.format("Could not store media package to search database %s", mediaPackage), e);
     }
   }
 
@@ -413,67 +301,21 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   public boolean deleteSynchronously(final String mediaPackageId) throws SearchException {
 
     // TODO: Permission checks
-    // TODO: Maybe don't delete, but mark as deleted?
+    logger.info("Removing media package {} from search index", mediaPackageId);
+
+    Date now = new Date();
     try {
-      var deleteRequest = new DeleteRequest(INDEX_NAME, mediaPackageId);
-      elasticsearchIndex.getClient().delete(deleteRequest, RequestOptions.DEFAULT);
-    } catch (IOException e) {
-      throw new SearchException("Could not delete episode " + mediaPackageId + " from index", e);
-    }
-
-    try {
-      logger.info("Removing media package {} from search index", mediaPackageId);
-
-      String seriesId = null;
-      Date now = new Date();
-      try {
-        seriesId = persistence.getMediaPackage(mediaPackageId).getSeries();
-        persistence.deleteMediaPackage(mediaPackageId, now);
-        logger.info("Removed media package {} from search persistence", mediaPackageId);
-      } catch (NotFoundException e) {
-        // even if mp not found in persistence, it might still exist in search index.
-        logger.info("Could not find media package with id {} in persistence, but will try remove it from index anyway.",
-                mediaPackageId);
-      } catch (SearchServiceDatabaseException | UnauthorizedException e) {
-        throw new SearchException(String.format("Could not delete media package with id %s from persistence storage",
-            mediaPackageId), e);
-      }
-
-      // Update series
-      if (seriesId != null) {
-        if (persistence.getSeries(seriesId).size() > 0) {
-          // Update series acl if there are still episodes in the series
-          final AccessControlList seriesAcl = persistence.getAccessControlLists(seriesId).stream()
-              .reduce(new AccessControlList(), AccessControlList::mergeActions);
-          // TODO: Update series ACL in Elasticsearch
-        } else {
-          // Remove series if there are no episodes in the series any longer
-          deleteSeriesSynchronously(seriesId);
-        }
-      }
-
-      return true;
+      persistence.deleteMediaPackage(mediaPackageId, now);
+      logger.info("Removed media package {} from search persistence", mediaPackageId);
+    } catch (NotFoundException e) {
+      // even if mp not found in persistence, it might still exist in search index.
+      logger.info("Could not find media package with id {} in persistence, but will try remove it from index anyway.",
+              mediaPackageId);
     } catch (SearchServiceDatabaseException e) {
-      logger.info("Could not delete media package with id {} from search index", mediaPackageId);
-      throw new SearchException(e);
+      throw new SearchException(String.format("Could not delete media package with id %s from persistence storage",
+          mediaPackageId), e);
     }
-  }
-
-  /**
-   * Immediately removes the given series from the search service.
-   *
-   * @param seriesId
-   *          the series
-   * @throws SearchException
-   */
-  public void deleteSeriesSynchronously(String seriesId) throws SearchException {
-    // TODO: Maybe don't delete, but mark as deleted?
-    try {
-      var deleteRequest = new DeleteRequest(INDEX_NAME, seriesId);
-      elasticsearchIndex.getClient().delete(deleteRequest, RequestOptions.DEFAULT);
-    } catch (IOException e) {
-      throw new SearchException("Could not delete series " + seriesId + " from index", e);
-    }
+    return true;
   }
 
   @Override

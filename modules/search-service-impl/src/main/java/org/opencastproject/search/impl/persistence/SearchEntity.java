@@ -77,6 +77,11 @@ public class SearchEntity {
   @JoinColumn(name = "organization", referencedColumnName = "id")
   protected JpaOrganization organization;
 
+  /** The dublin core created field */
+  @Column(name = "creation_date")
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date creationDate;
+
   /** The media package deleted */
   @Column(name = "deletion_date")
   @Temporal(TemporalType.TIMESTAMP)
@@ -227,5 +232,9 @@ public class SearchEntity {
    */
   public void setSeriesId(String seriesId) {
     this.seriesId = seriesId;
+  }
+
+  public void setCreationDate(Date creationDate) {
+    this.creationDate = creationDate;
   }
 }
