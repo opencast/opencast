@@ -13,7 +13,7 @@
     "i18next-browser-languagedetector": "^6.1.4",
     "iframe-resizer": "^4.3.2",
     "query-string": "^7.1.1",
-    "react": "^18.1.0",
+    "react": "^18.2.0",
     "react-bootstrap": "^2.4.0",
     "react-dom": "^18.1.0",
     "react-helmet": "^6.1.0",
@@ -66,7 +66,7 @@
     "http-mock-server": "^0.5.2",
     "@types/jest": "27.5.1",
     "@types/node": "17.0.38",
-    "@types/react": "17.0.39",
+    "@types/react": "18.0.14",
     "@types/react-dom": "18.0.5",
     "@types/react-helmet": "^6.1.5",
     "@types/react-js-pagination": "^3.0.4"
