@@ -97,7 +97,10 @@ public class SakaiUserProviderFactory implements ManagedServiceFactory {
   private static final String CACHE_EXPIRATION = "org.opencastproject.userdirectory.sakai.cache.expiration";
 
   /** A map of pid to sakai user provider instance */
-  private Map<String, ServiceRegistration> providerRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
+  private Map<String, ServiceRegistration> userProviderRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();;
+
+  /** A map of pid to sakai role provider instance */
+  private Map<String, ServiceRegistration> roleProviderRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();;
 
   /** The OSGI bundle context */
   protected BundleContext bundleContext = null;
@@ -202,9 +205,14 @@ public class SakaiUserProviderFactory implements ManagedServiceFactory {
     }
 
     // Now that we have everything we need, go ahead and activate a new provider, removing an old one if necessary
-    ServiceRegistration existingRegistration = providerRegistrations.remove(pid);
-    if (existingRegistration != null) {
-      existingRegistration.unregister();
+    ServiceRegistration existingUserRegistration = userProviderRegistrations.remove(pid);
+    if (existingUserRegistration != null) {
+      existingUserRegistration.unregister();
+    }
+
+    ServiceRegistration existingRoleRegistration = roleProviderRegistrations.remove(pid);
+    if (existingRoleRegistration != null) {
+      existingRoleRegistration.unregister();
     }
 
     Organization org;
@@ -219,9 +227,8 @@ public class SakaiUserProviderFactory implements ManagedServiceFactory {
     SakaiUserProviderInstance provider = new SakaiUserProviderInstance(pid,
             org, url, userDn, password, sitePattern, userPattern, instructorRoles, cacheSize, cacheExpiration);
 
-    providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
-    providerRegistrations.put(pid, bundleContext.registerService(RoleProvider.class.getName(), provider, null));
-
+    userProviderRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
+    roleProviderRegistrations.put(pid, bundleContext.registerService(RoleProvider.class.getName(), provider, null));
   }
 
   /**
@@ -232,15 +239,22 @@ public class SakaiUserProviderFactory implements ManagedServiceFactory {
   @Override
   public void deleted(String pid) {
     logger.debug("delete SakaiUserProviderInstance for pid=" + pid);
-    ServiceRegistration registration = providerRegistrations.remove(pid);
-    if (registration != null) {
-      registration.unregister();
+
+    ServiceRegistration userRegistration = userProviderRegistrations.remove(pid);
+    if (userRegistration != null) {
+      userRegistration.unregister();
       try {
         ManagementFactory.getPlatformMBeanServer().unregisterMBean(SakaiUserProviderFactory.getObjectName(pid));
       } catch (Exception e) {
         logger.warn("Unable to unregister mbean for pid='{}': {}", pid, e.getMessage());
       }
     }
+
+    ServiceRegistration roleRegistration = roleProviderRegistrations.remove(pid);
+    if (roleRegistration != null) {
+      roleRegistration.unregister();
+    }
+
   }
 
   /**
