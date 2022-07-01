@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>12-SNAPSHOT</version>
+    <version>13-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -57,16 +57,6 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-message-broker-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-solr</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-kernel</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -78,11 +68,6 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-elasticsearch-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-dublincore</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -156,6 +141,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <scope>test</scope>
@@ -176,6 +166,7 @@
           <ignoredUnusedDeclaredDependencies>
             <!-- provide a logger for tests -->
             <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>com.h2database:h2</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
@@ -191,7 +182,6 @@
               org.opencastproject.workflow.api;version=${project.version},
               org.opencastproject.rest;version=${project.version},
               org.opencastproject.mediapackage;version=${project.version},
-              org.opencastproject.message.broker.api.index;version=${project.version},
               org.opencastproject.workspace.api;version=${project.version},
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,

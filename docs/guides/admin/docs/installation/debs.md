@@ -58,31 +58,6 @@ First you have to install the necessary repositories so that your package manage
         apt-get update
 
 
-Install Apache ActiveMQ
------------------------
-
-The Apache ActiveMQ message broker is required by Opencast since version 2.0. It does not necessarily have to be
-installed on the same machine as Opencast, however many adopters commonly install it on their admin nodes.
-Install ActiveMQ with:
-
-    apt-get install activemq-dist
-
-
-A prepared configuration file for ActiveMQ can be found at `/usr/share/opencast/docs/scripts/activemq/activemq.xml`
-*after Opencast itself has been installed* and should replace `/etc/activemq/activemq.xml`. For an all-in-one
-installation the following command should suffice:
-
-    cp /usr/share/opencast/docs/scripts/activemq/activemq.xml /etc/activemq/activemq.xml
-
-ActiveMQ must be started *prior to* Opencast startup.
-
-More information about how to properly set up ActiveMQ for Opencast can be found in the [message broker configuration
-documentation](../configuration/message-broker.md).
-
-Note that most Debian based distributions also have ActiveMQ packaged by upstream package maintainers. These packages
-will work, however the ActiveMQ configuration file will require modification to function correctly.
-
-
 Install Elasticsearch
 ---------------------
 
@@ -126,16 +101,14 @@ pre-installed or otherwise takes precedence.  This version may work, however Ope
 version(s) in the repository.  To install the Opencast version of ffmpeg add `ffmpeg-dist` to the end of the command above.
 
 At this point Opencast is installed and will work locally, but it is not completely configured.  Because additional configuration
-is required, neither Opencast nor ActiveMQ are configured to start automatically. Please follow the
-[Basic Configuration guide](../configuration/basic.md).  Once you are ready, enable Opencast and ActiveMQ to start on boot with:
+is required, Opencast is not configured to start automatically. Please follow the
+[Basic Configuration guide](../configuration/basic.md).  Once you are ready, enable Opencast and Elasticsearch to start on boot with:
 
-        systemctl enable activemq.service
         systemctl enable elasticsearch.service
         systemctl enable opencast.service
 
 then start them with:
 
-        systemctl start activemq.service
         systemctl start elasticsearch.service
         systemctl start opencast.service
 

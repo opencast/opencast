@@ -45,12 +45,11 @@ import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.MimeTypes;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.handler.inspection.InspectWorkflowOperationHandler;
 import org.opencastproject.workspace.api.Workspace;
@@ -722,11 +721,11 @@ public class ProcessSmilWorkflowOperationHandlerTest {
   private WorkflowOperationResult getWorkflowOperationResult(MediaPackage mp, Map<String, String> configurations)
           throws WorkflowOperationException {
     // Add the mediapackage to a workflow instance
-    WorkflowInstanceImpl workflowInstance = new WorkflowInstanceImpl();
+    WorkflowInstance workflowInstance = new WorkflowInstance();
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowState.RUNNING);
     workflowInstance.setMediaPackage(mp);
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("op", OperationState.RUNNING);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("op", OperationState.RUNNING);
     operation.setTemplate("process-smil");
     operation.setState(OperationState.RUNNING);
     for (String key : configurations.keySet()) {

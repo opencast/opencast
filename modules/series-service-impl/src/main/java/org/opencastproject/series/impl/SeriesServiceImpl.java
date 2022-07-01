@@ -38,11 +38,10 @@ import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.EName;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.series.SeriesItem;
+import org.opencastproject.message.broker.api.update.SeriesUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
@@ -56,7 +55,6 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesException;
-import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.series.impl.persistence.SeriesEntity;
 import org.opencastproject.util.NotFoundException;
@@ -65,11 +63,12 @@ import org.opencastproject.util.data.Option;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -81,7 +80,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -90,7 +88,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Implements {@link SeriesService}. Uses {@link SeriesServiceDatabase} for permanent storage and
- * {@link SeriesServiceIndex} for searching.
+ * {@link ElasticsearchIndex} for searching.
  */
 @Component(
     property = {
@@ -106,9 +104,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
   private static final String THEME_PROPERTY_NAME = "theme";
 
-  /** Index for searching */
-  protected SeriesServiceIndex index;
-
   /** Persistent storage */
   protected SeriesServiceDatabase persistence;
 
@@ -118,22 +113,15 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   /** The organization directory */
   protected OrganizationDirectoryService orgDirectory;
 
-  /** The message broker service sender */
-  protected MessageSender messageSender;
-
   /** The system user name */
   private String systemUserName;
 
   /** The API index */
-  private ElasticsearchIndex elasticsearchIndex;
+  private ElasticsearchIndex index;
 
   private AclServiceFactory aclServiceFactory;
 
-  /** OSGi callback for setting index. */
-  @Reference
-  public void setIndex(SeriesServiceIndex index) {
-    this.index = index;
-  }
+  private ArrayList<SeriesUpdateHandler> updateHandlers = new ArrayList<>();
 
   /** OSGi callback for setting persistance. */
   @Reference
@@ -153,16 +141,24 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     this.orgDirectory = orgDirectory;
   }
 
-  /** OSGi callback for setting the message sender. */
-  @Reference
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
+  /** OSGi callbacks for settings and removing handlers. */
+  @Reference(
+      policy = ReferencePolicy.DYNAMIC,
+      cardinality = ReferenceCardinality.MULTIPLE,
+      unbind = "removeMessageHandler"
+  )
+  public void addMessageHandler(SeriesUpdateHandler handler) {
+    this.updateHandlers.add(handler);
+  }
+
+  public void removeMessageHandler(SeriesUpdateHandler handler) {
+    this.updateHandlers.remove(handler);
   }
 
   /** OSGi callbacks for setting the API index. */
   @Reference
   public void setElasticsearchIndex(ElasticsearchIndex index) {
-    this.elasticsearchIndex = index;
+    this.index = index;
   }
 
   @Reference
@@ -179,61 +175,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   public void activate(ComponentContext cc) throws Exception {
     logger.info("Activating Series Service");
     systemUserName = cc.getBundleContext().getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
-    populateSolr(systemUserName);
-  }
-
-  /** If the solr index is empty, but there are series in the database, populate the solr index. */
-  private void populateSolr(String systemUserName) {
-    long instancesInSolr;
-    try {
-      instancesInSolr = index.count();
-    } catch (Exception e) {
-      throw new IllegalStateException("Repopulating series Solr index failed", e);
-    }
-    if (instancesInSolr != 0L) {
-      return;
-    }
-
-    logger.info("The series index is empty. Populating it now with series");
-    List<SeriesEntity> allSeries = null;
-    try {
-      allSeries = persistence.getAllSeries();
-    } catch (SeriesServiceDatabaseException ex) {
-      throw new ServiceException("Unable to get all series from the database", ex);
-    }
-    final int total = allSeries.size();
-    if (total == 0) {
-      logger.info("No series found. Repopulating index finished.");
-      return;
-    }
-
-    int current = 0;
-    for (SeriesEntity series: allSeries) {
-      current++;
-      try {
-        // Run as the superuser so we get all series, regardless of organization or role
-        Organization organization = orgDirectory.getOrganization(series.getOrganization());
-        securityService.setOrganization(organization);
-        securityService.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
-
-        index.updateIndex(DublinCoreXmlFormat.read(series.getDublinCoreXML()));
-        String aclStr = series.getAccessControl();
-        if (StringUtils.isNotBlank(aclStr)) {
-          AccessControlList acl = AccessControlParser.parseAcl(aclStr);
-          index.updateSecurityPolicy(series.getSeriesId(), acl);
-        }
-      } catch (Exception ex) {
-        logger.error("Unable to repopulate index for series {}", series.getSeriesId(), ex);
-      } finally {
-        securityService.setOrganization(null);
-        securityService.setUser(null);
-      }
-      // log progress
-      if (current % 100 == 0) {
-        logger.info("Indexing series {}/{} ({} percent done)", current, total, current * 100 / total);
-      }
-    }
-    logger.info("Finished populating series search index");
   }
 
   @Override
@@ -256,22 +197,14 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
         }
 
         logger.debug("Updating series {}", id);
-        index.updateIndex(dublinCore);
-        try {
-          final AccessControlList acl = persistence.getAccessControlList(id);
-          if (acl != null) {
-            index.updateSecurityPolicy(id, acl);
-          }
-        } catch (NotFoundException ignore) {
-          // Ignore not found since this is the first indexing
-        }
+        // update API index
+        updateSeriesMetadataInIndex(id, dublinCore);
+
         // Make sure store to persistence comes after index, return value can be null
         DublinCoreCatalog updated = persistence.storeSeries(dublinCore);
-        // update API index
-        updateSeriesMetadataInIndex(id, elasticsearchIndex, dublinCore);
+
         // still sent for other asynchronous updates
-        messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
-                SeriesItem.updateCatalog(dublinCore));
+        triggerEventHandlers(SeriesItem.updateCatalog(dublinCore));
         return (updated == null) ? null : dublinCore;
       }
       return dc;
@@ -316,23 +249,15 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     if (needsUpdate(seriesId, accessControl) || overrideEpisodeAcl) {
       logger.debug("Updating ACL of series {}", seriesId);
       boolean updated;
-      // not found is thrown if it doesn't exist
-      try {
-        index.updateSecurityPolicy(seriesId, accessControl);
-      } catch (SeriesServiceDatabaseException e) {
-        logger.error("Could not update series {} with access control rules: {}", seriesId, e.getMessage());
-        throw new SeriesException(e);
-      }
 
       try {
         updated = persistence.storeSeriesAccessControl(seriesId, accessControl);
         //update API index
-        updateSeriesAclInIndex(seriesId, elasticsearchIndex, accessControl);
+        updateSeriesAclInIndex(seriesId, accessControl);
         // still sent for other asynchronous updates
-        messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
-                SeriesItem.updateAcl(seriesId, accessControl, overrideEpisodeAcl));
+        triggerEventHandlers(SeriesItem.updateAcl(seriesId, accessControl, overrideEpisodeAcl));
       } catch (SeriesServiceDatabaseException e) {
-        logger.error("Could not update series {} with access control rules: {}", seriesId, e.getMessage());
+        logger.error("Could not update series {} with access control rules", seriesId, e);
         throw new SeriesException(e);
       }
       return updated;
@@ -363,27 +288,19 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       persistence.deleteSeries(seriesID);
       // remove from API index
-      removeSeriesFromIndex(seriesID, elasticsearchIndex);
+      removeSeriesFromIndex(seriesID);
       // still sent for other asynchronous updates
-      messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
-              SeriesItem.delete(seriesID));
+      triggerEventHandlers(SeriesItem.delete(seriesID));
     } catch (SeriesServiceDatabaseException e1) {
       logger.error("Could not delete series with id {} from persistence storage", seriesID);
       throw new SeriesException(e1);
     }
-
-    try {
-      index.delete(seriesID);
-    } catch (SeriesServiceDatabaseException e) {
-      logger.error("Unable to delete series with id {}: {}", seriesID, e.getMessage());
-      throw new SeriesException(e);
-    }
   }
 
   @Override
-  public DublinCoreCatalogList getSeries(SeriesQuery query) throws SeriesException {
+  public DublinCoreCatalog getSeries(String seriesID) throws SeriesException, NotFoundException {
     try {
-      return index.search(query);
+      return persistence.getSeries(seriesID);
     } catch (SeriesServiceDatabaseException e) {
       logger.error("Failed to execute search query: {}", e.getMessage());
       throw new SeriesException(e);
@@ -408,44 +325,20 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     }
   }
 
-
-  @Override
-  public Map<String, String> getIdTitleMapOfAllSeries() throws SeriesException, UnauthorizedException {
-    try {
-      return index.queryIdTitleMap();
-    } catch (SeriesServiceDatabaseException e) {
-      logger.error("Failed to execute search query: {}", e.getMessage());
-      throw new SeriesException(e);
-    }
-  }
-
-  @Override
-  public DublinCoreCatalog getSeries(String seriesID) throws SeriesException, NotFoundException {
-    try {
-      return index.getDublinCore(notNull(seriesID, "seriesID"));
-    } catch (SeriesServiceDatabaseException e) {
-      logger.error("Exception occured while retrieving series {}: {}", seriesID, e.getMessage());
-      throw new SeriesException(e);
-    }
-  }
-
-  @Override
   public AccessControlList getSeriesAccessControl(String seriesID) throws NotFoundException, SeriesException {
     try {
-      return index.getAccessControl(notNull(seriesID, "seriesID"));
+      return persistence.getAccessControlList(seriesID);
     } catch (SeriesServiceDatabaseException e) {
-      throw new SeriesException(
-          String.format("Exception occurred while retrieving access control rules for series %s", seriesID), e);
+      throw new SeriesException("Failed to execute search query", e);
     }
   }
 
   @Override
   public int getSeriesCount() throws SeriesException {
     try {
-      return (int) index.count();
+      return persistence.countSeries();
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Exception occured while counting series.", e);
-      throw new SeriesException(e);
+      throw new SeriesException("Failed to execute search query", e);
     }
   }
 
@@ -455,8 +348,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       return persistence.getSeriesProperties(seriesID);
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Failed to get series properties for series with id '{}'", seriesID, e);
-      throw new SeriesException(e);
+      throw new SeriesException(String.format("Failed to get series properties for series with id '%s'", seriesID), e);
     }
   }
 
@@ -466,9 +358,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       return persistence.getSeriesProperty(seriesID, propertyName);
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Failed to get series property for series with series id '{}' and property name '{}'", seriesID,
-              propertyName, e);
-      throw new SeriesException(e);
+      String msg = String.format(
+              "Failed to get series property for series with series id '%s' and property name '%s'",
+              seriesID,
+              propertyName
+      );
+      throw new SeriesException(msg, e);
     }
   }
 
@@ -480,13 +375,16 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
       // update API index
       if (propertyName.equals(THEME_PROPERTY_NAME)) {
-        updateThemePropertyInIndex(seriesID, Optional.ofNullable(propertyValue), elasticsearchIndex);
+        updateThemePropertyInIndex(seriesID, Optional.ofNullable(propertyValue));
       }
     } catch (SeriesServiceDatabaseException e) {
-      logger.error(
-              "Failed to get series property for series with series id '{}' and property name '{}' and value '{}'",
-              seriesID, propertyName, propertyValue, e);
-      throw new SeriesException(e);
+      String msg = String.format(
+              "Failed to get series property for series with series id '%s' and property name '%s' and value '%s'",
+              seriesID,
+              propertyName,
+              propertyValue
+      );
+      throw new SeriesException(msg, e);
     }
   }
 
@@ -498,12 +396,15 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
       // update API index
       if (propertyName.equals(THEME_PROPERTY_NAME)) {
-        updateThemePropertyInIndex(seriesID, Optional.empty(), elasticsearchIndex);
+        updateThemePropertyInIndex(seriesID, Optional.empty());
       }
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Failed to delete series property for series with series id '{}' and property name '{}'",
-              seriesID, propertyName, e);
-      throw new SeriesException(e);
+      String msg = String.format(
+              "Failed to delete series property for series with series id '%s' and property name '%s'",
+              seriesID,
+              propertyName
+      );
+      throw new SeriesException(msg, e);
     }
   }
 
@@ -575,8 +476,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   public boolean updateSeriesElement(String seriesID, String type, byte[] data) throws SeriesException {
     try {
       if (persistence.existsSeriesElement(seriesID, type) && persistence.storeSeriesElement(seriesID, type, data)) {
-        messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
-                SeriesItem.updateElement(seriesID, type, new String(data, StandardCharsets.UTF_8)));
+        triggerEventHandlers(SeriesItem.updateElement(seriesID, type, new String(data, StandardCharsets.UTF_8)));
         return true;
       } else {
         return false;
@@ -600,7 +500,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   @Override
-  public void repopulate(final ElasticsearchIndex index) throws IndexRebuildException {
+  public void repopulate() throws IndexRebuildException {
     try {
       List<SeriesEntity> databaseSeries = persistence.getAllSeries();
       final int total = databaseSeries.size();
@@ -645,7 +545,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                   }
 
                   // do the actual index update
-                  updateSeriesInIndex(seriesId, index, organization.getId(),
+                  updateSeriesInIndex(seriesId, organization.getId(),
                           updateFunctions.toArray(new Function[0]));
 
                 });
@@ -655,6 +555,18 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     } catch (Exception e) {
       logIndexRebuildError(logger, index.getIndexName(), e);
       throw new IndexRebuildException(index.getIndexName(), getService(), e);
+    }
+  }
+
+  private void triggerEventHandlers(SeriesItem item) {
+    while (updateHandlers.size() != 1) {
+      logger.warn("Expecting 1 handler, but {} are registered.  Waiting 10s then retrying...", updateHandlers.size());
+      try {
+        Thread.sleep(10000L);
+      } catch (InterruptedException e) { /* swallow this, nothing to do */ }
+    }
+    for (SeriesUpdateHandler handler : updateHandlers) {
+      handler.execute(item);
     }
   }
 
@@ -671,12 +583,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    * @param index
    *          The API index to update
    */
-  private void removeSeriesFromIndex(String seriesId, ElasticsearchIndex index) {
+  private void removeSeriesFromIndex(String seriesId) {
     String orgId = securityService.getOrganization().getId();
     logger.debug("Removing series {} from the {} index.", seriesId, index.getIndexName());
 
     try {
-      index.delete(Series.DOCUMENT_TYPE, seriesId, orgId);
+      index.deleteSeries(seriesId, orgId);
       logger.debug("Series {} removed from the {} index.", seriesId, index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Series {} couldn't be removed from the {} index.", seriesId, index.getIndexName(), e);
@@ -693,13 +605,13 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    * @param dc
    *          The dublin core catalog
    */
-  private void updateSeriesMetadataInIndex(String seriesId, ElasticsearchIndex index, DublinCoreCatalog dc) {
+  private void updateSeriesMetadataInIndex(String seriesId, DublinCoreCatalog dc) {
     String orgId = securityService.getOrganization().getId();
     logger.debug("Updating metadata of series {} in the {} index.", seriesId, index.getIndexName());
 
     // update series
     Function<Optional<Series>, Optional<Series>> updateFunction = getMetadataUpdateFunction(seriesId, dc, orgId);
-    updateSeriesInIndex(seriesId, index, orgId, updateFunction);
+    updateSeriesInIndex(seriesId, orgId, updateFunction);
   }
 
   /**
@@ -750,11 +662,11 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    * @param acl
    *          The acl to update
    */
-  private void updateSeriesAclInIndex(String seriesId, ElasticsearchIndex index, AccessControlList acl) {
+  private void updateSeriesAclInIndex(String seriesId, AccessControlList acl) {
     String orgId = securityService.getOrganization().getId();
     logger.debug("Updating ACL of series {} in the {} index.", seriesId, index.getIndexName());
     Function<Optional<Series>, Optional<Series>> updateFunction = getAclUpdateFunction(seriesId, acl, orgId);
-    updateSeriesInIndex(seriesId, index, orgId, updateFunction);
+    updateSeriesInIndex(seriesId, orgId, updateFunction);
   }
 
   /**
@@ -794,13 +706,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    * @param index
    *          The API index to update
    */
-  private void updateThemePropertyInIndex(String seriesId, Optional<String> propertyValueOpt,
-          ElasticsearchIndex index) {
+  private void updateThemePropertyInIndex(String seriesId, Optional<String> propertyValueOpt) {
     String orgId = securityService.getOrganization().getId();
     logger.debug("Updating theme property of series {} in the {} index.", seriesId, index.getIndexName());
     Function<Optional<Series>, Optional<Series>> updateFunction =
             getThemePropertyUpdateFunction(seriesId, propertyValueOpt, orgId);
-    updateSeriesInIndex(seriesId, index, orgId, updateFunction);
+    updateSeriesInIndex(seriesId, orgId, updateFunction);
   }
 
   /**
@@ -834,14 +745,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    *          The series id
    * @param updateFunctions
    *          The function(s) to do the actual updating
-   * @param index
-   *          The API index to update
    * @param orgId
    *          The id of the current organization
    * @return the updated series (optional)
    */
   @SafeVarargs
-  private final Optional<Series> updateSeriesInIndex(String seriesId, ElasticsearchIndex index, String orgId,
+  private  Optional<Series> updateSeriesInIndex(String seriesId, String orgId,
           Function<Optional<Series>, Optional<Series>>... updateFunctions) {
     User user = securityService.getUser();
     Function<Optional<Series>, Optional<Series>> updateFunction = Arrays.stream(updateFunctions)

@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
-  <version>12-SNAPSHOT</version>
+  <version>13-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>opencast</name>
   <description>Opencast is a media capture, processing, management and distribution system</description>
@@ -25,7 +25,7 @@
     <commons-io.version>2.8.0</commons-io.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
     <commons-text.version>1.9</commons-text.version>
-    <cxf.version>3.4.3</cxf.version>
+    <cxf.version>3.4.6</cxf.version>
     <eclipselink.version>2.7.5</eclipselink.version>
     <failureaccess.version>1.0.1</failureaccess.version>
     <freemarker.version>2.3.31</freemarker.version>
@@ -42,7 +42,7 @@
     <jettison.version>1.4.1</jettison.version>
     <joda-time.version>2.10.10</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
-    <karaf.version>4.2.9</karaf.version>
+    <karaf.version>4.2.15</karaf.version>
     <node.version>v16.13.0</node.version>
     <osgi.compendium.version>6.0.0</osgi.compendium.version>
     <osgi.core.version>6.0.0</osgi.core.version>
@@ -165,7 +165,6 @@
     <module>modules/lti</module>
     <module>modules/mattermost-notification-workflowoperation</module>
     <module>modules/message-broker-api</module>
-    <module>modules/message-broker-impl</module>
     <module>modules/metadata-api</module>
     <module>modules/metadata-to-acl-workflowoperation</module>
     <module>modules/metadata</module>
@@ -812,11 +811,6 @@
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
         <version>3.1.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-client</artifactId>
-        <version>5.16.2</version>
       </dependency>
       <dependency>
         <groupId>org.apache.geronimo.specs</groupId>

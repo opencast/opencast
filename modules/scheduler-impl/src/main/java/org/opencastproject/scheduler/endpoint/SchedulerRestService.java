@@ -1528,12 +1528,10 @@ public class SchedulerRestService {
               .entity("Scheduler service is unavailable, please wait...").build();
     try {
       MediaPackage event = prolongingService.getCurrentRecording(agentId);
-      Opt<DublinCoreCatalog> dc = DublinCoreUtil.loadEpisodeDublinCore(workspace, event);
-      prolongingService.prolongEvent(event, dc.get(), agentId);
+      DublinCoreCatalog dc = DublinCoreUtil.loadEpisodeDublinCore(workspace, event).get();
+      prolongingService.prolongEvent(event, dc, agentId);
       return Response.ok().build();
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
+    } catch (NotFoundException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
       logger.error("Unable to prolong the immediate recording for agent '{}': {}", agentId, e);

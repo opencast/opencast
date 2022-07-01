@@ -29,7 +29,6 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
 import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.transcription.amberscript.AmberscriptTranscriptionService;
 import org.opencastproject.transcription.api.TranscriptionService;
 import org.opencastproject.transcription.api.TranscriptionServiceException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -140,8 +139,7 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
     Job job = null;
     for (Track track : elements) {
       try {
-        job = ((AmberscriptTranscriptionService)service)
-            .startTranscription(mediaPackage.getIdentifier().toString(), track, language, jobtype);
+        job = service.startTranscription(mediaPackage.getIdentifier().toString(), track, language, jobtype);
         // Only one job per media package
         break;
       } catch (TranscriptionServiceException e) {

@@ -23,11 +23,12 @@
 package org.opencastproject.workflow.api;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
@@ -41,23 +42,7 @@ public class WorkflowSetImpl implements WorkflowSet {
 
   /** A list of search items. */
   @XmlElement(name = "workflow")
-  private List<WorkflowInstance> resultSet = null;
-
-  /** The pagination offset. */
-  @XmlAttribute(name = "startPage")
-  private long startPage;
-
-  /** The pagination limit. */
-  @XmlAttribute(name = "count")
-  private long pageSize;
-
-  /** The search time in milliseconds */
-  @XmlAttribute(name = "searchTime")
-  private long searchTime;
-
-  /** The total number of results without paging */
-  @XmlAttribute(name = "totalCount")
-  private long totalCount;
+  private List<JaxbWorkflowInstance> resultSet = null;
 
   /**
    * A no-arg constructor needed by JAXB
@@ -65,15 +50,26 @@ public class WorkflowSetImpl implements WorkflowSet {
   public WorkflowSetImpl() {
   }
 
+  public WorkflowSetImpl(List<WorkflowInstance> workflows) {
+    this.resultSet = workflows.stream()
+        .map(JaxbWorkflowInstance::new)
+        .collect(Collectors.toList());
+  }
+
+
   /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.workflow.api.WorkflowSet#getItems()
    */
   @Override
-  public WorkflowInstance[] getItems() {
-    return resultSet == null || resultSet.size() == 0 ? new WorkflowInstance[0] : resultSet
-            .toArray(new WorkflowInstance[resultSet.size()]);
+  public List<WorkflowInstance> getItems() {
+    if (resultSet == null) {
+      return Collections.emptyList();
+    }
+    return resultSet.stream()
+        .map(JaxbWorkflowInstance::toWorkflowInstance)
+        .collect(Collectors.toList());
   }
 
   /**
@@ -86,8 +82,8 @@ public class WorkflowSetImpl implements WorkflowSet {
     if (item == null)
       throw new IllegalArgumentException("Parameter item cannot be null");
     if (resultSet == null)
-      resultSet = new ArrayList<WorkflowInstance>();
-    resultSet.add((WorkflowInstanceImpl) item);
+      resultSet = new ArrayList<JaxbWorkflowInstance>();
+    resultSet.add(new JaxbWorkflowInstance(item));
   }
 
   /**
@@ -98,78 +94,6 @@ public class WorkflowSetImpl implements WorkflowSet {
   @Override
   public long size() {
     return resultSet != null ? resultSet.size() : 0;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowSet#getStartPage()
-   */
-  public long getStartPage() {
-    return startPage;
-  }
-
-  /**
-   * Set the start page offset.
-   *
-   * @param startPage
-   *          The start page offset.
-   */
-  public void setStartPage(long startPage) {
-    this.startPage = startPage;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowSet#getPageSize()
-   */
-  @Override
-  public long getPageSize() {
-    return pageSize;
-  }
-
-  /**
-   * Set the pageSize.
-   *
-   * @param pageSize
-   *          The pageSize.
-   */
-  public void setPageSize(long pageSize) {
-    this.pageSize = pageSize;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowSet#getSearchTime()
-   */
-  public long getSearchTime() {
-    return searchTime;
-  }
-
-  /**
-   * Set the search time.
-   *
-   * @param searchTime
-   *          The time in ms.
-   */
-  public void setSearchTime(long searchTime) {
-    this.searchTime = searchTime;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowSet#getTotalCount()
-   */
-  @Override
-  public long getTotalCount() {
-    return totalCount;
-  }
-
-  public void setTotalCount(long totalCount) {
-    this.totalCount = totalCount;
   }
 
   public static class Adapter extends XmlAdapter<WorkflowSetImpl, WorkflowSet> {

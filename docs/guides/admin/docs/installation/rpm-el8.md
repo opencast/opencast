@@ -63,35 +63,6 @@ This will install the default distribution of Opencast and all its dependencies.
 For more options, see the [advanced installation section below](#advanced-installation).
 
 
-Install Apache ActiveMQ
------------------------
-
-The Apache ActiveMQ message broker is required by Opencast.
-It can be run on the same machine as Opencast.
-Install ActiveMQ by running:
-
-```sh
-dnf install activemq-dist
-```
-
-A prepared configuration file for ActiveMQ comes with Opencast.
-It should suffice for an all-in-one installation and can be copied to replace the default configuration:
-
-```sh
-cp /usr/share/opencast/docs/scripts/activemq/activemq.xml /etc/activemq/activemq.xml
-```
-
-Then start and enable ActiveMQ by running:
-
-```sh
-systemctl start activemq
-systemctl enable activemq
-```
-
-More information about how to properly set up ActiveMQ for Opencast, cluster installations in particular,
-can be found in the [message broker configuration documentation](../configuration/message-broker.md).
-
-
 Install Elasticsearch
 ---------------------
 

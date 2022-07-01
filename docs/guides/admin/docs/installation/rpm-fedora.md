@@ -31,17 +31,6 @@ For additional Unicode tests run during the build process, you can also install:
     dnf install hunspell-de tesseract-langpack-deu
 
 
-Install Apache ActiveMQ
------------------------
-
-The Apache ActiveMQ message broker is commonly installed on the same machine as Opencast for an all-in-one system. The
-version of ActiveMQ shipped with Fedora is too old but you can use the [ActiveMQ-dist Copr RPM repository
-](https://copr.fedoraproject.org/coprs/lkiesow/apache-activemq-dist/)
-
-Make sure it is properly configured for Opencast. For more information about the setup, have a look at the
-[message broker configuration documentation](../configuration/message-broker.md).
-
-
 Install Opencast
 ----------------
 

@@ -57,7 +57,7 @@ function loadOpencastPaella(containerId) {
         window.location.href = oacl.getAuthenticationUrl();
       }
       else {
-        var errorMessage = paella.dictionary
+        var errorMessage = paella.utils.dictionary
           .translate('Error loading video {id}')
           .replace(/\{id\}/g, paella.utils.parameters.get('id') || '');
         paella.messageBox.showError(errorMessage);
@@ -74,7 +74,8 @@ function loadOpencastPaella(containerId) {
               var converter = new OpencastToPaellaConverter();
               var data = converter.convertToDataJson(episode);
               if (data.streams.length < 1) {
-                paella.messageBox.showError(paella.dictionary.translate('Error loading video! No video tracks found'));
+                paella.messageBox.showError(paella.utils.dictionary.translate('Error loading video! \
+                No video tracks found'));
               }
               else {
                 resolve(data);

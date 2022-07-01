@@ -27,13 +27,16 @@ import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_1_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_2_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_5_0;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
+import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
@@ -103,10 +106,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -123,13 +129,14 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
-            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0 })
+            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0 })
 @RestService(name = "externalapiseries", title = "External API Series Service", notes = {},
              abstractText = "Provides resources and operations related to the series")
 @Component(
@@ -326,58 +333,63 @@ public class SeriesEndpoint {
 
       SearchResult<Series> result = elasticsearchIndex.getByQuery(query);
       final boolean includeAcl = (withAcl != null && withAcl);
-      return ApiResponses.Json.ok(requestedVersion, arr($(result.getItems()).map(new Fn<SearchResultItem<Series>, JValue>() {
-        @Override
-        public JValue apply(SearchResultItem<Series> a) {
-          final Series s = a.getSource();
-          JValue subjects;
-          if (s.getSubject() == null) {
-            subjects = arr();
-          } else {
-            subjects = arr(splitSubjectIntoArray(s.getSubject()));
-          }
-          Date createdDate = s.getCreatedDateTime();
-          JObject result;
-          if (requestedVersion.isSmallerThan(VERSION_1_1_0)) {
-            result = obj(
-                    f("identifier", v(s.getIdentifier())),
-                    f("title", v(s.getTitle())),
-                    f("creator", v(s.getCreator(), BLANK)),
-                    f("created", v(createdDate != null ? toUTC(createdDate.getTime()) : null, BLANK)),
-                    f("subjects", subjects),
-                    f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))),
-                    f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))),
-                    f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))));
-          }
-          else {
-            result = obj(
-                    f("identifier", v(s.getIdentifier())),
-                    f("title", v(s.getTitle())),
-                    f("description", v(s.getDescription(), BLANK)),
-                    f("creator", v(s.getCreator(), BLANK)),
-                    f("created", v(createdDate != null ? toUTC(createdDate.getTime()) : null, BLANK)),
-                    f("subjects", subjects),
-                    f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))),
-                    f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))),
-                    f("language", v(s.getLanguage(), BLANK)),
-                    f("license", v(s.getLicense(), BLANK)),
-                    f("rightsholder", v(s.getRightsHolder(), BLANK)),
-                    f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))));
+      return queryResultToJson(result, includeAcl, requestedVersion);
 
-            if (includeAcl) {
-              AccessControlList acl = getAclFromSeries(s);
-              result = result.merge(f("acl", arr(AclUtils.serializeAclToJson(acl))));
-            }
-          }
-
-          return result;
-
-        }
-      }).toList()));
     } catch (Exception e) {
       logger.warn("Could not perform search query", e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  private Response queryResultToJson(SearchResult<Series> result, boolean includeAcl, ApiVersion requestedVersion) {
+    return ApiResponses.Json.ok(requestedVersion, arr($(result.getItems()).map(new Fn<SearchResultItem<Series>, JValue>() {
+      @Override
+      public JValue apply(SearchResultItem<Series> a) {
+        final Series s = a.getSource();
+        JValue subjects;
+        if (s.getSubject() == null) {
+          subjects = arr();
+        } else {
+          subjects = arr(splitSubjectIntoArray(s.getSubject()));
+        }
+        Date createdDate = s.getCreatedDateTime();
+        JObject result;
+        if (requestedVersion.isSmallerThan(VERSION_1_1_0)) {
+          result = obj(
+                  f("identifier", v(s.getIdentifier())),
+                  f("title", v(s.getTitle())),
+                  f("creator", v(s.getCreator(), BLANK)),
+                  f("created", v(createdDate != null ? toUTC(createdDate.getTime()) : null, BLANK)),
+                  f("subjects", subjects),
+                  f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))),
+                  f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))),
+                  f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))));
+        }
+        else {
+          result = obj(
+                  f("identifier", v(s.getIdentifier())),
+                  f("title", v(s.getTitle())),
+                  f("description", v(s.getDescription(), BLANK)),
+                  f("creator", v(s.getCreator(), BLANK)),
+                  f("created", v(createdDate != null ? toUTC(createdDate.getTime()) : null, BLANK)),
+                  f("subjects", subjects),
+                  f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))),
+                  f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))),
+                  f("language", v(s.getLanguage(), BLANK)),
+                  f("license", v(s.getLicense(), BLANK)),
+                  f("rightsholder", v(s.getRightsHolder(), BLANK)),
+                  f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))));
+
+          if (includeAcl) {
+            AccessControlList acl = getAclFromSeries(s);
+            result = result.merge(f("acl", arr(AclUtils.serializeAclToJson(acl))));
+          }
+        }
+
+        return result;
+
+      }
+    }).toList()));
   }
 
   /**
@@ -420,7 +432,9 @@ public class SeriesEndpoint {
       withAcl = false;
     }
 
-    for (final Series s : indexService.getSeries(id, elasticsearchIndex)) {
+    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser());
+    if (optSeries.isPresent()) {
+      final Series s = optSeries.get();
       JValue subjects;
       if (s.getSubject() == null) {
         subjects = arr();
@@ -500,8 +514,8 @@ public class SeriesEndpoint {
   }
 
   private Response getAllMetadata(String id, ApiVersion requestedVersion) throws SearchIndexException {
-    Opt<Series> optSeries = indexService.getSeries(id, elasticsearchIndex);
-    if (optSeries.isNone())
+    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser());
+    if (optSeries.isEmpty())
       return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
 
     MetadataList metadataList = new MetadataList();
@@ -520,8 +534,8 @@ public class SeriesEndpoint {
   }
 
   private Response getMetadataByType(String id, String type, ApiVersion requestedVersion) throws SearchIndexException {
-    Opt<Series> optSeries = indexService.getSeries(id, elasticsearchIndex);
-    if (optSeries.isNone())
+    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser());
+    if (optSeries.isEmpty())
       return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
 
     // Try the main catalog first as we load it from the index.
@@ -706,8 +720,8 @@ public class SeriesEndpoint {
     Opt<DublinCoreMetadataCollection> optCollection = Opt.none();
     SeriesCatalogUIAdapter adapter = null;
 
-    Opt<Series> optSeries = indexService.getSeries(id, elasticsearchIndex);
-    if (optSeries.isNone())
+    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser());
+    if (optSeries.isEmpty())
       return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
 
     MetadataList metadataList = new MetadataList();
@@ -792,8 +806,8 @@ public class SeriesEndpoint {
               .build();
     }
 
-    Opt<Series> optSeries = indexService.getSeries(id, elasticsearchIndex);
-    if (optSeries.isNone())
+    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser());
+    if (optSeries.isEmpty())
       return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
 
     try {
@@ -813,8 +827,13 @@ public class SeriesEndpoint {
   public Response getSeriesAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id) throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     JSONParser parser = new JSONParser();
-    for (final Series series : indexService.getSeries(id, elasticsearchIndex)) {
+    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser());
+    if (optSeries.isPresent()) {
+      Series series = optSeries.get();
       // The ACL is stored as JSON string in the index. Parse it and extract the part we want to have in the API.
+      if (series.getAccessPolicy() == null) {
+        return ApiResponses.notFound("Acl for series with id '%s' is not defined.", id);
+      }
       JSONObject acl = (JSONObject) parser.parse(series.getAccessPolicy());
 
       if (!((JSONObject) acl.get("acl")).containsKey("ace")) {
@@ -834,7 +853,7 @@ public class SeriesEndpoint {
                   @RestResponse(description = "The series' properties are returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getSeriesProperties(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id) throws Exception {
-    if (indexService.getSeries(id, elasticsearchIndex).isSome()) {
+    if (elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser()).isPresent()) {
       final Map<String, String> properties = seriesService.getSeriesProperties(id);
 
       return ApiResponses.Json.ok(acceptHeader, obj($(properties.entrySet()).map(new Fn<Entry<String, String>, Field>() {
@@ -1099,6 +1118,334 @@ public class SeriesEndpoint {
     }
 
     return ApiResponses.Json.ok(acceptHeader, propertiesJson);
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("series.json")
+  @RestQuery(
+          name = "listSeriesAsJson",
+          description = "Returns the series matching the query parameters",
+          returnDescription = "Returns the series search results as JSON",
+          restParameters = {
+                  @RestParameter(
+                          name = "q",
+                          isRequired = false,
+                          description = "Free text search",
+                          type = STRING
+                  ),
+                  @RestParameter(
+                          name = "edit",
+                          isRequired = false,
+                          description = "Whether this query should return only series that are editable",
+                          type = BOOLEAN
+                  ),
+                  @RestParameter(
+                          name = "fuzzyMatch",
+                          isRequired = false,
+                          description = "Whether a partial match on series id is allowed, default is false",
+                          type = BOOLEAN
+                  ),
+                  @RestParameter(
+                          name = "seriesId",
+                          isRequired = false,
+                          description = "The series identifier",
+                          type = STRING
+                  ),
+                  @RestParameter(
+                          name = "seriesTitle",
+                          isRequired = false,
+                          description = "The series title",
+                          type = STRING
+                  ),
+                  @RestParameter(
+                          name = "creator",
+                          isRequired = false,
+                          description = "The series creator",
+                          type = STRING
+                  ),
+                  @RestParameter(
+                          name = "contributor",
+                          isRequired = false,
+                          description = "The series contributor",
+                          type = STRING
+                  ),
+                  @RestParameter(
+                          name = "publisher",
+                          isRequired = false,
+                          description = "The series publisher",
+                          type = STRING
+                  ),
+                  @RestParameter(
+                          name = "rightsholder",
+                          isRequired = false,
+                          description = "The series rights holder",
+                          type = STRING
+                  ),
+                  @RestParameter(
+                          name = "createdfrom",
+                          isRequired = false,
+                          description = "Filter results by created from (yyyy-MM-dd'T'HH:mm:ss'Z')",
+                          type = STRING
+                  ),
+                  @RestParameter(
+                          name = "createdto",
+                          isRequired = false,
+                          description = "Filter results by created to (yyyy-MM-dd'T'HH:mm:ss'Z')",
+                          type = STRING
+                  ),
+                  @RestParameter(
+                          name = "language",
+                          isRequired = false,
+                          description = "The series language",
+                          type = STRING
+                  ),
+                  @RestParameter(
+                          name = "license",
+                          isRequired = false,
+                          description = "The series license",
+                          type = STRING
+                  ),
+                  @RestParameter(
+                          name = "subject",
+                          isRequired = false,
+                          description = "The series subject",
+                          type = STRING
+                  ),
+                  @RestParameter(
+                          name = "description",
+                          isRequired = false,
+                          description = "The series description",
+                          type = STRING
+                  ),
+                  @RestParameter(
+                          name = "sort",
+                          isRequired = false,
+                          description = "The sort order. May include any of the following: TITLE, SUBJECT, "
+                                  + "CREATOR, PUBLISHERS, CONTRIBUTORS, DESCRIPTION, CREATED_DATE_TIME, "
+                                  + "LANGUAGE, RIGHTS_HOLDER, MANAGED_ACL, LICENCE. "
+                                  + "Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).",
+                          type = STRING
+                  ),
+                  @RestParameter(
+                          name = "offset",
+                          isRequired = false,
+                          description = "The offset",
+                          type = STRING
+                  ),
+                  @RestParameter(
+                          name = "count",
+                          isRequired = false,
+                          description = "Results per page (max 100)",
+                          type = STRING
+                  )
+          },
+          responses = {
+                  @RestResponse(
+                          responseCode = SC_OK,
+                          description = "The access control list."
+                  ),
+                  @RestResponse(
+                          responseCode = SC_UNAUTHORIZED,
+                          description = "If the current user is not authorized to perform this action"
+                  )
+          }
+  )
+  public Response getSeriesAsJson(
+          @QueryParam("q") String text,
+          @QueryParam("seriesId") String seriesId,
+          @QueryParam("edit") Boolean edit,
+          @QueryParam("fuzzyMatch") Boolean fuzzyMatch,
+          @QueryParam("seriesTitle") String seriesTitle,
+          @QueryParam("creator") String creator,
+          @QueryParam("contributor") String contributor,
+          @QueryParam("publisher") String publisher,
+          @QueryParam("rightsholder") String rightsHolder,
+          @QueryParam("createdfrom") String createdFrom,
+          @QueryParam("createdto") String createdTo,
+          @QueryParam("language") String language,
+          @QueryParam("license") String license,
+          @QueryParam("subject") String subject,
+          @QueryParam("description") String description,
+          @QueryParam("sort") String sort,
+          @QueryParam("offset") String offset,
+          @QueryParam("count") String count
+  ) throws UnauthorizedException {
+    try {
+      SearchResult<Series> items = getSeries(
+              text, seriesId, edit, seriesTitle, creator, contributor, publisher,
+              rightsHolder, createdFrom, createdTo, language, license, subject, description, sort,
+              offset, count, fuzzyMatch);
+
+      return queryResultToJson(items, false, ApiVersion.VERSION_1_7_0);
+
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.warn("Could not perform search query: {}", e.getMessage());
+    }
+    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+  }
+
+  private SearchResult<Series> getSeries(
+          String text,
+          String seriesId,
+          Boolean edit,
+          String seriesTitle,
+          String creator,
+          String contributor,
+          String publisher,
+          String rightsHolder,
+          String createdFrom,
+          String createdTo,
+          String language,
+          String license,
+          String subject,
+          String description,
+          String sort,
+          String offsetString,
+          String countString,
+          Boolean fuzzyMatch
+  ) throws SeriesException, UnauthorizedException {
+    int offset = 0;
+    if (StringUtils.isNotEmpty(offsetString)) {
+      try {
+        offset = Integer.parseInt(offsetString);
+      } catch (NumberFormatException e) {
+        logger.warn("Bad start page parameter");
+      }
+      if (offset < 0) {
+        offset = 0;
+      }
+    }
+
+    int count = DEFAULT_LIMIT;
+    if (StringUtils.isNotEmpty(countString)) {
+      try {
+        count = Integer.parseInt(countString);
+      } catch (NumberFormatException e) {
+        logger.warn("Bad count parameter");
+      }
+      if (count < 1) {
+        count = DEFAULT_LIMIT;
+      }
+    }
+
+    SeriesSearchQuery q = new SeriesSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
+    q.withLimit(count);
+    q.withOffset(offset);
+    if (edit != null) {
+      q.withEdit(edit);
+    }
+    if (StringUtils.isNotEmpty(text)) {
+      q.withText(fuzzyMatch.booleanValue(), text);
+    }
+    if (StringUtils.isNotEmpty(seriesId)) {
+      q.withIdentifier(seriesId);
+    }
+    if (StringUtils.isNotEmpty(seriesTitle)) {
+      q.withTitle(seriesTitle);
+    }
+    if (StringUtils.isNotEmpty(creator)) {
+      q.withCreator(creator);
+    }
+    if (StringUtils.isNotEmpty(contributor)) {
+      q.withContributor(contributor);
+    }
+    if (StringUtils.isNotEmpty(language)) {
+      q.withLanguage(language);
+    }
+    if (StringUtils.isNotEmpty(license)) {
+      q.withLicense(license);
+    }
+    if (StringUtils.isNotEmpty(subject)) {
+      q.withSubject(subject);
+    }
+    if (StringUtils.isNotEmpty(publisher)) {
+      q.withPublisher(publisher);
+    }
+    if (StringUtils.isNotEmpty(description)) {
+      q.withDescription(description);
+    }
+    if (StringUtils.isNotEmpty(rightsHolder)) {
+      q.withRightsHolder(rightsHolder);
+    }
+    try {
+      if (StringUtils.isNotEmpty(createdFrom)) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
+        Date date = formatter.parse(createdFrom);
+        q.withCreatedFrom(date);
+      }
+      if (StringUtils.isNotEmpty(createdTo)) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
+        Date date = formatter.parse(createdTo);
+        q.withCreatedFrom(date);
+      }
+    } catch (java.text.ParseException e1) {
+      logger.warn("Could not parse date parameter: {}", e1);
+    }
+
+    if (StringUtils.isNotBlank(sort)) {
+      String enumKey;
+      SortCriterion.Order order;
+      if (sort.endsWith("_DESC")) {
+        enumKey = sort.substring(0, sort.length() - "_DESC".length()).toUpperCase();
+        order = SortCriterion.Order.Descending;
+      } else {
+        enumKey = sort;
+        order = SortCriterion.Order.Ascending;
+      }
+
+      try {
+        switch (enumKey) {
+          case SeriesIndexSchema.TITLE:
+            q.sortByTitle(order);
+            break;
+          case SeriesIndexSchema.SUBJECT:
+            q.sortBySubject(order);
+            break;
+          case SeriesIndexSchema.CREATOR:
+            q.sortByCreator(order);
+            break;
+          case SeriesIndexSchema.PUBLISHERS:
+            q.sortByPublishers(order);
+            break;
+          case SeriesIndexSchema.CONTRIBUTORS:
+            q.sortByContributors(order);
+            break;
+          case SeriesIndexSchema.DESCRIPTION:
+            q.sortByDescription(order);
+            break;
+          case SeriesIndexSchema.LANGUAGE:
+            q.sortByLanguage(order);
+            break;
+          case SeriesIndexSchema.RIGHTS_HOLDER:
+            q.sortByRightsHolder(order);
+            break;
+          case SeriesIndexSchema.LICENSE:
+            q.sortByLicense(order);
+            break;
+          case SeriesIndexSchema.CREATED_DATE_TIME:
+            q.sortByCreatedDateTime(order);
+            break;
+          case SeriesIndexSchema.MANAGED_ACL:
+            q.sortByManagedAcl(order);
+            break;
+          default:
+            logger.info("Unknown filter criteria {}", enumKey);
+            throw new IllegalArgumentException("Unknown filter criteria " + enumKey);
+        }
+      } catch (IllegalArgumentException e) {
+        logger.warn("No sort enum matches '{}'", enumKey);
+      }
+    }
+
+    try {
+      return elasticsearchIndex.getByQuery(q);
+    } catch (SearchIndexException e) {
+      logger.error("Failed to execute search query: {}", e.getMessage());
+      throw new SeriesException(e);
+    }
   }
 
   /**

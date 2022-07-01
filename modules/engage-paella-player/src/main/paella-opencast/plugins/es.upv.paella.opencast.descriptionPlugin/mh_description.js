@@ -33,9 +33,9 @@ paella.addPlugin(function() {
 
     getSubclass() { return 'showMHDescriptionTabBar'; }
     getName() { return 'es.upv.paella.opencast.descriptionPlugin'; }
-    getTabName() { return paella.dictionary.translate('Description'); }
+    getTabName() { return paella.utils.dictionary.translate('Description'); }
     getIndex() { return 10; }
-    getDefaultToolTip() { return paella.dictionary.translate('Description'); }
+    getDefaultToolTip() { return paella.utils.dictionary.translate('Description'); }
 
 
     checkEnabled(onSuccess) {
@@ -93,7 +93,7 @@ paella.addPlugin(function() {
         this.desc.date = sd.toLocaleString();
       }
 
-      paella.ajax.get({url:'/usertracking/stats.json', params:{id:thisClass._episode.id}},
+      paella.utils.ajax.get({url:'/usertracking/stats.json', params:{id:thisClass._episode.id}},
         function(data, contentType, returnCode) {
           thisClass.desc.views = data.stats.views;
           thisClass.insertDescription();
@@ -115,38 +115,38 @@ paella.addPlugin(function() {
       var divPresenter = document.createElement('div'); divPresenter.className = 'showMHDescriptionTabBarElement';
       var divDescription = document.createElement('div'); divDescription.className = 'showMHDescriptionTabBarElement';
 
-      divDate.innerHTML = paella.dictionary.translate('Date')
+      divDate.innerHTML = paella.utils.dictionary.translate('Date')
         + ': <span class="showMHDescriptionTabBarValue">' + paella.AntiXSS.htmlEscape(this.desc.date) + '</span>';
-      divContributor.innerHTML = paella.dictionary.translate('Contributor')
+      divContributor.innerHTML = paella.utils.dictionary.translate('Contributor')
         + ': <span class="showMHDescriptionTabBarValue">'
         + paella.AntiXSS.htmlEscape(this.desc.contributor) + '</span>';
-      divLanguage.innerHTML = paella.dictionary.translate('Language')
+      divLanguage.innerHTML = paella.utils.dictionary.translate('Language')
         + ': <span class="showMHDescriptionTabBarValue">' + paella.AntiXSS.htmlEscape(this.desc.language) + '</span>';
-      divViews.innerHTML = paella.dictionary.translate('Views')
+      divViews.innerHTML = paella.utils.dictionary.translate('Views')
         + ': <span class="showMHDescriptionTabBarValue">' + paella.AntiXSS.htmlEscape(this.desc.views) + '</span>';
-      divTitle.innerHTML = paella.dictionary.translate('Title')
+      divTitle.innerHTML = paella.utils.dictionary.translate('Title')
         + ': <span class="showMHDescriptionTabBarValue">' + paella.AntiXSS.htmlEscape(this.desc.title) + '</span>';
-      divSubject.innerHTML = paella.dictionary.translate('Subject')
+      divSubject.innerHTML = paella.utils.dictionary.translate('Subject')
         + ': <span class="showMHDescriptionTabBarValue">' + paella.AntiXSS.htmlEscape(this.desc.subject) + '</span>';
       if (this.desc.presenter == '') {
-        divPresenter.innerHTML = paella.dictionary.translate('Presenter')
+        divPresenter.innerHTML = paella.utils.dictionary.translate('Presenter')
           + ': <span class="showMHDescriptionTabBarValue"></span>';
       }
       else {
-        divPresenter.innerHTML = paella.dictionary.translate('Presenter')
+        divPresenter.innerHTML = paella.utils.dictionary.translate('Presenter')
           + ': <span class="showMHDescriptionTabBarValue"><a tabindex="4001" href="/engage/ui/index.html?q='
           + this.desc.presenter + '">' + paella.AntiXSS.htmlEscape(this.desc.presenter) + '</a></span>';
       }
       if (this.desc.serieId == '') {
-        divSeries.innerHTML = paella.dictionary.translate('Series')
+        divSeries.innerHTML = paella.utils.dictionary.translate('Series')
           + ': <span class="showMHDescriptionTabBarValue"></span>';
       }
       else {
-        divSeries.innerHTML = paella.dictionary.translate('Series')
+        divSeries.innerHTML = paella.utils.dictionary.translate('Series')
           + ': <span class="showMHDescriptionTabBarValue"><a tabindex="4002" href="/engage/ui/index.html?epFrom='
           + this.desc.serieId + '">' + paella.AntiXSS.htmlEscape(this.desc.serie) + '</a></span>';
       }
-      divDescription.innerHTML = paella.dictionary.translate('Description')
+      divDescription.innerHTML = paella.utils.dictionary.translate('Description')
         + ': <span class="showMHDescriptionTabBarValue">'
         + paella.AntiXSS.htmlEscape(this.desc.description) + '</span>';
 

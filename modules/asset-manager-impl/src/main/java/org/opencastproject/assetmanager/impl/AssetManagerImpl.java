@@ -78,8 +78,8 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
+import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
@@ -141,6 +141,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -171,13 +172,14 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private static final String MANIFEST_DEFAULT_NAME = "manifest";
 
+  private CopyOnWriteArrayList<AssetManagerUpdateHandler> handlers = new CopyOnWriteArrayList<>();
+
   private SecurityService securityService;
   private AuthorizationService authorizationService;
   private OrganizationDirectoryService orgDir;
   private Workspace workspace;
   private AssetStore assetStore;
   private HttpAssetProvider httpAssetProvider;
-  private MessageSender messageSender;
   private String systemUserName;
   private Database db;
   private AclServiceFactory aclServiceFactory;
@@ -246,6 +248,19 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Reference(
       cardinality = ReferenceCardinality.MULTIPLE,
       policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeEventHandler"
+  )
+  public void addEventHandler(AssetManagerUpdateHandler handler) {
+    this.handlers.add(handler);
+  }
+
+  public void removeEventHandler(AssetManagerUpdateHandler handler) {
+    this.handlers.remove(handler);
+  }
+
+  @Reference(
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
       unbind = "removeRemoteAssetStore"
   )
   public synchronized void addRemoteAssetStore(RemoteAssetStore assetStore) {
@@ -259,11 +274,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Reference
   public void setHttpAssetProvider(HttpAssetProvider httpAssetProvider) {
     this.httpAssetProvider = httpAssetProvider;
-  }
-
-  @Reference
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
   }
 
   @Reference
@@ -400,12 +410,11 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                 mkPropertyName(ace.getRole(), ace.getAction())), Value.mk(ace.isAllow())));
       }
 
-      logger.info("Send update message for snapshot {}, {} to ActiveMQ",
-              snapshot.getMediaPackage().getIdentifier().toString(), snapshot.getVersion());
-      messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
-              mkTakeSnapshotMessage(snapshot));
+      logger.info("Trigger update handlers for snapshot {}, version {}",
+          snapshot.getMediaPackage().getIdentifier(), snapshot.getVersion());
+      fireEventHandlers(mkTakeSnapshotMessage(snapshot));
 
-      updateEventInIndex(snapshot, index);
+      updateEventInIndex(snapshot);
 
       return snapshot;
     }
@@ -471,7 +480,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * @param index
    *         The API index to update
    */
-  private void updateEventInIndex(Snapshot snapshot, ElasticsearchIndex index) {
+  private void updateEventInIndex(Snapshot snapshot) {
     final MediaPackage mp = snapshot.getMediaPackage();
     String eventId = mp.getIdentifier().toString();
     final String organization = securityService.getOrganization().getId();
@@ -529,15 +538,24 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * @param index
    *         The API index to update
    */
-  private void removeEventFromIndex(String eventId, ElasticsearchIndex index) {
-    final String organization = securityService.getOrganization().getId();
+  private void removeArchivedVersionFromIndex(String eventId) {
+    final String orgId = securityService.getOrganization().getId();
     final User user = securityService.getUser();
     logger.debug("Received AssetManager delete episode message {}", eventId);
+
+    Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+      if (eventOpt.isEmpty()) {
+        logger.warn("Event {} not found for deletion", eventId);
+        return Optional.empty();
+      }
+      Event event = eventOpt.get();
+      event.setArchiveVersion(null);
+      return Optional.of(event);
+    };
+
     try {
-      index.deleteAssets(organization, user, eventId);
+      index.addOrUpdateEvent(eventId, updateFunction, orgId, user);
       logger.debug("Event {} removed from the {} index", eventId, index.getIndexName());
-    } catch (NotFoundException e) {
-      logger.warn("Event {} not found for deletion", eventId);
     } catch (SearchIndexException e) {
       logger.error("Error deleting the event {} from the {} index.", eventId, index.getIndexName(), e);
     }
@@ -849,18 +867,16 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   @Override
   public void handleDeletedSnapshot(String mpId, VersionImpl version) {
-    logger.info("Send delete message for snapshot {}, {} to ActiveMQ", mpId, version);
-    messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
-            AssetManagerItem.deleteSnapshot(mpId, version.value(), new Date()));
+    logger.info("Firing event handlers for event {}, snapshot {}", mpId, version);
+    fireEventHandlers(AssetManagerItem.deleteSnapshot(mpId, version.value(), new Date()));
   }
 
   @Override
   public void handleDeletedEpisode(String mpId) {
-    logger.info("Send delete message for episode {} to ActiveMQ", mpId);
-    messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
-            AssetManagerItem.deleteEpisode(mpId, new Date()));
+    logger.info("Firing event handlers for event {}", mpId);
+    fireEventHandlers(AssetManagerItem.deleteEpisode(mpId, new Date()));
 
-    removeEventFromIndex(mpId, index);
+    removeArchivedVersionFromIndex(mpId);
   }
 
   /**
@@ -873,7 +889,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
-  public void repopulate(final ElasticsearchIndex index) throws IndexRebuildException {
+  public void repopulate() throws IndexRebuildException {
     final Organization org = securityService.getOrganization();
     final User user = (org != null ? securityService.getUser() : null);
     try {
@@ -899,7 +915,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           for (Snapshot snapshot : byOrg.get(orgId)) {
             current += 1;
             try {
-              updateEventInIndex(snapshot, index);
+              updateEventInIndex(snapshot);
             } catch (Throwable t) {
               logSkippingElement(logger, "event", snapshot.getMediaPackage().getIdentifier().toString(), org, t);
             }
@@ -1447,11 +1463,22 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
             mpCopy);
   }
 
+  public void fireEventHandlers(AssetManagerItem item) {
+    while (handlers.size() != 2) {
+      logger.warn("Expecting 2 handlers, but {} are registered.  Waiting 10s then retrying...", handlers.size());
+      try {
+        Thread.sleep(10000L);
+      } catch (InterruptedException e) { /* swallow this, nothing to do */ }
+    }
+    for (AssetManagerUpdateHandler handler : handlers) {
+      handler.execute(item);
+    }
+  }
+
   /**
    * Call {@link
    * org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery#run(AbstractADeleteQuery.DeleteSnapshotHandler)}
-   * with a delete handler that sends messages to ActiveMQ. Also make sure to propagate the behaviour to subsequent
-   * instances.
+   * with a delete handler. Also make sure to propagate the behaviour to subsequent instances.
    */
   private final class ADeleteQueryWithMessaging extends ADeleteQueryDecorator {
     ADeleteQueryWithMessaging(ADeleteQuery delegate) {

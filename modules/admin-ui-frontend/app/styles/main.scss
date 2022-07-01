@@ -516,27 +516,9 @@ table.main-tbl {
     display: none !important;
   }
 
-  td{
-    .fa-check {
-      float: right;
-      margin-top: 3px;
-      font-size: 18px;
-      opacity: 0;
-      visibility: hidden;
-      @include transition(all .2s);
-
-      &.saved {
-        opacity: 1;
-        visibility: visible;
-        color: $green;
-      }
-
-      &.dirty {
-        opacity: 1;
-        visibility: visible;
-        color: $red;
-      }
-    } // fa-check
+  .dirty {
+    border-right: 3px solid #333;
+    margin-right: -3px;
   }
 }
 

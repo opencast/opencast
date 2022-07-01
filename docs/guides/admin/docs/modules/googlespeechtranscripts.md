@@ -103,6 +103,8 @@ Edit  _etc/org.opencastproject.transcription.googlespeech.GoogleSpeechTranscript
 * Use **_OAuth Client ID_**, **_OAuth Client secret_**, **_Refresh token_**, **_Token endpoint_** and **_storage bucket_** created above to respectively set _google.cloud.client.id_ , _google.cloud.client.secret_ , _google.cloud.refresh.token_ , _google.cloud.token.endpoint.url_ and _google.cloud.storage.bucket_
 * Enter the appropriate language in _google.speech.language_, default is (_en-US_). List of supported language: [https://cloud.google.com/speech-to-text/docs/languages](https://cloud.google.com/speech-to-text/docs/languages)
 * Remove profanity (bad language) from transcription by using _google.speech.profanity.filter_, default is (_false_), not removed by default
+* Set the transcription model using _google.speech.transcription.model_, default is (_default_). List of models: https://cloud.google.com/speech-to-text/docs/transcription-model
+* Enable punctuation for transcription result by setting _google.speech.transcription.punctuation_, to (_true_) default is (_false_)
 * In _workflow_, enter the workflow definition id of the workflow to be used to attach the generated transcripts/captions
 * Enter a _notification.email_ to get job failure notifications. If not entered, the email in _etc/custom.properties_ (org.opencastproject.admin.email) will be used.
 If no email address specified in either _notification.email_ or _org.opencastproject.admin.email_,
@@ -128,6 +130,13 @@ google.speech.language=
 
 # Filter out profanities from result. Default is false
 google.speech.profanity.filter=false
+
+# Enable punctuations for transcription. Default is false
+google.speech.transcription.punctuation=true
+
+# Transcription model to use
+# If empty, the "default" model will be used
+google.speech.transcription.model=default
 
 # Workflow to be executed when results are ready to be attached to media package.
 workflow=google-speech-attach-transcripts

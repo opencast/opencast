@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>12-SNAPSHOT</version>
+    <version>13-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -28,11 +28,6 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-common-jpa-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-message-broker-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

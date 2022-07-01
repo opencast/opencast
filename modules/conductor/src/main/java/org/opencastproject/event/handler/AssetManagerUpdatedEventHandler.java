@@ -50,6 +50,9 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +62,15 @@ import java.net.URI;
 /**
  * Responds to series events by re-distributing metadata and security policy files to episodes.
  */
+@Component(
+    immediate = true,
+    service = {
+        AssetManagerUpdatedEventHandler.class
+    },
+    property = {
+        "service.description=AssetManagerUpdatedEventHandler"
+    }
+)
 public class AssetManagerUpdatedEventHandler {
 
   /** The logger */
@@ -91,6 +103,7 @@ public class AssetManagerUpdatedEventHandler {
    * @param bundleContext
    *          the OSGI bundle context
    */
+  @Activate
   protected void activate(BundleContext bundleContext) {
     this.systemAccount = bundleContext.getProperty("org.opencastproject.security.digest.user");
   }
@@ -99,6 +112,7 @@ public class AssetManagerUpdatedEventHandler {
    * @param workspace
    *          the workspace to set
    */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -107,6 +121,7 @@ public class AssetManagerUpdatedEventHandler {
    * @param dublinCoreService
    *          the dublin core service to set
    */
+  @Reference
   public void setDublinCoreCatalogService(DublinCoreCatalogService dublinCoreService) {
     this.dublinCoreService = dublinCoreService;
   }
@@ -115,6 +130,7 @@ public class AssetManagerUpdatedEventHandler {
    * @param assetManager
    *          the asset manager to set
    */
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -123,6 +139,7 @@ public class AssetManagerUpdatedEventHandler {
    * @param securityService
    *          the securityService to set
    */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -131,6 +148,7 @@ public class AssetManagerUpdatedEventHandler {
    * @param authorizationService
    *          the authorizationService to set
    */
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -139,6 +157,7 @@ public class AssetManagerUpdatedEventHandler {
    * @param organizationDirectoryService
    *          the organizationDirectoryService to set
    */
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }

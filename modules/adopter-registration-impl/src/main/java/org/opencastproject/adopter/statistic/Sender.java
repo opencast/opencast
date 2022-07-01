@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -70,67 +71,90 @@ public class Sender {
   /**
    * Executes the 'send' method with the proper REST URL suffix.
    * @param json The data which shall be sent.
-   * @throws Exception General exception that can occur while sending the data.
+   * @throws IOException General exception that can occur while sending the data.
    */
-  public void sendGeneralData(String json) throws Exception {
+  public void sendGeneralData(String json) throws IOException  {
     send(json, GENERAL_DATA_URL_SUFFIX);
+  }
+
+  /**
+   * Deletes the adopter data
+   * @param json The data which shall be sent.
+   * @throws IOException General exception that can occur while sending the data.
+   */
+  public void deleteGeneralData(String json) throws IOException  {
+    send(json, GENERAL_DATA_URL_SUFFIX, "DELETE");
   }
 
   /**
    * Executes the 'send' method with the proper REST URL suffix.
    * @param json The data which shall be sent.
-   * @throws Exception General exception that can occur while sending the data.
+   * @throws IOException General exception that can occur while sending the data.
    */
-  public void sendStatistics(String json) throws Exception {
+  public void sendStatistics(String json) throws IOException {
     send(json, STATISTIC_URL_SUFFIX);
+  }
+
+  /**
+   * Deletes the statistics data
+   * @param json The data which shall be sent.
+   * @throws IOException General exception that can occur while sending the data.
+   */
+  public void deleteStatistics(String json) throws IOException {
+    send(json, STATISTIC_URL_SUFFIX, "DELETE");
+  }
+
+
+  /**
+   * Sends the JSON string via post request.
+   * @param json The JSON string that has to be send.
+   * @param urlSuffix The url suffix determines to which rest endpoint the data will be send.
+   * @throws IOException General exception that can occur while processing the POST request.
+   */
+  private void send(String json, String urlSuffix) throws IOException {
+    send(json, urlSuffix, "GET");
   }
 
   /**
    * Sends the JSON string via post request.
    * @param json The JSON string that has to be send.
    * @param urlSuffix The url suffix determines to which rest endpoint the data will be send.
-   * @throws Exception General exception that can occur while processing the POST request.
+   * @param method The HTTP method to send to the server with.  Hint: Try DELETE
+   * @throws IOException General exception that can occur while processing the POST request.
    */
-  private void send(String json, String urlSuffix) throws Exception {
-    try {
-      URL url = new URL(baseUrl + urlSuffix);
-      HttpURLConnection con = (HttpURLConnection) url.openConnection();
-      con.setRequestMethod("POST");
-      con.setRequestProperty("Content-Type", "application/json; utf-8");
-      con.setRequestProperty("Accept", "application/json");
-      con.setDoOutput(true);
+  private void send(String json, String urlSuffix, String method) throws IOException {
+    URL url = new URL(baseUrl + urlSuffix);
+    HttpURLConnection con = (HttpURLConnection) url.openConnection();
+    con.setRequestMethod(method);
+    con.setRequestProperty("Content-Type", "application/json; utf-8");
+    con.setRequestProperty("Accept", "application/json");
+    con.setDoOutput(true);
 
-      try (OutputStream os = con.getOutputStream()) {
-        byte[] input = json.getBytes(StandardCharsets.UTF_8);
-        os.write(input, 0, input.length);
+    try (OutputStream os = con.getOutputStream()) {
+      byte[] input = json.getBytes(StandardCharsets.UTF_8);
+      os.write(input, 0, input.length);
+    }
+
+    String httpStatus = con.getResponseCode() + "";
+    boolean errorOccurred = !httpStatus.startsWith("2");
+    InputStream responseStream;
+
+    if (errorOccurred) {
+      responseStream = con.getErrorStream();
+    } else {
+      responseStream = con.getInputStream();
+    }
+
+    try (BufferedReader br = new BufferedReader(new InputStreamReader(responseStream, StandardCharsets.UTF_8))) {
+      StringBuilder response = new StringBuilder();
+      String responseLine;
+      while ((responseLine = br.readLine()) != null) {
+        response.append(responseLine.trim());
       }
-
-      String httpStatus = con.getResponseCode() + "";
-      boolean errorOccurred = !httpStatus.startsWith("2");
-      InputStream responseStream;
-
       if (errorOccurred) {
-        responseStream = con.getErrorStream();
-      } else {
-        responseStream = con.getInputStream();
+        String errorMessage = String.format("HttpStatus: %s, HttpResponse: %s", httpStatus, response);
+        throw new RuntimeException(errorMessage);
       }
-
-      try (BufferedReader br = new BufferedReader(
-              new InputStreamReader(responseStream, StandardCharsets.UTF_8))) {
-        StringBuilder response = new StringBuilder();
-        String responseLine;
-        while ((responseLine = br.readLine()) != null) {
-          response.append(responseLine.trim());
-        }
-        if (errorOccurred) {
-          String errorMessage = String.format("HttpStatus: %s, HttpResponse: %s", httpStatus, response);
-          throw new RuntimeException(errorMessage);
-        }
-      }
-
-    } catch (Exception e) {
-      logger.error("Error while sending JSON via POST request. The json string: {}", json, e);
-      throw e;
     }
   }
 

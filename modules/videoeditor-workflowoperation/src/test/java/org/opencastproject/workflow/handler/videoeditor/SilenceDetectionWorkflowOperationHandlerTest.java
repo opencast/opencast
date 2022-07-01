@@ -38,10 +38,8 @@ import org.opencastproject.smil.api.SmilService;
 import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -111,13 +109,13 @@ public class SilenceDetectionWorkflowOperationHandlerTest {
     return configuration;
   }
 
-  private WorkflowInstanceImpl getWorkflowInstance(MediaPackage mp, Map<String, String> configurations) {
-    WorkflowInstanceImpl workflowInstance = new WorkflowInstanceImpl();
+  private WorkflowInstance getWorkflowInstance(MediaPackage mp, Map<String, String> configurations) {
+    WorkflowInstance workflowInstance = new WorkflowInstance();
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowInstance.WorkflowState.RUNNING);
     workflowInstance.setMediaPackage(mp);
-    WorkflowOperationInstanceImpl operation
-        = new WorkflowOperationInstanceImpl("op", WorkflowOperationInstance.OperationState.RUNNING);
+    WorkflowOperationInstance operation
+        = new WorkflowOperationInstance("op", WorkflowOperationInstance.OperationState.RUNNING);
     operation.setTemplate("silence");
     operation.setState(WorkflowOperationInstance.OperationState.RUNNING);
     for (String key : configurations.keySet()) {
@@ -153,7 +151,7 @@ public class SilenceDetectionWorkflowOperationHandlerTest {
     silenceDetectionOperationHandler.setServiceRegistry(serviceRegistry);
     EasyMock.expect(serviceRegistry.getJob(EasyMock.anyLong())).andReturn(job);
     EasyMock.replay(job, serviceRegistry, silenceDetectionServiceMock, workspaceMock);
-    WorkflowInstanceImpl workflowInstance = getWorkflowInstance(mp, getDefaultConfiguration());
+    WorkflowInstance workflowInstance = getWorkflowInstance(mp, getDefaultConfiguration());
     WorkflowOperationResult result = silenceDetectionOperationHandler.start(workflowInstance, null);
     Assert.assertNotNull("SilenceDetectionWorkflowOperationHandler workflow operation returns null "
             + "but should be an instantiated WorkflowOperationResult", result);
@@ -164,7 +162,7 @@ public class SilenceDetectionWorkflowOperationHandlerTest {
 
     // test media package contains new smil catalog
     MediaPackageElementFlavor smilPartialFlavor = new MediaPackageElementFlavor("*", smilFlavorSubtypeProperty);
-    Catalog[] smilCatalogs = mp.getCatalogs(smilPartialFlavor);
+    Catalog[] smilCatalogs = result.getMediaPackage().getCatalogs(smilPartialFlavor);
     Assert.assertTrue("Media package should contain a smil catalog",
             smilCatalogs != null && smilCatalogs.length > 0);
   }

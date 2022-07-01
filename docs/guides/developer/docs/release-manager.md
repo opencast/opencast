@@ -123,10 +123,13 @@ To: dev@opencast.org
 Subject: Release Branch for Opencast <version> Cut
 
 Hi everyone,
-the Opencast <version> release branch (r/<version>) has been
-cut.  Pull requests for bug fixes may still be made against
-this branch but, as usual, features should go into develop
-instead.
+the Opencast <version> release branch (r/<version>.x) has been
+cut.  Please check if pull requests point to the correct branch.
+
+For a guide on what you can still add to release branches, please refer to
+
+  https://docs.opencast.org/develop/developer/development-process/#acceptance-criteria-for-patches-in-different-versions
+
 
 Remember the release schedule for this release:
 

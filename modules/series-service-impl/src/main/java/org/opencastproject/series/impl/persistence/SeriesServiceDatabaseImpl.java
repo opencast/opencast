@@ -321,7 +321,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
         // If the series existed but is marked deleted, we completely delete it
         // here to make sure no remains of the old series linger.
         if (entity != null) {
-          this.deleteSeries(seriesId);
+          em.remove(entity);
+          em.flush();
         }
 
         // no series stored, create new entity

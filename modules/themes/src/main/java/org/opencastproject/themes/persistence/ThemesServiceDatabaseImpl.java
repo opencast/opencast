@@ -219,7 +219,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
       // update the elasticsearch indices
       String orgId = securityService.getOrganization().getId();
       User user = securityService.getUser();
-      updateThemeInIndex(theme, index, orgId, user);
+      updateThemeInIndex(theme, orgId, user);
 
       return theme;
     } catch (Exception e) {
@@ -274,12 +274,12 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
 
       // update the elasticsearch indices
       String organization = securityService.getOrganization().getId();
-      removeThemeFromIndex(id, index, organization);
+      removeThemeFromIndex(id, organization);
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
       logger.error("Could not delete theme '{}'", id, e);
-      if (tx.isActive()) {
+      if (tx != null && tx.isActive()) {
         tx.rollback();
       }
       throw new ThemesServiceDatabaseException(e);
@@ -329,12 +329,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   }
 
   @Override
-  public void repopulate(final ElasticsearchIndex index) {
-    if (index.getIndexName() != this.index.getIndexName()) {
-      logger.info("Themes are currently not part of the {} index, no re-indexing necessary.");
-      return;
-    }
-
+  public void repopulate() {
     for (final Organization organization : organizationDirectoryService.getOrganizations()) {
       User systemUser = SecurityUtil.createSystemUser(cc, organization);
       SecurityUtil.runAs(securityService, organization, systemUser, () -> {
@@ -344,7 +339,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
           int current = 1;
           logIndexRebuildBegin(logger, index.getIndexName(), total, "themes", organization);
           for (Theme theme : themes) {
-            updateThemeInIndex(theme, index, organization.getId(), systemUser);
+            updateThemeInIndex(theme, organization.getId(), systemUser);
             logIndexRebuildProgress(logger, index.getIndexName(), total, current);
             current++;
           }
@@ -371,11 +366,11 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    * @param orgId
    *           the organization the theme belongs to
    */
-  private void removeThemeFromIndex(long themeId, ElasticsearchIndex index, String orgId) {
+  private void removeThemeFromIndex(long themeId, String orgId) {
     logger.debug("Removing theme {} from the {} index.", themeId, index.getIndexName());
 
     try {
-      index.delete(IndexTheme.DOCUMENT_TYPE, Long.toString(themeId), orgId);
+      index.deleteTheme(Long.toString(themeId), orgId);
       logger.debug("Theme {} removed from the {} index", themeId, index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Error deleting the theme {} from the {} index", themeId, index.getIndexName(), e);
@@ -392,7 +387,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    *           the organization the theme belongs to
    * @param user
    */
-  private void updateThemeInIndex(Theme theme, ElasticsearchIndex index, String orgId,
+  private void updateThemeInIndex(Theme theme, String orgId,
           User user) {
     logger.debug("Updating the theme with id '{}', name '{}', description '{}', organization '{}' in the {} index.",
             theme.getId(), theme.getName(), theme.getDescription(),
@@ -406,11 +401,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
       // the function to do the actual updating
       Function<Optional<IndexTheme>, Optional<IndexTheme>> updateFunction = (Optional<IndexTheme> indexThemeOpt) -> {
         IndexTheme indexTheme;
-        if (indexThemeOpt.isPresent()) {
-          indexTheme = indexThemeOpt.get();
-        } else {
-          indexTheme = new IndexTheme(id, orgId);
-        }
+        indexTheme = indexThemeOpt.orElseGet(() -> new IndexTheme(id, orgId));
         String creator = StringUtils.isNotBlank(theme.getCreator().getName())
                 ? theme.getCreator().getName() : theme.getCreator().getUsername();
 

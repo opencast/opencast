@@ -41,6 +41,7 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -143,6 +144,11 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo 
     updated(cc.getProperties());
   }
 
+  @Deactivate
+  public void deactivate() {
+    tryUnregisterServlet();
+  }
+
   /** Called by the ConfigurationAdmin service. This method actually sets up the server. */
   public synchronized void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     // Because the OAI-PMH server implementation is technically not a REST service implemented
@@ -231,12 +237,6 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo 
     res.setCharacterEncoding("UTF-8");
     res.setContentType("text/xml;charset=UTF-8");
     oai.generate(res.getOutputStream());
-  }
-
-  @Override
-  public void destroy() {
-    super.destroy();
-    tryUnregisterServlet();
   }
 
   private synchronized void tryUnregisterServlet() {

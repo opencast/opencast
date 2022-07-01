@@ -45,9 +45,14 @@ import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
+import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
+import org.opencastproject.metadata.dublincore.DublinCoreValue;
+import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
+import org.opencastproject.metadata.dublincore.OpencastMetadataCodec;
+import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -70,6 +75,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -78,9 +84,13 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -120,6 +130,8 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
   private static final String PLUS = "+";
   private static final String MINUS = "-";
 
+  private static final DateFormat ADMIN_UI_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
   /** Name of the configuration option that provides the source flavors we are looking for */
   public static final String SOURCE_FLAVORS_PROPERTY = "source-flavors";
 
@@ -140,6 +152,12 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
 
   /** The series ID that should be set on the copies (if unset, uses the same series) */
   public static final String SET_SERIES_ID = "set-series-id";
+
+  /** The new title that should be set on the copies (if unset, uses the old title (copy-number-prefix)) */
+  public static final String SET_TITLE = "set-title";
+
+  /** The new startDate that should be set on the copies (if unset, uses the old startDate) */
+  public static final String SET_START_DATE = "set-start-date-time";
 
   /** The default maximum number of events to create. Can be overridden. */
   public static final int MAX_NUMBER_DEFAULT = 25;
@@ -228,7 +246,9 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     final List<String> configuredSourceTags = tagsAndFlavors.getSrcTags();
     final List<String> configuredTargetTags = tagsAndFlavors.getTargetTags();
     final boolean noSuffix = Boolean.parseBoolean(trimToEmpty(operation.getConfiguration(NO_SUFFIX)));
+    final String startDateString = trimToEmpty(operation.getConfiguration(SET_START_DATE));
     final String seriesId = trimToEmpty(operation.getConfiguration(SET_SERIES_ID));
+    final String title = trimToEmpty(operation.getConfiguration(SET_TITLE));
     final int numberOfEvents = Integer.parseInt(operation.getConfiguration(NUMBER_PROPERTY));
     final String configuredPropertyNamespaces = trimToEmpty(operation.getConfiguration(PROPERTY_NAMESPACES_PROPERTY));
     int maxNumberOfEvents = MAX_NUMBER_DEFAULT;
@@ -244,7 +264,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
 
     SeriesInformation series = null;
     AccessControlList seriesAccessControl = null;
-    if (!seriesId.isEmpty()) {
+    if (!seriesId.isEmpty() && !seriesId.startsWith("${") && !seriesId.endsWith("}")) {
       try {
         final DublinCoreCatalog dc = seriesService.getSeries(seriesId);
         series = new SeriesInformation(seriesId, dc, dc.get(DublinCore.PROPERTY_TITLE).get(0).getValue());
@@ -326,14 +346,37 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     for (int i = 0; i < numberOfEvents; i++) {
       final List<URI> temporaryFiles = new ArrayList<>();
       MediaPackage newMp = null;
-
       try {
         String newMpId = workflowInstance.getConfiguration("newMpId");
         if (newMpId == null) {
           newMpId = UUID.randomUUID().toString();
         }
         // Clone the media package (without its elements)
-        newMp = copyMediaPackage(mediaPackage, series, newMpId, noSuffix, i + 1, copyNumberPrefix);
+        String useTitle;
+        if (title.isEmpty() || (title.startsWith("${") && (title.endsWith("}")))) {
+          final DublinCoreCatalog dublinCore = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage).get();
+          useTitle = dublinCore.getFirst(DublinCore.PROPERTY_TITLE);
+        } else {
+          useTitle = title;
+        }
+        if (!noSuffix) {
+          useTitle = String.format("%s (%s %d)", useTitle, copyNumberPrefix, i + 1);
+        }
+        Date mpDate;
+        if (!startDateString.isEmpty() || (!startDateString.startsWith("${") && (!startDateString.endsWith("}")))) {
+          try {
+            mpDate = ADMIN_UI_DATE_FORMAT.parse(startDateString);
+            logger.info("Setting StartDate to {}", mpDate);
+          } catch (ParseException ex) {
+            logger.warn("Could not parse: {} as date time", startDateString);
+            mpDate = mediaPackage.getDate();
+            logger.warn("Using original event date {} as default", mpDate);
+          }
+        } else {
+          mpDate = mediaPackage.getDate();
+          logger.warn("No date set, using original event date {} as default", mpDate);
+        }
+        newMp = copyMediaPackage(mediaPackage, series, newMpId, useTitle, mpDate);
 
         if (series != null) {
           URI newSeriesURI = null;
@@ -359,8 +402,9 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
         }
 
         // Create and add new episode dublin core with changed title
-        newMp = copyDublinCore(mediaPackage, originalEpisodeDc[0], newMp, series, removeTags, addTags, overrideTags,
-                temporaryFiles);
+        newMp = copyDublinCore(mediaPackage, originalEpisodeDc[0],
+              newMp, series, removeTags, addTags, overrideTags,
+              temporaryFiles, mpDate);
 
         // Clone regular elements
         for (final MediaPackageElement e : elements) {
@@ -441,9 +485,9 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
       final MediaPackage source,
       final SeriesInformation series,
       final String newMpId,
-      final boolean noSuffix,
-      final long copyNumber,
-      final String copyNumberPrefix) throws WorkflowOperationException {
+      final String title,
+      final Date startDate
+      ) throws WorkflowOperationException {
     // We are not using MediaPackage.clone() here, since it does "too much" for us (e.g. copies all the attachments)
     MediaPackage destination;
     try {
@@ -464,10 +508,8 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     destination.setDuration(source.getDuration());
     destination.setLanguage(source.getLanguage());
     destination.setLicense(source.getLicense());
-    final String newTitle = noSuffix
-            ? source.getTitle()
-            : String.format("%s (%s %d)", source.getTitle(), copyNumberPrefix, copyNumber);
-    destination.setTitle(newTitle);
+    destination.setDate(startDate);
+    destination.setTitle(title);
     return destination;
   }
 
@@ -533,11 +575,18 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
       final List<String> removeTags,
       final List<String> addTags,
       final List<String> overrideTags,
-      final List<URI> temporaryFiles) throws WorkflowOperationException {
+      final List<URI> temporaryFiles,
+      final Date creationDate
+  ) throws WorkflowOperationException {
     final DublinCoreCatalog destinationDublinCore = DublinCoreUtil.loadEpisodeDublinCore(workspace, source).get();
     destinationDublinCore.setIdentifier(null);
     destinationDublinCore.setURI(sourceDublinCore.getURI());
+    destinationDublinCore.set(DublinCore.PROPERTY_CREATED, OpencastMetadataCodec.encodeDate(creationDate, Precision.Second));
     destinationDublinCore.set(DublinCore.PROPERTY_TITLE, destination.getTitle());
+    if (StringUtils.isNotBlank(destinationDublinCore.getFirst(DublinCore.PROPERTY_TEMPORAL))) {
+      DublinCoreValue eventTime = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(creationDate, creationDate), Precision.Second);
+      destinationDublinCore.set(DublinCore.PROPERTY_TEMPORAL, eventTime);
+    }
     if (series != null) {
       destinationDublinCore.set(DublinCore.PROPERTY_IS_PART_OF, series.id);
     }

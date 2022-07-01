@@ -272,17 +272,19 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
   }
 
   @Override
-  public Job startTranscription(String mpId, Track track, String language) throws TranscriptionServiceException {
-    return startTranscription(mpId, track, language, getAmberscriptJobType());
-  }
-
-  public Job startTranscription(String mpId, Track track, String language, String jobtype)
-          throws TranscriptionServiceException {
-    if (StringUtils.isBlank(language)) {
+  public Job startTranscription(String mpId, Track track, String... args) throws TranscriptionServiceException {
+    String language;
+    if (args.length > 0 && StringUtils.isNotBlank(args[0])) {
+      language = args[0];
+    } else {
       language = getLanguage();
     }
-    if (StringUtils.isBlank(jobtype)) {
-      jobtype = getAmberscriptJobType();
+
+    String jobType;
+    if (args.length > 1 && StringUtils.isNotBlank(args[1])) {
+      jobType = args[1];
+    } else {
+      jobType = getAmberscriptJobType();
     }
 
     if (!enabled) {
@@ -290,11 +292,11 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
               + " If you want to enable it, please update the service configuration.");
     }
 
-    logger.info("New transcription job for mpId '{}' language '{}' JobType '{}'.", mpId, language, jobtype);
+    logger.info("New transcription job for mpId '{}' language '{}' JobType '{}'.", mpId, language, jobType);
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.StartTranscription.name(),
-              Arrays.asList(mpId, MediaPackageElementParser.getAsXml(track), language, jobtype));
+              Arrays.asList(mpId, MediaPackageElementParser.getAsXml(track), language, jobType));
     } catch (ServiceRegistryException e) {
       throw new TranscriptionServiceException("Unable to create a job", e);
     } catch (MediaPackageException e) {
@@ -313,9 +315,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
       } else {
         logger.debug("Unable to get and save the transcription result for mpId '{}'.", mpId);
       }
-    } catch (IOException e) {
-      logger.warn("Could not save transcription results file for mpId '{}': {}", mpId, e.toString());
-    } catch (TranscriptionServiceException e) {
+    } catch (IOException | TranscriptionServiceException e) {
       logger.warn("Could not save transcription results file for mpId '{}': {}", mpId, e.toString());
     } catch (TranscriptionDatabaseException e) {
       logger.warn("Transcription results file were saved but state in db not updated for mpId '{}': ", mpId, e);

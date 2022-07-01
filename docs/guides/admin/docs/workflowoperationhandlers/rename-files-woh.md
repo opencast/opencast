@@ -20,8 +20,8 @@ Parameter Table
 
 |configuration keys|description                                                                      |
 |------------------|---------------------------------------------------------------------------------|
-|source-flavors     |Comma separated list of flavors to select tracks to rename
-|source-flavor      |Same as `source-flavors` but can only select a single flavor
+|source-flavors    |Comma separated list of flavors to select tracks to rename
+|source-flavor     |Same as `source-flavors` but can only select a single flavor
 |name-pattern      |Pattern to use for renaming the media files
 
 
@@ -33,6 +33,8 @@ You can use the following placeholders in your replacement pattern:
 - `#{file.basename}`
 - `#{flavor.type}`
 - `#{flavor.subtype}`
+- `#{video.width}`
+- `#{video.height}`
 - `#{episode...}`
 - `#{series...}`
 

@@ -508,7 +508,7 @@ public class ToolsEndpoint {
       .map(SourceTrackInfo::toJson)
       .collect(Collectors.toList());
 
-    return RestUtils.okJson(obj(f("title", v(mp.getTitle(), Jsons.BLANK)),
+    return RestUtils.okJson(obj(f("title", v(event.getTitle(), Jsons.BLANK)),
             f("date", v(event.getRecordingStartDate(), Jsons.BLANK)),
             f("series", obj(f("id", v(event.getSeriesId(), Jsons.BLANK)),
             f("title", v(event.getSeriesName(), Jsons.BLANK)))),

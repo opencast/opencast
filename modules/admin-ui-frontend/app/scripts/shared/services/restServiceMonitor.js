@@ -29,7 +29,6 @@ function monitorService($http, $location, $translate, Storage) {
   };
 
   var LATEST_VERSION_NAME = 'Latest Version';
-  var AMQ_NAME = 'ActiveMQ';
   var STATES_NAME = 'Service States';
   var BACKEND_NAME = 'Backend Services';
   var MALFORMED_DATA = 'Malformed Data';
@@ -45,7 +44,6 @@ function monitorService($http, $location, $translate, Storage) {
     services.error = false;
     services.numErr = 0;
 
-    Monitoring.getActiveMQStats();
     Monitoring.getBasicServiceStats();
     Monitoring.getVersionStats();
   };
@@ -97,21 +95,6 @@ function monitorService($http, $location, $translate, Storage) {
     }).catch(function(err) {
       Monitoring.setError(LATEST_VERSION_NAME, err.statusText);
       services.service[LATEST_VERSION_NAME].docs_url = 'https://docs.opencast.org';
-    });
-  };
-
-  Monitoring.getActiveMQStats = function() {
-    $http.get('/broker/status').then(function(data) {
-      Monitoring.populateService(AMQ_NAME);
-      if (data.status === 204) {
-        services.service[AMQ_NAME].status = OK;
-        services.service[AMQ_NAME].error = false;
-      } else {
-        services.service[AMQ_NAME].status = data.statusText;
-        services.service[AMQ_NAME].error = true;
-      }
-    }).catch(function(err) {
-      Monitoring.setError(AMQ_NAME, err.statusText);
     });
   };
 
@@ -181,10 +164,8 @@ function monitorService($http, $location, $translate, Storage) {
       serviceName = event.target.getAttribute(SERVICE_NAME_ATTRIBUTE);
     else
       serviceName = event.target.parentNode.getAttribute(SERVICE_NAME_ATTRIBUTE);
-    if (serviceName != AMQ_NAME) {
-      Storage.put('filter', 'services', 'actions', 'true');
-      $location.path(SERVICES_FRAGMENT).replace();
-    }
+    Storage.put('filter', 'services', 'actions', 'true');
+    $location.path(SERVICES_FRAGMENT).replace();
   };
 
   Monitoring.getServiceStatus = function() {

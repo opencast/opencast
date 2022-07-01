@@ -24,11 +24,10 @@ package org.opencastproject.workflow.handler.workflow;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -82,9 +81,9 @@ public class ZipWorkflowOperationHandlerTest {
    */
   @Test
   public void testInvalidWorkflow() throws Exception {
-    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("test", OperationState.INSTANTIATED);
     ops.add(operation);
     instance.setOperations(ops);
 
@@ -107,9 +106,9 @@ public class ZipWorkflowOperationHandlerTest {
    */
   @Test
   public void testInvalidMediaPackage() throws Exception {
-    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("test", OperationState.INSTANTIATED);
     ops.add(operation);
     instance.setOperations(ops);
     instance.setMediaPackage(null);
@@ -132,9 +131,9 @@ public class ZipWorkflowOperationHandlerTest {
    */
   @Test
   public void testConfigKeyTargetFlavorDefaultValue() {
-    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("test", OperationState.INSTANTIATED);
     ops.add(operation);
     instance.setOperations(ops);
     instance.setMediaPackage(mp);

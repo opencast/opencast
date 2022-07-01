@@ -7,18 +7,21 @@ image that is rasterized as PNG as a last step.
 
 ## Parameter Table
 
-|Name|Type|Example|Default Value|Description|
-|----|----|-------|-------------|-----------|
-stylesheet *|URL|file:///etc/opencast/branding/coverimage.xsl|-|File URI to the XSL stylesheet used to generate the SVG image
-metadata|XML|```<meta><title>Hello!</title></meta>```|-|XML string which is passed to the XSL transformation. If parameter is not given, a default XML is handed to the transformation
-episodeFlavor|Flavor|dublincore/episode|dublincore/episode|Flavor of the passed episode
-seriesFlavor|Flavor|dublincore/series|dublincore/series|Flavor of the series that the passed episode is part of
-width *|int|1920|-|Width of the resulting image
-height *|int|1080|-|Height of the resulting image
+|Name             |Type|Example|Default Value|Description|
+|-----------------|----|-------|-------------|-----------|
+stylesheet \*     |URL|file:///etc/opencast/branding/coverimage.xsl|-|File URI to the XSL stylesheet used to generate the SVG image
+metadata          |XML|`<meta><title>Hello!</title></meta>`|-|XML string which is passed to the XSL transformation. If parameter is not given, a default XML is handed to the transformation
+episodeFlavor     |Flavor|dublincore/episode|dublincore/episode|Flavor of the passed episode
+seriesFlavor      |Flavor|dublincore/series|dublincore/series|Flavor of the series that the passed episode is part of
+width \*          |int|1920|-|Width of the resulting image
+height \*         |int|1080|-|Height of the resulting image
 posterimage-flavor|Flavor|image/poster|-|Flavor of a poster image which may be used as a part of the cover image (e.g. as a background)
-posterimage|URL|http://flickr.com/posterimage.jpg|-|URL to a custom poster image instead of using one out of the media package
-target-flavor *|Flavor|image/cover|-|Flavor of the resulting cover image
-target-tags|String|archive,download|-|Comma separated list of tags to be applied to the resulting attachment.
+posterimage       |URL|http://flickr.com/posterimage.jpg|-|URL to a custom poster image instead of using one out of the media package
+target-flavor \*  |Flavor|image/cover|-|Flavor of the resulting cover image
+target-tags       |String|archive,download|-|Comma separated list of tags to be applied to the resulting attachment.
+
+The `stylesheet` parameter may use `${karaf.etc}` to reference Opencast's configuration directory.
+
 
 ## Metadata
 

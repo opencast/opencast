@@ -1387,16 +1387,6 @@ message-broker-api
   org.slf4j                              slf4j-api                                        MIT License
 
 
-message-broker-impl
-  GroupId                                ArtifactId                                       Licenses
-  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
-  org.apache.activemq                    activemq-client                                  Apache License, Version 2.0
-  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
-  org.apache.geronimo.specs              geronimo-jms_1.1_spec                            The Apache Software License, Version 2.0
-  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
-  org.slf4j                              slf4j-api                                        MIT License
-
-
 metadata-api
   GroupId                                ArtifactId                                       Licenses
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0

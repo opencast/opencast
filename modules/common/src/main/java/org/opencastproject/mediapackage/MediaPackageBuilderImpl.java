@@ -104,10 +104,6 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
   public MediaPackage loadFromXml(InputStream is) throws MediaPackageException {
     try {
       Document xml = XmlSafeParser.parse(is);
-      if (serializer != null) {
-        //Convert InputStream to XML document to rewrite the URLs
-        rewriteUrls(xml, serializer);
-      }
       return loadFromXml(xml);
     } catch (Exception e) {
       throw new MediaPackageException("Error deserializing paths in media package", e);

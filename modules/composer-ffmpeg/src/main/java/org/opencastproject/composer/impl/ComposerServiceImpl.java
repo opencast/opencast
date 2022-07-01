@@ -494,6 +494,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     source.put("video", mediaFile);
     List<File> outputFiles = encoderEngine.process(source, profile, properties);
     var returnURLs = new ArrayList<URI>();
+    var tagsForUrls = new ArrayList<List<String>>();
     activeEncoder.remove(encoderEngine);
     int i = 0;
     var fileMapping = new HashMap<String, String>();
@@ -515,10 +516,21 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       }
 
       // Put the file in the workspace
+      final List<String> tags = profile.getTags();
       try (InputStream in = new FileInputStream(file)) {
-        var filename = fileMapping.get(file.getName());
-        var url = workspace.putInCollection(COLLECTION, filename, in);
+        var encodedFileName = file.getName();
+        var workspaceFilename = fileMapping.get(encodedFileName);
+        var url = workspace.putInCollection(COLLECTION, workspaceFilename, in);
         returnURLs.add(url);
+
+        var tagsForUrl = new ArrayList<String>();
+        for (final String tag : tags) {
+          if (encodedFileName.endsWith(profile.getSuffix(tag))) {
+            tagsForUrl.add(tag);
+          }
+        }
+        tagsForUrls.add(tagsForUrl);
+
         logger.info("Copied the encoded file to the workspace at {}", url);
       } catch (Exception e) {
         throw new EncoderException("Unable to put the encoded file into the workspace", e);
@@ -526,16 +538,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     }
 
     // Have the encoded track inspected and return the result
-    final List<String> tags = profile.getTags();
-    for (Track inspectedTrack: inspect(job, returnURLs)) {
+    for (Track inspectedTrack: inspect(job, returnURLs, tagsForUrls)) {
       final String targetTrackId = IdImpl.fromUUID().toString();
       inspectedTrack.setIdentifier(targetTrackId);
-
-      for (final String tag : tags) {
-        if (inspectedTrack.getURI().getPath().endsWith(profile.getSuffix(tag))) {
-          inspectedTrack.addTag(tag);
-        }
-      }
       if (isHLS) {
         AdaptivePlaylist.setLogicalName(inspectedTrack);
       }
@@ -1567,7 +1572,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     return profileScanner.getProfiles().get(profileId);
   }
 
-  protected List<Track> inspect(Job job, List<URI> uris) throws EncoderException {
+  protected List<Track> inspect(Job job, List<URI> uris, List<List<String>> tags) throws EncoderException {
     // Start inspection jobs
     Job[] inspectionJobs = new Job[uris.size()];
     for (int i = 0; i < uris.size(); i++) {
@@ -1592,14 +1597,26 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
     // De-serialize tracks
     List<Track> results = new ArrayList<>(uris.size());
+    int i = 0;
     for (Job inspectionJob: inspectionJobs) {
       try {
-        results.add((Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload()));
+        Track track = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
+        List<String> tagsForTrack = tags.get(i);
+        for (String tag : tagsForTrack) {
+          track.addTag(tag);
+        }
+        results.add(track);
       } catch (MediaPackageException e) {
         throw new EncoderException(e);
       }
+      i++;
     }
     return results;
+  }
+
+  protected List<Track> inspect(Job job, List<URI> uris) throws EncoderException {
+    List<List<String>> tags = java.util.Collections.nCopies(uris.size(), new ArrayList<String>());
+    return inspect(job, uris, tags);
   }
 
   protected Track inspect(Job job, URI workspaceURI) throws EncoderException {

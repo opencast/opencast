@@ -27,12 +27,10 @@ import org.opencastproject.security.api.User;
 public final class Retraction {
   private User user;
   private Organization organization;
-  private Runnable doOnNotFound;
 
-  public Retraction(User user, Organization organization, Runnable doOnNotFound) {
+  public Retraction(User user, Organization organization) {
     this.user = user;
     this.organization = organization;
-    this.doOnNotFound = doOnNotFound;
   }
 
   public User getUser() {
@@ -49,13 +47,5 @@ public final class Retraction {
 
   public void setOrganization(Organization organization) {
     this.organization = organization;
-  }
-
-  public Runnable getDoOnNotFound() {
-    return this.doOnNotFound;
-  }
-
-  public void setDoOnNotFound(Runnable doOnNotFound) {
-    this.doOnNotFound = doOnNotFound;
   }
 }

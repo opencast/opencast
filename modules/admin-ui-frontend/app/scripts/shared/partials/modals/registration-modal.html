@@ -299,21 +299,28 @@
 
   <footer>
     <div class="pull-right" ng-show="states[state]['buttons']['submit']">
-      <a ng-hide="state == 'form'"
-         class="continue-registration"
-         ng-click="nextState(1)"
+      <a ng-show="state == 'delete_submit'"
+         class="danger"
+         ng-click="nextState(0)"
          translate="{{states[state]['buttons']['submitButtonText']}}"></a>
       <a ng-show="state == 'form'"
          class="submit inactive"
          ng-form="adopterRegistrationForm"
          ng-class="{inactive: !adopter.agreedToPolicy}"
          ng-click="nextState(1)"
+         translate="{{!registered ? states[state]['buttons']['submitButtonText'] : 'WIZARD.UPDATE' }}"></a>
+      <a ng-show="state != 'form' && state != 'delete_submit'"
+         class="submit"
+         ng-form="adopterRegistrationForm"
+         ng-click="nextState(1)"
          translate="{{states[state]['buttons']['submitButtonText']}}"></a>
     </div>
 
     <div class="pull-left">
-      <a ng-show="states[state]['buttons']['back']" class="cancel"
-         ng-click="nextState(5)" translate="ADOPTER_REGISTRATION.MODAL.BACK"></a>
+      <a ng-show="states[state]['buttons']['back']"
+         class="cancel"
+         ng-click="nextState(5)"
+         translate="ADOPTER_REGISTRATION.MODAL.BACK"></a>
       <a ng-show="state == 'form' && registered"
          class="danger"
          ng-click="nextState(4)"

@@ -10,12 +10,6 @@ Two `docker-compose` files are provided to start up different development enviro
 (see "Testing Locally with Docker" guide in the administration documentation).
 
 
-First, download the support assets:
-```sh
-$ mkdir assets
-$ curl -o assets/activemq.xml https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/assets/activemq.xml
-```
-
 Now create a folder where the Opencast repository should be located, and expose its path as an environment variable. You
 must also create the local Maven repository if it does not already exist.
 
@@ -81,9 +75,7 @@ $ oc_uninstall
 $ oc_clean_data
 ```
 
-These scripts are provided to automate common tasks, but you can also run the necessary commands directly. The install
-script has the advantage that it automatically connects Opencast to the configured ActiveMQ instance available at
-`tcp://activemq:61616`.
+These scripts are provided to automate common tasks, but you can also run the necessary commands directly.
 
 Since the Opencast code is shared, any change from an IDE is directly visible within the container.
 

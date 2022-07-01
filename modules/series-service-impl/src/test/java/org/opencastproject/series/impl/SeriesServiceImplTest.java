@@ -29,10 +29,9 @@ import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.message.broker.api.MessageSender;
+import org.opencastproject.message.broker.api.update.SeriesUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
@@ -47,9 +46,7 @@ import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
-import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.impl.persistence.SeriesServiceDatabaseImpl;
-import org.opencastproject.series.impl.solr.SeriesServiceSolrIndex;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 
@@ -78,7 +75,6 @@ import java.util.function.Function;
 public class SeriesServiceImplTest {
 
   private SeriesServiceDatabaseImpl seriesDatabase;
-  private SeriesServiceSolrIndex index;
   private DublinCoreCatalogService dcService;
   private String root;
 
@@ -114,25 +110,18 @@ public class SeriesServiceImplTest {
     seriesDatabase.setSecurityService(securityService);
 
     root = PathSupport.concat("target", Long.toString(currentTime));
-    index = new SeriesServiceSolrIndex(root);
-    index.setDublinCoreService(dcService);
-    index.setSecurityService(securityService);
-    index.activate(null);
-
-    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
-    EasyMock.replay(messageSender);
 
     ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
+
     EasyMock.expect(esIndex.addOrUpdateSeries(EasyMock.anyString(), EasyMock.anyObject(Function.class),
             EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
     EasyMock.replay(esIndex);
 
     seriesService = new SeriesServiceImpl();
     seriesService.setPersistence(seriesDatabase);
-    seriesService.setIndex(index);
     seriesService.setSecurityService(securityService);
-    seriesService.setMessageSender(messageSender);
     seriesService.setElasticsearchIndex(esIndex);
+    seriesService.addMessageHandler(EasyMock.createNiceMock(SeriesUpdateHandler.class));
 
     BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
     EasyMock.expect(bundleContext.getProperty((String) EasyMock.anyObject())).andReturn("System Admin");
@@ -165,9 +154,7 @@ public class SeriesServiceImplTest {
   @After
   public void tearDown() throws Exception {
     seriesDatabase = null;
-    index.deactivate();
     FileUtils.deleteQuietly(new File(root));
-    index = null;
   }
 
   @Test
@@ -191,76 +178,6 @@ public class SeriesServiceImplTest {
     }
   }
 
-  @Test
-  public void testSorting() throws Exception {
-    seriesService.updateSeries(testCatalog);
-    seriesService.updateSeries(testCatalog2);
-    {
-      SeriesQuery q = new SeriesQuery().withSort(SeriesQuery.Sort.TITLE, true);
-      DublinCoreCatalogList r = seriesService.getSeries(q);
-      Assert.assertEquals(2, r.getCatalogList().size());
-      Assert.assertEquals("ABC", r.getCatalogList().get(0).getFirst(DublinCore.PROPERTY_TITLE));
-    }
-    {
-      SeriesQuery q = new SeriesQuery().withSort(SeriesQuery.Sort.TITLE, false);
-      DublinCoreCatalogList r = seriesService.getSeries(q);
-      Assert.assertEquals(2, r.getCatalogList().size());
-      Assert.assertEquals("Land and Vegetation: Key players on the Climate Scene",
-              r.getCatalogList().get(0).getFirst(DublinCore.PROPERTY_TITLE));
-    }
-    {
-      SeriesQuery q = new SeriesQuery().withSort(SeriesQuery.Sort.SUBJECT, true);
-      DublinCoreCatalogList r = seriesService.getSeries(q);
-      Assert.assertEquals(2, r.getCatalogList().size());
-      Assert.assertEquals("climate, land, vegetation", r.getCatalogList().get(0).getFirst(DublinCore.PROPERTY_SUBJECT));
-    }
-    {
-      SeriesQuery q = new SeriesQuery().withSort(SeriesQuery.Sort.SUBJECT, false);
-      DublinCoreCatalogList r = seriesService.getSeries(q);
-      Assert.assertEquals(2, r.getCatalogList().size());
-      Assert.assertEquals("x, y, z", r.getCatalogList().get(0).getFirst(DublinCore.PROPERTY_SUBJECT));
-    }
-    { // sort by series id, verify sort asc
-      SeriesQuery q = new SeriesQuery().withSort(SeriesQuery.Sort.IDENTIFIER, true);
-      DublinCoreCatalogList r = seriesService.getSeries(q);
-      Assert.assertEquals(2, r.getCatalogList().size());
-      String id1 = r.getCatalogList().get(0).getFirst(DublinCore.PROPERTY_IDENTIFIER);
-      String id2 = r.getCatalogList().get(1).getFirst(DublinCore.PROPERTY_IDENTIFIER);
-      Assert.assertTrue(id1.compareTo(id2) < 1);
-    }
-    { // sort by series id, verify sort desc
-      SeriesQuery q = new SeriesQuery().withSort(SeriesQuery.Sort.IDENTIFIER, false);
-      DublinCoreCatalogList r = seriesService.getSeries(q);
-      Assert.assertEquals(2, r.getCatalogList().size());
-      String id1 = r.getCatalogList().get(0).getFirst(DublinCore.PROPERTY_IDENTIFIER);
-      String id2 = r.getCatalogList().get(1).getFirst(DublinCore.PROPERTY_IDENTIFIER);
-      Assert.assertTrue(id1.compareTo(id2) > -1);
-    }
-  }
-
-  @Test
-  public void testSeriesQuery() throws Exception {
-    testCatalog.set(DublinCore.PROPERTY_TITLE, "Some title");
-    seriesService.updateSeries(testCatalog);
-    SeriesQuery q = new SeriesQuery().setSeriesTitle("other");
-    List<DublinCoreCatalog> result = seriesService.getSeries(q).getCatalogList();
-    Assert.assertEquals(0, result.size());
-
-    testCatalog.set(DublinCore.PROPERTY_TITLE, "Some other title");
-    seriesService.updateSeries(testCatalog);
-    result = seriesService.getSeries(q).getCatalogList();
-    Assert.assertEquals(1, result.size());
-  }
-
-  @Test
-  public void testSeriesFuzzyIdSearchQuery() throws Exception {
-    testCatalog.set(DublinCore.PROPERTY_IDENTIFIER, "20160119999");
-    seriesService.updateSeries(testCatalog);
-    SeriesQuery q = new SeriesQuery().setSeriesId("201601");
-    q.setFuzzyMatch(true);
-    List<DublinCoreCatalog> result = seriesService.getSeries(q).getCatalogList();
-    Assert.assertEquals(1, result.size());
-  }
 
   @Test
   public void testAddingSeriesWithoutID() throws Exception {
@@ -438,5 +355,4 @@ public class SeriesServiceImplTest {
     assertFalse(seriesService.deleteSeriesElement(seriesId, ELEMENT_TYPE));
     assertEquals(Opt.none(), seriesService.getSeriesElementData(seriesId, ELEMENT_TYPE));
   }
-
 }

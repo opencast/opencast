@@ -32,8 +32,11 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -53,6 +56,7 @@ public class ListProvidersServiceImpl implements ListProvidersService {
 
   private SecurityService securityService;
   private Map<ResourceTuple, ResourceListProvider> providers = new ConcurrentHashMap<>();
+  private static final Logger logger = LoggerFactory.getLogger(ListProvidersServiceImpl.class);
 
   /**
    * Instances of this class represent unique keys for the parent {@link ConcurrentHashMap},
@@ -154,6 +158,24 @@ public class ListProvidersServiceImpl implements ListProvidersService {
           throws ListProviderException {
     ResourceListProvider provider = getProvider(listName);
     Map<String, String> list = provider.getList(listName, query);
+    if ("SERIES".equals(listName)) {
+      for (Map.Entry<String,String> entry : list.entrySet()) {
+        int repeated = Collections.frequency(list.values(), entry.getValue());
+        if (repeated > 1) {
+          String newSeriesName = null;
+          //If a series name is repeated, will add the first 7 characters of the series ID to the display name on the
+          //admin-ui
+          try {
+            newSeriesName = entry.getValue() + " " + "(ID: " + entry.getKey().substring(0, 7) + "...)";
+          } catch (StringIndexOutOfBoundsException e) {
+            newSeriesName = entry.getValue() + " " + "(ID: " + entry.getKey() + ")";
+          }
+          logger.debug(String.format("Repeated series title \"%s\" found, changing to \"%s\" for admin-ui display",
+              entry.getValue(), newSeriesName));
+          list.put(entry.getKey(), newSeriesName);
+        }
+      }
+    }
     return inverseValueKey ? ListProviderUtil.invertMap(list) : list;
   }
 

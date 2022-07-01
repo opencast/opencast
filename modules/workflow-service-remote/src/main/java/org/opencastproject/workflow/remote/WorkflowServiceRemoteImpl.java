@@ -34,19 +34,14 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.SolrUtils;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowListener;
-import org.opencastproject.workflow.api.WorkflowParser;
-import org.opencastproject.workflow.api.WorkflowQuery;
-import org.opencastproject.workflow.api.WorkflowQuery.QueryTerm;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workflow.api.WorkflowSet;
-import org.opencastproject.workflow.api.WorkflowStatistics;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -75,6 +70,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 /**
  * An implementation of the workflow service that communicates with a remote workflow service via HTTP.
@@ -131,7 +127,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
         if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
           throw new NotFoundException("Workflow definition " + id + " does not exist.");
         } else {
-          return WorkflowParser.parseWorkflowDefinition(response.getEntity().getContent());
+          return XmlWorkflowParser.parseWorkflowDefinition(response.getEntity().getContent());
         }
       }
     } catch (NotFoundException e) {
@@ -158,7 +154,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
         if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
           throw new NotFoundException("Workflow instance " + id + " does not exist.");
         } else {
-          return WorkflowParser.parseWorkflowInstance(response.getEntity().getContent());
+          return XmlWorkflowParser.parseWorkflowInstance(response.getEntity().getContent());
         }
       }
     } catch (NotFoundException e) {
@@ -171,93 +167,14 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     throw new WorkflowDatabaseException("Unable to connect to a remote workflow service");
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowService
-   *      #getWorkflowInstances(org.opencastproject.workflow.api.WorkflowQuery)
-   */
   @Override
-  public WorkflowSet getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException {
-    List<NameValuePair> queryStringParams = new ArrayList<>();
-
-    if (query.getText() != null)
-      queryStringParams.add(new BasicNameValuePair("q", query.getText()));
-
-    if (query.getStates() != null) {
-      for (QueryTerm stateQueryTerm : query.getStates()) {
-        String value = stateQueryTerm.isInclude() ? stateQueryTerm.getValue() : "-" + stateQueryTerm.getValue();
-        queryStringParams.add(new BasicNameValuePair("state", value));
-      }
-    }
-
-    if (query.getCurrentOperations() != null) {
-      for (QueryTerm opQueryTerm : query.getCurrentOperations()) {
-        String value = opQueryTerm.isInclude() ? opQueryTerm.getValue() : "-" + opQueryTerm.getValue();
-        queryStringParams.add(new BasicNameValuePair("op", value));
-      }
-    }
-
-    if (query.getSeriesId() != null)
-      queryStringParams.add(new BasicNameValuePair("seriesId", query.getSeriesId()));
-
-    if (query.getSeriesTitle() != null)
-      queryStringParams.add(new BasicNameValuePair("seriesTitle", query.getSeriesTitle()));
-
-    if (query.getMediaPackageId() != null)
-      queryStringParams.add(new BasicNameValuePair("mp", query.getMediaPackageId()));
-
-    if (query.getWorkflowDefinitionId() != null)
-      queryStringParams.add(new BasicNameValuePair("workflowdefinition", query.getWorkflowDefinitionId()));
-
-    if (query.getFromDate() != null)
-      queryStringParams.add(new BasicNameValuePair("fromdate", SolrUtils.serializeDate(query.getFromDate())));
-
-    if (query.getToDate() != null)
-      queryStringParams.add(new BasicNameValuePair("todate", SolrUtils.serializeDate(query.getToDate())));
-
-    if (query.getCreator() != null)
-      queryStringParams.add(new BasicNameValuePair("creator", query.getCreator()));
-
-    if (query.getContributor() != null)
-      queryStringParams.add(new BasicNameValuePair("contributor", query.getContributor()));
-
-    if (query.getLanguage() != null)
-      queryStringParams.add(new BasicNameValuePair("language", query.getLanguage()));
-
-    if (query.getLicense() != null)
-      queryStringParams.add(new BasicNameValuePair("license", query.getLicense()));
-
-    if (query.getTitle() != null)
-      queryStringParams.add(new BasicNameValuePair("title", query.getTitle()));
-
-    if (query.getSubject() != null)
-      queryStringParams.add(new BasicNameValuePair("subject", query.getSubject()));
-
-    if (query.getSort() != null) {
-      String sort = query.getSort().toString();
-      if (!query.isSortAscending()) {
-        sort += "_DESC";
-      }
-      queryStringParams.add(new BasicNameValuePair("sort", sort));
-    }
-
-    if (query.getStartPage() > 0)
-      queryStringParams.add(new BasicNameValuePair("startPage", Long.toString(query.getStartPage())));
-
-    if (query.getCount() > 0)
-      queryStringParams.add(new BasicNameValuePair("count", Long.toString(query.getCount())));
-
-    StringBuilder url = new StringBuilder();
-    url.append("/instances.xml");
-    if (queryStringParams.size() > 0)
-      url.append("?" + URLEncodedUtils.format(queryStringParams, "UTF-8"));
-
-    HttpGet get = new HttpGet(url.toString());
+  public List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId)
+          throws WorkflowDatabaseException {
+    HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/instances.xml");
     HttpResponse response = getResponse(get);
     try {
       if (response != null)
-        return WorkflowParser.parseWorkflowSet(response.getEntity().getContent());
+        return XmlWorkflowParser.parseWorkflowSet(response.getEntity().getContent()).getItems();
     } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
     } finally {
@@ -266,35 +183,42 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     throw new WorkflowDatabaseException("Workflow instances can not be loaded from a remote workflow service");
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstancesForAdministrativeRead(org.opencastproject.workflow.api.WorkflowQuery)
-   */
   @Override
-  public WorkflowSet getWorkflowInstancesForAdministrativeRead(WorkflowQuery q) throws WorkflowDatabaseException,
-          UnauthorizedException {
-    return getWorkflowInstances(q);
-  }
+  public Optional<WorkflowInstance> getRunningWorkflowInstanceByMediaPackage(String mediaPackageId, String action)
+          throws WorkflowException {
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowService#getStatistics()
-   */
-  @Override
-  public WorkflowStatistics getStatistics() throws WorkflowDatabaseException {
-    HttpGet get = new HttpGet("/statistics.xml");
-    HttpResponse response = getResponse(get);
+    HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/instances.xml");
+    HttpResponse response = getResponse(get, SC_NOT_FOUND, SC_OK);
     try {
-      if (response != null)
-        return WorkflowParser.parseWorkflowStatistics(response.getEntity().getContent());
+      if (response != null) {
+        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+          return Optional.empty();
+        }
+        return Optional.ofNullable(
+                XmlWorkflowParser.parseWorkflowInstance(response.getEntity().getContent())
+        );
+      }
     } catch (Exception e) {
-      throw new WorkflowDatabaseException("Unable to load workflow statistics", e);
+      throw new WorkflowDatabaseException(e);
     } finally {
       closeConnection(response);
     }
-    throw new WorkflowDatabaseException("Unable to connect to a remote workflow service");
+    throw new WorkflowDatabaseException("Workflow instances can not be loaded from a remote workflow service");
+  }
+
+  @Override
+  public boolean mediaPackageHasActiveWorkflows(String mediaPackageId) throws WorkflowDatabaseException {
+    HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/hasActiveWorkflows");
+    HttpResponse response = getResponse(get);
+    try {
+      if (response != null)
+        return Boolean.parseBoolean(response.getEntity().getContent().toString());
+    } catch (Exception e) {
+      throw new WorkflowDatabaseException(e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new WorkflowDatabaseException("Workflow instances can not be loaded from a remote workflow service");
   }
 
   /**
@@ -345,7 +269,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     try {
       List<BasicNameValuePair> params = new ArrayList<>();
       if (workflowDefinition != null)
-        params.add(new BasicNameValuePair("definition", WorkflowParser.toXml(workflowDefinition)));
+        params.add(new BasicNameValuePair("definition", XmlWorkflowParser.toXml(workflowDefinition)));
       params.add(new BasicNameValuePair("mediapackage", MediaPackageParser.getAsXml(mediaPackage)));
       if (parentWorkflowId != null)
         params.add(new BasicNameValuePair("parent", parentWorkflowId.toString()));
@@ -361,7 +285,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
         if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
           throw new NotFoundException("Workflow instance " + parentWorkflowId + " does not exist.");
         } else {
-          return WorkflowParser.parseWorkflowInstance(response.getEntity().getContent());
+          return XmlWorkflowParser.parseWorkflowInstance(response.getEntity().getContent());
         }
       }
     } catch (NotFoundException e) {
@@ -397,22 +321,19 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
    */
   @Override
   public long countWorkflowInstances() throws WorkflowDatabaseException {
-    return countWorkflowInstances(null, null);
+    return countWorkflowInstances(null);
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowService#countWorkflowInstances(org.opencastproject.workflow.api.WorkflowInstance.WorkflowState,
-   *      java.lang.String)
+   * @see org.opencastproject.workflow.api.WorkflowService#countWorkflowInstances(org.opencastproject.workflow.api.WorkflowInstance.WorkflowState)
    */
   @Override
-  public long countWorkflowInstances(WorkflowState state, String operation) throws WorkflowDatabaseException {
+  public long countWorkflowInstances(WorkflowState state) throws WorkflowDatabaseException {
     List<NameValuePair> queryStringParams = new ArrayList<>();
     if (state != null)
       queryStringParams.add(new BasicNameValuePair("state", state.toString()));
-    if (operation != null)
-      queryStringParams.add(new BasicNameValuePair("operation", operation));
 
     StringBuilder url = new StringBuilder("/count");
     if (queryStringParams.size() > 0) {
@@ -432,9 +353,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
           throw new WorkflowDatabaseException("Unable to parse the response body as a long: " + body);
         }
       }
-    } catch (ParseException e) {
-      throw new WorkflowDatabaseException("Unable to parse the response body");
-    } catch (IOException e) {
+    } catch (ParseException | IOException e) {
       throw new WorkflowDatabaseException("Unable to parse the response body");
     } finally {
       closeConnection(response);
@@ -465,7 +384,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
           throw new NotFoundException("Workflow instance with id='" + workflowInstanceId + "' not found");
         } else {
           logger.info("Workflow '{}' stopped", workflowInstanceId);
-          return WorkflowParser.parseWorkflowInstance(response.getEntity().getContent());
+          return XmlWorkflowParser.parseWorkflowInstance(response.getEntity().getContent());
         }
       }
     } catch (NotFoundException e) {
@@ -500,7 +419,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
           throw new NotFoundException("Workflow instance with id='" + workflowInstanceId + "' not found");
         } else {
           logger.info("Workflow '{}' suspended", workflowInstanceId);
-          return WorkflowParser.parseWorkflowInstance(response.getEntity().getContent());
+          return XmlWorkflowParser.parseWorkflowInstance(response.getEntity().getContent());
         }
       }
     } catch (NotFoundException e) {
@@ -549,14 +468,10 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
           throw new IllegalStateException("Can not resume a workflow where the current state is not in paused");
         } else {
           logger.info("Workflow '{}' resumed", workflowInstanceId);
-          return WorkflowParser.parseWorkflowInstance(response.getEntity().getContent());
+          return XmlWorkflowParser.parseWorkflowInstance(response.getEntity().getContent());
         }
       }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (IllegalStateException e) {
+    } catch (NotFoundException | UnauthorizedException | IllegalStateException e) {
       throw e;
     } catch (Exception e) {
       throw new WorkflowException(e);
@@ -576,7 +491,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     HttpPost post = new HttpPost("/update");
     try {
       List<BasicNameValuePair> params = new ArrayList<>();
-      params.add(new BasicNameValuePair("workflow", WorkflowParser.toXml(workflowInstance)));
+      params.add(new BasicNameValuePair("workflow", XmlWorkflowParser.toXml(workflowInstance)));
       post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (UnsupportedEncodingException e) {
       throw new IllegalStateException("Unable to assemble a remote workflow service request", e);
@@ -650,7 +565,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     HttpResponse response = getResponse(get);
     try {
       if (response != null) {
-        List<WorkflowDefinition> list = WorkflowParser.parseWorkflowDefinitions(response.getEntity().getContent());
+        List<WorkflowDefinition> list = XmlWorkflowParser.parseWorkflowDefinitions(response.getEntity().getContent());
         Collections.sort(list); //sorts by title
         return list;
       }

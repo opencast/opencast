@@ -213,7 +213,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     } else if (configValue != null && configValue.contains("${")) {
       // If value contains a "${", it may be a template so apply it
       // Give a name to the inline template
-      templateName = workflowInstance.getTemplate() + "_" + operation.getPosition() + "_" + configName;
+      templateName = workflowInstance.getTemplate() + "_" + operation.getId() + "_" + configName;
       // Only alphanumeric and _
       templateName = templateName.replaceAll("[^A-Za-z0-9 ]", "_");
       templateContent = configValue;

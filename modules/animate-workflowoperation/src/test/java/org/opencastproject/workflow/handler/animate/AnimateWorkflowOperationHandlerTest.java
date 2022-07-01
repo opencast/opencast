@@ -39,10 +39,9 @@ import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.metadata.dublincore.DublinCores;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
@@ -60,7 +59,7 @@ import java.net.URI;
 public class AnimateWorkflowOperationHandlerTest {
 
   private AnimateWorkflowOperationHandler handler;
-  private WorkflowInstanceImpl workflow;
+  private WorkflowInstance workflow;
   private WorkflowOperationInstance instance;
   private File file;
 
@@ -91,11 +90,11 @@ public class AnimateWorkflowOperationHandlerTest {
     //catalog.setURI(getClass().getResource("/dc-episode.xml").toURI());
     mediaPackage.add(catalog);
 
-    instance = EasyMock.createNiceMock(WorkflowOperationInstanceImpl.class);
+    instance = EasyMock.createNiceMock(WorkflowOperationInstance.class);
     EasyMock.expect(instance.getConfiguration("target-flavor")).andReturn("a/b").anyTimes();
     EasyMock.expect(instance.getConfiguration("target-tags")).andReturn("a,b,c").anyTimes();
 
-    workflow = EasyMock.createMock(WorkflowInstanceImpl.class);
+    workflow = EasyMock.createMock(WorkflowInstance.class);
     EasyMock.expect(workflow.getMediaPackage()).andReturn(mediaPackage).anyTimes();
     EasyMock.expect(workflow.getCurrentOperation()).andReturn(instance).anyTimes();
 
