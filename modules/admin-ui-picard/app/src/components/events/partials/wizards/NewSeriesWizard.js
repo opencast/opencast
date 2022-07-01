@@ -2,7 +2,10 @@ import React, {useState} from "react";
 import {Formik} from "formik";
 import NewThemePage from "../ModalTabsAndPages/NewThemePage";
 import NewSeriesSummary from "./NewSeriesSummary";
-import {getSeriesMetadata} from "../../../../selectors/seriesSeletctor";
+import {
+    getSeriesExtendedMetadata,
+    getSeriesMetadata
+} from "../../../../selectors/seriesSeletctor";
 import {connect} from "react-redux";
 import NewMetadataPage from "../ModalTabsAndPages/NewMetadataPage";
 import NewMetadataExtendedPage from "../ModalTabsAndPages/NewMetadataExtendedPage";
@@ -12,14 +15,15 @@ import WizardStepper from "../../../shared/wizard/WizardStepper";
 import {initialFormValuesNewSeries} from "../../../../configs/modalConfig";
 import {NewSeriesSchema} from "../../../../utils/validate";
 import {logger} from "../../../../utils/logger";
+import {getInitialMetadataFieldValues} from "../../../../utils/resourceUtils";
 
 
 /**
  * This component manages the pages of the new series wizard and the submission of values
  */
-const NewSeriesWizard = ({ metadataFields, close, postNewSeries }) => {
+const NewSeriesWizard = ({ metadataFields, extendedMetadata, close, postNewSeries }) => {
 
-    const initialValues = getInitialValues(metadataFields);
+    const initialValues = getInitialValues(metadataFields, extendedMetadata);
 
     const [page, setPage] = useState(0);
     const [snapshot, setSnapshot] = useState(initialValues);
@@ -32,7 +36,7 @@ const NewSeriesWizard = ({ metadataFields, close, postNewSeries }) => {
     }, {
         translation: 'EVENTS.EVENTS.DETAILS.TABS.EXTENDED-METADATA',
         name: 'metadata-extended',
-        hidden: true
+        hidden: !(!!extendedMetadata && (extendedMetadata.length > 0))
     }, {
         translation: 'EVENTS.SERIES.NEW.ACCESS.CAPTION',
         name: 'access'
@@ -73,7 +77,7 @@ const NewSeriesWizard = ({ metadataFields, close, postNewSeries }) => {
     }
 
     const handleSubmit = (values) => {
-        const response = postNewSeries(values, metadataFields);
+        const response = postNewSeries(values, metadataFields, extendedMetadata);
         logger.info(response);
         close();
     }
@@ -105,7 +109,8 @@ const NewSeriesWizard = ({ metadataFields, close, postNewSeries }) => {
                           {page === 1 && (
                             <NewMetadataExtendedPage nextPage={nextPage}
                                                      previousPage={previousPage}
-                                                     formik={formik} />
+                                                     formik={formik}
+                                                     extendedMetadataFields={extendedMetadata} />
                           )}
                           {page === 2 && (
                             <NewAccessPage nextPage={nextPage}
@@ -131,14 +136,9 @@ const NewSeriesWizard = ({ metadataFields, close, postNewSeries }) => {
     );
 };
 
-const getInitialValues = metadataFields => {
+const getInitialValues = (metadataFields, extendedMetadata) => {
     // Transform metadata fields provided by backend (saved in redux)
-    let initialValues = {};
-    if (!!metadataFields.fields && metadataFields.fields.length > 0) {
-        metadataFields.fields.forEach(field => {
-            initialValues[field.id] = field.value;
-        });
-    }
+    let initialValues = getInitialMetadataFieldValues(metadataFields, extendedMetadata);
 
     // Add all initial form values known upfront listed in newSeriesConfig
     for (const [key, value] of Object.entries(initialFormValuesNewSeries)) {
@@ -150,11 +150,12 @@ const getInitialValues = metadataFields => {
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    metadataFields: getSeriesMetadata(state)
+    metadataFields: getSeriesMetadata(state),
+    extendedMetadata: getSeriesExtendedMetadata(state)
 });
 
 const mapDispatchToProps = dispatch => ({
-    postNewSeries: (values, metadataFields) => dispatch(postNewSeries(values,metadataFields))
+    postNewSeries: (values, metadataFields, extendedMetadata) => dispatch(postNewSeries(values, metadataFields, extendedMetadata))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(NewSeriesWizard);

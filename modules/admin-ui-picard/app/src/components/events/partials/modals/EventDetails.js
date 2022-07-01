@@ -45,6 +45,8 @@ import {removeNotificationWizardForm} from "../../../../actions/notificationActi
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 import EventDetailsStatisticsTab from "../ModalTabsAndPages/EventDetailsStatisticsTab";
 import {fetchAssetUploadOptions} from "../../../../thunks/assetsThunks";
+import {hasAnyDeviceAccess} from "../../../../utils/resourceUtils";
+import {getRecordings} from "../../../../selectors/recordingSelectors";
 
 
 // Get info about the current language and its date locale
@@ -54,8 +56,10 @@ const currentLanguage = getCurrentLanguageInformation();
  * This component manages the pages of the event details
  */
 const EventDetails = ({ tabIndex, eventId, close,
-                          metadata, extendedMetadata, isLoadingMetadata, hasSchedulingProperties, isLoadingScheduling, hasStatistics, isLoadingStatistics,
-                          loadMetadata, updateMetadata, updateExtendedMetadata, loadScheduling, loadStatistics, fetchAssetUploadOptions, removeNotificationWizardForm, user }) => {
+                          metadata, extendedMetadata, isLoadingMetadata, hasSchedulingProperties, isLoadingScheduling,
+                          hasStatistics, isLoadingStatistics, captureAgents, user,
+                          loadMetadata, updateMetadata, updateExtendedMetadata, loadScheduling, loadStatistics,
+                          fetchAssetUploadOptions, removeNotificationWizardForm}) => {
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -100,7 +104,7 @@ const EventDetails = ({ tabIndex, eventId, close,
             bodyHeaderTranslation: 'EVENTS.EVENTS.DETAILS.SCHEDULING.CAPTION',
             accessRole: 'ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW',
             name: 'scheduling',
-            hidden: !hasSchedulingProperties
+            hidden: (!hasSchedulingProperties) && hasAnyDeviceAccess(user, captureAgents)
         },
         {
             tabNameTranslation: 'EVENTS.EVENTS.DETAILS.TABS.WORKFLOWS',
@@ -351,6 +355,7 @@ const mapStateToProps = state => ({
     isLoadingScheduling: isFetchingScheduling(state),
     hasStatistics: hasStatistics(state),
     isLoadingStatistics: isFetchingStatistics(state),
+    captureAgents: getRecordings(state),
     user: getUserInformation(state)
 });
 

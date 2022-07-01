@@ -26,7 +26,7 @@ const DetailsMetadataTab = ({ metadataFields, updateResource, resourceId, header
         let initialValues = {};
 
         // Transform metadata fields and their values provided by backend (saved in redux)
-        if (!!metadataFields.fields && metadataFields.fields.length > 0) {
+        if (!!metadataFields && !!metadataFields.fields && metadataFields.fields.length > 0) {
             metadataFields.fields.forEach(field => {
                 initialValues[field.id] = field.value;
             });
@@ -64,7 +64,7 @@ const DetailsMetadataTab = ({ metadataFields, updateResource, resourceId, header
                                         <table className="main-tbl">
                                             <tbody>
                                             {/* Render table row for each metadata field depending on type */}
-                                            {!!metadataFields.fields && metadataFields.fields.map((field, key) => (
+                                            {!!metadataFields && !!metadataFields.fields && metadataFields.fields.map((field, key) => (
                                                 <tr key={key}>
                                                     <td>
                                                         <span>{t(field.label)}</span>

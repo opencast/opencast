@@ -11,6 +11,7 @@ export const LOAD_SERIES_FAILURE = 'LOAD_SERIES_FAILURE';
 export const SHOW_ACTIONS_SERIES = 'SHOW_ACTIONS_SERIES';
 export const SET_SERIES_COLUMNS = 'SET_SERIES_COLUMNS';
 export const SET_SERIES_SELECTED = 'SET_SERIES_SELECTED';
+export const SET_SERIES_DELETION_ALLOWED = 'SET_SERIES_DELETION_ALLOWED';
 
 // Constants of action types affecting fetching of series metadata from server
 export const LOAD_SERIES_METADATA_IN_PROGRESS = 'LOAD_SERIES_METADATA_IN_PROGRESS';
@@ -55,15 +56,20 @@ export const setSeriesSelected = id => ({
     payload: { id }
 });
 
+export const setSeriesDeletionAllowed = ( deletionAllowed, hasEvents ) => ({
+    type: SET_SERIES_DELETION_ALLOWED,
+    payload: { deletionAllowed, hasEvents }
+});
+
 // Actions affecting fetching of series metadata from server
 
 export const loadSeriesMetadataInProgress = () => ({
     type: LOAD_SERIES_IN_PROGRESS
 });
 
-export const loadSeriesMetadataSuccess = metadata => ({
+export const loadSeriesMetadataSuccess = ( metadata, extendedMetadata ) => ({
     type: LOAD_SERIES_METADATA_SUCCESS,
-    payload: { metadata }
+    payload: { metadata, extendedMetadata }
 });
 
 export const loadSeriesMetadataFailure = () => ({

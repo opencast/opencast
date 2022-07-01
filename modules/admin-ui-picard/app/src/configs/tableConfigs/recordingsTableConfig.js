@@ -15,19 +15,19 @@ import RecordingsUpdateCell from "../../components/recordings/partials/Recording
  */
 export const recordingsTableConfig = {
     columns: [{
-        name:  'Status',
+        name:  'status',
         template: 'RecordingsStatusCell',
         label: 'RECORDINGS.RECORDINGS.TABLE.STATUS',
         translate: true,
         sortable: true
     }, {
         template: 'RecordingsNameCell',
-        name:  'Name',
+        name:  'name',
         label: 'RECORDINGS.RECORDINGS.TABLE.NAME',
         sortable: true
     }, {
         template: 'RecordingsUpdateCell',
-        name:  'Update',
+        name:  'update',
         label: 'RECORDINGS.RECORDINGS.TABLE.UPDATED',
         sortable: true
     }, {

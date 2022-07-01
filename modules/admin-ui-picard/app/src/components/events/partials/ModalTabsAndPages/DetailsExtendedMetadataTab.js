@@ -1,4 +1,5 @@
 import React from "react";
+import {useTranslation} from "react-i18next";
 import {Field, Formik} from "formik";
 import cn from "classnames";
 import _ from 'lodash';
@@ -7,8 +8,7 @@ import RenderMultiField from "../../../shared/wizard/RenderMultiField";
 import RenderField from "../../../shared/wizard/RenderField";
 import {connect} from "react-redux";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
-import {hasAccess, isJson} from "../../../../utils/utils";
-import {useTranslation} from "react-i18next";
+import {hasAccess, isJson, parseValueForBooleanStrings} from "../../../../utils/utils";
 import {getMetadataCollectionFieldName} from "../../../../utils/resourceUtils";
 
 /**
@@ -29,7 +29,8 @@ const DetailsExtendedMetadataTab = ({ resourceId, editAccessRole, metadata, upda
         // Transform metadata fields and their values provided by backend (saved in redux)
         if (!!metadataCatalog.fields && metadataCatalog.fields.length > 0) {
             metadataCatalog.fields.forEach(field => {
-                initialValues[field.id] = field.value;
+                let value = parseValueForBooleanStrings(field.value);
+                initialValues[field.id] = value;
             });
         }
 

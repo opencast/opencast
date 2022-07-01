@@ -1,11 +1,14 @@
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
+import {getMetadataCollectionFieldName} from "../../../../utils/resourceUtils";
+import {connect} from "react-redux";
+import {getSchedulingSeriesOptions} from "../../../../selectors/eventSelectors";
 
 /**
  * This component renders the summary page of the edit scheduled bulk action
  */
-const EditScheduledEventsSummaryPage = ({ previousPage, formik }) => {
+const EditScheduledEventsSummaryPage = ({ previousPage, formik, seriesOptions }) => {
     const { t } = useTranslation();
 
     // Changes applied to events
@@ -37,8 +40,8 @@ const EditScheduledEventsSummaryPage = ({ previousPage, formik }) => {
             if (isChanged(event.series, event.changedSeries)) {
                 eventChanges.changes.push({
                     type: 'EVENTS.EVENTS.DETAILS.METADATA.SERIES',
-                    previous: event.series,
-                    next: event.changedSeries
+                    previous: getMetadataCollectionFieldName({collection: seriesOptions}, {value: event.series}),
+                    next: getMetadataCollectionFieldName({collection: seriesOptions}, {value: event.changedSeries})
                 });
             }
             if(isChanged(event.startTimeHour + ':' + event.startTimeMinutes,
@@ -64,11 +67,19 @@ const EditScheduledEventsSummaryPage = ({ previousPage, formik }) => {
                     next: event.changedLocation
                 });
             }
+            /* the following six lines can be commented in, when the possibility of a selection of individual inputs is desired and the backend has been adapted to support it
+            if (isArrayChanged(event.deviceInputs.split(','), event.changedDeviceInputs)){
+                eventChanges.changes.push({
+                    type: 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.INPUTS',
+                    previous: event.deviceInputs,
+                    next: event.changedDeviceInputs.join(',')
+                });
+            }*/
             if (isChanged(event.weekday, event.changedWeekday)) {
                 eventChanges.changes.push({
                     type: 'EVENTS.EVENTS.TABLE.WEEKDAY',
-                    previous: event.weekday,
-                    next: event.changedWeekday
+                    previous: t('EVENTS.EVENTS.NEW.WEEKDAYSLONG.' + event.weekday),
+                    next: t('EVENTS.EVENTS.NEW.WEEKDAYSLONG.' + event.changedWeekday)
                 });
             }
 
@@ -106,11 +117,11 @@ const EditScheduledEventsSummaryPage = ({ previousPage, formik }) => {
                                     <div className="obj-container">
                                         <table className="main-tbl">
                                             <thead>
-                                            <tr>
-                                                <th className="fit">{t('BULK_ACTIONS.EDIT_EVENTS.SUMMARY.TYPE')}</th>
-                                                <th className="fit">{t('BULK_ACTIONS.EDIT_EVENTS.SUMMARY.PREVIOUS')}</th>
-                                                <th className="fit">{t('BULK_ACTIONS.EDIT_EVENTS.SUMMARY.NEXT')}</th>
-                                            </tr>
+                                                <tr>
+                                                    <th className="fit">{t('BULK_ACTIONS.EDIT_EVENTS.SUMMARY.TYPE')}</th>
+                                                    <th className="fit">{t('BULK_ACTIONS.EDIT_EVENTS.SUMMARY.PREVIOUS')}</th>
+                                                    <th className="fit">{t('BULK_ACTIONS.EDIT_EVENTS.SUMMARY.NEXT')}</th>
+                                                </tr>
                                             </thead>
                                             <tbody>
                                             {/* Add table row with old value and new one if something has changed */}
@@ -146,4 +157,9 @@ const EditScheduledEventsSummaryPage = ({ previousPage, formik }) => {
     );
 };
 
-export default EditScheduledEventsSummaryPage;
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    seriesOptions: getSchedulingSeriesOptions(state)
+});
+
+export default connect(mapStateToProps, null)(EditScheduledEventsSummaryPage);

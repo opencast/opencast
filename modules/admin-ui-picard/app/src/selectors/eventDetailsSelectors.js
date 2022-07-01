@@ -32,7 +32,6 @@ export const getSchedulingProperties = state => state.eventDetails.scheduling.ha
 export const isFetchingScheduling = state => state.eventDetails.fetchingSchedulingInProgress;
 export const isSavingScheduling = state => state.eventDetails.savingSchedulingInProgress;
 export const getSchedulingSource = state => state.eventDetails.schedulingSource;
-export const getCaptureAgents = state => state.eventDetails.captureAgents;
 export const getSchedulingConflicts = state => state.eventDetails.schedulingConflicts;
 export const isCheckingConflicts = state => state.eventDetails.checkingConflicts;
 

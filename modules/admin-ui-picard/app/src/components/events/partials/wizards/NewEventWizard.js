@@ -1,7 +1,11 @@
 import React, {useState} from "react";
 import {Formik} from "formik";
 import NewEventSummary from "./NewEventSummary";
-import {getAssetUploadOptions, getEventMetadata} from "../../../../selectors/eventSelectors";
+import {
+    getAssetUploadOptions,
+    getEventMetadata,
+    getExtendedEventMetadata
+} from "../../../../selectors/eventSelectors";
 import {connect} from "react-redux";
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
@@ -17,6 +21,7 @@ import {sourceMetadata} from "../../../../configs/sourceConfig";
 import {initialFormValuesNewEvents} from "../../../../configs/modalConfig";
 import {NewEventSchema} from "../../../../utils/validate";
 import {logger} from "../../../../utils/logger";
+import {getInitialMetadataFieldValues} from "../../../../utils/resourceUtils";
 import WizardStepperEvent from '../../../shared/wizard/WizardStepperEvent';
 
 
@@ -26,9 +31,9 @@ const currentLanguage = getCurrentLanguageInformation();
 /**
  * This component manages the pages of the new event wizard and the submission of values
  */
-const NewEventWizard = ({ metadataFields, close, postNewEvent, uploadAssetOptions }) => {
+const NewEventWizard = ({ metadataFields, extendedMetadata, close, postNewEvent, uploadAssetOptions }) => {
 
-    const initialValues = getInitialValues(metadataFields, uploadAssetOptions);
+    const initialValues = getInitialValues(metadataFields, extendedMetadata, uploadAssetOptions);
     let workflowPanelRef = React.useRef();
 
 
@@ -45,7 +50,7 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent, uploadAssetOption
         {
             translation: 'EVENTS.EVENTS.DETAILS.TABS.EXTENDED-METADATA',
             name: 'metadata-extended',
-            hidden: true
+            hidden: !(!!extendedMetadata && (extendedMetadata.length > 0))
         },
         {
             translation: 'EVENTS.EVENTS.NEW.SOURCE.CAPTION',
@@ -100,7 +105,7 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent, uploadAssetOption
 
     const handleSubmit = (values) => {
         workflowPanelRef.current?.submitForm();
-        const response = postNewEvent(values, metadataFields);
+        const response = postNewEvent(values, metadataFields, extendedMetadata);
         logger.info(response);
         close();
     }
@@ -128,15 +133,14 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent, uploadAssetOption
                                                  formik={formik}
                                                  metadataFields={metadataFields}
                                                  header={steps[page].translation} />
-                              )}
-                              {page === 1 && (
-                                // todo: finish implementation when information about endpoints and structure are gathered
+                            )}
+                            {page === 1 && (
                                 <NewMetadataExtendedPage previousPage={previousPage}
                                                          nextPage={nextPage}
                                                          formik={formik}
-                                                         header={steps[page].translation} />
-                              )}
-                              {page === 2 && (
+                                                         extendedMetadataFields={extendedMetadata} />
+                            )}
+                            {page === 2 && (
                                 <NewSourcePage previousPage={previousPage}
                                                nextPage={nextPage}
                                                formik={formik} />
@@ -175,15 +179,9 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent, uploadAssetOption
 };
 
 // Transform all initial values needed from information provided by backend
-const getInitialValues = (metadataFields, uploadAssetOptions) => {
+const getInitialValues = (metadataFields, extendedMetadata, uploadAssetOptions) => {
     // Transform metadata fields provided by backend (saved in redux)
-    let initialValues = {};
-
-    if (!!metadataFields.fields && metadataFields.fields.length > 0) {
-        metadataFields.fields.forEach(field => {
-            initialValues[field.id] = field.value;
-        });
-    }
+    let initialValues = getInitialMetadataFieldValues(metadataFields, extendedMetadata);
 
     // Transform additional metadata for source (provided by constant in newEventConfig)
     if (!!sourceMetadata.UPLOAD) {
@@ -203,7 +201,6 @@ const getInitialValues = (metadataFields, uploadAssetOptions) => {
     }
 
     // Add possible files that can be uploaded in source step
-    // Todo: exchange uploadAssetOptions with Function for getting these options
     if (!!uploadAssetOptions) {
         initialValues.uploadAssetsTrack = [];
         // initial value of upload asset needs to be null, because object (file) is saved there
@@ -241,11 +238,12 @@ const getInitialValues = (metadataFields, uploadAssetOptions) => {
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     metadataFields: getEventMetadata(state),
+    extendedMetadata: getExtendedEventMetadata(state),
     uploadAssetOptions: getAssetUploadOptions(state),
 });
 
 const mapDispatchToProps = dispatch => ({
-    postNewEvent: (values, metadataFields) => dispatch(postNewEvent(values, metadataFields))
+    postNewEvent: (values, metadataFields, extendedMetadata) => dispatch(postNewEvent(values, metadataFields, extendedMetadata))
 });
 
 

@@ -175,7 +175,6 @@ const initialState = {
             inputMethods: []
         }
     },
-    captureAgents: [],
     checkingConflicts: false,
     schedulingConflicts: [],
     fetchingWorkflowsInProgress: false,
@@ -554,7 +553,7 @@ const eventDetails = (state=initialState, action) => {
             };
         }
         case LOAD_EVENT_SCHEDULING_SUCCESS: {
-            const { source, captureAgents } = payload;
+            const { source } = payload;
             return {
                 ...state,
                 fetchingSchedulingInProgress: false,
@@ -562,8 +561,7 @@ const eventDetails = (state=initialState, action) => {
                 scheduling: {
                     ...state.scheduling,
                     hasProperties: true
-                },
-                captureAgents: captureAgents
+                }
             };
         }
         case LOAD_EVENT_SCHEDULING_FAILURE: {
@@ -596,8 +594,7 @@ const eventDetails = (state=initialState, action) => {
                 scheduling: {
                     ...state.scheduling,
                     hasProperties: false
-                },
-                captureAgents: []
+                }
             };
         }
         case SAVE_EVENT_SCHEDULING_IN_PROGRESS: {

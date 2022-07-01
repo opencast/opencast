@@ -24,7 +24,7 @@ const RecordingsNameCell = ({ row, loadingEventsIntoTable, setSpecificEventFilte
               className="crosslink"
               onClick={async () => await redirectToEvents(row.Name)}
               title={t('RECORDINGS.RECORDINGS.TABLE.TOOLTIP.NAME')}>
-            {row.Name}
+            {row.name}
         </Link>
     )
 }

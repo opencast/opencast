@@ -11,7 +11,7 @@ export const fetchRecordings = flag => async (dispatch, getState) => {
 
         let data;
 
-        if (flag === "inputs") {
+        if (flag === 'inputs') {
             data = await axios.get('/admin-ng/capture-agents/agents.json?inputs=true');
         } else {
             const state = getState();
@@ -22,7 +22,27 @@ export const fetchRecordings = flag => async (dispatch, getState) => {
         }
 
         const recordings = await data.data;
-        dispatch(loadRecordingsSuccess(recordings));
+
+
+        let captureAgents = [];
+
+        for(const agent of recordings.results){
+            const transformedAgent = {
+                id: agent.Name,
+                name: agent.Name,
+                status: agent.Status,
+                updated: agent.Update,
+                inputs: !!agent.inputs ? [...agent.inputs] : [],
+                roomId: !!agent.roomId ? agent.roomId : '',
+                type: 'LOCATION',
+                url: !!agent.url ? agent.url : '',
+                removable: ('AGENTS.STATUS.OFFLINE' === agent.Status || 'AGENTS.STATUS.UNKNOWN' === agent.Status)
+            };
+
+            captureAgents.push(transformedAgent);
+        }
+
+        dispatch(loadRecordingsSuccess({...recordings, results: captureAgents}));
 
     } catch (e) {
         dispatch(loadRecordingsFailure());
