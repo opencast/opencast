@@ -42,7 +42,7 @@
     "karma-coverage": "^2.2.0",
     "karma-detect-browsers": "^2.0",
     "karma-firefox-launcher": "^2.1.2",
-    "karma-jasmine": "^4.0.2",
+    "karma-jasmine": "^5.1.0",
     "karma-ng-html2js-preprocessor": "^1.0.0",
     "request": "^2.88.2",
     "request-digest": "^1.0.13",
