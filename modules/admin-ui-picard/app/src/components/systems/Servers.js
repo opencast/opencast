@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import MainNav from "../shared/MainNav";
-import Link from "react-router-dom/Link";
+import { Link } from "react-router-dom";
 import cn from "classnames";
 import TableFilters from "../shared/TableFilters";
 import Table from "../shared/Table";
-import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import Notifications from "../shared/Notifications";
 import {serversTemplateMap} from "../../configs/tableConfigs/serversTableConfig";
@@ -23,13 +22,14 @@ import Header from "../Header";
 import Footer from "../Footer";
 import {getUserInformation} from "../../selectors/userInfoSelectors";
 import {hasAccess} from "../../utils/utils";
+import { getCurrentFilterResource } from '../../selectors/tableFilterSelectors';
 
 /**
  * This component renders the table view of servers
  */
 const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilters,
                      loadingJobs, loadingJobsIntoTable, loadingServices,
-                     loadingServicesIntoTable, resetTextFilter, resetOffset, user }) => {
+                     loadingServicesIntoTable, resetTextFilter, resetOffset, user, currentFilterType }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
 
@@ -42,8 +42,6 @@ const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilt
     }
 
     const loadJobs = () => {
-        loadingFilters("jobs");
-
         // Reset the current page to first page
         resetOffset();
 
@@ -55,8 +53,6 @@ const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilt
     }
 
     const loadServices = () => {
-        loadingFilters("services");
-
         // Reset the current page to first page
         resetOffset();
 
@@ -68,13 +64,17 @@ const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilt
     }
 
     useEffect(() => {
+        if ("servers" !== currentFilterType) {
+            loadingFilters("servers");
+        }
+
         resetTextFilter();
 
         // Load servers on mount
         loadServers().then(r => logger.info(r));
 
         // Fetch servers every minute
-        let fetchServersInterval = setInterval(loadServers, 100000);
+        let fetchServersInterval = setInterval(loadServers, 5000);
 
         return () => clearInterval(fetchServersInterval);
 
@@ -104,10 +104,7 @@ const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilt
                     {hasAccess("ROLE_UI_SERVERS_VIEW", user) && (
                         <Link to="/systems/servers"
                               className={cn({active: true})}
-                              onClick={() => {
-                                  loadingFilters("servers");
-                                  loadServers().then();
-                              }}>
+                              onClick={() => loadServers()}>
                             {t('SYSTEMS.NAVIGATION.SERVERS')}
                         </Link>
                     )}
@@ -144,7 +141,8 @@ const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilt
 // Getting state data out of redux store
 const mapStateToProps = state =>({
     servers: getTotalServers(state),
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    currentFilterType: getCurrentFilterResource(state)
 });
 
 // Mapping actions to dispatch
@@ -160,4 +158,4 @@ const mapDispatchToProps = dispatch => ({
     resetOffset: () => dispatch(setOffset(0))
 });
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Servers));
+export default connect(mapStateToProps, mapDispatchToProps)(Servers);

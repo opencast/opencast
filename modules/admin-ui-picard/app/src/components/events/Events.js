@@ -1,9 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {useTranslation} from "react-i18next";
 import cn from 'classnames';
 import {connect} from "react-redux";
-import Link from "react-router-dom/Link";
-import {withRouter} from "react-router-dom";
+import { Link, useLocation} from 'react-router-dom';
 import TableFilters from "../shared/TableFilters";
 import MainNav from "../shared/MainNav";
 import Stats from "../shared/Stats";
@@ -26,7 +25,7 @@ import {
     isShowActions
 } from "../../selectors/eventSelectors";
 import {editTextFilter} from "../../actions/tableFilterActions";
-import {setOffset} from "../../actions/tableActions";
+import { setOffset } from '../../actions/tableActions';
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 import {logger} from "../../utils/logger";
 import Header from "../Header";
@@ -36,7 +35,9 @@ import {hasAccess} from "../../utils/utils";
 import {showActions} from "../../actions/eventActions";
 import {GlobalHotKeys} from "react-hotkeys";
 import {availableHotkeys} from "../../configs/hotkeysConfig";
+import { getCurrentFilterResource } from '../../selectors/tableFilterSelectors';
 import {fetchAssetUploadOptions} from "../../thunks/assetsThunks";
+
 
 
 // References for detecting a click outside of the container of the dropdown menu
@@ -46,8 +47,9 @@ const containerAction = React.createRef();
  * This component renders the table view of events
  */
 const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loadingSeries,
-                    loadingSeriesIntoTable, loadingFilters, loadingStats, loadingEventMetadata, resetTextFilter, fetchAssetUploadOptions,
-                    resetOffset, setShowActions, user, isFetchingAssetUploadOptions }) => {
+    loadingSeriesIntoTable, loadingFilters, loadingStats, loadingEventMetadata, resetTextFilter, fetchAssetUploadOptions,
+    resetOffset, setShowActions, user, isFetchingAssetUploadOptions, currentFilterType }) => {
+
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
@@ -56,6 +58,9 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
     const [displayStartTaskModal, setStartTaskModal] = useState(false);
     const [displayEditScheduledEventsModal, setEditScheduledEventsModal] = useState(false);
     const [displayEditMetadataEventsModal, setEditMetadataEventsModal] = useState(false);
+
+    let location = useLocation();
+
 
     const loadEvents = async () => {
         // Fetching stats from server
@@ -70,9 +75,6 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
     };
 
     const loadSeries = () => {
-        // load filter for series
-        loadingFilters("series");
-
         // Reset the current page to first page
         resetOffset();
 
@@ -84,6 +86,11 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
     }
 
     useEffect(() => {
+
+        if ("events" !== currentFilterType) {
+            loadingFilters("events");
+        }
+
         resetTextFilter();
 
         // disable actions button
@@ -100,7 +107,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
         }
 
         // Fetch events every minute
-        let fetchEventsInterval = setInterval(loadEvents, 100000);
+        let fetchEventsInterval = setInterval(loadEvents, 5000);
 
         // Event listener for handle a click outside of dropdown menu
         window.addEventListener('mousedown', handleClickOutside);
@@ -111,7 +118,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
         }
 
 
-    }, []);
+    }, [location.hash]);
 
     const toggleNavigation = () => {
         setNavigation(!displayNavigation);
@@ -160,10 +167,10 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
             <section className="action-nav-bar">
                 <div className="btn-group">
                     {hasAccess("ROLE_UI_EVENTS_CREATE", user) && (
-                        <button className="add" onClick={() => showNewEventModal()}>
-                            <i className="fa fa-plus" />
-                            <span>{t('EVENTS.EVENTS.ADD_EVENT')}</span>
-                        </button>
+                      <button className="add" onClick={() => showNewEventModal()}>
+                          <i className="fa fa-plus" />
+                          <span>{t('EVENTS.EVENTS.ADD_EVENT')}</span>
+                      </button>
                     )}
                 </div>
 
@@ -176,19 +183,19 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 
                 {/* Display bulk actions modal if one is chosen from dropdown */}
                 {displayDeleteModal && (
-                    <DeleteEventsModal close={hideDeleteModal}/>
+                  <DeleteEventsModal close={hideDeleteModal}/>
                 )}
 
                 {displayStartTaskModal && (
-                    <StartTaskModal close={hideStartTaskModal}/>
+                  <StartTaskModal close={hideStartTaskModal}/>
                 )}
 
                 {displayEditScheduledEventsModal && (
-                    <EditScheduledEventsModal  close={hideEditScheduledEventsModal}/>
+                  <EditScheduledEventsModal  close={hideEditScheduledEventsModal}/>
                 )}
 
                 {displayEditMetadataEventsModal && (
-                    <EditMetadataEventsModal close={hideEditMetadataEventsModal}/>
+                  <EditMetadataEventsModal close={hideEditMetadataEventsModal}/>
                 )}
 
                 {/* Include Burger-button menu */}
@@ -197,29 +204,26 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 
                 <nav>
                     {hasAccess("ROLE_UI_EVENTS_VIEW", user) && (
-                        <Link to="/events/events"
-                              className={cn({active: true})}
-                              onClick={() => {
-                                  loadingFilters("events");
-                                  loadEvents().then();
-                              }}>
-                            {t('EVENTS.EVENTS.NAVIGATION.EVENTS')}
-                        </Link>
+                      <Link to="/events/events"
+                            className={cn({active: true})}
+                            onClick={() => loadEvents()}>
+                          {t('EVENTS.EVENTS.NAVIGATION.EVENTS')}
+                      </Link>
                     )}
                     {hasAccess("ROLE_UI_SERIES_VIEW", user) && (
-                        <Link to="/events/series"
-                              className={cn({active: false})}
-                              onClick={() => loadSeries()}>
-                            {t('EVENTS.EVENTS.NAVIGATION.SERIES')}
-                        </Link>
+                      <Link to="/events/series"
+                            className={cn({active: false})}
+                            onClick={() => loadSeries()}>
+                          {t('EVENTS.EVENTS.NAVIGATION.SERIES')}
+                      </Link>
                     )}
                 </nav>
 
                 {/* Include status bar component*/}
                 {hasAccess("ROLE_UI_EVENTS_COUNTERS_VIEW", user) && (
-                    <div className="stats-container">
-                        <Stats />
-                    </div>
+                  <div className="stats-container">
+                      <Stats />
+                  </div>
                 )}
 
             </section>
@@ -236,37 +240,37 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
                             <span>{t('BULK_ACTIONS.CAPTION')}</span>
                             {/* show dropdown if actions is clicked*/}
                             { displayActionMenu && (
-                                <ul className="dropdown-ul">
-                                    {hasAccess("ROLE_UI_EVENTS_DELETE", user) && (
-                                        <li>
-                                            <a onClick={() => setDeleteModal(true)}>
-                                                {t('BULK_ACTIONS.DELETE.EVENTS.CAPTION')}
-                                            </a>
-                                        </li>
-                                    )}
-                                    {hasAccess("ROLE_UI_TASKS_CREATE", user) && (
-                                        <li>
-                                            <a onClick={() => setStartTaskModal(true)}>
-                                                {t('BULK_ACTIONS.SCHEDULE_TASK.CAPTION')}
-                                            </a>
-                                        </li>
-                                    )}
-                                    {(hasAccess("ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT", user)
-                                        && hasAccess("ROLE_UI_EVENTS_DETAILS_METADATA_EDIT", user)) && (
-                                        <li>
-                                            <a onClick={() => setEditScheduledEventsModal(true)}>
-                                                {t('BULK_ACTIONS.EDIT_EVENTS.CAPTION')}
-                                            </a>
-                                        </li>
-                                    )}
-                                    {hasAccess("ROLE_UI_EVENTS_DETAILS_METADATA_EDIT", user) && (
-                                        <li>
-                                            <a onClick={() => setEditMetadataEventsModal(true)}>
-                                                {t('BULK_ACTIONS.EDIT_EVENTS_METADATA.CAPTION')}
-                                            </a>
-                                        </li>
-                                    )}
-                                </ul>
+                              <ul className="dropdown-ul">
+                                  {hasAccess("ROLE_UI_EVENTS_DELETE", user) && (
+                                    <li>
+                                        <a onClick={() => setDeleteModal(true)}>
+                                            {t('BULK_ACTIONS.DELETE.EVENTS.CAPTION')}
+                                        </a>
+                                    </li>
+                                  )}
+                                  {hasAccess("ROLE_UI_TASKS_CREATE", user) && (
+                                    <li>
+                                        <a onClick={() => setStartTaskModal(true)}>
+                                            {t('BULK_ACTIONS.SCHEDULE_TASK.CAPTION')}
+                                        </a>
+                                    </li>
+                                  )}
+                                  {(hasAccess("ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT", user)
+                                    && hasAccess("ROLE_UI_EVENTS_DETAILS_METADATA_EDIT", user)) && (
+                                    <li>
+                                        <a onClick={() => setEditScheduledEventsModal(true)}>
+                                            {t('BULK_ACTIONS.EDIT_EVENTS.CAPTION')}
+                                        </a>
+                                    </li>
+                                  )}
+                                  {hasAccess("ROLE_UI_EVENTS_DETAILS_METADATA_EDIT", user) && (
+                                    <li>
+                                        <a onClick={() => setEditMetadataEventsModal(true)}>
+                                            {t('BULK_ACTIONS.EDIT_EVENTS_METADATA.CAPTION')}
+                                        </a>
+                                    </li>
+                                  )}
+                              </ul>
                             )}
                         </div>
 
@@ -290,9 +294,11 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 const mapStateToProps = state => ({
     events: getTotalEvents(state),
     showActions: isShowActions(state),
-    isLoadingEvents: isLoading(state),
     user: getUserInformation(state),
+    currentFilterType: getCurrentFilterResource(state),
+    isLoadingEvents: isLoading(state),
     isFetchingAssetUploadOptions: isFetchingAssetUploadOptions(state)
+
 });
 
 // Mapping actions to dispatch
@@ -310,4 +316,4 @@ const mapDispatchToProps = dispatch => ({
     fetchAssetUploadOptions: () => dispatch(fetchAssetUploadOptions()),
 });
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Events));
+export default connect(mapStateToProps, mapDispatchToProps)(Events);

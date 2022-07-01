@@ -325,7 +325,7 @@ export const postNewEvent = (values, metadataInfo, extendedMetadata) => async (d
     }
 
     // prepare access rules provided by user
-   access = prepareAccessPolicyRulesForPost(values.policies);
+   access = prepareAccessPolicyRulesForPost(values.acls);
 
     // prepare configurations for post
     Object.keys(values.configuration).forEach(config => {
@@ -592,3 +592,58 @@ export const updateScheduledEventsBulk = values => async dispatch => {
             dispatch(addNotification('error', 'EVENTS_NOT_UPDATED'));
         });
 };
+
+// check provided date range for conflicts
+export const checkConflicts = values => async dispatch => {
+    let check = true;
+
+    // Only perform checks if source mode is SCHEDULE_SINGLE or SCHEDULE_MULTIPLE
+    if (values.sourceMode === 'SCHEDULE_SINGLE' ||
+      values.sourceMode === 'SCHEDULE_MULTIPLE') {
+
+        // Get timezone offset; Checks should be performed on UTC times
+        let offset = getTimezoneOffset();
+
+        // Prepare start date of event for check
+        let startDate = new Date(values.scheduleStartDate);
+        // NOTE: if time zone issues still occur during further testing, try to set times to UTC (-offset)
+        startDate.setHours((values.scheduleStartTimeHour), values.scheduleStartTimeMinutes, 0, 0);
+
+        // If start date of event is smaller than today --> Event is in past
+        if (startDate < new Date()) {
+            dispatch(addNotification('error', 'CONFLICT_ALREADY_ENDED', -1, null, NOTIFICATION_CONTEXT));
+            check = false;
+        }
+
+        let endDate;
+
+        // Prepare end date of event for check
+        if(values.sourceMode === 'SCHEDULE_SINGLE') {
+            endDate = new Date(values.scheduleStartDate);
+        } else {
+            endDate = new Date(values.scheduleEndDate);
+        }
+        // NOTE: if time zone issues still occur during further testing, try to set times to UTC (-offset)
+        endDate.setHours((values.scheduleEndTimeHour), values.scheduleEndTimeMinutes, 0, 0);
+
+        // if start date is higher than end date --> end date is before start date
+        if (startDate > endDate) {
+            dispatch(addNotification('error', 'CONFLICT_END_BEFORE_START', -1, null, NOTIFICATION_CONTEXT));
+            check = false;
+        }
+
+        // transform duration into milliseconds (needed for API request)
+        let duration = values.scheduleDurationHour * 3600000 + values.scheduleDurationMinutes * 60000;
+
+        // Check for conflicts with other already scheduled events
+        let conflicts = await checkForConflicts(startDate, endDate, duration, values.location);
+
+        // If conflicts with already scheduled events detected --> need to change times/date
+        if(!conflicts) {
+            dispatch(addNotification('error', 'CONFLICT_DETECTED', -1, null, NOTIFICATION_CONTEXT));
+            check = false;
+        }
+
+    }
+    return check;
+}

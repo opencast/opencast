@@ -10,11 +10,10 @@ import RenderField from "../../../shared/wizard/RenderField";
 import {getRecordings} from "../../../../selectors/recordingSelectors";
 import {fetchRecordings} from "../../../../thunks/recordingThunks";
 import {connect} from "react-redux";
-import {addNotification} from "../../../../thunks/notificationThunks";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
-import {checkForConflicts} from "../../../../thunks/eventThunks";
+import { checkConflicts } from '../../../../thunks/eventThunks';
 import {sourceMetadata} from "../../../../configs/sourceConfig";
-import {hours, minutes, NOTIFICATION_CONTEXT, weekdays} from "../../../../configs/modalConfig";
+import {hours, minutes, weekdays} from "../../../../configs/modalConfig";
 import {logger} from "../../../../utils/logger";
 import DateFnsUtils from '@date-io/date-fns';
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
@@ -35,8 +34,8 @@ const theme = createMuiTheme({
 /**
  * This component renders the source page for new events in the new event wizard.
  */
-const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, inputDevices, user, addNotification,
-                            removeNotificationWizardForm }) => {
+const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, inputDevices, user,
+                            removeNotificationWizardForm, checkConflicts }) => {
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -46,62 +45,6 @@ const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, in
         // validate form because dependent default values need to be checked
         formik.validateForm().then(r => logger.info(r));
     }, []);
-
-    // check user input for conflicts
-    const checkConflicts = async () =>  {
-        const values = formik.values
-        let check = true;
-
-        // Only perform checks if source mode is SCHEDULE_SINGLE or SCHEDULE_MULTIPLE
-        if (values.sourceMode === 'SCHEDULE_SINGLE' ||
-            values.sourceMode === 'SCHEDULE_MULTIPLE') {
-
-            // Get timezone offset; Checks should be performed on UTC times
-            let offset = getTimezoneOffset();
-
-            // Prepare start date of event for check
-            let startDate = new Date(values.scheduleStartDate);
-            // NOTE: if time zone issues still occur during further testing, try to set times to UTC (-offset)
-            startDate.setHours((values.scheduleStartTimeHour), values.scheduleStartTimeMinutes, 0, 0);
-
-            // If start date of event is smaller than today --> Event is in past
-            if (startDate < new Date()) {
-                addNotification('error', 'CONFLICT_ALREADY_ENDED', -1, null, NOTIFICATION_CONTEXT);
-                check = false;
-            }
-
-            let endDate;
-
-            // Prepare end date of event for check
-            if(values.sourceMode === 'SCHEDULE_SINGLE') {
-                endDate = new Date(values.scheduleStartDate);
-            } else {
-                endDate = new Date(values.scheduleEndDate);
-            }
-            // NOTE: if time zone issues still occur during further testing, try to set times to UTC (-offset)
-            endDate.setHours((values.scheduleEndTimeHour), values.scheduleEndTimeMinutes, 0, 0);
-
-            // if start date is higher than end date --> end date is before start date
-            if (startDate > endDate) {
-                addNotification('error', 'CONFLICT_END_BEFORE_START', -1, null, NOTIFICATION_CONTEXT);
-                check = false;
-            }
-
-            // transform duration into milliseconds (needed for API request)
-            let duration = values.scheduleDurationHour * 3600000 + values.scheduleDurationMinutes * 60000;
-
-            // Check for conflicts with other already scheduled events
-            let conflicts = await checkForConflicts(startDate, endDate, duration, values.location);
-
-            // If conflicts with already scheduled events detected --> need to change times/date
-            if(!conflicts) {
-                addNotification('error', 'CONFLICT_DETECTED', -1, null, NOTIFICATION_CONTEXT);
-                check = false;
-            }
-
-        }
-        return check;
-    }
 
     // Remove old notifications of context event-form
     // Helps to prevent multiple notifications for same problem
@@ -193,7 +136,7 @@ const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, in
                         disabled={!(formik.dirty && formik.isValid)}
                         onClick={async () => {
                             removeOldNotifications();
-                            if(await checkConflicts()) {
+                            if(await checkConflicts(formik.values)) {
                                 nextPage(formik.values);
                             }
                         }}
@@ -540,8 +483,8 @@ const mapStateToProps = state => ({
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadingInputDevices: () => dispatch(fetchRecordings("inputs")),
-    addNotification: (type, key, duration, parameter, context) => dispatch(addNotification(type, key, duration, parameter, context)),
-    removeNotificationWizardForm: () => dispatch(removeNotificationWizardForm())
+    removeNotificationWizardForm: () => dispatch(removeNotificationWizardForm()),
+    checkConflicts: values => dispatch(checkConflicts(values))
 });
 
 

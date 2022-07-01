@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
-import Link from "react-router-dom/Link";
+import { Link } from "react-router-dom";
 import cn from 'classnames';
-import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import MainNav from "../shared/MainNav";
 import TableFilters from "../shared/TableFilters";
@@ -24,13 +23,14 @@ import Header from "../Header";
 import Footer from "../Footer";
 import {getUserInformation} from "../../selectors/userInfoSelectors";
 import {hasAccess} from "../../utils/utils";
+import { getCurrentFilterResource } from '../../selectors/tableFilterSelectors';
 
 /**
  * This component renders the table view of users
  */
 const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
                    loadingGroups, loadingGroupsIntoTable, loadingAcls,
-                   loadingAclsIntoTable, resetTextFilter, resetOffset, user }) => {
+                   loadingAclsIntoTable, resetTextFilter, resetOffset, user, currentFilterType }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewUserModal, setNewUserModal] = useState(false);
@@ -45,8 +45,6 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
     }
 
     const loadGroups = () => {
-        loadingFilters("groups");
-
         // Reset the current page to first page
         resetOffset();
 
@@ -58,8 +56,6 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
     }
 
     const loadAcls = () => {
-        loadingFilters("acls");
-
         // Reset the current page to first page
         resetOffset();
 
@@ -71,13 +67,18 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
     }
 
     useEffect(() => {
+
+        if ("users" !== currentFilterType) {
+            loadingFilters("users");
+        }
+
         resetTextFilter();
 
         // Load users on mount
         loadUsers().then(r => logger.info(r));
 
         // Fetch users every minute
-        let fetchUsersInterval = setInterval(loadUsers, 100000);
+        let fetchUsersInterval = setInterval(loadUsers, 5000);
 
         return () => clearInterval(fetchUsersInterval);
 
@@ -123,10 +124,7 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
                     {hasAccess("ROLE_UI_USERS_VIEW", user) && (
                         <Link to="/users/users"
                               className={cn({active: true})}
-                              onClick={() => {
-                                  loadingFilters("users");
-                                  loadUsers().then();
-                              }}>
+                              onClick={() => loadUsers()}>
                             {t('USERS.NAVIGATION.USERS')}
                         </Link>
                     )}
@@ -170,7 +168,8 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     users: getTotalUsers(state),
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    currentFilterType: getCurrentFilterResource(state)
 });
 
 // Mapping actions to dispatch
@@ -186,4 +185,4 @@ const mapDispatchToProps = dispatch => ({
     resetOffset: () => dispatch(setOffset(0))
 });
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Users));
+export default connect(mapStateToProps, mapDispatchToProps)(Users);

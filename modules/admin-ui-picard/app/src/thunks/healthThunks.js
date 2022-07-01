@@ -6,7 +6,6 @@ import {
     loadStatusInProgress, resetNumError,
     setError
 } from "../actions/healthActions";
-import {getErrorStatus} from "../selectors/healthSelectors";
 import {logger} from "../utils/logger";
 
 
@@ -21,9 +20,10 @@ export const BACKEND_NAMES = 'Backend Services';
 
 const OK = 'OK';
 const MALFORMED_DATA = 'Malformed Data';
+const ERROR = 'error';
 
 // Fetch health status and transform it to further use
-export const fetchHealthStatus = () => async (dispatch, getState) => {
+export const fetchHealthStatus = () => async dispatch => {
     try {
         dispatch(loadStatusInProgress());
 
@@ -33,9 +33,9 @@ export const fetchHealthStatus = () => async (dispatch, getState) => {
             status: '',
             error: false
         }
-        dispatch(loadHealthStatus(healthStatus));
-        dispatch(resetNumError());
-        dispatch(setError(false));
+        await dispatch(loadHealthStatus(healthStatus));
+        await dispatch(resetNumError());
+        await dispatch(setError(false));
 
         // Get current state of Broker
         axios.get('/broker/status').then(
@@ -61,14 +61,12 @@ export const fetchHealthStatus = () => async (dispatch, getState) => {
         ).catch(function (err) {
             let healthStatus = {
                 name: AMQ_NAME,
-                status: err.statusText,
+                status: err.message,
                 error: true
             };
             dispatch(loadHealthStatus(healthStatus));
 
-            if (getErrorStatus(getState()) === false) {
-                dispatch(setError(true));
-            }
+            dispatch(setError(true));
             dispatch(addNumError(1));
         });
 
@@ -84,9 +82,8 @@ export const fetchHealthStatus = () => async (dispatch, getState) => {
                       };
                       dispatch(loadHealthStatus(healthStatus));
 
-                      if (getErrorStatus(getState()) === false) {
-                          dispatch(setError(true));
-                      }
+
+                      dispatch(setError(true));
                       dispatch(addNumError(1));
                       return;
                   }
@@ -102,14 +99,12 @@ export const fetchHealthStatus = () => async (dispatch, getState) => {
                   } else {
                       healthStatus = {
                           name: BACKEND_NAMES,
-                          status: response.statusText,
+                          status: ERROR,
                           error: true
                       }
                       dispatch(loadHealthStatus(healthStatus));
 
-                      if (getErrorStatus(getState()) === false) {
-                          dispatch(setError(true));
-                      }
+                      dispatch(setError(true));
                       dispatch(addNumError(abnormal));
                   }
 
@@ -117,14 +112,12 @@ export const fetchHealthStatus = () => async (dispatch, getState) => {
         ).catch(function (err) {
             let healthStatus = {
                 name: STATES_NAMES,
-                status: err.statusText,
+                status: err.message,
                 error: true
             }
             dispatch(loadHealthStatus(healthStatus));
 
-            if (getErrorStatus(getState()) === false) {
-                dispatch(setError(true));
-            }
+            dispatch(setError(true));
             dispatch(addNumError(1));
         });
 

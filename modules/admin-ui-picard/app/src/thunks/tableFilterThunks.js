@@ -1,43 +1,37 @@
 import {
-    loadFiltersSuccess,
+    editFilterValue,
     loadFiltersFailure,
     loadFiltersInProgress,
-    loadStats,
-    editFilterValue
+    loadFiltersSuccess,
+    loadStats
 } from '../actions/tableFilterActions';
-import axios from "axios";
-import {relativeDateSpanToFilterValue} from "../utils/dateUtils";
-import {logger} from "../utils/logger";
+import axios from 'axios';
+import { relativeDateSpanToFilterValue } from '../utils/dateUtils';
+import { logger } from '../utils/logger';
 import { setOffset } from '../actions/tableActions';
 import { fetchEvents } from './eventThunks';
+import { fetchServices } from './serviceThunks';
+
 /**
 * This file contains methods/thunks used to query the REST-API of Opencast to get the filters of a certain resource type.
 * This information is used to filter the entries of the table in the main view.
 *
 * */
 // Fetch table filters from opencast instance and transform them for further use
-export const fetchFilters = resource => async (dispatch, getState)=> {
+export const fetchFilters = resource => async (dispatch)=> {
     try {
-        const { tableFilters } = getState();
-
-        if (tableFilters.currentResource === resource) {
-            return;
-        }
-
         dispatch(loadFiltersInProgress());
 
         const data = await axios.get(`/admin-ng/resources/${resource}/filters.json`);
         const resourceData = await data.data;
 
-        let response = transformResponse(resourceData);
-
-        const filters = response
+        const filters = transformResponse(resourceData);
         const filtersList = Object.keys(filters.filters).map(key => {
             let filter = filters.filters[key];
             filter.name = key;
             return filter;
         });
-        dispatch(loadFiltersSuccess(filtersList, resource));
+        await dispatch(loadFiltersSuccess(filtersList, resource));
     } catch (e) {
         dispatch(loadFiltersFailure());
         logger.error(e);
@@ -68,6 +62,8 @@ export const fetchStats = () => async dispatch => {
 
                 if (Object.prototype.hasOwnProperty.call(value, 'relativeDateSpan')) {
                     value = relativeDateSpanToFilterValue(value.relativeDateSpan.from, value.relativeDateSpan.to, value.relativeDateSpan.unit);
+                    // set date span as filter value
+                    statsResponse[i].filters[j].value = value;
                 }
                 filter.push(name + ':' + value);
             }
@@ -116,6 +112,22 @@ export const setSpecificEventFilter = (filter, filterValue) => async (dispatch, 
 
     dispatch(fetchEvents());
 
+}
+
+export const setSpecificServiceFilter = (filter, filterValue) => async (dispatch, getState) => {
+    await dispatch(fetchFilters("services"));
+
+    const { tableFilters } = getState();
+
+    let filterToChange = tableFilters.data.find(({ name }) => name === filter);
+
+    if (!!filterToChange) {
+        await dispatch(editFilterValue(filterToChange.name, filterValue));
+    }
+
+    dispatch(setOffset(0));
+
+    dispatch(fetchServices());
 }
 
 // Transform received filter.json to a structure that can be used for filtering

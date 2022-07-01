@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from "react";
-import Link from "react-router-dom/Link";
+import { Link } from "react-router-dom";
 import {useTranslation} from "react-i18next";
-import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import cn from 'classnames';
 import TableFilters from "../shared/TableFilters";
@@ -23,13 +22,14 @@ import Header from "../Header";
 import Footer from "../Footer";
 import {getUserInformation} from "../../selectors/userInfoSelectors";
 import {hasAccess} from "../../utils/utils";
+import { getCurrentFilterResource } from '../../selectors/tableFilterSelectors';
 
 /**
  * This component renders the table view of jobs
  */
 const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
                   loadingServers, loadingServersIntoTable, loadingServices,
-                  loadingServicesIntoTable, resetTextFilter, resetOffset, user }) => {
+                  loadingServicesIntoTable, resetTextFilter, resetOffset, user, currentFilterType }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
 
@@ -42,8 +42,6 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
     }
 
     const loadServers = () => {
-        loadingFilters("servers");
-
         // Reset the current page to first page
         resetOffset();
 
@@ -55,8 +53,6 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
     }
 
     const loadServices = () => {
-        loadingFilters("services");
-
         // Reset the current page to first page
         resetOffset();
 
@@ -68,13 +64,17 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
     }
 
     useEffect(() => {
+        if ("jobs" !== currentFilterType) {
+            loadingFilters("jobs");
+        }
+
         resetTextFilter();
 
         // Load jobs on mount
         loadJobs().then(r => logger.info(r));
 
         // Fetch jobs every minute
-        let fetchJobInterval = setInterval(loadJobs, 100000);
+        let fetchJobInterval = setInterval(loadJobs, 5000);
 
         return () => clearInterval(fetchJobInterval);
 
@@ -97,10 +97,7 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
                     {hasAccess("ROLE_UI_JOBS_VIEW", user) && (
                         <Link to="/systems/jobs"
                               className={cn({active: true})}
-                              onClick={() => {
-                                  loadingFilters("jobs");
-                                  loadJobs().then();
-                              }}>
+                              onClick={() => loadJobs()}>
                             {t('SYSTEMS.NAVIGATION.JOBS')}
                         </Link>
                     )}
@@ -145,7 +142,8 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     jobs: getTotalJobs(state),
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    currentFilterType: getCurrentFilterResource(state)
 });
 
 // Mapping actions to dispatch
@@ -161,4 +159,4 @@ const mapDispatchToProps = dispatch => ({
     resetOffset: () => dispatch(setOffset(0))
 });
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Jobs));
+export default connect(mapStateToProps, mapDispatchToProps)(Jobs);

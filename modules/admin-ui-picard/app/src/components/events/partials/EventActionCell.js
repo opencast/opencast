@@ -144,8 +144,7 @@ const EventActionCell = ({ row, deleteEvent, fetchSeriesDetailsMetadata, fetchSe
 
             {/* If the event has an preview then the editor can be opened and status if it needs to be cut is shown */}
             {(!!row.has_preview && hasAccess("ROLE_UI_EVENTS_EDITOR_VIEW", user)) && (
-                // todo: When editor is implemented, fix url
-                <a href="#!/events/events/${row.id}/tools/editor"
+                <a href={`/editor-ui/index.html?id=${row.id}`}
                    className="cut" title={row.needs_cutting ?
                     t('EVENTS.EVENTS.TABLE.TOOLTIP.EDITOR_NEEDS_CUTTING') :
                     t('EVENTS.EVENTS.TABLE.TOOLTIP.EDITOR')}>

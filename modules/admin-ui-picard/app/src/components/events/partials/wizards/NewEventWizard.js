@@ -17,12 +17,12 @@ import NewMetadataPage from "../ModalTabsAndPages/NewMetadataPage";
 import NewAccessPage from "../ModalTabsAndPages/NewAccessPage";
 import NewProcessingPage from "../ModalTabsAndPages/NewProcessingPage";
 import NewSourcePage from "../ModalTabsAndPages/NewSourcePage";
-import WizardStepper from "../../../shared/wizard/WizardStepper";
 import {sourceMetadata} from "../../../../configs/sourceConfig";
 import {initialFormValuesNewEvents} from "../../../../configs/modalConfig";
 import {NewEventSchema} from "../../../../utils/validate";
 import {logger} from "../../../../utils/logger";
 import {getInitialMetadataFieldValues} from "../../../../utils/resourceUtils";
+import WizardStepperEvent from '../../../shared/wizard/WizardStepperEvent';
 
 
 // Get info about the current language and its date locale
@@ -39,6 +39,7 @@ const NewEventWizard = ({ metadataFields, extendedMetadata, close, postNewEvent,
 
     const [page, setPage] = useState(0);
     const [snapshot, setSnapshot] = useState(initialValues);
+    const [pageCompleted, setPageCompleted] = useState({});
 
     // Caption of steps used by Stepper
     const steps = [
@@ -79,6 +80,12 @@ const NewEventWizard = ({ metadataFields, extendedMetadata, close, postNewEvent,
 
     const nextPage = values => {
         setSnapshot(values);
+
+        // set page as completely filled out
+        let updatedPageCompleted = pageCompleted;
+        updatedPageCompleted[page] = true;
+        setPageCompleted(updatedPageCompleted);
+
         if (steps[page + 1].hidden) {
             setPage(page + 2);
         } else {
@@ -105,9 +112,6 @@ const NewEventWizard = ({ metadataFields, extendedMetadata, close, postNewEvent,
 
     return (
         <>
-            {/* Stepper that shows each step of wizard as header */}
-            <WizardStepper steps={steps} page={page}/>
-
             {/* Initialize overall form */}
             <MuiPickersUtilsProvider  utils={DateFnsUtils} locale={currentLanguage.dateLocale}>
                 <Formik initialValues={snapshot}
@@ -115,8 +119,16 @@ const NewEventWizard = ({ metadataFields, extendedMetadata, close, postNewEvent,
                         onSubmit={values => handleSubmit(values)}>
                     {/* Render wizard pages depending on current value of page variable */}
                     {formik => (
-                        <div>
-                            {page === 0 && (
+                      <>
+                          {/* Stepper that shows each step of wizard as header */}
+                          <WizardStepperEvent steps={steps}
+                                              page={page}
+                                              setPage={setPage}
+                                              completed={pageCompleted}
+                                              setCompleted={setPageCompleted}
+                                              formik={formik}/>
+                          <div>
+                              {page === 0 && (
                                 <NewMetadataPage nextPage={nextPage}
                                                  formik={formik}
                                                  metadataFields={metadataFields}
@@ -130,33 +142,34 @@ const NewEventWizard = ({ metadataFields, extendedMetadata, close, postNewEvent,
                             )}
                             {page === 2 && (
                                 <NewSourcePage previousPage={previousPage}
-                                                nextPage={nextPage}
-                                                formik={formik} />
-                            )}
-                            {page === 3  && (
+                                               nextPage={nextPage}
+                                               formik={formik} />
+                              )}
+                              {page === 3  && (
                                 <NewAssetUploadPage previousPage={previousPage}
                                                     nextPage={nextPage}
                                                     formik={formik} />
-                            )}
-                            {page === 4 && (
+                              )}
+                              {page === 4 && (
                                 <NewProcessingPage previousPage={previousPage}
                                                    nextPage={nextPage}
                                                    workflowPanelRef={workflowPanelRef}
                                                    formik={formik} />
-                            )}
-                            {page === 5 && (
+                              )}
+                              {page === 5 && (
                                 <NewAccessPage previousPage={previousPage}
                                                nextPage={nextPage}
                                                formik={formik}
                                                editAccessRole='ROLE_UI_SERIES_DETAILS_ACL_EDIT' />
-                            )}
-                            {page === 6 && (
+                              )}
+                              {page === 6 && (
                                 <NewEventSummary previousPage={previousPage}
                                                  formik={formik}
                                                  metaDataExtendedHidden={steps[1].hidden}
                                                  assetUploadHidden={steps[3].hidden} />
-                            )}
-                        </div>
+                              )}
+                          </div>
+                      </>
                     )}
                 </Formik>
             </MuiPickersUtilsProvider>

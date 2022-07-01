@@ -1,9 +1,8 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
-import Link  from 'react-router-dom/Link';
+import { Link }  from 'react-router-dom';
 import { setSpecificEventFilter } from '../../../thunks/tableFilterThunks';
 import { loadEventsIntoTable } from '../../../thunks/tableThunks';
-import { editTextFilter } from '../../../actions/tableFilterActions';
 import { connect } from 'react-redux';
 
 /**
@@ -12,18 +11,18 @@ import { connect } from 'react-redux';
 const RecordingsNameCell = ({ row, loadingEventsIntoTable, setSpecificEventFilter }) => {
     const { t } = useTranslation();
 
-    const redirectToEvents = locationName => {
-        // set the location filter value of events to location name
-        setSpecificEventFilter('location', locationName);
-
+    const redirectToEvents = async locationName => {
         // redirect to tables
-        loadingEventsIntoTable();
+        await loadingEventsIntoTable();
+
+        // set the location filter value of events to location name
+        await setSpecificEventFilter('location', locationName);
     }
 
     return (
         <Link to="/events/events"
               className="crosslink"
-              onClick={() => redirectToEvents(row.name)}
+              onClick={async () => await redirectToEvents(row.Name)}
               title={t('RECORDINGS.RECORDINGS.TABLE.TOOLTIP.NAME')}>
             {row.name}
         </Link>

@@ -41,7 +41,7 @@ const NewSeriesSummary = ({ formik, previousPage, metaDataExtendedHidden, metada
                         ): null}
 
                         {/*Summary access configuration*/}
-                        <AccessSummaryTable policies={formik.values.policies}
+                        <AccessSummaryTable policies={formik.values.acls}
                                             header={'EVENTS.SERIES.NEW.ACCESS.CAPTION'}/>
 
                         {/*Summary themes*/}

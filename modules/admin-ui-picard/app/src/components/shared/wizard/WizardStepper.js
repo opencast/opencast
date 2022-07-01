@@ -1,44 +1,53 @@
-import React from "react";
+import React from 'react';
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
-import {makeStyles, Step, StepLabel, Stepper} from "@material-ui/core";
-import {FaCircle, FaDotCircle} from "react-icons/all";
+import { Step, StepButton, StepLabel, Stepper } from '@material-ui/core';
+import { useStepperStyle } from '../../../utils/wizardUtils';
+import CustomStepIcon from './CustomStepIcon';
+import { checkAcls } from '../../../thunks/aclThunks';
+import { connect } from 'react-redux';
 
-// Base style for Stepper component
-const useStepperStyle = makeStyles(theme => ({
-    root: {
-        background: '#eeeff0',
-        height: '100px'
-    },
-}));
+/**
+ * This components renders the stepper navigation of new resource wizards
+ */
+const WizardStepper = ({ steps, page, setPage, formik, completed, setCompleted,
+    hasAccessPage=false, checkAcls }) => {
 
-// Style of icons used in Stepper
-const useStepIconStyles = makeStyles({
-    root: {
-        height: 22,
-        alignItems: 'center',
-    },
-    circle: {
-        color: '#92a0ab',
-        width: '20px',
-        height: '20px'
-    },
-});
-
-const WizardStepper = ({ steps, page }) => {
     const { t } = useTranslation();
 
     const classes = useStepperStyle();
 
+    const handleOnClick = async key => {
+
+        if(hasAccessPage) {
+            let check =  await checkAcls(formik.values.acls);
+            if (!check) {
+                return;
+            }
+        }
+
+        if (formik.isValid) {
+            let updatedCompleted = completed;
+            updatedCompleted[page] = true;
+            setCompleted(updatedCompleted);
+            setPage(key);
+        }
+    }
+
+    const disabled = !(formik.dirty && formik.isValid);
+
     return (
         <Stepper activeStep={page}
+                 nonLinear
                  alternativeLabel
                  connector={false}
                  className={cn("step-by-step", classes.root)}>
-            {steps.map(label => (
+            {steps.map((label, key) => (
                 !label.hidden ? (
-                    <Step key={label.translation}>
-                        <StepLabel StepIconComponent={CustomStepIcon}>{t(label.translation)}</StepLabel>
+                    <Step key={label.translation} completed={completed[key]}>
+                        <StepButton onClick={() => handleOnClick(key)} disabled={disabled}>
+                            <StepLabel StepIconComponent={CustomStepIcon}>{t(label.translation)}</StepLabel>
+                        </StepButton>
                     </Step>
                 ) : null
             ))}
@@ -46,16 +55,8 @@ const WizardStepper = ({ steps, page }) => {
     );
 };
 
-// Component that renders icons of Stepper depending on completeness of steps
-const CustomStepIcon = (props) => {
-    const classes = useStepIconStyles();
-    const { completed } = props;
+const mapDispatchToProps = dispatch => ({
+    checkAcls: acls => dispatch(checkAcls(acls))
+});
 
-    return (
-        <div className={cn(classes.root)}>
-            {completed ? <FaCircle className={classes.circle}/> : <FaDotCircle className={classes.circle}/>}
-        </div>
-    )
-};
-
-export default WizardStepper;
+export default connect(null, mapDispatchToProps)(WizardStepper);

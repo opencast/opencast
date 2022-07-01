@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {useTranslation} from "react-i18next";
 import {getFilters, getStats} from "../../selectors/tableFilterSelectors";
-import {editFilterValue} from "../../actions/tableFilterActions";
+import { editFilterValue, resetFilterValues } from '../../actions/tableFilterActions';
 import {connect} from "react-redux";
 import {fetchEvents} from "../../thunks/eventThunks";
 import {loadEventsIntoTable} from "../../thunks/tableThunks";
@@ -12,11 +12,12 @@ import {logger} from "../../utils/logger";
 /**
  * This component renders the status bar of the event view and filters depending on these
  */
-const Stats = ({ loadingStats, stats, filterMap, editFilterValue, loadEvents, loadEventsIntoTable }) => {
+const Stats = ({ loadingStats, stats, filterMap, editFilterValue, loadEvents, loadEventsIntoTable, resetFilterMap }) => {
     const { t } = useTranslation();
 
     // Filter with value of clicked status
     const showStatsFilter = async stats => {
+            resetFilterMap();
             let filterValue;
             await stats.filters.forEach(f => {
                 let filter = filterMap.find(({ name }) => name === f.name);
@@ -75,7 +76,8 @@ const mapDispatchToProps = dispatch => ({
     loadingStats: () => dispatch(fetchStats()),
     editFilterValue: (filterName, value) => dispatch(editFilterValue(filterName, value)),
     loadEvents: () => dispatch(fetchEvents()),
-    loadEventsIntoTable: () => dispatch(loadEventsIntoTable())
+    loadEventsIntoTable: () => dispatch(loadEventsIntoTable()),
+    resetFilterMap: () => dispatch(resetFilterValues())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Stats);

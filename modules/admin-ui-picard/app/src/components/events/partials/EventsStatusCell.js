@@ -13,11 +13,11 @@ const EventsStatusCell = ({ row, filterMap, editFilterValue, loadEvents, loadEve
     const { t } = useTranslation();
 
     // Filter with value of current cell
-    const addFilter = status => {
+    const addFilter = async status => {
         let filter = filterMap.find(({ name }) => name === "status");
         if (!!filter) {
-            editFilterValue(filter.name, status);
-            loadEvents();
+            await editFilterValue(filter.name, status);
+            await loadEvents();
             loadEventsIntoTable();
         }
     };

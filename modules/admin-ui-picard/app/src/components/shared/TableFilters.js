@@ -1,10 +1,15 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
 import {connect} from 'react-redux';
 import {DatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
-import {getFilters, getSecondFilter, getSelectedFilter, getTextFilter} from '../../selectors/tableFilterSelectors';
-import {fetchFilters} from '../../thunks/tableFilterThunks';
+import {
+    getCurrentFilterResource,
+    getFilters,
+    getSecondFilter,
+    getSelectedFilter,
+    getTextFilter
+} from '../../selectors/tableFilterSelectors';
 import {
     editFilterValue,
     editSecondFilter,
@@ -16,19 +21,19 @@ import {
     resetFilterValues
 } from '../../actions/tableFilterActions';
 import TableFilterProfiles from "./TableFilterProfiles";
-
 import {getCurrentLanguageInformation} from "../../utils/utils";
 import {availableHotkeys} from "../../configs/hotkeysConfig";
 import {GlobalHotKeys} from "react-hotkeys";
+import { getResourceType } from '../../selectors/tableSelectors';
+import { fetchFilters } from '../../thunks/tableFilterThunks';
 
 
 /**
  * This component renders the table filters in the upper right corner of the table
  */
-const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, secondFilter,
-                          onChangeTextFilter, removeTextFilter, editSelectedFilter, removeSelectedFilter,
-                          removeSecondFilter, resetFilterMap, editFilterValue,
-                          loadResource, loadResourceIntoTable, resource }) => {
+const TableFilters = ({filterMap, textFilter, selectedFilter, secondFilter, onChangeTextFilter,
+    removeTextFilter, editSelectedFilter, removeSelectedFilter, removeSecondFilter, resetFilterMap,
+    editFilterValue, loadResource, loadResourceIntoTable, resource}) => {
     const { t } = useTranslation();
 
     // Variables for showing different dialogs depending on what was clicked
@@ -38,8 +43,6 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
     // Variables containing selected start date and end date for date filter
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date());
-    const [startDateTouched, setStartDateTouched] = useState(false);
-    const [endDateTouched, setEndDateTouched] = useState(false);
 
     // Remove all selected filters, no filter should be "active" anymore
     const removeFilters = async () => {
@@ -94,29 +97,43 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
     }
 
     // Set the sate of startDate and endDate picked with datepicker
-    // Todo: not working correctly: you need to pick the second date twice before the value of the filter is set
-    // todo: get rid of bug described before
-    const handleDatepickerChange = (date, isStart) => {
+    const handleDatepickerChange = async (date, isStart=false) => {
+
         if (isStart) {
-            setStartDate(date);
-            setStartDateTouched(true);
+            await setStartDate(date);
         } else {
-            setEndDate(date);
-            setEndDateTouched(true);
+            await setEndDate(date);
         }
-        if (startDateTouched && endDateTouched) {
+
+        // When both dates set, then set the value for this filter
+        if (!isStart) {
             let filter = filterMap.find(({ name }) => name === selectedFilter);
-            // Todo: better way to save the period
-            // Todo: maybe need action for this
-            editFilterValue(filter.name, startDate.toDateString());
+            await editFilterValue(filter.name, startDate.toISOString() + '/' + date.toISOString());
             setFilterSelector(false);
             removeSelectedFilter();
+            // Reload of resource
+            await loadResource();
+            loadResourceIntoTable();
         }
 
     };
 
     const hotKeyHandlers = {
         REMOVE_FILTERS: removeFilters
+    }
+
+    const renderBlueBox = filter => {
+        let valueLabel = filter.options.find(opt => opt.value === filter.value).label;
+        return (
+            <span>
+                {t(filter.label).substr(0, 40)}:
+                {(filter.translatable) ? (
+                    t(valueLabel).substr(0, 40)
+                ) : (
+                    valueLabel.substr(0, 40)
+                )}
+            </span>
+        )
     }
 
     return (
@@ -200,23 +217,15 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
                                                 {
                                                     // Use different representation of name and value depending on type of filter
                                                     filter.type === 'select' ?
-                                                        (
-                                                            <span>
-                                                                {t(filter.label).substr(0, 40)}:
-                                                                {(filter.translatable) ? (
-                                                                    t(filter.value).substr(0, 40)
-                                                                ) : (
-                                                                    filter.value.substr(0, 40)
-                                                                )}
-                                                            </span>
-                                                        ) :
+                                                            renderBlueBox(filter)
+                                                        :
                                                         filter.type === 'period' ?
                                                             (
                                                                 <span>
                                                                     <span>
-                                                                        {/*todo: format date range*/}
                                                                         {t(filter.label).substr(0, 40)}:
-                                                                        {t('dateFormats.date.short', {date: new Date(filter.value)})}
+                                                                        {t('dateFormats.date.short', {date: new Date(filter.value.split('/')[0])})}-
+                                                                        {t('dateFormats.date.short', {date: new Date(filter.value.split('/')[1])})}
                                                                     </span>
                                                                 </span>
                                                             ) : null
@@ -355,7 +364,7 @@ const FilterSwitch = ({filterMap, selectedFilter, handleChange, startDate, endDa
                             value={endDate}
                             disableToolbar
                             format="dd/MM/yyyy"
-                            onChange={(date) => handleDate(date, false)}
+                            onChange={(date) => handleDate(date)}
                         />
                     </MuiPickersUtilsProvider>
                 </div>
@@ -368,7 +377,9 @@ const mapStateToProps = state => ({
     textFilter: getTextFilter(state),
     filterMap: getFilters(state),
     selectedFilter: getSelectedFilter(state),
-    secondFilter: getSecondFilter(state)
+    secondFilter: getSecondFilter(state),
+    resourceType: getResourceType(state),
+    filterResourceType: getCurrentFilterResource(state)
 });
 
 // Mapping actions to dispatch
@@ -379,9 +390,9 @@ const mapDispatchToProps = dispatch => ({
     removeSelectedFilter: () => dispatch(removeSelectedFilter()),
     editSecondFilter: filter => dispatch(editSecondFilter(filter)),
     removeSecondFilter: () => dispatch(removeSecondFilter()),
-    loadingFilters: resource => dispatch(fetchFilters(resource)),
     resetFilterMap: () => dispatch(resetFilterValues()),
-    editFilterValue: (filterName, value) => dispatch(editFilterValue(filterName, value))
+    editFilterValue: (filterName, value) => dispatch(editFilterValue(filterName, value)),
+    loadingFilters: resource => dispatch(fetchFilters(resource)),
 });
 
 

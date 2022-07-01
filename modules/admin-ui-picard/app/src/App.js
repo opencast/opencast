@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {connect} from "react-redux";
-import {HashRouter, Route, Switch} from "react-router-dom";
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import './App.scss';
 import Events from "./components/events/Events";
 import Recordings from "./components/recordings/Recordings";
@@ -14,66 +14,52 @@ import Services from "./components/systems/Services";
 import Groups from "./components/users/Groups";
 import Acls from "./components/users/Acls";
 import {fetchOcVersion, fetchUserInfo} from "./thunks/userInfoThunks";
-import { fetchFilters } from './thunks/tableFilterThunks';
 
-function App({ loadingUserInfo, loadingOcVersion, loadingFilters }) {
+function App({ loadingUserInfo, loadingOcVersion }) {
     useEffect(() => {
        // Load information about current user on mount
        loadingUserInfo();
        // Load information about current opencast version on mount
        loadingOcVersion();
-       // Load initial filters for event table view
-       loadingFilters("events");
-    }, []);
+    }, [loadingOcVersion, loadingUserInfo]);
 
   return (
           <HashRouter>
-              <Switch>
-                  <Route exact path={"/"}>
-                      <Events />
-                  </Route>
-                  <Route exact path={"/events/events"}>
-                      <Events />
-                  </Route>
-                  <Route exact path={"/events/series"}>
-                      <Series />
-                  </Route>
-                  <Route exact path={"/recordings/recordings"}>
-                      <Recordings />
-                  </Route>
-                  <Route exact path={"/systems/jobs"}>
-                      <Jobs />
-                  </Route>
-                  <Route exact path={"/systems/servers"}>
-                      <Servers />
-                  </Route>
-                  <Route exact path={"/systems/services"}>
-                      <Services />
-                  </Route>
-                  <Route exact path={"/users/users"}>
-                      <Users />
-                  </Route>
-                  <Route exact path={"/users/groups"}>
-                      <Groups />
-                  </Route>
-                  <Route exact path={"/users/acls"}>
-                      <Acls />
-                  </Route>
-                  <Route exact path={"/configuration/themes"}>
-                      <Themes />
-                  </Route>
-                  <Route exact path={"/statistics/organization"}>
-                      <Statistics />
-                  </Route>
-              </Switch>
+              <Routes>
+                  <Route exact path={"/"} element={<Events />} />
+
+                  <Route exact path={"/events/events"} element={<Events />} />
+
+                  <Route exact path={"/events/series"} element={<Series />} />
+
+                  <Route exact path={"/recordings/recordings"} element={<Recordings />} />
+
+                  <Route exact path={"/systems/jobs"} element={<Jobs />} />
+
+                  <Route exact path={"/systems/servers"} element={<Servers />} />
+
+                  <Route exact path={"/systems/services"} element={<Services />} />
+
+                  <Route exact path={"/users/users"} element={<Users />} />
+
+                  <Route exact path={"/users/groups"} element={<Groups />} />
+
+                  <Route exact path={"/users/acls"} element={<Acls />} />
+
+                  <Route exact path={"/configuration/themes"} element={<Themes />} />
+
+                  <Route exact path={"/statistics/organization"} element={<Statistics />} />
+
+                  <Route path={"*"}
+                         render={() => <Navigate to={"/events/events"} replace />} />
+              </Routes>
           </HashRouter>
   );
 }
 
 const mapDispatchToProps = dispatch => ({
     loadingUserInfo: () => dispatch(fetchUserInfo()),
-    loadingOcVersion: () => dispatch(fetchOcVersion()),
-    loadingFilters: resource => dispatch(fetchFilters(resource))
+    loadingOcVersion: () => dispatch(fetchOcVersion())
 });
 
 export default connect(null, mapDispatchToProps)(App);

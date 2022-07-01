@@ -2,9 +2,8 @@ import React from "react";
 import {useTranslation} from "react-i18next";
 import {connect} from "react-redux";
 import { loadEventsIntoTable } from '../../../thunks/tableThunks';
-import { editTextFilter } from '../../../actions/tableFilterActions';
 import { setSpecificEventFilter } from '../../../thunks/tableFilterThunks';
-import Link  from 'react-router-dom/Link';
+import { Link }  from 'react-router-dom';
 
 /**
  * This component renders the title cells of series in the table view
@@ -12,19 +11,19 @@ import Link  from 'react-router-dom/Link';
 const SeriesTitleCell = ({ row, loadingEventsIntoTable, setSpecificEventFilter }) => {
     const { t } = useTranslation();
 
-    const redirectToEvents = async seriesTitle => {
-        // set the series filter value of events to series title
-        setSpecificEventFilter('series', seriesTitle);
-
+    const redirectToEvents = async seriesId => {
         // redirect to tables
-        loadingEventsIntoTable();
+        await loadingEventsIntoTable();
+
+        // set the series filter value of events to series title
+        await setSpecificEventFilter('series', seriesId);
     }
 
     return (
         <Link to="/events/events"
               className="crosslink"
               title={t('EVENTS.SERIES.TABLE.TOOLTIP.SERIES')}
-              onClick={() => redirectToEvents(row.title)}>
+              onClick={async () => await redirectToEvents(row.id)}>
             {row.title}
         </Link>
     )
