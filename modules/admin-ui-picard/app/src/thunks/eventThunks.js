@@ -492,7 +492,7 @@ export const updateScheduledEventsBulk = values => async dispatch => {
         let originalEvent = values.events.find(event => event.id === values.changedEvents[i]);
 
         if (!eventChanges || !originalEvent) {
-            dispatch(addNotification('error', 'EVENTS_NOT_UPDATED'));
+            dispatch(addNotification('error', 'EVENTS_NOT_UPDATED_ID', 10, values.changedEvents[i]));
             return;
         }
 
@@ -542,7 +542,7 @@ export const updateScheduledEventsBulk = values => async dispatch => {
         })
         .catch(res => {
             logger.error(res);
-            dispatch(addNotification('error', 'EVENTS_NOT_UPDATED'));
+            dispatch(addNotification('error', 'EVENTS_NOT_UPDATED_ALL'));
         });
 };
 
