@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -79,8 +80,9 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
   private final Set<String> instructorRoles;
   private final Set<String> ignoredUsernames;
 
-  /** Regular expression for matching valid users */
+  /** Regular expressions for matching valid users and sites */
   private String userPattern;
+  private String sitePattern;
 
   /**
    * Constructs a Brighspace user provider with the needed settings
@@ -99,7 +101,8 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
       int cacheExpiration,
       Set instructorRoles,
       Set ignoredUsernames,
-      String userPattern
+      String userPattern,
+      String sitePattern
   ) {
 
     this.pid = pid;
@@ -108,6 +111,7 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
     this.instructorRoles = instructorRoles;
     this.ignoredUsernames = ignoredUsernames;
     this.userPattern = userPattern;
+    this.sitePattern = sitePattern;
 
     logger.info("Creating new BrightspaceUserProviderInstance(pid={}, url={}, cacheSize={}, cacheExpiration={}, "
                   + "InstructorRoles={}, ignoredUserNames={})", pid, client.getURL(), cacheSize, cacheExpiration,
@@ -260,7 +264,100 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
 
   @Override
   public Iterator<Role> findRoles(String query, Target target, int offset, int limit) {
-    return Collections.emptyIterator();
+
+    // We search for SITEID, SITEID_Learner, SITEID_Instructor
+    logger.debug("findRoles(query=" + query + " offset=" + offset + " limit=" + limit + ")");
+
+    // Don't return roles for users or groups
+    if (target == Role.Target.USER) {
+      return Collections.emptyIterator();
+    }
+
+    boolean exact = true;
+    boolean ltirole = false;
+
+    if (query.endsWith("%")) {
+      exact = false;
+      query = query.substring(0, query.length() - 1);
+    }
+
+    if (query.isEmpty()) {
+      return Collections.emptyIterator();
+    }
+
+    // Verify that role name ends with LTI_LEARNER_ROLE or LTI_INSTRUCTOR_ROLE
+    if (exact && !query.endsWith("_" + LTI_LEARNER_ROLE) && !query.endsWith("_" + LTI_INSTRUCTOR_ROLE)) {
+      return Collections.emptyIterator();
+    }
+
+    String orgUnitId = null;
+
+    if (query.endsWith("_" + LTI_LEARNER_ROLE)) {
+      orgUnitId = query.substring(0, query.lastIndexOf("_" + LTI_LEARNER_ROLE));
+      ltirole = true;
+    } else if (query.endsWith("_" + LTI_INSTRUCTOR_ROLE)) {
+      orgUnitId = query.substring(0, query.lastIndexOf("_" + LTI_INSTRUCTOR_ROLE));
+      ltirole = true;
+    }
+
+    if (!ltirole) {
+      orgUnitId = query;
+    }
+
+    if (!verifyOrgUnit(orgUnitId)) {
+      return Collections.emptyIterator();
+    }
+
+    // Roles list
+    List<Role> roles = new LinkedList<Role>();
+
+    JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
+
+    if (ltirole) {
+      // Query is for an org unit ID and an LTI role (Instructor/Learner)
+      roles.add(new JaxbRole(query, jaxbOrganization, "Brightspace Org Unit Role", Role.Type.EXTERNAL));
+    } else {
+      // Site ID - return both roles
+      roles.add(new JaxbRole(
+          orgUnitId + "_" + LTI_INSTRUCTOR_ROLE,
+          jaxbOrganization,
+          "Brightspace Org Unit Instructor Role",
+          Role.Type.EXTERNAL
+      ));
+      roles.add(new JaxbRole(
+          orgUnitId + "_" + LTI_LEARNER_ROLE,
+          jaxbOrganization,
+          "Brightspace Org Unit Learner Role",
+          Role.Type.EXTERNAL
+      ));
+    }
+
+    return roles.iterator();
+  }
+
+
+ /*
+   ** Verify that the site exists
+   ** Query with /direct/site/:ID:/exists
+   */
+  private boolean verifyOrgUnit(String orgUnitId) {
+
+    // We could additionally cache positive and negative siteId lookup results here
+    logger.debug("verifyOrgUnit({})", orgUnitId);
+
+    try {
+      if ((sitePattern != null) && !orgUnitId.matches(sitePattern)) {
+        logger.debug("verify org unit {} failed regexp {}", orgUnitId, sitePattern);
+        return false;
+      }
+    } catch (PatternSyntaxException e) {
+      logger.warn("Invalid regular expression for site pattern {} - disabling checks", sitePattern);
+      sitePattern = null;
+    }
+
+    // TODO call the Brightspace API to verify that the orgunit exists
+
+    return true;
   }
 
   private User loadUserFromBrightspace(String username) {

@@ -94,6 +94,9 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
   /** The key to look up the regular expression used to validate users */
   private static final String USER_PATTERN_KEY = "org.opencastproject.userdirectory.brightspace.user.pattern";
 
+  /** The key to look up the regular expression used to validate sites (org unit ids) */
+  private static final String SITE_PATTERN_KEY = "org.opencastproject.userdirectory.brightspace.site.pattern";
+
   protected BundleContext bundleContext;
   private Map<String, ServiceRegistration> userProviderRegistrations = new ConcurrentHashMap<>();
   private Map<String, ServiceRegistration> roleProviderRegistrations = new ConcurrentHashMap<>();
@@ -160,6 +163,7 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
     final String applicationKey = (String) properties.get(BRIGHTSPACE_APP_KEY);
 
     String userPattern = (String) properties.get(USER_PATTERN_KEY);
+    String sitePattern = (String) properties.get(SITE_PATTERN_KEY);
 
     String cacheSizeStr = (String) properties.get(CACHE_SIZE_KEY);
     if (StringUtils.isBlank(cacheSizeStr)) {
@@ -219,8 +223,8 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
     BrightspaceClientImpl clientImpl
         = new BrightspaceClientImpl(urlStr, applicationId, applicationKey, systemUserId, systemUserKey);
     BrightspaceUserProviderInstance provider
-        = new BrightspaceUserProviderInstance(pid, clientImpl, org, cacheSize, cacheExpiration  ,
-            instructorRoles, ignoredUsernames, userPattern);
+        = new BrightspaceUserProviderInstance(pid, clientImpl, org, cacheSize, cacheExpiration,
+            instructorRoles, ignoredUsernames, userPattern, sitePattern);
     this.userProviderRegistrations
             .put(pid, this.bundleContext.registerService(UserProvider.class.getName(), provider, null));
     this.roleProviderRegistrations
