@@ -4,11 +4,13 @@ import cn from "classnames";
 import {getSelectedRows} from "../../../../selectors/tableSelectors";
 import {connect} from "react-redux";
 import {useSelectionChanges} from "../../../../hooks/wizardHooks";
+import {hasDeviceAccess} from "../../../../utils/resourceUtils";
+import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 
 /**
  * This component renders the table overview of selected events in edit scheduled events bulk action
  */
-const EditScheduledEventsGeneralPage = ({ nextPage, formik, selectedRows }) => {
+const EditScheduledEventsGeneralPage = ({ nextPage, formik, selectedRows, user }) => {
     const { t } = useTranslation();
 
     const [selectedEvents, allChecked, onChangeSelected, onChangeAllSelected] = useSelectionChanges(formik, selectedRows);
@@ -34,11 +36,17 @@ const EditScheduledEventsGeneralPage = ({ nextPage, formik, selectedRows }) => {
         return true;
     };
 
-    // todo: implement when user management and authentication is implemented
-    const isAgentAccess = events => {
+    const isAgentAccess = event => {
+        return (!event.selected) || hasDeviceAccess(user, event.agent_id);
+    }
+
+    const isAllAgentAccess = events => {
         for (let i = 0; i < events.length; i++) {
             if(!events[i].selected || !isEditable(events[i])) {
                 continue;
+            }
+            if(!isAgentAccess(events[i])){
+                return false;
             }
         }
         return true;
@@ -48,7 +56,7 @@ const EditScheduledEventsGeneralPage = ({ nextPage, formik, selectedRows }) => {
     const checkValidity = () => {
         if (formik.values.events.length > 0) {
             if (isAllEditable(formik.values.events)
-                && isAgentAccess(formik.values.events)
+                && isAllAgentAccess(formik.values.events)
                 && formik.isValid) {
                 return formik.values.events.some(event => event.selected === true);
             } else {
@@ -71,7 +79,7 @@ const EditScheduledEventsGeneralPage = ({ nextPage, formik, selectedRows }) => {
                             </div>
                         )}
                         {/* Show only if user doesn't have access to all agents*/}
-                        {!isAgentAccess(selectedEvents) && (
+                        {!isAllAgentAccess(selectedEvents) && (
                             <div className="alert sticky info">
                                 <p>{t('BULK_ACTIONS.EDIT_EVENTS.GENERAL.CANNOTEDITSCHEDULE')}</p>
                             </div>
@@ -98,7 +106,7 @@ const EditScheduledEventsGeneralPage = ({ nextPage, formik, selectedRows }) => {
                                     <tbody>
                                     {/* Repeat for each selected event */}
                                     {selectedEvents.map((event, key) => (
-                                        <tr key={key} className={cn({error: !isEditable(event)},{info: !isAgentAccess(selectedEvents)})}>
+                                        <tr key={key} className={cn({error: !isEditable(event)},{info: !isAgentAccess(event)})}>
                                             <td>
                                                 <input type="checkbox"
                                                        name="events"
@@ -141,6 +149,7 @@ const EditScheduledEventsGeneralPage = ({ nextPage, formik, selectedRows }) => {
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     selectedRows: getSelectedRows(state),
+    user: getUserInformation(state)
 })
 
 export default connect(mapStateToProps)(EditScheduledEventsGeneralPage);

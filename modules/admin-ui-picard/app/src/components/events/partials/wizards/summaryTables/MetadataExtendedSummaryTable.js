@@ -5,23 +5,58 @@ import {useTranslation} from "react-i18next";
  * This component renders the metadata extended table containing access rules provided by user
  * before in wizard summary pages
  */
-const MetadataExtendedSummaryTable = ({ header }) => {
+const MetadataExtendedSummaryTable = ({ extendedMetadata, formikValues, formikInitialValues, header }) => {
     const { t } = useTranslation();
 
-    // todo: remove placeholder when metadata extended is implemented
+    // extended metadata that user has provided
+    const catalogs = [];
+    for (const catalog of extendedMetadata) {
+        const metadataFields = catalog.fields;
+        let metadata = [];
+
+        for (let i = 0; metadataFields.length > i; i++) {
+            let fieldValue = formikValues[catalog.flavor + '_' + metadataFields[i].id];
+            let initialValue = formikInitialValues[catalog.flavor + '_' + metadataFields[i].id];
+
+            if (fieldValue !== initialValue) {
+                if (fieldValue === true) {
+                    fieldValue = 'true';
+                } else if (fieldValue === false) {
+                    fieldValue = 'false';
+                }
+
+                if (!!fieldValue && fieldValue.length > 0) {
+                    metadata = metadata.concat({
+                        name: catalog.flavor + '_' + metadataFields[i].id,
+                        label: metadataFields[i].label,
+                        value: fieldValue
+                    });
+                }
+            }
+        }
+        catalogs.push(metadata);
+    }
 
     return (
         <div className="obj tbl-list">
             <header className="no-expand">{t(header)}</header>
             <div className="obj-container">
-                <table className="main-tbl">
-                    <tbody>
-                    <tr>
-                        <td>Placeholder Label</td>
-                        <td>Placeholder Value</td>
-                    </tr>
-                    </tbody>
-                </table>
+                {catalogs.map((catalog, key) => (
+                    <table className="main-tbl">
+                        <tbody>
+                            {catalog.map((entry, key) => (
+                                <tr key={key}>
+                                    <td>{t(entry.label)}</td>
+                                    <td>
+                                        {Array.isArray(entry.value) ?
+                                            entry.value.join(', ')
+                                            : entry.value}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ))}
             </div>
         </div>
     )

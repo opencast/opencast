@@ -13,7 +13,6 @@ import {addNotification} from "../../../thunks/notificationThunks";
 import {NOTIFICATION_CONTEXT} from "../../../configs/modalConfig";
 import {removeNotificationWizardForm} from "../../../actions/notificationActions";
 import {createPolicy, prepareAccessPolicyRulesForPost} from "../../../utils/resourceUtils";
-import {getPolicies} from "../../../selectors/eventDetailsSelectors";
 import {getUserInformation} from "../../../selectors/userInfoSelectors";
 import {hasAccess} from "../../../utils/utils";
 
@@ -63,7 +62,7 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                 fetchTransactionResult.active !== undefined ?
                     setTransactions({read_only: fetchTransactionResult.active})
                     : setTransactions({read_only: true});
-                if (fetchTransactionResult.active == undefined || fetchTransactionResult.active) {
+                if (fetchTransactionResult.active === undefined || fetchTransactionResult.active) {
                     addNotification('warning', 'ACTIVE_TRANSACTION', -1, null, NOTIFICATION_CONTEXT);
                 }
             }
@@ -182,11 +181,11 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                     {/* Notifications */}
                     <Notifications context="not_corner"/>
 
-                    {!loading && (
+                    {!loading && !!policies && (
                         <ul>
                             <li>
                                 <Formik
-                                    initialValues={{policies: [...policies], template: ""}}
+                                    initialValues={{policies: (policies.length > 0) ? [...policies] : [], template: ''}}
                                     enableReinitialize
                                     validate={values => validateFormik(values)}
                                     onSubmit={(values, actions) =>
@@ -222,8 +221,8 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                                                                 /* dropdown for selecting a policy template */
                                                                                 <Field className="chosen-single chosen-default"
                                                                                        style={{width: '200px'}}
-                                                                                       name={"template"}
-                                                                                       as="select"
+                                                                                       name={'template'}
+                                                                                       as='select'
                                                                                        onChange={event => handleTemplateChange(event.target.value, formik.setFieldValue)}
                                                                                 >
                                                                                     {(aclTemplates && aclTemplates.length > 0) ? (

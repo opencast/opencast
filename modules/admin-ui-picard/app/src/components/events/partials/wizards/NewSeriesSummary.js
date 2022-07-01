@@ -1,7 +1,11 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
 import {connect} from "react-redux";
-import {getSeriesMetadata, getSeriesThemes} from "../../../../selectors/seriesSeletctor";
+import {
+    getSeriesExtendedMetadata,
+    getSeriesMetadata,
+    getSeriesThemes
+} from "../../../../selectors/seriesSeletctor";
 import MetadataSummaryTable from "./summaryTables/MetadataSummaryTable";
 import MetadataExtendedSummaryTable from "./summaryTables/MetadataExtendedSummaryTable";
 import AccessSummaryTable from "./summaryTables/AccessSummaryTable";
@@ -10,7 +14,7 @@ import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButt
 /**
  * This component renders the summary page for new series in the new series wizard.
  */
-const NewSeriesSummary = ({ formik, previousPage, metaDataExtendedHidden, metadataSeries,
+const NewSeriesSummary = ({ formik, previousPage, metaDataExtendedHidden, metadataSeries, extendedMetadata,
                               seriesThemes }) => {
     const { t } = useTranslation();
 
@@ -29,9 +33,11 @@ const NewSeriesSummary = ({ formik, previousPage, metaDataExtendedHidden, metada
                                               header={'EVENTS.SERIES.NEW.METADATA.CAPTION'}/>
 
                         {/*Summary metadata extended*/}
-                        {/*todo: metadata extended not implemented yet, so there are no values provided by user yet*/}
                         {!metaDataExtendedHidden ? (
-                            <MetadataExtendedSummaryTable header={'EVENTS.SERIES.NEW.METADATA_EXTENDED.CAPTION'}/>
+                            <MetadataExtendedSummaryTable extendedMetadata={extendedMetadata}
+                                                          formikValues={formik.values}
+                                                          formikInitialValues={formik.initialValues}
+                                                          header={'EVENTS.SERIES.NEW.METADATA_EXTENDED.CAPTION'}/>
                         ): null}
 
                         {/*Summary access configuration*/}
@@ -69,6 +75,7 @@ const NewSeriesSummary = ({ formik, previousPage, metaDataExtendedHidden, metada
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     metadataSeries: getSeriesMetadata(state),
+    extendedMetadata: getSeriesExtendedMetadata(state),
     seriesThemes: getSeriesThemes(state)
 })
 

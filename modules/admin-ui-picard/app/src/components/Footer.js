@@ -1,6 +1,6 @@
 import React from "react";
 import {connect} from "react-redux";
-import {getUserInformation} from "../selectors/userInfoSelectors";
+import {getOrgProperties, getUserInformation} from "../selectors/userInfoSelectors";
 import {hasAccess} from "../utils/utils";
 
 /**
@@ -10,10 +10,12 @@ const version = {
     version: '8.03',
     buildNumber: '42'
 };
-const feedbackUrl = 'https://opencast.org/';
 
-const Footer = ({ user }) => (
-        <footer id="main-footer" >
+const Footer = ({ user, orgProperties }) => {
+    const feedbackUrlPropertyId = 'org.opencastproject.admin.feedback.url';
+
+    return (
+        <footer id="main-footer">
             <div className="default-footer">
                 {/* Only render if a version is set */}
                 {!!user.ocVersion && (
@@ -25,18 +27,20 @@ const Footer = ({ user }) => (
                     </div>
                 )}
                 {/* Only render if a feedback URL is set*/}
-                {!!feedbackUrl && (
+                {!!orgProperties && !!orgProperties[feedbackUrlPropertyId] && (
                     <div className="feedback-btn" id="feedback-btn">
-                        <a href={feedbackUrl}>Feedback</a>
+                        <a href={orgProperties[feedbackUrlPropertyId]}>Feedback</a>
                     </div>
                 )}
             </div>
         </footer>
-);
+    );
+};
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    orgProperties: getOrgProperties(state)
 });
 
 

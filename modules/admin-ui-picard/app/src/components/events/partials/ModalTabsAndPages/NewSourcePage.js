@@ -3,20 +3,21 @@ import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import Notifications from "../../../shared/Notifications";
 import {MuiPickersUtilsProvider, DatePicker} from "@material-ui/pickers";
-import { getCurrentLanguageInformation, getTimezoneOffset } from '../../../../utils/utils';
+import {getCurrentLanguageInformation, getTimezoneOffset} from '../../../../utils/utils';
 import {createMuiTheme, ThemeProvider} from "@material-ui/core";
 import {Field, FieldArray} from "formik";
 import RenderField from "../../../shared/wizard/RenderField";
 import {getRecordings} from "../../../../selectors/recordingSelectors";
 import {fetchRecordings} from "../../../../thunks/recordingThunks";
 import {connect} from "react-redux";
-import {addNotification} from "../../../../thunks/notificationThunks";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 import { checkConflicts } from '../../../../thunks/eventThunks';
 import {sourceMetadata} from "../../../../configs/sourceConfig";
 import {hours, minutes, weekdays} from "../../../../configs/modalConfig";
 import {logger} from "../../../../utils/logger";
 import DateFnsUtils from '@date-io/date-fns';
+import {getUserInformation} from "../../../../selectors/userInfoSelectors";
+import {filterDevicesForAccess, hasAnyDeviceAccess} from "../../../../utils/resourceUtils";
 
 
 // Style to bring date picker pop up to front
@@ -33,8 +34,8 @@ const theme = createMuiTheme({
 /**
  * This component renders the source page for new events in the new event wizard.
  */
-const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, inputDevices,
-    removeNotificationWizardForm, checkConflicts }) => {
+const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, inputDevices, user,
+                            removeNotificationWizardForm, checkConflicts }) => {
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -51,6 +52,10 @@ const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, in
         removeNotificationWizardForm();
     }
 
+    const scheduleOptionAvailable = () => {
+        return ((inputDevices.length > 0) && (hasAnyDeviceAccess(user, inputDevices)));
+    }
+
     return(
         <>
             <div className="modal-content">
@@ -63,33 +68,46 @@ const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, in
                             {/* Radio buttons for choosing source mode */}
                             <div className="obj-container">
                                 <ul>
-                                    <li>
-                                        <label>
-                                            <Field type="radio"
-                                                   name="sourceMode"
-                                                   className="source-toggle"
-                                                   value="UPLOAD"/>
-                                            <span>{t('EVENTS.EVENTS.NEW.SOURCE.UPLOAD.CAPTION')}</span>
-                                        </label>
-                                    </li>
-                                    <li>
-                                        <label>
-                                            <Field type="radio"
-                                                   name="sourceMode"
-                                                   className="source-toggle"
-                                                   value="SCHEDULE_SINGLE"/>
-                                            <span>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_SINGLE.CAPTION')}</span>
-                                        </label>
-                                    </li>
-                                    <li>
-                                        <label>
-                                            <Field type="radio"
-                                                   name="sourceMode"
-                                                   className="source-toggle"
-                                                   value="SCHEDULE_MULTIPLE"/>
-                                            <span>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.CAPTION')}</span>
-                                        </label>
-                                    </li>
+                                    {scheduleOptionAvailable() ? (
+                                        <li>
+                                            <label>
+                                                <Field type="radio"
+                                                       name="sourceMode"
+                                                       className="source-toggle"
+                                                       value="UPLOAD"/>
+                                                <span>{t('EVENTS.EVENTS.NEW.SOURCE.UPLOAD.CAPTION')}</span>
+                                            </label>
+                                        </li>
+                                    ) : (
+                                        <li>
+                                            <label>
+                                                <span>{t('EVENTS.EVENTS.NEW.SOURCE.UPLOAD.CAPTION')}</span>
+                                            </label>
+                                        </li>
+                                    )}
+                                    {scheduleOptionAvailable() && (
+                                        <>
+                                            <li>
+                                                <label>
+                                                    <Field type="radio"
+                                                           name="sourceMode"
+                                                           className="source-toggle"
+                                                           value="SCHEDULE_SINGLE"/>
+                                                    <span>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_SINGLE.CAPTION')}</span>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label>
+                                                    <Field type="radio"
+                                                           name="sourceMode"
+                                                           className="source-toggle"
+                                                           value="SCHEDULE_MULTIPLE"/>
+                                                    <span>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.CAPTION')}</span>
+                                                </label>
+                                            </li>
+                                        </>
+                                    )}
+
                                 </ul>
                             </div>
                         </div>
@@ -98,10 +116,10 @@ const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, in
                         {formik.values.sourceMode === 'UPLOAD' && (
                             <Upload formik={formik}/>
                         )}
-                        {(formik.values.sourceMode === 'SCHEDULE_SINGLE' ||
+                        {scheduleOptionAvailable() && (formik.values.sourceMode === 'SCHEDULE_SINGLE' ||
                             formik.values.sourceMode === 'SCHEDULE_MULTIPLE') && (
                             <Schedule formik={formik}
-                                      inputDevices={inputDevices} />
+                                      inputDevices={filterDevicesForAccess(user, inputDevices)} />
                         )}
                     </div>
                 </div>
@@ -237,7 +255,7 @@ const Schedule = ({ formik, inputDevices }) => {
 
     const renderInputDeviceOptions = () => {
         if (!!formik.values.location) {
-            let inputDevice = inputDevices.find(({ Name }) => Name === formik.values.location);
+            let inputDevice = inputDevices.find(({ name }) => name === formik.values.location);
             return (
                 inputDevice.inputs.map((input, key) => (
                         <label key={key}>
@@ -314,7 +332,7 @@ const Schedule = ({ formik, inputDevices }) => {
                                            as="select"
                                            name="scheduleStartTimeHour"
                                            placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
-                                        <option value="" />
+                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}</option>
                                         {hours.map((i, key) => (
                                           <option key={key}
                                                   value={i.value}>
@@ -331,7 +349,7 @@ const Schedule = ({ formik, inputDevices }) => {
                                            as="select"
                                            name="scheduleStartTimeMinutes"
                                            placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
-                                        <option value=""/>
+                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}</option>
                                         {minutes.map((i, key) => (
                                           <option key={key}
                                                   value={i.value}>
@@ -352,7 +370,7 @@ const Schedule = ({ formik, inputDevices }) => {
                                            as="select"
                                            name="scheduleDurationHour"
                                            placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
-                                        <option value="" />
+                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}</option>
                                         {hours.map((i, key) => (
                                           <option value={i.value}
                                                   key={key}>
@@ -369,7 +387,7 @@ const Schedule = ({ formik, inputDevices }) => {
                                            as="select"
                                            name="scheduleDurationMinutes"
                                            placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
-                                        <option value=""/>
+                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}</option>
                                         {minutes.map((i, key) => (
                                           <option key={key}
                                                   value={i.value}>
@@ -391,7 +409,7 @@ const Schedule = ({ formik, inputDevices }) => {
                                            as="select"
                                            name="scheduleEndTimeHour"
                                            placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
-                                        <option value="" />
+                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}</option>
                                         {hours.map((i, key) => (
                                           <option key={key}
                                                   value={i.value}>
@@ -408,7 +426,7 @@ const Schedule = ({ formik, inputDevices }) => {
                                            as="select"
                                            name="scheduleEndTimeMinutes"
                                            placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
-                                        <option value=""/>
+                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}</option>
                                         {minutes.map((i, key) => (
                                           <option key={key}
                                                   value={i.value}>
@@ -432,9 +450,11 @@ const Schedule = ({ formik, inputDevices }) => {
                                                 formik.setFieldValue("deviceInputs", []);
                                             }}
                                             name="location">
-                                        <option value=""/>
+                                        <option value='' hidden>
+                                            {t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}
+                                        </option>
                                         {inputDevices.map((inputDevice, key) => (
-                                          <option key={key} value={inputDevice.Name}>{inputDevice.Name}</option>
+                                          <option key={key} value={inputDevice.name}>{inputDevice.name}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -458,12 +478,12 @@ const Schedule = ({ formik, inputDevices }) => {
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     inputDevices: getRecordings(state),
+    user: getUserInformation(state)
 });
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadingInputDevices: () => dispatch(fetchRecordings("inputs")),
-    addNotification: (type, key, duration, parameter, context) => dispatch(addNotification(type, key, duration, parameter, context)),
     removeNotificationWizardForm: () => dispatch(removeNotificationWizardForm()),
     checkConflicts: values => dispatch(checkConflicts(values))
 });

@@ -9,7 +9,7 @@ const RecordingsUpdateCell = ({ row }) => {
 
     return (
         <span>
-            {t('dateFormats.dateTime.short', { dateTime: new Date(row.Update)})}
+            {t('dateFormats.dateTime.short', { dateTime: new Date(row.update)})}
         </span>
     )
 
