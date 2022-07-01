@@ -3,7 +3,10 @@ import axios from "axios";
 import {
     loadEventMetadataFailure,
     loadEventMetadataInProgress,
-    loadEventMetadataSuccess, loadEventSchedulingFailure, loadEventSchedulingInProgress, loadEventSchedulingSuccess,
+    loadEventMetadataSuccess,
+    loadEventSchedulingFailure,
+    loadEventSchedulingInProgress,
+    loadEventSchedulingSuccess,
     loadEventsFailure,
     loadEventsInProgress,
     loadEventsSuccess
@@ -17,7 +20,11 @@ import {
 } from "../utils/resourceUtils";
 import {getTimezoneOffset, makeTwoDigits} from "../utils/utils";
 import {sourceMetadata} from "../configs/sourceConfig";
-import {NOTIFICATION_CONTEXT, weekdays, WORKFLOW_UPLOAD_ASSETS_NON_TRACK} from "../configs/modalConfig";
+import {
+    NOTIFICATION_CONTEXT,
+    weekdays,
+    WORKFLOW_UPLOAD_ASSETS_NON_TRACK
+} from "../configs/modalConfig";
 import {logger} from "../utils/logger";
 import {addNotification} from "./notificationThunks";
 import {getAssetUploadOptions, getSchedulingEditedEvents} from "../selectors/eventSelectors";
