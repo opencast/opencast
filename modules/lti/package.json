@@ -15,7 +15,7 @@
     "query-string": "^7.1.1",
     "react": "^18.1.0",
     "react-bootstrap": "^2.4.0",
-    "react-dom": "^18.1.0",
+    "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
     "react-i18next": "^11.16.9",
     "react-js-pagination": "^3.0.2",
