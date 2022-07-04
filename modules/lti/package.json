@@ -22,6 +22,9 @@
     "react-select": "^5.3.2",
     "typescript": "4.7.4"
   },
+  "overrides": {
+    "autoprefixer": "10.4.5"
+  },
   "scripts": {
     "i18n": "./copy-translations.sh",
     "start": "react-scripts start",
