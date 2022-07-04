@@ -27,8 +27,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "mock-proxy": "npx http-mock-server --config mock-server-config.json --proxy http://localhost:3000"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -62,7 +61,6 @@
     ]
   },
   "devDependencies": {
-    "http-mock-server": "^0.5.2",
     "@types/jest": "27.5.1",
     "@types/node": "17.0.38",
     "@types/react": "17.0.39",
