@@ -1,6 +1,5 @@
 import Select, { OnChangeValue } from "react-select";
 import { Loading } from "./Loading";
-import Helmet from "react-helmet";
 import React from "react";
 import { withTranslation, WithTranslation } from "react-i18next";
 import { ProgressBar } from 'react-bootstrap';
@@ -284,10 +283,8 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
         if (this.state.metadata === "error")
             return <div>{this.props.t("LTI.ERROR_LOADING_METADATA")}</div>;
         const lockedString = this.state.metadata.edited.locked !== undefined ? "LTI.EVENT_LOCKED" : undefined;
+        document.title = this.props.t("LTI." + (this.state.eventId === undefined ? "UPLOAD_TITLE" : "EDIT_TITLE"));
         return <>
-            <Helmet>
-                <title>{this.props.t("LTI." + (this.state.eventId === undefined ? "UPLOAD_TITLE" : "EDIT_TITLE"))}</title>
-            </Helmet>
             <h2>{this.props.t("LTI." + (this.state.eventId === undefined ? "NEW_UPLOAD" : "EDIT_UPLOAD"))}</h2>
             {lockedString !== undefined && <div className="alert alert-secondary">
                 {this.props.t(lockedString)}<br />
