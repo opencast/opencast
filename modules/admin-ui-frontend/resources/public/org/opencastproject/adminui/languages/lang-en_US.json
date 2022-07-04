@@ -1134,7 +1134,7 @@
            "ADD_SUBPAGE": "Add subpage",
            "CANCEL": "Cancel",
            "HOMEPAGE": "Homepage",
-           "SELECTED_PAGE": "Series will be mounted unter the following path",
+           "SELECTED_PAGE": "Series will be mounted under the following path",
            "NO_PAGE_SELECTED": "No page selected. Series will not be mounted in Tobira.",
            "PATH": "Path"
          },
