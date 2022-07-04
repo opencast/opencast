@@ -137,7 +137,8 @@ const NewSeriesWizard = ({ metadataFields, extendedMetadata, close, postNewSerie
                           )}
                       </div>
                   </>
-                )}}
+                );
+                }}
             </Formik>
         </>
     );

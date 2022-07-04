@@ -2,7 +2,7 @@ import React from 'react';
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import { Step, StepButton, StepLabel, Stepper } from '@material-ui/core';
-import { useStepperStyle } from '../../../utils/wizardUtils';
+import { isSummaryReachable, useStepperStyle } from '../../../utils/wizardUtils';
 import CustomStepIcon from './CustomStepIcon';
 import { checkAcls } from '../../../thunks/aclThunks';
 import { connect } from 'react-redux';
@@ -19,7 +19,7 @@ const WizardStepper = ({ steps, page, setPage, formik, completed, setCompleted,
 
     const handleOnClick = async key => {
 
-        if (isSummaryReachable(key)) {
+        if (isSummaryReachable(key, steps, completed)) {
             if(hasAccessPage) {
                 let check =  await checkAcls(formik.values.acls);
                 if (!check) {
@@ -39,16 +39,6 @@ const WizardStepper = ({ steps, page, setPage, formik, completed, setCompleted,
 
     const disabled = !(formik.dirty && formik.isValid);
 
-    const isSummaryReachable = key => {
-
-        if (steps[key].name === "summary") {
-            const visibleSteps = steps.filter(step => !step.hidden);
-
-            return Object.keys(completed).length >= (visibleSteps.length - 2);
-        }
-
-        return true;
-    }
 
     return (
         <Stepper activeStep={page}

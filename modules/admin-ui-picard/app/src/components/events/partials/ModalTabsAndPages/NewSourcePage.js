@@ -259,7 +259,7 @@ const Schedule = ({ formik, inputDevices }) => {
             return (
                 inputDevice.inputs.map((input, key) => (
                         <label key={key}>
-                            <Field type="checkbox" name="deviceInputs" value={input.id} tabIndex="12"/>
+                            <Field type="checkbox" name="deviceInputs" value={input.id} tabIndex="12" />
                             {t(input.value)}
                         </label>
                     )
@@ -442,13 +442,12 @@ const Schedule = ({ formik, inputDevices }) => {
                             {/* one options for each capture agents that has input options */}
                             <td>
                                 <div className="chosen-container chosen-container-single">
-                                    <select placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}
+                                    <Field placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}
                                             tabIndex="11"
+                                            as="select"
                                             className="chosen-single"
-                                            onChange={e => {
-                                                formik.setFieldValue("location", e.target.value);
-                                                formik.setFieldValue("deviceInputs", []);
-                                            }}
+                                            onChange={e =>
+                                                formik.setFieldValue("location", e.target.value)}
                                             name="location">
                                         <option value='' hidden>
                                             {t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}
@@ -456,12 +455,12 @@ const Schedule = ({ formik, inputDevices }) => {
                                         {inputDevices.map((inputDevice, key) => (
                                           <option key={key} value={inputDevice.name}>{inputDevice.name}</option>
                                         ))}
-                                    </select>
+                                    </Field>
                                 </div>
                             </td>
                         </tr>
                         <tr>
-                            <td>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS')} <i className="required">*</i></td>
+                            <td>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS')}</td>
                             <td>
                                 {/* Render checkbox for each input option of the selected input device*/}
                                 {renderInputDeviceOptions()}

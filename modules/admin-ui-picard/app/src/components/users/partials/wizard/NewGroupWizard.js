@@ -92,7 +92,7 @@ const NewGroupWizard = ({ close, postNewGroup }) => {
                               )}
                           </div>
                       </>
-                    )
+                    );
                 }}
             </Formik>
         </>

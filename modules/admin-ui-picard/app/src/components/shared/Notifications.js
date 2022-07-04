@@ -40,7 +40,7 @@ const Notifications = ({ setNotificationHidden, notifications, globalPosition, c
             </ul>
         ) : context === 'above_table' ? (
           <ul>
-            {notifications.map ((notification, key) => (
+            {notifications.map((notification, key) => (
               !notification.hidden && (notification.context === 'global'
                 && notification.type === 'error') && (
                 renderNotification(notification, key)

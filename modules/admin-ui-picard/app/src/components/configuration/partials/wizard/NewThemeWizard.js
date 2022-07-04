@@ -115,7 +115,7 @@ const NewThemeWizard = ({ close, postNewTheme }) => {
                               )}
                           </div>
                       </>
-                    )
+                    );
                 }}
             </Formik>
         </>

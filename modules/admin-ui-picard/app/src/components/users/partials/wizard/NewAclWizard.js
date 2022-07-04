@@ -85,7 +85,7 @@ const NewAclWizard = ({ close, postNewAcl }) => {
                               )}
                           </div>
                       </>
-                    )
+                    );
                 }}
             </Formik>
         </>
