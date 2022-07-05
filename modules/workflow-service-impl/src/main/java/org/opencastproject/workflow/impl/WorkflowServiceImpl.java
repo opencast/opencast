@@ -195,6 +195,12 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   /** The thread pool to use for firing listeners and handling dispatched jobs */
   protected ThreadPoolExecutor executorService;
 
+  /** The number of threads to use when updating the elasticsearchindex */
+  protected List<Thread> rebuildThreads = new ArrayList<Thread>();
+
+  /** The number of threads to use when updating the elasticsearchindex */
+  protected int nThreads = 32;
+
   /** The workspace */
   protected Workspace workspace = null;
 
@@ -2193,12 +2199,26 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           }
         }
       } while (workflowIndexData.size() > 0);
+      waitForRebuildThreadsToComplete();
     }
   }
 
   @Override
   public IndexRebuildService.Service getService() {
     return IndexRebuildService.Service.Workflow;
+  }
+  /**
+   * Wait for the running index rebuild tasks to complete.
+   */
+  private void waitForRebuildThreadsToComplete() {
+    for (Thread thread : rebuildThreads) {
+      try {
+        thread.join();
+      } catch (InterruptedException e) {
+        //Do something useful
+      }
+    }
+    rebuildThreads = new ArrayList<Thread>();
   }
 
   /**
@@ -2290,14 +2310,42 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       event.setWorkflowState(workflowState);
       return Optional.of(event);
     };
+    if (rebuildThreads.size() > nThreads) {
+      waitForRebuildThreadsToComplete();
+    }
+    ParallelWorkflowUpdate update = new ParallelWorkflowUpdate(index, id, mpId, updateFunction, orgId, user);
+    Thread thread = new Thread(update);
+    thread.start();
+    rebuildThreads.add(thread);
+  }
 
-    try {
-      index.addOrUpdateEvent(mpId, updateFunction, orgId, user);
-      logger.debug("Workflow instance {} of event {} updated in the {} index.", id, mpId,
-              index.getIndexName());
-    } catch (SearchIndexException e) {
-      logger.error("Error updating the workflow instance {} of event {} in the {} index.", id, mpId,
-              index.getIndexName(), e);
+  private class ParallelWorkflowUpdate implements Runnable {
+    private final ElasticsearchIndex index;
+    private final long id;
+    private final String mpId;
+    private final Function<Optional<Event>, Optional<Event>> updateFunction;
+    private final String orgId;
+    private final User user;
+
+    ParallelWorkflowUpdate(ElasticsearchIndex searchIndex, long workflowId, String mediapackageId,
+            Function<Optional<Event>, Optional<Event>> function, String organisation, User securityUser) {
+      index = searchIndex;
+      id = workflowId;
+      mpId = mediapackageId;
+      updateFunction = function;
+      orgId = organisation;
+      user = securityUser;
+    }
+
+    public void run() {
+      try {
+        index.addOrUpdateEvent(mpId, updateFunction, orgId, user);
+        logger.debug("Workflow instance {} of event {} updated in the {} index.", id, mpId,
+                index.getIndexName());
+      } catch (SearchIndexException e) {
+        logger.error("Error updating the workflow instance {} of event {} in the {} index.", id, mpId,
+                index.getIndexName(), e);
+      }
     }
   }
 }
