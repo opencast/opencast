@@ -5,7 +5,6 @@ import { withTranslation, WithTranslation } from "react-i18next";
 import "../App.css";
 import 'bootstrap/dist/css/bootstrap.css';
 import Pagination from "react-js-pagination";
-import Helmet from "react-helmet";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faEdit, faComments, faDownload } from "@fortawesome/free-solid-svg-icons";
 import * as i18next from "i18next";
@@ -246,6 +245,7 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
                 },
                 total: sr.total
             };
+            document.title = this.props.t("LTI.SERIES_TITLE");
             return <>
                 <header>
                     {this.state.deleteSuccess === true && <div className="alert alert-success">
@@ -258,9 +258,6 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
                     </div>}
                     {this.props.t("LTI.RESULT_HEADING", headingOpts)}
                 </header>
-                <Helmet>
-                    <title>{this.props.t("LTI.SERIES_TITLE")}</title>
-                </Helmet>
                 <div className="list-group">
                     {sr.results.map((episode) => <SeriesEpisode
                         key={episode.id}

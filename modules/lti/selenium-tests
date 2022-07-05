@@ -6,6 +6,9 @@ import subprocess
 import sys
 import urllib3
 
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from threading import Thread
+
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
@@ -17,6 +20,32 @@ BASE_URL = 'http://127.0.0.1:7878'
 
 proc = []
 driver = None
+
+
+class MockRequestHandler(BaseHTTPRequestHandler):
+
+    MOCK_FILES = [
+            'lti',
+            'lti-service-gui/existing-event/metadata',
+            'lti-service-gui/jobs',
+            'lti-service-gui/new/metadata',
+            'search/episode.json']
+
+    def do_GET(self):
+        file = self.path[1:].split('?')[0]
+        self.send_response(200)
+        self.end_headers()
+        if file in self.MOCK_FILES:
+            print(f'Serving file {file}')
+            with open('./mock-server-api-data/' + file, 'rb') as f:
+                self.wfile.write(f.read())
+        else:
+            url = 'http://127.0.0.1:3000/' + self.path[1:]
+            http = urllib3.PoolManager()
+            print(f'Sending proxy request to {url}')
+            request = http.request('GET', url)
+            self.wfile.write(request.data)
+
 
 def header(message):
     print()
@@ -42,18 +71,6 @@ def react_start():
     http = urllib3.PoolManager()
     retries = urllib3.Retry(10, backoff_factor=0.2)
     request = http.request('GET', 'http://127.0.0.1:3000/', retries=retries)
-    if request.status != 200:
-        raise Exception('Server not ready after wait')
-
-
-def mock_proxy_start():
-    header('Starting Mock Proxy')
-    proc.append(subprocess.Popen(['npm', 'run', 'mock-proxy']))
-
-    # Wait for server
-    http = urllib3.PoolManager()
-    retries = urllib3.Retry(10, backoff_factor=0.2)
-    request = http.request('GET', 'http://127.0.0.1:7878/', retries=retries)
     if request.status != 200:
         raise Exception('Server not ready after wait')
 
@@ -124,7 +141,7 @@ def check_i18next():
     header('Testing Internationalization')
 
     # Probe German translation of the series tool
-    navigate(f'/ltitools/index.html?subtool=series&lng=de')
+    navigate('/ltitools/index.html?subtool=series&lng=de')
     wait_for(driver, (By.TAG_NAME, 'header'))
 
     # Check for a translated results header
@@ -136,13 +153,15 @@ def main():
     os.setpgrp()
     try:
         react_start()
-        mock_proxy_start()
+        httpd = HTTPServer(('localhost', 7878), MockRequestHandler)
+        Thread(target=httpd.serve_forever).start()
         check_overview_page()
         check_series_tool()
         check_series_tool(True, True)
         check_upload_tool()
         check_i18next()
         driver.close()
+        httpd.shutdown()
     finally:
         try:
             os.killpg(0, signal.SIGINT)
