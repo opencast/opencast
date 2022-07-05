@@ -4,6 +4,7 @@ import cn from "classnames";
 import {Field} from "formik";
 import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
 import FileUpload from "../../../shared/wizard/FileUpload";
+import Notifications from '../../../shared/Notifications';
 
 /**
  * This component renders the watermark page for new themes in the new themes wizard
@@ -22,7 +23,7 @@ const WatermarkPage = ({ formik, nextPage, previousPage, isEdit }) => {
                 <div className="modal-body">
                     <div className="full-col">
                         <p>{t('CONFIGURATION.THEMES.DETAILS.WATERMARK.DESCRIPTION')}</p>
-                        {/*todo: Notification*/}
+                        <Notifications context="not_corner"/>
                         <div className="obj">
                            <header>{t('CONFIGURATION.THEMES.DETAILS.WATERMARK.CAPTION')}</header>
                             <div className="obj-container content-list padded">
