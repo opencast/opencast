@@ -78,6 +78,19 @@ API changes
 - [[#3002](https://github.com/opencast/opencast/pull/3002)] - Sign publication URL of events in External API
 - [[#3148](https://github.com/opencast/opencast/pull/3148)] - Allow empty track duration
 
+Additional Notes about 11.9
+---------------------------
+
+- Bug fixes:
+    - Series ID's with length less than seven chars breaking the Admin UI
+      (cf. [[#3902](https://github.com/opencast/opencast/pull/3902)]).
+    - Ingest service download feature not working
+      (cf. [[#3915](https://github.com/opencast/opencast/pull/3915)]).
+- New features and updates:
+    - New parameters to set the event's title and start date and time for the duplicate event workflow operation
+      (cf. [[#3635](https://github.com/opencast/opencast/pull/3635)]). See the
+      [dedicated doc section](workflowoperationhandlers/duplicate-event-woh.md) for more details.
+
 Additional Notes about 11.8
 ---------------------------
 

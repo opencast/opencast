@@ -4,6 +4,25 @@ Changelog
 Opencast 11
 ----------
 
+### Opencast 11.9
+
+*Released on July 6th, 2022*
+
+- [[#3915](https://github.com/opencast/opencast/pull/3915)] -
+  Fix Ingest Service Download Feature
+- [[#3907](https://github.com/opencast/opencast/pull/3907)] -
+  Split url parameter on first equal sign
+- [[#3902](https://github.com/opencast/opencast/pull/3902)] -
+  Fix seriesname solver when ID is shorter than 7 characters
+- [[#3882](https://github.com/opencast/opencast/pull/3882)] -
+  Adopter wizard botton text repair
+- [[#3881](https://github.com/opencast/opencast/pull/3881)] -
+  Fix admin ui proxy
+- [[#3871](https://github.com/opencast/opencast/pull/3871)] -
+  Add changelog and release notes for OC 11.8
+- [[#3805](https://github.com/opencast/opencast/pull/3805)] -
+  Set Title and start date and time for duplicate events using duplicate WFH
+
 ### Opencast 11.8
 
 *Released on June 15th, 2022*
