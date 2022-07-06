@@ -54,7 +54,6 @@ import org.opencastproject.transcription.persistence.TranscriptionProviderContro
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
@@ -768,7 +767,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   private void saveResults(String jobId, JSONObject jsonObj) throws IOException {
     if (jsonObj.get("results") != null) {
       // Save the results into a collection
-      workspace.putInCollection(TRANSCRIPT_COLLECTION, buildResultsFileName(jobId),
+      workspace.putInCollection(TRANSCRIPT_COLLECTION, jobId + ".json",
               new ByteArrayInputStream(jsonObj.toJSONString().getBytes()));
     }
   }
@@ -793,7 +792,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       }
 
       // Results already saved?
-      URI uri = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, buildResultsFileName(jobId));
+      URI uri = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, jobId + ".json");
       try {
         workspace.get(uri);
       } catch (Exception e) {
@@ -851,10 +850,6 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     } catch (Exception e) {
       logger.error("Could not send email: {}\n{}", subject, body, e);
     }
-  }
-
-  private String buildResultsFileName(String jobId) {
-    return PathSupport.toSafeName(jobId + ".json");
   }
 
   public boolean isCallbackAlreadyRegistered() {

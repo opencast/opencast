@@ -53,7 +53,6 @@ import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -683,11 +682,11 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   }
 
   private String buildTmpFileName(String jobId) {
-    return PathSupport.toSafeName(tmpStorageDir + File.separator + "transcript_" + jobId);
+    return workspace.toSafeName(tmpStorageDir + File.separator + "transcript_" + jobId);
   }
 
   private String buildResultsFileName(String jobId) {
-    return PathSupport.toSafeName(jobId + "." + fileFormat);
+    return workspace.toSafeName(jobId + "." + fileFormat);
   }
 
   @Reference

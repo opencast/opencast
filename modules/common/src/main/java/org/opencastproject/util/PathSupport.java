@@ -22,16 +22,15 @@
 
 package org.opencastproject.util;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.UUID;
 
 /**
  * <code>PathSupport</code> is a helper class to deal with filesystem paths.
  */
+@Deprecated
 public final class PathSupport {
 
   /** The logging facility */
@@ -41,33 +40,6 @@ public final class PathSupport {
    * This class should not be instantiated, since it only provides static utility methods.
    */
   private PathSupport() {
-  }
-
-  /**
-   * Returns the filename translated into a version that can safely be used as part of a file system path.
-   *
-   * @param fileName
-   *          The file name
-   * @return the safe version
-   */
-  public static String toSafeName(String fileName) {
-    String urlExtension = FilenameUtils.getExtension(fileName);
-    String baseName = FilenameUtils.getBaseName(fileName);
-    String safeBaseName = baseName.replaceAll("\\W", "_"); // TODO -- ensure that this filename is safe on all platforms
-    String safeString;
-    if ("".equals(urlExtension)) {
-      safeString = safeBaseName;
-    } else {
-      safeString = safeBaseName + "." + urlExtension;
-    }
-    if (safeString.length() < 255)
-      return safeString;
-    String random = UUID.randomUUID().toString();
-    if (!"".equals(urlExtension)) {
-      random = random.concat(".").concat(urlExtension);
-    }
-    logger.info("using '{}' to represent url '{}', which is too long to store as a filename", random, fileName);
-    return random;
   }
 
   /**

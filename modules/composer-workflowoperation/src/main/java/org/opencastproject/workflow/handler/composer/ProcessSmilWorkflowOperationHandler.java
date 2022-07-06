@@ -44,7 +44,6 @@ import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -496,7 +495,7 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
     for (EncodingProfile ep : profiles) {
       String suffix = ep.getSuffix();
       // !! workspace.putInCollection renames the file - need to do the same with suffix
-      suffix = PathSupport.toSafeName(suffix);
+      suffix = workspace.toSafeName(suffix);
       if (suffix.length() > 0 && rawfileName.endsWith(suffix)) {
         track.addTag(ep.getIdentifier());
         return;

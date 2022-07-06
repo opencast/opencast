@@ -28,7 +28,6 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
@@ -43,6 +42,7 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.message.BasicStatusLine;
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
@@ -165,6 +165,8 @@ public class WorkspaceImplTest {
   public void testPutCachingWithoutFilesystemMapping() throws Exception {
     // First, mock up the collaborating working file repository
     WorkingFileRepository repo = EasyMock.createMock(WorkingFileRepository.class);
+    final Capture<String> capture = EasyMock.newCapture();
+    EasyMock.expect(repo.toSafeName(EasyMock.capture(capture))).andAnswer(capture::getValue).anyTimes();
     EasyMock.expect(
             repo.getURI(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString()))
             .andReturn(
@@ -189,33 +191,30 @@ public class WorkspaceImplTest {
     EasyMock.verify(repo);
 
     // Ensure that the file was cached in the workspace (since there is no configured filesystem mapping)
-    File file = new File(PathSupport.concat(new String[] {
-        workspaceRoot, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX, "foo", "bar", "header.gif"
-    }));
+    File file = Paths.get(
+        workspaceRoot, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX, "foo", "bar", "header.gif").toFile();
     Assert.assertTrue(file.exists());
   }
 
   @Test
   public void testGetWorkspaceFileWithOutPort() throws Exception {
     WorkingFileRepository repo = EasyMock.createNiceMock(WorkingFileRepository.class);
+    final Capture<String> capture = EasyMock.newCapture();
+    EasyMock.expect(repo.toSafeName(EasyMock.capture(capture))).andAnswer(capture::getValue).anyTimes();
     EasyMock.expect(repo.getBaseUri()).andReturn(new URI("http://localhost/files")).anyTimes();
     EasyMock.replay(repo);
     workspace.setRepository(repo);
 
     File workspaceFile = workspace.toWorkspaceFile(new URI("http://foo.com/myaccount/videos/bar.mov"));
-    File expected = new File(PathSupport.concat(new String[] {
-        workspaceRoot, "http_foo.com", "myaccount", "videos", "bar.mov"
-    }));
+    File expected = Paths.get(workspaceRoot, "http_foo.com", "myaccount", "videos", "bar.mov").toFile();
     Assert.assertEquals(expected.getAbsolutePath(), workspaceFile.getAbsolutePath());
 
     workspaceFile = workspace.toWorkspaceFile(new URI("http://foo.com:8080/myaccount/videos/bar.mov"));
-    expected = new File(PathSupport.concat(new String[] {
-        workspaceRoot, "http_foo.com_8080", "myaccount", "videos", "bar.mov"
-    }));
+    expected = Paths.get(workspaceRoot, "http_foo.com_8080", "myaccount", "videos", "bar.mov").toFile();
     Assert.assertEquals(expected.getAbsolutePath(), workspaceFile.getAbsolutePath());
 
     workspaceFile = workspace.toWorkspaceFile(new URI("http://localhost/files/collection/c1/bar.mov"));
-    expected = new File(PathSupport.concat(new String[] { workspaceRoot, "collection", "c1", "bar.mov" }));
+    expected = Paths.get(workspaceRoot, "collection", "c1", "bar.mov").toFile();
     Assert.assertEquals(expected.getAbsolutePath(), workspaceFile.getAbsolutePath());
 
   }
@@ -223,24 +222,22 @@ public class WorkspaceImplTest {
   @Test
   public void testGetWorkspaceFileWithPort() throws Exception {
     WorkingFileRepository repo = EasyMock.createNiceMock(WorkingFileRepository.class);
+    final Capture<String> capture = EasyMock.newCapture();
+    EasyMock.expect(repo.toSafeName(EasyMock.capture(capture))).andAnswer(capture::getValue).anyTimes();
     EasyMock.expect(repo.getBaseUri()).andReturn(new URI("http://localhost:8080/files")).anyTimes();
     EasyMock.replay(repo);
     workspace.setRepository(repo);
 
     File workspaceFile = workspace.toWorkspaceFile(new URI("http://foo.com/myaccount/videos/bar.mov"));
-    File expected = new File(PathSupport.concat(new String[] {
-        workspaceRoot, "http_foo.com", "myaccount", "videos", "bar.mov"
-    }));
+    File expected = Paths.get(workspaceRoot, "http_foo.com", "myaccount", "videos", "bar.mov").toFile();
     Assert.assertEquals(expected.getAbsolutePath(), workspaceFile.getAbsolutePath());
 
     workspaceFile = workspace.toWorkspaceFile(new URI("http://foo.com:8080/myaccount/videos/bar.mov"));
-    expected = new File(PathSupport.concat(new String[] {
-        workspaceRoot, "http_foo.com_8080", "myaccount", "videos", "bar.mov"
-    }));
+    expected = Paths.get(workspaceRoot, "http_foo.com_8080", "myaccount", "videos", "bar.mov").toFile();
     Assert.assertEquals(expected.getAbsolutePath(), workspaceFile.getAbsolutePath());
 
     workspaceFile = workspace.toWorkspaceFile(new URI("http://localhost:8080/files/collection/c1/bar.mov"));
-    expected = new File(PathSupport.concat(new String[] { workspaceRoot, "collection", "c1", "bar.mov" }));
+    expected = Paths.get(workspaceRoot, "collection", "c1", "bar.mov").toFile();
     Assert.assertEquals(expected.getAbsolutePath(), workspaceFile.getAbsolutePath());
 
   }

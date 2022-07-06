@@ -134,6 +134,8 @@ public interface WorkingFileRepository extends StorageUsage {
    */
   URI getURI(String mediaPackageID, String mediaPackageElementID, String fileName) throws IllegalArgumentException;
 
+  String toSafeName(String fileName);
+
   /**
    * Delete the file stored at the given media package and element IDs.
    *

@@ -70,7 +70,6 @@ import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.data.Collections;
@@ -1864,9 +1863,11 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       }
     }
 
-  // generate a "unique" name by jobid
+  /**
+   * Generate a "unique" name by job identifier
+   */
   private String renameJobFile(long jobId, File file) {
-      return PathSupport.toSafeName(format("%s.%s", jobId, FilenameUtils.getName(file.getAbsolutePath())));
+      return workspace.toSafeName(format("%s.%s", jobId, FilenameUtils.getName(file.getAbsolutePath())));
   }
 
   protected void hlsSetReference(Track track) throws IOException {
