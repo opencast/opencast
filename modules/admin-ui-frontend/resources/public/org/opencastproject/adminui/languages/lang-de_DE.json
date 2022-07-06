@@ -875,14 +875,14 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "NEW_USER": "Neuer Nutzer",
-                  "DETAILS": "Nicht-Nutzer Rollen",
-                  "USER": "Nutzer",
-                  "USERS": "Für das Video nicht authorisierte Nutzer",
-                  "NONEXISTANT_USER": "Nicht existierender Nutzer",
+                  "NEW_USER": "Neuer Benutzer",
+                  "DETAILS": "Weitere Zugriffsrichtlinien",
+                  "USER": "Benutzer",
+                  "USERS": "Für das Video authorisierte Benutzer",
+                  "NONEXISTANT_USER": "Nicht existierender Benutzer",
                   "HELP": {
-                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Nutzer das Video zu sehen",
-                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Nutzer das Video zu bearbeiten"
+                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Benutzer das Video zu sehen",
+                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Benutzer das Video zu bearbeiten"
                   }
                },
                "ROLES": {
@@ -890,8 +890,8 @@
                   "EMPTY": "Keine Rolle gefunden"
                 },
                 "USERS": {
-                  "LABEL": "Wähle einen Nutzer",
-                  "EMPTY": "Kein Nutzer gefunden"
+                  "LABEL": "Wähle einen Benutzer",
+                  "EMPTY": "Kein Benutzer gefunden"
                 }
             },
             "COMMENTS": {
@@ -1109,13 +1109,13 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "NEW_USER": "Neuer Nutzer",
-                  "DETAILS": "Nicht-Nutzer Rollen",
-                  "USER": "Nutzer",
-                  "USERS": "Für die Serie nicht authorisierte Nutzer",
+                  "NEW_USER": "Neuer Benutzer",
+                  "DETAILS": "Weitere Zugriffsrichtlinien",
+                  "USER": "Benutzer",
+                  "USERS": "Für die Serie nicht authorisierte Benutzer",
                   "HELP": {
-                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Nutzer die Serie zu sehen",
-                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Nutzer die Serie zu bearbeiten"
+                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Benutzer die Serie zu sehen",
+                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Benutzer die Serie zu bearbeiten"
                   }
                },
                "ROLES": {
@@ -1123,8 +1123,8 @@
                   "EMPTY": "Keine Rolle gefunden"
                 },
                 "USERS": {
-                  "LABEL": "Wähle einen Nutzer",
-                  "EMPTY": "Kein Nutzer gefunden"
+                  "LABEL": "Wähle einen Benutzer",
+                  "EMPTY": "Kein Benutzer gefunden"
                 }
             },
             "THEME": {
@@ -1183,18 +1183,18 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "DETAILS": "Nicht-Nutzer Rollen",
+                  "DETAILS": "Weitere Zugriffsrichtlinien",
                   "REPLACE_EVENT_ACLS": "Zugriffsrechte des Videos aktualisieren",
                   "REPLACE_EVENT_ACLS_HINT": "Sicherstellen, dass alle Videos dieser Serie genau diese Zugriffsrechte haben",
                   "LOAD_MORE_LIMIT": "angezeigte Richtlinien.",
                   "LOAD_MORE_LINK": "Mehr laden",
-                  "NEW_USER": "Neuer Nutzer",
-                  "USER": "Nutzer",
-                  "USERS": "Für die Serie nicht authorisierte Nutzer",
-                  "NONEXISTANT_USER": "Nicht existierender Nutzer",
+                  "NEW_USER": "Neuer Benutzer",
+                  "USER": "Benutzer",
+                  "USERS": "Für die Serie nicht authorisierte Benutzer",
+                  "NONEXISTANT_USER": "Nicht existierender Benutzer",
                   "HELP": {
-                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Nutzer die Serie zu sehen",
-                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Nutzer die Serie zu bearbeiten"
+                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Benutzer die Serie zu sehen",
+                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Benutzer die Serie zu bearbeiten"
                   }
                },
                "ROLES": {
@@ -1202,8 +1202,8 @@
                   "EMPTY": "Keine Rolle gefunden"
                },
                "USERS": {
-                "LABEL": "Wähle einen Nutzer",
-                "EMPTY": "Kein Nutzer gefunden"
+                "LABEL": "Wähle einen Benutzer",
+                "EMPTY": "Kein Benutzer gefunden"
               }
             },
             "METADATA": {
@@ -1435,14 +1435,14 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "DETAILS": "Nicht-Nutzer Rollen",
+                  "DETAILS": "Weitere Zugriffsrichtlinien",
                   "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu",
-                  "NEW_USER": "Neuer Nutzer",
-                  "USER": "Nutzer",
-                  "USERS": "Für die Richtlinie nicht authorisierte Nutzer",
+                  "NEW_USER": "Neuer Benutzer",
+                  "USER": "Benutzer",
+                  "USERS": "Für die Richtlinie nicht authorisierte Benutzer",
                   "HELP": {
-                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Nutzer die Richtlinie zu sehen",
-                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Nutzer die Richtlinie zu bearbeiten"
+                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Benutzer die Richtlinie zu sehen",
+                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Benutzer die Richtlinie zu bearbeiten"
                   }
                },
                "ROLES": {
@@ -1450,8 +1450,8 @@
                   "EMPTY": "Keine Rolle gefunden"
                },
                "USERS": {
-                "LABEL": "Wähle einen Nutzer",
-                "EMPTY": "Kein Nutzer gefunden"
+                "LABEL": "Wähle einen Benutzer",
+                "EMPTY": "Kein Benutzer gefunden"
               }
             }
          },
@@ -1484,15 +1484,15 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "DETAILS": "Nicht-Nutzer Rollen",
+                  "DETAILS": "Weitere Zugriffsrichtlinien",
                   "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu",
-                  "NEW_USER": "Neuer Nutzer",
-                  "USER": "Nutzer",
-                  "USERS": "Für die Richtlinie nicht authorisierte Nutzer",
-                  "NONEXISTANT_USER": "Nicht existierender Nutzer",
+                  "NEW_USER": "Neuer Benutzer",
+                  "USER": "Benutzer",
+                  "USERS": "Für die Richtlinie nicht authorisierte Benutzer",
+                  "NONEXISTANT_USER": "Nicht existierender Benutzer",
                   "HELP": {
-                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Nutzer die Richtlinie zu sehen",
-                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Nutzer die Richtlinie zu bearbeiten"
+                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Benutzer die Richtlinie zu sehen",
+                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Benutzer die Richtlinie zu bearbeiten"
                   }
                },
                "ROLES": {
@@ -1500,8 +1500,8 @@
                   "EMPTY": "Keine Rolle gefunden"
                },
                "USERS": {
-                "LABEL": "Wähle einen Nutzer",
-                "EMPTY": "Kein Nutzer gefunden"
+                "LABEL": "Wähle einen Benutzer",
+                "EMPTY": "Kein Benutzer gefunden"
               }
             }
          }
