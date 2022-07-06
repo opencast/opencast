@@ -319,8 +319,11 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
     logger.info("Running {}", cropCommandline);
 
     try {
-      pbuilder = new ProcessBuilder(cropCommandline.split(" "));
-      Process process = pbuilder.start();
+      Process process = new ProcessBuilder(cropCommandline.split(" "))
+          .redirectError(ProcessBuilder.Redirect.DISCARD)
+          .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+          .start();
+
       //wait until the task is finished
       exitCode = process.waitFor();
     } catch (InterruptedException | IOException e) {
