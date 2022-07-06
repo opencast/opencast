@@ -457,7 +457,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage mediaPackage)
-          throws WorkflowDatabaseException {
+          throws WorkflowDatabaseException, UnauthorizedException, WorkflowParsingException {
     return start(workflowDefinition, mediaPackage, new HashMap<>());
   }
 
@@ -469,7 +469,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage mediaPackage,
-          Map<String, String> properties) throws WorkflowDatabaseException {
+          Map<String, String> properties)
+          throws WorkflowDatabaseException, UnauthorizedException, WorkflowParsingException {
     try {
       return start(workflowDefinition, mediaPackage, null, properties);
     } catch (NotFoundException e) {
@@ -487,7 +488,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Override
   public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage sourceMediaPackage,
           Long parentWorkflowId, Map<String, String> originalProperties) throws WorkflowDatabaseException,
-          NotFoundException {
+          NotFoundException, UnauthorizedException, WorkflowParsingException, IllegalStateException {
     final String mediaPackageId = sourceMediaPackage.getIdentifier().toString();
     Map<String, String> properties = null;
 
@@ -570,7 +571,11 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         } catch (Exception failureToFail) {
           logger.warn(failureToFail, "Unable to update workflow to failed state");
         }
-        throw new WorkflowDatabaseException(t);
+        try {
+          throw t;
+        } catch (ServiceRegistryException e) {
+          throw new WorkflowDatabaseException(e);
+        }
       }
     } finally {
       logger.endUnitOfWork();
@@ -1147,7 +1152,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @see org.opencastproject.workflow.api.WorkflowService#update(org.opencastproject.workflow.api.WorkflowInstance)
    */
   @Override
-  public void update(final WorkflowInstance workflowInstance) throws WorkflowException, UnauthorizedException {
+  public void update(final WorkflowInstance workflowInstance) throws WorkflowDatabaseException, UnauthorizedException {
     final Lock lock = updateLock.get(workflowInstance.getId());
     lock.lock();
 
@@ -1264,7 +1269,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         throw new WorkflowDatabaseException("Job for workflow " + workflowInstance.getId()
             + " not found in service registry", e);
       } catch (Exception e) {
-        throw new WorkflowException("Update of workflow job " + job.getId() + " in the service registry failed, "
+        throw new WorkflowDatabaseException("Update of workflow job " + job.getId() + " in the service registry failed, "
             + "service registry and workflow table may be out of sync", e);
       }
 

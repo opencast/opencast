@@ -728,6 +728,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       responses = {
           @RestResponse(description = "Ingest successful. Returns workflow instance as XML", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Ingest failed due to invalid requests.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "Ingest failed. A workflow is currently active on the media package", responseCode = HttpServletResponse.SC_CONFLICT),
           @RestResponse(description = "Ingest failed. Something went wrong internally. Please have a look at the log files",
               responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
       returnDescription = "")
@@ -905,6 +906,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       return Response.serverError().status(Status.BAD_REQUEST).build();
     } catch (IllegalArgumentException e) {
       return badRequest(e.getMessage(), e);
+    } catch (IllegalStateException e) {
+      return Response.status(Status.CONFLICT).entity(e.getMessage()).build();
     } catch (Exception e) {
       logger.warn("Unable to add mediapackage", e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();

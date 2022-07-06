@@ -378,6 +378,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           @RestParameter(name = "parent", isRequired = false, description = "An optional parent workflow instance identifier", type = STRING),
           @RestParameter(name = "properties", isRequired = false, description = "An optional set of key=value\\n properties", type = TEXT) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the new workflow instance."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to resume. Maybe you need to authenticate."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "If the parent workflow does not exist") })
   public JaxbWorkflowInstance start(@FormParam("definition") String workflowDefinitionXmlOrId,
           @FormParam("mediapackage") MediaPackageImpl mp, @FormParam("parent") String parentWorkflowId,
@@ -397,12 +398,17 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       }
     }
 
-    WorkflowInstance instance = startWorkflow(workflowDefinition, mp, parentWorkflowId, localMap);
+    WorkflowInstance instance = null;
+    try {
+      instance = startWorkflow(workflowDefinition, mp, parentWorkflowId, localMap);
+    } catch (UnauthorizedException e) {
+      throw new WebApplicationException(e, Status.UNAUTHORIZED);
+    }
     return new JaxbWorkflowInstance(instance);
   }
 
   private WorkflowInstance startWorkflow(WorkflowDefinition workflowDefinition, MediaPackageImpl mp,
-          String parentWorkflowId, LocalHashMap localMap) {
+          String parentWorkflowId, LocalHashMap localMap) throws UnauthorizedException {
     Map<String, String> properties = new HashMap<String, String>();
     if (localMap != null)
       properties = localMap.getMap();
