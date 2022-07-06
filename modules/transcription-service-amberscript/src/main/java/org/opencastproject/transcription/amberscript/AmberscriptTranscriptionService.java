@@ -270,10 +270,10 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
       try {
         languageFromDublinCore = Boolean.parseBoolean(languageFromDublinCoreOpt.get());
       } catch (Exception e) {
-        logger.warn("Configured '{}' is invalid. Set to 'false'.", LANGUAGE_FROM_DUBLINCORE);
+        logger.warn("Configuration value for '{}' is invalid, defaulting to false.", LANGUAGE_FROM_DUBLINCORE);
       }
     }
-    logger.info("Configuration '{}' set to '{}'.", LANGUAGE_FROM_DUBLINCORE, languageFromDublinCore);
+    logger.info("Configuration value for '{}' is set to '{}'.", LANGUAGE_FROM_DUBLINCORE, languageFromDublinCore);
 
     amberscriptLangUtil = AmberscriptLangUtil.getInstance();
     int customMapEntriesCount = 0;
@@ -324,14 +324,14 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
 
     if (languageFromDublinCore) {
       for (Catalog catalog : track.getMediaPackage().getCatalogs(MediaPackageElements.EPISODE)) {
-        if (language != null) {
-          break;
-        }
         try (InputStream in = workspace.read(catalog.getURI())) {
           DublinCoreCatalog dublinCatalog = DublinCores.read(in);
           String dublinCoreLang = dublinCatalog.getFirst(DublinCore.PROPERTY_LANGUAGE);
           if (dublinCoreLang != null) {
             language = amberscriptLangUtil.getLanguageCodeOrNull(dublinCoreLang);
+          }
+          if (language != null) {
+            break;
           }
         } catch (IOException | NotFoundException e) {
           logger.error(String.format("Unable to load dublin core catalog for event '%s'",

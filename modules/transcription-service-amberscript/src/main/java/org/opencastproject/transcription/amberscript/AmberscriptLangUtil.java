@@ -179,7 +179,7 @@ public final class AmberscriptLangUtil {
       locale = Locale.forLanguageTag(amberLang + "-" + amberLang);
     }
     if (locale.getDisplayCountry().equals("")) {
-      logger.warn("Didn't found locale for code '{}'", amberLang);
+      logger.warn("Locale not found for code '{}'", amberLang);
       return;
     }
     langMap.put(amberLang, amberLang);
