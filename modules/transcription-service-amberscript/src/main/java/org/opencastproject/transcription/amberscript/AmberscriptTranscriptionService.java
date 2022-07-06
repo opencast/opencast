@@ -28,13 +28,18 @@ import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.Attachment;
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -50,6 +55,7 @@ import org.opencastproject.transcription.persistence.TranscriptionDatabase;
 import org.opencastproject.transcription.persistence.TranscriptionDatabaseException;
 import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Option;
@@ -86,6 +92,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
@@ -154,6 +161,8 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
   private static final String DISPATCH_WORKFLOW_INTERVAL_CONFIG = "workflow.dispatch.interval";
   private static final String MAX_PROCESSING_TIME_CONFIG = "max.overdue.time";
   private static final String CLEANUP_RESULTS_DAYS_CONFIG = "cleanup.results.days";
+  private static final String LANGUAGE_FROM_DUBLINCORE = "language.from.dublincore";
+  private static final String LANGUAGE_CODE_MAP = "language.code.map";
 
   // service configuration default values
   private boolean enabled = false;
@@ -164,6 +173,15 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
   private long workflowDispatchIntervalSeconds = 60;
   private long maxProcessingSeconds = 8 * 24 * 60 * 60; // maximum runtime for jobType perfect is 8 days
   private int cleanupResultDays = 7;
+
+  /**
+   * Contains mappings from several possible ways of writing a language name/code to the
+   * corresponding amberscript language code
+   */
+  private AmberscriptLangUtil amberscriptLangUtil;
+
+  /** determines if the transcription language should be taken from the dublincore */
+  private boolean languageFromDublinCore;
 
   private String systemAccount;
 
@@ -247,6 +265,35 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     }
     logger.info("Cleanup result files after {} days.", cleanupResultDays);
 
+    Option<String> languageFromDublinCoreOpt = OsgiUtil.getOptCfg(cc.getProperties(), LANGUAGE_FROM_DUBLINCORE);
+    if (languageFromDublinCoreOpt.isSome()) {
+      try {
+        languageFromDublinCore = Boolean.parseBoolean(languageFromDublinCoreOpt.get());
+      } catch (Exception e) {
+        logger.warn("Configuration value for '{}' is invalid, defaulting to false.", LANGUAGE_FROM_DUBLINCORE);
+      }
+    }
+    logger.info("Configuration value for '{}' is set to '{}'.", LANGUAGE_FROM_DUBLINCORE, languageFromDublinCore);
+
+    amberscriptLangUtil = AmberscriptLangUtil.getInstance();
+    int customMapEntriesCount = 0;
+    Option<String> langCodeMapOpt = OsgiUtil.getOptCfg(cc.getProperties(), LANGUAGE_CODE_MAP);
+    if (langCodeMapOpt.isSome()) {
+      try {
+        String langCodeMapStr = langCodeMapOpt.get();
+        if (langCodeMapStr != null) {
+          for (String mapping : langCodeMapStr.split(",")) {
+            String[] mapEntries = mapping.split(":");
+            amberscriptLangUtil.addCustomMapping(mapEntries[0], mapEntries[1]);
+            customMapEntriesCount += 1;
+          }
+        }
+      } catch (Exception e) {
+        logger.warn("Configuration '{}' is invalid. Using just default mapping.", LANGUAGE_CODE_MAP);
+      }
+    }
+    logger.info("Language code map was set. Added '{}' additional entries.", customMapEntriesCount);
+
     systemAccount = OsgiUtil.getContextProperty(cc, OpencastConstants.DIGEST_USER_PROPERTY);
 
     scheduledExecutor = Executors.newScheduledThreadPool(2);
@@ -273,11 +320,32 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
 
   @Override
   public Job startTranscription(String mpId, Track track, String... args) throws TranscriptionServiceException {
-    String language;
-    if (args.length > 0 && StringUtils.isNotBlank(args[0])) {
-      language = args[0];
-    } else {
-      language = getLanguage();
+    String language = null;
+
+    if (languageFromDublinCore) {
+      for (Catalog catalog : track.getMediaPackage().getCatalogs(MediaPackageElements.EPISODE)) {
+        try (InputStream in = workspace.read(catalog.getURI())) {
+          DublinCoreCatalog dublinCatalog = DublinCores.read(in);
+          String dublinCoreLang = dublinCatalog.getFirst(DublinCore.PROPERTY_LANGUAGE);
+          if (dublinCoreLang != null) {
+            language = amberscriptLangUtil.getLanguageCodeOrNull(dublinCoreLang);
+          }
+          if (language != null) {
+            break;
+          }
+        } catch (IOException | NotFoundException e) {
+          logger.error(String.format("Unable to load dublin core catalog for event '%s'",
+              track.getMediaPackage().getIdentifier()), e);
+        }
+      }
+    }
+
+    if (language == null) {
+      if (args.length > 0 && StringUtils.isNotBlank(args[0])) {
+        language = args[0];
+      } else {
+        language = getLanguage();
+      }
     }
 
     String jobType;
