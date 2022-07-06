@@ -7,7 +7,7 @@
 		<ns2:track id="compose-workflow-operation-test-trimmed-presentation-track-id">
 			<ns2:mimetype>video/flv</ns2:mimetype>
 			<ns2:tags/>
-			<ns2:url>fooVideoTrack2_v.flv</ns2:url>
+			<ns2:url>fooVideoTrack2-v.flv</ns2:url>
 			<ns2:checksum type="md5">322293948673e98459becf5b7ad82586</ns2:checksum>
 			<ns2:duration>50000</ns2:duration>
 			<ns2:audio id="compose-workflow-operation-test-trimmed-audio-id">

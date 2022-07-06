@@ -53,7 +53,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
@@ -178,56 +177,48 @@ public class ComplexCmdsEncoderEngineTest {
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
 
     workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andAnswer(new IAnswer<File>() {
-      @Override
-      public File answer() throws Throwable {
-        URI uri = (URI) EasyMock.getCurrentArguments()[0];
-        String name = uri.getPath();
-        logger.info("workspace Returns " + name);
-        if (name.contains("mux"))
-          return sourceMuxed;
-        else if (name.contains("avlarge"))
-          return sourceAudioVideoLarger;
-        else if (name.contains("audiovideo"))
-          return sourceAudioVideo;
-        else if (name.contains("audio"))
-          return sourceAudioOnly;
-        else if (name.contains("video"))
-          return sourceVideoOnly;
-        return sourceAudioVideo; // default
-      }
+    final Capture<String> capture = EasyMock.newCapture();
+    EasyMock.expect(workspace.toSafeName(EasyMock.capture(capture))).andAnswer(capture::getValue).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.anyObject())).andAnswer(() -> {
+      URI uri = (URI) EasyMock.getCurrentArguments()[0];
+      String name = uri.getPath();
+      logger.info("workspace Returns " + name);
+      if (name.contains("mux"))
+        return sourceMuxed;
+      else if (name.contains("avlarge"))
+        return sourceAudioVideoLarger;
+      else if (name.contains("audiovideo"))
+        return sourceAudioVideo;
+      else if (name.contains("audio"))
+        return sourceAudioOnly;
+      else if (name.contains("video"))
+        return sourceVideoOnly;
+      return sourceAudioVideo; // default
     }).anyTimes();
 
-    EasyMock.expect(workspace.get((URI) EasyMock.anyObject(), anyBoolean())).andAnswer(new IAnswer<File>() {
-      @Override
-      public File answer() throws Throwable {
-        URI uri = (URI) EasyMock.getCurrentArguments()[0];
-        String name = uri.getPath();
-        logger.info("workspace Returns " + name);
-        if (name.contains("mux"))
-          return sourceMuxed;
-        else if (name.contains("audiovideo"))
-          return sourceAudioVideo;
-        else if (name.contains("audio"))
-          return sourceAudioOnly;
-        else if (name.contains("video"))
-          return sourceVideoOnly;
-        return sourceAudioVideo; // default
-      }
+    EasyMock.expect(workspace.get(EasyMock.anyObject(), anyBoolean())).andAnswer(() -> {
+      URI uri = (URI) EasyMock.getCurrentArguments()[0];
+      String name = uri.getPath();
+      logger.info("workspace Returns " + name);
+      if (name.contains("mux"))
+        return sourceMuxed;
+      else if (name.contains("audiovideo"))
+        return sourceAudioVideo;
+      else if (name.contains("audio"))
+        return sourceAudioOnly;
+      else if (name.contains("video"))
+        return sourceVideoOnly;
+      return sourceAudioVideo; // default
     }).anyTimes();
 
-    EasyMock.expect(
-            workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (InputStream) EasyMock.anyObject())).andAnswer(new IAnswer<URI>() {
-                      @Override
-                      public URI answer() throws Throwable {
-                        File f = new File(workingDirectory, (String) EasyMock.getCurrentArguments()[1]);
-                        FileOutputStream out = new FileOutputStream(f);
-                        InputStream in = (InputStream) EasyMock.getCurrentArguments()[2];
-                        IOUtils.copy(in, out);
-                        return (f.toURI());
-                      }
-                    }).anyTimes();
+    EasyMock.expect(workspace.putInCollection(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyObject()))
+        .andAnswer(() -> {
+          File f1 = new File(workingDirectory, (String) EasyMock.getCurrentArguments()[1]);
+          FileOutputStream out = new FileOutputStream(f1);
+          InputStream in = (InputStream) EasyMock.getCurrentArguments()[2];
+          IOUtils.copy(in, out);
+          return (f1.toURI());
+        }).anyTimes();
 
     profileScanner = new EncodingProfileScanner();
     File encodingProfile = getFile("/encodingprofiles.properties");

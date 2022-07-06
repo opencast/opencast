@@ -39,6 +39,8 @@ import java.net.URI;
  */
 public interface Workspace extends StorageUsage {
 
+  String toSafeName(String fileName);
+
   /**
    * Gets a locally cached {@link File} for the given URI.
    *

@@ -57,8 +57,8 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -307,51 +307,45 @@ public class ProcessSmilWorkflowOperationHandlerTest {
 
     // set up mock workspace
     workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.moveTo((URI) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-            (String) EasyMock.anyObject(), (String) EasyMock.anyObject())).andAnswer(new IAnswer<URI>() {
-              @Override
-              public URI answer() throws Throwable {
-                String name;
-                try { // media file should be returned "as is"
-                  // URI uri = (URI) EasyMock.getCurrentArguments()[0];
-                  name = (String) EasyMock.getCurrentArguments()[3];
-                  String ext = FilenameUtils.getExtension(name);
-                  if (ext.matches("[fm][pol][v43]")) {
-                    return new URI(name);
-                  }
-                } catch (Exception e) {
-                }
-                return uriMP; // default
-              }
-            }).anyTimes();
+    final Capture<String> capture = EasyMock.newCapture();
+    EasyMock.expect(workspace.toSafeName(EasyMock.capture(capture))).andAnswer(capture::getValue).anyTimes();
+    EasyMock.expect(
+        workspace.moveTo(EasyMock.anyObject(), EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString()))
+        .andAnswer(() -> {
+          String name;
+          try { // media file should be returned "as is"
+            // URI uri = (URI) EasyMock.getCurrentArguments()[0];
+            name = (String) EasyMock.getCurrentArguments()[3];
+            String ext = FilenameUtils.getExtension(name);
+            if (ext.matches("[fm][pol][v43]")) {
+              return new URI(name);
+            }
+          } catch (Exception e) {
+          }
+          return uriMP; // default
+        }).anyTimes();
 
-    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andAnswer(new IAnswer<File>() {
-      @Override
-      public File answer() throws Throwable {
-        String name;
-        try {
-          URI uri = (URI) EasyMock.getCurrentArguments()[0];
-          name = uri.getPath();
-          if (name.contains("smil.smil"))
-            return smilfile;
-        } catch (Exception e) {
-          name = uriMP.getPath();
-        }
-        return new File(name); // default
+    EasyMock.expect(workspace.get(EasyMock.anyObject())).andAnswer(() -> {
+      String name;
+      try {
+        URI uri = (URI) EasyMock.getCurrentArguments()[0];
+        name = uri.getPath();
+        if (name.contains("smil.smil"))
+          return smilfile;
+      } catch (Exception e) {
+        name = uriMP.getPath();
       }
+      return new File(name); // default
     }).anyTimes();
 
-    EasyMock.expect(workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-            (InputStream) EasyMock.anyObject())).andAnswer(new IAnswer<URI>() {
-              @Override
-              public URI answer() throws Throwable {
-                File f = new File(workingDirectory, (String) EasyMock.getCurrentArguments()[1]);
-                FileOutputStream out = new FileOutputStream(f);
-                InputStream in = (InputStream) EasyMock.getCurrentArguments()[2];
-                IOUtils.copy(in, out);
-                return (f.toURI());
-              }
-            }).anyTimes();
+    EasyMock.expect(workspace.putInCollection(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyObject()))
+        .andAnswer(() -> {
+          File f = new File(workingDirectory, (String) EasyMock.getCurrentArguments()[1]);
+          FileOutputStream out = new FileOutputStream(f);
+          InputStream in = (InputStream) EasyMock.getCurrentArguments()[2];
+          IOUtils.copy(in, out);
+          return (f.toURI());
+        }).anyTimes();
     EasyMock.replay(workspace);
 
     operationHandler = new ProcessSmilWorkflowOperationHandler();
@@ -397,50 +391,45 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     EasyMock.replay(composerService);
     // set up mock workspace
     workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.moveTo((URI) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-            (String) EasyMock.anyObject(), (String) EasyMock.anyObject())).andAnswer(new IAnswer<URI>() {
-              @Override
-              public URI answer() throws Throwable {
-                String name;
-                try { // media file should be returned "as is"
-                  // URI uri = (URI) EasyMock.getCurrentArguments()[0];
-                  name = (String) EasyMock.getCurrentArguments()[3];
-                  String ext = FilenameUtils.getExtension(name);
-                  if (ext.matches("[fm][pol][v43]")) {
-                    return new URI(name);
-                  }
-                } catch (Exception e) {
-                }
-                return uriMP; // default
-              }
-            }).anyTimes();
-    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andAnswer(new IAnswer<File>() {
-      @Override
-      public File answer() throws Throwable {
-        String name;
-        try {
-          URI uri = (URI) EasyMock.getCurrentArguments()[0];
-          name = uri.getPath();
-          if (name.contains("smil.smil"))
-            return smilfile;
-        } catch (Exception e) {
-          name = uriMP.getPath();
-        }
-        return new File(name); // default
-      }
-    }).anyTimes();
+    final Capture<String> capture = EasyMock.newCapture();
+    EasyMock.expect(workspace.toSafeName(EasyMock.capture(capture))).andAnswer(capture::getValue).anyTimes();
+    EasyMock.expect(
+        workspace.moveTo(EasyMock.anyObject(), EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString()))
+        .andAnswer(() -> {
+          String name;
+          try { // media file should be returned "as is"
+            // URI uri = (URI) EasyMock.getCurrentArguments()[0];
+            name = (String) EasyMock.getCurrentArguments()[3];
+            String ext = FilenameUtils.getExtension(name);
+            if (ext.matches("[fm][pol][v43]")) {
+              return new URI(name);
+            }
+          } catch (Exception e) {
+          }
+          return uriMP; // default
+        }).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.anyObject()))
+        .andAnswer(() -> {
+          String name;
+          try {
+            URI uri = (URI) EasyMock.getCurrentArguments()[0];
+            name = uri.getPath();
+            if (name.contains("smil.smil"))
+              return smilfile;
+          } catch (Exception e) {
+            name = uriMP.getPath();
+          }
+          return new File(name); // default
+        }).anyTimes();
 
-    EasyMock.expect(workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-            (InputStream) EasyMock.anyObject())).andAnswer(new IAnswer<URI>() {
-              @Override
-              public URI answer() throws Throwable {
-                File f = new File(workingDirectory, (String) EasyMock.getCurrentArguments()[1]);
-                FileOutputStream out = new FileOutputStream(f);
-                InputStream in = (InputStream) EasyMock.getCurrentArguments()[2];
-                IOUtils.copy(in, out);
-                return (f.toURI());
-              }
-            }).anyTimes();
+    EasyMock.expect(workspace.putInCollection(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyObject()))
+        .andAnswer(() -> {
+          File f = new File(workingDirectory, (String) EasyMock.getCurrentArguments()[1]);
+          FileOutputStream out = new FileOutputStream(f);
+          InputStream in = (InputStream) EasyMock.getCurrentArguments()[2];
+          IOUtils.copy(in, out);
+          return (f.toURI());
+        }).anyTimes();
     EasyMock.replay(workspace);
 
     operationHandler = new ProcessSmilWorkflowOperationHandler();

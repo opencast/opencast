@@ -334,6 +334,21 @@ public final class WorkspaceImpl implements Workspace {
     }
   }
 
+  /**
+   * Returns the filename translated into a version that can safely be used as part of a file system path.
+   *
+   * The method shortens both the base file name and the extension to a maximum of 255 characters each,
+   * and replaces unsafe characters with <doce>_</doce>.
+   *
+   * @param fileName
+   *          The file name
+   * @return the safe version
+   */
+  @Override
+  public String toSafeName(String fileName) {
+    return wfr.toSafeName(fileName);
+  }
+
   @Override
   public File get(final URI uri) throws NotFoundException, IOException {
     return get(uri, false);
@@ -649,7 +664,7 @@ public final class WorkspaceImpl implements Workspace {
   @Override
   public URI put(String mediaPackageID, String mediaPackageElementID, String fileName, InputStream in)
           throws IOException {
-    String safeFileName = PathSupport.toSafeName(fileName);
+    String safeFileName = toSafeName(fileName);
     final URI uri = wfr.getURI(mediaPackageID, mediaPackageElementID, fileName);
     notNull(in, "in");
 
@@ -683,7 +698,7 @@ public final class WorkspaceImpl implements Workspace {
 
   @Override
   public URI putInCollection(String collectionId, String fileName, InputStream in) throws IOException {
-    String safeFileName = PathSupport.toSafeName(fileName);
+    String safeFileName = toSafeName(fileName);
     URI uri = wfr.getCollectionURI(collectionId, fileName);
 
     // Determine the target location in the workspace
@@ -765,8 +780,7 @@ public final class WorkspaceImpl implements Workspace {
   private void deleteFromCollection(String collectionId, String fileName, boolean removeCollection)
           throws NotFoundException, IOException {
     // local delete
-    final File f = workspaceFile(WorkingFileRepository.COLLECTION_PATH_PREFIX, collectionId,
-            PathSupport.toSafeName(fileName));
+    final File f = workspaceFile(WorkingFileRepository.COLLECTION_PATH_PREFIX, collectionId, toSafeName(fileName));
     FileUtils.deleteQuietly(f);
     if (removeCollection) {
       FileSupport.delete(f.getParentFile());
@@ -810,7 +824,7 @@ public final class WorkspaceImpl implements Workspace {
     File wsDirectory = new File(wsDirectoryPath);
     wsDirectory.mkdirs();
 
-    String safeFileName = PathSupport.toSafeName(FilenameUtils.getName(uriString));
+    String safeFileName = toSafeName(FilenameUtils.getName(uriString));
     if (StringUtils.isBlank(safeFileName)) {
       safeFileName = UNKNOWN_FILENAME;
     }

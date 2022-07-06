@@ -52,7 +52,7 @@
 		<ns2:track id="multiencode-workflow-operation-test-encode-track-id3">
 			<ns2:mimetype>video/h264</ns2:mimetype>
 			<ns2:tags ></ns2:tags>
-			<ns2:url>file_0_low.mp4</ns2:url>
+			<ns2:url>file_0-low.mp4</ns2:url>
 			<ns2:logicalname>file_0.mp4</ns2:logicalname>
 			<ns2:checksum type="md5">46cb2e9df2e73756b0d96c33b1aaf056</ns2:checksum>
 			<ns2:duration>65680</ns2:duration>

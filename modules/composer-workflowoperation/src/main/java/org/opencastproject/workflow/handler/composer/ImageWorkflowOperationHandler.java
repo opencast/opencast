@@ -54,7 +54,6 @@ import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.MimeTypes;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -295,13 +294,9 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   /**
    * Format a filename and make it "safe".
-   *
-   * @see org.opencastproject.util.PathSupport#toSafeName(String)
    */
   static String formatFileName(String format, double position, String suffix) {
-    // #toSafeName will be applied to the file name anyway when moving to the working file repository
-    // but doing it here make the tests more readable and useful for documentation
-    return PathSupport.toSafeName(format(format, position, suffix));
+    return format(format, position, suffix);
   }
 
 
