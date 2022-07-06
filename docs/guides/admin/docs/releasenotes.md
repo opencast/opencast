@@ -65,6 +65,7 @@ Behavior changes
 
 API changes
 -----------
+
 - Important: The endpoint for querying workflows has been removed from the
   External API.
 - [[#3204](https://github.com/opencast/opencast/pull/3204)] removes the fulltext
