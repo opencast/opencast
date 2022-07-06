@@ -12,6 +12,7 @@
     "@testing-library/user-event": "^7.2.1",
     "chart.js": "2.9.4",
     "react-chartjs-3": "^2.7.7",
+    "react-select": "^5.4.0",
     "array-move": "^3.0.1",
     "axios": "^0.21.1",
     "classnames": "^2.2.6",

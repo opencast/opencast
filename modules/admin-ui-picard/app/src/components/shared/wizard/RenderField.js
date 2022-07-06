@@ -1,4 +1,5 @@
-import React from "react";
+import React, {useState} from "react";
+import Select from 'react-select'
 import {useTranslation} from "react-i18next";
 import {DateTimePicker} from "@material-ui/pickers";
 import {createMuiTheme, ThemeProvider} from "@material-ui/core";
@@ -12,7 +13,7 @@ const childRef = React.createRef();
 /**
  * This component renders an editable field for single values depending on the type of the corresponding metadata
  */
-const RenderField = ({ field, metadataField, form, showCheck=false, isFirstField=false }) => {
+const RenderField = ({ field, metadataField, form, showCheck= false, isFirstField= false }) => {
     const { t } = useTranslation();
 
     // Indicator if currently edit mode is activated
@@ -22,9 +23,9 @@ const RenderField = ({ field, metadataField, form, showCheck=false, isFirstField
     const handleKeyDown = (event, type) => {
         const { key } = event;
         // keys pressable for leaving edit mode
-        const keys = ["Escape", "Tab", "Enter"];
+        const keys = ['Escape', 'Tab', 'Enter'];
 
-        if (type !== "textarea" && keys.indexOf(key) > -1) {
+        if (type !== 'textarea' && keys.indexOf(key) > -1) {
             setEditMode(false);
         }
     };
@@ -41,7 +42,7 @@ const RenderField = ({ field, metadataField, form, showCheck=false, isFirstField
                                          form={form}
                                          showCheck={showCheck}/>
             )}
-            {(metadataField.type === "text" && !!metadataField.collection && metadataField.collection.length > 0) &&
+            {(metadataField.type === "text" && !!metadataField.collection && metadataField.collection.length > 0) && (
                 <EditableSingleSelect metadataField={metadataField}
                                       field={field}
                                       form={form}
@@ -54,7 +55,7 @@ const RenderField = ({ field, metadataField, form, showCheck=false, isFirstField
                                       setEditMode={setEditMode}
                                       showCheck={showCheck}
                                       handleKeyDown={handleKeyDown}/>
-            }
+            )}
             {(metadataField.type === "ordered_text") && (
                 <EditableSingleSelect metadataField={metadataField}
                                       field={field}
@@ -162,36 +163,170 @@ const EditableDateValue = ({ field, text, form: { setFieldValue, initialValues }
 
 // renders editable field for selecting value via dropdown
 const EditableSingleSelect = ({ field, metadataField, text, editMode, setEditMode, handleKeyDown,
-                                  form: { initialValues }, showCheck }) => {
+                                   form: { setFieldValue, initialValues }, showCheck }) => {
     const { t } = useTranslation();
+
+    const [ search, setSearch ] = useState({
+        text: '',
+        filteredCollection: metadataField.collection
+    });
+
+    const filterBySearch = (filterText) => {
+        if (metadataField.id === 'language') {
+            return metadataField.collection.filter(item => t(item.name).toLowerCase().includes(filterText));
+        } else if (metadataField.id === 'isPartOf') {
+            return metadataField.collection.filter(item => item.name.toLowerCase().includes(filterText));
+        } else {
+            return metadataField.collection.filter(item => item.value.toLowerCase().includes(filterText));
+        }
+    }
+
+    const handleSearch = async (searchText) => {
+        setSearch({
+            text: searchText,
+            filteredCollection: filterBySearch(searchText.toLowerCase())
+        })
+    }
+
+    const formatOptions = unformattedOptions => {
+        const formattedOptions = [];
+        if (metadataField.value === '' || !metadataField.required) {
+            formattedOptions.push({
+                value: '',
+                label: `-- ${t('SELECT_NO_OPTION_SELECTED')} --`
+            });
+        }
+        if (metadataField.id === 'language') {
+            for (const item of unformattedOptions) {
+                formattedOptions.push({
+                    value: item.value,
+                    label: t(item.name)
+                });
+            }
+        } else {
+            // if selection of series then use item name as option label else use item value
+            if (metadataField.id === 'isPartOf') {
+                for (const item of unformattedOptions) {
+                    formattedOptions.push({
+                        value: item.value,
+                        label: item.name
+                    });
+                }
+            } else {
+                for (const item of unformattedOptions) {
+                    formattedOptions.push({
+                        value: item.value,
+                        label: item.value
+                    });
+                }
+            }
+        }
+        return formattedOptions;
+    }
+
+    const dropDownStyle = {
+        container: (provided, state) => ({
+            ...provided,
+            width: 250,
+            position: 'relative',
+            display: 'inline-block',
+            verticalAlign: 'middle',
+            font: 'inherit',
+            outline: 'none'
+        }),
+        control: (provided, state) => ({
+            ...provided,
+            marginBottom: 0,
+            border: '1px solid #aaa',
+            borderColor: state.selectProps.menuIsOpen ? '#5897fb' : '#aaa',
+            hoverBorderColor: state.selectProps.menuIsOpen ? '#5897fb' : '#aaa',
+            boxShadow: state.selectProps.menuIsOpen ?  '0 0 0 1px #5897fb' : '0 0 0 1px #aaa',
+            borderRadius: 4,
+            "&:hover": {
+                borderColor: '#aaa'
+            }
+        }),
+        dropdownIndicator: (provided, state) => ({
+            ...provided,
+            transform: state.selectProps.menuIsOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            color: '#aaa',
+            "&:hover": {
+                color: '#5897fb'
+            }
+        }),
+        indicatorSeparator: (provided, state) => ({
+            ...provided,
+            width: 0,
+            visibility: 'hidden'
+        }),
+        input: (provided, state) => ({
+            ...provided,
+            position: 'relative',
+            zIndex: 1010,
+            margin: 0,
+            whiteSpace: 'nowrap',
+            verticalAlign: 'middle',
+            background: 'url("../../img/search.png") no-repeat 180px 9px',
+            border: 'none'
+        }),
+        menu: (provided, state) => ({
+            ...provided,
+            marginTop: 1,
+            border: 'none'
+        }),
+        menuList: (provided, state) => ({
+            ...provided,
+            marginTop: 0,
+            border: '1px solid #aaa',
+            borderRadius: 4
+        }),
+        noOptionsMessage: (provided, state) => ({
+            ...provided,
+            textAlign: 'left'
+        }),
+        option: (provided, state) => ({
+            ...provided,
+            height: 25,
+            paddingTop: 0,
+            paddingBottom: 0,
+            backgroundColor: state.isSelected ? '#2a62bc' : state.isFocused ? '#5897fb' : 'white',
+            color: state.isFocused || state.isSelected ? 'white' : provided.color,
+            cursor: 'pointer',
+            "&:hover": {
+                height: 25
+            }
+        }),
+        singleValue: (provided, state) => ({
+            ...provided,
+            marginTop: 0,
+            marginBottom: 0,
+        }),
+        valueContainer: (provided, state) => ({
+            ...provided,
+            marginTop: 0,
+            marginBottom: 0,
+        })
+    }
+
     return (
         editMode ? (
-            <div
-                 onBlur={() => setEditMode(false)}
+            <div onBlur={() => setEditMode(false)}
                  onKeyDown={e => handleKeyDown(e, "select")}
-                 ref={childRef}>
-                <select {...field}
-                        data-width="'250px'">
-                    {(metadataField.value === '' || !metadataField.required) && (
-                        <option value="">{t('SELECT_NO_OPTION_SELECTED')}</option>
-                    )}
-                    {(metadataField.id === 'language') ? (
-                        metadataField.collection.map((item, key) => (
-                                <option key={key} value={item.value}>{t(item.name)}</option>
-                        ))
-                    ) : (
-                        // if selection of series then use item name as option label else use item value
-                        metadataField.id === 'isPartOf' ? (
-                            metadataField.collection.map((item, key) => (
-                                <option key={key} value={item.value}>{item.name}</option>
-                            ))
-                        ) : (
-                            metadataField.collection.map((item, key) => (
-                                <option key={key} value={item.value}>{item.value}</option>
-                            ))
-                        )
-                    )}
-                </select>
+                 ref={childRef}
+                 data-width="'250px'"
+            >
+                <Select autoFocus
+                        styles={dropDownStyle}
+                        defaultMenuIsOpen
+                        isSearchable
+                        value={{value: field.value, label: text === '' ? `-- ${t('SELECT_NO_OPTION_SELECTED')} --` : text}}
+                        inputValue={search.text}
+                        options={formatOptions(search.filteredCollection)}
+                        placeholder={`-- ${t('SELECT_NO_OPTION_SELECTED')} --`}
+                        noOptionsMessage={() => 'No matching results.'}
+                        onInputChange={value => handleSearch(value)}
+                        onChange={element => setFieldValue(field.name, element.value)}
+                />
             </div>
         ) : (
              <div onClick={() => setEditMode(true)}>
