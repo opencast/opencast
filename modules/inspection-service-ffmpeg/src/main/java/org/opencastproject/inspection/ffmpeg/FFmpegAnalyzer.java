@@ -104,9 +104,9 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
     final StringBuilder sb = new StringBuilder();
     Process encoderProcess = null;
     try {
-      ProcessBuilder processBuilder = new ProcessBuilder(command);
-      processBuilder.redirectErrorStream(false);
-      encoderProcess = processBuilder.start();
+      encoderProcess = new ProcessBuilder(command)
+          .redirectError(ProcessBuilder.Redirect.DISCARD)
+          .start();
 
       // tell encoder listeners about output
       try (var in = new BufferedReader(new InputStreamReader(encoderProcess.getInputStream()))) {
