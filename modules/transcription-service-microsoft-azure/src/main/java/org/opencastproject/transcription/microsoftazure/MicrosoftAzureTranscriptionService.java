@@ -238,16 +238,16 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
         return;
       }
     } else {
-      logger.info("Default profanity filter will be used");
+      logger.info("Default profanity filter will be used: {}", profanityOption);
     }
 
     // Vtt or Subrip
     Option<String> useSubRipOpt = OsgiUtil.getOptCfg(cc.getProperties(), USE_SUBRIP_FORMAT);
     if (useSubRipOpt.isSome()) {
       useSubRipTextCaptionFormat = Boolean.valueOf(useSubRipOpt.get());
-      logger.info("Subrip is used: {}", useSubRipTextCaptionFormat);
+      logger.info("Subrip caption format in use: {}", useSubRipTextCaptionFormat);
     } else {
-      logger.info("Default format will be used");
+      logger.info("Default '{}' format will be used", useSubRipTextCaptionFormat);
     }
 
     if (useSubRipTextCaptionFormat) {
@@ -258,9 +258,9 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     Option<String> phrasesOpt = OsgiUtil.getOptCfg(cc.getProperties(), PHRASES_LIST);
     if (useSubRipOpt.isSome()) {
       phraseList = new ArrayList<>(Arrays.asList(phrasesOpt.get().split(",")));
-      logger.info("Phrases are used: {}", phraseList);
+      logger.info("Phrases added to recognition: {}", phraseList);
     } else {
-      logger.info("No phrases are used");
+      logger.info("No additional phrases defined");
     }
 
     // Language model to be used
@@ -269,16 +269,16 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       defaultLanguage = languageOpt.get();
       logger.info("Language used is {}", defaultLanguage);
     } else {
-      logger.info("Default language will be used");
+      logger.info("Default '{}' language will be used during recognition.", defaultLanguage);
     }
 
     // Encoding to be used
     Option<String> encodingOpt = OsgiUtil.getOptCfg(cc.getProperties(), ENCODING_EXTENSION);
     if (encodingOpt.isSome()) {
       compressedAudioFormat = AudioStreamContainerFormat.valueOf(encodingOpt.get());
-      logger.info("Encoding used is {}", compressedAudioFormat);
+      logger.info("Audio encoding configured as {}", compressedAudioFormat);
     } else {
-      logger.info("Default encoding will be used");
+      logger.info("Default '{}' audio encoding will be used", compressedAudioFormat);
     }
 
     // Workflow to execute when getting callback (optional, with default)

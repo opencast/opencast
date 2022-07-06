@@ -13,7 +13,7 @@ and attached to the media package.
 
 **Note that because Speech-to-Text services require a significant amount of time to process a recording, 
 we do not wait for it to finish before proceeding with the rest of Opencast's normal processing.
-This means that the transcription process is run asynchronous.**
+This means that the transcription process is run asynchronously.**
 
 * Workflow 1 runs:
     * Speech-to-Text job is started
@@ -26,7 +26,7 @@ Speech-to-Text job finishes, workflow 2 is started.
     * Media package is republished with captions/transcripts
 
 Microsoft Azure Speech-to-Text service documentation, including which languages are currently supported, can be found
- [here](https://docs.microsoft.com/de-de/azure/cognitive-services/speech-service/language-support?tabs=speechtotext#speech-to-text).
+ [here](https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/language-support?tabs=speechtotext#speech-to-text).
 
 
 Configuration
@@ -36,12 +36,9 @@ Configuration
 
 * [Create an Azure subscription](https://azure.microsoft.com/en-US/free/cognitive-services/)
 * [Create a speech resource](https://portal.azure.com/#create/Microsoft.CognitiveServicesSpeechServices)
-* Get the subscription key and region. After your Speech resource is deployed, select 'Go to resource' to view and manage keys. For more information about Cognitive Services resources, see [here](https://docs.microsoft.com/en-us/azure/cognitive-services/cognitive-services-apis-create-account?tabs=multiservice%2Clinux#get-the-keys-for-your-resource)
-
-As of 10/30/2018, the service has migrated to token-based Identity and Access Management (IAM) authentication so user
-and password are not generated anymore. Previously created instances can still use user name and password.
-Details can be found [here](https://cloud.ibm.com/docs/services/speech-to-text/release-notes.html#October2018b).
-
+* Get the subscription key and region. After your Speech resource is deployed, select 'Go to resource' to view and 
+manage keys. For more information about Cognitive Services resources, see 
+[here](https://docs.microsoft.com/en-us/azure/cognitive-services/cognitive-services-apis-create-account?tabs=multiservice%2Clinux#get-the-keys-for-your-resource)
 
 ### Step 2: Configure the Microsoft Azure Transcription Service
 
@@ -49,15 +46,14 @@ Edit  _etc/org.opencastproject.transcription.microsoftazure.MicrosoftAzureTransc
 
 * Set _enabled_=true
 * Use service credentials obtained above to set _subscription.key_ and _region_
-still supported to be used with instances created previously)
-* All other settings are optional and explained in the config file.
+* All other settings are optional and explained in the config file
 
 
 ### Step 3: Add a workflow operations or create new workflow to start transcription
 
-The constitues a minimal working example workflow for an event that has a video file in the `presenter/source` flavor.
-However, you do not necessarily need an extra workflow, but can integrate the parts you need into your own. The
-relevant operations are `microsoft-azure-start-transcription` to start the transcription and `snapshot`, so the attach
+The workflow below is a minimal working example for an event that has a video file in the `presenter/source` flavor.
+You do not necessarily need an extra workflow, and instead you can integrate the parts you need into your own. The
+relevant operations are `microsoft-azure-start-transcription` to start the transcription and `snapshot`, so a second
 workflow can retrieve the mediapackage to attach captions/transcriptions
 
 ``` xml
