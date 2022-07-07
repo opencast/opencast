@@ -96,8 +96,13 @@ angular.module('adminNg.services')
         me.ud.policiesUser = [];
         angular.forEach(newPolicies, function (policy) {
           if (policy.role.startsWith(me.roleUserPrefix)) {
-
-            var id = policy.role.split(me.roleUserPrefix).pop().toLowerCase();
+            var id = policy.role.split(me.roleUserPrefix).pop();
+            // FIXMe: If roles are sanitized, WE CANNOT derive the user from their user role,
+            //  because the user roles are converted to uppercase, while usernames are case sensitive.
+            //  This is a terrible workaround, because usernames are usually all lowercase anyway.
+            if (me.aclCreateDefaults['sanitize']) {
+              id = id.toLowerCase();
+            }
 
             UserResource.get({ username: id }).$promise.then(function (data) {
               policy.user = data;
@@ -315,6 +320,8 @@ angular.module('adminNg.services')
         me.roleUserPrefix = me.aclCreateDefaults['role_user_prefix'] !== undefined
           ? me.aclCreateDefaults['role_user_prefix']
           : 'ROLE_USER_';
+        me.aclCreateDefaults['sanitize'] = me.aclCreateDefaults['sanitize'] !== undefined
+          ? (me.aclCreateDefaults['sanitize'].toLowerCase() === 'true') : true;
       });
 
       me.roles = RolesResource.queryNameOnly({limit: -1, target: 'ACL'});
@@ -324,7 +331,12 @@ angular.module('adminNg.services')
         me.aclCreateDefaults.$promise.then(function () {
           var newUsers = [];
           angular.forEach(me.users.rows, function(user) {
-            user.userRole = me.roleUserPrefix + user.username.replace(/\W/g, '').toUpperCase();
+            if (me.aclCreateDefaults['sanitize']) {
+              // FixMe: See the FixMe above pertaining to sanitize
+              user.userRole = me.roleUserPrefix + user.username.replace(/\W/g, '_').toUpperCase();
+            } else {
+              user.userRole = me.roleUserPrefix + user.username;
+            }
             newUsers.push(user);
           });
           me.users = newUsers;

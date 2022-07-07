@@ -210,7 +210,13 @@ angular.module('adminNg.controllers')
           $scope.policiesUser = [];
           angular.forEach(newPolicies, function (policy) {
             if (policy.role.startsWith($scope.roleUserPrefix)) {
-              var id = policy.role.split($scope.roleUserPrefix).pop().toLowerCase();
+              var id = policy.role.split($scope.roleUserPrefix).pop();
+              // FIXMe: If roles are sanitized, WE CANNOT derive the user from their user role,
+              //  because the user roles are converted to uppercase, while usernames are case sensitive.
+              //  This is a terrible workaround, because usernames are usually all lowercase anyway.
+              if ($scope.aclCreateDefaults['sanitize']) {
+                id = id.toLowerCase();
+              }
 
               UserResource.get({ username: id }).$promise.then(function (data) {
                 policy.user = data;
@@ -412,6 +418,8 @@ angular.module('adminNg.controllers')
             $scope.roleUserPrefix = $scope.aclCreateDefaults['role_user_prefix'] !== undefined
               ? $scope.aclCreateDefaults['role_user_prefix']
               : 'ROLE_USER_';
+              $scope.aclCreateDefaults['sanitize'] = $scope.aclCreateDefaults['sanitize'] !== undefined
+              ? ($scope.aclCreateDefaults['sanitize'].toLowerCase() === 'true') : true;
           });
 
           $scope.assets = EventAssetsResource.get({ id: id });
@@ -488,7 +496,12 @@ angular.module('adminNg.controllers')
             $scope.aclCreateDefaults.$promise.then(function () {
               var newUsers = [];
               angular.forEach($scope.users.rows, function(user) {
-                user.userRole = $scope.roleUserPrefix + user.username.replace(/\W/g, '').toUpperCase();
+                if ($scope.aclCreateDefaults['sanitize']) {
+                  // FixMe: See the FixMe above pertaining to sanitize
+                  user.userRole = $scope.roleUserPrefix + user.username.replace(/\W/g, '_').toUpperCase();
+                } else {
+                  user.userRole = $scope.roleUserPrefix + user.username;
+                }
                 newUsers.push(user);
               });
               $scope.users = newUsers;
