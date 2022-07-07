@@ -191,11 +191,11 @@
               </div>
 
               <!-- ACL rules -->
-              <div class="obj-container">
+              <div class="obj-container" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_USER_ROLES_VIEW')">
                 <div class="obj tbl-list">
                   <header translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.USERS"><!-- Details --></header>
                   <div class="obj-container">
-                    <table class="main-tbl" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_USER_ROLES_VIEW')">
+                    <table class="main-tbl">
                       <thead>
                         <tr>
                           <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.USER">
@@ -326,11 +326,11 @@
                   </div>
                 </div>
               </div>
-              <div class="obj-container">
+              <div class="obj-container" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_NONUSER_ROLES_VIEW')">
                 <div class="obj tbl-list">
                   <header translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.DETAILS"><!-- Details --></header>
                   <div class="obj-container">
-                    <table class="main-tbl" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_NONUSER_ROLES_VIEW')">
+                    <table class="main-tbl">
                       <thead>
                         <tr>
                           <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ROLE">

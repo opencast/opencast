@@ -94,13 +94,13 @@
                   </table>
                 </div>
               </div>
-              <div class="obj-container">
+              <div class="obj-container" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_USER_ROLES_VIEW')">
                 <div class="obj tbl-list">
                   <header translate="USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.USERS">
                     <!-- Details -->
                   </header>
                   <div class="obj-container">
-                    <table class="main-tbl" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_USER_ROLES_VIEW')">
+                    <table class="main-tbl">
                       <thead>
                         <tr>
                           <th translate="USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.USER">
@@ -176,13 +176,13 @@
               </div>
               <!-- Work in progress: Here, we will fill in the currently set privileges. The backend will
                 change the format of the response. -->
-                <div class="obj-container">
+                <div class="obj-container" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_NONUSER_ROLES_VIEW')">
                   <div class="obj tbl-list">
                     <header translate="USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.DETAILS">
                       <!-- Details -->
                     </header>
                     <div class="obj-container">
-                      <table class="main-tbl" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_NONUSER_ROLES_VIEW')">
+                      <table class="main-tbl">
                         <thead>
                           <tr>
                             <th translate="USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.ROLE">
