@@ -94,7 +94,6 @@ const DetailsMetadataTab = ({ metadataFields, updateResource, resourceId, header
                                                             ) : (
                                                                 <Field name={field.id}
                                                                        metadataField={field}
-                                                                       form={formik}
                                                                        showCheck
                                                                        component={RenderField}
                                                                 />

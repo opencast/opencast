@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import Select from 'react-select'
+import Select from "react-select";
 import {useTranslation} from "react-i18next";
 import {DateTimePicker} from "@material-ui/pickers";
 import {createMuiTheme, ThemeProvider} from "@material-ui/core";
@@ -13,7 +13,7 @@ const childRef = React.createRef();
 /**
  * This component renders an editable field for single values depending on the type of the corresponding metadata
  */
-const RenderField = ({ field, metadataField, form, showCheck= false, isFirstField= false }) => {
+const RenderField = ({ field, metadataField, form, showCheck=false, isFirstField=false }) => {
     const { t } = useTranslation();
 
     // Indicator if currently edit mode is activated
@@ -185,9 +185,15 @@ const EditableSingleSelect = ({ field, metadataField, text, editMode, setEditMod
         setSearch({
             text: searchText,
             filteredCollection: filterBySearch(searchText.toLowerCase())
-        })
+        });
     }
 
+    /*
+     * the Select component needs options to have an internal value and a displayed label
+     * this function formats metadata options as provided by the backend into that scheme
+     * it takes the options and provides the correct label to display for this kind of metadata,
+     * as well as adding an empty option, if available
+     */
     const formatOptions = unformattedOptions => {
         const formattedOptions = [];
         if (metadataField.value === '' || !metadataField.required) {
