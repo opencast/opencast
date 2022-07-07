@@ -86,7 +86,7 @@ const NewUserWizard = ({ close, usernames, postNewUser }) => {
                               </button>
                           </footer>
                       </>
-                    )
+                    );
                 }}
             </Formik>
         </>

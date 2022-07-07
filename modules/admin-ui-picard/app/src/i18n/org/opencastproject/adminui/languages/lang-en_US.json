@@ -157,7 +157,6 @@
      "GROUP_NOT_SAVED":      "The group could not be saved",
      "GROUP_DELETED":        "The group has been deleted",
      "GROUP_NOT_DELETED":    "The group could not be deleted",
-     "ACCESS_DENIED":       "Access denied. You're not allowed to view this page",
      "SERIES_ADDED":        "The series has been created",
      "SERIES_NOT_SAVED":    "The series could not be saved",
      "EVENTS_CREATED":      "The event has been created",
