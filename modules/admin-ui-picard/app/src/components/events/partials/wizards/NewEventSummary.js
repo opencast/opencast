@@ -105,7 +105,7 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
                                                             ({asset.type} "{asset.flavorType}//{asset.flavorSubType}")
                                                         </span>
                                                         </td>
-                                                        <td>{asset.file.name}</td>
+                                                        <td>{asset.file[0].name}</td>
                                                     </tr>
                                                 ) : null
                                             ))}

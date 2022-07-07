@@ -16,24 +16,37 @@ const Notifications = ({ setNotificationHidden, notifications, globalPosition, c
         setNotificationHidden(id, true);
     }
 
+    const renderNotification = (notification, key) => (
+      <li key={key}>
+        <div className={cn(notification.type, 'alert sticky')}>
+          <a onClick={() => closeNotification(notification.id)}
+             className="fa fa-times close"/>
+          <p>
+            {t(notification.message)}
+          </p>
+        </div>
+      </li>
+    );
+
     return (
         // if context is not_corner then render notification without consider global notification position
         context === 'not_corner' ? (
             <ul>{notifications.map((notification, key) => (
-                (!notification.hidden && (notification.context === NOTIFICATION_CONTEXT ||
-                    notification.context === NOTIFICATION_CONTEXT_ACCESS)) ? (
-                    <li key={key}>
-                        <div className={cn(notification.type, 'alert sticky')}>
-                            <a onClick={() => closeNotification(notification.id)}
-                               className="fa fa-times close"/>
-                            <p>
-                                {t(notification.message)}
-                            </p>
-                        </div>
-                    </li>
-                ) : null
+                !notification.hidden && (notification.context === NOTIFICATION_CONTEXT ||
+                    notification.context === NOTIFICATION_CONTEXT_ACCESS) && (
+                    renderNotification(notification, key)
+                )
             ))}
             </ul>
+        ) : context === 'above_table' ? (
+          <ul>
+            {notifications.map((notification, key) => (
+              !notification.hidden && (notification.context === 'global'
+                && notification.type === 'error') && (
+                renderNotification(notification, key)
+              )
+            ))}
+          </ul>
         ) : (
             <ul className={cn({'global-notifications' : true,
                 'notifications-top-left': globalPosition === 'top-left',
@@ -43,17 +56,9 @@ const Notifications = ({ setNotificationHidden, notifications, globalPosition, c
                 'notifications-bottom-right': globalPosition === 'bottom-right',
                 'notifications-bottom-center': globalPosition === 'bottom-center'})}>
                 {notifications.map((notification, key) => (
-                    (!notification.hidden && notification.context === 'global') ? (
-                        <li key={key}>
-                            <div className={cn(notification.type, 'alert sticky')}>
-                                <a onClick={() => closeNotification(notification.id)}
-                                   className="fa fa-times close"/>
-                                <p>
-                                    {t(notification.message)}
-                                </p>
-                            </div>
-                        </li>
-                    ) : null
+                    (!notification.hidden && notification.context === 'global') && (
+                        renderNotification(notification, key)
+                    )
                 ))
 
                 }

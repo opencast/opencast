@@ -75,6 +75,10 @@ export const fetchSeriesDetailsAcls = id => async dispatch => {
 
         const response = await data.data;
 
+        if (!!response.series_access.locked) {
+            dispatch(addNotification("warning", "SERIES_ACL_LOCKED", -1, null, NOTIFICATION_CONTEXT));
+        }
+
         let seriesAcls = [];
         if (!!response.series_access) {
             const json = JSON.parse(response.series_access.acl).acl.ace;
@@ -281,6 +285,7 @@ export const updateSeriesTheme = (id, values) => async (dispatch, getState) => {
             let seriesTheme = (transformToIdValueArray(themeResponse))[0].value;
 
             dispatch(setSeriesDetailsTheme(seriesTheme));
+            dispatch(addNotification("warning", "SERIES_THEME_REPROCESS_EXISTING_EVENTS", 10, null, NOTIFICATION_CONTEXT));
         })
         .catch(response => {
             logger.error(response);

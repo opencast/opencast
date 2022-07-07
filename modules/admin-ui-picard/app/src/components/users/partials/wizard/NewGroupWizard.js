@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from 'react';
 import {Formik} from "formik";
 import {connect} from "react-redux";
 import {initialFormValuesNewGroup} from "../../../../configs/modalConfig";
@@ -55,37 +55,45 @@ const NewGroupWizard = ({ close, postNewGroup }) => {
                     validationSchema={currentValidationSchema}
                     onSubmit={values => handleSubmit(values)}>
                 {/* Render wizard pages depending on current value of page variable */}
-                {formik => (
-                  <>
-                      {/* Stepper that shows each step of wizard as header */}
-                      <WizardStepper steps={steps}
-                                     page={page}
-                                     setPage={setPage}
-                                     completed={pageCompleted}
-                                     setCompleted={setPageCompleted}
-                                     formik={formik}/>
-                      <div>
-                          {page === 0 && (
-                            <GroupMetadataPage formik={formik}
-                                               nextPage={nextPage}/>
-                          )}
-                          {page === 1 && (
-                            <GroupRolesPage formik={formik}
-                                            nextPage={nextPage}
-                                            previousPage={previousPage}/>
-                          )}
-                          {page === 2 && (
-                            <GroupUsersPage formik={formik}
-                                            nextPage={nextPage}
-                                            previousPage={previousPage}/>
-                          )}
-                          {page === 3 && (
-                            <NewGroupSummaryPage formik={formik}
-                                                 previousPage={previousPage}/>
-                          )}
-                      </div>
-                  </>
-                )}
+                {formik => {
+
+                    // eslint-disable-next-line react-hooks/rules-of-hooks
+                    useEffect(() => {
+                        formik.validateForm();
+                    }, [page]);
+
+                    return (
+                      <>
+                          {/* Stepper that shows each step of wizard as header */}
+                          <WizardStepper steps={steps}
+                                         page={page}
+                                         setPage={setPage}
+                                         completed={pageCompleted}
+                                         setCompleted={setPageCompleted}
+                                         formik={formik}/>
+                          <div>
+                              {page === 0 && (
+                                <GroupMetadataPage formik={formik}
+                                                   nextPage={nextPage}/>
+                              )}
+                              {page === 1 && (
+                                <GroupRolesPage formik={formik}
+                                                nextPage={nextPage}
+                                                previousPage={previousPage}/>
+                              )}
+                              {page === 2 && (
+                                <GroupUsersPage formik={formik}
+                                                nextPage={nextPage}
+                                                previousPage={previousPage}/>
+                              )}
+                              {page === 3 && (
+                                <NewGroupSummaryPage formik={formik}
+                                                     previousPage={previousPage}/>
+                              )}
+                          </div>
+                      </>
+                    );
+                }}
             </Formik>
         </>
     )

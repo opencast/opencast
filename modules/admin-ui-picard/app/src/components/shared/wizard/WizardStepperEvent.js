@@ -2,7 +2,7 @@ import React from 'react';
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import { Step, StepButton, StepLabel, Stepper } from '@material-ui/core';
-import { useStepperStyle } from '../../../utils/wizardUtils';
+import { isSummaryReachable, useStepperStyle } from '../../../utils/wizardUtils';
 import CustomStepIcon from './CustomStepIcon';
 import { checkAcls } from '../../../thunks/aclThunks';
 import { connect } from 'react-redux';
@@ -16,30 +16,32 @@ const WizardStepperEvent = ({ steps, page, setPage, formik, completed, setComple
 
   const classes = useStepperStyle();
 
-
-
   const handleOnClick = async key => {
-    if (steps[page].name === "source") {
-      let dateCheck = await checkConflicts(formik.values);
-      if (!dateCheck) {
+
+    if (isSummaryReachable(key, steps, completed)) {
+
+      if (steps[page].name === "source") {
+        let dateCheck = await checkConflicts(formik.values);
+        if (!dateCheck) {
+          return;
+        }
+      }
+
+      if (steps[page].name === "processing" && !formik.values.processingWorkflow) {
         return;
       }
-    }
 
-    if (steps[page].name === "processing" && !formik.values.processingWorkflow) {
-      return;
-    }
+      let aclCheck = await checkAcls(formik.values.acls);
+      if (!aclCheck) {
+        return;
+      }
 
-    let aclCheck = await checkAcls(formik.values.acls);
-    if (!aclCheck) {
-      return;
-    }
-
-    if (formik.isValid) {
-      let updatedCompleted = completed;
-      updatedCompleted[page] = true;
-      setCompleted(updatedCompleted);
-      setPage(key);
+      if (formik.isValid) {
+        let updatedCompleted = completed;
+        updatedCompleted[page] = true;
+        setCompleted(updatedCompleted);
+        await setPage(key);
+      }
     }
   }
 

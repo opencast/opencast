@@ -8,6 +8,7 @@ import {
 } from "../actions/userInfoActions";
 import axios from "axios";
 import {logger} from "../utils/logger";
+import { addNotification } from './notificationThunks';
 
 export const fetchUserInfo = () => async dispatch => {
     try {
@@ -28,6 +29,7 @@ export const fetchUserInfo = () => async dispatch => {
     } catch (e) {
         logger.error(e);
         dispatch(loadUserInfoFailure());
+        dispatch(addNotification('error', 'PROBLEM_ON_START'));
     }
 }
 
