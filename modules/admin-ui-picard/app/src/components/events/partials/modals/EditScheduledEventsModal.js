@@ -64,7 +64,16 @@ const EditScheduledEventsModal = ({ close, updateScheduledEventsBulk, loadingInp
                 </header>
 
                 {/* Stepper that shows each step of wizard as header */}
-                <WizardStepper steps={steps} page={page}/>
+                <WizardStepper steps={steps}
+                               page={page}
+                               setPage={nextPage}
+                               completed={false}
+                               setCompleted={() => {}}
+                               formik={{
+                                   values: {acls: []},
+                                   isValid: false,
+                                   dirty: false
+                               }}/>
 
                 {/* Initialize overall form */}
                 <Formik initialValues={snapshot}

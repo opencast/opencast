@@ -141,7 +141,7 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
                                             {formik.values.sourceMode === 'SCHEDULE_MULTIPLE' && (
                                                 <tr>
                                                     <td>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.WEEKDAYS')}</td>
-                                                    <td>{formik.values.repeatOn.join(', ')}</td>
+                                                    <td>{formik.values.repeatOn.map(day => t('EVENTS.EVENTS.NEW.WEEKDAYSLONG.' + day)).join(', ')}</td>
                                                 </tr>
                                             )}
                                             <tr>

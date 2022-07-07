@@ -1,5 +1,7 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
+import {isJson} from "../../../../../utils/utils";
+import {getMetadataCollectionFieldName} from "../../../../../utils/resourceUtils";
 
 /**
  * This component renders the metadata table containing access rules provided by user before in wizard summary pages
@@ -12,6 +14,14 @@ const MetadataSummaryTable = ({ metadataFields, formikValues, header }) => {
     for (let i = 0; metadataFields.length > i; i++) {
         let fieldValue = formikValues[metadataFields[i].id];
         if (!!fieldValue && fieldValue.length > 0) {
+            if (metadataFields[i].type === "text" &&
+                !!metadataFields[i].collection &&
+                metadataFields[i].collection.length > 0) {
+                fieldValue = isJson(getMetadataCollectionFieldName(metadataFields[i], {value: fieldValue})) ?
+                    (t(JSON.parse(getMetadataCollectionFieldName(metadataFields[i], {value: fieldValue})).label)) :
+                    (t(getMetadataCollectionFieldName(metadataFields[i], {value: fieldValue})));
+            }
+
             metadata = metadata.concat({
                 name: metadataFields[i].id,
                 label: metadataFields[i].label,

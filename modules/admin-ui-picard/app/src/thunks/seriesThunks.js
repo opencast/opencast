@@ -109,7 +109,7 @@ export const postNewSeries = (values, metadataInfo, extendedMetadata) => async d
         metadata.push(entry);
     }
 
-    access = prepareAccessPolicyRulesForPost(values.policies);
+    access = prepareAccessPolicyRulesForPost(values.acls);
 
     let jsonData = {
             metadata: metadata,

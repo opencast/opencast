@@ -95,7 +95,8 @@ const DetailsMetadataTab = ({ metadataFields, updateResource, resourceId, header
                                                                 <Field name={field.id}
                                                                        metadataField={field}
                                                                        showCheck
-                                                                       component={RenderField}/>
+                                                                       component={RenderField}
+                                                                />
                                                             )}
                                                         </td>
                                                     )}
