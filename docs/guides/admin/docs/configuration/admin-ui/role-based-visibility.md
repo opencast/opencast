@@ -143,11 +143,13 @@ There are quite a number of roles to provide selective access to the tabs offere
 
 For the individual tabs, it is possible to further provide access:
 
-|Role                                  |User Interface                           |
-|--------------------------------------|-----------------------------------------|
-|ROLE_UI_SERIES_DETAILS_METADATA_EDIT  |Allow the user to edit *Metadata*        |
-|ROLE_UI_SERIES_DETAILS_ACL_EDIT       |Allow the user to edit *Access Policy*   |
-|ROLE_UI_SERIES_DETAILS_THEMES_EDIT    |Allow the user to edit *Theme*           |
+|Role                                           |User Interface                                 |
+|-----------------------------------------------|-----------------------------------------------|
+|ROLE_UI_SERIES_DETAILS_METADATA_EDIT           |Allow the user to edit *Metadata*              |
+|ROLE_UI_SERIES_DETAILS_ACL_USER_ROLES_VIEW     |Display user roles in *Access Policy*          |
+|ROLE_UI_SERIES_DETAILS_ACL_NONUSER_ROLES_VIEW  |Display non user roles in *Access Policy*      |
+|ROLE_UI_SERIES_DETAILS_ACL_EDIT                |Allow the user to edit *Access Policy*         |
+|ROLE_UI_SERIES_DETAILS_THEMES_EDIT             |Allow the user to edit *Theme*                 |
 
 ### Capture: Locations
 
