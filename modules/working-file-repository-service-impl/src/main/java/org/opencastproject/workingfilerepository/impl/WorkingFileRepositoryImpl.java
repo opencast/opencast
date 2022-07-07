@@ -67,6 +67,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.management.ObjectInstance;
 
@@ -116,6 +117,16 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   /** The URL path for the services provided by the working file repository */
   protected String servicePath = null;
 
+  /** The default pattern for characters forbidden in filenames */
+  private static final String FILENAME_REGEX_DEFAULT = "(^\\W|[^\\w-.])";
+
+  /** Key for configuring the filename pattern specifying forbidden characters */
+  private static final String FILENAME_REGEX_KEY = "filename.forbidden.pattern";
+
+  /** The pattern for characters allowed in filenames */
+  private String filenameRegex = FILENAME_REGEX_DEFAULT;
+
+
   /** The security service to get current organization from */
   protected SecurityService securityService;
 
@@ -128,6 +139,11 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   public void activate(ComponentContext cc) throws IOException {
     if (rootDirectory != null)
       return; // If the root directory was set, respect that setting
+
+    filenameRegex = Objects.toString(
+        cc.getProperties().get(FILENAME_REGEX_KEY),
+        FILENAME_REGEX_DEFAULT);
+    logger.debug("Configured filename forbidden pattern: {}", filenameRegex);
 
     // server url
     serverUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
@@ -221,11 +237,10 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    */
   @Override
   public String toSafeName(String fileName) {
-    var regex = "(^\\W|[^\\w-_.])";
     var extension = FilenameUtils.getExtension(fileName)
-        .replaceAll(regex, "_");
+        .replaceAll(filenameRegex, "_");
     var baseName = FilenameUtils.getBaseName(fileName)
-        .replaceAll(regex, "_");
+        .replaceAll(filenameRegex, "_");
 
     if (StringUtils.isEmpty(extension)) {
       return StringUtils.left(baseName, 255);
