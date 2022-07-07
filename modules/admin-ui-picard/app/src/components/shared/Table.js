@@ -12,6 +12,7 @@ import EditTableViewModal from "../shared/EditTableViewModal";
 import sortIcon from '../../img/tbl-sort.png';
 import sortUpIcon from '../../img/tbl-sort-up.png';
 import sortDownIcon from '../../img/tbl-sort-down.png';
+import Notifications from './Notifications';
 
 const SortIcon = styled.i`
     float: right;
@@ -126,6 +127,7 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
 
     return (
         <>
+            <Notifications context="above_table"/>
             <div className="action-bar">
               <ul>
                   <li>

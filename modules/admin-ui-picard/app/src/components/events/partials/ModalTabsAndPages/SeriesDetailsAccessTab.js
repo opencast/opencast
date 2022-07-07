@@ -1,15 +1,20 @@
-import React from "react";
+import React, { useEffect } from 'react';
 import {useTranslation} from "react-i18next";
 import {connect} from "react-redux";
 import ResourceDetailsAccessPolicyTab from "../../../shared/modals/ResourceDetailsAccessPolicyTab";
 import {getSeriesDetailsAcl} from "../../../../selectors/seriesDetailsSelectors";
 import {fetchSeriesDetailsAcls, updateSeriesAccess} from "../../../../thunks/seriesDetailsThunks";
+import { removeNotificationWizardForm } from '../../../../actions/notificationActions';
 
 /**
  * This component manages the access policy tab of the series details modal
  */
 const SeriesDetailsAccessTab = ({ seriesId, header, policies, fetchAccessPolicies, saveNewAccessPolicies }) => {
     const { t } = useTranslation();
+
+    useEffect(() => {
+        removeNotificationWizardForm();
+    }, []);
 
     return (
         <ResourceDetailsAccessPolicyTab resourceId={seriesId}

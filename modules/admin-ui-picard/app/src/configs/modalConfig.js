@@ -20,7 +20,7 @@ export const initialFormValuesNewEvents = {
     scheduleEndTimeMinutes: '',
     repeatOn: [],
     location: '',
-    deviceInputs: [],
+    //deviceInputs: [],
     processingWorkflow: '',
     configuration: {},
     acls: [{

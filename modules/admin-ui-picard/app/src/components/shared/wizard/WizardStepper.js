@@ -2,7 +2,7 @@ import React from 'react';
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import { Step, StepButton, StepLabel, Stepper } from '@material-ui/core';
-import { useStepperStyle } from '../../../utils/wizardUtils';
+import { isSummaryReachable, useStepperStyle } from '../../../utils/wizardUtils';
 import CustomStepIcon from './CustomStepIcon';
 import { checkAcls } from '../../../thunks/aclThunks';
 import { connect } from 'react-redux';
@@ -19,22 +19,26 @@ const WizardStepper = ({ steps, page, setPage, formik, completed, setCompleted,
 
     const handleOnClick = async key => {
 
-        if(hasAccessPage) {
-            let check =  await checkAcls(formik.values.acls);
-            if (!check) {
-                return;
+        if (isSummaryReachable(key, steps, completed)) {
+            if(hasAccessPage) {
+                let check =  await checkAcls(formik.values.acls);
+                if (!check) {
+                    return;
+                }
+            }
+
+            if (formik.isValid) {
+                let updatedCompleted = completed;
+                updatedCompleted[page] = true;
+                setCompleted(updatedCompleted);
+                setPage(key);
             }
         }
 
-        if (formik.isValid) {
-            let updatedCompleted = completed;
-            updatedCompleted[page] = true;
-            setCompleted(updatedCompleted);
-            setPage(key);
-        }
     }
 
     const disabled = !(formik.dirty && formik.isValid);
+
 
     return (
         <Stepper activeStep={page}

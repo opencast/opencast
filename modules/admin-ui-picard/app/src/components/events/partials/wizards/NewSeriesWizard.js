@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useEffect, useState } from 'react';
 import {Formik} from "formik";
 import NewThemePage from "../ModalTabsAndPages/NewThemePage";
 import NewSeriesSummary from "./NewSeriesSummary";
@@ -44,8 +44,8 @@ const NewSeriesWizard = ({ metadataFields, extendedMetadata, close, postNewSerie
         translation: 'EVENTS.SERIES.NEW.THEME.CAPTION',
         name: 'theme'
     }, {
-            translation: 'EVENTS.SERIES.NEW.SUMMARY.CAPTION',
-            name: 'summary'
+        translation: 'EVENTS.SERIES.NEW.SUMMARY.CAPTION',
+        name: 'summary'
     }];
 
     // Validation schema of current page
@@ -89,22 +89,29 @@ const NewSeriesWizard = ({ metadataFields, extendedMetadata, close, postNewSerie
                     validationSchema={currentValidationSchema}
                     onSubmit={values => handleSubmit(values)}>
                 {/* Render wizard pages depending on current value of page variable */}
-                {formik => (
-                  <>
-                      {/* Stepper that shows each step of wizard as header */}
-                      <WizardStepper steps={steps}
-                                     page={page}
-                                     setPage={setPage}
-                                     completed={pageCompleted}
-                                     setCompleted={setPageCompleted}
-                                     formik={formik}
-                                     hasAccessPage />
-                      <div>
-                          {page === 0 && (
-                            <NewMetadataPage nextPage={nextPage}
-                                             formik={formik}
-                                             metadataFields={metadataFields}
-                                             header={steps[page].translation}/>
+                {formik => {
+
+                    // eslint-disable-next-line react-hooks/rules-of-hooks
+                    useEffect(() => {
+                        formik.validateForm();
+                    }, [page]);
+
+                    return (
+                      <>
+                        {/* Stepper that shows each step of wizard as header */}
+                        <WizardStepper steps={steps}
+                                       page={page}
+                                       setPage={setPage}
+                                       completed={pageCompleted}
+                                       setCompleted={setPageCompleted}
+                                       formik={formik}
+                                       hasAccessPage />
+                        <div>
+                            {page === 0 && (
+                              <NewMetadataPage nextPage={nextPage}
+                                               formik={formik}
+                                               metadataFields={metadataFields}
+                                               header={steps[page].translation}/>
                           )}
                           {page === 1 && (
                             <NewMetadataExtendedPage nextPage={nextPage}
@@ -130,7 +137,8 @@ const NewSeriesWizard = ({ metadataFields, extendedMetadata, close, postNewSerie
                           )}
                       </div>
                   </>
-                )}
+                );
+                }}
             </Formik>
         </>
     );
