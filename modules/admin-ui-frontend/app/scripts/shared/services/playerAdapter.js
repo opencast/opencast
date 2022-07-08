@@ -48,6 +48,7 @@ angular.module('adminNg.services')
     PLAY: 'play',
     PAUSE: 'pause',
     SEEKING: 'seeking',
+    SEEKED: 'seeked',
     READY: 'ready',
     TIMEUPDATE: 'timeupdate',
     ERROR: 'error',

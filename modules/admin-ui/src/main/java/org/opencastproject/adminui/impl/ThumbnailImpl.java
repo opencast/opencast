@@ -258,7 +258,7 @@ public final class ThumbnailImpl {
 
       final MediaPackageElementFlavor trackFlavor = getPrimaryOrSecondaryTrack(mp).getFlavor();
 
-      final Tuple<URI, List<MediaPackageElement>> internalPublicationResult = updateInternalPublication(mp, true);
+      final Tuple<URI, List<MediaPackageElement>> internalPublicationResult = updateInternalPublication(mp, false);
       deletionUris.add(internalPublicationResult.getA());
       if (distributionConfigurable.getEnabled()) {
         deletionUris.add(updateConfigurablePublication(mp, trackFlavor));
@@ -456,35 +456,21 @@ public final class ThumbnailImpl {
     return Arrays.stream(mp.getPublications()).filter(p -> p.getChannel().equalsIgnoreCase(channelId)).findAny();
   }
 
-  private MediaPackageElement chooseThumbnail(final MediaPackage mp, final Track track, final double position)
+  private MediaPackageElement chooseThumbnail(final MediaPackage mp, final Track track, final double position, Optional<Tuple<InputStream, String>> optPreview)
     throws PublicationException, MediaPackageException, EncoderException, IOException, NotFoundException,
       UnknownFileTypeException, DistributionException {
 
-    String encodingProfile;
-    boolean downscale;
-    if (isAutoDistributionEnabled()) {
-      /* We extract a high quality image that will be converted to various formats as required by the distribution
-         channels. We do need to downscale the thumbnail preview image for the video editor in this case. */
-      encodingProfile = this.masterProfile;
-      downscale = true;
-    } else {
-      /* We only need the thumbnail preview image for the video editor so we use the corresponding encoding profile
-         and we do not need to downscale that image */
-      encodingProfile = this.previewProfile;
-      downscale = false;
-    }
-
-    tempThumbnail = composerService.imageSync(track, encodingProfile, position).get(0).getURI();
-    tempThumbnailMimeType = MimeTypes.fromURI(tempThumbnail);
-    tempThumbnailFileName = tempThumbnail.getPath().substring(tempThumbnail.getPath().lastIndexOf('/') + 1);
-
     final Collection<URI> deletionUris = new ArrayList<>(0);
     try {
+      if (optPreview.isPresent()) {
+        createTempThumbnail(mp, optPreview.get().getA(), optPreview.get().getB());
+        archive(mp);
+      }
 
       // Remove any uploaded thumbnails
       Arrays.stream(mp.getElementsByFlavor(uploadedFlavor)).forEach(mp::remove);
 
-      final Tuple<URI, List<MediaPackageElement>> internalPublicationResult = updateInternalPublication(mp, downscale);
+      final Tuple<URI, List<MediaPackageElement>> internalPublicationResult = updateInternalPublication(mp, false);
       deletionUris.add(internalPublicationResult.getA());
 
       if (distributionConfigurable.getEnabled()) {
@@ -508,11 +494,11 @@ public final class ThumbnailImpl {
     }
   }
 
-  public MediaPackageElement chooseDefaultThumbnail(final MediaPackage mp, final double position)
+  public MediaPackageElement chooseDefaultThumbnail(final MediaPackage mp, final double position, final Optional<Tuple<InputStream, String>> optPreview)
     throws PublicationException, MediaPackageException, EncoderException, IOException, NotFoundException,
     UnknownFileTypeException, DistributionException {
 
-    final MediaPackageElement result = chooseThumbnail(mp, getPrimaryOrSecondaryTrack(mp), position);
+    final MediaPackageElement result = chooseThumbnail(mp, getPrimaryOrSecondaryTrack(mp), position, optPreview);
 
     // Set workflow settings: type = DEFAULT
     WorkflowPropertiesUtil
@@ -525,7 +511,7 @@ public final class ThumbnailImpl {
     return result;
   }
 
-  public MediaPackageElement chooseThumbnail(final MediaPackage mp, final String trackFlavorType, final double position)
+  public MediaPackageElement chooseThumbnail(final MediaPackage mp, final String trackFlavorType, final double position, Optional<Tuple<InputStream, String>> optPreview)
     throws PublicationException, MediaPackageException, EncoderException, IOException, NotFoundException,
     UnknownFileTypeException, DistributionException {
 
@@ -536,7 +522,7 @@ public final class ThumbnailImpl {
       throw new MediaPackageException("Cannot find stream with flavor " + trackFlavor + " to extract thumbnail.");
     }
 
-    final MediaPackageElement result = chooseThumbnail(mp, track.get(), position);
+    final MediaPackageElement result = chooseThumbnail(mp, track.get(), position, optPreview);
 
     // Set workflow settings: type = SNAPSHOT, position, track
     WorkflowPropertiesUtil
