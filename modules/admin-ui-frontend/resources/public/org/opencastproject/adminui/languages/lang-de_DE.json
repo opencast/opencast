@@ -879,7 +879,7 @@
                   "DETAILS": "Weitere Zugriffsrichtlinien",
                   "USER": "Benutzer",
                   "USERS": "Für das Video authorisierte Benutzer",
-                  "NONEXISTANT_USER": "Nicht existierender Benutzer",
+                  "NONEXISTENT_USER": "Nicht existierender Benutzer",
                   "HELP": {
                     "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Benutzer das Video zu sehen",
                     "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Benutzer das Video zu bearbeiten"
@@ -1191,7 +1191,7 @@
                   "NEW_USER": "Neuer Benutzer",
                   "USER": "Benutzer",
                   "USERS": "Für die Serie nicht authorisierte Benutzer",
-                  "NONEXISTANT_USER": "Nicht existierender Benutzer",
+                  "NONEXISTENT_USER": "Nicht existierender Benutzer",
                   "HELP": {
                     "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Benutzer die Serie zu sehen",
                     "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Benutzer die Serie zu bearbeiten"
@@ -1489,7 +1489,7 @@
                   "NEW_USER": "Neuer Benutzer",
                   "USER": "Benutzer",
                   "USERS": "Für die Richtlinie nicht authorisierte Benutzer",
-                  "NONEXISTANT_USER": "Nicht existierender Benutzer",
+                  "NONEXISTENT_USER": "Nicht existierender Benutzer",
                   "HELP": {
                     "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Benutzer die Richtlinie zu sehen",
                     "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Benutzer die Richtlinie zu bearbeiten"

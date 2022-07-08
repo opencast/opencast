@@ -274,7 +274,7 @@
                         <!-- Another loop specifically to show user roles for which no user exists -->
                         <tr ng-repeat="policy in policiesUser | filter: not(userExists)">
                           <td>
-                            <p>{{'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.NONEXISTANT_USER' | translate}}: {{policy.userDoesNotExist}}</p>
+                            <p>{{'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.NONEXISTENT_USER' | translate}}: {{policy.userDoesNotExist}}</p>
                           </td>
                           <td class="fit text-center">
                             <input type="checkbox"
