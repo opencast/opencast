@@ -81,7 +81,8 @@ import javax.ws.rs.core.Response;
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
             ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
-            ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0 })
+            ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
+            ApiMediaType.VERSION_1_9_0 })
 @RestService(name = "externalapiworkflowdefinitions", title = "External API Workflow Definitions Service", notes = {},
              abstractText = "Provides resources and operations related to the workflow definitions")
 @Component(
