@@ -125,7 +125,7 @@ class OpencastToPaellaConverter {
     var res = new Array(0,0);
     // HLS-VOD
     if (track.video instanceof Object) {
-      if (!track.master) {
+      if (track.video.resolution) {
         res = track.video.resolution.split('x');
       }
       // HLS-VOD- parse sub-video data from the adaptive "master" tagged track
