@@ -58,7 +58,7 @@ Authorization
 Now the system knows all the information necessary to authenticate users against CAS, but also need some authorization
 information, to tell which services the user is allowed to use and which resources is allowed to see and/or modify.
 
-You will need to configure a [UserProvider](security.md) to look up users as identified by CAS.
+You will need to configure a [UserProvider](security.md#user-and-role-providers) to look up users as identified by CAS.
 
 * LDAP User Provider, described in [LDAP Security and Authorization](security.ldap.md)
 * [Sakai User Provider](security.user.sakai.md)
@@ -66,9 +66,3 @@ You will need to configure a [UserProvider](security.md) to look up users as ide
 * [Brightspace D2L User Provider](security.user.brightspace.md)
 * [Canvas LMS User Provider](security.user.canvas.md)
 
-Further Information
--------------------
-<!-- _This leads to Atlassian/Confluence which needs to be joined first, assuming the user already has an account. Is this necessary to include here? -->
-Original documentation from University of Saskatchewan:
-[University of Saskatchewan CAS and LDAP
-integration](https://opencast.jira.com/wiki/display/MH/University+of+Saskatchewan+CAS+and+LDAP+integration)
