@@ -11,7 +11,8 @@ import { setDefaultConfig } from '../../../../utils/workflowPanelUtils';
 /**
  * This component renders the workflow selection for start task bulk action
  */
-const StartTaskWorkflowPage = ({ formik, previousPage, nextPage, loadingWorkflowDef, workflowDef }) => {
+const StartTaskWorkflowPage = ({ formik, previousPage, nextPage, setPageCompleted,
+                                   loadingWorkflowDef, workflowDef }) => {
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -82,7 +83,13 @@ const StartTaskWorkflowPage = ({ formik, previousPage, nextPage, loadingWorkflow
                         }}
                         tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>
                 <button className="cancel"
-                        onClick={() => previousPage()}
+                        onClick={() => {
+                            previousPage();
+                            if (!formik.isValid) {
+                                // set page as not filled out
+                                setPageCompleted([]);
+                            }
+                        }}
                         tabIndex="101">{t('WIZARD.BACK')}</button>
             </footer>
 

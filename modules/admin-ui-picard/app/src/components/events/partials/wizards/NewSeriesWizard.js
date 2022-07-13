@@ -68,7 +68,7 @@ const NewSeriesWizard = ({ metadataFields, extendedMetadata, close, postNewSerie
 
     const previousPage = (values, twoPagesBack) => {
         setSnapshot(values);
-        // if previous page is hidden or not always shown, than go back two pages
+        // if previous page is hidden or not always shown, then go back two pages
         if (steps[page - 1].hidden || twoPagesBack) {
             setPage(page - 2);
         } else {
@@ -93,7 +93,7 @@ const NewSeriesWizard = ({ metadataFields, extendedMetadata, close, postNewSerie
 
                     // eslint-disable-next-line react-hooks/rules-of-hooks
                     useEffect(() => {
-                        formik.validateForm();
+                        formik.validateForm().then();
                     }, [page]);
 
                     return (

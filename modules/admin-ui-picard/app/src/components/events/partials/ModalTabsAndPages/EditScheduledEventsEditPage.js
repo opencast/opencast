@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import {connect} from "react-redux";
@@ -6,7 +6,7 @@ import {Field, FieldArray} from "formik";
 import Notifications from "../../../shared/Notifications";
 import RenderField from "../../../shared/wizard/RenderField";
 import {getTimezoneOffset, hasAccess} from "../../../../utils/utils";
-import {hours, minutes, NOTIFICATION_CONTEXT, weekdays} from "../../../../configs/modalConfig";
+import {hours, minutes, weekdays} from "../../../../configs/modalConfig";
 import {checkForSchedulingConflicts, fetchScheduling} from "../../../../thunks/eventThunks";
 import {addNotification} from "../../../../thunks/notificationThunks";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
@@ -15,18 +15,17 @@ import {
     getSchedulingSeriesOptions,
     isLoadingScheduling
 } from "../../../../selectors/eventSelectors";
+import {checkSchedulingConflicts} from "../../../../utils/bulkActionUtils";
 
 /**
  * This component renders the edit page for scheduled events of the corresponding bulk action
  */
 const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevices,
+                                         conflictState: {conflicts, setConflicts}, setPageCompleted,
                                          checkForSchedulingConflicts, addNotification,
                                          removeNotificationWizardForm, fetchSchedulingData,
                                          loading, seriesOptions, user }) => {
     const { t } = useTranslation();
-
-    // conflicts with other events
-    const [conflicts, setConflicts] = useState([]);
 
     useEffect(() => {
         // Fetch data about series and schedule info of chosen events from backend
@@ -50,34 +49,6 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
             )
         }
     };
-
-    const checkConflicts = async () => {
-
-        // Check if each start is before end
-        for (let i = 0; i < formik.values.editedEvents.length; i++) {
-            let event = formik.values.editedEvents[i];
-            let startTime = new Date();
-            startTime.setHours(event.changedStartTimeHour, event.changedStartTimeMinutes, 0, 0);
-            let endTime = new Date();
-            endTime.setHours(event.changedEndTimeHour, event.changedEndTimeMinutes, 0, 0);
-
-            if (startTime > endTime) {
-                addNotification('error', 'CONFLICT_END_BEFORE_START', -1, null, NOTIFICATION_CONTEXT);
-                return false;
-            }
-        }
-
-        // Use backend for check for conflicts with other events
-        const response = await checkForSchedulingConflicts(formik.values.editedEvents);
-
-        if (response.length > 0) {
-            setConflicts(response);
-            return false;
-        } else {
-            setConflicts([]);
-            return true;
-        }
-    }
 
     return (
         <>
@@ -296,14 +267,20 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                         disabled={!(formik.dirty && formik.isValid)}
                         onClick={async () => {
                             removeNotificationWizardForm();
-                            if (await checkConflicts()) {
+                            if (await checkSchedulingConflicts(formik.values, setConflicts, checkForSchedulingConflicts, addNotification)) {
                                 nextPage(formik.values);
                             }
                         }}
                         tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>
 
                 <button className="cancel"
-                        onClick={() => previousPage(formik.values, false)}
+                        onClick={() => {
+                            previousPage(formik.values, false);
+                            if (!formik.isValid) {
+                                // set page as not filled out
+                                setPageCompleted([]);
+                            }
+                        }}
                         tabIndex="101">{t('WIZARD.BACK')}</button>
             </footer>
 

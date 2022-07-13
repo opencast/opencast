@@ -9,11 +9,12 @@ today.setHours(0, 0, 0, 0);
 
 
 // Validation Schema used in new event wizard (each step has its own yup validation object)
-export const NewEventSchema = [Yup.object().shape({
-    title: Yup.string().required('Required')
-}), Yup.object().shape({
-
-}),
+export const NewEventSchema = [
+    Yup.object().shape({
+        title: Yup.string().required('Required')
+    }),
+    Yup.object().shape({
+    }),
     Yup.object().shape({
     uploadAssetsTrack: Yup.array().when('sourceMode', {
         is:  value => value === 'UPLOAD',
@@ -71,29 +72,31 @@ export const NewSeriesSchema = [Yup.object().shape({
 })];
 
 // Validation Schema used in new themes wizard (each step has its own yup validation object)
-export const NewThemeSchema = [Yup.object().shape({
-    name: Yup.string().required('Required')
-}), Yup.object().shape({
-    bumperFile: Yup.string().when('bumperActive', {
-        is: true,
-        then: Yup.string().required('Required')
+export const NewThemeSchema = [
+    Yup.object().shape({
+        name: Yup.string().required('Required')
+    }), Yup.object().shape({
+        bumperFile: Yup.string().when('bumperActive', {
+            is: true,
+            then: Yup.string().required('Required')
+        })
+    }), Yup.object().shape({
+        trailerFile: Yup.string().when('trailerActive', {
+            is: true,
+            then: Yup.string().required('Required')
+        })
+    }), Yup.object().shape({
+        titleSlideBackground: Yup.string().when('titleSlideMode', {
+            is: 'upload',
+            then: Yup.string().required('Required')
+        })
+    }), Yup.object().shape({
+        watermarkFile: Yup.string().when('watermarkActive', {
+            is: true,
+            then: Yup.string().required('Required')
+        })
     })
-}), Yup.object().shape({
-    trailerFile: Yup.string().when('trailerActive', {
-        is: true,
-        then: Yup.string().required('Required')
-    })
-}), Yup.object().shape({
-    titleSlideBackground: Yup.string().when('titleSlideMode', {
-        is: 'upload',
-        then: Yup.string().required('Required')
-    })
-}), Yup.object().shape({
-    watermarkFile: Yup.string().when('watermarkActive', {
-        is: true,
-        then: Yup.string().required('Required')
-    })
-})];
+];
 
 // Validation Schema used in new ACL wizard (each step has its own yup validation object)
 export const NewAclSchema = [
@@ -111,7 +114,7 @@ export const NewGroupSchema = [
 
 // Validation Schema used in new user wizard
 export const NewUserSchema = usernames => (
-        Yup.object().shape({
+    Yup.object().shape({
         username: Yup.string().required('Required').notOneOf(usernames, 'not unique'),
         name: Yup.string().required('Required'),
         email: Yup.string().email().required('Required'),

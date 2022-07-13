@@ -5,6 +5,7 @@ import {connect} from "react-redux";
 import cn from 'classnames';
 import {getSelectedRows} from "../../../../selectors/tableSelectors";
 import {useSelectionChanges} from "../../../../hooks/wizardHooks";
+import {checkValidityStartTaskEventSelection, isStartable, isTaskStartable} from "../../../../utils/bulkActionUtils";
 
 /**
  * This component renders the table overview of selected events in start task bulk action
@@ -16,39 +17,10 @@ const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
 
     useEffect(() => {
         // Set field value for formik on mount, because initially all events are selected
-        formik.setFieldValue('events', selectedEvents);
+        if (formik.values.events.length === 0) {
+            formik.setFieldValue('events', selectedEvents);
+        }
     }, []);
-
-    // Check if an event is in a state that a task on it can be started
-    const isStartable = event => {
-        return event.event_status.toUpperCase().indexOf('PROCESSED') > -1
-            || event.event_status.toUpperCase().indexOf('PROCESSING_FAILURE') > -1
-            || event.event_status.toUpperCase().indexOf('PROCESSING_CANCELED') > -1 || !event.selected;
-    };
-
-    // Check if multiple event is in a state that a task on it can be started
-    const isTaskStartable = events => {
-        for (let i = 0; i < events.length; i++) {
-            if (!isStartable(events[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    // Check validity for activating next button
-    const checkValidity = () => {
-        if (formik.values.events.length > 0) {
-            if (isTaskStartable(formik.values.events) && formik.isValid) {
-                return formik.values.events.some(event => event.selected === true);
-
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    };
 
     return (
         <>
@@ -115,10 +87,10 @@ const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
                 <button type="submit"
                         className={cn("submit",
                             {
-                                active: checkValidity(),
-                                inactive: !checkValidity()
+                                active: checkValidityStartTaskEventSelection(formik.values),
+                                inactive: !checkValidityStartTaskEventSelection(formik.values)
                             })}
-                        disabled={!checkValidity()}
+                        disabled={!checkValidityStartTaskEventSelection(formik.values)}
                         onClick={() => {
                             nextPage(formik.values);
                         }}

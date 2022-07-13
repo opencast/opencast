@@ -25,8 +25,10 @@ export const usePageFunctions = (initialPage, initialValues) => {
 }
 
 export const useSelectionChanges = (formik, selectedRows) => {
-    const [selectedEvents, setSelectedEvents] = useState(selectedRows);
-    const [allChecked, setAllChecked] = useState(true);
+    const [selectedEvents, setSelectedEvents] = useState((formik.values.events.length === 0) ?
+        selectedRows : formik.values.events);
+    const [allChecked, setAllChecked] = useState(formik.values.events.length === 0 ?
+        true : formik.values.events.every(event => event.selected === true));
 
     // Select or deselect all rows in table
     const onChangeAllSelected = e => {
