@@ -517,7 +517,7 @@
                                   data-width="'200px'"
                                   tabindex="1"
                                   focushere
-                                  ng-change="wizard.step.changeBaseAcl()"
+                                  ng-change="wizard.step.changeBaseAcl(wizard.step.ud.id)"
                                   ng-model="wizard.step.ud.id"
                                   ng-options="id as name for (id, name) in wizard.step.acls"
                                   placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"

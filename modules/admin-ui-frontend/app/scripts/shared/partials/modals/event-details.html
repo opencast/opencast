@@ -574,7 +574,7 @@
                                       pre-select-from="acls"
                                       data-width="'200px'"
                                       ng-disabled="((tab == 'access') && !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT'))"
-                                      ng-change="changeBaseAcl()"
+                                      ng-change="changeBaseAcl(baseAclId)"
                                       ng-model="baseAclId"
                                       ng-options="id as name for (id, name) in acls"
                                       placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"

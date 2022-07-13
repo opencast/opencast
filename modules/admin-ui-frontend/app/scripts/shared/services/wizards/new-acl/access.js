@@ -46,7 +46,8 @@ angular.module('adminNg.services')
       me.ud.policiesUser = [];
       me.ud.baseAcl = {};
 
-      this.changeBaseAcl = function () {
+      this.changeBaseAcl = function (id) {
+        me.ud.id = id;
         var newPolicies = {};
         me.ud.baseAcl = AclResource.get({id: me.ud.id}, function () {
           angular.forEach(me.ud.baseAcl.acl.ace, function (acl) {
@@ -92,8 +93,6 @@ angular.module('adminNg.services')
               me.ud.policiesUser.push(policy);
             }
           });
-
-          me.ud.id = '';
         });
       };
 

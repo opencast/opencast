@@ -91,13 +91,13 @@ angular.module('adminNg.controllers')
     $scope.policies = [];
     $scope.policiesUser = [];
     $scope.baseAcl = {};
+    $scope.baseAclId = '';
     $scope.metadata = {};
 
-    $scope.changeBaseAcl = function () {
-      $scope.baseAcl = AclResource.get({id: this.baseAclId}, function () {
+    $scope.changeBaseAcl = function (id) {
+      $scope.baseAcl = AclResource.get({id: id}, function () {
         changePolicies($scope.baseAcl.acl.ace);
       });
-      this.baseAclId = '';
     };
 
     $scope.not = function(func) {
@@ -216,6 +216,7 @@ angular.module('adminNg.controllers')
           if (angular.isDefined(data.acl)) {
             var json = angular.fromJson(data.acl);
             changePolicies(json.ace, true);
+            $scope.baseAclId = data.acl.id.toString();
           }
 
           angular.forEach(angular.fromJson(data.acl.ace), function(value, key) {

@@ -98,6 +98,7 @@ angular.module('adminNg.controllers')
     $scope.aclLocked = false,
     $scope.policies = [];
     $scope.baseAcl = {};
+    $scope.baseAclId = '';
 
     AuthService.getUser().$promise.then(function (user) {
       var mode = user.org.properties['admin.series.acl.event.update.mode'];
@@ -107,11 +108,10 @@ angular.module('adminNg.controllers')
       $scope.updateMode = mode;
     }).catch(angular.noop);
 
-    $scope.changeBaseAcl = function () {
-      $scope.baseAcl = SeriesAccessResource.getManagedAcl({id: this.baseAclId}, function () {
+    $scope.changeBaseAcl = function (id) {
+      $scope.baseAcl = SeriesAccessResource.getManagedAcl({id: id}, function () {
         changePolicies($scope.baseAcl.acl.ace);
       });
-      this.baseAclId = '';
     };
 
     $scope.not = function(func) {
@@ -358,6 +358,7 @@ angular.module('adminNg.controllers')
           if (angular.isDefined(data.series_access)) {
             var json = angular.fromJson(data.series_access.acl);
             changePolicies(json.acl.ace, true);
+            $scope.baseAclId = data.series_access.current_acl.toString();
 
             $scope.aclLocked = data.series_access.locked;
 

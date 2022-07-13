@@ -472,6 +472,7 @@ angular.module('adminNg.controllers')
             if (angular.isDefined(data.episode_access)) {
               var json = angular.fromJson(data.episode_access.acl);
               changePolicies(json.acl.ace, true);
+              $scope.baseAclId = data.episode_access.current_acl.toString();
             }
           });
 
@@ -674,6 +675,7 @@ angular.module('adminNg.controllers')
     $scope.policies = [];
     $scope.policiesUser = [];
     $scope.baseAcl = {};
+    $scope.baseAclId = '';
 
     $scope.not = function(func) {
       return function (item) {
@@ -709,11 +711,10 @@ angular.module('adminNg.controllers')
       return [].concat($scope.policies, $scope.policiesUser);
     };
 
-    $scope.changeBaseAcl = function () {
-      $scope.baseAcl = EventAccessResource.getManagedAcl({id: this.baseAclId}, function () {
+    $scope.changeBaseAcl = function (id) {
+      $scope.baseAcl = EventAccessResource.getManagedAcl({id: id}, function () {
         changePolicies($scope.baseAcl.acl.ace);
       });
-      this.baseAclId = '';
     };
 
     // E.g. model === $scope.policies
@@ -980,6 +981,7 @@ angular.module('adminNg.controllers')
         if (angular.isDefined(data.episode_access)) {
           var json = angular.fromJson(data.episode_access.acl);
           changePolicies(json.acl.ace, true);
+          $scope.baseAclId = data.episode_access.current_acl.toString();
         }
       });
     };

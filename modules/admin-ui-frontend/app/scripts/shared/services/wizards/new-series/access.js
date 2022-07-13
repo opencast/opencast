@@ -86,7 +86,8 @@ angular.module('adminNg.services')
       me.ud.policiesUser = addUserRolePolicy(me.ud.policiesUser);
       me.ud.baseAcl = {};
 
-      this.changeBaseAcl = function () {
+      this.changeBaseAcl = function (id) {
+        me.ud.id = id;
         var newPolicies = {};
         me.ud.baseAcl = SeriesAccessResource.getManagedAcl({id: me.ud.id}, function () {
           angular.forEach(me.ud.baseAcl.acl.ace, function (acl) {
@@ -138,8 +139,6 @@ angular.module('adminNg.services')
               me.ud.policiesUser.push(policy);
             }
           });
-
-          me.ud.id = '';
         });
       };
 
