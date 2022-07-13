@@ -28,9 +28,12 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
     const { t } = useTranslation();
 
     useEffect(() => {
+        const fetchEventInfos = (formik.values.editedEvents.length !== formik.values.events) ||
+            (formik.values.events.some(event => !formik.values.editedEvents.find(e => e.eventId === event.id)))
+
         // Fetch data about series and schedule info of chosen events from backend
-        fetchSchedulingData(formik.values.events, (formik.values.editedEvents.length === 0), formik.setFieldValue);
-    }, []);
+        fetchSchedulingData(formik.values.events, fetchEventInfos, formik.setFieldValue);
+    }, [formik.values.events]);
 
     // Render input device options of currently chosen input device
     const renderInputDeviceOptions = eventKey => {
