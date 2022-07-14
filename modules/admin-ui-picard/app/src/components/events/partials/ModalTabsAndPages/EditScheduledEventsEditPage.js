@@ -16,6 +16,7 @@ import {
     isLoadingScheduling
 } from "../../../../selectors/eventSelectors";
 import {checkSchedulingConflicts} from "../../../../utils/bulkActionUtils";
+import DropDown from "../../../shared/DropDown";
 
 /**
  * This component renders the edit page for scheduled events of the corresponding bulk action
@@ -111,7 +112,8 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                             <span>{t('EVENTS.EVENTS.DETAILS.METADATA.TITLE')}</span>
                                                                         </td>
                                                                         <td className="editable ng-isolated-scope">
-                                                                            <Field name={`editedEvents.${key}.changedTitle`}
+                                                                            <Field tabIndex={(key * 14) + 1}
+                                                                                   name={`editedEvents.${key}.changedTitle`}
                                                                                    metadataField={{
                                                                                        type: 'text'
                                                                                    }}
@@ -123,7 +125,8 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                             <span>{t('EVENTS.EVENTS.DETAILS.METADATA.SERIES')}</span>
                                                                         </td>
                                                                         <td className="editable ng-isolated-scope">
-                                                                            <Field name={`editedEvents.${key}.changedSeries`}
+                                                                            <Field tabIndex={(key * 14) + 2}
+                                                                                   name={`editedEvents.${key}.changedSeries`}
                                                                                    metadataField={{
                                                                                        type: 'text',
                                                                                        collection: seriesOptions,
@@ -145,7 +148,7 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.START_TIME')}</td>
                                                                         <td>
                                                                             {/* One option for each entry in hours*/}
-                                                                            <Field tabIndex="5"
+                                                                            <Field tabIndex={(key * 14) + 3}
                                                                                    as="select"
                                                                                    name={`editedEvents.${key}.changedStartTimeHour`}
                                                                                    placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}>
@@ -157,7 +160,7 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                                 ))}
                                                                             </Field>
                                                                             {/* One option for each entry in minutes*/}
-                                                                            <Field tabIndex="5"
+                                                                            <Field tabIndex={(key * 14) + 4}
                                                                                    as="select"
                                                                                    name={`editedEvents.${key}.changedStartTimeMinutes`}
                                                                                    placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}>
@@ -174,7 +177,7 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.END_TIME')}</td>
                                                                         <td>
                                                                             {/* One option for each entry in hours*/}
-                                                                            <Field tabIndex="7"
+                                                                            <Field tabIndex={(key * 14) + 5}
                                                                                    as="select"
                                                                                    name={`editedEvents.${key}.changedEndTimeHour`}
                                                                                    placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}>
@@ -186,7 +189,7 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                                 ))}
                                                                             </Field>
                                                                             {/* One option for each entry in minutes*/}
-                                                                            <Field tabIndex="8"
+                                                                            <Field tabIndex={(key * 14) + 6}
                                                                                    as="select"
                                                                                    name={`editedEvents.${key}.changedEndTimeMinutes`}
                                                                                    placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}>
@@ -203,23 +206,18 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                     <tr>
                                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION')}</td>
                                                                         <td>
-                                                                            <select tabIndex="11"
-                                                                                    defaultValue="default"
-                                                                                    onChange={e => {
-                                                                                        formik.setFieldValue(`editedEvents.${key}.changedLocation`, e.target.value);
-                                                                                        formik.setFieldValue(`editedEvents.${key}.changedDeviceInputs`, []);
-                                                                                    }}>
-                                                                                <option value='default'
-                                                                                        hidden>
-                                                                                    {formik.values.editedEvents[key].changedLocation}
-                                                                                </option>
-                                                                                {inputDevices.map((inputDevices, key) => (
-                                                                                    <option key={key}
-                                                                                            value={inputDevices.name}>
-                                                                                        {inputDevices.name}
-                                                                                    </option>
-                                                                                ))}
-                                                                            </select>
+                                                                            <DropDown value={formik.values.editedEvents[key].changedLocation}
+                                                                                      text={formik.values.editedEvents[key].changedLocation}
+                                                                                      options={inputDevices}
+                                                                                      type={'captureAgent'}
+                                                                                      required={true}
+                                                                                      handleChange={element => {
+                                                                                          formik.setFieldValue(`editedEvents.${key}.changedLocation`, element.value);
+                                                                                          formik.setFieldValue(`editedEvents.${key}.changedDeviceInputs`, []);
+                                                                                      }}
+                                                                                      placeholder={`-- ${t('SELECT_NO_OPTION_SELECTED')} --`}
+                                                                                      tabIndex={(key * 14) + 7}
+                                                                            />
                                                                         </td>
                                                                     </tr>
                                                                     {/* the following seven lines can be commented in, when the possibility of a selection of individual inputs is desired and the backend has been adapted to support it
@@ -237,7 +235,8 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                         <td className="weekdays">
                                                                             {weekdays.map((day, index) => (
                                                                                 <label key={index}>
-                                                                                    <Field type="radio"
+                                                                                    <Field tabIndex={(key * 14) + 8 + index}
+                                                                                           type="radio"
                                                                                            name={`editedEvents.${key}.changedWeekday`}
                                                                                            value={day.name}/>
                                                                                     {t(day.label)}

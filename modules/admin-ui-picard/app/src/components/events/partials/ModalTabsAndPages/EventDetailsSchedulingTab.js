@@ -36,6 +36,7 @@ import {
 } from "../../../../utils/dateUtils";
 import {filterDevicesForAccess, hasDeviceAccess} from "../../../../utils/resourceUtils";
 import {NOTIFICATION_CONTEXT} from "../../../../configs/modalConfig";
+import DropDown from "../../../shared/DropDown";
 
 /**
  * This component manages the main assets tab of event details modal
@@ -558,23 +559,15 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                             <td>
                                                                 {/*drop-down for capture agents (aka. rooms or locations)*/}
                                                                 <div className="chosen-container chosen-container-single">
-                                                                    <Field
-                                                                        className="chosen-single"
-                                                                        name="captureAgent"
-                                                                        as="select"
-                                                                        disabled={!accessAllowed(formik.values.captureAgent)}
-                                                                        data-width="'200px'"
-                                                                        onChange={event => changeInputs(event.target.value, formik.setFieldValue)}
-                                                                        placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION')}
-                                                                    >
-                                                                        <option value="" hidden/>
-                                                                        {filterDevicesForAccess(user, captureAgents).filter(a => filterCaptureAgents(a)).map((ca, key) => (
-                                                                            <option value={ca.name}
-                                                                                    key={key}>
-                                                                                {ca.name}
-                                                                            </option>
-                                                                        ))}
-                                                                    </Field>
+                                                                    <DropDown value={formik.values.captureAgent}
+                                                                              text={formik.values.captureAgent}
+                                                                              options={filterDevicesForAccess(user, captureAgents).filter(a => filterCaptureAgents(a))}
+                                                                              type={'captureAgent'}
+                                                                              required={true}
+                                                                              handleChange={element => changeInputs(element.value, formik.setFieldValue)}
+                                                                              placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION')}
+                                                                              tabIndex={"11"}
+                                                                    />
                                                                 </div>
                                                             </td>
                                                         )}

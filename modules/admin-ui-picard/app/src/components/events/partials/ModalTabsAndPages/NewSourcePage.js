@@ -18,6 +18,7 @@ import {logger} from "../../../../utils/logger";
 import DateFnsUtils from '@date-io/date-fns';
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 import {filterDevicesForAccess, hasAnyDeviceAccess} from "../../../../utils/resourceUtils";
+import DropDown from "../../../shared/DropDown";
 
 
 // Style to bring date picker pop up to front
@@ -442,20 +443,15 @@ const Schedule = ({ formik, inputDevices }) => {
                             {/* one options for each capture agents that has input options */}
                             <td>
                                 <div className="chosen-container chosen-container-single">
-                                    <Field placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}
-                                            tabIndex="11"
-                                            as="select"
-                                            className="chosen-single"
-                                            onChange={e =>
-                                                formik.setFieldValue("location", e.target.value)}
-                                            name="location">
-                                        <option value='' hidden>
-                                            {t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}
-                                        </option>
-                                        {inputDevices.map((inputDevice, key) => (
-                                          <option key={key} value={inputDevice.name}>{inputDevice.name}</option>
-                                        ))}
-                                    </Field>
+                                    <DropDown value={formik.values.location}
+                                              text={formik.values.location}
+                                              options={inputDevices}
+                                              type={'captureAgent'}
+                                              required={true}
+                                              handleChange={element => formik.setFieldValue('location', element.value)}
+                                              placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}
+                                              tabIndex={"11"}
+                                    />
                                 </div>
                             </td>
                         </tr>

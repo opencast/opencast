@@ -7,6 +7,12 @@ import cn from "classnames";
 import {useClickOutsideField} from "../../../hooks/wizardHooks";
 import {isJson} from "../../../utils/utils";
 import {getMetadataCollectionFieldName} from "../../../utils/resourceUtils";
+import {dropDownStyle} from "../../../utils/componentStyles";
+import {
+    formatDropDownOptions,
+    handleSearch
+} from "../../../utils/dropDownUtils";
+import DropDown from "../DropDown";
 
 
 const childRef = React.createRef();
@@ -166,154 +172,6 @@ const EditableSingleSelect = ({ field, metadataField, text, editMode, setEditMod
                                    form: { setFieldValue, initialValues }, showCheck }) => {
     const { t } = useTranslation();
 
-    const [ search, setSearch ] = useState({
-        text: '',
-        filteredCollection: metadataField.collection
-    });
-
-    const filterBySearch = (filterText) => {
-        if (metadataField.id === 'language') {
-            return metadataField.collection.filter(item => t(item.name).toLowerCase().includes(filterText));
-        } else if (metadataField.id === 'isPartOf') {
-            return metadataField.collection.filter(item => item.name.toLowerCase().includes(filterText));
-        } else {
-            return metadataField.collection.filter(item => item.value.toLowerCase().includes(filterText));
-        }
-    }
-
-    const handleSearch = async (searchText) => {
-        setSearch({
-            text: searchText,
-            filteredCollection: filterBySearch(searchText.toLowerCase())
-        });
-    }
-
-    /*
-     * the Select component needs options to have an internal value and a displayed label
-     * this function formats metadata options as provided by the backend into that scheme
-     * it takes the options and provides the correct label to display for this kind of metadata,
-     * as well as adding an empty option, if available
-     */
-    const formatOptions = unformattedOptions => {
-        const formattedOptions = [];
-        if (metadataField.value === '' || !metadataField.required) {
-            formattedOptions.push({
-                value: '',
-                label: `-- ${t('SELECT_NO_OPTION_SELECTED')} --`
-            });
-        }
-        if (metadataField.id === 'language') {
-            for (const item of unformattedOptions) {
-                formattedOptions.push({
-                    value: item.value,
-                    label: t(item.name)
-                });
-            }
-        } else {
-            // if selection of series then use item name as option label else use item value
-            if (metadataField.id === 'isPartOf') {
-                for (const item of unformattedOptions) {
-                    formattedOptions.push({
-                        value: item.value,
-                        label: item.name
-                    });
-                }
-            } else {
-                for (const item of unformattedOptions) {
-                    formattedOptions.push({
-                        value: item.value,
-                        label: item.value
-                    });
-                }
-            }
-        }
-        return formattedOptions;
-    }
-
-    const dropDownStyle = {
-        container: (provided, state) => ({
-            ...provided,
-            width: 250,
-            position: 'relative',
-            display: 'inline-block',
-            verticalAlign: 'middle',
-            font: 'inherit',
-            outline: 'none'
-        }),
-        control: (provided, state) => ({
-            ...provided,
-            marginBottom: 0,
-            border: '1px solid #aaa',
-            borderColor: state.selectProps.menuIsOpen ? '#5897fb' : '#aaa',
-            hoverBorderColor: state.selectProps.menuIsOpen ? '#5897fb' : '#aaa',
-            boxShadow: state.selectProps.menuIsOpen ?  '0 0 0 1px #5897fb' : '0 0 0 1px #aaa',
-            borderRadius: 4,
-            "&:hover": {
-                borderColor: '#aaa'
-            }
-        }),
-        dropdownIndicator: (provided, state) => ({
-            ...provided,
-            transform: state.selectProps.menuIsOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-            color: '#aaa',
-            "&:hover": {
-                color: '#5897fb'
-            }
-        }),
-        indicatorSeparator: (provided, state) => ({
-            ...provided,
-            width: 0,
-            visibility: 'hidden'
-        }),
-        input: (provided, state) => ({
-            ...provided,
-            position: 'relative',
-            zIndex: 1010,
-            margin: 0,
-            whiteSpace: 'nowrap',
-            verticalAlign: 'middle',
-            background: 'url("../../img/search.png") no-repeat 180px 9px',
-            border: 'none'
-        }),
-        menu: (provided, state) => ({
-            ...provided,
-            marginTop: 1,
-            border: 'none'
-        }),
-        menuList: (provided, state) => ({
-            ...provided,
-            marginTop: 0,
-            border: '1px solid #aaa',
-            borderRadius: 4
-        }),
-        noOptionsMessage: (provided, state) => ({
-            ...provided,
-            textAlign: 'left'
-        }),
-        option: (provided, state) => ({
-            ...provided,
-            height: 25,
-            paddingTop: 0,
-            paddingBottom: 0,
-            backgroundColor: state.isSelected ? '#2a62bc' : state.isFocused ? '#5897fb' : 'white',
-            color: state.isFocused || state.isSelected ? 'white' : provided.color,
-            cursor: 'pointer',
-            "&:hover": {
-                height: 25
-            }
-        }),
-        singleValue: (provided, state) => ({
-            ...provided,
-            marginTop: 0,
-            marginBottom: 0,
-        }),
-        valueContainer: (provided, state) => ({
-            ...provided,
-            marginTop: 0,
-            marginBottom: 0,
-        })
-    }
-
     return (
         editMode ? (
             <div onBlur={() => setEditMode(false)}
@@ -321,17 +179,16 @@ const EditableSingleSelect = ({ field, metadataField, text, editMode, setEditMod
                  ref={childRef}
                  data-width="'250px'"
             >
-                <Select autoFocus
-                        styles={dropDownStyle}
-                        defaultMenuIsOpen
-                        isSearchable
-                        value={{value: field.value, label: text === '' ? `-- ${t('SELECT_NO_OPTION_SELECTED')} --` : text}}
-                        inputValue={search.text}
-                        options={formatOptions(search.filteredCollection)}
-                        placeholder={`-- ${t('SELECT_NO_OPTION_SELECTED')} --`}
-                        noOptionsMessage={() => 'No matching results.'}
-                        onInputChange={value => handleSearch(value)}
-                        onChange={element => setFieldValue(field.name, element.value)}
+                <DropDown value={field.value}
+                          text={text}
+                          options={metadataField.collection}
+                          type={metadataField.id}
+                          required={metadataField.required}
+                          handleChange={element => setFieldValue(field.name, element.value)}
+                          placeholder={`-- ${t('SELECT_NO_OPTION_SELECTED')} --`}
+                          tabIndex={"10"}
+                          autoFocus={true}
+                          defaultOpen={true}
                 />
             </div>
         ) : (
