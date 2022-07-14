@@ -21,10 +21,11 @@
 'use strict';
 
 angular.module('adminNg.services')
-.factory('NewEventSource', ['JsHelper', 'CaptureAgentsResource', 'ConflictCheckResource', 'Notifications', 'Language',
-  '$translate', '$filter', 'underscore', '$timeout', 'localStorageService', 'AuthService', 'SchedulingHelperService',
-  function (JsHelper, CaptureAgentsResource, ConflictCheckResource, Notifications, Language, $translate, $filter, _,
-    $timeout, localStorageService, AuthService, SchedulingHelperService) {
+.factory('NewEventSource', ['JsHelper', 'CaptureAgentsResource', 'ConflictCheckResource', 'EventSchedulingResource',
+  'Notifications', 'Language', '$translate', '$filter', 'underscore', '$timeout', 'localStorageService', 'AuthService',
+  'SchedulingHelperService',
+  function (JsHelper, CaptureAgentsResource, ConflictCheckResource, EventSchedulingResource, Notifications, Language,
+    $translate, $filter, _, $timeout, localStorageService, AuthService, SchedulingHelperService) {
 
     // -- constants ------------------------------------------------------------------------------------------------- --
 
@@ -68,6 +69,12 @@ angular.module('adminNg.services')
       self.isSourceState = true;
 
       this.defaultsSet = false;
+
+      // Id of the event used as a template for this new one
+      self.copyEventId = undefined;
+      this.setCopyEventId = function(copyEventId) {
+        self.copyEventId = copyEventId;
+      };
 
       this.checkingConflicts = false;
       this.hasConflicts = false;
@@ -546,8 +553,50 @@ angular.module('adminNg.services')
             defaults.type = localStorageService.get('sourceSticky');
           }
 
-          self.reset(defaults);
-          self.defaultsSet = true;
+          // Set/Overwrite defaults with values from template event
+          if (self.copyEventId !== undefined) {
+            EventSchedulingResource.get({ id: self.copyEventId }, function (source) {
+              CaptureAgentsResource.query({inputs: true}).$promise.then(function (data) {
+                angular.forEach(data.rows, function (agent) {
+                  var inputs;
+                  if (agent.id === source.agentId) {
+                    source.device = agent;
+                    // Retrieve agent inputs configuration
+                    if (angular.isDefined(source.agentConfiguration['capture.device.names'])) {
+                      inputs = source.agentConfiguration['capture.device.names'].split(',');
+                      source.device.inputMethods = {};
+                      angular.forEach(inputs, function (input) {
+                        source.device.inputMethods[input] = true;
+                      });
+                    }
+                  }
+                });
+
+                defaults.duration = source.duration;
+                defaults.end = source.end;
+                defaults.start = source.start;
+                defaults.device = source.device;
+
+                self.reset(defaults);
+                self.defaultsSet = true;
+                self.checkConflicts();
+
+              // In case of error, just set defaults
+              }).catch(function(e) {
+                self.reset(defaults);
+                self.defaultsSet = true;
+              });
+              // Not a scheduled event
+            }, function () {
+              defaults.type = 'UPLOAD';
+              self.reset(defaults);
+              self.defaultsSet = true;
+            });
+          // If not copying from an event, just set defaults
+          } else {
+            self.reset(defaults);
+            self.defaultsSet = true;
+          }
         }).catch(angular.noop);
       };
 
