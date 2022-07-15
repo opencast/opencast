@@ -1,7 +1,6 @@
 import React, {useState} from "react";
-import {Bar} from "react-chartjs-3";
 import {useTranslation} from "react-i18next";
-import {dropDownSpacingTheme, dropDownSpacingThemeTime, dropDownStyle} from "../../utils/componentStyles";
+import {dropDownSpacingTheme, dropDownStyle} from "../../utils/componentStyles";
 import {formatDropDownOptions, handleSearch} from "../../utils/dropDownUtils";
 import Select from "react-select";
 
