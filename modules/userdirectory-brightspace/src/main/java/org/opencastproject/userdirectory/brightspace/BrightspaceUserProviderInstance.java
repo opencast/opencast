@@ -114,8 +114,8 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
     this.sitePattern = sitePattern;
 
     logger.info("Creating new BrightspaceUserProviderInstance(pid={}, url={}, cacheSize={}, cacheExpiration={}, "
-                  + "InstructorRoles={}, ignoredUserNames={})", pid, client.getURL(), cacheSize, cacheExpiration,
-                  instructorRoles, ignoredUsernames);
+                  + "InstructorRoles={}, ignoredUserNames={}), userPattern={}, sitePattern={}", pid, client.getURL(), cacheSize, cacheExpiration,
+                  instructorRoles, ignoredUsernames, userPattern, sitePattern);
 
     cache = CacheBuilder.newBuilder().maximumSize(cacheSize).expireAfterWrite(cacheExpiration, TimeUnit.MINUTES)
             .build(new CacheLoader<String, Object>() {
@@ -343,7 +343,7 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
   private boolean verifyOrgUnit(String orgUnitId) {
 
     // We could additionally cache positive and negative siteId lookup results here
-    logger.debug("verifyOrgUnit({})", orgUnitId);
+    logger.debug("verifyOrgUnit({}) with pattern {}", orgUnitId, sitePattern);
 
     try {
       if ((sitePattern != null) && !orgUnitId.matches(sitePattern)) {
@@ -356,6 +356,7 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
     }
 
     // TODO call the Brightspace API to verify that the orgunit exists
+    logger.debug("org unit {} accepted", orgUnitId);
 
     return true;
   }
