@@ -112,7 +112,8 @@ public class BrightspaceClientImpl implements BrightspaceClient {
       do {
         String request = composePagedUrl(bookmark, userid);
         OrgUnitResponse orgUnitPage = findOrgUnitPage(request);
-        if (SUPER_ADMIN.equals(orgUnitPage.getItems().get(0).getRole().getName())) {
+
+        if (!orgUnitPage.getItems().isEmpty() && SUPER_ADMIN.equals(orgUnitPage.getItems().get(0).getRole().getName())) {
           roleList.add("BRIGHTSPACE_ADMIN");
           return roleList;
         }
