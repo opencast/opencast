@@ -441,18 +441,16 @@ const Schedule = ({ formik, inputDevices }) => {
                         <tr>
                             <td>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')} <i className="required">*</i></td>
                             {/* one options for each capture agents that has input options */}
-                            <td>
-                                <div className="chosen-container chosen-container-single">
-                                    <DropDown value={formik.values.location}
-                                              text={formik.values.location}
-                                              options={inputDevices}
-                                              type={'captureAgent'}
-                                              required={true}
-                                              handleChange={element => formik.setFieldValue('location', element.value)}
-                                              placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}
-                                              tabIndex={"11"}
-                                    />
-                                </div>
+                            <td className="editable ng-isolated-scope">
+                                <DropDown value={formik.values.location}
+                                          text={formik.values.location}
+                                          options={inputDevices}
+                                          type={'captureAgent'}
+                                          required={true}
+                                          handleChange={element => formik.setFieldValue('location', element.value)}
+                                          placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}
+                                          tabIndex={"11"}
+                                />
                             </td>
                         </tr>
                         <tr>

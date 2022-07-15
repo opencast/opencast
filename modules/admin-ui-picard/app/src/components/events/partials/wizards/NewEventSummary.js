@@ -152,10 +152,12 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
                                                 <td>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}</td>
                                                 <td>{formik.values.location}</td>
                                             </tr>
-                                            <tr>
-                                                <td>{t('EVENTS.EVENTS.NEW.SUMMARY.SOURCE.INPUT')}</td>
-                                                <td>{formik.values.deviceInputs.join(', ')}</td>
-                                            </tr>
+                                            {!!formik.values.deviceInputs && (
+                                                <tr>
+                                                    <td>{t('EVENTS.EVENTS.NEW.SUMMARY.SOURCE.INPUT')}</td>
+                                                    <td>{formik.values.deviceInputs.join(', ')}</td>
+                                                </tr>
+                                            )}
                                         </tbody>
                                     </table>
                                 )}

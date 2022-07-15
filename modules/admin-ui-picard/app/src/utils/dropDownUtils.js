@@ -2,6 +2,8 @@
  * this file contains functions, which are needed for the searchable drop-down selections
  */
 
+import {makeTwoDigits} from "./utils";
+
 const filterBySearch = (filterText, type, options, t) => {
     if (type === 'language') {
         return options.filter(item => t(item.name).toLowerCase().includes(filterText));
@@ -15,7 +17,7 @@ const filterBySearch = (filterText, type, options, t) => {
 export const handleSearch = async (searchText, type, options, setSearch, t) => {
     setSearch({
         text: searchText,
-        filteredCollection: filterBySearch(searchText.toLowerCase(), type, options)
+        filteredCollection: filterBySearch(searchText.toLowerCase(), type, options, t)
     });
 }
 
@@ -52,6 +54,13 @@ export const formatDropDownOptions = (unformattedOptions, type, currentValue, re
             formattedOptions.push({
                 value: item.name,
                 label: item.name
+            });
+        }
+    } else if (type === 'time') {
+        for (const item of unformattedOptions) {
+            formattedOptions.push({
+                value: makeTwoDigits(item.index),
+                label: item.value
             });
         }
     } else {

@@ -112,6 +112,11 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                             <span>{t('EVENTS.EVENTS.DETAILS.METADATA.TITLE')}</span>
                                                                         </td>
                                                                         <td className="editable ng-isolated-scope">
+                                                                            {/*
+                                                                              * Per event there are 14 input fields, so with 'key * 14', the right
+                                                                              * event is reached. After the '+' comes the number of the input field.
+                                                                              * This is the first input field for this event.
+                                                                              */}
                                                                             <Field tabIndex={(key * 14) + 1}
                                                                                    name={`editedEvents.${key}.changedTitle`}
                                                                                    metadataField={{
@@ -125,6 +130,11 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                             <span>{t('EVENTS.EVENTS.DETAILS.METADATA.SERIES')}</span>
                                                                         </td>
                                                                         <td className="editable ng-isolated-scope">
+                                                                            {/*
+                                                                              * Per event there are 14 input fields, so with 'key * 14', the right
+                                                                              * event is reached. After the '+' comes the number of the input field.
+                                                                              * This is the second input field for this event.
+                                                                              */}
                                                                             <Field tabIndex={(key * 14) + 2}
                                                                                    name={`editedEvents.${key}.changedSeries`}
                                                                                    metadataField={{
@@ -147,7 +157,12 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                     <tr>
                                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.START_TIME')}</td>
                                                                         <td>
-                                                                            {/* One option for each entry in hours*/}
+                                                                            {/* One option for each entry in hours
+                                                                              *
+                                                                              * Per event there are 14 input fields, so with 'key * 14', the right
+                                                                              * event is reached. After the '+' comes the number of the input field.
+                                                                              * This is the third input field for this event.
+                                                                              */}
                                                                             <Field tabIndex={(key * 14) + 3}
                                                                                    as="select"
                                                                                    name={`editedEvents.${key}.changedStartTimeHour`}
@@ -159,7 +174,13 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                                     </option>
                                                                                 ))}
                                                                             </Field>
-                                                                            {/* One option for each entry in minutes*/}
+
+                                                                            {/* One option for each entry in minutes
+                                                                              *
+                                                                              * Per event there are 14 input fields, so with 'key * 14', the right
+                                                                              * event is reached. After the '+' comes the number of the input field.
+                                                                              * This is the fourth input field for this event.
+                                                                              */}
                                                                             <Field tabIndex={(key * 14) + 4}
                                                                                    as="select"
                                                                                    name={`editedEvents.${key}.changedStartTimeMinutes`}
@@ -176,7 +197,12 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                     <tr>
                                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.END_TIME')}</td>
                                                                         <td>
-                                                                            {/* One option for each entry in hours*/}
+                                                                            {/* One option for each entry in hours
+                                                                              *
+                                                                              * Per event there are 14 input fields, so with 'key * 14', the right
+                                                                              * event is reached. After the '+' comes the number of the input field.
+                                                                              * This is the fifth input field for this event.
+                                                                              */}
                                                                             <Field tabIndex={(key * 14) + 5}
                                                                                    as="select"
                                                                                    name={`editedEvents.${key}.changedEndTimeHour`}
@@ -188,7 +214,13 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                                     </option>
                                                                                 ))}
                                                                             </Field>
-                                                                            {/* One option for each entry in minutes*/}
+
+                                                                            {/* One option for each entry in minutes
+                                                                              *
+                                                                              * Per event there are 14 input fields, so with 'key * 14', the right
+                                                                              * event is reached. After the '+' comes the number of the input field.
+                                                                              * This is the sixth input field for this event.
+                                                                              */}
                                                                             <Field tabIndex={(key * 14) + 6}
                                                                                    as="select"
                                                                                    name={`editedEvents.${key}.changedEndTimeMinutes`}
@@ -202,10 +234,16 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                             </Field>
                                                                         </td>
                                                                     </tr>
-                                                                    {/* Dropdown for location/input device */}
+
+                                                                    {/* Dropdown for location/input device
+                                                                      *
+                                                                      * Per event there are 14 input fields, so with 'key * 14', the right
+                                                                      * event is reached. After the '+' comes the number of the input field.
+                                                                      * This is the seventh input field for this event.
+                                                                      */}
                                                                     <tr>
                                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION')}</td>
-                                                                        <td>
+                                                                        <td className="editable ng-isolated-scope">
                                                                             <DropDown value={formik.values.editedEvents[key].changedLocation}
                                                                                       text={formik.values.editedEvents[key].changedLocation}
                                                                                       options={inputDevices}
@@ -220,6 +258,7 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                             />
                                                                         </td>
                                                                     </tr>
+
                                                                     {/* the following seven lines can be commented in, when the possibility of a selection of individual inputs is desired and the backend has been adapted to support it
                                                                     <tr>
                                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.INPUTS')}</td>
@@ -229,7 +268,13 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                         </td>
                                                                     </tr>
                                                                     */}
-                                                                    {/* Radio buttons for weekdays */}
+
+                                                                    {/* Radio buttons for weekdays
+                                                                      *
+                                                                      * Per event there are 14 input fields, so with 'key * 14', the right
+                                                                      * event is reached. After the '+' comes the number of the input field.
+                                                                      * These radio buttons are input fields 8 to 14 for this event.
+                                                                      */}
                                                                     <tr>
                                                                         <td>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.WEEKDAY')}</td>
                                                                         <td className="weekdays">
