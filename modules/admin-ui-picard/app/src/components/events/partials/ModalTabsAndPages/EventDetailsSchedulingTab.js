@@ -36,6 +36,7 @@ import {
 } from "../../../../utils/dateUtils";
 import {filterDevicesForAccess, hasDeviceAccess} from "../../../../utils/resourceUtils";
 import {NOTIFICATION_CONTEXT} from "../../../../configs/modalConfig";
+import DropDown from "../../../shared/DropDown";
 
 /**
  * This component manages the main assets tab of event details modal
@@ -236,11 +237,11 @@ const EventDetailsSchedulingTab = ({ eventId, t,
     // finds the inputs to be displayed in the formik
     const getInputs = deviceId => {
         if(deviceId === source.device.id) {
-            return source.device.inputs;
+            return !!source.device.inputs ? source.device.inputs : [];
         } else {
             for(const agent of filterDevicesForAccess(user, captureAgents)){
                 if(agent.id === deviceId){
-                    return agent.inputs;
+                    return !!agent.inputs ? agent.inputs : [];
                 }
             }
             return [];
@@ -292,6 +293,8 @@ const EventDetailsSchedulingTab = ({ eventId, t,
         const startDate = new Date(source.start.date);
         const endDate = new Date(source.end.date);
 
+        const inputs = !!source.device.inputMethods ? Array.from(source.device.inputMethods) : []
+
         return {
             scheduleStartDate: startDate.setHours(0,0,0),
             scheduleStartHour: makeTwoDigits(source.start.hour),
@@ -302,7 +305,7 @@ const EventDetailsSchedulingTab = ({ eventId, t,
             scheduleEndHour: makeTwoDigits(source.end.hour),
             scheduleEndMinute: makeTwoDigits(source.end.minute),
             captureAgent: source.device.name,
-            inputs: !!source.device.inputMethods ? Array.from(source.device.inputMethods) : []
+            inputs: inputs.filter(input => input !== '')
         };
     }
 
@@ -379,48 +382,37 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                     <tr>
                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.START_TIME')}</td>
                                                         {hasAccessRole && (
-                                                            <td>
-                                                                {/*drop-down for hour*/}
-                                                                <div className="chosen-container chosen-container-single">
-                                                                    <Field
-                                                                        className="chosen-single"
-                                                                        name={"scheduleStartHour"}
-                                                                        as="select"
-                                                                        disabled={!accessAllowed(formik.values.captureAgent)}
-                                                                        data-width="'100px'"
-                                                                        onChange={event => changeStartHour(event.target.value, formik.values, formik.setFieldValue)}
-                                                                        placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}
-                                                                    >
-                                                                        <option value="" hidden/>
-                                                                        {hours.map((h, key) => (
-                                                                            <option value={makeTwoDigits(h.index)}
-                                                                                    key={key}>
-                                                                                {h.value}
-                                                                            </option>
-                                                                        ))}
-                                                                    </Field>
-                                                                </div>
 
-                                                                {/*drop-down for minute*/}
-                                                                <div className="chosen-container chosen-container-single">
-                                                                    <Field
-                                                                        className="chosen-single"
-                                                                        name="scheduleStartMinute"
-                                                                        as="select"
-                                                                        disabled={!accessAllowed(formik.values.captureAgent)}
-                                                                        data-width="'100px'"
-                                                                        onChange={event => changeStartMinute(event.target.value, formik.values, formik.setFieldValue)}
-                                                                        placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}
-                                                                    >
-                                                                        <option value="" hidden/>
-                                                                        {minutes.map((m, key) => (
-                                                                            <option value={makeTwoDigits(m.index)}
-                                                                                    key={key}>
-                                                                                {m.value}
-                                                                            </option>
-                                                                        ))}
-                                                                    </Field>
-                                                                </div>
+                                                            <td className="editable ng-isolated-scope">
+                                                                {/*drop-down for hour
+                                                                  *
+                                                                  * This is the second input field.
+                                                                  */}
+                                                                <DropDown value={formik.values.scheduleStartHour}
+                                                                          text={formik.values.scheduleStartHour}
+                                                                          options={hours}
+                                                                          type={'time'}
+                                                                          required={true}
+                                                                          handleChange={element => changeStartHour(element.value, formik.values, formik.setFieldValue)}
+                                                                          placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}
+                                                                          tabIndex={"2"}
+                                                                          disabled={!accessAllowed(formik.values.captureAgent)}
+                                                                />
+
+                                                                {/*drop-down for minute
+                                                                  *
+                                                                  * This is the third input field.
+                                                                  */}
+                                                                <DropDown value={formik.values.scheduleStartMinute}
+                                                                          text={formik.values.scheduleStartMinute}
+                                                                          options={minutes}
+                                                                          type={'time'}
+                                                                          required={true}
+                                                                          handleChange={element => changeStartMinute(element.value, formik.values, formik.setFieldValue)}
+                                                                          placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}
+                                                                          tabIndex={"3"}
+                                                                          disabled={!accessAllowed(formik.values.captureAgent)}
+                                                                />
                                                             </td>
                                                         )}
                                                         {!hasAccessRole && (
@@ -435,48 +427,36 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                     <tr>
                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.DURATION')}</td>
                                                         {hasAccessRole && (
-                                                            <td>
-                                                                {/*drop-down for hour*/}
-                                                                <div className="chosen-container chosen-container-single">
-                                                                    <Field
-                                                                        className="chosen-single"
-                                                                        name="scheduleDurationHours"
-                                                                        as="select"
-                                                                        disabled={!accessAllowed(formik.values.captureAgent)}
-                                                                        data-width="'100px'"
-                                                                        onChange={event => changeDurationHour(event.target.value, formik.values, formik.setFieldValue)}
-                                                                        placeholder={t('WIZARD.DURATION.HOURS')}
-                                                                    >
-                                                                        <option value="" hidden/>
-                                                                        {hours.map((h, key) => (
-                                                                            <option value={makeTwoDigits(h.index)}
-                                                                                    key={key}>
-                                                                                {h.value}
-                                                                            </option>
-                                                                        ))}
-                                                                    </Field>
-                                                                </div>
+                                                            <td className="editable ng-isolated-scope">
+                                                                {/*drop-down for hour
+                                                                  *
+                                                                  * This is the fourth input field.
+                                                                  */}
+                                                                <DropDown value={formik.values.scheduleDurationHours}
+                                                                          text={formik.values.scheduleDurationHours}
+                                                                          options={hours}
+                                                                          type={'time'}
+                                                                          required={true}
+                                                                          handleChange={element => changeDurationHour(element.value, formik.values, formik.setFieldValue)}
+                                                                          placeholder={t('WIZARD.DURATION.HOURS')}
+                                                                          tabIndex={"4"}
+                                                                          disabled={!accessAllowed(formik.values.captureAgent)}
+                                                                />
 
-                                                                {/*drop-down for minute*/}
-                                                                <div className="chosen-container chosen-container-single">
-                                                                    <Field
-                                                                        className="chosen-single"
-                                                                        name="scheduleDurationMinutes"
-                                                                        as="select"
-                                                                        disabled={!accessAllowed(formik.values.captureAgent)}
-                                                                        data-width="'100px'"
-                                                                        onChange={event => changeDurationMinute(event.target.value, formik.values, formik.setFieldValue)}
-                                                                        placeholder={t('WIZARD.DURATION.MINUTES')}
-                                                                    >
-                                                                        <option value="" hidden/>
-                                                                        {minutes.map((m, key) => (
-                                                                            <option value={makeTwoDigits(m.index)}
-                                                                                    key={key}>
-                                                                                {m.value}
-                                                                            </option>
-                                                                        ))}
-                                                                    </Field>
-                                                                </div>
+                                                                {/*drop-down for minute
+                                                                  *
+                                                                  * This is the fifth input field.
+                                                                  */}
+                                                                <DropDown value={formik.values.scheduleDurationMinutes}
+                                                                          text={formik.values.scheduleDurationMinutes}
+                                                                          options={minutes}
+                                                                          type={'time'}
+                                                                          required={true}
+                                                                          handleChange={element => changeDurationMinute(element.value, formik.values, formik.setFieldValue)}
+                                                                          placeholder={t('WIZARD.DURATION.MINUTES')}
+                                                                          tabIndex={"5"}
+                                                                          disabled={!accessAllowed(formik.values.captureAgent)}
+                                                                />
                                                             </td>
                                                         )}
                                                         {!hasAccessRole && (
@@ -491,52 +471,40 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                     <tr>
                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.END_TIME')}</td>
                                                         {hasAccessRole && (
-                                                            <td>
-                                                                {/*drop-down for hour*/}
-                                                                <div className="chosen-container chosen-container-single">
-                                                                    <Field
-                                                                        className="chosen-single"
-                                                                        name="scheduleEndHour"
-                                                                        as="select"
-                                                                        disabled={!accessAllowed(formik.values.captureAgent)}
-                                                                        data-width="'100px'"
-                                                                        onChange={event => changeEndHour(event.target.value, formik.values, formik.setFieldValue)}
-                                                                        placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}
-                                                                    >
-                                                                        <option value="" hidden/>
-                                                                        {hours.map((h, key) => (
-                                                                            <option value={makeTwoDigits(h.index)}
-                                                                                    key={key}>
-                                                                                {h.value}
-                                                                            </option>
-                                                                        ))}
-                                                                    </Field>
-                                                                </div>
+                                                            <td className="editable ng-isolated-scope">
+                                                                {/*drop-down for hour
+                                                                  *
+                                                                  * This is the sixth input field.
+                                                                  */}
+                                                                <DropDown value={formik.values.scheduleEndHour}
+                                                                          text={formik.values.scheduleEndHour}
+                                                                          options={hours}
+                                                                          type={'time'}
+                                                                          required={true}
+                                                                          handleChange={element => changeEndHour(element.value, formik.values, formik.setFieldValue)}
+                                                                          placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}
+                                                                          tabIndex={"6"}
+                                                                          disabled={!accessAllowed(formik.values.captureAgent)}
+                                                                />
 
-                                                                {/*drop-down for minute*/}
-                                                                <div className="chosen-container chosen-container-single">
-                                                                    <Field
-                                                                        className="chosen-single"
-                                                                        name="scheduleEndMinute"
-                                                                        as="select"
-                                                                        disabled={!accessAllowed(formik.values.captureAgent)}
-                                                                        data-width="'100px'"
-                                                                        onChange={event => changeEndMinute(event.target.value, formik.values, formik.setFieldValue)}
-                                                                        placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}
-                                                                    >
-                                                                        <option value="" hidden/>
-                                                                        {minutes.map((m, key) => (
-                                                                            <option value={makeTwoDigits(m.index)}
-                                                                                    key={key}>
-                                                                                {m.value}
-                                                                            </option>
-                                                                        ))}
-                                                                    </Field>
-                                                                </div>
+                                                                {/*drop-down for minute
+                                                                  *
+                                                                  * This is the seventh input field.
+                                                                  */}
+                                                                <DropDown value={formik.values.scheduleEndMinute}
+                                                                          text={formik.values.scheduleEndMinute}
+                                                                          options={minutes}
+                                                                          type={'time'}
+                                                                          required={true}
+                                                                          handleChange={element => changeEndMinute(element.value, formik.values, formik.setFieldValue)}
+                                                                          placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}
+                                                                          tabIndex={"7"}
+                                                                          disabled={!accessAllowed(formik.values.captureAgent)}
+                                                                />
 
                                                                 {/*display end date if on different day to start date*/}
                                                                 {(formik.values.scheduleEndDate.toString() !== formik.values.scheduleStartDate.toString()) && (
-                                                                    <span>{(new Date(formik.values.scheduleEndDate)).toLocaleDateString(currentLanguage.dateLocale.code)}</span>
+                                                                    <span style={{paddingLeft: '5px'}}>{(new Date(formik.values.scheduleEndDate)).toLocaleDateString(currentLanguage.dateLocale.code)}</span>
                                                                 )}
                                                             </td>
                                                         )}
@@ -555,27 +523,21 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                     <tr>
                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION')}</td>
                                                         {hasAccessRole && (
-                                                            <td>
-                                                                {/*drop-down for capture agents (aka. rooms or locations)*/}
-                                                                <div className="chosen-container chosen-container-single">
-                                                                    <Field
-                                                                        className="chosen-single"
-                                                                        name="captureAgent"
-                                                                        as="select"
-                                                                        disabled={!accessAllowed(formik.values.captureAgent)}
-                                                                        data-width="'200px'"
-                                                                        onChange={event => changeInputs(event.target.value, formik.setFieldValue)}
-                                                                        placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION')}
-                                                                    >
-                                                                        <option value="" hidden/>
-                                                                        {filterDevicesForAccess(user, captureAgents).filter(a => filterCaptureAgents(a)).map((ca, key) => (
-                                                                            <option value={ca.name}
-                                                                                    key={key}>
-                                                                                {ca.name}
-                                                                            </option>
-                                                                        ))}
-                                                                    </Field>
-                                                                </div>
+                                                            <td className="editable ng-isolated-scope">
+                                                                {/*drop-down for capture agents (aka. rooms or locations)
+                                                                  *
+                                                                  * This is the eighth input field.
+                                                                  */}
+                                                                <DropDown value={formik.values.captureAgent}
+                                                                          text={formik.values.captureAgent}
+                                                                          options={filterDevicesForAccess(user, captureAgents).filter(a => filterCaptureAgents(a))}
+                                                                          type={'captureAgent'}
+                                                                          required={true}
+                                                                          handleChange={element => changeInputs(element.value, formik.setFieldValue)}
+                                                                          placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION')}
+                                                                          tabIndex={"8"}
+                                                                          disabled={!accessAllowed(formik.values.captureAgent)}
+                                                                />
                                                             </td>
                                                         )}
                                                         {!hasAccessRole && (
@@ -590,23 +552,27 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.INPUTS')}</td>
                                                         <td>
                                                             {!!formik.values.captureAgent && !!getInputs(formik.values.captureAgent) && getInputs(formik.values.captureAgent).length > 0 && (
-                                                                (hasAccessRole && accessAllowed(formik.values.captureAgent))? (
-                                                                    /*checkboxes for available inputs*/
+                                                                (hasAccessRole && accessAllowed(formik.values.captureAgent)) ? (
+                                                                    /*checkboxes for available inputs
+                                                                     *
+                                                                     * These are the input fields starting at 8.
+                                                                     */
                                                                     getInputs(formik.values.captureAgent).map((inputMethod, key) => (
                                                                         <label key={key}>
                                                                             <Field name="inputs"
                                                                                    type="checkbox"
+                                                                                   tabIndex={8 + key}
                                                                                    value={inputMethod.id}
                                                                             />
                                                                             {t(inputMethod.value)}
                                                                         </label>
                                                                     ))
-                                                                ):(
+                                                                ) : (
                                                                     formik.values.inputs.map((input, key) => (
                                                                         <span key={key}>
-                                                                        {t(getInputs(formik.values.captureAgent).find(agent => (agent.id === input)).value)}
+                                                                            {t(getInputs(formik.values.captureAgent).find(agent => (agent.id === input)).value)}
                                                                             <br/>
-                                                                    </span>
+                                                                        </span>
                                                                     ))
                                                                 )
                                                             )}

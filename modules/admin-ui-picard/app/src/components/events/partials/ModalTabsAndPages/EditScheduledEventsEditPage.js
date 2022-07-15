@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import {connect} from "react-redux";
@@ -6,7 +6,7 @@ import {Field, FieldArray} from "formik";
 import Notifications from "../../../shared/Notifications";
 import RenderField from "../../../shared/wizard/RenderField";
 import {getTimezoneOffset, hasAccess} from "../../../../utils/utils";
-import {hours, minutes, NOTIFICATION_CONTEXT, weekdays} from "../../../../configs/modalConfig";
+import {hours, minutes, weekdays} from "../../../../configs/modalConfig";
 import {checkForSchedulingConflicts, fetchScheduling} from "../../../../thunks/eventThunks";
 import {addNotification} from "../../../../thunks/notificationThunks";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
@@ -15,23 +15,26 @@ import {
     getSchedulingSeriesOptions,
     isLoadingScheduling
 } from "../../../../selectors/eventSelectors";
+import {checkSchedulingConflicts} from "../../../../utils/bulkActionUtils";
+import DropDown from "../../../shared/DropDown";
 
 /**
  * This component renders the edit page for scheduled events of the corresponding bulk action
  */
 const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevices,
+                                         conflictState: {conflicts, setConflicts}, setPageCompleted,
                                          checkForSchedulingConflicts, addNotification,
                                          removeNotificationWizardForm, fetchSchedulingData,
                                          loading, seriesOptions, user }) => {
     const { t } = useTranslation();
 
-    // conflicts with other events
-    const [conflicts, setConflicts] = useState([]);
-
     useEffect(() => {
+        const fetchEventInfos = (formik.values.editedEvents.length !== formik.values.events) ||
+            (formik.values.events.some(event => !formik.values.editedEvents.find(e => e.eventId === event.id)))
+
         // Fetch data about series and schedule info of chosen events from backend
-        fetchSchedulingData(formik.values.events, (formik.values.editedEvents.length === 0), formik.setFieldValue);
-    }, []);
+        fetchSchedulingData(formik.values.events, fetchEventInfos, formik.setFieldValue);
+    }, [formik.values.events]);
 
     // Render input device options of currently chosen input device
     const renderInputDeviceOptions = eventKey => {
@@ -50,34 +53,6 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
             )
         }
     };
-
-    const checkConflicts = async () => {
-
-        // Check if each start is before end
-        for (let i = 0; i < formik.values.editedEvents.length; i++) {
-            let event = formik.values.editedEvents[i];
-            let startTime = new Date();
-            startTime.setHours(event.changedStartTimeHour, event.changedStartTimeMinutes, 0, 0);
-            let endTime = new Date();
-            endTime.setHours(event.changedEndTimeHour, event.changedEndTimeMinutes, 0, 0);
-
-            if (startTime > endTime) {
-                addNotification('error', 'CONFLICT_END_BEFORE_START', -1, null, NOTIFICATION_CONTEXT);
-                return false;
-            }
-        }
-
-        // Use backend for check for conflicts with other events
-        const response = await checkForSchedulingConflicts(formik.values.editedEvents);
-
-        if (response.length > 0) {
-            setConflicts(response);
-            return false;
-        } else {
-            setConflicts([]);
-            return true;
-        }
-    }
 
     return (
         <>
@@ -137,7 +112,13 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                             <span>{t('EVENTS.EVENTS.DETAILS.METADATA.TITLE')}</span>
                                                                         </td>
                                                                         <td className="editable ng-isolated-scope">
-                                                                            <Field name={`editedEvents.${key}.changedTitle`}
+                                                                            {/*
+                                                                              * Per event there are 14 input fields, so with 'key * 14', the right
+                                                                              * event is reached. After the '+' comes the number of the input field.
+                                                                              * This is the first input field for this event.
+                                                                              */}
+                                                                            <Field tabIndex={(key * 14) + 1}
+                                                                                   name={`editedEvents.${key}.changedTitle`}
                                                                                    metadataField={{
                                                                                        type: 'text'
                                                                                    }}
@@ -149,7 +130,13 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                             <span>{t('EVENTS.EVENTS.DETAILS.METADATA.SERIES')}</span>
                                                                         </td>
                                                                         <td className="editable ng-isolated-scope">
-                                                                            <Field name={`editedEvents.${key}.changedSeries`}
+                                                                            {/*
+                                                                              * Per event there are 14 input fields, so with 'key * 14', the right
+                                                                              * event is reached. After the '+' comes the number of the input field.
+                                                                              * This is the second input field for this event.
+                                                                              */}
+                                                                            <Field tabIndex={(key * 14) + 2}
+                                                                                   name={`editedEvents.${key}.changedSeries`}
                                                                                    metadataField={{
                                                                                        type: 'text',
                                                                                        collection: seriesOptions,
@@ -170,8 +157,13 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                     <tr>
                                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.START_TIME')}</td>
                                                                         <td>
-                                                                            {/* One option for each entry in hours*/}
-                                                                            <Field tabIndex="5"
+                                                                            {/* One option for each entry in hours
+                                                                              *
+                                                                              * Per event there are 14 input fields, so with 'key * 14', the right
+                                                                              * event is reached. After the '+' comes the number of the input field.
+                                                                              * This is the third input field for this event.
+                                                                              */}
+                                                                            <Field tabIndex={(key * 14) + 3}
                                                                                    as="select"
                                                                                    name={`editedEvents.${key}.changedStartTimeHour`}
                                                                                    placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}>
@@ -182,8 +174,14 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                                     </option>
                                                                                 ))}
                                                                             </Field>
-                                                                            {/* One option for each entry in minutes*/}
-                                                                            <Field tabIndex="5"
+
+                                                                            {/* One option for each entry in minutes
+                                                                              *
+                                                                              * Per event there are 14 input fields, so with 'key * 14', the right
+                                                                              * event is reached. After the '+' comes the number of the input field.
+                                                                              * This is the fourth input field for this event.
+                                                                              */}
+                                                                            <Field tabIndex={(key * 14) + 4}
                                                                                    as="select"
                                                                                    name={`editedEvents.${key}.changedStartTimeMinutes`}
                                                                                    placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}>
@@ -199,8 +197,13 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                     <tr>
                                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.END_TIME')}</td>
                                                                         <td>
-                                                                            {/* One option for each entry in hours*/}
-                                                                            <Field tabIndex="7"
+                                                                            {/* One option for each entry in hours
+                                                                              *
+                                                                              * Per event there are 14 input fields, so with 'key * 14', the right
+                                                                              * event is reached. After the '+' comes the number of the input field.
+                                                                              * This is the fifth input field for this event.
+                                                                              */}
+                                                                            <Field tabIndex={(key * 14) + 5}
                                                                                    as="select"
                                                                                    name={`editedEvents.${key}.changedEndTimeHour`}
                                                                                    placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}>
@@ -211,8 +214,14 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                                     </option>
                                                                                 ))}
                                                                             </Field>
-                                                                            {/* One option for each entry in minutes*/}
-                                                                            <Field tabIndex="8"
+
+                                                                            {/* One option for each entry in minutes
+                                                                              *
+                                                                              * Per event there are 14 input fields, so with 'key * 14', the right
+                                                                              * event is reached. After the '+' comes the number of the input field.
+                                                                              * This is the sixth input field for this event.
+                                                                              */}
+                                                                            <Field tabIndex={(key * 14) + 6}
                                                                                    as="select"
                                                                                    name={`editedEvents.${key}.changedEndTimeMinutes`}
                                                                                    placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}>
@@ -225,29 +234,31 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                             </Field>
                                                                         </td>
                                                                     </tr>
-                                                                    {/* Dropdown for location/input device */}
+
+                                                                    {/* Dropdown for location/input device
+                                                                      *
+                                                                      * Per event there are 14 input fields, so with 'key * 14', the right
+                                                                      * event is reached. After the '+' comes the number of the input field.
+                                                                      * This is the seventh input field for this event.
+                                                                      */}
                                                                     <tr>
                                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION')}</td>
-                                                                        <td>
-                                                                            <select tabIndex="11"
-                                                                                    defaultValue="default"
-                                                                                    onChange={e => {
-                                                                                        formik.setFieldValue(`editedEvents.${key}.changedLocation`, e.target.value);
-                                                                                        formik.setFieldValue(`editedEvents.${key}.changedDeviceInputs`, []);
-                                                                                    }}>
-                                                                                <option value='default'
-                                                                                        hidden>
-                                                                                    {formik.values.editedEvents[key].changedLocation}
-                                                                                </option>
-                                                                                {inputDevices.map((inputDevices, key) => (
-                                                                                    <option key={key}
-                                                                                            value={inputDevices.name}>
-                                                                                        {inputDevices.name}
-                                                                                    </option>
-                                                                                ))}
-                                                                            </select>
+                                                                        <td className="editable ng-isolated-scope">
+                                                                            <DropDown value={formik.values.editedEvents[key].changedLocation}
+                                                                                      text={formik.values.editedEvents[key].changedLocation}
+                                                                                      options={inputDevices}
+                                                                                      type={'captureAgent'}
+                                                                                      required={true}
+                                                                                      handleChange={element => {
+                                                                                          formik.setFieldValue(`editedEvents.${key}.changedLocation`, element.value);
+                                                                                          formik.setFieldValue(`editedEvents.${key}.changedDeviceInputs`, []);
+                                                                                      }}
+                                                                                      placeholder={`-- ${t('SELECT_NO_OPTION_SELECTED')} --`}
+                                                                                      tabIndex={(key * 14) + 7}
+                                                                            />
                                                                         </td>
                                                                     </tr>
+
                                                                     {/* the following seven lines can be commented in, when the possibility of a selection of individual inputs is desired and the backend has been adapted to support it
                                                                     <tr>
                                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.INPUTS')}</td>
@@ -257,13 +268,20 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                         </td>
                                                                     </tr>
                                                                     */}
-                                                                    {/* Radio buttons for weekdays */}
+
+                                                                    {/* Radio buttons for weekdays
+                                                                      *
+                                                                      * Per event there are 14 input fields, so with 'key * 14', the right
+                                                                      * event is reached. After the '+' comes the number of the input field.
+                                                                      * These radio buttons are input fields 8 to 14 for this event.
+                                                                      */}
                                                                     <tr>
                                                                         <td>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.WEEKDAY')}</td>
                                                                         <td className="weekdays">
                                                                             {weekdays.map((day, index) => (
                                                                                 <label key={index}>
-                                                                                    <Field type="radio"
+                                                                                    <Field tabIndex={(key * 14) + 8 + index}
+                                                                                           type="radio"
                                                                                            name={`editedEvents.${key}.changedWeekday`}
                                                                                            value={day.name}/>
                                                                                     {t(day.label)}
@@ -296,14 +314,20 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                         disabled={!(formik.dirty && formik.isValid)}
                         onClick={async () => {
                             removeNotificationWizardForm();
-                            if (await checkConflicts()) {
+                            if (await checkSchedulingConflicts(formik.values, setConflicts, checkForSchedulingConflicts, addNotification)) {
                                 nextPage(formik.values);
                             }
                         }}
                         tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>
 
                 <button className="cancel"
-                        onClick={() => previousPage(formik.values, false)}
+                        onClick={() => {
+                            previousPage(formik.values, false);
+                            if (!formik.isValid) {
+                                // set page as not filled out
+                                setPageCompleted([]);
+                            }
+                        }}
                         tabIndex="101">{t('WIZARD.BACK')}</button>
             </footer>
 

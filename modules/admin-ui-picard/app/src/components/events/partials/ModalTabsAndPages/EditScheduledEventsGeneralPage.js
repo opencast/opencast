@@ -4,8 +4,14 @@ import cn from "classnames";
 import {getSelectedRows} from "../../../../selectors/tableSelectors";
 import {connect} from "react-redux";
 import {useSelectionChanges} from "../../../../hooks/wizardHooks";
-import {hasDeviceAccess} from "../../../../utils/resourceUtils";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
+import {
+    checkValidityUpdateScheduleEventSelection,
+    isAgentAccess,
+    isAllAgentAccess,
+    isAllScheduleEditable,
+    isScheduleEditable
+} from "../../../../utils/bulkActionUtils";
 
 /**
  * This component renders the table overview of selected events in edit scheduled events bulk action
@@ -17,55 +23,10 @@ const EditScheduledEventsGeneralPage = ({ nextPage, formik, selectedRows, user }
 
     useEffect(() => {
         // Set field value for formik on mount, because initially all events are selected
-        formik.setFieldValue('events', selectedEvents);
+        if (formik.values.events.length === 0) {
+            formik.setFieldValue('events', selectedEvents);
+        }
     }, []);
-
-    // Check if an event is scheduled and therefore editable
-    const isEditable = event => {
-        return event.event_status.toUpperCase().indexOf('SCHEDULED') > -1
-            || !event.selected;
-    };
-
-    // Check if multiple events are scheduled and therefore editable
-    const isAllEditable = events => {
-        for (let i = 0; i < events.length; i++) {
-            if(!isEditable(events[i])) {
-                return false;
-            }
-        }
-        return true;
-    };
-
-    const isAgentAccess = event => {
-        return (!event.selected) || hasDeviceAccess(user, event.agent_id);
-    }
-
-    const isAllAgentAccess = events => {
-        for (let i = 0; i < events.length; i++) {
-            if(!events[i].selected || !isEditable(events[i])) {
-                continue;
-            }
-            if(!isAgentAccess(events[i])){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    // Check validity for activating next button
-    const checkValidity = () => {
-        if (formik.values.events.length > 0) {
-            if (isAllEditable(formik.values.events)
-                && isAllAgentAccess(formik.values.events)
-                && formik.isValid) {
-                return formik.values.events.some(event => event.selected === true);
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    };
 
     return (
         <>
@@ -73,13 +34,13 @@ const EditScheduledEventsGeneralPage = ({ nextPage, formik, selectedRows, user }
                 <div className="modal-body">
                     <div className="row">
                         {/* Show only if non-scheduled event is selected*/}
-                        {!isAllEditable(selectedEvents) && (
+                        {!isAllScheduleEditable(selectedEvents) && (
                             <div className="alert sticky warning">
                                 <p>{t('BULK_ACTIONS.EDIT_EVENTS.GENERAL.CANNOTSTART')}</p>
                             </div>
                         )}
                         {/* Show only if user doesn't have access to all agents*/}
-                        {!isAllAgentAccess(selectedEvents) && (
+                        {!isAllAgentAccess(selectedEvents, user) && (
                             <div className="alert sticky info">
                                 <p>{t('BULK_ACTIONS.EDIT_EVENTS.GENERAL.CANNOTEDITSCHEDULE')}</p>
                             </div>
@@ -106,7 +67,7 @@ const EditScheduledEventsGeneralPage = ({ nextPage, formik, selectedRows, user }
                                     <tbody>
                                     {/* Repeat for each selected event */}
                                     {selectedEvents.map((event, key) => (
-                                        <tr key={key} className={cn({error: !isEditable(event)},{info: !isAgentAccess(event)})}>
+                                        <tr key={key} className={cn({error: !isScheduleEditable(event)},{info: !isAgentAccess(event, user)})}>
                                             <td>
                                                 <input type="checkbox"
                                                        name="events"
@@ -131,10 +92,10 @@ const EditScheduledEventsGeneralPage = ({ nextPage, formik, selectedRows, user }
                 <button type="submit"
                         className={cn("submit",
                             {
-                                active: checkValidity(),
-                                inactive: !checkValidity()
+                                active: checkValidityUpdateScheduleEventSelection(formik.values, user),
+                                inactive: !checkValidityUpdateScheduleEventSelection(formik.values, user)
                             })}
-                        disabled={!checkValidity()}
+                        disabled={!checkValidityUpdateScheduleEventSelection(formik.values, user)}
                         onClick={() => {
                             nextPage(formik.values);
                         }}

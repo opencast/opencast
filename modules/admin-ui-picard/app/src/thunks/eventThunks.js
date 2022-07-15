@@ -280,7 +280,7 @@ export const postNewEvent = (values, metadataInfo, extendedMetadata) => async (d
             metadata: {
                 start: startDate,
                 device: values.location,
-                inputs: values.deviceInputs.join(','),
+                inputs: !!values.deviceInputs ? values.deviceInputs.join(',') : '',
                 end: endDate,
                 duration: duration.toString()
             }
