@@ -635,7 +635,8 @@
                "EDITOR_NEEDS_CUTTING": "Öppna video editor (en kommentar anger att det har begärts att skära videon)",
                "COMMENTS": "Visa kommentarer",
                "PAUSED_WORKFLOW": "Visa pausat arbetsflöde",
-               "PRESENTER": "Filter för denna presentatör"
+               "PRESENTER": "Filter för denna presentatör",
+               "COPY_TO_NEW_EVENT": "Copy metadata to new event"
             }
          },
          "STATUS": {

@@ -142,7 +142,7 @@
       "HELP": "Ayuda",
       "USERS_GUIDE": "Guía del usuario",
       "DOCUMENTATION": "Documentación",
-      "REST_DOC": "Documentación de la API REST",
+      "REST_DOC": "API REST",
       "HOTKEY_CHEAT_SHEET": "Atajos de Teclado",
       "ADOPTER_REGISTRATION": "Registro de Adopters"
    },
@@ -635,7 +635,8 @@
                "EDITOR_NEEDS_CUTTING": "Abrir editor de vídeo (un comentario indica que se ha solicitado edición)",
                "COMMENTS": "Ver comentarios",
                "PAUSED_WORKFLOW": "Ver Workflows pausados",
-               "PRESENTER": "Filtrar para este presentador"
+               "PRESENTER": "Filtrar para este presentador",
+               "COPY_TO_NEW_EVENT": "Copy metadata to new event"
             }
          },
          "STATUS": {
@@ -1303,12 +1304,12 @@
                "ADD": "Añadir rol"
             },
             "STRENGTH": {
-               "BAD": "Bad password",
-               "VERYWEAK": "Very weak password",
-               "WEAK": "Weak password",
-               "GOOD": "Good password",
-               "STRONG": "Strong password",
-               "VERYSTRONG": "Very strong password"
+               "BAD": "Contraseña Incorrecta",
+               "VERYWEAK": "Contraseña muy débil",
+               "WEAK": "Contraseña débil",
+               "GOOD": "Buen Password",
+               "STRONG": "Contraseña segura",
+               "VERYSTRONG": "Contraseña muy segura"
             }
          }
       },

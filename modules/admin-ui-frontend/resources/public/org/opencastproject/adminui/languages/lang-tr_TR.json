@@ -635,7 +635,8 @@
                "EDITOR_NEEDS_CUTTING": "Video Editörünü aç (videonun kesilmesini isteyen bir yorum var)",
                "COMMENTS": "Yorumları görüntüle",
                "PAUSED_WORKFLOW": "Duraklatılmış iş akışını görüntüle",
-               "PRESENTER": "Bu sunucu için filtre"
+               "PRESENTER": "Bu sunucu için filtre",
+               "COPY_TO_NEW_EVENT": "Copy metadata to new event"
             }
          },
          "STATUS": {

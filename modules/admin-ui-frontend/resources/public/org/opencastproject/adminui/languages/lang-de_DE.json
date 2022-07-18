@@ -635,7 +635,8 @@
                "EDITOR_NEEDS_CUTTING": "Video Editor öffnen (ein Kommentar zeigt, dass ein Videoschnitt angefordert wurde)",
                "COMMENTS": "Kommentare ansehen",
                "PAUSED_WORKFLOW": "Angehaltenen Workflow anzeigen",
-               "PRESENTER": "Nach diesem Vortragenden filtern"
+               "PRESENTER": "Nach diesem Vortragenden filtern",
+               "COPY_TO_NEW_EVENT": "Copy metadata to new event"
             }
          },
          "STATUS": {

@@ -635,7 +635,8 @@
                "EDITOR_NEEDS_CUTTING": "Otwórz w Edytorze (komenarz wskazuje, że ktoś domaga się wycięcia fragmentu filmu)",
                "COMMENTS": "Pokaż komentarze",
                "PAUSED_WORKFLOW": "Zobacz zatrzymane procesy zadań",
-               "PRESENTER": "Filter for this presenter"
+               "PRESENTER": "Filter for this presenter",
+               "COPY_TO_NEW_EVENT": "Copy metadata to new event"
             }
          },
          "STATUS": {
