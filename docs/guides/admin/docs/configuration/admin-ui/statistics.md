@@ -25,24 +25,9 @@ A complete setup consists of the following components:
 For example, using Opencast's [_opencast-influxdb-adapter_](https://github.com/opencast/opencast-influxdb-adapter), your
 architecture would look like this:
 
-```graphviz dot statistics-architecture.png
-
-/**
-Webserver Logs --> opencast-influxdb-adapter --> InfluxDB --> Opencast
-**/
-
-digraph G {
-  rankdir="LR";
-  bgcolor="transparent";
-  node[fontsize=8.0, fontname="sans"];
-
-  webserver -> adapter -> influxdb -> opencast;
-
-  webserver[label="Webserver Logs"];
-  adapter[label="influxdb-adapter"];
-  influxdb[label="InfluxDB"];
-  opencast[label="Opencast"];
-}
+```mermaid
+graph LR
+  Webserver[Webserver Logs] --> Adapter --> InfluxDB --> Opencast;
 ```
 
 Precisely, the Opencast bundle `opencast-statistics-provider-influx` is the one that needs to be able to connect to

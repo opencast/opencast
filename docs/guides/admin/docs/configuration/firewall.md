@@ -19,41 +19,31 @@ General rules are:
 
 A visual representation of the communication within a three-node cluster will look like this:
 
-```graphviz dot network.png
-digraph G {
-  user[label = "User"];
-  activemq[label = "ActiveMQ"];
-  oc1[label = "Opencast Admin"];
-  oc2[label = "Opencast Worker"];
-  oc3[label = "Opencast Presentation"];
-  db[label = "Database"];
-  es[label = "Elasticsearch"];
-  storage[label = "Storage"];
-  ca[label = "Capture Agent"];
+```mermaid
+graph LR
 
-  user -> oc1 [label = "80, 443"];
-  user -> oc2 [style = "dashed", label = "80¹, 443¹"];
-  user -> oc3 [label = "80, 443"];
-  oc1 -> oc2 [dir = "both", label = "80, 443"];
-  oc2 -> oc3 [dir = "both", label = "80, 443"];
-  oc3 -> oc1 [dir = "both", label = "80, 443"];
-  oc1 -> db [label = "3306²"];
-  oc2 -> db [label = "3306²"];
-  oc3 -> db [label = "3306²"];
-  oc1 -> activemq [label = "61616"];
-  oc1 -> es[label = "9300"];
-  oc1 -> storage;
-  oc2 -> storage;
-  oc3 -> storage;
-  ca -> oc1[label = "80, 443"];
-}
+  user(User) -->|80, 443| oc1(Opencast Admin)
+  user -.->|80, 443| oc2(Opencast Worker)
+  user -->|80, 443| oc3(Opencast Presentation)
+  oc1 <-->|80, 443| oc2
+  oc2 <-->|80, 443| oc3
+  oc3 <-->|80, 443| oc1
+  oc1 -->|61616| activemq(ActiveMQ)
+  oc1 -->|e.g. 3306| db(Database)
+  oc2 -->|e.g. 3306| db
+  oc3 -->|e.g. 3306| db
+  oc1 -->|9200| es(Elasticsearch)
+  oc1 --> storage(Storage)
+  oc2 --> storage
+  oc3 --> storage
+  ca(Capture Agent) -->|80, 443| oc1
 ```
 
 Notes:
 
-- _The numbers in the diagram describe TCP ports_
-- _¹) Communication between users and workers is often not necessary_
-- _²) If you use a database other than MariaDB, the port may differ_
+- The numbers in the diagram describe TCP ports
+- Communication between users and workers is often not necessary
+- If you use a database other than MariaDB, the port may differ
 
 
 Suggested Firewall Configurations

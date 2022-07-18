@@ -1,6 +1,4 @@
 mkdocs
 mkdocs-windmill
-markdown_inline_graphviz_extension
-markdown-inline-graphviz-extension-png
 mkdocs-mermaid2-plugin
 mkdocs-macros-plugin
