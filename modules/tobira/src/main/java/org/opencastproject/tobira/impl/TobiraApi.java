@@ -28,6 +28,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type;
 
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.util.Jsons;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -61,6 +62,25 @@ import javax.ws.rs.core.Response;
 public class TobiraApi {
   private static final Logger logger = LoggerFactory.getLogger(TobiraApi.class);
 
+  // Versioning the Tobira API:
+  //
+  // Since both Tobira and this API are changing over time, we need some machanism for ensuring they
+  // are compatible. We don't want to enforce a 1:1 thing, where a particular Tobira needs one
+  // exact API as that makes the update process harder (especially once this module is included in
+  // the community version). So instead we have some semver-like versioning here. Increase the
+  // minor version for backwards-compatible changes and the major version for breaking changes.
+  //
+  // Note that we cannot use the Opencast version as some institutions might want to patch their
+  // Opencast to include a newer Tobira module.
+  //
+  // So what's a breaking change and what not? For starters, the harvesting still needs to work with
+  // all Tobira versions that it worked with previously. Since Tobira ignores unknown fields,
+  // adding new JSON fields is a non-breaking change. You should also consider whether Tobira needs
+  // to resynchronize, i.e. to get new data.
+  private static final int VERSION_MAJOR = 1;
+  private static final int VERSION_MINOR = 0;
+  private static final String VERSION = VERSION_MAJOR + "." + VERSION_MINOR;
+
   private SearchService searchService;
   private SeriesService seriesService;
   private Workspace workspace;
@@ -80,6 +100,26 @@ public class TobiraApi {
 
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
+  }
+
+  @GET
+  @Path("/version")
+  @Produces(APPLICATION_JSON)
+  @RestQuery(
+      name = "version",
+      description = "The Tobira Module API version",
+      restParameters = {},
+      responses = {
+          @RestResponse(description = "Version information", responseCode = HttpServletResponse.SC_OK)
+      },
+      returnDescription = "JSON object with string field 'version'"
+  )
+  public Response version() {
+    var body = Jsons.obj(Jsons.p("version", VERSION));
+    return Response.ok()
+        .type(APPLICATION_JSON_TYPE)
+        .entity(body.toJson())
+        .build();
   }
 
   @GET
