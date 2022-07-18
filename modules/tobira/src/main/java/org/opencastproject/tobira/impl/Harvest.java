@@ -135,11 +135,27 @@ final class Harvest {
           final var lastSeriesModifiedDate = rawSeries.get(rawSeries.size() - 1).getModifiedDate();
           return !event.getModified().after(lastSeriesModifiedDate);
         })
-        .map(event -> new Item(event, workspace));
+        .map(event -> {
+          try {
+            return new Item(event, workspace);
+          } catch (Exception e) {
+            var id = event == null ? null : event.getId();
+            logger.error("Error reading event '{}'", id, e);
+            throw e;
+          }
+        });
 
     final var seriesItems = rawSeries.stream()
         .limit(preferredAmount)
-        .map(series -> new Item(series));
+        .map(series -> {
+          try {
+            return new Item(series);
+          } catch (Exception e) {
+            var id = series == null ? null : series.getId();
+            logger.error("Error reading series '{}'", id, e);
+            throw e;
+          }
+        });
 
 
     // Combine series and events into one combined list and sort it.
