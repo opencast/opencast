@@ -31,6 +31,8 @@ import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.search.api.SearchResultItem;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.series.api.Series;
 import org.opencastproject.util.Jsons;
@@ -92,7 +94,7 @@ class Item {
           Jsons.p("thumbnail", findThumbnail(mp)),
           Jsons.p("timelinePreview", findTimelinePreview(mp)),
           Jsons.p("tracks", Jsons.arr(assembleTracks(event, mp))),
-          Jsons.p("acl", assembleAcl(event)),
+          Jsons.p("acl", assembleAcl(event.getAccessControlList())),
           Jsons.p("isLive", isLive),
           Jsons.p("metadata", dccToMetadata(mp, workspace)),
           Jsons.p("updated", event.getModified().getTime())
@@ -158,10 +160,10 @@ class Item {
     return Jsons.obj(fields);
   }
 
-  private static Jsons.Obj assembleAcl(SearchResultItem event) {
+  private static Jsons.Obj assembleAcl(AccessControlList acl) {
     final var canReadRoles = new ArrayList<Jsons.Val>();
     final var canWriteRoles = new ArrayList<Jsons.Val>();
-    for (final var entry: event.getAccessControlList().getEntries()) {
+    for (final var entry: acl.getEntries()) {
       if (entry.getAction().equals(Permissions.Action.READ.toString())) {
         canReadRoles.add(Jsons.v(entry.getRole()));
       } else if (entry.getAction().equals(Permissions.Action.WRITE.toString())) {
@@ -247,6 +249,16 @@ class Item {
   Item(Series series) {
     this.modifiedDate = series.getModifiedDate();
 
+    var serializedACL = series.getAccessControl();
+    var acl = new AccessControlList();
+    if (serializedACL != null) {
+      try {
+        acl = AccessControlParser.parseAcl(serializedACL);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+
     if (series.isDeleted()) {
       this.obj = Jsons.obj(
         Jsons.p("kind", "series-deleted"),
@@ -259,6 +271,7 @@ class Item {
         Jsons.p("id", series.getId()),
         Jsons.p("title", series.getDublinCore().getFirst(PROPERTY_TITLE)),
         Jsons.p("description", series.getDublinCore().getFirst(PROPERTY_DESCRIPTION)),
+        Jsons.p("acl", assembleAcl(acl)),
         Jsons.p("updated", series.getModifiedDate().getTime())
       );
     }
