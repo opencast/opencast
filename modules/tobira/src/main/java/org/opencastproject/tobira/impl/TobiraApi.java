@@ -22,7 +22,6 @@
 package org.opencastproject.tobira.impl;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.opencastproject.util.doc.rest.RestParameter.Type;
 
@@ -116,10 +115,7 @@ public class TobiraApi {
   )
   public Response version() {
     var body = Jsons.obj(Jsons.p("version", VERSION));
-    return Response.ok()
-        .type(APPLICATION_JSON_TYPE)
-        .entity(body.toJson())
-        .build();
+    return Response.ok(body.toJson()).build();
   }
 
   @GET
@@ -176,11 +172,8 @@ public class TobiraApi {
       var json = Harvest.harvest(
           preferredAmount, new Date(since), searchService, seriesService, workspace);
 
-      return Response.ok()
-          .type(APPLICATION_JSON_TYPE)
-          // TODO: encoding
-          .entity(json.toJson())
-          .build();
+      // TODO: encoding
+      return Response.ok(json.toJson()).build();
     } catch (Exception e) {
       logger.error("Unexpected exception in tobira/harvest", e);
       return Response.serverError().build();
