@@ -71,6 +71,16 @@
 
         "has_open_comments": { "type" : "boolean" },
 
+        "comments": {
+            "type": "nested",
+            "properties": {
+                "id": { "type": "keyword" },
+                "reason": { "type": "keyword" },
+                "text": { "type": "text" },
+                "resolvedStatus": { "type":  "boolean"}
+            }
+        },
+
         "needs_cutting": { "type" : "boolean" },
 
         "recording_status": { "type" : "keyword" },
