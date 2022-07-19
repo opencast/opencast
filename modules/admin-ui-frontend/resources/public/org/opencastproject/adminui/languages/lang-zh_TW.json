@@ -635,7 +635,8 @@
                "EDITOR_NEEDS_CUTTING": "打開影片編輯器（評論中已請求裁剪影片）",
                "COMMENTS": "檢視註解",
                "PAUSED_WORKFLOW": "查看暫停的工作流",
-               "PRESENTER": "篩選此簡報者"
+               "PRESENTER": "篩選此簡報者",
+               "COPY_TO_NEW_EVENT": "Copy metadata to new event"
             }
          },
          "STATUS": {

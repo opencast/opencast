@@ -365,7 +365,10 @@ public class Ingestor implements Runnable {
       String output;
       Process process = null;
       try {
-        process = new ProcessBuilder(command).start();
+        process = new ProcessBuilder(command)
+            .redirectError(ProcessBuilder.Redirect.DISCARD)
+            .start();
+
         try (InputStream in = process.getInputStream()) {
           output = IOUtils.toString(in, StandardCharsets.UTF_8);
         }

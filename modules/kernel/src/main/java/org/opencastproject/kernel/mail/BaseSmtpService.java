@@ -250,13 +250,16 @@ public class BaseSmtpService {
       return;
     }
     Transport t = getSession().getTransport(mailTransport);
+    ClassLoader cl = Thread.currentThread().getContextClassLoader();
     try {
+      Thread.currentThread().setContextClassLoader(javax.mail.Session.class.getClassLoader());
       if (user != null)
         t.connect(user, password);
       else
         t.connect();
       t.sendMessage(message, message.getAllRecipients());
     } finally {
+      Thread.currentThread().setContextClassLoader(cl);
       t.close();
     }
   }

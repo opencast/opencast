@@ -635,7 +635,8 @@
                "EDITOR_NEEDS_CUTTING": "Odpri video urejevalnik (opomba označuje, da je bilo sproženo obrezovanje videa)",
                "COMMENTS": "Poglej komentarje",
                "PAUSED_WORKFLOW": "Poglej začasno ustavljen potek dela",
-               "PRESENTER": "Filter for this presenter"
+               "PRESENTER": "Filter for this presenter",
+               "COPY_TO_NEW_EVENT": "Copy metadata to new event"
             }
          },
          "STATUS": {

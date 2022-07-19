@@ -635,7 +635,8 @@
                "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "View comments",
                "PAUSED_WORKFLOW": "View paused workflow",
-               "PRESENTER": "Filter for this presenter"
+               "PRESENTER": "Filter for this presenter",
+               "COPY_TO_NEW_EVENT": "Copy metadata to new event"
             }
          },
          "STATUS": {

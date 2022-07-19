@@ -22,14 +22,17 @@
 
 // Controller for creating a new event. This is a wizard, so it implements a state machine design pattern.
 angular.module('adminNg.controllers')
-.controller('NewEventCtrl', ['$scope', '$timeout', 'Table', 'NewEventStates', 'NewEventResource', 'EVENT_TAB_CHANGE',
-  'Notifications', 'Modal',
-  function ($scope, $timeout, Table, NewEventStates, NewEventResource, EVENT_TAB_CHANGE, Notifications, Modal) {
+.controller('NewEventCtrl', ['$scope', '$timeout', 'Table', 'NewEventStates', 'NewEventResource',
+  'EventMetadataResource', 'EVENT_TAB_CHANGE','Notifications', 'Modal',
+  function ($scope, $timeout, Table, NewEventStates, NewEventResource, EventMetadataResource, EVENT_TAB_CHANGE,
+    Notifications, Modal) {
     $scope.states = NewEventStates.get();
     // This is a hack, due to the fact that we need to read html from the server :(
     // Shall be banished ASAP
 
     var metadata,
+        extendedMetadata,
+        sourceController,
         accessController,
         // Reset all the wizard states
         resetStates = function () {
@@ -47,8 +50,25 @@ angular.module('adminNg.controllers')
         // MH-12854 get latest collections (series)
         state.stateController.reset({resetDefaults: true});
         metadata = state.stateController;
+      } else if (state.stateController.isMetadataExtendedState) {
+        state.stateController.reset({resetDefaults: true});
+        extendedMetadata = state.stateController;
+      } else if (state.stateController.isSourceState) {
+        state.stateController.reset({resetDefaults: true});
+        sourceController = state.stateController;
       }
     });
+
+    // Set template event Id
+    if (angular.isDefined(metadata)) {
+      metadata.setCopyEventId( $scope.resourceId );
+    }
+    if (angular.isDefined(extendedMetadata)) {
+      extendedMetadata.setCopyEventId( $scope.resourceId );
+    }
+    if (angular.isDefined(sourceController)) {
+      sourceController.setCopyEventId( $scope.resourceId );
+    }
 
     if (angular.isDefined(metadata) && angular.isDefined(accessController)) {
       accessController.setMetadata(metadata);

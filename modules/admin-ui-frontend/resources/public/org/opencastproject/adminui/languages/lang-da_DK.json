@@ -635,7 +635,8 @@
                "EDITOR_NEEDS_CUTTING": "Åbn videoredigeringsværktøjet (en kommentar indikerer, at der er blevet anmodet om videobeskæring)",
                "COMMENTS": "Vis kommentarer",
                "PAUSED_WORKFLOW": "Vis arbejdsgange på pause",
-               "PRESENTER": "Filtrér til denne vært"
+               "PRESENTER": "Filtrér til denne vært",
+               "COPY_TO_NEW_EVENT": "Copy metadata to new event"
             }
          },
          "STATUS": {

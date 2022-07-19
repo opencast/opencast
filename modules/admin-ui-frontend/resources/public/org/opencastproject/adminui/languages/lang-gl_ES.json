@@ -635,7 +635,8 @@
                "EDITOR_NEEDS_CUTTING": "Abrir editor de vídeo (un comentario indica que se solicitou cortar o vídeo)",
                "COMMENTS": "Ver comentarios",
                "PAUSED_WORKFLOW": "Ver fluxos de traballo pausados",
-               "PRESENTER": "Filtrar por este presentador"
+               "PRESENTER": "Filtrar por este presentador",
+               "COPY_TO_NEW_EVENT": "Copy metadata to new event"
             }
          },
          "STATUS": {

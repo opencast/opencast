@@ -635,7 +635,8 @@
                "EDITOR_NEEDS_CUTTING": "打开视频编辑器（有人通过评论建议剪辑视频）",
                "COMMENTS": "查看评论",
                "PAUSED_WORKFLOW": "查看已暂停的工作流",
-               "PRESENTER": "只显示此演讲者的事件"
+               "PRESENTER": "只显示此演讲者的事件",
+               "COPY_TO_NEW_EVENT": "复制元数据到新事件"
             }
          },
          "STATUS": {
