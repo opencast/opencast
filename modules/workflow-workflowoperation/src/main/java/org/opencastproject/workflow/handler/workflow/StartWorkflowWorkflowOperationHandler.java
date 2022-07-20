@@ -27,6 +27,7 @@ import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -151,7 +152,7 @@ public class StartWorkflowWorkflowOperationHandler extends AbstractWorkflowOpera
         logger.info("Starting '{}' workflow for media package '{}'", configuredWorkflowDefinition,
                 mpId);
         workflowService.start(workflowDefinition, mp, properties);
-      } catch (WorkflowDatabaseException | WorkflowParsingException e) {
+      } catch (WorkflowDatabaseException | WorkflowParsingException | UnauthorizedException e) {
         if (failOnError) {
           throw new WorkflowOperationException(e);
         } else {

@@ -27,6 +27,7 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -72,7 +73,7 @@ public class Workflows {
       @Override public Opt<WorkflowInstance> apply(MediaPackage mp) {
         try {
           return Opt.some(wfs.start(wf.getWorkflowDefinition(), mp, wf.getParameters()));
-        } catch (WorkflowDatabaseException | WorkflowParsingException e) {
+        } catch (WorkflowDatabaseException | WorkflowParsingException | UnauthorizedException e) {
           logger.error("Cannot start workflow on media package " + mp.getIdentifier().toString(), e);
           return Opt.none();
         }

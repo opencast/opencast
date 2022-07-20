@@ -150,9 +150,12 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
       List<String> profilelist = asList(profiles);
       for (String profile : profilelist) {
         EncodingProfile encodingprofile = composerService.getProfile(profile);
-        if (encodingprofile != null)
+        if (encodingprofile != null) {
           encodingProfiles.add(encodingprofile.getIdentifier());
-        encodingProfileList.add(encodingprofile);
+          encodingProfileList.add(encodingprofile);
+        } else {
+          throw new IllegalArgumentException("Encoding profile " + profile + " not found.");
+        }
       }
     }
 

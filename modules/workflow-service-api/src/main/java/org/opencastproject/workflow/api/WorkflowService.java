@@ -103,7 +103,8 @@ public interface WorkflowService {
    *           if there is a problem parsing or serializing workflow entities
    */
   WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage mediaPackage,
-          Map<String, String> properties) throws WorkflowDatabaseException, WorkflowParsingException;
+          Map<String, String> properties) throws WorkflowDatabaseException, WorkflowParsingException,
+          UnauthorizedException;
 
   /**
    * Creates a new workflow instance and starts the workflow.
@@ -123,9 +124,15 @@ public interface WorkflowService {
    *           if there is a problem storing the workflow instance in persistence
    * @throws WorkflowParsingException
    *           if there is a problem parsing or serializing workflow entities
+   * @throws IllegalStateException
+   *           if there is currently a workflow active on the media package
+   * @throws UnauthorizedException
+   *           if the current user does not have {@link org.opencastproject.security.api.Permissions.Action#WRITE}
+   *           on the media package.
    */
   WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage mediaPackage, Long parentWorkflowId,
-          Map<String, String> properties) throws WorkflowDatabaseException, WorkflowParsingException, NotFoundException;
+          Map<String, String> properties) throws WorkflowDatabaseException, WorkflowParsingException,
+          UnauthorizedException, NotFoundException, IllegalStateException;
 
   /**
    * Creates a new workflow instance and starts the workflow.
@@ -141,7 +148,7 @@ public interface WorkflowService {
    *           if there is a problem parsing or serializing workflow entities
    */
   WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage mediaPackage)
-          throws WorkflowDatabaseException, WorkflowParsingException;
+          throws WorkflowDatabaseException, WorkflowParsingException, UnauthorizedException;
 
   /**
    * Gets the total number of workflows that have been created to date.
@@ -279,7 +286,7 @@ public interface WorkflowService {
    * @throws UnauthorizedException
    *           if the current user does not have read permissions on the workflow instance's mediapackage.
    */
-  void update(WorkflowInstance workflowInstance) throws WorkflowException, UnauthorizedException;
+  void update(WorkflowInstance workflowInstance) throws WorkflowDatabaseException, UnauthorizedException;
 
   /**
    * Gets the list of available workflow definitions. In order to be "available", a workflow definition must be
