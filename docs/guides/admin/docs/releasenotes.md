@@ -1,7 +1,25 @@
 # Opencast 12: Release Notes
 
-Features
---------
+Opencast 12.1
+-------------
+
+The first maintenance release of Opencast 12.
+Notable changes:
+
+- New editor version including dark mode feature
+- Updated Paella Player 7 beta version
+- Fix email sending
+- Fix MariaDB database driver
+- Allow creating a new event with metadata from another event
+- Azure transcription integration
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
+
+Opencast 12.0
+-------------
+
+### Features
 
 - Opencast 12 ships Paella Player 6.5.6 as its new default player.
 - Paella Player 7 supporting new features like CSS customization is now included and
@@ -17,8 +35,7 @@ Features
 - A new workflow operation handler [allows you to copy media package elements from existing publications
   ](https://github.com/opencast/opencast/pull/3554)
 
-Improvements
-------------
+### Improvements
 
 - ActiveMQ is no longer required by Opencast. It is safe to uninstall.
 - In case a request to Elasticsearch fails because of an
@@ -45,8 +62,7 @@ Improvements
   [explore Opencast's H2 database](https://docs.opencast.org/r/12.x/developer/explore-h2-database/).
 
 
-Behavior changes
------------------
+### Behavior changes
 
 - Due to the lack of usage and thus testing, official support of Opencast for
   MySQL databases is dropped. Please use MariaDB or PostegreSQL instead.
@@ -63,8 +79,7 @@ Behavior changes
   different. This may cause new series to be generated for capture agents in
   some cases. [[#3810](https://github.com/opencast/opencast/pull/3810)]
 
-API changes
------------
+### API changes
 
 - Important: The endpoint for querying workflows has been removed from the
   External API.
