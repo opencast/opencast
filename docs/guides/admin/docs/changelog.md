@@ -4,6 +4,54 @@ Changelog
 Opencast 12
 -----------
 
+### Opencast 12.1
+
+*Released on July 20th, 2022*
+
+- [[#3966](https://github.com/opencast/opencast/pull/3966)] -
+  Mark Opencast 12 RPMs as ready
+- [[#3965](https://github.com/opencast/opencast/pull/3965)] -
+  Update Editor to Version 2022-07-08
+- [[#3964](https://github.com/opencast/opencast/pull/3964)] -
+  Backport Paella 7 updates from develop
+- [[#3958](https://github.com/opencast/opencast/pull/3958)] -
+  Fail early on missing encoding profile
+- [[#3957](https://github.com/opencast/opencast/pull/3957)] -
+  Fix sendmail UnsupportedDataType exception
+- [[#3954](https://github.com/opencast/opencast/pull/3954)] -
+  Handle process stdout and stderr
+- [[#3951](https://github.com/opencast/opencast/pull/3951)] -
+  Allow for more diverse exception throwing WorkflowService.start()
+- [[#3941](https://github.com/opencast/opencast/pull/3941)] -
+  Fix MariaDB Database Driver
+- [[#3920](https://github.com/opencast/opencast/pull/3920)] -
+  Automate the language selection in the transcription workflow of amberscript
+- [[#3913](https://github.com/opencast/opencast/pull/3913)] -
+  Allow Inbox Scanner to parse date formats
+- [[#3912](https://github.com/opencast/opencast/pull/3912)] -
+  Always store ACE entries in JSON as array
+- [[#3908](https://github.com/opencast/opencast/pull/3908)] -
+  Add authentication entry point with redirect query parameter support
+- [[#3906](https://github.com/opencast/opencast/pull/3906)] -
+  Add "Create new event with metadata from another event" button to Admin UI
+- [[#3901](https://github.com/opencast/opencast/pull/3901)] -
+  Paella 7: Use master tracks in HLS serverless mode
+- [[#3896](https://github.com/opencast/opencast/pull/3896)] -
+  Add Azure Transcription Integration
+- [[#3890](https://github.com/opencast/opencast/pull/3890)] -
+  fix brightspace api with large datasets
+- [[#3883](https://github.com/opencast/opencast/pull/3883)] -
+  Add formal Opensearch support
+- [[#3876](https://github.com/opencast/opencast/pull/3876)] -
+  Remove Solr from Admin Node
+- [[#3874](https://github.com/opencast/opencast/pull/3874)] -
+  Update Changelog
+- [[#3873](https://github.com/opencast/opencast/pull/3873)] -
+  Finish the Opencast 12 release notes
+- [[#3872](https://github.com/opencast/opencast/pull/3872)] -
+  Opencast 12 Upgrade Guide
+
+
 ### Opencast 12.0
 
 Dependabot's changes are excluded from this log.
