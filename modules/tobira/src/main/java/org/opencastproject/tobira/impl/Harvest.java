@@ -140,10 +140,11 @@ final class Harvest {
             return new Item(event, workspace);
           } catch (Exception e) {
             var id = event == null ? null : event.getId();
-            logger.error("Error reading event '{}'", id, e);
-            throw e;
+            logger.error("Error reading event '{}' (skipping...)", id, e);
+            return null;
           }
-        });
+        })
+        .filter(item -> item != null);
 
     final var seriesItems = rawSeries.stream()
         .limit(preferredAmount)
@@ -152,10 +153,11 @@ final class Harvest {
             return new Item(series);
           } catch (Exception e) {
             var id = series == null ? null : series.getId();
-            logger.error("Error reading series '{}'", id, e);
-            throw e;
+            logger.error("Error reading series '{}' (skipping...)", id, e);
+            return null;
           }
-        });
+        })
+        .filter(item -> item != null);
 
 
     // Combine series and events into one combined list and sort it.
