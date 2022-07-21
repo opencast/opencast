@@ -84,19 +84,9 @@ public class FFmpegEdit {
    */
   public FFmpegEdit(Properties properties) {
     String fade = properties.getProperty(VideoEditorProperties.AUDIO_FADE, DEFAULT_AUDIO_FADE);
-    try {
-      this.afade = Float.parseFloat(fade);
-    } catch (Exception e) {
-      logger.error("Unable to parse audio fade duration {}. Falling back to default value.", DEFAULT_AUDIO_FADE);
-      this.afade = Float.parseFloat(DEFAULT_AUDIO_FADE);
-    }
+    this.afade = Float.parseFloat(fade);
     fade = properties.getProperty(VideoEditorProperties.VIDEO_FADE, DEFAULT_VIDEO_FADE);
-    try {
-      this.vfade = Float.parseFloat(fade);
-    } catch (Exception e) {
-      logger.error("Unable to parse video fade duration {}. Falling back to default value.", DEFAULT_VIDEO_FADE);
-      this.vfade = Float.parseFloat(DEFAULT_VIDEO_FADE);
-    }
+    this.vfade = Float.parseFloat(fade);
     this.ffmpegProperties = properties.getProperty(VideoEditorProperties.FFMPEG_PROPERTIES, DEFAULT_FFMPEG_PROPERTIES);
     this.ffmpegScaleFilter = properties.getProperty(VideoEditorProperties.FFMPEG_SCALE_FILTER, null);
     this.videoCodec = properties.getProperty(VideoEditorProperties.VIDEO_CODEC, null);
