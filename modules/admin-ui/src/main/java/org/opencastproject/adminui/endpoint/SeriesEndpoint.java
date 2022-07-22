@@ -51,6 +51,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
+import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.util.QueryPreprocessor;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
@@ -188,6 +189,7 @@ public class SeriesEndpoint {
   private IndexService indexService;
   private ListProvidersService listProvidersService;
   private ElasticsearchIndex searchIndex;
+  private AdminUIConfiguration adminUIConfiguration;
 
   /** Default server URL */
   private String serverUrl = "http://localhost:8080";
@@ -230,6 +232,12 @@ public class SeriesEndpoint {
 
   private AclService getAclService() {
     return aclServiceFactory.serviceFor(securityService.getOrganization());
+  }
+
+  /** OSGi DI. */
+  @Reference
+  public void setAdminUIConfiguration(AdminUIConfiguration adminUIConfiguration) {
+    this.adminUIConfiguration = adminUIConfiguration;
   }
 
   @Activate
@@ -291,7 +299,8 @@ public class SeriesEndpoint {
     JSONObject seriesAccessJson = new JSONObject();
     try {
       AccessControlList seriesAccessControl = seriesService.getSeriesAccessControl(seriesId);
-      Option<ManagedAcl> currentAcl = AccessInformationUtil.matchAcls(acls, seriesAccessControl);
+      Option<ManagedAcl> currentAcl = AccessInformationUtil.matchAclsLenient(acls, seriesAccessControl,
+              adminUIConfiguration.getMatchManagedAclRolePrefixes());
       seriesAccessJson.put("current_acl", currentAcl.isSome() ? currentAcl.get().getId() : 0);
       seriesAccessJson.put("privileges", AccessInformationUtil.serializePrivilegesByRole(seriesAccessControl));
       seriesAccessJson.put("acl", AccessControlParser.toJsonSilent(seriesAccessControl));
