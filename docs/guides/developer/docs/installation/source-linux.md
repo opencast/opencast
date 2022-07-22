@@ -77,7 +77,6 @@ Required:
 
 Required as a service for running Opencast:
 
-    ActiveMQ >= 5.10
     elasticsearch = 7.9.x
 
 Required for some services. Some tests may be skipped and some features

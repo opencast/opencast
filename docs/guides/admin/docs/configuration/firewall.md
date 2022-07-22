@@ -12,8 +12,7 @@ General rules are:
 - Users communicate with Opencast via HTTP(S)
 - Capture agents communicate with Opencast via HTTP(S)
 - Opencast nodes communicate among each other via HTTP(S)
-- Often Elasticsearch and ActiveMQ are run on the admin node since this node communicates with these services
-  exclusively
+- Often Elasticsearch runs on the admin node since this node communicates with these services exclusively
 - All servers should get access to the storage infrastructure
 - All Opencast nodes need database access
 

@@ -41,7 +41,6 @@ That is why patches may only be accepted into releases branches (`r/?.x`) if the
 
 * Patches must not modify existing database tables
 * Patches must not modify the indexes or otherwise cause re-indexing
-* Patches must not require a different ActiveMQ configuration
 * Patches must not modify existing translation keys
 * Patches must work with the same configuration within a major version
 

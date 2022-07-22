@@ -93,7 +93,7 @@ Install Opencast
 
 For a basic installation (All-In-One) just run:
 
-    apt-get install opencast-{{ opencast_major_version() }}-allinone elasticsearch-oss activemq-dist
+    apt-get install opencast-{{ opencast_major_version() }}-allinone elasticsearch-oss
 
 This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.  Note
 that while the repository provides a packaged version of FFmpeg, your distribution may have a version which is
@@ -220,5 +220,5 @@ Troubleshooting
 ### Missing Dependencies
 
 This repository expects that the `stable` section is always available, regardless of which version of Opencast you have
-installed.  The 3rd party tools (ActiveMQ, FFmpeg) may or may not be in the other sections, but if they are there it is
+installed.  The 3rd party tools (e.g. FFmpeg) may or may not be in the other sections, but if they are there it is
 only during a testing period for a new version.  For day-to-day use, please install them from `stable`!
