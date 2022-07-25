@@ -1112,7 +1112,7 @@
                   "NEW_USER": "Neuer Benutzer",
                   "DETAILS": "Weitere Zugriffsrichtlinien",
                   "USER": "Benutzer",
-                  "USERS": "Für die Serie nicht authorisierte Benutzer",
+                  "USERS": "Für die Serie authorisierte Benutzer",
                   "HELP": {
                     "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Benutzer die Serie zu sehen",
                     "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Benutzer die Serie zu bearbeiten"
@@ -1190,7 +1190,7 @@
                   "LOAD_MORE_LINK": "Mehr laden",
                   "NEW_USER": "Neuer Benutzer",
                   "USER": "Benutzer",
-                  "USERS": "Für die Serie nicht authorisierte Benutzer",
+                  "USERS": "Für die Serie authorisierte Benutzer",
                   "NONEXISTENT_USER": "Nicht existierender Benutzer",
                   "HELP": {
                     "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Benutzer die Serie zu sehen",
@@ -1439,7 +1439,7 @@
                   "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu",
                   "NEW_USER": "Neuer Benutzer",
                   "USER": "Benutzer",
-                  "USERS": "Für die Richtlinie nicht authorisierte Benutzer",
+                  "USERS": "Für die Richtlinie authorisierte Benutzer",
                   "HELP": {
                     "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Benutzer die Richtlinie zu sehen",
                     "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Benutzer die Richtlinie zu bearbeiten"
@@ -1488,7 +1488,7 @@
                   "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu",
                   "NEW_USER": "Neuer Benutzer",
                   "USER": "Benutzer",
-                  "USERS": "Für die Richtlinie nicht authorisierte Benutzer",
+                  "USERS": "Für die Richtlinie authorisierte Benutzer",
                   "NONEXISTENT_USER": "Nicht existierender Benutzer",
                   "HELP": {
                     "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Benutzer die Richtlinie zu sehen",
