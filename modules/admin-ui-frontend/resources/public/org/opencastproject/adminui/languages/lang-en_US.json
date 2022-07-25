@@ -458,7 +458,7 @@
           "TEXT": "An error occurred while processing your request."
         },
          "DELETE_SUBMIT_STATE": {
-          "TEXT": "Are you sure you want to delete your registration data?"
+          "TEXT": "Are you sure you want to delete your registration data? Confirming this will also remove your registration data from the Opencast project server with the next update interval."
          }
       }
    },
