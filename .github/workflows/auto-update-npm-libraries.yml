@@ -4,9 +4,10 @@ name: Auto-update npm libraries
 # Braking changes *MUST* be caught in the CI or they will cause errors.
 # Updating test libraries like eslint should be safe however.
 
+# Perform updates at 3am every day
 on:
   schedule:
-  - cron: "0 5 * * *"
+  - cron: "0 3 * * *"
 
 jobs:
   update-npm-libs:
