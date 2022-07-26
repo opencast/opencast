@@ -66,3 +66,8 @@ You will need to configure a [UserProvider](security.md#user-and-role-providers)
 * [Brightspace D2L User Provider](security.user.brightspace.md)
 * [Canvas LMS User Provider](security.user.canvas.md)
 
+
+Working Example
+---------------
+
+A working example of CAS with an LDAP user provider can be found [here](https://github.com/opencast/community-integrations/tree/main/CAS)
