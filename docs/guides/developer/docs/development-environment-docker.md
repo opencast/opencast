@@ -6,7 +6,7 @@ because of Docker's isolation functionality, multiple environments can be operat
 
 ## Setting up a Docker build environment
 
-Two `docker-compose` files are provided to start up different development environments. You also need the ActiveMQ configuration
+Multiple `docker-compose` files are provided to start up different development environments
 (see "Testing Locally with Docker" guide in the administration documentation).
 
 
