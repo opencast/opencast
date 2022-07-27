@@ -111,7 +111,8 @@ import java.util.stream.Collectors;
     immediate = true,
     service = { LtiService.class,ManagedService.class },
     property = {
-        "service.description=LTI Service"
+        "service.description=LTI Service",
+        "service.pid=org.opencastproject.lti.service.impl.LtiServiceImpl"
     }
 )
 public class LtiServiceImpl implements LtiService, ManagedService {
