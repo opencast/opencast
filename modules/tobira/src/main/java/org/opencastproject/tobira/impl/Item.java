@@ -28,8 +28,10 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
+import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
+import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
@@ -48,8 +50,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -82,6 +86,19 @@ class Item {
           .map(creator -> Jsons.v(creator))
           .collect(Collectors.toCollection(ArrayList::new));
 
+      // Get start and end time
+      final var period = getDccsFromMp(mp, workspace)
+              .map(dcc -> dcc.getFirst(DublinCore.PROPERTY_TEMPORAL))
+              .filter(Objects::nonNull)
+              .findFirst()
+              .flatMap(str -> {
+                try {
+                  return Optional.of(EncodingSchemeUtils.decodeMandatoryPeriod(str));
+                } catch (Exception e) {
+                  return Optional.empty();
+                }
+              });
+
       this.obj = Jsons.obj(
           Jsons.p("kind", "event"),
           Jsons.p("id", event.getId()),
@@ -89,6 +106,8 @@ class Item {
           Jsons.p("partOf", event.getDcIsPartOf()),
           Jsons.p("description", event.getDcDescription()),
           Jsons.p("created", event.getDcCreated().getTime()),
+          Jsons.p("startTime", period.map(p -> p.getStart().getTime()).orElse(null)),
+          Jsons.p("endTime", period.map(p -> p.getEnd().getTime()).orElse(null)),
           Jsons.p("creators", Jsons.arr(creators)),
           Jsons.p("duration", Math.max(0, event.getDcExtent())),
           Jsons.p("thumbnail", findThumbnail(mp)),
@@ -102,6 +121,21 @@ class Item {
     }
   }
 
+  private static Stream<DublinCoreCatalog> getDccsFromMp(MediaPackage mp, Workspace workspace) {
+    return Arrays.stream(mp.getElements())
+            .filter(mpe -> {
+              final var flavor = mpe.getFlavor();
+              if (flavor == null) {
+                return false;
+              }
+              final var isForEpisode = Objects.equals(flavor.getSubtype(), "episode");
+              final var isCatalog = Objects.equals(mpe.getElementType(), MediaPackageElement.Type.Catalog);
+              final var isXml = Objects.equals(mpe.getMimeType(), MimeType.mimeType("text", "xml"));
+              return isCatalog && isForEpisode && isXml;
+            })
+            .map(mpe -> DublinCoreUtil.loadDublinCore(workspace, mpe));
+  }
+
   /** Assembles the object containing all additional metadata. */
   private static Jsons.Obj dccToMetadata(MediaPackage mp, Workspace workspace) {
     /** Metadata fields from dcterms that we already handle elsewhere. Therefore, we don't need to
@@ -111,19 +145,7 @@ class Item {
     });
 
 
-    final var dccs = Arrays.stream(mp.getElements())
-        .filter(mpe -> {
-          final var flavor = mpe.getFlavor();
-          if (flavor == null) {
-            return false;
-          }
-          final var isForEpisode = Objects.equals(flavor.getSubtype(), "episode");
-          final var isCatalog = Objects.equals(mpe.getElementType(), MediaPackageElement.Type.Catalog);
-          final var isXml = Objects.equals(mpe.getMimeType(), MimeType.mimeType("text", "xml"));
-          return isCatalog && isForEpisode && isXml;
-        })
-        .map(mpe -> DublinCoreUtil.loadDublinCore(workspace, mpe));
-
+    final var dccs = getDccsFromMp(mp, workspace);
     final var namespaces = new HashMap<String, ArrayList<Jsons.Prop>>();
 
     for (final var dcc : (Iterable<DublinCoreCatalog>) dccs::iterator) {
