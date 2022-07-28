@@ -112,16 +112,16 @@ $ curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 $ sudo apt-get install -y nodejs
 ```
 
-### Install and start Elasticsearch and ActiveMQ with Docker
+### Install and start Elasticsearch with Docker
 
-You can use `docker-compose` to easily run both ActiveMQ and Elasticsearch:
+You can use `docker-compose` to easily run Elasticsearch:
 
 ```sh
 $ cd docs/scripts/devel-dependency-containers
 $ docker-compose up -d
 ```
 
-To shut the services down ahain, run:
+To shut the services down again, run:
 
 ```sh
 $ cd docs/scripts/devel-dependency-containers
