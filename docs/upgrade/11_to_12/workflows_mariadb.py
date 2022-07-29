@@ -2,6 +2,11 @@
 # Requires Python3 to run
 # Required packages:
 #   $ pip install mysql-connector-python
+# NOTE: Please don't install version 8.0.30 of the mysql-connector-python module,
+# because the script runs into errors. Install a newer version if exists or
+# install the previous version 8.0.29 (in case newer versions are still running into errors).
+# You can install a specific version like this:
+#   $ pip install mysql_connector_python==8.0.29
 # Set vars to point to your database
 # Run on commandline: "python3 workflow_db_upgrade.py"
 # WARNING: THIS SCRIPT DELETES DATA. CREATE A BACKUP BEFORE RUNNING
