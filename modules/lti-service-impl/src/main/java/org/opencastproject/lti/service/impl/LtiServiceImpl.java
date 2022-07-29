@@ -133,7 +133,6 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   private String retractWorkflowId;
   private String copyWorkflowId;
   private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<>();
-  private boolean listAllJobsInSeries;
 
   /** OSGi DI */
   @Reference
@@ -243,10 +242,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   public List<LtiJob> listJobs(String seriesId) {
     final User user = securityService.getUser();
     final EventSearchQuery query = new EventSearchQuery(securityService.getOrganization().getId(), user)
-            .withSeriesId(StringUtils.trimToNull(seriesId));
-    if (!listAllJobsInSeries) {
-      query.withCreator(user.getName());
-    }
+            .withCreator(user.getName()).withSeriesId(StringUtils.trimToNull(seriesId));
     try {
       SearchResult<Event> results = this.searchIndex.getByQuery(query);
       ZonedDateTime startOfDay = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS);
@@ -565,7 +561,5 @@ public class LtiServiceImpl implements LtiService, ManagedService {
     } catch (JsonSyntaxException e) {
       throw new IllegalArgumentException("Invalid JSON specified for workflow configuration");
     }
-    String listAllJobsInSeriesStr = Objects.toString(properties.get("list-all-jobs-in-series"), "false");
-    this.listAllJobsInSeries = Boolean.parseBoolean(listAllJobsInSeriesStr);
   }
 }
