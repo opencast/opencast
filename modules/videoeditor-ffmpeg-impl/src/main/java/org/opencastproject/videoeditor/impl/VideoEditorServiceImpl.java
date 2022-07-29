@@ -284,7 +284,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       String outputResolution = "";    //TODO: fetch the largest output resolution from SMIL.head.layout.root-layout
       // When outputResolution is set to WxH, all clips are scaled to that size in the output video.
       // TODO: Each clips could have a region id, relative to the root-layout
-      // Then each clip is zoomed/panned/padded to WxH befor concatenation
+      // Then each clip is zoomed/panned/padded to WxH before concatenation
       FFmpegEdit ffmpeg = new FFmpegEdit(properties);
       error = ffmpeg.processEdits(inputfile, outputPath.getAbsolutePath(), outputResolution, cleanclips,
               sourceTrack.hasAudio(), sourceTrack.hasVideo());
