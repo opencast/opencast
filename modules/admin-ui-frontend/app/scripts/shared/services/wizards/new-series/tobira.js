@@ -21,8 +21,8 @@
 'use strict';
 
 angular.module('adminNg.services')
-.factory('NewSeriesTobira', ['Notifications', 'NewSeriesTobiraResource', function (Notifications,
-  NewSeriesTobiraResource) {
+.factory('NewSeriesTobira', ['AuthService', 'Notifications', 'NewSeriesTobiraResource', function (AuthService,
+  Notifications, NewSeriesTobiraResource) {
   var Tobira = function () {
     var me = this;
     var validationNotifications = {};
@@ -32,8 +32,12 @@ angular.module('adminNg.services')
       me.ud = {
         breadcrumbs: []
       };
-      me.visible = true;
-      me.goto({ path: '/' });
+      if (AuthService.userIsAuthorizedAs('ROLE_UI_SERIES_DETAILS_TOBIRA_EDIT')) {
+        me.visible = true;
+        me.goto({ path: '/' });
+      } else {
+        me.visible = false;
+      }
     };
 
     me.isValid = function () {
