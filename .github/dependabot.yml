@@ -34,11 +34,13 @@ updates:
   directory: "/modules/engage-paella-player"
   schedule:
     interval: daily
+  target-branch: "r/11.x"
   open-pull-requests-limit: 10
 - package-ecosystem: npm
   directory: "/modules/engage-paella-player-7"
   schedule:
     interval: daily
+  target-branch: "r/12.x"
   open-pull-requests-limit: 10
 - package-ecosystem: npm
   directory: "/modules/admin-ui-frontend"
