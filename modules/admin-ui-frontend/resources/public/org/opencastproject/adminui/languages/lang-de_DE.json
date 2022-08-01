@@ -455,7 +455,7 @@
             "TEXT": "Beim Ausführen der Abfrage ist ein Fehler aufgetreten."
          },
          "DELETE_SUBMIT_STATE": {
-            "TEXT": "Sind Sie sicher, dass Sie die Registrierung löschen möchten?"
+            "TEXT": "Are you sure you want to delete your registration data? Confirming this will also remove your registration data from the Opencast project server with the next update interval."
          }
       }
    },

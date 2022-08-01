@@ -455,7 +455,7 @@
             "TEXT": "Er is een fout opgetreden tijdens het verwerken van je verzoek."
          },
          "DELETE_SUBMIT_STATE": {
-            "TEXT": "Zeker dat je jouw registratiegegevens wilt verwijderen?"
+            "TEXT": "Are you sure you want to delete your registration data? Confirming this will also remove your registration data from the Opencast project server with the next update interval."
          }
       }
    },
