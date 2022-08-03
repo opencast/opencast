@@ -258,7 +258,9 @@ angular.module('adminNg.controllers')
         if (response.status === 500) {
           Notifications.add('error', 'TOBIRA_SERVER_ERROR', 'series-tobira', -1);
         }
-        $scope.tobiraData = {};
+        if (response.status !== 503) {
+          $scope.tobiraData = {};
+        }
       });
 
       $scope.roles = RolesResource.queryNameOnly({limit: -1, target: 'ACL'});
