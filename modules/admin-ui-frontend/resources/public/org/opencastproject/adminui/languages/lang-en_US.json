@@ -1127,7 +1127,7 @@
            "CAPTION": "Tobira",
            "DESCRIPTION": "Here you can select where you want the series to show up in the Tobira video portal. You can only select one location here, and it needs to be empty (marked in bold). You can create new pages here, but note that they are only persisted if they are on the path to the selected page.",
            "SELECT_PAGE": "Select a target page",
-           "PAGE_TITLE": "Page title",
+           "PAGE_TITLE": "Subpage title",
            "PATH_SEGMENT": "Path segment",
            "SUBPAGES": "Subpages",
            "ADD_SUBPAGE": "Add subpage",
@@ -1214,8 +1214,8 @@
          "TOBIRA": {
            "HOMEPAGE": "(Homepage)",
            "DIRECT_LINK": "Direct link to series",
-           "NOT_MOUNTED": "This series is not included on any page",
-           "PAGES": "Pages in Tobira that include this series"
+             "NOT_MOUNTED": "This series is currently not included the page structure, and can only be reached using the direct link above.",
+           "PAGES": "Pages in Tobira that contain this series"
          },
          "EVENTS": {
            "TITLE":     "Title",
