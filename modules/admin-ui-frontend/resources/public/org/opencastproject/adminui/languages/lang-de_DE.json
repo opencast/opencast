@@ -1125,7 +1125,7 @@
               "CAPTION": "Tobira",
               "DESCRIPTION": "Hier können Sie auswählen, ob die Serie im Tobira Videoportal eingehängt werden soll. Sie können nur eine Seite auswählen, die außerdem leer sein muss (mit fetter Schrift markiert). Sie können auch neue Seiten erstellen. Diese werden jedoch nur gespeichert, wenn sie Teil des Pfades zur ausgewählten Seite sind.",
               "SELECT_PAGE": "Wählen Sie eine Zielseite aus",
-              "PAGE_TITLE": "Seitentitel",
+              "PAGE_TITLE": "Unterseitentitel",
               "PATH_SEGMENT": "Pfadsegment",
               "SUBPAGES": "Unterseiten",
               "ADD_SUBPAGE": "Unterseite hinzufügen",
@@ -1212,8 +1212,8 @@
             "TOBIRA": {
               "HOMEPAGE": "(Startseite)",
               "DIRECT_LINK": "Direktlink zur Serie",
-              "NOT_MOUNTED": "Diese Serie wird zurzeit auf keiner Seite angezeigt",
-              "PAGES": "Seiten, die diese Serie anzeigen"
+              "NOT_MOUNTED": "Diese Serie ist zurzeit nicht in der Seitenstruktur enthalten und kann nur über den obenstehenden Direktlink aufgerufen werden.",
+              "PAGES": "Seiten, die diese Serie enthalten"
             },
             "EVENTS": {
                "TITLE": "Titel",
