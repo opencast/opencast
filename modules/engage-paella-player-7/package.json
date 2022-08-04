@@ -24,7 +24,7 @@
     "html-linter": "^1.1.1",
     "html-validate": "^7.1.2",
     "http-proxy": "^1.18.1",
-    "source-map-loader": "^3.0.1",
+    "source-map-loader": "^4.0.0",
     "style-loader": "^3.3.1",
     "svg-inline-loader": "^0.8.2",
     "webpack": "^5.74.0",
