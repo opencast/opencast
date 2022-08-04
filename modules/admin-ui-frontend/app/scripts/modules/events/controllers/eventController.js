@@ -49,7 +49,7 @@ angular.module('adminNg.controllers')
         createPolicy = function (role, read, write) {
           return {
             role  : role,
-            read  : read !== undefined ? read : true,
+            read  : read !== undefined ? read : false,
             write : write !== undefined ? write : false,
             actions : {
               name : 'event-acl-actions',
