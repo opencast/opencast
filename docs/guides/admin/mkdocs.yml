@@ -2,9 +2,6 @@ site_name: Administration Guide
 repo_url: https://github.com/opencast/opencast
 edit_uri: edit/develop/docs/guides/admin/docs/
 
-markdown_extensions:
-  - markdown_inline_graphviz
-
 plugins:
   - search:
   - macros:
