@@ -2,6 +2,7 @@
 
 set -eu
 
+# https://github.com/settings/tokens
 USER=<username>
 TOKEN=<personal-github-access-token>
 
@@ -17,6 +18,8 @@ curl -s -u "$USER:$TOKEN" \
   https://api.github.com/orgs/opencast/teams/committers/members \
     | jq -r '.[] | "<li>'"${LINK}${IMG}"' + .login + "</a></li>"' \
     | sort -f \
-    | grep -v oc-bot
+    | grep -v oc-bot \
+    | sed 's_margin: 0"_margin: 0"\n_g' \
+    | sed 's_ />_\n />_g'
 
 echo '</ul>'
