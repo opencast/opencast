@@ -53,7 +53,6 @@ Required:
 
 Required (not necessarily on the same machine):
 
-    ActiveMQ >= 5.10 (older versions untested)
     Elasticsearch 7.9.x
 
 Required for text extraction (recommended):
@@ -109,7 +108,6 @@ hostname, login information, etc.
 
 <!-- _Up to here, the MacOS source install is pretty similar, but now the steps aren't homogenous anymore... Is running OC so different in the two OSs that in MacOS it doesn't mention running as a service? -->
 
-<!-- _No mention of running ActiveMQ first here!! -->
 Running Opencast
 ------------------
 

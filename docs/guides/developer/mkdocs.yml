@@ -2,8 +2,11 @@ site_name: Developer Guide
 repo_url: https://github.com/opencast/opencast
 edit_uri: edit/develop/docs/guides/developer/docs/
 
-markdown_extensions:
-  - markdown_inline_graphviz
+plugins:
+  - search:
+  - mermaid2:
+      arguments:
+        theme: neutral
 
 # Default theme used is windmill
 theme: windmill
