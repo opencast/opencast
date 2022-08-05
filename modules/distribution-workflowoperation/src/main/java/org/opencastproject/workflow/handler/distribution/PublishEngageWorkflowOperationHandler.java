@@ -39,6 +39,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageReference;
 import org.opencastproject.mediapackage.MediaPackageReferenceImpl;
@@ -47,6 +48,9 @@ import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.mediapackage.track.TrackImpl;
+import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreValue;
+import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
@@ -66,6 +70,7 @@ import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIUtils;
@@ -140,6 +145,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   /** The search service */
   private SearchService searchService = null;
 
+  private Workspace workspace;
+
   /** The server url */
   private URL serverUrl;
 
@@ -192,6 +199,12 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);
   }
+
+  @Reference
+  public void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
+  }
+
 
   /** Supported streaming formats */
   private static final Set<TrackImpl.StreamingProtocol> STREAMING_FORMATS = new HashSet<>(Arrays.asList(
@@ -373,6 +386,22 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
             break;
           default:
           // nothing to do here
+        }
+
+        if (StringUtils.isBlank(mediaPackageForSearch.getTitle())) {
+          var dcUri = Arrays.stream(mediaPackageForSearch.getCatalogs(MediaPackageElements.EPISODE))
+              .findFirst()
+              .map(MediaPackageElement::getURI);
+          if (dcUri.isPresent()) {
+            try (var in = workspace.read(dcUri.get())) {
+              DublinCoreXmlFormat.read(in)
+                  .get(DublinCore.PROPERTY_TITLE)
+                  .stream()
+                  .findFirst()
+                  .map(DublinCoreValue::getValue)
+                  .ifPresent(mediaPackageForSearch::setTitle);
+            }
+          }
         }
 
         // Check that the media package meets the criteria for publication
