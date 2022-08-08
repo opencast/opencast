@@ -455,7 +455,7 @@
             "TEXT": "处理您的请求时出错。"
          },
          "DELETE_SUBMIT_STATE": {
-            "TEXT": "Are you sure you want to delete your registration data? Confirming this will also remove your registration data from the Opencast project server with the next update interval."
+            "TEXT": "您确定要删除您的注册信息吗？ 如果确认，将在下次Opencast服务器更新时，移除您的注册信息。"
          }
       }
    },
