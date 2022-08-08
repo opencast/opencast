@@ -258,9 +258,12 @@ angular.module('adminNg.controllers')
       }, function (response) {
         if (response.status === 500) {
           Notifications.add('error', 'TOBIRA_SERVER_ERROR', 'series-tobira', -1);
+        } else if (response.status === 404) {
+          Notifications.add('warning', 'TOBIRA_NOT_FOUND', 'series-tobira', -1);
         }
+
         if (response.status !== 503) {
-          $scope.tobiraData = {};
+          $scope.tobiraData = { error: true };
         }
       });
       $scope.copyTobiraDirectLink = function () {
