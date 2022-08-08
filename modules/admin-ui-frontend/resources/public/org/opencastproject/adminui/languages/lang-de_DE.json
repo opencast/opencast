@@ -254,7 +254,8 @@
       "TOBIRA_PAGE_NOT_FOUND": "Die angefragte Seite existiert nicht (mehr). Versuchen Sie wieder vom Anfang zu beginnen.",
       "TOBIRA_SERVER_ERROR":" Fehler bei der Kommunikation mit Tobira. Kontaktieren Sie Ihren Systemadministrator oder versuchen Sie es später erneut.",
       "TOBIRA_COPIED_DIRECT_LINK": "Verknüpfung wurde erfolgreich in die Zwischenablage kopiert.",
-      "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Verknüpfung konnte nicht in die Zwischenablage kopiert werden."
+      "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Verknüpfung konnte nicht in die Zwischenablage kopiert werden.",
+      "TOBIRA_NOT_FOUND": "Diese Serie ist Tobira (noch) nicht bekannt. Versuchen Sie es in ein paar Minuten noch einmal oder kontaktieren Sie ihren Systemadministrator."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Aktionen",
