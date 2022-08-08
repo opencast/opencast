@@ -81,8 +81,13 @@ Opencast 12.0
 
 ### API changes
 
-- Important: The endpoint for querying workflows has been removed from the
-  External API.
+<div class=warn>
+The endpoint for querying workflows has been completely removed from the External API.
+It was conflicting with our removal of Solr.
+We tried making sure that no one was using this, but if we missed you and you desperately need it, please reach out.
+We will then see what we can reasonaably do about this.
+</div>
+
 - [[#3204](https://github.com/opencast/opencast/pull/3204)] removes the fulltext
   search query from the series endpoint and adds it to the
   [External API](https://docs.opencast.org/r/12.x/developer/#api/series-api/).
