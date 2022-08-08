@@ -184,6 +184,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Configuration key for the encoding preferred worker nodes */
   protected static final String OPT_ENCODINGWORKERS = "org.opencastproject.encoding.workers";
 
+  /** Configuration key for the encoding workers load threshold */
+  protected static final String OPT_ENCODINGTHRESHOLD = "org.opencastproject.encoding.workers.threshold";
+
   /** The http client to use when connecting to remote servers */
   protected TrustedHttpClient client = null;
 
@@ -233,6 +236,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** Comma-seperate list with URLs of encoding specialised workers*/
   protected static List<String> encodingWorkers = new ArrayList<String>();
+
+  /** Threshold value under which defined workers get preferred when dispatching encoding jobs */
+  protected static double encodingThreshold = 0.0;
 
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
@@ -776,6 +782,23 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     if (StringUtils.isNotBlank(encodingWorkersString)) {
       encodingWorkers = Arrays.asList(encodingWorkersString.split("\\s*,\\s*"));
     }
+
+    // get the encoding worker load threshold defined in the configuration file and parse the double
+    String encodingThersholdString = StringUtils.trimToNull((String) properties.get(OPT_ENCODINGTHRESHOLD));
+    if (StringUtils.isNotBlank(encodingThersholdString) && encodingThersholdString != null){
+      if (encodingThreshold >= 0 && encodingThreshold <= 1){
+        try {
+        encodingThreshold = Double.parseDouble(encodingThersholdString);
+        } catch (NumberFormatException e) {
+          logger.warn("Can not set encoding threshold to {}. {} must be an parsable double", encodingThersholdString,
+              OPT_ENCODINGTHRESHOLD);
+        }
+      } else {
+        encodingThreshold = 0.0;
+        logger.warn("org.opencastproject.encoding.workers.threshold is not between 0 and 1");
+      }
+    }
+
 
     String maxJobAgeString = StringUtils.trimToNull((String) properties.get(OPT_SERVICE_STATISTICS_MAX_JOB_AGE));
     if (maxJobAgeString != null) {
@@ -2967,23 +2990,19 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       NodeLoad nodeA = loadByHost.get(hostA);
       NodeLoad nodeB = loadByHost.get(hostB);
 
-
-
       if (encodingWorkers != null) {
-
         if (isEncodingWorker(hostA, encodingWorkers) && !isEncodingWorker(hostB, encodingWorkers)) {
-          if (nodeA.getLoadFactor() <= 0.4) {
+          if (nodeA.getLoadFactor() <= encodingThreshold) {
             return -1;
           }
-          return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor() * 4);
+          return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor());
         }
         if (isEncodingWorker(hostB, encodingWorkers) && !isEncodingWorker(hostA, encodingWorkers)) {
-          if (nodeB.getLoadFactor() <= 0.4) {
+          if (nodeB.getLoadFactor() <= encodingThreshold) {
             return 1;
           }
-          return Float.compare(nodeA.getLoadFactor() * 4, nodeB.getLoadFactor());
+          return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor());
         }
-
       }
 
       //If the load factors are about the same, sort based on maximum load
