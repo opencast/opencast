@@ -252,7 +252,9 @@
       "TOBIRA_PATH_SEGMENT_INVALID": "Pfadsegment ist ungültig. Ein gültiges Pfadsegment ist mindestens zwei Zeichen lang, enthält keine Leerzeichen, Kontrollzeichen, keins der Zeichen '<>\"[\\]^`{|}#%\/?]' und fängt mit keinem der Zeichen '-+~@_!$&;:.,=*'()' an.",
       "TOBIRA_PATH_SEGMENT_UNIQUE": "Das gleiche Pfadsegment darf nicht mehrmals für Seiten mit der gleichen Überseite verwendet werden.",
       "TOBIRA_PAGE_NOT_FOUND": "Die angefragte Seite existiert nicht (mehr). Versuchen Sie wieder vom Anfang zu beginnen.",
-      "TOBIRA_SERVER_ERROR":" Fehler bei der Kommunikation mit Tobira. Kontaktieren Sie Ihren Systemadministrator oder versuchen Sie es später erneut."
+      "TOBIRA_SERVER_ERROR":" Fehler bei der Kommunikation mit Tobira. Kontaktieren Sie Ihren Systemadministrator oder versuchen Sie es später erneut.",
+      "TOBIRA_COPIED_DIRECT_LINK": "Verknüpfung wurde erfolgreich in die Zwischenablage kopiert.",
+      "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Verknüpfung konnte nicht in die Zwischenablage kopiert werden."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Aktionen",
@@ -1212,6 +1214,7 @@
             "TOBIRA": {
               "HOMEPAGE": "(Startseite)",
               "DIRECT_LINK": "Direktlink zur Serie",
+              "COPY_DIRECT_LINK": "In die Zwischenablage kopieren",
               "NOT_MOUNTED": "Diese Serie ist zurzeit nicht in der Seitenstruktur enthalten und kann nur über den obenstehenden Direktlink aufgerufen werden.",
               "PAGES": "Seiten, die diese Serie enthalten"
             },

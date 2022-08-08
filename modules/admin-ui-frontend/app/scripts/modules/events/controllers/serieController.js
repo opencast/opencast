@@ -254,6 +254,7 @@ angular.module('adminNg.controllers')
       Notifications.removeAll('series-tobira');
       SeriesTobiraResource.get({ id: id }, function (tobiraData) {
         $scope.tobiraData = tobiraData;
+        $scope.directTobiraLink = tobiraData.baseURL + '/!s/:' + $scope.resourceId;
       }, function (response) {
         if (response.status === 500) {
           Notifications.add('error', 'TOBIRA_SERVER_ERROR', 'series-tobira', -1);
@@ -262,6 +263,13 @@ angular.module('adminNg.controllers')
           $scope.tobiraData = {};
         }
       });
+      $scope.copyTobiraDirectLink = function () {
+        navigator.clipboard.writeText($scope.directTobiraLink).then(function () {
+          Notifications.add('info', 'TOBIRA_COPIED_DIRECT_LINK', 'series-tobira', 3000);
+        }, function () {
+          Notifications.add('error', 'TOBIRA_FAILED_COPYING_DIRECT_LINK', 'series-tobira', 3000);
+        });
+      };
 
       $scope.roles = RolesResource.queryNameOnly({limit: -1, target: 'ACL'});
 

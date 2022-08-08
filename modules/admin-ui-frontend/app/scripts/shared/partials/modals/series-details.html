@@ -390,7 +390,9 @@
         <div class="obj list-obj">
           <header translate="EVENTS.SERIES.DETAILS.TABS.TOBIRA"></header>
           <div class="obj-container">
-            <a translate="EVENTS.SERIES.DETAILS.TOBIRA.DIRECT_LINK" href="{{tobiraData.baseURL}}/!s/:{{resourceId}}"></a>
+            <a translate="EVENTS.SERIES.DETAILS.TOBIRA.DIRECT_LINK" href="{{directTobiraLink}}"></a> <a ng-click="copyTobiraDirectLink()" aria-label="{{'EVENTS.SERIES.DETAILS.TOBIRA.COPY_DIRECT_LINK' | translate}}">
+              <i aria-hidden="true" class="fa fa-copy" title="{{'EVENTS.SERIES.DETAILS.TOBIRA.COPY_DIRECT_LINK' | translate}}"></i>
+            </a>
           </div>
           <div class="obj-container">
             <div class="obj tbl-list">
