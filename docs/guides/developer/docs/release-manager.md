@@ -88,8 +88,8 @@ Example on how to create the Opencast 7 release branch:
         git checkout develop
         git pull <remote> develop
 
-2. Modify the Paella target branch (For Paella 6.x and 7.x), found in the dependabot configuration file `.github/dependabot.yml` to target the 
-   latest supported version when this version will released. 
+2. Modify the Paella target branch (For Paella 6.x and 7.x), found in the dependabot configuration
+   file `.github/dependabot.yml` to target the latest supported version when this version will released.
 
         Example:
         - package-ecosystem: npm
@@ -109,10 +109,6 @@ Example on how to create the Opencast 7 release branch:
           open-pull-requests-limit: 10
 
   make a PR then merge this change to `develop` branch.
-
-
-
-        
 
 3. Make sure you did not modify any files. If you did, stash those changes:
 
