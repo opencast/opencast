@@ -206,3 +206,10 @@
 .tobira-not-mounted {
     font-style: italic;
 }
+
+.tobira-copy-direct-link {
+    @include btn(white);
+    i {
+        margin: 0;
+    }
+}
