@@ -53,7 +53,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 /**
@@ -78,6 +77,7 @@ class Item {
       );
     } else {
       final var mp = event.getMediaPackage();
+      final var dccs = getDccsFromMp(mp, workspace);
 
       // Figure out whether this is a live event
       final var isLive = Arrays.stream(mp.getTracks()).anyMatch(track -> track.isLive());
@@ -87,7 +87,7 @@ class Item {
           .collect(Collectors.toCollection(ArrayList::new));
 
       // Get start and end time
-      final var period = getDccsFromMp(mp, workspace)
+      final var period = dccs.stream()
               .map(dcc -> dcc.getFirst(DublinCore.PROPERTY_TEMPORAL))
               .filter(Objects::nonNull)
               .findFirst()
@@ -99,10 +99,26 @@ class Item {
                 }
               });
 
+      // Get title. We require a title and will consult all three sources for it, in decreasing
+      // order of trust in that source.
+      var title = dccs.stream()
+              .map(dcc -> dcc.getFirst(DublinCore.PROPERTY_TITLE))
+              .filter(Objects::nonNull)
+              .findFirst()
+              .orElse(mp.getTitle());
+      if (title == null) {
+        title = event.getDcTitle();
+      }
+      if (title == null) {
+        // If there is no title to be found, we throw an exception to skip this event.
+        throw new RuntimeException("Event has no title");
+      }
+
+
       this.obj = Jsons.obj(
           Jsons.p("kind", "event"),
           Jsons.p("id", event.getId()),
-          Jsons.p("title", mp.getTitle()),
+          Jsons.p("title", title),
           Jsons.p("partOf", event.getDcIsPartOf()),
           Jsons.p("description", event.getDcDescription()),
           Jsons.p("created", event.getDcCreated().getTime()),
@@ -115,13 +131,13 @@ class Item {
           Jsons.p("tracks", Jsons.arr(assembleTracks(event, mp))),
           Jsons.p("acl", assembleAcl(event.getAccessControlList())),
           Jsons.p("isLive", isLive),
-          Jsons.p("metadata", dccToMetadata(mp, workspace)),
+          Jsons.p("metadata", dccToMetadata(dccs)),
           Jsons.p("updated", event.getModified().getTime())
       );
     }
   }
 
-  private static Stream<DublinCoreCatalog> getDccsFromMp(MediaPackage mp, Workspace workspace) {
+  private static List<DublinCoreCatalog> getDccsFromMp(MediaPackage mp, Workspace workspace) {
     return Arrays.stream(mp.getElements())
             .filter(mpe -> {
               final var flavor = mpe.getFlavor();
@@ -133,11 +149,12 @@ class Item {
               final var isXml = Objects.equals(mpe.getMimeType(), MimeType.mimeType("text", "xml"));
               return isCatalog && isForEpisode && isXml;
             })
-            .map(mpe -> DublinCoreUtil.loadDublinCore(workspace, mpe));
+            .map(mpe -> DublinCoreUtil.loadDublinCore(workspace, mpe))
+            .collect(Collectors.toCollection(ArrayList::new));
   }
 
   /** Assembles the object containing all additional metadata. */
-  private static Jsons.Obj dccToMetadata(MediaPackage mp, Workspace workspace) {
+  private static Jsons.Obj dccToMetadata(List<DublinCoreCatalog> dccs) {
     /** Metadata fields from dcterms that we already handle elsewhere. Therefore, we don't need to
       * include them here again. */
     final var ignoredDcFields = Set.of(new String[] {
@@ -145,7 +162,6 @@ class Item {
     });
 
 
-    final var dccs = getDccsFromMp(mp, workspace);
     final var namespaces = new HashMap<String, ArrayList<Jsons.Prop>>();
 
     for (final var dcc : (Iterable<DublinCoreCatalog>) dccs::iterator) {
