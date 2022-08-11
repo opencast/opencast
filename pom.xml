@@ -107,6 +107,8 @@
     <module>modules/distribution-service-streaming-wowza</module>
     <module>modules/distribution-workflowoperation</module>
     <module>modules/dublincore</module>
+    <module>modules/editor-external-url</module>
+    <module>modules/editor-service</module>
     <module>modules/editor-service-api</module>
     <module>modules/editor-service-remote</module>
     <module>modules/editor-service</module>

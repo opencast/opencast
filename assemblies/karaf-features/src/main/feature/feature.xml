@@ -182,6 +182,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-streaming-wowza/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-workflowoperation/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-editor/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-editor-external-url/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-editor-service/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-editor-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-email-template-service-api/${project.version}</bundle>
@@ -293,6 +294,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-streaming-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-workflowoperation/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-editor/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-editor-external-url/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-editor-service/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-editor-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-email-template-service-api/${project.version}</bundle>
