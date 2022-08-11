@@ -461,7 +461,7 @@ public class IndexServiceImpl implements IndexService {
 
     if (orgEventCatalogUIAdapter.isPresent()) {
       return orgEventCatalogUIAdapter.get();
-    } else if (organization != DEFAULT_ORGANIZATION_ID) {
+    } else if (!organization.equals(DEFAULT_ORGANIZATION_ID)) {
       return getCommonEventCatalogUIAdapter(DEFAULT_ORGANIZATION_ID);
     } else {
        throw new IllegalStateException("Common event metadata for " + DEFAULT_ORGANIZATION_ID + " needs to be "
@@ -477,7 +477,7 @@ public class IndexServiceImpl implements IndexService {
 
     if (orgSeriesCatalogUIAdapter.isPresent()) {
       return orgSeriesCatalogUIAdapter.get();
-    } else if (organization != DEFAULT_ORGANIZATION_ID) {
+    } else if (!organization.equals(DEFAULT_ORGANIZATION_ID)) {
       return getCommonSeriesCatalogUIAdapter(DEFAULT_ORGANIZATION_ID);
     } else {
       throw new IllegalStateException("Common series metadata for " + DEFAULT_ORGANIZATION_ID + " needs to be "
