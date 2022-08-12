@@ -858,6 +858,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   @Reference(
       cardinality = ReferenceCardinality.OPTIONAL,
       policy = ReferencePolicy.DYNAMIC,
+      target = "(service.pid=org.opencastproject.mediapackage.ChainingMediaPackageSerializer)",
       unbind = "unsetMediaPackageSerializer"
   )
   protected void setMediaPackageSerializer(MediaPackageSerializer serializer) {
