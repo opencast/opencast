@@ -156,82 +156,74 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, inputDevi
                                                                     </tr>
                                                                     <tr>
                                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.START_TIME')}</td>
-                                                                        <td>
-                                                                            {/* One option for each entry in hours
+                                                                        <td className="editable ng-isolated-scope">
+                                                                            {/* drop-down for hour
                                                                               *
                                                                               * Per event there are 14 input fields, so with 'key * 14', the right
                                                                               * event is reached. After the '+' comes the number of the input field.
                                                                               * This is the third input field for this event.
                                                                               */}
-                                                                            <Field tabIndex={(key * 14) + 3}
-                                                                                   as="select"
-                                                                                   name={`editedEvents.${key}.changedStartTimeHour`}
-                                                                                   placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}>
-                                                                                {hours.map((i, key) => (
-                                                                                    <option key={key}
-                                                                                            value={i.value}>
-                                                                                        {i.value}
-                                                                                    </option>
-                                                                                ))}
-                                                                            </Field>
+                                                                            <DropDown value={formik.values.editedEvents[key].changedStartTimeHour}
+                                                                                      text={formik.values.editedEvents[key].changedStartTimeHour}
+                                                                                      options={hours}
+                                                                                      type={'time'}
+                                                                                      required={true}
+                                                                                      handleChange={element => formik.setFieldValue(`editedEvents.${key}.changedStartTimeHour`, element.value)}
+                                                                                      placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}
+                                                                                      tabIndex={(key * 14) + 3}
+                                                                            />
 
-                                                                            {/* One option for each entry in minutes
+                                                                            {/* drop-down for minute
                                                                               *
                                                                               * Per event there are 14 input fields, so with 'key * 14', the right
                                                                               * event is reached. After the '+' comes the number of the input field.
                                                                               * This is the fourth input field for this event.
                                                                               */}
-                                                                            <Field tabIndex={(key * 14) + 4}
-                                                                                   as="select"
-                                                                                   name={`editedEvents.${key}.changedStartTimeMinutes`}
-                                                                                   placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}>
-                                                                                {minutes.map((i, key) => (
-                                                                                    <option key={key}
-                                                                                            value={i.value}>
-                                                                                        {i.value}
-                                                                                    </option>
-                                                                                ))}
-                                                                            </Field>
+                                                                            <DropDown value={formik.values.editedEvents[key].changedStartTimeMinutes}
+                                                                                      text={formik.values.editedEvents[key].changedStartTimeMinutes}
+                                                                                      options={minutes}
+                                                                                      type={'time'}
+                                                                                      required={true}
+                                                                                      handleChange={element => formik.setFieldValue(`editedEvents.${key}.changedStartTimeMinutes`, element.value)}
+                                                                                      placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}
+                                                                                      tabIndex={(key * 14) + 4}
+                                                                            />
                                                                         </td>
                                                                     </tr>
                                                                     <tr>
                                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.END_TIME')}</td>
-                                                                        <td>
-                                                                            {/* One option for each entry in hours
+                                                                        <td className="editable ng-isolated-scope">
+                                                                            {/* drop-down for hour
                                                                               *
                                                                               * Per event there are 14 input fields, so with 'key * 14', the right
                                                                               * event is reached. After the '+' comes the number of the input field.
                                                                               * This is the fifth input field for this event.
                                                                               */}
-                                                                            <Field tabIndex={(key * 14) + 5}
-                                                                                   as="select"
-                                                                                   name={`editedEvents.${key}.changedEndTimeHour`}
-                                                                                   placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}>
-                                                                                {hours.map((i, key) => (
-                                                                                    <option key={key}
-                                                                                            value={i.value}>
-                                                                                        {i.value}
-                                                                                    </option>
-                                                                                ))}
-                                                                            </Field>
+                                                                            <DropDown value={formik.values.editedEvents[key].changedEndTimeHour}
+                                                                                      text={formik.values.editedEvents[key].changedEndTimeHour}
+                                                                                      options={hours}
+                                                                                      type={'time'}
+                                                                                      required={true}
+                                                                                      handleChange={element => formik.setFieldValue(`editedEvents.${key}.changedEndTimeHour`, element.value)}
+                                                                                      placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}
+                                                                                      tabIndex={(key * 14) + 5}
+                                                                            />
 
-                                                                            {/* One option for each entry in minutes
+                                                                            {/* drop-down for minute
                                                                               *
                                                                               * Per event there are 14 input fields, so with 'key * 14', the right
                                                                               * event is reached. After the '+' comes the number of the input field.
                                                                               * This is the sixth input field for this event.
                                                                               */}
-                                                                            <Field tabIndex={(key * 14) + 6}
-                                                                                   as="select"
-                                                                                   name={`editedEvents.${key}.changedEndTimeMinutes`}
-                                                                                   placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}>
-                                                                                {minutes.map((i, key) => (
-                                                                                    <option key={key}
-                                                                                            value={i.value}>
-                                                                                        {i.value}
-                                                                                    </option>
-                                                                                ))}
-                                                                            </Field>
+                                                                            <DropDown value={formik.values.editedEvents[key].changedEndTimeMinutes}
+                                                                                      text={formik.values.editedEvents[key].changedEndTimeMinutes}
+                                                                                      options={minutes}
+                                                                                      type={'time'}
+                                                                                      required={true}
+                                                                                      handleChange={element => formik.setFieldValue(`editedEvents.${key}.changedEndTimeMinutes`, element.value)}
+                                                                                      placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}
+                                                                                      tabIndex={(key * 14) + 6}
+                                                                            />
                                                                         </td>
                                                                     </tr>
 

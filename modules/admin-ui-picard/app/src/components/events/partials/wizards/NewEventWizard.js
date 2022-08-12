@@ -232,12 +232,12 @@ const getInitialValues = (metadataFields, extendedMetadata, uploadAssetOptions) 
     const defaultDate = new Date();
 
     // fill times with some default values
-    initialValues['scheduleStartTimeHour'] = (defaultDate.getHours() + 1).toString();
-    initialValues['scheduleStartTimeMinutes'] = '00';
-    initialValues['scheduleDurationHour'] = '00';
+    initialValues['scheduleStartHour'] = (defaultDate.getHours() + 1).toString();
+    initialValues['scheduleStartMinute'] = '00';
+    initialValues['scheduleDurationHours'] = '00';
     initialValues['scheduleDurationMinutes'] = '55';
-    initialValues['scheduleEndTimeHour'] = (defaultDate.getHours() + 1).toString();
-    initialValues['scheduleEndTimeMinutes'] = '55';
+    initialValues['scheduleEndHour'] = (defaultDate.getHours() + 1).toString();
+    initialValues['scheduleEndMinute'] = '55';
 
     return initialValues;
 };

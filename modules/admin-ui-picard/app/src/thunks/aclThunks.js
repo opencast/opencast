@@ -45,8 +45,6 @@ export const fetchAclActions = async () => {
 
     const actions = transformToIdValueArray(response);
 
-    console.log(actions);
-
     return actions;
 
 };

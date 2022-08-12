@@ -34,18 +34,10 @@ export const getCurrentLanguageInformation = () => {
 export const initArray = numberOfElements => {
     let i, result = [];
     for (i = 0; i < numberOfElements; i++) {
-        if (i < 10) {
-            result.push({
-                index: i,
-                value: '0' + i
-            });
-        }
-        else {
-            result.push({
-                index: i,
-                value: '' + i
-            });
-        }
+        result.push({
+            index: i,
+            value: makeTwoDigits(i)
+        });
     }
     return result;
 };
@@ -148,10 +140,9 @@ export const parseValueForBooleanStrings = value => {
 }
 
 /*
-* checks if an user is admin or has the required role to access an ui element
+* checks if a user is admin or has the required role to access an ui element
 */
 export const hasAccess = (role, userInfo) =>  {
-
     return !!(userInfo.isAdmin || userInfo.roles.includes(role));
 }
 

@@ -15,6 +15,8 @@ import {removeNotificationWizardForm} from "../../../actions/notificationActions
 import {createPolicy, prepareAccessPolicyRulesForPost} from "../../../utils/resourceUtils";
 import {getUserInformation} from "../../../selectors/userInfoSelectors";
 import {hasAccess} from "../../../utils/utils";
+import DropDown from "../DropDown";
+import {filterRoles, getAclTemplateText} from "../../../utils/aclUtils";
 
 /**
  * This component manages the access policy tab of resource details modals
@@ -51,7 +53,7 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
         async function fetchData() {
             setLoading(true);
             const responseTemplates = await fetchAclTemplates();
-            setAclTemplates(responseTemplates);
+            await setAclTemplates(responseTemplates);
             const responseActions = await fetchAclActions();
             setAclActions(responseActions);
             setHasActions(responseActions.length > 0);
@@ -173,7 +175,6 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
         setFormikFieldValue('template', templateId);
     };
 
-    // todo: add user and role management
     return (
         <div className="modal-content">
             <div className="modal-body">
@@ -211,46 +212,33 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
 
                                                             <tbody>
                                                                 <tr>
-                                                                    <td>
-                                                                        <div className="obj-container padded chosen-container chosen-container-single">
-                                                                            <p>
-                                                                                {descriptionText /* Description text for policies*/}
-                                                                            </p>
-                                                                            {!transactions.read_only ? (
+                                                                    <td className="editable">
+                                                                        <p>
+                                                                            {descriptionText /* Description text for policies*/}
+                                                                        </p>
+                                                                        {!transactions.read_only ? (
 
-                                                                                /* dropdown for selecting a policy template */
-                                                                                <Field className="chosen-single chosen-default"
-                                                                                       style={{width: '200px'}}
-                                                                                       name={'template'}
-                                                                                       as='select'
-                                                                                       onChange={event => handleTemplateChange(event.target.value, formik.setFieldValue)}
-                                                                                >
-                                                                                    {(aclTemplates && aclTemplates.length > 0) ? (
-                                                                                        <>
-                                                                                            <option value="" defaultValue hidden>
-                                                                                                {t(buttonText)}
-                                                                                            </option>
-                                                                                            {
-                                                                                                aclTemplates.map((template, key) => (
-                                                                                                    <option value={template.id}
-                                                                                                            key={key}
-                                                                                                    >
-                                                                                                        {template.value}
-                                                                                                    </option>
-                                                                                                ))
-                                                                                            }
-                                                                                        </>
-                                                                                    ) : (
-                                                                                        <option value="" defaultValue hidden>
-                                                                                            {t('EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.EMPTY')}
-                                                                                        </option>
-                                                                                    )}
-                                                                                </Field>
-
-                                                                            ) : (
-                                                                                baseAclId
-                                                                            )}
-                                                                        </div>
+                                                                            /* dropdown for selecting a policy template */
+                                                                            <DropDown value={formik.values.template}
+                                                                                      text={getAclTemplateText(aclTemplates, formik.values.template)}
+                                                                                      options={ !!aclTemplates ?
+                                                                                          aclTemplates
+                                                                                          : []
+                                                                                      }
+                                                                                      type={'aclTemplate'}
+                                                                                      required={true}
+                                                                                      handleChange={element =>
+                                                                                          handleTemplateChange(element.value, formik.setFieldValue)
+                                                                                      }
+                                                                                      placeholder={ (!!aclTemplates && aclTemplates.length > 0) ?
+                                                                                          t(buttonText)
+                                                                                          : t('EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.EMPTY')
+                                                                                      }
+                                                                                      tabIndex={'1'}
+                                                                            />
+                                                                        ) : (
+                                                                            baseAclId
+                                                                        )}
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
@@ -302,42 +290,26 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                                                                 <tr key={index}>
 
                                                                                     {/* dropdown for policy.role */}
-                                                                                    <td>
+                                                                                    <td className="editable">
                                                                                         { !transactions.read_only ? (
-                                                                                            <Field className="chosen-single chosen-default"
-                                                                                                   style={{width: '360px'}}
-                                                                                                   name={`policies.${index}.role`}
-                                                                                                   as="select"
-                                                                                                   disabled={!hasAccess(editAccessRole, user)}
-                                                                                                   onChange={role => replace(index, {...policy, role:role.target.value})}
-                                                                                            >
-                                                                                                { (roles && roles.length > 0) && (
-                                                                                                    <>
-                                                                                                        { !policy.role &&
-                                                                                                        <option value="" defaultValue hidden>
-                                                                                                            {t('EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL')}
-                                                                                                        </option>
-                                                                                                        }
-                                                                                                        { !!policy.role &&
-                                                                                                        <option value={policy.role} defaultValue>
-                                                                                                            {policy.role}
-                                                                                                        </option>
-                                                                                                        }
-                                                                                                        { roles.filter(role => !formik.values.policies.find(policy => policy.role === role.name)).map((role, key) => (
-                                                                                                            <option value={role.name}
-                                                                                                                    key={key}
-                                                                                                            >
-                                                                                                                {role.name}
-                                                                                                            </option>
-                                                                                                        ))}
-                                                                                                    </>
-                                                                                                )}
-                                                                                                {(roles && roles.length > 0) || (
-                                                                                                    <option value="" defaultValue hidden>
-                                                                                                        {t('EVENTS.EVENTS.DETAILS.ACCESS.ROLES.EMPTY')}
-                                                                                                    </option>
-                                                                                                )}
-                                                                                            </Field>
+                                                                                            <DropDown value={policy.role}
+                                                                                                      text={policy.role}
+                                                                                                      options={ (!!roles && roles.length > 0) ?
+                                                                                                          filterRoles(roles, formik.values.policies)
+                                                                                                          : []
+                                                                                                      }
+                                                                                                      type={'aclRole'}
+                                                                                                      required={true}
+                                                                                                      handleChange={element =>
+                                                                                                          replace(index, {...policy, role:element.value})
+                                                                                                      }
+                                                                                                      placeholder={ (!!roles && roles.length > 0) ?
+                                                                                                          t('EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL')
+                                                                                                          : t('EVENTS.EVENTS.DETAILS.ACCESS.ROLES.EMPTY')
+                                                                                                      }
+                                                                                                      tabIndex={index + 1}
+                                                                                                      disabled={!hasAccess(editAccessRole, user)}
+                                                                                            />
                                                                                         ) : (
                                                                                             <p>{policy.role}</p>
                                                                                         )}

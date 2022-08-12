@@ -24,6 +24,7 @@ const AclDetails = ({close, aclDetails, updateAclDetails, checkAcls}) => {
     // set initial values
     const initialValues = {
         name: aclDetails.name,
+        aclTemplate: '',
         acls: aclDetails.acl
     };
 

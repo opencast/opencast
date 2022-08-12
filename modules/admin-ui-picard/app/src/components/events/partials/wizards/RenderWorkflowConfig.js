@@ -45,171 +45,170 @@ const RenderWorkflowConfig = (props) => {
     };
 
   return (
-    <>
-      {(displayDescription && description.length > 0) && (
-        <div className="collapsible-box" style={descriptionBoxStyle}>
-          <div style={descriptionTextStyle}>{description}</div>
-        </div>
-      )}
+      <>
+          {(displayDescription && description.length > 0) && (
+              <div className="collapsible-box" style={descriptionBoxStyle}>
+                  <div style={descriptionTextStyle}>{description}</div>
+              </div>
+          )}
 
-      {configPanel.length > 0 && (
-        <form>
-          <div id="workflow-configuration">
-            {configPanel.map((configOption, key) => (
-              <fieldset key={key}>
-                {!!configOption.legend && (
-                  <legend>{configOption.legend}</legend>
-                )}
-                {!!configOption.description && (
-                  <p>{configOption.description}</p>
-                )}
-                <ul>
-                  {configOption.fieldset?.map((field, keys) => (
-                    renderInputByType(field, keys, formik)
-                  ))}
-                </ul>
-              </fieldset>
-            ))}
-          </div>
-        </form>
-      )}
-    </>
-
+          {configPanel.length > 0 && (
+              <form>
+                  <div id="workflow-configuration">
+                      {configPanel.map((configOption, key) => (
+                          <fieldset key={key}>
+                              {!!configOption.legend && (
+                                  <legend>{configOption.legend}</legend>
+                              )}
+                              {!!configOption.description && (
+                                  <p>{configOption.description}</p>
+                              )}
+                              <ul>
+                                  {configOption.fieldset?.map((field, keys) => (
+                                      renderInputByType(field, keys, formik)
+                                  ))}
+                              </ul>
+                          </fieldset>
+                      ))}
+                  </div>
+              </form>
+          )}
+      </>
   );
 }
 
 // render input depending on field type
 const renderInputByType = (field, key, formik) => {
-  switch (field.type) {
-    case 'checkbox':
-      return <RenderCheckbox field={field} key={key} formik={formik}/>;
-    case 'radio':
-      return <RenderRadio field={field} key={key} formik={formik}/>;
-    case 'number':
-      return <RenderNumber field={field} key={key} formik={formik}/>;
-    case 'text':
-      return <RenderText field={field} key={key} formik={formik}/>;
-    default:
-      return '';
-  }
+    switch (field.type) {
+        case 'checkbox':
+            return <RenderCheckbox field={field} key={key} formik={formik}/>;
+        case 'radio':
+            return <RenderRadio field={field} key={key} formik={formik}/>;
+        case 'number':
+            return <RenderNumber field={field} key={key} formik={formik}/>;
+        case 'text':
+            return <RenderText field={field} key={key} formik={formik}/>;
+        default:
+            return '';
+    }
 }
 
 const RenderCheckbox = ({ field, key, formik }) => {
-  // id used for Field and label
-  const uuid = uuidv4();
-  const disabled = !!field.disabled ? field.disabled : false;
+    // id used for Field and label
+    const uuid = uuidv4();
+    const disabled = !!field.disabled ? field.disabled : false;
 
-  return (
-    <li key={key}>
-      <Field id={uuid}
-             className="configField"
-             name={'configuration.' + field.name}
-             defaultValue={field.value}
-             disabled={disabled}
-             type={field.type}/>
-      <label htmlFor={uuid}>{field.label}</label>
-      {/* if input has an additional fieldset or further configuration inputs
-      then render again by input type*/}
-      {(!!field.fieldset && !!formik.values.configuration[field.name]) && (
-        <ul className="workflow-configuration-subpanel">
-          {field.fieldset?.map((f, keys) => (
-            renderInputByType(f, keys, formik)
-          ))}
-        </ul>
-      )}
-    </li>
-  );
+    return (
+        <li key={key}>
+            <Field id={uuid}
+                   className="configField"
+                   name={'configuration.' + field.name}
+                   defaultValue={field.value}
+                   disabled={disabled}
+                   type={field.type}/>
+            <label htmlFor={uuid}>{field.label}</label>
+            {/* if input has an additional fieldset or further configuration inputs
+             then render again by input type*/}
+            {(!!field.fieldset && !!formik.values.configuration[field.name]) && (
+                <ul className="workflow-configuration-subpanel">
+                    {field.fieldset?.map((f, keys) => (
+                        renderInputByType(f, keys, formik)
+                    ))}
+                </ul>
+            )}
+        </li>
+    );
 }
 
 const RenderRadio = ({ field, key, formik }) => {
-  // id used for Field and label
-  const uuid = uuidv4();
-  const disabled = !!field.disabled ? field.disabled : false;
+    // id used for Field and label
+    const uuid = uuidv4();
+    const disabled = !!field.disabled ? field.disabled : false;
 
-  return (
-    <li key={key}>
-      <Field id={uuid}
-             className="configField"
-             name={'configuration.' + field.name}
-             value={field.value}
-             disabled={disabled}
-             type={field.type}/>
-      <label htmlFor={uuid}>{field.label}</label>
-      {/* if input has an additional fieldset or further configuration inputs
-      then render again by input type*/}
-      {(!!field.fieldset && formik.values.configuration[field.name] === field.value) && (
-        <ul className="workflow-configuration-subpanel">
-          {field.fieldset?.map((f, keys) => (
-            renderInputByType(f, keys, formik)
-          ))}
-        </ul>
-      )}
-    </li>
-  );
+    return (
+        <li key={key}>
+            <Field id={uuid}
+                   className="configField"
+                   name={'configuration.' + field.name}
+                   value={field.value}
+                   disabled={disabled}
+                   type={field.type}/>
+            <label htmlFor={uuid}>{field.label}</label>
+            {/* if input has an additional fieldset or further configuration inputs
+            then render again by input type*/}
+            {(!!field.fieldset && formik.values.configuration[field.name] === field.value) && (
+                <ul className="workflow-configuration-subpanel">
+                    {field.fieldset?.map((f, keys) => (
+                        renderInputByType(f, keys, formik)
+                    ))}
+                </ul>
+            )}
+        </li>
+    );
 }
 
 const RenderNumber = ({ field, key, formik }) => {
-  // id used for Field and label
-  const uuid = uuidv4();
-  const disabled = !!field.disabled ? field.disabled : false;
+    // id used for Field and label
+    const uuid = uuidv4();
+    const disabled = !!field.disabled ? field.disabled : false;
 
-  // validate that value of number is between max and min
-  const validate = value => {
-    let error;
-    if (parseInt(value) > field.max || parseInt(value) < field.min) {
-      error = "out of range";
+    // validate that value of number is between max and min
+    const validate = value => {
+        let error;
+        if (parseInt(value) > field.max || parseInt(value) < field.min) {
+            error = "out of range";
+        }
+        return error;
     }
-    return error;
-  }
 
-  return (
-    <li key={key}>
-      <Field id={uuid}
-             validate={validate}
-             className="configField"
-             name={'configuration.' + field.name}
-             disabled={disabled}
-             type={field.type}
-             min={field.min}
-             max={field.max}/>
-      <label htmlFor={uuid}>{field.label}</label>
-      {/* if input has an additional fieldset or further configuration inputs
-      then render again by input type*/}
-      {(!!field.fieldset && !!formik.values.configuration[field.name]) && (
-        <ul className="workflow-configuration-subpanel">
-          {field.fieldset?.map((f, keys) => (
-            renderInputByType(f, keys, formik)
-          ))}
-        </ul>
-      )}
-    </li>
-  );
+    return (
+        <li key={key}>
+            <Field id={uuid}
+                   validate={validate}
+                   className="configField"
+                   name={'configuration.' + field.name}
+                   disabled={disabled}
+                   type={field.type}
+                   min={field.min}
+                   max={field.max}/>
+            <label htmlFor={uuid}>{field.label}</label>
+            {/* if input has an additional fieldset or further configuration inputs
+            then render again by input type*/}
+            {(!!field.fieldset && !!formik.values.configuration[field.name]) && (
+                <ul className="workflow-configuration-subpanel">
+                    {field.fieldset?.map((f, keys) => (
+                        renderInputByType(f, keys, formik)
+                    ))}
+                </ul>
+            )}
+        </li>
+    );
 }
 
 const RenderText = ({ field, key, formik }) => {
-  // id used for Field and label
-  const uuid = uuidv4();
-  const disabled = !!field.disabled ? field.disabled : false;
+    // id used for Field and label
+    const uuid = uuidv4();
+    const disabled = !!field.disabled ? field.disabled : false;
 
-  return (
-    <li key={key}>
-      <Field id={uuid}
-             className="configField"
-             name={'configuration.' + field.name}
-             disabled={disabled}
-             type={field.type}/>
-      <label htmlFor={uuid}>{field.label}</label>
-      {/* if input has an additional fieldset or further configuration inputs
-      then render again by input type*/}
-      {(!!field.fieldset && !!formik.values.configuration[field.name]) && (
-        <ul className="workflow-configuration-subpanel">
-          {field.fieldset?.map((f, keys) => (
-            renderInputByType(f, keys, formik)
-          ))}
-        </ul>
-      )}
-    </li>
-  );
+    return (
+        <li key={key}>
+            <Field id={uuid}
+                   className="configField"
+                   name={'configuration.' + field.name}
+                   disabled={disabled}
+                   type={field.type}/>
+            <label htmlFor={uuid}>{field.label}</label>
+            {/* if input has an additional fieldset or further configuration inputs
+            then render again by input type*/}
+            {(!!field.fieldset && !!formik.values.configuration[field.name]) && (
+                <ul className="workflow-configuration-subpanel">
+                    {field.fieldset?.map((f, keys) => (
+                        renderInputByType(f, keys, formik)
+                    ))}
+                </ul>
+            )}
+        </li>
+    );
 }
 
 // Getting state data out of redux store

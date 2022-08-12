@@ -27,13 +27,19 @@ import {
     getTimezoneOffset,
     getTimezoneString,
     hasAccess,
-    initArray,
     makeTwoDigits
 } from "../../../../utils/utils";
 import {
-    calculateDuration,
+    changeDurationHour,
+    changeDurationMinute,
+    changeEndHour,
+    changeEndMinute,
+    changeStartDate,
+    changeStartHour,
+    changeStartMinute,
     makeDate
 } from "../../../../utils/dateUtils";
+import {hours, minutes} from "../../../../configs/modalConfig";
 import {filterDevicesForAccess, hasDeviceAccess} from "../../../../utils/resourceUtils";
 import {NOTIFICATION_CONTEXT} from "../../../../configs/modalConfig";
 import DropDown from "../../../shared/DropDown";
@@ -52,10 +58,6 @@ const EventDetailsSchedulingTab = ({ eventId, t,
 
     // Get info about the current language and its date locale
     const currentLanguage = getCurrentLanguageInformation();
-
-    // Make arrays of possible values for hours and minutes
-    const hours = initArray(24);
-    const minutes = initArray(60);
 
     // Get timezone offset; Checks should be performed on UTC times
     const offset = getTimezoneOffset();
@@ -77,162 +79,6 @@ const EventDetailsSchedulingTab = ({ eventId, t,
     // Variable and function for checking access rights
     const hasAccessRole = hasAccess("ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT", user);
     const accessAllowed = (agentId) => {return (!checkingConflicts)  && hasDeviceAccess(user, agentId)};
-
-    // sets the duration in the formik
-    const setDuration = (startDate, endDate, setFieldValue) => {
-        const {durationHours, durationMinutes} = calculateDuration(startDate, endDate);
-
-        setFieldValue('scheduleDurationHours', makeTwoDigits(durationHours));
-        setFieldValue('scheduleDurationMinutes', makeTwoDigits(durationMinutes));
-    }
-
-    // checks if the time of the endDate is before the time of the startDate
-    const isEndBeforeStart = (startDate, endDate) => {
-        return (startDate.getHours() > endDate.getHours()) || ((startDate.getHours() === endDate.getHours()) && (startDate.getMinutes() > endDate.getMinutes()));
-    }
-
-    // changes the start in the formik
-    const changeStart = (start, formikValues, setFieldValue) => {
-        const startDate = makeDate(start.date, start.hour, start.minute);
-
-        let endDate = makeDate(start.date, formikValues.scheduleEndHour, formikValues.scheduleEndMinute);
-
-        if(isEndBeforeStart(startDate, endDate)){
-            endDate.setDate(startDate.getDate() + 1);
-        }
-
-        setDuration(startDate, endDate, setFieldValue);
-        setFieldValue('scheduleEndDate', endDate.setHours(0, 0, 0));
-        setFieldValue('scheduleStartDate', startDate.setHours(0, 0, 0));
-
-        checkConflicts(eventId, startDate, endDate, formikValues.captureAgent).then(r => {});
-    };
-
-    const changeStartDate = (value, formikValues, setFieldValue) => {
-        changeStart(
-            {
-                date: value,
-                hour: formikValues.scheduleStartHour,
-                minute: formikValues.scheduleStartMinute
-            },
-            formikValues,
-            setFieldValue
-        );
-    }
-
-    const changeStartHour = async (value, formikValues, setFieldValue) => {
-        changeStart(
-            {
-                date: formikValues.scheduleStartDate,
-                hour: value,
-                minute: formikValues.scheduleStartMinute
-            },
-            formikValues,
-            setFieldValue
-        );
-
-        setFieldValue('scheduleStartHour', value);
-    };
-
-    const changeStartMinute = async (value, formikValues, setFieldValue) => {
-        changeStart(
-            {
-                date: formikValues.scheduleStartDate,
-                hour: formikValues.scheduleStartHour,
-                minute: value
-            },
-            formikValues,
-            setFieldValue
-        );
-
-        setFieldValue('scheduleStartMinute', value);
-    };
-
-    // changes the end in the formik
-    const changeEnd = (end, formikValues, setFieldValue) => {
-        const endDate = makeDate(formikValues.scheduleStartDate, end.hour, end.minute);
-
-        const startDate = makeDate(formikValues.scheduleStartDate, formikValues.scheduleStartHour, formikValues.scheduleStartMinute);
-
-        if(isEndBeforeStart(startDate, endDate)){
-            endDate.setDate(startDate.getDate() + 1);
-        }
-
-        setDuration(startDate, endDate, setFieldValue);
-        setFieldValue('scheduleEndDate', endDate.setHours(0,0,0));
-
-        checkConflicts(eventId, startDate, endDate, formikValues.captureAgent).then(r => {});
-    }
-
-    const changeEndHour = async (value, formikValues, setFieldValue) => {
-        changeEnd(
-            {
-                hour: value,
-                minute: formikValues.scheduleEndMinute
-            },
-            formikValues,
-            setFieldValue
-        );
-
-        setFieldValue('scheduleEndHour', value);
-    };
-
-    const changeEndMinute = async (value, formikValues, setFieldValue) => {
-        changeEnd(
-            {
-                hour: formikValues.scheduleEndHour,
-                minute: value
-            },
-            formikValues,
-            setFieldValue
-        );
-
-        setFieldValue('scheduleEndMinute', value);
-    };
-
-    // changes the duration in the formik
-    const changeDuration = (duration, formikValues, setFieldValue) => {
-
-        const startDate = makeDate(formikValues.scheduleStartDate, formikValues.scheduleStartHour, formikValues.scheduleStartMinute);
-
-        const endDate = new Date(startDate.toISOString());
-
-        endDate.setHours(endDate.getHours() + parseInt(duration.hours));
-        endDate.setMinutes(endDate.getMinutes() + parseInt(duration.minutes));
-
-        setFieldValue('scheduleEndHour', makeTwoDigits(endDate.getHours()));
-        setFieldValue('scheduleEndMinute', makeTwoDigits(endDate.getMinutes()));
-
-        setFieldValue('scheduleEndDate', endDate.setHours(0,0,0));
-
-        checkConflicts(eventId, startDate, endDate, formikValues.captureAgent).then(r => {});
-    }
-
-    const changeDurationHour = async (value, formikValues, setFieldValue) => {
-        changeDuration(
-            {
-                hours: value,
-                minutes: formikValues.scheduleDurationMinutes
-            },
-            formikValues,
-            setFieldValue
-        );
-
-        setFieldValue('scheduleDurationHours', value);
-    };
-
-    const changeDurationMinute = async (value, formikValues, setFieldValue) => {
-        changeDuration(
-            {
-                hours: formikValues.scheduleDurationHours,
-                minutes: value
-            },
-            formikValues,
-            setFieldValue
-        );
-
-        setFieldValue('scheduleDurationMinutes', value);
-    };
 
     // finds the inputs to be displayed in the formik
     const getInputs = deviceId => {
@@ -354,22 +200,25 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                         <div className="obj-container">
                                             <table className="main-tbl">
                                                 <tbody>
-                                                    {/*time zone*/}
+                                                    {/* time zone */}
                                                     <tr>
                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.TIMEZONE')}</td>
                                                         <td>{tz}</td>
                                                     </tr>
 
-                                                    {/*start date*/}
+                                                    {/* start date */}
                                                     <tr>
                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.START_DATE')}</td>
                                                         <td>
                                                             {(hasAccessRole && accessAllowed(formik.values.captureAgent))? (
-                                                                /*date picker for start date*/
+                                                                /* date picker for start date */
                                                                 <ThemeProvider theme={theme}>
                                                                     <DatePicker name="scheduleStartDate"
+                                                                                tabIndex={"1"}
                                                                                 value={formik.values.scheduleStartDate}
-                                                                                onChange={value => changeStartDate(value, formik.values, formik.setFieldValue)}
+                                                                                onChange={value =>
+                                                                                    changeStartDate(value, formik.values, formik.setFieldValue, eventId, checkConflicts)
+                                                                                }
                                                                     />
                                                                 </ThemeProvider>
                                                             ):(
@@ -378,13 +227,13 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                         </td>
                                                     </tr>
 
-                                                    {/*start time*/}
+                                                    {/* start time */}
                                                     <tr>
                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.START_TIME')}</td>
                                                         {hasAccessRole && (
 
-                                                            <td className="editable ng-isolated-scope">
-                                                                {/*drop-down for hour
+                                                            <td className="editable">
+                                                                {/* drop-down for hour
                                                                   *
                                                                   * This is the second input field.
                                                                   */}
@@ -393,13 +242,15 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                                           options={hours}
                                                                           type={'time'}
                                                                           required={true}
-                                                                          handleChange={element => changeStartHour(element.value, formik.values, formik.setFieldValue)}
+                                                                          handleChange={element =>
+                                                                              changeStartHour(element.value, formik.values, formik.setFieldValue, eventId, checkConflicts)
+                                                                          }
                                                                           placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}
                                                                           tabIndex={"2"}
                                                                           disabled={!accessAllowed(formik.values.captureAgent)}
                                                                 />
 
-                                                                {/*drop-down for minute
+                                                                {/* drop-down for minute
                                                                   *
                                                                   * This is the third input field.
                                                                   */}
@@ -408,7 +259,9 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                                           options={minutes}
                                                                           type={'time'}
                                                                           required={true}
-                                                                          handleChange={element => changeStartMinute(element.value, formik.values, formik.setFieldValue)}
+                                                                          handleChange={element =>
+                                                                              changeStartMinute(element.value, formik.values, formik.setFieldValue, eventId, checkConflicts)
+                                                                          }
                                                                           placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}
                                                                           tabIndex={"3"}
                                                                           disabled={!accessAllowed(formik.values.captureAgent)}
@@ -423,12 +276,12 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                         )}
                                                     </tr>
 
-                                                    {/*duration*/}
+                                                    {/* duration */}
                                                     <tr>
                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.DURATION')}</td>
                                                         {hasAccessRole && (
-                                                            <td className="editable ng-isolated-scope">
-                                                                {/*drop-down for hour
+                                                            <td className="editable">
+                                                                {/* drop-down for hour
                                                                   *
                                                                   * This is the fourth input field.
                                                                   */}
@@ -437,13 +290,15 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                                           options={hours}
                                                                           type={'time'}
                                                                           required={true}
-                                                                          handleChange={element => changeDurationHour(element.value, formik.values, formik.setFieldValue)}
+                                                                          handleChange={element =>
+                                                                              changeDurationHour(element.value, formik.values, formik.setFieldValue, eventId, checkConflicts)
+                                                                }
                                                                           placeholder={t('WIZARD.DURATION.HOURS')}
                                                                           tabIndex={"4"}
                                                                           disabled={!accessAllowed(formik.values.captureAgent)}
                                                                 />
 
-                                                                {/*drop-down for minute
+                                                                {/* drop-down for minute
                                                                   *
                                                                   * This is the fifth input field.
                                                                   */}
@@ -452,7 +307,9 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                                           options={minutes}
                                                                           type={'time'}
                                                                           required={true}
-                                                                          handleChange={element => changeDurationMinute(element.value, formik.values, formik.setFieldValue)}
+                                                                          handleChange={element =>
+                                                                              changeDurationMinute(element.value, formik.values, formik.setFieldValue, eventId, checkConflicts)
+                                                                          }
                                                                           placeholder={t('WIZARD.DURATION.MINUTES')}
                                                                           tabIndex={"5"}
                                                                           disabled={!accessAllowed(formik.values.captureAgent)}
@@ -467,12 +324,12 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                         )}
                                                     </tr>
 
-                                                    {/*end time*/}
+                                                    {/* end time */}
                                                     <tr>
                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.END_TIME')}</td>
                                                         {hasAccessRole && (
-                                                            <td className="editable ng-isolated-scope">
-                                                                {/*drop-down for hour
+                                                            <td className="editable">
+                                                                {/* drop-down for hour
                                                                   *
                                                                   * This is the sixth input field.
                                                                   */}
@@ -481,13 +338,15 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                                           options={hours}
                                                                           type={'time'}
                                                                           required={true}
-                                                                          handleChange={element => changeEndHour(element.value, formik.values, formik.setFieldValue)}
+                                                                          handleChange={element =>
+                                                                              changeEndHour(element.value, formik.values, formik.setFieldValue, eventId, checkConflicts)
+                                                                          }
                                                                           placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}
                                                                           tabIndex={"6"}
                                                                           disabled={!accessAllowed(formik.values.captureAgent)}
                                                                 />
 
-                                                                {/*drop-down for minute
+                                                                {/* drop-down for minute
                                                                   *
                                                                   * This is the seventh input field.
                                                                   */}
@@ -496,15 +355,17 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                                           options={minutes}
                                                                           type={'time'}
                                                                           required={true}
-                                                                          handleChange={element => changeEndMinute(element.value, formik.values, formik.setFieldValue)}
+                                                                          handleChange={element =>
+                                                                              changeEndMinute(element.value, formik.values, formik.setFieldValue, eventId, checkConflicts)
+                                                                          }
                                                                           placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}
                                                                           tabIndex={"7"}
                                                                           disabled={!accessAllowed(formik.values.captureAgent)}
                                                                 />
 
-                                                                {/*display end date if on different day to start date*/}
+                                                                {/* display end date if on different day to start date */}
                                                                 {(formik.values.scheduleEndDate.toString() !== formik.values.scheduleStartDate.toString()) && (
-                                                                    <span style={{paddingLeft: '5px'}}>{(new Date(formik.values.scheduleEndDate)).toLocaleDateString(currentLanguage.dateLocale.code)}</span>
+                                                                    <span style={{marginLeft: '10px'}}>{(new Date(formik.values.scheduleEndDate)).toLocaleDateString(currentLanguage.dateLocale.code)}</span>
                                                                 )}
                                                             </td>
                                                         )}
@@ -519,12 +380,12 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                         )}
                                                     </tr>
 
-                                                    {/*capture agent (aka. room or location)*/}
+                                                    {/* capture agent (aka. room or location) */}
                                                     <tr>
                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION')}</td>
                                                         {hasAccessRole && (
-                                                            <td className="editable ng-isolated-scope">
-                                                                {/*drop-down for capture agents (aka. rooms or locations)
+                                                            <td className="editable">
+                                                                {/* drop-down for capture agents (aka. rooms or locations)
                                                                   *
                                                                   * This is the eighth input field.
                                                                   */}
@@ -547,13 +408,13 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                         )}
                                                     </tr>
 
-                                                    {/*inputs*/}
+                                                    {/* inputs */}
                                                     <tr>
                                                         <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.INPUTS')}</td>
                                                         <td>
                                                             {!!formik.values.captureAgent && !!getInputs(formik.values.captureAgent) && getInputs(formik.values.captureAgent).length > 0 && (
                                                                 (hasAccessRole && accessAllowed(formik.values.captureAgent)) ? (
-                                                                    /*checkboxes for available inputs
+                                                                    /* checkboxes for available inputs
                                                                      *
                                                                      * These are the input fields starting at 8.
                                                                      */

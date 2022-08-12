@@ -14,6 +14,8 @@ import {connect} from "react-redux";
 import RenderMultiField from "../../../shared/wizard/RenderMultiField";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 import {hasAccess} from "../../../../utils/utils";
+import DropDown from "../../../shared/DropDown";
+import {filterRoles, getAclTemplateText} from "../../../../utils/aclUtils";
 
 /**
  * This component renders the access page for new events and series in the wizards.
@@ -43,10 +45,11 @@ const NewAccessPage = ({ previousPage, nextPage, formik, editAccessRole, user, c
         fetchData();
     }, []);
 
-    const handleTemplateChange = async (e) => {
+    const handleTemplateChange = async (value) => {
         // fetch information about chosen template from backend
-        const template =  await fetchAclTemplateById(e.target.value);
+        const template =  await fetchAclTemplateById(value);
 
+        formik.setFieldValue('aclTemplate', value);
         formik.setFieldValue('acls', template);
         await checkAcls(formik.values.acls);
     }
@@ -82,19 +85,21 @@ const NewAccessPage = ({ previousPage, nextPage, formik, editAccessRole, user, c
                                                     <tbody>
                                                         <tr>
                                                             {aclTemplates.length > 0 ? (
-                                                                <td>
+                                                                <td className="editable">
                                                                     <div className="obj-container padded">
-                                                                        <select tabIndex="1"
-                                                                                autoFocus
-                                                                                style={{width: '200px'}}
-                                                                                onChange={e => handleTemplateChange(e)}
-                                                                                placeholder={t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL')}>
-                                                                            <option value=''>{t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL')}</option>
-                                                                            {aclTemplates.map((template, key) => (
-                                                                                <option value={template.id}
-                                                                                        key={key}>{template.value}</option>
-                                                                            ))}
-                                                                        </select>
+                                                                        {/* dropdown for selecting a policy template */}
+                                                                        <DropDown value={formik.values.aclTemplate}
+                                                                                  text={getAclTemplateText(aclTemplates, formik.values.aclTemplate)}
+                                                                                  options={aclTemplates}
+                                                                                  type={'aclTemplate'}
+                                                                                  required={true}
+                                                                                  handleChange={element =>
+                                                                                      handleTemplateChange(element.value)
+                                                                                  }
+                                                                                  placeholder={t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL')}
+                                                                                  tabIndex={'1'}
+                                                                                  autoFocus={true}
+                                                                        />
                                                                     </div>
                                                                 </td>
                                                             ) : (
@@ -151,22 +156,20 @@ const NewAccessPage = ({ previousPage, nextPage, formik, editAccessRole, user, c
                                                                                     formik.values.acls.map((policy, index) => (
                                                                                         <tr key={index}>
 
-                                                                                            <td>
-                                                                                                <Field style={{width: '360px'}}
-                                                                                                       name={`acls.${index}.role`}
-                                                                                                       as="select"
-                                                                                                       placeholder={t('EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL')}>
-                                                                                                    {roles.length > 0 && (
-                                                                                                        <>
-                                                                                                            <option value='' hidden>{t('EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL')}</option>
-                                                                                                            {roles.map((role, key) => (
-                                                                                                                <option value={role.name}
-                                                                                                                        key={key}>{role.name}</option>
-                                                                                                            ))}
-                                                                                                        </>
-                                                                                                    )}
-
-                                                                                                </Field>
+                                                                                            {/* dropdown for acl (/policy) role */}
+                                                                                            <td className="editable">
+                                                                                                <DropDown value={policy.role}
+                                                                                                          text={policy.role}
+                                                                                                          options={filterRoles(roles, formik.values.acls)}
+                                                                                                          type={'aclRole'}
+                                                                                                          required={true}
+                                                                                                          handleChange={element =>
+                                                                                                              formik.setFieldValue(`acls.${index}.role`, element.value)
+                                                                                                          }
+                                                                                                          placeholder={t('EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL')}
+                                                                                                          tabIndex={index + 1}
+                                                                                                          disabled={!hasAccess(editAccessRole, user)}
+                                                                                                />
                                                                                             </td>
                                                                                             {/* Checkboxes for  policy.read and policy.write*/}
                                                                                             <td className="fit text-center"><Field type="checkbox" name={`acls.${index}.read`}/></td>

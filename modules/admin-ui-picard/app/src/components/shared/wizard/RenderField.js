@@ -7,11 +7,6 @@ import cn from "classnames";
 import {useClickOutsideField} from "../../../hooks/wizardHooks";
 import {isJson} from "../../../utils/utils";
 import {getMetadataCollectionFieldName} from "../../../utils/resourceUtils";
-import {dropDownStyle} from "../../../utils/componentStyles";
-import {
-    formatDropDownOptions,
-    handleSearch
-} from "../../../utils/dropDownUtils";
 import DropDown from "../DropDown";
 
 
@@ -177,7 +172,6 @@ const EditableSingleSelect = ({ field, metadataField, text, editMode, setEditMod
             <div onBlur={() => setEditMode(false)}
                  onKeyDown={e => handleKeyDown(e, "select")}
                  ref={childRef}
-                 data-width="'250px'"
             >
                 <DropDown value={field.value}
                           text={text}

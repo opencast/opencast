@@ -19,6 +19,15 @@ import DateFnsUtils from '@date-io/date-fns';
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 import {filterDevicesForAccess, hasAnyDeviceAccess} from "../../../../utils/resourceUtils";
 import DropDown from "../../../shared/DropDown";
+import {
+    changeDurationHour, changeDurationHourMultiple,
+    changeDurationMinute, changeDurationMinuteMultiple, changeEndDateMultiple,
+    changeEndHour, changeEndHourMultiple,
+    changeEndMinute, changeEndMinuteMultiple,
+    changeStartDate, changeStartDateMultiple,
+    changeStartHour, changeStartHourMultiple,
+    changeStartMinute, changeStartMinuteMultiple
+} from "../../../../utils/dateUtils";
 
 
 // Style to bring date picker pop up to front
@@ -93,6 +102,7 @@ const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, in
                                                     <Field type="radio"
                                                            name="sourceMode"
                                                            className="source-toggle"
+                                                           onClick={() => changeStartDate(formik.values.scheduleStartDate, formik.values, formik.setFieldValue)}
                                                            value="SCHEDULE_SINGLE"/>
                                                     <span>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_SINGLE.CAPTION')}</span>
                                                 </label>
@@ -285,9 +295,13 @@ const Schedule = ({ formik, inputDevices }) => {
                                     <MuiPickersUtilsProvider utils={DateFnsUtils} locale={currentLanguage.dateLocale}>
                                         <DatePicker name="scheduleStartDate"
                                                     value={formik.values.scheduleStartDate}
-                                                    onChange={value =>
-                                                      formik.setFieldValue("scheduleStartDate", value)
-                                                    }
+                                                    onChange={value => {
+                                                        if (formik.values.sourceMode === 'SCHEDULE_MULTIPLE') {
+                                                            changeStartDateMultiple(value, formik.values, formik.setFieldValue);
+                                                        } else {
+                                                            changeStartDate(value, formik.values, formik.setFieldValue);
+                                                        }
+                                                    }}
                                                     tabIndex="4"/>
                                     </MuiPickersUtilsProvider>
                                 </ThemeProvider>
@@ -302,8 +316,8 @@ const Schedule = ({ formik, inputDevices }) => {
                                         <ThemeProvider theme={theme}>
                                             <DatePicker name="scheduleEndDate"
                                                         value={formik.values.scheduleEndDate}
-                                                        onChange={value => formik.setFieldValue("scheduleEndDate", value)}
-                                                        tabIndex="4"/>
+                                                        onChange={value => changeEndDateMultiple(value, formik.values, formik.setFieldValue)}
+                                                        tabIndex="5"/>
                                         </ThemeProvider>
                                     </td>
                                 </tr>
@@ -316,7 +330,7 @@ const Schedule = ({ formik, inputDevices }) => {
                                             <div key={key} className="day-check-container">
                                                 {t(day.label)}
                                                 <br/>
-                                                <Field type="checkbox" name="repeatOn" value={day.name}/>
+                                                <Field type="checkbox" name="repeatOn" value={day.name} tabIndex={6 + key}/>
                                             </div>
                                         ))}
                                     </td>
@@ -325,122 +339,149 @@ const Schedule = ({ formik, inputDevices }) => {
                         )}
                         <tr>
                             <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_TIME')} <i className="required">*</i></td>
-                            <td>
-                                {/* one options for each entry in hours*/}
-                                <div className="chosen-container chosen-container-single">
-                                    <Field className="chosen-single"
-                                           tabIndex="5"
-                                           as="select"
-                                           name="scheduleStartTimeHour"
-                                           placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
-                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}</option>
-                                        {hours.map((i, key) => (
-                                          <option key={key}
-                                                  value={i.value}>
-                                              {i.value}
-                                          </option>
-                                        ))}
-                                    </Field>
-                                </div>
+                            <td className="editable ng-isolated-scope">
+                                {/* drop-down for hour
+                                  *
+                                  * This is the 13th input field.
+                                  */}
+                                <DropDown value={formik.values.scheduleStartHour}
+                                          text={formik.values.scheduleStartHour}
+                                          options={hours}
+                                          type={'time'}
+                                          required={true}
+                                          handleChange={element => {
+                                              if (formik.values.sourceMode === 'SCHEDULE_MULTIPLE') {
+                                                  changeStartHourMultiple(element.value, formik.values, formik.setFieldValue).then();
+                                              } else {
+                                                  changeStartHour(element.value, formik.values, formik.setFieldValue).then();
+                                              }
+                                          }}
+                                          placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}
+                                          tabIndex={"13"}
+                                />
 
-                                {/* one options for each entry in minutes*/}
-                                <div className="chosen-container chosen-container-single">
-                                    <Field className="chosen-single"
-                                           tabIndex="6"
-                                           as="select"
-                                           name="scheduleStartTimeMinutes"
-                                           placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
-                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}</option>
-                                        {minutes.map((i, key) => (
-                                          <option key={key}
-                                                  value={i.value}>
-                                              {i.value}
-                                          </option>
-                                        ))}
-                                    </Field>
-                                </div>
+                                {/* drop-down for minute
+                                  *
+                                  * This is the 14th input field.
+                                  */}
+                                <DropDown value={formik.values.scheduleStartMinute}
+                                          text={formik.values.scheduleStartMinute}
+                                          options={minutes}
+                                          type={'time'}
+                                          required={true}
+                                          handleChange={element => {
+                                              if (formik.values.sourceMode === 'SCHEDULE_MULTIPLE') {
+                                                  changeStartMinuteMultiple(element.value, formik.values, formik.setFieldValue).then();
+                                              } else {
+                                                  changeStartMinute(element.value, formik.values, formik.setFieldValue).then();
+                                              }
+                                          }}
+                                          placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}
+                                          tabIndex={"14"}
+                                />
                             </td>
                         </tr>
                         <tr>
                             <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.DURATION')} <i className="required">*</i></td>
-                            <td>
-                                {/* one options for each entry in hours*/}
-                                <div className="chosen-container chosen-container-single">
-                                    <Field className="chosen-single"
-                                           tabIndex="7"
-                                           as="select"
-                                           name="scheduleDurationHour"
-                                           placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
-                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}</option>
-                                        {hours.map((i, key) => (
-                                          <option value={i.value}
-                                                  key={key}>
-                                              {i.value}
-                                          </option>
-                                        ))}
-                                    </Field>
-                                </div>
+                            <td className="editable ng-isolated-scope">
+                                {/* drop-down for hour
+                                  *
+                                  * This is the 15th input field.
+                                  */}
+                                <DropDown value={formik.values.scheduleDurationHours}
+                                          text={formik.values.scheduleDurationHours}
+                                          options={hours}
+                                          type={'time'}
+                                          required={true}
+                                          handleChange={element => {
+                                              if (formik.values.sourceMode === 'SCHEDULE_MULTIPLE') {
+                                                  changeDurationHourMultiple(element.value, formik.values, formik.setFieldValue).then();
+                                              } else {
+                                                  changeDurationHour(element.value, formik.values, formik.setFieldValue).then();
+                                              }
+                                          }}
+                                          placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}
+                                          tabIndex={"15"}
+                                />
 
-                                {/* one options for each entry in minutes*/}
-                                <div className="chosen-container chosen-container-single">
-                                    <Field className="chosen-single"
-                                           tabIndex="8"
-                                           as="select"
-                                           name="scheduleDurationMinutes"
-                                           placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
-                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}</option>
-                                        {minutes.map((i, key) => (
-                                          <option key={key}
-                                                  value={i.value}>
-                                              {i.value}
-                                          </option>
-                                        ))}
-                                    </Field>
-                                </div>
-
+                                {/* drop-down for minute
+                                  *
+                                  * This is the 16th input field.
+                                  */}
+                                <DropDown value={formik.values.scheduleDurationMinutes}
+                                          text={formik.values.scheduleDurationMinutes}
+                                          options={minutes}
+                                          type={'time'}
+                                          required={true}
+                                          handleChange={element => {
+                                              if (formik.values.sourceMode === 'SCHEDULE_MULTIPLE') {
+                                                  changeDurationMinuteMultiple(element.value, formik.values, formik.setFieldValue).then();
+                                              } else {
+                                                  changeDurationMinute(element.value, formik.values, formik.setFieldValue).then();
+                                              }
+                                          }}
+                                          placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}
+                                          tabIndex={"16"}
+                                />
                             </td>
                         </tr>
                         <tr>
                             <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_TIME')} <i className="required">*</i></td>
-                            <td>
-                                {/* one options for each entry in hours*/}
-                                <div className="chosen-container chosen-container-single">
-                                    <Field className="chosen-single"
-                                           tabIndex="9"
-                                           as="select"
-                                           name="scheduleEndTimeHour"
-                                           placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
-                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}</option>
-                                        {hours.map((i, key) => (
-                                          <option key={key}
-                                                  value={i.value}>
-                                              {i.value}
-                                          </option>
-                                        ))}
-                                    </Field>
-                                </div>
+                            <td className="editable ng-isolated-scope">
+                                {/* drop-down for hour
+                                  *
+                                  * This is the 17th input field.
+                                  */}
+                                <DropDown value={formik.values.scheduleEndHour}
+                                          text={formik.values.scheduleEndHour}
+                                          options={hours}
+                                          type={'time'}
+                                          required={true}
+                                          handleChange={element => {
+                                              if (formik.values.sourceMode === 'SCHEDULE_MULTIPLE') {
+                                                  changeEndHourMultiple(element.value, formik.values, formik.setFieldValue).then();
+                                              } else {
+                                                  changeEndHour(element.value, formik.values, formik.setFieldValue).then();
+                                              }
+                                          }}
+                                          placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}
+                                          tabIndex={"17"}
+                                />
 
-                                {/* one options for each entry in minutes*/}
-                                <div className="chosen-container chosen-container-single">
-                                    <Field className="chosen-single"
-                                           tabIndex="10"
-                                           as="select"
-                                           name="scheduleEndTimeMinutes"
-                                           placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
-                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}</option>
-                                        {minutes.map((i, key) => (
-                                          <option key={key}
-                                                  value={i.value}>
-                                              {i.value}
-                                          </option>
-                                        ))}
-                                    </Field>
-                                </div>
+                                {/* drop-down for minute
+                                  *
+                                  * This is the 18th input field.
+                                  */}
+                                <DropDown value={formik.values.scheduleEndMinute}
+                                          text={formik.values.scheduleEndMinute}
+                                          options={minutes}
+                                          type={'time'}
+                                          required={true}
+                                          handleChange={element => {
+                                              if (formik.values.sourceMode === 'SCHEDULE_MULTIPLE') {
+                                                  changeEndMinuteMultiple(element.value, formik.values, formik.setFieldValue).then();
+                                              } else {
+                                                  changeEndMinute(element.value, formik.values, formik.setFieldValue).then();
+                                              }
+                                          }}
+                                          placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}
+                                          tabIndex={"18"}
+                                />
+
+                                {/* display end date if on different day to start date, only if this is current source mode */}
+                                {formik.values.sourceMode === 'SCHEDULE_SINGLE' && (
+                                    (formik.values.scheduleEndDate.toString() !== formik.values.scheduleStartDate.toString()) && (
+                                        <span style={{marginLeft: '10px'}}>{(new Date(formik.values.scheduleEndDate)).toLocaleDateString(currentLanguage.dateLocale.code)}</span>
+                                    )
+                                )}
                             </td>
                         </tr>
                         <tr>
                             <td>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')} <i className="required">*</i></td>
-                            {/* one options for each capture agents that has input options */}
+                            {/* one options for each capture agents that has input options
+                              *
+                              * This is the 19th input field.
+                              */}
                             <td className="editable ng-isolated-scope">
                                 <DropDown value={formik.values.location}
                                           text={formik.values.location}
@@ -449,7 +490,7 @@ const Schedule = ({ formik, inputDevices }) => {
                                           required={true}
                                           handleChange={element => formik.setFieldValue('location', element.value)}
                                           placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}
-                                          tabIndex={"11"}
+                                          tabIndex={"19"}
                                 />
                             </td>
                         </tr>

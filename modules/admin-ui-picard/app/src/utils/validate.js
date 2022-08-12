@@ -34,15 +34,15 @@ export const NewEventSchema = [
         is: 'SCHEDULE_MULTIPLE',
         then: Yup.array().min(1).required('Required')
     }),
-    scheduleStartTimeHour: Yup.string().when('sourceMode', {
+    scheduleStartHour: Yup.string().when('sourceMode', {
         is: value => value === 'SCHEDULE_SINGLE' || value === 'SCHEDULE_MULTIPLE',
         then: Yup.string().required('Required')
     }),
-    scheduleStartTimeMinutes: Yup.string().when('sourceMode', {
+    scheduleStartMinute: Yup.string().when('sourceMode', {
         is: value => value === 'SCHEDULE_SINGLE' || value === 'SCHEDULE_MULTIPLE',
         then: Yup.string().required('Required')
     }),
-    scheduleDurationHour: Yup.string().when('sourceMode', {
+    scheduleDurationHours: Yup.string().when('sourceMode', {
         is: value => value === 'SCHEDULE_SINGLE' || value === 'SCHEDULE_MULTIPLE',
         then: Yup.string().required('Required')
     }),
@@ -50,11 +50,11 @@ export const NewEventSchema = [
         is: value => value === 'SCHEDULE_SINGLE' || value === 'SCHEDULE_MULTIPLE',
         then: Yup.string().required('Required')
     }),
-    scheduleEndTimeHour: Yup.string().when('sourceMode', {
+    scheduleEndHour: Yup.string().when('sourceMode', {
         is: value => value === 'SCHEDULE_SINGLE' || value === 'SCHEDULE_MULTIPLE',
         then: Yup.string().required('Required')
     }),
-    scheduleEndTimeMinutes: Yup.string().when('sourceMode', {
+    scheduleEndMinute: Yup.string().when('sourceMode', {
         is: value => value === 'SCHEDULE_SINGLE' || value === 'SCHEDULE_MULTIPLE',
         then: Yup.string().required('Required')
     }),
