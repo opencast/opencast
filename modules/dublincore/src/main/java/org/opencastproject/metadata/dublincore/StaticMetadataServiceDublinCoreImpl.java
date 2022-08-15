@@ -115,6 +115,7 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
   @Reference(
       cardinality = ReferenceCardinality.OPTIONAL,
       policy = ReferencePolicy.DYNAMIC,
+      target = "(service.pid=org.opencastproject.mediapackage.ChainingMediaPackageSerializer)",
       unbind = "unsetMediaPackageSerializer"
   )
   public void setMediaPackageSerializer(MediaPackageSerializer serializer) {

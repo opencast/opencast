@@ -49,10 +49,16 @@ You can do this in a virtual Python environment if you do not want to install th
 ```sh
 python3 -m venv venv
 . ./venv/bin/activate
+
 # you might need to have a MariaDB/PostgrSQL client installed
+
+# for PostgrSQL:
 pip install psycopg2-binary
-# or for MariaDB
-pip install mysql-connector-python
+
+# or for MariaDB:
+pip install mysql_connector_python==8.0.29
+# NOTE: please don't install version 8.0.30, because the migration
+# script runs into errors with this version. Newer versions also were not tested yet.
 ```
 
 Alternatively to using `pip`, use your system's package manager, e.g.:
