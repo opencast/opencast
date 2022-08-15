@@ -62,6 +62,7 @@ import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.SearchHit;
@@ -237,6 +238,52 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     }
   }
 
+  public void directInsert() {
+    var request = new IndexRequest("opencast_search");
+    request.id("some-uuid");
+    Map<String, Object> data = Map.of(
+        "id", "some-uuid",
+        "media_package", "<mediapackage />",
+        "org", "mh_default_org",
+        "dc", Map.of("title", Collections.singletonList("Some Title"))
+    );
+    request.source(data);
+    try {
+      client.index(request, RequestOptions.DEFAULT);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void directSearch() {
+    SearchRequest searchRequest = new SearchRequest("opencast_search");
+    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+    var queryTitle = QueryBuilders.matchQuery("dc.title", "Some Title");
+    var queryOrg = QueryBuilders.termQuery("org", "mh_default_org");
+    var query = QueryBuilders.boolQuery()
+        .must(queryTitle)
+        .must(queryOrg);
+    //BoolQueryBuilder booleanQuery = new BoolQueryBuilder();
+    logger.error("Sending query: {}", query);
+    searchSourceBuilder.query(query);
+    //searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+    searchRequest.source(searchSourceBuilder);
+    try {
+      SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
+      logger.error("response: {}", response);
+      logger.error("response status: {}", response.status());
+      logger.error("response terminated early: {}", response.isTerminatedEarly());
+      logger.error("response total hits: {}", response.isTerminatedEarly());
+      for (SearchHit hit : response.getHits().getHits()) {
+        String id = hit.getId();
+        Map<String, Object> source = hit.getSourceAsMap();
+        logger.error("{}: {}", id, source);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   /**
    * Posts the input document to the search index.
    *
@@ -360,6 +407,15 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
 
     // Create the index
     createIndex();
+    /*
+    directInsert();
+    try {
+      Thread.sleep(5000);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+    directSearch();
+    */
   }
 
   /**
@@ -570,7 +626,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     return this.indexIdentifier + "_" + type;
   }
 
-  protected RestHighLevelClient getClient() {
+  public RestHighLevelClient getClient() {
     return client;
   }
 

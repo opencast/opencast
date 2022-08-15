@@ -193,9 +193,7 @@
     <module>modules/scheduler-remote</module>
     <module>modules/schema</module>
     <module>modules/search-service-api</module>
-    <module>modules/search-service-feeds</module>
     <module>modules/search-service-impl</module>
-    <module>modules/search-service-remote</module>
     <module>modules/security-aai</module>
     <module>modules/security-cas-client-wrapper</module>
     <module>modules/security-cas</module>
@@ -214,7 +212,6 @@
     <module>modules/smil-api</module>
     <module>modules/smil-impl</module>
     <module>modules/smil-workflowoperation</module>
-    <module>modules/solr</module>
     <module>modules/sox-api</module>
     <module>modules/sox-impl</module>
     <module>modules/sox-remote</module>

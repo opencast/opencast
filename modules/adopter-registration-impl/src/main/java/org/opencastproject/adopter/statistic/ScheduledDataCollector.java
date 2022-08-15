@@ -30,17 +30,11 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
-import org.opencastproject.search.api.SearchQuery;
-import org.opencastproject.search.api.SearchResult;
-import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
@@ -58,7 +52,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
@@ -281,47 +274,17 @@ public class ScheduledDataCollector extends TimerTask {
     statisticData.setSeriesCount(seriesService.getSeriesCount());
     statisticData.setUserCount(userAndRoleProvider.countAllUsers());
 
-    SearchQuery sq = new SearchQuery();
-    sq.withId("");
-    sq.withElementTags(new String[0]);
-    sq.withElementFlavors(new MediaPackageElementFlavor[0]);
-    sq.signURLs(false);
-    sq.includeEpisodes(true);
-    sq.includeSeries(false);
-    sq.withLimit(SEARCH_ITERATION_SIZE);
-
     List<Organization> orgs = organizationDirectoryService.getOrganizations();
     statisticData.setTenantCount(orgs.size());
 
     for (Organization org : orgs) {
       SecurityUtil.runAs(securityService, org, systemAdminUser, () -> {
-        //Calculate the number of attached CAs for this org, add it to the total
+        // Calculate the number of attached CAs for this org, add it to the total
         long current = statisticData.getCACount();
         int orgCAs = caStateService.getKnownAgents().size();
         statisticData.setCACount(current + orgCAs);
 
-        //Calculate the total number of minutes for this org, add it to the total
-        current = statisticData.getTotalMinutes();
-        long orgDuration = 0L;
-        long total = 0;
-        int offset = 0;
-        try {
-          do {
-            sq.withOffset(offset);
-            SearchResult sr = searchService.getForAdministrativeRead(sq);
-            offset += SEARCH_ITERATION_SIZE;
-            total = sr.getTotalSize();
-            orgDuration = Arrays.stream(sr.getItems())
-                                       .map(SearchResultItem::getMediaPackage)
-                                       .map(MediaPackage::getDuration)
-                                       .mapToLong(Long::valueOf)
-                                       .sum() / 1000L;
-          } while (false); //offset + SEARCH_ITERATION_SIZE <= total);
-        } catch (UnauthorizedException e) {
-          //This should never happen, but...
-          logger.warn("Unable to calculate total minutes, unauthorized");
-        }
-        statisticData.setTotalMinutes(current + orgDuration);
+        // TODO: Calculate the total number of minutes for this org, add it to the total
       });
     }
     statisticData.setVersion(version);
