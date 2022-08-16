@@ -53,9 +53,9 @@ public class FFmpegEdit {
   private static final String FFMPEG_BINARY_DEFAULT = "ffmpeg";
   private static final String CONFIG_FFMPEG_PATH = "org.opencastproject.composer.ffmpeg.path";
 
-  private static final String DEFAULT_FFMPEG_PROPERTIES = "-strict -2 -preset faster -crf 18";
-  private static final String DEFAULT_AUDIO_FADE = "2.0";
-  private static final String DEFAULT_VIDEO_FADE = "2.0";
+  private static final String DEFAULT_FFMPEG_PROPERTIES = "-preset faster -crf 18";
+  private static final String DEFAULT_AUDIO_FADE = "0.2";
+  private static final String DEFAULT_VIDEO_FADE = "0.2";
   private static String binary = FFMPEG_BINARY_DEFAULT;
 
   protected float vfade;
