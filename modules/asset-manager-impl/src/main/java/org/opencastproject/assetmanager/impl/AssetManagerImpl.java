@@ -564,7 +564,77 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   /**
+<<<<<<< HEAD
    * Remove the event from the Elasticsearch index
+=======
+   * Update the events in the API index.
+   *
+   * @param snapshots
+   *         The latest snapshots of the events to update
+   * @param index
+   *         The API index to update
+   */
+  private void updateEventBundleInIndex(List<Snapshot> snapshots) {
+    final String organization = securityService.getOrganization().getId();
+    final User user = securityService.getUser();
+    List<String> eventIds = new ArrayList<>();
+    List<Function<Optional<Event>, Optional<Event>>> updateFunctions = new ArrayList<>();
+
+    for (Snapshot snapshot: snapshots) {
+      MediaPackage mp = snapshot.getMediaPackage();
+      String eventId = mp.getIdentifier().toString();
+      eventIds.add(eventId);
+      Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+        Event event = eventOpt.orElse(new Event(eventId, organization));
+
+        AccessControlList acl = authorizationService.getActiveAcl(mp).getA();
+        List<ManagedAcl> acls = aclServiceFactory.serviceFor(securityService.getOrganization()).getAcls();
+        for (final ManagedAcl managedAcl : AccessInformationUtil.matchAcls(acls, acl)) {
+          event.setManagedAcl(managedAcl.getName());
+        }
+        event.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
+        event.setArchiveVersion(Long.parseLong(snapshot.getVersion().toString()));
+        if (StringUtils.isBlank(event.getCreator())) {
+          event.setCreator(securityService.getUser().getName());
+        }
+        EventIndexUtils.updateEvent(event, mp);
+
+        for (Catalog catalog: mp.getCatalogs(MediaPackageElements.EPISODE)) {
+          try (InputStream in = workspace.read(catalog.getURI())) {
+            EventIndexUtils.updateEvent(event, DublinCores.read(in));
+          } catch (IOException | NotFoundException e) {
+            throw new IllegalStateException(String.format("Unable to load dublin core catalog for event '%s'",
+                    mp.getIdentifier()), e);
+          }
+        }
+
+        // Update series name if not already done
+        try {
+          EventIndexUtils.updateSeriesName(event, organization, user, index);
+        } catch (SearchIndexException e) {
+          logger.error("Error updating the series name of the event {} in the {} index.", eventId, index.getIndexName(),
+                  e);
+        }
+        return Optional.of(event);
+      };
+      updateFunctions.add(updateFunction);
+    }
+    // Persist the scheduling events
+    try {
+      index.addOrUpdateEventBundle(eventIds, updateFunctions, organization, user);
+      for (String eventId: eventIds) {
+        logger.debug("Event {} updated in the {} index.", eventId, index.getIndexName());
+      }
+    } catch (SearchIndexException e) {
+      for (String eventId: eventIds) {
+        logger.error("Error updating the event {} in the {} index.", eventId, index.getIndexName(), e);
+      }
+    }
+  }
+
+  /**
+   * Remove the event from the API index
+>>>>>>> 6048653241 (Use bulk inserts for all services during index rebuild)
    *
    * @param eventId
    *         The id of the event to remove
@@ -942,6 +1012,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       final RichAResult r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).run());
       final int total = r.countSnapshots();
       int current = 0;
+      int n = 16;
       logIndexRebuildBegin(logger, index.getIndexName(), total, "snapshot(s)");
 
       final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
@@ -951,15 +1022,25 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           snapshotOrg = orgDir.getOrganization(orgId);
           securityService.setOrganization(snapshotOrg);
           securityService.setUser(SecurityUtil.createSystemUser(systemUserName, snapshotOrg));
-
+          List<Snapshot> snapshotBundle = new ArrayList<>();
           for (Snapshot snapshot : byOrg.get(orgId)) {
             current += 1;
-            try {
-              updateEventInIndex(snapshot);
-            } catch (Throwable t) {
-              logSkippingElement(logger, "event", snapshot.getMediaPackage().getIdentifier().toString(), org, t);
+            snapshotBundle.add(snapshot);
+
+            if ((current % n) == 0 || current == byOrg.get(orgId).size()) {
+              try {
+                updateEventBundleInIndex(snapshotBundle);
+              } catch (Throwable t) {
+                for (Snapshot snap : snapshotBundle) {
+                  logSkippingElement(logger, "event", snap.getMediaPackage().getIdentifier().toString(), org, t);
+                }
+              }
+              for (int i = 1; i <= snapshotBundle.size(); i++) {
+                int logEntry = i + (current - snapshotBundle.size());
+                logIndexRebuildProgress(logger, index.getIndexName(), total, logEntry);
+              }
+              snapshotBundle.clear();
             }
-            logIndexRebuildProgress(logger, index.getIndexName(), total, current);
           }
         } catch (Throwable t) {
           logIndexRebuildError(logger, index.getIndexName(), t, org);

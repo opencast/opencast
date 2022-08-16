@@ -58,6 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -417,6 +418,85 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
   }
 
   /**
+   * Adds or updates the events in the search index. Uses a locking mechanism to avoid issues like Lost Update.
+   *
+   * @param ids
+   *          The ids of the event to update
+   * @param updateFunctionBundle
+   *          The functions that do the actual updating
+   * @param orgId
+   *          The organization the events belong to
+   * @param user
+   *          The user
+   *
+   * @throws SearchIndexException
+   *          Thrown if unable to update the event.
+   */
+  public List<Optional<Event>> addOrUpdateEventBundle(List<String> ids,
+      List<Function<Optional<Event>, Optional<Event>>> updateFunctionBundle,
+      String orgId, User user) throws SearchIndexException {
+    List<Lock> lockBundle = new ArrayList<>();
+    for (String id: ids) {
+      lockBundle.add(this.locks.get(id));
+      lockBundle.get(lockBundle.size() - 1).lock();
+      logger.debug("Locked event '{}'", id);
+    }
+    try {
+      List<Optional<Event>> updatedEventOptBundle = new ArrayList<>();
+      List<Event> updatedEventBundle = new ArrayList<>();
+      boolean allPresent = true;
+      for (int i = 0; i < ids.size(); i++) {
+        Optional<Event> eventOpt = getEvent(ids.get(i), orgId, user,
+                maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
+        updatedEventOptBundle.add(updateFunctionBundle.get(i).apply(eventOpt));
+        if (!updatedEventOptBundle.get(updatedEventOptBundle.size() - 1).isPresent()) {
+          allPresent = false;
+        }
+      }
+      for (int i = 0; i < ids.size(); i++) {
+        updatedEventBundle.add(updatedEventOptBundle.get(i).get());
+      }
+      if (allPresent) {
+        bundleEventUpdate(updatedEventBundle);
+      }
+      return updatedEventOptBundle;
+    } finally {
+      for (int i = 0; i < ids.size(); i++) {
+        lockBundle.get(i).unlock();
+        logger.debug("Released locked event '{}'", ids.get(i));
+      }
+    }
+  }
+
+  /**
+   * Adds the recording events to the search index or updates it accordingly if it is there.
+   *
+   * @param eventList
+   *          The events to update
+   *
+   * @throws SearchIndexException
+   *          If the events cannot be added or updated
+   */
+  private void bundleEventUpdate(List<Event> eventList) throws SearchIndexException {
+    List<ElasticsearchDocument> docs = new ArrayList<>();
+    for (Event event: eventList) {
+      logger.debug("Adding event {} to search index", event.getIdentifier());
+      // Add the resource to the index
+      SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(event);
+      List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
+      docs.add(new ElasticsearchDocument(inputDocument.getIdentifier(),
+              inputDocument.getDocumentType(), resourceMetadata));
+    }
+    try {
+      bundleUpdate(maxRetryAttemptsUpdate, retryWaitingPeriodUpdate, docs);
+    } catch (Throwable t) {
+      for (Event event: eventList) {
+        throw new SearchIndexException("Cannot write event " + event + " to index", t);
+      }
+    }
+  }
+
+  /**
    * Adds or updates the series in the search index. Uses a locking mechanism to avoid issues like Lost Update.
    *
    * @param id
@@ -476,6 +556,85 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
   }
 
   /**
+   * Adds or updates the series in the search index. Uses a locking mechanism to avoid issues like Lost Update.
+   *
+   * @param ids
+   *          The ids of the series to add
+   * @param updateFunctionBundle
+   *          The functions that do the actual updating
+   * @param orgId
+   *          The organization the series belongs to
+   * @param user
+   *          The user
+   *
+   * @throws SearchIndexException
+   *          Thrown if unable to add or update the series.
+   */
+  public List<Optional<Series>> addOrUpdateSeriesBundle(List<String> ids,
+          List<Function<Optional<Series>, Optional<Series>>> updateFunctionBundle,
+          String orgId, User user) throws SearchIndexException {
+    List<Lock> lockBundle = new ArrayList<>();
+    for (String id: ids) {
+      lockBundle.add(this.locks.get(id));
+      lockBundle.get(lockBundle.size() - 1).lock();
+      logger.debug("Locked series '{}'", id);
+    }
+    try {
+      List<Optional<Series>> updatedSeriesOptBundle = new ArrayList<>();
+      List<Series> updatedSeriesBundle = new ArrayList<>();
+      boolean allPresent = true;
+      for (int i = 0; i < ids.size(); i++) {
+        Optional<Series> seriesOpt = getSeries(ids.get(i), orgId, user,
+                maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
+        updatedSeriesOptBundle.add(updateFunctionBundle.get(i).apply(seriesOpt));
+        if (!updatedSeriesOptBundle.get(updatedSeriesOptBundle.size() - 1).isPresent()) {
+          allPresent = false;
+        }
+      }
+      for (int i = 0; i < ids.size(); i++) {
+        updatedSeriesBundle.add(updatedSeriesOptBundle.get(i).get());
+      }
+      if (allPresent) {
+        bundleSeriesUpdate(updatedSeriesBundle);
+      }
+      return updatedSeriesOptBundle;
+    } finally {
+      for (int i = 0; i < ids.size(); i++) {
+        lockBundle.get(i).unlock();
+        logger.debug("Released locked series '{}'", ids.get(i));
+      }
+    }
+  }
+
+    /**
+   * Add or update a bundle of series in the search index.
+   *
+   * @param seriesList
+   *          The series to update
+   *
+   * @throws SearchIndexException
+   *          If the series cannot be added or updated
+   */
+  private void bundleSeriesUpdate(List<Series> seriesList) throws SearchIndexException {
+    List<ElasticsearchDocument> docs = new ArrayList<>();
+    for (Series series: seriesList) {
+      logger.debug("Adding series {} to search index", series.getIdentifier());
+      // Add the resource to the index
+      SearchMetadataCollection inputDocument = SeriesIndexUtils.toSearchMetadata(series);
+      List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
+      docs.add(new ElasticsearchDocument(inputDocument.getIdentifier(),
+              inputDocument.getDocumentType(), resourceMetadata));
+    }
+    try {
+      bundleUpdate(maxRetryAttemptsUpdate, retryWaitingPeriodUpdate, docs);
+    } catch (Throwable t) {
+      for (Series series: seriesList) {
+        throw new SearchIndexException("Cannot write series " + series + " to index", t);
+      }
+    }
+  }
+
+  /**
    * Adds or updates the theme in the search index. Uses a locking mechanism to avoid issues like Lost Update.
    *
    * @param id
@@ -531,6 +690,85 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
       update(maxRetryAttemptsUpdate, retryWaitingPeriodUpdate, doc);
     } catch (Throwable t) {
       throw new SearchIndexException("Cannot write theme " + theme + " to index", t);
+    }
+  }
+
+  /**
+   * Adds or updates the themes in the search index. Uses a locking mechanism to avoid issues like Lost Update.
+   *
+   * @param ids
+   *          The ids of the themes to update
+   * @param updateFunctions
+   *          The functions that do the actual updating
+   * @param orgId
+   *          The organization the themes belong to
+   * @param user
+   *          The user
+   *
+   * @throws SearchIndexException
+   *          Thrown if unable to update the themes.
+   */
+  public List<Optional<IndexTheme>> addOrUpdateThemeBundle(List<Long> ids, List<Function<Optional<IndexTheme>,
+          Optional<IndexTheme>>> updateFunctions, String orgId, User user) throws SearchIndexException {
+    List<Lock> lockBundle = new ArrayList<>();
+    for (Long id: ids) {
+      lockBundle.add(this.locks.get(id));
+      lockBundle.get(lockBundle.size() - 1).lock();
+      logger.debug("Locked theme '{}'", id);
+    }
+
+    try {
+      List<Optional<IndexTheme>> updatedThemeOptBundle = new ArrayList<>();
+      List<IndexTheme> updatedThemeBundle = new ArrayList<>();
+      boolean allPresent = true;
+
+      for (int i = 0; i < ids.size(); i++) {
+        Optional<IndexTheme> themeOpt = getTheme(ids.get(i), orgId, user, maxRetryAttemptsUpdate,
+                retryWaitingPeriodUpdate);
+        updatedThemeOptBundle.add(updateFunctions.get(i).apply(themeOpt));
+        if (!updatedThemeOptBundle.get(updatedThemeOptBundle.size() - 1).isPresent()) {
+          allPresent = false;
+        }
+        updatedThemeBundle.add(updatedThemeOptBundle.get(i).get());
+      }
+      if (allPresent) {
+        bundleThemeUpdate(updatedThemeBundle);
+      }
+      return updatedThemeOptBundle;
+    } finally {
+      for (int i = 0; i < ids.size(); i++) {
+        lockBundle.get(i).unlock();
+        logger.debug("Released locked theme '{}'", ids.get(i));
+      }
+    }
+  }
+
+  /**
+   * Adds or updates the themes in the search index.
+   *
+   * @param themeList
+   *          The themes to update
+   *
+   * @throws SearchIndexException
+   *          Thrown if unable to add or update the themes.
+   */
+  private void bundleThemeUpdate(List<IndexTheme> themeList) throws SearchIndexException {
+    List<ElasticsearchDocument> docs = new ArrayList<>();
+    for (IndexTheme theme: themeList) {
+      logger.debug("Adding theme {} to search index", theme.getIdentifier());
+
+      // Add the resource to the index
+      SearchMetadataCollection inputDocument = theme.toSearchMetadata();
+      List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
+      docs.add(new ElasticsearchDocument(inputDocument.getIdentifier(),
+              inputDocument.getDocumentType(), resourceMetadata));
+    }
+    try {
+      bundleUpdate(maxRetryAttemptsUpdate, retryWaitingPeriodUpdate, docs);
+    } catch (Throwable t) {
+      for (IndexTheme theme: themeList) {
+        throw new SearchIndexException("Cannot write theme " + theme + " to index", t);
+      }
     }
   }
 

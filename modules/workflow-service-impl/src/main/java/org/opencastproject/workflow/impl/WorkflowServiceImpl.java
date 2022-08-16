@@ -2170,6 +2170,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       int limit = 1000;
       int offset = 0;
       int current = 0;
+      int n = 16;
       String currentMediapackageId;
       String lastMediapackageId = "";
 
@@ -2183,17 +2184,24 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         if (workflowIndexData.size() > 0) {
           offset += limit;
           logger.debug("Got {} workflows for re-indexing", workflowIndexData.size());
+          List<WorkflowIndexData> workflowBundle = new ArrayList<>();
 
           for (WorkflowIndexData data : workflowIndexData) {
             currentMediapackageId = data.getMediaPackageId();
             if (currentMediapackageId.equals(lastMediapackageId)) {
               continue;
             }
-            updateWorkflowInstanceInIndex(data.getId(), data.getState(), data.getMediaPackageId(), data.getOrganizationId());
-
             current += 1;
+            workflowBundle.add(data);
+            if ((current % n) == 0 || current == total) {
+              updateWorkflowInstanceBundleInIndex(workflowBundle, data.getOrganizationId());
+              for (int i = 1; i <= workflowBundle.size(); i++) {
+                int logEntry = i + (current - workflowBundle.size());
+                logIndexRebuildProgress(logger.getSlf4jLogger(), index.getIndexName(), total, logEntry);
+              }
+              workflowBundle.clear();
+            }
             lastMediapackageId = currentMediapackageId;
-            logIndexRebuildProgress(logger.getSlf4jLogger(), index.getIndexName(), total, current);
           }
         }
       } while (workflowIndexData.size() > 0);
@@ -2279,8 +2287,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    *         corresponding mediapackage id
    * @param orgId
    *         workflow organization id
-   * @param index
-   *         the index to update
    */
   private void updateWorkflowInstanceInIndex(long id, int state, String mpId, String orgId) {
     final WorkflowState workflowState = WorkflowState.values()[state];
@@ -2302,6 +2308,45 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     } catch (SearchIndexException e) {
       logger.error("Error updating the workflow instance {} of event {} in the {} index.", id, mpId,
               index.getIndexName(), e);
+    }
+  }
+
+  /**
+   * Update a bundle of workflow instances in the API index.
+   *
+   * @param workflowBundle
+   *         workflow properties used for the update
+   * @param orgId
+   *         workflow organization id
+   */
+  private void updateWorkflowInstanceBundleInIndex(List<WorkflowIndexData> workflowBundle, String orgId) {
+    final User user = securityService.getUser();
+    List<Function<Optional<Event>, Optional<Event>>> updateFunctions = new ArrayList<>();
+    List<String> mpIds = new ArrayList<>();
+
+    for (WorkflowIndexData data: workflowBundle) {
+      logger.debug("Updating workflow instance {} of event {} in the {} index.", data.getId(),
+              data.getMediaPackageId(),  index.getIndexName());
+      Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+        Event event = eventOpt.orElse(new Event(data.getMediaPackageId(), data.getOrganizationId()));
+        event.setWorkflowId(data.getId());
+        event.setWorkflowState(WorkflowState.values()[data.getState()]);
+        return Optional.of(event);
+      };
+      updateFunctions.add(updateFunction);
+      mpIds.add(data.getMediaPackageId());
+    }
+    try {
+      index.addOrUpdateEventBundle(mpIds, updateFunctions, orgId, user);
+      for (String mpId: mpIds) {
+        logger.debug("Workflow instance of event {} updated in the {} index.", mpId,
+                index.getIndexName());
+      }
+    } catch (SearchIndexException e) {
+      for (String mpId: mpIds) {
+        logger.error("Error updating the workflow instance of event {} in the {} index.", mpId,
+                index.getIndexName(), e);
+      }
     }
   }
 }

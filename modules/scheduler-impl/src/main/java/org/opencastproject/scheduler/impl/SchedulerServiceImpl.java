@@ -1476,7 +1476,100 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * Set recording status to null for this event in the Elasticsearch index.
+   * Update the events in the API index. Fields will only be updated of the corresponding Opt is not none.
+   *
+   * @param mediaPackageId
+   * @param index
+   * @param acl
+   * @param dublinCore
+   * @param startTime
+   * @param endTime
+   * @param presenters
+   * @param agentId
+   * @param properties
+   * @param recordingStatus
+   */
+  private void updateEventBundleInIndex(List<String> mediaPackageIdList, List<Opt<AccessControlList>> aclList,
+          List<Opt<DublinCoreCatalog>> dublinCoreList, List<Opt<Date>> startTimeList, List<Opt<Date>> endTimeList,
+          List<Opt<Set<String>>> presentersList, List<Opt<String>> agentIdList,
+          List<Opt<Map<String, String>>> propertiesList, List<Opt<String>> recordingStatusList) {
+
+    String organization = getSecurityService().getOrganization().getId();
+    User user = getSecurityService().getUser();
+    List<Function<Optional<Event>, Optional<Event>>> updateFunctions = new ArrayList<>();
+
+    for (int i = 0; i < mediaPackageIdList.size(); i++) {
+
+      String mediaPackageId = mediaPackageIdList.get(i);
+      Opt<AccessControlList> acl = aclList.get(i);
+      Opt<DublinCoreCatalog> dublinCore = dublinCoreList.get(i);
+      Opt<Date> startTime = startTimeList.get(i);
+      Opt<Date> endTime = endTimeList.get(i);
+      Opt<Set<String>> presenters = presentersList.get(i);
+      Opt<String> agentId = agentIdList.get(i);
+      Opt<Map<String, String>> properties = propertiesList.get(i);
+      Opt<String> recordingStatus = recordingStatusList.get(i);
+
+      Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+        Event event = eventOpt.orElse(new Event(mediaPackageId, organization));
+
+        if (acl.isSome()) {
+          event.setAccessPolicy(AccessControlParser.toJsonSilent(acl.get()));
+        }
+        if (dublinCore.isSome()) {
+          EventIndexUtils.updateEvent(event, dublinCore.get());
+          if (isBlank(event.getCreator()))
+            event.setCreator(getSecurityService().getUser().getName());
+
+          // Update series name if not already done
+          try {
+            EventIndexUtils.updateSeriesName(event, organization, user, index);
+          } catch (SearchIndexException e) {
+            logger.error("Error updating the series name of the event {} in the {} index.", mediaPackageId,
+                    index.getIndexName(), e);
+          }
+        }
+        if (presenters.isSome()) {
+          event.setTechnicalPresenters(new ArrayList<>(presenters.get()));
+        }
+        if (agentId.isSome()) {
+          event.setAgentId(agentId.get());
+        }
+        if (recordingStatus.isSome() && !recordingStatus.get().equals(RecordingState.UNKNOWN)) {
+          event.setRecordingStatus(recordingStatus.get());
+        }
+        if (properties.isSome()) {
+          event.setAgentConfiguration(properties.get());
+        }
+        if (startTime.isSome()) {
+          String startTimeStr = startTime == null ? null : DateTimeSupport.toUTC(startTime.get().getTime());
+          event.setTechnicalStartTime(startTimeStr);
+        }
+        if (endTime.isSome()) {
+          String endTimeStr = endTime == null ? null : DateTimeSupport.toUTC(endTime.get().getTime());
+          event.setTechnicalEndTime(endTimeStr);
+        }
+
+        return Optional.of(event);
+      };
+
+        updateFunctions.add(updateFunction);
+    }
+
+    try {
+      index.addOrUpdateEventBundle(mediaPackageIdList, updateFunctions, organization, user);
+      for (String mediaPackageId: mediaPackageIdList) {
+        logger.debug("Scheduled event {} updated in the {} index.", mediaPackageId, index.getIndexName());
+      }
+    } catch (SearchIndexException e) {
+      for (String mediaPackageId: mediaPackageIdList) {
+        logger.error("Error updating the scheduled event {} in the {} index.", mediaPackageId, index.getIndexName(), e);
+      }
+    }
+  }
+
+  /**
+   * Set recording status to null for this event in the API index.
    *
    * @param mediaPackageId
    * @param index
@@ -1717,6 +1810,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   public void repopulate() throws IndexRebuildException {
     final int[] current = {0};
     final int total;
+    int n = 16;
     try {
        total = persistence.countEvents();
     } catch (SchedulerServiceDatabaseException e) {
@@ -1736,27 +1830,58 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           return;
         }
 
+        List<String> mediaPackageIdList = new ArrayList<>();
+        List<Opt<AccessControlList>> aclList = new ArrayList<>();
+        List<Opt<DublinCoreCatalog>> dublinCoreList = new ArrayList<>();
+        List<Opt<Date>> startTimeList = new ArrayList<>();
+        List<Opt<Date>> endTimeList = new ArrayList<>();
+        List<Opt<Set<String>>> presentersList = new ArrayList<>();
+        List<Opt<String>> agentIdList = new ArrayList<>();
+        List<Opt<Map<String, String>>> propertiesList = new ArrayList<>();
+        List<Opt<String>> recordingStatusList = new ArrayList<>();
+
         for (ExtendedEventDto event : events) {
-          String mpId = event.getMediaPackageId();
           current[0] = current[0] + 1;
+          mediaPackageIdList.add(event.getMediaPackageId());
           try {
             final Set<String> presenters = getPresenters(Opt.nul(event.getPresenters()).getOr(""));
             final Map<String, String> caMetadata = deserializeExtendedEventProperties(event.getCaptureAgentProperties());
 
             AQueryBuilder query = assetManager.createQuery();
             final AResult result = query.select(query.snapshot())
-                    .where(query.mediaPackageId(mpId).and(query.version().isLatest())).run();
+                    .where(query.mediaPackageId(event.getMediaPackageId()).and(query.version().isLatest())).run();
             final Snapshot snapshot = result.getRecords().head().get().getSnapshot().get();
-            final Opt<AccessControlList> acl = Opt.some(authorizationService.getActiveAcl(snapshot.getMediaPackage()).getA());
+            aclList.add(Opt.some(authorizationService.getActiveAcl(snapshot.getMediaPackage()).getA()));
+            startTimeList.add(Opt.some(event.getStartDate()));
+            endTimeList.add(Opt.some(event.getEndDate()));
+            presentersList.add(Opt.some(presenters));
+            agentIdList.add(Opt.some(event.getCaptureAgentId()));
+            propertiesList.add(Opt.some(caMetadata));
+            recordingStatusList.add(Opt.nul(event.getRecordingState()));
 
-            final Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(snapshot);
 
-            updateEventInIndex(mpId, acl, dublinCore, Opt.some(event.getStartDate()),
-                    Opt.some(event.getEndDate()), Opt.some(presenters), Opt.some(event.getCaptureAgentId()),
-                    Opt.some(caMetadata), Opt.nul(event.getRecordingState()));
-            logIndexRebuildProgress(logger, index.getIndexName(), total, current[0]);
+            dublinCoreList.add(loadEpisodeDublinCoreFromAsset(snapshot));
+            if ((current[0] % n) == 0 || current[0] == events.size()) {
+              updateEventBundleInIndex(mediaPackageIdList, aclList, dublinCoreList, startTimeList,
+                      endTimeList, presentersList, agentIdList,propertiesList, recordingStatusList);
+              for (int i = 1; i <= mediaPackageIdList.size(); i++) {
+                int logEntry = i + (current[0] - mediaPackageIdList.size());
+                logIndexRebuildProgress(logger, index.getIndexName(), total, logEntry);
+              }
+              mediaPackageIdList.clear();
+              aclList.clear();
+              dublinCoreList.clear();
+              startTimeList.clear();
+              endTimeList.clear();
+              presentersList.clear();
+              agentIdList.clear();
+              propertiesList.clear();
+              recordingStatusList.clear();
+            }
           } catch (Exception e) {
-            logSkippingElement(logger, "scheduled event", mpId, e);
+            for (String mpId: mediaPackageIdList) {
+              logSkippingElement(logger, "scheduled event", mpId, e);
+            }
           }
         }
       });
