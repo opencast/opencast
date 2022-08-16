@@ -38,7 +38,9 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Dictionary;
 import java.util.Map;
+import java.util.Objects;
 
 @Component(
     immediate = true,
@@ -51,12 +53,24 @@ public class SchedulerEventUpdateHandler extends UpdateHandler implements Schedu
 
   private static final Logger logger = LoggerFactory.getLogger(SchedulerEventUpdateHandler.class);
 
+  private static final String DELETE_ON_CAPTURE_ERROR = "live.deleteOnCapureError";
+
   protected SchedulerService schedulerService;
 
+  private boolean deleteOnCaptureError = true;
+
+  /**
+   * OSGi callback on component activation.
+   *
+   * @param context
+   *          the component context
+   */
   @Activate
   @Override
   public void activate(ComponentContext cc) {
     super.activate(cc);
+    Dictionary properties = cc.getProperties();
+    deleteOnCaptureError = BooleanUtils.toBoolean(Objects.toString(properties.get(DELETE_ON_CAPTURE_ERROR), "true"));
   }
 
   public void execute(final String mpId, final SchedulerItem schedulerItem) {
@@ -105,8 +119,8 @@ public class SchedulerEventUpdateHandler extends UpdateHandler implements Schedu
         case UpdateRecordingStatus:
           String state = schedulerItem.getRecordingState();
           if (RecordingState.CAPTURE_FINISHED.equals(state) || RecordingState.UPLOADING.equals(state)
-                  || RecordingState.UPLOADING.equals(state) || RecordingState.CAPTURE_ERROR.equals(state)
-                  || RecordingState.UPLOAD_ERROR.equals(state)) {
+                  || RecordingState.UPLOAD_ERROR.equals(state)
+                  || (RecordingState.CAPTURE_ERROR.equals(state) && deleteOnCaptureError)) {
             if (isLive(mpId)) {
               liveScheduleService.deleteLiveEvent(mpId);
             }
