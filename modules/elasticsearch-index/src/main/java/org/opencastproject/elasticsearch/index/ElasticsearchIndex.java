@@ -58,6 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -472,6 +473,85 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
       update(maxRetryAttemptsUpdate, retryWaitingPeriodUpdate, doc);
     } catch (Throwable t) {
       throw new SearchIndexException("Cannot write series " + series + " to index", t);
+    }
+  }
+
+  /**
+   * Adds or updates the series in the search index. Uses a locking mechanism to avoid issues like Lost Update.
+   *
+   * @param ids
+   *          The ids of the series to add
+   * @param updateFunctionBundle
+   *          The functions that does the actual updating
+   * @param orgId
+   *          The organization the series belongs to
+   * @param user
+   *          The user
+   *
+   * @throws SearchIndexException
+   *          Thrown if unable to add or update the series.
+   */
+  public List<Optional<Series>> addOrUpdateSeriesBundle(List<String> ids,
+          List<Function<Optional<Series>, Optional<Series>>> updateFunctionBundle,
+          String orgId, User user) throws SearchIndexException {
+    List<Lock> lockBundle = new ArrayList<>();
+    for (String id: ids) {
+      lockBundle.add(this.locks.get(id));
+      lockBundle.get(lockBundle.size() - 1).lock();
+      logger.debug("Locked series '{}'", id);
+    }
+    try {
+      List<Optional<Series>> updatedSeriesOptBundle = new ArrayList<>();
+      List<Series> updatedSeriesBundle = new ArrayList<>();
+      boolean allPresent = true;
+      for (int i = 0; i < ids.size(); i++) {
+        Optional<Series> seriesOpt = getSeries(ids.get(i), orgId, user,
+                maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
+        updatedSeriesOptBundle.add(updateFunctionBundle.get(i).apply(seriesOpt));
+        if (!updatedSeriesOptBundle.get(updatedSeriesOptBundle.size() - 1).isPresent()) {
+          allPresent = false;
+        }
+      }
+      for (int i = 0; i < ids.size(); i++) {
+        updatedSeriesBundle.add(updatedSeriesOptBundle.get(i).get());
+      }
+      if (allPresent) {
+        bundleUpdate(updatedSeriesBundle);
+      }
+      return updatedSeriesOptBundle;
+    } finally {
+      for (int i = 0; i < ids.size(); i++) {
+        lockBundle.get(i).unlock();
+        logger.debug("Released locked series '{}'", ids.get(i));
+      }
+    }
+  }
+
+    /**
+   * Add or update a series in the search index.
+   *
+   * @param seriesList
+   *          The series to update
+   *
+   * @throws SearchIndexException
+   *          If the series cannot be added or updated
+   */
+  private void bundleUpdate(List<Series> seriesList) throws SearchIndexException {
+    List<ElasticsearchDocument> docs = new ArrayList<>();
+    for (Series series: seriesList) {
+      logger.debug("Adding series {} to search index", series.getIdentifier());
+      // Add the resource to the index
+      SearchMetadataCollection inputDocument = SeriesIndexUtils.toSearchMetadata(series);
+      List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
+      docs.add(new ElasticsearchDocument(inputDocument.getIdentifier(),
+              inputDocument.getDocumentType(), resourceMetadata));
+    }
+    try {
+      bundleUpdate(maxRetryAttemptsUpdate, retryWaitingPeriodUpdate, docs);
+    } catch (Throwable t) {
+      for (Series series: seriesList) {
+        throw new SearchIndexException("Cannot write series " + series + " to index", t);
+      }
     }
   }
 
