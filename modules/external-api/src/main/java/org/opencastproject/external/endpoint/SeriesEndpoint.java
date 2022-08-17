@@ -179,7 +179,7 @@ public class SeriesEndpoint {
   @Path("")
   @RestQuery(name = "getseries", description = "Returns a list of series.", returnDescription = "", restParameters = {
           @RestParameter(name = "onlyWithWriteAccess", isRequired = false, description = "Whether only to get the series to which we have write access.", type = RestParameter.Type.BOOLEAN),
-          @RestParameter(name = "filter", isRequired = false, description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form <Filter Name>:<Value to Filter With>.", type = STRING),
+          @RestParameter(name = "filter", isRequired = false, description = "Usage <Filter Name>:<Value to Filter With>. Filters can combine using a comma \",\". Available Filters: managedAcl, contributors, CreationDate, Creator, textFilter, language, license, organizers, subject, title. If API ver > 1.1.0 also: identifier, description, creator, publishers, rightsholder.", type = STRING),
           @RestParameter(name = "sort", description = "Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory.", isRequired = false, type = STRING),
           @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.", isRequired = false, type = RestParameter.Type.INTEGER),
           @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false, type = RestParameter.Type.INTEGER),
@@ -210,9 +210,9 @@ public class SeriesEndpoint {
       // Parse the filters
       if (StringUtils.isNotBlank(filter)) {
         for (String f : filter.split(",")) {
-          String[] filterTuple = f.split(":");
-          if (filterTuple.length != 2) {
-            logger.info("No value for filter {} in filters list: {}", filterTuple[0], filter);
+          String[] filterTuple = f.split(":",2);
+          if (filterTuple.length < 2) {
+            logger.info("Filter {} not valid: {}", filterTuple[0], filter);
             continue;
           }
           String name = filterTuple[0];
@@ -230,18 +230,20 @@ public class SeriesEndpoint {
           } else if ("contributors".equals(name)) {
             query.withContributor(value);
           } else if ("CreationDate".equals(name)) {
-            if (name.split("/").length == 2) {
               try {
-                Tuple<Date, Date> fromAndToCreationRange = getFromAndToCreationRange(name.split("/")[0],
-                        name.split("/")[1]);
+                Tuple<Date, Date> fromAndToCreationRange = getFromAndToCreationRange(value.split("/")[0],
+                        value.split("/")[1]);
                 query.withCreatedFrom(fromAndToCreationRange.getA());
                 query.withCreatedTo(fromAndToCreationRange.getB());
               } catch (IllegalArgumentException e) {
                 return RestUtil.R.badRequest(e.getMessage());
+              } catch (ArrayIndexOutOfBoundsException e) {
+                String dateErrorMsg = String.format("Filter Series API error: Malformed date period. "
+                    + "Correct UTC time period format: yyyy-MM-ddTHH:mm:ssZ/yyyy-MM-ddTHH:mm:ssZ, "
+                    + "stated date period string: \"%s\"", value);
+                logger.warn(dateErrorMsg);
+                return RestUtil.R.badRequest(dateErrorMsg);
               }
-
-            }
-            query.withCreator(value);
           } else if ("Creator".equals(name)) {
             query.withCreator(value);
           } else if ("textFilter".equals(name)) {
