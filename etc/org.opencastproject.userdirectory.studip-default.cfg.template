@@ -7,7 +7,7 @@
 org.opencastproject.userdirectory.studip.org=mh_default_org
 
 # The URL and token for the Studip REST webservice
-org.opencastproject.userdirectory.studip.url=http://my-studip.de/opencast/api/
+org.opencastproject.userdirectory.studip.url=https://my-studip.de/studip5/plugins.php/opencast/api/
 org.opencastproject.userdirectory.studip.token=mytoken1234abcdef
 
 # The maximum number of users to cache

@@ -275,13 +275,13 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
       return user;
 
     } catch (ParseException e) {
-      logger.debug("User {} not found in Moodle system", userName);
+      logger.error("Exception while parsing response from provider for user {}", userName, e);
       return null;
     } catch (IOException e) {
-      logger.debug("User {} not found in Moodle system", userName);
+      logger.error(e.getMessage());
       return null;
     } catch (URISyntaxException e) {
-      logger.debug("User {} not found in Moodle system", userName);
+      logger.error("Misspelled URI", e);
       return null;
     } finally {
       currentThread.setContextClassLoader(originalClassloader);
@@ -298,7 +298,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
     // Build URL
     URIBuilder url = new URIBuilder(studipUrl + "opencast/user/" + eid);
 //    url.addParameters(params);
-    url.addParameter("wstoken", studipToken);
+    url.addParameter("token", studipToken);
 
     // Execute request
     HttpGet get = new HttpGet(url.build());
@@ -306,6 +306,10 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
 
     try (CloseableHttpClient client = HttpClients.createDefault()) {
       try (CloseableHttpResponse resp = client.execute(get)) {
+        if (resp.getStatusLine().getStatusCode() / 100 != 2) {
+          throw new IOException("HttpRequest unsuccessful, reason: " + resp.getStatusLine().getReasonPhrase());
+        }
+
         // Parse response
         BufferedReader reader = new BufferedReader(new InputStreamReader(resp.getEntity().getContent()));
         JSONParser parser = new JSONParser();
