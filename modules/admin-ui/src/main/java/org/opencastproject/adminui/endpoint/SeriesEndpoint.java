@@ -608,7 +608,21 @@ public class SeriesEndpoint {
       return false;
     }
     var tobiraParamsObject = (JSONObject) tobiraParams;
-    tobiraParamsObject.put("seriesId", seriesId);
+
+    var metadataCatalogs = (JSONArray) params.get("metadata");
+    var firstCatalog = (JSONObject) metadataCatalogs.get(0);
+    var metadataFields = (List<JSONObject>) firstCatalog.get("fields");
+    var title = metadataFields.stream()
+            .filter(field -> field.get("id").equals("title"))
+            .findAny()
+            .map(field -> field.get("value"))
+            .map(String.class::cast)
+            .get();
+
+    var series = new JSONObject(Map.of(
+            "opencastId", seriesId,
+            "title", title));
+    tobiraParamsObject.put("series", series);
 
     try {
       tobira.mount(tobiraParamsObject);
