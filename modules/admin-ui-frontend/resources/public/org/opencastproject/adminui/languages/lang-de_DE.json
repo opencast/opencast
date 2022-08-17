@@ -246,7 +246,7 @@
       "ADOPTER_PROFILE_NOT_UPDATED": "Hoppla! Profil-Informationen konnten nicht aktualisiert werden. Bitte versuchen Sie es erneut!",
       "ADOPTER_PROFILE_DELETED": "Profil-Informationen erfolgreich gelöscht.",
       "ADOPTER_PROFILE_NOT_DELETED": "Hoppla! Profil-Informationen konnten nicht gelöscht werden. Bitte versuchen Sie es erneut!",
-      "TOBIRA_NO_TITLE": "Seite benötigt einen Titel.",
+      "TOBIRA_OVERRIDE_NAME": "Der Titel der ausgewählten Seite wird mit dem Titel der Serie überschrieben.",
       "TOBIRA_NO_PATH_SEGMENT": "Seite benötigt ein Pfadsegment.",
       "TOBIRA_NOT_MOUNTED": "Serie konnte nicht in Tobira eingehängt werden.",
       "TOBIRA_PATH_SEGMENT_INVALID": "Pfadsegment ist ungültig. Ein gültiges Pfadsegment ist mindestens zwei Zeichen lang, enthält keine Leerzeichen, Kontrollzeichen, keins der Zeichen '<>\"[\\]^`{|}#%\/?]' und fängt mit keinem der Zeichen '-+~@_!$&;:.,=*'()' an.",
