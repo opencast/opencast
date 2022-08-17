@@ -1,5 +1,17 @@
 # Opencast 12: Release Notes
 
+Opencast 12.2
+-------------
+
+The second maintenance release of Opencast 12.
+Notable changes:
+
+- New Opencast Studio version including dark mode feature
+- Fix OAI-PMH
+- Update CAS documentation
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
 Opencast 12.1
 -------------
 
