@@ -731,6 +731,9 @@ angular.module('adminNg.controllers')
         if (policy.write) {
           remainingACEs.push({role: policy.role, action: 'write', allow: true});
         }
+        for (const action of policy.actions.value) {
+          remainingACEs.push({role: policy.role, action: action, allow: true})
+        }
       });
 
       $scope.baseAcl = EventAccessResource.getManagedAcl({id: id}, function () {
