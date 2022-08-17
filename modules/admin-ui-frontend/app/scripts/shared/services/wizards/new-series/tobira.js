@@ -49,21 +49,25 @@ angular.module('adminNg.services')
       var valid = true;
       var newPage = me.currentPage.children[me.currentPage.children.length - 1];
 
-      function check(key, callback) {
+      function check(key, callback, level) {
+        level = level || 'warning';
         if (callback()) {
           Notifications.remove(validationNotifications[key], 'series-tobira-new');
           delete validationNotifications[key];
         } else {
           if (!validationNotifications[key]) {
-            validationNotifications[key] = Notifications.add('warning', key, 'series-tobira-new', -1);
+            validationNotifications[key] = Notifications.add(level, key, 'series-tobira-new', -1);
           }
-          valid = false;
+          if (level !== 'info') {
+            valid = false;
+          }
         }
       }
 
-      check('TOBIRA_NO_TITLE', function () {
-        return newPage.title;
-      });
+      check('TOBIRA_OVERRIDE_NAME', function () {
+        return me.ud.selectedPage && !me.ud.selectedPage.title;
+      }, 'info');
+
       check('TOBIRA_NO_PATH_SEGMENT', function () {
         return newPage.segment;
       });
