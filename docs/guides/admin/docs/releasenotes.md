@@ -83,7 +83,7 @@ Additional Notes about 11.10
 ----------------------------
 
 - Bug Fixes:
-	- Fix CreatorDate Filter in GET api/series/
+  - Fix CreatorDate Filter in GET api/series/
     (cf. [[#4068](https://github.com/opencast/opencast/pull/4068)]).
 - New features and updates:
   - Handle tracks with multiple videos in engage player
