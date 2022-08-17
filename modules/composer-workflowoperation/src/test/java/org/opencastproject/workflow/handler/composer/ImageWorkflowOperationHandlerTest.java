@@ -30,7 +30,6 @@ import static org.opencastproject.workflow.handler.composer.ImageWorkflowOperati
 import static org.opencastproject.workflow.handler.composer.ImageWorkflowOperationHandler.validateTargetBaseNameFormat;
 
 import org.opencastproject.composer.api.EncodingProfile;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.workflow.handler.composer.ImageWorkflowOperationHandler.Cfg;
 import org.opencastproject.workflow.handler.composer.ImageWorkflowOperationHandler.Extractor;
@@ -145,8 +144,8 @@ public class ImageWorkflowOperationHandlerTest {
 
   private Cfg cfg(Opt<String> targetBaseNamePatternSecond, Opt<String> targetBaseNamePatternPercent) {
     return new Cfg(l.<Track> nil(), l.<MediaPosition> nil(), l.<EncodingProfile> nil(),
-            l.<MediaPackageElementFlavor> nil(), l.<String> nil(), targetBaseNamePatternSecond,
-            targetBaseNamePatternPercent, 0);
+            null, l.<String> nil(), targetBaseNamePatternSecond,
+            targetBaseNamePatternPercent, 0, false);
   }
 
   private MediaPosition sec(double a) {

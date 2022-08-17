@@ -80,6 +80,7 @@ import com.entwinemedia.fn.parser.Parsers;
 import com.entwinemedia.fn.parser.Result;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -89,6 +90,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.IllegalFormatException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -113,6 +115,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   public static final String OPT_TARGET_BASE_NAME_FORMAT_SECOND = "target-base-name-format-second";
   public static final String OPT_TARGET_BASE_NAME_FORMAT_PERCENT = "target-base-name-format-percent";
   public static final String OPT_END_MARGIN = "end-margin";
+  public static final String OPT_SKIP_IF_TARGET_FLAVOR_HAS_ELEMENTS = "skip_if_target_flavor_has_elements";
 
   private static final long END_MARGIN_DEFAULT = 100;
   public static final double SINGLE_FRAME_POS = 0.0;
@@ -176,6 +179,10 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
         logger.info("No source tracks found in media package {}, skipping operation", mp.getIdentifier());
         return handler.createResult(mp, Action.SKIP);
       }
+      if (cfg.skipIfTargetFlavorHasElements && mp.getElementsByFlavor(cfg.targetImageFlavor).length > 0) {
+        logger.info("Target flavor {} already contains at least one element, skipping operation", cfg.targetImageFlavor);
+        return handler.createResult(mp, Action.SKIP);
+      }
       // start image extraction jobs
       final List<Extraction> extractions = cfg.sourceTracks.stream().flatMap(track -> {
           final List<MediaPosition> positions = limit(track, cfg.positions);
@@ -223,16 +230,14 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
      */
     void adjustMetadata(Extraction extraction, Attachment image) {
       // Adjust the target flavor. Make sure to account for partial updates
-      for (final MediaPackageElementFlavor flavor : cfg.targetImageFlavor) {
-        final String flavorType = eq("*", flavor.getType())
-                ? extraction.track.getFlavor().getType()
-                : flavor.getType();
-        final String flavorSubtype = eq("*", flavor.getSubtype())
-                ? extraction.track.getFlavor().getSubtype()
-                : flavor.getSubtype();
-        image.setFlavor(new MediaPackageElementFlavor(flavorType, flavorSubtype));
-        logger.debug("Resulting image has flavor '{}'", image.getFlavor());
-      }
+      final String flavorType = Objects.equals("*", cfg.targetImageFlavor.getType())
+              ? extraction.track.getFlavor().getType()
+              : cfg.targetImageFlavor.getType();
+      final String flavorSubtype = Objects.equals("*", cfg.targetImageFlavor.getSubtype())
+              ? extraction.track.getFlavor().getSubtype()
+              : cfg.targetImageFlavor.getSubtype();
+      image.setFlavor(new MediaPackageElementFlavor(flavorType, flavorSubtype));
+      logger.debug("Resulting image has flavor '{}'", image.getFlavor());
       // Set the mime type
       try {
         image.setMimeType(MimeTypes.fromURI(image.getURI()));
@@ -443,20 +448,22 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     private final List<Track> sourceTracks;
     private final List<MediaPosition> positions;
     private final List<EncodingProfile> profiles;
-    private final List<MediaPackageElementFlavor> targetImageFlavor;
+    private final MediaPackageElementFlavor targetImageFlavor;
     private final List<String> targetImageTags;
     private final Opt<String> targetBaseNameFormatSecond;
     private final Opt<String> targetBaseNameFormatPercent;
     private final long endMargin;
+    private final boolean skipIfTargetFlavorHasElements;
 
     Cfg(List<Track> sourceTracks,
         List<MediaPosition> positions,
         List<EncodingProfile> profiles,
-        List<MediaPackageElementFlavor> targetImageFlavor,
+        MediaPackageElementFlavor targetImageFlavor,
         List<String> targetImageTags,
         Opt<String> targetBaseNameFormatSecond,
         Opt<String> targetBaseNameFormatPercent,
-        long endMargin) {
+        long endMargin,
+        boolean skipIfTargetFlavorHasElements) {
       this.sourceTracks = sourceTracks;
       this.positions = positions;
       this.profiles = profiles;
@@ -465,6 +472,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
       this.endMargin = endMargin;
       this.targetBaseNameFormatSecond = targetBaseNameFormatSecond;
       this.targetBaseNameFormatPercent = targetBaseNameFormatPercent;
+      this.skipIfTargetFlavorHasElements = skipIfTargetFlavorHasElements;
     }
   }
 
@@ -476,7 +484,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     final List<EncodingProfile> profiles = getOptConfig(woi, OPT_PROFILES).toStream().bind(asList.toFn())
             .map(fetchProfile(composerService)).toList();
     final List<String> targetImageTags = tagsAndFlavors.getTargetTags();
-    final List<MediaPackageElementFlavor> targetImageFlavor = tagsAndFlavors.getTargetFlavors();
+    final MediaPackageElementFlavor targetImageFlavor = tagsAndFlavors.getSingleTargetFlavor();
     final List<Track> sourceTracks;
     {
       // get the source tags
@@ -499,7 +507,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     }
     final List<MediaPosition> positions = parsePositions(getConfig(woi, OPT_POSITIONS));
     final long endMargin = getOptConfig(woi, OPT_END_MARGIN).bind(Strings.toLong).getOr(END_MARGIN_DEFAULT);
-    //
+    final boolean skipIfTargetFlavorHasElements = BooleanUtils.toBoolean(woi.getConfiguration(OPT_SKIP_IF_TARGET_FLAVOR_HAS_ELEMENTS));
     return new Cfg(sourceTracks,
                    positions,
                    profiles,
@@ -507,7 +515,8 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
                    targetImageTags,
                    getTargetBaseNameFormat(woi, OPT_TARGET_BASE_NAME_FORMAT_SECOND),
                    getTargetBaseNameFormat(woi, OPT_TARGET_BASE_NAME_FORMAT_PERCENT),
-                   endMargin);
+                   endMargin,
+                   skipIfTargetFlavorHasElements);
   }
 
   /** Validate a target base name format. */
