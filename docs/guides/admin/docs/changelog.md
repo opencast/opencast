@@ -38,8 +38,6 @@ Opencast 12
   Remove ActiveMQ related steps from doc
 - [[#4012](https://github.com/opencast/opencast/pull/4012)] -
   Prevent Redirect When Going to Studio
-- [[#4007](https://github.com/opencast/opencast/pull/4007)] -
-  Opencast 12.1 Release Notes
 - [[#4005](https://github.com/opencast/opencast/pull/4005)] -
   Allow Admins Access to Editor Interface
 - [[#4004](https://github.com/opencast/opencast/pull/4004)] -
