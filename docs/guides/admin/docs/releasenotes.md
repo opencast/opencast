@@ -78,6 +78,17 @@ API changes
 - [[#3002](https://github.com/opencast/opencast/pull/3002)] - Sign publication URL of events in External API
 - [[#3148](https://github.com/opencast/opencast/pull/3148)] - Allow empty track duration
 
+
+Additional Notes about 11.10
+----------------------------
+
+- Bug Fixes:
+    - Fix CreatorDate Filter in GET api/series/
+      (cf. [[#4068](https://github.com/opencast/opencast/pull/4068)]).
+- New features and updates:
+    - Handle tracks with multiple videos in engage player
+      (cf. [[#3923](https://github.com/opencast/opencast/pull/3923)]).
+
 Additional Notes about 11.9
 ---------------------------
 
