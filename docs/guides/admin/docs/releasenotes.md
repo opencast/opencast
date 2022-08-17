@@ -9,6 +9,11 @@ Notable changes:
 - New Opencast Studio version including dark mode feature
 - Fix OAI-PMH
 - Update CAS documentation
+- Bugfix update the MariaDB database driver (again)
+- Use an event title fallback from Dublin Core catalog while publishing to
+  Engage
+- Update the migration script installation instructions, which will otherwise
+  fail with newer versions of the MariaDB Python connector
 
 See [changelog](changelog.md) for a comprehensive list of changes.
 
