@@ -238,8 +238,11 @@ public class SeriesEndpoint {
               } catch (IllegalArgumentException e) {
                 return RestUtil.R.badRequest(e.getMessage());
               } catch (ArrayIndexOutOfBoundsException e) {
-                logger.error("Malformed date period. Correct UTC time period format: yyyy-MM-ddTHH:mm:ssZ/yyyy-MM-ddTHH:mm:ssZ");
-                return RestUtil.R.badRequest(e.getMessage());
+                String dateErrorMsg = String.format("Filter Series API error: Malformed date period. "
+                    + "Correct UTC time period format: yyyy-MM-ddTHH:mm:ssZ/yyyy-MM-ddTHH:mm:ssZ, "
+                    + "stated date period string: \"%s\"", value);
+                logger.warn(dateErrorMsg);
+                return RestUtil.R.badRequest(dateErrorMsg);
               }
           } else if ("Creator".equals(name)) {
             query.withCreator(value);
