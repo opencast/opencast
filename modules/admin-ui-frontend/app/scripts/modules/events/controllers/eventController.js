@@ -46,14 +46,14 @@ angular.module('adminNg.controllers')
         idConfigElement = '#event-workflow-configuration',
         workflowConfigEl = angular.element(idConfigElement),
         baseWorkflow,
-        createPolicy = function (role, read, write) {
+        createPolicy = function (role, read, write, actionValues) {
           return {
             role  : role,
             read  : read !== undefined ? read : false,
             write : write !== undefined ? write : false,
             actions : {
               name : 'event-acl-actions',
-              value : []
+              value : actionValues !== undefined ? actionValues : [],
             },
             user: undefined,
           };
@@ -411,6 +411,8 @@ angular.module('adminNg.controllers')
               ? ($scope.aclCreateDefaults['read_readonly'].toLowerCase() === 'true') : true;
             $scope.aclCreateDefaults['write_readonly'] = $scope.aclCreateDefaults['write_readonly'] !== undefined
               ? ($scope.aclCreateDefaults['write_readonly'].toLowerCase() === 'true') : false;
+            $scope.aclCreateDefaults['default_actions'] = $scope.aclCreateDefaults['default_actions'] !== undefined
+              ? $scope.aclCreateDefaults['default_actions'].split(',') : [];
             $scope.roleUserPrefix = $scope.aclCreateDefaults['role_user_prefix'] !== undefined
               ? $scope.aclCreateDefaults['role_user_prefix']
               : 'ROLE_USER_';
@@ -719,7 +721,8 @@ angular.module('adminNg.controllers')
       model.push(createPolicy(
         undefined,
         $scope.aclCreateDefaults['read_enabled'],
-        $scope.aclCreateDefaults['write_enabled']
+        $scope.aclCreateDefaults['write_enabled'],
+        $scope.aclCreateDefaults['default_actions']
       ));
     };
 
