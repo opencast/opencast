@@ -147,7 +147,7 @@ public class StatisticsEndpoint {
     restParameters = {
       @RestParameter(
         name = "filter", isRequired = false,
-        description = "Usage <Filter Name>:<Value to Filter With>. Available filter: \"resourceType\"",
+        description = "Usage [Filter Name]:[Value to Filter With]. Available filter: \"resourceType\"",
         type = RestParameter.Type.STRING),
       @RestParameter(
         name = "withparameters", isRequired = false,
