@@ -178,7 +178,12 @@ public class JpaJob {
   @OrderColumn(name = "argument_index")
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "oc_job_argument",
-      joinColumns = @JoinColumn(name = "id", referencedColumnName = "id", nullable = false))
+      joinColumns = @JoinColumn(name = "id", referencedColumnName = "id", nullable = false),
+      indexes = {
+          @Index(name = "IX_oc_job_argument_id", columnList = ("id")),
+          @Index(name = "IX_oc_job_argument_id_argument", columnList = ("id, argument")),
+      }
+  )
   private List<String> arguments;
 
   @Column(name = "date_completed")
