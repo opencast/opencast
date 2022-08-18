@@ -115,7 +115,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   public static final String OPT_TARGET_BASE_NAME_FORMAT_SECOND = "target-base-name-format-second";
   public static final String OPT_TARGET_BASE_NAME_FORMAT_PERCENT = "target-base-name-format-percent";
   public static final String OPT_END_MARGIN = "end-margin";
-  public static final String OPT_SKIP_IF_TARGET_FLAVOR_HAS_ELEMENTS = "skip_if_target_flavor_has_elements";
+  public static final String OPT_SKIP_IF_TARGET_FLAVOR_HAS_ELEMENTS = "skip-if-target-flavor-has-elements";
 
   private static final long END_MARGIN_DEFAULT = 100;
   public static final double SINGLE_FRAME_POS = 0.0;

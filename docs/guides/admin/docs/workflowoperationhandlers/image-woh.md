@@ -24,7 +24,7 @@ Parameter Table
 |target-base-name-format-second|thumbnail\_%.0f%s|Used to control the target filenames for images extracted at absolute times. Mainly helpful when integrating third-party applications that prefer to use filename to distinguish individual images|
 |target-base-name-format-percent|thumbnail\_%.3f%s|Used to control the target filenames for images extracted at relative times. Mainly helpful when integrating third-party applications that prefer to use filename to distinguish individual images|
 |end-margin        |500|Safety margin at the end of the track. Sometimes, image extraction is critical at the end of the file. Using *end-margin* ensures, that no images are being extracted near the end of the video file to avoid problems with defective inputs.</br>(Default: 100)|
-|skip_if_target_flavor_has_elements|false|Does not run the operation if the target flavor already contains elements (Default: false)    |
+|skip-if-target-flavor-has-elements|false|Does not run the operation if the target flavor already contains elements (Default: false)    |
 
 Notes:
 
