@@ -298,7 +298,7 @@ public class StatisticsEndpoint {
                           name = "offset", description = "Offset for pagination.",
                           isRequired = false, type = RestParameter.Type.INTEGER),
                   @RestParameter(
-                          name = "filter", description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form <Filter Name>:<Value to Filter With>.",
+                          name = "filter", description = "Usage [Filter Name]:[Value to Filter With]. Multiple filters can be used by combining them with commas \",\".",
                           isRequired = false, type = RestParameter.Type.STRING)
           },
           responses = {

@@ -133,7 +133,7 @@ public class WorkflowDefinitionsEndpoint {
   @RestQuery(name = "getworkflowdefinitions", description = "Returns a list of workflow definition.", returnDescription = "", restParameters = {
           @RestParameter(name = "withoperations", description = "Whether the workflow operations should be included in the response", isRequired = false, type = BOOLEAN),
           @RestParameter(name = "withconfigurationpanel", description = "Whether the workflow configuration panel should be included in the response", isRequired = false, type = BOOLEAN),
-          @RestParameter(name = "filter", description = "Usage <Filter Name>:<Value to Filter With>. Available filter: \"tag\"", isRequired = false, type = STRING),
+          @RestParameter(name = "filter", description = "Usage [Filter Name]:[Value to Filter With]. Available filter: \"tag\"", isRequired = false, type = STRING),
           @RestParameter(name = "sort", description = "Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory.", isRequired = false, type = STRING),
           @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.", isRequired = false, type = INTEGER),
           @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false, type = INTEGER) }, responses = {
