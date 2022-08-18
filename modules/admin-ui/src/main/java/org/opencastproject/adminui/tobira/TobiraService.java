@@ -77,8 +77,8 @@ public final class TobiraService {
 
   public void mount(Map<String, Object> variables) throws TobiraException {
     request(
-            "mutation AdminUIMountSeries($seriesId: String!, $parentPagePath: String!, $newPages: [RealmSpecifier!]!) {"
-                    + "  mountSeries(ocSeriesId: $seriesId, parentRealmPath: $parentPagePath, newRealms: $newPages) {"
+            "mutation AdminUIMountSeries($series: NewSeries!, $parentPagePath: String!, $newPages: [RealmSpecifier!]!) {"
+                    + "  mountSeries(series: $series, parentRealmPath: $parentPagePath, newRealms: $newPages) {"
                     // We need to query something here, but we really don't care at the moment
                     + "    id"
                     + "  }"
