@@ -1,5 +1,22 @@
 # Opencast 12: Release Notes
 
+Opencast 12.2
+-------------
+
+The second maintenance release of Opencast 12.
+Notable changes:
+
+- New Opencast Studio version including dark mode feature
+- Fix OAI-PMH
+- Update CAS documentation
+- Bugfix update the MariaDB database driver (again)
+- Use an event title fallback from Dublin Core catalog while publishing to
+  Engage
+- Update the migration script installation instructions, which will otherwise
+  fail with newer versions of the MariaDB Python connector
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
 Opencast 12.1
 -------------
 
@@ -32,8 +49,9 @@ Opencast 12.0
 - You can now define workflows in YAML. An
   [example workflow written in YAML](https://github.com/opencast/opencast/blob/r/12.x/etc/workflows/fast.yaml) is provided.
   [Documentation is available](configuration/workflow.md#using-yaml-files-with-workflows).
-- A new workflow operation handler [allows you to copy media package elements from existing publications
-  ](https://github.com/opencast/opencast/pull/3554)
+- The new [publication to workspace workflow operation handler](workflowoperationhandlers/publication-to-workspace-woh.md)
+  allows you to copy media package elements from existing publications
+  [[#3554](https://github.com/opencast/opencast/pull/3554)].
 
 ### Improvements
 

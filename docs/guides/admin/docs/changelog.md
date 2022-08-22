@@ -4,6 +4,48 @@ Changelog
 Opencast 12
 -----------
 
+### Opencast 12.2
+
+*Released on August 17th, 2022*
+
+- [[#4087](https://github.com/opencast/opencast/pull/4087)] -
+  Link the docs for the publication to workspace WOH
+- [[#4064](https://github.com/opencast/opencast/pull/4064)] -
+  Fallback for Event Title in Publication
+- [[#4063](https://github.com/opencast/opencast/pull/4063)] -
+  Warn About Removed Workflow Endpoint
+- [[#4059](https://github.com/opencast/opencast/pull/4059)] -
+  Bump mariadb-java-client from 3.0.6 to 3.0.7 in /modules/db
+- [[#4057](https://github.com/opencast/opencast/pull/4057)] -
+  Fixed OSGI annotation for OaiPmhServer
+- [[#4049](https://github.com/opencast/opencast/pull/4049)] -
+  Update Opencast Studio to 2022-08-03
+- [[#4048](https://github.com/opencast/opencast/pull/4048)] -
+  Don't Fail on Missing Jobs
+- [[#4032](https://github.com/opencast/opencast/pull/4032)] -
+  Clarify migration script dependencies and make aware of the mysql_connector_python error
+- [[#4031](https://github.com/opencast/opencast/pull/4031)] -
+  Remove ManagedService from LtiServiceImpl
+- [[#4030](https://github.com/opencast/opencast/pull/4030)] -
+  Removing remaining activemq docs
+- [[#4027](https://github.com/opencast/opencast/pull/4027)] -
+  Add new config `list-all-jobs-in-series` to LtiServiceImpl
+- [[#4025](https://github.com/opencast/opencast/pull/4025)] -
+  Update CAS docs
+- [[#4016](https://github.com/opencast/opencast/pull/4016)] -
+  Force inject ChainingMediaPackageSerializer as MediaPackageSeriailzer
+- [[#4015](https://github.com/opencast/opencast/pull/4015)] -
+  Remove ActiveMQ related steps from doc
+- [[#4012](https://github.com/opencast/opencast/pull/4012)] -
+  Prevent Redirect When Going to Studio
+- [[#4005](https://github.com/opencast/opencast/pull/4005)] -
+  Allow Admins Access to Editor Interface
+- [[#4004](https://github.com/opencast/opencast/pull/4004)] -
+  MariaDB Connector Bugfix Update
+- [[#3995](https://github.com/opencast/opencast/pull/3995)] -
+  Avoid GitHub Actions Scheduling Conflicts
+
+
 ### Opencast 12.1
 
 *Released on July 20th, 2022*
