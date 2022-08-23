@@ -260,6 +260,19 @@ Dependabot's changes are excluded from this log.
 Opencast 11
 ----------
 
+### Opencast 11.10
+
+*Released on August 17th, 2022*
+
+- [[#4068](https://github.com/opencast/opencast/pull/4068)] -
+  Fix CreatorDate Filter in GET api/series/
+- [[#3990](https://github.com/opencast/opencast/pull/3990)] -
+  Remove Graphviz from Documentation
+- [[#3952](https://github.com/opencast/opencast/pull/3952)] -
+  Add changelog and release notes for OC 11.9
+- [[#3923](https://github.com/opencast/opencast/pull/3923)] -
+  Handle tracks with multiple videos in engage player
+
 ### Opencast 11.9
 
 *Released on July 6th, 2022*
