@@ -18,6 +18,12 @@ please refer to [older release notes](https://docs.opencast.org).
 Database Migration
 ------------------
 
+<div class=warn>
+Bug in 12.2:
+Please use the latest version of the upgrade script linked below.
+Version 12.2 of the MariaDB variant contained a bug which would make the script exit successfully while doing nothing.
+</div>
+
 Upgrading to Opencast 12 requires a database migration as some tables have changed.
 Migration scripts can be found in
 [`doc/upgrade/11_to_12/`](https://github.com/opencast/opencast/tree/r/12.x/docs/upgrade/11_to_12).
