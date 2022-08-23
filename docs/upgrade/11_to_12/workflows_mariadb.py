@@ -45,7 +45,6 @@ def create_connection(host_name, user_name, user_password, db_name):
         print("Connection to database successful")
     except mysql.connector.errors.ProgrammingError:
         print("Collation error found, try to use an older version of mysql_connector_python")
-    finally:
         quit()
     return connection
 
