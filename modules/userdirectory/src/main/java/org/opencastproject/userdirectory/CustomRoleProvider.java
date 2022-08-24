@@ -25,15 +25,10 @@ import static org.opencastproject.security.api.UserProvider.ALL_ORGANIZATIONS;
 
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.Role.Type;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
-
-import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.StreamOp;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
@@ -45,7 +40,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -155,24 +149,26 @@ public class CustomRoleProvider implements RoleProvider {
       throw new IllegalArgumentException("Query must be set");
     }
 
-    Organization organization = securityService.getOrganization();
+    var organization = JaxbOrganization.fromOrganization(securityService.getOrganization());
 
     // Match the custom regular expression first if this is an ACL role query
     if ((target == Role.Target.ACL) && (rolematch != null)) {
       String exactQuery = StringUtils.removeEnd(query, "%");
       Matcher m = rolematch.matcher(exactQuery);
       if (m.matches()) {
-        List<Role> roles = new LinkedList<Role>();
-        JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
-        roles.add(new JaxbRole(exactQuery, jaxbOrganization, "Custom Role", Role.Type.EXTERNAL));
-        return roles.iterator();
+        return Collections
+            .singletonList((Role) new JaxbRole(exactQuery, organization, "Custom Role", Role.Type.EXTERNAL))
+            .iterator();
       }
     }
 
     // Otherwise match on the custom roles specified in a list
-    return Stream.$(roles).filter(filterByName._2(query)).drop(offset)
-            .apply(limit > 0 ? StreamOp.<String> id().take(limit) : StreamOp.<String> id()).map(toRole._2(organization))
-            .iterator();
+    return roles.stream()
+        .filter(role -> like(role, query))
+        .skip(offset)
+        .limit(limit > 0 ? limit : Long.MAX_VALUE)
+        .map(role -> (Role) new JaxbRole(role, organization, "Custom Role", Type.INTERNAL))
+        .iterator();
   }
 
   private static boolean like(String string, final String query) {
@@ -180,19 +176,5 @@ public class CustomRoleProvider implements RoleProvider {
     Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     return p.matcher(string).matches();
   }
-
-  private static final Fn2<String, Organization, Role> toRole = new Fn2<String, Organization, Role>() {
-    @Override
-    public Role apply(String role, Organization organization) {
-      return new JaxbRole(role, JaxbOrganization.fromOrganization(organization), "Custom Role", Type.INTERNAL);
-    }
-  };
-
-  private static final Fn2<String, String, Boolean> filterByName = new Fn2<String, String, Boolean>() {
-    @Override
-    public Boolean apply(String role, String query) {
-      return like(role, query);
-    }
-  };
 
 }
