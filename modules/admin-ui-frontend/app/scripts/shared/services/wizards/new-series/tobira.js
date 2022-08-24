@@ -49,7 +49,7 @@ angular.module('adminNg.services')
         }
       }
 
-      check('info', 'TOBIRA_OVERRIDE_NAME', 'series-tobira', function () {
+      check('info', 'TOBIRA_OVERRIDE_NAME', 'series-tobira-existing', function () {
         return me.ud.selectedPage && me.ud.selectedPage.title;
       });
 

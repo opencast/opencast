@@ -274,6 +274,7 @@
           <ul>
             <li ng-switch="!!wizard.step.ud.selectedPage && wizard.step.isValid()">
               <div data-admin-ng-notifications="" context="series-tobira-new"></div>
+              <div data-admin-ng-notifications="" context="series-tobira-existing"></div>
               <p ng-switch-when="true">
                 {{'EVENTS.SERIES.NEW.TOBIRA.SELECTED_PAGE' | translate}}:
                 <code class="tobira-path">{{wizard.step.ud.selectedPage.path}}</code>
