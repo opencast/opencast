@@ -155,7 +155,7 @@ public class SeriesUpdatedEventHandler {
    * @param distributionService
    *          the distributionService to set
    */
-  @Reference
+  @Reference(target = "(distribution.channel=download)")
   public void setDistributionService(DistributionService distributionService) {
     this.distributionService = distributionService;
   }
