@@ -109,7 +109,7 @@ It is **not recommended** to enable remote debugging on production systems!
 Adding Dummy Capture Agent
 ---------------------------
 
-In the case that is needed, you can create a dummy capture agent with testing porpurses. 
+In the case that is needed, you can create a dummy capture agent with testing porpurses.
 To add a dummy CA, go to the API Docs page in Opencast and enter a new capture agent in:
 
     {opencast-url}/docs.html?path=/capture-admin#setAgentStateConfiguration-4
