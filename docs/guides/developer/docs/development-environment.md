@@ -105,3 +105,26 @@ For more information on remote debugging with Karaf you can visit [this
 site.](https://karaf.apache.org/manual/latest/#_debugging)
 
 It is **not recommended** to enable remote debugging on production systems!
+
+Adding Dummy Capture Agent
+---------------------------
+
+In the case that is needed, you can create a dummy capture agent with testing porpurses. To add a dummy CA, go to the API Docs page in Opencast and enter a new capture agent in:
+
+    {opencast-url}/docs.html?path=/capture-admin#setAgentStateConfiguration-4
+
+
+  **Name:** Any name of your desire.
+  
+  
+  **Configuration:**
+
+    {
+    "key": "capture.device.names",
+    "value": "presentation,presenter"
+    }
+
+Click on `submit` and is ready to go.
+
+Additionaly you can call this REST endpoint directly using `CURL` for example.
+
