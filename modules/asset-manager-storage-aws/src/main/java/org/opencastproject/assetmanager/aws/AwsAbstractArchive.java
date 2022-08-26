@@ -33,6 +33,7 @@ import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabaseExceptio
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetMapping;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.util.ConfigurationException;
+import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
@@ -176,7 +177,7 @@ public abstract class AwsAbstractArchive implements AssetStore {
     String objectVersion = null;
     try {
       // Upload file to AWS
-      AwsUploadOperationResult result = uploadObject(origin, objectName);
+      AwsUploadOperationResult result = uploadObject(origin, objectName, source.getMimeType());
       objectName = result.getObjectName();
       objectVersion = result.getObjectVersion();
     } catch (Exception e) {
@@ -193,7 +194,8 @@ public abstract class AwsAbstractArchive implements AssetStore {
     }
   }
 
-  protected abstract AwsUploadOperationResult uploadObject(File origin, String objectName) throws AssetStoreException;
+  protected abstract AwsUploadOperationResult uploadObject(File origin, String objectName, Opt<MimeType> mimeType)
+          throws AssetStoreException;
 
   /** @see AssetStore#get(StoragePath) */
   public Opt<InputStream> get(final StoragePath path) throws AssetStoreException {
