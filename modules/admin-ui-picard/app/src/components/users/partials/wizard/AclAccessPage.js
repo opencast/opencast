@@ -75,49 +75,49 @@ const AclAccessPage = ({ previousPage, nextPage, formik, isEdit, user, checkAcls
                                                 {isAccess && (
                                                     <table className="main-tbl">
                                                         <thead>
-                                                        <tr>
-                                                            <th>{t('USERS.ACLS.NEW.ACCESS.TEMPLATES.TITLE')}</th>
-                                                        </tr>
+                                                            <tr>
+                                                                <th>{t('USERS.ACLS.NEW.ACCESS.TEMPLATES.TITLE')}</th>
+                                                            </tr>
                                                         </thead>
                                                         <tbody>
-                                                        <tr>
-                                                            {aclTemplates.length > 0 ? (
-                                                                <td className="editable">
-                                                                    <div className="obj-container padded">
-                                                                        <p>
-                                                                            {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION')}
-                                                                        </p>
+                                                            <tr>
+                                                                {aclTemplates.length > 0 ? (
+                                                                    <td className="editable">
+                                                                        <div className="obj-container padded">
+                                                                            <p>
+                                                                                {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION')}
+                                                                            </p>
 
-                                                                        {/* dropdown for selecting a policy template */}
-                                                                        <DropDown value={formik.values.aclTemplate}
-                                                                                  text={getAclTemplateText(aclTemplates, formik.values.aclTemplate)}
-                                                                                  options={ !!aclTemplates ?
-                                                                                      aclTemplates
-                                                                                      : []
-                                                                                  }
-                                                                                  type={'aclTemplate'}
-                                                                                  required={true}
-                                                                                  handleChange={element =>
-                                                                                      handleTemplateChange(element.value)
-                                                                                  }
-                                                                                  placeholder={t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.LABEL')}
-                                                                                  tabIndex={'1'}
-                                                                                  autoFocus={true}
-                                                                        />
-                                                                    </div>
-                                                                </td>
-                                                            ) : (
-                                                                // Show if no option is available
-                                                                <td>
-                                                                    <div className="obj-container padded">
-                                                                        <p>
-                                                                            {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION')}
-                                                                        </p>
-                                                                        {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.EMPTY')}
-                                                                    </div>
-                                                                </td>
-                                                            )}
-                                                        </tr>
+                                                                            {/* dropdown for selecting a policy template */}
+                                                                            <DropDown value={formik.values.aclTemplate}
+                                                                                      text={getAclTemplateText(aclTemplates, formik.values.aclTemplate)}
+                                                                                      options={ !!aclTemplates ?
+                                                                                          aclTemplates
+                                                                                          : []
+                                                                                      }
+                                                                                      type={'aclTemplate'}
+                                                                                      required={true}
+                                                                                      handleChange={element =>
+                                                                                          handleTemplateChange(element.value)
+                                                                                      }
+                                                                                      placeholder={t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.LABEL')}
+                                                                                      tabIndex={'1'}
+                                                                                      autoFocus={true}
+                                                                            />
+                                                                        </div>
+                                                                    </td>
+                                                                ) : (
+                                                                    // Show if no option is available
+                                                                    <td>
+                                                                        <div className="obj-container padded">
+                                                                            <p>
+                                                                                {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION')}
+                                                                            </p>
+                                                                            {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.EMPTY')}
+                                                                        </div>
+                                                                    </td>
+                                                                )}
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 )}

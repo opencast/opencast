@@ -123,11 +123,12 @@ const EventDetailsSchedulingTab = ({ eventId, t,
 
     // submits the formik form
     const submitForm = async (values) => {
+        removeNotificationWizardForm();
         const startDate = makeDate(values.scheduleStartDate, values.scheduleStartHour, values.scheduleStartMinute);
         const endDate = makeDate(values.scheduleEndDate, values.scheduleEndHour, values.scheduleEndMinute);
         checkConflicts(eventId, startDate, endDate, values.captureAgent).then(r => {
-            if(r && !(conflicts.length > 0)){
-                saveSchedulingInfo(eventId, values, startDate, endDate).then(r => {});
+            if(r){
+                saveSchedulingInfo(eventId, values, startDate, endDate).then();
             } else {
                 addNotification('error', 'EVENTS_NOT_UPDATED', -1, null, NOTIFICATION_CONTEXT);
             }

@@ -20,13 +20,21 @@ import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 import {filterDevicesForAccess, hasAnyDeviceAccess} from "../../../../utils/resourceUtils";
 import DropDown from "../../../shared/DropDown";
 import {
-    changeDurationHour, changeDurationHourMultiple,
-    changeDurationMinute, changeDurationMinuteMultiple, changeEndDateMultiple,
-    changeEndHour, changeEndHourMultiple,
-    changeEndMinute, changeEndMinuteMultiple,
-    changeStartDate, changeStartDateMultiple,
-    changeStartHour, changeStartHourMultiple,
-    changeStartMinute, changeStartMinuteMultiple
+    changeDurationHour,
+    changeDurationHourMultiple,
+    changeDurationMinute,
+    changeDurationMinuteMultiple,
+    changeEndDateMultiple,
+    changeEndHour,
+    changeEndHourMultiple,
+    changeEndMinute,
+    changeEndMinuteMultiple,
+    changeStartDate,
+    changeStartDateMultiple,
+    changeStartHour,
+    changeStartHourMultiple,
+    changeStartMinute,
+    changeStartMinuteMultiple
 } from "../../../../utils/dateUtils";
 
 
@@ -147,7 +155,8 @@ const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, in
                         disabled={!(formik.dirty && formik.isValid)}
                         onClick={async () => {
                             removeOldNotifications();
-                            if(await checkConflicts(formik.values)) {
+                            const noConflicts = await checkConflicts(formik.values);
+                            if (noConflicts) {
                                 nextPage(formik.values);
                             }
                         }}
