@@ -21,6 +21,8 @@
 
 package org.opencastproject.assetmanager.aws.s3;
 
+import static java.lang.String.format;
+
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
@@ -49,12 +51,12 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.BucketVersioningConfiguration;
 import com.amazonaws.services.s3.model.CopyObjectRequest;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.GetObjectTaggingRequest;
 import com.amazonaws.services.s3.model.GetObjectTaggingResult;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.ObjectTagging;
 import com.amazonaws.services.s3.model.RestoreObjectRequest;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.SetBucketVersioningConfigurationRequest;
 import com.amazonaws.services.s3.model.SetObjectTaggingRequest;
 import com.amazonaws.services.s3.model.StorageClass;
@@ -76,8 +78,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
@@ -353,7 +355,9 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   public String getAssetStorageClass(StoragePath storagePath) throws AssetStoreException {
     try {
       AwsAssetMapping map = database.findMapping(storagePath);
-
+      if (!contains(storagePath)) {
+        return "NONE";
+      }
       return getObjectStorageClass(map.getObjectKey());
     } catch (AwsAssetDatabaseException e) {
       throw new AssetStoreException(e);
@@ -425,16 +429,12 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
    *
    */
   @Override
-    protected InputStream getObject(AwsAssetMapping map) {
-    return getObject(map.getObjectKey()).getObjectContent();
-  }
-
-  private S3Object getObject(String objectName) {
-    String storageClassId = getObjectStorageClass(objectName);
+  protected InputStream getObject(AwsAssetMapping map) {
+    String storageClassId = getObjectStorageClass(map.getObjectKey());
 
     if (StorageClass.Glacier.equals(storageClassId)) {
       // restore object and wait until available if necessary
-      restoreGlacierObject(objectName, restorePeriod, true);
+      restoreGlacierObject(map.getObjectKey(), restorePeriod, true);
     }
 
     try {
@@ -458,7 +458,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
 
       Date expirationTime = s3.getObjectMetadata(bucketName, map.getObjectKey()).getRestoreExpirationTime();
       if (expirationTime != null) {
-        return String.format("RESTORED,%s", expirationTime.toString());
+        return format("RESTORED, expires in %s", expirationTime.toString());
       }
 
       Boolean prevOngoingRestore = s3.getObjectMetadata(bucketName, map.getObjectKey()).getOngoingRestore();
@@ -489,6 +489,12 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
 
   private void restoreGlacierObject(String objectName, Integer objectRestorePeriod, Boolean wait) {
     Boolean prevOngoingRestore = s3.getObjectMetadata(bucketName, objectName).getOngoingRestore();
+    if (prevOngoingRestore && wait) {
+      logger.info("Object {} is already being restored, waiting", objectName);
+    } else if (prevOngoingRestore && !wait) {
+      logger.info("Object {} is already being restored", objectName);
+      return;
+    }
     RestoreObjectRequest requestRestore = new RestoreObjectRequest(bucketName, objectName, objectRestorePeriod);
     s3.restoreObjectV2(requestRestore);
 

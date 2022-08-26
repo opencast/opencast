@@ -111,7 +111,7 @@ public abstract class AwsAbstractArchive implements AssetStore {
   public boolean copy(final StoragePath from, final StoragePath to) throws AssetStoreException {
     try {
       AwsAssetMapping map = database.findMapping(from);
-      if (map == null) {
+      if (!contains(from)) {
         logger.warn("Origin file mapping not found in database: {}", from);
         return false;
       }

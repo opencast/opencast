@@ -53,6 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -148,7 +149,7 @@ public class AwsS3RestEndpoint {
               throw new AssetManagerException(ex);
             }
           } else {
-            info.append(String.format("%s,NONE\n", e.getURI(), awsS3AssetStore.getStoreType()));
+            info.append(String.format("%s,NONE\n", e.getURI()));
           }
         }
         return ok(info.toString());
@@ -231,7 +232,7 @@ public class AwsS3RestEndpoint {
               throw new AssetManagerException(ex);
             }
           } else {
-            info.append(String.format("%s,NONE\n", e.getURI(), awsS3AssetStore.getStoreType()));
+            info.append(String.format("%s,NONE\n", e.getURI()));
           }
         }
         return ok(info.toString());
@@ -296,15 +297,15 @@ public class AwsS3RestEndpoint {
                                                     getMediaPackageId(),
                                                     item.getSnapshot().get().getVersion(),
                                                     e.getIdentifier());
-          String assetStorageClass = awsS3AssetStore.getAssetStorageClass(storagePath);
-          if (awsS3AssetStore.contains(storagePath)
-              && ("GLACIER".equals(assetStorageClass) || "DEEP_ARCHIVE".equals(assetStorageClass))) {
+          if (isFrozen(storagePath)) {
             try {
               info.append(String.format("%s,%s\n", awsS3AssetStore.getAssetObjectKey(storagePath),
                                                    awsS3AssetStore.getAssetRestoreStatusString(storagePath)));
             } catch (AssetStoreException ex) {
               throw new AssetManagerException(ex);
             }
+          } else {
+            info.append(String.format("%s,NONE\n", storagePath));
           }
         }
         if (info.length() == 0) {
@@ -340,6 +341,9 @@ public class AwsS3RestEndpoint {
               description = "restore of assets started",
               responseCode = HttpServletResponse.SC_NO_CONTENT),
           @RestResponse(
+              description = "invalid restore period, must be greater than zero",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(
               description = "mediapackage not found or has no assets in S3",
               responseCode = HttpServletResponse.SC_NOT_FOUND)
       },
@@ -356,6 +360,11 @@ public class AwsS3RestEndpoint {
       }
 
       @Override public Response apply() {
+        Integer restorePeriod = getRestorePeriod();
+        if (restorePeriod < 1) {
+          throw new BadRequestException("Restore period must be greater than zero!");
+        }
+
         AQueryBuilder q = assetManager.createQuery();
         final ASelectQuery idQuery = q.select(q.snapshot())
             .where(
@@ -371,6 +380,7 @@ public class AwsS3RestEndpoint {
         }
         final ARecord item = result.getRecords().head2();
 
+
         for (MediaPackageElement e : assetManager.getMediaPackage(item.getMediaPackageId()).get().elements()) {
           if (e.getElementType() == MediaPackageElement.Type.Publication) {
             continue;
@@ -380,9 +390,7 @@ public class AwsS3RestEndpoint {
                                                     getMediaPackageId(),
                                                     item.getSnapshot().get().getVersion(),
                                                     e.getIdentifier());
-          String assetStorageClass = awsS3AssetStore.getAssetStorageClass(storagePath);
-          if (awsS3AssetStore.contains(storagePath)
-              && (StorageClass.Glacier.equals(assetStorageClass) || "DEEP_ARCHIVE".equals(assetStorageClass))) {
+          if (isFrozen(storagePath)) {
             try {
               // Initiate restore and return
               awsS3AssetStore.initiateRestoreAsset(storagePath, getRestorePeriod());
@@ -394,6 +402,13 @@ public class AwsS3RestEndpoint {
         return noContent();
       }
     });
+  }
+
+  private boolean isFrozen(StoragePath storagePath) {
+    String assetStorageClass = awsS3AssetStore.getAssetStorageClass(storagePath);
+    return awsS3AssetStore.contains(storagePath)
+        && (StorageClass.Glacier == StorageClass.fromValue(assetStorageClass)
+          || StorageClass.DeepArchive == StorageClass.fromValue(assetStorageClass));
   }
 
 

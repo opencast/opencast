@@ -34,7 +34,6 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
 import com.entwinemedia.fn.data.Opt;
@@ -107,8 +106,8 @@ public class AwsS3AssetStoreTest {
     s3Client = EasyMock.createStrictMock(AmazonS3Client.class);
     s3Transfer = EasyMock.createStrictMock(TransferManager.class);
     EasyMock.expect(s3Client.listObjects(BUCKET_NAME)).andReturn(null);
-    EasyMock.expect(s3Client.getObject(BUCKET_NAME, KEY_VERSION_1 + ASSET_ID + ".xml")).andReturn(s3Object);
-    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, KEY_VERSION_1 + ASSET_ID + ".xml"))
+    EasyMock.expect(s3Client.getObject(BUCKET_NAME, OBJECT_KEY_1)).andReturn(s3Object);
+    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, OBJECT_KEY_1))
         .andReturn(objMetadata).anyTimes();
     // Replay will be called in each test
 
