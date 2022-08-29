@@ -36,6 +36,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +59,16 @@ import javax.ws.rs.core.Response;
     title = "Tobira API Endpoint",
     abstractText = "Opencast Tobira API endpoint.",
     notes = { "This provides API endpoint used by Tobira to harvest media metadata" }
+)
+@Component(
+    property = {
+        "service.description=Tobira",
+        "opencast.service.type=org.opencastproject.tobira",
+        "opencast.service.path=/tobira",
+        "opencast.service.jobproducer=false"
+    },
+    immediate = true,
+    service = TobiraApi.class
 )
 public class TobiraApi {
   private static final Logger logger = LoggerFactory.getLogger(TobiraApi.class);
@@ -89,14 +101,17 @@ public class TobiraApi {
     logger.info("Activated Tobira API");
   }
 
+  @Reference
   public void setSearchService(SearchService service) {
     this.searchService = service;
   }
 
+  @Reference
   public void setSeriesService(SeriesService service) {
     this.seriesService = service;
   }
 
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

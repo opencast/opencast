@@ -79,9 +79,11 @@
               javax.ws.rs.core;version=2.0.1,
               *
             </Import-Package>
-            <Service-Component>
-              OSGI-INF/tobira-api.xml
-            </Service-Component>
+            <Export-Package>
+              org.opencastproject.tobira;version=${project.version}
+            </Export-Package>
+            <!-- Remove once all used services use OSGi annotations -->
+            <_dsannotations-options>norequirements</_dsannotations-options>
           </instructions>
         </configuration>
       </plugin>
