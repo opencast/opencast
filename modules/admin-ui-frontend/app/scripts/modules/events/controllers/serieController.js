@@ -251,15 +251,15 @@ angular.module('adminNg.controllers')
         });
       });
 
-      Notifications.removeAll('series-tobira');
+      Notifications.removeAll('series-tobira-details');
       SeriesTobiraResource.get({ id: id }, function (tobiraData) {
         $scope.tobiraData = tobiraData;
         $scope.directTobiraLink = tobiraData.baseURL + '/!s/:' + $scope.resourceId;
       }, function (response) {
         if (response.status === 500) {
-          Notifications.add('error', 'TOBIRA_SERVER_ERROR', 'series-tobira', -1);
+          Notifications.add('error', 'TOBIRA_SERVER_ERROR', 'series-tobira-details', -1);
         } else if (response.status === 404) {
-          Notifications.add('warning', 'TOBIRA_NOT_FOUND', 'series-tobira', -1);
+          Notifications.add('warning', 'TOBIRA_NOT_FOUND', 'series-tobira-details', -1);
         }
 
         if (response.status !== 503) {
@@ -268,9 +268,9 @@ angular.module('adminNg.controllers')
       });
       $scope.copyTobiraDirectLink = function () {
         navigator.clipboard.writeText($scope.directTobiraLink).then(function () {
-          Notifications.add('info', 'TOBIRA_COPIED_DIRECT_LINK', 'series-tobira', 3000);
+          Notifications.add('info', 'TOBIRA_COPIED_DIRECT_LINK', 'series-tobira-details', 3000);
         }, function () {
-          Notifications.add('error', 'TOBIRA_FAILED_COPYING_DIRECT_LINK', 'series-tobira', 3000);
+          Notifications.add('error', 'TOBIRA_FAILED_COPYING_DIRECT_LINK', 'series-tobira-details', 3000);
         });
       };
 
