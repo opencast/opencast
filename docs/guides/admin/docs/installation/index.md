@@ -13,10 +13,11 @@ Installation from Repository
 There are package repositories available for multiple operating systems. It provides packages containing pre-configured and
 pre-built Opencast installations.
 
-* [RedHat 8 based](rpm-el8.md)
-    * [RedHat Enterprise Linux 8](rpm-el8.md)
-    * [CentOS 8](rpm-el8.md)
-* [RedHat 7 based](rpm-el8.md)
+* [Red Hat 8/9 based](rpm-el.md)
+    * [RedHat Enterprise Linux](rpm-el.md)
+    * [CentOS Stream](rpm-el.md)
+    * …
+* [Red Hat 7 based](rpm-el7.md)
     * [RedHat Enterprise Linux 7](rpm-el7.md)
     * [CentOS 7](rpm-el7.md)
     * [Scientific Linux 7](rpm-el7.md)
