@@ -1,11 +1,9 @@
-Install from Repository (Red Hat Enterprise Linux 8.x, CentOS 8.x)
-==================================================================
+Install from Repository (Red Hat Enterprise Linux, CentOS Stream, …
+===================================================================
 
-> *This guide is for EL8 only. There is a separate [CentOS 7 and Red Hat Enterprise Linux 7 guide](rpm-el7.md).*
-
-This guide is based on an RPM software repository available for Red Hat-based Linux distributions provided by [Osnabrück
-University](https://uni-osnabrueck.de). This repository provides preconfigured Opencast installations and all necessary
-3rd-party-tools.
+This guide is based on an RPM software repository available for Red Hat based Linux distributions provided by [Osnabrück
+University](https://uni-osnabrueck.de) and [ELAN e.V.](https://elan-ev.de).
+This repository provides preconfigured Opencast installations and all necessary 3rd-party-tools.
 
 <div class=warn>
   <b>Opencast {{ opencast_major_version() }}</b> is not yet available.
@@ -18,10 +16,13 @@ University](https://uni-osnabrueck.de). This repository provides preconfigured O
 Currently Supported
 -------------------
 
-- CentOS 8.x (x86\_64)
-- Red Hat Enterprise Linux 8.x (x86\_64)
+We frequently test on CentOS Stream 8/9 and infrequently test on Red Hat Enterprise Linux 8/9,
+trying to ensure that installations on those systems work without problems.
+Since Rocky Linux and AlmaLinux OS are intended to be fully compatible to RHEL,
+those distributions should work as well.
+But we don't test against those.
 
-Other architectures like i386, i686, arm, … are not supported.
+We support only the x86\_64 architecture.
 
 
 Activate Repository
@@ -30,7 +31,8 @@ Activate Repository
 First you have to install the necessary repositories:
 
 ```sh
-dnf install -y https://pkg.opencast.org/rpms/release/el/8/oc-{{ opencast_major_version() }}/noarch/opencast-repository-{{ opencast_major_version() }}-1.el8.noarch.rpm
+dnf install -y \
+  "https://pkg.opencast.org/rpms/release/el/$(rpm -E %rhel)/oc-{{ opencast_major_version() }}/noarch/opencast-repository-{{ opencast_major_version() }}-1.el$(rpm -E %rhel).noarch.rpm"
 ```
 
 It might take some time after the release of a new Opencast version before the RPMs are moved to the stable repository.
@@ -152,7 +154,8 @@ systemctl stop opencast.service
 Then, update the repository:
 
 ```sh
-dnf install -y https://pkg.opencast.org/rpms/release/el/8/oc-{{ opencast_major_version() }}/noarch/opencast-repository-{{ opencast_major_version() }}-1.el8.noarch.rpm
+dnf install -y \
+  "https://pkg.opencast.org/rpms/release/el/$(rpm -E %rhel)/oc-{{ opencast_major_version() }}/noarch/opencast-repository-{{ opencast_major_version() }}-1.el$(rpm -E %rhel).noarch.rpm"
 ```
 
 Upgrade to the new Opencast package by running:
