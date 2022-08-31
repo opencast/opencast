@@ -129,11 +129,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -186,8 +188,7 @@ public class SeriesEndpoint {
   public static final String SERIES_HASEVENTS_DELETE_ALLOW_KEY = "series.hasEvents.delete.allow";
   public static final String SERIESTAB_ONLYSERIESWITHWRITEACCESS_KEY = "seriesTab.onlySeriesWithWriteAccess";
   public static final String EVENTSFILTER_ONLYSERIESWITHWRITEACCESS_KEY = "eventsFilter.onlySeriesWithWriteAccess";
-  public static final String TOBIRA_ORIGIN = "tobira.origin";
-  public static final String TOBIRA_TRUSTED_KEY = "tobira.trustedKey";
+  public static final Pattern TOBIRA_CONFIG = Pattern.compile("^tobira\\.(?<organization>.*)\\.(?<key>origin|trustedKey)$");
 
   private SeriesService seriesService;
   private SecurityService securityService;
@@ -239,7 +240,7 @@ public class SeriesEndpoint {
     return aclServiceFactory.serviceFor(securityService.getOrganization());
   }
 
-  private TobiraService tobira = new TobiraService();
+  private Map<String, TobiraService> tobiras = new HashMap<>();
 
   @Activate
   protected void activate(ComponentContext cc, Map<String, Object> properties) {
@@ -273,10 +274,23 @@ public class SeriesEndpoint {
     mapValue = properties.get(EVENTSFILTER_ONLYSERIESWITHWRITEACCESS_KEY);
     onlySeriesWithWriteAccessEventsFilter = BooleanUtils.toBoolean(Objects.toString(mapValue, "true"));
 
-    mapValue = properties.get(TOBIRA_ORIGIN);
-    tobira.setOrigin((String) mapValue);
-    mapValue = properties.get(TOBIRA_TRUSTED_KEY);
-    tobira.setTrustedKey((String) mapValue);
+    properties.forEach((key, value) -> {
+      var matches = TOBIRA_CONFIG.matcher(key);
+      if (!matches.matches()) {
+        return;
+      }
+      var tobira = getTobira(matches.group("organization"));
+      switch (matches.group("key")) {
+        case "origin":
+          tobira.setOrigin((String) value);
+          break;
+        case "trustedKey":
+          tobira.setTrustedKey((String) value);
+          break;
+        default:
+          throw new RuntimeException("unhandled Tobira config key");
+      }
+    });
 
     logger.info("Configuration updated");
   }
@@ -511,6 +525,14 @@ public class SeriesEndpoint {
     return Response.ok(themesJson.toJSONString()).build();
   }
 
+  private TobiraService getTobira(String organization) {
+    return tobiras.computeIfAbsent(organization, org -> new TobiraService());
+  }
+
+  private TobiraService getTobira() {
+    return getTobira(securityService.getOrganization().getId());
+  }
+
   @GET
   @Path("new/tobira/page")
   @Produces(MediaType.APPLICATION_JSON)
@@ -542,6 +564,7 @@ public class SeriesEndpoint {
       throw new WebApplicationException("`path` missing", BAD_REQUEST);
     }
 
+    var tobira = getTobira();
     if (!tobira.ready()) {
       return Response.status(Status.SERVICE_UNAVAILABLE)
               .entity("Tobira is not configured (correctly)")
@@ -596,6 +619,7 @@ public class SeriesEndpoint {
   }
 
   private boolean mountSeriesInTobira(String seriesId, JSONObject params) {
+    var tobira = getTobira();
     if (!tobira.ready()) {
       return false;
     }
@@ -1085,6 +1109,7 @@ public class SeriesEndpoint {
                           responseCode = SC_SERVICE_UNAVAILABLE,
                           description = "Tobira is not configured (correctly)") })
 public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
+    var tobira = getTobira();
     if (!tobira.ready()) {
       return Response.status(Status.SERVICE_UNAVAILABLE)
               .entity("Tobira is not configured (correctly)")
