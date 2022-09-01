@@ -117,7 +117,7 @@ public class Sender {
    * @throws IOException General exception that can occur while processing the POST request.
    */
   private void send(String json, String urlSuffix) throws IOException {
-    send(json, urlSuffix, "POST");
+    send(json, urlSuffix, "GET");
   }
 
   /**
