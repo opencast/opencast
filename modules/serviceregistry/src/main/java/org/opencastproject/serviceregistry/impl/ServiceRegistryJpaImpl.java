@@ -21,16 +21,12 @@
 
 package org.opencastproject.serviceregistry.impl;
 
-import static com.entwinemedia.fn.Stream.$;
 import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.job.api.AbstractJobProducer.ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY;
 import static org.opencastproject.job.api.AbstractJobProducer.DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING;
 import static org.opencastproject.job.api.Job.FailureReason.DATA;
 import static org.opencastproject.job.api.Job.Status.FAILED;
-import static org.opencastproject.security.api.SecurityConstants.ORGANIZATION_HEADER;
-import static org.opencastproject.security.api.SecurityConstants.USER_HEADER;
 import static org.opencastproject.serviceregistry.api.ServiceState.ERROR;
 import static org.opencastproject.serviceregistry.api.ServiceState.NORMAL;
 import static org.opencastproject.serviceregistry.api.ServiceState.WARNING;
@@ -41,12 +37,10 @@ import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.jpa.JpaJob;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.security.api.User;
-import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.HostStatistics;
 import org.opencastproject.serviceregistry.api.IncidentService;
@@ -69,18 +63,11 @@ import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.util.jmx.JmxUtil;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Fn2;
-
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -98,7 +85,6 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -109,14 +95,13 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.management.ObjectInstance;
@@ -137,7 +122,7 @@ import javax.persistence.TypedQuery;
     "service.description=Service registry"
   },
   immediate = true,
-  service = { ManagedService.class, ServiceRegistry.class }
+  service = { ManagedService.class, ServiceRegistry.class, ServiceRegistryJpaImpl.class }
 )
 public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
@@ -185,9 +170,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Configuration key for the maximum load */
   protected static final String OPT_MAXLOAD = "org.opencastproject.server.maxload";
 
-  /** Configuration key for the dispatch interval, in seconds */
-  protected static final String OPT_DISPATCHINTERVAL = "dispatch.interval";
-
   /** Configuration key for the interval to check whether the hosts in the service registry are still alive, in seconds */
   protected static final String OPT_HEARTBEATINTERVAL = "heartbeat.interval";
 
@@ -199,15 +181,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** The http client to use when connecting to remote servers */
   protected TrustedHttpClient client = null;
-
-  /** Minimum delay between job dispatching attempts, in seconds */
-  static final long MIN_DISPATCH_INTERVAL = 1;
-
-  /** Default delay between job dispatching attempts, in seconds */
-  static final long DEFAULT_DISPATCH_INTERVAL = 2;
-
-  /** Default delay before starting job dispatching, in seconds */
-  static final long DEFAULT_DISPATCH_START_DELAY = 60;
 
   /** Default jobs limit during dispatching
    * (larger value will fetch more entries from the database at the same time and increase RAM usage) */
@@ -265,12 +238,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** The security service */
   protected SecurityService securityService = null;
 
-  /** The user directory service */
-  protected UserDirectoryService userDirectoryService = null;
-
-  /** The organization directory service */
-  protected OrganizationDirectoryService organizationDirectoryService = null;
-
   protected Incidents incidents;
 
   /** Whether to collect detailed job statistics */
@@ -291,9 +258,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING = new ArrayList<Status>();
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.RUNNING);
   }
-
-  /** The dispatcher priority list */
-  protected final Map<Long, String> dispatchPriorityList = new HashMap<>();
 
   /** Whether to accept a job whose load exceeds the host’s max load */
   protected Boolean acceptJobLoadsExeedingMaxLoad = true;
@@ -769,25 +733,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       }
     }
 
-    long dispatchInterval = DEFAULT_DISPATCH_INTERVAL;
-    String dispatchIntervalString = StringUtils.trimToNull((String) properties.get(OPT_DISPATCHINTERVAL));
-    if (StringUtils.isNotBlank(dispatchIntervalString)) {
-      try {
-        dispatchInterval = Long.parseLong(dispatchIntervalString);
-      } catch (Exception e) {
-        logger.warn("Dispatch interval '{}' is malformed, setting to {}", dispatchIntervalString, MIN_DISPATCH_INTERVAL);
-        dispatchInterval = MIN_DISPATCH_INTERVAL;
-      }
-      if (dispatchInterval == 0) {
-        logger.info("Dispatching disabled");
-      } else if (dispatchInterval < MIN_DISPATCH_INTERVAL) {
-        logger.warn("Dispatch interval {} ms too low, adjusting to {}", dispatchInterval, MIN_DISPATCH_INTERVAL);
-        dispatchInterval = MIN_DISPATCH_INTERVAL;
-      } else {
-        logger.info("Dispatch interval set to {} ms", dispatchInterval);
-      }
-    }
-
     long heartbeatInterval = DEFAULT_HEART_BEAT;
     String heartbeatIntervalString = StringUtils.trimToNull((String) properties.get(OPT_HEARTBEATINTERVAL));
     if (StringUtils.isNotBlank(heartbeatIntervalString)) {
@@ -829,27 +774,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       }
     }
 
-    long dispatchDelay = DEFAULT_DISPATCH_START_DELAY;
-
-    // Stop the current scheduled executors so we can configure new ones
-    if (scheduledExecutor != null) {
-      scheduledExecutor.shutdown();
-      dispatchDelay = dispatchInterval;
-    }
-
-    scheduledExecutor = Executors.newScheduledThreadPool(2);
+    scheduledExecutor = Executors.newScheduledThreadPool(1);
 
     // Schedule the service heartbeat if the interval is > 0
     if (heartbeatInterval > 0) {
       logger.debug("Starting service heartbeat at a custom interval of {}s", heartbeatInterval);
       scheduledExecutor.scheduleWithFixedDelay(new JobProducerHeartbeat(), heartbeatInterval, heartbeatInterval,
-              TimeUnit.SECONDS);
-    }
-
-    // Schedule the job dispatching.
-    if (dispatchInterval > 0) {
-      logger.debug("Starting job dispatching at a custom interval of {}s", dispatchInterval);
-      scheduledExecutor.scheduleWithFixedDelay(new JobDispatcher(), dispatchDelay, dispatchInterval,
               TimeUnit.SECONDS);
     }
   }
@@ -915,7 +845,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     currentJob.set(job);
   }
 
-  private JpaJob updateJob(JpaJob job) throws ServiceRegistryException {
+  JpaJob updateJob(JpaJob job) throws ServiceRegistryException {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
@@ -1036,6 +966,21 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         tx.rollback();
       }
       throw e;
+    }
+  }
+
+  public void updateStatisticsJobData() {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      jobsStatistics.updateAvg(getAvgOperations(em));
+      jobsStatistics.updateJobCount(getCountPerHostService(em));
+    } catch (ServiceRegistryException e) {
+      logger.warn("Unable to update job dispatch statistics data", e);
+    } finally {
+      if (null != em) {
+        em.close();
+      }
     }
   }
 
@@ -1957,30 +1902,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
   }
 
-  /**
-   * Return dispatchable job ids, where the job status is RESTART or QUEUED and the job id is listed in the given set.
-   *
-   * @param em the entity manager
-   * @param jobIds set with job id's interested in
-   * @return list with dispatchable job id's from the given set, with job status RESTART or QUEUED
-   * @throws ServiceRegistryException if there is a problem communicating with the jobs database
-   */
-  protected List<Long> getDispatchableJobsWithIdFilter(EntityManager em, Set<Long> jobIds)
-          throws ServiceRegistryException {
-    if (jobIds == null || jobIds.isEmpty())
-      return Collections.EMPTY_LIST;
-
-    Query query = null;
-    try {
-      query = em.createNamedQuery("Job.dispatchable.status.idfilter");
-      query.setParameter("jobids", dispatchPriorityList.keySet());
-      query.setParameter("statuses", Arrays.asList(Status.RESTART.ordinal(), Status.QUEUED.ordinal()));
-      return query.getResultList();
-    } catch (Exception e) {
-      throw new ServiceRegistryException(e);
-    }
-  }
-
   @SuppressWarnings("unchecked")
   protected List<Object[]> getAvgOperations(EntityManager em) throws ServiceRegistryException {
     Query query = null;
@@ -2463,28 +2384,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     this.securityService = securityService;
   }
 
-  /**
-   * Callback for setting the user directory service.
-   *
-   * @param userDirectoryService
-   *          the userDirectoryService to set
-   */
-  @Reference
-  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
-    this.userDirectoryService = userDirectoryService;
-  }
-
-  /**
-   * Sets a reference to the organization directory service.
-   *
-   * @param organizationDirectory
-   *          the organization directory
-   */
-  @Reference
-  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
-    this.organizationDirectoryService = organizationDirectory;
-  }
-
   /** OSGi DI. */
   @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy =  ReferencePolicy.DYNAMIC, unbind = "unsetIncidentService")
   public void setIncidentService(IncidentService incidentService) {
@@ -2716,7 +2615,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           List<ServiceRegistration> serviceRegistrations, List<HostRegistration> hostRegistrations,
           final SystemLoad systemLoad) {
 
-    final List<String> hostBaseUrls = $(hostRegistrations).map(toBaseUrl).toList();
+    final List<String> hostBaseUrls = hostRegistrations.stream()
+                                                       .map(toBaseUrl)
+                                                       .collect(Collectors.toUnmodifiableList());
     final List<ServiceRegistration> filteredList = new ArrayList<ServiceRegistration>();
 
     for (ServiceRegistration service : serviceRegistrations) {
@@ -2800,7 +2701,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           List<ServiceRegistration> serviceRegistrations, List<HostRegistration> hostRegistrations,
           final SystemLoad systemLoad) {
 
-    final List<String> hostBaseUrls = $(hostRegistrations).map(toBaseUrl).toList();
+    final List<String> hostBaseUrls = hostRegistrations.stream()
+                                                       .map(toBaseUrl)
+                                                       .collect(Collectors.toUnmodifiableList());
     final List<ServiceRegistration> filteredList = new ArrayList<ServiceRegistration>();
 
     logger.debug("Finding services to dispatch job of type {}", jobType);
@@ -2888,408 +2791,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
   }
 
-  private final Fn<HostRegistration, String> toBaseUrl = new Fn<HostRegistration, String>() {
+  private final Function<HostRegistration, String> toBaseUrl = new Function<HostRegistration, String>() {
     @Override
     public String apply(HostRegistration h) {
       return h.getBaseUrl();
     }
   };
-
-  /**
-   * This dispatcher implementation will check for jobs in the QUEUED {@link Status}. If
-   * new jobs are found, the dispatcher will attempt to dispatch each job to the least loaded service.
-   */
-  class JobDispatcher implements Runnable {
-
-    /** A list with job types that cannot be dispatched in each interation */
-    private List<String> undispatchableJobTypes = null;
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.lang.Thread#run()
-     */
-    @Override
-    public void run() {
-
-      logger.debug("Starting job dispatching");
-
-      undispatchableJobTypes = new ArrayList<String>();
-      EntityManager em = null;
-      try {
-        em = emf.createEntityManager();
-
-        // FIXME: the stats are not currently used and the queries are very
-        // expense in database time.
-        if (collectJobstats) {
-          jobsStatistics.updateAvg(getAvgOperations(em));
-          jobsStatistics.updateJobCount(getCountPerHostService(em));
-        }
-
-        if (!dispatchPriorityList.isEmpty()) {
-          logger.trace("Checking for outdated jobs in dispatchPriorityList's '{}' jobs", dispatchPriorityList.size());
-          // Remove outdated jobs from priority list
-          List<Long> jobIds = getDispatchableJobsWithIdFilter(em, dispatchPriorityList.keySet());
-          for (Long jobId : new HashSet<>(dispatchPriorityList.keySet())) {
-            if (!jobIds.contains(jobId)) {
-              logger.debug("Removing outdated dispatchPriorityList job '{}'", jobId);
-              dispatchPriorityList.remove(jobId);
-            }
-          }
-        }
-
-        int jobsOffset = 0;
-        List<JpaJob> dispatchableJobs = null;
-        List<JpaJob> workflowJobs = new ArrayList();
-        boolean jobsFound = false;
-        do {
-          // dispatch all dispatchable jobs with status restarted
-          dispatchableJobs = getDispatchableJobsWithStatus(em, jobsOffset, DEFAULT_DISPATCH_JOBS_LIMIT, Status.RESTART);
-          jobsOffset += DEFAULT_DISPATCH_JOBS_LIMIT;
-          jobsFound = !dispatchableJobs.isEmpty();
-
-          // skip all jobs of type workflow, we will handle them next
-          for (JpaJob job : dispatchableJobs) {
-            if (TYPE_WORKFLOW.equals(job.getJobType())) {
-              workflowJobs.add(job);
-            }
-          }
-          if (dispatchableJobs.removeAll(workflowJobs) && dispatchableJobs.isEmpty())
-            continue;
-
-          dispatchDispatchableJobs(em, dispatchableJobs);
-        } while (jobsFound);
-
-        jobsOffset = 0;
-        jobsFound = false;
-        do {
-          // dispatch all dispatchable jobs with status queued
-          dispatchableJobs = getDispatchableJobsWithStatus(em, jobsOffset, DEFAULT_DISPATCH_JOBS_LIMIT, Status.QUEUED);
-          jobsOffset += DEFAULT_DISPATCH_JOBS_LIMIT;
-          jobsFound = !dispatchableJobs.isEmpty();
-
-          // skip all jobs of type workflow, we will handle them next
-          for (JpaJob job : dispatchableJobs) {
-            if (TYPE_WORKFLOW.equals(job.getJobType())) {
-              workflowJobs.add(job);
-            }
-          }
-          if (dispatchableJobs.removeAll(workflowJobs) && dispatchableJobs.isEmpty())
-            continue;
-
-          dispatchDispatchableJobs(em, dispatchableJobs);
-        } while (jobsFound);
-
-        if (!workflowJobs.isEmpty())
-          dispatchDispatchableJobs(em, workflowJobs);
-
-      } catch (Throwable t) {
-        logger.warn("Error dispatching jobs", t);
-      } finally {
-        undispatchableJobTypes = null;
-        if (em != null)
-          em.close();
-      }
-
-      logger.debug("Finished job dispatching");
-    }
-
-    /**
-     * Dispatch the given jobs.
-     *
-     * @param em the entity manager
-     * @param jobsToDispatch list with dispatchable jobs to dispatch
-     */
-    private void dispatchDispatchableJobs(EntityManager em, List<JpaJob> jobsToDispatch) {
-      //Get the current system load
-      SystemLoad systemLoad = getHostLoads(em);
-
-      for (JpaJob job : jobsToDispatch) {
-
-        // Remember the job type
-        String jobType = job.getJobType();
-
-        // Skip jobs that we already know can't be dispatched except of jobs in the priority list
-        String jobSignature = new StringBuilder(jobType).append('@').append(job.getOperation()).toString();
-        if (undispatchableJobTypes.contains(jobSignature) && !dispatchPriorityList.keySet().contains(job.getId())) {
-          logger.trace("Skipping dispatching of {} with type '{}' for this round of dispatching", job,
-                  jobType);
-          continue;
-        }
-
-        // Set the job's user and organization prior to dispatching
-        String creator = job.getCreator();
-        String creatorOrganization = job.getOrganization();
-
-        // Try to load the organization.
-        Organization organization = null;
-        try {
-          organization = organizationDirectoryService.getOrganization(creatorOrganization);
-          securityService.setOrganization(organization);
-        } catch (NotFoundException e) {
-          logger.debug("Skipping dispatching of job for non-existing organization '{}'", creatorOrganization);
-          continue;
-        }
-
-        // Try to load the user
-        User user = userDirectoryService.loadUser(creator);
-        if (user == null) {
-          logger.warn("Unable to dispatch {}: creator '{}' is not available", job, creator);
-          continue;
-        }
-        securityService.setUser(user);
-
-        // Start dispatching
-        try {
-          List<ServiceRegistration> services = getServiceRegistrations(em);
-          List<HostRegistration> hosts = $(getHostRegistrations(em)).filter(filterOutPriorityHosts._2(job.getId()))
-                  .toList();
-          List<ServiceRegistration> candidateServices = null;
-
-          // Depending on whether this running job is trying to reach out to other services or whether this is an
-          // attempt to execute the next operation in a workflow, choose either from a limited or from the full list
-          // of services
-          Job parentJob = null;
-          try {
-            if (job.getParentJob() != null)
-              parentJob = getJob(job.getParentJob().getId());
-          } catch (NotFoundException e) {
-            // That's ok
-          }
-
-          // When a job A starts a series of child jobs, then those child jobs should only be dispatched at the
-          // same time if there is processing capacity available.
-          boolean parentHasRunningChildren = false;
-          if (parentJob != null) {
-            for (Job child : getChildJobs(parentJob.getId())) {
-              if (Status.RUNNING.equals(child.getStatus())) {
-                parentHasRunningChildren = true;
-                break;
-              }
-            }
-          }
-
-          // If this is a root job (a new workflow or a new workflow operation), then only dispatch if there is
-          // capacity, i. e. the workflow service is ok dispatching the next workflow or the next workflow operation.
-          if (parentJob == null || TYPE_WORKFLOW.equals(jobType) || parentHasRunningChildren) {
-            logger.trace("Using available capacity only for dispatching of {} to a service of type '{}'", job,
-                    jobType);
-            candidateServices = getServiceRegistrationsWithCapacity(jobType, services, hosts, systemLoad);
-          } else {
-            logger.trace("Using full list of services for dispatching of {} to a service of type '{}'", job, jobType);
-            candidateServices = getServiceRegistrationsByLoad(jobType, services, hosts, systemLoad);
-          }
-
-          // Try to dispatch the job
-          String hostAcceptingJob = null;
-          try {
-            hostAcceptingJob = dispatchJob(em, job, candidateServices);
-            try {
-              systemLoad.updateNodeLoad(hostAcceptingJob, job.getJobLoad());
-            } catch (NotFoundException e) {
-              logger.info("Host {} not found in load list, cannot dispatch {} to it", hostAcceptingJob, job);
-            }
-
-            dispatchPriorityList.remove(job.getId());
-          } catch (ServiceUnavailableException e) {
-            logger.debug("Jobs of type {} currently cannot be dispatched", job.getOperation());
-            // Don't mark workflow jobs as undispatchable to not impact worklfow operations
-            if (!TYPE_WORKFLOW.equals(jobType))
-              undispatchableJobTypes.add(jobSignature);
-            continue;
-          } catch (UndispatchableJobException e) {
-            logger.debug("{} currently cannot be dispatched", job);
-            continue;
-          }
-
-          logger.debug("{} dispatched to {}", job, hostAcceptingJob);
-        } catch (ServiceRegistryException e) {
-          Throwable cause = (e.getCause() != null) ? e.getCause() : e;
-          logger.error("Error dispatching {}: {}", job, cause);
-        } finally {
-          securityService.setUser(null);
-          securityService.setOrganization(null);
-        }
-      }
-    }
-
-    /**
-     * Dispatches the job to the least loaded service that will accept the job, or throws a
-     * <code>ServiceUnavailableException</code> if there is no such service.
-     *
-     * @param em
-     *          the current entity manager
-     * @param job
-     *          the job to dispatch
-     * @param services
-     *          a list of service registrations
-     * @return the host that accepted the dispatched job, or <code>null</code> if no services took the job.
-     * @throws ServiceRegistryException
-     *           if the service registrations are unavailable
-     * @throws ServiceUnavailableException
-     *           if no service is available or if all available services refuse to take on more work
-     * @throws UndispatchableJobException
-     *           if the current job cannot be processed
-     */
-    protected String dispatchJob(EntityManager em, JpaJob job, List<ServiceRegistration> services)
-            throws ServiceRegistryException, ServiceUnavailableException, UndispatchableJobException {
-
-      if (services.size() == 0) {
-        logger.debug("No service is currently available to handle jobs of type '" + job.getJobType() + "'");
-        throw new ServiceUnavailableException("No service of type " + job.getJobType() + " available");
-      }
-
-      // Try the service registrations, after the first one finished, we quit;
-      job.setStatus(Status.DISPATCHING);
-
-      boolean triedDispatching = false;
-
-      boolean jobLoadExceedsMaximumLoads = false;
-      final Float highestMaxLoad = $(services).map(toHostRegistration).map(toMaxLoad).sort(sortFloatValuesDesc).head2();
-      if (job.getJobLoad() > highestMaxLoad) {
-        // None of the available hosts is able to accept the job because the largest max load value is less than this job's load value
-        jobLoadExceedsMaximumLoads = true;
-      }
-
-      for (ServiceRegistration registration : services) {
-        job.setProcessorServiceRegistration((ServiceRegistrationJpaImpl) registration);
-
-        // Skip registration of host with less max load than highest available max load
-        // Note: This service registration may or may not live on a node which is set to accept jobs exceeding its max load
-        if (jobLoadExceedsMaximumLoads
-                && job.getProcessorServiceRegistration().getHostRegistration().getMaxLoad() != highestMaxLoad) {
-          continue;
-        }
-
-        try {
-          job = updateInternal(em, job);
-        } catch (Exception e) {
-          // In theory, we should catch javax.persistence.OptimisticLockException. Unfortunately, eclipselink throws
-          // org.eclipse.persistence.exceptions.OptimisticLockException. In order to avoid importing the implementation
-          // specific APIs, we just catch Exception.
-          logger.debug("Unable to dispatch {}.  This is likely caused by another service registry dispatching the job",
-                  job);
-          throw new UndispatchableJobException(job + " is already being dispatched");
-        }
-
-        triedDispatching = true;
-
-        String serviceUrl = UrlSupport.concat(registration.getHost(), registration.getPath(), "dispatch");
-        HttpPost post = new HttpPost(serviceUrl);
-
-        // Add current organization and user so they can be used during execution at the remote end
-        post.addHeader(ORGANIZATION_HEADER, securityService.getOrganization().getId());
-        post.addHeader(USER_HEADER, securityService.getUser().getUsername());
-
-        List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-        params.add(new BasicNameValuePair("id", Long.toString(job.getId())));
-        params.add(new BasicNameValuePair("operation", job.getOperation()));
-        post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
-
-        // Post the request
-        HttpResponse response = null;
-        int responseStatusCode;
-        try {
-          logger.debug("Trying to dispatch {} type '{}' load {} to {}",
-                  job, job.getJobType(), job.getJobLoad(), registration.getHost());
-          if (!START_WORKFLOW.equals(job.getOperation()))
-            setCurrentJob(job.toJob());
-          response = client.execute(post);
-          responseStatusCode = response.getStatusLine().getStatusCode();
-          if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
-            return registration.getHost();
-          } else if (responseStatusCode == HttpStatus.SC_SERVICE_UNAVAILABLE) {
-            logger.debug("Service {} is currently refusing to accept jobs of type {}", registration,
-                    job.getOperation());
-            continue;
-          } else if (responseStatusCode == HttpStatus.SC_PRECONDITION_FAILED) {
-            job.setStatus(Status.FAILED);
-            job = updateJob(job);
-            logger.debug("Service {} refused to accept {}", registration, job);
-            throw new UndispatchableJobException(IOUtils.toString(response.getEntity().getContent()));
-          } else if (responseStatusCode == HttpStatus.SC_METHOD_NOT_ALLOWED) {
-            logger.debug("Service {} is not yet reachable", registration);
-            continue;
-          } else {
-            logger.warn("Service {} failed ({}) accepting {}", registration, responseStatusCode, job);
-            continue;
-          }
-        } catch (UndispatchableJobException e) {
-          throw e;
-        } catch (TrustedHttpClientException e) {
-          // Will try another node. If no other node, it will be re-queued
-          logger.warn("Unable to dispatch {}", job, e);
-          continue;
-        } catch (Exception e) {
-          logger.warn("Unable to dispatch {}", job, e);
-        } finally {
-          try {
-            client.close(response);
-          } catch (IOException e) {
-            // ignore
-          }
-          setCurrentJob(null);
-        }
-      }
-
-      // We've tried dispatching to every online service that can handle this type of job, with no luck.
-      if (triedDispatching) {
-        // Workflow type jobs are not set to priority list, because they handle accepting jobs not based on the job load
-        // If the system don't accepts jobs whose load exceeds the host's max load we can't make use of the priority
-        // list
-        if (acceptJobLoadsExeedingMaxLoad && !dispatchPriorityList.containsKey(job.getId())
-                && !TYPE_WORKFLOW.equals(job.getJobType()) && job.getProcessorServiceRegistration() != null) {
-          String host = job.getProcessorServiceRegistration().getHost();
-          logger.debug("About to add {} to dispatchPriorityList with processor host {}", job, host);
-          dispatchPriorityList.put(job.getId(), host);
-        }
-
-        try {
-          job.setStatus(Status.QUEUED);
-          job.setProcessorServiceRegistration(null);
-          job = updateJob(job);
-        } catch (Exception e) {
-          logger.error("Unable to put {} back into queue", job, e);
-        }
-      }
-
-      logger.debug("Unable to dispatch {}, no service is currently ready to accept the job", job);
-      throw new UndispatchableJobException(job + " is currently undispatchable");
-    }
-
-    private final Fn2<HostRegistration, Long, Boolean> filterOutPriorityHosts = new Fn2<HostRegistration, Long, Boolean>() {
-      @Override
-      public Boolean apply(HostRegistration host, Long jobId) {
-        if (dispatchPriorityList.values().contains(host.getBaseUrl())
-                && !host.getBaseUrl().equals(dispatchPriorityList.get(jobId))) {
-          return false;
-        }
-        return true;
-      }
-    };
-
-    private final Fn<ServiceRegistration, HostRegistration> toHostRegistration = new Fn<ServiceRegistration, HostRegistration>() {
-      @Override
-      public HostRegistration apply(ServiceRegistration s) {
-        return ((ServiceRegistrationJpaImpl) s).getHostRegistration();
-      }
-    };
-
-    private final Fn<HostRegistration, Float> toMaxLoad = new Fn<HostRegistration, Float>() {
-      @Override
-      public Float apply(HostRegistration h) {
-        return h.getMaxLoad();
-      }
-    };
-
-    private final Comparator<Float> sortFloatValuesDesc = new Comparator<Float>() {
-      @Override
-      public int compare(Float o1, Float o2) {
-        return o2.compareTo(o1);
-      }
-    };
-
-  }
 
   /** A periodic check on each service registration to ensure that it is still alive. */
   class JobProducerHeartbeat implements Runnable {

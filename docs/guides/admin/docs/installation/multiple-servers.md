@@ -158,8 +158,3 @@ set all servers to use the same URL (e.g. URL of the admin node).
 
     prop.org.opencastproject.file.repo.url=http://<ADMIN-URL>:8080
 
-### org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg
-
-To ensure that jobs are not dispatched by non-admin nodes, on these you should also set:
-
-    dispatch.interval=0

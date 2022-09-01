@@ -9,6 +9,7 @@
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
+    <enableJobDispatching>true</enableJobDispatching>
   </properties>
   <artifactId>opencast-dist-allinone</artifactId>
   <packaging>karaf-assembly</packaging>
