@@ -1,3 +1,6 @@
+> Using this requires you to turn on an Opencast plugin.
+> Take a look [at the plugin management documentation](../modules/plugin-management.md) to find out how you can do that.
+
 ### What it does
 
 The [Brightspace](https://www.d2l.com/) User Provider enriches Opencast users with a

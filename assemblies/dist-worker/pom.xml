@@ -110,6 +110,7 @@
             <feature>wrap</feature>
             <!-- Opencast features -->
             <feature>opencast-worker</feature>
+            <feature>opencast-pluginmanager</feature>
           </bootFeatures>
         </configuration>
       </plugin>
