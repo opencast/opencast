@@ -94,7 +94,7 @@ public class IngestRestServiceTest {
             (MediaPackage) EasyMock.anyObject())).andReturn(MediaPackageBuilderFactory.newInstance()
         .newMediaPackageBuilder().createNew());
     EasyMock.expect(ingestService.addTrack((URI) EasyMock.anyObject(), (MediaPackageElementFlavor) EasyMock.anyObject(),
-            (MediaPackage) EasyMock.anyObject()))
+                    (String[]) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject()))
             .andReturn(MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
     EasyMock.expect(ingestService.addTrack((URI) EasyMock.anyObject(), (MediaPackageElementFlavor) EasyMock.anyObject(),
             (String[]) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject()))

@@ -658,20 +658,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * {@inheritDoc}
    *
    * @see org.opencastproject.ingest.api.IngestService#addTrack(java.net.URI,
-   *      org.opencastproject.mediapackage.MediaPackageElementFlavor, org.opencastproject.mediapackage.MediaPackage)
-   */
-  @Override
-  public MediaPackage addTrack(URI uri, MediaPackageElementFlavor flavor, MediaPackage mediaPackage)
-          throws IOException, IngestException {
-    String[] tags = null;
-    return this.addTrack(uri, flavor, tags, mediaPackage);
-
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.ingest.api.IngestService#addTrack(java.net.URI,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor, String[] ,
    *      org.opencastproject.mediapackage.MediaPackage)
    */
