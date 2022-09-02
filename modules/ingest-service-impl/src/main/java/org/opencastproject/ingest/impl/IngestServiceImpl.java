@@ -1239,6 +1239,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         agentProperties.put(key, properties.get(key));
       }
     }
+
+    // Remove workflow configuration prefixes from the workflow properties
+    workflowProperties = removePrefixFromProperties(workflowProperties);
+
     try {
       schedulerService.addEvent(period.getStart(), period.getEnd(), captureAgent, new HashSet<>(), mediaPackage,
               workflowProperties, agentProperties, Opt.none());
