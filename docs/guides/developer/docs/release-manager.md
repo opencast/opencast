@@ -88,27 +88,49 @@ Example on how to create the Opencast 7 release branch:
         git checkout develop
         git pull <remote> develop
 
-2. Make sure you did not modify any files. If you did, stash those changes:
+2. Modify the Paella target branch (For Paella 6.x and 7.x), found in the dependabot configuration
+   file `.github/dependabot.yml` to target the latest supported version when this version will released.
+
+        Example:
+        - package-ecosystem: npm
+          directory: "/modules/engage-paella-player-7"
+          schedule:
+          interval: daily
+          target-branch: "r/12.x"
+          open-pull-requests-limit: 10
+        
+        to
+
+        - package-ecosystem: npm
+          directory: "/modules/engage-paella-player-7"
+          schedule:
+          interval: daily
+          target-branch: "r/13.x"
+          open-pull-requests-limit: 10
+
+  make a PR then merge this change to `develop` branch.
+
+3. Make sure you did not modify any files. If you did, stash those changes:
 
         git status   # check for modified files
         git stash    # stash them if necessary
 
-3. Create and push the new release branch:
+4. Create and push the new release branch:
 
         git checkout -b r/7.x
         git push <remote> r/7.x
 
-4. That is it for the release branch. Now update the versions in `develop` in preparation for the next release:
+5. That is it for the release branch. Now update the versions in `develop` in preparation for the next release:
 
         git checkout develop
         mvn versions:set -DnewVersion=8-SNAPSHOT versions:commit
 
-5. Have a look at the changes. Make sure that nothing else was modified:
+6. Have a look at the changes. Make sure that nothing else was modified:
 
         git diff
         git status | grep modified: | grep -v pom.xml   # this should have no output
 
-6. If everything looks fine, commit the changes and push it to the community repository:
+7. If everything looks fine, commit the changes and push it to the community repository:
 
         git add $(git status | grep 'modified:.*pom.xml' | awk '{print $2;}')
         git commit -s -m 'Bumping pom.xml Version Numbers'
