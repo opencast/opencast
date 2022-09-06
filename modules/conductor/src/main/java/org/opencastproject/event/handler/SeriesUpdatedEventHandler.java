@@ -186,7 +186,7 @@ public class SeriesUpdatedEventHandler {
     try {
       securityService.setUser(SecurityUtil.createSystemUser(systemAccount, prevOrg));
 
-      SearchQuery q = new SearchQuery().withSeriesId(seriesId);
+      SearchQuery q = new SearchQuery().withSeriesId(seriesId).withLimit(-1);
       SearchResult result = searchService.getForAdministrativeRead(q);
 
       for (SearchResultItem item : result.getItems()) {
