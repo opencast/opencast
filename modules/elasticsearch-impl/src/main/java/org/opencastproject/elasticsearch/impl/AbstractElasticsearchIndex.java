@@ -273,15 +273,14 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
         retryAttempts++;
 
         if (retryAttempts <= maxRetryAttempts) {
-          logger.warn("Could not update documents in index {} because of {}, retrying in {} ms.", getIndexName(),
-                  e.getMessage(), retryWaitingPeriod);
+          logger.warn("Could not update documents in index {}, retrying in {} ms.", getIndexName(),
+                  e, retryWaitingPeriod);
           if (retryWaitingPeriod > 0) {
             Thread.sleep(retryWaitingPeriod);
           }
         } else {
-          logger.error("Could not update documents in index {} because of {}, not retrying.", getIndexName(),
-                  e.getMessage());
-          throw e;
+          logger.error("Could not update documents in index {}, not retrying.", getIndexName(),
+                  e);
         }
       }
     } while (indexResponse == null);
@@ -305,7 +304,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    * @throws InterruptedException
    *         If waiting during retry is interrupted
    */
-  protected BulkResponse bundleUpdate(int maxRetryAttempts, int retryWaitingPeriod,
+  protected BulkResponse bulkUpdate(int maxRetryAttempts, int retryWaitingPeriod,
       List<ElasticsearchDocument> documents)
           throws IOException, InterruptedException {
     BulkRequest bulkRequest = new BulkRequest().setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
@@ -330,9 +329,8 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
             Thread.sleep(retryWaitingPeriod);
           }
         } else {
-          logger.error("Could not update documents in index {} because of {}, not retrying.", getIndexName(),
-                  e.getMessage());
-          throw e;
+          logger.error("Could not update documents in index {}, not retrying.", getIndexName(),
+                  e);
         }
       }
     } while (bulkResponse == null);
@@ -374,9 +372,8 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
             Thread.sleep(retryWaitingPeriod);
           }
         } else {
-          logger.error("Could not remove documents from index {} because of {}, not retrying.", getIndexName(),
-                  e.getMessage());
-          throw e;
+          logger.error("Could not remove documents from index {}, not retrying.", getIndexName(),
+                  e);
         }
       }
     } while (deleteResponse == null);
@@ -669,9 +666,8 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
             Thread.sleep(retryWaitingPeriod);
           }
         } else {
-          logger.error("Could not query documents from index {} because of {}, not retrying.", getIndexName(),
-                  e.getMessage());
-          throw e;
+          logger.error("Could not query documents from index {}, not retrying.", getIndexName(),
+                  e);
         }
       }
     } while (searchResponse == null);

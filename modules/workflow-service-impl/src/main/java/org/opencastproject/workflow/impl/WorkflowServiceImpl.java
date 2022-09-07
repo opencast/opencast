@@ -2155,56 +2155,63 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
   @Override
   public void repopulate() throws IndexRebuildException {
-    final int total;
     try {
-      total = persistence.countMediaPackages();
-    } catch (WorkflowDatabaseException e) {
+      final int total;
+      try {
+        total = persistence.countMediaPackages();
+      } catch (WorkflowDatabaseException e) {
+        logIndexRebuildError(logger.getSlf4jLogger(), index.getIndexName(), e);
+        throw new IndexRebuildException(index.getIndexName(), getService(), e);
+      }
+
+      if (total > 0) {
+        logIndexRebuildBegin(logger.getSlf4jLogger(), index.getIndexName(), total, "workflows");
+        int current = 0;
+        int n = 16;
+        List<WorkflowIndexData> workflowIndexData;
+
+        int limit = 1000;
+        int offset = 0;
+        String currentMediapackageId;
+        String lastMediapackageId = "";
+        do {
+          try {
+            workflowIndexData = persistence.getWorkflowIndexData(limit, offset);
+          } catch (WorkflowDatabaseException e) {
+            logIndexRebuildError(logger.getSlf4jLogger(), index.getIndexName(), e);
+            throw new IndexRebuildException(index.getIndexName(), getService(), e);
+          }
+          if (workflowIndexData.size() > 0) {
+            offset += limit;
+            logger.debug("Got {} workflows for re-indexing", workflowIndexData.size());
+            var updatedWorkflowRange = new ArrayList<Event>();
+
+            for (WorkflowIndexData indexData : workflowIndexData) {
+              currentMediapackageId = indexData.getMediaPackageId();
+              if (currentMediapackageId.equals(lastMediapackageId)) {
+                continue;
+              }
+              current++;
+
+              var updatedWorkflowData = index.getEvent(indexData.getMediaPackageId(), indexData.getOrganizationId(),
+                        securityService.getUser());
+              updatedWorkflowData = getStateUpdateFunction(indexData).apply(updatedWorkflowData);
+              updatedWorkflowRange.add(updatedWorkflowData.get());
+
+              if (updatedWorkflowRange.size() >= n || current >= total) {
+                index.bulkEventUpdate(updatedWorkflowRange);
+                logIndexRebuildProgress(logger.getSlf4jLogger(), index.getIndexName(), total, current);
+                updatedWorkflowRange.clear();
+              }
+
+              lastMediapackageId = currentMediapackageId;
+            }
+          }
+        } while (workflowIndexData.size() > 0);
+      }
+    } catch (Exception e) {
       logIndexRebuildError(logger.getSlf4jLogger(), index.getIndexName(), e);
       throw new IndexRebuildException(index.getIndexName(), getService(), e);
-    }
-
-    if (total > 0) {
-      logIndexRebuildBegin(logger.getSlf4jLogger(), index.getIndexName(), total, "workflows");
-      List<WorkflowIndexData> workflowIndexData;
-
-      int limit = 1000;
-      int offset = 0;
-      int current = 0;
-      int n = 16;
-      String currentMediapackageId;
-      String lastMediapackageId = "";
-
-      do {
-        try {
-          workflowIndexData = persistence.getWorkflowIndexData(limit, offset);
-        } catch (WorkflowDatabaseException e) {
-          logIndexRebuildError(logger.getSlf4jLogger(), index.getIndexName(), e);
-          throw new IndexRebuildException(index.getIndexName(), getService(), e);
-        }
-        if (workflowIndexData.size() > 0) {
-          offset += limit;
-          logger.debug("Got {} workflows for re-indexing", workflowIndexData.size());
-          List<WorkflowIndexData> workflowBundle = new ArrayList<>();
-
-          for (WorkflowIndexData data : workflowIndexData) {
-            currentMediapackageId = data.getMediaPackageId();
-            if (currentMediapackageId.equals(lastMediapackageId)) {
-              continue;
-            }
-            current += 1;
-            workflowBundle.add(data);
-            if ((current % n) == 0 || current == total) {
-              updateWorkflowInstanceBundleInIndex(workflowBundle, data.getOrganizationId());
-              for (int i = 1; i <= workflowBundle.size(); i++) {
-                int logEntry = i + (current - workflowBundle.size());
-                logIndexRebuildProgress(logger.getSlf4jLogger(), index.getIndexName(), total, logEntry);
-              }
-              workflowBundle.clear();
-            }
-            lastMediapackageId = currentMediapackageId;
-          }
-        }
-      } while (workflowIndexData.size() > 0);
     }
   }
 
@@ -2312,41 +2319,18 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   /**
-   * Update a bundle of workflow instances in the API index.
+   * Get the function to update the workflow state for an event in the Elasticsearch index.
    *
-   * @param workflowBundle
-   *         workflow properties used for the update
-   * @param orgId
-   *         workflow organization id
+   * @param wfData
+   *          The workflow index data package
+   * @return the function to do the update
    */
-  private void updateWorkflowInstanceBundleInIndex(List<WorkflowIndexData> workflowBundle, String orgId) {
-    final User user = securityService.getUser();
-    List<Function<Optional<Event>, Optional<Event>>> updateFunctions = new ArrayList<>();
-    List<String> mpIds = new ArrayList<>();
-
-    for (WorkflowIndexData data: workflowBundle) {
-      logger.debug("Updating workflow instance {} of event {} in the {} index.", data.getId(),
-              data.getMediaPackageId(),  index.getIndexName());
-      Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
-        Event event = eventOpt.orElse(new Event(data.getMediaPackageId(), data.getOrganizationId()));
-        event.setWorkflowId(data.getId());
-        event.setWorkflowState(WorkflowState.values()[data.getState()]);
-        return Optional.of(event);
-      };
-      updateFunctions.add(updateFunction);
-      mpIds.add(data.getMediaPackageId());
-    }
-    try {
-      index.addOrUpdateEventBundle(mpIds, updateFunctions, orgId, user);
-      for (String mpId: mpIds) {
-        logger.debug("Workflow instance of event {} updated in the {} index.", mpId,
-                index.getIndexName());
-      }
-    } catch (SearchIndexException e) {
-      for (String mpId: mpIds) {
-        logger.error("Error updating the workflow instance of event {} in the {} index.", mpId,
-                index.getIndexName(), e);
-      }
-    }
+  private Function<Optional<Event>, Optional<Event>> getStateUpdateFunction(WorkflowIndexData wfData) {
+    return (Optional<Event> eventOpt) -> {
+      Event event = eventOpt.orElse(new Event(wfData.getMediaPackageId(), wfData.getOrganizationId()));
+      event.setWorkflowId(wfData.getId());
+      event.setWorkflowState(WorkflowState.values()[wfData.getState()]);
+      return Optional.of(event);
+    };
   }
 }

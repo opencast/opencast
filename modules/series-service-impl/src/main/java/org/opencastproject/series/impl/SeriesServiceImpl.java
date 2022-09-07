@@ -514,88 +514,73 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       List<SeriesEntity> databaseSeries = persistence.getAllSeries();
       final int total = databaseSeries.size();
       logIndexRebuildBegin(logger, index.getIndexName(), total, "series");
-      if (total > 0) {
-        String lastOrg = databaseSeries.get(0).getOrganization();
-        int current = 0;
-        int n = 16;
-        while (current < total) {
-          List<SeriesEntity> seriesBundle = new ArrayList<>();
-          for (int i = 0; i < n; i++) {
-            if (current + i >= total) {
-              break;
-            }
-            String currentOrg = databaseSeries.get(current + i).getOrganization();
-            if (currentOrg.equals(lastOrg)) {
-              seriesBundle.add(databaseSeries.get(current + i));
-            } else {
-              lastOrg = currentOrg;
-              break;
-            }
-          }
-          current += seriesBundle.size();
+      int current = 0;
+      int n = 16;
+      var updatedSeriesRange = new ArrayList<Series>();
 
-          Organization organization = orgDirectory.getOrganization(seriesBundle.get(0).getOrganization());
-          User systemUser = SecurityUtil.createSystemUser(systemUserName, organization);
-          SecurityUtil.runAs(securityService, organization, systemUser,
-                  () -> {
-                    List<String> seriesIds = new ArrayList<>();
-                    List<Function<Optional<Series>, Optional<Series>>[]> updateFunctionBundle = new ArrayList<>();
-                    for (SeriesEntity series: seriesBundle) {
-                      String seriesId = series.getSeriesId();
-                      seriesIds.add(seriesId);
-                      logger.trace("Adding series {} for organization {} to the {} index.", seriesId,
-                              series.getOrganization(), index.getIndexName());
-                      List<Function<Optional<Series>, Optional<Series>>> updateFunctions = new ArrayList<>();
-                      try {
-                        DublinCoreCatalog catalog = DublinCoreXmlFormat.read(series.getDublinCoreXML());
-                        updateFunctions.add(getMetadataUpdateFunction(seriesId, catalog, organization.getId()));
-                      } catch (IOException | ParserConfigurationException | SAXException e) {
-                        logger.error("Could not read dublin core XML of series {}.", seriesId, e);
-                        return;
-                      }
+      for (SeriesEntity series: databaseSeries) {
+        String seriesId = series.getSeriesId();
+        logger.trace("Adding series {} for organization {} to the {} index.", seriesId,
+                series.getOrganization(), index.getIndexName());
+        Organization organization = orgDirectory.getOrganization(series.getOrganization());
+        User systemUser = SecurityUtil.createSystemUser(systemUserName, organization);
+        current++;
 
-                      // remove all extended metadata catalogs first so we get rid of old data
-                      updateFunctions.add(getResetExtendedMetadataFunction());
-                      for (Map.Entry<String, byte[]> entry: series.getElements().entrySet()) {
-                        try {
-                          DublinCoreCatalog dc = DublinCoreByteFormat.read(entry.getValue());
-                          updateFunctions.add(getExtendedMetadataUpdateFunction(seriesId, dc, entry.getKey(),
-                                  organization.getId()));
-                        } catch (IOException | ParseException | ParserConfigurationException | SAXException e) {
-                          logger.error("Could not parse series element {} of series {} as a dublin core catalog, skipping.",
-                                  entry.getKey(), seriesId, e);
-                        }
-                      }
+        SecurityUtil.runAs(securityService, organization, systemUser,
+              () -> {
+                var updatedSeriesData = Optional.of(new Series(seriesId, organization.getId()));
+                try {
+                  DublinCoreCatalog catalog = DublinCoreXmlFormat.read(series.getDublinCoreXML());
+                  updatedSeriesData = getMetadataUpdateFunction(seriesId, catalog, organization.getId())
+                      .apply(updatedSeriesData);
+                } catch (IOException | ParserConfigurationException | SAXException e) {
+                  logger.error("Could not read dublincore XML of series {}.", seriesId, e);
+                  return;
+                }
 
-                      String aclStr = series.getAccessControl();
-                      if (StringUtils.isNotBlank(aclStr)) {
-                        try {
-                          AccessControlList acl = AccessControlParser.parseAcl(aclStr);
-                          updateFunctions.add(getAclUpdateFunction(seriesId, acl, organization.getId()));
-                        } catch (Exception ex) {
-                          logger.error("Unable to parse ACL of series {}.", seriesId, ex);
-                        }
-                      }
+                // remove all extended metadata catalogs first so we get rid of old data
+                updatedSeriesData = getResetExtendedMetadataFunction().apply(updatedSeriesData);
+                for (Map.Entry<String, byte[]> entry: series.getElements().entrySet()) {
+                  try {
+                    DublinCoreCatalog dc = DublinCoreByteFormat.read(entry.getValue());
 
-                      try {
-                        Map<String, String> properties = persistence.getSeriesProperties(seriesId);
-                        updateFunctions.add(getThemePropertyUpdateFunction(seriesId,
-                                Optional.ofNullable(properties.get(THEME_PROPERTY_NAME)), organization.getId()));
-                      } catch (NotFoundException | SeriesServiceDatabaseException e) {
-                        logger.error("Error reading properties of series {}", seriesId, e);
-                      }
-                      updateFunctionBundle.add(updateFunctions.toArray(new Function[0]));
-                    }
+                    updatedSeriesData = getExtendedMetadataUpdateFunction(seriesId, dc, entry.getKey(),
+                            organization.getId()).apply(updatedSeriesData);
 
-                    // do the actual index update
-                    updateSeriesBundleInIndex(seriesIds, organization.getId(),
-                            updateFunctionBundle);
+                  } catch (IOException | ParseException | ParserConfigurationException | SAXException e) {
+                    logger.error("Could not parse series element {} of series {} as a dublin core catalog, skipping.",
+                            entry.getKey(), seriesId, e);
+                  }
+                }
 
-                  });
-          for (int i = 1; i <= seriesBundle.size(); i++) {
-            int logEntry = i + (current - seriesBundle.size());
-            logIndexRebuildProgress(logger, index.getIndexName(), total, logEntry);
-          }
+                String aclStr = series.getAccessControl();
+                if (StringUtils.isNotBlank(aclStr)) {
+                  try {
+                    AccessControlList acl = AccessControlParser.parseAcl(aclStr);
+                    updatedSeriesData = getAclUpdateFunction(seriesId, acl, organization.getId())
+                        .apply(updatedSeriesData);
+                  } catch (Exception ex) {
+                    logger.error("Unable to parse ACL of series {}.", seriesId, ex);
+                  }
+                }
+
+                try {
+                  Map<String, String> properties = persistence.getSeriesProperties(seriesId);
+                  updatedSeriesData = getThemePropertyUpdateFunction(seriesId,
+                          Optional.ofNullable(properties.get(THEME_PROPERTY_NAME)), organization.getId())
+                      .apply(updatedSeriesData);
+                } catch (NotFoundException | SeriesServiceDatabaseException e) {
+                  logger.error("Error reading properties of series {}", seriesId, e);
+                }
+                updatedSeriesRange.add(updatedSeriesData.get());
+
+              });
+
+        if (updatedSeriesRange.size() >= n || current >= databaseSeries.size()) {
+          // do the actual index update
+          index.bulkSeriesUpdate(updatedSeriesRange);
+          logIndexRebuildProgress(logger, index.getIndexName(), total, current);
+          updatedSeriesRange.clear();
         }
       }
     } catch (Exception e) {
@@ -892,42 +877,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     } catch (SearchIndexException e) {
       logger.error("Series {} couldn't be updated in the {} index.", seriesId, index.getIndexName(), e);
       return Optional.empty();
-    }
-  }
-
-  /**
-   * Update a bundle of series in an API index.
-   *
-   * @param seriesIds
-   *          The series ids
-   * @param updateFunctionBundle
-   *          The functions to do the actual updating
-   * @param orgId
-   *          The id of the current organization
-   * @return the updated series (optional)
-   */
-  private  List<Optional<Series>> updateSeriesBundleInIndex(List<String> seriesIds, String orgId,
-          List<Function<Optional<Series>, Optional<Series>>[]> updateFunctionBundle) {
-    User user = securityService.getUser();
-    List<Function<Optional<Series>, Optional<Series>>> updateFunctions = new ArrayList<>();
-
-    for (int i = 0; i < seriesIds.size(); i++) {
-      Function<Optional<Series>, Optional<Series>> updateFunction =
-              Arrays.stream(updateFunctionBundle.get(i)).reduce(Function.identity(), Function::andThen);
-      updateFunctions.add(updateFunction);
-    }
-
-    try {
-      List<Optional<Series>> seriesOptBundle = index.addOrUpdateSeriesBundle(seriesIds, updateFunctions, orgId, user);
-      for (String seriesId: seriesIds) {
-        logger.debug("Series {} updated in the {} index", seriesId, index.getIndexName());
-      }
-      return seriesOptBundle;
-    } catch (SearchIndexException e) {
-      for (String seriesId: seriesIds) {
-        logger.error("Series {} couldn't be updated in the {} index.", seriesId, index.getIndexName(), e);
-      }
-      return new ArrayList<>();
     }
   }
 }

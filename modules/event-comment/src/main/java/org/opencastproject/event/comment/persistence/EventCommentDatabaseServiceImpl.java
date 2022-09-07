@@ -443,58 +443,6 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     }
   }
 
-  private void updateBundleIndex(List<String> eventIds, List<Boolean> hasCommentsList,
-          List<Boolean> hasOpenCommentsList, List<List<EventComment>> commentsList, List<Boolean> needsCuttingList,
-          String organization, User user) {
-    List<Function<Optional<Event>, Optional<Event>>> updateFunctions = new ArrayList<>();
-    for (int i = 0; i < eventIds.size(); i++) {
-      List<EventComment> comments = commentsList.get(i);
-      String eventId = eventIds.get(i);
-      Boolean hasComments = hasCommentsList.get(i);
-      Boolean hasOpenComments = hasOpenCommentsList.get(i);
-      Boolean needsCutting = needsCuttingList.get(i);
-      logger.debug("Updating comment status of event {} in the {} index.", eventId, index.getIndexName());
-      if (!hasComments && hasOpenComments) {
-        throw new IllegalStateException(
-                "Invalid comment update request: You can't have open comments without having any comments!");
-      }
-      if (!hasOpenComments && needsCutting) {
-        throw new IllegalStateException(
-                "Invalid comment update request: You can't have an needs cutting comment without having any open "
-                        + "comments!");
-      }
-
-      Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
-        if (eventOpt.isEmpty()) {
-          logger.debug("Event {} not found for comment status updating", eventId);
-          return Optional.empty();
-        }
-        Event event = eventOpt.get();
-        event.setHasComments(hasComments);
-        event.setHasOpenComments(hasOpenComments);
-        List<Comment> indexComments = new ArrayList<Comment>();
-        for (EventComment comment : comments) {
-          indexComments.add(new Comment(
-                  comment.getId().get().toString(), comment.getReason(), comment.getText(), comment.isResolvedStatus()
-          ));
-          // Do we want to include replies? Maybe not, no good reason to filter for them?
-        }
-        event.setComments(indexComments);
-        event.setNeedsCutting(needsCutting);
-        return Optional.of(event);
-      };
-      updateFunctions.add(updateFunction);
-    }
-
-    try {
-      index.addOrUpdateEventBundle(eventIds, updateFunctions, organization, user);
-    } catch (SearchIndexException e) {
-      for (String eventId: eventIds) {
-        logger.error("Error updating comment status of event {} in the {} index:", eventId, index.getIndexName(), e);
-      }
-    }
-  }
-
   private static final Fn<EventComment, Boolean> filterOpenComments = new Fn<EventComment, Boolean>() {
     @Override
     public Boolean apply(EventComment comment) {
@@ -513,48 +461,35 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   public void repopulate() throws IndexRebuildException {
     try {
       final int total = countComments();
+      logIndexRebuildBegin(logger, index.getIndexName(), total, "events with comment");
       final int[] current = new int[1];
       current[0] = 0;
       int n = 16;
-      logIndexRebuildBegin(logger, index.getIndexName(), total, "events with comment");
-      List<String> eventIds = new ArrayList<>();
-      List<Boolean> hasCommentsList = new ArrayList<>();
-      List<Boolean> hasOpenCommentsList = new ArrayList<>();
-      List<Boolean> needsCuttingList = new ArrayList<>();
-      List<List<EventComment>> commentsList = new ArrayList<>();
+      var updatedEventRange = new ArrayList<Event>();
+
       final Map<String, List<String>> eventsWithComments = getEventsWithComments();
       for (String orgId : eventsWithComments.keySet()) {
         Organization organization = organizationDirectoryService.getOrganization(orgId);
         User systemUser = SecurityUtil.createSystemUser(cc, organization);
         SecurityUtil.runAs(securityService, organization, systemUser,
                 () -> {
+                  int i = 0;
                   for (String eventId : eventsWithComments.get(orgId)) {
                     try {
-                      List<EventComment> comments = getComments(eventId);
-                      commentsList.add(comments);
-                      eventIds.add(eventId);
-                      hasCommentsList.add(!comments.isEmpty());
-                      hasOpenCommentsList.add(!Stream.$(comments).filter(filterOpenComments).toList().isEmpty());
-                      needsCuttingList.add(!Stream.$(comments).filter(filterNeedsCuttingComment).toList().isEmpty());
+                      current[0] += getComments(eventId).size();
+                      i++;
 
-                      current[0] += comments.size();
-                      if ((current[0] % n) == 0 || current[0] == eventsWithComments.get(orgId).size()) {
-                        updateBundleIndex(eventIds, hasCommentsList, hasOpenCommentsList, commentsList,
-                                needsCuttingList, orgId, systemUser);
-                        for (int i = 1; i <= eventIds.size(); i++) {
-                          int logEntry = i + (current[0] - eventIds.size());
-                          logIndexRebuildProgress(logger, index.getIndexName(), total, logEntry);
-                        }
-                        commentsList.clear();
-                        eventIds.clear();
-                        hasCommentsList.clear();
-                        hasOpenCommentsList.clear();
-                        needsCuttingList.clear();
+                      var updatedEventData = index.getEvent(eventId, orgId, securityService.getUser());
+                      updatedEventData = getEventUpdateFunction(eventId).apply(updatedEventData);
+                      updatedEventRange.add(updatedEventData.get());
+
+                      if (updatedEventRange.size() >= n || i >= eventsWithComments.get(orgId).size()) {
+                        index.bulkEventUpdate(updatedEventRange);
+                        logIndexRebuildProgress(logger, index.getIndexName(), total, current[0]);
+                        updatedEventRange.clear();
                       }
                     } catch (Throwable t) {
-                      for (String event: eventIds) {
-                        logSkippingElement(logger, "comment of event", event, organization, t);
-                      }
+                      logSkippingElement(logger, "comment of event", eventId, organization, t);
                     }
                   }
                 });
@@ -568,5 +503,54 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   @Override
   public IndexRebuildService.Service getService() {
     return IndexRebuildService.Service.Comments;
+  }
+  /**
+   * Get the function to update a commented event in the Elasticsearch index.
+   *
+   * @param eventId
+   *          The id of the current event
+   * @return the function to do the update
+   */
+  private Function<Optional<Event>, Optional<Event>> getEventUpdateFunction(String eventId) {
+    return (Optional<Event> eventOpt) -> {
+      List<EventComment> comments;
+      try {
+        if (eventOpt.isEmpty()) {
+          logger.debug("Event {} not found for comment status updating", eventId);
+          return Optional.empty();
+        }
+        comments = getComments(eventId);
+        Boolean hasComments = !comments.isEmpty();
+        Boolean hasOpenComments = !Stream.$(comments).filter(filterOpenComments).toList().isEmpty();
+        Boolean needsCutting = !Stream.$(comments).filter(filterNeedsCuttingComment).toList().isEmpty();
+
+        logger.debug("Updating comment status of event {} in the {} index.", eventId, index.getIndexName());
+        if (!hasComments && hasOpenComments) {
+          throw new IllegalStateException(
+                  "Invalid comment update request: You can't have open comments without having any comments!");
+        }
+        if (!hasOpenComments && needsCutting) {
+          throw new IllegalStateException(
+                  "Invalid comment update request: You can't have an needs cutting comment without having any open "
+                          + "comments!");
+        }
+        Event event = eventOpt.get();
+        event.setHasComments(hasComments);
+        event.setHasOpenComments(hasOpenComments);
+        List<Comment> indexComments = new ArrayList<Comment>();
+        for (EventComment comment : comments) {
+          indexComments.add(new Comment(
+                  comment.getId().get().toString(), comment.getReason(), comment.getText(), comment.isResolvedStatus()
+          ));
+          // Do we want to include replies? Maybe not, no good reason to filter for them?
+        }
+        event.setComments(indexComments);
+        event.setNeedsCutting(needsCutting);
+        return Optional.of(event);
+      } catch (EventCommentDatabaseException e) {
+        logger.error("Unable to get comments from event {}", eventId, e);
+        return Optional.empty();
+      }
+    };
   }
 }

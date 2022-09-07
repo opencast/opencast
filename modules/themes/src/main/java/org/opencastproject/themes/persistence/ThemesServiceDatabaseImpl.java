@@ -26,13 +26,13 @@ import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
 import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.themes.Theme;
 import org.opencastproject.themes.ThemesServiceDatabase;
 import org.opencastproject.util.NotFoundException;
@@ -332,35 +332,39 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   }
 
   @Override
-  public void repopulate() {
-    for (final Organization organization : organizationDirectoryService.getOrganizations()) {
-      User systemUser = SecurityUtil.createSystemUser(cc, organization);
-      SecurityUtil.runAs(securityService, organization, systemUser, () -> {
+  public void repopulate() throws IndexRebuildException {
+    try {
+      for (final Organization organization : organizationDirectoryService.getOrganizations()) {
         try {
           final List<Theme> themes = getThemes();
           int total = themes.size();
+          logIndexRebuildBegin(logger, index.getIndexName(), total, "themes", organization);
           int current = 0;
           int n = 16;
-          logIndexRebuildBegin(logger, index.getIndexName(), total, "themes", organization);
-          List<Theme> themeBundle = new ArrayList<>();
+          List<IndexTheme> updatedThemeRange = new ArrayList<>();
 
           for (Theme theme : themes) {
             current++;
-            themeBundle.add(theme);
-            if ((current % n) == 0 || current == themes.size()) {
-              updateThemeBundleInIndex(themeBundle, organization.getId(), systemUser);
-              for (int i = 1; i <= themeBundle.size(); i++) {
-                int logEntry = i + (current - themeBundle.size());
-                logIndexRebuildProgress(logger, index.getIndexName(), total, logEntry);
-              }
-              themeBundle.clear();
+
+            var updatedThemeData = index.getTheme(theme.getId().get(), organization.toString(),
+                        securityService.getUser());
+            updatedThemeData = getThemeUpdateFunction(theme, organization.toString()).apply(updatedThemeData);
+            updatedThemeRange.add(updatedThemeData.get());
+
+            if (updatedThemeRange.size() >= n || current >= themes.size()) {
+              index.bulkThemeUpdate(updatedThemeRange);
+              logIndexRebuildProgress(logger, index.getIndexName(), total, current);
+              updatedThemeRange.clear();
             }
           }
         } catch (ThemesServiceDatabaseException e) {
           logger.error("Unable to get themes from the database", e);
           throw new IllegalStateException(e);
         }
-      });
+      }
+    } catch (Exception e) {
+      logIndexRebuildError(logger, index.getIndexName(), e);
+      throw new IndexRebuildException(index.getIndexName(), getService(), e);
     }
   }
 
@@ -446,68 +450,40 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
     }
   }
   /**
-   * Update the themes in the ElasticSearch index.
-   *  @param themeBundle
-   *           the themes to update
-   * @param index
-   *           the index to update
+   * Get the function to update a theme in the Elasticsearch index.
+   *
+   * @param theme
+   *          The theme to update
    * @param orgId
-   *           the organization the themes belong to
-   * @param user
+   *          The id of the current organization
+   * @return the function to do the update
    */
-  private void updateThemeBundleInIndex(List<Theme> themeBundle, String orgId,
-          User user) {
-    for (Theme theme: themeBundle) {
-      logger.debug("Updating the theme with id '{}', name '{}', description '{}', organization '{}' in the {} index.",
-              theme.getId(), theme.getName(), theme.getDescription(), orgId, index.getIndexName());
-    }
-    try {
-      List<Function<Optional<IndexTheme>, Optional<IndexTheme>>> updateFunctions = new ArrayList<>();
-      List<Long> ids = new ArrayList<>();
-      for (Theme theme: themeBundle) {
-        if (theme.getId().isNone()) {
-          throw new IllegalArgumentException("Can't put theme in index without valid id!");
-        }
-        Long id = theme.getId().get();
-        ids.add(id);
+  private Function<Optional<IndexTheme>, Optional<IndexTheme>> getThemeUpdateFunction(Theme theme, String orgId) {
+    return (Optional<IndexTheme> indexThemeOpt) -> {
+      IndexTheme indexTheme;
+      indexTheme = indexThemeOpt.orElseGet(() -> new IndexTheme(theme.getId().get(), orgId));
+      String creator = StringUtils.isNotBlank(theme.getCreator().getName())
+              ? theme.getCreator().getName() : theme.getCreator().getUsername();
 
-        // the function to do the actual updating
-        Function<Optional<IndexTheme>, Optional<IndexTheme>> updateFunction = (Optional<IndexTheme> indexThemeOpt) -> {
-          IndexTheme indexTheme;
-          indexTheme = indexThemeOpt.orElseGet(() -> new IndexTheme(id, orgId));
-          String creator = StringUtils.isNotBlank(theme.getCreator().getName())
-                  ? theme.getCreator().getName() : theme.getCreator().getUsername();
-
-          indexTheme.setCreationDate(theme.getCreationDate());
-          indexTheme.setDefault(theme.isDefault());
-          indexTheme.setName(theme.getName());
-          indexTheme.setDescription(theme.getDescription());
-          indexTheme.setCreator(creator);
-          indexTheme.setBumperActive(theme.isBumperActive());
-          indexTheme.setBumperFile(theme.getBumperFile());
-          indexTheme.setTrailerActive(theme.isTrailerActive());
-          indexTheme.setTrailerFile(theme.getTrailerFile());
-          indexTheme.setTitleSlideActive(theme.isTitleSlideActive());
-          indexTheme.setTitleSlideBackground(theme.getTitleSlideBackground());
-          indexTheme.setTitleSlideMetadata(theme.getTitleSlideMetadata());
-          indexTheme.setLicenseSlideActive(theme.isLicenseSlideActive());
-          indexTheme.setLicenseSlideBackground(theme.getLicenseSlideBackground());
-          indexTheme.setLicenseSlideDescription(theme.getLicenseSlideDescription());
-          indexTheme.setWatermarkActive(theme.isWatermarkActive());
-          indexTheme.setWatermarkFile(theme.getWatermarkFile());
-          indexTheme.setWatermarkPosition(theme.getWatermarkPosition());
-          return Optional.of(indexTheme);
-        };
-        updateFunctions.add(updateFunction);
-      }
-      index.addOrUpdateThemeBundle(ids, updateFunctions, orgId, user);
-      for (Theme theme: themeBundle) {
-        logger.debug("Updated the theme {} in the {} index", theme.getId(), index.getIndexName());
-      }
-    } catch (SearchIndexException e) {
-      for (Theme theme: themeBundle) {
-        logger.error("Error updating the theme {} in the {} index", theme.getId(), index.getIndexName(), e);
-      }
-    }
+      indexTheme.setCreationDate(theme.getCreationDate());
+      indexTheme.setDefault(theme.isDefault());
+      indexTheme.setName(theme.getName());
+      indexTheme.setDescription(theme.getDescription());
+      indexTheme.setCreator(creator);
+      indexTheme.setBumperActive(theme.isBumperActive());
+      indexTheme.setBumperFile(theme.getBumperFile());
+      indexTheme.setTrailerActive(theme.isTrailerActive());
+      indexTheme.setTrailerFile(theme.getTrailerFile());
+      indexTheme.setTitleSlideActive(theme.isTitleSlideActive());
+      indexTheme.setTitleSlideBackground(theme.getTitleSlideBackground());
+      indexTheme.setTitleSlideMetadata(theme.getTitleSlideMetadata());
+      indexTheme.setLicenseSlideActive(theme.isLicenseSlideActive());
+      indexTheme.setLicenseSlideBackground(theme.getLicenseSlideBackground());
+      indexTheme.setLicenseSlideDescription(theme.getLicenseSlideDescription());
+      indexTheme.setWatermarkActive(theme.isWatermarkActive());
+      indexTheme.setWatermarkFile(theme.getWatermarkFile());
+      indexTheme.setWatermarkPosition(theme.getWatermarkPosition());
+      return Optional.of(indexTheme);
+    };
   }
 }
