@@ -268,7 +268,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   function initTranslate(language, funcSuccess, funcError) {
     var path = Engage.getPluginPath('EngagePluginVideoVideoJS').replace(/(\.\.\/)/g, '');
     /* this solution is really bad, fix it... */
-    var jsonstr = window.location.origin + '/engage/theodul/' + path;
+    var jsonstr = window.location.origin + '/engage/theodul-deprecated/' + path;
 
     Engage.log('Controls: selecting language ' + language);
     jsonstr += 'language/' + language + '.json';

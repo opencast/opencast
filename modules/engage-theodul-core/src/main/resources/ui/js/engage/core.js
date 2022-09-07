@@ -461,19 +461,19 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'b
   function loadTemplate(plugin, plugin_name, plugin_path) {
     if (plugin.template !== 'none') {
       // load template asynchronously
-      $.get('engage/theodul/' + plugin_path + plugin.template, function (template) {
+      $.get('engage/theodul-deprecated/' + plugin_path + plugin.template, function (template) {
         var template_data = {};
         // add template data if not undefined
         if (plugin.template_data !== undefined) {
           template_data = plugin.template_data;
         }
         // add full plugin path to the template data
-        template_data.plugin_path = 'engage/theodul/' + plugin_path;
+        template_data.plugin_path = 'engage/theodul-deprecated/' + plugin_path;
         // process the template using underscore and set it in the plugin obj
         var _template = _.template(template);
         plugin.templateProcessed = _template(template_data);
         plugin.template = template;
-        plugin.pluginPath = 'engage/theodul/' + plugin_path;
+        plugin.pluginPath = 'engage/theodul-deprecated/' + plugin_path;
         if (plugin.insertIntoDOM) {
           // load the compiled HTML into the component
           engageCore.pluginView.insertPlugin(plugin, plugin_name, translationData);
@@ -522,7 +522,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'b
             link.attr({
               type: 'text/css',
               rel: 'stylesheet',
-              href: 'engage/theodul/' + plugin_path + style_path
+              href: 'engage/theodul-deprecated/' + plugin_path + style_path
             });
             $('head').append(link);
           }
@@ -533,7 +533,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'b
           link.attr({
             type: 'text/css',
             rel: 'stylesheet',
-            href: 'engage/theodul/' + plugin_path + plugin.styles
+            href: 'engage/theodul-deprecated/' + plugin_path + plugin.styles
           });
           $('head').append(link);
         }
@@ -543,19 +543,19 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'b
       // video if the player controls are below it
       if (plugin.template_topIfBottom && plugin.template_topIfBottom !== 'none') {
         // load template asynchronously
-        $.get('engage/theodul/' + plugin_path + plugin.template_topIfBottom, function (template) {
+        $.get('engage/theodul-deprecated/' + plugin_path + plugin.template_topIfBottom, function (template) {
           var template_data = {};
           // add template data if not undefined
           if (plugin.template_data_topIfBottom !== undefined) {
             template_data = plugin.template_data_topIfBottom;
           }
           // add full plugin path to the template data
-          template_data.plugin_path = 'engage/theodul/' + plugin_path;
+          template_data.plugin_path = 'engage/theodul-deprecated/' + plugin_path;
           // process the template using underscore and set it in the plugin obj
           var _template = _.template(template);
           plugin.templateProcessed_topIfBottom = _template(template_data);
           plugin.template_topIfBottom = template;
-          plugin.pluginPath_topIfBottom = 'engage/theodul/' + plugin_path;
+          plugin.pluginPath_topIfBottom = 'engage/theodul-deprecated/' + plugin_path;
           loadTemplate(plugin, plugin_name, plugin_path);
         });
       } else {

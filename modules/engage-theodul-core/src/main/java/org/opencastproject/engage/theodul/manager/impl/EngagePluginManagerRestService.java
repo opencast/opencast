@@ -61,7 +61,7 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Engage Plugin Manager REST Endpoint",
         "opencast.service.type=org.opencastproject.engage.plugin.manager",
-        "opencast.service.path=/engage/theodul/manager"
+        "opencast.service.path=/engage/theodul-deprecated/manager"
     },
     immediate = true,
     service = EngagePluginManagerRestService.class

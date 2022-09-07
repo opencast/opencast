@@ -59,7 +59,7 @@ public class TheodulCoreStaticResources {
   static final String DEFAULT_OVERRIDE_DIR = "theodul.web";
 
   // path under which the static resources will be served
-  static final String URL_ALIAS = "/engage/theodul/ui";
+  static final String URL_ALIAS = "/engage/theodul-deprecated/ui";
 
   // classpath under which resources are found inside bundle
   static final String UI_CLASSPATH = "/ui";

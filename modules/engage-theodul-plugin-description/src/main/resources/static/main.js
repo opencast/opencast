@@ -102,7 +102,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/core', 'moment'],
 
   function initTranslate(language) {
     var path = Engage.getPluginPath('EngagePluginDescription').replace(/(\.\.\/)/g, '');
-    var jsonstr = window.location.origin + '/engage/theodul/' + path; // this solution is really bad, fix it...
+    var jsonstr = window.location.origin + '/engage/theodul-deprecated/' + path; // this soln is really bad, fix it...
 
     Engage.log('Controls: selecting language ' + language);
     jsonstr += 'language/' + language + '.json';

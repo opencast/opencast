@@ -77,7 +77,7 @@ define(['jquery', 'underscore', 'backbone', 'engage/core'], function ($, _, Back
   function initTranslate(language, funcSuccess, funcError) {
     var path = Engage.getPluginPath('EngagePluginTabDownloads').replace(/(\.\.\/)/g, '');
     Engage.log('Tab:Downloads: Choosing ' + language + ' translations');
-    const languageURL = `/engage/theodul/${path}language/${language}.json`;
+    const languageURL = `/engage/theodul-deprecated/${path}language/${language}.json`;
 
     $.ajax({
       url: languageURL,

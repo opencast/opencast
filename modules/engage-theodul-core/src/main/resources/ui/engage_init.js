@@ -36,6 +36,6 @@ requirejs.config({
         }
     }
 });
-var PLUGIN_PATH = "/engage/theodul/plugin/";
+var PLUGIN_PATH = "/engage/theodul-deprecated/plugin/";
 // start core logic
 require(["engage/core"]);
