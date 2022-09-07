@@ -853,7 +853,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       logger.info("Start adding catalog {} from URL {} on mediapackage {}", elementId, uri, mediaPackage);
       URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
       if (MediaPackageElements.SERIES.equals(flavor)) {
-        updateSeries(uri);
+        updateSeries(newUrl);
       }
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Catalog,
               flavor);
@@ -1239,6 +1239,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         agentProperties.put(key, properties.get(key));
       }
     }
+
+    // Remove workflow configuration prefixes from the workflow properties
+    workflowProperties = removePrefixFromProperties(workflowProperties);
+
     try {
       schedulerService.addEvent(period.getStart(), period.getEnd(), captureAgent, new HashSet<>(), mediaPackage,
               workflowProperties, agentProperties, Opt.none());

@@ -284,8 +284,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               name = "limit",
               isRequired = false,
               type = RestParameter.Type.STRING,
-              defaultValue = "20",
-              description = "The maximum number of items to return per page."
+              defaultValue = "100",
+              description = "The maximum number of items to return per page. -1 translates to everything, however, "
+                      + "non-admin users will only ever get a maximum of 2000 results. 0 is equal to 100."
           ),
           @RestParameter(
               name = "offset",
@@ -425,8 +426,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               name = "limit",
               isRequired = false,
               type = RestParameter.Type.STRING,
-              defaultValue = "20",
-              description = "The maximum number of items to return per page."
+              defaultValue = "100",
+              description = "The maximum number of items to return per page. -1 translates to everything, however, "
+                      + "non-admin users will only ever get a maximum of 2000 results. 0 is equal to 100."
           ),
           @RestParameter(
               name = "offset",
@@ -606,8 +608,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               name = "limit",
               isRequired = false,
               type = RestParameter.Type.STRING,
-              defaultValue = "20",
-              description = "The maximum number of items to return per page."
+              defaultValue = "100",
+              description = "The maximum number of items to return per page. -1 translates to everything, however, "
+                      + "non-admin users will only ever get a maximum of 2000 results. 0 is equal to 100."
           ),
           @RestParameter(
               name = "offset",

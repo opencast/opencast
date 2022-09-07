@@ -22,6 +22,8 @@
 
 package org.opencastproject.search.api;
 
+import static org.opencastproject.search.api.SearchQuery.DEFAULT_LIMIT;
+
 import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
@@ -31,7 +33,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -50,7 +51,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(
     name = "search-results",
     namespace = "http://search.opencastproject.org",
-    propOrder = { "query", "resultSet", "limit" }
+    propOrder = { "query", "resultSet" }
 )
 @XmlRootElement(name = "search-results", namespace = "http://search.opencastproject.org")
 public class SearchResultImpl implements SearchResult {
@@ -98,9 +99,9 @@ public class SearchResultImpl implements SearchResult {
   @XmlAttribute
   private long offset = 0;
 
-  /** The pagination limit. Default is 10. */
-  @XmlElement
-  private Optional<Long> limit = Optional.of(10L);
+  /** The pagination limit. Default is 100. */
+  @XmlAttribute
+  private long limit = DEFAULT_LIMIT;
 
   /** The number of hits total, regardless of the limit */
   @XmlAttribute
@@ -195,7 +196,7 @@ public class SearchResultImpl implements SearchResult {
    *
    * @see org.opencastproject.search.api.SearchResult#getLimit()
    */
-  public Optional<Long> getLimit() {
+  public long getLimit() {
     return limit;
   }
 
@@ -205,7 +206,7 @@ public class SearchResultImpl implements SearchResult {
    * @param limit
    *          The limit.
    */
-  public void setLimit(Optional<Long> limit) {
+  public void setLimit(long limit) {
     this.limit = limit;
   }
 
@@ -253,8 +254,8 @@ public class SearchResultImpl implements SearchResult {
    * @see org.opencastproject.search.api.SearchResult#getPage()
    */
   public long getPage() {
-    if (limit.isPresent() && limit.get() != 0) {
-      return offset / limit.get();
+    if (limit != 0) {
+      return offset / limit;
     }
     return 0;
   }
