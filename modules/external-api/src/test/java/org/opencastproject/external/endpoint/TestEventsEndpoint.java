@@ -196,13 +196,13 @@ public class TestEventsEndpoint extends EventsEndpoint {
     // Two Pubs
     Event twoPublicationsEvent = new Event(TWO_PUBLICATIONS, defaultOrg.getId());
     MediaPackage twoPublicationsMP = EasyMock.createMock(MediaPackage.class);
-    Publication theodulPublication = new PublicationImpl(ENGAGE_PUBLICATION_ID, "EVENTS.EVENTS.DETAILS.PUBLICATIONS.ENGAGE",
-            new URI("http://mh-allinone.localdomain/engage/theodul/ui/core.html?id=af1a51ce-fb61-4dae-9d5a-f85b9e4fcc99"),
+    Publication paellaPublication = new PublicationImpl(ENGAGE_PUBLICATION_ID, "EVENTS.EVENTS.DETAILS.PUBLICATIONS.ENGAGE",
+            new URI("http://mh-allinone.localdomain/paella/ui/watch.html?id=af1a51ce-fb61-4dae-9d5a-f85b9e4fcc99"),
             MimeType.mimeType("not", "used"));
     Publication oaipmh = new PublicationImpl(OAIPMH_PUBLICATION_ID, "oaipmh",
             new URI("http://mh-allinone.localdomain/oaipmh/default?verb=ListMetadataFormats&identifier=af1a51ce-fb61-4dae-9d5a-f85b9e4fcc99"),
             MimeType.mimeType("not", "used"));
-    EasyMock.expect(twoPublicationsMP.getPublications()).andReturn(new Publication[] { theodulPublication, oaipmh })
+    EasyMock.expect(twoPublicationsMP.getPublications()).andReturn(new Publication[] { paellaPublication, oaipmh })
             .anyTimes();
     EasyMock.expect(indexService.getEvent(TWO_PUBLICATIONS, elasticsearchIndex)).andReturn(Opt.some(twoPublicationsEvent))
             .anyTimes();

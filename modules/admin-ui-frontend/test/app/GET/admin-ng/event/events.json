@@ -102,7 +102,7 @@
         {
           "name": "EVENTS.EVENTS.DETAILS.PUBLICATIONS.ENGAGE",
           "id": "engage-player",
-          "url": "http://localhost:8080/engage/theodul/ui/core.html?id=c990ea15-e5ed-4fcf-bc17-cb070091c343"
+          "url": "http://localhost:8080/paella/ui/watch.html?id=c990ea15-e5ed-4fcf-bc17-cb070091c343"
         },
         {
           "name": "EVENTS.EVENTS.DETAILS.PUBLICATIONS.CUSTOM",

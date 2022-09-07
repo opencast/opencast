@@ -118,19 +118,6 @@
     <module>modules/email-template-service-impl</module>
     <module>modules/engage-paella-player-7</module>
     <module>modules/engage-paella-player</module>
-    <module>modules/engage-theodul-api</module>
-    <module>modules/engage-theodul-core</module>
-    <module>modules/engage-theodul-plugin-archetype</module>
-    <module>modules/engage-theodul-plugin-controls</module>
-    <module>modules/engage-theodul-plugin-custom-matomo</module>
-    <module>modules/engage-theodul-plugin-custom-mhConnection</module>
-    <module>modules/engage-theodul-plugin-custom-notifications</module>
-    <module>modules/engage-theodul-plugin-description</module>
-    <module>modules/engage-theodul-plugin-tab-description</module>
-    <module>modules/engage-theodul-plugin-tab-downloads</module>
-    <module>modules/engage-theodul-plugin-tab-shortcuts</module>
-    <module>modules/engage-theodul-plugin-tab-slidetext</module>
-    <module>modules/engage-theodul-plugin-video-videojs</module>
     <module>modules/engage-ui</module>
     <module>modules/event-comment</module>
     <module>modules/execute-api</module>
