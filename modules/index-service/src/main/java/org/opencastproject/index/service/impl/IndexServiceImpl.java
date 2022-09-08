@@ -1488,6 +1488,28 @@ public class IndexServiceImpl implements IndexService {
 
   @Override
   public boolean removeEvent(String id) throws NotFoundException, UnauthorizedException {
+    boolean unauthorizedWorkflow = false;
+    boolean notFoundWorkflow = false;
+    boolean removedWorkflow = false;
+    try {
+      List<WorkflowInstance> workflowInstances = workflowService.getWorkflowInstancesByMediaPackage(id);
+      if (workflowInstances.isEmpty()) {
+        notFoundWorkflow = true;
+      } else {
+        for (WorkflowInstance instance : workflowInstances) {
+          workflowService.stop(instance.getId());
+          workflowService.remove(instance.getId());
+        }
+        removedWorkflow = true;
+      }
+    } catch (NotFoundException e) {
+      notFoundWorkflow = true;
+    } catch (UnauthorizedException e) {
+      unauthorizedWorkflow = true;
+    } catch (WorkflowException e) {
+      logger.error("Unable to remove the event '{}' because removing workflow failed:", id, e);
+    }
+
     boolean unauthorizedScheduler = false;
     boolean notFoundScheduler = false;
     boolean removedScheduler = false;
@@ -1502,27 +1524,6 @@ public class IndexServiceImpl implements IndexService {
       logger.error("Unable to remove the event '{}' from scheduler service:", id, e);
     }
 
-    boolean unauthorizedWorkflow = false;
-    boolean notFoundWorkflow = false;
-    boolean removedWorkflow = false;
-    try {
-      List<WorkflowInstance> workflowInstances = workflowService.getWorkflowInstancesByMediaPackage(id);
-      if (workflowInstances.size() == 0) {
-        notFoundWorkflow = true;
-      }
-      for (WorkflowInstance instance : workflowInstances) {
-        workflowService.stop(instance.getId());
-        workflowService.remove(instance.getId());
-      }
-      removedWorkflow = true;
-    } catch (NotFoundException e) {
-      notFoundWorkflow = true;
-    } catch (UnauthorizedException e) {
-      unauthorizedWorkflow = true;
-    } catch (WorkflowException e) {
-      logger.error("Unable to remove the event '{}' because removing workflow failed:", id, e);
-    }
-
     boolean unauthorizedArchive = false;
     boolean notFoundArchive = false;
     boolean removedArchive = false;
@@ -1532,8 +1533,10 @@ public class IndexServiceImpl implements IndexService {
       final AResult r = q.select(q.nothing()).where(p).run();
       if (r.getSize() > 0) {
         q.delete(DEFAULT_OWNER, q.snapshot()).where(p).run();
+        removedArchive = true;
+      } else {
+        notFoundArchive = true;
       }
-      removedArchive = true;
     } catch (AssetManagerException e) {
       if (e.getCause() instanceof UnauthorizedException) {
         unauthorizedArchive = true;

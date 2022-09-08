@@ -53,7 +53,6 @@ import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
@@ -722,7 +721,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     JSONArray resultsArray = getTranscriptionResult(jsonObj);
     if (resultsArray != null) {
       // Save the results into a collection
-      workspace.putInCollection(TRANSCRIPT_COLLECTION, buildResultsFileName(jobId),
+      workspace.putInCollection(TRANSCRIPT_COLLECTION, jobId + ".json",
               new ByteArrayInputStream(jsonObj.toJSONString().getBytes()));
     }
   }
@@ -748,7 +747,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       }
 
       // Results already saved?
-      URI uri = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, buildResultsFileName(jobId));
+      URI uri = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, jobId + ".json");
       try {
         workspace.get(uri);
       } catch (Exception e) {
@@ -910,10 +909,6 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     } catch (Exception e) {
       logger.error("Could not send email: {}\n{}", subject, body, e);
     }
-  }
-
-  private String buildResultsFileName(String jobId) {
-    return PathSupport.toSafeName(jobId + ".json");
   }
 
   private void cancelTranscription(String jobId, String message) {

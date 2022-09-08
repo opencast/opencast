@@ -34,18 +34,14 @@ XML_DECLARATION = "<?xml version='1.0' encoding='UTF-8'?>"
 
 # DB functions
 def create_connection(host_name, user_name, user_password, db_name):
-    try:
-        connection = mysql.connector.connect(
-            host=host_name,
-            user=user_name,
-            passwd=user_password,
-            database=db_name
-        )
-        connection.row_factory = lambda cursor, row: row[0]
-        print("Connection to database successful")
-    except mysql.connector.errors.ProgrammingError:
-        print("Collation error found, try to use an older version of mysql_connector_python")
-        quit()
+    connection = mysql.connector.connect(
+        host=host_name,
+        user=user_name,
+        passwd=user_password,
+        database=db_name
+    )
+    connection.row_factory = lambda cursor, row: row[0]
+    print("Connection to database successful")
     return connection
 
 
