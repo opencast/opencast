@@ -38,10 +38,16 @@ import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
+/**
+ * Helper class defining common query functions that can be used with DBSession query execution methods.
+ */
 public final class Queries {
   private Queries() {
   }
 
+  /**
+   * Execute a typed named query.
+   */
   public static final TypedQueriesBase namedQuery = new TypedQueriesBase() {
     @Override
     protected Query createQuery(EntityManager em, String queryName, Object... params) {
@@ -54,6 +60,9 @@ public final class Queries {
     }
   };
 
+  /**
+   * Execute a native SQL query.
+   */
   public static final QueriesBase nativeQuery = new QueriesBase() {
     @Override
     protected Query createQuery(EntityManager em, String sql, Object... params) {
@@ -62,10 +71,26 @@ public final class Queries {
   };
 
   public abstract static class TypedQueriesBase extends QueriesBase {
+    /**
+     * Find entity by its id.
+     *
+     * @param clazz Entity class.
+     * @param id ID of the entity.
+     * @return The entity or null if not found.
+     * @param <T> Entity type.
+     */
     public <T> Function<EntityManager, T> findById(Class<T> clazz, Object id) {
       return em -> em.find(clazz, id);
     }
 
+    /**
+     * Find entity by its id.
+     *
+     * @param clazz Entity class.
+     * @param id ID of the entity.
+     * @return An Optional with the entity or an empty Optional if not found.
+     * @param <T> Entity type.
+     */
     public <T> Function<EntityManager, Optional<T>> findByIdOpt(Class<T> clazz, Object id) {
       return em -> {
         try {
@@ -80,10 +105,28 @@ public final class Queries {
       };
     }
 
+    /**
+     * Execute a named query and return a single result.
+     *
+     * @param q Name of the query.
+     * @param clazz Entity class.
+     * @param params Parameters passed to the query.
+     * @return The entity. An exception is thrown if not found.
+     * @param <T> Entity type.
+     */
     public <T> Function<EntityManager, T> find(String q, Class<T> clazz, Object... params) {
       return em -> createTypedQuery(em, q, clazz, params).getSingleResult();
     }
 
+    /**
+     * Execute a named query and return a single result.
+     *
+     * @param q Name of the query.
+     * @param clazz Entity class.
+     * @param params Parameters passed to the query.
+     * @return An Optional with the entity or an empty Optional if not found.
+     * @param <T> Entity type.
+     */
     public <T> Function<EntityManager, Optional<T>> findOpt(String q, Class<T> clazz, Object... params) {
       return em -> {
         try {
@@ -94,6 +137,15 @@ public final class Queries {
       };
     }
 
+    /**
+     * Execute a named query and return all results.
+     *
+     * @param q Name of the query.
+     * @param clazz Entity class.
+     * @param params Parameters passed to the query.
+     * @return A list of entities.
+     * @param <T> Entity type.
+     */
     public <T> Function<EntityManager, List<T>> findAll(String q, Class<T> clazz, Object... params) {
       return em -> createTypedQuery(em, q, clazz, params).getResultList();
     }
@@ -107,10 +159,24 @@ public final class Queries {
   }
 
   public abstract static class QueriesBase {
+    /**
+     * Execute a named query and return a single result.
+     *
+     * @param q Name of the query.
+     * @param params Parameters passed to the query.
+     * @return The entity. An exception is thrown if not found.
+     */
     public Function<EntityManager, Object> find(String q, Object... params) {
       return em -> createQuery(em, q, params).getSingleResult();
     }
 
+    /**
+     * Execute a named query and return a single result.
+     *
+     * @param q Name of the query.
+     * @param params Parameters passed to the query.
+     * @return An Optional with the entity or an empty Optional if not found.
+     */
     public Function<EntityManager, Optional<Object>> findOpt(String q, Object... params) {
       return em -> {
         try {
@@ -121,18 +187,46 @@ public final class Queries {
       };
     }
 
+    /**
+     * Execute a named query and return all results.
+     *
+     * @param q Name of the query.
+     * @param params Parameters passed to the query.
+     * @return A list of entities.
+     */
     public Function<EntityManager, List> findAll(String q, Object... params) {
       return em -> createQuery(em, q, params).getResultList();
     }
 
+    /**
+     * Execute a named update query.
+     *
+     * @param q Name of the query.
+     * @param params Parameters passed to the query.
+     * @return The number of updated entities.
+     */
     public Function<EntityManager, Integer> update(String q, Object... params) {
       return em -> createQuery(em, q, params).executeUpdate();
     }
 
+    /**
+     * Execute a named delete query.
+     *
+     * @param q Name of the query.
+     * @param params Parameters passed to the query.
+     * @return The number of deleted entities.
+     */
     public Function<EntityManager, Integer> delete(String q, Object... params) {
       return em -> createQuery(em, q, params).executeUpdate();
     }
 
+    /**
+     * Create or update passed entity.
+     *
+     * @param entity Entity to create or update.
+     * @return Created or updated entity.
+     * @param <E> Entity type.
+     */
     public <E> Function<EntityManager, E> persistOrUpdate(final E entity) {
       return em -> {
         final Object id = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(entity);
@@ -152,12 +246,26 @@ public final class Queries {
       };
     }
 
+    /**
+     * Delete passed entity.
+     *
+     * @param entity Entity to delete.
+     * @return Deleted entity.
+     * @param <E> Entity type.
+     */
     public <E> Consumer<EntityManager> remove(final E entity) {
       return em -> {
         em.remove(entity);
       };
     }
 
+    /**
+     * Create passed entity.
+     *
+     * @param entity Entity to create.
+     * @return Created entity.
+     * @param <E> Entity type.
+     */
     public <E> Function<EntityManager, E> persist(final E entity) {
       return em -> {
         em.persist(entity);
@@ -165,6 +273,13 @@ public final class Queries {
       };
     }
 
+    /**
+     * Create passed entity.
+     *
+     * @param entity Entity to create.
+     * @return Optional with the created entity.
+     * @param <E> Entity type.
+     */
     public <E> Function<EntityManager, Optional<E>> persistOpt(final E entity) {
       return em -> {
         em.persist(entity);

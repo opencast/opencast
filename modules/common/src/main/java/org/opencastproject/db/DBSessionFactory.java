@@ -23,6 +23,15 @@ package org.opencastproject.db;
 
 import javax.persistence.EntityManagerFactory;
 
+/**
+ * Factory interface for creating DBSessions.
+ */
 public interface DBSessionFactory {
+  /**
+   * Creates a new DBSession.
+   *
+   * @param emf EntityManagerFactory that the new DBSession should use.
+   * @return A new DBSession.
+   */
   DBSession createSession(EntityManagerFactory emf);
 }
