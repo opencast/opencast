@@ -105,6 +105,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -135,6 +136,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -224,6 +226,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The password for download from external sources */
   public static final String DOWNLOAD_PASSWORD = "org.opencastproject.download.password";
 
+  /** The authentication method for download from external sources */
+  public static final String DOWNLOAD_AUTH_METHOD = "org.opencastproject.download.auth.method";
+
+  /** Force basic authentication even if download host does not ask for it */
+  public static final String DOWNLOAD_AUTH_FORCE_BASIC = "org.opencastproject.download.auth.force_basic";
+
   /** By default, do not allow event ingest to modify existing series metadata */
   public static final boolean DEFAULT_ALLOW_SERIES_MODIFICATIONS = false;
 
@@ -232,6 +240,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /** The default is not to automatically skip attachments and catalogs from capture agent */
   public static final boolean DEFAULT_SKIP = false;
+
+  /** The default for force basic authentication even if download host does not ask for it */
+  public static final boolean DEFAULT_DOWNLOAD_AUTH_FORCE_BASIC = false;
 
   /** The maximum length of filenames ingested by Opencast */
   public static final int FILENAME_LENGTH_MAX = 75;
@@ -268,6 +279,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /** The password for download from external sources */
   private static String downloadPassword = DOWNLOAD_PASSWORD;
+
+  /** The authentication method for download from external sources */
+  private static String downloadAuthMethod = DOWNLOAD_AUTH_METHOD;
+
+  /** Force basic authentication even if download host does not ask for it */
+  private static boolean downloadAuthForceBasic = DEFAULT_DOWNLOAD_AUTH_FORCE_BASIC;
 
   /** The external source dns name */
   private static String downloadSource = DOWNLOAD_SOURCE;
@@ -380,6 +397,13 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       return;
     }
 
+    downloadAuthMethod = StringUtils.trimToEmpty((String)properties.get(DOWNLOAD_AUTH_METHOD));
+    if (!"Digest".equals(downloadAuthMethod) && !"Basic".equals(downloadAuthMethod)) {
+      logger.warn("Download authentication method is neither Digest nor Basic; setting to Digest");
+      downloadAuthMethod = "Digest";
+    }
+    downloadAuthForceBasic = BooleanUtils.toBoolean(Objects.toString(properties.get(DOWNLOAD_AUTH_FORCE_BASIC),
+        BooleanUtils.toStringTrueFalse(DEFAULT_DOWNLOAD_AUTH_FORCE_BASIC)));
     downloadPassword = StringUtils.trimToEmpty((String)properties.get(DOWNLOAD_PASSWORD));
     downloadUser = StringUtils.trimToEmpty(((String) properties.get(DOWNLOAD_USER)));
     downloadSource = StringUtils.trimToEmpty(((String) properties.get(DOWNLOAD_SOURCE)));
@@ -1600,9 +1624,15 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         var clusterUrls = securityService.getOrganization().getServers().keySet();
 
         if (uri.toString().matches(downloadSource)) {
-          //NB: We're creating a new client here with *different* auth than the system auth creds
+          // NB: We're creating a new client here with *different* auth than the system auth creds
           externalHttpClient = getAuthedHttpClient();
-          get.setHeader("X-Requested-Auth", "Digest");
+          get.setHeader("X-Requested-Auth", downloadAuthMethod);
+          if ("Basic".equals(downloadAuthMethod) && downloadAuthForceBasic) {
+            String auth = downloadUser + ":" + downloadPassword;
+            byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.ISO_8859_1));
+            String authHeader = "Basic " + new String(encodedAuth);
+            get.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+          }
           response = externalHttpClient.execute(get);
         } else if (clusterUrls.contains(uri.getScheme() + "://" + uri.getHost())) {
           // Only using the system-level httpclient and digest credentials against our own servers
@@ -1812,8 +1842,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   protected CloseableHttpClient getAuthedHttpClient() {
     HttpClientBuilder cb = HttpClientBuilder.create();
     CredentialsProvider provider = new BasicCredentialsProvider();
+    String schema = AuthSchemes.DIGEST;
+    if ("Basic".equals(downloadAuthMethod)) {
+      schema = AuthSchemes.BASIC;
+    }
     provider.setCredentials(
-      new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthSchemes.DIGEST),
+      new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, schema),
       new UsernamePasswordCredentials(downloadUser, downloadPassword));
     return cb.setDefaultCredentialsProvider(provider).build();
   }
