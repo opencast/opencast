@@ -479,6 +479,7 @@
     <!-- CAS Auth:  Uncomment this if using CAS authentication -->
     <!-- <property name="userEntryPoint" ref="casEntryPoint" /> -->
     <property name="digestAuthenticationEntryPoint" ref="digestEntryPoint" />
+    <property name="basicAuthenticationEntryPoint" ref="basicEntryPoint" />
   </bean>
 
   <!-- Redirects unauthenticated requests to the login form -->

@@ -23,6 +23,7 @@ package org.opencastproject.kernel.security;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint;
 
 import java.io.IOException;
@@ -38,10 +39,12 @@ import javax.servlet.http.HttpServletResponse;
 public class DelegatingAuthenticationEntryPoint implements AuthenticationEntryPoint {
   public static final String REQUESTED_AUTH_HEADER = "X-Requested-Auth";
   public static final String DIGEST_AUTH = "Digest";
+  public static final String BASIC_AUTH = "Basic";
   public static final String INITIAL_REQUEST_PATH = "initial_request_path";
 
   protected AuthenticationEntryPoint userEntryPoint;
   protected DigestAuthenticationEntryPoint digestAuthenticationEntryPoint;
+  private BasicAuthenticationEntryPoint basicAuthenticationEntryPoint;
 
   /**
    * {@inheritDoc}
@@ -54,6 +57,8 @@ public class DelegatingAuthenticationEntryPoint implements AuthenticationEntryPo
           throws IOException, ServletException {
     if (DIGEST_AUTH.equals(request.getHeader(REQUESTED_AUTH_HEADER))) {
       digestAuthenticationEntryPoint.commence(request, response, authException);
+    } else if (BASIC_AUTH.equals(request.getHeader(REQUESTED_AUTH_HEADER))) {
+      basicAuthenticationEntryPoint.commence(request, response, authException);
     } else {
       // if the user attempted to access a url other than /, store this in the session so we can forward the user there
       // after a successful login
@@ -86,5 +91,13 @@ public class DelegatingAuthenticationEntryPoint implements AuthenticationEntryPo
    */
   public void setDigestAuthenticationEntryPoint(DigestAuthenticationEntryPoint digestAuthenticationEntryPoint) {
     this.digestAuthenticationEntryPoint = digestAuthenticationEntryPoint;
+  }
+
+  /**
+   * @param basicAuthenticationEntryPoint
+   *          the basic auth entrypoint to set
+   */
+  public void setBasicAuthenticationEntryPoint(BasicAuthenticationEntryPoint basicAuthenticationEntryPoint) {
+    this.basicAuthenticationEntryPoint = basicAuthenticationEntryPoint;
   }
 }
