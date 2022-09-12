@@ -153,8 +153,6 @@ angular.module('adminNg.services')
       me.ud.id = {};
       me.ud.policies = [];
       me.ud.policiesUser = [];
-      // Add the user's role upon creating the ACL editor
-      me.ud.policiesUser = addUserRolePolicy(me.ud.policiesUser);
       me.ud.baseAcl = {};
 
       this.filterUserRoles = function (item) {
@@ -360,6 +358,9 @@ angular.module('adminNg.services')
         me.aclCreateDefaults['keep_on_template_switch_role_prefixes'] =
           me.aclCreateDefaults['keep_on_template_switch_role_prefixes'] !== undefined
             ? me.aclCreateDefaults['keep_on_template_switch_role_prefixes'].split(',') : [];
+
+        // Add the user's role upon creating the ACL editor - but only after defaults have loaded
+        me.ud.policiesUser = addUserRolePolicy(me.ud.policiesUser);
       });
 
       me.roles = RolesResource.queryNameOnly({limit: -1, target: 'ACL'});

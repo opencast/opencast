@@ -81,8 +81,6 @@ angular.module('adminNg.services')
       me.ud.id = {};
       me.ud.policies = [];
       me.ud.policiesUser = [];
-      // Add the current user's role to the ACL upon the first startup
-      me.ud.policiesUser = addUserRolePolicy(me.ud.policiesUser);
       me.ud.baseAcl = {};
 
       this.changeBaseAcl = function (id) {
@@ -273,6 +271,9 @@ angular.module('adminNg.services')
         me.aclCreateDefaults['keep_on_template_switch_role_prefixes'] =
           me.aclCreateDefaults['keep_on_template_switch_role_prefixes'] !== undefined
             ? me.aclCreateDefaults['keep_on_template_switch_role_prefixes'].split(',') : [];
+
+        // Add the current user's role to the ACL upon the first startup - but only after defaults have loaded
+        me.ud.policiesUser = addUserRolePolicy(me.ud.policiesUser);
       });
 
       me.roles = RolesResource.queryNameOnly({limit: -1, target: 'ACL'});
