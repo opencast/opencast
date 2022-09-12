@@ -82,8 +82,6 @@
             <Export-Package>
               org.opencastproject.tobira;version=${project.version}
             </Export-Package>
-            <!-- Remove once all used services use OSGi annotations -->
-            <_dsannotations-options>norequirements</_dsannotations-options>
           </instructions>
         </configuration>
       </plugin>
