@@ -29,14 +29,14 @@ angular.module('adminNg.services')
 
       var me = this;
       var NOTIFICATION_CONTEXT = 'events-access';
-      var createPolicy = function (role, read, write) {
+      var createPolicy = function (role, read, write, actionValues) {
         return {
           role  : role,
           read  : read !== undefined ? read : false,
           write : write !== undefined ? write : false,
           actions : {
             name : 'new-event-acl-actions',
-            value : []
+            value : actionValues !== undefined ? actionValues : [],
           },
           user: undefined,
         };
@@ -220,6 +220,9 @@ angular.module('adminNg.services')
           if (policy.write) {
             remainingACEs.push({role: policy.role, action: 'write', allow: true});
           }
+          for (const action of policy.actions.value) {
+            remainingACEs.push({role: policy.role, action: action, allow: true});
+          }
         });
 
         me.ud.id = id;
@@ -276,7 +279,8 @@ angular.module('adminNg.services')
         model.push(createPolicy(
           undefined,
           me.aclCreateDefaults['read_enabled'],
-          me.aclCreateDefaults['write_enabled']
+          me.aclCreateDefaults['write_enabled'],
+          me.aclCreateDefaults['default_actions']
         ));
       };
 
@@ -346,6 +350,9 @@ angular.module('adminNg.services')
           ? (me.aclCreateDefaults['read_readonly'].toLowerCase() === 'true') : true;
         me.aclCreateDefaults['write_readonly'] = me.aclCreateDefaults['write_readonly'] !== undefined
           ? (me.aclCreateDefaults['write_readonly'].toLowerCase() === 'true') : false;
+        me.aclCreateDefaults['default_actions'] = me.aclCreateDefaults['default_actions'] !== undefined
+          ? me.aclCreateDefaults['default_actions'].split(',') : [];
+
         me.roleUserPrefix = me.aclCreateDefaults['role_user_prefix'] !== undefined
           ? me.aclCreateDefaults['role_user_prefix']
           : 'ROLE_USER_';
