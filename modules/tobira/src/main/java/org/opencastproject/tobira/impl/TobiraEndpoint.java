@@ -73,10 +73,10 @@ import javax.ws.rs.core.Response;
         "opencast.service.jobproducer=false"
     },
     immediate = true,
-    service = TobiraApi.class
+    service = TobiraEndpoint.class
 )
-public class TobiraApi {
-  private static final Logger logger = LoggerFactory.getLogger(TobiraApi.class);
+public class TobiraEndpoint {
+  private static final Logger logger = LoggerFactory.getLogger(TobiraEndpoint.class);
 
   // Versioning the Tobira API:
   //
