@@ -411,8 +411,6 @@ angular.module('adminNg.services')
         // Add user role after reset
         me.ud.policiesUser = addUserRolePolicy(me.ud.policiesUser);
       };
-
-      this.reset();
     };
     return new Access();
   }]);
