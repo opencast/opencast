@@ -69,9 +69,8 @@ angular.module('adminNg.services')
           },
           addUserRolePolicy = function (policies) {
             if (angular.isDefined(AuthService.getUserRole())) {
-              var currentUserPolicy = createPolicy(AuthService.getUserRole());
-              currentUserPolicy.read = true;
-              currentUserPolicy.write = true;
+              var currentUserPolicy = createPolicy(AuthService.getUserRole(), true, true,
+                me.aclCreateDefaults['default_actions']);
               currentUserPolicy.userRole = currentUserPolicy.role;
               policies.push(currentUserPolicy);
             }
