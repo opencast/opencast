@@ -182,10 +182,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   protected static final String OPT_SERVICE_STATISTICS_MAX_JOB_AGE = "org.opencastproject.statistics.services.max_job_age";
 
   /** Configuration key for the encoding preferred worker nodes */
-  protected static final String OPT_ENCODINGWORKERS = "org.opencastproject.encoding.workers";
+  protected static final String OPT_ENCODING_WORKERS = "org.opencastproject.encoding.workers";
 
   /** Configuration key for the encoding workers load threshold */
-  protected static final String OPT_ENCODINGTHRESHOLD = "org.opencastproject.encoding.workers.threshold";
+  protected static final String OPT_ENCODING_THRESHOLD = "org.opencastproject.encoding.workers.threshold";
 
   /** The http client to use when connecting to remote servers */
   protected TrustedHttpClient client = null;
@@ -778,20 +778,20 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
 
     // get the encoding worker nodes defined in the configuration file and parse the comma-separated list
-    String encodingWorkersString = (String) properties.get(OPT_ENCODINGWORKERS);
+    String encodingWorkersString = (String) properties.get(OPT_ENCODING_WORKERS);
     if (StringUtils.isNotBlank(encodingWorkersString)) {
       encodingWorkers = Arrays.asList(encodingWorkersString.split("\\s*,\\s*"));
     }
 
     // get the encoding worker load threshold defined in the configuration file and parse the double
-    String encodingThersholdString = StringUtils.trimToNull((String) properties.get(OPT_ENCODINGTHRESHOLD));
-    if (StringUtils.isNotBlank(encodingThersholdString) && encodingThersholdString != null){
-      if (encodingThreshold >= 0 && encodingThreshold <= 1){
+    String encodingThersholdString = StringUtils.trimToNull((String) properties.get(OPT_ENCODING_THRESHOLD));
+    if (StringUtils.isNotBlank(encodingThersholdString) && encodingThersholdString != null) {
+      if (encodingThreshold >= 0 && encodingThreshold <= 1) {
         try {
         encodingThreshold = Double.parseDouble(encodingThersholdString);
         } catch (NumberFormatException e) {
           logger.warn("Can not set encoding threshold to {}. {} must be an parsable double", encodingThersholdString,
-              OPT_ENCODINGTHRESHOLD);
+              OPT_ENCODING_THRESHOLD);
         }
       } else {
         encodingThreshold = 0.0;
