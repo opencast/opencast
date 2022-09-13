@@ -162,6 +162,7 @@ public class EditorServiceImpl implements EditorService {
   private String waveformSubtype;
   private MediaPackageElementFlavor smilSilenceFlavor;
   private ElasticsearchIndex searchIndex;
+  private MediaPackageElementFlavor captionsFlavor;
 
   private static final String DEFAULT_PREVIEW_SUBTYPE = "prepared";
   private static final String DEFAULT_PREVIEW_TAG = "editor";
@@ -170,6 +171,7 @@ public class EditorServiceImpl implements EditorService {
   private static final String DEFAULT_SMIL_CATALOG_TAGS = "archive";
   private static final String DEFAULT_SMIL_SILENCE_FLAVOR = "*/silence";
   private static final String DEFAULT_PREVIEW_VIDEO_SUBTYPE = "video+preview";
+  private static final String DEFAULT_CAPTIONS_FLAVOR = "captions/*";
 
   public static final String OPT_PREVIEW_SUBTYPE = "preview.subtype";
   public static final String OPT_PREVIEW_TAG = "preview.tag";
@@ -177,8 +179,8 @@ public class EditorServiceImpl implements EditorService {
   public static final String OPT_SMIL_CATALOG_FLAVOR = "smil.catalog.flavor";
   public static final String OPT_SMIL_CATALOG_TAGS = "smil.catalog.tags";
   public static final String OPT_SMIL_SILENCE_FLAVOR = "smil.silence.flavor";
-
   public static final String OPT_PREVIEW_VIDEO_SUBTYPE = "preview.video.subtype";
+  public static final String OPT_CAPTIONS_FLAVOR = "captions.flavor";
 
   private final Set<String> smilCatalogTagSet = new HashSet<>();
 
@@ -298,6 +300,11 @@ public class EditorServiceImpl implements EditorService {
     // Preview Video subtype
     previewVideoSubtype =  Objects.toString(properties.get(OPT_PREVIEW_VIDEO_SUBTYPE), DEFAULT_PREVIEW_VIDEO_SUBTYPE);
     logger.debug("Preview video subtype set to '{}'", previewVideoSubtype);
+
+    // Flavor for captions
+    captionsFlavor = MediaPackageElementFlavor.parseFlavor(
+            StringUtils.defaultString((String) properties.get(OPT_CAPTIONS_FLAVOR), DEFAULT_CAPTIONS_FLAVOR));
+    logger.debug("Caption flavor set to '{}'", captionsFlavor);
   }
 
   private Boolean elementHasPreviewTag(MediaPackageElement element) {
@@ -451,35 +458,36 @@ public class EditorServiceImpl implements EditorService {
    */
   private void addSubtitleTrack(MediaPackage mediaPackage, List<PostEditingData.Subtitle> subtitles)
           throws IOException {
-    if (subtitles != null) {
-      for (PostEditingData.Subtitle subtitle : subtitles) {
-        // Generate ID for new tracks
-        String subtitleId = UUID.randomUUID().toString();
-        String trackId = null;
+    for (PostEditingData.Subtitle subtitle : subtitles) {
+      if (!subtitle.getFlavor().matches(captionsFlavor)) {
+        break;
+      }
 
-        // Check if subtitle already exists
-        for (Track t : mediaPackage.getTracks()) {
-          if (t.getFlavor().matches(subtitle.getFlavor())) {
-            logger.debug("Set Identifier for Subtitle-Track to: {}", t.getIdentifier());
-            subtitleId = t.getIdentifier();
-            trackId = t.getIdentifier();
-            break;
-          }
+      // Generate ID for new tracks
+      String subtitleId = UUID.randomUUID().toString();
+      String trackId = null;
+
+      // Check if subtitle already exists
+      for (Track t : mediaPackage.getTracks()) {
+        if (t.getFlavor().matches(subtitle.getFlavor())) {
+          logger.debug("Set Identifier for Subtitle-Track to: {}", t.getIdentifier());
+          subtitleId = t.getIdentifier();
+          trackId = t.getIdentifier();
+          break;
         }
+      }
 
-        Track track = mediaPackage.getTrack(trackId);
+      Track track = mediaPackage.getTrack(trackId);
 
-        // Memorize uri of the previous track file for deletion
-        URI oldTrackURI = null;
-        if (track != null) {
-          oldTrackURI = track.getURI();
-        }
+      // Memorize uri of the previous track file for deletion
+      URI oldTrackURI = null;
+      if (track != null) {
+        oldTrackURI = track.getURI();
+      }
 
-        // Put updated filename in working file repository and update the track.
-        InputStream is = IOUtils.toInputStream(subtitle.getSubtitle(), "UTF-8");
-        URI subtitleUri = workspace.put(mediaPackage.getIdentifier().toString(), subtitleId, "subtitle.vtt",
-                //                  EditorService.TARGET_FILE_NAME,
-                is);
+      // Put updated filename in working file repository and update the track.
+      try (InputStream is = IOUtils.toInputStream(subtitle.getSubtitle(), "UTF-8")) {
+        URI subtitleUri = workspace.put(mediaPackage.getIdentifier().toString(), subtitleId, "subtitle.vtt", is);
 
         // If not exists, create new Track
         if (track == null) {
@@ -491,12 +499,9 @@ public class EditorServiceImpl implements EditorService {
 
         track.setURI(subtitleUri);
         track.setIdentifier(subtitleId);
-        for (String tag : getSmilCatalogTags()) {
-          track.addTag(tag);
-        }
         track.setChecksum(null);
 
-        if (oldTrackURI != null) {
+        if (oldTrackURI != null && oldTrackURI != subtitleUri) {
           // Delete the old files from the working file repository and workspace if they were in there
           logger.info("Removing old track file {}", oldTrackURI);
           try {
@@ -505,14 +510,14 @@ public class EditorServiceImpl implements EditorService {
             logger.info("Could not remove track from workspace. Could be it was never there.");
           }
         }
+      }
 
-        try {
-          assetManager.takeSnapshot(mediaPackage);
-        } catch (AssetManagerException e) {
-          logger.error("Error while adding the updated media package ({}) to the archive", mediaPackage.getIdentifier(),
-                  e);
-          throw new IOException(e);
-        }
+
+
+      try {
+        assetManager.takeSnapshot(mediaPackage);
+      } catch (AssetManagerException e) {
+        throw new IOException("Error while adding the updated media package " + mediaPackage + " to the archive", e);
       }
     }
   }

@@ -51,8 +51,9 @@ public final class PostEditingData extends EditingData {
 
   private PostEditingData(List<SegmentData> segments, List<TrackData> tracks, List<WorkflowData> workflows,
           Long duration, String title, String recordingStartDate, String seriesId, String seriesName,
-          Boolean workflowActive, List<Subtitle> subtitles) {
-    super(segments, tracks, workflows, duration, title, recordingStartDate, seriesId, seriesName, workflowActive);
+          Boolean workflowActive, List<String> waveformURIs, List<Subtitle> subtitles) {
+    super(segments, tracks, workflows, duration, title, recordingStartDate, seriesId, seriesName, workflowActive,
+            waveformURIs);
     this.subtitles = subtitles;
   }
 
