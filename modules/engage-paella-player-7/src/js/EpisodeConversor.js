@@ -293,41 +293,73 @@ function processAttachments(episode, manifest, config) {
   }
 }
 
-function getCaptions(episode) {
-  const result = [];
-  let attachments = episode.mediapackage?.attachments?.attachment;
-  if (!(attachments instanceof Array)) {
-    attachments = attachments ? [attachments] : [];
-  }
+function readCaptions(potentialNewCaptions, captions) {
+  potentialNewCaptions.forEach((potentialCaption) => {
+    try {
+      let captions_regex = /^captions\/([^+]+)(\+(.+))?/g;
+      let captions_match = captions_regex.exec(potentialCaption.type);
 
+      if (captions_match) {
+        let captions_lang = captions_match[3];
 
-  attachments.forEach(att => {
-    const exp = /captions\/([a-z\d]+)(?:\+([a-z]+))?/.exec(att.type);
-    if (exp) {
-      const format = exp[1];
-      const lang = exp[2] || '';
-      result.push({
-        id: att.id,
-        lang: lang,
-        text: lang || 'Unknown language',
-        format: format,
-        url:att.url
-      });
+        // TODO: read the lang from the dfxp file
+        //if (captions_format == "dfxp") {}
+
+        if (!captions_lang && potentialCaption.tags && potentialCaption.tags.tag) {
+          if (!(potentialCaption.tags.tag instanceof Array)) {
+            potentialCaption.tags.tag = [potentialCaption.tags.tag];
+          }
+          potentialCaption.tags.tag.forEach((tag)=>{
+            if (tag.startsWith('lang:')){
+              let split = tag.split(':');
+              captions_lang = split[1];
+            }
+          });
+        }
+
+        let captions_label = captions_lang || 'unknown language';
+        //paella.utils.dictionary.translate("CAPTIONS_" + captions_lang);
+
+        let captions_format = potentialCaption.url.
+          substring(potentialCaption.url.lastIndexOf('.') + 1, potentialCaption.url.length)
+          || potentialCaption.url;
+
+        captions.push({
+          id: potentialCaption.id,
+          lang: captions_lang,
+          text: captions_label,
+          url: potentialCaption.url,
+          format: captions_format
+        });
+      }
     }
+    catch (err) {/**/}
   });
+}
 
-  let catalogs = episode.mediapackage?.metadata?.catalog;
-  if (!(catalogs instanceof Array)) {
-    catalogs = catalogs ? [catalogs] : [];
-  }
+function getCaptions(episode) {
+  var captions = [];
 
+  var attachments = episode.mediapackage.attachments.attachment;
+  var catalogs = episode.mediapackage.metadata.catalog;
+  var tracks = episode.mediapackage.media.track;
+  if (!(attachments instanceof Array)) { attachments = attachments ? [attachments] : []; }
+  if (!(catalogs instanceof Array)) { catalogs = catalogs ? [catalogs] : []; }
+  if (!(tracks instanceof Array)) { tracks = tracks ? [tracks] : []; }
+
+  // Read the attachments
+  readCaptions(attachments, captions);
+
+  // Read the tracks
+  readCaptions(tracks, captions);
+
+  // Read the catalogs
   catalogs.forEach((currentCatalog) => {
     try {
       // backwards compatibility:
       // Catalogs flavored as 'captions/timedtext' are assumed to be dfxp
       if (currentCatalog.type == 'captions/timedtext') {
         let captions_lang;
-
         if (currentCatalog.tags && currentCatalog.tags.tag) {
           if (!(currentCatalog.tags.tag instanceof Array)) {
             currentCatalog.tags.tag = [currentCatalog.tags.tag];
@@ -341,7 +373,7 @@ function getCaptions(episode) {
         }
 
         let captions_label = captions_lang || 'unknown language';
-        result.push({
+        captions.push({
           id: currentCatalog.id,
           lang: captions_lang,
           text: captions_label,
@@ -353,7 +385,7 @@ function getCaptions(episode) {
     catch (err) {/**/}
   });
 
-  return result;
+  return captions;
 }
 
 export function episodeToManifest(ocResponse, config) {
