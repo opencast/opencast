@@ -21,6 +21,7 @@
 package org.opencastproject.workflow.handler.workflow;
 
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.presets.api.PresetProvider;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
@@ -101,7 +102,8 @@ public class DefaultsWorkflowOperationHandler extends AbstractWorkflowOperationH
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     Long id = workflowInstance.getId();
     String organizationId = workflowInstance.getOrganizationId();
-    String seriesID = workflowInstance.getMediaPackage().getSeries();
+    MediaPackage mp = workflowInstance.getMediaPackage();
+    String seriesID = mp.getSeries();
     // Iterate over all configuration keys
     Map<String, String> properties = new HashMap<>();
     logger.debug("Getting properties for {} {} {}", id, organizationId, seriesID);
@@ -124,7 +126,7 @@ public class DefaultsWorkflowOperationHandler extends AbstractWorkflowOperationH
         logger.debug("Configuration key '{}' of workflow {} is set to '{}' specified in event.", key, id, value);
       }
     }
-    return createResult(workflowInstance.getMediaPackage(), properties, Action.CONTINUE, 0);
+    return createResult(mp, properties, Action.CONTINUE, 0);
   }
 
   @Reference

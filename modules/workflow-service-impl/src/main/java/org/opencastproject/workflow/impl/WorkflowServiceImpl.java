@@ -875,14 +875,15 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
   private void removeTempFiles(WorkflowInstance workflowInstance) {
     logger.info("Removing temporary files for workflow {}", workflowInstance);
-    if (null == workflowInstance.getMediaPackage()) {
+    MediaPackage mp = workflowInstance.getMediaPackage();
+    if (null == mp) {
       logger.warn("Workflow instance {} does not have an media package set", workflowInstance.getId());
       return;
     }
-    for (MediaPackageElement elem : workflowInstance.getMediaPackage().getElements()) {
+    for (MediaPackageElement elem : mp.getElements()) {
       if (null == elem.getURI()) {
         logger.warn("Mediapackage element {} from the media package {} does not have an URI set",
-                elem.getIdentifier(), workflowInstance.getMediaPackage().getIdentifier().toString());
+                elem.getIdentifier(), mp.getIdentifier().toString());
         continue;
       }
       try {
