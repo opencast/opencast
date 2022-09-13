@@ -20,6 +20,8 @@ on:
 
 jobs:
   build:
+    # Don't run dependabot pull requests multiple times
+    if: ${{ !(github.event_name == 'push' && github.actor == 'dependabot[bot]')  }}
     strategy:
       matrix:
         java:
