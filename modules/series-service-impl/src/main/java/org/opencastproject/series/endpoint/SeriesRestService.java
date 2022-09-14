@@ -1237,7 +1237,7 @@ public class SeriesRestService {
   }
 
   @PUT
-  @Path("{seriesId}/extended-metadata/{type}")
+  @Path("{seriesId}/extendedMetadata/{type}")
   @RestQuery(
           name = "updateExtendedMetadata",
           description = "Updates extended metadata of a series",
@@ -1245,11 +1245,13 @@ public class SeriesRestService {
           pathParameters = {
                   @RestParameter(name = "seriesId", description = "The series identifier", type = STRING,
                           isRequired = true),
-                  @RestParameter(name = "type", description = "The catalog type", type = STRING,
-                          isRequired = true),
+                  @RestParameter(name = "type", description = "The type of the catalog flavor", type = STRING,
+                          isRequired = true)
+          },
+          restParameters = {
                   @RestParameter(name = "dc", description = "The catalog with extended metadata.", type = TEXT,
                           isRequired = true, defaultValue = SAMPLE_DUBLIN_CORE
-                  ),
+                  )
           },
           responses = {
                   @RestResponse(responseCode = SC_NO_CONTENT, description = "Extended metadata updated"),

@@ -534,7 +534,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
 
   @Override
   public boolean updateExtendedMetadata(String seriesId, String type, DublinCoreCatalog dc) throws SeriesException {
-    HttpPut put = new HttpPut("/" + seriesId + "/extended-metadata/" + type);
+    HttpPut put = new HttpPut("/" + seriesId + "/extendedMetadata/" + type);
     try {
       List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("dc", dc.toXmlString()));

@@ -122,7 +122,7 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
     Option<String> optCommonMetadata = getOptCfg(properties, CONF_COMMON_METADATA_KEY);
     final boolean isCommonMetadata = optCommonMetadata.isSome() ? Boolean.parseBoolean(optCommonMetadata.get()) : false;
     Dictionary serviceProperties = new Properties();
-    serviceProperties.put("common-metadata", isCommonMetadata);
+    serviceProperties.put(CONF_COMMON_METADATA_KEY, isCommonMetadata);
 
     // Check for valid configuration values
     if (!(CATALOG_TYPE_EVENTS.equalsIgnoreCase(type) || CATALOG_TYPE_SERIES.equalsIgnoreCase(type))) {

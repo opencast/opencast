@@ -133,6 +133,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -530,7 +531,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
       // extended metadata
       event.resetExtendedMetadata();  // getting rid of old data
-      for (EventCatalogUIAdapter extendedCatalogUIAdapter : extendedEventCatalogUIAdapters.get(organization)) {
+      for (EventCatalogUIAdapter extendedCatalogUIAdapter : extendedEventCatalogUIAdapters.getOrDefault(organization,
+              Collections.emptyList())) {
         for (Catalog catalog: mp.getCatalogs(extendedCatalogUIAdapter.getFlavor())) {
           try (InputStream in = workspace.read(catalog.getURI())) {
             EventIndexUtils.updateEventExtendedMetadata(event, DublinCores.read(in),
