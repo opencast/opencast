@@ -119,6 +119,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.JAXBException;
@@ -785,6 +786,13 @@ public class EditorServiceImpl implements EditorService {
       }
     }
 
+    // Get subtitles from the asset manager, so they are guaranteed to be up-to-date after saving
+    trackList.removeIf(t -> t.getFlavor().matches(captionsFlavor));
+    trackList = Stream.concat(trackList.stream(), Arrays.stream(mp.getTracks(captionsFlavor)))
+            .collect(Collectors.toList());
+
+    // Get tracks from the internal publication because it is a lot faster than getting them from the asset manager
+    // for some reason.
     final List<TrackData> tracks = trackList.stream().map(track -> {
       final String uri = signIfNecessary(track.getURI());
       final boolean audioEnabled = !hiddens.contains(tuple(track.getFlavor().getType(), "audio"));
