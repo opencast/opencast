@@ -74,12 +74,10 @@ How to Enable Preconfigured Asset Options
 
 Catalogs and attachments can be added to new and existing events. New source tracks can only be defined for the upload of new events. Some
 predefined catalog and attachment examples are commented out in the properties file. You can uncomment any of these
-to make them upload options in the Admin UI. The default workflow `publish-uploaded-assets` will automatically distribute,
+to make them upload options in the Admin UI. The sample workflow `publish-uploaded-assets` will automatically distribute,
 publish, and archive uploaded assets on existing events.
 
     # Asset upload options are for new and existing events.
-    # Only one file can be uploaded for each of these options, the uploaded file replaces existing elements of the same
-    # type and flavor in the mediapackage.
     # EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CAPTIONS_DFXP={"id":"catalog_captions_dfxp", "type": "catalog",
     #     "flavorType": "captions", "flavorSubType": "timedtext", "displayOrder": 2}
     # EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CAPTIONS_WEBVTT={"id":"attachment_captions_webvtt",
@@ -93,7 +91,6 @@ publish, and archive uploaded assets on existing events.
     EVENTS.EVENTS.NEW.UPLOAD_ASSET.WORKFLOWDEFID=publish-uploaded-assets
 
     # The video source track upload options are only for new events.
-    # Unlike the other assets, multiple source tracks can be uploaded for a single flavor.
     # The MULTIPLE_PARTS example shows how to enable choosing multiple source files for a single flavor. In this case,
     # a fictional "multipart/part+source".
     # EVENTS.EVENTS.NEW.SOURCE.UPLOAD.MULTIPLE_PARTS={"id": "track_parts","type":"track",
@@ -104,6 +101,59 @@ publish, and archive uploaded assets on existing events.
          "flavorType":"presenter", "flavorSubType": "source", "multiple":false, "displayOrder": 12}
     EVENTS.EVENTS.NEW.SOURCE.UPLOAD.SEGMENTABLE={"id": "track_presentation","type":"track",
          "flavorType":"presentation", "flavorSubType": "source", "multiple":false, "displayOrder": 13}
+
+Sample `publish-uploaded-assets` workflow:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+  <id>publish-uploaded-assets</id>
+  <title>Publish uploaded assets</title>
+  <tags />
+  <description>Publish uploaded assets</description>
+  <configuration_panel>
+  </configuration_panel>
+
+  <operations>
+    <!-- Publish to engage player -->
+
+    <operation
+      id="publish-engage"
+      exception-handler-workflow="partial-error"
+      description="Update recording in Opencast Media Module">
+      <configurations>
+        <configuration key="download-source-flavors">${download-source-flavors},dublincore/*,security/*</configuration>
+        <configuration key="download-source-tags">engage-download</configuration>
+        <configuration key="streaming-source-tags">engage-streaming</configuration>
+        <configuration key="strategy">merge</configuration>
+        <configuration key="check-availability">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Archive the current state of the mediapackage -->
+
+    <operation
+      id="snapshot"
+      description="Archiving new assets">
+      <configurations>
+        <configuration key="source-flavors">*/*</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Clean up work artifacts -->
+
+    <operation
+        id="cleanup"
+        fail-on-error="false"
+        description="Remove temporary processing artifacts">
+      <configurations>
+        <configuration key="delete-external">true</configuration>
+        <configuration key="preserve-flavors">security/*</configuration>
+      </configurations>
+    </operation>
+  </operations>
+</definition>
+```
 
 How to Upload Assets in the Admin UI
 ------------------------------------
@@ -119,24 +169,23 @@ The manually uploaded assets appear in the Create event summary
 To Upload an asset to an existing event, go into the existing event details Assets tab, and click "Add Asset >" link
     ![assetUploadExistingEvent](images/assetUploadExistingEvent.png)
 
-The option selection is the same as for Create event, except the "Add Asset" button automatically executes the workflow
+The option selection is the same as when creating an event, except the "Add Asset" button automatically executes the workflow
 defined by `EVENTS.EVENTS.NEW.UPLOAD_ASSET.WORKFLOWDEFID`
     ![assetUploadExistingOptions](images/assetUploadExistingOptions.png)
 
 How to Create a New Asset Option
 --------------------------------
 
-The following steps will assist you in creating a new asset upload option. As mentioned before, only catalog and
-attachments can be added to existing events. New source types can be added to new events.
+The following steps will assist you in creating a new asset upload option. New source types can be added to new events.
 
 Tasks:
 
 - Modify `etc/listproviders/event.upload.asset.options.properties`
 - For the title of the options displayed in the admin interface, either:
     - add a translation for the new asset name to
-      `modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/...`
+      `modules/admin-ui-frontend/resources/public/org/opencastproject/adminui/languages/...`
     - or add a `title` field to the upload specification
-- Modify your workflow from `etc/workflows/...`
+- Add a workflow to publish the uploaded assets to `etc/workflows`
 - Test your changes
 
 The following steps describe how to change the properties configuration.
@@ -186,7 +235,7 @@ accept | 'video/*,.png' | A list of accepted file formats as taken by the HTML \
 
 
 The parameter key is internationalized as the display text in the admin UI
-ref: modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/
+ref: modules/admin-ui-frontend/resources/public/org/opencastproject/adminui/languages/
 
 
 ### Step 3. Add translation for the new option
@@ -196,11 +245,11 @@ Add a translation for the option property when adding new option, otherwise the 
 
 The translation language files are located:
 
-    modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/...
+    modules/admin-ui-frontend/resources/public/org/opencastproject/adminui/languages/...
 
 Example of US English translation for `EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CAPTIONS_WEBVTT`:
 
-    modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/lang-en_US.json
+    modules/admin-ui-frontend/resources/public/org/opencastproject/adminui/languages/lang-en_US.json
 
 
 ```json
