@@ -100,6 +100,9 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   /** The Elasticsearch maximum results window size */
   private static final int ELASTICSEARCH_INDEX_MAX_RESULT_WINDOW = Integer.MAX_VALUE;
 
+  /** The Elasticsearch term aggregation size */
+  private static final int ELASTICSEARCH_TERM_AGGREGATION_SIZE = 10000;
+
   /** Configuration key defining the hostname of an external Elasticsearch server */
   public static final String ELASTICSEARCH_SERVER_HOSTNAME_KEY = "org.opencastproject.elasticsearch.server.hostname";
 
@@ -683,7 +686,10 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    */
   public List<String> getTermsForField(String field, String type) {
     final String facetName = "terms";
-    final AggregationBuilder aggBuilder = AggregationBuilders.terms(facetName).field(field);
+    // Add size to aggregation to return all values (the default is the top ten terms with the most documents).
+    // We set it to 10,000, which should be enough (the maximum is 'search.max_buckets', which defaults to 65,536).
+    final AggregationBuilder aggBuilder = AggregationBuilders.terms(facetName).field(field)
+            .size(ELASTICSEARCH_TERM_AGGREGATION_SIZE);
     final SearchSourceBuilder searchSource = new SearchSourceBuilder().aggregation(aggBuilder);
     final SearchRequest searchRequest = new SearchRequest(this.getSubIndexIdentifier(type)).source(searchSource);
     try {
