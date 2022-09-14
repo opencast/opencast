@@ -43,6 +43,7 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.BucketVersioningConfiguration;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.SetBucketVersioningConfigurationRequest;
 import com.amazonaws.services.s3.transfer.TransferManager;
@@ -243,6 +244,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   /**
    * Returns the aws s3 object id created by aws
    */
+  @Override
   protected AwsUploadOperationResult uploadObject(File origin, String objectName) throws AssetStoreException {
     // Check first if bucket is there.
     if (!bucketCreated) {
@@ -254,7 +256,6 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     // TransferManager processes all transfers asynchronously, so this call will return immediately.
     logger.info("Uploading {} to archive bucket {}...", objectName, bucketName);
 
-    S3Object obj = null;
     try {
       Upload upload = s3TransferManager.upload(bucketName, objectName, origin);
       long start = System.currentTimeMillis();
@@ -262,10 +263,10 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       upload.waitForCompletion();
       logger.info("Upload of {} to archive bucket {} completed in {} seconds",
               new Object[] { objectName, bucketName, (System.currentTimeMillis() - start) / 1000 });
-      obj = s3.getObject(bucketName, objectName);
-      //If bucket versioning is disabled the versionId is null, so return a -1 to indicate no version
-      String versionId = obj.getObjectMetadata().getVersionId();
-      //FIXME: We need to do better checking this, what if versioning is just suspended?
+      ObjectMetadata objMetadata = s3.getObjectMetadata(bucketName, objectName);
+      logger.trace("Got object metadata for: {}, version is {}", objectName, objMetadata.getVersionId());
+      // If bucket versioning is disabled the versionId is null, so return a -1 to indicate no version
+      String versionId = objMetadata.getVersionId();
       if (null == versionId) {
         return new AwsUploadOperationResult(objectName, "-1");
       }
@@ -274,20 +275,13 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       throw new AssetStoreException("Operation interrupted", e);
     } catch (Exception e) {
       throw new AssetStoreException("Upload failed", e);
-    } finally {
-      try {
-        if (obj != null) {
-          obj.close();
-        }
-      } catch (IOException e) {
-        //Swallow and ignore
-      }
     }
   }
 
   /**
    *
    */
+  @Override
   protected InputStream getObject(AwsAssetMapping map) {
     S3Object object = s3.getObject(bucketName, map.getObjectKey());
     return object.getObjectContent();
@@ -296,6 +290,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   /**
   *
   */
+  @Override
   protected void deleteObject(AwsAssetMapping map) {
     s3.deleteObject(bucketName, map.getObjectKey());
   }

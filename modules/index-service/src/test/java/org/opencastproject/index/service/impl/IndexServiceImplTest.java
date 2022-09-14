@@ -623,7 +623,7 @@ public class IndexServiceImplTest {
     // Run Test
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setIngestService(setupIngestService(mediapackage, Capture.<InputStream> newInstance()));
-    mediapackage = indexServiceImpl.updateMpAssetFlavor(assetList, mediapackage, assetMetadata, true);
+    mediapackage = indexServiceImpl.updateMpAssetFlavor(assetList, mediapackage, assetMetadata);
     assertTrue("The mediapackage attachment has the updated flavor", mediapackage.getAttachments(newElemflavor).length == 1);
   }
 

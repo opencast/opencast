@@ -205,7 +205,6 @@ public class IndexServiceImpl implements IndexService {
   private String trackRegex = "^track.*";
   private String numberedAssetRegex = "^\\*$";
 
-  private boolean isOverwriteExistingAsset = true;
   private Pattern patternAttachment = Pattern.compile(attachmentRegex);
   private Pattern patternCatalog = Pattern.compile(catalogRegex);
   private Pattern patternTrack = Pattern.compile(trackRegex);
@@ -602,7 +601,7 @@ public class IndexServiceImpl implements IndexService {
         try {
           JSONArray assetMetadata = (JSONArray)((JSONObject) metadataJson.get("assets")).get("options");
           if (assetMetadata != null) {
-            mp = updateMpAssetFlavor(assetList, mp, assetMetadata, isOverwriteExistingAsset);
+            mp = updateMpAssetFlavor(assetList, mp, assetMetadata);
            }
           } catch (Exception e) {
             // Assuming a parse error versus a file error and logging the error type
@@ -694,7 +693,7 @@ public class IndexServiceImpl implements IndexService {
       try {
         JSONArray assetMetadata = (JSONArray)((JSONObject) metadataJson.get("assets")).get("options");
         if (assetMetadata != null) {
-          mp = updateMpAssetFlavor(assetList, mp, assetMetadata, isOverwriteExistingAsset);
+          mp = updateMpAssetFlavor(assetList, mp, assetMetadata);
         } else {
           logger.warn("The asset option mapping parameter was not found");
           throw new IndexServiceException("The asset option mapping parameter was not found");
@@ -1142,12 +1141,10 @@ public class IndexServiceImpl implements IndexService {
    *          the mediapackage to update
    * @param assetMetadata
    *          a set of mapping metadata for the asset list
-   * @param overwriteExisting
-   *          true if the existing asset of the same flavor should be overwritten
    * @return mediapackage updated with assets
    */
   @SuppressWarnings("unchecked")
-  protected MediaPackage updateMpAssetFlavor(List<String> assetList, MediaPackage mp, JSONArray assetMetadata, Boolean overwriteExisting) {
+  protected MediaPackage updateMpAssetFlavor(List<String> assetList, MediaPackage mp, JSONArray assetMetadata) {
     // Create JSONObject data map
     JSONObject assetDataMap = new JSONObject();
     for (int i = 0; i < assetMetadata.size(); i++) {
@@ -1172,6 +1169,8 @@ public class IndexServiceImpl implements IndexService {
           String type = (String)((JSONObject) assetDataMap.get(asset)).get("type");
           String flavorType = (String)((JSONObject) assetDataMap.get(asset)).get("flavorType");
           String flavorSubType = (String)((JSONObject) assetDataMap.get(asset)).get("flavorSubType");
+          // Use 'multiple' setting to allow multiple elements with same flavor or not.
+          boolean overwriteExisting = !(Boolean) ((JSONObject) assetDataMap.get(asset)).getOrDefault("multiple", false);
           if (patternNumberedAsset.matcher(flavorSubType).matches() && (assetNumber != null)) {
             flavorSubType = assetNumber;
           }

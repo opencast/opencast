@@ -88,6 +88,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.IllegalFormatException;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -296,7 +297,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * Format a filename and make it "safe".
    */
   static String formatFileName(String format, double position, String suffix) {
-    return format(format, position, suffix);
+    return format(Locale.ROOT, format, position, suffix);
   }
 
 
