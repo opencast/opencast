@@ -49,7 +49,6 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.SetBucketVersioningConfigurationRequest;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
-import com.entwinemedia.fn.Prelude;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -288,7 +287,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
    *
    */
   @Override
-  protected InputStream getObject(AwsAssetMapping map) {
+  protected InputStream getObject(AwsAssetMapping map) throws AssetStoreException {
     try {
       // Do not use S3 object stream anymore because the S3 object needs to be closed to release
       // the http connection so create the stream using the object url (signed).
@@ -300,7 +299,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       logger.debug("Returning pre-signed URL stream for '{}': {}", map, signedUrl);
       return signedUrl.openStream();
     } catch (IOException e) {
-      return Prelude.chuck(e);
+      throw new AssetStoreException(e);
     }
   }
 
