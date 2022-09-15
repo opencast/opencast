@@ -22,7 +22,7 @@
 
 angular.module('adminNg.directives')
 .constant('EVENT_TAB_CHANGE', 'tab_change')
-.directive('adminNgWizard', ['EVENT_TAB_CHANGE', function (EVENT_TAB_CHANGE) {
+.directive('adminNgWizard', ['EVENT_TAB_CHANGE', 'HotkeysService', function (EVENT_TAB_CHANGE, HotkeysService) {
   function createWizard($scope) {
     var currentState = $scope.states[0], step, lookupIndex, lookupState, toTab,
         getCurrentState, getCurrentStateController, getPreviousState, getNextState,
@@ -113,14 +113,23 @@ angular.module('adminNg.directives')
       } catch (e) { }
     };
 
-    /* Will switch to the tab denoted in the data-modal-tab attribute of
+    /**
+     * Will switch to the tab denoted in the data-modal-tab attribute of
      * the anchor that was clicked.
      * Prerequisite: All previous steps of the wizard have been passed
      * successfully.
+     *
+     * @param {Event} $event event getting emitted when 'next' or 'previous' button is clicked.
+     *
+     * @param {string=} altTargetStepName (optional) 'next' or 'previous'. Needed by HotkeysService
+     *                                    because the emitted event and it's target are tied to an anchor
+     *                                    getting clicked - which does not happen when shortcuts are used.
+     *                                    Only used when $event.target.getAttribute('data-modal-tab)
+     *                                    returns 'undefined'.
      */
-    toTab = function ($event) {
+    toTab = function ($event, altTargetStepName) {
       var targetStepName, targetState;
-      targetStepName = $event.target.getAttribute('data-modal-tab');
+      targetStepName = $event.target.getAttribute('data-modal-tab') || altTargetStepName;
       if (targetStepName === 'previous') {
         targetState = getPreviousState();
       } else if (targetStepName === 'next') {
@@ -258,6 +267,19 @@ angular.module('adminNg.directives')
         }
       };
 
+      HotkeysService.activateHotkey(scope, 'add_media.next_tab', (event) => {
+        if (!scope.wizard.isLast()) {
+          scope.wizard.toTab(event, 'next');
+        } else {
+          scope.submit();
+        }
+        event.preventDefault();
+      });
+
+      HotkeysService.activateHotkey(scope, 'add_media.previous_tab', (event) => {
+        scope.wizard.toTab(event, 'previous');
+        event.preventDefault();
+      });
     }
   };
 }]);
