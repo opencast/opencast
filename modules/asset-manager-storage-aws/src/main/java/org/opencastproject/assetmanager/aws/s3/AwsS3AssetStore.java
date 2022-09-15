@@ -35,6 +35,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.ClientConfiguration;
+import com.amazonaws.HttpMethod;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -43,8 +44,8 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.BucketVersioningConfiguration;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.SetBucketVersioningConfigurationRequest;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
@@ -61,6 +62,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Date;
 import java.util.Dictionary;
 
 @Component(
@@ -92,6 +95,8 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   public static final int DEFAULT_MAX_CONNECTIONS = 50;
   public static final int DEFAULT_CONNECTION_TIMEOUT = 10000;
   public static final int DEFAULT_MAX_RETRIES = 100;
+
+  public static final long DOWNLOAD_URL_EXPIRATION_MS = 30 * 60 * 1000; // 30 min
 
   /** The AWS client and transfer manager */
   private AmazonS3 s3 = null;
@@ -282,9 +287,20 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
    *
    */
   @Override
-  protected InputStream getObject(AwsAssetMapping map) {
-    S3Object object = s3.getObject(bucketName, map.getObjectKey());
-    return object.getObjectContent();
+  protected InputStream getObject(AwsAssetMapping map) throws AssetStoreException {
+    try {
+      // Do not use S3 object stream anymore because the S3 object needs to be closed to release
+      // the http connection so create the stream using the object url (signed).
+      String objectKey = map.getObjectKey();
+      Date expiration = new Date(System.currentTimeMillis() + DOWNLOAD_URL_EXPIRATION_MS);
+      GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucketName, objectKey)
+              .withMethod(HttpMethod.GET).withExpiration(expiration);
+      URL signedUrl = s3.generatePresignedUrl(generatePresignedUrlRequest);
+      logger.debug("Returning pre-signed URL stream for '{}': {}", map, signedUrl);
+      return signedUrl.openStream();
+    } catch (IOException e) {
+      throw new AssetStoreException(e);
+    }
   }
 
   /**

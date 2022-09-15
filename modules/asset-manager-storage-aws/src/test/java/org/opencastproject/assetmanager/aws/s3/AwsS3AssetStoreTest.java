@@ -31,9 +31,9 @@ import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
 import com.entwinemedia.fn.data.Opt;
@@ -73,6 +73,8 @@ public class AwsS3AssetStoreTest {
   private static final String KEY_VERSION_1 = ORG_ID + "/" + MP_ID + "/1/";
   private static final String KEY_VERSION_2 = ORG_ID + "/" + MP_ID + "/2/";
   private static final String AWS_VERSION_1 = "1234";
+  private static final String OBJECT_KEY_1 = KEY_VERSION_1 + ASSET_ID + ".xml";
+  private static final String OBJECT_KEY_2 = KEY_VERSION_2 + ASSET_ID + ".xml";
 
   private URI uri;
   private File sampleFile;
@@ -127,8 +129,8 @@ public class AwsS3AssetStoreTest {
     EasyMock.expectLastCall().once();
     EasyMock.replay(upload);
 
-    EasyMock.expect(s3Transfer.upload(BUCKET_NAME, KEY_VERSION_1 + ASSET_ID + ".xml", sampleFile)).andReturn(upload);
-    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, KEY_VERSION_1 + ASSET_ID + ".xml")).andReturn(objMetadata);
+    EasyMock.expect(s3Transfer.upload(BUCKET_NAME, OBJECT_KEY_1, sampleFile)).andReturn(upload);
+    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, OBJECT_KEY_1)).andReturn(objMetadata);
     EasyMock.replay(s3Client, s3Transfer);
 
     StoragePath path = new StoragePath(ORG_ID, MP_ID, new VersionImpl(1L), ASSET_ID);
@@ -150,8 +152,8 @@ public class AwsS3AssetStoreTest {
     EasyMock.expectLastCall().once();
     EasyMock.replay(upload);
 
-    EasyMock.expect(s3Transfer.upload(BUCKET_NAME, KEY_VERSION_1 + ASSET_ID + ".xml", sampleFile)).andReturn(upload);
-    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, KEY_VERSION_1 + ASSET_ID + ".xml")).andReturn(objMetadata);
+    EasyMock.expect(s3Transfer.upload(BUCKET_NAME, OBJECT_KEY_1, sampleFile)).andReturn(upload);
+    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, OBJECT_KEY_1)).andReturn(objMetadata);
     EasyMock.replay(s3Client, s3Transfer);
 
     // Store first asset
@@ -200,12 +202,11 @@ public class AwsS3AssetStoreTest {
     EasyMock.expectLastCall().once();
     EasyMock.replay(upload);
 
-    EasyMock.expect(s3Transfer.upload(BUCKET_NAME, KEY_VERSION_1 + ASSET_ID + ".xml", sampleFile)).andReturn(upload);
-    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, KEY_VERSION_1 + ASSET_ID + ".xml")).andReturn(objMetadata);
-    S3ObjectInputStream s3Stream = EasyMock.createNiceMock(S3ObjectInputStream.class);
-    EasyMock.expect(s3Object.getObjectContent()).andReturn(s3Stream);
-    EasyMock.expect(s3Client.getObject(BUCKET_NAME, KEY_VERSION_1 + ASSET_ID + ".xml")).andReturn(s3Object);
-    EasyMock.replay(s3Object, s3Stream, s3Client, s3Transfer);
+    EasyMock.expect(s3Transfer.upload(BUCKET_NAME, OBJECT_KEY_1, sampleFile)).andReturn(upload);
+    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, OBJECT_KEY_1)).andReturn(objMetadata);
+    EasyMock.expect(s3Client.generatePresignedUrl(EasyMock.anyObject(GeneratePresignedUrlRequest.class)))
+            .andReturn(uri.toURL());
+    EasyMock.replay(s3Object, s3Client, s3Transfer);
 
     // Store asset
     StoragePath path = new StoragePath(ORG_ID, MP_ID, new VersionImpl(1L), ASSET_ID);
@@ -232,13 +233,13 @@ public class AwsS3AssetStoreTest {
     EasyMock.expectLastCall().times(2);
     EasyMock.replay(upload);
 
-    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, KEY_VERSION_1 + ASSET_ID + ".xml")).andReturn(objMetadata);
-    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, KEY_VERSION_2 + ASSET_ID + ".xml")).andReturn(objMetadata);
-    s3Client.deleteObject(BUCKET_NAME, KEY_VERSION_1 + ASSET_ID + ".xml");
+    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, OBJECT_KEY_1)).andReturn(objMetadata);
+    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, OBJECT_KEY_2)).andReturn(objMetadata);
+    s3Client.deleteObject(BUCKET_NAME, OBJECT_KEY_1);
     EasyMock.expectLastCall().once();
-    EasyMock.expect(s3Transfer.upload(BUCKET_NAME, KEY_VERSION_1 + ASSET_ID + ".xml", sampleFile)).andReturn(upload)
+    EasyMock.expect(s3Transfer.upload(BUCKET_NAME, OBJECT_KEY_1, sampleFile)).andReturn(upload)
             .once();
-    EasyMock.expect(s3Transfer.upload(BUCKET_NAME, KEY_VERSION_2 + ASSET_ID + ".xml", sampleFile))
+    EasyMock.expect(s3Transfer.upload(BUCKET_NAME, OBJECT_KEY_2, sampleFile))
             .andReturn(upload).once();
     EasyMock.replay(s3Object, s3Client, s3Transfer);
 
@@ -279,16 +280,16 @@ public class AwsS3AssetStoreTest {
     EasyMock.expectLastCall().times(2);
     EasyMock.replay(upload);
 
-    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, KEY_VERSION_1 + ASSET_ID + ".xml")).andReturn(objMetadata);
-    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, KEY_VERSION_2 + ASSET_ID + ".xml")).andReturn(objMetadata);
-    s3Client.deleteObject(BUCKET_NAME, KEY_VERSION_1 + ASSET_ID + ".xml");
+    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, OBJECT_KEY_1)).andReturn(objMetadata);
+    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, OBJECT_KEY_2)).andReturn(objMetadata);
+    s3Client.deleteObject(BUCKET_NAME, OBJECT_KEY_1);
     EasyMock.expectLastCall().once();
-    s3Client.deleteObject(BUCKET_NAME, KEY_VERSION_2 + ASSET_ID + ".xml");
+    s3Client.deleteObject(BUCKET_NAME, OBJECT_KEY_2);
     EasyMock.expectLastCall().once();
 
-    EasyMock.expect(s3Transfer.upload(BUCKET_NAME, KEY_VERSION_1 + ASSET_ID + ".xml", sampleFile)).andReturn(upload)
+    EasyMock.expect(s3Transfer.upload(BUCKET_NAME, OBJECT_KEY_1, sampleFile)).andReturn(upload)
             .once();
-    EasyMock.expect(s3Transfer.upload(BUCKET_NAME, KEY_VERSION_2 + ASSET_ID + ".xml", sampleFile))
+    EasyMock.expect(s3Transfer.upload(BUCKET_NAME, OBJECT_KEY_2, sampleFile))
             .andReturn(upload).once();
     EasyMock.replay(s3Object, s3Client, s3Transfer);
 
@@ -330,7 +331,7 @@ public class AwsS3AssetStoreTest {
     s3Client.deleteObject(BUCKET_NAME, KEY_VERSION_1 + sampleFile.getName());
     EasyMock.expectLastCall().times(2);
 
-    EasyMock.expect(s3Transfer.upload(BUCKET_NAME, KEY_VERSION_1 + ASSET_ID + ".xml", sampleFile)).andReturn(upload)
+    EasyMock.expect(s3Transfer.upload(BUCKET_NAME, OBJECT_KEY_1, sampleFile)).andReturn(upload)
             .once();
     EasyMock.replay(s3Client, s3Transfer);
 
@@ -359,10 +360,10 @@ public class AwsS3AssetStoreTest {
     EasyMock.expectLastCall().once();
     EasyMock.replay(upload);
 
-    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, KEY_VERSION_1 + ASSET_ID + ".xml")).andReturn(objMetadata);
-    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, KEY_VERSION_2 + ASSET_ID + ".xml")).andReturn(objMetadata);
+    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, OBJECT_KEY_1)).andReturn(objMetadata);
+    EasyMock.expect(s3Client.getObjectMetadata(BUCKET_NAME, OBJECT_KEY_2)).andReturn(objMetadata);
 
-    EasyMock.expect(s3Transfer.upload(BUCKET_NAME, KEY_VERSION_1 + ASSET_ID + ".xml", sampleFile)).andReturn(upload)
+    EasyMock.expect(s3Transfer.upload(BUCKET_NAME, OBJECT_KEY_1, sampleFile)).andReturn(upload)
             .once();
     EasyMock.replay(s3Object, s3Client, s3Transfer);
 
