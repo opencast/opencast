@@ -309,13 +309,32 @@
             ]
         },
 
-        "org.opencast.paella.opencast.userTrackingDataPlugin" :{
-            "enabled": true,
+        "org.opencast.paella.opencast.userTrackingDataPlugin": {
+            "enabled": false,
             "context": [
                 "userTracking"
             ]
         },
-
+        "org.opencast.paella.matomo.userTrackingDataPlugin": {
+            "enabled": false,
+            "context": [
+                "userTracking"
+            ],
+            "server": "//matomo.server.com/",
+            "siteId": "1",
+            "matomoGlobalLoaded": false,
+            "logUserId": true,
+            "events": {
+                "category": "PaellaPlayer",
+                "action": "${event}",
+                "name": "${videoId}"
+            },
+            "customDimensions": {
+                "1": "${videoId}",
+                "2": "${metadata.series} - ${metadata.seriestitle}",
+                "3": "${metadata.presenters}"
+            }
+        },
         "org.opencast.paella.breaksPlugin": {
             "enabled": true
         }
