@@ -21,21 +21,27 @@
 
 package org.opencastproject.plugin.impl;
 
+import org.opencastproject.plugin.PluginManager;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.karaf.features.Feature;
 import org.apache.karaf.features.FeaturesService;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -45,10 +51,9 @@ import java.util.stream.Collectors;
     property = {
         "service.description=Plugin Manager Service"
     },
-    immediate = true,
-    service = PluginManagerImpl.class
+    immediate = true
 )
-public class PluginManagerImpl {
+public class PluginManagerImpl implements PluginManager {
 
   /** The module specific logger */
   private static final Logger logger = LoggerFactory.getLogger(PluginManagerImpl.class);
@@ -57,6 +62,7 @@ public class PluginManagerImpl {
   private static final String PLUGIN_FEATURE_PREFIX = OPENCAST_FEATURE_PREFIX + "plugin-";
   private static final String VERBOSE = "verbose";
 
+  private ExecutorService executor;
   private FeaturesService featuresService;
   private Set<String> activePlugins;
   private boolean verbose;
@@ -71,6 +77,12 @@ public class PluginManagerImpl {
   void activate(Map<String, Object> properties) {
     logger.debug("Activating {}", PluginManagerImpl.class);
 
+    if (executor == null) {
+      executor = Executors.newSingleThreadExecutor(
+          runnable -> new Thread(runnable, PluginManager.class.getSimpleName())
+      );
+    }
+
     // Load plugin configuration
     activePlugins = properties.entrySet().stream()
             .filter(e -> BooleanUtils.toBoolean(Objects.toString(e.getValue(), "")))
@@ -81,8 +93,39 @@ public class PluginManagerImpl {
     // Verbose Karaf logs active?
     verbose = BooleanUtils.toBoolean(Objects.toString(properties.get(VERBOSE)));
 
-    Thread thread = new Thread(new PluginStarter());
-    thread.start();
+    executor.submit(new PluginStarter());
+  }
+
+  @Deactivate
+  void deactivate() {
+    if (executor != null) {
+      executor.shutdownNow();
+      executor = null;
+    }
+  }
+
+  @Override
+  public Set<String> listAvailablePlugins() {
+    try {
+      return Arrays.stream(featuresService.listFeatures())
+          .map(Feature::getName)
+          .filter(feature -> feature.startsWith(PLUGIN_FEATURE_PREFIX))
+          .collect(Collectors.toSet());
+    } catch (Exception e) {
+      return Collections.emptySet();
+    }
+  }
+
+  @Override
+  public Set<String> listInstalledPlugins() {
+    try {
+      return Arrays.stream(featuresService.listInstalledFeatures())
+          .map(Feature::getName)
+          .filter(feature -> feature.startsWith(PLUGIN_FEATURE_PREFIX))
+          .collect(Collectors.toSet());
+    } catch (Exception e) {
+      return Collections.emptySet();
+    }
   }
 
   public class PluginStarter implements Runnable {
@@ -101,10 +144,7 @@ public class PluginManagerImpl {
                 .collect(Collectors.toSet());
         logger.debug("Detected active Opencast features: {}", ocFeatures);
 
-        var installedPlugins = Arrays.stream(featuresService.listInstalledFeatures())
-                .map(Feature::getName)
-                .filter(feature -> feature.startsWith(PLUGIN_FEATURE_PREFIX))
-                .collect(Collectors.toSet());
+        var installedPlugins = listInstalledPlugins();
         logger.debug("Detected, already active Opencast plugins: {}", installedPlugins);
 
         logger.info("Loading plug-ins…");
