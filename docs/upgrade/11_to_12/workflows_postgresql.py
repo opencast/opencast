@@ -254,10 +254,11 @@ for offset in range(0, workflow_count, 100):
 
         # oc_workflow_configuration
         for configuration in root.find(f"{WORKFLOW_NS}configurations"):
+            value = configuration.text
             workflow_config.append([
                 workflow_id,
                 get_attrib_from_node(configuration, "key"),
-                configuration.text])
+                value if value is not None else ""])
 
         # oc_workflow_operation
         operation_position = 0
@@ -290,10 +291,11 @@ for offset in range(0, workflow_count, 100):
 
             # oc_workflow_operation_configuration
             for op_config in operation.find("{http://workflow.opencastproject.org}configurations"):
+                value = op_config.text
                 workflow_operation_config.append([
                     operation_id,
                     get_attrib_from_node(op_config, "key"),
-                    op_config.text])
+                    value if value is not None else ""])
 
             # Generate ID and position for next operation
             operation_id += 1

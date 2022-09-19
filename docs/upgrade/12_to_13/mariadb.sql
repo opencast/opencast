@@ -19,3 +19,11 @@ ALTER TABLE oc_workflow_operation
 ALTER TABLE oc_workflow_operation_configuration
   DROP FOREIGN KEY IF EXISTS cworkflowoperationconfigurationworkflowoperationid,
   ADD FOREIGN KEY IF NOT EXISTS IX_oc_workflow_operation_configuration_workflow_operation_id (`workflow_operation_id`) REFERENCES `oc_workflow_operation` (`id`);
+
+UPDATE oc_workflow_configuration
+SET configuration_value = ''
+WHERE configuration_value IS NULL;
+
+UPDATE oc_workflow_operation_configuration
+SET configuration_value = ''
+WHERE configuration_value IS NULL;

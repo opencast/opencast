@@ -11,3 +11,11 @@ ALTER TABLE oc_workflow_operation
 CREATE INDEX IF NOT EXISTS IX_oc_workflow_configuration_workflow_id ON oc_workflow_configuration (workflow_id);
 CREATE INDEX IF NOT EXISTS IX_oc_workflow_operation_workflow_id ON oc_workflow_operation (workflow_id);
 CREATE INDEX IF NOT EXISTS IX_oc_workflow_operation_configuration_workflow_operation_id ON oc_workflow_operation_configuration (workflow_operation_id);
+
+UPDATE oc_workflow_configuration
+SET configuration_value = ''
+WHERE configuration_value IS NULL;
+
+UPDATE oc_workflow_operation_configuration
+SET configuration_value = ''
+WHERE configuration_value IS NULL;
