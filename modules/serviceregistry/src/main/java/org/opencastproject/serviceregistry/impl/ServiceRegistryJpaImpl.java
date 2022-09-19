@@ -96,7 +96,6 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -200,6 +199,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Default setting on service statistics retrieval */
   static final int DEFAULT_SERVICE_STATISTICS_MAX_JOB_AGE = 14;
 
+  static final List<String>  DEFAULT_ENCODING_WORKERS = new ArrayList<String>();
+
+  static final double DEFAULT_ENCODING_THRESHOLD = 0.0;
+
   /** The configuration key for setting {@link #maxAttemptsBeforeErrorState} */
   static final String MAX_ATTEMPTS_CONFIG_KEY = "max.attempts";
 
@@ -235,10 +238,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   protected String jobHost;
 
   /** Comma-seperate list with URLs of encoding specialised workers*/
-  protected static List<String> encodingWorkers = new ArrayList<String>();
+  protected static List<String> encodingWorkers = DEFAULT_ENCODING_WORKERS;
 
   /** Threshold value under which defined workers get preferred when dispatching encoding jobs */
-  protected static double encodingThreshold = 0.0;
+  protected static double encodingThreshold = DEFAULT_ENCODING_THRESHOLD;
 
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
@@ -781,23 +784,26 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     String encodingWorkersString = (String) properties.get(OPT_ENCODING_WORKERS);
     if (StringUtils.isNotBlank(encodingWorkersString)) {
       encodingWorkers = Arrays.asList(encodingWorkersString.split("\\s*,\\s*"));
-    }
+    } else
+      encodingWorkers = DEFAULT_ENCODING_WORKERS;
 
     // get the encoding worker load threshold defined in the configuration file and parse the double
     String encodingThersholdString = StringUtils.trimToNull((String) properties.get(OPT_ENCODING_THRESHOLD));
     if (StringUtils.isNotBlank(encodingThersholdString) && encodingThersholdString != null) {
-      if (encodingThreshold >= 0 && encodingThreshold <= 1) {
         try {
-        encodingThreshold = Double.parseDouble(encodingThersholdString);
+          double encodingThresholdTmp = Double.parseDouble(encodingThersholdString);
+          if (encodingThresholdTmp >= 0 && encodingThresholdTmp <= 1)
+            encodingThreshold = encodingThresholdTmp;
+          else {
+            encodingThreshold = DEFAULT_ENCODING_THRESHOLD;
+            logger.warn("org.opencastproject.encoding.workers.threshold is not between 0 and 1");
+          }
         } catch (NumberFormatException e) {
           logger.warn("Can not set encoding threshold to {}. {} must be an parsable double", encodingThersholdString,
               OPT_ENCODING_THRESHOLD);
         }
-      } else {
-        encodingThreshold = 0.0;
-        logger.warn("org.opencastproject.encoding.workers.threshold is not between 0 and 1");
-      }
-    }
+    } else
+      encodingThreshold = DEFAULT_ENCODING_THRESHOLD;
 
 
     String maxJobAgeString = StringUtils.trimToNull((String) properties.get(OPT_SERVICE_STATISTICS_MAX_JOB_AGE));
@@ -2932,9 +2938,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * Comparator that will sort service registrations depending on their capacity, wich is defined by the number of jobs
    * the service's host is already running divided by the MaxLoad of the Server. The lower that number, the bigger the capacity.
    */
-  private static final class LoadComparator implements Comparator<ServiceRegistration> {
+  private class LoadComparator implements Comparator<ServiceRegistration> {
 
-    private SystemLoad loadByHost = null;
+    protected SystemLoad loadByHost = null;
 
     /**
      * Creates a new comparator which is using the given map of host names and loads.
@@ -2970,9 +2976,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * the service's host is already running divided by the MaxLoad of the Server. The lower that number, the bigger the capacity.
    * This Comparator will preferre encoding workers, if none are defined in the configuration file it will act like the LoadComparator.
    */
-  private static final class LoadComparatorEncoding implements Comparator<ServiceRegistration> {
-
-    private SystemLoad loadByHost = null;
+  private class LoadComparatorEncoding extends LoadComparator implements Comparator<ServiceRegistration> {
 
     /**
      * Creates a new comparator which is using the given map of host names and loads.
@@ -2980,7 +2984,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
      * @param loadByHost
      */
     LoadComparatorEncoding(SystemLoad loadByHost) {
-      this.loadByHost = loadByHost;
+      super(loadByHost);
     }
 
     @Override
@@ -2991,39 +2995,20 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       NodeLoad nodeB = loadByHost.get(hostB);
 
       if (encodingWorkers != null) {
-        if (isEncodingWorker(hostA, encodingWorkers) && !isEncodingWorker(hostB, encodingWorkers)) {
+        if (encodingWorkers.contains(hostA) && !encodingWorkers.contains(hostB)) {
           if (nodeA.getLoadFactor() <= encodingThreshold) {
             return -1;
           }
           return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor());
         }
-        if (isEncodingWorker(hostB, encodingWorkers) && !isEncodingWorker(hostA, encodingWorkers)) {
+        if (encodingWorkers.contains(hostB) && !encodingWorkers.contains(hostA)) {
           if (nodeB.getLoadFactor() <= encodingThreshold) {
             return 1;
           }
           return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor());
         }
       }
-
-      //If the load factors are about the same, sort based on maximum load
-      if (Math.abs(nodeA.getLoadFactor() - nodeB.getLoadFactor()) <= 0.01) {
-        //NOTE: The sort order below is *reversed* from what you'd expect
-        //When we're comparing the load factors we want the node with the lowest factor to be first
-        //When we're comparing the maximum load value, we want the node with the highest max to be first
-        return Float.compare(nodeB.getMaxLoad(), nodeA.getMaxLoad());
-      }
-      return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor());
-
-    }
-
-    private boolean isEncodingWorker(String host, List<String> encodingWorkersList) {
-      Iterator<String> workerIterator = encodingWorkersList.iterator();
-      while (workerIterator.hasNext()) {
-        if (workerIterator.next().equals(host)) {
-          return true;
-        }
-      }
-      return false;
+        return super.compare(serviceA, serviceB);
     }
   }
 
