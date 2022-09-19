@@ -17,6 +17,7 @@ from datetime import datetime
 user = "opencast"
 password = "dbpassword"
 host = "127.0.0.1"
+port = 3306
 database = "opencast"
 
 # Constants
@@ -33,12 +34,13 @@ XML_DECLARATION = "<?xml version='1.0' encoding='UTF-8'?>"
 
 
 # DB functions
-def create_connection(host_name, user_name, user_password, db_name):
+def create_connection(host_name, port_number, user_name, user_password, db_name):
     connection = mysql.connector.connect(
         host=host_name,
+        port=port_number,
         user=user_name,
         passwd=user_password,
-        database=db_name
+        database=db_name,
     )
     connection.row_factory = lambda cursor, row: row[0]
     print("Connection to database successful")
@@ -120,7 +122,7 @@ def parse_bool(value):
 
 # Connect
 print("Creating connection to database...")
-connection = create_connection(host, user, password, database)
+connection = create_connection(host, port, user, password, database)
 
 # Create new tables
 #  Currently added indexes:
