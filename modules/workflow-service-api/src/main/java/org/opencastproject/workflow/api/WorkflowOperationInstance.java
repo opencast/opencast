@@ -37,6 +37,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
@@ -50,7 +51,8 @@ import javax.persistence.TemporalType;
  */
 @Entity(name = "WorkflowOperationInstance")
 @Access(AccessType.FIELD)
-@Table(name = "oc_workflow_operation")
+@Table(name = "oc_workflow_operation", indexes = {
+    @Index(name = "IX_oc_workflow_operation_workflow_id", columnList = ("workflow_id"))})
 public class WorkflowOperationInstance implements Configurable {
   public enum OperationState {
     INSTANTIATED, RUNNING, PAUSED, SUCCEEDED, FAILED, SKIPPED, RETRY
@@ -76,7 +78,10 @@ public class WorkflowOperationInstance implements Configurable {
   @ElementCollection
   @CollectionTable(
           name = "oc_workflow_operation_configuration",
-          joinColumns = @JoinColumn(name = "workflow_operation_id")
+          joinColumns = @JoinColumn(name = "workflow_operation_id"),
+          indexes = {
+                @Index(name = "IX_oc_workflow_operation_configuration_workflow_operation_id", columnList = ("workflow_operation_id")),
+          }
   )
   @MapKeyColumn(name = "configuration_key", nullable = false)
   @Lob

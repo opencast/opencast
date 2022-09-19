@@ -144,8 +144,8 @@ CREATE TABLE {workflow_table_name} (
   `template` varchar(255) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `IX_oc_workflow_mediapackage_id` (`mediapackage_id`),
-  KEY `IX_oc_workflow_series_id` (`series_id`)
+  KEY `IX_{workflow_table_name}_mediapackage_id` (`mediapackage_id`),
+  KEY `IX_{workflow_table_name}_series_id` (`series_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 """
 
@@ -154,8 +154,8 @@ CREATE TABLE {workflow_configuration_table_name} (
   `workflow_id` bigint(20) DEFAULT NULL,
   `configuration_value` longtext DEFAULT NULL,
   `configuration_key` varchar(255) DEFAULT NULL,
-  KEY `FK_oc_workflow_configuration_workflow_id` (`workflow_id`),
-  CONSTRAINT `FK_oc_workflow_configuration_workflow_id` FOREIGN KEY (`workflow_id`) REFERENCES `oc_workflow` (`id`)
+  KEY `IX_{workflow_configuration_table_name}_workflow_id` (`workflow_id`),
+  CONSTRAINT `IX_{workflow_configuration_table_name}_workflow_id` FOREIGN KEY (`workflow_id`) REFERENCES `{workflow_table_name}` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 """
 
@@ -181,8 +181,8 @@ CREATE TABLE {workflow_operation_table_name} (
   `workflow_id` bigint(20) NOT NULL,
   `position` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `FK_oc_workflow_operation_workflow_id` (`workflow_id`),
-  CONSTRAINT `FK_oc_workflow_operation_workflow_id` FOREIGN KEY (`workflow_id`) REFERENCES `oc_workflow` (`id`)
+  KEY `IX_{workflow_operation_table_name}_workflow_id` (`workflow_id`),
+  CONSTRAINT `IX_{workflow_operation_table_name}_workflow_id` FOREIGN KEY (`workflow_id`) REFERENCES `{workflow_table_name}` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 """
 
@@ -191,8 +191,8 @@ CREATE TABLE {workflow_operation_configuration_table_name} (
   `workflow_operation_id` bigint(20) DEFAULT NULL,
   `configuration_value` longtext DEFAULT NULL,
   `configuration_key` varchar(255) NOT NULL,
-  KEY `cworkflowoperationconfigurationworkflowoperationid` (`workflow_operation_id`),
-  CONSTRAINT `cworkflowoperationconfigurationworkflowoperationid` FOREIGN KEY (`workflow_operation_id`) REFERENCES `oc_workflow_operation` (`id`)
+  KEY `IX_{workflow_operation_configuration_table_name}_workflow_operation_id` (`workflow_operation_id`),
+  CONSTRAINT `IX_{workflow_operation_configuration_table_name}_workflow_operation_id` FOREIGN KEY (`workflow_operation_id`) REFERENCES `{workflow_operation_table_name}` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 """
 

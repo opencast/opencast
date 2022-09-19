@@ -144,11 +144,11 @@ CREATE TABLE {workflow_table_name} (
 """
 
 create_workflow_table_index_mediapackageId = f"""
-CREATE INDEX ix_oc_workflow_mediapackage_id ON {workflow_table_name} USING btree (mediapackage_id);
+CREATE INDEX IX_{workflow_table_name}_mediapackage_id ON {workflow_table_name} USING btree (mediapackage_id);
 """
 
 create_workflow_table_index_seriesId = f"""
-CREATE INDEX ix_oc_workflow_series_id ON {workflow_table_name} USING btree (series_id);
+CREATE INDEX IX_{workflow_table_name}_series_id ON {workflow_table_name} USING btree (series_id);
 """
 
 create_workflow_configuration_table = f"""
@@ -157,6 +157,10 @@ CREATE TABLE {workflow_configuration_table_name} (
     configuration_value text,
     configuration_key character varying(255)
 )
+"""
+
+create_workflow_configuration_table_index_workflow_id = f"""
+CREATE INDEX IX_{workflow_configuration_table_name}_workflow_id ON {workflow_configuration_table_name} USING btree (workflow_id);
 """
 
 create_workflow_operation_table = f"""
@@ -183,6 +187,10 @@ CREATE TABLE {workflow_operation_table_name} (
 )
 """
 
+create_workflow_operation_table_index_workflow_id = f"""
+CREATE INDEX IX_{workflow_operation_table_name}_workflow_id ON {workflow_operation_table_name} USING btree (workflow_id);
+"""
+
 create_workflow_operation_configuration_table = f"""
 CREATE TABLE {workflow_operation_configuration_table_name} (
     workflow_operation_id bigint REFERENCES {workflow_operation_table_name}(id),
@@ -191,12 +199,19 @@ CREATE TABLE {workflow_operation_configuration_table_name} (
 )
 """
 
+create_workflow_operation_configuration_table_index_workflow_operation_id = f"""
+CREATE INDEX IX_{workflow_operation_configuration_table_name}_workflow_operation_id ON {workflow_operation_configuration_table_name} USING btree (workflow_operation_id);
+"""
+
 execute_query(connection, create_workflow_table)
 execute_query(connection, create_workflow_table_index_mediapackageId)
 execute_query(connection, create_workflow_table_index_seriesId)
 execute_query(connection, create_workflow_configuration_table)
+execute_query(connection, create_workflow_configuration_table_index_workflow_id)
 execute_query(connection, create_workflow_operation_table)
+execute_query(connection, create_workflow_operation_table_index_workflow_id)
 execute_query(connection, create_workflow_operation_configuration_table)
+execute_query(connection, create_workflow_operation_configuration_table_index_workflow_operation_id)
 
 print("Collect information from oc_job table...")
 select_workflow_count = """

@@ -168,7 +168,10 @@ public class WorkflowInstance {
   @ElementCollection
   @CollectionTable(
           name = "oc_workflow_configuration",
-          joinColumns = @JoinColumn(name = "workflow_id")
+          joinColumns = @JoinColumn(name = "workflow_id"),
+          indexes = {
+                @Index(name = "IX_oc_workflow_configuration_workflow_id", columnList = ("workflow_id")),
+          }
   )
   @MapKeyColumn(name = "configuration_key")
   @Lob
