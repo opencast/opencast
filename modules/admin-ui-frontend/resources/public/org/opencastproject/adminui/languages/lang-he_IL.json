@@ -2085,7 +2085,8 @@
       "GROUPS": {
          "GENERAL": "כללי",
          "PLAYER": "נגן",
-         "EDITOR": "עורך"
+         "EDITOR": "עורך",
+         "ADD_MEDIA": "Create Event/Series"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2118,6 +2119,10 @@
             "CLEAR_LIST": "נקה מקטע",
             "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "חזור על המקטע עם הקדמה",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "סוף קטע"
+         },
+         "ADD_MEDIA": {
+            "NEXT_TAB": "Next tab/Create",
+            "PREVIOUS_TAB": "Previous tab"
          }
       }
    },

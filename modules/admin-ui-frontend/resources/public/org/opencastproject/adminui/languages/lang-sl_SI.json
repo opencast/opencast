@@ -2085,7 +2085,8 @@
       "GROUPS": {
          "GENERAL": "Splošno",
          "PLAYER": "Predvajalnik",
-         "EDITOR": "Urejevalnik"
+         "EDITOR": "Urejevalnik",
+         "ADD_MEDIA": "Create Event/Series"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2118,6 +2119,10 @@
             "CLEAR_LIST": "Počisti segment",
             "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Konec segmenta"
+         },
+         "ADD_MEDIA": {
+            "NEXT_TAB": "Next tab/Create",
+            "PREVIOUS_TAB": "Previous tab"
          }
       }
    },

@@ -455,7 +455,7 @@
             "TEXT": "Beim Ausführen der Abfrage ist ein Fehler aufgetreten."
          },
          "DELETE_SUBMIT_STATE": {
-            "TEXT": "Are you sure you want to delete your registration data? Confirming this will also remove your registration data from the Opencast project server with the next update interval."
+            "TEXT": "Sind Sie sicher, dass Sie Ihre Registrierungsdaten löschen möchten? Wenn Sie dies bestätigen, werden Ihre Registrierungsdaten mit dem nächsten Update-Intervall vom Server des Opencast Projekt entfernt."
          }
       }
    },
@@ -636,7 +636,7 @@
                "COMMENTS": "Kommentare ansehen",
                "PAUSED_WORKFLOW": "Angehaltenen Workflow anzeigen",
                "PRESENTER": "Nach diesem Vortragenden filtern",
-               "COPY_TO_NEW_EVENT": "Copy metadata to new event"
+               "COPY_TO_NEW_EVENT": "Metadaten zu einer neuen Aufzeichnung kopieren"
             }
          },
          "STATUS": {
@@ -2085,7 +2085,8 @@
       "GROUPS": {
          "GENERAL": "Allgemein",
          "PLAYER": "Player",
-         "EDITOR": "Editor"
+         "EDITOR": "Editor",
+         "ADD_MEDIA": "Video/Serie erstellen"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2118,6 +2119,10 @@
             "CLEAR_LIST": "Segmente löschen",
             "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Segment mit Vorlauf abspielen",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Segmentende"
+         },
+         "ADD_MEDIA": {
+            "NEXT_TAB": "Nächster Tab/Erstellen",
+            "PREVIOUS_TAB": "Vorheriger Tab"
          }
       }
    },
