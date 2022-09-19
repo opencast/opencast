@@ -137,6 +137,7 @@ public class WorkflowInstance {
   private String title;
 
   @Column(name = "description")
+  @Lob
   private String description;
 
   @Column(name = "creator_id")

@@ -71,6 +71,7 @@ public class WorkflowOperationInstance implements Configurable {
   protected OperationState state;
 
   @Column(name = "description")
+  @Lob
   protected String description;
 
   @ElementCollection
@@ -87,6 +88,7 @@ public class WorkflowOperationInstance implements Configurable {
   protected boolean failOnError;
 
   @Column(name = "if_condition")
+  @Lob
   protected String executeCondition;
 
   @Column(name = "exception_handler_workflow")
