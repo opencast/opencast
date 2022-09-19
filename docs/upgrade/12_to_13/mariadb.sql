@@ -17,3 +17,11 @@ ALTER TABLE oc_workflow_operation
 
 ALTER TABLE oc_workflow_operation_configuration
   RENAME INDEX cworkflowoperationconfigurationworkflowoperationid TO IX_oc_workflow_operation_configuration_workflow_operation_id;
+
+UPDATE oc_workflow_configuration
+SET configuration_value = ''
+WHERE configuration_value IS NULL;
+
+UPDATE oc_workflow_operation_configuration
+SET configuration_value = ''
+WHERE configuration_value IS NULL;
