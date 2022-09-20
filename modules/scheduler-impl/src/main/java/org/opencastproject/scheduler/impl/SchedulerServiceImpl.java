@@ -175,9 +175,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /** The Etag for an empty calendar */
   private static final String EMPTY_CALENDAR_ETAG = "mod0";
 
-  /** The workflow configuration prefix */
-  public static final String WORKFLOW_CONFIG_PREFIX = "org.opencastproject.workflow.config.";
-
   private static final String SNAPSHOT_OWNER = SchedulerService.JOB_TYPE;
 
   private static final Gson gson = new Gson();

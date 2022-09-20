@@ -20,6 +20,8 @@
  */
 package org.opencastproject.liveschedule.message;
 
+import static org.opencastproject.scheduler.api.SchedulerService.WORKFLOW_CONFIG_PREFIX;
+
 import org.opencastproject.message.broker.api.MessageItem;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItemList;
@@ -73,7 +75,7 @@ public class SchedulerUpdateHandler extends UpdateHandler {
           break;
         case UpdateProperties:
           // Workflow properties may have been updated (publishLive configuration)
-          String publishLive = schedulerItem.getProperties().get(PUBLISH_LIVE_PROPERTY);
+          String publishLive = schedulerItem.getProperties().get(WORKFLOW_CONFIG_PREFIX.concat(PUBLISH_LIVE_PROPERTY));
           if (publishLive == null) {
             // Not specified so we do nothing. We don't want to delete if we got incomplete props.
             return;
