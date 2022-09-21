@@ -250,6 +250,7 @@
     <module>modules/timelinepreviews-ffmpeg</module>
     <module>modules/timelinepreviews-remote</module>
     <module>modules/timelinepreviews-workflowoperation</module>
+    <module>modules/tobira</module>
     <module>modules/transcription-service-amberscript</module>
     <module>modules/transcription-service-api</module>
     <module>modules/transcription-service-google-speech-impl</module>
