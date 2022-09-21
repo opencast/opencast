@@ -211,16 +211,24 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
     var securityContext = getUserAndOrganization(securityService, orgDir, orgId, userDir, userId)
             .map(a -> new SecurityContext(securityService, a.getB(), a.getA()));
-    while (securityContext.isEmpty()) {
-      logger.debug("Could not create security context for user {}, organization {}. "
-              + "Either the organization or the user does not exist (yet).", userId, orgId);
-        try {
-          Thread.sleep(5000);
-        } catch (InterruptedException e) {
-          return;
-        }
+
+    if (securityContext.isEmpty()) {
+      logger.warn("Could not create security context for user {}, organization {}. "
+          + "Either the organization or the user does not exist (yet).", userId, orgId);
+    }
+    for (int attempts = 0; attempts < 25 && securityContext.isEmpty(); attempts++) {
+      logger.info("Waiting for security context...");
+      try {
+        Thread.sleep(5000);
+      } catch (InterruptedException e) {
+        logger.warn("Interrupted while waiting for security context");
+      }
       securityContext = getUserAndOrganization(securityService, orgDir, orgId, userDir, userId)
-              .map(a -> new SecurityContext(securityService, a.getB(), a.getA()));
+          .map(a -> new SecurityContext(securityService, a.getB(), a.getA()));
+    }
+    if (securityContext.isEmpty()) {
+      logger.warn("Security context for user {} and organization {} is still empty. Giving up.", userId, orgId);
+      return;
     }
 
     // remove old file install configuration
