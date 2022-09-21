@@ -112,7 +112,7 @@ public final class AclServiceImpl implements AclService {
   }
 
   /**
-   * Update the Managed ACL in the events and series in the API index.
+   * Update the Managed ACL in the events and series in the Elasticsearch index.
    *
    * @param currentAclName
    *         the current name of the managed acl
@@ -135,7 +135,7 @@ public final class AclServiceImpl implements AclService {
   }
 
   /**
-   * Remove the Managed ACL from the events and series in the API index.
+   * Remove the Managed ACL from the events and series in the Elasticsearch index.
    *
    * @param currentAclName
    *         the current name of the managed acl
@@ -156,7 +156,7 @@ public final class AclServiceImpl implements AclService {
   }
 
   /**
-   * Update or remove the Managed Acl for the series in the API index.
+   * Update or remove the Managed Acl for the series in the Elasticsearch index.
    *
    * @param currentAclName
    *         the current name of the managed acl
@@ -206,7 +206,7 @@ public final class AclServiceImpl implements AclService {
   }
 
   /**
-   * Update or remove the Managed Acl for the events in the API index.
+   * Update or remove the Managed Acl for the events in the Elasticsearch index.
    *
    * @param currentAclName
    *         the current name of the managed acl

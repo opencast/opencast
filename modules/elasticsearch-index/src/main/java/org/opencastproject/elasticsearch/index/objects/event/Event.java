@@ -26,6 +26,7 @@ import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.XmlSafeParser;
+import org.opencastproject.util.jaxb.ExtendedMetadataAdapter;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 
 import org.apache.commons.lang3.StringUtils;
@@ -59,6 +60,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -72,7 +74,7 @@ import javax.xml.stream.XMLStreamWriter;
     propOrder = {
         "identifier", "organization", "title", "description", "subject", "location", "presenters",
         "contributors", "seriesId", "seriesName", "language", "source", "created", "creator",
-        "publisher", "license", "rights", "accessPolicy", "managedAcl", "workflowState",
+        "publisher", "license", "rights", "extendedMetadata", "accessPolicy", "managedAcl", "workflowState",
         "workflowId", "workflowDefinitionId", "recordingStartTime", "recordingEndTime", "duration",
         "hasComments", "hasOpenComments", "hasPreview", "needsCutting", "publications",
         "archiveVersion", "recordingStatus", "eventStatus", "agentId", "agentConfigurations",
@@ -184,6 +186,10 @@ public class Event implements IndexObject {
   /** The rights of the event */
   @XmlElement(name = "rights")
   private String rights = null;
+
+  @XmlElement(name = "extendedMetadata")
+  @XmlJavaTypeAdapter(ExtendedMetadataAdapter.class)
+  private Map<String, Map<String, List<String>>> extendedMetadata = new HashMap();
 
   /** The access policy of the event */
   @XmlElement(name = "access_policy")
@@ -1056,6 +1062,34 @@ public class Event implements IndexObject {
    */
   public void setTechnicalPresenters(List<String> technicalPresenters) {
     this.technicalPresenters = technicalPresenters;
+  }
+
+  /**
+   * Sets the external metadata for a catalog flavor.
+   *
+   * @param type
+   *         The catalog type
+   * @param metadata
+   *         The metadata
+   */
+  public void setExtendedMetadata(String type, Map<String, List<String>> metadata) {
+    extendedMetadata.put(type, metadata);
+  }
+
+  /**
+   * Removes all external metadata.
+   */
+  public void resetExtendedMetadata() {
+    extendedMetadata.clear();
+  }
+
+  /**
+   * Returns the extended metadata
+   *
+   * @return the extended metadata in a map by catalog type
+   */
+  public Map<String, Map<String, List<String>>> getExtendedMetadata() {
+    return extendedMetadata;
   }
 
   /**

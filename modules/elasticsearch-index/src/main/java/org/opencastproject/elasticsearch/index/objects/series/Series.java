@@ -26,6 +26,7 @@ import org.opencastproject.util.DateTimeSupport.UtcTimestampAdapter;
 import org.opencastproject.util.EqualsUtil;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.XmlSafeParser;
+import org.opencastproject.util.jaxb.ExtendedMetadataAdapter;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -65,8 +66,8 @@ import javax.xml.stream.XMLStreamWriter;
  * Object wrapper for a series.
  */
 @XmlType(name = "series", namespace = IndexObject.INDEX_XML_NAMESPACE, propOrder = { "identifier", "title",
-        "description", "subject", "organization", "language", "creator", "license", "accessPolicy", "managedAcl",
-        "createdDateTime", "organizers", "contributors", "publishers", "rightsHolder", "theme" })
+        "description", "subject", "organization", "language", "creator", "license", "extendedMetadata", "accessPolicy",
+        "managedAcl", "createdDateTime", "organizers", "contributors", "publishers", "rightsHolder", "theme" })
 @XmlRootElement(name = "series", namespace = IndexObject.INDEX_XML_NAMESPACE)
 @XmlAccessorType(XmlAccessType.NONE)
 public class Series implements IndexObject {
@@ -108,6 +109,10 @@ public class Series implements IndexObject {
   /** The license of the series */
   @XmlElement(name = "license")
   private String license = null;
+
+  @XmlElement(name = "extendedMetadata")
+  @XmlJavaTypeAdapter(ExtendedMetadataAdapter.class)
+  private Map<String, Map<String, List<String>>> extendedMetadata = new HashMap();
 
   /** The access policy of the series */
   @XmlElement(name = "access_policy")
@@ -504,6 +509,44 @@ public class Series implements IndexObject {
    */
   public Long getTheme() {
     return theme;
+  }
+
+  /**
+   * Sets the external metadata for a catalog type.
+   *
+   * @param type
+   *         The catalog type
+   * @param metadata
+   *         The metadata
+   */
+  public void setExtendedMetadata(String type, Map<String, List<String>> metadata) {
+    extendedMetadata.put(type, metadata);
+  }
+
+  /**
+   * Removes the external metadata for a catalog type.
+   *
+   * @param type
+   *         The catalog type
+   */
+  public void removeExtendedMetadata(String type) {
+    extendedMetadata.remove(type);
+  }
+
+  /**
+   * Removes all external metadata.
+   */
+  public void resetExtendedMetadata() {
+    extendedMetadata.clear();
+  }
+
+  /**
+   * Returns the extended metadata
+   *
+   * @return the extended metadata in a map by catalog type
+   */
+  public Map<String, Map<String, List<String>>> getExtendedMetadata() {
+    return extendedMetadata;
   }
 
   /**

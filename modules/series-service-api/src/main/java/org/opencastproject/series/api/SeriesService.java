@@ -150,6 +150,22 @@ public interface SeriesService {
           throws SeriesException, UnauthorizedException;
 
   /**
+   * Updates the extended metadata of a series from a Dublin Core catalog.
+   *
+   * @param seriesId
+   *         the series identifier
+   * @param type
+   *         the type of dublin core catalog
+   * @param dc
+   *         the dublin core catalog with extended metadata
+   *
+   * @return true if the extended metadata could be updated
+   * @throws SeriesException
+   *           if an error occurred during updating of the extended metadata
+   */
+  boolean updateExtendedMetadata(String seriesId, String type, DublinCoreCatalog dc) throws SeriesException;
+
+  /**
    * Returns all the elements of a series in a map. The key of the map marks the element type. If
    * the series does not contain any elements, an empty map is returned. If the series does not
    * exist, {@code Opt.none()} is returned.
@@ -177,31 +193,15 @@ public interface SeriesService {
   Opt<byte[]> getSeriesElementData(String seriesId, String type) throws SeriesException;
 
   /**
-   * Adds a new element to a series.
+   * Creates or updates an element of a series.
    *
    * @param seriesId
    *          the series identifier
    * @param type
-   *          the type of the new element
+   *          the type of the element
    * @param data
-   *          the data of the new element
-   * @return true, if the element could be added; false if an element with the given key already exists or if there is
-   *         no series with the given identifier.
-   * @throws SeriesException
-   *           if an error occurs while saving the element
-   */
-  boolean addSeriesElement(String seriesId, String type, byte[] data) throws SeriesException;
-
-  /**
-   * Updates an existing element of a series.
-   *
-   * @param seriesId
-   *          the series identifier
-   * @param type
-   *          the type of the new element
-   * @param data
-   *          the data of the new element
-   * @return true if the element could be updated; false if no such element/series exists
+   *          the data of the element
+   * @return true if the element could be created or updated
    * @throws SeriesException
    *           if an error occurs while updating the element
    */

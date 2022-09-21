@@ -20,7 +20,13 @@
  */
 package org.opencastproject.metadata.dublincore;
 
-import java.io.ByteArrayInputStream;
+import org.json.simple.parser.ParseException;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Byte serialization of Dublin Core catalogs.
@@ -29,8 +35,29 @@ public final class DublinCoreByteFormat {
   private DublinCoreByteFormat() {
   }
 
-  public static DublinCoreCatalog read(byte[] bytes) {
-    return DublinCores.read(new ByteArrayInputStream(bytes));
+  /**
+   * Parse a Dublin Core catalog represented by a byte array. Will recognize if it's in JSON or XML format and use
+   * the correct method.
+   *
+   * @param bytes
+   *         the catalog represented by a byte array
+   * @return the catalog
+   * @throws IOException
+   *         if the input can't be read
+   * @throws ParseException
+   *         if setting up the JSON parser failed
+   * @throws ParserConfigurationException
+   *         if setting up the XML parser failed
+   * @throws SAXException
+   *         if an error occurred while parsing the XML catalog
+   */
+  public static DublinCoreCatalog read(byte[] bytes)
+          throws IOException, ParseException, ParserConfigurationException, SAXException {
+    final String catalogString = new String(bytes, StandardCharsets.UTF_8);
+    if (DublinCoreJsonFormat.isJson(catalogString)) {
+      return DublinCoreJsonFormat.read(catalogString);
+    } else {
+      return DublinCoreXmlFormat.read(catalogString);
+    }
   }
-
 }

@@ -533,6 +533,42 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   }
 
   @Override
+  public boolean updateExtendedMetadata(String seriesId, String type, DublinCoreCatalog dc) throws SeriesException {
+    HttpPut put = new HttpPut("/" + seriesId + "/extendedMetadata/" + type);
+    try {
+      List<BasicNameValuePair> params = new ArrayList<>();
+      params.add(new BasicNameValuePair("dc", dc.toXmlString()));
+      put.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
+    } catch (Exception e) {
+      throw new SeriesException("Unable to assemble a remote series request for updating extended metadata of series "
+              + seriesId, e);
+    }
+
+    HttpResponse response = getResponse(put, SC_NO_CONTENT, SC_CREATED, SC_INTERNAL_SERVER_ERROR);
+    try {
+      if (response == null) {
+        throw new SeriesException(format("Error while updating extended metadata catalog of type '%s' for series '%s'",
+                type, seriesId));
+      } else {
+        final int statusCode = response.getStatusLine().getStatusCode();
+        switch (statusCode) {
+          case SC_NO_CONTENT:
+          case SC_CREATED:
+            return true;
+          case SC_INTERNAL_SERVER_ERROR:
+            throw new SeriesException(
+                    format("Error while updating extended metadata catalog of type '%s' for series '%s'", type,
+                            seriesId));
+          default:
+            throw new SeriesException(format("Unexpected status code", statusCode));
+        }
+      }
+    } finally {
+      closeConnection(response);
+    }
+  }
+
+  @Override
   public Opt<Map<String, byte[]>> getSeriesElements(String seriesID) throws SeriesException {
     HttpGet get = new HttpGet("/" + seriesID + "/elements.json");
     HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_INTERNAL_SERVER_ERROR);
@@ -605,32 +641,6 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   }
 
   @Override
-  public boolean addSeriesElement(String seriesID, String type, byte[] data) throws SeriesException {
-    HttpPut put = new HttpPut("/" + seriesID + "/elements/" + type);
-    put.setEntity(new ByteArrayEntity(data, ContentType.DEFAULT_BINARY));
-
-    HttpResponse response = getResponse(put, SC_CREATED, SC_INTERNAL_SERVER_ERROR);
-    try {
-      if (response == null) {
-        throw new SeriesException(format("Error while adding element of type '%s' in series '%s'", type, seriesID));
-      } else {
-        final int statusCode = response.getStatusLine().getStatusCode();
-        switch (statusCode) {
-          case SC_CREATED:
-            return true;
-          case SC_INTERNAL_SERVER_ERROR:
-            throw new SeriesException(
-                    format("Error while updating element of type '%s' in series '%s'", type, seriesID));
-          default:
-            throw new SeriesException(format("Unexpected status code", statusCode));
-        }
-      }
-    } finally {
-      closeConnection(response);
-    }
-  }
-
-  @Override
   public boolean updateSeriesElement(String seriesID, String type, byte[] data) throws SeriesException {
     HttpPut put = new HttpPut("/" + seriesID + "/elements/" + type);
     put.setEntity(new ByteArrayEntity(data, ContentType.DEFAULT_BINARY));
@@ -643,6 +653,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
         final int statusCode = response.getStatusLine().getStatusCode();
         switch (statusCode) {
           case SC_NO_CONTENT:
+          case SC_CREATED:
             return true;
           case SC_INTERNAL_SERVER_ERROR:
             throw new SeriesException(

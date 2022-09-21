@@ -2206,7 +2206,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   /**
-   * Remove a workflow instance from the API index.
+   * Remove a workflow instance from the Elasticsearch index.
    *
    * @param workflowInstanceId
    *         the identifier of the workflow instance to remove
@@ -2269,7 +2269,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   /**
-   * Update a workflow instance in the API index.
+   * Update a workflow instance in the Elasticsearch index.
    *
    * @param id
    *         workflow id
