@@ -1,5 +1,17 @@
 # Opencast 12: Release Notes
 
+Opencast 12.3
+-------------
+
+The third maintenance release of Opencast 12.
+Notable changes are:
+
+- Added Tobira connector to allow Opencast to work with the new video portal
+- Fixed deletion of scheduled events
+- Fix MariaDB upgrade script
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
 Opencast 12.2
 -------------
 
