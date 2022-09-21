@@ -79,12 +79,33 @@ API changes
 - [[#3148](https://github.com/opencast/opencast/pull/3148)] - Allow empty track duration
 
 
+Additional Notes about 11.11
+----------------------------
+
+- Bug Fixes:
+    - Filtering on fields in Admin UI may only show 10 terms
+      (cf. [[#4200](https://github.com/opencast/opencast/pull/4200]).
+    - S3 asset storage not releasing HTTP connections
+      (cf. [[#4185](https://github.com/opencast/opencast/pull/4185]).
+    - Race condition when loading workflow definitions
+      (cf. [[#4182](https://github.com/opencast/opencast/pull/4182]).
+    - Uploading multiple tracks with same flavor not working
+      (cf. [[#4172](https://github.com/opencast/opencast/pull/4172]).
+    - Asset manager warning after every upload to S3
+      (cf. [[#4164](https://github.com/opencast/opencast/pull/4164]).
+    - Ingest of series catalog via external URL not working
+      (cf. [[#4155](https://github.com/opencast/opencast/pull/4155]).
+- New features and updates:
+    - Make deletion of live publication in case of capture errors configurable
+      (cf. [[#3681](https://github.com/opencast/opencast/pull/3681]).
+
 Additional Notes about 11.10
 ----------------------------
 
 - Bug Fixes:
     - Fix CreatorDate Filter in GET api/series/
       (cf. [[#4068](https://github.com/opencast/opencast/pull/4068)]).
+    - Race condition when loading 
 - New features and updates:
     - Handle tracks with multiple videos in engage player
       (cf. [[#3923](https://github.com/opencast/opencast/pull/3923)]).
