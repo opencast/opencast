@@ -78,6 +78,29 @@ API changes
 - [[#3002](https://github.com/opencast/opencast/pull/3002)] - Sign publication URL of events in External API
 - [[#3148](https://github.com/opencast/opencast/pull/3148)] - Allow empty track duration
 
+Additional Notes about 11.11
+----------------------------
+
+- Bug Fixes:
+    - Fix for S3 asset storage not releasing http connections
+       (cf. [[#4185](https://github.com/opencast/opencast/pull/4185)])
+    - Fix race condition when loading workflow definitions
+       (cf. [[#4182](https://github.com/opencast/opencast/pull/4182)])
+    - Fix search service limit - update more than 10 events for a series change
+       (cf. [[#4159](https://github.com/opencast/opencast/pull/4159)])
+    - Fix ingest of series catalog via external URL
+       (cf. [[#4155](https://github.com/opencast/opencast/pull/4155)])
+    - Fix workflow config handover from ingest to scheduler service
+       (cf. [[#4155](https://github.com/opencast/opencast/pull/4155)])
+- New Features and updates:
+  - Add size to term aggregation in order to return more than 10 terms
+     (cf. [[#4200](https://github.com/opencast/opencast/pull/4200)])
+  - Allow upload of multiple assets with the same flavor (based on config)
+     (cf. [[#4172](https://github.com/opencast/opencast/pull/4172)])
+  - Make deletion of live publication in case of capture errors configurable
+     (cf. [[#3681](https://github.com/opencast/opencast/pull/3681)])
+
+
 
 Additional Notes about 11.10
 ----------------------------
