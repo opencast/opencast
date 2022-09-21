@@ -260,6 +260,31 @@ Dependabot's changes are excluded from this log.
 Opencast 11
 ----------
 
+### Opencast 11.11
+
+*Released on September 21th, 2022*
+
+- [[#4200](https://github.com/opencast/opencast/pull/4200)] -
+  Add size to term aggregation in order to return more than 10 terms
+- [[#4185](https://github.com/opencast/opencast/pull/4185)] -
+  Fix for S3 asset storage not releasing http connections
+- [[#4182](https://github.com/opencast/opencast/pull/4182)] -
+  Fix race condition when loading workflow definitions
+- [[#4172](https://github.com/opencast/opencast/pull/4172)] -
+  Allow upload of multiple assets with the same flavor (based on config)
+- [[#4164](https://github.com/opencast/opencast/pull/4164)] -
+  Use getObjectMetadata to get object version when uploading file to S3 archive (fixes #4161)
+- [[#4159](https://github.com/opencast/opencast/pull/4159)] -
+  Fix search service limit - update more than 10 events for a series change
+- [[#4155](https://github.com/opencast/opencast/pull/4155)] -
+  Fix ingest of series catalog via external URL
+- [[#4155](https://github.com/opencast/opencast/pull/4155)] -
+  Fix workflow config handover from ingest to scheduler service
+- [[#4119](https://github.com/opencast/opencast/pull/4119)] -
+  Respect system settings when sending adopter data
+- [[#3681](https://github.com/opencast/opencast/pull/3681)] -
+  Make deletion of live publication in case of capture errors configurable
+
 ### Opencast 11.10
 
 *Released on August 17th, 2022*
