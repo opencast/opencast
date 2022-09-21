@@ -93,12 +93,12 @@ Additional Notes about 11.11
     - Fix workflow config handover from ingest to scheduler service
        (cf. [[#4155](https://github.com/opencast/opencast/pull/4155)])
 - New Features and updates:
-  - Add size to term aggregation in order to return more than 10 terms
-     (cf. [[#4200](https://github.com/opencast/opencast/pull/4200)])
-  - Allow upload of multiple assets with the same flavor (based on config)
-     (cf. [[#4172](https://github.com/opencast/opencast/pull/4172)])
-  - Make deletion of live publication in case of capture errors configurable
-     (cf. [[#3681](https://github.com/opencast/opencast/pull/3681)])
+    - Add size to term aggregation in order to return more than 10 terms
+       (cf. [[#4200](https://github.com/opencast/opencast/pull/4200)])
+    - Allow upload of multiple assets with the same flavor (based on config)
+       (cf. [[#4172](https://github.com/opencast/opencast/pull/4172)])
+    - Make deletion of live publication in case of capture errors configurable
+       (cf. [[#3681](https://github.com/opencast/opencast/pull/3681)])
 
 
 
