@@ -124,7 +124,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller, Organizatio
       }
 
       // Determine the number of available profiles
-      String[] filesInDirectory = artifact.getParentFile().list((arg0, name) -> name.endsWith(".xml"));
+      String[] filesInDirectory = artifact.getParentFile().list((arg0, name) -> name.matches(".*\\.(xml|yaml|yml)$"));
       if (filesInDirectory == null) {
         throw new RuntimeException("error retrieving files from directory \"" + artifact.getParentFile() + "\"");
       }

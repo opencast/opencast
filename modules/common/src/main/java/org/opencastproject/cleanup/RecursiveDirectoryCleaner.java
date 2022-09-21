@@ -29,6 +29,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Duration;
@@ -74,7 +75,9 @@ public final class RecursiveDirectoryCleaner implements FileVisitor<Path> {
 
   @Override
   public FileVisitResult visitFileFailed(Path path, IOException e) throws IOException {
-    logger.warn("Visiting file {} failed with exception {}", path, e);
+    if (!(e instanceof NoSuchFileException)) {
+      logger.warn("Visiting file {} failed with exception {}", path, e);
+    }
     return FileVisitResult.CONTINUE;
   }
 
