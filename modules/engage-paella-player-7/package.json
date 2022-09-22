@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "paella-basic-plugins": "^1.2.0",
-    "paella-core": "^1.2.4",
+    "paella-core": "^1.5.2",
     "paella-slide-plugins": "^1.2.1",
     "paella-user-tracking": "^1.0.14",
     "paella-zoom-plugin": "^1.2.0"
