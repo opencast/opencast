@@ -51,6 +51,7 @@ import org.opencastproject.transcription.persistence.TranscriptionDatabase;
 import org.opencastproject.transcription.persistence.TranscriptionDatabaseException;
 import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
+import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
@@ -299,8 +300,8 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       try {
         splitTextLineSize = Integer.parseInt(splitTextLineSizeOpt.get());
       } catch (NumberFormatException e) {
-        // Use default
-        logger.warn("Invalid configuration for split text line size. Default used instead: {}", splitTextLineSize);
+        throw new ConfigurationException("Invalid configuration for split text line size. Please check your"
+                + "configuration");
       }
     }
 
