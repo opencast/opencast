@@ -111,11 +111,10 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
       try {
         Map<String, Object> returnValues = service.getReturnValues(mediaPackage.getIdentifier().toString(), jobId);
         autoDetectedLanguage = (String) returnValues.get("autoDetectedLanguage");
-        logger.warn(autoDetectedLanguage);
       } catch (NullPointerException e) {
         logger.warn("Key missing in return values", e);
       } catch (TranscriptionServiceException e) {
-        logger.warn("No return values present", e);
+        logger.warn("Something went wrong when trying to receive return values", e);
       }
 
       // Set the target flavor
