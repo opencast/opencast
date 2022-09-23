@@ -51,6 +51,7 @@ import org.opencastproject.transcription.persistence.TranscriptionDatabase;
 import org.opencastproject.transcription.persistence.TranscriptionDatabaseException;
 import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
+import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
@@ -62,6 +63,8 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.microsoft.cognitiveservices.speech.AutoDetectSourceLanguageConfig;
+import com.microsoft.cognitiveservices.speech.AutoDetectSourceLanguageResult;
 import com.microsoft.cognitiveservices.speech.CancellationReason;
 import com.microsoft.cognitiveservices.speech.PhraseListGrammar;
 import com.microsoft.cognitiveservices.speech.ProfanityOption;
@@ -76,6 +79,7 @@ import com.microsoft.cognitiveservices.speech.audio.AudioStreamContainerFormat;
 import com.microsoft.cognitiveservices.speech.audio.AudioStreamFormat;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -85,6 +89,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -97,6 +103,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
@@ -136,9 +143,13 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   private static final AudioStreamContainerFormat DEFAULT_ENCODING = AudioStreamContainerFormat.ANY;
   private static final ProfanityOption DEFAULT_PROFANITY_OPTION = ProfanityOption.Raw;
   private static final String DEFAULT_TMP_DIR = "tmp/microsoftazuretranscription";
+  private static final boolean DEFAULT_IS_AUTO_DETECT_LANGUAGE = false;
 
   // Cluster name
   private String clusterName = "";
+
+  /** Return values keys */
+  private static final String DETECTED_LANGUAGE = "autoDetectedLanguage";
 
   /**
    * Service dependencies
@@ -156,6 +167,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
 
   // Only used by unit tests!
   private Workflows wfUtil;
+  private AutoDetectSourceLanguageResult autoDetectSourceLanguageResult = null;
 
   private enum Operation {
     StartTranscription
@@ -178,6 +190,8 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   public static final String NOTIFICATION_EMAIL_CONFIG = "notification.email";
   public static final String CLEANUP_RESULTS_DAYS_CONFIG = "cleanup.results.days";
   public static final String ENCODING_EXTENSION = "encoding.extension";
+  public static final String IS_AUTO_DETECT_LANGUAGE = "auto.detect.language";
+  public static final String AUTO_DETECT_LANGUAGES = "auto.detect.languages";
 
   /**
    * Service configuration values
@@ -201,6 +215,8 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   private List<String> phraseList = new ArrayList<>();
   private boolean useSubRipTextCaptionFormat = false;
   private String fileFormat = "vtt";
+  private boolean defaultIsAutoDetectLanguage = DEFAULT_IS_AUTO_DETECT_LANGUAGE;
+  private List<String> defaultAutoDetectLanguages = new ArrayList<>();
 
   public MicrosoftAzureTranscriptionService() {
     super(JOB_TYPE);
@@ -255,7 +271,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
 
     // Phrases to be used
     Option<String> phrasesOpt = OsgiUtil.getOptCfg(cc.getProperties(), PHRASES_LIST);
-    if (useSubRipOpt.isSome()) {
+    if (phrasesOpt.isSome()) {
       phraseList = new ArrayList<>(Arrays.asList(phrasesOpt.get().split(",")));
       logger.info("Phrases added to recognition: {}", phraseList);
     } else {
@@ -278,6 +294,27 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       logger.info("Audio encoding configured as {}", compressedAudioFormat);
     } else {
       logger.info("Default '{}' audio encoding will be used", compressedAudioFormat);
+    }
+
+    // If language should be detected automatically
+    Option<String> isAutoDetectLanguageOpt = OsgiUtil.getOptCfg(cc.getProperties(), IS_AUTO_DETECT_LANGUAGE);
+    if (isAutoDetectLanguageOpt.isSome()) {
+      defaultIsAutoDetectLanguage = Boolean.valueOf(isAutoDetectLanguageOpt.get());
+    }
+    logger.info("Automatically detecting language is globally enabled: {}", defaultIsAutoDetectLanguage);
+
+    // Which languages should be used in automatic language detection
+    Option<String> autoDetectLanguagesOpt = OsgiUtil.getOptCfg(cc.getProperties(), AUTO_DETECT_LANGUAGES);
+    if (autoDetectLanguagesOpt.isSome()) {
+      defaultAutoDetectLanguages = new ArrayList<>(Arrays.asList(autoDetectLanguagesOpt.get().split(",")));
+      if (defaultIsAutoDetectLanguage
+              && (defaultAutoDetectLanguages.size() == 0 || defaultAutoDetectLanguages.size() > 4)) {
+        throw new ConfigurationException("When using automatic language detection, the list of languages must contain"
+                + "at least one language and at most four languages");
+      }
+      logger.info("Languages for auto detection: {}", defaultAutoDetectLanguages);
+    } else {
+      logger.info("No languages for auto detection defined");
     }
 
     // Workflow to execute when getting callback (optional, with default)
@@ -403,13 +440,19 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
               "This service is disabled. If you want to enable it, please update the service configuration.");
     }
 
-    if (args.length == 0) {
-      throw new IllegalArgumentException("Additional language argument is required.");
+    if (args.length != 3) {
+      throw new IllegalArgumentException("Must provide three arguments: language, autoDetect, autoDetectLanguages. Any"
+              + "of these arguments may be an empty string.");
     }
+
+    String language = args[0];
+    String autoDetect = args[1];
+    String autoDetectLanguages = args[2];
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.StartTranscription.name(),
-              Arrays.asList(mpId, MediaPackageElementParser.getAsXml(track), args[0]));
+              Arrays.asList(mpId, MediaPackageElementParser.getAsXml(track), language, autoDetect,
+                      autoDetectLanguages));
     } catch (ServiceRegistryException e) {
       throw new TranscriptionServiceException("Unable to create a job", e);
     } catch (MediaPackageException e) {
@@ -419,7 +462,12 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
 
   @Override
   public Job startTranscription(String mpId, Track track) throws TranscriptionServiceException {
-    return startTranscription(mpId, track, defaultLanguage);
+    return startTranscription(
+            mpId,
+            track,
+            defaultLanguage,
+            Boolean.toString(defaultIsAutoDetectLanguage),
+            String.join(", ", defaultAutoDetectLanguages));
   }
 
   @Override
@@ -452,37 +500,68 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     Operation op = null;
     String operation = job.getOperation();
     List<String> arguments = job.getArguments();
-    String result = "";
     op = Operation.valueOf(operation);
     switch (op) {
       case StartTranscription:
         String mpId = arguments.get(0);
         Track track = (Track) MediaPackageElementParser.getFromXml(arguments.get(1));
         String languageCode = arguments.get(2);
-        runTranscriptionJob(mpId, track, Long.toString(job.getId()), languageCode);
+        String autoDetect = arguments.get(3);
+        String autoDetectLanguages = arguments.get(4);
+        runTranscriptionJob(mpId, track, Long.toString(job.getId()), languageCode, autoDetect, autoDetectLanguages);
         break;
       default:
         throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
     }
-    return result;
+    return "";
   }
 
   /**
    * Setup speech recognition
    */
-  void runTranscriptionJob(String mpId, Track track, String jobId, String languageCode)
+  void runTranscriptionJob(String mpId, Track track, String jobId, String languageCode, String isAutoDetectString,
+          String isAutoDetectLanguagesString)
           throws TranscriptionServiceException {
+    boolean isAutoDetectLanguage;
+    List<String> autoDetectLanguages;
+    if (StringUtils.isBlank(languageCode)) {
+      languageCode = defaultLanguage;
+    }
+    if (StringUtils.isBlank(isAutoDetectString)) {
+      isAutoDetectLanguage = defaultIsAutoDetectLanguage;
+    } else {
+      isAutoDetectLanguage = Boolean.valueOf(isAutoDetectString);
+    }
+    if (StringUtils.isBlank(isAutoDetectLanguagesString)) {
+      autoDetectLanguages = defaultAutoDetectLanguages;
+    } else {
+      autoDetectLanguages = new ArrayList<>(Arrays.asList(isAutoDetectLanguagesString.split(",")));
+      if (defaultIsAutoDetectLanguage
+              && (defaultAutoDetectLanguages.size() == 0 || defaultAutoDetectLanguages.size() > 4)) {
+        throw new TranscriptionServiceException("When using automatic language detection, the list of languages must"
+                + " contain at least one language and at most four languages");
+      }
+    }
+
     try {
       final AudioConfig audioConfig = getAudioConfig(workspace.get(track.getURI()).getPath());
       final SpeechConfig speechConfig = getSpeechConfig(languageCode);
-      final SpeechRecognizer speechRecognizer = new SpeechRecognizer(speechConfig, audioConfig);
+      final SpeechRecognizer speechRecognizer;
+
+      if (isAutoDetectLanguage) {
+        AutoDetectSourceLanguageConfig autoDetectSourceLanguageConfig = AutoDetectSourceLanguageConfig
+                .fromLanguages(autoDetectLanguages);
+        speechRecognizer = new SpeechRecognizer(speechConfig, autoDetectSourceLanguageConfig, audioConfig);
+      } else {
+        speechRecognizer = new SpeechRecognizer(speechConfig, audioConfig);
+      }
 
       PhraseListGrammar grammar = PhraseListGrammar.fromRecognizer(speechRecognizer);
       for (String phrase : phraseList) {
         grammar.addPhrase(phrase);
       }
 
-      recognizeContinuous(speechRecognizer, jobId, mpId, track);
+      recognizeContinuous(speechRecognizer, jobId, mpId, track, isAutoDetectLanguage);
     } catch (ExecutionException | NotFoundException | IOException e) {
       throw new TranscriptionServiceException(e.getMessage());
     } catch (InterruptedException e) {
@@ -493,7 +572,8 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   /**
    * Track speech recognizing progress through event listeners
    */
-  void recognizeContinuous(SpeechRecognizer speechRecognizer, String jobId, String mpId, Track track)
+  void recognizeContinuous(SpeechRecognizer speechRecognizer, String jobId, String mpId, Track track,
+          boolean isAutoDetectLanguage)
           throws ExecutionException, InterruptedException {
     // This lets us modify local variables from inside a lambda.
     final int[] sequenceNumber = new int[] { 0 };
@@ -518,14 +598,19 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
 
     // Fired when an utterance is completely recognized
     speechRecognizer.recognized.addEventListener((s, e) -> {
-      if (ResultReason.RecognizedSpeech == e.getResult().getReason() && e.getResult().getText().length() > 0) {
+      SpeechRecognitionResult result = e.getResult();
+      if (ResultReason.RecognizedSpeech == result.getReason() && result.getText().length() > 0) {
         sequenceNumber[0]++;
-        String text = captionFromSpeechRecognitionResult(sequenceNumber[0], e.getResult());
+        String text = captionFromSpeechRecognitionResult(sequenceNumber[0], result);
 
         try {
           writeToTmpFile(text, jobId);
         } catch (IOException ioException) {
           logger.error(String.format("Could not write to tmp file: %s", text));
+        }
+
+        if (autoDetectSourceLanguageResult == null && isAutoDetectLanguage) {
+          autoDetectSourceLanguageResult = AutoDetectSourceLanguageResult.fromResult(result);
         }
       }
       else if (ResultReason.NoMatch == e.getResult().getReason()) {
@@ -565,7 +650,14 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
         database.updateJobControl(jobId, TranscriptionJobControl.Status.TranscriptionComplete.name());
 
         workspace.putInCollection(TRANSCRIPT_COLLECTION, buildResultsFileName(jobId),
-                new FileInputStream(new File(buildTmpFileName(jobId))));
+                new FileInputStream(new File(buildTmpResultsFileName(jobId))));
+
+        Properties properties = new Properties();
+        properties.put(DETECTED_LANGUAGE, autoDetectSourceLanguageResult.getLanguage());
+        properties.store(new FileOutputStream(buildTmpReturnValuesFileName(jobId)),
+                null);
+        workspace.putInCollection(TRANSCRIPT_COLLECTION, buildReturnValuesFileName(jobId),
+                new FileInputStream(new File(buildTmpReturnValuesFileName(jobId))));
 
         return;
       } catch (IOException | InterruptedException | TranscriptionDatabaseException | ExecutionException ex) {
@@ -579,7 +671,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   }
 
   private void writeToTmpFile(String text, String jobId) throws IOException {
-    FileWriter outputFile = new FileWriter(buildTmpFileName(jobId), true);
+    FileWriter outputFile = new FileWriter(buildTmpResultsFileName(jobId), true);
     outputFile.write(text);
     outputFile.close();
     logger.debug("Recognized");
@@ -637,18 +729,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     try {
       // If jobId is unknown, look for all jobs associated to that mpId
       if (jobId == null || "null".equals(jobId)) {
-        jobId = null;
-        for (TranscriptionJobControl jc : database.findByMediaPackage(mpId)) {
-          if (TranscriptionJobControl.Status.Closed.name().equals(jc.getStatus())
-                  || TranscriptionJobControl.Status.TranscriptionComplete.name().equals(jc.getStatus())) {
-            jobId = jc.getTranscriptionJobId();
-          }
-        }
-      }
-
-      if (jobId == null) {
-        throw new TranscriptionServiceException(
-                "No completed or closed transcription job found in database for media package " + mpId);
+        jobId = getTranscriptionJobId(mpId);
       }
 
       // Results already saved?
@@ -661,9 +742,52 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     }
   }
 
+  public Map<String, Object> getReturnValues(String mpId, String jobId)
+          throws TranscriptionServiceException {
+    try {
+      // If jobId is unknown, look for all jobs associated to that mpId
+      if (jobId == null || "null".equals(jobId)) {
+        jobId = getTranscriptionJobId(mpId);
+      }
+
+      // Results already saved?
+      URI uri = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, buildReturnValuesFileName(jobId));
+      Map<String, Object> returnValues = new HashMap<>();
+      Properties properties = new Properties();
+      properties.load(new FileInputStream(workspace.get(uri)));
+      for (String key : properties.stringPropertyNames()) {
+        returnValues.put(key, properties.get(key).toString());
+      }
+      return returnValues;
+    } catch (TranscriptionDatabaseException | FileNotFoundException e) {
+      throw new TranscriptionServiceException("Job id not informed and could not find transcription", e);
+    } catch (IOException | NotFoundException e) {
+      throw new TranscriptionServiceException("Error getting file from workspace", e);
+    }
+  }
+
   @Override
   public void transcriptionDone(String mpId, Object obj) throws TranscriptionServiceException {
     logger.info("transcriptionDone not implemented");
+  }
+
+  private String getTranscriptionJobId(String mpId) throws TranscriptionServiceException,
+          TranscriptionDatabaseException {
+    // If jobId is unknown, look for all jobs associated to that mpId
+    String jobId = null;
+    for (TranscriptionJobControl jc : database.findByMediaPackage(mpId)) {
+      if (TranscriptionJobControl.Status.Closed.name().equals(jc.getStatus())
+              || TranscriptionJobControl.Status.TranscriptionComplete.name().equals(jc.getStatus())) {
+        jobId = jc.getTranscriptionJobId();
+      }
+    }
+
+    if (jobId == null) {
+      throw new TranscriptionServiceException(
+              "No completed or closed transcription job found in database for media package " + mpId);
+    }
+
+    return jobId;
   }
 
   private void sendEmail(String subject, String body) {
@@ -680,12 +804,20 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     }
   }
 
-  private String buildTmpFileName(String jobId) {
+  private String buildTmpResultsFileName(String jobId) {
     return workspace.toSafeName(tmpStorageDir + File.separator + "transcript_" + jobId);
   }
 
   private String buildResultsFileName(String jobId) {
     return workspace.toSafeName(jobId + "." + fileFormat);
+  }
+
+  private String buildTmpReturnValuesFileName(String jobId) {
+    return workspace.toSafeName(tmpStorageDir + File.separator + "returnValues_" + jobId);
+  }
+
+  private String buildReturnValuesFileName(String jobId) {
+    return workspace.toSafeName(jobId + "." + "returnValues");
   }
 
   @Reference

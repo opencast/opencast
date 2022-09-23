@@ -27,6 +27,7 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.transcription.api.TranscriptionService;
+import org.opencastproject.transcription.api.TranscriptionServiceException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -46,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 
 @Component(
         immediate = true,
@@ -62,13 +64,15 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
 
   /** Workflow configuration option keys */
   static final String TRANSCRIPTION_JOB_ID = "transcription-job-id";
-  static final String TARGET_FLAVOR = "target-flavor";
-  static final String TARGET_TAGS = "target-tags";
   static final String TARGET_CAPTION_FORMAT = "target-caption-format";
+  static final String OPT_LANGUAGE = "replace-with-language";
 
   /** The transcription service */
   private TranscriptionService service = null;
   private Workspace workspace;
+
+  private static final String REPLACE_THIS_WITH_LANGUAGE = "____";
+  private String autoDetectedLanguage = null;
 
   @Override
   @Activate
@@ -93,21 +97,42 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
     // Check which tags/flavors have been configured
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(
             workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
-    List<String> targetTagOption = tagsAndFlavors.getTargetTags();
-    List<MediaPackageElementFlavor> targetFlavorOption = tagsAndFlavors.getTargetFlavors();
+    List<String> targetTags = tagsAndFlavors.getTargetTags();
     // Target flavor is mandatory
     MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
+    String language = StringUtils.trimToNull(operation.getConfiguration(OPT_LANGUAGE));
 
     try {
       // Get transcription file from the service
-      MediaPackageElement original = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId);
-      MediaPackageElement transcription = original;
+      MediaPackageElement transcription = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(),
+              jobId);
+
+      // Get return values from the service
+      try {
+        Map<String, Object> returnValues = service.getReturnValues(mediaPackage.getIdentifier().toString(), jobId);
+        autoDetectedLanguage = (String) returnValues.get("autoDetectedLanguage");
+        logger.warn(autoDetectedLanguage);
+      } catch (NullPointerException e) {
+        logger.warn("Key missing in return values", e);
+      } catch (TranscriptionServiceException e) {
+        logger.warn("No return values present", e);
+      }
 
       // Set the target flavor
+      if (language != null) {
+        targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavor.toString()
+                .replace(REPLACE_THIS_WITH_LANGUAGE, language));
+      } else if (autoDetectedLanguage != null) {
+        targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavor.toString()
+                .replace(REPLACE_THIS_WITH_LANGUAGE, autoDetectedLanguage));
+      } else {
+        targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavor.toString()
+                .replace(REPLACE_THIS_WITH_LANGUAGE, ""));
+      }
       transcription.setFlavor(targetFlavor);
 
       // Add tags
-      for (String tag : targetTagOption) {
+      for (String tag : targetTags) {
         transcription.addTag(tag);
       }
 
