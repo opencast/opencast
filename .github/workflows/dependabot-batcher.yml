@@ -25,12 +25,13 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version-file: '.nvmrc'
+
 # Batches Dependabot PRs into one by merging them into a combined branch, then raising a new PR
-  - name: 'Dependabot Batcher'
-    if: ${{ contains(github.head_ref, '/modules/engage-paella-player-7') }}
-    uses: Legal-and-General/dependabot-batcher@v1.0.1
-    with:
-      token: ${{ secrets.DEPENDABOT_BATCHER }} #required
-      baseBranchName: 'r/12.x' #optional
-      batchBranchName: 'dep-batcher-updates' #optional
-      batchPullTitle: 'Dependabot Batcher Updates' #optional
+    - name: 'Dependabot Batcher'
+      if: ${{ contains(github.head_ref, '/modules/engage-paella-player-7') }}
+      uses: Legal-and-General/dependabot-batcher@v1.0.1
+      with:
+        token: ${{ secrets.DEPENDABOT_BATCHER }} #required
+        baseBranchName: 'r/12.x' #optional
+        batchBranchName: 'dep-batcher-updates' #optional
+        batchPullTitle: 'Dependabot Batcher Updates' #optional
