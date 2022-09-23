@@ -532,7 +532,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
           try {
             writeToTmpFile(String.format("WEBVTT%s%s", System.lineSeparator(), System.lineSeparator()), jobId);
           } catch (IOException ioException) {
-            logger.error(String.format("Could not write header to tmp file"));
+            logger.error("Could not write header to tmp file");
           }
         }
       } catch (TranscriptionDatabaseException ex) {
@@ -552,7 +552,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
           try {
             writeToTmpFile(text, jobId);
           } catch (IOException ioException) {
-            logger.error(String.format("Could not write to tmp file: %s", text));
+            logger.error("Could not write to tmp file: {}", text);
           }
         }
       }
@@ -1003,7 +1003,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
         return true;
       }
     } catch (Exception e) {
-      logger.error(String.format("ERROR while calculating transcription request expiration for job: %s", jobId), e);
+      logger.error("ERROR while calculating transcription request expiration for job: %s", jobId, e);
       // to avoid perpetual non-expired state, transcription is set as expired
       return true;
     }
@@ -1034,7 +1034,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
 
       sendEmail("Transcription ERROR", String.format("%s(media package %s, job id %s).", message, mpId, jobId));
     } catch (Exception e) {
-      logger.error(String.format("ERROR while deleting transcription job: %s", jobId), e);
+      logger.error("ERROR while deleting transcription job: %s", jobId, e);
     }
   }
 
