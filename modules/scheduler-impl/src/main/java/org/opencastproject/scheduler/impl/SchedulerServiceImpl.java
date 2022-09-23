@@ -630,15 +630,15 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   private void updateEventInternal(final String mpId, Opt<Date> startDateTime,
-          Opt<Date> endDateTime, Opt<String> captureAgentId, Opt<Set<String>> userIds, Opt<MediaPackage> mediaPackage,
-          Opt<Map<String, String>> wfProperties, Opt<Map<String, String>> caMetadata, boolean allowConflict)
-                throws NotFoundException, SchedulerException {
+          Opt<Date> endDateTime, Opt<String> captureAgentId, Opt<Set<String>> userIds,
+          Opt<MediaPackage> mediaPackageOpt, Opt<Map<String, String>> wfProperties, Opt<Map<String, String>> caMetadata,
+          boolean allowConflict) throws NotFoundException, SchedulerException {
     notEmpty(mpId, "mpId");
     notNull(startDateTime, "startDateTime");
     notNull(endDateTime, "endDateTime");
     notNull(captureAgentId, "captureAgentId");
     notNull(userIds, "userIds");
-    notNull(mediaPackage, "mediaPackage");
+    notNull(mediaPackageOpt, "mediaPackageOpt");
     notNull(wfProperties, "wfProperties");
     notNull(caMetadata, "caMetadata");
 
@@ -657,12 +657,14 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       ARecord record = optEvent.get();
       if (record.getSnapshot().isNone())
         throw new NotFoundException("No mediapackage found while updating event " + mpId);
+      Snapshot snapshot = record.getSnapshot().get();
+      MediaPackage archivedMediaPackage = snapshot.getMediaPackage();
 
-      Opt<DublinCoreCatalog> dublinCoreOpt = loadEpisodeDublinCoreFromAsset(record.getSnapshot().get());
-      if (dublinCoreOpt.isNone())
+      Opt<DublinCoreCatalog> archivedDublinCoreOpt = loadEpisodeDublinCoreFromAsset(snapshot);
+      if (archivedDublinCoreOpt.isNone())
         throw new NotFoundException("No dublincore found while updating event " + mpId);
-
-
+      DublinCoreCatalog archivedDublinCore = archivedDublinCoreOpt.get();
+      AccessControlList archivedAcl = authorizationService.getActiveAcl(archivedMediaPackage).getA();
 
       final ExtendedEventDto extendedEventDto = optExtEvent.get();
       Date start = extendedEventDto.getStartDate();
@@ -672,10 +674,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         throw new SchedulerException("The end date is before the start date");
 
       String agentId = extendedEventDto.getCaptureAgentId();
-      Opt<String> seriesId = Opt.nul(record.getSnapshot().get().getMediaPackage().getSeries());
+      Opt<String> seriesId = Opt.nul(archivedMediaPackage.getSeries());
 
       // Check for conflicting events
-      // Check scheduling conficts in case a property relevant for conflicts has changed
+      // Check scheduling conflicts in case a property relevant for conflicts has changed
       if ((captureAgentId.isSome() || startDateTime.isSome() || endDateTime.isSome())
             && (!allowConflict || !isAdmin())) {
         List<MediaPackage> conflictingEvents = $(findConflictingEvents(captureAgentId.getOr(agentId),
@@ -693,7 +695,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
       Set<String> presenters = getPresenters(Opt.nul(extendedEventDto.getPresenters()).getOr(""));
       Map<String, String> wfProps = deserializeExtendedEventProperties(extendedEventDto.getWorkflowProperties());
-      Map<String, String> caProperties = deserializeExtendedEventProperties(extendedEventDto.getCaptureAgentProperties());
+      Map<String, String> caProperties = deserializeExtendedEventProperties(
+              extendedEventDto.getCaptureAgentProperties());
 
       boolean propertiesChanged = false;
       boolean dublinCoreChanged = false;
@@ -713,56 +716,62 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       if (captureAgentId.isSome())
         propertiesChanged = true;
 
-      Opt<AccessControlList> acl = Opt.none();
-      Opt<DublinCoreCatalog> dublinCore = Opt.none();
-      Opt<AccessControlList> aclOld =
-              some(authorizationService.getActiveAcl(record.getSnapshot().get().getMediaPackage()).getA());
-
-      //update metadata for dublincore
-      if (startDateTime.isSome() && endDateTime.isSome()) {
-        DublinCoreValue eventTime = EncodingSchemeUtils
-                .encodePeriod(new DCMIPeriod(startDateTime.get(), endDateTime.get()), Precision.Second);
-        dublinCoreOpt.get().set(DublinCore.PROPERTY_TEMPORAL, eventTime);
-        if (captureAgentId.isSome()) {
-          dublinCoreOpt.get().set(DublinCore.PROPERTY_SPATIAL, captureAgentId.get());
-        }
-        dublinCore = dublinCoreOpt;
-        dublinCoreChanged = true;
-      }
-
-      for (MediaPackage mpToUpdate : mediaPackage) {
+      Opt<AccessControlList> changedAclOpt = Opt.none();
+      Opt<DublinCoreCatalog> changedDublinCoreOpt = Opt.none();
+      if (mediaPackageOpt.isSome()) {
+        MediaPackage mediaPackage = mediaPackageOpt.get();
         // Check for series change
-        if (ne(record.getSnapshot().get().getMediaPackage().getSeries(), mpToUpdate.getSeries())) {
+        if (ne(archivedMediaPackage.getSeries(), mediaPackage.getSeries())) {
           propertiesChanged = true;
-          seriesId = Opt.nul(mpToUpdate.getSeries());
+          seriesId = Opt.nul(mediaPackage.getSeries());
         }
 
-        // Check for ACL change and send update
-        AccessControlList aclNew = authorizationService.getActiveAcl(mpToUpdate).getA();
-        if (aclOld.isNone() || !AccessControlUtil.equals(aclNew, aclOld.get())) {
-          acl = some(aclNew);
+        // Check for ACL change
+        AccessControlList acl = authorizationService.getActiveAcl(mediaPackage).getA();
+        if (!AccessControlUtil.equals(acl, archivedAcl)) {
+          changedAclOpt = some(acl);
         }
 
-        // Check for dublin core change and send update
-        Opt<DublinCoreCatalog> dublinCoreNew = DublinCoreUtil.loadEpisodeDublinCore(workspace, mpToUpdate);
-        if (dublinCoreNew.isSome() && !DublinCoreUtil.equals(dublinCoreOpt.get(), dublinCoreNew.get())) {
+        // Check for dublin core change
+        Opt<DublinCoreCatalog> dublinCoreOpt = DublinCoreUtil.loadEpisodeDublinCore(workspace,
+                mediaPackage);
+        if (dublinCoreOpt.isSome() && !DublinCoreUtil.equals(archivedDublinCore, dublinCoreOpt.get())) {
           dublinCoreChanged = true;
           propertiesChanged = true;
-          dublinCore = dublinCoreNew;
+          changedDublinCoreOpt = dublinCoreOpt;
         }
+      }
+
+      //update metadata for dublincore
+      DublinCoreCatalog dublinCore = changedDublinCoreOpt.getOr(archivedDublinCore);
+      DublinCoreCatalog dublinCoreCopy = (DublinCoreCatalog) dublinCore.clone();
+      if (startDateTime.isSome() && endDateTime.isSome()) {
+        DublinCoreValue eventTime = EncodingSchemeUtils.encodePeriod(
+                new DCMIPeriod(startDateTime.get(), endDateTime.get()), Precision.Second);
+        dublinCore.set(DublinCore.PROPERTY_TEMPORAL, eventTime);
+      }
+      if (captureAgentId.isSome()) {
+        dublinCore.set(DublinCore.PROPERTY_SPATIAL, captureAgentId.get());
+      }
+      if (!DublinCoreUtil.equals(dublinCore, dublinCoreCopy)) {
+        dublinCoreChanged = true;
+        changedDublinCoreOpt = Opt.some(dublinCore);
+        mediaPackageOpt = Opt.some(updateDublincCoreCatalog(mediaPackageOpt.getOr(archivedMediaPackage),
+                changedDublinCoreOpt.get()));
       }
 
       Opt<Map<String, String>> finalCaProperties = Opt.none();
       if (propertiesChanged) {
         finalCaProperties = Opt.some(getFinalAgentProperties(caProperties, wfProps, captureAgentId.getOr(agentId),
-                                                             seriesId, some(dublinCore.getOr(dublinCoreOpt.get()))));
+                                                             seriesId, some(changedDublinCoreOpt.getOr(
+                                                                     archivedDublinCore))));
       }
 
       String checksum = calculateChecksum(workspace, getEventCatalogUIAdapterFlavors(), startDateTime.getOr(start),
               endDateTime.getOr(end), captureAgentId.getOr(agentId), userIds.getOr(presenters),
-              mediaPackage.getOr(record.getSnapshot().get().getMediaPackage()),
-              some(dublinCore.getOr(dublinCoreOpt.get())), wfProperties.getOr(wfProps),
-              finalCaProperties.getOr(caProperties), acl.getOr(new AccessControlList()));
+              mediaPackageOpt.getOr(archivedMediaPackage),
+              some(changedDublinCoreOpt.getOr(archivedDublinCore)), wfProperties.getOr(wfProps),
+              finalCaProperties.getOr(caProperties), changedAclOpt.getOr(new AccessControlList()));
 
       String oldChecksum = extendedEventDto.getChecksum();
       if (checksum.equals(oldChecksum)) {
@@ -772,15 +781,15 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
       // Update asset
       persistEvent(mpId, checksum, startDateTime, endDateTime, captureAgentId, userIds,
-              mediaPackage, wfProperties, finalCaProperties, Opt.<String> none());
+              mediaPackageOpt, wfProperties, finalCaProperties, Opt.none());
 
       // Update live event
-      updateLiveEvent(mpId, acl, dublinCore, startDateTime, endDateTime, Opt.some(agentId),
+      updateLiveEvent(mpId, changedAclOpt, changedDublinCoreOpt, startDateTime, endDateTime, Opt.some(agentId),
               finalCaProperties);
 
       // Update API index
-      updateEventInIndex(mpId, index, acl, dublinCore, startDateTime, endDateTime, userIds, Opt.some(agentId),
-              finalCaProperties, Opt.none());
+      updateEventInIndex(mpId, index, changedAclOpt, changedDublinCoreOpt, startDateTime, endDateTime, userIds,
+              Opt.some(agentId), finalCaProperties, Opt.none());
 
       // Update last modified
       if (propertiesChanged || dublinCoreChanged || startDateTime.isSome() || endDateTime.isSome()) {
