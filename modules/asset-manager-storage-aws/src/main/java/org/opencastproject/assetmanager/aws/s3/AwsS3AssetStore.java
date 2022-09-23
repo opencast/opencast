@@ -138,7 +138,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   /** The Glacier storage class, restore period **/
   private Integer restorePeriod;
 
-  private boolean bucketCreated = false;
+  protected boolean bucketCreated = false;
 
   /** OSGi Di */
   @Override
@@ -251,7 +251,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   /**
    * Creates the AWS S3 bucket if it doesn't exist yet.
    */
-  private void createAWSBucket() {
+  void createAWSBucket() {
     // Does bucket exist?
     try {
       s3.listObjects(bucketName);
@@ -353,15 +353,10 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
    * @param storagePath asset storage path
    */
   public String getAssetStorageClass(StoragePath storagePath) throws AssetStoreException {
-    try {
-      AwsAssetMapping map = database.findMapping(storagePath);
-      if (!contains(storagePath)) {
-        return "NONE";
-      }
-      return getObjectStorageClass(map.getObjectKey());
-    } catch (AwsAssetDatabaseException e) {
-      throw new AssetStoreException(e);
+    if (!contains(storagePath)) {
+      return "NONE";
     }
+    return getObjectStorageClass(getAssetObjectKey(storagePath));
   }
 
   private String getObjectStorageClass(String objectName) throws AssetStoreException {
@@ -489,11 +484,16 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
 
   private void restoreGlacierObject(String objectName, Integer objectRestorePeriod, Boolean wait) {
     Boolean prevOngoingRestore = s3.getObjectMetadata(bucketName, objectName).getOngoingRestore();
-    if (prevOngoingRestore && wait) {
-      logger.info("Object {} is already being restored, waiting", objectName);
-    } else if (prevOngoingRestore && !wait) {
-      logger.info("Object {} is already being restored", objectName);
-      return;
+    //FIXME: prevOngoingRestore is null when the object isn't being restored for some reason
+    // The javadocs for getOngoingRestore don't say anything about retuning null, and it doesn't make a ton of sense
+    // so I'm guessing this is a bug in the library itself that's not present in the version Manchester is using
+    if (prevOngoingRestore != null) {
+      if (prevOngoingRestore && wait) {
+        logger.info("Object {} is already being restored, waiting", objectName);
+      } else if (prevOngoingRestore && !wait) {
+        logger.info("Object {} is already being restored", objectName);
+        return;
+      }
     }
     RestoreObjectRequest requestRestore = new RestoreObjectRequest(bucketName, objectName, objectRestorePeriod);
     s3.restoreObjectV2(requestRestore);

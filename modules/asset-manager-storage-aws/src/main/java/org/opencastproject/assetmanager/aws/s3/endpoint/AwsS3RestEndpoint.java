@@ -108,7 +108,7 @@ public class AwsS3RestEndpoint {
               description = "mediapackage not found or has no assets in S3",
               responseCode = HttpServletResponse.SC_NOT_FOUND)
       },
-      returnDescription = "List each assets's Object Key and S3 Storage Class ")
+      returnDescription = "List each assets's Object Key and S3 Storage Class")
   public Response getStorageClass(@PathParam("mediaPackageId") final String mediaPackageId) {
     return handleException(new Function0<Response>() {
       private String getMediaPackageId() {
@@ -265,7 +265,7 @@ public class AwsS3RestEndpoint {
               responseCode = HttpServletResponse.SC_NOT_FOUND)
       },
       returnDescription = "List each glacier asset's restoration status and expiration date")
-  public Response restoreAssetsStatus(@PathParam("mediaPackageId") final String mediaPackageId) {
+  public Response getAssetRestoreState(@PathParam("mediaPackageId") final String mediaPackageId) {
     return handleException(new Function0<Response>() {
       private String getMediaPackageId() {
         return StringUtils.trimToNull(mediaPackageId);
