@@ -7,7 +7,7 @@ on:
   push:
     branches: [ "r/12.x", "develop" ]
   pull_request:
-    branches: [ "r/12.x", develop ]
+    branches: [ "r/12.x", "develop" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
