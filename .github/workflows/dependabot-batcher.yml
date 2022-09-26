@@ -34,5 +34,5 @@ jobs:
         with:
           token: ${{ secrets.DEPENDABOT_BATCHER }} #required
           baseBranchName: 'r/12.x' #optional
-          batchBranchName: 'dep-batcher-updates' #optional
-          batchPullTitle: 'Dependabot Batcher Updates' #optional
+          batchBranchName: 'paella7-batcher-updates'
+          batchPullTitle: 'Batch Dependabot Updates for Paella 7'
