@@ -4,10 +4,9 @@ name: 'Dependabot Batcher'
 
 # Controls when the workflow will run
 on:
-  push:
-    branches: [ "r/12.x", "develop" ]
   pull_request:
-    branches: [ "r/12.x", "develop" ]
+    paths:
+      - '/modules/engage-paella-player-7/**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -29,7 +28,6 @@ jobs:
 
   # Batches Dependabot PRs into one by merging them into a combined branch, then raising a new PR
       - name: 'Dependabot Batcher'
-        if: ${{ contains(github.head_ref, '/modules/engage-paella-player-7') }}
         uses: Legal-and-General/dependabot-batcher@v1.0.1
         with:
           token: ${{ secrets.DEPENDABOT_BATCHER }} #required
