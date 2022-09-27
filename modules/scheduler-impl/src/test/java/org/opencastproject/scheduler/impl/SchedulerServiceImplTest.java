@@ -78,12 +78,10 @@ import org.opencastproject.assetmanager.impl.AssetManagerImpl;
 import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.assetmanager.impl.persistence.Database;
-import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.db.DBSession;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
-import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -91,12 +89,10 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
-import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.message.broker.api.update.SchedulerUpdateHandler;
-import org.opencastproject.metadata.dublincore.CatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCores;
@@ -107,9 +103,7 @@ import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
 import org.opencastproject.scheduler.api.SchedulerException;
-import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
-import org.opencastproject.scheduler.api.Util;
 import org.opencastproject.scheduler.endpoint.SchedulerRestService;
 import org.opencastproject.scheduler.impl.persistence.SchedulerServiceDatabaseImpl;
 import org.opencastproject.security.api.AccessControlEntry;
@@ -1449,65 +1443,6 @@ public class SchedulerServiceImplTest {
     assertFalse(currentRecording.isSome());
   }
 
-  @Test
-  public void testRepopulateIndexMultitenant() throws Exception {
-    List<Organization> orgList = Arrays.asList(
-            (Organization) new DefaultOrganization(),
-            createOrganization("org1", "Org 1"),
-            createOrganization("org2", "Org 2"));
-
-    List<User> usersList = Arrays.asList(
-            createUser(orgList.get(0), "user1", Arrays.asList(orgList.get(0).getAdminRole())),
-            createUser(orgList.get(1), "user2", Arrays.asList(orgList.get(1).getAdminRole())),
-            createUser(orgList.get(2), "user3", Arrays.asList(orgList.get(2).getAdminRole())));
-
-    currentUser = usersList.get(0);
-    currentOrg = currentUser.getOrganization();
-
-    EventCatalogUIAdapter episodeAdapter = EasyMock.createMock(EventCatalogUIAdapter.class);
-    EasyMock.expect(episodeAdapter.getFlavor()).andReturn(MediaPackageElements.EPISODE).anyTimes();
-    EasyMock.expect(episodeAdapter.getOrganization()).andReturn(CatalogUIAdapter.ORGANIZATION_WILDCARD).anyTimes();
-    EasyMock.expect(episodeAdapter.handlesOrganization(EasyMock.anyString())).andReturn(true).anyTimes();
-    EasyMock.replay(episodeAdapter);
-    schedSvc.addCatalogUIAdapter(episodeAdapter);
-
-    EasyMock.reset(orgDirectoryService);
-    EasyMock.expect(orgDirectoryService.getOrganizations()).andReturn(orgList).anyTimes();
-    EasyMock.expect(orgDirectoryService.getOrganization(EasyMock.anyString())).andAnswer(() -> {
-      String orgId = (String) EasyMock.getCurrentArguments()[0];
-      return orgList.stream().filter(org -> org.getId().equalsIgnoreCase(orgId)).findFirst().orElse(null);
-    }).anyTimes();
-
-    SecurityService securityService = schedSvc.getSecurityService();
-    EasyMock.reset(securityService);
-    EasyMock.expect(securityService.getUser()).andAnswer(() -> currentUser).anyTimes();
-    EasyMock.expect(securityService.getOrganization()).andAnswer(() -> currentOrg).anyTimes();
-    securityService.setUser(EasyMock.anyObject(User.class));
-    EasyMock.expectLastCall().anyTimes();
-    EasyMock.replay(orgDirectoryService, securityService);
-
-    // create test events for each organization
-    for (User user : usersList) {
-      currentUser = user;
-      currentOrg = user.getOrganization();
-      createEvents("Event", "ca_" + currentOrg.getId(), 1, schedSvc);
-    }
-    currentUser = usersList.get(0);
-    currentOrg = currentUser.getOrganization();
-
-    SearchResult result = EasyMock.createNiceMock(SearchResult.class);
-
-    EasyMock.reset(index);
-    EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
-    EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
-    EasyMock.expect(index.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(java.util.function.Function.class),
-            EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).times(orgList.size());
-    EasyMock.replay(index, result);
-    schedSvc.setIndex(index);
-
-    schedSvc.repopulate();
-  }
-
   private String addDublinCore(Opt<String> id, MediaPackage mediaPackage, final DublinCoreCatalog initalEvent)
           throws URISyntaxException, IOException {
     String catalogId = UUID.randomUUID().toString();
@@ -1525,43 +1460,6 @@ public class SchedulerServiceImplTest {
     }
     catalog.setChecksum(null);
     return catalogId;
-  }
-
-  private String addAcl(Opt<String> id, MediaPackage mediaPackage, final AccessControlList acl) throws Exception {
-    String attachmentId = UUID.randomUUID().toString();
-    Attachment attachment = null;
-    if (id.isSome()) {
-      attachmentId = id.get();
-      attachment = mediaPackage.getAttachment(attachmentId);
-    }
-
-    URI uri = workspace.put(mediaPackage.getIdentifier().toString(), attachmentId, "security.xml",
-            IOUtils.toInputStream(XACMLUtils.getXacml(mediaPackage, acl), StandardCharsets.UTF_8.name()));
-    if (attachment == null) {
-      attachment = (Attachment) mediaPackage.add(uri, Type.Attachment, MediaPackageElements.XACML_POLICY_EPISODE);
-      attachment.setIdentifier(attachmentId);
-    }
-    attachment.setChecksum(null);
-    return attachmentId;
-  }
-
-  private List<String> createEvents(String titlePrefix, String agent, int number, SchedulerService schedulerService)
-      throws Exception {
-    List<String> events = new ArrayList<>();
-    long offset = System.currentTimeMillis();
-    for (int i = 0; i < number; i++) {
-      MediaPackage mp = generateEvent(Opt.<String> none());
-      Date startDateTime = new Date(offset + 10 * 1000 + i * Util.EVENT_MINIMUM_SEPARATION_MILLISECONDS);
-      Date endDateTime = new Date(offset + 3610000 + i * Util.EVENT_MINIMUM_SEPARATION_MILLISECONDS);
-      offset = endDateTime.getTime();
-      final DublinCoreCatalog event = generateEvent(agent, Opt.<String> none(), Opt.some(titlePrefix + "-" + i),
-              startDateTime, endDateTime);
-      addDublinCore(Opt.<String> none(), mp, event);
-      schedulerService.addEvent(startDateTime, endDateTime, agent, Collections.<String> emptySet(), mp, wfProperties,
-              Collections.<String, String> emptyMap(), Opt.<String> none());
-      events.add(mp.getIdentifier().toString());
-    }
-    return events;
   }
 
   private void verifyRecording(String id, String state) throws SchedulerException {

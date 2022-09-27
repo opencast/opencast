@@ -64,7 +64,7 @@ public class IndexRebuildService implements BundleActivator {
    * Attention: The order is relevant for the index rebuild and should not be changed!
    */
   public enum Service {
-    Themes, Series, Scheduler, Workflow, AssetManager, Comments
+    Themes, Series, Workflow, AssetManager, Comments
   }
 
   private static final Logger logger = LoggerFactory.getLogger(IndexRebuildService.class);

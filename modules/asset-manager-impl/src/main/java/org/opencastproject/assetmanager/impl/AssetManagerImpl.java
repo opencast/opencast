@@ -58,6 +58,7 @@ import org.opencastproject.assetmanager.api.storage.Source;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.persistence.AssetDtos;
 import org.opencastproject.assetmanager.impl.persistence.Database;
+import org.opencastproject.assetmanager.impl.persistence.SchedulerIndexData;
 import org.opencastproject.assetmanager.impl.persistence.SnapshotDto;
 import org.opencastproject.assetmanager.impl.query.AQueryBuilderImpl;
 import org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery;
@@ -97,6 +98,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
+import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RequireUtil;
@@ -134,9 +136,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -949,6 +953,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
       final AQueryBuilder q = createQuery();
       final RichAResult r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).run());
+
+      final Map<String, SchedulerIndexData> schedulerData;
+      schedulerData = getDatabase().getSchedulerIndexData();
+
       final int total = r.countSnapshots();
       logIndexRebuildBegin(logger, index.getIndexName(), total, "snapshot(s)");
       int current = 0;
@@ -965,10 +973,15 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           for (Snapshot snapshot : byOrg.get(orgId)) {
             try {
               current++;
+              String mpId = snapshot.getMediaPackage().getIdentifier().toString();
 
-              var updatedEventData = index.getEvent(snapshot.getMediaPackage().getIdentifier().toString(), orgId, user);
+              var updatedEventData = index.getEvent(mpId, orgId, user);
               updatedEventData = getEventUpdateFunction(snapshot, orgId, user).apply(updatedEventData);
               updatedEventRange.add(updatedEventData.get());
+              if (schedulerData.containsKey(mpId)) {
+                updatedEventData = getSchedulerUpdateFunction(schedulerData.get(mpId), orgId,
+                        user).apply(updatedEventData);
+              }
 
               if (updatedEventRange.size() >= n || current >= byOrg.get(orgId).size()) {
                 index.bulkEventUpdate(updatedEventRange);
@@ -1599,5 +1612,54 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       }
       return Optional.of(event);
     };
+  }
+
+  /**
+   * Get the function to update a scheduled event in the Elasticsearch index.
+   *
+   * @param scheduledEvent
+   *          The theme to update
+   * @param orgId
+   *          The id of the current organization
+   * @param user
+   *          The user
+   * @return the function to do the update
+   */
+  public static Function<Optional<Event>, Optional<Event>> getSchedulerUpdateFunction(SchedulerIndexData schedulerEntry,
+          String orgId, User user) {
+    return (Optional<Event> eventOpt) -> {
+      Event event = eventOpt.orElse(new Event(schedulerEntry.getMediaPackageId(), orgId));
+
+      final Set<String> presenters = getPresenters(Opt.nul(schedulerEntry.getPresenters()).getOr(""));
+      Opt<Set<String>> presentersOpt = Opt.some(presenters);
+      Opt<Date> startTime = Opt.some(schedulerEntry.getStartDate());
+      Opt<Date> endTime = Opt.some(schedulerEntry.getEndDate());
+      Opt<String> agentId = Opt.some(schedulerEntry.getCaptureAgentId());
+      Opt<String> recordingStatus = Opt.nul(schedulerEntry.getRecordingState());
+
+      if (presentersOpt.isSome()) {
+        event.setTechnicalPresenters(new ArrayList<>(presentersOpt.get()));
+      }
+      if (agentId.isSome()) {
+        event.setAgentId(agentId.get());
+      }
+      if (recordingStatus.isSome() && !recordingStatus.get().equals("unknown")) {
+        event.setRecordingStatus(recordingStatus.get());
+      }
+      if (startTime.isSome()) {
+        String startTimeStr = startTime == null ? null : DateTimeSupport.toUTC(startTime.get().getTime());
+        event.setTechnicalStartTime(startTimeStr);
+      }
+      if (endTime.isSome()) {
+        String endTimeStr = endTime == null ? null : DateTimeSupport.toUTC(endTime.get().getTime());
+        event.setTechnicalEndTime(endTimeStr);
+      }
+
+      return Optional.of(event);
+    };
+  }
+
+  private static Set<String> getPresenters(String presentersString) {
+    return new HashSet<>(Arrays.asList(StringUtils.split(presentersString, ",")));
   }
 }

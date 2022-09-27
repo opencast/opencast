@@ -50,7 +50,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -352,6 +354,21 @@ public class Database implements EntityPaths {
           .singleResult(Full.select);
       return Opt.nul(result).map(Full.fromTuple);
     });
+  }
+
+  /**
+   * Gets Scheduler index data for all events.
+   * Selects only mediapackage id, capture agent id, recording state, presenters, start date and end date
+   *
+   * @return list of {@link SchedulerIndexData}s
+   */
+  public Map<String, SchedulerIndexData> getSchedulerIndexData() {
+    var result = db.exec(namedQuery.findAll(
+            "SchedulerIndexData.getAll",
+            SchedulerIndexData.class
+    ));
+    return result.stream().collect(
+            Collectors.toMap(data -> data.getMediaPackageId(), data -> data));
   }
 
   //
