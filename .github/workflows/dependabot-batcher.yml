@@ -1,6 +1,6 @@
 # Dependabot Batcher v1.0.1
 
-name: 'Dependabot Batcher'
+name: 'Dependabot Batcher for Paella 7'
 
 # Controls when the workflow will run
 on:
@@ -12,20 +12,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  dependabot-batcher:
+  dependabot-batcher-paella-7:
     name: 'Combine dependabot PRs'
     runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout Repo'
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.DEPENDABOT_BATCHER }}
-
-      - name: 'Set Node Version'
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.8.0
-
   # Batches Dependabot PRs into one by merging them into a combined branch, then raising a new PR
       - name: 'Dependabot Batcher'
         uses: Legal-and-General/dependabot-batcher@v1.0.1
