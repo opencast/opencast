@@ -97,6 +97,9 @@ public class JobDispatcher {
   /** JPA persistence unit name */
   public static final String PERSISTENCE_UNIT = "org.opencastproject.common";
 
+  /** Identifier for the workflow service */
+  public static final String TYPE_WORKFLOW = "org.opencastproject.workflow";
+
   /** Configuration key for the dispatch interval, in seconds */
   protected static final String OPT_DISPATCHINTERVAL = "dispatch.interval";
 
@@ -306,10 +309,12 @@ public class JobDispatcher {
             continue;
           }
 
+          dispatchableJobs.sort(new workflowPriorizationComparator());
           dispatchDispatchableJobs(em, dispatchableJobs);
         } while (jobsFound);
 
         if (!workflowJobs.isEmpty()) {
+          workflowJobs.sort(new workflowPriorizationComparator());
           dispatchDispatchableJobs(em, workflowJobs);
         }
 
@@ -640,5 +645,39 @@ public class JobDispatcher {
         return o2.compareTo(o1);
       }
     };
+  }
+
+
+  /**
+   * Comparator that will sort jobs according to their status. Those that were restarted are on top, those that are
+   * queued are next.
+   */
+  static final class workflowPriorizationComparator implements Comparator<JpaJob> {
+
+    @Override
+    public int compare(JpaJob jobA, JpaJob jobB) {
+
+      // Jobs that are in "restart" mode should be handled first
+      if (Job.Status.RESTART.equals(jobA.getStatus()) && !Job.Status.RESTART.equals(jobB.getStatus())) {
+        return -1;
+      } else if (Job.Status.RESTART.equals(jobB.getStatus()) && !Job.Status.RESTART.equals(jobA.getStatus())) {
+        return 1;
+      }
+
+      // Regular jobs should be processed prior to workflow and workflow operation jobs
+      if (TYPE_WORKFLOW.equals(jobA.getJobType()) && !TYPE_WORKFLOW.equals(jobB.getJobType())) {
+        return 1;
+      } else if (TYPE_WORKFLOW.equals(jobB.getJobType()) && !TYPE_WORKFLOW.equals(jobA.getJobType())) {
+        return -1;
+      }
+
+      //Prioritize older workflows
+      if (jobA.getRootJob() != null && jobB.getRootJob() != null && jobA.getRootJob().getDateCreated() != null && jobB.getRootJob().getDateCreated() != null ) {
+        return jobA.getRootJob().getDateCreated().compareTo( jobB.getRootJob().getDateCreated());
+      }
+
+      // undecided
+      return 0;
+    }
   }
 }

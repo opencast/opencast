@@ -675,8 +675,14 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
     try {
       logger.info("Scheduling workflow %s for execution", workflow.getId());
-      Job job = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(),
-              Collections.singletonList(Long.toString(workflow.getId())), null, false, null, WORKFLOW_JOB_LOAD);
+      Job job = null;
+      if (serviceRegistry.getJob(workflow.getId()) != null) {
+        job = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(), Collections.singletonList(Long.toString(workflow.getId())), null, false,
+            serviceRegistry.getJob(workflow.getId()), WORKFLOW_JOB_LOAD);
+      } else {
+        job = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(), Collections.singletonList(Long.toString(workflow.getId())), null, false,
+            null, WORKFLOW_JOB_LOAD);
+      }
       operation.setId(job.getId());
       update(workflow);
       job.setStatus(Status.QUEUED);
@@ -784,8 +790,13 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         case FAILING:
         case RUNNING:
           try {
-            job = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(),
-                    Collections.singletonList(Long.toString(workflow.getId())), null, false, null, WORKFLOW_JOB_LOAD);
+            if (serviceRegistry.getJob(workflow.getId()) != null){
+              job = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(),
+                  Collections.singletonList(Long.toString(workflow.getId())), null, false, serviceRegistry.getJob(workflow.getId()) , WORKFLOW_JOB_LOAD);
+            } else {
+              job = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(),
+                  Collections.singletonList(Long.toString(workflow.getId())), null, false, null , WORKFLOW_JOB_LOAD);
+            }
             currentOperation.setId(job.getId());
             update(workflow);
             job.setStatus(Status.QUEUED);
@@ -1041,8 +1052,13 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     if (OperationState.INSTANTIATED.equals(currentOperation.getState())) {
       try {
         // the operation has its own job. Update that too.
-        Job operationJob = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(),
-                Collections.singletonList(Long.toString(workflowInstanceId)), null, false, null, WORKFLOW_JOB_LOAD);
+        Job operationJob = null;
+        if (serviceRegistry.getJob(workflowInstance.getId()) != null) {
+          operationJob = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(), Collections.singletonList(Long.toString(workflowInstance.getId())), null, false,
+              serviceRegistry.getJob(workflowInstance.getId()), WORKFLOW_JOB_LOAD);
+        } else {
+          operationJob = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(), Collections.singletonList(Long.toString(workflowInstanceId)), null, false, null, WORKFLOW_JOB_LOAD);
+        }
 
         // this method call is publicly visible, so it doesn't necessarily go through the accept method. Set the
         // workflow state manually.
