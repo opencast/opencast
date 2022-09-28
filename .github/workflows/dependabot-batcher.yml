@@ -24,7 +24,7 @@ jobs:
       - name: 'Dependabot Batcher'
         uses: Legal-and-General/dependabot-batcher@v1.0.1
         with:
-          token: ${{ secrets.DEPENDABOT_BATCHER }} #required
+          token: ${{ secrets.GITHUB_TOKEN }} #required
           baseBranchName: 'r/12.x' #optional
           batchBranchName: 'paella7-batcher-updates'
           batchPullTitle: 'Batch Dependabot Updates for Paella 7'
