@@ -4,7 +4,10 @@ name: 'Dependabot Batcher for Paella 7'
 
 # Controls when the workflow will run
 on:
-  [pull_request, push]:
+  pull_request:
+    paths:
+      - '/modules/engage-paella-player-7/**'
+  push:
     paths:
       - '/modules/engage-paella-player-7/**'
 
