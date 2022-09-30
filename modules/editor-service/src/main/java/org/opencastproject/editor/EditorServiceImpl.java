@@ -457,10 +457,11 @@ public class EditorServiceImpl implements EditorService {
    * @throws IOException
    */
   private void addSubtitleTrack(MediaPackage mediaPackage, List<EditingData.Subtitle> subtitles)
-          throws IOException {
+          throws IOException, IllegalArgumentException {
     for (EditingData.Subtitle subtitle : subtitles) {
       if (!subtitle.getFlavor().matches(captionsFlavor)) {
-        break;
+        throw new IllegalArgumentException("Given subtitle flavor " + subtitle.getFlavor().toString()
+                + " does match caption flavor " + captionsFlavor);
       }
 
       // Generate ID for new tracks
@@ -906,6 +907,8 @@ public class EditorServiceImpl implements EditorService {
       addSubtitleTrack(mediaPackage, editingData.getSubtitles());
     } catch (IOException e) {
       errorExit("Unable to add subtitle track to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
+    } catch (IllegalArgumentException e) {
+      errorExit("Illegal subtitle given", mediaPackageId, ErrorStatus.UNKNOWN, e);
     }
 
     if (editingData.getPostProcessingWorkflow() != null) {
