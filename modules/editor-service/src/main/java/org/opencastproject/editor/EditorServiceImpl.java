@@ -34,7 +34,6 @@ import org.opencastproject.editor.api.EditingData;
 import org.opencastproject.editor.api.EditorService;
 import org.opencastproject.editor.api.EditorServiceException;
 import org.opencastproject.editor.api.ErrorStatus;
-import org.opencastproject.editor.api.PostEditingData;
 import org.opencastproject.editor.api.SegmentData;
 import org.opencastproject.editor.api.TrackData;
 import org.opencastproject.editor.api.TrackSubData;
@@ -448,7 +447,7 @@ public class EditorServiceImpl implements EditorService {
   }
 
   /**
-   * Adds subtitles {@link PostEditingData.Subtitle} to the media package and sends the updated media package
+   * Adds subtitles {@link EditingData.Subtitle} to the media package and sends the updated media package
    * to the archive. If a subtitle flavor already exists, the subtitle is overwritten
    *
    * @param mediaPackage
@@ -457,9 +456,9 @@ public class EditorServiceImpl implements EditorService {
    *          the subtitles to be added
    * @throws IOException
    */
-  private void addSubtitleTrack(MediaPackage mediaPackage, List<PostEditingData.Subtitle> subtitles)
+  private void addSubtitleTrack(MediaPackage mediaPackage, List<EditingData.Subtitle> subtitles)
           throws IOException {
-    for (PostEditingData.Subtitle subtitle : subtitles) {
+    for (EditingData.Subtitle subtitle : subtitles) {
       if (!subtitle.getFlavor().matches(captionsFlavor)) {
         break;
       }
@@ -788,7 +787,8 @@ public class EditorServiceImpl implements EditorService {
 
     // Get subtitles from the asset manager, so they are guaranteed to be up-to-date after saving
     trackList.removeIf(t -> t.getFlavor().matches(captionsFlavor));
-    trackList = Stream.concat(trackList.stream(), Arrays.stream(mp.getTracks(captionsFlavor)))
+    List<EditingData.Subtitle> subtitles = Arrays.stream(mp.getTracks(captionsFlavor))
+            .map(t -> new EditingData.Subtitle(t.getFlavor(), t.getURI().toString()))
             .collect(Collectors.toList());
 
     // Get tracks from the internal publication because it is a lot faster than getting them from the asset manager
@@ -818,7 +818,7 @@ public class EditorServiceImpl implements EditorService {
             .collect(Collectors.toList());
 
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
-            event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList);
+            event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList, subtitles);
   }
 
 
@@ -861,7 +861,7 @@ public class EditorServiceImpl implements EditorService {
   }
 
   @Override
-  public void setEditData(String mediaPackageId, PostEditingData editingData) throws EditorServiceException,
+  public void setEditData(String mediaPackageId, EditingData editingData) throws EditorServiceException,
           IOException {
     final Event event = getEvent(mediaPackageId);
 

@@ -44,7 +44,7 @@ public interface EditorService {
    * Store information about edited data relevant to the given mediaPackageId
    * @param editingData
    */
-  void setEditData(String mediaPackageId, PostEditingData editingData) throws EditorServiceException, IOException;
+  void setEditData(String mediaPackageId, EditingData editingData) throws EditorServiceException, IOException;
 
   /**
    * Provide all meta information about the given mediaPackageId
