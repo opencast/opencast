@@ -672,7 +672,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Override
   public void moveSnapshotsByIdAndDate(final String mpId, final Date start, final Date end, final String targetStore)
           throws NotFoundException {
-    RichAResult results = getSnapshotsByDate(start, end);
+    RichAResult results = getSnapshotsByIdAndDate(mpId, start, end);
 
     if (results.getRecords().isEmpty()) {
       throw new NotFoundException("No media package with id " + mpId + " found between " + start + " and " + end);
