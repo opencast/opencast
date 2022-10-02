@@ -660,7 +660,14 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Override
   public void moveSnapshotsByDate(final Date start, final Date end, final String targetStore)
           throws NotFoundException {
-    RichAResult results = getSnapshotsByDate(start, end);
+    // We don't use #getSnapshotsByDate() as this includes also all snapshots already in targetStore. On large installs
+    // this could lead to memory overflow.
+    AQueryBuilder q = createQuery();
+    ASelectQuery query = baseQuery(q)
+        .where(q.storage(targetStore).not())
+        .where(q.archived().ge(start))
+        .where(q.archived().le(end));
+    RichAResult results = Enrichments.enrich(query.run());
 
     if (results.getRecords().isEmpty()) {
       throw new NotFoundException("No media packages found between " + start + " and " + end);
