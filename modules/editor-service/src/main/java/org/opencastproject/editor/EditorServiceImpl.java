@@ -494,13 +494,16 @@ public class EditorServiceImpl implements EditorService {
    */
   private void addSubtitleTrack(MediaPackage mediaPackage, List<EditingData.Subtitle> subtitles)
           throws IOException, IllegalArgumentException {
+    // Check if any of the provided subtitles fail to match the designated flavor
     for (EditingData.Subtitle subtitle : subtitles) {
       if (!subtitle.getFlavor().matches(captionsFlavor)) {
         throw new IllegalArgumentException(
                 "Given subtitle flavor " + subtitle.getFlavor().toString() + " does match caption flavor "
                         + captionsFlavor);
       }
+    }
 
+    for (EditingData.Subtitle subtitle : subtitles) {
       // Generate ID for new tracks
       String subtitleId = UUID.randomUUID().toString();
       String trackId = null;
