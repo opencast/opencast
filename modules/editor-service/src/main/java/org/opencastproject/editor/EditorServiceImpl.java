@@ -88,6 +88,7 @@ import org.opencastproject.workspace.api.Workspace;
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
@@ -99,10 +100,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -118,7 +121,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.JAXBException;
@@ -788,9 +790,17 @@ public class EditorServiceImpl implements EditorService {
 
     // Get subtitles from the asset manager, so they are guaranteed to be up-to-date after saving
     trackList.removeIf(t -> t.getFlavor().matches(captionsFlavor));
-    List<EditingData.Subtitle> subtitles = Arrays.stream(mp.getTracks(captionsFlavor))
-            .map(t -> new EditingData.Subtitle(t.getFlavor(), t.getURI().toString()))
-            .collect(Collectors.toList());
+    Track[] subtitleTracks = mp.getTracks(captionsFlavor);
+    List<EditingData.Subtitle> subtitles = new ArrayList<>();
+    for (Track t: subtitleTracks) {
+      try {
+        File subtitleFile = workspace.get(t.getURI());
+        String subtitleString = FileUtils.readFileToString(subtitleFile, StandardCharsets.UTF_8);
+        subtitles.add(new EditingData.Subtitle(t.getFlavor(), subtitleString));
+      } catch (NotFoundException | IOException e) {
+        errorExit("Could not read subtitle from file", mediaPackageId, ErrorStatus.UNKNOWN);
+      }
+    }
 
     // Get tracks from the internal publication because it is a lot faster than getting them from the asset manager
     // for some reason.
