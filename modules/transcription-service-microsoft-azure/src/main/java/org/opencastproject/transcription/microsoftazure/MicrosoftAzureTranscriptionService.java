@@ -542,15 +542,14 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
         return;
       }
       else if (CancellationReason.CancelledByUser == e.getReason()) {
-        errorMessage = String.format("User canceled request.%s", System.lineSeparator());
+        errorMessage = "User canceled request.";
       }
       else if (CancellationReason.Error == e.getReason()) {
-        errorMessage = String.format("Encountered error.%sError code: %d%sError details: %s%s",
-                System.lineSeparator(), e.getErrorCode(), e.getErrorDetails());
+        errorMessage = String.format("Encountered error.%sError code: %s%sError details: %s",
+                System.lineSeparator(), e.getErrorCode().name(), System.lineSeparator(), e.getErrorDetails());
       }
       else {
-        errorMessage = String.format("Request was cancelled for an unrecognized reason: %d.%s",
-                e.getReason(), System.lineSeparator());
+        errorMessage = String.format("Request was cancelled for an unrecognized reason: %d.", e.getReason());
       }
 
       errorCallback(errorMessage, speechRecognizer, jobId, mpId);
