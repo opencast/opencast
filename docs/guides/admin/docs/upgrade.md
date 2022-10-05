@@ -18,6 +18,12 @@ please refer to [older release notes](https://docs.opencast.org).
 Database Migration
 ------------------
 
+<div class=warn>
+Bug in 12.2:
+Please use the latest version of the upgrade script linked below.
+Version 12.2 of the MariaDB variant contained a bug which would make the script exit successfully while doing nothing.
+</div>
+
 Upgrading to Opencast 12 requires a database migration as some tables have changed.
 Migration scripts can be found in
 [`doc/upgrade/11_to_12/`](https://github.com/opencast/opencast/tree/r/12.x/docs/upgrade/11_to_12).
@@ -49,10 +55,16 @@ You can do this in a virtual Python environment if you do not want to install th
 ```sh
 python3 -m venv venv
 . ./venv/bin/activate
+
 # you might need to have a MariaDB/PostgrSQL client installed
+
+# for PostgrSQL:
 pip install psycopg2-binary
-# or for MariaDB
-pip install mysql-connector-python
+
+# or for MariaDB:
+pip install mysql_connector_python==8.0.29
+# NOTE: please don't install version 8.0.30, because the migration
+# script runs into errors with this version. Newer versions also were not tested yet.
 ```
 
 Alternatively to using `pip`, use your system's package manager, e.g.:

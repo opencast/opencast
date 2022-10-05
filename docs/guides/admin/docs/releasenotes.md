@@ -1,5 +1,34 @@
 # Opencast 12: Release Notes
 
+Opencast 12.3
+-------------
+
+The third maintenance release of Opencast 12.
+Notable changes are:
+
+- Added Tobira connector to allow Opencast to work with the new video portal
+- Fixed deletion of scheduled events
+- Fix MariaDB upgrade script
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
+Opencast 12.2
+-------------
+
+The second maintenance release of Opencast 12.
+Notable changes:
+
+- New Opencast Studio version including dark mode feature
+- Fix OAI-PMH
+- Update CAS documentation
+- Bugfix update the MariaDB database driver (again)
+- Use an event title fallback from Dublin Core catalog while publishing to
+  Engage
+- Update the migration script installation instructions, which will otherwise
+  fail with newer versions of the MariaDB Python connector
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
 Opencast 12.1
 -------------
 
@@ -32,8 +61,9 @@ Opencast 12.0
 - You can now define workflows in YAML. An
   [example workflow written in YAML](https://github.com/opencast/opencast/blob/r/12.x/etc/workflows/fast.yaml) is provided.
   [Documentation is available](configuration/workflow.md#using-yaml-files-with-workflows).
-- A new workflow operation handler [allows you to copy media package elements from existing publications
-  ](https://github.com/opencast/opencast/pull/3554)
+- The new [publication to workspace workflow operation handler](workflowoperationhandlers/publication-to-workspace-woh.md)
+  allows you to copy media package elements from existing publications
+  [[#3554](https://github.com/opencast/opencast/pull/3554)].
 
 ### Improvements
 
@@ -81,8 +111,13 @@ Opencast 12.0
 
 ### API changes
 
-- Important: The endpoint for querying workflows has been removed from the
-  External API.
+<div class=warn>
+The endpoint for querying workflows has been completely removed from the External API.
+It was conflicting with our removal of Solr.
+We tried making sure that no one was using this, but if we missed you and you desperately need it, please reach out.
+We will then see what we can reasonaably do about this.
+</div>
+
 - [[#3204](https://github.com/opencast/opencast/pull/3204)] removes the fulltext
   search query from the series endpoint and adds it to the
   [External API](https://docs.opencast.org/r/12.x/developer/#api/series-api/).

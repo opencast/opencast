@@ -636,7 +636,7 @@
                "COMMENTS": "Kommentare ansehen",
                "PAUSED_WORKFLOW": "Angehaltenen Workflow anzeigen",
                "PRESENTER": "Nach diesem Vortragenden filtern",
-               "COPY_TO_NEW_EVENT": "Copy metadata to new event"
+               "COPY_TO_NEW_EVENT": "Metadaten zu einer neuen Aufzeichnung kopieren"
             }
          },
          "STATUS": {

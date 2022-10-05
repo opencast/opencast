@@ -4,6 +4,96 @@ Changelog
 Opencast 12
 -----------
 
+### Opencast 12.3
+
+*Released on September 21th, 2022*
+
+- [[#4220](https://github.com/opencast/opencast/pull/4220)] -
+  Remove unused configuration
+- [[#4219](https://github.com/opencast/opencast/pull/4219)] -
+  Ignore NoSuchFileException when cleaning directories
+- [[#4213](https://github.com/opencast/opencast/pull/4213)] -
+  Fix check if all workflows were loaded when using YAML
+- [[#4207](https://github.com/opencast/opencast/pull/4207)] -
+  Do not run dependabot pushes multiple times
+- [[#4197](https://github.com/opencast/opencast/pull/4197)] -
+  Bump eslint from 8.23.0 to 8.23.1 in /modules/engage-paella-player-7
+- [[#4187](https://github.com/opencast/opencast/pull/4187)] -
+  Dont run gh actions on dbot multiple times
+- [[#4178](https://github.com/opencast/opencast/pull/4178)] -
+  Fix filename dependency on locale
+- [[#4177](https://github.com/opencast/opencast/pull/4177)] -
+  Bump webpack-dev-server from 4.9.3 to 4.11.0 in /modules/engage-paella-player-7
+- [[#4168](https://github.com/opencast/opencast/pull/4168)] -
+  Bump html-validate from 7.2.0 to 7.3.3 in /modules/engage-paella-player-7
+- [[#4165](https://github.com/opencast/opencast/pull/4165)] -
+  Bump eslint from 8.21.0 to 8.23.0 in /modules/engage-paella-player-7
+- [[#4151](https://github.com/opencast/opencast/pull/4151)] -
+  Allow global admins to always get workflow instances for a media package
+- [[#4137](https://github.com/opencast/opencast/pull/4137)] -
+  Delete scheduled events fixed (fixes #4084)
+- [[#4134](https://github.com/opencast/opencast/pull/4134)] -
+  Update CentOS Stream/RHEL documentation
+- [[#4129](https://github.com/opencast/opencast/pull/4129)] -
+  Add Tobira module for Synchronization with an external Tobira application
+- [[#4113](https://github.com/opencast/opencast/pull/4113)] -
+  Add Dummy capture agent documentation
+- [[#4111](https://github.com/opencast/opencast/pull/4111)] -
+  add missing reference target
+- [[#4107](https://github.com/opencast/opencast/pull/4107)] -
+  Fix Publication to Workspace Operation Documentation
+- [[#4104](https://github.com/opencast/opencast/pull/4104)] -
+  Document broken MariaDB upgrade script
+- [[#4103](https://github.com/opencast/opencast/pull/4103)] -
+  Revert try-catch in 12.x MariaDB upgrade script
+- [[#4101](https://github.com/opencast/opencast/pull/4101)] -
+  Fixes mysql upgrade script stop error
+- [[#4094](https://github.com/opencast/opencast/pull/4094)] -
+  Replace DownloadDistributionService target filter with aws version
+
+
+### Opencast 12.2
+
+*Released on August 17th, 2022*
+
+- [[#4087](https://github.com/opencast/opencast/pull/4087)] -
+  Link the docs for the publication to workspace WOH
+- [[#4064](https://github.com/opencast/opencast/pull/4064)] -
+  Fallback for Event Title in Publication
+- [[#4063](https://github.com/opencast/opencast/pull/4063)] -
+  Warn About Removed Workflow Endpoint
+- [[#4059](https://github.com/opencast/opencast/pull/4059)] -
+  Bump mariadb-java-client from 3.0.6 to 3.0.7 in /modules/db
+- [[#4057](https://github.com/opencast/opencast/pull/4057)] -
+  Fixed OSGI annotation for OaiPmhServer
+- [[#4049](https://github.com/opencast/opencast/pull/4049)] -
+  Update Opencast Studio to 2022-08-03
+- [[#4048](https://github.com/opencast/opencast/pull/4048)] -
+  Don't Fail on Missing Jobs
+- [[#4032](https://github.com/opencast/opencast/pull/4032)] -
+  Clarify migration script dependencies and make aware of the mysql_connector_python error
+- [[#4031](https://github.com/opencast/opencast/pull/4031)] -
+  Remove ManagedService from LtiServiceImpl
+- [[#4030](https://github.com/opencast/opencast/pull/4030)] -
+  Removing remaining activemq docs
+- [[#4027](https://github.com/opencast/opencast/pull/4027)] -
+  Add new config `list-all-jobs-in-series` to LtiServiceImpl
+- [[#4025](https://github.com/opencast/opencast/pull/4025)] -
+  Update CAS docs
+- [[#4016](https://github.com/opencast/opencast/pull/4016)] -
+  Force inject ChainingMediaPackageSerializer as MediaPackageSeriailzer
+- [[#4015](https://github.com/opencast/opencast/pull/4015)] -
+  Remove ActiveMQ related steps from doc
+- [[#4012](https://github.com/opencast/opencast/pull/4012)] -
+  Prevent Redirect When Going to Studio
+- [[#4005](https://github.com/opencast/opencast/pull/4005)] -
+  Allow Admins Access to Editor Interface
+- [[#4004](https://github.com/opencast/opencast/pull/4004)] -
+  MariaDB Connector Bugfix Update
+- [[#3995](https://github.com/opencast/opencast/pull/3995)] -
+  Avoid GitHub Actions Scheduling Conflicts
+
+
 ### Opencast 12.1
 
 *Released on July 20th, 2022*
@@ -217,6 +307,44 @@ Dependabot's changes are excluded from this log.
 
 Opencast 11
 ----------
+
+### Opencast 11.11
+
+*Released on September 21th, 2022*
+
+- [[#4200](https://github.com/opencast/opencast/pull/4200)] -
+  Add size to term aggregation in order to return more than 10 terms
+- [[#4185](https://github.com/opencast/opencast/pull/4185)] -
+  Fix for S3 asset storage not releasing http connections
+- [[#4182](https://github.com/opencast/opencast/pull/4182)] -
+  Fix race condition when loading workflow definitions
+- [[#4172](https://github.com/opencast/opencast/pull/4172)] -
+  Allow upload of multiple assets with the same flavor (based on config)
+- [[#4164](https://github.com/opencast/opencast/pull/4164)] -
+  Use getObjectMetadata to get object version when uploading file to S3 archive (fixes #4161)
+- [[#4159](https://github.com/opencast/opencast/pull/4159)] -
+  Fix search service limit - update more than 10 events for a series change
+- [[#4155](https://github.com/opencast/opencast/pull/4155)] -
+  Fix ingest of series catalog via external URL
+- [[#4155](https://github.com/opencast/opencast/pull/4155)] -
+  Fix workflow config handover from ingest to scheduler service
+- [[#4119](https://github.com/opencast/opencast/pull/4119)] -
+  Respect system settings when sending adopter data
+- [[#3681](https://github.com/opencast/opencast/pull/3681)] -
+  Make deletion of live publication in case of capture errors configurable
+
+### Opencast 11.10
+
+*Released on August 17th, 2022*
+
+- [[#4068](https://github.com/opencast/opencast/pull/4068)] -
+  Fix CreatorDate Filter in GET api/series/
+- [[#3990](https://github.com/opencast/opencast/pull/3990)] -
+  Remove Graphviz from Documentation
+- [[#3952](https://github.com/opencast/opencast/pull/3952)] -
+  Add changelog and release notes for OC 11.9
+- [[#3923](https://github.com/opencast/opencast/pull/3923)] -
+  Handle tracks with multiple videos in engage player
 
 ### Opencast 11.9
 

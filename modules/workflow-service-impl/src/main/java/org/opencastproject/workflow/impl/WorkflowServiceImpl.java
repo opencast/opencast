@@ -1135,15 +1135,15 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   protected boolean assertMediaPackagePermission(String mediaPackageId, String action) {
-    Opt<MediaPackage> assetMediaPackage = assetManager.getMediaPackage(mediaPackageId);
-    if (assetMediaPackage.isSome()) {
-      var currentUser = securityService.getUser();
-      var mediaPackage = assetMediaPackage.get();
-      return currentUser.hasRole(GLOBAL_ADMIN_ROLE)
-          || currentUser.hasRole(securityService.getOrganization().getAdminRole())
-          || authorizationService.hasPermission(mediaPackage, action);
-    }
-    return false;
+    var currentUser = securityService.getUser();
+    Opt<MediaPackage> mp = assetManager.getMediaPackage(mediaPackageId);
+
+    // asset manager already checks if user is admin, org admin for same org as mp, or has explicit read rights
+    // global admins can still get workflow instances if mp is gone from asset manager
+    // org admins can't because then we don't know if mp belonged to same org as user
+    return currentUser.hasRole(GLOBAL_ADMIN_ROLE)
+            || mp.isSome() && currentUser.hasRole(securityService.getOrganization().getAdminRole())
+            || mp.isSome() && authorizationService.hasPermission(mp.get(), action);
   }
 
   /**

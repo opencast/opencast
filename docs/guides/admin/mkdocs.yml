@@ -2,9 +2,6 @@ site_name: Administration Guide
 repo_url: https://github.com/opencast/opencast
 edit_uri: edit/develop/docs/guides/admin/docs/
 
-markdown_extensions:
-  - markdown_inline_graphviz
-
 plugins:
   - search:
   - macros:
@@ -53,7 +50,7 @@ nav:
       - Debian/Ubuntu: 'installation/debs.md'
       - Fedora: 'installation/rpm-fedora.md'
       - RHEL/CentOS 7: 'installation/rpm-el7.md'
-      - RHEL/CentOS 8: 'installation/rpm-el8.md'
+      - RHEL/CentOS Stream 8/9: 'installation/rpm-el.md'
    - Installation via script:
       - Ansible: 'installation/ansible.md'
    - Installation with Docker:

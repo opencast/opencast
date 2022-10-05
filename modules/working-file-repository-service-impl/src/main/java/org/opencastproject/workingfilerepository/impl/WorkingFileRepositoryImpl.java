@@ -40,6 +40,7 @@ import org.opencastproject.workingfilerepository.jmx.WorkingFileRepositoryBean;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
@@ -66,6 +67,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.management.ObjectInstance;
 
@@ -115,6 +117,16 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   /** The URL path for the services provided by the working file repository */
   protected String servicePath = null;
 
+  /** The default pattern for characters forbidden in filenames */
+  private static final String FILENAME_REGEX_DEFAULT = "(^\\W|[^\\w-.])";
+
+  /** Key for configuring the filename pattern specifying forbidden characters */
+  private static final String FILENAME_REGEX_KEY = "filename.forbidden.pattern";
+
+  /** The pattern for characters allowed in filenames */
+  private String filenameRegex = FILENAME_REGEX_DEFAULT;
+
+
   /** The security service to get current organization from */
   protected SecurityService securityService;
 
@@ -127,6 +139,11 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   public void activate(ComponentContext cc) throws IOException {
     if (rootDirectory != null)
       return; // If the root directory was set, respect that setting
+
+    filenameRegex = Objects.toString(
+        cc.getProperties().get(FILENAME_REGEX_KEY),
+        FILENAME_REGEX_DEFAULT);
+    logger.debug("Configured filename forbidden pattern: {}", filenameRegex);
 
     // server url
     serverUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
@@ -209,6 +226,29 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   }
 
   /**
+   * Returns the filename translated into a version that can safely be used as part of a file system path.
+   *
+   * The method shortens both the base file name and the extension to a maximum of 255 characters each,
+   * and replaces unsafe characters with <doce>_</doce>.
+   *
+   * @param fileName
+   *          The file name
+   * @return the safe version
+   */
+  @Override
+  public String toSafeName(String fileName) {
+    var extension = FilenameUtils.getExtension(fileName)
+        .replaceAll(filenameRegex, "_");
+    var baseName = FilenameUtils.getBaseName(fileName)
+        .replaceAll(filenameRegex, "_");
+
+    if (StringUtils.isEmpty(extension)) {
+      return StringUtils.left(baseName, 255);
+    }
+    return String.format("%.255s.%.255s", baseName, extension);
+  }
+
+  /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#delete(java.lang.String, java.lang.String)
@@ -251,7 +291,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   @Override
   public URI getCollectionURI(String collectionID, String fileName) {
     try {
-      return new URI(getBaseUri() + COLLECTION_PATH_PREFIX + collectionID + "/" + PathSupport.toSafeName(fileName));
+      return new URI(getBaseUri() + COLLECTION_PATH_PREFIX + collectionID + "/" + toSafeName(fileName));
     } catch (URISyntaxException e) {
       throw new IllegalStateException("Unable to create valid uri from " + collectionID + " and " + fileName);
     }
@@ -274,8 +314,8 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    */
   @Override
   public URI getURI(String mediaPackageID, String mediaPackageElementID, String fileName) {
-    String uri = UrlSupport.concat(new String[]{getBaseUri().toString(), MEDIAPACKAGE_PATH_PREFIX, mediaPackageID,
-            mediaPackageElementID});
+    String uri = UrlSupport.concat(getBaseUri().toString(), MEDIAPACKAGE_PATH_PREFIX, mediaPackageID,
+        mediaPackageElementID);
     if (fileName == null) {
       File existingDirectory = getElementDirectory(mediaPackageID, mediaPackageElementID);
       if (existingDirectory.isDirectory()) {
@@ -289,11 +329,11 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
           }
         }
         if (md5Exists && fileName != null) {
-          uri = UrlSupport.concat(uri, PathSupport.toSafeName(fileName));
+          uri = UrlSupport.concat(uri, toSafeName(fileName));
         }
       }
     } else {
-      uri = UrlSupport.concat(uri, PathSupport.toSafeName(fileName));
+      uri = UrlSupport.concat(uri, toSafeName(fileName));
     }
     try {
       return new URI(uri);
@@ -325,7 +365,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     }
 
     // Destination files
-    File f = new File(dir, PathSupport.toSafeName(filename));
+    File f = new File(dir, toSafeName(filename));
     File md5File = getMd5File(f);
 
     // Temporary files while adding
@@ -527,7 +567,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     } catch (IOException e) {
       // can be ignored, since we don't want the directory to be created, so it will never happen
     }
-    File sourceFile = new File(directory, PathSupport.toSafeName(fileName));
+    File sourceFile = new File(directory, toSafeName(fileName));
     File md5File = getMd5File(sourceFile);
     if (!sourceFile.exists())
       throw new NotFoundException(sourceFile.getAbsolutePath());
@@ -537,8 +577,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   }
 
   private File getElementDirectory(String mediaPackageID, String mediaPackageElementID) {
-    return new File(PathSupport.concat(new String[]{rootDirectory, MEDIAPACKAGE_PATH_PREFIX, mediaPackageID,
-            mediaPackageElementID}));
+    return Paths.get(rootDirectory, MEDIAPACKAGE_PATH_PREFIX, mediaPackageID, mediaPackageElementID).toFile();
   }
 
   /**
@@ -615,8 +654,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   public URI putInCollection(String collectionId, String fileName, InputStream in) throws IOException {
     checkPathSafe(collectionId);
     checkPathSafe(fileName);
-    File f = new File(PathSupport.concat(new String[]{rootDirectory, COLLECTION_PATH_PREFIX, collectionId,
-            PathSupport.toSafeName(fileName)}));
+    File f = Paths.get(rootDirectory, COLLECTION_PATH_PREFIX, collectionId, toSafeName(fileName)).toFile();
     logger.debug("Attempting to write a file to {}", f.getAbsolutePath());
     FileOutputStream out = null;
     try {
@@ -684,7 +722,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     }
     File destFile;
     try {
-      destFile = new File(destDir, PathSupport.toSafeName(toFileName));
+      destFile = new File(destDir, toSafeName(toFileName));
       FileSupport.link(source, destFile);
       createMd5(destFile);
     } catch (Exception e) {
@@ -724,7 +762,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       logger.debug("Removing existing file from target location at {}", dest);
       delete(toMediaPackage, toMediaPackageElement);
     } catch (NotFoundException e) {
-      dest = new File(getElementDirectory(toMediaPackage, toMediaPackageElement), PathSupport.toSafeName(toFileName));
+      dest = new File(getElementDirectory(toMediaPackage, toMediaPackageElement), toSafeName(toFileName));
     }
 
     try {
@@ -810,7 +848,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     for (int i = 0; i < files.length; i++) {
       try {
         uris[i] = new URI(getBaseUri() + COLLECTION_PATH_PREFIX + collectionId + "/"
-                                  + PathSupport.toSafeName(getSourceFile(files[i]).getName()));
+                                  + toSafeName(getSourceFile(files[i]).getName()));
       } catch (URISyntaxException e) {
         throw new IllegalStateException("Invalid URI for " + files[i]);
       }

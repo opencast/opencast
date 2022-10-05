@@ -35,6 +35,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.ClientConfiguration;
+import com.amazonaws.HttpMethod;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -43,7 +44,8 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.BucketVersioningConfiguration;
-import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.SetBucketVersioningConfigurationRequest;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
@@ -60,6 +62,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Date;
 import java.util.Dictionary;
 
 @Component(
@@ -91,6 +95,8 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   public static final int DEFAULT_MAX_CONNECTIONS = 50;
   public static final int DEFAULT_CONNECTION_TIMEOUT = 10000;
   public static final int DEFAULT_MAX_RETRIES = 100;
+
+  public static final long DOWNLOAD_URL_EXPIRATION_MS = 30 * 60 * 1000; // 30 min
 
   /** The AWS client and transfer manager */
   private AmazonS3 s3 = null;
@@ -243,6 +249,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   /**
    * Returns the aws s3 object id created by aws
    */
+  @Override
   protected AwsUploadOperationResult uploadObject(File origin, String objectName) throws AssetStoreException {
     // Check first if bucket is there.
     if (!bucketCreated) {
@@ -254,7 +261,6 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     // TransferManager processes all transfers asynchronously, so this call will return immediately.
     logger.info("Uploading {} to archive bucket {}...", objectName, bucketName);
 
-    S3Object obj = null;
     try {
       Upload upload = s3TransferManager.upload(bucketName, objectName, origin);
       long start = System.currentTimeMillis();
@@ -262,10 +268,10 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       upload.waitForCompletion();
       logger.info("Upload of {} to archive bucket {} completed in {} seconds",
               new Object[] { objectName, bucketName, (System.currentTimeMillis() - start) / 1000 });
-      obj = s3.getObject(bucketName, objectName);
-      //If bucket versioning is disabled the versionId is null, so return a -1 to indicate no version
-      String versionId = obj.getObjectMetadata().getVersionId();
-      //FIXME: We need to do better checking this, what if versioning is just suspended?
+      ObjectMetadata objMetadata = s3.getObjectMetadata(bucketName, objectName);
+      logger.trace("Got object metadata for: {}, version is {}", objectName, objMetadata.getVersionId());
+      // If bucket versioning is disabled the versionId is null, so return a -1 to indicate no version
+      String versionId = objMetadata.getVersionId();
       if (null == versionId) {
         return new AwsUploadOperationResult(objectName, "-1");
       }
@@ -274,28 +280,33 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       throw new AssetStoreException("Operation interrupted", e);
     } catch (Exception e) {
       throw new AssetStoreException("Upload failed", e);
-    } finally {
-      try {
-        if (obj != null) {
-          obj.close();
-        }
-      } catch (IOException e) {
-        //Swallow and ignore
-      }
     }
   }
 
   /**
    *
    */
-  protected InputStream getObject(AwsAssetMapping map) {
-    S3Object object = s3.getObject(bucketName, map.getObjectKey());
-    return object.getObjectContent();
+  @Override
+  protected InputStream getObject(AwsAssetMapping map) throws AssetStoreException {
+    try {
+      // Do not use S3 object stream anymore because the S3 object needs to be closed to release
+      // the http connection so create the stream using the object url (signed).
+      String objectKey = map.getObjectKey();
+      Date expiration = new Date(System.currentTimeMillis() + DOWNLOAD_URL_EXPIRATION_MS);
+      GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucketName, objectKey)
+              .withMethod(HttpMethod.GET).withExpiration(expiration);
+      URL signedUrl = s3.generatePresignedUrl(generatePresignedUrlRequest);
+      logger.debug("Returning pre-signed URL stream for '{}': {}", map, signedUrl);
+      return signedUrl.openStream();
+    } catch (IOException e) {
+      throw new AssetStoreException(e);
+    }
   }
 
   /**
   *
   */
+  @Override
   protected void deleteObject(AwsAssetMapping map) {
     s3.deleteObject(bucketName, map.getObjectKey());
   }

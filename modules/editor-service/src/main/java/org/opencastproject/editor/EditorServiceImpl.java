@@ -53,6 +53,7 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataJson;
@@ -73,6 +74,7 @@ import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.smil.entity.media.api.SmilMediaObject;
 import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
 import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
+import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
@@ -100,6 +102,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import java.awt.datatransfer.MimeTypeParseException;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -109,6 +113,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Dictionary;
@@ -162,9 +167,12 @@ public class EditorServiceImpl implements EditorService {
   private String previewTag;
   private String previewSubtype;
   private String waveformSubtype;
+  private String thumbnailSubType;
   private MediaPackageElementFlavor smilSilenceFlavor;
   private ElasticsearchIndex searchIndex;
   private MediaPackageElementFlavor captionsFlavor;
+  private String thumbnailWfProperty;
+  private List<MediaPackageElementFlavor> thumbnailSourcePrimary;
 
   private static final String DEFAULT_PREVIEW_SUBTYPE = "prepared";
   private static final String DEFAULT_PREVIEW_TAG = "editor";
@@ -174,6 +182,9 @@ public class EditorServiceImpl implements EditorService {
   private static final String DEFAULT_SMIL_SILENCE_FLAVOR = "*/silence";
   private static final String DEFAULT_PREVIEW_VIDEO_SUBTYPE = "video+preview";
   private static final String DEFAULT_CAPTIONS_FLAVOR = "captions/*";
+  private static final String DEFAULT_THUMBNAIL_SUBTYPE = "player+preview";
+  private static final String DEFAULT_THUMBNAIL_WF_PROPERTY = "thumbnail_edited";
+  private static final List<MediaPackageElementFlavor> DEFAULT_THUMBNAIL_PRIORITY_FLAVOR = new ArrayList<>();
 
   public static final String OPT_PREVIEW_SUBTYPE = "preview.subtype";
   public static final String OPT_PREVIEW_TAG = "preview.tag";
@@ -183,6 +194,9 @@ public class EditorServiceImpl implements EditorService {
   public static final String OPT_SMIL_SILENCE_FLAVOR = "smil.silence.flavor";
   public static final String OPT_PREVIEW_VIDEO_SUBTYPE = "preview.video.subtype";
   public static final String OPT_CAPTIONS_FLAVOR = "captions.flavor";
+  public static final String OPT_THUMBNAILSUBTYPE = "thumbnail.subtype";
+  public static final String OPT_THUMBNAIL_WF_PROPERTY = "thumbnail.workflow.property";
+  public static final String OPT_THUMBNAIL_PRIORITY_FLAVOR = "thumbnail.priority.flavor";
 
   private final Set<String> smilCatalogTagSet = new HashSet<>();
 
@@ -259,6 +273,10 @@ public class EditorServiceImpl implements EditorService {
     return waveformSubtype;
   }
 
+  private String getThumbnailSubtype() {
+    return thumbnailSubType;
+  }
+
   @Activate
   @Modified
   public void activate(ComponentContext cc) {
@@ -307,6 +325,22 @@ public class EditorServiceImpl implements EditorService {
     captionsFlavor = MediaPackageElementFlavor.parseFlavor(
             StringUtils.defaultString((String) properties.get(OPT_CAPTIONS_FLAVOR), DEFAULT_CAPTIONS_FLAVOR));
     logger.debug("Caption flavor set to '{}'", captionsFlavor);
+
+    thumbnailSubType =  Objects.toString(properties.get(OPT_THUMBNAILSUBTYPE), DEFAULT_THUMBNAIL_SUBTYPE);
+    logger.debug("Thumbnail subtype set to '{}'", thumbnailSubType);
+
+    thumbnailWfProperty = Objects.toString(properties.get(OPT_THUMBNAIL_WF_PROPERTY), DEFAULT_THUMBNAIL_WF_PROPERTY);
+    logger.debug("Thumbnail workflow property set to '{}'", thumbnailWfProperty);
+
+    String thumbnailPriorities = Objects.toString(properties.get(OPT_THUMBNAIL_PRIORITY_FLAVOR));
+    if ("null".equals(thumbnailPriorities)  || thumbnailPriorities.isEmpty()) {
+      thumbnailSourcePrimary = DEFAULT_THUMBNAIL_PRIORITY_FLAVOR;
+    } else {
+      thumbnailSourcePrimary = Arrays.stream(thumbnailPriorities.split(",", -1))
+                                .map(s -> MediaPackageElementFlavor.parseFlavor(s))
+                                .collect(Collectors.toList());
+    }
+    logger.debug("Thumbnail track priority set to '{}'", thumbnailSourcePrimary);
   }
 
   private Boolean elementHasPreviewTag(MediaPackageElement element) {
@@ -462,8 +496,9 @@ public class EditorServiceImpl implements EditorService {
           throws IOException, IllegalArgumentException {
     for (EditingData.Subtitle subtitle : subtitles) {
       if (!subtitle.getFlavor().matches(captionsFlavor)) {
-        throw new IllegalArgumentException("Given subtitle flavor " + subtitle.getFlavor().toString()
-                + " does match caption flavor " + captionsFlavor);
+        throw new IllegalArgumentException(
+                "Given subtitle flavor " + subtitle.getFlavor().toString() + " does match caption flavor "
+                        + captionsFlavor);
       }
 
       // Generate ID for new tracks
@@ -515,14 +550,105 @@ public class EditorServiceImpl implements EditorService {
         }
       }
 
-
-
       try {
         assetManager.takeSnapshot(mediaPackage);
       } catch (AssetManagerException e) {
         throw new IOException("Error while adding the updated media package " + mediaPackage + " to the archive", e);
       }
     }
+  }
+
+  /**
+   * Adds base64 encoded thumbnail images to the mediapackage and takes a snapshot
+   *
+   * @param editingData
+   *          the editing information
+   * @param mediaPackage
+   *          the media package
+   * @throws MimeTypeParseException
+   * @throws IOException
+   */
+  private void addThumbnailsToArchive(EditingData editingData, MediaPackage mediaPackage)
+          throws MimeTypeParseException, IOException {
+    for (TrackData track : editingData.getTracks()) {
+      String id = track.getId();
+      MediaPackageElementFlavor flavor = new MediaPackageElementFlavor(track.getFlavor().getType(),
+              getThumbnailSubtype());
+      String uri = track.getThumbnailURI();
+
+      // If no uri, what do?
+      if (uri == null || uri.isEmpty()) {
+        continue;
+      }
+      // If uri not base64 encoded, what do?
+      if (!uri.startsWith("data")) {
+        continue;
+      }
+
+      // Decode
+      uri = uri.substring(uri.indexOf(",") + 1);
+      byte[] byteArray;
+      byteArray = Base64.getMimeDecoder().decode(uri);
+      ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
+
+      // Get MimeType
+      String stringMimeType = detectMimeType(uri);
+      MimeType mimeType = MimeType.mimeType(stringMimeType.split("/")[0], stringMimeType.split("/")[1]);
+
+      // Store image in workspace
+      InputStream inputStream = bais;
+      final String filename = "thumbnail_" + id + "." + mimeType.getSubtype();
+      final String originalThumbnailId = UUID.randomUUID().toString();
+      URI tempThumbnail = null;
+      try {
+        tempThumbnail = workspace
+                .put(mediaPackage.getIdentifier().toString(), originalThumbnailId, filename, inputStream);
+      } catch (IOException e) {
+        throw new IOException("Could not add thumbnail to workspace", e);
+      }
+
+      // Archive
+      final Attachment attachment = AttachmentImpl.fromURI(tempThumbnail);
+      attachment.setFlavor(flavor);
+      attachment.setMimeType(mimeType);
+      Arrays.asList(mediaPackage.getElementsByFlavor(flavor)[0].getTags()).forEach(attachment::addTag);
+      Arrays.stream(mediaPackage.getElementsByFlavor(flavor)).forEach(mediaPackage::remove);
+      mediaPackage.add(attachment);
+
+      // Update publications here in the future?
+
+      // Set workflow property
+      WorkflowPropertiesUtil
+              .storeProperty(assetManager, mediaPackage,
+                      flavor.getType() + "/" + thumbnailWfProperty, "true");
+    }
+
+    // Snapshot
+    // Should we call takeSnapshot just once at the end of setEditData instead?
+    assetManager.takeSnapshot(mediaPackage);
+  }
+
+  /**
+   * Determines if mimetype of a base64 encoded string is one of the listed image mimetypes and returns it.
+   *
+   * @param b64
+   *          the encoded string that is supposed to be an image
+   * @return
+   *          the mimetype
+   * @throws MimeTypeParseException
+   */
+  private String detectMimeType(String b64) throws MimeTypeParseException {
+    var signatures = new HashMap<String, String>();
+    signatures.put("R0lGODdh", "image/gif");
+    signatures.put("iVBORw0KGgo", "image/png");
+    signatures.put("/9j/", "image/jpg");
+
+    for (var s : signatures.entrySet()) {
+      if (b64.indexOf(s.getKey()) == 0) {
+        return s.getValue();
+      }
+    }
+    throw new MimeTypeParseException("No image mimetype found");
   }
 
   private Opt<Publication> getInternalPublication(MediaPackage mp) {
@@ -819,8 +945,17 @@ public class EditorServiceImpl implements EditorService {
       final TrackSubData video = new TrackSubData(track.hasVideo(), videoPreview,
                         videoEnable);
 
+      final String thumbnailURI = Arrays.stream(internalPub.getAttachments())
+              .filter(attachment -> attachment.getFlavor().getType().equals(track.getFlavor().getType()))
+              .filter(attachment -> attachment.getFlavor().getSubtype().equals(getThumbnailSubtype()))
+              .map(MediaPackageElement::getURI).map(this::signIfNecessary)
+              .findAny()
+              .orElse(null);
+
+      final int priority = thumbnailSourcePrimary.indexOf(track.getFlavor());
+
       return new TrackData(track.getFlavor().getType(), track.getFlavor().getSubtype(), audio, video, uri,
-                        track.getIdentifier());
+                        track.getIdentifier(), thumbnailURI, priority);
     }).collect(Collectors.toList());
 
     List<String> waveformList = Arrays.stream(internalPub.getAttachments())
@@ -919,6 +1054,14 @@ public class EditorServiceImpl implements EditorService {
       errorExit("Unable to add subtitle track to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
     } catch (IllegalArgumentException e) {
       errorExit("Illegal subtitle given", mediaPackageId, ErrorStatus.UNKNOWN, e);
+    }
+
+    try {
+      addThumbnailsToArchive(editingData, mediaPackage);
+    } catch (MimeTypeParseException e) {
+      errorExit("Thumbnail had an illegal MimeType", mediaPackageId, ErrorStatus.UNKNOWN, e);
+    } catch (IOException e) {
+      errorExit("Unable to add thumbnail to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
     }
 
     if (editingData.getPostProcessingWorkflow() != null) {

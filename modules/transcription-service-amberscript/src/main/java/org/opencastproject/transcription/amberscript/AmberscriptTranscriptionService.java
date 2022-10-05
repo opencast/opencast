@@ -58,7 +58,6 @@ import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -649,7 +648,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
           logger.info("Retrieved details for transcription with jobid: '{}'", jobId);
 
           // Save the result subrip (srt) file into a collection
-          workspace.putInCollection(TRANSCRIPT_COLLECTION, buildResultsFileName(jobId, "srt"), entity.getContent());
+          workspace.putInCollection(TRANSCRIPT_COLLECTION, jobId + ".srt", entity.getContent());
           done = true;
           break;
 
@@ -695,7 +694,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
       }
 
       // Results already saved?
-      URI uri = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, buildResultsFileName(jobId, "srt"));
+      URI uri = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, jobId + ".srt");
 
       logger.info("Looking for transcript at URI: {}", uri);
 
@@ -770,10 +769,6 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     } catch (IOException e) {
       logger.warn("Unable to remove submission file {} from collection {}", filename, SUBMISSION_COLLECTION);
     }
-  }
-
-  private String buildResultsFileName(String jobId, String extension) {
-    return PathSupport.toSafeName(jobId + "." + extension);
   }
 
   @Reference

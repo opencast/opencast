@@ -53,7 +53,6 @@ import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -543,15 +542,14 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
         return;
       }
       else if (CancellationReason.CancelledByUser == e.getReason()) {
-        errorMessage = String.format("User canceled request.%s", System.lineSeparator());
+        errorMessage = "User canceled request.";
       }
       else if (CancellationReason.Error == e.getReason()) {
-        errorMessage = String.format("Encountered error.%sError code: %d%sError details: %s%s",
-                System.lineSeparator(), e.getErrorCode(), e.getErrorDetails());
+        errorMessage = String.format("Encountered error.%sError code: %s%sError details: %s",
+                System.lineSeparator(), e.getErrorCode().name(), System.lineSeparator(), e.getErrorDetails());
       }
       else {
-        errorMessage = String.format("Request was cancelled for an unrecognized reason: %d.%s",
-                e.getReason(), System.lineSeparator());
+        errorMessage = String.format("Request was cancelled for an unrecognized reason: %d.", e.getReason());
       }
 
       errorCallback(errorMessage, speechRecognizer, jobId, mpId);
@@ -683,11 +681,11 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   }
 
   private String buildTmpFileName(String jobId) {
-    return PathSupport.toSafeName(tmpStorageDir + File.separator + "transcript_" + jobId);
+    return workspace.toSafeName(tmpStorageDir + File.separator + "transcript_" + jobId);
   }
 
   private String buildResultsFileName(String jobId) {
-    return PathSupport.toSafeName(jobId + "." + fileFormat);
+    return workspace.toSafeName(jobId + "." + fileFormat);
   }
 
   @Reference

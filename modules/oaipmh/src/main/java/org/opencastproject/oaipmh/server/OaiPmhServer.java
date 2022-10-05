@@ -92,6 +92,11 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo 
   private ServiceRegistration<?> serviceRegistration;
 
   /** OSGi DI. */
+  @Reference(
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "unsetRepository"
+  )
   public void setRepository(final OaiPmhRepository r) {
     synchronized (repositories) {
       final String rId = r.getRepositoryId();
@@ -106,11 +111,6 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo 
   }
 
   /** OSGi DI. */
-  @Reference(
-      cardinality = ReferenceCardinality.MULTIPLE,
-      policy = ReferencePolicy.DYNAMIC,
-      unbind = "unsetRepository"
-  )
   public void unsetRepository(OaiPmhRepository r) {
     synchronized (repositories) {
       repositories.remove(r.getRepositoryId());

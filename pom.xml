@@ -249,6 +249,7 @@
     <module>modules/timelinepreviews-ffmpeg</module>
     <module>modules/timelinepreviews-remote</module>
     <module>modules/timelinepreviews-workflowoperation</module>
+    <module>modules/tobira</module>
     <module>modules/transcription-service-amberscript</module>
     <module>modules/transcription-service-api</module>
     <module>modules/transcription-service-google-speech-impl</module>
@@ -293,7 +294,6 @@
     <module>modules/workflow-workflowoperation</module>
     <module>modules/working-file-repository-service-api</module>
     <module>modules/working-file-repository-service-impl</module>
-    <module>modules/working-file-repository-service-remote</module>
     <module>modules/workspace-api</module>
     <module>modules/workspace-impl</module>
     <module>assemblies</module>

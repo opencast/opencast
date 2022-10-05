@@ -2,8 +2,11 @@ site_name: Developer Guide
 repo_url: https://github.com/opencast/opencast
 edit_uri: edit/develop/docs/guides/developer/docs/
 
-markdown_extensions:
-  - markdown_inline_graphviz
+plugins:
+  - search:
+  - mermaid2:
+      arguments:
+        theme: neutral
 
 # Default theme used is windmill
 theme: windmill
@@ -102,6 +105,7 @@ nav:
    - Statistics API: 'api/statistics-api.md'
    - Groups API: 'api/groups-api.md'
    - Security API: 'api/security-api.md'
+   - Workflow API: 'api/workflow-api.md'
    - Data Types: 'api/types.md'
    - Glossary: 'api/glossary.md'
 - Configure a Local Cluster for Testing: local-cluster.md

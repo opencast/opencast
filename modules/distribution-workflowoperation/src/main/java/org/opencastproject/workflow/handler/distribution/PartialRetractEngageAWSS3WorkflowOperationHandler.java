@@ -49,7 +49,7 @@ public class PartialRetractEngageAWSS3WorkflowOperationHandler extends PartialRe
    * @param downloadDistributionService
    *          the download distribution service
    */
-  @Reference(target = "(distribution.channel=download)")
+  @Reference(target = "(distribution.channel=aws.s3)")
   public void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
     super.setDownloadDistributionService(downloadDistributionService);
   }

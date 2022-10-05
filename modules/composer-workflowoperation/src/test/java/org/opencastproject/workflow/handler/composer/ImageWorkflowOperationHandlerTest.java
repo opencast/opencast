@@ -75,19 +75,19 @@ public class ImageWorkflowOperationHandlerTest {
   @Test
   public void testFileNameGeneration() {
     final ImageWorkflowOperationHandler dummy = new ImageWorkflowOperationHandler();
-    assertEquals("thumbnail_12_5p_small.jpg",
+    assertEquals("thumbnail_12.5p_small.jpg",
             new Extractor(dummy, cfg(Opt.<String> none(), Opt.some("thumbnail_%.1fp%s"))).createFileName("_small.jpg",
                     uri("http://localhost/path/filename.mp4"), new MediaPosition(PositionType.Percentage, 12.5)));
     assertEquals("thumbnail_0p.jpg",
             new Extractor(dummy, cfg(Opt.<String> none(), Opt.some("thumbnail_%.0fp%s"))).createFileName(".jpg",
                     uri("http://localhost/path/filename.mp4"), new MediaPosition(PositionType.Percentage, 0)));
-    assertEquals("video_14_200s.jpg",
+    assertEquals("video_14.200s.jpg",
             new Extractor(dummy, cfg(Opt.<String> none(), Opt.<String> none())).createFileName(".jpg",
                     uri("http://localhost/path/video.mp4"), new MediaPosition(PositionType.Seconds, 14.2)));
-    assertEquals("video_15_110s_medium.jpg",
+    assertEquals("video_15.110s_medium.jpg",
             new Extractor(dummy, cfg(Opt.<String> none(), Opt.<String> none())).createFileName("_medium.jpg",
                     uri("http://localhost/path/video.mp4"), new MediaPosition(PositionType.Seconds, 15.1099)));
-    assertEquals("thumbnail_15_110s_large.jpg",
+    assertEquals("thumbnail_15.110s_large.jpg",
             new Extractor(dummy, cfg(Opt.some("thumbnail_%.3fs%s"), Opt.<String> none())).createFileName("_large.jpg",
                     uri("http://localhost/path/video.mp4"), new MediaPosition(PositionType.Seconds, 15.1099)));
     assertEquals("thumbnail", new Extractor(dummy, cfg(Opt.some("thumbnail"), Opt.<String> none())).createFileName(

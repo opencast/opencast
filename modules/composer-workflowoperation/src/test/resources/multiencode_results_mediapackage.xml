@@ -7,7 +7,7 @@
     <ns2:track id="multiencode-workflow-operation-test-encode-track-id1">
       <ns2:mimetype>video/x-flv</ns2:mimetype>
       <ns2:tags />
-      <ns2:url>fooVideo_http.flv</ns2:url>
+      <ns2:url>fooVideo.http.flv</ns2:url>
       <ns2:checksum type="md5">46cb2e9df2e73756b0d96c33b1aaf055</ns2:checksum>
       <ns2:duration>65680</ns2:duration>
       <ns2:audio id="audio-1">
@@ -28,7 +28,7 @@
     <ns2:track id="multiencode-workflow-operation-test-encode-track-id2">
       <ns2:mimetype>video/h264</ns2:mimetype>
       <ns2:tags ></ns2:tags>
-      <ns2:url>fooVideo_low.mp4</ns2:url>
+      <ns2:url>fooVideo-low.mp4</ns2:url>
       <ns2:checksum type="md5">46cb2e9df2e73756b0d96c33b1aaf055</ns2:checksum>
       <ns2:duration>65680</ns2:duration>
       <ns2:audio id="audio-1">
