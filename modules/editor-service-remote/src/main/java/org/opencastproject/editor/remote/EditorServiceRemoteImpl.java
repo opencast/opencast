@@ -24,7 +24,6 @@ import org.opencastproject.editor.api.EditingData;
 import org.opencastproject.editor.api.EditorService;
 import org.opencastproject.editor.api.EditorServiceException;
 import org.opencastproject.editor.api.ErrorStatus;
-import org.opencastproject.editor.api.PostEditingData;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -69,7 +68,7 @@ public class EditorServiceRemoteImpl extends RemoteBase implements EditorService
   }
 
   @Override
-  public void setEditData(String mediaPackageId, PostEditingData editingData) throws EditorServiceException {
+  public void setEditData(String mediaPackageId, EditingData editingData) throws EditorServiceException {
     doPostForMediaPackage(mediaPackageId, EDIT_SUFFIX, editingData.toString());
   }
 
