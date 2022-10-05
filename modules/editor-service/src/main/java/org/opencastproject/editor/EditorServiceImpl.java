@@ -918,7 +918,6 @@ public class EditorServiceImpl implements EditorService {
     }
 
     // Get subtitles from the asset manager, so they are guaranteed to be up-to-date after saving
-    trackList.removeIf(t -> t.getFlavor().matches(captionsFlavor));
     Track[] subtitleTracks = mp.getTracks(captionsFlavor);
     List<EditingData.Subtitle> subtitles = new ArrayList<>();
     for (Track t: subtitleTracks) {
