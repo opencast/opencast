@@ -59,7 +59,19 @@
 [thumbnail]
 
 # If the thumbnail editor appears in the main menu
-# Warning: This interface is unfinished
 # Type: boolean
 # Default: false
-#show = false
+# show = false
+
+# Whether to use "simple" or "professional" mode.
+# Professional mode allows users to edit all thumbnails that fit the subflavor
+# specified in the Opencast configuration file
+# `etc/org.opencastproject.editor.EditorServiceImpl.cfg`. It is useful
+# when working with multiple thumbnails.
+# Simple mode only allows users to edit the "primary" thumbnail, as specified
+# in the Opencast configuration file
+# `etc/org.opencastproject.editor.EditorServiceImpl.cfg`. It is useful
+# when there is only a single thumbnail to worry about and you want hide
+# potential fallbacks from the user. If a primary thumbnail cannot be
+# determined, this falls back to professional mode.
+simpleMode = false
