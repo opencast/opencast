@@ -24,6 +24,7 @@ import static org.opencastproject.util.persistencefn.Queries.persistOrUpdate;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Comment;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
@@ -399,11 +400,11 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     String organization = securityService.getOrganization().getId();
     User user = securityService.getUser();
 
-    updateIndex(eventId, !comments.isEmpty(), hasOpenComments, needsCutting, organization, user);
+    updateIndex(eventId, !comments.isEmpty(), hasOpenComments, comments, needsCutting, organization, user);
   }
 
-  private void updateIndex(String eventId, boolean hasComments, boolean hasOpenComments, boolean needsCutting,
-          String organization, User user) {
+  private void updateIndex(String eventId, boolean hasComments, boolean hasOpenComments, List<EventComment> comments,
+          boolean needsCutting, String organization, User user) {
     logger.debug("Updating comment status of event {} in the {} index.", eventId, index.getIndexName());
     if (!hasComments && hasOpenComments) {
       throw new IllegalStateException(
@@ -423,6 +424,14 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       Event event = eventOpt.get();
       event.setHasComments(hasComments);
       event.setHasOpenComments(hasOpenComments);
+      List<Comment> indexComments = new ArrayList<Comment>();
+      for (EventComment comment : comments) {
+        indexComments.add(new Comment(
+                comment.getId().get().toString(), comment.getReason(), comment.getText(), comment.isResolvedStatus()
+        ));
+        // Do we want to include replies? Maybe not, no good reason to filter for them?
+      }
+      event.setComments(indexComments);
       event.setNeedsCutting(needsCutting);
       return Optional.of(event);
     };
@@ -467,7 +476,8 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
                       boolean hasOpenComments = !Stream.$(comments).filter(filterOpenComments).toList().isEmpty();
                       boolean needsCutting = !Stream.$(comments).filter(filterNeedsCuttingComment).toList().isEmpty();
 
-                      updateIndex(eventId, !comments.isEmpty(), hasOpenComments, needsCutting, orgId, systemUser);
+                      updateIndex(eventId, !comments.isEmpty(), hasOpenComments, comments, needsCutting, orgId,
+                              systemUser);
                       current[0] += comments.size();
                       logIndexRebuildProgress(logger, index.getIndexName(), total, current[0]);
                     } catch (Throwable t) {

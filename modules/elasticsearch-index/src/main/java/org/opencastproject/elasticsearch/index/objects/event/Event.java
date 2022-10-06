@@ -76,7 +76,7 @@ import javax.xml.stream.XMLStreamWriter;
         "contributors", "seriesId", "seriesName", "language", "source", "created", "creator",
         "publisher", "license", "rights", "extendedMetadata", "accessPolicy", "managedAcl", "workflowState",
         "workflowId", "workflowDefinitionId", "recordingStartTime", "recordingEndTime", "duration",
-        "hasComments", "hasOpenComments", "hasPreview", "needsCutting", "publications",
+        "hasComments", "hasOpenComments", "comments", "hasPreview", "needsCutting", "publications",
         "archiveVersion", "recordingStatus", "eventStatus", "agentId", "agentConfigurations",
         "technicalStartTime", "technicalEndTime", "technicalPresenters"
     }
@@ -234,6 +234,10 @@ public class Event implements IndexObject {
   /** Whether the event has open comments */
   @XmlElement(name = "has_open_comments")
   private Boolean hasOpenComments = false;
+
+  /** Comments on the event */
+  @XmlElement(name = "comments")
+  private List<Comment> comments = new ArrayList<>();
 
   /** Whether the event has preview files */
   @XmlElement(name = "has_preview")
@@ -792,6 +796,25 @@ public class Event implements IndexObject {
    */
   public boolean hasOpenComments() {
     return hasOpenComments;
+  }
+
+  /**
+   * Sets the list of comments.
+   *
+   * @param comments
+   *          the comments for this event
+   */
+  public void setComments(List<Comment> comments) {
+    this.comments = comments;
+  }
+
+  /**
+   * Returns the event comments.
+   *
+   * @return the comments
+   */
+  public List<Comment> comments() {
+    return comments;
   }
 
   /**

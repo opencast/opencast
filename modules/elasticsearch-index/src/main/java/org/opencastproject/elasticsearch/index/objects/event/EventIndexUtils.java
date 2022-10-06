@@ -185,6 +185,25 @@ public final class EventIndexUtils {
 
     metadata.addField(EventIndexSchema.HAS_COMMENTS, event.hasComments(), true);
     metadata.addField(EventIndexSchema.HAS_OPEN_COMMENTS, event.hasOpenComments(), true);
+
+    if (event.comments() != null) {
+      List<Comment> comments = event.comments();
+      HashMap<String, Object>[] commentsArray = new HashMap[comments.size()];
+      for (int i = 0; i < comments.size(); i++) {
+        Comment comment = comments.get(i);
+        HashMap<String, Object> myMap = new HashMap<String, Object>() {{
+            put(CommentIndexSchema.ID, comment.getId());
+            put(CommentIndexSchema.REASON, comment.getReason());
+            put(CommentIndexSchema.TEXT, comment.getText());
+            put(CommentIndexSchema.RESOLVED_STATUS, comment.isResolvedStatus());
+          }};
+        commentsArray[i] = myMap;
+//        generatePublicationDoc(comments.get(i).getType());
+      }
+
+      metadata.addField(EventIndexSchema.COMMENTS, commentsArray, true);
+    }
+
     metadata.addField(EventIndexSchema.NEEDS_CUTTING, event.needsCutting(), true);
 
     if (event.getPublications() != null) {
