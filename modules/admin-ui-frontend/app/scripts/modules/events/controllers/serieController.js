@@ -65,8 +65,6 @@ angular.module('adminNg.controllers')
 
           if (loading) {
             $scope.validAcl = true;
-          } else {
-            $scope.accessSave();
           }
         };
 
@@ -108,8 +106,6 @@ angular.module('adminNg.controllers')
       if (angular.isDefined(index)) {
         $scope.policies.splice(index, 1);
       }
-
-      $scope.accessSave();
     };
 
     $scope.getMatchingRoles = function (value) {
@@ -256,6 +252,7 @@ angular.module('adminNg.controllers')
         if (angular.isDefined(data.series_access)) {
           var json = angular.fromJson(data.series_access.acl);
           changePolicies(json.acl.ace, true);
+          getCurrentPolicies();
 
           $scope.aclLocked = data.series_access.locked;
 
@@ -324,7 +321,8 @@ angular.module('adminNg.controllers')
 
     $scope.close = function() {
       if (($scope.unsavedChanges([$scope.commonMetadataCatalog]) === false
-           && $scope.unsavedChanges($scope.extendedMetadataCatalogs) === false)
+           && $scope.unsavedChanges($scope.extendedMetadataCatalogs) === false
+           && unsavedAccessChanges() === false)
           || confirmUnsaved()) {
         Modal.$scope.close();
       }
@@ -420,12 +418,6 @@ angular.module('adminNg.controllers')
       });
     };
 
-    $scope.accessChanged = function (role) {
-      if (role) {
-        $scope.accessSave();
-      }
-    };
-
     $scope.accessSave = function (override) {
       var ace = [],
           hasRights = false,
@@ -494,6 +486,51 @@ angular.module('adminNg.controllers')
         me.notificationRights = undefined;
       }
 
+      return { ace, hasRights, rulesValid };
+    };
+
+    let oldPolicies = {}
+    
+    function getCurrentPolicies () {
+
+      oldPolicies = $scope.policies.map(policy => {
+        let newObject = {};
+        Object.keys(policy).forEach(propertyKey => {
+          newObject[propertyKey] = policy[propertyKey];
+        });
+        return newObject;
+      })
+
+      return oldPolicies;
+    };
+    
+    $scope.saveChanges = function (override) {
+      var access = $scope.accessSave(override);
+      
+      var ace = access.ace;
+      var hasRights = access.hasRights;
+      var rulesValid = access.rulesValid;
+
+      if (hasRights && rulesValid) {
+        SeriesAccessResource.save({ id: $scope.resourceId }, {
+          acl: {
+            ace: ace
+          },
+          override: false
+        });
+
+        Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT, 1200);
+      }
+      getCurrentPolicies();
+    };
+
+    $scope.updateEventPermissions = function (override) {
+      var access = $scope.accessSave(override);
+      
+      var ace = access.ace;
+      var hasRights = access.hasRights;
+      var rulesValid = access.rulesValid;
+
       if (hasRights && rulesValid) {
         SeriesAccessResource.save({ id: $scope.resourceId }, {
           acl: {
@@ -504,6 +541,31 @@ angular.module('adminNg.controllers')
 
         Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT, 1200);
       }
+      getCurrentPolicies();
+    };
+
+    function unsavedAccessChanges () {
+      let hasChanges = false;
+
+      if (oldPolicies.length !== $scope.policies.length) {
+        hasChanges = true;
+        return hasChanges;
+      }
+
+      oldPolicies.forEach((oldPolicy, index) => {
+        const policy = $scope.policies[index]
+
+        if(oldPolicy.role !== policy.role) {
+          hasChanges = true;
+        }
+        else if (oldPolicy.read !== policy.read) {
+          hasChanges = true;
+        }
+        else if (oldPolicy.write !== policy.write) {
+          hasChanges = true;
+        }
+      });
+      return hasChanges
     };
 
     $scope.themeSave = function () {

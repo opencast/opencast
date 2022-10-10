@@ -227,7 +227,6 @@
                                     ng-disabled="(tab == 'permissions') && (!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked)"
                                     data-width="'360px'"
                                     ng-model="policy.role"
-                                    ng-change="accessChanged(policy.role)"
                                     ng-options="role as role for role in roles"
                                     call-on-search="getMatchingRoles"
                                     placeholder-text-single="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.LABEL' | translate }}'"
@@ -237,18 +236,15 @@
                           <td class="fit text-center">
                             <input type="checkbox"
                                    ng-model="policy.read"
-                                   ng-change="accessSave()"
                                    ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked"/>
                           </td>
                           <td class="fit text-center">
                             <input type="checkbox"
                                    ng-model="policy.write"
-                                   ng-change="accessSave()"
                                    ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked"/>
                           </td>
                           <td class="fit editable" ng-if="hasActions">
                             <div ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked"
-                                 save="accessSave"
                                  admin-ng-editable-multi-select
                                  mixed="false"
                                  params="::policy.actions"
@@ -282,14 +278,22 @@
                 </div>
               </div>
               <footer ng-if="updateMode === 'optional'">
-                <!-- Button to remove all episode ACLs to ensure only the series ACL applies -->
-                <a ng-click="accessSave(true)"
-                   class="submit"
-                   ng-class="{disabled: !validAcl}"
-                   translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.REPLACE_EVENT_ACLS"
-                   title="{{'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.REPLACE_EVENT_ACLS_HINT' | translate}}">
-                  <!-- Submit -->
-                </a>
+                <div style="float: right">
+                  <a ng-click="saveChanges(true)"
+                    class="submit" style="float: left"
+                    translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.SAVE_SERIES_ACLS"
+                    title="{{'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.SAVE_SERIES_ACLS_HINT' | translate}}">
+                    <!-- Save -->
+                  </a>
+                  <!-- Button to remove all episode ACLs to ensure only the series ACL applies -->
+                  <a ng-click="updateEventPermissions(true)"
+                    class="submit"
+                    ng-class="{disabled: !validAcl}"
+                    translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.REPLACE_EVENT_ACLS"
+                    title="{{'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.REPLACE_EVENT_ACLS_HINT' | translate}}">
+                    <!-- Submit -->
+                  </a>
+                </div>
               </footer>
             </div>
           </li>
