@@ -94,7 +94,7 @@ public class TobiraEndpoint {
   // adding new JSON fields is a non-breaking change. You should also consider whether Tobira needs
   // to resynchronize, i.e. to get new data.
   private static final int VERSION_MAJOR = 1;
-  private static final int VERSION_MINOR = 0;
+  private static final int VERSION_MINOR = 1;
   private static final String VERSION = VERSION_MAJOR + "." + VERSION_MINOR;
 
   private SearchService searchService;

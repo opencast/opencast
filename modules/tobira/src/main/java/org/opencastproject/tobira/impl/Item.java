@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -119,6 +120,8 @@ class Item {
         throw new RuntimeException("Event has no title");
       }
 
+      final var captions = findCaptions(mp);
+
 
       this.obj = Jsons.obj(
           Jsons.p("kind", "event"),
@@ -137,6 +140,7 @@ class Item {
           Jsons.p("acl", assembleAcl(event.getAccessControlList())),
           Jsons.p("isLive", isLive),
           Jsons.p("metadata", dccToMetadata(dccs)),
+          Jsons.p("captions", Jsons.arr(captions)),
           Jsons.p("updated", event.getModified().getTime())
       );
     }
@@ -244,6 +248,56 @@ class Item {
           );
         })
         .collect(Collectors.toCollection(ArrayList::new));
+  }
+
+  private static List<Jsons.Val> findCaptions(MediaPackage mp) {
+    // We deduplicate the captions by URL and language in case we somehow find
+    // one twice.
+    var captions = new HashMap<String, HashSet<String>>();
+    Arrays.stream(mp.getElements())
+        .filter(element -> {
+          final var isVTT = element.getFlavor().toString().startsWith("captions/vtt")
+                || element.getMimeType().eq("text", "vtt");
+          final var isCorrectType = element.getElementType() == MediaPackageElement.Type.Attachment
+                || element.getElementType() == MediaPackageElement.Type.Track;
+
+          return isVTT && isCorrectType;
+        })
+        .forEach(track -> {
+          final var uri = track.getURI().toString();
+          captions.putIfAbsent(uri, new HashSet<String>());
+
+          // Try to get language from flavor. Otherwise there is an empty list
+          // in the map.
+          final var subflavor = track.getFlavor().getSubtype();
+          if (subflavor.startsWith("vtt+")) {
+            final var suffix = subflavor.substring("vtt+".length());
+            if (suffix.length() > 0) {
+              captions.get(uri).add(suffix);
+            }
+          }
+
+        });
+
+    return captions.entrySet()
+        .stream()
+        .flatMap(e -> {
+          final var languages = e.getValue();
+          final var uri = e.getKey();
+
+          // If this caption URL had no language associated with it, we push a
+          // `null` language to emit this caption at all. Otherwise, all
+          // languages are output as a separate track.
+          if (languages.isEmpty()) {
+            languages.add(null);
+          }
+
+          return languages.stream().map(lang -> Jsons.obj(
+            Jsons.p("uri", uri),
+            Jsons.p("lang", lang)
+          ));
+        })
+      .collect(Collectors.toCollection(ArrayList::new));
   }
 
   private static String findThumbnail(MediaPackage mp) {
