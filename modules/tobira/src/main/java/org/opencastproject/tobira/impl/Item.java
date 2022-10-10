@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -82,9 +83,13 @@ class Item {
       // Figure out whether this is a live event
       final var isLive = Arrays.stream(mp.getTracks()).anyMatch(track -> track.isLive());
 
-      final var creators = Arrays.stream(mp.getCreators())
-          .map(creator -> Jsons.v(creator))
-          .collect(Collectors.toCollection(ArrayList::new));
+      // Obtain creators. We first try to obtain it from the DCCs. We collect
+      // into `LinkedHashSet` to deduplicate entries.
+      final var creators = dccs.stream()
+              .flatMap(dcc -> dcc.get(DublinCore.PROPERTY_CREATOR).stream())
+              .filter(Objects::nonNull)
+              .map(creator -> Jsons.v(creator.getValue()))
+              .collect(Collectors.toCollection(LinkedHashSet::new));
 
       // Get start and end time
       final var period = dccs.stream()
@@ -124,7 +129,7 @@ class Item {
           Jsons.p("created", event.getDcCreated().getTime()),
           Jsons.p("startTime", period.map(p -> p.getStart().getTime()).orElse(null)),
           Jsons.p("endTime", period.map(p -> p.getEnd().getTime()).orElse(null)),
-          Jsons.p("creators", Jsons.arr(creators)),
+          Jsons.p("creators", Jsons.arr(new ArrayList<>(creators))),
           Jsons.p("duration", Math.max(0, event.getDcExtent())),
           Jsons.p("thumbnail", findThumbnail(mp)),
           Jsons.p("timelinePreview", findTimelinePreview(mp)),
