@@ -22,6 +22,7 @@ package org.opencastproject.editor.api;
 
 import static java.util.Objects.requireNonNull;
 
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.util.data.Tuple;
 
 import com.google.gson.Gson;
@@ -34,7 +35,7 @@ import java.util.List;
 /**
  * Provides access to the parsed editing information
  */
-public final class EditingData {
+public class EditingData {
   public static final String WORKFLOW_ACTIVE = "workflow_active";
   private final List<SegmentData> segments;
   private final List<WorkflowData> workflows;
@@ -46,10 +47,11 @@ public final class EditingData {
   @SerializedName(WORKFLOW_ACTIVE)
   private final Boolean workflowActive;
   private final List<String> waveformURIs;
+  private final List<Subtitle> subtitles;
 
   public EditingData(List<SegmentData> segments, List<TrackData> tracks, List<WorkflowData> workflows, Long duration,
           String title, String recordingStartDate, String seriesId, String seriesName, Boolean workflowActive,
-          List<String> waveformURIs) {
+          List<String> waveformURIs, List<Subtitle> subtitles) {
     this.segments = segments;
     this.tracks = tracks;
     this.workflows = workflows;
@@ -59,6 +61,7 @@ public final class EditingData {
     this.series = new SeriesData(seriesId, seriesName);
     this.workflowActive = workflowActive;
     this.waveformURIs = waveformURIs;
+    this.subtitles = subtitles;
   }
 
   public static EditingData parse(String json) {
@@ -90,9 +93,31 @@ public final class EditingData {
     return Collections.unmodifiableList(tracks);
   }
 
+  public List<Subtitle> getSubtitles() {
+    return subtitles;
+  }
+
   public String toString() {
     Gson gson = new GsonBuilder().serializeNulls().create();
     return gson.toJson(this);
+  }
+
+  public static final class Subtitle {
+    private final MediaPackageElementFlavor flavor;
+    private final String subtitle;
+
+    public Subtitle(MediaPackageElementFlavor flavor, String subtitle) {
+      this.flavor = flavor;
+      this.subtitle = subtitle;
+    }
+
+    public MediaPackageElementFlavor getFlavor() {
+      return flavor;
+    }
+
+    public String getSubtitle() {
+      return subtitle;
+    }
   }
 }
 
