@@ -941,8 +941,8 @@ angular.module('adminNg.controllers')
       getCurrentPolicies();
     };
 
-    let oldPolicies = {}
-    
+    let oldPolicies = {};
+
     function getCurrentPolicies () {
 
       oldPolicies = $scope.policies.map(policy => {
@@ -951,10 +951,10 @@ angular.module('adminNg.controllers')
           newObject[propertyKey] = policy[propertyKey];
         });
         return newObject;
-      })
+      });
 
-      return oldPolicies
-    };
+      return oldPolicies;
+    }
 
     function unsavedAccessChanges () {
       let hasChanges = false;
@@ -965,7 +965,7 @@ angular.module('adminNg.controllers')
       }
 
       oldPolicies.forEach((oldPolicy, index) => {
-        const policy = $scope.policies[index]
+        const policy = $scope.policies[index];
 
         if(oldPolicy.role !== policy.role) {
           hasChanges = true;
@@ -977,8 +977,8 @@ angular.module('adminNg.controllers')
           hasChanges = true;
         }
       });
-      return hasChanges
-    };
+      return hasChanges;
+    }
 
     $scope.statisticsCsvFileName = function (statsTitle) {
       var sanitizedStatsTitle = statsTitle.replace(/[^0-9a-z]/gi, '_').toLowerCase();

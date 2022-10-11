@@ -489,8 +489,8 @@ angular.module('adminNg.controllers')
       return { ace, hasRights, rulesValid };
     };
 
-    let oldPolicies = {}
-    
+    let oldPolicies = {};
+
     function getCurrentPolicies () {
 
       oldPolicies = $scope.policies.map(policy => {
@@ -499,14 +499,14 @@ angular.module('adminNg.controllers')
           newObject[propertyKey] = policy[propertyKey];
         });
         return newObject;
-      })
+      });
 
       return oldPolicies;
-    };
-    
+    }
+
     $scope.saveChanges = function (override) {
       var access = $scope.accessSave(override);
-      
+
       var ace = access.ace;
       var hasRights = access.hasRights;
       var rulesValid = access.rulesValid;
@@ -526,7 +526,7 @@ angular.module('adminNg.controllers')
 
     $scope.updateEventPermissions = function (override) {
       var access = $scope.accessSave(override);
-      
+
       var ace = access.ace;
       var hasRights = access.hasRights;
       var rulesValid = access.rulesValid;
@@ -553,7 +553,7 @@ angular.module('adminNg.controllers')
       }
 
       oldPolicies.forEach((oldPolicy, index) => {
-        const policy = $scope.policies[index]
+        const policy = $scope.policies[index];
 
         if(oldPolicy.role !== policy.role) {
           hasChanges = true;
@@ -565,8 +565,8 @@ angular.module('adminNg.controllers')
           hasChanges = true;
         }
       });
-      return hasChanges
-    };
+      return hasChanges;
+    }
 
     $scope.themeSave = function () {
       var selectedThemeID = $scope.selectedTheme.id;
