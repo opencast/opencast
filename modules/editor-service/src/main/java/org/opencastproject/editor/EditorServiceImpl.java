@@ -90,6 +90,7 @@ import org.opencastproject.workspace.api.Workspace;
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
@@ -103,10 +104,12 @@ import org.xml.sax.SAXException;
 
 import java.awt.datatransfer.MimeTypeParseException;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -167,6 +170,7 @@ public class EditorServiceImpl implements EditorService {
   private String thumbnailSubType;
   private MediaPackageElementFlavor smilSilenceFlavor;
   private ElasticsearchIndex searchIndex;
+  private MediaPackageElementFlavor captionsFlavor;
   private String thumbnailWfProperty;
   private List<MediaPackageElementFlavor> thumbnailSourcePrimary;
 
@@ -177,6 +181,7 @@ public class EditorServiceImpl implements EditorService {
   private static final String DEFAULT_SMIL_CATALOG_TAGS = "archive";
   private static final String DEFAULT_SMIL_SILENCE_FLAVOR = "*/silence";
   private static final String DEFAULT_PREVIEW_VIDEO_SUBTYPE = "video+preview";
+  private static final String DEFAULT_CAPTIONS_FLAVOR = "captions/*";
   private static final String DEFAULT_THUMBNAIL_SUBTYPE = "player+preview";
   private static final String DEFAULT_THUMBNAIL_WF_PROPERTY = "thumbnail_edited";
   private static final List<MediaPackageElementFlavor> DEFAULT_THUMBNAIL_PRIORITY_FLAVOR = new ArrayList<>();
@@ -188,6 +193,7 @@ public class EditorServiceImpl implements EditorService {
   public static final String OPT_SMIL_CATALOG_TAGS = "smil.catalog.tags";
   public static final String OPT_SMIL_SILENCE_FLAVOR = "smil.silence.flavor";
   public static final String OPT_PREVIEW_VIDEO_SUBTYPE = "preview.video.subtype";
+  public static final String OPT_CAPTIONS_FLAVOR = "captions.flavor";
   public static final String OPT_THUMBNAILSUBTYPE = "thumbnail.subtype";
   public static final String OPT_THUMBNAIL_WF_PROPERTY = "thumbnail.workflow.property";
   public static final String OPT_THUMBNAIL_PRIORITY_FLAVOR = "thumbnail.priority.flavor";
@@ -314,6 +320,11 @@ public class EditorServiceImpl implements EditorService {
     // Preview Video subtype
     previewVideoSubtype =  Objects.toString(properties.get(OPT_PREVIEW_VIDEO_SUBTYPE), DEFAULT_PREVIEW_VIDEO_SUBTYPE);
     logger.debug("Preview video subtype set to '{}'", previewVideoSubtype);
+
+    // Flavor for captions
+    captionsFlavor = MediaPackageElementFlavor.parseFlavor(
+            StringUtils.defaultString((String) properties.get(OPT_CAPTIONS_FLAVOR), DEFAULT_CAPTIONS_FLAVOR));
+    logger.debug("Caption flavor set to '{}'", captionsFlavor);
 
     thumbnailSubType =  Objects.toString(properties.get(OPT_THUMBNAILSUBTYPE), DEFAULT_THUMBNAIL_SUBTYPE);
     logger.debug("Thumbnail subtype set to '{}'", thumbnailSubType);
@@ -469,6 +480,85 @@ public class EditorServiceImpl implements EditorService {
       throw new IOException(e);
     }
 
+  }
+
+  /**
+   * Adds subtitles {@link EditingData.Subtitle} to the media package and sends the updated media package
+   * to the archive. If a subtitle flavor already exists, the subtitle is overwritten
+   *
+   * @param mediaPackage
+   *          the media package to at the SMIL catalog
+   * @param subtitles
+   *          the subtitles to be added
+   * @throws IOException
+   */
+  private void addSubtitleTrack(MediaPackage mediaPackage, List<EditingData.Subtitle> subtitles)
+          throws IOException, IllegalArgumentException {
+    // Check if any of the provided subtitles fail to match the designated flavor
+    for (EditingData.Subtitle subtitle : subtitles) {
+      if (!subtitle.getFlavor().matches(captionsFlavor)) {
+        throw new IllegalArgumentException(
+                "Given subtitle flavor " + subtitle.getFlavor().toString() + " does match caption flavor "
+                        + captionsFlavor);
+      }
+    }
+
+    for (EditingData.Subtitle subtitle : subtitles) {
+      // Generate ID for new tracks
+      String subtitleId = UUID.randomUUID().toString();
+      String trackId = null;
+
+      // Check if subtitle already exists
+      for (Track t : mediaPackage.getTracks()) {
+        if (t.getFlavor().matches(subtitle.getFlavor())) {
+          logger.debug("Set Identifier for Subtitle-Track to: {}", t.getIdentifier());
+          subtitleId = t.getIdentifier();
+          trackId = t.getIdentifier();
+          break;
+        }
+      }
+
+      Track track = mediaPackage.getTrack(trackId);
+
+      // Memorize uri of the previous track file for deletion
+      URI oldTrackURI = null;
+      if (track != null) {
+        oldTrackURI = track.getURI();
+      }
+
+      // Put updated filename in working file repository and update the track.
+      try (InputStream is = IOUtils.toInputStream(subtitle.getSubtitle(), "UTF-8")) {
+        URI subtitleUri = workspace.put(mediaPackage.getIdentifier().toString(), subtitleId, "subtitle.vtt", is);
+
+        // If not exists, create new Track
+        if (track == null) {
+          MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
+          track = (Track) mpeBuilder.elementFromURI(subtitleUri, MediaPackageElement.Type.Track, subtitle.getFlavor());
+          mediaPackage.add(track);
+          logger.info("Creating new track for flavor: " + track.getFlavor());
+        }
+
+        track.setURI(subtitleUri);
+        track.setIdentifier(subtitleId);
+        track.setChecksum(null);
+
+        if (oldTrackURI != null && oldTrackURI != subtitleUri) {
+          // Delete the old files from the working file repository and workspace if they were in there
+          logger.info("Removing old track file {}", oldTrackURI);
+          try {
+            workspace.delete(oldTrackURI);
+          } catch (NotFoundException | IOException e) {
+            logger.info("Could not remove track from workspace. Could be it was never there.");
+          }
+        }
+      }
+
+      try {
+        assetManager.takeSnapshot(mediaPackage);
+      } catch (AssetManagerException e) {
+        throw new IOException("Error while adding the updated media package " + mediaPackage + " to the archive", e);
+      }
+    }
   }
 
   /**
@@ -827,6 +917,21 @@ public class EditorServiceImpl implements EditorService {
       }
     }
 
+    // Get subtitles from the asset manager, so they are guaranteed to be up-to-date after saving
+    Track[] subtitleTracks = mp.getTracks(captionsFlavor);
+    List<EditingData.Subtitle> subtitles = new ArrayList<>();
+    for (Track t: subtitleTracks) {
+      try {
+        File subtitleFile = workspace.get(t.getURI());
+        String subtitleString = FileUtils.readFileToString(subtitleFile, StandardCharsets.UTF_8);
+        subtitles.add(new EditingData.Subtitle(t.getFlavor(), subtitleString));
+      } catch (NotFoundException | IOException e) {
+        errorExit("Could not read subtitle from file", mediaPackageId, ErrorStatus.UNKNOWN);
+      }
+    }
+
+    // Get tracks from the internal publication because it is a lot faster than getting them from the asset manager
+    // for some reason.
     final List<TrackData> tracks = trackList.stream().map(track -> {
       final String uri = signIfNecessary(track.getURI());
       final boolean audioEnabled = !hiddens.contains(tuple(track.getFlavor().getType(), "audio"));
@@ -861,7 +966,7 @@ public class EditorServiceImpl implements EditorService {
             .collect(Collectors.toList());
 
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
-            event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList);
+            event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList, subtitles);
   }
 
 
@@ -904,7 +1009,8 @@ public class EditorServiceImpl implements EditorService {
   }
 
   @Override
-  public void setEditData(String mediaPackageId, EditingData editingData) throws EditorServiceException {
+  public void setEditData(String mediaPackageId, EditingData editingData) throws EditorServiceException,
+          IOException {
     final Event event = getEvent(mediaPackageId);
 
     if (WorkflowUtil.isActive(event.getWorkflowState())) {
@@ -942,6 +1048,14 @@ public class EditorServiceImpl implements EditorService {
       addSmilToArchive(mediaPackage, smil);
     } catch (IOException e) {
       errorExit("Unable to add SMIL cutting catalog to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
+    }
+
+    try {
+      addSubtitleTrack(mediaPackage, editingData.getSubtitles());
+    } catch (IOException e) {
+      errorExit("Unable to add subtitle track to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
+    } catch (IllegalArgumentException e) {
+      errorExit("Illegal subtitle given", mediaPackageId, ErrorStatus.UNKNOWN, e);
     }
 
     try {

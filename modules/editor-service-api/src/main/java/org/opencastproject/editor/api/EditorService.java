@@ -23,6 +23,8 @@ package org.opencastproject.editor.api;
 
 import org.opencastproject.security.api.UnauthorizedException;
 
+import java.io.IOException;
+
 /**
  * Api for the Editor Service
  */
@@ -42,7 +44,7 @@ public interface EditorService {
    * Store information about edited data relevant to the given mediaPackageId
    * @param editingData
    */
-  void setEditData(String mediaPackageId, EditingData editingData) throws EditorServiceException;
+  void setEditData(String mediaPackageId, EditingData editingData) throws EditorServiceException, IOException;
 
   /**
    * Provide all meta information about the given mediaPackageId
