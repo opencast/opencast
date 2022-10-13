@@ -212,6 +212,13 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
     }
 
     // Publications
+    if (query.getComments() != null) {
+      for (String comment : query.getComments()) {
+        and(EventIndexSchema.COMMENTS, comment);
+      }
+    }
+
+    // Publications
     if (query.getPublications() != null) {
       for (String publication : query.getPublications()) {
         and(EventIndexSchema.PUBLICATION, publication);

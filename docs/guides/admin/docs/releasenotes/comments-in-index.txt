@@ -1,0 +1,7 @@
+ Add comments in the event index #4029
+
+ Adds comment reason, text and resolvedStatus to the events index. This allows for filtering events by certain comments
+ in the Admin UI by using the searchbar. For example, if you are using the notes column in the events table, you could
+ search for all events that have a note that contains "silent".
+
+ This requires an index rebuild.

@@ -2085,7 +2085,8 @@
       "GROUPS": {
          "GENERAL": "Ogólne",
          "PLAYER": "Player",
-         "EDITOR": "Edytor"
+         "EDITOR": "Edytor",
+         "ADD_MEDIA": "Create Event/Series"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2118,6 +2119,10 @@
             "CLEAR_LIST": "Wyczyść segment",
             "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Powtórz segment z końcówką poprzedniego",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Koniec segmentu"
+         },
+         "ADD_MEDIA": {
+            "NEXT_TAB": "Next tab/Create",
+            "PREVIOUS_TAB": "Previous tab"
          }
       }
    },

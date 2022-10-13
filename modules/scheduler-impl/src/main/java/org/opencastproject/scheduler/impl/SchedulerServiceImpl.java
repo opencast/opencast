@@ -188,9 +188,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /** The Etag for an empty calendar */
   private static final String EMPTY_CALENDAR_ETAG = "mod0";
 
-  /** The workflow configuration prefix */
-  public static final String WORKFLOW_CONFIG_PREFIX = "org.opencastproject.workflow.config.";
-
   private static final String SNAPSHOT_OWNER = SchedulerService.JOB_TYPE;
 
   private static final Gson gson = new Gson();
@@ -354,10 +351,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * OSgi callback to set the API index.
+   * OSgi callback to set the Elasticsearch index.
    *
    * @param index
-   *          the API index.
+   *          the Elasticsearch index.
    */
   @Reference
   public void setIndex(ElasticsearchIndex index) {
@@ -482,7 +479,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       updateLiveEvent(mediaPackageId, Opt.some(acl), dublinCore, Opt.some(startDateTime),
               Opt.some(endDateTime), Opt.some(captureAgentId), Opt.some(finalCaProperties));
 
-      // Update API index
+      // Update Elasticsearch index
       updateEventInIndex(mediaPackageId, Opt.some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
           Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties), Opt.none());
 
@@ -628,7 +625,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         updateLiveEvent(mediaPackageId, some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
                 Opt.some(captureAgentId), Opt.some(finalCaProperties));
 
-        // Update API index
+        // Update Elasticsearch index
         updateEventInIndex(mediaPackageId, some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
                 Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties), Opt.none());
 
@@ -821,7 +818,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       updateLiveEvent(mpId, acl, dublinCore, startDateTime, endDateTime, Opt.some(agentId),
               finalCaProperties);
 
-      // Update API index
+      // Update Elasticsearch index
       updateEventInIndex(mpId, acl, dublinCore, startDateTime, endDateTime, userIds, Opt.some(agentId),
               finalCaProperties, Opt.none());
 
@@ -901,7 +898,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       // Update live event
       sendSchedulerUpdate(new SchedulerItemList(mediaPackageId, SchedulerItem.delete()));
 
-      // Update API index
+      // Update Elasticsearch index
       removeSchedulingInfoFromIndex(mediaPackageId);
     } catch (Exception e) {
       logger.error("Could not remove event '{}' from persistent storage: {}", mediaPackageId, e);
@@ -1296,7 +1293,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         sendSchedulerUpdate(new SchedulerItemList(r.getID(), Collections.singletonList(SchedulerItem
                 .updateRecordingStatus(r.getState(), r.getLastCheckinTime()))));
 
-        // Update API index
+        // Update Elasticsearch index
         updateEventInIndex(r.getID(), Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none(),
                 Opt.none(), Opt.none(), Opt.some(r.getState()));
       } else {
@@ -1356,7 +1353,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       // Update live event
       sendSchedulerUpdate(new SchedulerItemList(id, SchedulerItem.deleteRecordingState()));
 
-      // Update API index
+      // Update Elasticsearch index
       removeRecordingStatusFromIndex(id);
     } catch (NotFoundException e) {
       throw e;
@@ -1407,7 +1404,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * Update the event in the API index. Fields will only be updated of the corresponding Opt is not none.
+   * Update the event in the Elasticsearch index. Fields will only be updated of the corresponding Opt is not none.
    *
    * @param mediaPackageId
    * @param index
@@ -1479,7 +1476,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * Set recording status to null for this event in the API index.
+   * Set recording status to null for this event in the Elasticsearch index.
    *
    * @param mediaPackageId
    * @param index
@@ -1504,7 +1501,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * Remove scheduling information for this event from the API index.
+   * Remove scheduling information for this event from the Elasticsearch index.
    *
    * @param mediaPackageId
    * @param index

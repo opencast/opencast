@@ -105,6 +105,7 @@ nav:
    - Statistics API: 'api/statistics-api.md'
    - Groups API: 'api/groups-api.md'
    - Security API: 'api/security-api.md'
+   - Workflow API: 'api/workflow-api.md'
    - Data Types: 'api/types.md'
    - Glossary: 'api/glossary.md'
 - Configure a Local Cluster for Testing: local-cluster.md

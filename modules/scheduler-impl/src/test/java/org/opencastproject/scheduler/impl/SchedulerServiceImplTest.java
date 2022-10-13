@@ -92,6 +92,7 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.message.broker.api.update.SchedulerUpdateHandler;
+import org.opencastproject.metadata.dublincore.CatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCores;
@@ -153,6 +154,7 @@ import net.fortuna.ical4j.model.property.RRule;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.After;
@@ -250,11 +252,16 @@ public class SchedulerServiceImplTest {
     EasyMock.expect(episodeAdapter.getFlavor()).andReturn(new MediaPackageElementFlavor("dublincore", "episode"))
             .anyTimes();
     EasyMock.expect(episodeAdapter.getOrganization()).andReturn(new DefaultOrganization().getId()).anyTimes();
+    final Capture<String> stringCapture = EasyMock.newCapture();
+    EasyMock.expect(episodeAdapter.handlesOrganization(EasyMock.capture(stringCapture)))
+        .andAnswer(() -> DefaultOrganization.DEFAULT_ORGANIZATION_ID.equals(stringCapture.getValue())).anyTimes();
 
     EventCatalogUIAdapter extendedAdapter = EasyMock.createMock(EventCatalogUIAdapter.class);
     EasyMock.expect(extendedAdapter.getFlavor()).andReturn(new MediaPackageElementFlavor("extended", "episode"))
             .anyTimes();
     EasyMock.expect(extendedAdapter.getOrganization()).andReturn(new DefaultOrganization().getId()).anyTimes();
+    EasyMock.expect(extendedAdapter.handlesOrganization(EasyMock.capture(stringCapture)))
+        .andAnswer(() -> DefaultOrganization.DEFAULT_ORGANIZATION_ID.equals(stringCapture.getValue())).anyTimes();
 
     BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
     EasyMock.expect(bundleContext.getProperty(EasyMock.anyString())).andReturn("adminuser").anyTimes();
@@ -1456,7 +1463,8 @@ public class SchedulerServiceImplTest {
 
     EventCatalogUIAdapter episodeAdapter = EasyMock.createMock(EventCatalogUIAdapter.class);
     EasyMock.expect(episodeAdapter.getFlavor()).andReturn(MediaPackageElements.EPISODE).anyTimes();
-    EasyMock.expect(episodeAdapter.getOrganization()).andAnswer(() -> { return currentOrg.getId(); }).anyTimes();
+    EasyMock.expect(episodeAdapter.getOrganization()).andReturn(CatalogUIAdapter.ORGANIZATION_WILDCARD).anyTimes();
+    EasyMock.expect(episodeAdapter.handlesOrganization(EasyMock.anyString())).andReturn(true).anyTimes();
     EasyMock.replay(episodeAdapter);
     schedSvc.addCatalogUIAdapter(episodeAdapter);
 

@@ -81,6 +81,7 @@ import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
@@ -132,6 +133,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -184,6 +186,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   private Database db;
   private AclServiceFactory aclServiceFactory;
   private ElasticsearchIndex index;
+  private Map<String, List<EventCatalogUIAdapter>> extendedEventCatalogUIAdapters = new HashMap<>();
 
   // Settings for role filter
   private boolean includeAPIRoles;
@@ -284,6 +287,20 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Reference
   public void setIndex(ElasticsearchIndex index) {
     this.index = index;
+  }
+
+  @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC,
+          target = "(common-metadata=false)")
+  public synchronized void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
+    List<EventCatalogUIAdapter> list = extendedEventCatalogUIAdapters.computeIfAbsent(
+            catalogUIAdapter.getOrganization(), k -> new ArrayList());
+    list.add(catalogUIAdapter);
+  }
+
+  public synchronized void removeCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
+    if (extendedEventCatalogUIAdapters.containsKey(catalogUIAdapter.getOrganization())) {
+      extendedEventCatalogUIAdapters.get(catalogUIAdapter.getOrganization()).remove(catalogUIAdapter);
+    }
   }
 
   /**
@@ -473,12 +490,12 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   /**
-   * Update the event in the API index.
+   * Update the event in the Elasticsearch index.
    *
    * @param snapshot
    *         The newest snapshot of the event to update
    * @param index
-   *         The API index to update
+   *         The Elasticsearch index to update
    */
   private void updateEventInIndex(Snapshot snapshot) {
     final MediaPackage mp = snapshot.getMediaPackage();
@@ -502,12 +519,28 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       }
       EventIndexUtils.updateEvent(event, mp);
 
+      // common metadata
       for (Catalog catalog: mp.getCatalogs(MediaPackageElements.EPISODE)) {
         try (InputStream in = workspace.read(catalog.getURI())) {
           EventIndexUtils.updateEvent(event, DublinCores.read(in));
         } catch (IOException | NotFoundException e) {
-          throw new IllegalStateException(String.format("Unable to load dublin core catalog for event '%s'",
+          throw new IllegalStateException(String.format("Unable to load common dublin core catalog for event '%s'",
                   mp.getIdentifier()), e);
+        }
+      }
+
+      // extended metadata
+      event.resetExtendedMetadata();  // getting rid of old data
+      for (EventCatalogUIAdapter extendedCatalogUIAdapter : extendedEventCatalogUIAdapters.getOrDefault(organization,
+              Collections.emptyList())) {
+        for (Catalog catalog: mp.getCatalogs(extendedCatalogUIAdapter.getFlavor())) {
+          try (InputStream in = workspace.read(catalog.getURI())) {
+            EventIndexUtils.updateEventExtendedMetadata(event, DublinCores.read(in),
+                    extendedCatalogUIAdapter.getFlavor());
+          } catch (IOException | NotFoundException e) {
+            throw new IllegalStateException(String.format("Unable to load extended dublin core catalog '%s' for event "
+                            + "'%s'", catalog.getFlavor(), mp.getIdentifier()), e);
+          }
         }
       }
 
@@ -531,12 +564,12 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   /**
-   * Remove the event from the API index
+   * Remove the event from the Elasticsearch index
    *
    * @param eventId
    *         The id of the event to remove
    * @param index
-   *         The API index to update
+   *         The Elasticsearch index to update
    */
   private void removeArchivedVersionFromIndex(String eventId) {
     final String orgId = securityService.getOrganization().getId();
@@ -660,7 +693,14 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Override
   public void moveSnapshotsByDate(final Date start, final Date end, final String targetStore)
           throws NotFoundException {
-    RichAResult results = getSnapshotsByDate(start, end);
+    // We don't use #getSnapshotsByDate() as this includes also all snapshots already in targetStore. On large installs
+    // this could lead to memory overflow.
+    AQueryBuilder q = createQuery();
+    ASelectQuery query = baseQuery(q)
+        .where(q.storage(targetStore).not())
+        .where(q.archived().ge(start))
+        .where(q.archived().le(end));
+    RichAResult results = Enrichments.enrich(query.run());
 
     if (results.getRecords().isEmpty()) {
       throw new NotFoundException("No media packages found between " + start + " and " + end);
@@ -672,7 +712,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Override
   public void moveSnapshotsByIdAndDate(final String mpId, final Date start, final Date end, final String targetStore)
           throws NotFoundException {
-    RichAResult results = getSnapshotsByDate(start, end);
+    RichAResult results = getSnapshotsByIdAndDate(mpId, start, end);
 
     if (results.getRecords().isEmpty()) {
       throw new NotFoundException("No media package with id " + mpId + " found between " + start + " and " + end);

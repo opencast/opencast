@@ -2393,6 +2393,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       logger.info("ProcessSmil/MultiTrimConcat returns {} media files {}", outputs.size(), outputs);
       List<URI> workspaceURIs = putToCollection(job, outputs, "processSmil files");
       List<Track> tracks = inspect(job, workspaceURIs);
+      if (isHLS) {
+        tracks.forEach(eachtrack -> AdaptivePlaylist.setLogicalName(eachtrack));
+      }
       tracks.forEach(track -> track.setIdentifier(IdImpl.fromUUID().toString()));
       return tracks;
     } catch (Exception e) { // clean up all the stored files

@@ -236,6 +236,9 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   }
 
   private void updateTheme(Theme theme, ThemeDto themeDto) {
+    if (theme.getId().isSome()) {
+      themeDto.setId(theme.getId().get());
+    }
     themeDto.setUsername(theme.getCreator().getUsername());
     themeDto.setCreationDate(theme.getCreationDate());
     themeDto.setDefault(theme.isDefault());

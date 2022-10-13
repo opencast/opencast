@@ -107,12 +107,14 @@ public class SeriesWorkflowOperationHandlerTest {
 
     SeriesCatalogUIAdapter adapter = EasyMock.createNiceMock(SeriesCatalogUIAdapter.class);
     EasyMock.expect(adapter.getOrganization()).andReturn(new DefaultOrganization().getId()).anyTimes();
+    EasyMock.expect(adapter.handlesOrganization(EasyMock.eq(DefaultOrganization.DEFAULT_ORGANIZATION_ID))).andReturn(true).anyTimes();
     EasyMock.expect(adapter.getFlavor()).andReturn(MediaPackageElementFlavor.parseFlavor("creativecommons/series"))
             .anyTimes();
     EasyMock.replay(adapter);
 
     SeriesCatalogUIAdapter seriesAdapter = EasyMock.createNiceMock(SeriesCatalogUIAdapter.class);
     EasyMock.expect(seriesAdapter.getOrganization()).andReturn(new DefaultOrganization().getId()).anyTimes();
+    EasyMock.expect(seriesAdapter.handlesOrganization(EasyMock.eq(DefaultOrganization.DEFAULT_ORGANIZATION_ID))).andReturn(true).anyTimes();
     EasyMock.expect(seriesAdapter.getFlavor()).andReturn(MediaPackageElementFlavor.parseFlavor("dublincore/series"))
             .anyTimes();
     EasyMock.replay(seriesAdapter);

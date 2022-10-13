@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -120,6 +121,8 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
     final String type = getCfg(properties, CONF_TYPE_KEY);
     Option<String> optCommonMetadata = getOptCfg(properties, CONF_COMMON_METADATA_KEY);
     final boolean isCommonMetadata = optCommonMetadata.isSome() ? Boolean.parseBoolean(optCommonMetadata.get()) : false;
+    Dictionary serviceProperties = new Properties();
+    serviceProperties.put(CONF_COMMON_METADATA_KEY, isCommonMetadata);
 
     // Check for valid configuration values
     if (!(CATALOG_TYPE_EVENTS.equalsIgnoreCase(type) || CATALOG_TYPE_SERIES.equalsIgnoreCase(type))) {
@@ -155,7 +158,7 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
           adapter.updated(properties);
 
           ServiceRegistration<?> configurationRegistration = bundleContext.registerService(adapterClassesNames, adapter,
-                  null);
+                  serviceProperties);
           adapterServiceRegistrations.put(pid, configurationRegistration);
         }
         break;
@@ -186,7 +189,7 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
           adapter.updated(properties);
 
           ServiceRegistration<?> adapterServiceRegistration = bundleContext.registerService(adapterClassesNames,
-                  adapter, null);
+                  adapter, serviceProperties);
           adapterServiceRegistrations.put(pid, adapterServiceRegistration);
         }
         break;

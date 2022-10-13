@@ -439,7 +439,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   public List<EventCatalogUIAdapter> getEventCatalogUIAdapters(String organization) {
-    return eventCatalogUIAdapters.stream().filter(a -> organization.equals(a.getOrganization()))
+    return eventCatalogUIAdapters.stream().filter(a -> a.handlesOrganization(organization))
             .collect(Collectors.toList());
   }
 
@@ -449,14 +449,14 @@ public class IndexServiceImpl implements IndexService {
    * @return A {@link List} of {@link SeriesCatalogUIAdapter} that provide the metadata to the front end.
    */
   public List<SeriesCatalogUIAdapter> getSeriesCatalogUIAdapters(String organization) {
-    return seriesCatalogUIAdapters.stream().filter(a -> organization.equals(a.getOrganization()))
+    return seriesCatalogUIAdapters.stream().filter(a -> a.handlesOrganization(organization))
             .collect(Collectors.toList());
   }
 
   public EventCatalogUIAdapter getCommonEventCatalogUIAdapter(String organization) {
     Optional<EventCatalogUIAdapter> orgEventCatalogUIAdapter = eventCatalogUIAdapters.stream()
             .filter(a -> a instanceof CommonEventCatalogUIAdapter)
-            .filter(a -> organization.equals(a.getOrganization()))
+            .filter(a -> a.handlesOrganization(organization))
             .findFirst();
 
     if (orgEventCatalogUIAdapter.isPresent()) {
@@ -472,7 +472,7 @@ public class IndexServiceImpl implements IndexService {
   public SeriesCatalogUIAdapter getCommonSeriesCatalogUIAdapter(String organization) {
     Optional<SeriesCatalogUIAdapter> orgSeriesCatalogUIAdapter = seriesCatalogUIAdapters.stream()
             .filter(a -> a instanceof CommonSeriesCatalogUIAdapter)
-            .filter(a -> organization.equals(a.getOrganization()))
+            .filter(a -> a.handlesOrganization(organization))
             .findFirst();
 
     if (orgSeriesCatalogUIAdapter.isPresent()) {
@@ -494,7 +494,7 @@ public class IndexServiceImpl implements IndexService {
   public List<EventCatalogUIAdapter> getExtendedEventCatalogUIAdapters() {
     String organization = securityService.getOrganization().getId();
     return eventCatalogUIAdapters.stream().filter(a -> !(a instanceof CommonEventCatalogUIAdapter))
-            .filter(a -> organization.equals(a.getOrganization())).collect(Collectors.toList());
+            .filter(a -> a.handlesOrganization(organization)).collect(Collectors.toList());
   }
 
   @Override

@@ -250,6 +250,7 @@
     <module>modules/timelinepreviews-ffmpeg</module>
     <module>modules/timelinepreviews-remote</module>
     <module>modules/timelinepreviews-workflowoperation</module>
+    <module>modules/tobira</module>
     <module>modules/transcription-service-amberscript</module>
     <module>modules/transcription-service-api</module>
     <module>modules/transcription-service-google-speech-impl</module>
@@ -710,6 +711,20 @@
               <version>1.11.1</version>
             </dependency>
           </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.karaf.tooling</groupId>
+          <artifactId>karaf-services-maven-plugin</artifactId>
+          <version>${karaf.version}</version>
+          <executions>
+            <execution>
+              <id>service-metadata-generate</id>
+              <phase>process-classes</phase>
+              <goals>
+                <goal>service-metadata-generate</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>

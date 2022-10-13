@@ -122,15 +122,38 @@ public final class SeriesIndexUtils {
       metadata.addField(SeriesIndexSchema.RIGHTS_HOLDER, series.getRightsHolder(), true);
     }
 
+    if (!series.getExtendedMetadata().isEmpty()) {
+      addExtendedMetadata(metadata, series.getExtendedMetadata());
+    }
+
     if (StringUtils.trimToNull(series.getAccessPolicy()) != null) {
       metadata.addField(SeriesIndexSchema.ACCESS_POLICY, series.getAccessPolicy(), false);
       addAuthorization(metadata, series.getAccessPolicy());
     }
-
     if (series.getTheme() != null) {
       metadata.addField(SeriesIndexSchema.THEME, series.getTheme(), false);
     }
     return metadata;
+  }
+
+  /**
+   * Adds extended metadata fields to the input document
+   *
+   * @param doc
+   *          the input document
+   * @param extendedMetadata
+   *          the extended metadata map
+   */
+  private static void addExtendedMetadata(SearchMetadataCollection doc, Map<String, Map<String,
+          List<String>>> extendedMetadata) {
+    for (String type: extendedMetadata.keySet()) {
+      Map<String, List<String>> extendedMetadataByType = extendedMetadata.get(type);
+      for (String name: extendedMetadataByType.keySet()) {
+        List<String> values = extendedMetadataByType.get(name);
+        String fieldName = SeriesIndexSchema.EXTENDED_METADATA_PREFIX.concat(type + "_" + name);
+        doc.addField(fieldName, values, true);
+      }
+    }
   }
 
   /**
@@ -142,11 +165,11 @@ public final class SeriesIndexUtils {
    *          the access control list string
    */
   private static void addAuthorization(SearchMetadataCollection doc, String aclString) {
-    Map<String, List<String>> permissions = new HashMap<String, List<String>>();
+    Map<String, List<String>> permissions = new HashMap<>();
 
     // Define containers for common permissions
     for (Action action : Permissions.Action.values()) {
-      permissions.put(action.toString(), new ArrayList<String>());
+      permissions.put(action.toString(), new ArrayList<>());
     }
 
     AccessControlList acl = AccessControlParser.parseAclSilent(aclString);
@@ -157,7 +180,7 @@ public final class SeriesIndexUtils {
       }
       List<String> actionPermissions = permissions.get(entry.getAction());
       if (actionPermissions == null) {
-        actionPermissions = new ArrayList<String>();
+        actionPermissions = new ArrayList<>();
         permissions.put(entry.getAction(), actionPermissions);
       }
       actionPermissions.add(entry.getRole());

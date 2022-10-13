@@ -55,6 +55,9 @@ public interface SeriesIndexSchema extends IndexSchema {
   /** The license of the series */
   String LICENSE = "license";
 
+  /** The key in the input documents representing the prefix to extended metadata */
+  String EXTENDED_METADATA_PREFIX = "extended_metadata_";
+
   /** The access policy of the series */
   String ACCESS_POLICY = "access_policy";
 

@@ -2085,7 +2085,8 @@
       "GROUPS": {
          "GENERAL": "概况",
          "PLAYER": "播放器",
-         "EDITOR": "编辑器"
+         "EDITOR": "编辑器",
+         "ADD_MEDIA": "新建 事件/系列"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2118,6 +2119,10 @@
             "CLEAR_LIST": "清除分段",
             "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "重新播放片段（在片段开始稍前处开始播放）",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "分段结尾"
+         },
+         "ADD_MEDIA": {
+            "NEXT_TAB": "下一个标签页 / 创建",
+            "PREVIOUS_TAB": "上一个标签页"
          }
       }
    },

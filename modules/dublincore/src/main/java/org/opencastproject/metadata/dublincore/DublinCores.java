@@ -175,7 +175,7 @@ public final class DublinCores {
     } catch (IOException e) {
       throw new RuntimeException("Unable to read DublinCore from stream", e);
     }
-    if (ser.startsWith("{")) {
+    if (DublinCoreJsonFormat.isJson(ser)) {
       try {
         return DublinCoreJsonFormat.read(ser);
       } catch (Exception e) {

@@ -4,6 +4,54 @@ Changelog
 Opencast 12
 -----------
 
+### Opencast 12.3
+
+*Released on September 21th, 2022*
+
+- [[#4220](https://github.com/opencast/opencast/pull/4220)] -
+  Remove unused configuration
+- [[#4219](https://github.com/opencast/opencast/pull/4219)] -
+  Ignore NoSuchFileException when cleaning directories
+- [[#4213](https://github.com/opencast/opencast/pull/4213)] -
+  Fix check if all workflows were loaded when using YAML
+- [[#4207](https://github.com/opencast/opencast/pull/4207)] -
+  Do not run dependabot pushes multiple times
+- [[#4197](https://github.com/opencast/opencast/pull/4197)] -
+  Bump eslint from 8.23.0 to 8.23.1 in /modules/engage-paella-player-7
+- [[#4187](https://github.com/opencast/opencast/pull/4187)] -
+  Dont run gh actions on dbot multiple times
+- [[#4178](https://github.com/opencast/opencast/pull/4178)] -
+  Fix filename dependency on locale
+- [[#4177](https://github.com/opencast/opencast/pull/4177)] -
+  Bump webpack-dev-server from 4.9.3 to 4.11.0 in /modules/engage-paella-player-7
+- [[#4168](https://github.com/opencast/opencast/pull/4168)] -
+  Bump html-validate from 7.2.0 to 7.3.3 in /modules/engage-paella-player-7
+- [[#4165](https://github.com/opencast/opencast/pull/4165)] -
+  Bump eslint from 8.21.0 to 8.23.0 in /modules/engage-paella-player-7
+- [[#4151](https://github.com/opencast/opencast/pull/4151)] -
+  Allow global admins to always get workflow instances for a media package
+- [[#4137](https://github.com/opencast/opencast/pull/4137)] -
+  Delete scheduled events fixed (fixes #4084)
+- [[#4134](https://github.com/opencast/opencast/pull/4134)] -
+  Update CentOS Stream/RHEL documentation
+- [[#4129](https://github.com/opencast/opencast/pull/4129)] -
+  Add Tobira module for Synchronization with an external Tobira application
+- [[#4113](https://github.com/opencast/opencast/pull/4113)] -
+  Add Dummy capture agent documentation
+- [[#4111](https://github.com/opencast/opencast/pull/4111)] -
+  add missing reference target
+- [[#4107](https://github.com/opencast/opencast/pull/4107)] -
+  Fix Publication to Workspace Operation Documentation
+- [[#4104](https://github.com/opencast/opencast/pull/4104)] -
+  Document broken MariaDB upgrade script
+- [[#4103](https://github.com/opencast/opencast/pull/4103)] -
+  Revert try-catch in 12.x MariaDB upgrade script
+- [[#4101](https://github.com/opencast/opencast/pull/4101)] -
+  Fixes mysql upgrade script stop error
+- [[#4094](https://github.com/opencast/opencast/pull/4094)] -
+  Replace DownloadDistributionService target filter with aws version
+
+
 ### Opencast 12.2
 
 *Released on August 17th, 2022*
@@ -259,6 +307,31 @@ Dependabot's changes are excluded from this log.
 
 Opencast 11
 ----------
+
+### Opencast 11.11
+
+*Released on September 21th, 2022*
+
+- [[#4200](https://github.com/opencast/opencast/pull/4200)] -
+  Add size to term aggregation in order to return more than 10 terms
+- [[#4185](https://github.com/opencast/opencast/pull/4185)] -
+  Fix for S3 asset storage not releasing http connections
+- [[#4182](https://github.com/opencast/opencast/pull/4182)] -
+  Fix race condition when loading workflow definitions
+- [[#4172](https://github.com/opencast/opencast/pull/4172)] -
+  Allow upload of multiple assets with the same flavor (based on config)
+- [[#4164](https://github.com/opencast/opencast/pull/4164)] -
+  Use getObjectMetadata to get object version when uploading file to S3 archive (fixes #4161)
+- [[#4159](https://github.com/opencast/opencast/pull/4159)] -
+  Fix search service limit - update more than 10 events for a series change
+- [[#4155](https://github.com/opencast/opencast/pull/4155)] -
+  Fix ingest of series catalog via external URL
+- [[#4155](https://github.com/opencast/opencast/pull/4155)] -
+  Fix workflow config handover from ingest to scheduler service
+- [[#4119](https://github.com/opencast/opencast/pull/4119)] -
+  Respect system settings when sending adopter data
+- [[#3681](https://github.com/opencast/opencast/pull/3681)] -
+  Make deletion of live publication in case of capture errors configurable
 
 ### Opencast 11.10
 

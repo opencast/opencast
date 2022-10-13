@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -148,6 +149,19 @@ public final class AccessControlList {
     }
     this.entries = new ArrayList<>(rules.values());
     return this;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof AccessControlList) {
+      return entries.equals(((AccessControlList) o).entries);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(entries);
   }
 
 }

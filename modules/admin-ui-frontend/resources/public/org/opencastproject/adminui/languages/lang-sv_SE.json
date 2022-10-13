@@ -2085,7 +2085,8 @@
       "GROUPS": {
          "GENERAL": "Allmänt",
          "PLAYER": "Spelare",
-         "EDITOR": "Redigerare"
+         "EDITOR": "Redigerare",
+         "ADD_MEDIA": "Create Event/Series"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2118,6 +2119,10 @@
             "CLEAR_LIST": "Rensa segment",
             "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Spela upp segment med pre-roll",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Slutet av segmentet"
+         },
+         "ADD_MEDIA": {
+            "NEXT_TAB": "Next tab/Create",
+            "PREVIOUS_TAB": "Previous tab"
          }
       }
    },

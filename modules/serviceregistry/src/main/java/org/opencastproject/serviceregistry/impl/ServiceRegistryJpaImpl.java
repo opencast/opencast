@@ -179,6 +179,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Configuration key for the retrieval of service statistics: Do not consider jobs older than max_job_age (in days) */
   protected static final String OPT_SERVICE_STATISTICS_MAX_JOB_AGE = "org.opencastproject.statistics.services.max_job_age";
 
+  /** Configuration key for the encoding preferred worker nodes */
+  protected static final String OPT_ENCODING_WORKERS = "org.opencastproject.encoding.workers";
+
+  /** Configuration key for the encoding workers load threshold */
+  protected static final String OPT_ENCODING_THRESHOLD = "org.opencastproject.encoding.workers.threshold";
+
   /** The http client to use when connecting to remote servers */
   protected TrustedHttpClient client = null;
 
@@ -191,6 +197,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** Default setting on service statistics retrieval */
   static final int DEFAULT_SERVICE_STATISTICS_MAX_JOB_AGE = 14;
+
+  static final List<String>  DEFAULT_ENCODING_WORKERS = new ArrayList<String>();
+
+  static final double DEFAULT_ENCODING_THRESHOLD = 0.0;
 
   /** The configuration key for setting {@link #maxAttemptsBeforeErrorState} */
   static final String MAX_ATTEMPTS_CONFIG_KEY = "max.attempts";
@@ -225,6 +235,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** The base URL for job URLs */
   protected String jobHost;
+
+  /** Comma-seperate list with URLs of encoding specialised workers*/
+  protected static List<String> encodingWorkers = DEFAULT_ENCODING_WORKERS;
+
+  /** Threshold value under which defined workers get preferred when dispatching encoding jobs */
+  protected static double encodingThreshold = DEFAULT_ENCODING_THRESHOLD;
 
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
@@ -762,6 +778,32 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         collectJobstats = DEFAULT_JOB_STATISTICS;
       }
     }
+
+    // get the encoding worker nodes defined in the configuration file and parse the comma-separated list
+    String encodingWorkersString = (String) properties.get(OPT_ENCODING_WORKERS);
+    if (StringUtils.isNotBlank(encodingWorkersString)) {
+      encodingWorkers = Arrays.asList(encodingWorkersString.split("\\s*,\\s*"));
+    } else
+      encodingWorkers = DEFAULT_ENCODING_WORKERS;
+
+    // get the encoding worker load threshold defined in the configuration file and parse the double
+    String encodingThersholdString = StringUtils.trimToNull((String) properties.get(OPT_ENCODING_THRESHOLD));
+    if (StringUtils.isNotBlank(encodingThersholdString) && encodingThersholdString != null) {
+        try {
+          double encodingThresholdTmp = Double.parseDouble(encodingThersholdString);
+          if (encodingThresholdTmp >= 0 && encodingThresholdTmp <= 1)
+            encodingThreshold = encodingThresholdTmp;
+          else {
+            encodingThreshold = DEFAULT_ENCODING_THRESHOLD;
+            logger.warn("org.opencastproject.encoding.workers.threshold is not between 0 and 1");
+          }
+        } catch (NumberFormatException e) {
+          logger.warn("Can not set encoding threshold to {}. {} must be an parsable double", encodingThersholdString,
+              OPT_ENCODING_THRESHOLD);
+        }
+    } else
+      encodingThreshold = DEFAULT_ENCODING_THRESHOLD;
+
 
     String maxJobAgeString = StringUtils.trimToNull((String) properties.get(OPT_SERVICE_STATISTICS_MAX_JOB_AGE));
     if (maxJobAgeString != null) {
@@ -2746,8 +2788,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       filteredList.add(service);
     }
 
-    // Sort the list by capacity
-    Collections.sort(filteredList, new LoadComparator(systemLoad));
+    // Sort the list by capacity and distinguish between composer jobs and other jobs
+    if ("org.opencastproject.composer".equals(jobType))
+      Collections.sort(filteredList, new LoadComparatorEncoding(systemLoad));
+    else
+      Collections.sort(filteredList, new LoadComparator(systemLoad));
 
     return filteredList;
   }
@@ -2890,11 +2935,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Comparator that will sort service registrations depending on their capacity, wich is defined by the number of jobs
-   * the service's host is already running. The lower that number, the bigger the capacity.
+   * the service's host is already running divided by the MaxLoad of the Server. The lower that number, the bigger the capacity.
    */
-  private static final class LoadComparator implements Comparator<ServiceRegistration> {
+  private class LoadComparator implements Comparator<ServiceRegistration> {
 
-    private SystemLoad loadByHost = null;
+    protected SystemLoad loadByHost = null;
 
     /**
      * Creates a new comparator which is using the given map of host names and loads.
@@ -2921,6 +2966,84 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       }
       return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor());
 
+    }
+
+  }
+
+  /**
+   * Comparator that will sort service registrations depending on their capacity, which is defined by the number of jobs
+   * the service's host is already running divided by the MaxLoad of the Server. The lower that number, the bigger the capacity.
+   * This Comparator will preferre encoding workers, if none are defined in the configuration file it will act like the LoadComparator.
+   */
+  private class LoadComparatorEncoding extends LoadComparator implements Comparator<ServiceRegistration> {
+
+    /**
+     * Creates a new comparator which is using the given map of host names and loads.
+     *
+     * @param loadByHost
+     */
+    LoadComparatorEncoding(SystemLoad loadByHost) {
+      super(loadByHost);
+    }
+
+    @Override
+    public int compare(ServiceRegistration serviceA, ServiceRegistration serviceB) {
+      String hostA = serviceA.getHost();
+      String hostB = serviceB.getHost();
+      NodeLoad nodeA = loadByHost.get(hostA);
+      NodeLoad nodeB = loadByHost.get(hostB);
+
+      if (encodingWorkers != null) {
+        if (encodingWorkers.contains(hostA) && !encodingWorkers.contains(hostB)) {
+          if (nodeA.getLoadFactor() <= encodingThreshold) {
+            return -1;
+          }
+          return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor());
+        }
+        if (encodingWorkers.contains(hostB) && !encodingWorkers.contains(hostA)) {
+          if (nodeB.getLoadFactor() <= encodingThreshold) {
+            return 1;
+          }
+          return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor());
+        }
+      }
+        return super.compare(serviceA, serviceB);
+    }
+  }
+
+  /**
+   * Comparator that will sort jobs according to their status. Those that were restarted are on top, those that are
+   * queued are next.
+   */
+  static final class DispatchableComparator implements Comparator<JpaJob> {
+
+    @Override
+    public int compare(JpaJob jobA, JpaJob jobB) {
+
+      // Jobs that are in "restart" mode should be handled first
+      if (Status.RESTART.equals(jobA.getStatus()) && !Status.RESTART.equals(jobB.getStatus())) {
+        return -1;
+      } else if (Status.RESTART.equals(jobB.getStatus()) && !Status.RESTART.equals(jobA.getStatus())) {
+        return 1;
+      }
+
+      // Regular jobs should be processed prior to workflow and workflow operation jobs
+      if (TYPE_WORKFLOW.equals(jobA.getJobType()) && !TYPE_WORKFLOW.equals(jobB.getJobType())) {
+        return 1;
+      } else if (TYPE_WORKFLOW.equals(jobB.getJobType()) && !TYPE_WORKFLOW.equals(jobA.getJobType())) {
+        return -1;
+      }
+
+      // Use created date
+      if (jobA.getDateCreated() != null && jobB.getDateCreated() != null) {
+        if (jobA.getDateCreated().getTime() < jobB.getDateCreated().getTime())
+          return -1;
+        else if (jobA.getDateCreated().getTime() > jobB.getDateCreated().getTime())
+          return 1;
+      }
+
+      // undecided
+      return 0;
     }
 
   }
