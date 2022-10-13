@@ -84,10 +84,12 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller, Organizatio
   /** OSGi bundle context */
   private BundleContext bundleCtx = null;
 
-  /** Tag to define if the the workflows definition have already been loaded */
+  /** Tag to define if the workflows definition has already been loaded */
   private boolean isWFSinitialized = false;
 
   private OrganizationDirectoryService organizationDirectoryService;
+
+  private WorkflowFilenameFilter workflowFilenameFilter;
 
   @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
@@ -106,6 +108,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller, Organizatio
   void activate(BundleContext ctx) {
     this.bundleCtx = ctx;
     organizationDirectoryService.addOrganizationDirectoryListener(this);
+    this.workflowFilenameFilter = new WorkflowFilenameFilter("workflows", ".*\\.(xml|yaml|yml)$");
   }
 
   /**
@@ -124,7 +127,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller, Organizatio
       }
 
       // Determine the number of available profiles
-      String[] filesInDirectory = artifact.getParentFile().list((arg0, name) -> name.matches(".*\\.(xml|yaml|yml)$"));
+      String[] filesInDirectory = artifact.getParentFile().list(workflowFilenameFilter);
       if (filesInDirectory == null) {
         throw new RuntimeException("error retrieving files from directory \"" + artifact.getParentFile() + "\"");
       }
@@ -322,7 +325,6 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller, Organizatio
    * @see org.apache.felix.fileinstall.ArtifactListener#canHandle(java.io.File)
    */
   public boolean canHandle(File artifact) {
-    return "workflows".equals(artifact.getParentFile().getName())
-        && (artifact.getName().endsWith(".xml") || artifact.getName().endsWith(".yml") || artifact.getName().endsWith(".yaml"));
+    return workflowFilenameFilter.accept(artifact.getParentFile(),artifact.getName());
   }
 }
