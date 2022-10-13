@@ -818,6 +818,14 @@ public class LiveScheduleServiceImplTest {
             EasyMock.anyObject(Set.class), EasyMock.anyBoolean())).andReturn(job);
     EasyMock.expect(serviceRegistry.getJob(1L)).andReturn(job).anyTimes();
 
+    Capture<MediaPackage> capturedSnapshotMp = Capture.newInstance();
+    Version v = EasyMock.createNiceMock(Version.class);
+    Snapshot s = EasyMock.createNiceMock(Snapshot.class);
+    EasyMock.expect(s.getVersion()).andReturn(v);
+    EasyMock.replay(s, v);
+    EasyMock.expect(
+            assetManager.takeSnapshot(EasyMock.capture(capturedSnapshotMp))).andReturn(s);
+
     Job jobPub = createJob(2L, "anything", "anything");
     Capture<MediaPackage> capturedMp = Capture.newInstance();
     EasyMock.expect(searchService.add(EasyMock.capture(capturedMp))).andReturn(jobPub);
