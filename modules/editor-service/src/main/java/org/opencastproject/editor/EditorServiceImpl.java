@@ -1051,7 +1051,9 @@ public class EditorServiceImpl implements EditorService {
     }
 
     try {
-      addSubtitleTrack(mediaPackage, editingData.getSubtitles());
+      if (editingData.getSubtitles() != null) {
+        addSubtitleTrack(mediaPackage, editingData.getSubtitles());
+      }
     } catch (IOException e) {
       errorExit("Unable to add subtitle track to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
     } catch (IllegalArgumentException e) {
