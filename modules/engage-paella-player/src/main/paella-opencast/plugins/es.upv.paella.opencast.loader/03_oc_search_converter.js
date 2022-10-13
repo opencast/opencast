@@ -411,7 +411,7 @@ class OpencastToPaellaConverter {
           captions.push({
             id: potentialCaption.id,
             lang: captions_lang,
-            text: captions_lang || 'unknown language';,
+            text: captions_lang || 'unknown language',
             url: potentialCaption.url,
             format: captions_format
           });
