@@ -261,7 +261,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
 
                   // Sort out ref elements
                   if (media.getMediaType() == SmilMediaElement.MediaType.REF) {
-                    refElements.add(new VideoClip(index, begin, end));
+                    refElements.add(new VideoClip(index, begin / 1000.0, end / 1000.0));
                   } else {
                     videoclips.add(new VideoClip(index, begin / 1000.0, end / 1000.0));
                   }
@@ -337,8 +337,10 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
         if (VideoEditorProperties.WEBVTT_EXTENSION.equals(extension)) {
           // Parse
           WebVTTParser parser = new WebVTTParser();
-          FileInputStream fin = new FileInputStream(sourceFile);
-          WebVTTSubtitle subtitle = parser.parse(fin);
+          WebVTTSubtitle subtitle;
+          try (FileInputStream fin = new FileInputStream(sourceFile)) {
+            subtitle = parser.parse(fin);
+          }
 
           // Edit
           List<WebVTTSubtitleCue> cutCues = new ArrayList<>();
@@ -355,8 +357,10 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
           subtitle.setCues(cutCues);
 
           // Write
-          WebVTTWriter writer = new WebVTTWriter();
-          writer.write(subtitle, new FileOutputStream(outputPath));
+          try (FileOutputStream fos = new FileOutputStream(outputPath)) {
+            WebVTTWriter writer = new WebVTTWriter();
+            writer.write(subtitle, fos);
+          }
         } else {
           throw new ProcessFailedException("The video editor does not support the following file: " + sourceTrackUri);
         }

@@ -39,9 +39,11 @@ public class WebVTTSubtitle extends Subtitle<WebVTTSubtitleCue> {
   public void addCue(WebVTTSubtitleCue cue) {
     this.cues.add(cue);
   }
+
   public List<WebVTTSubtitleCue> getCues() {
     return this.cues;
   }
+
   public void setCues(List<WebVTTSubtitleCue> cues) {
     this.cues = cues;
   }
@@ -49,6 +51,7 @@ public class WebVTTSubtitle extends Subtitle<WebVTTSubtitleCue> {
   public void addRegion(WebVTTSubtitleRegion region) {
     this.regions.add(region);
   }
+
   public List<WebVTTSubtitleRegion> getRegions() {
     return regions;
   }
@@ -56,6 +59,7 @@ public class WebVTTSubtitle extends Subtitle<WebVTTSubtitleCue> {
   public void addStyle(WebVTTSubtitleStyle style) {
     this.style.add(style);
   }
+
   public List<WebVTTSubtitleStyle> getStyle() {
     return style;
   }

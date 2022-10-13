@@ -64,10 +64,6 @@ public class WebVTTParser {
   }
 
   public WebVTTSubtitle parse(InputStream is) throws IOException, SubtitleParsingException {
-    return parse(is, true);
-  }
-
-  public WebVTTSubtitle parse(InputStream is, boolean strict) throws IOException, SubtitleParsingException {
     // Create subtitle object
     WebVTTSubtitle subtitle = new WebVTTSubtitle();
 

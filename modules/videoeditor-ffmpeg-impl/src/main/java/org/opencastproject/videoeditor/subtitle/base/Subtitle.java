@@ -35,9 +35,11 @@ public abstract class Subtitle<T extends SubtitleCue> {
   public void addHeaderLine(String headerLine) {
     this.headerLines.add(headerLine);
   }
+
   public List<String> getHeaderLines() {
     return headerLines;
   }
+
   public void setHeaderLines(List<String> headerLines) {
     this.headerLines = headerLines;
   }
@@ -45,9 +47,11 @@ public abstract class Subtitle<T extends SubtitleCue> {
   public void addCue(T cue) {
     this.cues.add(cue);
   }
+
   public List<T> getCues() {
     return this.cues;
   }
+
   public void setCues(List<T> cues) {
     this.cues = cues;
   }

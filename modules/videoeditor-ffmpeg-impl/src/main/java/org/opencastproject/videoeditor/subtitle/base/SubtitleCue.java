@@ -40,12 +40,23 @@ public abstract class SubtitleCue {
     this.lines = new ArrayList<>();
   }
 
+  /**
+   * A single subtitle segment
+   * @param startTime in milliseconds
+   * @param endTime in milliseconds
+   */
   protected SubtitleCue(long startTime, long endTime) {
     this.startTime = startTime;
     this.endTime = endTime;
     this.lines = new ArrayList<>();
   }
 
+  /**
+   * A single subtitle segment
+   * @param startTime in milliseconds
+   * @param endTime in milliseconds
+   * @param lines the text. Each string will be seperated by a newline
+   */
   protected SubtitleCue(long startTime, long endTime, List<String> lines) {
     this.startTime = startTime;
     this.endTime = endTime;

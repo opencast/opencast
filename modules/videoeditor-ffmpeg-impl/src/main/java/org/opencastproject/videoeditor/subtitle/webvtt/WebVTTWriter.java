@@ -102,10 +102,10 @@ public class WebVTTWriter {
   }
 
   private String formatTimeCode(long ms) {
-    long milliseconds = (ms % 1000);
-    long seconds = (long)Math.floor((ms / 1000) % 60);
-    long minutes = (long)Math.floor((ms / (1000 * 60)) % 60);
-    long hours = (long)Math.floor((ms / (1000 * 60 * 60)));
+    long milliseconds = ms % 1000L;
+    long seconds = ms / 1000L % 60L;
+    long minutes = ms / (1000L * 60L) % 60L;
+    long hours = ms / (1000L * 60L * 60L);
 
     return String.format("%02d:%02d:%02d.%03d",
             hours,
