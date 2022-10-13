@@ -24,15 +24,17 @@
 angular.module('adminNg.controllers')
 .controller('RegistrationCtrl', ['$scope', '$timeout', 'Table', 'AdopterRegistrationStates',
   'AdopterRegistrationResource', 'TermsOfUseResource', 'CountryResource', 'NewEventStates', 'NewEventResource',
-  'EVENT_TAB_CHANGE', 'Notifications', 'Modal', 'AuthService',
+  'AdopterStatisticSummaryResource', 'EVENT_TAB_CHANGE', 'Notifications', 'Modal', 'AuthService',
   function ($scope, $timeout, Table, AdopterRegistrationStates, AdopterRegistrationResource, TermsOfUseResource,
-    CountryResource, NewEventStates, NewEventResource, EVENT_TAB_CHANGE, Notifications, Modal, AuthService) {
+    CountryResource, NewEventStates, NewEventResource, AdopterStatisticSummaryResource, EVENT_TAB_CHANGE, Notifications,
+    Modal, AuthService) {
 
     $scope.state = AdopterRegistrationStates.getInitialState($scope.$parent.resourceId);
     $scope.states = AdopterRegistrationStates.get($scope.$parent.resourceId);
     $scope.countries = CountryResource.getCountries();
     $scope.tou = TermsOfUseResource.get();
     $scope.adopter = new AdopterRegistrationResource();
+    $scope.summary = AdopterStatisticSummaryResource.get();
 
     document.getElementById('help-dd').classList.remove('active');
 

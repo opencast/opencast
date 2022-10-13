@@ -29,13 +29,27 @@ angular.module('adminNg.services')
           'information': {
             'nextState': {
               0: 'close',
-              1: 'form',
+              1: 'summary',
               2: 'skip'
             },
             'buttons': {
               'submit': true,
               'back': false,
               'skip': true,
+              'close': true,
+              'submitButtonText': 'WIZARD.NEXT_STEP'
+            }
+          },
+          'summary': {
+            'nextState': {
+              0: 'close',
+              1: 'form',
+              5: 'information'
+            },
+            'buttons': {
+              'submit': true,
+              'back': true,
+              'skip': false,
               'close': true,
               'submitButtonText': 'WIZARD.NEXT_STEP'
             }
@@ -47,7 +61,7 @@ angular.module('adminNg.services')
               2: 'legal_info',
               3: 'update',
               4: 'delete_submit',
-              5: 'information'
+              5: 'summary'
             },
             'buttons': {
               'submit': true,

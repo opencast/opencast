@@ -28,6 +28,7 @@ import static org.opencastproject.util.RestUtil.R.serverError;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.adopter.statistic.ScheduledDataCollector;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -82,12 +83,19 @@ public class Controller {
   /** The service that provides methods for the registration */
   protected Service registrationService;
 
+  /** The scheduled data collector so we can pull the current stats on demand */
+  protected ScheduledDataCollector dataCollector;
+
   /** OSGi setter for the registration service */
   @Reference
   public void setRegistrationService(Service registrationService) {
     this.registrationService = registrationService;
   }
 
+  @Reference
+  public void setDataCollector(ScheduledDataCollector collector) {
+    this.dataCollector = collector;
+  }
 
   @GET
   @Path("registration")
@@ -103,6 +111,23 @@ public class Controller {
     return gson.toJson(registrationService.retrieveFormData());
   }
 
+  @GET
+  @Path("summary")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "getsummary", description = "GETs the adopter registration statistics data.", responses = {
+      @RestResponse(description = "Retrieved statistic data.",
+          responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "Error while retrieving adopter statistic data.",
+          responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
+      returnDescription = "GETs the adopter registration statistics data.")
+  public Response getAdopterStatistics() {
+    logger.debug("Retrieving adopter registration statistics data.");
+    try {
+      return Response.ok(dataCollector.getRegistrationDataAsString()).build();
+    } catch (Exception e) {
+      return Response.serverError().build();
+    }
+  }
 
   @POST
   @Path("registration")
