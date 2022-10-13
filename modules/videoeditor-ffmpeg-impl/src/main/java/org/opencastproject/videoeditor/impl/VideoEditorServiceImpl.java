@@ -261,7 +261,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
 
                   // Sort out ref elements
                   if (media.getMediaType() == SmilMediaElement.MediaType.REF) {
-                    refElements.add(new VideoClip(index, begin / 1000.0, end / 1000.0));
+                    refElements.add(new VideoClip(index, begin, end));
                   } else {
                     videoclips.add(new VideoClip(index, begin / 1000.0, end / 1000.0));
                   }
