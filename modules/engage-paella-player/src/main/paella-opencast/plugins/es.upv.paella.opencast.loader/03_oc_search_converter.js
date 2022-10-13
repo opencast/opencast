@@ -401,23 +401,17 @@ class OpencastToPaellaConverter {
             }
             potentialCaption.tags.tag.forEach((tag)=>{
               if (tag.startsWith('lang:')){
-                let split = tag.split(':');
-                captions_lang = split[1];
+                captions_lang = tag.substring('lang:'.length);
               }
             });
           }
 
-          let captions_label = captions_lang || 'unknown language';
-          //paella.utils.dictionary.translate("CAPTIONS_" + captions_lang);
-
-          let captions_format = potentialCaption.url.
-            substring(potentialCaption.url.lastIndexOf('.') + 1, potentialCaption.url.length)
-            || potentialCaption.url;
+          let captions_format = potentialCaption.url.split('.').pop();
 
           captions.push({
             id: potentialCaption.id,
             lang: captions_lang,
-            text: captions_label,
+            text: captions_lang || 'unknown language';,
             url: potentialCaption.url,
             format: captions_format
           });
@@ -457,8 +451,7 @@ class OpencastToPaellaConverter {
             }
             currentCatalog.tags.tag.forEach((tag)=>{
               if (tag.startsWith('lang:')){
-                let split = tag.split(':');
-                captions_lang = split[1];
+                captions_lang = tag.substring('lang:'.length);
               }
             });
           }

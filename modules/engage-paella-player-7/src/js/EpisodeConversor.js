@@ -302,32 +302,23 @@ function readCaptions(potentialNewCaptions, captions) {
       if (captions_match) {
         let captions_lang = captions_match[3];
 
-        // TODO: read the lang from the dfxp file
-        //if (captions_format == "dfxp") {}
-
         if (!captions_lang && potentialCaption.tags && potentialCaption.tags.tag) {
           if (!(potentialCaption.tags.tag instanceof Array)) {
             potentialCaption.tags.tag = [potentialCaption.tags.tag];
           }
           potentialCaption.tags.tag.forEach((tag)=>{
             if (tag.startsWith('lang:')){
-              let split = tag.split(':');
-              captions_lang = split[1];
+              captions_lang = tag.substring('lang:'.length);
             }
           });
         }
 
-        let captions_label = captions_lang || 'unknown language';
-        //paella.utils.dictionary.translate("CAPTIONS_" + captions_lang);
-
-        let captions_format = potentialCaption.url.
-          substring(potentialCaption.url.lastIndexOf('.') + 1, potentialCaption.url.length)
-          || potentialCaption.url;
+        let captions_format = potentialCaption.url.split('.').pop();
 
         captions.push({
           id: potentialCaption.id,
           lang: captions_lang,
-          text: captions_label,
+          text: captions_lang || 'unknown language';,
           url: potentialCaption.url,
           format: captions_format
         });
@@ -366,8 +357,7 @@ function getCaptions(episode) {
           }
           currentCatalog.tags.tag.forEach((tag)=>{
             if (tag.startsWith('lang:')){
-              let split = tag.split(':');
-              captions_lang = split[1];
+              captions_lang = tag.substring('lang:'.length);
             }
           });
         }
