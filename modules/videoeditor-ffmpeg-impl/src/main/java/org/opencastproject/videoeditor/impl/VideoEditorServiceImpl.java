@@ -344,12 +344,18 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
 
           // Edit
           List<WebVTTSubtitleCue> cutCues = new ArrayList<>();
-          for (VideoClip time: cleanclips) {
+          double removedTime = 0;
+          for (int i = 0; i < cleanclips.size(); i++) {
+            if (i == 0) {
+              removedTime = removedTime + (cleanclips.get(i).getStart());
+            } else {
+              removedTime = removedTime + (cleanclips.get(i).getStart() - cleanclips.get(i - 1).getEnd());
+            }
             for (WebVTTSubtitleCue cue : subtitle.getCues()) {
-              if ((time.getStart() - SUBTITLE_GRACE_PERIOD) <= cue.getStartTime()
-                      && (time.getEnd() + SUBTITLE_GRACE_PERIOD) >= cue.getEndTime()) {
-                cue.setStartTime((long) (cue.getStartTime() - time.getStart()));
-                cue.setEndTime((long) (cue.getEndTime() - time.getStart()));
+              if ((cleanclips.get(i).getStart() - SUBTITLE_GRACE_PERIOD) <= cue.getStartTime()
+                      && (cleanclips.get(i).getEnd() + SUBTITLE_GRACE_PERIOD) >= cue.getEndTime()) {
+                cue.setStartTime((long) (cue.getStartTime() - removedTime));
+                cue.setEndTime((long) (cue.getEndTime() - removedTime));
                 cutCues.add(cue);
               }
             }
