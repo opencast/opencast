@@ -1,12 +1,14 @@
-ZipWorkflowOperation
-====================
+Zip Workflow Operation
+======================
+
+ID: `zip`
 
 Description
 -----------
 
-The ZipWorkflowOperationHandler creates a zip archive including all elements of the current media package that are
-specified in the operation configuration. It then adds the archive to the media package as an attachment with the given
-flavor and tags and by default stores the zip file in the working file repository's "zip" collection.
+The `zip` oeration creates a zip archive including all elements of the current media package that are specified in the
+operation configuration. It then adds the archive to the media package as an attachment with the given flavor and tags
+and by default stores the zip file in the working file repository's "zip" collection.
 
 
 Parameter Table
@@ -31,13 +33,25 @@ Additional notes:
 Operation Example
 -----------------
 
-    <operation
-      id="zip"
-      description="Creating zipped recording archive">
-      <configurations>
-        <configuration key="zip-collection">failed.zips</configuration>
-        <configuration key="include-flavors">*/source,dublincore/*</configuration>
-        <configuration key="target-flavor">all/zip</configuration>
-        <configuration key="compression">false</configuration>
-      </configurations>
-    </operation>
+```xml
+<operation
+  id="zip"
+  description="Creating zipped recording archive">
+  <configurations>
+    <configuration key="zip-collection">failed.zips</configuration>
+    <configuration key="include-flavors">*/source,dublincore/*</configuration>
+    <configuration key="target-flavor">all/zip</configuration>
+    <configuration key="compression">false</configuration>
+  </configurations>
+</operation>
+```
+
+```yml
+- id: zip
+  description: Creating zipped recording archive
+  configurations:
+    - zip-collection: failed.zips
+    - include-flavors: */source,dublincore/*
+    - target-flavor: all/zip
+    - compression: false
+```
