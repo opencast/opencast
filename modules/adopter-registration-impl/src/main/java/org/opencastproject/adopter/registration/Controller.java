@@ -218,6 +218,9 @@ public class Controller {
   @GET
   @Produces(MediaType.TEXT_PLAIN)
   @Path("latestToU")
+  @RestQuery(name = "getLatestTermsOfUse", description = "Gets the latest terms of use version.", responses = {
+      @RestResponse(description = "Retrieved statistic data.", responseCode = HttpServletResponse.SC_OK) },
+      returnDescription = "The latest terms of use version.")
   public String getLatestTermsofUse() {
     return Form.getLatestTermsOfUse().name();
   }
