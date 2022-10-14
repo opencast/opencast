@@ -1,12 +1,17 @@
-# PostMediapackageWorkflowHandler
+Post Media Package Workflow Operation
+=====================================
 
-## Description
+ID: `post-mediapackage`
 
-This Workflow Operation Handler can be used to send a POST request containing an XML/JSON representation of the
-Mediapackage processed by the workflow to an external webservice. The service supports HTTP Basic and Digest
-Authentication.
+Description
+-----------
 
-## Parameter Table
+This workflow operation can be used to send a POST request containing an XML/JSON representation of the
+media package processed by the workflow to an external web service. the service supports HTTP Basic and Digest
+authentication.
+
+Parameter Table
+---------------
 
 |Configuration Keys |Description                                                                                   |
 |-------------------|----------------------------------------------------------------------------------------------|
@@ -19,21 +24,22 @@ Authentication.
 |auth.password      |password for authentication                                                                   |
 |+source_system     |fields with keys beginning with `+` will be added to the message body                         |
 
-## Operation Example
+Operation Example
+-----------------
 
-    <operation
-        id="post-mediapackage"
-        fail-on-error="false"
-        exception-handler-workflow="error"
-        description="Sending MediaPackage to Lernfunk3">
-        <configurations>
-            <configuration key="url">http://example.com:5000/</configuration>
-            <configuration key="format">xml</configuration>
-            <configuration key="debug">no</configuration>
-            <configuration key="mediapackage.type">search</configuration>
-            <configuration key="auth.enabled">yes</configuration>
-            <configuration key="auth.username">exportuser</configuration>
-            <configuration key="auth.password">secret</configuration>
-            <configuration key="+source_system">video.example.com</configuration>
-        </configurations>
-    </operation>
+```xml
+<operation
+    id="post-mediapackage"
+    description="Sending MediaPackage to Lernfunk3">
+  <configurations>
+    <configuration key="url">http://example.com:5000/</configuration>
+    <configuration key="format">xml</configuration>
+    <configuration key="debug">no</configuration>
+    <configuration key="mediapackage.type">search</configuration>
+    <configuration key="auth.enabled">yes</configuration>
+    <configuration key="auth.username">exportuser</configuration>
+    <configuration key="auth.password">secret</configuration>
+    <configuration key="+source_system">video.example.com</configuration>
+  </configurations>
+</operation>
+```

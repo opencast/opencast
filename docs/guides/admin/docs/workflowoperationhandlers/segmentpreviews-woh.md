@@ -1,10 +1,16 @@
-# SegmentpreviewsWorkflowOperation
+Segment Previews Workflo wOperation
+===================================
 
-## Description
-The SegmentpreviewsWorkflowOperation will extract still images from a video using FFmpeg, a given encoding profile and
+ID: `segmentpreviews`
+
+Description
+-----------
+
+The segment previews operation will extract still images from a video using FFmpeg, a given encoding profile and
 previous discovered segments.
 
-## Parameter Table
+Parameter Table
+---------------
 
 |configuration keys|example|description|
 |------------------|-------|-----------|
@@ -16,20 +22,21 @@ previous discovered segments.
 |reference-flavor    |presentation/work    |Flavor of the segments to use.     |
 |reference-tags    |engage    |Tags of the segments to use.     |
 
-## Operation Example
+Operation Example
+-----------------
 
-    <operation
-          id="segmentpreviews"
-          fail-on-error="false"
-          exception-handler-workflow="error"
-          description="Encoding presentation (screen) to segment preview image">
-          <configurations>
-                <configuration key="source-flavor">presentation/trimmed</configuration>
-                <configuration key="source-tags"></configuration>
-                <configuration key="target-flavor">presentation/segment+preview</configuration>
-                <configuration key="reference-flavor">presentation/delivery</configuration>
-                <configuration key="reference-tags">engage</configuration>
-                <configuration key="target-tags">engage</configuration>
-                <configuration key="encoding-profile">player-slides.http</configuration>
-          </configurations>
-    </operation>
+```xml
+<operation
+    id="segmentpreviews"
+    description="Encoding presentation (screen) to segment preview image">
+  <configurations>
+    <configuration key="source-flavor">presentation/trimmed</configuration>
+    <configuration key="source-tags"></configuration>
+    <configuration key="target-flavor">presentation/segment+preview</configuration>
+    <configuration key="reference-flavor">presentation/delivery</configuration>
+    <configuration key="reference-tags">engage</configuration>
+    <configuration key="target-tags">engage</configuration>
+    <configuration key="encoding-profile">player-slides.http</configuration>
+  </configurations>
+</operation>
+```
