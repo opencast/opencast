@@ -263,6 +263,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
                   if (media.getMediaType() == SmilMediaElement.MediaType.REF) {
                     refElements.add(new VideoClip(index, begin, end));
                   } else {
+                    // Convert ms to seconds for later ffmpeg command
                     videoclips.add(new VideoClip(index, begin / 1000.0, end / 1000.0));
                   }
                 }
