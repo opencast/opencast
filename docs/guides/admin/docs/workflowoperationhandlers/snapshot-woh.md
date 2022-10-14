@@ -1,5 +1,7 @@
-AssetManagerSnapshotWorkflowOperationHandler
-============================================
+Asset Manager Snapshot Workflow Operation
+=========================================
+
+ID: `snapshot`
 
 Description
 -----------
@@ -20,10 +22,12 @@ Parameter Table
 Operation Example
 -----------------
 
-    <operation
-      id="snapshot"
-      description="Archiving">
-      <configurations>
-        <configuration key="source-tags">archive</configuration>
-      </configurations>
-    </operation>
+```xml
+<operation
+    id="snapshot"
+    description="Archiving">
+  <configurations>
+    <configuration key="source-tags">archive</configuration>
+  </configurations>
+</operation>
+```

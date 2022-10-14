@@ -1,12 +1,14 @@
-LoggingWorkflowOperationHandler
-===============================
+Logging Workflow Operation
+==========================
+
+ID: `log`
 
 
 Description
 -----------
 
-The LoggingWorkflowOperationHandler is primarily meant for testing and debugging purposes. It allows to log the current
-state of of a workflow and/or its media package.
+The `log` operation is primarily meant for testing and debugging purposes.
+It allows you to log the current state of of a workflow and/or its media package.
 
 |Name                |Default|Description                                                  |
 |--------------------|-------|-------------------------------------------------------------|
@@ -21,6 +23,11 @@ explicitly enabled will be logged.
 
 Operation Example
 -----------------
+
+```yml
+- id: log
+  description: Log to system logger
+```
 
 ```xml
 <operation

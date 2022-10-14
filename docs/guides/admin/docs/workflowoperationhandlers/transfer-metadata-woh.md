@@ -1,6 +1,8 @@
 Transfer Metadata Workflow Operation
 ====================================
 
+ID: `transfer-metadata`
+
 Description
 -----------
 
@@ -45,8 +47,8 @@ Operation Example
 
 ```xml
 <operation
-  id="transfer-metadata"
-  description="Transfer dcterms:creator to myterms:owner">
+    id="transfer-metadata"
+    description="Transfer dcterms:creator to myterms:owner">
   <configurations>
     <configuration key="source-flavor">dublincore/episode</configuration>
     <configuration key="target-flavor">myterms/episode</configuration>

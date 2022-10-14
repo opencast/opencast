@@ -1,9 +1,15 @@
-# CommentWorkflowOperationHandler
+Comment Workflow Operation
+==========================
 
-## Description
-The CommentWorkflowOperationHandler can be used to create, resolve or delete comments for events within workflows.
+ID: `comment`
 
-## Parameter Table
+Description
+-----------
+
+The comment operation can be used to create, resolve or delete comments for events within workflows.
+
+Parameter Table
+---------------
 
 |Configuration Key|Example                         |Description                                       |
 |-----------------|--------------------------------|--------------------------------------------------|
@@ -20,28 +26,32 @@ Notes:
    or reason and description). If more than one comment matches the parameters, only the first matching comment will be
    resolved or deleted.
 
-## Operation Examples
+Operation Example
+-----------------
 
 Create a comment:
 
-    <operation
-      id="comment"
-      description="Mark the recording for cutting">
-      <configurations>
-        <configuration key="action">create</configuration>
-        <configuration key="reason">EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING</configuration>
-        <configuration key="description">Recording has not been cut yet.</configuration>
-      </configurations>
-    </operation>
+```xml
+<operation
+    id="comment"
+    description="Mark the recording for cutting">
+  <configurations>
+    <configuration key="action">create</configuration>
+    <configuration key="reason">EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING</configuration>
+    <configuration key="description">Recording has not been cut yet.</configuration>
+  </configurations>
+</operation>
+```
 
 Resolve a comment:
 
-    <operation
-      id="comment"
-      description="Resolve the cutting flag">
-      <configurations>
-        <configuration key="action">resolve</configuration>
-        <configuration key="reason">EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING</configuration>
-      </configurations>
-    </operation>
-
+```xml
+<operation
+    id="comment"
+    description="Resolve the cutting flag">
+  <configurations>
+    <configuration key="action">resolve</configuration>
+    <configuration key="reason">EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING</configuration>
+  </configurations>
+</operation>
+```
