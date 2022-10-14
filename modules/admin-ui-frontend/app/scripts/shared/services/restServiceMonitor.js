@@ -29,6 +29,7 @@ function monitorService($http, $location, $translate, Storage) {
   };
 
   var LATEST_VERSION_NAME = 'Latest Version';
+  var REGISTRATION_NAME = 'Registration';
   var STATES_NAME = 'Service States';
   var BACKEND_NAME = 'Backend Services';
   var MALFORMED_DATA = 'Malformed Data';
@@ -46,6 +47,17 @@ function monitorService($http, $location, $translate, Storage) {
 
     Monitoring.getBasicServiceStats();
     Monitoring.getVersionStats();
+    Monitoring.getRegistrationState();
+  };
+
+  Monitoring.getRegistrationState = function() {
+    $http.get('/admin-ng/adopter/isUpToDate').then(function(data) {
+      if (!('true' === data['data'])) {
+        $translate('MONITOR.REGISTRATION').then(function(translation) {
+          Monitoring.setError(REGISTRATION_NAME, translation);
+        }).catch(angular.noop);
+      }
+    });
   };
 
   Monitoring.getVersionStats = function() {

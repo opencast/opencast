@@ -40,6 +40,8 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Calendar;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -174,6 +176,24 @@ public class Controller {
     return Response.ok().build();
   }
 
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("isUpToDate")
+  @RestQuery(name = "isUpToDate", description = "Returns true if Opencast has been able to register", responses = {
+      @RestResponse(description = "Registratino status",
+          responseCode = HttpServletResponse.SC_OK)
+      },
+      returnDescription = "true if registration has been updated in the last week, false otherwise")
+  public Response isUpToDate() {
+    Form data = (Form) registrationService.retrieveFormData();
+    Calendar cal = Calendar.getInstance();
+    cal.add(Calendar.DAY_OF_MONTH, -7);
+    //A fresh install might have no data at all, so we null check everything
+    if (data != null && data.getDateModified() != null && data.getDateModified().after(cal.getTime())) {
+      return Response.ok("true").build();
+    }
+    return Response.ok("false").build();
+  }
 
   @DELETE
   @Path("registration")
