@@ -53,7 +53,7 @@ public class Host {
     this.cores = host.getCores();
     this.maxLoad = host.getMaxLoad();
     this.memory = host.getMemory();
-    this.hostname = host.getNodeName();
+    this.hostname = host.getBaseUrl();
     //FIXME: Need disk space
   }
 
