@@ -263,19 +263,18 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
                   if (media.getMediaType() == SmilMediaElement.MediaType.REF) {
                     refElements.add(new VideoClip(index, begin, end));
                   } else {
-                    // Convert ms to seconds for later ffmpeg command
-                    videoclips.add(new VideoClip(index, begin / 1000.0, end / 1000.0));
+                    videoclips.add(new VideoClip(index, begin, end));
                   }
                 }
               } else {
                 throw new ProcessFailedException("Smil container '"
                         + ((SmilMediaContainer) elementChild).getContainerType().toString()
-                        + "'is not supportet yet");
+                        + "'is not supported yet");
               }
             }
           } else {
             throw new ProcessFailedException("Smil container '"
-                    + container.getContainerType().toString() + "'is not supportet yet");
+                    + container.getContainerType().toString() + "'is not supported yet");
           }
         }
       }
@@ -348,13 +347,16 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
           double removedTime = 0;
           for (int i = 0; i < cleanclips.size(); i++) {
             if (i == 0) {
-              removedTime = removedTime + (cleanclips.get(i).getStart());
+              removedTime = removedTime
+                  + cleanclips.get(i).getStartInMilliseconds();
             } else {
-              removedTime = removedTime + (cleanclips.get(i).getStart() - cleanclips.get(i - 1).getEnd());
+              removedTime = removedTime
+                  + cleanclips.get(i).getStartInMilliseconds()
+                  - cleanclips.get(i - 1).getEndInMilliseconds();
             }
             for (WebVTTSubtitleCue cue : subtitle.getCues()) {
-              if ((cleanclips.get(i).getStart() - SUBTITLE_GRACE_PERIOD) <= cue.getStartTime()
-                      && (cleanclips.get(i).getEnd() + SUBTITLE_GRACE_PERIOD) >= cue.getEndTime()) {
+              if ((cleanclips.get(i).getStartInMilliseconds() - SUBTITLE_GRACE_PERIOD) <= cue.getStartTime()
+                      && (cleanclips.get(i).getEndInMilliseconds() + SUBTITLE_GRACE_PERIOD) >= cue.getEndTime()) {
                 cue.setStartTime((long) (cue.getStartTime() - removedTime));
                 cue.setEndTime((long) (cue.getEndTime() - removedTime));
                 cutCues.add(cue);
@@ -441,14 +443,14 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
    * Otherwise it can be very slow to run and output will be ugly because of the cross fades
    */
   private static List<VideoClip> sortSegments(List<VideoClip> edits) {
-    LinkedList<VideoClip> ll = new LinkedList<VideoClip>();
-    List<VideoClip> clips = new ArrayList<VideoClip>();
+    LinkedList<VideoClip> ll = new LinkedList<>();
+    List<VideoClip> clips = new ArrayList<>();
     Iterator<VideoClip> it = edits.iterator();
     VideoClip clip;
     VideoClip nextclip;
     while (it.hasNext()) {     // Check for legal durations
       clip = it.next();
-      if (clip.getDuration() > 2) { // Keep segments at least 2 seconds long
+      if (clip.getDurationInSeconds() > 2) { // Keep segments at least 2 seconds long
         ll.add(clip);
       }
     }
@@ -457,8 +459,8 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       if (ll.peek() != null) {
         nextclip = ll.pop();  // check next consecutive segment
         // collapse two segments into one
-        if ((nextclip.getSrc() == clip.getSrc()) && (nextclip.getStart() - clip.getEnd()) < 2) {
-          clip.setEnd(nextclip.getEnd());   // by using inpt of seg 1 and outpoint of seg 2
+        if (nextclip.getSrc() == clip.getSrc() && nextclip.getStartInSeconds() - clip.getEndInSeconds() < 2) {
+          clip.setEnd(nextclip.getEndInMilliseconds());   // by using inpt of seg 1 and outpoint of seg 2
         } else {
           clips.add(clip);   // keep last segment
           clip = nextclip;   // check next segment
