@@ -1,11 +1,18 @@
-# AmberScript Attach Transcription
+AmberScript Attach Transcription Workflow Operation
+===================================================
 
-## Description
+ID: `amberscript-attach-transcription`
 
-AmberScript Attach Transcription workflow operation attaches the result file received from the Transcription Service
+
+Description
+-----------
+
+The AmberScript Attach Transcription operation attaches the result file received from the transcription service
 to the media package.
 
-## Parameter Table
+
+Parameter Table
+---------------
 
 | configuration keys    | description                                                                 | default               | example                                      |
 |-----------------------|-----------------------------------------------------------------------------|-----------------------|----------------------------------------------|

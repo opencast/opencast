@@ -1,14 +1,19 @@
-# RepublishOaiPmhWorkflowOperation
+Republish OAI-PMH Workflow Operation
+====================================
+
+ID: `republish-oaipmh`
 
 
-## Description
+Description
+-----------
 
 The Republish OAI-PMH workflow operation will update metadata in your OAI-PMH repositories. In case that the media has
 not been published before, this operation will skip. Otherwise all elements matching the flavors and tags will be replaced.
 In case of missing elements in the media package, the published elements will be also removed.
 
 
-## Parameter Table
+Parameter Table
+---------------
 
 | Configuration Keys | Description                                                                                                     |
 |:-------------------|:----------------------------------------------------------------------------------------------------------------|
@@ -17,13 +22,16 @@ In case of missing elements in the media package, the published elements will be
 | repository         | The name of the OAI-PMH repository where the media should be updated                                            |
 
 
-## Operation Example
+Operation Example
+-----------------
 
-    <operation
-      id="republish-oaipmh"
-      description="Update recording metadata in default OAI-PMH repository">
-      <configurations>
-        <configuration key="source-flavors">dublincore/*,security/*</configuration>
-        <configuration key="repository">default</configuration>
-      </configurations>
-    </operation>
+```xml
+<operation
+    id="republish-oaipmh"
+    description="Update recording metadata in default OAI-PMH repository">
+  <configurations>
+    <configuration key="source-flavors">dublincore/*,security/*</configuration>
+    <configuration key="repository">default</configuration>
+  </configurations>
+</operation>
+```

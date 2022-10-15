@@ -1,5 +1,7 @@
-AddCatalogWorkflowOperationHandler
-==================================
+Add Catalog Workflow Operation
+==============================
+
+ID: `add-catalog`
 
 Description
 -----------
@@ -39,10 +41,8 @@ Operation Example
 
 ```xml
 <operation
-  id="add-catalog"
-  fail-on-error="true"
-  exception-handler-workflow="partial-error"
-  description="Add catalog to media package">
+    id="add-catalog"
+    description="Add catalog to media package">
   <configurations>
     <configuration key="catalog-path">${karaf.etc}/catalogs/default_dublincore.xml</configuration>
     <configuration key="catalog-flavor">dublincore/episode</configuration>

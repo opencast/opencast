@@ -1,5 +1,7 @@
-AssetManagerDeleteWorkflowOperationHandler
-==========================================
+Asset Manager Delete Workflow Operation
+=======================================
+
+ID: `asset-delete`
 
 Description
 -----------
@@ -12,7 +14,8 @@ If the keep-last-snapshot parameter is used, it is advised to use the *ingest-do
 Otherwise there will be logged a lot of errors for unreferenced snapshots and ACLs may vanish.
 
 
-## Parameter Table
+Parameter Table
+---------------
 
 |Configuration Key         |Example           |Description                                       |
 |--------------------------|------------------|--------------------------------------------------|
@@ -22,12 +25,12 @@ Otherwise there will be logged a lot of errors for unreferenced snapshots and AC
 Operation Example
 -----------------
 
-    <operation
-      id="asset-delete"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Delete from AssetManager">
-      <configurations>
-        <configuration key="keep-last-snapshot">true</configuration>
-      </configurations>
-    </operation>
+```xml
+<operation
+    id="asset-delete"
+    description="Delete from AssetManager">
+  <configurations>
+    <configuration key="keep-last-snapshot">true</configuration>
+  </configurations>
+</operation>
+```

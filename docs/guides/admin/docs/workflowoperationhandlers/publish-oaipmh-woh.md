@@ -1,11 +1,18 @@
-# PublishOaiPmhWorkflowOperation
+Publish OAI-PMH Workflow Operation
+==================================
 
-## Description
+ID: `publish-oaipmh`
 
-The Publish OAI-PMH workflow operation exposes your media's metadata in a OAI-PMH repository for harvesting by OAI-PMH
+
+Description
+-----------
+
+The publish OAI-PMH operation exposes your media's metadata in a OAI-PMH repository for harvesting by OAI-PMH
 aware applications.
 
-## Parameter Table
+
+Parameter Table
+---------------
 
 |Configuration Keys |Description                                                                                   |
 |-------------------|----------------------------------------------------------------------------------------------|
@@ -22,7 +29,9 @@ aware applications.
 Note: The all or none of the configuration keys `external-template`, `external-channel` and `external-mime-type` must to
 be set.
 
-## Customizing the OAI-PMH Publication Element
+
+Customizing the OAI-PMH Publication Element
+-------------------------------------------
 
 If the configuration keys `external-template`, `external-channel` and `external-mime-type` are not set, the publication
 element will use the following default values:
@@ -61,17 +70,19 @@ URL of the publication element.
 
 The configuration key 'external-channel' is used to set the name of the publication channel.
 
-## Operation Example
 
-    <operation
-        id="publish-oaipmh"
-        fail-on-error="true"
-        exception-handler-workflow="error"
-        description="Publish event to the OAI-PMH repository">
-        <configurations>
-            <configuration key="download-tags">oaipmh-download</configuration>
-            <configuration key="streaming-tags">oaipmh-streaming</configuration>
-            <configuration key="check-availability">true</configuration>
-            <configuration key="repository">default</configuration>
-        </configurations>
-    </operation>
+Operation Example
+-----------------
+
+```xml
+<operation
+    id="publish-oaipmh"
+    description="Publish event to the OAI-PMH repository">
+  <configurations>
+    <configuration key="download-tags">oaipmh-download</configuration>
+    <configuration key="streaming-tags">oaipmh-streaming</configuration>
+    <configuration key="check-availability">true</configuration>
+    <configuration key="repository">default</configuration>
+  </configurations>
+</operation>
+```

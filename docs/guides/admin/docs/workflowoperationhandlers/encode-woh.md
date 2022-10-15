@@ -1,4 +1,4 @@
-Encode Workflow Operation Handler
+Encode Workflow Operation
 =================================
 
 ID: `encode`

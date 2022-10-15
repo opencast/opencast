@@ -1,10 +1,17 @@
-# ExtractTextWorkflowOperation
+Extract Text Workflow Operation
+=======================================
 
-## Description
+ID: `extract-text`
 
-The ExtractTextWorkflowOperation will try to extract test from a video using Tesseract OCR.
 
-## Parameter Table
+Description
+-----------
+
+The extract-text operation will try to extract test from a video using Tesseract OCR.
+
+
+Parameter Table
+---------------
 
 |configuration keys|example          |description|
 |------------------|-----------------|-----------|
@@ -12,14 +19,14 @@ The ExtractTextWorkflowOperation will try to extract test from a video using Tes
 |source-tags       |text             |Specifies which media should be processed|
 |target-tags       |engage           |Specifies the tags for the produces media|
 
-## Operation Example
+
+Operation Example
+-----------------
 
 ```xml
 <operation
-  id="extract-text"
-  fail-on-error="false"
-  exception-handler-workflow="error"
-  description="Extracting text from presentation segments">
+    id="extract-text"
+    description="Extracting text from presentation segments">
   <configurations>
     <configuration key="source-flavor">presentation/trimmed</configuration>
     <configuration key="source-tags"></configuration>

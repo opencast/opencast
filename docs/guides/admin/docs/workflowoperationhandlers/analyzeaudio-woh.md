@@ -1,17 +1,25 @@
-# AnalyzeAudioWorkflowOperationHandler
+Analyze Audio Workflow Operation
+================================
 
-## Description
-The AnalyzeAudioWorkflowOperationHandler analyzes the first audio stream of a video or audio track through SoX
+ID: `analyze-audio`
+
+
+Description
+-----------
+
+The abalyze audio operation analyzes the first audio stream of a video or audio track through SoX
 (http://sox.sourceforge.net/) and writes the result back to the given track.
 
 This workflow operation handler can be used with audio and/or video files. At least one audio stream must be available
 otherwise nothing happens. Here are the internal steps done by the different inputs:
 
 ### Used with Audio only file (forceTranscode is deactivated):
+
 * Analyze the given audio file with SoX
 * Write analyzed audio metadata back to the given track's mediapackage.
 
 ### Used with Video file or with Audio only file with forceTranscode activated:
+
 * Extract audio file encoded as FLAC audio and save it temporary in a collection
 * Analyze the previous encoded audio file with SoX
 * Write analyzed audio metadata back to the given track's mediapackage.
@@ -40,8 +48,8 @@ Example result track:
 </track>
 ```
 
-## Parameter Table
-
+Parameter Table
+---------------
 
 |configuration keys|example                           |description|default value|
 |------------------|----------------------------------|-----------|-------------|
@@ -50,14 +58,13 @@ Example result track:
 |source-tags       |"engage,atom,rss"                 |The "tag" of the track to use as a source input|EMPTY|
 |force-transcode   |"true" or "false"                 |Whether to force transcoding the audio stream (This is needed when trying to strip an audio stream from an audio only video container, because SoX can not handle video formats, so it must be encoded to an audio format)|FALSE|
 
-## Operation Example
+Operation Example
+-----------------
 
 ```xml
 <operation
-  id="analyze-audio"
-  fail-on-error="true"
-  exception-handler-workflow="error"
-  description="Analyze audio stream">
+    id="analyze-audio"
+    description="Analyze audio stream">
   <configurations>
     <configuration key="source-flavor">*/work</configuration>
     <configuration key="force-transcode">true</configuration>
@@ -65,14 +72,15 @@ Example result track:
 </operation>
 ```
 
-## Missing Encoding Profiles
+Encoding Profiles
+-----------------
 
 Some of the encoding profiles necessary for this operation are not included
 in Opencast per default, but the operation will not work without them.
 You need to include the following encoding profiles by copy and pasting them in
 a `.properties` file in the `etc/encoding` folder of your installation.
 
-```xml
+```properties
 # SoX Audio only (strip video)
 profile.sox-audio-only.work.name = sox audio only
 profile.sox-audio-only.work.input = visual
