@@ -43,7 +43,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class FeedImplTest {
   private static final Logger logger = LoggerFactory.getLogger(FeedImplTest.class);

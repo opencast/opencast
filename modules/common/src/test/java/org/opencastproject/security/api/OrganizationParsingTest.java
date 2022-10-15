@@ -21,11 +21,9 @@
 
 package org.opencastproject.security.api;
 
-import static junit.framework.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,6 +34,7 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.transform.stream.StreamSource;
+
 
 /**
  * Tests the JAXB java to xml conversion of the organization class.
@@ -59,11 +58,11 @@ public class OrganizationParsingTest {
     String[] strings2 = StringUtils.stripEnd(in2, " /").split(" ");
     Arrays.sort(strings1);
     Arrays.sort(strings2);
-    assertEquals("Organization XML not formed as expected - error in number of XML attributes", strings1.length,
+    Assert.assertEquals("Organization XML not formed as expected - error in number of XML attributes", strings1.length,
             strings2.length);
     for (int i = 0; i < strings1.length; i++) {
       if (!(strings1[i].equals(strings2[i]))) {
-        assertEquals("Organization XML not formed as expected - xml-attributes don't match", "<" + in1 + ">", "<" + in2
+        Assert.assertEquals("Organization XML not formed as expected - xml-attributes don't match", "<" + in1 + ">", "<" + in2
                 + ">");
       }
     }
@@ -79,7 +78,7 @@ public class OrganizationParsingTest {
 
     Arrays.sort(strings1);
     Arrays.sort(strings2);
-    assertEquals("Organization XML not formed as expected - error in number of XML tags", strings1.length,
+    Assert.assertEquals("Organization XML not formed as expected - error in number of XML tags", strings1.length,
             strings2.length);
     for (int i = 0; i < strings1.length; i++) {
       if (!compareXMLattsEqual(strings1[i], strings2[i])) {
@@ -90,11 +89,11 @@ public class OrganizationParsingTest {
   }
 
   private void compareOrgs(Organization org, Organization organization) {
-    assertEquals(org.getId(), organization.getId());
-    assertEquals(org.getName(), organization.getName());
-    assertEquals(org.getAdminRole(), organization.getAdminRole());
-    assertEquals(org.getAnonymousRole(), organization.getAnonymousRole());
-    assertEquals(org.getServers().size(), organization.getServers().size());
+    Assert.assertEquals(org.getId(), organization.getId());
+    Assert.assertEquals(org.getName(), organization.getName());
+    Assert.assertEquals(org.getAdminRole(), organization.getAdminRole());
+    Assert.assertEquals(org.getAnonymousRole(), organization.getAnonymousRole());
+    Assert.assertEquals(org.getServers().size(), organization.getServers().size());
     for (Map.Entry<String, Integer> server : org.getServers().entrySet()) {
       boolean found = false;
       for (Map.Entry<String, Integer> s : organization.getServers().entrySet()) {
@@ -103,9 +102,9 @@ public class OrganizationParsingTest {
           break;
         }
       }
-      assertTrue(found);
+      Assert.assertTrue(found);
     }
-    assertEquals(org.getProperties(), organization.getProperties());
+    Assert.assertEquals(org.getProperties(), organization.getProperties());
   }
 
   @Test
@@ -118,7 +117,7 @@ public class OrganizationParsingTest {
     String producedOutput = writer.toString();
 
     boolean val = compareXMLTagsEqual(expectedOutput, producedOutput);
-    assertTrue("Organization XML not formed as expected", val);
+    Assert.assertTrue("Organization XML not formed as expected", val);
 
     StreamSource streamSource = new StreamSource(new StringReader(producedOutput));
     // CHECKSTYLE:OFF
@@ -136,7 +135,7 @@ public class OrganizationParsingTest {
     String producedOutput = OrganizationParser.toXml(org);
 
     boolean val = compareXMLTagsEqual(expectedOutput, producedOutput);
-    assertTrue("Organization XML not formed as expected", val);
+    Assert.assertTrue("Organization XML not formed as expected", val);
 
     StreamSource streamSource = new StreamSource(new StringReader(producedOutput));
     // CHECKSTYLE:OFF

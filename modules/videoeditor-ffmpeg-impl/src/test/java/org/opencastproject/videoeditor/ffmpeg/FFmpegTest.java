@@ -32,7 +32,7 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Tests the ffmpeg concatenation service

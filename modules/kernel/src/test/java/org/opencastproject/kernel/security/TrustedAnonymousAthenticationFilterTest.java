@@ -34,7 +34,7 @@ import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Tests the {@link TrustedAnonymousAuthenticationFilter}

@@ -41,7 +41,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Test class for {@link ZipWorkflowOperationHandler}
