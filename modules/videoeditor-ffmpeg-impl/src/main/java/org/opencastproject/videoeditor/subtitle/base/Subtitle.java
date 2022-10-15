@@ -18,28 +18,41 @@
  * the License.
  *
  */
+package org.opencastproject.videoeditor.subtitle.base;
 
-package org.opencastproject.videoeditor.impl;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * VideoEditorService properties that can be used to modify default processing values.
- */
-public interface VideoEditorProperties {
+public abstract class Subtitle<T extends SubtitleCue> {
+  private List<String> headerLines;
+  private List<T> cues;
 
-  /** audio encoder codec */
-  String AUDIO_CODEC = "audio.codec";
+  public Subtitle() {
+    this.headerLines = new ArrayList<String>();
+    this.cues = new ArrayList<T>();
+  }
 
-  /** video codec */
-  String VIDEO_CODEC = "video.codec";
+  public void addHeaderLine(String headerLine) {
+    this.headerLines.add(headerLine);
+  }
 
-  /** Custom output file extension */
-  String OUTPUT_FILE_EXTENSION = "outputfile.extension";
-  String FFMPEG_PROPERTIES = "ffmpeg.properties";
-  String FFMPEG_PRESET = "ffmpeg.preset";
-  String FFMPEG_SCALE_FILTER = "ffmpeg.scalefilter";
-  String AUDIO_FADE = "audio.fade";
-  String VIDEO_FADE = "video.fade";
-  String DEFAULT_EXTENSION = ".mp4";
-  String WEBVTT_EXTENSION = "vtt";
-  long SUBTITLE_GRACE_PERIOD = 500; //ms
+  public List<String> getHeaderLines() {
+    return headerLines;
+  }
+
+  public void setHeaderLines(List<String> headerLines) {
+    this.headerLines = headerLines;
+  }
+
+  public void addCue(T cue) {
+    this.cues.add(cue);
+  }
+
+  public List<T> getCues() {
+    return this.cues;
+  }
+
+  public void setCues(List<T> cues) {
+    this.cues = cues;
+  }
 }

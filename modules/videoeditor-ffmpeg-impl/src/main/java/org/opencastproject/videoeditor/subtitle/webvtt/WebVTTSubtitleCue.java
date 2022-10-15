@@ -18,28 +18,17 @@
  * the License.
  *
  */
+package org.opencastproject.videoeditor.subtitle.webvtt;
 
-package org.opencastproject.videoeditor.impl;
+import org.opencastproject.videoeditor.subtitle.base.SubtitleCue;
 
-/**
- * VideoEditorService properties that can be used to modify default processing values.
- */
-public interface VideoEditorProperties {
+public class WebVTTSubtitleCue extends SubtitleCue {
+  private String cueSettingsList;
 
-  /** audio encoder codec */
-  String AUDIO_CODEC = "audio.codec";
-
-  /** video codec */
-  String VIDEO_CODEC = "video.codec";
-
-  /** Custom output file extension */
-  String OUTPUT_FILE_EXTENSION = "outputfile.extension";
-  String FFMPEG_PROPERTIES = "ffmpeg.properties";
-  String FFMPEG_PRESET = "ffmpeg.preset";
-  String FFMPEG_SCALE_FILTER = "ffmpeg.scalefilter";
-  String AUDIO_FADE = "audio.fade";
-  String VIDEO_FADE = "video.fade";
-  String DEFAULT_EXTENSION = ".mp4";
-  String WEBVTT_EXTENSION = "vtt";
-  long SUBTITLE_GRACE_PERIOD = 500; //ms
+  public String getCueSettingsList() {
+    return cueSettingsList;
+  }
+  public void setCueSettingsList(String cueSettingsList) {
+    this.cueSettingsList = cueSettingsList;
+  }
 }

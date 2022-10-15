@@ -18,28 +18,25 @@
  * the License.
  *
  */
+package org.opencastproject.videoeditor.subtitle.webvtt;
 
-package org.opencastproject.videoeditor.impl;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * VideoEditorService properties that can be used to modify default processing values.
- */
-public interface VideoEditorProperties {
+public class WebVTTSubtitleRegion {
+  private List<String> lines;
 
-  /** audio encoder codec */
-  String AUDIO_CODEC = "audio.codec";
+  public WebVTTSubtitleRegion() {
+    this.lines = new ArrayList<>();
+  }
 
-  /** video codec */
-  String VIDEO_CODEC = "video.codec";
-
-  /** Custom output file extension */
-  String OUTPUT_FILE_EXTENSION = "outputfile.extension";
-  String FFMPEG_PROPERTIES = "ffmpeg.properties";
-  String FFMPEG_PRESET = "ffmpeg.preset";
-  String FFMPEG_SCALE_FILTER = "ffmpeg.scalefilter";
-  String AUDIO_FADE = "audio.fade";
-  String VIDEO_FADE = "video.fade";
-  String DEFAULT_EXTENSION = ".mp4";
-  String WEBVTT_EXTENSION = "vtt";
-  long SUBTITLE_GRACE_PERIOD = 500; //ms
+  public List<String> getLines() {
+    return this.lines;
+  }
+  public void setLines(List<String> lines) {
+    this.lines = lines;
+  }
+  public void addLine(String line) {
+    this.lines.add(line);
+  }
 }
