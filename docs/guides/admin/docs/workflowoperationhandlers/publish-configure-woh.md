@@ -1,11 +1,18 @@
-# ConfigurablePublishWorkflowOperationHandler
+Configurable Publish Workflow Operation
+===============================================
 
-## Description
+ID: `publish-configure`
+
+
+Description
+-----------
 
 The `ConfigurablePublishWorkflowOperationHandler` will distribute the given elements and create a publication element 
 for them. By default it will retract all published download elements before publishing anew.
 
-## Parameter Table
+
+Parameter Table
+---------------
 
 These are the keys that can be configured for this operation in the workflow definition. At least one media package 
 element must match the supplied `source-flavors` or `source-tags` (either for download or streaming or both) or else 
@@ -28,7 +35,9 @@ the operation will not know what to publish. The `channel-id` and `url-pattern` 
 
 \* Enable if you have published streaming elements to this channel.
 
-## Mode
+
+Mode
+----
 
 The configuration key `mode` can be used to control how media package elements are being distributed:
 
@@ -41,7 +50,9 @@ The configuration key `mode` can be used to control how media package elements a
 This allows you to choose a lot of jobs and parallelism (`single`), just one job and no parallelism (`bulk`)
 or something in between (`mixed`). The best choice depends on your setup.
 
-## URL Pattern Variables
+
+URL Pattern Variables
+---------------------
 
 These are the variables available in the `url-pattern` configuration. They will be replaced with the value during the
 execution of the workflow operation.
@@ -63,54 +74,61 @@ with `_` (underscore).
 Additional to the organization properties you can use `org_id`, `org_name`, `org_admin_role` and
 `org_anonymous_role` as well.
 
-## Publication Channel Labels and Icons
+
+Publication Channel Labels and Icons
+------------------------------------
 
 Using this workflow operation, you can create arbitrary custom publication channels. Without further action, the
 administrative user interface will label these channels "Custom". You can specify both a label and an icon for each
 custom publication channels in the configuration files `etc/listproviders/publication.channel.labels.properties` and
 `etc/listproviders/publication.channel.icons.properties`.
 
-## Operation Examples
 
-### Internal Channel
+Operation Example
+-----------------
 
-    <operation
-      id="publish-configure"
-      exception-handler-workflow="partial-error"
-      description="Publish to internal channel">
-      <configurations>
-        <configuration key="download-source-tags">engage,atom,rss</configuration>
-        <configuration key="channel-id">internal</configuration>
-        <configuration key="url-pattern">http://localhost:8080/admin-ng/index.html#/events/events/${event_id}/tools/playback</configuration>
-      </configurations>
-    </operation>
+Publish to internal channel:
 
-### External API
+```xml
+<operation
+    id="publish-configure"
+    description="Publish to internal channel">
+  <configurations>
+    <configuration key="download-source-tags">engage,atom,rss</configuration>
+    <configuration key="channel-id">internal</configuration>
+    <configuration key="url-pattern">http://localhost:8080/admin-ng/index.html#/events/events/${event_id}/tools/playback</configuration>
+  </configurations>
+</operation>
+```
 
-    <operation
-      id="publish-configure"
-      exception-handler-workflow="partial-error"
-      description="Publish to external api publication channel">
-      <configurations>
-        <configuration key="channel-id">api</configuration>
-        <configuration key="mimetype">application/json</configuration>
-        <configuration key="download-source-tags">engage-download,engage-streaming</configuration>
-        <configuration key="url-pattern">http://api.oc.org/api/events/${event_id}</configuration>
-        <configuration key="check-availability">true</configuration>
-      </configurations>
-    </operation>
+Publish to external API:
 
-### Meta publication
-Meta publications are URL only publications as reference to external systems like media portal.
+```xml
+<operation
+    id="publish-configure"
+    description="Publish to external api publication channel">
+  <configurations>
+    <configuration key="channel-id">api</configuration>
+    <configuration key="mimetype">application/json</configuration>
+    <configuration key="download-source-tags">engage-download,engage-streaming</configuration>
+    <configuration key="url-pattern">http://api.oc.org/api/events/${event_id}</configuration>
+    <configuration key="check-availability">true</configuration>
+  </configurations>
+</operation>
+```
 
-    <operation
-      id="publish-configure"
-      exception-handler-workflow="partial-error"
-      description="Publish to meta publication channel">
-      <configurations>
-        <configuration key="channel-id">edu-reference</configuration>
-        <configuration key="mimetype">text/html</configuration>
-        <configuration key="url-pattern">https://org.mediaportal.edu/events/${event_id}</configuration>
-        <configuration key="check-availability">false</configuration>
-      </configurations>
-    </operation>
+Create a meta publication.
+A reference to external systems like a media portal:
+
+```xml
+<operation
+    id="publish-configure"
+    description="Publish to meta publication channel">
+  <configurations>
+    <configuration key="channel-id">edu-reference</configuration>
+    <configuration key="mimetype">text/html</configuration>
+    <configuration key="url-pattern">https://org.mediaportal.edu/events/${event_id}</configuration>
+    <configuration key="check-availability">false</configuration>
+  </configurations>
+</operation>
+```

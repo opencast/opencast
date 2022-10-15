@@ -1,6 +1,11 @@
-# MultiencodeWorkflowHandler
+Multi-encode Workflow Operation
+=======================================
 
-## Description
+ID: `multiencode`
+
+
+Description
+-----------
 
 The MultiencodeWorkflowHandler is used to encode source media into multiple formats concurrently.
 The source recording are selected by source-flavors AND source-tags.
@@ -11,7 +16,7 @@ This operation will generate one multiencode operation per source medium,
 all of them running concurrently on the same or on different workers.
 In addition, the target media can be optionally tagged with the encoding profile ids.
 
-### Configuration details
+### Configuration Details
 
 This workflow handles each source selector independently as a section.
 The parameters for each configuration, such as flavors are separated positionally into sections by "**;**".
@@ -21,11 +26,13 @@ The use of the semi-colon is optional. If it is absent, there is only one sectio
 ```xml
 <configuration key="source-flavors">*/source</configuration>
 ```
+
 > One source selector means that all the matching recording will be processed the same way.
->
+
 ```xml
 <configuration key="source-flavors">presenter/source;presentation/source</configuration>
 ```
+
 > Two different source selectors means that all the matching recordings in the first selector will be processed
 > according to the parameters in the first section and the all the matching recordings in the second selector will
 > be processed according to the parameters in next section.
@@ -39,9 +46,9 @@ For example:
 ```xml
 <configuration key="target-flavors">*/preview</configuration>
 ```
->   All targets are flavored the same way, using the example above, becomes "presenter/preview"
+
+> All targets are flavored the same way, using the example above, becomes "presenter/preview"
 > and "presentation/preview"
->
 
 Each source selector can have its own set of target tags and flavors, defined as a comma delimited list.
 For example:
@@ -49,6 +56,7 @@ For example:
 ```xml
 <configuration key="target-tags">engage-streaming,rss,atom;engage-download,rss,atom</configuration>
 ```
+
 > Using the example above.
 > "presenter/preview" is tagged with "engage-streaming,rss,atom".
 > "presentation/preview" is tagged with "engage-download,rss,atom".
@@ -66,15 +74,17 @@ The target flavors are additionally tagged with encoding profiles, so that they 
 
 This workflow supports HLS adaptive streaming.
 By:
-  1. Using only H.264/HENV encodings in the list of encoding profiles. 
-  2. In the encoding profile, use the `-<option>:<a or v>` form in FFmpeg options when appropriate
-  (eg: "-b:a" instead of "-ab"),
-  and add the suffix ":v" for options that apply to video and ":a" to options that apply to audio,
-  (eg: -maxrate:v, -g:v )
-  3. Use the same keyframe intervals (-keyint <int> and -keyint_min <int>) in each profile and 
-  segment size (see below) should be a multiple of this integer.
-  4. Adding a special encoding profile "multiencode-hls" to the list of encoding profiles. By default,
-  the segments size is 6s (-hls-time) .
+
+1. Using only H.264/HENV encodings in the list of encoding profiles. 
+2. In the encoding profile, use the `-<option>:<a or v>` form in FFmpeg options when appropriate
+   (eg: "-b:a" instead of "-ab"),
+   and add the suffix ":v" for options that apply to video and ":a" to options that apply to audio,
+   (eg: -maxrate:v, -g:v )
+3. Use the same keyframe intervals (`-keyint <int>` and `-keyint_min <int>`) in each profile and 
+   segment size (see below) should be a multiple of this integer.
+4. Adding a special encoding profile "multiencode-hls" to the list of encoding profiles. By default,
+   the segments size is 6s (-hls-time).
+
 HLS Playlists are generated as part of the encoding process. Each mp4 is a fragmented MP4.
 A variant playlist is created for each mp4 and a master playlist is used to access all the different qualities.
 
@@ -88,12 +98,13 @@ https://tools.ietf.org/html/draft-pantos-http-live-streaming-23
 
 Without HLS, it will look like the following.
 
-## Parameter Table
+Parameter Table
+---------------
 
 |configuration keys | example                     | description                                                         |
 |-------------------|-----------------------------|---------------------------------------------------------------------|
 |source-flavors     | presenter/source*;*presentation/source  | Which media should be encoded                               |
-|target-flavors     | */preview                | Specifies the flavor of the new media                               |
+|target-flavors     | \*/preview                | Specifies the flavor of the new media                               |
 |target-tags        | rss,archive              | Specifies the tags of the new media                                 |
 |encoding-profiles  | mp4-low.http,mp4-medium.http*;*mp4-hd.http,mp4-hd.http | Encoding profiles for each source flavor |
 |tag-with-profile   | true (default to false)  | target medium are tagged with corresponding encoding profile Id      |
@@ -104,40 +115,42 @@ Without HLS, it will look like the following.
 ```xml
 <operation
     id="multiencode"
-    fail-on-error="true"
-    exception-handler-workflow="partial-error"
     description="Encode to delivery formats, with different encoding settings for each video source">
-    <configurations>
-        <configuration key="source-flavors">presenter/work;presentation/work</configuration>
-        <configuration key="target-flavors">*/delivery</configuration>
-        <configuration key="target-tags">rss,archive</configuration>
-        <configuration key="encoding-profiles">
-          hls-full-res-presenter-mp4,
-          hls-half-res-presenter-mp4,
-          hls-quarter-15fps-presenter-mp4,
-          multiencode-hls
-        </configuration>
-        <configuration key="tag-with-profile">true</configuration>
-    </configurations>
+  <configurations>
+    <configuration key="source-flavors">presenter/work;presentation/work</configuration>
+    <configuration key="target-flavors">*/delivery</configuration>
+    <configuration key="target-tags">rss,archive</configuration>
+    <configuration key="encoding-profiles">
+        hls-full-res-presenter-mp4,
+        hls-half-res-presenter-mp4,
+        hls-quarter-15fps-presenter-mp4,
+        multiencode-hls
+    </configuration>
+    <configuration key="tag-with-profile">true</configuration>
+  </configurations>
 </operation>
 ```
 
-On subsequent operations that run on the encoded files (e.g. `image`,`segment-video`, `segmentpreviews`, `timelinepreviews`, `extract-text`), you will **have to** specify on which encoding the operations run on, otherwise they will fail. This is done by adding a `source-tags` key to each operation like so:
+On subsequent operations that run on the encoded files (e.g. `image`,`segment-video`, `segmentpreviews`,
+`timelinepreviews`, `extract-text`), you will **have to** specify on which encoding the operations run on, otherwise
+they will fail. This is done by adding a `source-tags` key to each operation like so:
 
 ```xml
 <configuration key="source-tags">hls-full-res-presenter-mp4</configuration>
 ```
 
-## Encoding Profiles
-The encoding profiles necessary for this operation are not included
-in Opencast per default, but the operation will not work without them.
-Depending on which encoding profiles you want to use in your operation, you will need to include some or all of the following encoding profiles in your Opencast. Copy and pasting them in
-a new `HLS-streaming-movies.properties` file in the `etc/encoding` folder of your installation.
+Encoding Profile
+----------------
+
+The encoding profiles necessary for this operation are not included in Opencast per default, but the operation will not
+work without them.  Depending on which encoding profiles you want to use in your operation, you will need to include
+some or all of the following encoding profiles in your Opencast. Copy and pasting them in a new
+`HLS-streaming-movies.properties` file in the `etc/encoding` folder of your installation.
 
 <details>
 <summary>Click me to see the encoding profiles</summary>
 
-```
+```properties
 ###
 # Profile definitions for serverless HLS using multiencode
 # Presenter and presentation can have different resolutions
@@ -371,18 +384,23 @@ profile.multiencode-hls-4s.ffmpeg.command = -flags +global_header+cgop -hls_time
 -master_pl_name #{out.name}#{out.suffix} #{out.dir}/variant_%v.m3u8
 profile.multiencode-hls-4s.jobload=1.0
 ```
+
 </details>
 
-## Note: (Important)
+
+Note (Important)
+----------------
+
 Each source flavor generates all the target formats in one FFmpeg call by incorporating relevant parts
 of the encoding profile commands.
 
 * Care must be taken that no FFmpeg complex filters are used in the encoding profiles used for this workflow,
-as it can cause a conflict.
+  as it can cause a conflict.
 
 * Encoded target recording are distinguished by the suffix, it is important that all the encoding profiles used have
-distinct suffixes to use "tag-with-profile" configuration, for example:
-```
+  distinct suffixes to use "tag-with-profile" configuration, for example:
+
+```properties
 profile.mp4-vga-medium.http.suffix = -vga-medium.mp4
 profile.mp4-medium.http.suffix = -medium.mp4
 ```

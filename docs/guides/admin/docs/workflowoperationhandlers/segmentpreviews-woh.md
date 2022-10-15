@@ -1,4 +1,4 @@
-Segment Previews Workflo wOperation
+Segment Previews Workflow Operation
 ===================================
 
 ID: `segmentpreviews`

@@ -1,5 +1,10 @@
 Execute Many Workflow Operation
--------------------------------
+===============================
+
+ID: `execute-many`
+
+Description
+-----------
 
 This operation handler filters a set of MediaPackageElements that match certain input conditions
 and runs a command on each of them. The command may be used to create a new mediapackage element,
@@ -10,7 +15,9 @@ To run a command only once for the whole mediapackage, use the [Execute Once](ex
 Commands run by this operation handler must first be included in the `commands.allowed` list in the
 [Execute Service](../modules/execute.md#service-configuration) configuration.
 
-### Parameter table
+
+Parameter Table
+---------------
 
 All parameters are empty by default if not specified. The special parameters `#in` and `#out` are described
 in [Execute Service: Parameter Substitution](../modules/execute.md#parameter-substitution)
@@ -34,21 +41,20 @@ If `set-workflow-properties` is true, the command should write a plain-text prop
 location specified by #{out} in the key-value format supported by the [Java Properties](http://docs.oracle.com/javase/8/docs/api/java/util/Properties.html#load-java.io.Reader-)
 class, for example:
 
-````
+```properties
 key1=value1
 key2=value2
-````
+```
 
-### Operation Examples
+Operation Example
+-----------------
 
 Run a command which creates a new version of a track:
 
-````
+```xml
 <operation
-  id="execute-many"
-  fail-on-error="true"
-  exception-handler-workflow="error"
-  description="Run command">
+    id="execute-many"
+    description="Run command">
   <configurations>
     <configuration key="exec">qt-faststart</configuration>
     <configuration key="params">-f #{in} #{out}</configuration>
@@ -60,13 +66,13 @@ Run a command which creates a new version of a track:
     <configuration key="expected-type">Track</configuration>
   </configurations>
 </operation>
-````
+```
 
 Run a command which inspects any track with a `presenter/source` flavor and an audio stream,
 and adds new configuration properties to the running workflow, leaving the mediapackage unchanged:
 
 
-````
+```xml
 <operation
   id="execute-many"
   fail-on-error="true"
@@ -82,4 +88,4 @@ and adds new configuration properties to the running workflow, leaving the media
     <configuration key="expected-type">Attachment</configuration>
   </configurations>
 </operation>
-````
+```

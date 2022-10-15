@@ -1,5 +1,5 @@
-Cut Marks to Smil Operation
-===========================
+Cut Marks to Smil Workflow Operation
+====================================
 
 ID: `cut-marks-to-smil`
 
