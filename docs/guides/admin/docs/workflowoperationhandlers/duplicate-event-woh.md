@@ -1,7 +1,7 @@
 Duplicate Event Workflow Operation
-===============================
+==================================
 
-```Id: duplicate-event```
+ID: `duplicate-event`
 
 Description
 -----------
@@ -14,10 +14,10 @@ have to publish it manually when he is done editing it.
 
 For each duplicated event the new media package ID is stored as a workflow property:
 
-|Name                                    |Example                                                             |Description                                    |
-|----------------------------------------|--------------------------------------------------------------------|-----------------------------------------------|
-|duplicate_media_package_*number*_id     |`duplicate_media_package_1_id=e72f2265-472a-49ae-bc04-8301d94b4b1a` |Media package ID of the duplicated event       | \*
-|duplicate_media_package_ids             |`duplicate_media_package_ids=e72f2265-472a-49ae-bc04-8301d94b4b1a, a32e2265-472a-49ae-bc04-8351d94b4b1c` | comma separated list of Media package IDs of the duplicated event |
+|Name                                  |Example                                                             |Description                                    |
+|--------------------------------------|--------------------------------------------------------------------|-----------------------------------------------|
+|`duplicate_media_package_*number*_id` |`duplicate_media_package_1_id=e72f2265-472a-49ae-bc04-8301d94b4b1a` |Media package ID of the duplicated event       | \*
+|`duplicate_media_package_ids`         |`duplicate_media_package_ids=e72f2265-472a-49ae-bc04-8301d94b4b1a, a32e2265-472a-49ae-bc04-8351d94b4b1c` | comma separated list of Media package IDs of the duplicated event |
 
 \* will be deprecated
 
@@ -42,24 +42,21 @@ Parameter Table
 Operation Example
 -----------------
 
-    <operation
-      id="duplicate-event"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="Duplicate event">
-      <configurations>
-        <configuration key="source-flavors">*/*</configuration>
-        <configuration key="number-of-events">${numberOfEvents}</configuration>
-        <configuration key="max-number-of-events">1000</configuration>
-        <configuration key="target-tags"></configuration> 
-        <configuration key="no-suffix">false</configuration
-        <configuration key="set-series-id">${seriesId}</configuration>
-        <configuration key="set-title">${mpTitle}</configuration>
-        <configuration key="set-start-date-time">${startDateTime}</configuration>
-        <configuration key="property-namespaces">
-          org.opencastproject.assetmanager.security
-        </configuration>
-        <configuration key="copy-number-prefix">copy</configuration>
-      </configurations>
-    </operation>
-
+```xml
+<operation
+    id="duplicate-event"
+    description="Duplicate event">
+  <configurations>
+    <configuration key="source-flavors">*/*</configuration>
+    <configuration key="number-of-events">${numberOfEvents}</configuration>
+    <configuration key="max-number-of-events">1000</configuration>
+    <configuration key="target-tags"></configuration> 
+    <configuration key="no-suffix">false</configuration
+    <configuration key="set-series-id">${seriesId}</configuration>
+    <configuration key="set-title">${mpTitle}</configuration>
+    <configuration key="set-start-date-time">${startDateTime}</configuration>
+    <configuration key="property-namespaces">org.opencastproject.assetmanager.security</configuration>
+    <configuration key="copy-number-prefix">copy</configuration>
+  </configurations>
+</operation>
+```

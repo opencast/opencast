@@ -3,6 +3,7 @@ Zip Workflow Operation
 
 ID: `zip`
 
+
 Description
 -----------
 
@@ -33,6 +34,7 @@ Additional notes:
 Operation Example
 -----------------
 
+XML
 ```xml
 <operation
   id="zip"
@@ -46,6 +48,7 @@ Operation Example
 </operation>
 ```
 
+YAML
 ```yml
 - id: zip
   description: Creating zipped recording archive

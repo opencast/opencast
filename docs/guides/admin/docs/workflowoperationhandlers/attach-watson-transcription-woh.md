@@ -1,11 +1,14 @@
-Attach Watson Transcription
-===========================
+Attach Watson Transcription Workflow Operation
+==============================================
+
+ID: `attach-watson-transcription`
+
 
 Description
 -----------
 
-The Attach Watson Transcription converts the results file received from the IBM Watson Speech-to-Text service in json
-format, converts it to the desired caption format, and adds it to the media package.
+The attach Watson transcription operation converts the results file received from the IBM Watson Speech-to-Text service
+in json format, converts it to the desired caption format, and adds it to the media package.
 
 
 Parameter Table
@@ -25,9 +28,7 @@ Example
 ```xml
 <!-- Attach caption/transcript -->
 <operation id="attach-watson-transcription"
-  fail-on-error="true"
-  exception-handler-workflow="partial-error"
-  description="Attach captions/transcription">
+    description="Attach captions/transcription">
   <configurations>
     <!-- This is filled out by the transcription service when starting this workflow so just use this as is -->
     <configuration key="transcription-job-id">${transcriptionJobId}</configuration>
@@ -40,9 +41,7 @@ Example
 
 <!-- Merge caption/transcript to existing publication and republish -->
 <operation id="publish-engage"
-  fail-on-error="true"
-  exception-handler-workflow="partial-error"
-  description="Distribute and publish to engage server">
+    description="Distribute and publish to engage server">
   <configurations>
     <configuration key="download-source-tags">engage-download</configuration>
     <configuration key="strategy">merge</configuration>

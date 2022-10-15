@@ -1,5 +1,5 @@
-Publish Engage Workflow Operation (AWS)
-=======================================
+Publish Engage AWS/S3 Workflow Operation
+========================================
 
 ID: `publish-engage-aws`
 

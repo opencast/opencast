@@ -1,5 +1,7 @@
-CleanupWorkflowOperationHandler
-===============================
+Cleanup Workflow Operation
+==========================
+
+ID: `cleanup`
 
 Description
 -----------
@@ -28,13 +30,14 @@ Parameter Table
 Operation Example
 -----------------
 
-    <operation
-      id="cleanup"
-      fail-on-error="false"
-      description="Remove temporary processing artifacts">
-      <configurations>
-        <configuration key="preserve-flavors">security/*</configuration>
-        <configuration key="delete-external">true</configuration>
-        <configuration key="delay">5</configuration>
-      </configurations>
-    </operation>
+```xml
+<operation
+    id="cleanup"
+    description="Remove temporary processing artifacts">
+  <configurations>
+    <configuration key="preserve-flavors">security/*</configuration>
+    <configuration key="delete-external">true</configuration>
+    <configuration key="delay">5</configuration>
+  </configurations>
+</operation>
+```

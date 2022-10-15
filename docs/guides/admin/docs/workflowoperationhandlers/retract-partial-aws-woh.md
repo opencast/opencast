@@ -1,5 +1,5 @@
-Partial Retract Engage Workflow Operation (AWS)
-===============================================
+Partial Retract Engage AWS/S3 Workflow Operation
+================================================
 
 ID: `retract-partial-aws`
 
