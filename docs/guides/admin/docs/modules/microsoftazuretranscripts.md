@@ -251,6 +251,23 @@ to the mediapackages and republishes it. Copy it into a new file under
 
 ```
 
+### Step 5: Install gstreamer
+
+Microsoft Speech-to-text API uses gstreamer to transcode audio stream.
+Therefor gstreamer must be installed on your Opencast admin node.
+On Debian based system you can do it by running:
+
+```shell
+sudo apt-get install libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly
+```
+
+For RedHat based systems run:
+
+```shell
+sudo yum install gstreamer1 gstreamer1-plugins-base gstreamer1-plugins-good gstreamer1-plugins-bad-free gstreamer1-plugins-ugly-free
+```
+
+
 Workflow Operations
 -------------------
 

@@ -75,7 +75,6 @@ import com.microsoft.cognitiveservices.speech.audio.AudioInputStream;
 import com.microsoft.cognitiveservices.speech.audio.AudioStreamContainerFormat;
 import com.microsoft.cognitiveservices.speech.audio.AudioStreamFormat;
 
-import org.apache.commons.io.FileUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -83,12 +82,13 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -135,7 +135,6 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   private static final String PROVIDER = "Microsoft Azure";
   private static final AudioStreamContainerFormat DEFAULT_ENCODING = AudioStreamContainerFormat.ANY;
   private static final ProfanityOption DEFAULT_PROFANITY_OPTION = ProfanityOption.Raw;
-  private static final String DEFAULT_TMP_DIR = "tmp/microsoftazuretranscription";
 
   // Cluster name
   private String clusterName = "";
@@ -194,7 +193,6 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   private int cleanupResultDays = DEFAULT_CLEANUP_RESULTS_DAYS;
   private String systemAccount;
   private ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
-  protected File tmpStorageDir;
 
   private AudioStreamContainerFormat compressedAudioFormat = DEFAULT_ENCODING;
   private ProfanityOption profanityOption = DEFAULT_PROFANITY_OPTION;
@@ -359,16 +357,6 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     }
     logger.info("Environment name is {}", clusterName);
 
-    // create directory
-    tmpStorageDir = new File(cc.getBundleContext().getProperty("org.opencastproject.storage.dir"), DEFAULT_TMP_DIR);
-    try {
-      FileUtils.forceMkdir(tmpStorageDir);
-    } catch (IOException e) {
-      logger.error("Could not create temporary directory for transcription files: `{}`",
-              tmpStorageDir.getAbsolutePath());
-      throw new IllegalStateException(e);
-    }
-
     // Schedule the workflow dispatching, starting in 2 minutes
     scheduledExecutor.scheduleWithFixedDelay(new WorkflowDispatcher(), 120, workflowDispatchInterval,
             TimeUnit.SECONDS);
@@ -499,21 +487,17 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     final int[] sequenceNumber = new int[] { 0 };
 
     speechRecognizer.sessionStarted.addEventListener((s, e) -> {
+      logger.trace("Transcription job {} started on media package {}.", jobId, mpId);
       try {
         database.storeJobControl(mpId, track.getIdentifier(), jobId, TranscriptionJobControl.Status.InProgress.name(),
                 track.getDuration() == null ? 0 : track.getDuration().longValue(), null, PROVIDER);
 
-        if (!useSubRipTextCaptionFormat) {
-          try {
-            writeToTmpFile(String.format("WEBVTT%s%s", System.lineSeparator(), System.lineSeparator()), jobId);
-          } catch (IOException ioException) {
-            logger.error(String.format("Could not write header to tmp file"));
-          }
-        }
+        createTranscriptFile(jobId);
       } catch (TranscriptionDatabaseException ex) {
-        errorCallback("Could not store job: " + ex, speechRecognizer, jobId, mpId);
+        errorCallback("Could not store transcript job: " + ex, speechRecognizer, jobId, mpId);
+      }  catch (IOException ex) {
+        errorCallback("Unable to create transcript file: " + ex, speechRecognizer, jobId, mpId);
       }
-      return;
     });
 
     // Fired when an utterance is completely recognized
@@ -521,15 +505,19 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       if (ResultReason.RecognizedSpeech == e.getResult().getReason() && e.getResult().getText().length() > 0) {
         sequenceNumber[0]++;
         String text = captionFromSpeechRecognitionResult(sequenceNumber[0], e.getResult());
-
         try {
-          writeToTmpFile(text, jobId);
-        } catch (IOException ioException) {
-          logger.error(String.format("Could not write to tmp file: %s", text));
+          writeTranscriptToFile(text, jobId);
+        } catch (NotFoundException ex) {
+          logger.debug("Speech recognized before session start. "
+              + "Transcription file not created before as it should be.");
+          errorCallback("Transcription file not found: " + ex, speechRecognizer, jobId, mpId);
+        } catch (IOException ex) {
+          errorCallback("Unable to write to transcription file: " + ex, speechRecognizer, jobId, mpId);
         }
       }
       else if (ResultReason.NoMatch == e.getResult().getReason()) {
-        logger.warn(String.format("NOMATCH: Speech could not be recognized.%s", System.lineSeparator()));
+        logger.info("NOMATCH: Speech could not be recognized by transcription job {} on media package {}.",
+            mpId, jobId);
       }
     });
 
@@ -538,18 +526,19 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       String errorMessage = null;
       if (CancellationReason.EndOfStream == e.getReason()) {
         // This is expected
-        logger.info("End of stream reached");
+        logger.trace("End of stream reached for transcription job {}", jobId);
         return;
       }
       else if (CancellationReason.CancelledByUser == e.getReason()) {
-        errorMessage = "User canceled request.";
+        errorMessage = String.format("User canceled request.%s", System.lineSeparator());
       }
       else if (CancellationReason.Error == e.getReason()) {
-        errorMessage = String.format("Encountered error.%sError code: %s%sError details: %s",
-                System.lineSeparator(), e.getErrorCode().name(), System.lineSeparator(), e.getErrorDetails());
+        errorMessage = String.format("Encountered error.%sError code: %d%sError details: %s%s",
+                System.lineSeparator(), e.getErrorCode(), e.getErrorDetails());
       }
       else {
-        errorMessage = String.format("Request was cancelled for an unrecognized reason: %d.", e.getReason());
+        errorMessage = String.format("Request was cancelled for an unrecognized reason: %d.%s",
+                e.getReason(), System.lineSeparator());
       }
 
       errorCallback(errorMessage, speechRecognizer, jobId, mpId);
@@ -557,33 +546,39 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
 
     speechRecognizer.sessionStopped.addEventListener((s, e) -> {
       try {
-        logger.info("Session stopped");
+        logger.trace("Transcriptiong job {} session stopped", jobId);
         speechRecognizer.stopContinuousRecognitionAsync().get();
         // Update state in database
         // If there's an optimistic lock exception here, it's ok because the workflow dispatcher
         // may be doing the same thing
         database.updateJobControl(jobId, TranscriptionJobControl.Status.TranscriptionComplete.name());
-
-        workspace.putInCollection(TRANSCRIPT_COLLECTION, buildResultsFileName(jobId),
-                new FileInputStream(new File(buildTmpFileName(jobId))));
-
-        return;
-      } catch (IOException | InterruptedException | TranscriptionDatabaseException | ExecutionException ex) {
-        errorCallback("Could not save transcription results file: " + ex, speechRecognizer, jobId, mpId);
+      } catch (InterruptedException | TranscriptionDatabaseException | ExecutionException ex) {
+        errorCallback("Unable to update transcription job status to COMPLETE: " + ex, speechRecognizer, jobId, mpId);
       }
     });
 
     speechRecognizer.startContinuousRecognitionAsync().get();
-
-    return;
   }
 
-  private void writeToTmpFile(String text, String jobId) throws IOException {
-    FileWriter outputFile = new FileWriter(buildTmpFileName(jobId), true);
-    outputFile.write(text);
-    outputFile.close();
-    logger.debug("Recognized");
-    logger.debug(text);
+  private URI createTranscriptFile(String jobId) throws IOException {
+    String transcript = "";
+    if (!useSubRipTextCaptionFormat) {
+      transcript = String.format("WEBVTT%s%s", System.lineSeparator(), System.lineSeparator());
+    }
+    return workspace.putInCollection(TRANSCRIPT_COLLECTION, getTranscriptFileName(jobId),
+        new ByteArrayInputStream(transcript.getBytes(StandardCharsets.UTF_8)));
+  }
+  private void writeTranscriptToFile(String text, String jobId) throws NotFoundException, IOException {
+    URI collectionURI = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, getTranscriptFileName(jobId));
+    File transcriptFile = workspace.get(collectionURI);
+    logger.trace("Write transcript to {}: {}", transcriptFile.getAbsolutePath(), text);
+    try (FileWriter transcriptWriter = new FileWriter(transcriptFile, true)) {
+      transcriptWriter.write(text);
+    }
+  }
+
+  private String getTranscriptFileName(String jobId) {
+    return workspace.toSafeName("transcript_" + jobId + "." + fileFormat);
   }
 
   private String captionFromSpeechRecognitionResult(int sequenceNumber, SpeechRecognitionResult result) {
@@ -652,7 +647,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       }
 
       // Results already saved?
-      URI uri = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, buildResultsFileName(jobId));
+      URI uri = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, getTranscriptFileName(jobId));
       MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
       return builder.elementFromURI(uri, Attachment.TYPE, new MediaPackageElementFlavor("captions",
               "microsoft-azure"));
@@ -663,7 +658,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
 
   @Override
   public void transcriptionDone(String mpId, Object obj) throws TranscriptionServiceException {
-    logger.info("transcriptionDone not implemented");
+    logger.debug("transcriptionDone not implemented");
   }
 
   private void sendEmail(String subject, String body) {
@@ -678,14 +673,6 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     } catch (Exception e) {
       logger.error("Could not send email: {}\n{}", subject, body, e);
     }
-  }
-
-  private String buildTmpFileName(String jobId) {
-    return workspace.toSafeName(tmpStorageDir + File.separator + "transcript_" + jobId);
-  }
-
-  private String buildResultsFileName(String jobId) {
-    return workspace.toSafeName(jobId + "." + fileFormat);
   }
 
   @Reference

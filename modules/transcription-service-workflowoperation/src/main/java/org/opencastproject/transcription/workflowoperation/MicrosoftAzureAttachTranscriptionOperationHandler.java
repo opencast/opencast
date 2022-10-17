@@ -117,7 +117,7 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
       String uri = transcription.getURI().toString();
       String ext = uri.substring(uri.lastIndexOf("."));
       transcription.setURI(workspace.moveTo(transcription.getURI(), mediaPackage.getIdentifier().toString(),
-              transcription.getIdentifier(), "captions." + ext));
+              transcription.getIdentifier(), "captions" + ext));
     } catch (Exception e) {
       throw new WorkflowOperationException(e);
     }
