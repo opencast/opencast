@@ -23,10 +23,11 @@
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
 .controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource',
-  'SeriesThemeResource', 'ResourcesListResource', 'RolesResource', 'Notifications', 'AuthService',
-  'StatisticsReusable', '$http', 'Modal', '$translate',
+  'SeriesThemeResource', 'SeriesTobiraResource', 'ResourcesListResource', 'RolesResource', 'Notifications',
+  'AuthService', 'StatisticsReusable', '$http', 'Modal', '$translate',
   function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource,
-    ResourcesListResource, RolesResource, Notifications, AuthService, StatisticsReusable, $http, Modal, $translate) {
+    SeriesTobiraResource, ResourcesListResource, RolesResource, Notifications, AuthService, StatisticsReusable, $http,
+    Modal, $translate) {
 
     var metadataChangedFns = {}, aclNotification,
         me = this,
@@ -249,6 +250,29 @@ angular.module('adminNg.controllers')
           });
         });
       });
+
+      Notifications.removeAll('series-tobira-details');
+      SeriesTobiraResource.get({ id: id }, function (tobiraData) {
+        $scope.tobiraData = tobiraData;
+        $scope.directTobiraLink = tobiraData.baseURL + '/!s/:' + $scope.resourceId;
+      }, function (response) {
+        if (response.status === 500) {
+          Notifications.add('error', 'TOBIRA_SERVER_ERROR', 'series-tobira-details', -1);
+        } else if (response.status === 404) {
+          Notifications.add('warning', 'TOBIRA_NOT_FOUND', 'series-tobira-details', -1);
+        }
+
+        if (response.status !== 503) {
+          $scope.tobiraData = { error: true };
+        }
+      });
+      $scope.copyTobiraDirectLink = function () {
+        navigator.clipboard.writeText($scope.directTobiraLink).then(function () {
+          Notifications.add('info', 'TOBIRA_COPIED_DIRECT_LINK', 'series-tobira-details', 3000);
+        }, function () {
+          Notifications.add('error', 'TOBIRA_FAILED_COPYING_DIRECT_LINK', 'series-tobira-details', 3000);
+        });
+      };
 
       $scope.roles = RolesResource.queryNameOnly({limit: -1, target: 'ACL'});
 

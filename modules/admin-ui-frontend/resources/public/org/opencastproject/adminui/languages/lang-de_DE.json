@@ -245,7 +245,17 @@
       "ADOPTER_PROFILE_UPDATED": "Profil-Informationen erfolgreich aktualisiert.",
       "ADOPTER_PROFILE_NOT_UPDATED": "Hoppla! Profil-Informationen konnten nicht aktualisiert werden. Bitte versuchen Sie es erneut!",
       "ADOPTER_PROFILE_DELETED": "Profil-Informationen erfolgreich gelöscht.",
-      "ADOPTER_PROFILE_NOT_DELETED": "Hoppla! Profil-Informationen konnten nicht gelöscht werden. Bitte versuchen Sie es erneut!"
+      "ADOPTER_PROFILE_NOT_DELETED": "Hoppla! Profil-Informationen konnten nicht gelöscht werden. Bitte versuchen Sie es erneut!",
+      "TOBIRA_OVERRIDE_NAME": "Der Titel der ausgewählten Seite wird mit dem Titel der Serie überschrieben.",
+      "TOBIRA_NO_PATH_SEGMENT": "Seite benötigt ein Pfadsegment.",
+      "TOBIRA_NOT_MOUNTED": "Serie konnte nicht in Tobira eingehängt werden.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "Pfadsegment ist ungültig. Ein gültiges Pfadsegment ist mindestens zwei Zeichen lang, enthält keine Leerzeichen, Kontrollzeichen, keins der Zeichen '<>\"[\\]^`{|}#%\/?]' und fängt mit keinem der Zeichen '-+~@_!$&;:.,=*'()' an.",
+      "TOBIRA_PATH_SEGMENT_UNIQUE": "Das gleiche Pfadsegment darf nicht mehrmals für Seiten mit der gleichen Überseite verwendet werden.",
+      "TOBIRA_PAGE_NOT_FOUND": "Die angefragte Seite existiert nicht (mehr). Versuchen Sie wieder vom Anfang zu beginnen.",
+      "TOBIRA_SERVER_ERROR":" Fehler bei der Kommunikation mit Tobira. Kontaktieren Sie Ihren Systemadministrator oder versuchen Sie es später erneut.",
+      "TOBIRA_COPIED_DIRECT_LINK": "Link wurde erfolgreich in die Zwischenablage kopiert.",
+      "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Link konnte nicht in die Zwischenablage kopiert werden.",
+      "TOBIRA_NOT_FOUND": "Diese Serie ist Tobira (noch) nicht bekannt. Versuchen Sie es in ein paar Minuten noch einmal oder kontaktieren Sie ihren Systemadministrator."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Aktionen",
@@ -1114,6 +1124,20 @@
                "LABEL": "Branding auswählen",
                "EMPTY": "Kein Branding gefunden"
             },
+            "TOBIRA": {
+              "CAPTION": "Tobira",
+              "DESCRIPTION": "Hier können Sie auswählen, ob die Serie im Tobira Videoportal eingehängt werden soll. Sie können nur eine Seite auswählen, die außerdem leer sein muss (mit fetter Schrift markiert). Sie können auch neue Seiten erstellen. Diese werden jedoch nur gespeichert, wenn sie Teil des Pfades zur ausgewählten Seite sind.",
+              "SELECT_PAGE": "Wählen Sie eine Zielseite aus",
+              "PAGE_TITLE": "Unterseitentitel",
+              "PATH_SEGMENT": "Pfadsegment",
+              "SUBPAGES": "Unterseiten",
+              "ADD_SUBPAGE": "Unterseite hinzufügen",
+              "CANCEL": "Abbrechen",
+              "HOMEPAGE": "Startseite",
+              "SELECTED_PAGE": "Serie wird im folgenden Pfad eingehängt",
+              "NO_PAGE_SELECTED": "Keine Seite ausgewählt. Serie wird nicht eingehängt werden.",
+              "PATH": "Pfad"
+            },
             "SUMMARY": {
                "CAPTION": "Zusammenfassung"
             }
@@ -1142,6 +1166,7 @@
                "EVENTS": "Videos",
                "PERMISSIONS": "Zugriffsrechte",
                "THEME": "Branding",
+               "TOBIRA": "Tobira",
                "STATISTICS": "Statistik"
             },
             "ACCESS": {
@@ -1186,6 +1211,13 @@
                "LANGUAGE": "Sprache",
                "LICENSE": "Lizenz",
                "DESCRIPTION": "Beschreibung"
+            },
+            "TOBIRA": {
+              "HOMEPAGE": "(Startseite)",
+              "DIRECT_LINK": "Direktlink zur Serie",
+              "COPY_DIRECT_LINK": "In die Zwischenablage kopieren",
+              "NOT_MOUNTED": "Diese Serie ist zurzeit nicht in der Seitenstruktur enthalten und kann nur über den obenstehenden Direktlink aufgerufen werden.",
+              "PAGES": "Seiten, die diese Serie enthalten"
             },
             "EVENTS": {
                "TITLE": "Titel",
