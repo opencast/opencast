@@ -1,19 +1,20 @@
-# RetractYoutubeWorkflowOperation
+Retract Youtube Workflow Operation
+==================================
 
+ID: `retract-youtube`
 
-## Description
+Description
+-----------
 
-The RetractYoutubeWorkflowOperationHandler retracts the published elements from YouTube.
-
+The retract YouTube operation retracts the published elements from YouTube.
 There are no configuration keys at this time.
 
-## Operation Example
+Operation Example
+-----------------
 
 ```xml
-    <operation
-      id="retract-youtube"
-      fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
-      description="Retract recording from YouTube">
-    </operation>
+<operation
+  id="retract-youtube"
+  description="Retract recording from YouTube">
+</operation>
 ```

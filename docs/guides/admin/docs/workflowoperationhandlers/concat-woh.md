@@ -1,7 +1,9 @@
-Concat Workflow Operation Handler
-=================================
+Concat Workflow Operation
+=========================
 
-The *concat* operation handler has been created to concatenate multiple video tracks into one video track.
+ID: `concat`
+
+The concat operation has been created to concatenate multiple video tracks into one video track.
 
 For a concatenation of two video files to work, both files need to have the same format (timebase, resolution, codecs,
 frame rate, etc.). This workflow operation has two modes to deal with this restriction:
@@ -129,10 +131,8 @@ Example of a concat operation in a workflow definition.
 ```xml
 <!-- Add intro and outro part to the presenter track -->
 <operation
-  id="concat"
-  fail-on-error="true"
-  exception-handler-workflow="error"
-  description="Concatenate the presenter track and the intro/outro videos.">
+    id="concat"
+    description="Concatenate the presenter track and the intro/outro videos.">
   <configurations>
     <configuration key="source-flavor-part-0">intro/source</configuration>
     <configuration key="source-flavor-part-1">presenter/trimmed</configuration>
@@ -153,5 +153,7 @@ Encoding Profile
 The encoding profile command must contain the #{concatCommand} parameter which will set all input and possibly filter
 commands required for this operation:
 
-    profile.concat.ffmpeg.command = #{concatCommand} \
-      … #{out.dir}/#{out.name}#{out.suffix}
+```properties
+profile.concat.ffmpeg.command = #{concatCommand} \
+  … #{out.dir}/#{out.name}#{out.suffix}
+```

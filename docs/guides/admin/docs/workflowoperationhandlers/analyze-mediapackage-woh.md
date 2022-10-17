@@ -1,20 +1,23 @@
-AnalyzeMediapackageWorkflowOperationHandler
-=====================================
+Analyze Media Package Workflow Operation
+========================================
+
+ID: `analyze-mediapackage`
 
 
 Description
 -----------
-The AnalyzeMediapackageWorkflowOperationHandler analyzes the mediapackage and sets workflow instance
+
+The analyze media package operation  analyzes the mediapackage and sets workflow instance
 variables based on the content of the medapackage. These variables can then be used to control if workflow
 operations should be executed or skipped.
 
 Workflow Instance Variables
 ---------------------------
 
-|Name            |Example                        |Description                                                  |
-|----------------|-------------------------------|-------------------------------------------------------------|
-|*flavor*_exists |`presenter_source_exists=true` |Whether an element with given flavor is in the mediapackage. |
-|*flavor*_type   |`presenter_source_type=Track`  |The type of the element with the given flavor. Possible values are: `Attachment`, `Catalog`, `Track`. |
+|Name              |Example                        |Description                                                  |
+|------------------|-------------------------------|-------------------------------------------------------------|
+|`*flavor*_exists` |`presenter_source_exists=true` |Whether an element with given flavor is in the mediapackage. |
+|`*flavor*_type`   |`presenter_source_type=Track`  |The type of the element with the given flavor. Possible values are: `Attachment`, `Catalog`, `Track`. |
 
 
 
@@ -34,20 +37,20 @@ If no mediapackage element matches a configuration key, no workflow instance var
 Operation Example
 -----------------
 
-    <operation
-      id="analyze-mediapackage"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="Analyze media package and set control variables">
-      <configurations>
-      </configurations>
-    </operation>
+```xml
+<operation
+    id="analyze-mediapackage"
+    description="Analyze media package and set control variables">
+</operation>
+```
 
 The operation will create workflow instance variables like this:
 
-    dublincore_episode_exists=true
-    dublincore_episode_type=Catalog
-    presentation_source_exists=true
-    presentation_source_type=Track
-    security_xacml_episode_exists=true
-    security_xacml_episode_type=Attachment
+```properties
+dublincore_episode_exists=true
+dublincore_episode_type=Catalog
+presentation_source_exists=true
+presentation_source_type=Track
+security_xacml_episode_exists=true
+security_xacml_episode_type=Attachment
+```

@@ -17,11 +17,11 @@ on:
       - 'docs/log4j/**'
       - 'assemblies/**'
       - '.github/**'
+    branches-ignore:    
+      - 'dependabot/**'  # Don't run dependabot branches, as they are already covered by pull requests
 
 jobs:
   build:
-    # Don't run dependabot pull requests multiple times
-    if: ${{ !(github.event_name == 'push' && github.actor == 'dependabot[bot]')  }}
     strategy:
       matrix:
         java:

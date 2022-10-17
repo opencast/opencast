@@ -199,6 +199,7 @@ public class IndexServiceImplTest {
     User user = EasyMock.createMock(User.class);
     EasyMock.expect(user.getOrganization()).andReturn(organization).anyTimes();
     EasyMock.expect(user.getUsername()).andReturn(username);
+    EasyMock.expect(user.hasRole(EasyMock.anyString())).andReturn(false);
     EasyMock.replay(user);
 
     SecurityService securityService = EasyMock.createMock(SecurityService.class);

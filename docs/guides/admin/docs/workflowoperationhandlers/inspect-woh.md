@@ -1,13 +1,19 @@
-# InspectWorkflowOperation
+Inspect Workflow Operation
+==================================
 
-## Description
+ID: `inspect`
 
-The InspectWorkflowOperation is used to inspect all tracks of a media package. It tries to verify if they are valid
-media tracks.
-The InspectWorkflowOperation will also set the duration and creation date of the dublincore/episode catalog
+Description
+-----------
+
+The inspect operation is used to inspect all tracks of a media package.
+It tries to verify if they are valid media tracks.
+The inspect operation will also set the duration and creation date of the `dublincore/episode` catalog
 (if available) to the media package duration and media package creation date.
 
-## Parameter Table
+
+Parameter Table
+---------------
 
 |Configuration Key    |Type    |Description                                                                |Default |
 |---------------------|--------|---------------------------------------------------------------------------|--------|
@@ -33,16 +39,18 @@ computation power.
 The inspection service will try to fill empty metadata fields. It will not overwrite any existing values except when
 you specify the option `overwrite` as `true`.
 
-## Operation Example
 
-    <operation
-        id="inspect"
-        fail-on-error="true"
-        exception-handler-workflow="error"
-        description="Inspecting mediapackage track elements">
-        <configurations>
-            <configuration key="overwrite">false</configuration>
-            <configuration key="accept-no-media">false</configuration>
-            <configuration key="accurate-frame-count">false</configuration>
-        </configurations>
-    </operation>
+Operation Example
+-----------------
+
+```xml
+<operation
+    id="inspect"
+    description="Inspecting mediapackage track elements">
+  <configurations>
+    <configuration key="overwrite">false</configuration>
+    <configuration key="accept-no-media">false</configuration>
+    <configuration key="accurate-frame-count">false</configuration>
+  </configurations>
+</operation>
+```

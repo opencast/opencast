@@ -40,5 +40,6 @@ public interface VideoEditorProperties {
   String AUDIO_FADE = "audio.fade";
   String VIDEO_FADE = "video.fade";
   String DEFAULT_EXTENSION = ".mp4";
-
+  String WEBVTT_EXTENSION = "vtt";
+  long SUBTITLE_GRACE_PERIOD = 500; //ms
 }

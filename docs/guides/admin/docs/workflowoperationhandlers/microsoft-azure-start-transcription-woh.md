@@ -1,11 +1,16 @@
-# Microsoft Azure Start Transcription
+Microsoft Azure Start Transcription Workflow Operation
+======================================================
 
-## Description
+ID: `microsoft-azure-start-transcription`
+
+Description
+-----------
 
 Microsoft Azure Start Transcription invokes the Azure Speech-to-Text service by passing a file with an audio track
 to be translated to text.
 
-## Parameter Table
+Parameter Table
+---------------
 
 |configuration keys|description|default value|example|
 |------------------|-------|-----------|-------------|
@@ -18,7 +23,8 @@ to be translated to text.
 
 **One of source-flavor or source-tag must be specified.**
 
-## Examples
+Examples
+--------
 
 ```xml
     <!-- Start Microsoft Azure transcription job -->

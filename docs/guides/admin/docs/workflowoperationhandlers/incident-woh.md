@@ -1,10 +1,17 @@
-# IncidentCreatorWorkflowOperationHandler
+Incident Creator Workflow Operation
+===========================================
 
-## Description
+ID: `incident`
 
-The IncidentCreatorWorkflowOperationHandler creates an incident on a dummy job used for integration testing.
 
-## Parameter Table
+Description
+-----------
+
+The incident-create operation creates an incident on a dummy job used for integration testing.
+
+
+Parameter Table
+---------------
 
 |configuration keys|example                       |description                                  |default value|
 |------------------|------------------------------|---------------------------------------------|-------------|
@@ -13,14 +20,14 @@ The IncidentCreatorWorkflowOperationHandler creates an incident on a dummy job u
 |details           |"tagged,+rss" / "-rss,+tagged"|Some details: title=content;title=content;...|EMPTY|
 |params            |"presentation/tagged"         |Some params: key=value;key=value;...         |EMPTY|
 
-## Operation Example
+
+Operation Example
+-----------------
 
 ```xml
 <operation
-  id="incident"
-  fail-on-error="true"
-  exception-handler-workflow="error"
-  description="Provoke a job incident">
+    id="incident"
+    description="Provoke a job incident">
   <configurations>
     <configuration key="code">3</configuration>
     <configuration key="severity">INFO</configuration>

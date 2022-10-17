@@ -1,10 +1,12 @@
-WaveformWorkflowOperationHandler
-================================
+Waveform Workflow Operation
+===========================
+
+ID: `waveform`
 
 Description
 -----------
 
-The waveform operation creates an image showing the temporal audio activity within the recording like this:
+The `waveform` operation creates an image showing the temporal audio activity within the recording like this:
 
 ![waveform](waveform.png)
 
@@ -26,6 +28,7 @@ min-width         |10000       |Minimum width of waveform image in pixels       
 max-width         |30000       |Maximum width of waveform image in pixels                       |20000
 height            |60          |Height of waveform image in pixels                              |500
 color             |black       |Color of waveform image, see [ffmpeg.org/ffmpeg-all.html#Color](https://www.ffmpeg.org/ffmpeg-all.html#Color) |black
+
 Additional notes:
 
 - All media, that match either source-flavors or source tags will be processed.
@@ -35,17 +38,19 @@ Additional notes:
 Operation Example
 -----------------
 
-    <operation
-      id="waveform"
-      description="Generating waveform">
-      <configurations>
-        <configuration key="source-flavor">*/audio</configuration>
-        <configuration key="target-flavor">*/waveform</configuration>
-        <configuration key="target-tags">preview</configuration>
-        <configuration key="pixels-per-minute">200</configuration>
-        <configuration key="min-width">5000</configuration>
-        <configuration key="max-width">20000</configuration>
-        <configuration key="height">60</configuration>
-        <configuration key="color">black</configuration>
-      </configurations>
-    </operation>
+```xml
+<operation
+    id="waveform"
+    description="Generating waveform">
+  <configurations>
+    <configuration key="source-flavor">*/audio</configuration>
+    <configuration key="target-flavor">*/waveform</configuration>
+    <configuration key="target-tags">preview</configuration>
+    <configuration key="pixels-per-minute">200</configuration>
+    <configuration key="min-width">5000</configuration>
+    <configuration key="max-width">20000</configuration>
+    <configuration key="height">60</configuration>
+    <configuration key="color">black</configuration>
+  </configurations>
+</operation>
+```

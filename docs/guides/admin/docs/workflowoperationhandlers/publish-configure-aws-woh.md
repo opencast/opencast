@@ -1,11 +1,18 @@
-# ConfigurableAWSS3PublishWorkflowOperationHandler
+Configurable AWS/S3 Publish Workflow Operation
+======================================================
 
-## Description
+ID: `publish-configure-aws`
+
+
+Description
+-----------
 
 The `ConfigurableAWSS3PublishWorkflowOperationHandler` will distribute the given elements to AWS S3 and create a
 publication element for them. By default, it will retract all published download elements before publishing anew.
 
-## Parameter Table
+
+Parameter Table
+---------------
 
 These are the keys that can be configured for this operation in the workflow definition. At least one media package 
 element must match the supplied `source-flavors` or `source-tags` or else the operation will not know what to publish.
@@ -23,7 +30,9 @@ The `channel-id` and `url-pattern` are also mandatory.
 |strategy                 |Strategy for when there is already published material      |`fail`               |`retract`|
 |mode                     |How elements are distributed                               |`mixed`              |`bulk`   |
 
-## Mode
+
+Mode
+----
 
 The configuration key `mode` can be used to control how media package elements are being distributed:
 
@@ -36,7 +45,9 @@ The configuration key `mode` can be used to control how media package elements a
 This allows you to choose a lot of jobs and parallelism (`single`), just one job and no parallelism (`bulk`)
 or something in between (`mixed`). The best choice depends on your setup.
 
-## URL Pattern Variables
+
+URL Pattern Variables
+---------------------
 
 These are the variables available in the `url-pattern` configuration. They will be replaced with the value during the
 execution of the workflow operation.
@@ -58,39 +69,45 @@ with `_` (underscore).
 Additional to the organization properties you can use `org_id`, `org_name`, `org_admin_role` and
 `org_anonymous_role` as well.
 
-## Publication Channel Labels and Icons
+
+Publication Channel Labels and Icons
+------------------------------------
 
 Using this workflow operation, you can create arbitrary custom publication channels. Without further action, the
 administrative user interface will label these channels "Custom". You can specify both a label and an icon for each
 custom publication channels in the configuration files `etc/listproviders/publication.channel.labels.properties` and
 `etc/listproviders/publication.channel.icons.properties`.
 
-## Operation Examples
 
-### Internal Channel
+Operation Example
+-----------------
 
-    <operation
-      id="publish-configure-aws"
-      exception-handler-workflow="partial-error"
-      description="Publish to internal channel using AWS S3">
-      <configurations>
-        <configuration key="source-tags">engage,atom,rss</configuration>
-        <configuration key="channel-id">internal</configuration>
-        <configuration key="url-pattern">http://localhost:8080/admin-ng/index.html#/events/events/${event_id}/tools/playback</configuration>
-      </configurations>
-    </operation>
+Publish to internal channel:
 
-### External API
+```xml
+<operation
+    id="publish-configure-aws"
+    description="Publish to internal channel using AWS S3">
+  <configurations>
+    <configuration key="source-tags">engage,atom,rss</configuration>
+    <configuration key="channel-id">internal</configuration>
+    <configuration key="url-pattern">http://localhost:8080/admin-ng/index.html#/events/events/${event_id}/tools/playback</configuration>
+  </configurations>
+</operation>
+```
 
-    <operation
-      id="publish-configure-aws"
-      exception-handler-workflow="partial-error"
-      description="Publish to external api publication channel using AWS S3">
-      <configurations>
-        <configuration key="channel-id">api</configuration>
-        <configuration key="mimetype">application/json</configuration>
-        <configuration key="source-tags">engage-download</configuration>
-        <configuration key="url-pattern">http://api.oc.org/api/events/${event_id}</configuration>
-        <configuration key="check-availability">true</configuration>
-      </configurations>
-    </operation>
+Publish to external API:
+
+```xml
+<operation
+    id="publish-configure-aws"
+    description="Publish to external api publication channel using AWS S3">
+  <configurations>
+    <configuration key="channel-id">api</configuration>
+    <configuration key="mimetype">application/json</configuration>
+    <configuration key="source-tags">engage-download</configuration>
+    <configuration key="url-pattern">http://api.oc.org/api/events/${event_id}</configuration>
+    <configuration key="check-availability">true</configuration>
+  </configurations>
+</operation>
+```

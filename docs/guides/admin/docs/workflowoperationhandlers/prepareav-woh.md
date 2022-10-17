@@ -1,7 +1,12 @@
-# PrepareAVWorkflowOperation
+Prepare-AV Workflow Operation
+=============================
 
-## Description
-The PrepareAVWorkflowOperation works is like this:
+ID: `prepare-av`
+
+Description
+-----------
+
+The prepare-av operation works is like this:
 
 If there are two tracks with the same flavor, and one of them contains a video stream only, while the other contains an
 audio stream only, the implementation will call the composer's "mux" method, with the result that the audio will be
@@ -14,7 +19,9 @@ compatibility (most often, the stream's codec contains differing information fro
 asking FFmepg to rewrite the whole thing, which will in many cases eliminate problems that would otherwise occur later
 in the pipeline (encoding to flash, mjpeg etc.).
 
-## Parameter Table
+
+Parameter Table
+---------------
 
 |configuration keys|example|description|
 |------------------|-------|-----------|
@@ -28,23 +35,27 @@ in the pipeline (encoding to flash, mjpeg etc.).
 |audio-muxing-source-flavors|presentation/source,presentation/\*,\*/\*    |If there is no matching flavor to mux, search for a track with audio that can be muxed by going from left to right through this comma-separated list of source flavors|
 
 
-## Operation Example
+Operation Example
+-----------------
 
-    <operation
-      id="prepare-av"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Preparing presenter audio and video work versions">
-      <configurations>
-        <configuration key="source-flavor">presenter/source</configuration>
-        <configuration key="target-flavor">presenter/work</configuration>
-        <configuration key="rewrite">false</configuration>
-        <configuration key="audio-muxing-source-flavors">*/?,*/*</configuration>
-      </configurations>
-    </operation>
+```xml
+<operation
+    id="prepare-av"
+    description="Preparing presenter audio and video work versions">
+  <configurations>
+    <configuration key="source-flavor">presenter/source</configuration>
+    <configuration key="target-flavor">presenter/work</configuration>
+    <configuration key="rewrite">false</configuration>
+    <configuration key="audio-muxing-source-flavors">*/?,*/*</configuration>
+  </configurations>
+</operation>
+```
 
-## Audio Muxing
-The PrepareAVWorkflowOperation can be used for audio muxing in case a matching source video track has no audio. Audio
+
+Audio Muxing
+------------
+
+The prepare-av operation can be used for audio muxing in case a matching source video track has no audio. Audio
 muxing is performed as described below:
 
 In case the *source-flavor* matches to exactly two tracks whereas one track is a video-only track and the other is an
@@ -56,30 +67,29 @@ defines the search order of how to find an audio track.
 
 The following two wildcard characters can be used in flavors in that list:
 
-* '*' will match to any type or subtype
+* '\*' will match to any type or subtype
 * '?' will match to the type or subtype of the matching *source-flavor*
 
 Note: In case that a flavor used with *audio-muxing-source-flavors* matches to multiple tracks within the media package
 resulting in a list of matching tracks, the search order within that list is undefined, i.e. PrepareAVWorkflowOperation
 will just pick any of those tracks that has audio.
 
-### Example
 
-    [...]
-    <configuration key="source-flavor">presenter/*</configuration>
-    <configuration key="audio-muxing-source-flavors">presenter-audio/?, presentation/?,presentation/*,?/audio,*/*</configuration>
-    [...]
+Example
+-------
+
+```xml
+<configuration key="source-flavor">presenter/*</configuration>
+<configuration key="audio-muxing-source-flavors">presenter-audio/?, presentation/?,presentation/*,?/audio,*/*</configuration>
+```
 
 Let's assume that exactly one video-only track of flavor presenter/source in the media package and another track of
 flavor audio/track that has audio.
-
 
 In this example, the PrepareAVWorkflowOperation would perform the following steps:
 
 1. Search tracks of flavor presenter-audio/source (presenter-audio/?)
 2. Search tracks of flavor presentation/source (presentation/?)
-3. Search tracks of flavor presentation/*
+3. Search tracks of flavor presentation/\*
 4. Search tracks of flavor presenter/audio (?/audio)
 5. Search tracks of flavor \*/\*
-
-
