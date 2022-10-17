@@ -272,7 +272,7 @@ describe('Serie controller', function () {
             };
 
             spyOn(SeriesAccessResource, 'save');
-            $scope.accessSave.call(this);
+            $scope.updateEventPermissions.call(this);
 
             expect(SeriesAccessResource.save).toHaveBeenCalledWith({ id: '73f9b7ab-1d8f-4c75-9da1-ceb06736d82c' },
                 {

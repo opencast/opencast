@@ -486,7 +486,7 @@ angular.module('adminNg.controllers')
         me.notificationRights = undefined;
       }
 
-      return { ace, hasRights, rulesValid };
+      return { ace, hasRights, rulesValid, override };
     };
 
     let oldPolicies = {};
@@ -530,6 +530,7 @@ angular.module('adminNg.controllers')
       var ace = access.ace;
       var hasRights = access.hasRights;
       var rulesValid = access.rulesValid;
+      override = access.override;
 
       if (hasRights && rulesValid) {
         SeriesAccessResource.save({ id: $scope.resourceId }, {
