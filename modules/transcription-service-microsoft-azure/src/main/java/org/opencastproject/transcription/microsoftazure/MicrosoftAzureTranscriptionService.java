@@ -508,8 +508,8 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
         try {
           writeTranscriptToFile(text, jobId);
         } catch (NotFoundException ex) {
-          logger.debug("Speech recognized before session start. "
-              + "Transcription file not created before as it should be.");
+          logger.debug("Speech recognized before session started. "
+              + "Transcription file not created before, as it should be.");
           errorCallback("Transcription file not found: " + ex, speechRecognizer, jobId, mpId);
         } catch (IOException ex) {
           errorCallback("Unable to write to transcription file: " + ex, speechRecognizer, jobId, mpId);
@@ -568,6 +568,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     return workspace.putInCollection(TRANSCRIPT_COLLECTION, getTranscriptFileName(jobId),
         new ByteArrayInputStream(transcript.getBytes(StandardCharsets.UTF_8)));
   }
+
   private void writeTranscriptToFile(String text, String jobId) throws NotFoundException, IOException {
     URI collectionURI = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, getTranscriptFileName(jobId));
     File transcriptFile = workspace.get(collectionURI);
