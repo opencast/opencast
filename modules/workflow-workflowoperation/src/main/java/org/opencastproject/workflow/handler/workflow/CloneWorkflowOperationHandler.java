@@ -151,7 +151,7 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
     if (elements.size() == 0) {
       // If no one found, we skip the operation
       logger.debug("No matching elements found, skipping operation.");
-      return createResult(workflowInstance.getMediaPackage(), Action.SKIP);
+      return createResult(mediaPackage, Action.SKIP);
     } else {
       logger.debug("Copy " + elements.size() + " elements to new flavor: {}", targetFlavorOption);
 

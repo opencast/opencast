@@ -108,7 +108,7 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
 
     // Read optional existing workflow properties from mediapackage
     Properties workflowProps = new Properties();
-    Opt<Attachment> existingPropsElem = loadPropertiesElementFromMediaPackage(targetFlavor, workflowInstance);
+    Opt<Attachment> existingPropsElem = loadPropertiesElementFromMediaPackage(targetFlavor, mediaPackage);
     if (existingPropsElem.isSome()) {
       workflowProps = loadPropertiesFromXml(workspace, existingPropsElem.get().getURI());
 

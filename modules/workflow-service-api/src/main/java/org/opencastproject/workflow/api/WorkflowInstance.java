@@ -64,6 +64,7 @@ import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
@@ -156,6 +157,9 @@ public class WorkflowInstance {
   @Column(name = "mediapackage", length = 16777215)
   private String mediaPackage;
 
+  @Transient
+  private MediaPackage mediaPackageObj;
+
   @OneToMany(
           mappedBy = "instance",
           cascade = CascadeType.ALL,
@@ -233,6 +237,7 @@ public class WorkflowInstance {
     this.organizationId = organization != null ? organization.getId() : null;
     this.state = WorkflowState.INSTANTIATED;
     this.dateCreated = new Date();
+    this.mediaPackageObj = mediaPackage;
     this.mediaPackage = mediaPackage == null ? null : MediaPackageParser.getAsXml(mediaPackage);
     this.mediaPackageId = mediaPackage == null ? null : mediaPackage.getIdentifier().toString();
     this.seriesId = mediaPackage == null ? null : mediaPackage.getSeries();
@@ -270,6 +275,7 @@ public class WorkflowInstance {
     this.organizationId = organizationId;
     this.dateCreated = dateCreated;
     this.dateCompleted = dateCompleted;
+    this.mediaPackageObj = mediaPackage;
     this.mediaPackage = mediaPackage == null ? null : MediaPackageParser.getAsXml(mediaPackage);
     this.operations = operations;
     this.configurations = configurations;
@@ -355,8 +361,12 @@ public class WorkflowInstance {
 
   public MediaPackage getMediaPackage()  {
     try {
+      if (mediaPackageObj != null) {
+        return mediaPackageObj;
+      }
       if (mediaPackage != null) {
-        return MediaPackageParser.getFromXml(mediaPackage);
+        mediaPackageObj = MediaPackageParser.getFromXml(mediaPackage);
+        return mediaPackageObj;
       }
     } catch (MediaPackageException e) {
       logger.error("Error parsing media package in workflow instance", e);
@@ -365,6 +375,7 @@ public class WorkflowInstance {
   }
 
   public void setMediaPackage(MediaPackage mediaPackage) {
+    this.mediaPackageObj = mediaPackage;
     this.mediaPackage = mediaPackage == null ? null : MediaPackageParser.getAsXml(mediaPackage);
     this.mediaPackageId = mediaPackage == null ? null : mediaPackage.getIdentifier().toString();
     this.seriesId = mediaPackage == null ? null : mediaPackage.getSeries();

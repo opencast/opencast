@@ -151,8 +151,9 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
           throws WorkflowOperationException {
     logger.debug("Running image workflow operation on {}", wi);
     try {
-      final Extractor e = new Extractor(this, configure(wi.getMediaPackage(), wi));
-      return e.main(MediaPackageSupport.copy(wi.getMediaPackage()));
+      MediaPackage mp = wi.getMediaPackage();
+      final Extractor e = new Extractor(this, configure(mp, wi));
+      return e.main(MediaPackageSupport.copy(mp));
     } catch (Exception e) {
       throw new WorkflowOperationException(e);
     }

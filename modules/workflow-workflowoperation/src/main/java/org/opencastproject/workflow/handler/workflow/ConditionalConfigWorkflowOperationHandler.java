@@ -22,6 +22,7 @@
 package org.opencastproject.workflow.handler.workflow;
 
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -68,6 +69,7 @@ public class ConditionalConfigWorkflowOperationHandler extends AbstractWorkflowO
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
+    MediaPackage mp = workflowInstance.getMediaPackage();
 
     Map<String, String> properties = new HashMap<>();
 
@@ -109,7 +111,7 @@ public class ConditionalConfigWorkflowOperationHandler extends AbstractWorkflowO
          // Replace workflow configuration, even if already set.
         properties.put(wfConfigName, value.trim());
         logger.debug("Configuration key '{}' of workflow {} is set to value '{}'", wfConfigName, id, value.trim());
-        return createResult(workflowInstance.getMediaPackage(), properties, Action.CONTINUE, 0);
+        return createResult(mp, properties, Action.CONTINUE, 0);
       }
     }
 
@@ -118,7 +120,7 @@ public class ConditionalConfigWorkflowOperationHandler extends AbstractWorkflowO
     if (StringUtils.isNotEmpty(NO_MATCH)) {
       properties.put(wfConfigName, noMatch);
       logger.debug("Configuration key '{}' of workflow {} is set to value '{}'", wfConfigName, id, noMatch);
-      return createResult(workflowInstance.getMediaPackage(), properties, Action.CONTINUE, 0);
+      return createResult(mp, properties, Action.CONTINUE, 0);
     }
     return createResult(Action.SKIP);
   }
