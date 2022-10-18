@@ -27,14 +27,19 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatalogProperties;
 
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
+import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageBuilder;
+import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.PublicationImpl;
@@ -51,6 +56,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
+import org.opencastproject.workflow.api.WorkflowService;
 
 import com.entwinemedia.fn.data.Opt;
 
@@ -58,6 +64,7 @@ import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.osgi.service.cm.ConfigurationException;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Collections;
@@ -86,6 +93,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
   public static final String METADATA_GET_EVENT = "metadatagetevent";
   public static final String SCHEDULING_GET_EVENT = "schedulinggetevent";
   public static final String SCHEDULING_UPDATE_EVENT = "schedulingupdateevent";
+  public static final String TRACK_UPDATE_EVENT = "trackupdateevent";
 
   private static Capture<MetadataList> capturedMetadataList1;
   private static Capture<MetadataList> capturedMetadataList2;
@@ -93,6 +101,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
   private static Capture<Opt<Date>> capturedEndDate;
   private static Capture<Opt<String>> capturedAgentId;
   private static Capture<Opt<Map<String, String>>> capturedAgentConfig;
+  private static Capture<MediaPackage> capturedMediaPackage;
 
   private static Organization defaultOrg = new DefaultOrganization();
 
@@ -137,6 +146,12 @@ public class TestEventsEndpoint extends EventsEndpoint {
     EasyMock.expect(indexService.getEvent(MISSING_ID, elasticsearchIndex)).andReturn(Opt.<Event> none()).anyTimes();
 
     SchedulerService schedulerService = EasyMock.createMock(SchedulerService.class);
+
+    IngestService ingestService = EasyMock.createMock(IngestService.class);
+
+    AssetManager assetManager = EasyMock.createMock(AssetManager.class);
+
+    WorkflowService workflowService = EasyMock.createNiceMock(WorkflowService.class);
 
     /**
      * Delete Metadata external service mocking
@@ -212,6 +227,26 @@ public class TestEventsEndpoint extends EventsEndpoint {
     EasyMock.expect(indexService.getEventMediapackage(updateEventMetadata)).andReturn(null).anyTimes();
 
     /**
+     * Update event track data
+     */
+    capturedMediaPackage = Capture.newInstance();
+    Event updateEventTrack = new Event(TRACK_UPDATE_EVENT, defaultOrg.getId());
+
+    MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
+    URI uriMP = TestEventsEndpoint.class.getResource("/event-track-update-mediapackage.xml").toURI();
+    URI uriMPUpdated = TestEventsEndpoint.class.getResource("/event-track-update-mediapackage-updated.xml").toURI();
+    MediaPackage mp = builder.loadFromXml(uriMP.toURL().openStream());
+    MediaPackage mpUpdated = builder.loadFromXml(uriMPUpdated.toURL().openStream());
+
+    EasyMock.expect(indexService.getEvent(TRACK_UPDATE_EVENT, elasticsearchIndex)).andReturn(Opt.some(updateEventTrack)).anyTimes();
+    EasyMock.expect(indexService.getEventMediapackage(updateEventTrack)).andReturn(mp).anyTimes();
+    EasyMock.expect(ingestService.addTrack((InputStream) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (MediaPackageElementFlavor) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject()))
+            .andReturn(mpUpdated);
+    EasyMock.expect(assetManager.takeSnapshot(EasyMock.capture(capturedMediaPackage))).andReturn(EasyMock.createNiceMock(Snapshot.class));
+    EasyMock.expect(workflowService.mediaPackageHasActiveWorkflows(mp.getIdentifier().toString())).andReturn(false).anyTimes();
+
+    /**
      * Get event metadata external service mocking
      */
     Event getEvent = new Event(METADATA_GET_EVENT, defaultOrg.getId());
@@ -271,11 +306,14 @@ public class TestEventsEndpoint extends EventsEndpoint {
 
 
     // Replay all mocks
-    EasyMock.replay(deleteMetadataMP, indexService, schedulerService, noPublicationsMP, twoPublicationsMP);
+    EasyMock.replay(deleteMetadataMP, indexService, schedulerService, ingestService, assetManager, workflowService, noPublicationsMP, twoPublicationsMP);
 
     setElasticsearchIndex(elasticsearchIndex);
     setIndexService(indexService);
     setSchedulerService(schedulerService);
+    setIngestService(ingestService);
+    setAssetManager(assetManager);
+    setWorkflowService(workflowService);
     setupSecurityService();
     setupEventCatalogUIAdapters();
     Properties properties = new Properties();
@@ -305,5 +343,9 @@ public class TestEventsEndpoint extends EventsEndpoint {
 
   public static Capture<Opt<Map<String, String>>> getCapturedAgentConfig() {
     return capturedAgentConfig;
+  }
+
+  public static Capture<MediaPackage> getCapturedMediaPackage() {
+    return capturedMediaPackage;
   }
 }

@@ -166,6 +166,15 @@
       <groupId>com.entwinemedia.common</groupId>
       <artifactId>functional</artifactId>
     </dependency>
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-asset-manager-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Testing -->
     <dependency>
       <groupId>io.rest-assured</groupId>
