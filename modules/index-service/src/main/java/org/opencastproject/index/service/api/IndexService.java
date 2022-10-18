@@ -45,6 +45,8 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 
 import com.entwinemedia.fn.data.Opt;
 
+import org.json.simple.JSONObject;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
@@ -310,7 +312,7 @@ public interface IndexService {
    * @throws UnauthorizedException
    *           Thrown if the user cannot create a new series.
    */
-  String createSeries(String metadata) throws IllegalArgumentException, IndexServiceException, UnauthorizedException;
+  String createSeries(JSONObject metadata) throws IllegalArgumentException, IndexServiceException, UnauthorizedException;
 
   /**
    * Create a series from a set of metadata and options.
