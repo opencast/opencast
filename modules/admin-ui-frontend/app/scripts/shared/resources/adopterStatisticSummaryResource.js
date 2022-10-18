@@ -28,10 +28,10 @@ angular.module('adminNg.resources')
       headers: {'Content-Type': 'application/json'},
       transformResponse: function (data) {
         data = JSON.parse(data);
-        for (var host in data['statistics']['hosts']) {
+        /*for (var host in data['statistics']['hosts']) {
           var shortenedServices = data['statistics']['hosts'][host]['services'].substring(0, 50) + '[...]';
           data['statistics']['hosts'][host]['services'] = shortenedServices;
-        }
+        }*/
         return {'general': data['general'], 'statistics': data['statistics']};
       }
     }
