@@ -34,10 +34,12 @@
         <div class="scrollbox">
           <pre>{{ summary.general | json:2}}</pre>
         </div>
-        <p translate="ADOPTER_REGISTRATION.MODAL.SUMMARY_STATE.STATS_HEADER"></p>
-        <div class="scrollbox">
+        <br/>
+        <p ng-show="adopter.allowsStatistics" translate="ADOPTER_REGISTRATION.MODAL.SUMMARY_STATE.STATS_HEADER"></p>
+        <div ng-show="adopter.allowsStatistics" class="scrollbox">
           <pre>{{ summary.statistics | json:2}}</pre>
         </div>
+        <p ng-show="!adopter.allowsStatistics">No statistics data will be shared</p>
       </div>
     </div>
   </div>

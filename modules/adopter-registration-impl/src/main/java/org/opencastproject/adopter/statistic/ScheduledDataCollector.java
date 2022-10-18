@@ -236,7 +236,12 @@ public class ScheduledDataCollector extends TimerTask {
   public String getRegistrationDataAsString() throws Exception {
     Form adopter = (Form) adopterFormService.retrieveFormData();
     String generalJson = collectGeneralData(adopter);
-    String statsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
+    String statsJson;
+    if (adopter.allowsStatistics()) {
+      statsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
+    } else {
+      statsJson = "{}";
+    }
     //It's not stupid if it works!
     return "{ \"general\":" + generalJson + ", \"statistics\":" + statsJson + "}";
   }

@@ -53,6 +53,9 @@ angular.module('adminNg.controllers')
       }
     });
 
+    $scope.refreshSummary = function() {
+      $scope.summary = AdopterStatisticSummaryResource.get();
+    };
 
     $scope.nextState = function (inputAction) {
       if ($scope.state === 'form' && (inputAction === 1 || inputAction === 3)) { // 1:Save, 3:Update
@@ -83,14 +86,16 @@ angular.module('adminNg.controllers')
     $scope.save = function () {
       if($scope.adopterRegistrationForm.$valid) {
         AuthService.getUser().$promise.then(function() {
-          $scope.adopter.registered = true;
           AdopterRegistrationResource.create({}, $scope.adopter,
             function ($response, header) {
               // success callback
               $scope.nextState(0);
+              $scope.adopter.registered = true;
+              $scope.refreshSummary();
             }, function(error) {
               // error callback
               $scope.nextState(1);
+              $scope.refreshSummary();
             });
         }).catch(angular.noop);
       }
@@ -99,7 +104,7 @@ angular.module('adminNg.controllers')
 
     $scope.notNow = function () {
       AuthService.getUser().$promise.then(function() {
-        $scope.registered = false;
+        $scope.adopter.registered = false;
         AdopterRegistrationResource.create({}, $scope.adopter,
           function ($response, header) {
             // success callback
