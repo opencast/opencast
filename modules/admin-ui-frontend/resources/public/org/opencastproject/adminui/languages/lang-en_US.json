@@ -1190,8 +1190,10 @@
              "ACTION"      : "Actions",
              "NEW"         : "New policy",
              "DETAILS"     : "Details",
-             "REPLACE_EVENT_ACLS": "Update event permissions",
+             "REPLACE_EVENT_ACLS": "Save & update event permissions",
              "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect",
+             "SAVE_SERIES_ACLS": "Save",
+             "SAVE_SERIES_ACLS_HINT": "Apply permissions only to series",
              "LOAD_MORE_LIMIT": "policies shown.",
              "LOAD_MORE_LINK": "Load more"
            },
