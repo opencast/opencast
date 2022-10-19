@@ -51,6 +51,37 @@
 # Default: true
 #show = true
 
+####
+# Subtitles
+##
+
+[subtitles]
+
+# If the subtitle editor appears in the main menu
+# Before you enable the subtitle editor, you should define some languages
+# under "subtitles.languages"
+# Type: boolean
+# Default: false
+#show = false
+
+# The main flavor of the subtitle tracks in Opencast
+# No other tracks should have the same main flavor as subtitle tracks
+# Type: string
+# Default: "captions"
+#mainFlavor = "captions"
+
+## A list of languages for which subtitles can be created
+#
+# Example:
+[subtitles.languages]
+# "captions/source+de" = "Deutsch"
+# "captions/source+en" = "English"
+
+# Specify the default video in the subtitle video player by flavor
+# If not specified, the editor will decide on a default by itself
+#[subtitles.defaultVideoFlavor]
+# "type" = "presentation"
+# "subtype" = "preview"
 
 ####
 # Thumbnail Selection
