@@ -590,16 +590,14 @@ public class EditorServiceImpl implements EditorService {
 
       // Decode
       uri = uri.substring(uri.indexOf(",") + 1);
-      byte[] byteArray;
-      byteArray = Base64.getMimeDecoder().decode(uri);
-      ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
+      byte[] byteArray = Base64.getMimeDecoder().decode(uri);
+      InputStream inputStream = new ByteArrayInputStream(byteArray);
 
       // Get MimeType
       String stringMimeType = detectMimeType(uri);
       MimeType mimeType = MimeType.mimeType(stringMimeType.split("/")[0], stringMimeType.split("/")[1]);
 
       // Store image in workspace
-      InputStream inputStream = bais;
       final String filename = "thumbnail_" + id + "." + mimeType.getSubtype();
       final String originalThumbnailId = UUID.randomUUID().toString();
       URI tempThumbnail = null;
@@ -610,12 +608,20 @@ public class EditorServiceImpl implements EditorService {
         throw new IOException("Could not add thumbnail to workspace", e);
       }
 
-      // Archive
+      // Build thumbnail attachment
       final Attachment attachment = AttachmentImpl.fromURI(tempThumbnail);
       attachment.setFlavor(flavor);
       attachment.setMimeType(mimeType);
-      Arrays.asList(mediaPackage.getElementsByFlavor(flavor)[0].getTags()).forEach(attachment::addTag);
+      Arrays.stream(mediaPackage.getElementsByFlavor(flavor))
+          .map(MediaPackageElement::getTags)
+          .flatMap(Arrays::stream)
+          .distinct()
+          .forEach(attachment::addTag);
+
+      // Remove old thumbnails
       Arrays.stream(mediaPackage.getElementsByFlavor(flavor)).forEach(mediaPackage::remove);
+
+      // Add new thumbnail
       mediaPackage.add(attachment);
 
       // Update publications here in the future?
