@@ -195,8 +195,8 @@ public class FFmpegEdit {
       // get clip and add fades to each clip
       VideoClip vclip = clips.get(i);
       int fileindx = vclip.getSrc();   // get source file by index
-      double inpt = vclip.getStart();     // get in points
-      double duration = vclip.getDuration();
+      double inpt = vclip.getStartInSeconds();     // get in points
+      double duration = vclip.getDurationInSeconds();
 
       String clip = "";
       if (hasVideo) {
