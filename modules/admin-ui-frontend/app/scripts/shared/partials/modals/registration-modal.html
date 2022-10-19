@@ -320,7 +320,7 @@
     <div class="pull-right" ng-show="states[state]['buttons']['submit']">
       <a ng-show="state == 'delete_submit'"
          class="danger"
-         ng-click="nextState(0)"
+         ng-click="nextState(1)"
          translate="{{states[state]['buttons']['submitButtonText']}}"></a>
       <a ng-show="state == 'form'"
          class="submit inactive"
@@ -340,7 +340,9 @@
          class="cancel"
          ng-click="nextState(5)"
          translate="ADOPTER_REGISTRATION.MODAL.BACK"></a>
-      <a ng-show="state == 'form' && registered"
+      <!-- Agreeing to the policy happens the second the checkbox is ticked, but registering only happens once you go to
+           the next page.  We need both to happen prior to showing the delete button -->
+      <a ng-show="state == 'form' && adopter.agreedToPolicy && adopter.registered"
          class="danger"
          ng-click="nextState(4)"
          translate="WIZARD.DELETE"></a>
