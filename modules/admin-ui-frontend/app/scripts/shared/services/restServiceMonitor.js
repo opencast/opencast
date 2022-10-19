@@ -54,7 +54,7 @@ function monitorService($http, $location, $translate, Storage) {
     $http.get('/admin-ng/adopter/isUpToDate').then(function(data) {
       if (!('true' === data['data'])) {
         $translate('MONITOR.REGISTRATION').then(function(translation) {
-          Monitoring.setError(REGISTRATION_NAME, translation);
+          Monitoring.setWarning(REGISTRATION_NAME, translation);
         }).catch(angular.noop);
       }
     });
