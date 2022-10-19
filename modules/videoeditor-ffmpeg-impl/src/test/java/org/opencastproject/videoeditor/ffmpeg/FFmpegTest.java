@@ -23,6 +23,7 @@ package org.opencastproject.videoeditor.ffmpeg;
 
 import org.opencastproject.videoeditor.impl.VideoClip;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -31,8 +32,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-
-import junit.framework.Assert;
 
 /**
  * Tests the ffmpeg concatenation service
@@ -85,10 +84,10 @@ public class FFmpegTest {
     if (!ffmpegInstalled) {
       return;
     }
-    ArrayList<String> input = new ArrayList<String>();
-    ArrayList<VideoClip> clips = new ArrayList<VideoClip>();
-    clips.add(new VideoClip(0, 0.0, 10.0));
-    clips.add(new VideoClip(0, 25.0, 44.0));
+    ArrayList<String> input = new ArrayList<>();
+    ArrayList<VideoClip> clips = new ArrayList<>();
+    clips.add(new VideoClip(0, 0, 10000));
+    clips.add(new VideoClip(0, 25000, 44000));
     input.add(inputFilePath);
     FFmpegEdit fmp = new FFmpegEdit();
     fmp.processEdits(input, outputFilePath, null, clips);
@@ -108,10 +107,10 @@ public class FFmpegTest {
     if (!ffmpegInstalled) {
       return;
     }
-    ArrayList<String> input = new ArrayList<String>();
-    ArrayList<VideoClip> clips = new ArrayList<VideoClip>();
-    clips.add(new VideoClip(0, 0.0, 10.0));
-    clips.add(new VideoClip(1, 25.0, 44.0));
+    ArrayList<String> input = new ArrayList<>();
+    ArrayList<VideoClip> clips = new ArrayList<>();
+    clips.add(new VideoClip(0, 0, 10000));
+    clips.add(new VideoClip(1, 25000, 44000));
     input.add(inputFilePath);
     input.add(inputFilePath);
     FFmpegEdit fmp = new FFmpegEdit();
