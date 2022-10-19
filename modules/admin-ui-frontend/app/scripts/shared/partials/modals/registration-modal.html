@@ -25,6 +25,25 @@
     </div>
   </div>
 
+  <div ng-show="state == 'summary'" class="modal-content"
+       style="display: block;">
+    <div class="modal-body">
+      <div class="row">
+        <p translate="ADOPTER_REGISTRATION.MODAL.SUMMARY_STATE.HEADER"></p>
+        <p translate="ADOPTER_REGISTRATION.MODAL.SUMMARY_STATE.GENERAL_HEADER"></p>
+        <div class="scrollbox">
+          <pre>{{ summary.general | json:2}}</pre>
+        </div>
+        <br/>
+        <p ng-show="adopter.allowsStatistics" translate="ADOPTER_REGISTRATION.MODAL.SUMMARY_STATE.STATS_HEADER"></p>
+        <div ng-show="adopter.allowsStatistics" class="scrollbox">
+          <pre>{{ summary.statistics | json:2}}</pre>
+        </div>
+        <p ng-show="!adopter.allowsStatistics">No statistics data will be shared</p>
+      </div>
+    </div>
+  </div>
+
   <div ng-show="state == 'legal_info'" class="modal-content"
     style="display: block;">
     <div class="modal-body">
@@ -301,7 +320,7 @@
     <div class="pull-right" ng-show="states[state]['buttons']['submit']">
       <a ng-show="state == 'delete_submit'"
          class="danger"
-         ng-click="nextState(0)"
+         ng-click="nextState(1)"
          translate="{{states[state]['buttons']['submitButtonText']}}"></a>
       <a ng-show="state == 'form'"
          class="submit inactive"
@@ -321,7 +340,9 @@
          class="cancel"
          ng-click="nextState(5)"
          translate="ADOPTER_REGISTRATION.MODAL.BACK"></a>
-      <a ng-show="state == 'form' && registered"
+      <!-- Agreeing to the policy happens the second the checkbox is ticked, but registering only happens once you go to
+           the next page.  We need both to happen prior to showing the delete button -->
+      <a ng-show="state == 'form' && adopter.agreedToPolicy && adopter.registered"
          class="danger"
          ng-click="nextState(4)"
          translate="WIZARD.DELETE"></a>

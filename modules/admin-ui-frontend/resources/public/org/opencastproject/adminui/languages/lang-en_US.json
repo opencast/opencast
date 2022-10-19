@@ -417,6 +417,11 @@
          "LEGAL_INFO_STATE": {
            "HEADER": "Terms of Service and Privacy Policy"
          },
+         "SUMMARY_STATE": {
+           "HEADER": "This is a JSON summary of exactly what would be sent to Opencast's servers",
+           "GENERAL_HEADER": "Adopter Information",
+           "STATS_HEADER": "Statistical Information"
+         },
          "INFORMATION_STATE": {
            "HEADER": "Thank you for using Opencast!",
            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
