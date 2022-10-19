@@ -138,7 +138,7 @@ angular.module('adminNg.services')
         for (var i = 0; i < radios[radioId].length; i++) {
           radioValues.push(htmlFields[radios[radioId][i]]);
         }
-        if (allTheSame(radioValues)) {
+        if (allTheSame(radioValues) && radioValues.length > 1) {
           for (var j = 0; j < radios[radioId].length; j++) {
             htmlFields[radios[radioId][j]] = null;
           }
