@@ -51,6 +51,37 @@
 # Default: true
 #show = true
 
+####
+# Subtitles
+##
+
+[subtitles]
+
+# If the subtitle editor appears in the main menu
+# Before you enable the subtitle editor, you should define some languages
+# under "subtitles.languages"
+# Type: boolean
+# Default: false
+#show = false
+
+# The main flavor of the subtitle tracks in Opencast
+# No other tracks should have the same main flavor as subtitle tracks
+# Type: string
+# Default: "captions"
+#mainFlavor = "captions"
+
+## A list of languages for which subtitles can be created
+#
+# Example:
+[subtitles.languages]
+# "captions/source+de" = "Deutsch"
+# "captions/source+en" = "English"
+
+# Specify the default video in the subtitle video player by flavor
+# If not specified, the editor will decide on a default by itself
+#[subtitles.defaultVideoFlavor]
+# "type" = "presentation"
+# "subtype" = "preview"
 
 ####
 # Thumbnail Selection
@@ -59,7 +90,19 @@
 [thumbnail]
 
 # If the thumbnail editor appears in the main menu
-# Warning: This interface is unfinished
 # Type: boolean
 # Default: false
-#show = false
+# show = false
+
+# Whether to use "simple" or "professional" mode.
+# Professional mode allows users to edit all thumbnails that fit the subflavor
+# specified in the Opencast configuration file
+# `etc/org.opencastproject.editor.EditorServiceImpl.cfg`. It is useful
+# when working with multiple thumbnails.
+# Simple mode only allows users to edit the "primary" thumbnail, as specified
+# in the Opencast configuration file
+# `etc/org.opencastproject.editor.EditorServiceImpl.cfg`. It is useful
+# when there is only a single thumbnail to worry about and you want hide
+# potential fallbacks from the user. If a primary thumbnail cannot be
+# determined, this falls back to professional mode.
+simpleMode = false
