@@ -21,9 +21,11 @@
 
 package org.opencastproject.inspection.ffmpeg;
 
-import org.junit.Assert;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.MimeType.mimeType;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
