@@ -1,5 +1,20 @@
 # Opencast 12: Release Notes
 
+Opencast 12.4
+-------------
+
+The fourth maintenance release of Opencast 12.
+Notable changes are:
+
+- [Stand-Alone Video Editor](modules/editor.md): Edit subtitles and create thumbnails.
+    - Both features are disabled by default and will require additional configuration.
+- Stand-Alone Video Editor: Usability and accessibility improvements (tooltips, high contrast mode) and bug fixes
+- Paella Player 7: Updates
+- Admin UI: Save button for event/series "Access policy"-tab
+- Bug fixes
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
 Opencast 12.3
 -------------
 
