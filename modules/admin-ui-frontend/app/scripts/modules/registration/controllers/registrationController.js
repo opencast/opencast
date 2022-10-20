@@ -33,7 +33,7 @@ angular.module('adminNg.controllers')
     $scope.states = AdopterRegistrationStates.get($scope.$parent.resourceId);
     $scope.countries = CountryResource.getCountries();
     $scope.tou = TermsOfUseResource.get();
-    $scope.adopter = new AdopterRegistrationResource();
+    $scope.adopter = new AdopterRegistrationResource.get();
     $scope.summary = AdopterStatisticSummaryResource.get();
 
     document.getElementById('help-dd').classList.remove('active');
@@ -42,14 +42,14 @@ angular.module('adminNg.controllers')
     AdopterRegistrationResource.get({}, function (adopter) {
       for (var field in adopter) {
         if(field === 'registered') {
-          $scope.registered = adopter[field];
+          $scope.adopter.registered = adopter[field];
           continue;
         }
         $scope.adopter[field] = adopter[field];
       }
       if (!angular.isDefined(adopter['termsVersionAgreed']) || $scope.tou['latest'] != adopter['termsVersionAgreed']) {
         $scope.adopter['agreedToPolicy'] = false;
-        $scope.registered = false;
+        $scope.adopter.registered = false;
       }
     });
 
@@ -75,6 +75,8 @@ angular.module('adminNg.controllers')
         $scope.notNow();
       } else if($scope.state === 'save') {
         $scope.save();
+      } else if($scope.state === 'finalize') {
+        $scope.finalize();
       } else if($scope.state === 'update') {
         $scope.updateProfile();
       } else if($scope.state === 'delete') {
@@ -96,6 +98,22 @@ angular.module('adminNg.controllers')
               // error callback
               $scope.nextState(1);
               $scope.refreshSummary();
+            });
+        }).catch(angular.noop);
+      }
+    };
+
+    $scope.finalize = function () {
+      if($scope.adopterRegistrationForm.$valid) {
+        AuthService.getUser().$promise.then(function() {
+          AdopterRegistrationResource.finalize({}, {},
+            function ($response, header) {
+              // success callback
+              $scope.nextState(0);
+              $scope.adopter.registered = true;
+            }, function(error) {
+              // error callback
+              $scope.nextState(1);
             });
         }).catch(angular.noop);
       }

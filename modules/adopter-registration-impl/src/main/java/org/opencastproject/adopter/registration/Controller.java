@@ -201,6 +201,28 @@ public class Controller {
     return Response.ok().build();
   }
 
+  @POST
+  @Path("registration/finalize")
+  @RestQuery(name = "finalizeRegistration",
+      description = "Finalizes the registration and starts sending data.",
+      returnDescription = "Status",
+      restParameters = {},
+      responses = { @RestResponse(responseCode = SC_OK, description = "Registration finalized.") })
+  public Response register() {
+    logger.debug("Finalizing adopter registration.");
+
+    Form form = (Form) registrationService.retrieveFormData();
+    form.setRegistered(true);
+
+    try {
+      registrationService.saveFormData(form);
+    } catch (Exception e) {
+      logger.error("Error while saving adopter registration data.", e);
+      return Response.serverError().build();
+    }
+    return Response.ok().build();
+  }
+
   @GET
   @Produces(MediaType.TEXT_PLAIN)
   @Path("isUpToDate")

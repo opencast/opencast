@@ -55,7 +55,7 @@ angular.module('adminNg.services')
               'skip': false,
               'close': true,
               'delete': false,
-              'submitButtonText': 'WIZARD.CREATE'
+              'submitButtonText': 'WIZARD.NEXT_STEP'
             }
           },
           'save': {
@@ -74,7 +74,7 @@ angular.module('adminNg.services')
           'summary': {
             'nextState': {
               0: 'close',
-              1: 'thank_you',
+              1: 'finalize',
               5: 'form'
             },
             'buttons': {
@@ -82,7 +82,20 @@ angular.module('adminNg.services')
               'back': true,
               'skip': false,
               'close': true,
-              'submitButtonText': 'WIZARD.NEXT_STEP'
+              'submitButtonText': 'WIZARD.CREATE'
+            }
+          },
+          'finalize': {
+            'nextState': {
+              0: 'thank_you',
+              1: 'error'
+            },
+            'buttons': {
+              'submit': false,
+              'back': false,
+              'skip': false,
+              'close': false,
+              'submitButtonText': null
             }
           },
           'update': {
