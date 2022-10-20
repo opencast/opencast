@@ -171,7 +171,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
         return cachedJwt.getUsername();
       }
     } catch (JWTVerificationException | JwkException exception) {
-      logger.error(exception.getMessage());
+      logger.debug(exception.getMessage());
     }
 
     return null;
