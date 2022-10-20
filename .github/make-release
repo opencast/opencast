@@ -1,0 +1,56 @@
+#!/bin/sh
+
+set -eux
+
+# fail if we are not on a release branch
+git rev-parse --abbrev-ref HEAD | grep -e 'r/[0-9]*\.x'
+
+# make sure we have all tags
+git fetch --tags
+
+# determine the version we want to release
+MAJOR="$(git rev-parse --abbrev-ref HEAD | sed 's_r/\([0-9]*\)\.x_\1_')"
+LATEST_MINOR="$(git tag | grep "^${MAJOR}" | cut -d. -f2 | sort -n | tail -n1)"
+if [ -z $LATEST_MINOR ]; then
+  LATEST_MINOR=-1
+fi
+MINOR="$((LATEST_MINOR + 1))"
+VERSION="${MAJOR}.${MINOR}"
+
+# fail if any files are modified
+git status | grep modified: && exit 1
+
+# update pom.xml versions
+mvn versions:set -DnewVersion="${VERSION}" versions:commit
+
+# build opencast
+mvn clean install \
+  -Pdev \
+  -DskipTests \
+  -Dcheckstyle.skip=true \
+  --batch-mode \
+  -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+  -Dhttp.keepAlive=false \
+  -Dmaven.wagon.http.pool=false \
+  -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+
+# prepare dependencies
+cd docs/scripts/devel-dependency-containers
+docker-compose up -d
+cd -
+curl -fisS --retry 30 --retry-delay 5 --retry-all-errors http://localhost:9200/
+
+# run opencast
+"./build/opencast-dist-develop-${VERSION}/bin/start-opencast" daemon &
+
+# check opencast starts up and build is consistent
+curl -fsS --retry 30 --retry-delay 10 --retry-all-errors "http://127.0.0.1:8080/sysinfo/bundles/version" -o version.json
+test "$(jq .consistent < version.json)" = "true"
+
+# commit changes
+git add pom.xml modules/*/pom.xml
+git commit -m "Opencast ${VERSION}"
+git tag "${VERSION}" -m "Opencast ${VERSION}"
+
+# push new tag
+git push origin "${VERSION}:${VERSION}"
