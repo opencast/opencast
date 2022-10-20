@@ -51,6 +51,10 @@ angular.module('adminNg.controllers')
     });
     $scope.tou = TermsOfUseResource.get();
 
+    $scope.showAdoptionDialog = function() {
+      ResourceModal.show('registration-modal');
+    };
+
     AuthService.getUser().$promise.then(function (user) {
       $scope.currentUser = user;
 
