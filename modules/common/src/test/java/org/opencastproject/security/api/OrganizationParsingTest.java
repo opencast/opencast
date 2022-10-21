@@ -35,7 +35,6 @@ import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.transform.stream.StreamSource;
 
-
 /**
  * Tests the JAXB java to xml conversion of the organization class.
  */
