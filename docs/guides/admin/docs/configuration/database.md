@@ -27,12 +27,12 @@ Step 1: Select a Database
 
 The EclipseLink JPA implementation which is used in Opencast supports several different databases, although
 some databases might require additional drivers.
-Official support only exists for MariaDB, MySQL, PostgreSQL and H2.
+Official support only exists for MariaDB, PostgreSQL and H2.
 Other database engines are not tested and specific issues will likely not be addressed.
 
 - __MariaDB__ is the recommended database engine.
   It is used by most adopters and is well tested.
-- __PostgreSQL__ support is experimental.
+- __PostgreSQL__ is fully supported and a production ready alternative.
 - __H2__ is not suitable for anything but testing and development.
   It cannot be used in distributed environments.
 
@@ -110,8 +110,6 @@ Finally, leave the client and restart the database server to enable the new user
 
 ### PostgreSQL
 
-Opencast's official PostgreSQL support is still marked as experimental.
-
 Install PostgreSQL, create a database and a user.
 You may need to enable password authentication in your `pg_hba.conf` first.
 Please refer to the PostgreSQL documentation for more details.
@@ -161,7 +159,7 @@ Trying to generate the schema automatically will most likely fail.
 
 If you want to use OAI-PMH, you must create the necessary table manually.
 
-Use the following code to generate the OAI-PMH database table on MariaDB/MySQL.
+Use the following code to generate the OAI-PMH database table on MariaDB.
 PostgreSQL is not yet supported.
 
 ```sql
