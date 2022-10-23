@@ -68,7 +68,7 @@ import java.util.Set;
 public class EngagePluginManagerImpl implements EngagePluginManager, ServiceListener {
 
   private static final Logger log = LoggerFactory.getLogger(EngagePluginManagerImpl.class);
-  static final String PLUGIN_URL_PREFIX = "/engage/theodul/plugin/";
+  static final String PLUGIN_URL_PREFIX = "/engage/theodul-deprecated/plugin/";
   private BundleContext bundleContext;
   private static final String pluginServiceFilter = "(objectClass=" + EngagePlugin.class.getName() + ")";
   private final PluginDataStore plugins = new PluginDataStore();

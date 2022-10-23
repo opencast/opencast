@@ -21,7 +21,7 @@
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
 define(['require', 'jquery', 'underscore', 'backbone'], function (require, $, _, Backbone) {
-  var PLUGIN_MANAGER_PATH = '/engage/theodul/manager/list.json';
+  var PLUGIN_MANAGER_PATH = '/engage/theodul-deprecated/manager/list.json';
 
   var PluginInfoModel = Backbone.Model.extend({
     // URL of the search enpoint

@@ -22,5 +22,5 @@ requirejs.config({
     }
   }
 });
-var PLUGIN_MANAGER_PATH = '/engage/theodul/manager/list.json';
-var PLUGIN_PATH = '/engage/theodul/plugin/';
+var PLUGIN_MANAGER_PATH = '/engage/theodul-deprecated/manager/list.json';
+var PLUGIN_PATH = '/engage/theodul-deprecated/plugin/';

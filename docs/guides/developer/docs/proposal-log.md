@@ -9,6 +9,27 @@ The following list contains a list of passed proposals for reference.
 Passed Proposals
 ----------------
 
+### Deprecate Theodul with Opencast 12
+Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Fri, July 1 2022
+```no-highlight
+Hi all,
+
+After a discussion today at the technical meeting, I'm going to propose
+deprecating Theodul with Opencast 12.  It's no longer the default, and actually
+causes problems in some situations[1].  It's also no longer being developed.
+If this passes then Theodul could be removed from the codebase with Opencast
+13.  If this is a problem for your installation, now would be the time to speak
+up!
+
+Proposal closes EOD 2022-07-01
+
+G
+
+1: https://github.com/opencast/opencast/issues/1749
+```
+
+Note: Deprecation actually happened in Opencast 13, with removal in Opencast 14.
+
 ### Opensearch Support
 Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Wed, June 22 2022
 ```no-highlight
