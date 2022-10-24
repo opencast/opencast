@@ -2,22 +2,23 @@ import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {connect} from "react-redux";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import i18n from "../i18n/i18n";
 import languages from "../i18n/languages";
 import opencastLogo from '../img/opencast-white.svg';
-import {fetchHealthStatus} from "../thunks/healthThunks";
-import { getErrorCount, getHealthStatus } from '../selectors/healthSelectors';
-import {getCurrentLanguageInformation, hasAccess} from "../utils/utils";
-import {logger} from "../utils/logger";
-import {getOrgProperties, getUserInformation} from "../selectors/userInfoSelectors";
-import axios from "axios";
-import RegistrationModal from "./shared/RegistrationModal";
-import { loadServicesIntoTable} from "../thunks/tableThunks";
-import {studioURL} from "../configs/generalConfig";
-import HotKeyCheatSheet from "./shared/HotKeyCheatSheet";
 import {GlobalHotKeys} from "react-hotkeys";
-import {availableHotkeys} from "../configs/hotkeysConfig";
+import {fetchHealthStatus} from "../thunks/healthThunks";
 import { setSpecificServiceFilter } from '../thunks/tableFilterThunks';
+import { loadServicesIntoTable} from "../thunks/tableThunks";
+import { getErrorCount, getHealthStatus } from '../selectors/healthSelectors';
+import {getOrgProperties, getUserInformation} from "../selectors/userInfoSelectors";
+import {availableHotkeys} from "../configs/hotkeysConfig";
+import {studioURL} from "../configs/generalConfig";
+import {getCurrentLanguageInformation, hasAccess} from "../utils/utils";
+import {overflowStyle} from "../utils/componentStyles";
+import {logger} from "../utils/logger";
+import RegistrationModal from "./shared/RegistrationModal";
+import HotKeyCheatSheet from "./shared/HotKeyCheatSheet";
 
 
 // Get code, flag and name of the current language
@@ -305,7 +306,9 @@ const MenuHelp = ({ hideMenuHelp, showRegistrationModal, showHotKeyCheatSheet, u
 
     return (
         <>
-            <ul className="dropdown-ul">
+            <ul
+                style={overflowStyle}
+                className="dropdown-ul">
                 {/* Show only if documentationUrl is set */}
                 {!!orgProperties["org.opencastproject.admin.help.documentation.url"] && (
                     <li>

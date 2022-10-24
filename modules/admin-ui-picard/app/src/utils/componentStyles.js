@@ -120,3 +120,8 @@ export const dropDownSpacingTheme = (theme) => ({
         baseUnit: 2,
     }
 });
+
+export const overflowStyle = {
+    overflow: 'auto',
+    overflowWrap: 'normal'
+}

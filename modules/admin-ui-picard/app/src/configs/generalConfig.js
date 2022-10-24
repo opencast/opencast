@@ -1,5 +1,5 @@
 // URL to Opencast Studio
-export const studioURL = "https://opencast.org/";
+export const studioURL = "/studio";
 
 // Duration of different notification types
 // sets how long an error notification is shown
