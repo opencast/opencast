@@ -1523,6 +1523,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     try {
       index.addOrUpdateEvent(mediaPackageId, updateFunction, orgId, user);
+      index.deleteEvent(mediaPackageId, orgId);
       logger.debug("Scheduling information of event {} removed from the {} index.", mediaPackageId,
               index.getIndexName());
     } catch (SearchIndexException e) {
