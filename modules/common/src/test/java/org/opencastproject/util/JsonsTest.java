@@ -21,11 +21,11 @@
 
 package org.opencastproject.util;
 
-import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.Jsons.NULL;
 import static org.opencastproject.util.Jsons.ZERO_ARR;
 import static org.opencastproject.util.Jsons.ZERO_OBJ;
