@@ -245,7 +245,17 @@
       "ADOPTER_PROFILE_UPDATED": "Profile information successfully updated.",
       "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
       "ADOPTER_PROFILE_DELETED": "Profile information successfully deleted.",
-      "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!"
+      "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!",
+      "TOBIRA_OVERRIDE_NAME": "The title of the selected page will be overridden with the title of the series.",
+      "TOBIRA_NO_PATH_SEGMENT": "Page needs a path segment.",
+      "TOBIRA_NOT_MOUNTED": "Series could not be mounted in Tobira.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
+      "TOBIRA_PATH_SEGMENT_UNIQUE": "The path segment of a page must be unqiue among all its sibling pages.",
+      "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
+      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and/or try again later.",
+      "TOBIRA_COPIED_DIRECT_LINK": "Copied link to clipboard.",
+      "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Couldn't copy link to clipboard.",
+      "TOBIRA_NOT_FOUND": "Tobira doesn't know about this series (yet). Try again in a few minutes or contact your system administrator."
    },
    "BULK_ACTIONS": {
       "CAPTION": "פעולות",
@@ -1114,6 +1124,20 @@
                "LABEL": "אין ערכת נושא",
                "EMPTY": "לא נמצאו ערכות נושא"
             },
+            "TOBIRA": {
+               "CAPTION": "Tobira",
+               "DESCRIPTION": "Here you can select where you want the series to show up in the Tobira video portal. You can only select one location here, and it needs to be empty (marked in bold). You can create new pages here, but note that they are only persisted if they are on the path to the selected page.",
+               "SELECT_PAGE": "Select a target page",
+               "PAGE_TITLE": "Subpage title",
+               "PATH_SEGMENT": "Path segment",
+               "SUBPAGES": "Subpages",
+               "ADD_SUBPAGE": "Add subpage",
+               "CANCEL": "Cancel",
+               "HOMEPAGE": "Homepage",
+               "SELECTED_PAGE": "Series will be mounted under the following path",
+               "NO_PAGE_SELECTED": "No page selected. Series will not be mounted in Tobira.",
+               "PATH": "Path"
+            },
             "SUMMARY": {
                "CAPTION": "סיכום"
             }
@@ -1142,6 +1166,7 @@
                "EVENTS": "אירועים",
                "PERMISSIONS": "מדיניות גישה",
                "THEME": "ערכת נושא",
+               "TOBIRA": "Tobira",
                "STATISTICS": "סטטיסטיקות"
             },
             "ACCESS": {
@@ -1162,8 +1187,10 @@
                   "ACTION": "פעולות",
                   "NEW": "מדיניות חדשה",
                   "DETAILS": "פרטים",
-                  "REPLACE_EVENT_ACLS": "עדכון הרשאות אירוע",
+                  "REPLACE_EVENT_ACLS": "Save & update event permissions",
                   "REPLACE_EVENT_ACLS_HINT": "בדיקה שכל האירועים של סדרה זו יש הרשאות אלה בתוקף",
+                  "SAVE_SERIES_ACLS": "Save",
+                  "SAVE_SERIES_ACLS_HINT": "Apply permissions only to series",
                   "LOAD_MORE_LIMIT": "policies shown.",
                   "LOAD_MORE_LINK": "Load more"
                },
@@ -1186,6 +1213,13 @@
                "LANGUAGE": "שפה",
                "LICENSE": "רישיון",
                "DESCRIPTION": "תאור"
+            },
+            "TOBIRA": {
+               "HOMEPAGE": "(Homepage)",
+               "DIRECT_LINK": "Direct link to series",
+               "COPY_DIRECT_LINK": "Copy to clipboard",
+               "NOT_MOUNTED": "This series is currently not included the page structure, and can only be reached using the direct link above.",
+               "PAGES": "Pages in Tobira that contain this series"
             },
             "EVENTS": {
                "TITLE": "כותרת",
