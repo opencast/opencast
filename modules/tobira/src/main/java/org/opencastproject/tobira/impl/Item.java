@@ -235,7 +235,8 @@ class Item {
               Jsons.p("uri", track.getURI().toString()),
               Jsons.p("mimetype", track.getMimeType().toString()),
               Jsons.p("flavor", track.getFlavor().toString()),
-              Jsons.p("resolution", resolution)
+              Jsons.p("resolution", resolution),
+              Jsons.p("isMaster", track.isMaster())
           );
         })
         .collect(Collectors.toCollection(ArrayList::new));
