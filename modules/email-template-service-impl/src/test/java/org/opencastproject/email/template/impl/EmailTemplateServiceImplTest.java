@@ -20,11 +20,15 @@
  */
 package org.opencastproject.email.template.impl;
 
+import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
+import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
@@ -82,12 +86,13 @@ public class EmailTemplateServiceImplTest {
                     + "date: ${mediaPackage.date?datetime?iso_utc}");
     EasyMock.expect(templateScanner.getTemplate("templateCatalog"))
         .andReturn(
-            "EPISODE creator: ${catalogs[\"episode\"][\"creator\"]}, "
-                + "isPartOf: ${catalogs[\"episode\"][\"isPartOf\"]}, "
-                + "title: ${catalogs[\"episode\"][\"title\"]}, created: ${catalogs[\"episode\"][\"created\"]}, "
-                + "SERIES creator: ${catalogs[\"series\"][\"creator\"]}, "
-                + "description: ${catalogs[\"series\"][\"description\"]}, "
-                + "subject: ${catalogs[\"series\"][\"subject\"]}");
+            "EPISODE creator: ${catalogs[\"dublincore/episode\"][\"creator\"]}, "
+                + "isPartOf: ${catalogs[\"dublincore/episode\"][\"isPartOf\"]}, "
+                + "title: ${catalogs[\"dublincore/episode\"][\"title\"]}, "
+                + "created: ${catalogs[\"dublincore/episode\"][\"created\"]}, "
+                + "SERIES creator: ${catalogs[\"dublincore/series\"][\"creator\"]}, "
+                + "description: ${catalogs[\"dublincore/series\"][\"description\"]}, "
+                + "subject: ${catalogs[\"dublincore/series\"][\"subject\"]}");
     EasyMock.expect(templateScanner.getTemplate("templateFailed")).andReturn(
             "<#if failedOperation?has_content>Workflow failed in operation: ${failedOperation.template}</#if>, "
                     + "Workflow errors: <#list incident as inc><#list inc.details as de>${de.b} </#list></#list>");
@@ -144,6 +149,29 @@ public class EmailTemplateServiceImplTest {
 
     service.setIncidentService(is);
 
+    IndexService indexService = EasyMock.createNiceMock(IndexService.class);
+    EventCatalogUIAdapter commonEventCatalogUIAdapter = EasyMock.createNiceMock(EventCatalogUIAdapter.class);
+    EasyMock.expect(commonEventCatalogUIAdapter.getFlavor())
+        .andReturn(new MediaPackageElementFlavor("dublincore", "episode"))
+        .anyTimes();
+    EasyMock.expect(indexService.getCommonEventCatalogUIAdapter())
+        .andReturn(commonEventCatalogUIAdapter)
+        .anyTimes();
+    EasyMock.expect(indexService.getEventCatalogUIAdapters())
+        .andReturn(List.of(commonEventCatalogUIAdapter))
+        .anyTimes();
+    SeriesCatalogUIAdapter commonSeriesCatalogUIAdapter = EasyMock.createNiceMock(SeriesCatalogUIAdapter.class);
+    EasyMock.expect(commonSeriesCatalogUIAdapter.getFlavor())
+        .andReturn(new MediaPackageElementFlavor("dublincore", "series"))
+        .anyTimes();
+    EasyMock.expect(indexService.getCommonSeriesCatalogUIAdapter())
+        .andReturn(commonSeriesCatalogUIAdapter)
+        .anyTimes();
+    EasyMock.expect(indexService.getSeriesCatalogUIAdapters())
+        .andReturn(List.of(commonSeriesCatalogUIAdapter))
+        .anyTimes();
+    service.setIndexService(indexService);
+
     workflowInstance = new WorkflowInstance(def, null, null, null, props);
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowState.RUNNING);
@@ -166,7 +194,8 @@ public class EmailTemplateServiceImplTest {
     operationList.add(operation);
     workflowInstance.setOperations(operationList);
 
-    EasyMock.replay(is, subtree, job1Tree, incident1, incident2);
+    EasyMock.replay(is, subtree, job1Tree, incident1, incident2, indexService, commonEventCatalogUIAdapter,
+        commonSeriesCatalogUIAdapter);
   }
 
   @Test

@@ -43,8 +43,8 @@ public class EmailData extends DocData {
   private final Map<String, String> workflowConfig;
   private final MediaPackage mediaPackage;
   // The hash map below looks like this:
-  // "episode" --> { "creator": "John Harvard", "type": "L05", "isPartOf": "20140224038"... }
-  // "series" --> { "creator": "Harvard", "identifier": "20140224038"... }
+  // "dublincore/episode" --> { "creator": "John Harvard", "type": "L05", "isPartOf": "20140224038"... }
+  // "dublincore/series" --> { "creator": "Harvard", "identifier": "20140224038"... }
   private final HashMap<String, HashMap<String, String>> catalogs;
   private final WorkflowOperationInstance failed;
   private final List<Incident> incidents;

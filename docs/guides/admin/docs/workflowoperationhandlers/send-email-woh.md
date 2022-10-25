@@ -102,16 +102,16 @@ In your email template:
 
 ### Catalog fields
 
-Use `${catalogs['SUBTYPE']['FIELD']}`
+Use `${catalogs['FLAVOR']['FIELD']}`
 
 #### Examples
 
 |Field          |How To Get It|
 |---------------|-------------|
-|episode creator|${catalogs['episode']['creator']}|
-|episode title  |${catalogs['episode']['title']}|
-|series creator |${catalogs['series']['creator']}|
-|series title   |${catalogs['series']['title']}|
+|episode creator|${catalogs['dublincore/episode']['creator']}|
+|episode title  |${catalogs['dublincore/episode']['title']}|
+|series creator |${catalogs['dublincore/series']['creator']}|
+|series title   |${catalogs['dublincore/series']['title']}|
 
 
 Examples
@@ -149,9 +149,9 @@ To and subject are inline templates; the email body uses a template file named s
   <configurations>
     <!-- This is going to be replaced with the episode catalog publisher field, which in this example it is assumed
     it contains a notification email address -->
-    <configuration key="to">${catalogs['episode']['publisher']}</configuration>
+    <configuration key="to">${catalogs['dublincore/episode']['publisher']}</configuration>
     <!-- This is going to be replaced with the episode catalog title field -->
-    <configuration key="subject">${catalogs['episode']['title']} is ready for EDIT</configuration>
+    <configuration key="subject">${catalogs['dublincore/episode']['title']} is ready for EDIT</configuration>
     <!-- Email body is going to be built using the sample template found in <config_dir>/etc/email -->
     <configuration key="body-template-file">sample</configuration>
   </configurations>
@@ -164,9 +164,9 @@ The contents of the `…/etc/email/sample` email template:
 
 ```
 Event Details
-<#if catalogs['series']?has_content>
-Series Title: ${catalogs['series']['title']}
-Instructor: ${catalogs['series']['contributor']}
+<#if catalogs['dublincore/series']?has_content>
+Series Title: ${catalogs['dublincore/series']['title']}
+Instructor: ${catalogs['dublincore/series']['contributor']}
 </#if>
 Media Package Id: ${mediaPackage.identifier}
 Title: ${mediaPackage.title}
@@ -256,7 +256,7 @@ In error handling workflow (email-error):
   description="Sends email">
     <configurations>
     <!-- Note that you can use variable substitution in to, subject, body
-         e.g. ${(catalogs['episode']['FIELD']!'root@localhost'}  -->
+         e.g. ${(catalogs['dublincore/episode']['FIELD']!'root@localhost'}  -->
     <configuration key="to">root@localhost</configuration>
     <configuration key="subject">Failure processing a mediapackage</configuration>
     <configuration key="body-template-file">errorDetails</configuration>
@@ -271,11 +271,11 @@ The contents of the <config_dir>/etc/email/errorDetails email template:
 ```
 Error Details
 
-<#if catalogs['series']?has_content>
-Course: ${catalogs['series']['subject']!'series subject missing'}-${catalogs['series']['title']!'series title missing'}
-Instructor: ${catalogs['series']['contributor']!'instructor missing'}
+<#if catalogs['dublincore/series']?has_content>
+Course: ${catalogs['dublincore/series']['subject']!'series subject missing'}-${catalogs['dublincore/series']['title']!'series title missing'}
+Instructor: ${catalogs['dublincore/series']['contributor']!'instructor missing'}
 </#if>
-Title: ${catalogs['episode']['title']!'title missing'}
+Title: ${catalogs['dublincore/episode']['title']!'title missing'}
 Event Date: ${mediaPackage.date?datetime?iso_local}
 
 <#if failedOperation?has_content>
@@ -305,7 +305,7 @@ The user name is stored in the episode dublin core `contributor` field. There's 
       fail-on-error="false"
       description="Notify user associated to this recording that it is ready to be trimmed">
       <configurations>
-        <configuration key="to">${(catalogs['episode']['contributor'])}</configuration>
+        <configuration key="to">${(catalogs['dublincore/episode']['contributor'])}</configuration>
         <configuration key="subject">Recording is ready for EDIT</configuration>
         <configuration key="body-template-file">eventDetails</configuration>
       </configurations>

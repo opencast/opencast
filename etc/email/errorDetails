@@ -1,10 +1,10 @@
 Error Details
 
-<#if catalogs['series']?has_content>
-Course: ${catalogs['series']['subject']!'series subject missing'} - ${catalogs['series']['title']!'series title missing'}
-Instructor: ${catalogs['series']['contributor']!'instructor missing'}
+<#if catalogs['dublincore/series']?has_content>
+Course: ${catalogs['dublincore/series']['subject']!'series subject missing'} - ${catalogs['dublincore/series']['title']!'series title missing'}
+Instructor: ${catalogs['dublincore/series']['contributor']!'instructor missing'}
 </#if>
-Title: ${catalogs['episode']['title']!'title missing'}
+Title: ${catalogs['dublincore/episode']['title']!'title missing'}
 Event Date: ${mediaPackage.date?datetime?iso_local}
 
 <#if failedOperation?has_content>
