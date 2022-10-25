@@ -178,7 +178,8 @@ const TableFilters = ({filterMap, textFilter, selectedFilter, secondFilter, onCh
                                             <option value=""
                                                     disabled>{t('TABLE_FILTERS.FILTER_SELECTION.PLACEHOLDER')}</option>
                                             {
-                                                filterMap.map((filter, key) => (
+                                                filterMap.filter(filter => filter.name !== "presentersBibliographic")
+                                                    .map((filter, key) => (
                                                     <option
                                                         key={key}
                                                         value={filter.name}>
