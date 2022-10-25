@@ -400,7 +400,7 @@ export function episodeToManifest(ocResponse, config) {
     return result;
   }
   else {
-    throw Error('No episode found');
+    return null;
   }
 }
 
