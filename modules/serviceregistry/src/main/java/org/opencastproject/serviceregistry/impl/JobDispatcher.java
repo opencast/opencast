@@ -309,11 +309,13 @@ public class JobDispatcher {
             continue;
           }
 
+          //Prioritization of jobs from older workflows
           dispatchableJobs.sort(new workflowPriorizationComparator());
           dispatchDispatchableJobs(em, dispatchableJobs);
         } while (jobsFound);
 
         if (!workflowJobs.isEmpty()) {
+          //Prioritization of jobs from older workflows
           workflowJobs.sort(new workflowPriorizationComparator());
           dispatchDispatchableJobs(em, workflowJobs);
         }
@@ -649,29 +651,14 @@ public class JobDispatcher {
 
 
   /**
-   * Comparator that will sort jobs according to their status. Those that were restarted are on top, those that are
-   * queued are next.
+   * Comparator that will sort jobs according to to the age of the workflows that evoked them. Jobs from older workflows are prioratized.
    */
   static final class workflowPriorizationComparator implements Comparator<JpaJob> {
 
     @Override
     public int compare(JpaJob jobA, JpaJob jobB) {
 
-      // Jobs that are in "restart" mode should be handled first
-      if (Job.Status.RESTART.equals(jobA.getStatus()) && !Job.Status.RESTART.equals(jobB.getStatus())) {
-        return -1;
-      } else if (Job.Status.RESTART.equals(jobB.getStatus()) && !Job.Status.RESTART.equals(jobA.getStatus())) {
-        return 1;
-      }
-
-      // Regular jobs should be processed prior to workflow and workflow operation jobs
-      if (TYPE_WORKFLOW.equals(jobA.getJobType()) && !TYPE_WORKFLOW.equals(jobB.getJobType())) {
-        return 1;
-      } else if (TYPE_WORKFLOW.equals(jobB.getJobType()) && !TYPE_WORKFLOW.equals(jobA.getJobType())) {
-        return -1;
-      }
-
-      //Prioritize older workflows
+      //Prioritize jobs from older root jobs
       if (jobA.getRootJob() != null && jobB.getRootJob() != null && jobA.getRootJob().getDateCreated() != null && jobB.getRootJob().getDateCreated() != null ) {
         return jobA.getRootJob().getDateCreated().compareTo( jobB.getRootJob().getDateCreated());
       }
