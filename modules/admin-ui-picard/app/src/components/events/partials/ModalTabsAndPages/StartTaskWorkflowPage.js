@@ -7,6 +7,7 @@ import {getWorkflowDef} from "../../../../selectors/workflowSelectors";
 import {connect} from "react-redux";
 import cn from 'classnames';
 import { setDefaultConfig } from '../../../../utils/workflowPanelUtils';
+import DropDown from "../../../shared/DropDown";
 
 /**
  * This component renders the workflow selection for start task bulk action
@@ -20,8 +21,8 @@ const StartTaskWorkflowPage = ({ formik, previousPage, nextPage, setPageComplete
         loadingWorkflowDef();
     }, []);
 
-  const setDefaultValues = e => {
-    let workflowId = e.target.value;
+  const setDefaultValues = value => {
+    let workflowId = value;
     // fill values with default configuration of chosen workflow
     let defaultConfiguration = setDefaultConfig(workflowDef, workflowId);
 
@@ -41,17 +42,21 @@ const StartTaskWorkflowPage = ({ formik, previousPage, nextPage, setPageComplete
                             <header>{t('BULK_ACTIONS.SCHEDULE_TASK.TASKS.SELECT')}</header>
                             <div className="obj-container">
                                 {workflowDef.length > 0 && (
-                                        <Field tabIndex="99"
-                                                name="workflow"
-                                                onChange={e => setDefaultValues(e)}
-                                                as="select"
-                                                style={{width: '100%'}}>
-                                            <option value="" hidden>{t('EVENTS.EVENTS.DETAILS.PUBLICATIONS.SELECT_WORKFLOW')}</option>
-                                            {workflowDef.map((workflow, key)=> (
-                                                <option key={key} value={workflow.id}>{workflow.title}</option>
-                                            ))}
-                                        </Field>
-                                    )}
+                                    <div className="editable">
+                                        <DropDown value={formik.values.workflow}
+                                                  text={ !!workflowDef.find(workflowDef => workflowDef.id === formik.values.workflow) ?
+                                                      workflowDef.find(workflowDef => workflowDef.id === formik.values.workflow).title
+                                                      : ''
+                                                  }
+                                                  options={workflowDef}
+                                                  type={'workflow'}
+                                                  required={true}
+                                                  handleChange={element => setDefaultValues(element.value)}
+                                                  placeholder={t('EVENTS.EVENTS.DETAILS.PUBLICATIONS.SELECT_WORKFLOW')}
+                                                  tabIndex={"99"}
+                                        />
+                                    </div>
+                                )}
                                 {formik.values.workflow  && (
                                     <>
                                         {/* Configuration panel of selected workflow */}

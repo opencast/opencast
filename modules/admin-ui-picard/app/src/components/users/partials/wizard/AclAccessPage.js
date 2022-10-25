@@ -14,6 +14,8 @@ import {
 } from '../../../../thunks/aclThunks';
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 import {hasAccess} from "../../../../utils/utils";
+import DropDown from "../../../shared/DropDown";
+import {filterRoles, getAclTemplateText} from "../../../../utils/aclUtils";
 
 /**
  * This component renders the access policy page in the new ACL wizard and in the ACL details modal
@@ -44,11 +46,12 @@ const AclAccessPage = ({ previousPage, nextPage, formik, isEdit, user, checkAcls
         fetchData();
     }, []);
 
-    const handleTemplateChange = async (e) => {
+    const handleTemplateChange = async (value) => {
         // fetch information about chosen template from backend
-        const template =  await fetchAclTemplateById(e.target.value);
+        const template =  await fetchAclTemplateById(value);
 
         formik.setFieldValue('acls', template);
+        formik.setFieldValue('aclTemplate', value);
         await checkAcls(formik.values.acls);
     }
 
@@ -72,45 +75,49 @@ const AclAccessPage = ({ previousPage, nextPage, formik, isEdit, user, checkAcls
                                                 {isAccess && (
                                                     <table className="main-tbl">
                                                         <thead>
-                                                        <tr>
-                                                            <th>{t('USERS.ACLS.NEW.ACCESS.TEMPLATES.TITLE')}</th>
-                                                        </tr>
+                                                            <tr>
+                                                                <th>{t('USERS.ACLS.NEW.ACCESS.TEMPLATES.TITLE')}</th>
+                                                            </tr>
                                                         </thead>
                                                         <tbody>
-                                                        <tr>
-                                                            {aclTemplates.length > 0 ? (
-                                                                <td>
-                                                                    <div className="obj-container padded">
-                                                                        <p>
-                                                                            {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION')}
-                                                                        </p>
-                                                                        <select tabIndex="1"
-                                                                                autoFocus
-                                                                                style={{width: '200px'}}
-                                                                                onChange={e => handleTemplateChange(e)}
-                                                                                placeholder={t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.LABEL')}>
-                                                                            <option value=""/>
-                                                                            {aclTemplates.map((template, key) => (
-                                                                                <option value={template.id}
-                                                                                        key={key}>
-                                                                                    {template.value}
-                                                                                </option>
-                                                                            ))}
-                                                                        </select>
-                                                                    </div>
-                                                                </td>
-                                                            ) : (
-                                                                // Show if no option is available
-                                                                <td>
-                                                                    <div className="obj-container padded">
-                                                                        <p>
-                                                                            {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION')}
-                                                                        </p>
-                                                                        {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.EMPTY')}
-                                                                    </div>
-                                                                </td>
-                                                            )}
-                                                        </tr>
+                                                            <tr>
+                                                                {aclTemplates.length > 0 ? (
+                                                                    <td className="editable">
+                                                                        <div className="obj-container padded">
+                                                                            <p>
+                                                                                {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION')}
+                                                                            </p>
+
+                                                                            {/* dropdown for selecting a policy template */}
+                                                                            <DropDown value={formik.values.aclTemplate}
+                                                                                      text={getAclTemplateText(aclTemplates, formik.values.aclTemplate)}
+                                                                                      options={ !!aclTemplates ?
+                                                                                          aclTemplates
+                                                                                          : []
+                                                                                      }
+                                                                                      type={'aclTemplate'}
+                                                                                      required={true}
+                                                                                      handleChange={element =>
+                                                                                          handleTemplateChange(element.value)
+                                                                                      }
+                                                                                      placeholder={t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.LABEL')}
+                                                                                      tabIndex={'1'}
+                                                                                      autoFocus={true}
+                                                                            />
+                                                                        </div>
+                                                                    </td>
+                                                                ) : (
+                                                                    // Show if no option is available
+                                                                    <td>
+                                                                        <div className="obj-container padded">
+                                                                            <p>
+                                                                                {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION')}
+                                                                            </p>
+                                                                            {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.EMPTY')}
+                                                                        </div>
+                                                                    </td>
+                                                                )}
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 )}
@@ -152,22 +159,22 @@ const AclAccessPage = ({ previousPage, nextPage, formik, isEdit, user, checkAcls
                                                                                 formik.values.acls.length > 0 &&
                                                                                     formik.values.acls.map((acl, index) => (
                                                                                         <tr key={index}>
-                                                                                            <td>
-                                                                                                <Field style={{width: '360px'}}
-                                                                                                       name={`acls.${index}.role`}
-                                                                                                       as="select"
-                                                                                                       disabled={!isAccess}
-                                                                                                       placeholder={t('USERS.ACLS.NEW.ACCESS.ROLES.LABEL')}>
-                                                                                                    {roles.length > 0 && (
-                                                                                                        <>
-                                                                                                            <option  value="" />
-                                                                                                            {roles.map((role, key) => (
-                                                                                                                <option value={role.name}
-                                                                                                                        key={key}>{role.name}</option>
-                                                                                                            ))}
-                                                                                                        </>
-                                                                                                    )}
-                                                                                                </Field>
+                                                                                            <td className="editable">
+                                                                                                <DropDown value={acl.role}
+                                                                                                          text={acl.role}
+                                                                                                          options={ (!!roles && roles.length > 0) ?
+                                                                                                              filterRoles(roles, formik.values.acls)
+                                                                                                              : []
+                                                                                                          }
+                                                                                                          type={'aclRole'}
+                                                                                                          required={true}
+                                                                                                          handleChange={element =>
+                                                                                                              formik.setFieldValue(`acls.${index}.role`, element.value)
+                                                                                                          }
+                                                                                                          placeholder={t('USERS.ACLS.NEW.ACCESS.ROLES.LABEL')}
+                                                                                                          tabIndex={index + 1}
+                                                                                                          disabled={!isAccess}
+                                                                                                />
                                                                                             </td>
                                                                                             <td className="fit text-center">
                                                                                                 <Field type="checkbox" name={`acls.${index}.read`}/>

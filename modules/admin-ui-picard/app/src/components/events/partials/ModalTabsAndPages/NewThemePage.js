@@ -4,6 +4,7 @@ import {connect} from "react-redux";
 import {Field} from "formik";
 import {getSeriesThemes} from "../../../../selectors/seriesSeletctor";
 import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
+import DropDown from "../../../shared/DropDown";
 
 /**
  * This component renders the theme page for new series in the new series wizard.
@@ -31,17 +32,20 @@ const NewThemePage = ({ formik, nextPage, previousPage, seriesThemes }) => {
                                         {seriesThemes.length > 0 ? (
                                             <>
                                                 <p>
-                                                    <Field tabIndex="1"
-                                                           name="theme"
-                                                           as="select"
-                                                           placeholder={t('EVENTS.SERIES.NEW.THEME.LABEL')}
-                                                           style={{width: '100%'}}>
-                                                        <option value=''>{t('EVENTS.SERIES.NEW.THEME.LABEL')}</option>
-                                                        {seriesThemes.map((theme, key) => (
-                                                            <option value={theme.id}
-                                                                    key={key}>{theme.name}</option>
-                                                        ))}
-                                                    </Field>
+                                                    <div className="editable">
+                                                        <DropDown value={formik.values.theme}
+                                                                  text={!!seriesThemes.find(theme => formik.values.theme === theme.id) ?
+                                                                      seriesThemes.find(theme => formik.values.theme === theme.id).name
+                                                                      : ''
+                                                                  }
+                                                                  options={seriesThemes}
+                                                                  type={'newTheme'}
+                                                                  required={false}
+                                                                  handleChange={element => formik.setFieldValue('theme', element.value)}
+                                                                  placeholder={t('EVENTS.SERIES.NEW.THEME.LABEL')}
+                                                                  tabIndex={"1"}
+                                                        />
+                                                    </div>
                                                 </p>
                                                 {!!formik.values.theme && (
                                                     <p>{getDescription(formik.values.theme)}</p>

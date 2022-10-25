@@ -7,6 +7,7 @@ import {fetchWorkflowDef} from "../../../../thunks/workflowThunks";
 import {getWorkflowDef} from "../../../../selectors/workflowSelectors";
 import RenderWorkflowConfig from "../wizards/RenderWorkflowConfig";
 import { setDefaultConfig } from '../../../../utils/workflowPanelUtils';
+import DropDown from "../../../shared/DropDown";
 
 /**
  * This component renders the processing page for new events in the new event wizard.
@@ -29,8 +30,8 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, loadingWorkflowDef,
 
     }
 
-    const setDefaultValues = e => {
-      let workflowId = e.target.value;
+    const setDefaultValues = value => {
+      let workflowId = value;
       // fill values with default configuration of chosen workflow
       let defaultConfiguration = setDefaultConfig(workflowDef, workflowId);
 
@@ -52,17 +53,22 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, loadingWorkflowDef,
                             </header>
                             <div className="obj-container padded">
                                 {workflowDef.length > 0 ? (
-                                    <Field tabIndex="99"
-                                           as="select"
-                                           name="processingWorkflow"
-                                           onChange={e => setDefaultValues(e)}
-                                           placeholder={t('EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW')}
-                                           style={{width: '100%'}}>
-                                        <option value='' hidden>{t('EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW')}</option>
-                                        {workflowDef.map((workflow, key)=> (
-                                            <option key={key} value={workflow.id}>{workflow.title}</option>
-                                        ))}
-                                    </Field>
+                                    <div className="editable">
+                                        <DropDown value={formik.values.processingWorkflow}
+                                                  text={!!workflowDef.find(workflow =>
+                                                      formik.values.processingWorkflow === workflow.id) ?
+                                                      workflowDef.find(workflow =>
+                                                      formik.values.processingWorkflow === workflow.id).title
+                                                      : ''
+                                                  }
+                                                  options={workflowDef}
+                                                  type={'workflow'}
+                                                  required={true}
+                                                  handleChange={element => setDefaultValues(element.value)}
+                                                  placeholder={t('EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW')}
+                                                  tabIndex={"99"}
+                                        />
+                                    </div>
                                 ) : (
                                     <span>{t('EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW_EMPTY')}</span>
                                 )}

@@ -2,23 +2,18 @@
  * this file contains functions, which are needed for the searchable drop-down selections
  */
 
-import {makeTwoDigits} from "./utils";
-
-const filterBySearch = (filterText, type, options, t) => {
+export const filterBySearch = (filterText, type, options, t) => {
     if (type === 'language') {
         return options.filter(item => t(item.name).toLowerCase().includes(filterText));
-    } else if (type === 'isPartOf' || type === 'captureAgent') {
+    } else if (type === 'isPartOf' || type === 'captureAgent' || type === 'aclRole'|| type === 'newTheme') {
         return options.filter(item => item.name.toLowerCase().includes(filterText));
+    } else if (type === 'workflow') {
+        return options.filter(item => item.title.toLowerCase().includes(filterText));
+    } else if (type === 'comment') {
+        return options.filter(item => t(item[0]).toLowerCase().includes(filterText));
     } else {
         return options.filter(item => item.value.toLowerCase().includes(filterText));
     }
-}
-
-export const handleSearch = async (searchText, type, options, setSearch, t) => {
-    setSearch({
-        text: searchText,
-        filteredCollection: filterBySearch(searchText.toLowerCase(), type, options, t)
-    });
 }
 
 /*
@@ -29,7 +24,7 @@ export const handleSearch = async (searchText, type, options, setSearch, t) => {
  */
 export const formatDropDownOptions = (unformattedOptions, type, currentValue, required, t) => {
     const formattedOptions = [];
-    if (currentValue === '' || !required) {
+    if (!required) {
         formattedOptions.push({
             value: '',
             label: `-- ${t('SELECT_NO_OPTION_SELECTED')} --`
@@ -49,18 +44,39 @@ export const formatDropDownOptions = (unformattedOptions, type, currentValue, re
                     label: item.name
                 });
             }
-    } else if (type === 'captureAgent') {
+    } else if (type === 'captureAgent' || type === 'aclRole') {
         for (const item of unformattedOptions) {
             formattedOptions.push({
                 value: item.name,
                 label: item.name
             });
         }
-    } else if (type === 'time') {
+    } else if (type === 'workflow') {
         for (const item of unformattedOptions) {
             formattedOptions.push({
-                value: makeTwoDigits(item.index),
+                value: item.id,
+                label: item.title
+            });
+        }
+    } else if (type === 'aclTemplate') {
+        for (const item of unformattedOptions) {
+            formattedOptions.push({
+                value: item.id,
                 label: item.value
+            });
+        }
+    } else if (type === 'newTheme') {
+        for (const item of unformattedOptions) {
+            formattedOptions.push({
+                value: item.id,
+                label: item.name
+            });
+        }
+    } else if (type === 'comment') {
+        for (const item of unformattedOptions) {
+            formattedOptions.push({
+                value: item[0],
+                label: t(item[1])
             });
         }
     } else {

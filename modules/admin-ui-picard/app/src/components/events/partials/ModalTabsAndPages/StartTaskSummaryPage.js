@@ -1,11 +1,13 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
 import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
+import {getWorkflowDef} from "../../../../selectors/workflowSelectors";
+import {connect} from "react-redux";
 
 /**
  * This component renders the summary page of the start task bulk action
  */
-const StartTaskSummaryPage = ({ formik, previousPage }) => {
+const StartTaskSummaryPage = ({ formik, previousPage, workflowDef }) => {
     const { t } = useTranslation();
 
     return (
@@ -25,7 +27,11 @@ const StartTaskSummaryPage = ({ formik, previousPage }) => {
                                     </li>
                                     <li>
                                         <span>{t('BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.WORKFLOW')}</span>
-                                        <p>{formik.values.workflow}</p>
+                                        <p>
+                                            { !!workflowDef.find(workflowDef => workflowDef.id === formik.values.workflow) ?
+                                                workflowDef.find(workflowDef => workflowDef.id === formik.values.workflow).title
+                                                : ''}
+                                        </p>
                                     </li>
                                     <li>
                                         <span>{t('BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.CONFIGURATION')}</span>
@@ -48,4 +54,9 @@ const StartTaskSummaryPage = ({ formik, previousPage }) => {
     );
 };
 
-export default StartTaskSummaryPage;
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    workflowDef: getWorkflowDef(state)
+});
+
+export default connect(mapStateToProps, null)(StartTaskSummaryPage);

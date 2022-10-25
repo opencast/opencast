@@ -190,29 +190,39 @@ export const updateBulkMetadata = (metadataFields, values) => async dispatch => 
 }
 
 // Check for conflicts with already scheduled events
-export const checkForConflicts =  async (startDate, endDate, duration, device) => {
-
-    let metadata = {
-        start: startDate,
-        device: device,
-        duration: duration,
-        end: endDate
-    }
+export const checkForConflicts =  async (startDate, endDate, duration, device, repeatOn=null) => {
+    let metadata = !!repeatOn ?
+        {
+            start: startDate,
+            device: device,
+            duration: duration.toString(),
+            end: endDate,
+            rrule: `FREQ=WEEKLY;BYDAY=${repeatOn.join()};BYHOUR=${startDate.getHours()};BYMINUTE=${startDate.getMinutes()}`
+        }
+        :
+        {
+            start: startDate,
+            device: device,
+            duration: duration.toString(),
+            end: endDate
+        }
     let status = 0;
 
-    axios.post('/admin-ng/event/new/conflicts', metadata,
+    let formData = new URLSearchParams();
+    formData.append('metadata', JSON.stringify(metadata));
+
+    return await axios.post('/admin-ng/event/new/conflicts', formData,
         {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
-        }).then(response => {
-            status = response.status;
+    }).then(response => {
+        status = response.status;
+        return status === 409;
     }).catch(reason => {
-            status = reason.status;
+        status = reason.response.status;
+        return status === 409;
     });
-
-    return status !== 409;
-
 }
 
 // post new event to backend
@@ -255,11 +265,13 @@ export const postNewEvent = (values, metadataInfo, extendedMetadata) => async (d
     // transform date data for post request if source mode is SCHEDULE_*
     if (values.sourceMode === 'SCHEDULE_SINGLE' || values.sourceMode === 'SCHEDULE_MULTIPLE') {
         // Get timezone offset
-        let offset = getTimezoneOffset();
+        //let offset = getTimezoneOffset();
 
         // Prepare start date of event for post
         let startDate = new Date(values.scheduleStartDate);
-        startDate.setHours((values.scheduleStartTimeHour - offset), values.scheduleStartTimeMinutes, 0, 0);
+        // NOTE: if time zone issues still occur during further testing, try to set times to UTC (-offset)
+        //startDate.setHours((values.scheduleStartHour - offset), values.scheduleStartMinute, 0, 0);
+        startDate.setHours((values.scheduleStartHour), values.scheduleStartMinute, 0, 0);
 
         let endDate;
 
@@ -269,10 +281,12 @@ export const postNewEvent = (values, metadataInfo, extendedMetadata) => async (d
         } else {
             endDate = new Date(values.scheduleEndDate);
         }
-        endDate.setHours((values.scheduleEndTimeHour - offset), values.scheduleEndTimeMinutes, 0, 0);
+        // NOTE: if time zone issues still occur during further testing, try to set times to UTC (-offset)
+        //endDate.setHours((values.scheduleEndHour - offset), values.scheduleEndMinute, 0, 0);
+        endDate.setHours((values.scheduleEndHour), values.scheduleEndMinute, 0, 0);
 
         // transform duration into milliseconds
-        let duration = values.scheduleDurationHour * 3600000 + values.scheduleDurationMinutes * 60000;
+        let duration = values.scheduleDurationHours * 3600000 + values.scheduleDurationMinutes * 60000;
 
         // data about source for post request
         source = {
@@ -614,24 +628,17 @@ export const checkConflicts = values => async dispatch => {
         // Prepare start date of event for check
         let startDate = new Date(values.scheduleStartDate);
         // NOTE: if time zone issues still occur during further testing, try to set times to UTC (-offset)
-        startDate.setHours((values.scheduleStartTimeHour), values.scheduleStartTimeMinutes, 0, 0);
+        startDate.setHours((values.scheduleStartHour), values.scheduleStartMinute, 0, 0);
 
         // If start date of event is smaller than today --> Event is in past
-        if (startDate < new Date()) {
+        if (values.sourceMode === 'SCHEDULE_SINGLE' && startDate < new Date()) {
             dispatch(addNotification('error', 'CONFLICT_ALREADY_ENDED', -1, null, NOTIFICATION_CONTEXT));
             check = false;
         }
 
-        let endDate;
-
-        // Prepare end date of event for check
-        if(values.sourceMode === 'SCHEDULE_SINGLE') {
-            endDate = new Date(values.scheduleStartDate);
-        } else {
-            endDate = new Date(values.scheduleEndDate);
-        }
+        const endDate = new Date(values.scheduleEndDate);
         // NOTE: if time zone issues still occur during further testing, try to set times to UTC (-offset)
-        endDate.setHours((values.scheduleEndTimeHour), values.scheduleEndTimeMinutes, 0, 0);
+        endDate.setHours((values.scheduleEndHour), values.scheduleEndMinute, 0, 0);
 
         // if start date is higher than end date --> end date is before start date
         if (startDate > endDate) {
@@ -640,17 +647,18 @@ export const checkConflicts = values => async dispatch => {
         }
 
         // transform duration into milliseconds (needed for API request)
-        let duration = values.scheduleDurationHour * 3600000 + values.scheduleDurationMinutes * 60000;
+        let duration = values.scheduleDurationHours * 3600000 + values.scheduleDurationMinutes * 60000;
 
         // Check for conflicts with other already scheduled events
-        let conflicts = await checkForConflicts(startDate, endDate, duration, values.location);
+        let conflicts = (values.sourceMode === 'SCHEDULE_SINGLE') ?
+            await checkForConflicts(startDate, endDate, duration, values.location)
+            : await checkForConflicts(startDate, endDate, duration, values.location, values.repeatOn);
 
         // If conflicts with already scheduled events detected --> need to change times/date
-        if(!conflicts) {
+        if(conflicts) {
             dispatch(addNotification('error', 'CONFLICT_DETECTED', -1, null, NOTIFICATION_CONTEXT));
             check = false;
         }
-
     }
     return check;
 }

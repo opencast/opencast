@@ -13,11 +13,11 @@ const EventsPresentersCell = ({ row, filterMap, editFilterValue, loadEvents, loa
     const { t } = useTranslation();
 
     // Filter with value of current cell
-    const addFilter = presenter => {
+    const addFilter = async presenter => {
         let filter = filterMap.find(({ name }) => name === "presentersBibliographic");
         if (!!filter) {
-            editFilterValue(filter.name, presenter);
-            loadEvents();
+            await editFilterValue(filter.name, presenter);
+            await loadEvents();
             loadEventsIntoTable();
         }
     };
@@ -28,7 +28,8 @@ const EventsPresentersCell = ({ row, filterMap, editFilterValue, loadEvents, loa
         row.presenters.map((presenter, key) => (
             <a className="metadata-entry"
                key={key}
-               title={t('EVENTS.EVENTS.TABLE.TOOLTIP.PRESENTER')} onClick={() => addFilter(presenter)}>
+               title={t('EVENTS.EVENTS.TABLE.TOOLTIP.PRESENTER')}
+               onClick={() => addFilter(presenter)}>
                 {presenter}
             </a>
         ))

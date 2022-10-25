@@ -31,6 +31,11 @@ export const fetchFilters = resource => async (dispatch)=> {
             filter.name = key;
             return filter;
         });
+
+        if (resource === 'events') {
+            filtersList.push({name: "presentersBibliographic"})
+        }
+
         await dispatch(loadFiltersSuccess(filtersList, resource));
     } catch (e) {
         dispatch(loadFiltersFailure());

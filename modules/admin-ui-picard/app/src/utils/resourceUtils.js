@@ -35,7 +35,7 @@ export const getURLParams = state => {
 
     let params = {
         limit: getPageLimit(state),
-        offset: getPageOffset(state)
+        offset: getPageOffset(state) * getPageLimit(state)
     }
 
     if (filters.length) {

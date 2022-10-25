@@ -1,7 +1,10 @@
 import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
 import {dropDownSpacingTheme, dropDownStyle} from "../../utils/componentStyles";
-import {formatDropDownOptions, handleSearch} from "../../utils/dropDownUtils";
+import {
+    filterBySearch,
+    formatDropDownOptions
+} from "../../utils/dropDownUtils";
 import Select from "react-select";
 
 /**
@@ -11,10 +14,7 @@ const DropDown = ({value, text, options, type, required, handleChange, placehold
                       autoFocus=false, defaultOpen=false, disabled=false}) => {
     const { t } = useTranslation();
 
-    const [ search, setSearch ] = useState({
-        text: '',
-        filteredCollection: options
-    });
+    const [ searchText, setSearch ] = useState('');
 
     const style = dropDownStyle(type);
 
@@ -26,11 +26,11 @@ const DropDown = ({value, text, options, type, required, handleChange, placehold
                 autoFocus={autoFocus}
                 isSearchable
                 value={{value: value, label: text === '' ? placeholder : text}}
-                inputValue={search.text}
-                options={formatDropDownOptions(search.filteredCollection, type, value, required, t)}
+                inputValue={searchText}
+                options={formatDropDownOptions(filterBySearch(searchText.toLowerCase(), type, options, t), type, value, required, t)}
                 placeholder={placeholder}
                 noOptionsMessage={() => 'No matching results.'}
-                onInputChange={value => handleSearch(value, type, options, setSearch, t)}
+                onInputChange={value => setSearch(value)}
                 onChange={element => handleChange(element)}
                 isDisabled={disabled}
         />

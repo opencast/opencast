@@ -18,6 +18,7 @@ import Notifications from "../../../shared/Notifications";
 import {logger} from "../../../../utils/logger";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 import {hasAccess} from "../../../../utils/utils";
+import DropDown from "../../../shared/DropDown";
 
 /**
  * This component manages the comment tab of the event details modal
@@ -178,25 +179,19 @@ const EventDetailsCommentsTab = ({ eventId, header, t,
                                             value={newCommentText}
                                             onChange={ (comment) => setNewCommentText(comment.target.value)}
                                             placeholder={t('EVENTS.EVENTS.DETAILS.COMMENTS.PLACEHOLDER')}>
-                                </textarea>
+                                        </textarea>
 
                                         {/* drop-down for selecting a reason for the comment */}
-                                        <div className="chosen-container chosen-container-single">
-                                            <select className="chosen-single chosen-default"
-                                                    chosen
-                                                    value={commentReason}
-                                                    onChange={(newReason) =>
-                                                        setCommentReason(newReason.target.value)}
-                                                    pre-select-from="components.eventCommentReasons"
-                                                    data-width="'200px'"
-                                            >
-                                                <option value="" disabled selected hidden>
-                                                    {t('EVENTS.EVENTS.DETAILS.COMMENTS.SELECTPLACEHOLDER')}
-                                                </option>
-                                                {Object.entries(commentReasons).map( (reason, key) =>
-                                                    <option value={reason[0]} key={key}>{t(reason[1])}</option>
-                                                )}
-                                            </select>
+                                        <div className="editable">
+                                            <DropDown value={commentReason}
+                                                      text={t(commentReason)}
+                                                      options={Object.entries(commentReasons)}
+                                                      type={'comment'}
+                                                      required={true}
+                                                      handleChange={element => setCommentReason(element.value)}
+                                                      placeholder={t('EVENTS.EVENTS.DETAILS.COMMENTS.SELECTPLACEHOLDER')}
+                                                      tabIndex={'5'}
+                                            />
                                         </div>
 
                                         {/* submit button for comment (only active, if text has been written and a reason has been selected) */}

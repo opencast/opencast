@@ -188,6 +188,14 @@ a.disabled, button.disabled, div.disabled {
 span.editable {
   border-bottom: 1px dashed #999;
 }
+div.editable {
+  cursor: text;
+  line-height: 25px;
+
+  input {
+    height: auto;
+  }
+}
 td.editable {
   cursor: text;
 
@@ -196,7 +204,10 @@ td.editable {
   }
 
   input {
-    padding: 0 0 0 10px;
+    padding-right: 10px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 5px;
     width: 98%;
     height: auto;
     margin: 0;

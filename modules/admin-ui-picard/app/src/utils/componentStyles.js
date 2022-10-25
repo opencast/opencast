@@ -6,7 +6,11 @@ const colorDropDownNormalFocus = '#5897fb';
 const colorDropDownDarkerFocus = '#2a62bc';
 
 export const dropDownStyle = (type) => {
-    const width = type === 'time' ? 70 : 250
+    const width = ((type === 'theme') || (type === 'newTheme') || (type === 'workflow')) ? '100%'
+        : (type === 'time') ? 70
+        : (type === 'aclRole') ? 360
+        : ((type === 'aclTemplate') || (type === 'comment')) ? 200
+        : 250;
 
     return {
         container: (provided, state) => ({
@@ -16,7 +20,12 @@ export const dropDownStyle = (type) => {
             display: 'inline-block',
             verticalAlign: 'middle',
             font: 'inherit',
-            outline: 'none'
+            outline: 'none',
+            paddingTop: 0,
+            paddingBottom: 0,
+            marginTop: 0,
+            marginBottom: 0,
+            marginRight: 1
         }),
         control: (provided, state) => ({
             ...provided,
@@ -26,6 +35,8 @@ export const dropDownStyle = (type) => {
             hoverBorderColor: state.selectProps.menuIsOpen ? colorDropDownNormalFocus : colorDropDownMain,
             boxShadow: state.selectProps.menuIsOpen ?  `0 0 0 1px ${colorDropDownNormalFocus}` : `0 0 0 1px ${colorDropDownMain}`,
             borderRadius: 4,
+            paddingTop: 0,
+            paddingBottom: 0,
             "&:hover": {
                 borderColor: colorDropDownMain
             }
@@ -33,6 +44,8 @@ export const dropDownStyle = (type) => {
         dropdownIndicator: (provided, state) => ({
             ...provided,
             transform: state.selectProps.menuIsOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            paddingTop: 0,
+            paddingBottom: 0,
             color: colorDropDownMain,
             "&:hover": {
                 color: colorDropDownNormalFocus
@@ -40,8 +53,7 @@ export const dropDownStyle = (type) => {
         }),
         indicatorSeparator: (provided, state) => ({
             ...provided,
-            width: 0,
-            visibility: 'hidden'
+            display: 'none'
         }),
         input: (provided, state) => ({
             ...provided,
@@ -50,7 +62,9 @@ export const dropDownStyle = (type) => {
             margin: 0,
             whiteSpace: 'nowrap',
             verticalAlign: 'middle',
-            border: 'none'
+            border: 'none',
+            paddingTop: 0,
+            paddingBottom: 0,
         }),
         menu: (provided, state) => ({
             ...provided,
@@ -66,29 +80,34 @@ export const dropDownStyle = (type) => {
         }),
         noOptionsMessage: (provided, state) => ({
             ...provided,
-            textAlign: 'left'
+            textAlign: 'left',
+            paddingTop: 0,
+            paddingBottom: 0,
         }),
         option: (provided, state) => ({
             ...provided,
-            height: 25,
-            paddingTop: 0,
-            paddingBottom: 0,
+            paddingTop: ((type === 'aclRole') || (type === 'aclTemplate') || type === 'comment') ? 5 : 0,
+            paddingBottom: ((type === 'aclRole') || (type === 'aclTemplate') || type === 'comment') ? 5 : 0,
             backgroundColor: state.isSelected ? colorDropDownDarkerFocus : state.isFocused ? colorDropDownNormalFocus : 'white',
             color: state.isFocused || state.isSelected ? 'white' : provided.color,
             cursor: 'pointer',
-            "&:hover": {
-                height: 25
-            }
+            overflowWrap: 'normal',
+            lineHeight: type === 'comment' ? '105%' : 'inherit'
         }),
         singleValue: (provided, state) => ({
             ...provided,
             marginTop: 0,
             marginBottom: 0,
+            paddingTop: 0,
+            paddingBottom: 0,
         }),
         valueContainer: (provided, state) => ({
             ...provided,
             marginTop: 0,
             marginBottom: 0,
+            paddingLeft: 5,
+            paddingTop: 0,
+            paddingBottom: 0,
         })
     };
 }
@@ -97,7 +116,12 @@ export const dropDownSpacingTheme = (theme) => ({
     ...theme,
     spacing: {
         ...theme.spacing,
-        controlHeight: 30,
+        controlHeight: 25,
         baseUnit: 2,
     }
 });
+
+export const overflowStyle = {
+    overflow: 'auto',
+    overflowWrap: 'normal'
+}

@@ -28,7 +28,8 @@ const EventsTechnicalDateCell = ({ row, filterMap, editFilterValue, loadEvents,
     return (
         // Link template for technical date of event
         <a  className="crosslink"
-            title={t('EVENTS.EVENTS.TABLE.TOOLTIP.START')} onClick={() => addFilter()}>
+            title={t('EVENTS.EVENTS.TABLE.TOOLTIP.START')}
+            onClick={() => addFilter()}>
             {t('dateFormats.date.short', { date: new Date(row.technical_start) })}
         </a>
     );

@@ -728,7 +728,7 @@ export const checkConflicts = (eventId, startDate, endDate, deviceId) => async (
         const conflictTimeFrame = {
             id: eventId,
             start: startDate.toISOString(),
-            duration: endDate - startDate,
+            duration: (endDate - startDate),
             device: deviceId,
             end: endDate.toISOString()
         };
@@ -736,11 +736,10 @@ export const checkConflicts = (eventId, startDate, endDate, deviceId) => async (
         let data = new URLSearchParams();
         data.append("metadata", JSON.stringify(conflictTimeFrame));
 
-        await axios.post(`/admin-ng/event/new/conflicts`, data, headers )
+        return await axios.post(`/admin-ng/event/new/conflicts`, data, headers )
             .then(response => {
-                logger.info(response);
                 const responseStatus = response.status;
-                if(responseStatus === 409){
+                if (responseStatus === 409) {
                     //conflict detected, add notification and get conflict specifics
                     dispatch(addNotification('error', 'CONFLICT_DETECTED', -1, null, NOTIFICATION_CONTEXT));
                     const conflictsResponse =  response.data;
@@ -752,18 +751,41 @@ export const checkConflicts = (eventId, startDate, endDate, deviceId) => async (
                             end: conflict.end
                         });
                     }
-                } else if(204){
+
+                    dispatch(checkConflictsSuccess(conflicts));
+                    return false;
+                } else if (responseStatus === 204) {
                     //no conflicts detected
+                    dispatch(checkConflictsSuccess(conflicts));
+                    return true;
+                } else {
+                    dispatch(checkConflictsSuccess(conflicts));
+                    return false;
                 }
-
-                dispatch(checkConflictsSuccess(conflicts));
             })
-            .catch(response => {
-                logger.error(response);
-                dispatch(checkConflictsFailure());
-            });
+            .catch(error => {
+                const responseStatus = error.response.status;
+                if (responseStatus === 409) {
+                    //conflict detected, add notification and get conflict specifics
+                    dispatch(addNotification('error', 'CONFLICT_DETECTED', -1, null, NOTIFICATION_CONTEXT));
+                    const conflictsResponse =  error.response.data;
 
-        return true;
+                    for (const conflict of conflictsResponse) {
+                        conflicts.push({
+                            title: conflict.title,
+                            start: conflict.start,
+                            end: conflict.end
+                        });
+                    }
+
+                    dispatch(checkConflictsSuccess(conflicts));
+                    return false;
+                } else {
+                    logger.error(error);
+                    dispatch(checkConflictsFailure());
+                    return false;
+                }
+            });
     }
 }
 

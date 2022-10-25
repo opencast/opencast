@@ -8,6 +8,7 @@ import Notifications from "../../../shared/Notifications";
 import {updateSeriesTheme} from "../../../../thunks/seriesDetailsThunks";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 import {hasAccess} from "../../../../utils/utils";
+import DropDown from "../../../shared/DropDown";
 
 /**
  * This component renders the tab for editing the theme of a certain series
@@ -46,16 +47,19 @@ const SeriesDetailsThemeTab = ({ theme, seriesId, themeNames, updateTheme, user 
                                                 <p>{t('EVENTS.SERIES.NEW.THEME.DESCRIPTION.TEXT')}</p>
                                                 {themeNames.length > 0 && (
                                                     <p>
-                                                        <Field name="theme"
-                                                               as="select"
-                                                               disabled={!hasAccess("ROLE_UI_SERIES_DETAILS_THEMES_EDIT", user)}
-                                                               style={{width: '100%'}}>
-                                                            <option value={theme}>{theme}</option>
-                                                            {themeNames.map((theme, key) => (
-                                                                <option value={theme.value}
-                                                                        key={key}>{theme.value}</option>
-                                                            ))}
-                                                        </Field>
+                                                        <div className="editable">
+                                                            <DropDown value={formik.values.theme}
+                                                                      text={formik.values.theme}
+                                                                      options={themeNames}
+                                                                      type={'theme'}
+                                                                      required={false}
+                                                                      handleChange={element => formik.setFieldValue('theme', element.value)}
+                                                                      placeholder={t('EVENTS.SERIES.NEW.THEME.LABEL')}
+                                                                      tabIndex={"8"}
+                                                                      disabled={!hasAccess("ROLE_UI_SERIES_DETAILS_THEMES_EDIT", user)}
+                                                            />
+                                                        </div>
+                                                        {/*<option value={theme}>{theme}</option>*/}
                                                     </p>
                                                 )}
                                             </li>

@@ -126,7 +126,7 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
                                             </tr>
                                             <tr>
                                                 <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_TIME')}</td>
-                                                <td>{formik.values.scheduleStartTimeHour}:{formik.values.scheduleStartTimeMinutes}</td>
+                                                <td>{formik.values.scheduleStartHour}:{formik.values.scheduleStartMinute}</td>
                                             </tr>
                                             {formik.values.sourceMode === 'SCHEDULE_MULTIPLE' && (
                                                 <tr>
@@ -136,7 +136,7 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
                                             )}
                                             <tr>
                                                 <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_TIME')}</td>
-                                                <td>{formik.values.scheduleEndTimeHour}:{formik.values.scheduleEndTimeMinutes}</td>
+                                                <td>{formik.values.scheduleEndHour}:{formik.values.scheduleEndMinute}</td>
                                             </tr>
                                             {formik.values.sourceMode === 'SCHEDULE_MULTIPLE' && (
                                                 <tr>
@@ -146,7 +146,7 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
                                             )}
                                             <tr>
                                                 <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.DURATION')}</td>
-                                                <td>{formik.values.scheduleDurationHour}:{formik.values.scheduleDurationMinutes}</td>
+                                                <td>{formik.values.scheduleDurationHours}:{formik.values.scheduleDurationMinutes}</td>
                                             </tr>
                                             <tr>
                                                 <td>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}</td>
