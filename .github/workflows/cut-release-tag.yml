@@ -1,0 +1,19 @@
+name: Cut Release Tag
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cut-release-tag:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: prepare git
+        run: |
+          git config --global user.email 'cloud@opencast.org'
+          git config --global user.name 'Release Bot'
+
+      - name: make release
+        run: |
+          ./.github/make-release
