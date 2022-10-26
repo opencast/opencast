@@ -32,6 +32,8 @@ import org.opencastproject.metadata.dublincore.CatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.util.doc.DocUtil;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -55,6 +57,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -82,6 +85,8 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
   private IncidentService incidentService = null;
 
   private IndexService indexService;
+
+  private SecurityService securityService;
 
   @Activate
   protected void activate(ComponentContext context) {
@@ -131,8 +136,14 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
       }
     }
 
-    return DocUtil.generate(new EmailData(templateName, workflowInstance, catalogs, failed, incidentList),
-            templateContent);
+    Map<String, String> orgProperties = null;
+    Organization org = securityService.getOrganization();
+    if (org != null) {
+      orgProperties = org.getProperties();
+    }
+
+    return DocUtil.generate(new EmailData(templateName, workflowInstance, catalogs, failed, incidentList,
+            orgProperties), templateContent);
   }
 
   /**
@@ -273,5 +284,10 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
   @Reference
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
+  }
+
+  @Reference
+  protected void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 }

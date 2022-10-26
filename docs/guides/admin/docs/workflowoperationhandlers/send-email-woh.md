@@ -113,6 +113,15 @@ Use `${catalogs['FLAVOR']['FIELD']}`
 |series creator |${catalogs['dublincore/series']['creator']}|
 |series title   |${catalogs['dublincore/series']['title']}|
 
+### Organization properties
+
+Use `${organization['PROPERTY']}`
+
+#### Examples
+
+|Property  |How To Get It|
+|----------|-------------|
+|Engage URL|${organization["org.opencastproject.engage.ui.url"]}|
 
 Examples
 --------
