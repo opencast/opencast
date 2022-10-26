@@ -139,8 +139,8 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
     // Make sure either one of tags or flavors are provided
     if (sourceTagsOption.isEmpty() && sourceFlavorsOption.isEmpty()) {
-      logger.info("No source tags or flavors have been specified, not matching anything");
-      return createResult(mediaPackage, Action.CONTINUE);
+      logger.warn("No source tags or flavors have been specified, not matching anything");
+      return createResult(mediaPackage, Action.SKIP);
     }
 
     // Select the source flavors
@@ -207,7 +207,7 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
     if (encodingJobs.isEmpty()) {
       logger.info("No matching tracks found");
-      return createResult(mediaPackage, Action.CONTINUE);
+      return createResult(mediaPackage, Action.SKIP);
     }
 
     // Wait for the jobs to return
