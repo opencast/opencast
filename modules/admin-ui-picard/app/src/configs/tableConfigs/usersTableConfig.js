@@ -12,36 +12,43 @@ import UsersRolesCell from "../../components/users/partials/UsersRolesCell";
  * - is multi select possible?
  */
 export const usersTableConfig = {
-    columns: [{
-        name:  'name',
-        label: 'USERS.USERS.TABLE.NAME',
-        sortable: true
-    }, {
-        name:  'username',
-        label: 'USERS.USERS.TABLE.USERNAME',
-        sortable: true
-    }, {
-        name:  'email',
-        label: 'USERS.USERS.TABLE.EMAIL',
-        sortable: true
-    }, {
-        template: 'UsersRolesCell',
-        name:  'roles',
-        label: 'USERS.USERS.TABLE.ROLES',
-        sortable: true
-    }, {
-        name:  'provider',
-        label: 'USERS.USERS.TABLE.PROVIDER',
-        sortable: true
-    }, {
-        template: 'UsersActionsCell',
-        name:  'actions',
-        label:    'USERS.USERS.TABLE.ACTION'
-    }],
-    caption:    'USERS.USERS.TABLE.CAPTION',
-    resource:   'users',
-    category:   'users',
-    multiSelect: false
+	columns: [
+		{
+			name: "name",
+			label: "USERS.USERS.TABLE.NAME",
+			sortable: true,
+		},
+		{
+			name: "username",
+			label: "USERS.USERS.TABLE.USERNAME",
+			sortable: true,
+		},
+		{
+			name: "email",
+			label: "USERS.USERS.TABLE.EMAIL",
+			sortable: true,
+		},
+		{
+			template: "UsersRolesCell",
+			name: "roles",
+			label: "USERS.USERS.TABLE.ROLES",
+			sortable: true,
+		},
+		{
+			name: "provider",
+			label: "USERS.USERS.TABLE.PROVIDER",
+			sortable: true,
+		},
+		{
+			template: "UsersActionsCell",
+			name: "actions",
+			label: "USERS.USERS.TABLE.ACTION",
+		},
+	],
+	caption: "USERS.USERS.TABLE.CAPTION",
+	resource: "users",
+	category: "users",
+	multiSelect: false,
 };
 
 /**
@@ -50,6 +57,6 @@ export const usersTableConfig = {
  * uses template map.
  */
 export const usersTemplateMap = {
-    'UsersActionsCell': UsersActionCell,
-    'UsersRolesCell': UsersRolesCell
+	UsersActionsCell: UsersActionCell,
+	UsersRolesCell: UsersRolesCell,
 };

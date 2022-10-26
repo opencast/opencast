@@ -3,39 +3,39 @@
  */
 
 // Constants of action types for fetching information about the current user from server
-export const LOAD_USER_INFO_IN_PROGRESS = 'LOAD_USER_INFO_IN_PROGRESS';
-export const LOAD_USER_INFO_SUCCESS = 'LOAD_USER_INFO_SUCCESS';
-export const LOAD_USER_INFO_FAILURE = 'LOAD_USER_INFO_FAILURE';
+export const LOAD_USER_INFO_IN_PROGRESS = "LOAD_USER_INFO_IN_PROGRESS";
+export const LOAD_USER_INFO_SUCCESS = "LOAD_USER_INFO_SUCCESS";
+export const LOAD_USER_INFO_FAILURE = "LOAD_USER_INFO_FAILURE";
 
 // Constants of action types for fetching opencast version from server
-export const LOAD_OC_VERSION_IN_PROGRESS = 'LOAD_OC_VERSION_IN_PROGRESS';
-export const LOAD_OC_VERSION_SUCCESS = 'LOAD_OC_VERSION_SUCCESS';
-export const LOAD_OC_VERSION_FAILURE = 'LOAD_OC_VERSION_FAILURE';
+export const LOAD_OC_VERSION_IN_PROGRESS = "LOAD_OC_VERSION_IN_PROGRESS";
+export const LOAD_OC_VERSION_SUCCESS = "LOAD_OC_VERSION_SUCCESS";
+export const LOAD_OC_VERSION_FAILURE = "LOAD_OC_VERSION_FAILURE";
 
 // Actions affecting fetching information about the current user from server
 
 export const loadUserInfoInProgress = () => ({
-    type: LOAD_USER_INFO_IN_PROGRESS
+	type: LOAD_USER_INFO_IN_PROGRESS,
 });
 
-export const loadUserInfoSuccess = userInfo => ({
-    type: LOAD_USER_INFO_SUCCESS,
-    payload: { userInfo }
+export const loadUserInfoSuccess = (userInfo) => ({
+	type: LOAD_USER_INFO_SUCCESS,
+	payload: { userInfo },
 });
 
 export const loadUserInfoFailure = () => ({
-    type: LOAD_USER_INFO_FAILURE
+	type: LOAD_USER_INFO_FAILURE,
 });
 
 export const loadOcVersionInProgress = () => ({
-    type: LOAD_OC_VERSION_IN_PROGRESS
+	type: LOAD_OC_VERSION_IN_PROGRESS,
 });
 
-export const loadOcVersionSuccess = ocVersion => ({
-    type: LOAD_OC_VERSION_SUCCESS,
-    payload: { ocVersion }
+export const loadOcVersionSuccess = (ocVersion) => ({
+	type: LOAD_OC_VERSION_SUCCESS,
+	payload: { ocVersion },
 });
 
 export const loadOcVersionFailure = () => ({
-    type: LOAD_OC_VERSION_FAILURE
-})
+	type: LOAD_OC_VERSION_FAILURE,
+});

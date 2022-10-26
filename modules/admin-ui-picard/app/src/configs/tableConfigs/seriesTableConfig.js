@@ -4,7 +4,6 @@ import SeriesContributorsCell from "../../components/events/partials/SeriesContr
 import SeriesDateTimeCell from "../../components/events/partials/SeriesDateTimeCell";
 import SeriesActionsCell from "../../components/events/partials/SeriesActionsCell";
 
-
 /**
  * Config that contains the columns and further information regarding series. These are the information that never or hardly changes.
  * That's why it is hard coded here and not fetched from server.
@@ -16,35 +15,41 @@ import SeriesActionsCell from "../../components/events/partials/SeriesActionsCel
  * - is multi select possible?
  */
 export const seriesTableConfig = {
-    columns: [{
-        template: 'SeriesTitleCell',
-        name: 'title',
-        label: 'EVENTS.SERIES.TABLE.TITLE',
-        sortable: true
-    }, {
-        template: 'SeriesCreatorsCell',
-        name: 'organizers',
-        label: 'EVENTS.SERIES.TABLE.ORGANIZERS',
-        sortable: true
-    }, {
-        template: 'SeriesContributorsCell',
-        name: 'contributors',
-        label: 'EVENTS.SERIES.TABLE.CONTRIBUTORS',
-        sortable: true
-    }, {
-        template: 'SeriesDateTimeCell',
-        name: 'creation_date',
-        label: 'EVENTS.SERIES.TABLE.CREATED',
-        sortable: true
-    }, {
-        template: 'SeriesActionsCell',
-        name: 'actions',
-        label: 'EVENTS.SERIES.TABLE.ACTION'
-    }],
-    caption: 'EVENTS.SERIES.TABLE.CAPTION',
-    resource: 'series',
-    category: 'events',
-    multiSelect: true
+	columns: [
+		{
+			template: "SeriesTitleCell",
+			name: "title",
+			label: "EVENTS.SERIES.TABLE.TITLE",
+			sortable: true,
+		},
+		{
+			template: "SeriesCreatorsCell",
+			name: "organizers",
+			label: "EVENTS.SERIES.TABLE.ORGANIZERS",
+			sortable: true,
+		},
+		{
+			template: "SeriesContributorsCell",
+			name: "contributors",
+			label: "EVENTS.SERIES.TABLE.CONTRIBUTORS",
+			sortable: true,
+		},
+		{
+			template: "SeriesDateTimeCell",
+			name: "creation_date",
+			label: "EVENTS.SERIES.TABLE.CREATED",
+			sortable: true,
+		},
+		{
+			template: "SeriesActionsCell",
+			name: "actions",
+			label: "EVENTS.SERIES.TABLE.ACTION",
+		},
+	],
+	caption: "EVENTS.SERIES.TABLE.CAPTION",
+	resource: "series",
+	category: "events",
+	multiSelect: true,
 };
 
 /**
@@ -52,9 +57,9 @@ export const seriesTableConfig = {
  * This helps to render different templates of cells more dynamically
  */
 export const seriesTemplateMap = {
-    'SeriesTitleCell': SeriesTitleCell,
-    'SeriesCreatorsCell': SeriesCreatorsCell,
-    'SeriesContributorsCell': SeriesContributorsCell,
-    'SeriesDateTimeCell': SeriesDateTimeCell,
-    'SeriesActionsCell': SeriesActionsCell
-}
+	SeriesTitleCell: SeriesTitleCell,
+	SeriesCreatorsCell: SeriesCreatorsCell,
+	SeriesContributorsCell: SeriesContributorsCell,
+	SeriesDateTimeCell: SeriesDateTimeCell,
+	SeriesActionsCell: SeriesActionsCell,
+};

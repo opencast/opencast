@@ -14,31 +14,36 @@ import RecordingsUpdateCell from "../../components/recordings/partials/Recording
  * - is multi select possible?
  */
 export const recordingsTableConfig = {
-    columns: [{
-        name:  'status',
-        template: 'RecordingsStatusCell',
-        label: 'RECORDINGS.RECORDINGS.TABLE.STATUS',
-        translate: true,
-        sortable: true
-    }, {
-        template: 'RecordingsNameCell',
-        name:  'name',
-        label: 'RECORDINGS.RECORDINGS.TABLE.NAME',
-        sortable: true
-    }, {
-        template: 'RecordingsUpdateCell',
-        name:  'update',
-        label: 'RECORDINGS.RECORDINGS.TABLE.UPDATED',
-        sortable: true
-    }, {
-        template: 'RecordingsActionCell',
-        name: 'actions',
-        label:    'RECORDINGS.RECORDINGS.TABLE.ACTION'
-    }],
-    caption:    'RECORDINGS.RECORDINGS.TABLE.CAPTION',
-    resource:   'recordings',
-    category:   'recordings',
-    multiSelect: false
+	columns: [
+		{
+			name: "status",
+			template: "RecordingsStatusCell",
+			label: "RECORDINGS.RECORDINGS.TABLE.STATUS",
+			translate: true,
+			sortable: true,
+		},
+		{
+			template: "RecordingsNameCell",
+			name: "name",
+			label: "RECORDINGS.RECORDINGS.TABLE.NAME",
+			sortable: true,
+		},
+		{
+			template: "RecordingsUpdateCell",
+			name: "update",
+			label: "RECORDINGS.RECORDINGS.TABLE.UPDATED",
+			sortable: true,
+		},
+		{
+			template: "RecordingsActionCell",
+			name: "actions",
+			label: "RECORDINGS.RECORDINGS.TABLE.ACTION",
+		},
+	],
+	caption: "RECORDINGS.RECORDINGS.TABLE.CAPTION",
+	resource: "recordings",
+	category: "recordings",
+	multiSelect: false,
 };
 
 /**
@@ -46,8 +51,8 @@ export const recordingsTableConfig = {
  * This helps to render different templates of cells more dynamically
  */
 export const recordingsTemplateMap = {
-    'RecordingsActionCell': RecordingsActionCell,
-    'RecordingsNameCell': RecordingsNameCell,
-    'RecordingsStatusCell': RecordingsStatusCell,
-    'RecordingsUpdateCell': RecordingsUpdateCell
+	RecordingsActionCell: RecordingsActionCell,
+	RecordingsNameCell: RecordingsNameCell,
+	RecordingsStatusCell: RecordingsStatusCell,
+	RecordingsUpdateCell: RecordingsUpdateCell,
 };

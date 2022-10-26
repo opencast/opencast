@@ -20,68 +20,79 @@ import EventsStartCell from "../../components/events/partials/EventsStartCell";
  * - is multi select possible?
  */
 export const eventsTableConfig = {
-    columns: [{
-        name: 'title',
-        label: 'EVENTS.EVENTS.TABLE.TITLE',
-        sortable: true,
-        translate: false
-    }, {
-        template: 'EventsPresentersCell',
-        name: 'presenters',
-        label: 'EVENTS.EVENTS.TABLE.PRESENTERS',
-        sortable: true,
-        translate: false
-    }, {
-        template: 'EventsSeriesCell',
-        name: 'series',
-        label: 'EVENTS.EVENTS.TABLE.SERIES',
-        sortable: true,
-        translate: false
-    }, {
-        template: 'EventsDateCell',
-        name: 'date',
-        label: 'EVENTS.EVENTS.TABLE.DATE',
-        sortable: true,
-        translate: false
-    }, {
-        template: 'EventsStartCell',
-        name: 'start_date',
-        label: 'EVENTS.EVENTS.TABLE.START',
-        sortable: true,
-        translate: false
-    }, {
-        template: 'EventsEndCell',
-        name: 'end_date',
-        label: 'EVENTS.EVENTS.TABLE.STOP',
-        sortable: true,
-        translate: false
-    }, {
-        template: 'EventsLocationCell',
-        name: 'location',
-        label: 'EVENTS.EVENTS.TABLE.LOCATION',
-        sortable: true,
-        translate: false
-    }, {
-        name: 'published',
-        label: 'EVENTS.EVENTS.TABLE.PUBLISHED',
-        template: 'PublishedCell',
-        translate: false
-    }, {
-        template: 'EventsStatusCell',
-        name: 'event_status',
-        label: 'EVENTS.EVENTS.TABLE.STATUS',
-        sortable: true,
-        translate: true
-    }, {
-        name: 'actions',
-        template: 'EventActionsCell',
-        label: 'EVENTS.EVENTS.TABLE.ACTION',
-        translate: false
-    }],
-    caption: 'EVENTS.EVENTS.TABLE.CAPTION',
-    resource: 'events',
-    category: 'events',
-    multiSelect: true
+	columns: [
+		{
+			name: "title",
+			label: "EVENTS.EVENTS.TABLE.TITLE",
+			sortable: true,
+			translate: false,
+		},
+		{
+			template: "EventsPresentersCell",
+			name: "presenters",
+			label: "EVENTS.EVENTS.TABLE.PRESENTERS",
+			sortable: true,
+			translate: false,
+		},
+		{
+			template: "EventsSeriesCell",
+			name: "series",
+			label: "EVENTS.EVENTS.TABLE.SERIES",
+			sortable: true,
+			translate: false,
+		},
+		{
+			template: "EventsDateCell",
+			name: "date",
+			label: "EVENTS.EVENTS.TABLE.DATE",
+			sortable: true,
+			translate: false,
+		},
+		{
+			template: "EventsStartCell",
+			name: "start_date",
+			label: "EVENTS.EVENTS.TABLE.START",
+			sortable: true,
+			translate: false,
+		},
+		{
+			template: "EventsEndCell",
+			name: "end_date",
+			label: "EVENTS.EVENTS.TABLE.STOP",
+			sortable: true,
+			translate: false,
+		},
+		{
+			template: "EventsLocationCell",
+			name: "location",
+			label: "EVENTS.EVENTS.TABLE.LOCATION",
+			sortable: true,
+			translate: false,
+		},
+		{
+			name: "published",
+			label: "EVENTS.EVENTS.TABLE.PUBLISHED",
+			template: "PublishedCell",
+			translate: false,
+		},
+		{
+			template: "EventsStatusCell",
+			name: "event_status",
+			label: "EVENTS.EVENTS.TABLE.STATUS",
+			sortable: true,
+			translate: true,
+		},
+		{
+			name: "actions",
+			template: "EventActionsCell",
+			label: "EVENTS.EVENTS.TABLE.ACTION",
+			translate: false,
+		},
+	],
+	caption: "EVENTS.EVENTS.TABLE.CAPTION",
+	resource: "events",
+	category: "events",
+	multiSelect: true,
 };
 
 /**
@@ -89,16 +100,14 @@ export const eventsTableConfig = {
  * This helps to render different templates of cells more dynamically
  */
 export const eventsTemplateMap = {
-    'EventActionsCell': EventActionCell,
-    'EventsDateCell': EventsDateCell,
-    'EventsStartCell': EventsStartCell,
-    'EventsEndCell': EventsEndCell,
-    'EventsLocationCell': EventsLocationCell,
-    'EventsPresentersCell': EventsPresentersCell,
-    'EventsSeriesCell': EventsSeriesCell,
-    'EventsStatusCell': EventsStatusCell,
-    'EventsTechnicalDateCell': EventsTechnicalDateCell,
-    'PublishedCell': PublishedCell
-}
-
-
+	EventActionsCell: EventActionCell,
+	EventsDateCell: EventsDateCell,
+	EventsStartCell: EventsStartCell,
+	EventsEndCell: EventsEndCell,
+	EventsLocationCell: EventsLocationCell,
+	EventsPresentersCell: EventsPresentersCell,
+	EventsSeriesCell: EventsSeriesCell,
+	EventsStatusCell: EventsStatusCell,
+	EventsTechnicalDateCell: EventsTechnicalDateCell,
+	PublishedCell: PublishedCell,
+};

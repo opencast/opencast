@@ -11,27 +11,32 @@ import GroupsActionsCell from "../../components/users/partials/GroupsActionsCell
  * - is multi select possible?
  */
 export const groupsTableConfig = {
-    columns: [{
-        name:  'name',
-        label: 'USERS.GROUPS.TABLE.NAME',
-        sortable: true
-    }, {
-        name:  'description',
-        label: 'USERS.GROUPS.TABLE.DESCRIPTION',
-        sortable: true
-    }, {
-        name:  'role',
-        label: 'USERS.GROUPS.TABLE.ROLE',
-        sortable: true
-    }, {
-        template: 'GroupsActionsCell',
-        name: 'actions',
-        label:    'USERS.USERS.TABLE.ACTION'
-    }],
-    caption:    'USERS.GROUPS.TABLE.CAPTION',
-    resource:   'groups',
-    category:   'users',
-    multiSelect: false
+	columns: [
+		{
+			name: "name",
+			label: "USERS.GROUPS.TABLE.NAME",
+			sortable: true,
+		},
+		{
+			name: "description",
+			label: "USERS.GROUPS.TABLE.DESCRIPTION",
+			sortable: true,
+		},
+		{
+			name: "role",
+			label: "USERS.GROUPS.TABLE.ROLE",
+			sortable: true,
+		},
+		{
+			template: "GroupsActionsCell",
+			name: "actions",
+			label: "USERS.USERS.TABLE.ACTION",
+		},
+	],
+	caption: "USERS.GROUPS.TABLE.CAPTION",
+	resource: "groups",
+	category: "users",
+	multiSelect: false,
 };
 
 /**
@@ -40,5 +45,5 @@ export const groupsTableConfig = {
  * uses template map.
  */
 export const groupsTemplateMap = {
-    'GroupsActionsCell': GroupsActionsCell
+	GroupsActionsCell: GroupsActionsCell,
 };

@@ -1,74 +1,88 @@
-import React from 'react';
-import {useTranslation} from "react-i18next";
+import React from "react";
+import { useTranslation } from "react-i18next";
 import cn from "classnames";
-import { Step, StepButton, StepLabel, Stepper } from '@material-ui/core';
-import { isSummaryReachable, useStepperStyle } from '../../../utils/wizardUtils';
-import CustomStepIcon from './CustomStepIcon';
-import { checkAcls } from '../../../thunks/aclThunks';
-import { connect } from 'react-redux';
-import { checkConflicts } from '../../../thunks/eventThunks';
+import { Step, StepButton, StepLabel, Stepper } from "@material-ui/core";
+import {
+	isSummaryReachable,
+	useStepperStyle,
+} from "../../../utils/wizardUtils";
+import CustomStepIcon from "./CustomStepIcon";
+import { checkAcls } from "../../../thunks/aclThunks";
+import { connect } from "react-redux";
+import { checkConflicts } from "../../../thunks/eventThunks";
 
+const WizardStepperEvent = ({
+	steps,
+	page,
+	setPage,
+	formik,
+	completed,
+	setCompleted,
+	checkAcls,
+	checkConflicts,
+}) => {
+	const { t } = useTranslation();
 
-const WizardStepperEvent = ({ steps, page, setPage, formik, completed, setCompleted, checkAcls,
-  checkConflicts }) => {
+	const classes = useStepperStyle();
 
-  const { t } = useTranslation();
+	const handleOnClick = async (key) => {
+		if (isSummaryReachable(key, steps, completed)) {
+			if (steps[page].name === "source") {
+				let dateCheck = await checkConflicts(formik.values);
+				if (!dateCheck) {
+					return;
+				}
+			}
 
-  const classes = useStepperStyle();
+			if (
+				steps[page].name === "processing" &&
+				!formik.values.processingWorkflow
+			) {
+				return;
+			}
 
-  const handleOnClick = async key => {
+			let aclCheck = await checkAcls(formik.values.acls);
+			if (!aclCheck) {
+				return;
+			}
 
-    if (isSummaryReachable(key, steps, completed)) {
+			if (formik.isValid) {
+				let updatedCompleted = completed;
+				updatedCompleted[page] = true;
+				setCompleted(updatedCompleted);
+				await setPage(key);
+			}
+		}
+	};
 
-      if (steps[page].name === "source") {
-        let dateCheck = await checkConflicts(formik.values);
-        if (!dateCheck) {
-          return;
-        }
-      }
+	const disabled = !(formik.dirty && formik.isValid);
 
-      if (steps[page].name === "processing" && !formik.values.processingWorkflow) {
-        return;
-      }
-
-      let aclCheck = await checkAcls(formik.values.acls);
-      if (!aclCheck) {
-        return;
-      }
-
-      if (formik.isValid) {
-        let updatedCompleted = completed;
-        updatedCompleted[page] = true;
-        setCompleted(updatedCompleted);
-        await setPage(key);
-      }
-    }
-  }
-
-  const disabled = !(formik.dirty && formik.isValid);
-
-  return (
-    <Stepper activeStep={page}
-             nonLinear
-             alternativeLabel
-             connector={false}
-             className={cn("step-by-step", classes.root)}>
-      {steps.map((label, key) => (
-        !label.hidden ? (
-          <Step key={label.translation} completed={completed[key]}>
-            <StepButton onClick={() => handleOnClick(key)} disabled={disabled}>
-              <StepLabel StepIconComponent={CustomStepIcon}>{t(label.translation)}</StepLabel>
-            </StepButton>
-          </Step>
-        ) : null
-      ))}
-    </Stepper>
-  );
+	return (
+		<Stepper
+			activeStep={page}
+			nonLinear
+			alternativeLabel
+			connector={false}
+			className={cn("step-by-step", classes.root)}
+		>
+			{steps.map((label, key) =>
+				!label.hidden ? (
+					<Step key={label.translation} completed={completed[key]}>
+						<StepButton onClick={() => handleOnClick(key)} disabled={disabled}>
+							<StepLabel StepIconComponent={CustomStepIcon}>
+								{t(label.translation)}
+							</StepLabel>
+						</StepButton>
+					</Step>
+				) : null
+			)}
+		</Stepper>
+	);
 };
 
-const mapDispatchToProps = dispatch => ({
-  checkAcls: acls => dispatch(checkAcls(acls)),
-  checkConflicts: values => dispatch(checkConflicts(values))
+const mapDispatchToProps = (dispatch) => ({
+	checkAcls: (acls) => dispatch(checkAcls(acls)),
+	checkConflicts: (values) => dispatch(checkConflicts(values)),
 });
 
 export default connect(null, mapDispatchToProps)(WizardStepperEvent);

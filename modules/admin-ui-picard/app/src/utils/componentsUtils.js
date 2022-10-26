@@ -1,6 +1,6 @@
 export const styleNavOpen = {
-    marginLeft: '130px',
+	marginLeft: "130px",
 };
 export const styleNavClosed = {
-    marginLeft: '20px',
+	marginLeft: "20px",
 };

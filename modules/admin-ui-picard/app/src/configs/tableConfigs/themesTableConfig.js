@@ -11,31 +11,37 @@ import ThemesActionsCell from "../../components/configuration/partials/ThemesAct
  * - is multi select possible?
  */
 export const themesTableConfig = {
-    columns: [{
-        name: 'name',
-        label: 'CONFIGURATION.THEMES.TABLE.NAME',
-        sortable: true
-    }, {
-        name: 'description',
-        label: 'CONFIGURATION.THEMES.TABLE.DESCRIPTION',
-        sortable: true
-    }, {
-        name: 'creator',
-        label: 'CONFIGURATION.THEMES.TABLE.CREATOR',
-        sortable: true
-    }, {
-        name: 'creation_date',
-        label: 'CONFIGURATION.THEMES.TABLE.CREATED',
-        sortable: true
-    }, {
-        template: 'ThemesActionsCell',
-        name: 'actions',
-        label: 'CONFIGURATION.THEMES.TABLE.ACTION'
-    }],
-    caption: 'CONFIGURATION.THEMES.TABLE.CAPTION',
-    resource: 'themes',
-    category: 'configuration',
-    multiSelect: false
+	columns: [
+		{
+			name: "name",
+			label: "CONFIGURATION.THEMES.TABLE.NAME",
+			sortable: true,
+		},
+		{
+			name: "description",
+			label: "CONFIGURATION.THEMES.TABLE.DESCRIPTION",
+			sortable: true,
+		},
+		{
+			name: "creator",
+			label: "CONFIGURATION.THEMES.TABLE.CREATOR",
+			sortable: true,
+		},
+		{
+			name: "creation_date",
+			label: "CONFIGURATION.THEMES.TABLE.CREATED",
+			sortable: true,
+		},
+		{
+			template: "ThemesActionsCell",
+			name: "actions",
+			label: "CONFIGURATION.THEMES.TABLE.ACTION",
+		},
+	],
+	caption: "CONFIGURATION.THEMES.TABLE.CAPTION",
+	resource: "themes",
+	category: "configuration",
+	multiSelect: false,
 };
 
 /**
@@ -44,5 +50,5 @@ export const themesTableConfig = {
  * uses template map.
  */
 export const themesTemplateMap = {
-    'ThemesActionsCell': ThemesActionsCell
+	ThemesActionsCell: ThemesActionsCell,
 };

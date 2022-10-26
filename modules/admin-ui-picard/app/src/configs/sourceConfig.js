@@ -10,18 +10,17 @@
  * - tabindex: tabindex of the metadata field
  */
 export const sourceMetadata = {
-    UPLOAD: {
-        metadata: [
-            {
-                id: 'startDate',
-                label: 'EVENTS.EVENTS.DETAILS.METADATA.START_DATE',
-                value: new Date(Date.now()).toISOString(),
-                type: 'date',
-                readOnly: false,
-                required: false,
-                tabindex: 7
-            }
-        ]
-    }
+	UPLOAD: {
+		metadata: [
+			{
+				id: "startDate",
+				label: "EVENTS.EVENTS.DETAILS.METADATA.START_DATE",
+				value: new Date(Date.now()).toISOString(),
+				type: "date",
+				readOnly: false,
+				required: false,
+				tabindex: 7,
+			},
+		],
+	},
 };
-

@@ -10,19 +10,22 @@ import AclsActionsCell from "../../components/users/partials/AclsActionsCell";
  * - is multi select possible?
  */
 export const aclsTableConfig = {
-    columns: [{
-        name: 'name',
-        label: 'USERS.ACLS.TABLE.NAME',
-        sortable: true
-    }, {
-        template: 'AclsActionsCell',
-        name: 'actions',
-        label: 'USERS.ACLS.TABLE.ACTION'
-    }],
-    caption: 'USERS.ACLS.TABLE.CAPTION',
-    resource: 'acls',
-    category: 'users',
-    multiSelect: false
+	columns: [
+		{
+			name: "name",
+			label: "USERS.ACLS.TABLE.NAME",
+			sortable: true,
+		},
+		{
+			template: "AclsActionsCell",
+			name: "actions",
+			label: "USERS.ACLS.TABLE.ACTION",
+		},
+	],
+	caption: "USERS.ACLS.TABLE.CAPTION",
+	resource: "acls",
+	category: "users",
+	multiSelect: false,
 };
 
 /**
@@ -31,5 +34,5 @@ export const aclsTableConfig = {
  * uses template map.
  */
 export const aclsTemplateMap = {
-    'AclsActionsCell': AclsActionsCell
+	AclsActionsCell: AclsActionsCell,
 };

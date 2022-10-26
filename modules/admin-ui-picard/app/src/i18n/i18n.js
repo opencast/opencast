@@ -1,5 +1,5 @@
 import i18n from "i18next";
-import {initReactI18next} from "react-i18next";
+import { initReactI18next } from "react-i18next";
 import moment from "moment";
 
 import Backend from "i18next-xhr-backend";
@@ -23,53 +23,51 @@ import svSETrans from "./org/opencastproject/adminui/languages/lang-sv_SE";
 import trTRTrans from "./org/opencastproject/adminui/languages/lang-tr_TR";
 import zhZWTrans from "./org/opencastproject/adminui/languages/lang-zh_TW";
 
-
 // Assignment of language code to translation file
 // !!! If translation file of a new language is added, please add assignment here, too !!!
 const resources = {
-    'en-GB': { translation: enGBTrans },
-    'en-US': { translation: enUSTrans },
-    da: { translation: daDKTrans },
-    de: { translation: deDETrans },
-    el: { translation: elGRTrans },
-    es: { translation: esESTrans },
-    fr: { translation: frFRTrans },
-    gl: { translation: glESTrans },
-    he: { translation: heILTrans },
-    it: { translation: itITTrans },
-    nl: { translation: nlNLTrans },
-    pl: { translation: plPLTrans },
-    sl: { translation: slSITrans },
-    sv: { translation: svSETrans },
-    tr: { translation: trTRTrans },
-    zh: { translation: zhZWTrans }
+	"en-GB": { translation: enGBTrans },
+	"en-US": { translation: enUSTrans },
+	da: { translation: daDKTrans },
+	de: { translation: deDETrans },
+	el: { translation: elGRTrans },
+	es: { translation: esESTrans },
+	fr: { translation: frFRTrans },
+	gl: { translation: glESTrans },
+	he: { translation: heILTrans },
+	it: { translation: itITTrans },
+	nl: { translation: nlNLTrans },
+	pl: { translation: plPLTrans },
+	sl: { translation: slSITrans },
+	sv: { translation: svSETrans },
+	tr: { translation: trTRTrans },
+	zh: { translation: zhZWTrans },
 };
 
 // Configuration of i18next
 i18n
-    .use(Backend)
-    .use(LanguageDetector)
-    .use(initReactI18next)
-    .init({
-        resources,
-        fallbackLng: 'en-GB',
-        debug: true,
+	.use(Backend)
+	.use(LanguageDetector)
+	.use(initReactI18next)
+	.init({
+		resources,
+		fallbackLng: "en-GB",
+		debug: true,
 
-        interpolation: {
-            escapeValue: false,
-            format: function(value, format, lng) {
-                if (value instanceof Date) {
-                    return moment(value).format(format);
-                }
+		interpolation: {
+			escapeValue: false,
+			format: function (value, format, lng) {
+				if (value instanceof Date) {
+					return moment(value).format(format);
+				}
 
-                return value;
-            }
-        },
-        react: {
-            wait: true,
-            useSuspense: false
-        },
-
-    });
+				return value;
+			},
+		},
+		react: {
+			wait: true,
+			useSuspense: false,
+		},
+	});
 
 export default i18n;
