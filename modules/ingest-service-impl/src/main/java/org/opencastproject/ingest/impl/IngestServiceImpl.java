@@ -658,20 +658,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * {@inheritDoc}
    *
    * @see org.opencastproject.ingest.api.IngestService#addTrack(java.net.URI,
-   *      org.opencastproject.mediapackage.MediaPackageElementFlavor, org.opencastproject.mediapackage.MediaPackage)
-   */
-  @Override
-  public MediaPackage addTrack(URI uri, MediaPackageElementFlavor flavor, MediaPackage mediaPackage)
-          throws IOException, IngestException {
-    String[] tags = null;
-    return this.addTrack(uri, flavor, tags, mediaPackage);
-
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.ingest.api.IngestService#addTrack(java.net.URI,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor, String[] ,
    *      org.opencastproject.mediapackage.MediaPackage)
    */
@@ -695,7 +681,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       if (tags != null && tags.length > 0) {
         MediaPackageElement trackElement = mp.getTrack(elementId);
         for (String tag : tags) {
-          logger.info("Adding Tag: " + tag + " to Element: " + elementId);
+          logger.info("Adding tag: " + tag + " to Element: " + elementId);
           trackElement.addTag(tag);
         }
       }
@@ -840,7 +826,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor, org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
-  public MediaPackage addCatalog(URI uri, MediaPackageElementFlavor flavor, MediaPackage mediaPackage)
+  public MediaPackage addCatalog(URI uri, MediaPackageElementFlavor flavor, String[] tags, MediaPackage mediaPackage)
           throws IOException, IngestException {
     Job job = null;
     try {
@@ -857,6 +843,13 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       }
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Catalog,
               flavor);
+      if (tags != null && tags.length > 0) {
+        MediaPackageElement catalogElement = mp.getCatalog(elementId);
+        for (String tag : tags) {
+          logger.info("Adding tag: " + tag + " to Element: " + elementId);
+          catalogElement.addTag(tag);
+        }
+      }
       job.setStatus(Job.Status.FINISHED);
       logger.info("Successful added catalog {} on mediapackage {} at URL {}", elementId, mediaPackage, newUrl);
       return mp;
@@ -1008,7 +1001,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor, org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
-  public MediaPackage addAttachment(URI uri, MediaPackageElementFlavor flavor, MediaPackage mediaPackage)
+  public MediaPackage addAttachment(URI uri, MediaPackageElementFlavor flavor, String[] tags, MediaPackage mediaPackage)
           throws IOException, IngestException {
     Job job = null;
     try {
@@ -1022,6 +1015,13 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Attachment,
               flavor);
+      if (tags != null && tags.length > 0) {
+        MediaPackageElement attachmentElement = mp.getAttachment(elementId);
+        for (String tag : tags) {
+          logger.debug("Adding tag: " + tag + " to Element: " + elementId);
+          attachmentElement.addTag(tag);
+        }
+      }
       job.setStatus(Job.Status.FINISHED);
       logger.info("Successful added attachment {} on mediapackage {} at URL {}", elementId, mediaPackage, newUrl);
       return mp;
@@ -1056,7 +1056,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       if (tags != null && tags.length > 0) {
         MediaPackageElement trackElement = mp.getAttachment(elementId);
         for (String tag : tags) {
-          logger.info("Adding Tag: " + tag + " to Element: " + elementId);
+          logger.info("Adding tag: " + tag + " to Element: " + elementId);
           trackElement.addTag(tag);
         }
       }
