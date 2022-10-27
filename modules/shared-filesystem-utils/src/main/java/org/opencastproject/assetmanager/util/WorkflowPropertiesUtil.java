@@ -61,11 +61,8 @@ public final class WorkflowPropertiesUtil {
 
   /**
    * Retrieve latest properties for a set of event ids
-   *
-   * @param assetManager
-   *          The Asset Manager to use
-   * @param eventIds
-   *          Collection of event IDs (can be a set, but doesn't have to be)
+   * @param assetManager The Asset Manager to use
+   * @param eventIds Collection of event IDs (can be a set, but doesn't have to be)
    * @return A map mapping event IDs to key value pairs (which are themselves maps) representing the properties
    */
   public static Map<String, Map<String, String>> getLatestWorkflowPropertiesForEvents(final AssetManager assetManager,
@@ -88,28 +85,24 @@ public final class WorkflowPropertiesUtil {
 
   /**
    * Retrieve the latest properties for a single media package
-   *
-   * @param assetManager
-   *          The Asset Manager to use
-   * @param mediaPackageId
-   *          The media package to query
+   * @param assetManager The Asset Manager to use
+   * @param mediaPackageId The media package to query
    * @return A list of properties represented by a Map
    */
   public static Map<String, String> getLatestWorkflowProperties(final AssetManager assetManager,
           final String mediaPackageId) {
-    return assetManager.selectProperties(mediaPackageId, WORKFLOW_PROPERTIES_NAMESPACE).parallelStream()
-            .collect(Collectors.toMap(p -> p.getId().getName(), p -> p.getValue().get(Value.STRING)));
+    return assetManager.selectProperties(mediaPackageId, WORKFLOW_PROPERTIES_NAMESPACE)
+            .parallelStream()
+            .collect(Collectors.toMap(
+                    p -> p.getId().getName(),
+                    p -> p.getValue().get(Value.STRING)));
   }
 
   /**
    * Store selected properties for a media package
-   *
-   * @param assetManager
-   *          The Asset Manager to use
-   * @param mediaPackage
-   *          The media package to store properties relative to
-   * @param properties
-   *          A list of properties represented by a Map
+   * @param assetManager The Asset Manager to use
+   * @param mediaPackage The media package to store properties relative to
+   * @param properties A list of properties represented by a Map
    */
   public static void storeProperties(final AssetManager assetManager, final MediaPackage mediaPackage,
           final Map<String, String> properties) {
@@ -134,15 +127,15 @@ public final class WorkflowPropertiesUtil {
 
     // Store all properties
     for (final Map.Entry<String, String> entry : properties.entrySet()) {
-      final PropertyId propertyId = PropertyId.mk(mediaPackage.getIdentifier().toString(),
-              WORKFLOW_PROPERTIES_NAMESPACE, entry.getKey());
+      final PropertyId propertyId = PropertyId
+              .mk(mediaPackage.getIdentifier().toString(), WORKFLOW_PROPERTIES_NAMESPACE, entry.getKey());
       final Property property = Property.mk(propertyId, Value.mk(entry.getValue()));
       assetManager.setProperty(property);
     }
   }
 
-  public static void storeProperty(final AssetManager assetManager, final MediaPackage mediaPackage, final String name,
-          final String value) {
+  public static void storeProperty(final AssetManager assetManager, final MediaPackage mediaPackage,
+          final String name, final String value) {
     storeProperties(assetManager, mediaPackage, Collections.singletonMap(name, value));
   }
 }
