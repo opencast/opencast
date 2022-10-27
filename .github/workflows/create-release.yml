@@ -48,7 +48,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: build/opencast-dist-*.tar.gz
-          draft: true
           fail_on_unmatched_files: true
           name: Opencast ${{ steps.get_version.outputs.VERSION }}
           body: |

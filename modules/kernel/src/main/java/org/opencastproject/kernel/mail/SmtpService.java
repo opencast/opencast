@@ -63,7 +63,7 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
   private static final String SPLIT_PATTERN = "[\\s,]+";
 
   /** Define the MIME type for HTML mail content */
-  private static final String TEXT_HTML = "text/html";
+  private static final String TEXT_HTML = "text/html; charset=UTF-8";
 
   /**
    * Callback from the OSGi <code>ConfigurationAdmin</code> on configuration changes.
