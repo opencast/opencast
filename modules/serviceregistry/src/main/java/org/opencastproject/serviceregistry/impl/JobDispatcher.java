@@ -333,7 +333,12 @@ public class JobDispatcher {
      */
     private void dispatchDispatchableJobs(EntityManager em, List<JpaJob> jobsToDispatch) {
       //Get the current system load
-      SystemLoad systemLoad = serviceRegistry.getHostLoads(em);
+      SystemLoad systemLoad;
+      //if enabled use the hardware loads instead
+      if (serviceRegistry.isHardwareLoadEnabled())
+        systemLoad = serviceRegistry.getSystemHardwareLoad();
+      else
+        systemLoad = serviceRegistry.getHostLoads(em);
 
       for (JpaJob job : jobsToDispatch) {
 
@@ -411,12 +416,29 @@ public class JobDispatcher {
             candidateServices = serviceRegistry.getServiceRegistrationsByLoad(jobType, services, hosts, systemLoad);
           }
 
+          //if enabled use the hardware loads to exclude fully occupied services
+          if (serviceRegistry.isHardwareLoadEnabled()) {
+            final List<ServiceRegistration> servicesToRemove = new ArrayList<ServiceRegistration>();
+
+            for (ServiceRegistration serviceReg : candidateServices) {
+              if (systemLoad.get(serviceReg.getHost()).getCurrentLoad() > systemLoad.get(serviceReg.getHost()).getMaxLoad())
+                servicesToRemove.add(serviceReg);
+            }
+            candidateServices.removeAll(servicesToRemove);
+            if (candidateServices.isEmpty())
+              logger.info("Dispatching of job {} delayed, all potential services of type '{}' are occupied", job, jobType);
+          }
+
           // Try to dispatch the job
           String hostAcceptingJob = null;
           try {
             hostAcceptingJob = dispatchJob(em, job, candidateServices);
             try {
-              systemLoad.updateNodeLoad(hostAcceptingJob, job.getJobLoad());
+              //if hardware load is enabled update the hardware load value for the host
+              if (!serviceRegistry.isHardwareLoadEnabled())
+                systemLoad.updateNodeLoad(hostAcceptingJob, job.getJobLoad());
+              else
+                systemLoad.get(hostAcceptingJob).setCurrentLoad(serviceRegistry.getHardwareLoadbyHost(hostAcceptingJob));
             } catch (NotFoundException e) {
               logger.info("Host {} not found in load list, cannot dispatch {} to it", hostAcceptingJob, job);
             }

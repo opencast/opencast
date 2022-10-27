@@ -60,6 +60,7 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -689,13 +690,17 @@ public class ServiceRegistryEndpoint {
 
   @GET
   @Path("maxhardwareload")
-  @Produces(MediaType.TEXT_PLAIN)
+  @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "maxhardwareload", description = "Returns the maximum hardware load this service registry can execute concurrently.",
       returnDescription = "The  maximum hardware load this service registry can execute", restParameters = {},
       responses = { @RestResponse(responseCode = SC_OK, description = "Maximum hardware load this service registry can execute.") })
   public Response getMaxHardwareLoad() {
     try {
-      return Response.ok(serviceRegistry.getMaxHardwareLoad()).build();
+      JSONArray list = new JSONArray();
+
+      list.add(serviceRegistry.getMaxHardwareLoad());
+
+      return Response.ok(list.toString()).build();
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
     }
@@ -739,7 +744,12 @@ public class ServiceRegistryEndpoint {
       responses = { @RestResponse(responseCode = SC_OK, description = "Current hardware load for the cluster.") })
   public Response getHardwareLoad() {
     try {
-      return Response.ok(serviceRegistry.getHardwareLoad()).build();
+      JSONObject list = new JSONObject();
+
+      list.put("load",serviceRegistry.getHardwareLoad());
+      list.put("maxLoad",serviceRegistry.getMaxHardwareLoad());
+
+      return Response.ok(list.toString()).build();
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
     }

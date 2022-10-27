@@ -70,6 +70,9 @@ import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -202,6 +205,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** The http client to use when connecting to remote servers */
   protected TrustedHttpClient client = null;
+
+  private static final JSONParser jsonParser = new JSONParser();
 
   /** Default jobs limit during dispatching
    * (larger value will fetch more entries from the database at the same time and increase RAM usage) */
@@ -419,38 +424,42 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     return hardwareLoad;
   }
 
+  /**
+   * Returns maximum hardware load for this host
+   */
   @Override
   public double getMaxHardwareLoad() throws ServiceRegistryException {
     return maxHardwareLoad;
   }
 
+  /**
+   *  Returns SystemLoad object with hardware load values for all hosts in the cluster (used by JobDispatcher class)
+   */
   protected SystemLoad getSystemHardwareLoad() {
 
     SystemLoad loads = new SystemLoad();
 
     List<HostRegistration> hostsHW = getHostRegistrations();
     for (HostRegistration hostHW : hostsHW) {
-      float load = getHardwareLoadbyHost(hostHW.toString());
-      float maxLoad = getMaxHardwareLoadbyHost(hostHW.toString());
-
+      // If we can't reach the hardware load endpoint return -1 as load and maxLoad
+      float load = (float)-1;
+      float maxLoad = (float)-1;
+      JSONObject jsonObject = reachHardwareLoadEndpoint(hostHW.toString());
+      if (jsonObject != null) {
+        load = ((Double)jsonObject.get("load")).floatValue();
+        maxLoad = ((Double)jsonObject.get("maxLoad")).floatValue();
+      }
       loads.addNodeLoad(new NodeLoad(hostHW.toString(), load, maxLoad));
     }
     return loads;
   }
 
-  protected float getHardwareLoadbyHost(String host) {
-    return reachHardwareLoadEndpoint(host, "/services/hardwareload");
-  }
+  /**
+   *  Helper function for getSystemHardwareLoad
+   */
+  protected JSONObject reachHardwareLoadEndpoint(String host) {
 
-  protected float getMaxHardwareLoadbyHost(String host) {
-    return reachHardwareLoadEndpoint(host, "/services/maxhardwareload");
-  }
-
-  //Helper function for getHardwareLoadbyHost and getMaxHardwareLoadbyHost
-  protected float reachHardwareLoadEndpoint(String host, String endpoint) {
-
-    float load = Float.parseFloat("-1.0");
-    String serviceUrl = UrlSupport.concat(host , endpoint);
+    String serviceUrl = UrlSupport.concat(host , "/services/hardwareload");
     HttpGet post = new HttpGet(serviceUrl);
     HttpResponse response = null;
 
@@ -463,14 +472,30 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         response.getEntity().writeTo(out);
         String responseString = out.toString();
         out.close();
-        load = Float.parseFloat(responseString);
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(responseString);
+        return jsonObject;
       } else
         logger.warn("HTTP Status {} trying to reach {}", statusLine.getStatusCode(), serviceUrl);
     } catch (IOException e) {
       logger.warn("IOException trying to reach {}", serviceUrl);
       e.printStackTrace();
+    } catch (ParseException p) {
+      logger.warn("JSON ParseException trying to parse {}", response.toString());
+      p.printStackTrace();
     }
-    return load;
+    return null;
+  }
+
+  /**
+   *  Returns the current hardware load for a host (used by JobDispatcher class)
+   */
+  protected float getHardwareLoadbyHost(String host) {
+    JSONObject jsonObject = reachHardwareLoadEndpoint(host);
+    if (jsonObject != null) {
+      float load = ((Double)jsonObject.get("load")).floatValue();
+      return load;
+    }
+    return (float)-1;
   }
 
   @Override
@@ -2315,13 +2340,16 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
-      SystemLoad loads = getHostLoads(em);
-      List<HostRegistration> hostRegistrations = getHostRegistrations();
-      List<ServiceRegistration> serviceRegistrations = getServiceRegistrationsByType(serviceType);
+      SystemLoad loadByHost;
       // if enabled use the hardware loads instead
       if (hardwareLoadEnabled)
-        loads = getSystemHardwareLoad();
-      return getServiceRegistrationsByLoad(serviceType, serviceRegistrations, hostRegistrations, loads);
+        loadByHost = getSystemHardwareLoad();
+      else
+        loadByHost = getHostLoads(em);
+      List<HostRegistration> hostRegistrations = getHostRegistrations();
+      List<ServiceRegistration> serviceRegistrations = getServiceRegistrationsByType(serviceType);
+
+      return getServiceRegistrationsByLoad(serviceType, serviceRegistrations, hostRegistrations, loadByHost);
     } finally {
       if (em != null)
         em.close();
@@ -3079,15 +3107,18 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       String hostB = serviceB.getHost();
       NodeLoad nodeA = loadByHost.get(hostA);
       NodeLoad nodeB = loadByHost.get(hostB);
-      //If the load factors are about the same, sort based on maximum load
-      if (Math.abs(nodeA.getLoadFactor() - nodeB.getLoadFactor()) <= 0.01) {
-        //NOTE: The sort order below is *reversed* from what you'd expect
-        //When we're comparing the load factors we want the node with the lowest factor to be first
-        //When we're comparing the maximum load value, we want the node with the highest max to be first
-        return Float.compare(nodeB.getMaxLoad(), nodeA.getMaxLoad());
-      }
-      return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor());
 
+      if (nodeA != null && nodeB != null) {
+        //If the load factors are about the same, sort based on maximum load
+        if (Math.abs(nodeA.getLoadFactor() - nodeB.getLoadFactor()) <= 0.01) {
+          //NOTE: The sort order below is *reversed* from what you'd expect
+          //When we're comparing the load factors we want the node with the lowest factor to be first
+          //When we're comparing the maximum load value, we want the node with the highest max to be first
+          return Float.compare(nodeB.getMaxLoad(), nodeA.getMaxLoad());
+        }
+        return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor());
+      } else
+        return 0;  // undecided
     }
 
   }
@@ -3115,7 +3146,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       NodeLoad nodeA = loadByHost.get(hostA);
       NodeLoad nodeB = loadByHost.get(hostB);
 
-      if (encodingWorkers != null) {
+      if (encodingWorkers != null && nodeA != null && nodeB != null) {
         if (encodingWorkers.contains(hostA) && !encodingWorkers.contains(hostB)) {
           if (nodeA.getLoadFactor() <= encodingThreshold) {
             return -1;
