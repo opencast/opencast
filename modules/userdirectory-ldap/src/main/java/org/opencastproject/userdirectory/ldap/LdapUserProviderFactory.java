@@ -149,7 +149,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
   /** The key to indicate a comma-separated list of extra roles to add to the authenticated user */
   private static final String EXTRA_ROLES_KEY = "org.opencastproject.userdirectory.ldap.extra.roles";
 
-  /** The key to setup a LDAP connection ID as an OSGI service property */
+  /** The key to setup an LDAP connection ID as an OSGI service property */
   private static final String INSTANCE_ID_SERVICE_PROPERTY_KEY = "instanceId";
 
   /** A map of pid to ldap user provider instance */
@@ -375,11 +375,6 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
     dict.put(INSTANCE_ID_SERVICE_PROPERTY_KEY, instanceId);
 
     // Instantiate this LDAP instance and register it as such
-    LdapUserProviderInstance provider = new LdapUserProviderInstance(pid, org, searchBase, searchFilter, url, userDn,
-            password, roleAttributes, rolePrefix, extraRoles, excludePrefixes, convertToUppercase, cacheSize,
-            cacheExpiration, securityService);
-
-    providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
 
     OpencastLdapAuthoritiesPopulator authoritiesPopulator = new OpencastLdapAuthoritiesPopulator(roleAttributes,
             rolePrefix, excludePrefixes, groupCheckPrefix, applyRoleattributesAsRoles, applyRoleattributesAsGroups,
@@ -389,6 +384,13 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
     // Also, register this instance as LdapAuthoritiesPopulator so that it can be used within the security.xml file
     authoritiesPopulatorRegistrations.put(pid,
             bundleContext.registerService(LdapAuthoritiesPopulator.class.getName(), authoritiesPopulator, dict));
+
+    LdapUserProviderInstance provider = new LdapUserProviderInstance(pid, org, searchBase, searchFilter, url, userDn,
+        password, roleAttributes, cacheSize,
+        cacheExpiration, securityService, authoritiesPopulator);
+
+    providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
+
   }
 
   /**
