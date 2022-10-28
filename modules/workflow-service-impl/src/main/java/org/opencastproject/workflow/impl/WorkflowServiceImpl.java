@@ -492,6 +492,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     final String mediaPackageId = sourceMediaPackage.getIdentifier().toString();
     Map<String, String> properties = null;
 
+    // WorkflowPropertiesUtil.storeProperties will take a snapshot if there isn't one
+    // and we want the mp in the snapshot to have all the metadata populated.
+    populateMediaPackageMetadata(sourceMediaPackage);
+
     if (originalProperties != null) {
       WorkflowPropertiesUtil.storeProperties(assetManager, sourceMediaPackage, originalProperties);
       properties = WorkflowPropertiesUtil.getLatestWorkflowProperties(assetManager, mediaPackageId);
@@ -1472,7 +1476,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           throws WorkflowDatabaseException {
 
     // Get the operation and its handler
-    WorkflowOperationInstance currentOperation = (WorkflowOperationInstance) workflow.getCurrentOperation();
+    WorkflowOperationInstance currentOperation = workflow.getCurrentOperation();
     WorkflowOperationHandler handler = getWorkflowOperationHandler(currentOperation.getTemplate());
 
     // Create an operation result for the lazy or else update the workflow's media package
