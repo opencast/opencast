@@ -237,7 +237,7 @@ nav:
    - Sanitize Adaptive: 'workflowoperationhandlers/sanitize-adaptive-woh.md'
    - Segment Previews: 'workflowoperationhandlers/segmentpreviews-woh.md'
    - Segment Video: 'workflowoperationhandlers/segmentvideo-woh.md'
-   - Select Streams: 'workflowoperationhandlers/select-streams-woh.md'
+   - Select Tracks: 'workflowoperationhandlers/select-streams-woh.md'
    - Select Version: 'workflowoperationhandlers/select-version-woh.md'
    - Send Email: 'workflowoperationhandlers/send-email-woh.md'
    - Series: 'workflowoperationhandlers/series-woh.md'
