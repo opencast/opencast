@@ -97,9 +97,6 @@ public class JobDispatcher {
   /** JPA persistence unit name */
   public static final String PERSISTENCE_UNIT = "org.opencastproject.common";
 
-  /** Identifier for the workflow service */
-  public static final String TYPE_WORKFLOW = "org.opencastproject.workflow";
-
   /** Configuration key for the dispatch interval, in seconds */
   protected static final String OPT_DISPATCHINTERVAL = "dispatch.interval";
 
