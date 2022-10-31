@@ -12,10 +12,10 @@
     "check": "npm run eslint && npm run html-linter && npm run html-validate"
   },
   "devDependencies": {
-    "@babel/core": "^7.19.3",
+    "@babel/core": "^7.19.6",
     "@babel/eslint-parser": "^7.19.1",
     "@babel/preset-env": "^7.19.4",
-    "babel-loader": "^8.2.5",
+    "babel-loader": "^9.0.0",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.1",
     "eslint": "^8.26.0",
@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "paella-basic-plugins": "^1.6.2",
-    "paella-core": "^1.8.2",
+    "paella-core": "^1.8.9",
     "paella-slide-plugins": "^1.7.1",
     "paella-user-tracking": "^1.0.14",
     "paella-zoom-plugin": "^1.2.0"
