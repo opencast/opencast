@@ -310,13 +310,13 @@ public class JobDispatcher {
           }
 
           //Prioritization of jobs from older workflows
-          dispatchableJobs.sort(new workflowPriorizationComparator());
+          dispatchableJobs.sort(new WorkflowPriorizationComparator());
           dispatchDispatchableJobs(em, dispatchableJobs);
         } while (jobsFound);
 
         if (!workflowJobs.isEmpty()) {
           //Prioritization of jobs from older workflows
-          workflowJobs.sort(new workflowPriorizationComparator());
+          workflowJobs.sort(new WorkflowPriorizationComparator());
           dispatchDispatchableJobs(em, workflowJobs);
         }
 
@@ -653,14 +653,14 @@ public class JobDispatcher {
   /**
    * Comparator that will sort jobs according to to the age of the workflows that evoked them. Jobs from older workflows are prioratized.
    */
-  static final class workflowPriorizationComparator implements Comparator<JpaJob> {
+  static final class WorkflowPriorizationComparator implements Comparator<JpaJob> {
 
     @Override
     public int compare(JpaJob jobA, JpaJob jobB) {
 
       //Prioritize jobs from older root jobs
-      if (jobA.getRootJob() != null && jobB.getRootJob() != null && jobA.getRootJob().getDateCreated() != null && jobB.getRootJob().getDateCreated() != null ) {
-        return jobA.getRootJob().getDateCreated().compareTo( jobB.getRootJob().getDateCreated());
+      if (jobA.getRootJob() != null && jobB.getRootJob() != null && jobA.getRootJob().getDateCreated() != null && jobB.getRootJob().getDateCreated() != null) {
+        return jobA.getRootJob().getDateCreated().compareTo(jobB.getRootJob().getDateCreated());
       }
 
       // undecided

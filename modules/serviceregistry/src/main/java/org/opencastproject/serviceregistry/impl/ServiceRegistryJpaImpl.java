@@ -568,7 +568,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       tx.commit();
 
       //Jobs with out a parent are there own root. The Job ID is created at the time of persisting so this operation needs to be its own transaction
-      if (parentJob == null){
+      if (parentJob == null) {
         tx.begin();
         jpaJob.setRootJob(jpaJob);
         em.persist(jpaJob);

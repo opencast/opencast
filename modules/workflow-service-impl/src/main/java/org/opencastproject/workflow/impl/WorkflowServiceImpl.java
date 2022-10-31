@@ -790,7 +790,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         case FAILING:
         case RUNNING:
           try {
-            if (serviceRegistry.getJob(workflow.getId()) != null){
+            if (serviceRegistry.getJob(workflow.getId()) != null) {
               job = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(),
                   Collections.singletonList(Long.toString(workflow.getId())), null, false, serviceRegistry.getJob(workflow.getId()) , WORKFLOW_JOB_LOAD);
             } else {
