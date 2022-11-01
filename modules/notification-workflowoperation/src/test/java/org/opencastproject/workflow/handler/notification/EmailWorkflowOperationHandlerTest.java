@@ -65,7 +65,8 @@ public class EmailWorkflowOperationHandlerTest {
   private Capture<String[]> capturedCC;
   private Capture<String[]> capturedBCC;
   private Capture<String> capturedSubject;
-  private Capture<String> capturedBody;
+  private Capture<String> capturedBodyText;
+  private Capture<String> capturedBodyHTML;
 
   @Before
   public void setUp() throws Exception {
@@ -80,8 +81,13 @@ public class EmailWorkflowOperationHandlerTest {
     EasyMock.expect(emailTemplateService.applyTemplate("DCE_workflow_null_body",
             "This is the media package: ${mediaPackage.identifier}", workflowInstance))
             .andReturn("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557");
+    EasyMock.expect(emailTemplateService.applyTemplate("DCE_workflow_null_body_html",
+            "<h1>This is the media package: ${mediaPackage.identifier}</h1>", workflowInstance))
+            .andReturn("<h1>This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557</h1>");
     EasyMock.expect(emailTemplateService.applyTemplate("template1", null, workflowInstance))
             .andReturn("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557");
+    EasyMock.expect(emailTemplateService.applyTemplate("template1html", null, workflowInstance))
+        .andReturn("<h1>This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557</h1>");
     EasyMock.expect(emailTemplateService.applyTemplate("templateNotFound", null, workflowInstance))
             .andReturn("TEMPLATE NOT FOUND!");
     EasyMock.replay(emailTemplateService);
@@ -92,9 +98,10 @@ public class EmailWorkflowOperationHandlerTest {
     capturedCC = Capture.newInstance();
     capturedBCC = Capture.newInstance();
     capturedSubject = Capture.newInstance();
-    capturedBody = Capture.newInstance();
+    capturedBodyText = Capture.newInstance();
+    capturedBodyHTML = Capture.newInstance();
     smtpService.send(EasyMock.capture(capturedTo), EasyMock.capture(capturedCC), EasyMock.capture(capturedBCC),
-            EasyMock.capture(capturedSubject), EasyMock.capture(capturedBody), EasyMock.anyBoolean());
+            EasyMock.capture(capturedSubject), EasyMock.capture(capturedBodyText), EasyMock.capture(capturedBodyHTML));
     EasyMock.expectLastCall().once();
     EasyMock.replay(smtpService);
     operationHandler.setSmtpService(smtpService);
@@ -144,17 +151,19 @@ public class EmailWorkflowOperationHandlerTest {
     Assert.assertArrayEquals(new String[] {DEFAULT_CC}, capturedCC.getValue());
     Assert.assertArrayEquals(new String[] {DEFAULT_BCC}, capturedBCC.getValue());
     Assert.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
-    Assert.assertEquals("Test Media Package (3e7bb56d-2fcc-4efe-9f0e-d6e56422f557)", capturedBody.getValue());
+    Assert.assertEquals("Test Media Package (3e7bb56d-2fcc-4efe-9f0e-d6e56422f557)", capturedBodyText.getValue());
   }
 
   @Test
-  public void testTemplateInBody() throws Exception {
+  public void testTemplateInBodyText() throws Exception {
     operation.setConfiguration(EmailWorkflowOperationHandler.TO_PROPERTY, DEFAULT_TO);
     operation.setConfiguration(EmailWorkflowOperationHandler.CC_PROPERTY, DEFAULT_CC);
     operation.setConfiguration(EmailWorkflowOperationHandler.BCC_PROPERTY, DEFAULT_BCC);
     operation.setConfiguration(EmailWorkflowOperationHandler.SUBJECT_PROPERTY, DEFAULT_SUBJECT);
     operation.setConfiguration(EmailWorkflowOperationHandler.BODY_PROPERTY,
             "This is the media package: ${mediaPackage.identifier}");
+    operation.setConfiguration(EmailWorkflowOperationHandler.BODY_HTML_PROPERTY,
+        "<h1>This is the media package: ${mediaPackage.identifier}</h1>");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
 
@@ -163,7 +172,9 @@ public class EmailWorkflowOperationHandlerTest {
     Assert.assertArrayEquals(new String[] {DEFAULT_CC}, capturedCC.getValue());
     Assert.assertArrayEquals(new String[] {DEFAULT_BCC}, capturedBCC.getValue());
     Assert.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
-    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", capturedBody.getValue());
+    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", capturedBodyText.getValue());
+    Assert.assertEquals("<h1>This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557</h1>",
+        capturedBodyHTML.getValue());
   }
 
   @Test
@@ -173,6 +184,7 @@ public class EmailWorkflowOperationHandlerTest {
     operation.setConfiguration(EmailWorkflowOperationHandler.BCC_PROPERTY, DEFAULT_BCC);
     operation.setConfiguration(EmailWorkflowOperationHandler.SUBJECT_PROPERTY, DEFAULT_SUBJECT);
     operation.setConfiguration(EmailWorkflowOperationHandler.BODY_TEMPLATE_FILE_PROPERTY, "template1");
+    operation.setConfiguration(EmailWorkflowOperationHandler.BODY_TEMPLATE_FILE_HTML_PROPERTY, "template1html");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
 
@@ -181,7 +193,9 @@ public class EmailWorkflowOperationHandlerTest {
     Assert.assertArrayEquals(new String[] {DEFAULT_CC}, capturedCC.getValue());
     Assert.assertArrayEquals(new String[] {DEFAULT_BCC}, capturedBCC.getValue());
     Assert.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
-    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", capturedBody.getValue());
+    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", capturedBodyText.getValue());
+    Assert.assertEquals("<h1>This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557</h1>",
+        capturedBodyHTML.getValue());
   }
 
   @Test
@@ -198,7 +212,7 @@ public class EmailWorkflowOperationHandlerTest {
     Assert.assertArrayEquals(new String[] {DEFAULT_CC}, capturedCC.getValue());
     Assert.assertArrayEquals(new String[] {DEFAULT_BCC}, capturedBCC.getValue());
     Assert.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
-    Assert.assertEquals("TEMPLATE NOT FOUND!", capturedBody.getValue());
+    Assert.assertEquals("TEMPLATE NOT FOUND!", capturedBodyText.getValue());
   }
 
   @Test
@@ -217,7 +231,7 @@ public class EmailWorkflowOperationHandlerTest {
     Assert.assertArrayEquals(new String[] {DEFAULT_TO}, capturedCC.getValue());
     Assert.assertArrayEquals(new String[] {DEFAULT_TO}, capturedBCC.getValue());
     Assert.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
-    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", capturedBody.getValue());
+    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", capturedBodyText.getValue());
   }
 
   @Test
@@ -237,7 +251,7 @@ public class EmailWorkflowOperationHandlerTest {
     Assert.assertEquals(0, capturedCC.getValue().length);
     Assert.assertEquals(0, capturedBCC.getValue().length);
     Assert.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
-    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", capturedBody.getValue());
+    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", capturedBodyText.getValue());
   }
 
   @Test
@@ -256,7 +270,7 @@ public class EmailWorkflowOperationHandlerTest {
     Assert.assertArrayEquals(new String[] {DEFAULT_TO}, capturedCC.getValue());
     Assert.assertArrayEquals(new String[] {DEFAULT_TO}, capturedBCC.getValue());
     Assert.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
-    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", capturedBody.getValue());
+    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", capturedBodyText.getValue());
   }
 
   @Test(expected = WorkflowOperationException.class)
@@ -275,7 +289,7 @@ public class EmailWorkflowOperationHandlerTest {
     Assert.assertEquals(DEFAULT_TO, capturedCC.getValue());
     Assert.assertEquals(DEFAULT_TO, capturedBCC.getValue());
     Assert.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
-    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", capturedBody.getValue());
+    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", capturedBodyText.getValue());
   }
 
   @Test

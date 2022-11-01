@@ -28,16 +28,18 @@ Parameter Table
 |------------------|-------|-----------|-------------|
 |body|Email body content.<br>Takes precedence over body-template-file.|`<Recording Title> (<Mediapackage ID>)`|Lecture 1 (4bf316fc-ea78-4903-b00e-9976b0912e4d)|
 |body-template-file|Name of file that will be used as a template for the content of the email body.|EMPTY|templateName|
+|body-html|Email body content send as HTML.<br>Takes precedence over body-template-file-html.|EMPTY|`<h1>${mediapackage.identifier}</h1>`|
+|body-template-file-html|Name of file that will be used as a template for the HTML content of the email body.|EMPTY|templateNameHTML|
 |subject|Email subject.|EMPTY|Operation has been completed|
 |to|The field `to` of the email<br>i.e. the comma separated list of email accounts the email will be sent to.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
 |cc|The field `cc` of the email<br>i.e. the comma separated list of email accounts that will receive a carbon copy of the email.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
 |bcc|The field `bcc` of the email<br>i.e. the comma separated list of email accounts that will receive a blind carbon copy of the email.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
-|use-html|Flag to indicate that the email content should be displayed as 'text/html'|false|true/false|
 |address-separator|Separator to use for splitting a string into separate email addresses|`, <tab>`|`,`|
 |skip-invalid-address|If the operation should skip invalid addresses instead of failing|false|true/false|
 
 **Some other email parameters can be customized in the SMTP Service configuration**
 
+If both a text and HTML body is set, a multipart email body is sent.
 
 Variable Substitution
 ---------------------
