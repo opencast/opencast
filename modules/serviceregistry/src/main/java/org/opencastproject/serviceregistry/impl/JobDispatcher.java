@@ -656,9 +656,8 @@ public class JobDispatcher {
     public int compare(JpaJob jobA, JpaJob jobB) {
 
       //Prioritize jobs from older root jobs
-      if (jobA.getRootJob() != null && jobB.getRootJob() != null && jobA.getRootJob().getDateCreated() != null && jobB.getRootJob().getDateCreated() != null) {
+      if (jobA.getRootJob() != null && jobB.getRootJob() != null && jobA.getRootJob().getDateCreated() != null && jobB.getRootJob().getDateCreated() != null)
         return jobA.getRootJob().getDateCreated().compareTo(jobB.getRootJob().getDateCreated());
-      }
 
       // undecided
       return 0;
