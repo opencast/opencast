@@ -18,7 +18,7 @@ Parameter Table
 |source-tag|The flavor of the file to be sent for translation.|EMPTY|transcript|
 |skip-if-flavor-exists|If this flavor already exists in the media package, skip this operation.<br/>To be used when the media package already has a transcript file. Optional|false|captions/vtt+en-us|
 |language-code|The language code to use for the transcription. Optional. If set, it will override the configuration language code|EMPTY|en-US, [supported languages](https://docs.microsoft.com/de-de/azure/cognitive-services/speech-service/language-support?tabs=speechtotext#speech-to-text)|
-|auto-detect-language|Activate automatic language detection by Azure. Optional. Overrides the language set in language-code. If set, will override the value in the configuration|false|true
+|auto-detect-language|Activate automatic language detection by Azure. Optional. Overrides the language set in `language-code`. If set, will override the value in the configuration|false|true
 |auto-detect-languages|A list of language codes. The Azure language auto detection will pick it's detected language from one of these. The language auto detection cannot detect any languages not specified in this list. The list needs to have at least one element and can have at most four elements.|EMPTY|en-US,de-DE,it-IT
 
 **One of source-flavor or source-tag must be specified.**
