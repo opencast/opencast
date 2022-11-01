@@ -292,7 +292,6 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     if (isSplitTextOpt.isSome()) {
       splitText = Boolean.valueOf(isSplitTextOpt.get());
     }
-    logger.info("Long text will be split at {} characters", splitText);
 
     // When splitting text into multiple cues, how many characters should each cue have at most
     Option<String> splitTextLineSizeOpt = OsgiUtil.getOptCfg(cc.getProperties(), SPLIT_TEXT_LINE_SIZE);
@@ -303,6 +302,10 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
         throw new ConfigurationException("Invalid configuration for split text line size. Please check your"
                 + "configuration");
       }
+    }
+
+    if (splitText) {
+      logger.info("Long text will be split at {} characters", splitTextLineSize);
     }
 
     // Workflow to execute when getting callback (optional, with default)
