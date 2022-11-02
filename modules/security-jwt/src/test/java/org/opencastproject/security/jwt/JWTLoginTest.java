@@ -31,7 +31,6 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
 
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.SecurityService;
@@ -48,7 +47,6 @@ import org.junit.Test;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedCredentialsNotFoundException;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -57,18 +55,20 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Tests for {@link JWTRequestHeaderAuthenticationFilter} and {@link DynamicLoginHandler}.
+ * Tests a configurable authentication filter and {@link DynamicLoginHandler}.
+ *
+ * See subclasses for authentication filter details.
  */
-public class JWTLoginTest {
+public abstract class JWTLoginTest {
 
-  private UserReferenceProvider userReferenceProvider;
-  private JWTGenerator generator;
-  private JWTRequestHeaderAuthenticationFilter authFilter;
-  private DynamicLoginHandler loginHandler;
-  private UserDetailsService userDetailsServiceExistingUser;
-  private UserDetailsService userDetailsServiceNewUser;
-  private GuavaCachedUrlJwkProvider validJwkProvider;
-  private GuavaCachedUrlJwkProvider invalidJwkProvider;
+  protected UserReferenceProvider userReferenceProvider;
+  protected JWTGenerator generator;
+  protected TestAbstractPreAuthenticatedProcessingFilter authFilter;
+  protected DynamicLoginHandler loginHandler;
+  protected UserDetailsService userDetailsServiceExistingUser;
+  protected UserDetailsService userDetailsServiceNewUser;
+  protected GuavaCachedUrlJwkProvider validJwkProvider;
+  protected GuavaCachedUrlJwkProvider invalidJwkProvider;
 
   @Before
   public void setUp() throws NoSuchAlgorithmException, JwkException {
@@ -98,11 +98,6 @@ public class JWTLoginTest {
         .atLeastOnce();
     replay(userReferenceProvider);
     loginHandler.setUserReferenceProvider(userReferenceProvider);
-
-    // Prepare authentication filter
-    authFilter = new JWTRequestHeaderAuthenticationFilter();
-    authFilter.setLoginHandler(loginHandler);
-    authFilter.setPrincipalRequestHeader("Authorization");
 
     // Prepare user details service variants
     userDetailsServiceExistingUser = createNiceMock(UserDetailsService.class);
@@ -135,14 +130,7 @@ public class JWTLoginTest {
     replay(invalidJwkProvider);
   }
 
-  private HttpServletRequest mockRequest(String content) {
-    HttpServletRequest request = createNiceMock(HttpServletRequest.class);
-    expect(request.getHeader("Authorization"))
-        .andReturn(content)
-        .atLeastOnce();
-    replay(request);
-    return request;
-  }
+  protected abstract HttpServletRequest mockRequest(String generateValidSymmetricJWT);
 
   @Test
   public void testLoginExistingUser() {
@@ -204,26 +192,6 @@ public class JWTLoginTest {
   }
 
   @Test
-  public void testLoginWithPrincipalPrefix() {
-    Object username;
-    String prefix = "Bearer ";
-    authFilter.setPrincipalPrefix(prefix);
-
-    // Existing principal prefix
-    loginHandler.setUserDetailsService(userDetailsServiceNewUser);
-    username = authFilter.getPreAuthenticatedPrincipal(
-        mockRequest(prefix + generator.generateValidSymmetricJWT())
-    );
-    assertEquals(username, generator.getUsername());
-
-    // Missing principal prefix
-    username = authFilter.getPreAuthenticatedPrincipal(
-        mockRequest(generator.generateValidSymmetricJWT())
-    );
-    assertNull(username);
-  }
-
-  @Test
   public void testLoginWithInvalidAlgorithm() {
     loginHandler.setExpectedAlgorithms(List.of("XY"));
     Object username = authFilter.getPreAuthenticatedPrincipal(
@@ -265,17 +233,6 @@ public class JWTLoginTest {
         mockRequest(generator.generateExpiredSymmetricJWT())
     );
     assertNull(username);
-  }
-
-  @Test
-  public void testLoginWithInvalidRequestHeader() {
-    authFilter.setPrincipalRequestHeader("XY");
-    assertThrows(
-        PreAuthenticatedCredentialsNotFoundException.class,
-        () -> authFilter.getPreAuthenticatedPrincipal(
-            mockRequest(generator.generateExpiredSymmetricJWT())
-        )
-    );
   }
 
   @Test
