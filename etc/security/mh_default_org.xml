@@ -442,6 +442,8 @@
 
         <!-- Uncomment the line below to support JWT.
         <ref bean="jwtHeaderFilter" /> -->
+        <!-- Additionally/alternatively uncomment this to support passing a JWT in a URL parameter.
+        <ref bean="jwtQueryParameterFilter" /> -->
       </list>
     </property>
   </bean>
@@ -704,6 +706,15 @@
     <property name="debug" value="false" />
   </bean>-->
 
+  <!-- General JWT query parameter extraction filter
+  <bean id="jwtQueryParameterFilter" class="org.opencastproject.security.jwt.JWTQueryParameterAuthenticationFilter">
+    <property name="parameterName" value="jwt" />
+    <property name="authenticationManager" ref="authenticationManager" />
+    <property name="loginHandler" ref="jwtLoginHandler" />
+    <property name="exceptionIfParameterMissing" value="false" />
+    <property name="debug" value="false" />
+  </bean>-->
+
   <!-- JWT login handler
   <bean id="jwtLoginHandler" class="org.opencastproject.security.jwt.DynamicLoginHandler">
     <property name="userDetailsService" ref="userDetailsService" />
@@ -818,8 +829,8 @@
                   interface="org.opencastproject.security.api.SecurityService" />
 
   <!-- Uncomment to enable external users e.g. used together with shibboleth and JWT -->
-  <!-- <osgi:reference id="userReferenceProvider" cardinality="1..1"
-                  interface="org.opencastproject.userdirectory.api.UserReferenceProvider"  /> -->
+  <osgi:reference id="userReferenceProvider" cardinality="1..1"
+                  interface="org.opencastproject.userdirectory.api.UserReferenceProvider"  />
 
   <osgi:reference id="userDirectoryService" cardinality="1..1"
                   interface="org.opencastproject.security.api.UserDirectoryService" />
