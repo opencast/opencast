@@ -368,16 +368,8 @@
     <!-- Opencast is shipping its own implementation of the anonymous filter -->
     <sec:custom-filter ref="anonymousFilter" position="ANONYMOUS_FILTER" />
 
-    <!-- Shibboleth header authentication filter
-    <sec:custom-filter ref="shibbolethHeaderFilter" position="PRE_AUTH_FILTER"/>
-    -->
-
     <!-- CAS Auth:  Uncomment this if using CAS authentication
     <sec:custom-filter position="FORM_LOGIN_FILTER" ref="casFilter" />
-    -->
-
-    <!-- JWT header authentication filter
-    <sec:custom-filter ref="jwtHeaderFilter" position="PRE_AUTH_FILTER"/>
     -->
 
     <!-- Enables "remember me" functionality -->

@@ -54,11 +54,6 @@ sections found in `etc/security/mh_default_org.xml`. Some of the options are con
 <osgi:reference id="userReferenceProvider" cardinality="1..1"
                 interface="org.opencastproject.userdirectory.api.UserReferenceProvider" />
 ```
-* Enable the JWT header authentication filter.
-```xml
-<!-- JWT header authentication filter -->
-<sec:custom-filter ref="jwtHeaderFilter" position="PRE_AUTH_FILTER"/>
-```
 * Add the configured `jwtHeaderFilter` to the filters list of the `authenticationFilters` bean.
 ```xml
 <!-- Uncomment the line below to support JWT. -->
