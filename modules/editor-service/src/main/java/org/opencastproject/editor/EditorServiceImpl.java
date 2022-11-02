@@ -92,6 +92,7 @@ import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -173,6 +174,8 @@ public class EditorServiceImpl implements EditorService {
   private MediaPackageElementFlavor captionsFlavor;
   private String thumbnailWfProperty;
   private List<MediaPackageElementFlavor> thumbnailSourcePrimary;
+  private String distributionDirectory;
+  private Boolean localPublication = null;
 
   private static final String DEFAULT_PREVIEW_SUBTYPE = "prepared";
   private static final String DEFAULT_PREVIEW_TAG = "editor";
@@ -197,6 +200,7 @@ public class EditorServiceImpl implements EditorService {
   public static final String OPT_THUMBNAILSUBTYPE = "thumbnail.subtype";
   public static final String OPT_THUMBNAIL_WF_PROPERTY = "thumbnail.workflow.property";
   public static final String OPT_THUMBNAIL_PRIORITY_FLAVOR = "thumbnail.priority.flavor";
+  public static final String OPT_LOCAL_PUBLICATION = "publication.local";
 
   private final Set<String> smilCatalogTagSet = new HashSet<>();
 
@@ -337,10 +341,41 @@ public class EditorServiceImpl implements EditorService {
       thumbnailSourcePrimary = DEFAULT_THUMBNAIL_PRIORITY_FLAVOR;
     } else {
       thumbnailSourcePrimary = Arrays.stream(thumbnailPriorities.split(",", -1))
-                                .map(s -> MediaPackageElementFlavor.parseFlavor(s))
+                                .map(MediaPackageElementFlavor::parseFlavor)
                                 .collect(Collectors.toList());
     }
+
+    String localPublicationConfig = Objects.toString(properties.get(OPT_LOCAL_PUBLICATION), "auto");
+    if (!"auto".equals(localPublicationConfig)) {
+      // If this is not set to `auto`, we expect this to be a boolean
+      localPublication = BooleanUtils.toBoolean(localPublicationConfig);
+    }
+
+    distributionDirectory = cc.getBundleContext().getProperty("org.opencastproject.download.directory");
+    if (StringUtils.isEmpty(distributionDirectory)) {
+      final String storageDir = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
+      if (StringUtils.isNotEmpty(storageDir)) {
+        distributionDirectory = new File(storageDir, "downloads").getPath();
+      }
+    }
     logger.debug("Thumbnail track priority set to '{}'", thumbnailSourcePrimary);
+  }
+
+  /**
+   * Check if a media URL can be served from this server.
+   *
+   * @param mediaUrl
+   *      URL locating a media file
+   * @return
+   *      If the file is available locally
+   */
+  private boolean isLocal(URI uri) {
+    var path = uri.normalize().getPath();
+    if (!path.startsWith("/static/")) {
+      return false;
+    }
+    var localFile = new File(distributionDirectory, path.substring("/static".length()));
+    return localFile.exists();
   }
 
   private Boolean elementHasPreviewTag(MediaPackageElement element) {
@@ -962,8 +997,12 @@ public class EditorServiceImpl implements EditorService {
 
       final int priority = thumbnailSourcePrimary.indexOf(track.getFlavor());
 
+      if (localPublication == null) {
+        localPublication = isLocal(track.getURI());
+      }
+
       return new TrackData(track.getFlavor().getType(), track.getFlavor().getSubtype(), audio, video, uri,
-                        track.getIdentifier(), thumbnailURI, priority);
+          track.getIdentifier(), thumbnailURI, priority);
     }).collect(Collectors.toList());
 
     List<String> waveformList = Arrays.stream(internalPub.getAttachments())
@@ -972,7 +1011,7 @@ public class EditorServiceImpl implements EditorService {
             .collect(Collectors.toList());
 
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
-            event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList, subtitles);
+            event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList, subtitles, localPublication);
   }
 
 

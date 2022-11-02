@@ -21,6 +21,7 @@
 package org.opencastproject.editor;
 
 import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.anyString;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -50,6 +51,7 @@ import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
 import java.io.InputStream;
@@ -208,8 +210,13 @@ public class EditorServiceImplTest {
     dictionary.put(EditorServiceImpl.OPT_SMIL_CATALOG_FLAVOR, "smil/cutting");
     dictionary.put(EditorServiceImpl.OPT_SMIL_SILENCE_FLAVOR, "*/silence");
 
+    BundleContext bundleContext = EasyMock.createMock(BundleContext.class);
+    expect(bundleContext.getProperty(anyString())).andReturn("/").anyTimes();
+    replay(bundleContext);
+
     ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
     expect(cc.getProperties()).andReturn(dictionary).anyTimes();
+    expect(cc.getBundleContext()).andReturn(bundleContext).anyTimes();
     replay(cc);
 
     editorService.activate(cc);
