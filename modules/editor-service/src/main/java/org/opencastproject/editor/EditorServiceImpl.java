@@ -21,7 +21,6 @@
 
 package org.opencastproject.editor;
 
-import static com.entwinemedia.fn.Stream.$;
 import static java.util.Collections.emptyList;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static org.opencastproject.util.data.Tuple.tuple;
@@ -87,7 +86,6 @@ import org.opencastproject.workflow.api.WorkflowUtil;
 import org.opencastproject.workflow.handler.distribution.InternalPublicationChannel;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.FileUtils;
@@ -115,6 +113,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -123,6 +122,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -392,22 +392,13 @@ public class EditorServiceImpl implements EditorService {
       String trackId = trackdata.getId();
       Track track = mediaPackage.getTrack(trackId);
       if (track == null) {
-        Opt<Track> trackOpt = getInternalPublication(mediaPackage).toStream().bind(new Fn<Publication, List<Track>>() {
-          @Override
-          public List<Track> apply(Publication a) {
-            return Arrays.asList(a.getTracks());
-          }
-        }).filter(new Fn<Track, Boolean>() {
-          @Override
-          public Boolean apply(Track a) {
-            return trackId.equals(a.getIdentifier());
-          }
-        }).head();
-        if (trackOpt.isNone()) {
-          throw new IllegalStateException(
-                  String.format("The track '%s' doesn't exist in media package '%s'", trackId, mediaPackage));
-        }
-        track = trackOpt.get();
+        track = Arrays.stream(getInternalPublication(mediaPackage)
+            .orElseThrow(() -> new IllegalStateException("Event has no internal publication"))
+            .getTracks())
+            .filter(t -> trackId.equals(t.getIdentifier()))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException(
+                  String.format("The track '%s' doesn't exist in media package '%s'", trackId, mediaPackage)));
       }
       tracks.add(track);
     }
@@ -660,13 +651,10 @@ public class EditorServiceImpl implements EditorService {
     throw new MimeTypeParseException("No image mimetype found");
   }
 
-  private Opt<Publication> getInternalPublication(MediaPackage mp) {
-    return $(mp.getPublications()).filter(new Fn<Publication, Boolean>() {
-      @Override
-      public Boolean apply(Publication a) {
-        return InternalPublicationChannel.CHANNEL_ID.equals(a.getChannel());
-      }
-    }).head();
+  private Optional<Publication> getInternalPublication(MediaPackage mp) {
+    return Arrays.stream(mp.getPublications())
+        .filter(publication -> InternalPublicationChannel.CHANNEL_ID.equals(publication.getChannel()))
+        .findFirst();
   }
 
   /**
@@ -699,20 +687,14 @@ public class EditorServiceImpl implements EditorService {
    * @return a list of workflow definitions
    */
   private List<WorkflowDefinition> getEditingWorkflows() {
-    List<WorkflowDefinition> workflows;
     try {
-      workflows = workflowService.listAvailableWorkflowDefinitions();
+      return workflowService.listAvailableWorkflowDefinitions().stream()
+          .filter(workflow -> workflow.containsTag(EDITOR_WORKFLOW_TAG))
+          .collect(Collectors.toList());
     } catch (WorkflowDatabaseException e) {
       logger.warn("Error while retrieving list of workflow definitions:", e);
-      return emptyList();
     }
-
-    return $(workflows).filter(new Fn<WorkflowDefinition, Boolean>() {
-      @Override
-      public Boolean apply(WorkflowDefinition a) {
-        return a.containsTag(EDITOR_WORKFLOW_TAG);
-      }
-    }).toList();
+    return emptyList();
   }
 
   /**
@@ -881,8 +863,8 @@ public class EditorServiceImpl implements EditorService {
 
     boolean workflowActive = WorkflowUtil.isActive(event.getWorkflowState());
 
-    final Opt<Publication> internalPubOpt = getInternalPublication(mp);
-    if (internalPubOpt.isNone() || internalPubOpt.isEmpty()) {
+    final Optional<Publication> internalPubOpt = getInternalPublication(mp);
+    if (internalPubOpt.isEmpty()) {
       errorExit("No internal publication", mediaPackageId, ErrorStatus.NO_INTERNAL_PUBLICATION);
     }
     Publication internalPub = internalPubOpt.get();
@@ -1080,7 +1062,7 @@ public class EditorServiceImpl implements EditorService {
         final Map<String, String> workflowParameters = WorkflowPropertiesUtil
                 .getLatestWorkflowProperties(assetManager, mediaPackage.getIdentifier().toString());
         final Workflows workflows = new Workflows(assetManager, workflowService);
-        workflows.applyWorkflowToLatestVersion($(mediaPackage.getIdentifier().toString()),
+        workflows.applyWorkflowToLatestVersion(Collections.singletonList(mediaPackage.getIdentifier().toString()),
                 ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId), workflowParameters))
                 .run();
       } catch (AssetManagerException e) {
