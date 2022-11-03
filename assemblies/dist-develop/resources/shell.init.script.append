@@ -1,5 +1,0 @@
-
-echo "\u001B[1mDevelopment distribution\u001B[0m: Automatically launching \u001B[1m'log:tail'\u001B[0m.\n"
-
-sleep 2
-log:tail

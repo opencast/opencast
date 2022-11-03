@@ -1,1 +1,0 @@
-This bundle is a OSGi wrapper for org.jasig.cas.client/cas-client-core and its dependencies

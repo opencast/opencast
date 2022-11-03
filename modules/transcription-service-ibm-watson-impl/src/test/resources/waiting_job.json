@@ -1,6 +1,0 @@
-{
-   "created": "2021-02-23T19:53:15.685Z",
-   "id": "jobId1",
-   "url": "https://api.us-south.speech-to-text.watson.cloud.ibm.com/instances/instanceId/v1/recognitions/jobId1",
-   "status": "waiting"
-}

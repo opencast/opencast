@@ -1,30 +1,7 @@
-Opencast
-========
+# Tobira Opencast Fork (archived)
 
-![Test Opencast](https://github.com/opencast/opencast/workflows/Test%20Opencast/badge.svg)
+This repository was a fork of Opencast to develop functionality needed by
+[Tobira](https://github.com/elan-ev/tobira). Everything developed here has been
+merged upstream and is now managed in [the main repository](https://github.com/opencast/opencast).
 
-Open Source Lecture Capture & Video Management for Education
-
-Opencast is a free, open-source platform to support the management of
-educational audio and video content. Institutions can use Opencast to
-produce lecture recordings, manage existing video, serve designated
-distribution channels, and provide user interfaces to engage students with
-educational videos.
-
-
-Installation
-------------
-
-Installation instructions can be found locally at `docs/guides/admin/docs` or in
-our [online documentation](https://docs.opencast.org).
-
-
-Community
----------
-
-More information about the community:
-
-- [Website](https://opencast.org)
-- [Documentation](https://docs.opencast.org)
-- [Twitter](https://twitter.com/openmatter)
-- [Facebook](https://facebook.com/opencast)
+This fork is only used to deploy a test instance used internally. There is nothing to see here!
