@@ -1,7 +1,6 @@
 ---
 
 dependencies:
-  - elan.opencast_activemq
   # configure firewalld before certbot
   - elan.opencast_firewalld
   - certbot

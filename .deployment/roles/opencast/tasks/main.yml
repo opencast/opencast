@@ -13,8 +13,9 @@
 
 - name: extract distribution
   unarchive:
-    src: '{{ lookup("fileglob", "../../../build/opencast-dist-allinone-*.tar.gz") }}'
+    src: 'https://radosgw.public.os.wwu.de/opencast-daily/opencast-dist-allinone-12-SNAPSHOT.tar.gz'
     dest: /opt
+    remote_src: true
     owner: root
     group: root
 
