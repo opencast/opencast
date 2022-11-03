@@ -71,6 +71,13 @@
       - nmap-ncat
     state: present
 
+- name: enable JWT stuff
+  lineinfile:
+    state: present
+    path: /opt/opencast/etc/org.apache.karaf.features.cfg
+    insertafter: '    opencast-allinone/12.0.0.SNAPSHOT, \\'
+    line: '    opencast-security-jwt/12.0.0.SNAPSHOT, \'
+
 - name: configure opencast
   template:
     src: '{{ item }}'
@@ -83,7 +90,6 @@
     - etc/org.opencastproject.adminui.endpoint.SeriesEndpoint.cfg
     - etc/org.opencastproject.fsresources.StaticResourceServlet.cfg
     - etc/org.opencastproject.liveschedule.impl.LiveScheduleServiceImpl.cfg
-    - etc/org.apache.karaf.features.cfg
     - etc/security/mh_default_org.xml
     - etc/workflows/fast.xml
     - etc/workflows/schedule-and-upload.xml
