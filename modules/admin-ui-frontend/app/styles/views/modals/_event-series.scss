@@ -193,3 +193,23 @@
         }
     }
 }
+
+.tobira-page-separator {
+    color: $color-gray;
+}
+
+.tobira-leaf-page {
+    font-size: larger;
+    font-weight: $weight-bold;
+}
+
+.tobira-not-mounted {
+    font-style: italic;
+}
+
+.tobira-copy-direct-link {
+    @include btn(white);
+    i {
+        margin: 0;
+    }
+}

@@ -152,13 +152,12 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
    */
   private void createComment(WorkflowInstance workflowInstance, String reason, String description)
           throws EventCommentException {
-    Opt<EventComment> optComment = findComment(workflowInstance.getMediaPackage().getIdentifier().toString(), reason,
-            description);
+    String mpId = workflowInstance.getMediaPackage().getIdentifier().toString();
+    Opt<EventComment> optComment = findComment(mpId, reason, description);
     if (optComment.isNone()) {
       final User user = userDirectoryService.loadUser(workflowInstance.getCreatorName());
       EventComment comment = EventComment.create(
-          Option.none(),
-          workflowInstance.getMediaPackage().getIdentifier().toString(),
+          Option.none(), mpId,
           securityService.getOrganization().getId(), description, user, reason, false);
       eventCommentService.updateComment(comment);
     } else {
@@ -181,12 +180,12 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
    */
   private void resolveComment(WorkflowInstance workflowInstance, String reason, String description)
           throws EventCommentException {
-    Opt<EventComment> optComment = findComment(workflowInstance.getMediaPackage().getIdentifier().toString(), reason,
-            description);
+    String mpId = workflowInstance.getMediaPackage().getIdentifier().toString();
+    Opt<EventComment> optComment = findComment(mpId, reason, description);
     if (optComment.isSome()) {
       EventComment comment = EventComment.create(
           optComment.get().getId(),
-          workflowInstance.getMediaPackage().getIdentifier().toString(),
+          mpId,
           securityService.getOrganization().getId(), optComment.get().getText(),
           optComment.get().getAuthor(), optComment.get().getReason(), true, optComment.get().getCreationDate(),
           optComment.get().getModificationDate(), optComment.get().getReplies());
@@ -212,8 +211,8 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
    */
   private void deleteComment(WorkflowInstance workflowInstance, String reason, String description)
           throws EventCommentException, NotFoundException {
-    Opt<EventComment> optComment = findComment(workflowInstance.getMediaPackage().getIdentifier().toString(), reason,
-            description);
+    String mpId = workflowInstance.getMediaPackage().getIdentifier().toString();
+    Opt<EventComment> optComment = findComment(mpId, reason, description);
     if (optComment.isSome()) {
       try {
         eventCommentService.deleteComment(optComment.get().getId().get());

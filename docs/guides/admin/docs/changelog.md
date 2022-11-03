@@ -4,6 +4,72 @@ Changelog
 Opencast 12
 -----------
 
+### Opencast 12.4
+
+*Released on October 19th, 2022*
+
+- [[#4346](https://github.com/opencast/opencast/pull/4346)] -
+  Generate more of the release notes
+- [[#4345](https://github.com/opencast/opencast/pull/4345)] -
+  Add Opencast 12.4 release notes
+- [[#4340](https://github.com/opencast/opencast/pull/4340)] -
+  Fix saving thumbnails if no previous ones existed
+- [[#4337](https://github.com/opencast/opencast/pull/4337)] -
+  Bump paella-core from 1.7.0 to 1.8.1 in /modules/engage-paella-player-7
+- [[#4329](https://github.com/opencast/opencast/pull/4329)] -
+  Make Workflow Operation Docs Look Alike
+- [[#4328](https://github.com/opencast/opencast/pull/4328)] -
+  Specify Units in Video Clips
+- [[#4324](https://github.com/opencast/opencast/pull/4324)] -
+  Update hostname to use server url in adopter registration information
+- [[#4322](https://github.com/opencast/opencast/pull/4322)] -
+  Make Workflow Operation Docs Look Alike
+- [[#4317](https://github.com/opencast/opencast/pull/4317)] -
+  Fix NullPointerException when editor does not send subtitles
+- [[#4314](https://github.com/opencast/opencast/pull/4314)] -
+  Reuse mediapackage object from workflow instance where possible
+- [[#4313](https://github.com/opencast/opencast/pull/4313)] -
+  Skip check if user has global admin role
+- [[#4311](https://github.com/opencast/opencast/pull/4311)] -
+  Bump @babel/preset-env from 7.19.3 to 7.19.4 in /modules/engage-paella-player-7
+- [[#4308](https://github.com/opencast/opencast/pull/4308)] -
+  Save button for event/series "Access policy"-tab
+- [[#4307](https://github.com/opencast/opencast/pull/4307)] -
+  Publish Captions by Default
+- [[#4306](https://github.com/opencast/opencast/pull/4306)] -
+  Bump source-map-loader from 4.0.0 to 4.0.1 in /modules/engage-paella-player-7
+- [[#4305](https://github.com/opencast/opencast/pull/4305)] -
+  Bump html-validate from 7.5.0 to 7.6.0 in /modules/engage-paella-player-7
+- [[#4304](https://github.com/opencast/opencast/pull/4304)] -
+  Bump express from 4.18.1 to 4.18.2 in /modules/engage-paella-player-7
+- [[#4303](https://github.com/opencast/opencast/pull/4303)] -
+  Bump eslint from 8.24.0 to 8.25.0 in /modules/engage-paella-player-7
+- [[#4302](https://github.com/opencast/opencast/pull/4302)] -
+  Bump paella-slide-plugins from 1.2.1 to 1.7.1 in /modules/engage-paella-player-7
+- [[#4294](https://github.com/opencast/opencast/pull/4294)] -
+  Batch Dependabot Updates for Paella 7
+- [[#4287](https://github.com/opencast/opencast/pull/4287)] -
+  Update editor release 2022-10-19
+- [[#4276](https://github.com/opencast/opencast/pull/4276)] -
+  Batch Dependabot Updates for Paella 7
+- [[#4274](https://github.com/opencast/opencast/pull/4274)] -
+  Fix single radio button in new-task UI
+- [[#4270](https://github.com/opencast/opencast/pull/4270)] -
+  Add back workflow API documentation
+- [[#4269](https://github.com/opencast/opencast/pull/4269)] -
+  Fix snapshot moving
+- [[#4247](https://github.com/opencast/opencast/pull/4247)] -
+  Bump eslint from 8.23.1 to 8.24.0 in /modules/engage-paella-player-7
+- [[#4240](https://github.com/opencast/opencast/pull/4240)] -
+  Group dependabot Paella 7 commits
+- [[#4238](https://github.com/opencast/opencast/pull/4238)] -
+  Fixed azure transcription error message in case of Error
+- [[#4229](https://github.com/opencast/opencast/pull/4229)] -
+  Make busy waiting explicit during InboxScannerService config update
+- [[#4227](https://github.com/opencast/opencast/pull/4227)] -
+  Bump mariadb-java-client from 3.0.7 to 3.0.8 in /modules/db
+
+
 ### Opencast 12.3
 
 *Released on September 21th, 2022*

@@ -39,6 +39,7 @@ describe('Serie controller', function () {
         $httpBackend.whenGET('/admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/theme.json')
             .respond(JSON.stringify(getJSONFixture('admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/theme.json')));
         $httpBackend.whenPUT('/admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/theme').respond('{}');
+        $httpBackend.whenGET('/admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/tobira/pages').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/THEMES.NAME.json')
             .respond({1001: 'Heinz das Pferd', 1002: 'Full Fledged', 401: 'Doc Test'});
         $httpBackend.whenGET('/admin-ng/resources/THEMES.DESCRIPTION.json')
@@ -272,7 +273,7 @@ describe('Serie controller', function () {
             };
 
             spyOn(SeriesAccessResource, 'save');
-            $scope.accessSave.call(this);
+            $scope.updateEventPermissions.call(this);
 
             expect(SeriesAccessResource.save).toHaveBeenCalledWith({ id: '73f9b7ab-1d8f-4c75-9da1-ceb06736d82c' },
                 {

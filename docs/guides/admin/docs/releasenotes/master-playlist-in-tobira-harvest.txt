@@ -1,0 +1,5 @@
+The Tobira harvesting API now identifies the master playlist of events with multiple HLS streams.
+This is needed for example when you are using the `multiencode` operation;
+without this information, the quality selection in Paella can't work in Tobira.
+(See also [elan-ev/tobira#573](https://github.com/elan-ev/tobira/issues/573).)
+If this affects you, you need to resync your Tobira instance.

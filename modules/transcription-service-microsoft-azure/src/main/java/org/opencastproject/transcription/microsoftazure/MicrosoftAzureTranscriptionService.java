@@ -93,11 +93,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -192,6 +194,8 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   public static final String ENCODING_EXTENSION = "encoding.extension";
   public static final String IS_AUTO_DETECT_LANGUAGE = "auto.detect.language";
   public static final String AUTO_DETECT_LANGUAGES = "auto.detect.languages";
+  public static final String SPLIT_TEXT = "split.text";
+  public static final String SPLIT_TEXT_LINE_SIZE = "split.text.line.size";
 
   /**
    * Service configuration values
@@ -217,6 +221,8 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   private String fileFormat = "vtt";
   private boolean defaultIsAutoDetectLanguage = DEFAULT_IS_AUTO_DETECT_LANGUAGE;
   private List<String> defaultAutoDetectLanguages = new ArrayList<>();
+  private boolean splitText = false;
+  private int splitTextLineSize = 100;
 
   public MicrosoftAzureTranscriptionService() {
     super(JOB_TYPE);
@@ -315,6 +321,27 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       logger.info("Languages for auto detection: {}", defaultAutoDetectLanguages);
     } else {
       logger.info("No languages for auto detection defined");
+    }
+
+    // If text should be split into multiple cues
+    Option<String> isSplitTextOpt = OsgiUtil.getOptCfg(cc.getProperties(), SPLIT_TEXT);
+    if (isSplitTextOpt.isSome()) {
+      splitText = Boolean.valueOf(isSplitTextOpt.get());
+    }
+
+    // When splitting text into multiple cues, how many characters should each cue have at most
+    Option<String> splitTextLineSizeOpt = OsgiUtil.getOptCfg(cc.getProperties(), SPLIT_TEXT_LINE_SIZE);
+    if (splitTextLineSizeOpt.isSome()) {
+      try {
+        splitTextLineSize = Integer.parseInt(splitTextLineSizeOpt.get());
+      } catch (NumberFormatException e) {
+        throw new ConfigurationException("Invalid configuration for split text line size. Please check your"
+                + "configuration");
+      }
+    }
+
+    if (splitText) {
+      logger.info("Long text will be split at {} characters", splitTextLineSize);
     }
 
     // Workflow to execute when getting callback (optional, with default)
@@ -587,7 +614,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
           try {
             writeToTmpFile(String.format("WEBVTT%s%s", System.lineSeparator(), System.lineSeparator()), jobId);
           } catch (IOException ioException) {
-            logger.error(String.format("Could not write header to tmp file"));
+            logger.error("Could not write header to tmp file");
           }
         }
       } catch (TranscriptionDatabaseException ex) {
@@ -601,12 +628,15 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       SpeechRecognitionResult result = e.getResult();
       if (ResultReason.RecognizedSpeech == result.getReason() && result.getText().length() > 0) {
         sequenceNumber[0]++;
-        String text = captionFromSpeechRecognitionResult(sequenceNumber[0], result);
+        List<String> texts = captionFromSpeechRecognitionResult(sequenceNumber[0], e.getResult());
+        sequenceNumber[0] += texts.size() - 1;
 
-        try {
-          writeToTmpFile(text, jobId);
-        } catch (IOException ioException) {
-          logger.error(String.format("Could not write to tmp file: %s", text));
+        for (String text : texts) {
+          try {
+            writeToTmpFile(text, jobId);
+          } catch (IOException ioException) {
+            logger.error("Could not write to tmp file: {}", text);
+          }
         }
 
         if (autoDetectSourceLanguageResult == null && isAutoDetectLanguage) {
@@ -678,21 +708,108 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     logger.debug(text);
   }
 
-  private String captionFromSpeechRecognitionResult(int sequenceNumber, SpeechRecognitionResult result) {
-    StringBuilder caption = new StringBuilder();
-    if (useSubRipTextCaptionFormat) {
-      caption.append(String.format("%d%s", sequenceNumber, System.lineSeparator()));
+  /**
+   * Creates a WebVTT cue string from the given result that can be directly appended to a WebVTT file.
+   * If splitText is enabled, will split a given result into multiple cues based on line size.
+   *
+   * @param sequenceNumber number of the cue. Used for SubRip.
+   * @param result A recognized text
+   * @return A list containing at least one WebVTT cue as it would be written in a file.
+   */
+  private List<String> captionFromSpeechRecognitionResult(int sequenceNumber, SpeechRecognitionResult result) {
+    List<String> lines;
+    List<BigInteger> offsets;
+    List<BigInteger> durations;
+
+    if (splitText) {
+      lines = splitText(result.getText());
+      Map<String, List<BigInteger>> offsetsAndDurations = splitTextTimes(lines, result.getOffset(),
+              result.getDuration());
+      offsets = offsetsAndDurations.get("offsets");
+      durations = offsetsAndDurations.get("durations");
+    } else {
+      lines = Collections.singletonList(result.getText());
+      offsets = Collections.singletonList(result.getOffset());
+      durations = Collections.singletonList(result.getDuration());
     }
-    caption.append(String.format("%s%s", timestampFromSpeechRecognitionResult(result), System.lineSeparator()));
-    caption.append(String.format("%s%s%s", result.getText(), System.lineSeparator(), System.lineSeparator()));
-    return caption.toString();
+
+    List<String> formattedLines = new ArrayList<>();
+    for (int i = 0; i < lines.size(); i++) {
+      StringBuilder caption = new StringBuilder();
+
+      if (useSubRipTextCaptionFormat) {
+        caption.append(String.format("%d%s", sequenceNumber + i, System.lineSeparator()));
+      }
+      caption.append(String.format("%s%s", timestampFromSpeechRecognitionResult(offsets.get(i), durations.get(i)),
+              System.lineSeparator()));
+      caption.append(String.format("%s%s%s", lines.get(i), System.lineSeparator(), System.lineSeparator()));
+
+      formattedLines.add(caption.toString());
+    }
+
+    return formattedLines;
   }
 
-  private String timestampFromSpeechRecognitionResult(SpeechRecognitionResult result) {
+  // Split text into multiple lines if too long
+  private List<String> splitText(String text) {
+    int previousSplitLength = 0;
+    int nextSplitLength = splitTextLineSize;
+    List<String> lines = new ArrayList();
+
+    do {
+      // Search ahead to next whitespace or end of text
+      int index;
+      for (index = nextSplitLength; index < text.length(); index++) {
+        if (text.charAt(index) == ' ') {
+          break;
+        }
+      }
+
+      if (index >= text.length()) {
+        index = text.length() - 1;
+      }
+
+      lines.add(text.substring(previousSplitLength, index).trim());
+
+      previousSplitLength = index;
+      nextSplitLength = index + splitTextLineSize;
+    } while (text.length() > previousSplitLength + 1);
+
+    return lines;
+  }
+
+  // If text was split into multiple lines, divide time between them
+  private Map<String, List<BigInteger>> splitTextTimes(List<String> lines, BigInteger offset, BigInteger duration) {
+    List<BigInteger> offsets = new ArrayList<>();
+    List<BigInteger> durations = new ArrayList<>();
+    BigInteger percentage = BigInteger.ZERO;
+    int lengthOfAllLines = lines.stream()
+            .mapToInt(l -> l.length())
+            .sum();
+
+    for (int i = 0; i < lines.size(); i++) {
+      BigInteger previousDurations = durations.stream().reduce(BigInteger.ZERO, BigInteger::add);
+      offsets.add(offset.add(previousDurations));
+
+      // Divide total duration fairly between lines, based on char count
+      percentage = BigDecimal.valueOf((double) lines.get(i).length() / lengthOfAllLines)
+              .multiply(new BigDecimal(duration))
+              .toBigInteger();
+
+      durations.add(percentage);
+    }
+
+    Map<String,List<BigInteger>> map = new HashMap();
+    map.put("offsets", offsets);
+    map.put("durations", durations);
+    return map;
+  }
+
+  private String timestampFromSpeechRecognitionResult(BigInteger offset, BigInteger duration) {
     final BigInteger ticksPerMillisecond = BigInteger.valueOf(10000);
-    final Date startTime = new Date(result.getOffset().divide(ticksPerMillisecond).longValue());
-    final Date endTime = new Date((result.getOffset()
-            .add(result.getDuration())).divide(ticksPerMillisecond).longValue());
+    final Date startTime = new Date(offset.divide(ticksPerMillisecond).longValue());
+    final Date endTime = new Date((offset
+            .add(duration)).divide(ticksPerMillisecond).longValue());
 
     String format = "";
     if (useSubRipTextCaptionFormat) {
@@ -1019,7 +1136,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
         return true;
       }
     } catch (Exception e) {
-      logger.error(String.format("ERROR while calculating transcription request expiration for job: %s", jobId), e);
+      logger.error("ERROR while calculating transcription request expiration for job: %s", jobId, e);
       // to avoid perpetual non-expired state, transcription is set as expired
       return true;
     }
@@ -1050,7 +1167,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
 
       sendEmail("Transcription ERROR", String.format("%s(media package %s, job id %s).", message, mpId, jobId));
     } catch (Exception e) {
-      logger.error(String.format("ERROR while deleting transcription job: %s", jobId), e);
+      logger.error("ERROR while deleting transcription job: %s", jobId, e);
     }
   }
 

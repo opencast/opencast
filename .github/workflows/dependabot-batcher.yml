@@ -6,14 +6,18 @@ name: 'Dependabot Batcher for Paella 7'
 on:
   pull_request:
     paths:
-      - '/modules/engage-paella-player-7/**'
+      - 'modules/engage-paella-player-7/**'
   push:
     paths:
-      - '/modules/engage-paella-player-7/**'
+      - 'modules/engage-paella-player-7/**'
 
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   dependabot-batcher-paella-7:

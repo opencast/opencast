@@ -48,6 +48,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -82,9 +84,13 @@ class Item {
       // Figure out whether this is a live event
       final var isLive = Arrays.stream(mp.getTracks()).anyMatch(track -> track.isLive());
 
-      final var creators = Arrays.stream(mp.getCreators())
-          .map(creator -> Jsons.v(creator))
-          .collect(Collectors.toCollection(ArrayList::new));
+      // Obtain creators. We first try to obtain it from the DCCs. We collect
+      // into `LinkedHashSet` to deduplicate entries.
+      final var creators = dccs.stream()
+              .flatMap(dcc -> dcc.get(DublinCore.PROPERTY_CREATOR).stream())
+              .filter(Objects::nonNull)
+              .map(creator -> Jsons.v(creator.getValue()))
+              .collect(Collectors.toCollection(LinkedHashSet::new));
 
       // Get start and end time
       final var period = dccs.stream()
@@ -114,6 +120,8 @@ class Item {
         throw new RuntimeException("Event has no title");
       }
 
+      final var captions = findCaptions(mp);
+
 
       this.obj = Jsons.obj(
           Jsons.p("kind", "event"),
@@ -124,7 +132,7 @@ class Item {
           Jsons.p("created", event.getDcCreated().getTime()),
           Jsons.p("startTime", period.map(p -> p.getStart().getTime()).orElse(null)),
           Jsons.p("endTime", period.map(p -> p.getEnd().getTime()).orElse(null)),
-          Jsons.p("creators", Jsons.arr(creators)),
+          Jsons.p("creators", Jsons.arr(new ArrayList<>(creators))),
           Jsons.p("duration", Math.max(0, event.getDcExtent())),
           Jsons.p("thumbnail", findThumbnail(mp)),
           Jsons.p("timelinePreview", findTimelinePreview(mp)),
@@ -132,6 +140,7 @@ class Item {
           Jsons.p("acl", assembleAcl(event.getAccessControlList())),
           Jsons.p("isLive", isLive),
           Jsons.p("metadata", dccToMetadata(dccs)),
+          Jsons.p("captions", Jsons.arr(captions)),
           Jsons.p("updated", event.getModified().getTime())
       );
     }
@@ -235,10 +244,61 @@ class Item {
               Jsons.p("uri", track.getURI().toString()),
               Jsons.p("mimetype", track.getMimeType().toString()),
               Jsons.p("flavor", track.getFlavor().toString()),
-              Jsons.p("resolution", resolution)
+              Jsons.p("resolution", resolution),
+              Jsons.p("isMaster", track.isMaster())
           );
         })
         .collect(Collectors.toCollection(ArrayList::new));
+  }
+
+  private static List<Jsons.Val> findCaptions(MediaPackage mp) {
+    // We deduplicate the captions by URL and language in case we somehow find
+    // one twice.
+    var captions = new HashMap<String, HashSet<String>>();
+    Arrays.stream(mp.getElements())
+        .filter(element -> {
+          final var isVTT = element.getFlavor().toString().startsWith("captions/vtt")
+                || element.getMimeType().eq("text", "vtt");
+          final var isCorrectType = element.getElementType() == MediaPackageElement.Type.Attachment
+                || element.getElementType() == MediaPackageElement.Type.Track;
+
+          return isVTT && isCorrectType;
+        })
+        .forEach(track -> {
+          final var uri = track.getURI().toString();
+          captions.putIfAbsent(uri, new HashSet<String>());
+
+          // Try to get language from flavor. Otherwise there is an empty list
+          // in the map.
+          final var subflavor = track.getFlavor().getSubtype();
+          if (subflavor.startsWith("vtt+")) {
+            final var suffix = subflavor.substring("vtt+".length());
+            if (suffix.length() > 0) {
+              captions.get(uri).add(suffix);
+            }
+          }
+
+        });
+
+    return captions.entrySet()
+        .stream()
+        .flatMap(e -> {
+          final var languages = e.getValue();
+          final var uri = e.getKey();
+
+          // If this caption URL had no language associated with it, we push a
+          // `null` language to emit this caption at all. Otherwise, all
+          // languages are output as a separate track.
+          if (languages.isEmpty()) {
+            languages.add(null);
+          }
+
+          return languages.stream().map(lang -> Jsons.obj(
+            Jsons.p("uri", uri),
+            Jsons.p("lang", lang)
+          ));
+        })
+      .collect(Collectors.toCollection(ArrayList::new));
   }
 
   private static String findThumbnail(MediaPackage mp) {
