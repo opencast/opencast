@@ -50,6 +50,19 @@ org.opencastproject.userdirectory.ldap.roleattributes=
 #org.opencastproject.userdirectory.ldap.userDn=
 #org.opencastproject.userdirectory.ldap.password=
 
+## The attributes used to construct the user details.
+## If left empty, the user details wont be mapped.
+## The name config key is a comma-separated list of attributes that will be joined
+##   with a whitespace character in the order they appear.
+## Example:
+##  org.opencastproject.userdirectory.ldap.userattributes.name=givenName,sn
+##  org.opencastproject.userdirectory.ldap.userattributes.mail=mail
+## Result:
+##   name: John Doe
+##   mail: john.doe@example.org
+#org.opencastproject.userdirectory.ldap.userattributes.name=
+#org.opencastproject.userdirectory.ldap.userattributes.mail=
+
 ## The maximum number of users to cache
 ## Default: 1000
 #org.opencastproject.userdirectory.ldap.cache.size=1000

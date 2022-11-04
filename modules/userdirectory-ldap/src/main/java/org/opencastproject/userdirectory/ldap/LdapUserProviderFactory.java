@@ -90,6 +90,12 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
   /** The key to look up the role attributes in the service configuration properties */
   private static final String ROLE_ATTRIBUTES_KEY = "org.opencastproject.userdirectory.ldap.roleattributes";
 
+  /** The key to look up the users name attributes **/
+  private static final String USER_NAME_ATTRIBUTES_KEY = "org.opencastproject.userdirectory.ldap.userattributes.name";
+
+  /** The key to look up the users attribute to set its mail address**/
+  private static final String USER_MAIL_ATTRIBUTE_KEY = "org.opencastproject.userdirectory.ldap.userattributes.mail";
+
   /** The key to look up the organization identifier in the service configuration properties */
   private static final String ORGANIZATION_KEY = "org.opencastproject.userdirectory.ldap.org";
 
@@ -250,6 +256,8 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
     String organization = (String) properties.get(ORGANIZATION_KEY);
     String userDn = (String) properties.get(SEARCH_USER_DN);
     String password = (String) properties.get(SEARCH_PASSWORD);
+    String[] userAttributeName = StringUtils.split((String) properties.get(USER_NAME_ATTRIBUTES_KEY),',');
+    String userAttributeMail = (String) properties.get(USER_MAIL_ATTRIBUTE_KEY);
 
     // optional with default values
     String rolePrefix = Objects.toString(properties.get(ROLE_PREFIX_KEY), "ROLE_");
@@ -385,9 +393,14 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
     authoritiesPopulatorRegistrations.put(pid,
             bundleContext.registerService(LdapAuthoritiesPopulator.class.getName(), authoritiesPopulator, dict));
 
+    OpencastUserDetailsContextMapper mapper = null;
+    if (userAttributeName != null && userAttributeMail != null) {
+      mapper = new OpencastUserDetailsContextMapper(userAttributeName, userAttributeMail);
+    }
+
     LdapUserProviderInstance provider = new LdapUserProviderInstance(pid, org, searchBase, searchFilter, url, userDn,
         password, roleAttributes, cacheSize,
-        cacheExpiration, securityService, authoritiesPopulator);
+        cacheExpiration, securityService, authoritiesPopulator, mapper);
 
     providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
 

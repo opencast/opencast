@@ -55,8 +55,8 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
   private String groupCheckPrefix = null;
   private boolean applyAttributesAsRoles = true;
   private boolean applyAttributesAsGroups = true;
-  private Map<String, String[]> ldapAssignmentRoleMap = new HashMap();
-  private Map<String, String[]> ldapAssignmentGroupMap = new HashMap();
+  private Map<String, String[]> ldapAssignmentRoleMap = new HashMap<>();
+  private Map<String, String[]> ldapAssignmentGroupMap = new HashMap<>();
   private boolean uppercase = true;
   private Organization organization;
   private SecurityService securityService;
