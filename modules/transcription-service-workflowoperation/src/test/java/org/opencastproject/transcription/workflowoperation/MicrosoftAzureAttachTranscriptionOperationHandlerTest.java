@@ -101,6 +101,7 @@ public class MicrosoftAzureAttachTranscriptionOperationHandlerTest {
     service = EasyMock.createStrictMock(TranscriptionService.class);
 
     EasyMock.expect(service.getGeneratedTranscription("mpId1", "transcriptionJob")).andReturn(attachment);
+    EasyMock.expect(service.getReturnValues("mpId1", "transcriptionJob")).andReturn(null);
     EasyMock.replay(service);
 
     // Workspace set up
@@ -132,10 +133,8 @@ public class MicrosoftAzureAttachTranscriptionOperationHandlerTest {
   public void testStartWebVtt() throws Exception {
     operation.setConfiguration(
             MicrosoftAzureAttachTranscriptionOperationHandler.TRANSCRIPTION_JOB_ID, "transcriptionJob");
-    operation.setConfiguration(
-            MicrosoftAzureAttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/timedtext");
-    operation.setConfiguration(
-            MicrosoftAzureAttachTranscriptionOperationHandler.TARGET_TAGS, "tag1,tag2");
+    operation.setConfiguration("target-flavor", "captions/timedtext");
+    operation.setConfiguration("target-tags", "tag1,tag2");
     operation.setConfiguration(
             MicrosoftAzureAttachTranscriptionOperationHandler.TARGET_CAPTION_FORMAT, "webvtt");
 

@@ -450,6 +450,11 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
   }
 
   @Override
+  public Map<String, Object> getReturnValues(String mpId, String jobId) throws TranscriptionServiceException {
+    throw new TranscriptionServiceException("Method not implemented");
+  }
+
+  @Override
   public void transcriptionError(String mpId, Object obj) throws TranscriptionServiceException {
     JSONObject jsonObj = null;
     String jobId = null;

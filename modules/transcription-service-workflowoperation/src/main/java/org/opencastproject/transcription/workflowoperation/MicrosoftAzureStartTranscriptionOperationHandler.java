@@ -68,8 +68,10 @@ public class MicrosoftAzureStartTranscriptionOperationHandler extends AbstractWo
   /** Workflow configuration option keys */
   static final String SOURCE_FLAVOR = "source-flavor";
   static final String SOURCE_TAG = "source-tag";
-  static final String LANGUAGE_CODE = "language-code";
-  static final String SKIP_IF_FLAVOR_EXISTS = "skip-if-flavor-exists";
+  static final String OPT_LANGUAGE_CODE = "language-code";
+  static final String OPT_SKIP_IF_FLAVOR_EXISTS = "skip-if-flavor-exists";
+  static final String OPT_AUTO_DETECT_LANGUAGE = "auto-detect-language";
+  static final String OPT_AUTO_DETECT_LANGUAGES = "auto-detect-languages";
 
   /** The transcription service */
   private TranscriptionService service = null;
@@ -86,7 +88,7 @@ public class MicrosoftAzureStartTranscriptionOperationHandler extends AbstractWo
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
 
-    String skipOption = StringUtils.trimToNull(operation.getConfiguration(SKIP_IF_FLAVOR_EXISTS));
+    String skipOption = StringUtils.trimToNull(operation.getConfiguration(OPT_SKIP_IF_FLAVOR_EXISTS));
     if (skipOption != null) {
       MediaPackageElement[] mpes = mediaPackage.getElementsByFlavor(MediaPackageElementFlavor.parseFlavor(skipOption));
       if (mpes != null && mpes.length > 0) {
@@ -121,7 +123,15 @@ public class MicrosoftAzureStartTranscriptionOperationHandler extends AbstractWo
     }
 
     // Get language code if configured
-    String langCode = operation.getConfiguration(LANGUAGE_CODE);
+    String langCode = operation.getConfiguration(OPT_LANGUAGE_CODE);
+    if (StringUtils.isNotBlank(langCode)) {
+      langCode = StringUtils.trim(langCode);
+    }
+    String autoDetectLanguage = operation.getConfiguration(OPT_AUTO_DETECT_LANGUAGE);
+    if (StringUtils.isNotBlank(langCode)) {
+      langCode = StringUtils.trim(langCode);
+    }
+    String autoDetectLanguages = operation.getConfiguration(OPT_AUTO_DETECT_LANGUAGES);
     if (StringUtils.isNotBlank(langCode)) {
       langCode = StringUtils.trim(langCode);
     }
@@ -130,7 +140,8 @@ public class MicrosoftAzureStartTranscriptionOperationHandler extends AbstractWo
     Job job = null;
     for (Track track : elements) {
       try {
-        job = service.startTranscription(mediaPackage.getIdentifier().toString(), track, langCode);
+        job = service.startTranscription(mediaPackage.getIdentifier().toString(), track, langCode, autoDetectLanguage,
+                autoDetectLanguages);
         // Only one job per media package
         break;
       } catch (TranscriptionServiceException e) {

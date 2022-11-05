@@ -462,6 +462,11 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     return language;
   }
 
+  @Override
+  public Map<String, Object> getReturnValues(String mpId, String jobId) throws TranscriptionServiceException {
+    throw new TranscriptionServiceException("Method not implemented");
+  }
+
   public String getAmberscriptJobType() {
     return amberscriptJobType;
   }
