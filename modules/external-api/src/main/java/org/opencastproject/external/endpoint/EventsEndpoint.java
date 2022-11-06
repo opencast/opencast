@@ -159,6 +159,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -242,6 +243,7 @@ public class EventsEndpoint implements ManagedService {
   private IngestService ingestService;
   private SecurityService securityService;
   private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<>();
+  private final HashMap<String, List<EventCatalogUIAdapter>> orgCatalogUIAdaptersMap = new HashMap<>();
   private UrlSigningService urlSigningService;
   private SchedulerService schedulerService;
   private CaptureAgentStateService agentStateService;
@@ -304,11 +306,27 @@ public class EventsEndpoint implements ManagedService {
   )
   public void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     catalogUIAdapters.add(catalogUIAdapter);
+    invalidateOrgCatalogUIAdaptersMapFor(catalogUIAdapter);
   }
 
   /** OSGi DI. */
   public void removeCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     catalogUIAdapters.remove(catalogUIAdapter);
+    invalidateOrgCatalogUIAdaptersMapFor(catalogUIAdapter);
+  }
+
+  /**
+   * Invalidates caches for organizations that are handled by given catalog.
+   *
+   * @param catalogUIAdapter catalog used to identify affected organizations.
+   */
+  private void invalidateOrgCatalogUIAdaptersMapFor(EventCatalogUIAdapter catalogUIAdapter) {
+    // clean cached org to catalog map
+    for (String orgName : orgCatalogUIAdaptersMap.keySet()) {
+      if (catalogUIAdapter.handlesOrganization(orgName)) {
+        orgCatalogUIAdaptersMap.remove(orgName);
+      }
+    }
   }
 
   /** OSGi DI */
@@ -328,19 +346,16 @@ public class EventsEndpoint implements ManagedService {
     this.workflowService = workflowService;
   }
 
-
   private List<EventCatalogUIAdapter> getEventCatalogUIAdapters() {
-    return new ArrayList<>(getEventCatalogUIAdapters(getSecurityService().getOrganization().getId()));
+    return getEventCatalogUIAdapters(getSecurityService().getOrganization().getId());
   }
 
-  public List<EventCatalogUIAdapter> getEventCatalogUIAdapters(String organization) {
-    List<EventCatalogUIAdapter> adapters = new ArrayList<>();
-    for (EventCatalogUIAdapter adapter : catalogUIAdapters) {
-      if (adapter.handlesOrganization(organization)) {
-        adapters.add(adapter);
-      }
-    }
-    return adapters;
+  private List<EventCatalogUIAdapter> getEventCatalogUIAdapters(String organization) {
+    List<EventCatalogUIAdapter> cachedCatalogUIAdapters = orgCatalogUIAdaptersMap.computeIfAbsent(organization,
+        org -> new ArrayList<>(catalogUIAdapters.stream()
+            .filter(a -> a.handlesOrganization(org))
+            .collect(Collectors.toList())));
+    return new CopyOnWriteArrayList<>(cachedCatalogUIAdapters);
   }
 
   /** OSGi activation method */
