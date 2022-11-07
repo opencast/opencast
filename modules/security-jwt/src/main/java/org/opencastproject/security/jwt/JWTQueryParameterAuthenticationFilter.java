@@ -26,13 +26,9 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedC
 import org.springframework.util.Assert;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
-
-// TODO Amend documentation
 
 /**
  * Authentication filter for JWTs in query parameters
@@ -63,21 +59,22 @@ public class JWTQueryParameterAuthenticationFilter extends AbstractPreAuthentica
       Util.debug(logger, request);
     }
 
-    String queryString = Objects.requireNonNullElse(
-            request.getQueryString(), "");
+    String queryString = Objects.requireNonNullElse(request.getQueryString(), "");
 
-    Map<String, String> queryParams = Arrays.stream(
-                    queryString.split("&"))
+    String token = Arrays.stream(queryString.split("&"))
             .map(kv -> kv.split("="))
-            .collect(Collectors.toMap(
-                    kv -> kv[0],
-                    kv -> kv.length < 2 ? "" : kv[1]));
+            .filter(kv -> kv[0].equals(parameterName))
+            .findAny()
+            .map(kv -> kv.length < 2 ? "" : kv[1])
+            .orElseGet(() -> {
+              if (exceptionIfParameterMissing) {
+                throw new PreAuthenticatedCredentialsNotFoundException(
+                        parameterName + " parameter not found in request.");
+              }
+              return "";
+            });
 
-    String token = queryParams.get(parameterName);
-
-    if (token == null && exceptionIfParameterMissing) {
-      throw new PreAuthenticatedCredentialsNotFoundException(this.parameterName + " parameter not found in request.");
-    } else if (token == null || token.isBlank()) {
+    if (token.isBlank()) {
       return null;
     }
 

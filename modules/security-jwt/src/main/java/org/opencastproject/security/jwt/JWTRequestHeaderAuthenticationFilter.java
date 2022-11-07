@@ -27,7 +27,7 @@ import org.springframework.util.Assert;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Authentication filter for JWTs in request headers
+ * Authentication filter for JWTs in request headers.
  */
 public class JWTRequestHeaderAuthenticationFilter extends RequestHeaderAuthenticationFilter {
 
