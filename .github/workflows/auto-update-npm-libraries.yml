@@ -47,7 +47,7 @@ jobs:
           done
 
       - name: make sure tests still work
-        working-directory: modules/engage-theodul-core
+        working-directory: modules
         run: |
           set -ue
           for module in $(ls -1 engage-theodul-*/package.json | sed 's_/package.json__')
