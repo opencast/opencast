@@ -131,6 +131,22 @@ public abstract class ConfigurableDCCatalogUIAdapter implements CatalogUIAdapter
     return rawFields;
   }
 
+  @Override
+  public DublinCoreMetadataCollection getRawFields(ResourceListQuery collectionQueryOverride) {
+    DublinCoreMetadataCollection rawFields = new DublinCoreMetadataCollection();
+    for (MetadataField metadataField : dublinCoreProperties.values()) {
+      try {
+        String defaultKey = getCollectionDefault(metadataField, listProvidersService);
+
+        rawFields.addField(new MetadataField(metadataField), Optional.ofNullable(defaultKey),
+            Optional.ofNullable(collectionQueryOverride), listProvidersService);
+      } catch (IllegalArgumentException e) {
+        logger.error("Skipping metadata field '{}' because of error", metadataField, e);
+      }
+    }
+    return rawFields;
+  }
+
   protected DublinCoreMetadataCollection getFieldsFromCatalogs(List<DublinCoreCatalog> dcCatalogs) {
     Map<String,List<MetadataField>> metadataFields = new HashMap<>();
     List<MetadataField> emptyFields = new ArrayList<>(dublinCoreProperties.values());

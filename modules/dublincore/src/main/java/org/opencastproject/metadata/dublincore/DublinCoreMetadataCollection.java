@@ -239,6 +239,11 @@ public class DublinCoreMetadataCollection {
         ResourceListQuery resourceListQuery;
         if (collectionQueryOverrideOpt.isPresent()) {
           resourceListQuery = collectionQueryOverrideOpt.get();
+
+          // shortcut: don't query list provider if limit is set to 0
+          if (resourceListQuery.getLimit().getOrElseNull() == 0) {
+            return Collections.emptyMap();
+          }
         } else {
           resourceListQuery = new ResourceListQueryImpl();
         }

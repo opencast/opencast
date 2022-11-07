@@ -63,6 +63,7 @@ import org.opencastproject.index.service.util.RequestUtils;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
+import org.opencastproject.list.impl.EmptyResourceListQuery;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.Catalog;
@@ -1370,8 +1371,8 @@ public class EventsEndpoint implements ManagedService {
         if (fields != null) metadataList.add(catalogUIAdapter, fields);
       }
     }
-    // TODO: This is slow:
-    DublinCoreMetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter);
+    DublinCoreMetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter,
+        EmptyResourceListQuery.get());
     ExternalMetadataUtils.changeSubjectToSubjects(collection);
     ExternalMetadataUtils.removeCollectionList(collection);
     metadataList.add(eventCatalogUIAdapter, collection);
@@ -1400,7 +1401,8 @@ public class EventsEndpoint implements ManagedService {
       // Try the main catalog first as we load it from the index.
       EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
       if (flavor.get().equals(eventCatalogUIAdapter.getFlavor())) {
-        DublinCoreMetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter);
+        DublinCoreMetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter,
+            EmptyResourceListQuery.get());
         ExternalMetadataUtils.changeSubjectToSubjects(collection);
         ExternalMetadataUtils.removeCollectionList(collection);
         convertStartDateTimeToApiV1(collection);

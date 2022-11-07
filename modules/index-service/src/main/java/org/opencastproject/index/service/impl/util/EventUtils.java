@@ -22,6 +22,7 @@
 package org.opencastproject.index.service.impl.util;
 
 import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
@@ -54,7 +55,6 @@ public final class EventUtils {
   }
 
   private EventUtils() {
-
   }
 
   /**
@@ -62,6 +62,8 @@ public final class EventUtils {
    *
    * @param event
    *          the source {@link Event}
+   * @param eventCatalogUIAdapter
+   *          the catalog definition
    * @return a {@link DublinCoreMetadataCollection} instance with all the event metadata
    *
    * @throws ParseException
@@ -69,6 +71,28 @@ public final class EventUtils {
   public static DublinCoreMetadataCollection getEventMetadata(Event event, EventCatalogUIAdapter eventCatalogUIAdapter)
           throws ParseException {
     DublinCoreMetadataCollection eventMetadata = new DublinCoreMetadataCollection(eventCatalogUIAdapter.getRawFields());
+    setEventMetadataValues(event, eventMetadata);
+    return eventMetadata;
+  }
+
+  /**
+   * Loads the metadata for the given event
+   *
+   * @param event
+   *          the source {@link Event}
+   * @param eventCatalogUIAdapter
+   *          the catalog definition
+   * @param collectionQueryOverride
+   *          a custom list provider query mapped to every metadata field.
+   *
+   * @return a {@link DublinCoreMetadataCollection} instance with all the event metadata
+   *
+   * @throws ParseException
+   */
+  public static DublinCoreMetadataCollection getEventMetadata(Event event, EventCatalogUIAdapter eventCatalogUIAdapter,
+      ResourceListQuery collectionQueryOverride) throws ParseException {
+    DublinCoreMetadataCollection eventMetadata = new DublinCoreMetadataCollection(
+        eventCatalogUIAdapter.getRawFields(collectionQueryOverride));
     setEventMetadataValues(event, eventMetadata);
     return eventMetadata;
   }
