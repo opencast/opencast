@@ -1368,7 +1368,10 @@ public class EventsEndpoint implements ManagedService {
       for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
         // TODO: This is very slow:
         DublinCoreMetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
-        if (fields != null) metadataList.add(catalogUIAdapter, fields);
+        if (fields != null) {
+          ExternalMetadataUtils.removeCollectionList(fields);
+          metadataList.add(catalogUIAdapter, fields);
+        }
       }
     }
     DublinCoreMetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter,
