@@ -95,7 +95,8 @@ public class MicrosoftAzureStartTranscriptionOperationHandlerTest {
     capturedTrack = Capture.newInstance();
     EasyMock
             .expect(service.startTranscription(
-                    EasyMock.anyObject(String.class), EasyMock.capture(capturedTrack), EasyMock.anyObject(String.class))
+                    EasyMock.anyObject(String.class), EasyMock.capture(capturedTrack), EasyMock.anyObject(String.class),
+                    EasyMock.anyObject(String.class), EasyMock.anyObject(String.class))
             )
             .andReturn(null);
     EasyMock.replay(service);
@@ -139,7 +140,8 @@ public class MicrosoftAzureStartTranscriptionOperationHandlerTest {
   @Test
   public void testStartSkipFlavor() throws Exception {
     // Make sure operation will be skipped if media package already contains the flavor passed
-    operation.setConfiguration(MicrosoftAzureStartTranscriptionOperationHandler.SKIP_IF_FLAVOR_EXISTS, "audio/flac");
+    operation.setConfiguration(MicrosoftAzureStartTranscriptionOperationHandler.OPT_SKIP_IF_FLAVOR_EXISTS,
+            "audio/flac");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
     Assert.assertEquals(Action.SKIP, result.getAction());
@@ -150,7 +152,7 @@ public class MicrosoftAzureStartTranscriptionOperationHandlerTest {
     operation.setConfiguration(MicrosoftAzureStartTranscriptionOperationHandler.SOURCE_TAG, "transcript");
     // Make sure operation will NOT be skipped if media package does NOT contain the flavor passed
     operation.setConfiguration(
-            MicrosoftAzureStartTranscriptionOperationHandler.SKIP_IF_FLAVOR_EXISTS, "captions/timedtext");
+            MicrosoftAzureStartTranscriptionOperationHandler.OPT_SKIP_IF_FLAVOR_EXISTS, "captions/timedtext");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
     Assert.assertEquals(Action.CONTINUE, result.getAction());
