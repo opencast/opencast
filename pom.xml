@@ -225,6 +225,7 @@
     <module>modules/speech-to-text-impl</module>
     <module>modules/speech-to-text-remote</module>
     <module>modules/speech-to-text-workflowoperation</module>
+    <module>modules/subtitle-parser</module>
     <module>modules/static-file-service-api</module>
     <module>modules/static-file-service-impl</module>
     <module>modules/static</module>

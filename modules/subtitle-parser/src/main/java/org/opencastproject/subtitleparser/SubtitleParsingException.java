@@ -18,41 +18,15 @@
  * the License.
  *
  */
-package org.opencastproject.videoeditor.subtitle.base;
+package org.opencastproject.subtitleparser;
 
-import java.util.ArrayList;
-import java.util.List;
+public class SubtitleParsingException extends Exception {
 
-public abstract class Subtitle<T extends SubtitleCue> {
-  private List<String> headerLines;
-  private List<T> cues;
-
-  public Subtitle() {
-    this.headerLines = new ArrayList<String>();
-    this.cues = new ArrayList<T>();
+  public SubtitleParsingException(String message) {
+    super(message);
   }
 
-  public void addHeaderLine(String headerLine) {
-    this.headerLines.add(headerLine);
-  }
-
-  public List<String> getHeaderLines() {
-    return headerLines;
-  }
-
-  public void setHeaderLines(List<String> headerLines) {
-    this.headerLines = headerLines;
-  }
-
-  public void addCue(T cue) {
-    this.cues.add(cue);
-  }
-
-  public List<T> getCues() {
-    return this.cues;
-  }
-
-  public void setCues(List<T> cues) {
-    this.cues = cues;
+  public SubtitleParsingException(String message, Throwable throwable) {
+    super(message, throwable);
   }
 }

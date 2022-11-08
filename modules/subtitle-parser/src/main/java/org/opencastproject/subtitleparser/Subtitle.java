@@ -18,25 +18,41 @@
  * the License.
  *
  */
-package org.opencastproject.videoeditor.subtitle.webvtt;
+package org.opencastproject.subtitleparser;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class WebVTTSubtitleStyle {
-  private List<String> lines;
+public abstract class Subtitle<T extends SubtitleCue> {
+  private List<String> headerLines;
+  private List<T> cues;
 
-  public WebVTTSubtitleStyle() {
-    this.lines = new ArrayList<>();
+  public Subtitle() {
+    this.headerLines = new ArrayList<String>();
+    this.cues = new ArrayList<T>();
   }
 
-  public List<String> getLines() {
-    return this.lines;
+  public void addHeaderLine(String headerLine) {
+    this.headerLines.add(headerLine);
   }
-  public void setLines(List<String> lines) {
-    this.lines = lines;
+
+  public List<String> getHeaderLines() {
+    return headerLines;
   }
-  public void addLine(String line) {
-    this.lines.add(line);
+
+  public void setHeaderLines(List<String> headerLines) {
+    this.headerLines = headerLines;
+  }
+
+  public void addCue(T cue) {
+    this.cues.add(cue);
+  }
+
+  public List<T> getCues() {
+    return this.cues;
+  }
+
+  public void setCues(List<T> cues) {
+    this.cues = cues;
   }
 }
