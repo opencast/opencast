@@ -43,6 +43,26 @@ jobs:
           npm run eslint
           git add package.json package-lock.json
 
+      - name: update runtime-info-ui test libraries
+        working-directory: modules/runtime-info-ui
+        run: |
+          set -eu
+          npm install --save --dev eslint@latest eslint-plugin-header@latest html-linter@latest
+          npm audit fix || true
+          npm run eslint
+          npm run html-linter
+          git add package.json package-lock.json
+
+      - name: update runtime-info-ui-ng test libraries
+        working-directory: modules/runtime-info-ui-ng
+        run: |
+          set -eu
+          npm install --save --dev eslint@latest eslint-plugin-header@latest html-linter@latest
+          npm audit fix || true
+          npm run eslint
+          npm run html-linter
+          git add package.json package-lock.json
+
       - name: update all engage-theodul-* libraries (they only have tests)
         working-directory: modules/
         run: |
