@@ -1,4 +1,3 @@
-
 /**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
@@ -19,21 +18,31 @@
  * the License.
  *
  */
-
 import { MatomoUserTrackingDataPlugin } from 'paella-user-tracking';
 
 export default class OpencastMatomoUserTrackingDataPlugin extends MatomoUserTrackingDataPlugin {
 
-    async getCurrentUserId() {
-        if (this.config.logUserId) {
-            if (!this.opencast_username) {
-                const data = await fetch('/info/me.json');
-                const me = await data.json();
-                this.opencast_username = me?.user?.username || 'anonymous';        
-            }
-            return this.opencast_username;
-        }
+  async getCurrentUserId() {
+    try {
+      if (this.config.logUserId) {
 
-        return null;
+        if (this.opencast_username === undefined) {
+          const data = await fetch('/info/me.json');
+          const me = await data.json();
+          if ((me?.roles?.length == 1) && (me.roles[0] == me.org.anonymousRole)) {
+            this.opencast_username = null;
+          }
+          else {
+            this.opencast_username = me.user.username;
+          }
+        }
+        return this.opencast_username;
+      }
     }
+    catch(e) {
+      this.player.log.debug('Error getting opencast username');
+    }
+
+    return null;
+  }
 }
