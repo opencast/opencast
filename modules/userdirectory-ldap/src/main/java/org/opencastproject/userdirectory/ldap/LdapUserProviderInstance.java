@@ -345,7 +345,6 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
       // Get the roles and add the extra roles
       Collection<GrantedAuthority> authorities = new HashSet<>();
       authorities.addAll(userDetails.getAuthorities());
-      authorities.addAll(setExtraRoles);
 
       Set<JaxbRole> roles = new HashSet<>();
       /*
@@ -376,6 +375,9 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
         // Finally, add the role itself
         roles.add(new JaxbRole(strAuthority, jaxbOrganization));
       }
+
+      // Add extra roles afterwards
+      setExtraRoles.forEach(r ->roles.add(new JaxbRole(r.getAuthority(), jaxbOrganization)));
 
       User user = new JaxbUser(userDetails.getUsername(), PROVIDER_NAME, jaxbOrganization, roles);
       cache.put(userName, user);
