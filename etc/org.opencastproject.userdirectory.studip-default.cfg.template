@@ -11,7 +11,9 @@ org.opencastproject.userdirectory.studip.url=https://my-studip.de/studip5/plugin
 org.opencastproject.userdirectory.studip.token=mytoken1234abcdef
 
 # The maximum number of users to cache
+# Default: 1000
 #org.opencastproject.userdirectory.studip.cache.size=1000
 
 # The maximum number of minutes to cache a user
+# Default: 60
 #org.opencastproject.userdirectory.studip.cache.expiration=60
