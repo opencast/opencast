@@ -152,7 +152,7 @@ public class StudipUserProviderFactory implements ManagedServiceFactory {
         }
       }
     } catch (Exception e) {
-      logger.warn("{} could not be loaded, default value is used: {}", CACHE_SIZE, cacheSize);
+      throw new ConfigurationException("{} could not be loaded", CACHE_SIZE);
     }
 
 
@@ -165,7 +165,7 @@ public class StudipUserProviderFactory implements ManagedServiceFactory {
         }
       }
     } catch (Exception e) {
-      logger.warn("{} could not be loaded, default value is used: {}", CACHE_EXPIRATION, cacheExpiration);
+      throw new ConfigurationException("{} could not be loaded", CACHE_EXPIRATION);
     }
 
     // Now that we have everything we need, go ahead and activate a new provider, removing an old one if necessary
