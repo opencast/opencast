@@ -168,7 +168,6 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
 
   // Only used by unit tests!
   private Workflows wfUtil;
-  private AutoDetectSourceLanguageResult autoDetectSourceLanguageResult = null;
 
   private enum Operation {
     StartTranscription
@@ -592,9 +591,10 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
           throws ExecutionException, InterruptedException {
     // This lets us modify local variables from inside a lambda.
     final int[] sequenceNumber = new int[] { 0 };
+    final boolean[] languageDetected = new boolean[] { false };
 
     speechRecognizer.sessionStarted.addEventListener((s, e) -> {
-      logger.debug("Transcription job {} started.", jobId);
+      logger.info("Transcription job {} for media package {} started.", jobId, mpId);
       try {
         database.storeJobControl(mpId, track.getIdentifier(), jobId, TranscriptionJobControl.Status.InProgress.name(),
             track.getDuration() == null ? 0 : track.getDuration().longValue(), null, PROVIDER);
@@ -624,8 +624,21 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
           }
         }
 
-        if (autoDetectSourceLanguageResult == null && isAutoDetectLanguage) {
-          autoDetectSourceLanguageResult = AutoDetectSourceLanguageResult.fromResult(result);
+        if (!languageDetected[0] && isAutoDetectLanguage) {
+          AutoDetectSourceLanguageResult autoDetectSourceLanguageResult = AutoDetectSourceLanguageResult.fromResult(
+              result);
+          if (autoDetectSourceLanguageResult != null
+              && StringUtils.isNotBlank(autoDetectSourceLanguageResult.getLanguage())) {
+            try {
+              workspace.putInCollection(TRANSCRIPT_COLLECTION, getTranscriptLanguageFileName(jobId),
+                  new ByteArrayInputStream(autoDetectSourceLanguageResult.getLanguage()
+                      .getBytes(StandardCharsets.UTF_8)));
+              languageDetected[0] = true;
+            } catch (IOException ex) {
+              errorCallback("Unable to write to transcription language file: " + ex, speechRecognizer,
+                  jobId, mpId);
+            }
+          }
         }
       }
       else if (ResultReason.NoMatch == e.getResult().getReason()) {
@@ -657,17 +670,13 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
 
     speechRecognizer.sessionStopped.addEventListener((s, e) -> {
       try {
-        logger.debug("Session stopped for transcription job {}.", jobId);
+        logger.info("Transcription job {} for media package {} ended.", jobId, mpId);
         speechRecognizer.stopContinuousRecognitionAsync().get();
         // Update state in database
         // If there's an optimistic lock exception here, it's ok because the workflow dispatcher
         // may be doing the same thing
         database.updateJobControl(jobId, TranscriptionJobControl.Status.TranscriptionComplete.name());
-        if (autoDetectSourceLanguageResult != null) {
-          workspace.putInCollection(TRANSCRIPT_COLLECTION, getTranscriptLanguageFileName(jobId),
-              new ByteArrayInputStream(autoDetectSourceLanguageResult.getLanguage().getBytes(StandardCharsets.UTF_8)));
-        }
-      } catch (IOException | InterruptedException | TranscriptionDatabaseException | ExecutionException ex) {
+      } catch (InterruptedException | TranscriptionDatabaseException | ExecutionException ex) {
         errorCallback("Could not save transcription results file: " + ex, speechRecognizer, jobId, mpId);
       }
     });
