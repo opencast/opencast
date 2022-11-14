@@ -55,7 +55,7 @@ sections found in `etc/security/mh_default_org.xml`. Some of the options are con
                 interface="org.opencastproject.userdirectory.api.UserReferenceProvider" />
 ```
 * Add the configured `jwtHeaderFilter` and/or `jwtQueryParameterFilter` to the filters list
-  of the `authenticationFilters` bean.
+  of the `preAuthenticationFilters` bean.
 ```xml
 <!-- Uncomment the line below to support JWT. -->
 <ref bean="jwtHeaderFilter" />
