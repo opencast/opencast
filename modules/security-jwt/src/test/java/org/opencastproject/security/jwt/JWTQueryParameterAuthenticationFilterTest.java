@@ -59,8 +59,8 @@ public class JWTQueryParameterAuthenticationFilterTest extends JWTLoginTest {
   @Override
   protected HttpServletRequest mockRequest(String content) {
     HttpServletRequest request = createNiceMock(HttpServletRequest.class);
-    expect(request.getQueryString())
-            .andReturn("jwt=" + content)
+    expect(request.getParameter("jwt"))
+            .andReturn(content)
             .atLeastOnce();
     replay(request);
     return request;
