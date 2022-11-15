@@ -104,6 +104,8 @@ In your email template:
 
 Use `${catalogs['FLAVOR']['FIELD']}`
 
+Deprecation notice: Opencast versions before 13 used `${catalogs['SUBFLAVOR']['FIELD']}` for `dublincore/SUBFLAVOR` catalogs. This syntax is still accepted but deprecation. Future versions might remove support.
+
 #### Examples
 
 |Field          |How To Get It|
