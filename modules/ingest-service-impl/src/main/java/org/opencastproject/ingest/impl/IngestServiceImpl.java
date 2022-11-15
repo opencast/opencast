@@ -407,6 +407,11 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     downloadPassword = StringUtils.trimToEmpty((String)properties.get(DOWNLOAD_PASSWORD));
     downloadUser = StringUtils.trimToEmpty(((String) properties.get(DOWNLOAD_USER)));
     downloadSource = StringUtils.trimToEmpty(((String) properties.get(DOWNLOAD_SOURCE)));
+    if (!isBlank(downloadSource) && (isBlank(downloadUser) || isBlank(downloadPassword))) {
+      logger.warn("Configured ingest download source has no configured user or password; deactivating authenticated"
+          + "download");
+      downloadSource = "";
+    }
 
     skipAttachments = BooleanUtils.toBoolean(Objects.toString(properties.get(SKIP_ATTACHMENTS_KEY),
             BooleanUtils.toStringTrueFalse(DEFAULT_SKIP)));
@@ -1623,7 +1628,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         HttpGet get = new HttpGet(uri);
         var clusterUrls = securityService.getOrganization().getServers().keySet();
 
-        if (uri.toString().matches(downloadSource)) {
+        if (!isBlank(downloadSource) && uri.toString().matches(downloadSource)) {
           // NB: We're creating a new client here with *different* auth than the system auth creds
           externalHttpClient = getAuthedHttpClient();
           get.setHeader("X-Requested-Auth", downloadAuthMethod);
