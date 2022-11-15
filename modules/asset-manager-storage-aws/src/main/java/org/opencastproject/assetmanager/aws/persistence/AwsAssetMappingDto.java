@@ -33,6 +33,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
@@ -46,6 +47,12 @@ import javax.xml.bind.annotation.XmlAttribute;
 @Entity(name = "AwsAssetMapping")
 @Table(
     name = "oc_aws_asset_mapping",
+    indexes = {
+        @Index(
+            name = "IX_oc_aws_asset_mapping_object_key",
+            columnList = ("object_key")
+        )
+    },
     uniqueConstraints = @UniqueConstraint(
         name = "UNQ_aws_archive_mapping_0",
         columnNames = {"organization", "mediapackage", "mediapackage_element", "version"}
