@@ -60,11 +60,16 @@
           <ul class="dropdown-ul">
             <li ng-repeat="(key, value) in services.service"><!-- service directive -->
               <a ng-if="key == 'Latest Version' && (value.error || value.warning)" href="{{ value.docs_url }}" service-name="{{ key }}">
-                <span>Opencast</span>
+                <span>{{ key }}</span>
                 <span ng-if="value.error" class="ng-multi-value ng-multi-value-red">{{ value.status }}</span>
                 <span ng-if="value.warning" class="ng-multi-value ng-multi-value-orange">{{ value.status }}</span>
               </a>
-              <a ng-if="key != 'Latest Version'" ng-click="toServices($event)" service-name="{{ key }}">
+              <a ng-if="key == 'Registration' && (value.error || value.warning)" ng-click="showAdoptionDialog()" service-name="{{ key }}">
+                <span>{{ key }}</span>
+                <span ng-if="value.error" class="ng-multi-value ng-multi-value-red">{{ value.status }}</span>
+                <span ng-if="value.warning" class="ng-multi-value ng-multi-value-orange">{{ value.status }}</span>
+              </a>
+              <a ng-if="key != 'Latest Version' && key != 'Registration'" ng-click="toServices($event)" service-name="{{ key }}">
                 <span>{{ key }}</span>
                 <span class="ng-multi-value ng-multi-value-red" ng-if="value.error">{{ value.status }}</span>
                 <span class="ng-multi-value ng-multi-value-green" ng-if="!value.error">{{ value.status }}</span>
@@ -260,6 +265,7 @@
     <script src="scripts/shared/resources/newThemeResource.js"></script>
     <script src="scripts/shared/resources/taskResource.js"></script>
     <script src="scripts/shared/resources/adopterRegistrationResource.js"></script>
+    <script src="scripts/shared/resources/adopterStatisticSummaryResource.js"></script>
     <script src="scripts/shared/resources/countryResource.js"></script>
     <script src="scripts/shared/resources/termsOfUseResource.js"></script>
     <script src="scripts/shared/services/wizards/new-event/access.js"></script>

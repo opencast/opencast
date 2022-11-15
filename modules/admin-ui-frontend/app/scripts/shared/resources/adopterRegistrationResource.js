@@ -22,9 +22,19 @@
 
 angular.module('adminNg.resources')
 .factory('AdopterRegistrationResource', ['$resource', function ($resource) {
-  //return $resource('/admin-ng/adopter/registration');
-  return $resource('/admin-ng/adopter/registration/:target', {}, {
-    create: {
+  var get,
+      create,
+      finalize;
+
+  get = $resource('/admin-ng/adopter/registration/', {}, {
+    get: {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    },
+  });
+
+  create = $resource('/admin-ng/adopter/registration/:target', {}, {
+    post: {
       params : { target: '' },
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -57,6 +67,20 @@ angular.module('adminNg.resources')
 
         return $.param(parameters);
       }
-    }
+    },
   });
+
+  finalize = $resource('/admin-ng/adopter/registration/finalize/:target', {}, {
+    post: {
+      params : { target: '' },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    },
+  });
+
+  return {
+    get: get.get,
+    create : create.post,
+    finalize : finalize.post
+  };
 }]);

@@ -28,7 +28,7 @@ angular.module('adminNg.controllers')
   function ($scope, $rootScope, $location, $window, AuthService, Notifications, ResourceModal,
     VersionResource, TermsOfUseResource, HotkeysService, $interval, RestServiceMonitor, AdopterRegistrationResource){
 
-    $scope.adopter = new AdopterRegistrationResource();
+    $scope.adopter = new AdopterRegistrationResource.get();
 
     $scope.bodyClicked = function () {
       angular.element('[old-admin-ng-dropdown]').removeClass('active');
@@ -50,6 +50,10 @@ angular.module('adminNg.controllers')
       $scope.studioReturnUrl = encodeURIComponent(newUrl);
     });
     $scope.tou = TermsOfUseResource.get();
+
+    $scope.showAdoptionDialog = function() {
+      ResourceModal.show('registration-modal');
+    };
 
     AuthService.getUser().$promise.then(function (user) {
       $scope.currentUser = user;
