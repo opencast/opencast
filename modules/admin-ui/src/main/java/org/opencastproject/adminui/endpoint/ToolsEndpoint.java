@@ -204,6 +204,7 @@ public class ToolsEndpoint {
 
   /** Field names in thumbnail request. */
   private static final String THUMBNAIL_FILE = "FILE";
+  private static final String THUMBNAIL_PREVIEW_FILE = "PREVIEWFILE";
   private static final String THUMBNAIL_TRACK = "TRACK";
   private static final String THUMBNAIL_POSITION = "POSITION";
   private static final String THUMBNAIL_DEFAULT = "DEFAULT";
@@ -568,6 +569,32 @@ public class ToolsEndpoint {
               f("defaultPosition", thumbnail.getDefaultPosition()),
               f("type", ThumbnailImpl.ThumbnailSource.UPLOAD.name()),
               f("url", signIfNecessary(distElement.getURI()))))));
+        } else if (!current.isFormField() && THUMBNAIL_PREVIEW_FILE.equalsIgnoreCase(current.getFieldName())) {
+
+          if (!position.isPresent()) {
+            return R.badRequest("Missing thumbnail position");
+          }
+
+          final MediaPackageElement distributedElement;
+          final ThumbnailImpl.ThumbnailSource thumbnailSource;
+          InputStream preview = current.openStream();
+          try {
+            if (track.isPresent()) {
+              distributedElement = thumbnail.chooseThumbnail(mp, track.get(), position.getAsDouble(), Optional.of(Tuple.tuple(preview, current.getContentType())));
+              thumbnailSource = ThumbnailImpl.ThumbnailSource.SNAPSHOT;
+            } else {
+              distributedElement = thumbnail.chooseDefaultThumbnail(mp, position.getAsDouble(), Optional.of(Tuple.tuple(preview, current.getContentType())));
+              thumbnailSource = ThumbnailImpl.ThumbnailSource.DEFAULT;
+            }
+          } finally {
+            preview.close();
+          }
+          return RestUtils.okJson(obj(f("thumbnail", obj(
+            f("type", thumbnailSource.name()),
+            f("position", position.getAsDouble()),
+            f("defaultPosition", thumbnail.getDefaultPosition()),
+            f("url", signIfNecessary(distributedElement.getURI()))
+          ))));
         } else if (current.isFormField() && THUMBNAIL_TRACK.equalsIgnoreCase(current.getFieldName())) {
           final String value = Streams.asString(current.openStream());
           if (!THUMBNAIL_DEFAULT.equalsIgnoreCase(value)) {
@@ -579,25 +606,7 @@ public class ToolsEndpoint {
         }
       }
 
-      if (!position.isPresent()) {
-        return R.badRequest("Missing thumbnail position");
-      }
-
-      final MediaPackageElement distributedElement;
-      final ThumbnailImpl.ThumbnailSource thumbnailSource;
-      if (track.isPresent()) {
-        distributedElement = thumbnail.chooseThumbnail(mp, track.get(), position.getAsDouble());
-        thumbnailSource = ThumbnailImpl.ThumbnailSource.SNAPSHOT;
-      } else {
-        distributedElement = thumbnail.chooseDefaultThumbnail(mp, position.getAsDouble());
-        thumbnailSource = ThumbnailImpl.ThumbnailSource.DEFAULT;
-      }
-      return RestUtils.okJson(obj(f("thumbnail", obj(
-        f("type", thumbnailSource.name()),
-        f("position", position.getAsDouble()),
-        f("defaultPosition", thumbnail.getDefaultPosition()),
-        f("url", signIfNecessary(distributedElement.getURI()))
-      ))));
+      return R.badRequest("Missing thumbnail or preview");
     } catch (IOException | FileUploadException e) {
       logger.error("Error reading request body:", e);
       return R.serverError();
@@ -682,7 +691,7 @@ public class ToolsEndpoint {
             .getThumbnail(mediaPackage, urlSigningService, expireSeconds);
           if (optThumbnail.isPresent() && optThumbnail.get().getType().equals(ThumbnailImpl.ThumbnailSource.DEFAULT)) {
             distributedThumbnail = thumbnailImpl
-              .chooseDefaultThumbnail(mediaPackage, editingInfo.getDefaultThumbnailPosition().getAsDouble());
+              .chooseDefaultThumbnail(mediaPackage, editingInfo.getDefaultThumbnailPosition().getAsDouble(), Optional.empty());
           }
         } catch (UrlSigningException | URISyntaxException e) {
           logger.error("Error while trying to serialize the thumbnail url because:", e);
