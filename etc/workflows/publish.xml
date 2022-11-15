@@ -58,6 +58,7 @@
       id="snapshot"
       description="Archive publishing information">
       <configurations>
+        <configuration key="source-flavors">captions/*</configuration>
         <configuration key="source-tags">archive</configuration>
       </configurations>
     </operation>
