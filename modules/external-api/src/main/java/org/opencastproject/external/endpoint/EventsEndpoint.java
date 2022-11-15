@@ -56,7 +56,6 @@ import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.ExternalMetadataUtils;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
-import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.util.EventHttpServletRequest;
 import org.opencastproject.index.service.impl.util.EventUtils;
@@ -242,7 +241,6 @@ public class EventsEndpoint implements ManagedService {
   private IndexService indexService;
   private IngestService ingestService;
   private SecurityService securityService;
-  private CommonEventCatalogUIAdapter eventCatalogUIAdapter;
   private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<>();
   private UrlSigningService urlSigningService;
   private SchedulerService schedulerService;
@@ -296,12 +294,6 @@ public class EventsEndpoint implements ManagedService {
   @Reference
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
-  }
-
-  /** OSGi DI. */
-  @Reference
-  public void setCommonEventCatalogUIAdapter(CommonEventCatalogUIAdapter eventCatalogUIAdapter) {
-    this.eventCatalogUIAdapter = eventCatalogUIAdapter;
   }
 
   /** OSGi DI. */
@@ -1353,7 +1345,8 @@ public class EventsEndpoint implements ManagedService {
   protected Opt<MetadataList> getEventMetadata(Event event) throws IndexServiceException, Exception {
     MetadataList metadataList = new MetadataList();
     List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
-    catalogUIAdapters.remove(this.eventCatalogUIAdapter);
+    EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
+    catalogUIAdapters.remove(eventCatalogUIAdapter);
     MediaPackage mediaPackage = indexService.getEventMediapackage(event);
     if (catalogUIAdapters.size() > 0) {
       for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
@@ -1390,6 +1383,7 @@ public class EventsEndpoint implements ManagedService {
                 String.format("Unable to parse type '%s' as a flavor so unable to find the matching catalog.", type));
       }
       // Try the main catalog first as we load it from the index.
+      EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
       if (flavor.get().equals(eventCatalogUIAdapter.getFlavor())) {
         DublinCoreMetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter);
         ExternalMetadataUtils.changeSubjectToSubjects(collection);
@@ -1456,6 +1450,7 @@ public class EventsEndpoint implements ManagedService {
     for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
       MetadataList metadataList = new MetadataList();
       // Try the main catalog first as we load it from the index.
+      EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
       if (flavor.get().equals(eventCatalogUIAdapter.getFlavor())) {
         collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter);
         adapter = eventCatalogUIAdapter;
@@ -1585,6 +1580,7 @@ public class EventsEndpoint implements ManagedService {
         return R.badRequest(
                 String.format("Unable to parse type '%s' as a flavor so unable to find the matching catalog.", type));
       }
+      EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
       if (flavor.get().equals(eventCatalogUIAdapter.getFlavor())) {
         return Response
                 .status(Status.FORBIDDEN).entity(String

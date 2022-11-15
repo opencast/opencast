@@ -43,7 +43,6 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.PublicationImpl;
-import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.scheduler.api.SchedulerService;
@@ -62,7 +61,6 @@ import com.entwinemedia.fn.data.Opt;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.osgi.service.cm.ConfigurationException;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -116,27 +114,6 @@ public class TestEventsEndpoint extends EventsEndpoint {
     setSecurityService(securityService);
   }
 
-  private void setupEventCatalogUIAdapters() throws ConfigurationException {
-    // Setup common event catalog
-    CommonEventCatalogUIAdapter commonEventCatalogUIAdapter = new CommonEventCatalogUIAdapter();
-    Properties episodeCatalogProperties = getCatalogProperties(getClass(), "/episode-catalog.properties");
-    commonEventCatalogUIAdapter.updated(PropertiesUtil.toDictionary(episodeCatalogProperties));
-    this.setCommonEventCatalogUIAdapter(commonEventCatalogUIAdapter);
-    addCatalogUIAdapter(commonEventCatalogUIAdapter);
-
-    // Setup catalog to be deleted.
-    EventCatalogUIAdapter deleteAdapter = EasyMock.createMock(EventCatalogUIAdapter.class);
-    EasyMock.expect(deleteAdapter.getFlavor()).andReturn(new MediaPackageElementFlavor(DELETE_CATALOG_TYPE, "episode"))
-            .anyTimes();
-    DublinCoreMetadataCollection collectionMock = EasyMock.createNiceMock(DublinCoreMetadataCollection.class);
-    EasyMock.expect(deleteAdapter.getOrganization()).andReturn(defaultOrg.getId()).anyTimes();
-    EasyMock.expect(deleteAdapter.handlesOrganization(EasyMock.eq(defaultOrg.getId()))).andReturn(true).anyTimes();
-    EasyMock.expect(deleteAdapter.getFields(EasyMock.anyObject(MediaPackage.class))).andReturn(null).anyTimes();
-    EasyMock.expect(deleteAdapter.getUITitle()).andReturn(null).anyTimes();
-    EasyMock.replay(deleteAdapter);
-    addCatalogUIAdapter(deleteAdapter);
-  }
-
   public TestEventsEndpoint() throws Exception {
     this.endpointBaseUrl = "https://api.opencast.org";
 
@@ -152,6 +129,29 @@ public class TestEventsEndpoint extends EventsEndpoint {
     AssetManager assetManager = EasyMock.createMock(AssetManager.class);
 
     WorkflowService workflowService = EasyMock.createNiceMock(WorkflowService.class);
+
+    /**
+     * Setup CommonEventCatalog
+     */
+    CommonEventCatalogUIAdapter commonEventCatalogUIAdapter = new CommonEventCatalogUIAdapter();
+    Properties episodeCatalogProperties = getCatalogProperties(getClass(), "/episode-catalog.properties");
+    commonEventCatalogUIAdapter.updated(PropertiesUtil.toDictionary(episodeCatalogProperties));
+    addCatalogUIAdapter(commonEventCatalogUIAdapter);
+    EasyMock.expect(indexService.getCommonEventCatalogUIAdapter())
+        .andReturn(commonEventCatalogUIAdapter).anyTimes();
+
+    /**
+     * Setup catalog to be deleted.
+     */
+    EventCatalogUIAdapter deleteAdapter = EasyMock.createMock(EventCatalogUIAdapter.class);
+    EasyMock.expect(deleteAdapter.getFlavor()).andReturn(new MediaPackageElementFlavor(DELETE_CATALOG_TYPE, "episode"))
+        .anyTimes();
+    EasyMock.expect(deleteAdapter.getOrganization()).andReturn(defaultOrg.getId()).anyTimes();
+    EasyMock.expect(deleteAdapter.handlesOrganization(EasyMock.eq(defaultOrg.getId()))).andReturn(true).anyTimes();
+    EasyMock.expect(deleteAdapter.getFields(EasyMock.anyObject(MediaPackage.class))).andReturn(null).anyTimes();
+    EasyMock.expect(deleteAdapter.getUITitle()).andReturn(null).anyTimes();
+    EasyMock.replay(deleteAdapter);
+    addCatalogUIAdapter(deleteAdapter);
 
     /**
      * Delete Metadata external service mocking
@@ -315,7 +315,6 @@ public class TestEventsEndpoint extends EventsEndpoint {
     setAssetManager(assetManager);
     setWorkflowService(workflowService);
     setupSecurityService();
-    setupEventCatalogUIAdapters();
     Properties properties = new Properties();
     properties.load(getClass().getResourceAsStream("/events-endpoint.properties"));
     updated((Hashtable) properties);

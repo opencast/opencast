@@ -141,10 +141,6 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
           ConfigurableEventDCCatalogUIAdapter adapter;
           String[] adapterClassesNames;
           if (isCommonMetadata) {
-            if (bundleContext.getServiceReference(CommonEventCatalogUIAdapter.class.getName()) != null)
-              throw new ConfigurationException(CONF_COMMON_METADATA_KEY, format(
-                      "Only one common metadata catalog adapter is allowed for the type '%s'", CATALOG_TYPE_EVENTS));
-
             adapter = new CommonEventCatalogUIAdapter();
             adapterClassesNames = new String[] { CommonEventCatalogUIAdapter.class.getName(),
                     EventCatalogUIAdapter.class.getName() };
@@ -173,10 +169,6 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
           ConfigurableSeriesDCCatalogUIAdapter adapter;
           String[] adapterClassesNames;
           if (isCommonMetadata) {
-            if (bundleContext.getServiceReference(CommonSeriesCatalogUIAdapter.class.getName()) != null)
-              throw new ConfigurationException(CONF_COMMON_METADATA_KEY, format(
-                      "Only one common metadata catalog adapter is allowed for the type '%s'", CATALOG_TYPE_SERIES));
-
             adapter = new CommonSeriesCatalogUIAdapter();
             adapterClassesNames = new String[] { CommonSeriesCatalogUIAdapter.class.getName(),
                     SeriesCatalogUIAdapter.class.getName() };
