@@ -184,7 +184,7 @@ public class EmailWorkflowOperationHandlerTest {
     operation.setConfiguration(EmailWorkflowOperationHandler.BCC_PROPERTY, DEFAULT_BCC);
     operation.setConfiguration(EmailWorkflowOperationHandler.SUBJECT_PROPERTY, DEFAULT_SUBJECT);
     operation.setConfiguration(EmailWorkflowOperationHandler.BODY_TEMPLATE_FILE_PROPERTY, "template1");
-    operation.setConfiguration(EmailWorkflowOperationHandler.BODY_TEMPLATE_FILE_HTML_PROPERTY, "template1html");
+    operation.setConfiguration(EmailWorkflowOperationHandler.BODY_HTML_TEMPLATE_FILE_PROPERTY, "template1html");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
 

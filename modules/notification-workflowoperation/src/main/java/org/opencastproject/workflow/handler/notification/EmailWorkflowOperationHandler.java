@@ -80,9 +80,9 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
   static final String BCC_PROPERTY = "bcc";
   static final String SUBJECT_PROPERTY = "subject";
   static final String BODY_PROPERTY = "body";
-  static final String BODY_HTML_PROPERTY = "body-html";
   static final String BODY_TEMPLATE_FILE_PROPERTY = "body-template-file";
-  static final String BODY_TEMPLATE_FILE_HTML_PROPERTY = "body-template-file-html";
+  static final String BODY_HTML_PROPERTY = "body-html";
+  static final String BODY_HTML_TEMPLATE_FILE_PROPERTY = "body-html-template-file";
   static final String ADDRESS_SEPARATOR_PROPERTY = "address-separator";
   static final String ADDRESS_SEPARATOR_DEFAULT = ", \t";
   static final String SKIP_INVALID_ADDRESS_PROPERTY = "skip-invalid-address";
@@ -125,15 +125,15 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     String subject = applyTemplateIfNecessary(workflowInstance, operation, SUBJECT_PROPERTY);
 
     String bodyCfg = operation.getConfiguration(BODY_PROPERTY);
-    String bodyHtmlCfg = operation.getConfiguration(BODY_HTML_PROPERTY);
     String bodyTemplateFileCfg = operation.getConfiguration(BODY_TEMPLATE_FILE_PROPERTY);
-    String bodyTemplateFileHtmlCfg = operation.getConfiguration(BODY_TEMPLATE_FILE_HTML_PROPERTY);
+    String bodyHtmlCfg = operation.getConfiguration(BODY_HTML_PROPERTY);
+    String bodyHtmlTemplateFileCfg = operation.getConfiguration(BODY_HTML_TEMPLATE_FILE_PROPERTY);
 
     String bodyText = null;
     String bodyHTML = null;
 
     // Body informed? If not, use the default.
-    if (bodyCfg == null && bodyHtmlCfg == null && bodyTemplateFileCfg == null && bodyTemplateFileHtmlCfg == null) {
+    if (bodyCfg == null && bodyHtmlCfg == null && bodyTemplateFileCfg == null && bodyHtmlTemplateFileCfg == null) {
       // Set the body of the message to be the ID of the media package
       bodyText = String.format("%s (%s)", srcPackage.getTitle(), srcPackage.getIdentifier());
     }
@@ -146,8 +146,8 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
     if (bodyHtmlCfg != null) {
       bodyHTML = applyTemplateIfNecessary(workflowInstance, operation, BODY_HTML_PROPERTY);
-    } else if (bodyTemplateFileHtmlCfg != null) {
-      bodyHTML = applyTemplateIfNecessary(workflowInstance, operation, BODY_TEMPLATE_FILE_HTML_PROPERTY);
+    } else if (bodyHtmlTemplateFileCfg != null) {
+      bodyHTML = applyTemplateIfNecessary(workflowInstance, operation, BODY_HTML_TEMPLATE_FILE_PROPERTY);
     }
 
     try {
@@ -222,7 +222,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     String templateName = null;
     String templateContent = null;
 
-    if (BODY_TEMPLATE_FILE_PROPERTY.equals(configName) || BODY_TEMPLATE_FILE_HTML_PROPERTY.equals(configName)) {
+    if (BODY_TEMPLATE_FILE_PROPERTY.equals(configName) || BODY_HTML_TEMPLATE_FILE_PROPERTY.equals(configName)) {
       templateName = configValue; // Use body template file name
     } else if (configValue != null && configValue.contains("${")) {
       // If value contains a "${", it may be a template so apply it
