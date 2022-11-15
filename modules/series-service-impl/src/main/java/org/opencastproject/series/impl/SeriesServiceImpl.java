@@ -513,65 +513,75 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       List<SeriesEntity> databaseSeries = persistence.getAllSeries();
       final int total = databaseSeries.size();
-      int current = 1;
       logIndexRebuildBegin(logger, index.getIndexName(), total, "series");
+      int current = 0;
+      int n = 16;
+      var updatedSeriesRange = new ArrayList<Series>();
 
       for (SeriesEntity series: databaseSeries) {
+        String seriesId = series.getSeriesId();
+        logger.trace("Adding series {} for organization {} to the {} index.", seriesId,
+                series.getOrganization(), index.getIndexName());
         Organization organization = orgDirectory.getOrganization(series.getOrganization());
         User systemUser = SecurityUtil.createSystemUser(systemUserName, organization);
-        SecurityUtil.runAs(securityService, organization, systemUser,
-                () -> {
-                  String seriesId = series.getSeriesId();
-                  logger.trace("Adding series {} for organization {} to the {} index.", seriesId,
-                          series.getOrganization(), index.getIndexName());
-                  List<Function<Optional<Series>, Optional<Series>>> updateFunctions = new ArrayList<>();
-
-                  try {
-                    DublinCoreCatalog catalog = DublinCoreXmlFormat.read(series.getDublinCoreXML());
-                    updateFunctions.add(getMetadataUpdateFunction(seriesId, catalog, organization.getId()));
-                  } catch (IOException | ParserConfigurationException | SAXException e) {
-                    logger.error("Could not read dublin core XML of series {}.", seriesId, e);
-                    return;
-                  }
-
-                  // remove all extended metadata catalogs first so we get rid of old data
-                  updateFunctions.add(getResetExtendedMetadataFunction());
-                  for (Map.Entry<String, byte[]> entry: series.getElements().entrySet()) {
-                    try {
-                      DublinCoreCatalog dc = DublinCoreByteFormat.read(entry.getValue());
-                      updateFunctions.add(getExtendedMetadataUpdateFunction(seriesId, dc, entry.getKey(),
-                              organization.getId()));
-                    } catch (IOException | ParseException | ParserConfigurationException | SAXException e) {
-                      logger.error("Could not parse series element {} of series {} as a dublin core catalog, skipping.",
-                              entry.getKey(), seriesId, e);
-                    }
-                  }
-
-                  String aclStr = series.getAccessControl();
-                  if (StringUtils.isNotBlank(aclStr)) {
-                    try {
-                      AccessControlList acl = AccessControlParser.parseAcl(aclStr);
-                      updateFunctions.add(getAclUpdateFunction(seriesId, acl, organization.getId()));
-                    } catch (Exception ex) {
-                      logger.error("Unable to parse ACL of series {}.", seriesId, ex);
-                    }
-                  }
-
-                  try {
-                    Map<String, String> properties = persistence.getSeriesProperties(seriesId);
-                    updateFunctions.add(getThemePropertyUpdateFunction(seriesId,
-                            Optional.ofNullable(properties.get(THEME_PROPERTY_NAME)), organization.getId()));
-                  } catch (NotFoundException | SeriesServiceDatabaseException e) {
-                    logger.error("Error reading properties of series {}", seriesId, e);
-                  }
-
-                  // do the actual index update
-                  updateSeriesInIndex(seriesId, organization.getId(),
-                          updateFunctions.toArray(new Function[0]));
-
-                });
-        logIndexRebuildProgress(logger, index.getIndexName(), total, current);
         current++;
+
+        SecurityUtil.runAs(securityService, organization, systemUser,
+              () -> {
+                var updatedSeriesData = Optional.of(new Series(seriesId, organization.getId()));
+                try {
+                  DublinCoreCatalog catalog = DublinCoreXmlFormat.read(series.getDublinCoreXML());
+                  updatedSeriesData = getMetadataUpdateFunction(seriesId, catalog, organization.getId())
+                      .apply(updatedSeriesData);
+                } catch (IOException | ParserConfigurationException | SAXException e) {
+                  logger.error("Could not read dublincore XML of series {}.", seriesId, e);
+                  return;
+                }
+
+                // remove all extended metadata catalogs first so we get rid of old data
+                updatedSeriesData = getResetExtendedMetadataFunction().apply(updatedSeriesData);
+                for (Map.Entry<String, byte[]> entry: series.getElements().entrySet()) {
+                  try {
+                    DublinCoreCatalog dc = DublinCoreByteFormat.read(entry.getValue());
+
+                    updatedSeriesData = getExtendedMetadataUpdateFunction(seriesId, dc, entry.getKey(),
+                            organization.getId()).apply(updatedSeriesData);
+
+                  } catch (IOException | ParseException | ParserConfigurationException | SAXException e) {
+                    logger.error("Could not parse series element {} of series {} as a dublin core catalog, skipping.",
+                            entry.getKey(), seriesId, e);
+                  }
+                }
+
+                String aclStr = series.getAccessControl();
+                if (StringUtils.isNotBlank(aclStr)) {
+                  try {
+                    AccessControlList acl = AccessControlParser.parseAcl(aclStr);
+                    updatedSeriesData = getAclUpdateFunction(seriesId, acl, organization.getId())
+                        .apply(updatedSeriesData);
+                  } catch (Exception ex) {
+                    logger.error("Unable to parse ACL of series {}.", seriesId, ex);
+                  }
+                }
+
+                try {
+                  Map<String, String> properties = persistence.getSeriesProperties(seriesId);
+                  updatedSeriesData = getThemePropertyUpdateFunction(seriesId,
+                          Optional.ofNullable(properties.get(THEME_PROPERTY_NAME)), organization.getId())
+                      .apply(updatedSeriesData);
+                } catch (NotFoundException | SeriesServiceDatabaseException e) {
+                  logger.error("Error reading properties of series {}", seriesId, e);
+                }
+                updatedSeriesRange.add(updatedSeriesData.get());
+
+              });
+
+        if (updatedSeriesRange.size() >= n || current >= databaseSeries.size()) {
+          // do the actual index update
+          index.bulkSeriesUpdate(updatedSeriesRange);
+          logIndexRebuildProgress(logger, index.getIndexName(), total, current);
+          updatedSeriesRange.clear();
+        }
       }
     } catch (Exception e) {
       logIndexRebuildError(logger, index.getIndexName(), e);

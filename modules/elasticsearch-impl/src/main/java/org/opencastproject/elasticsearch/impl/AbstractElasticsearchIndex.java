@@ -42,6 +42,8 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
@@ -271,20 +273,69 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
         retryAttempts++;
 
         if (retryAttempts <= maxRetryAttempts) {
+          logger.warn("Could not update documents in index {}, retrying in {} ms.", getIndexName(),
+                  e, retryWaitingPeriod);
+          if (retryWaitingPeriod > 0) {
+            Thread.sleep(retryWaitingPeriod);
+          }
+        } else {
+          logger.error("Could not update documents in index {}, not retrying.", getIndexName(),
+                  e);
+        }
+      }
+    } while (indexResponse == null);
+
+    return indexResponse;
+  }
+
+  /**
+   * Posts the input documents to the search index.
+   *
+   * @param maxRetryAttempts
+   *          How often to retry update in case of ElasticsearchStatusException
+   * @param retryWaitingPeriod
+   *          How long to wait (in ms) between retries
+   * @param documents
+   *          The Elasticsearch documents
+   * @return the query response
+   *
+   * @throws IOException
+   *         If updating the index fails
+   * @throws InterruptedException
+   *         If waiting during retry is interrupted
+   */
+  protected BulkResponse bulkUpdate(int maxRetryAttempts, int retryWaitingPeriod,
+      List<ElasticsearchDocument> documents)
+          throws IOException, InterruptedException {
+    BulkRequest bulkRequest = new BulkRequest().setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
+
+    for (ElasticsearchDocument document: documents) {
+      bulkRequest.add(new IndexRequest(getSubIndexIdentifier(document.getType())).id(document.getUID())
+          .source(document));
+    }
+
+    BulkResponse bulkResponse = null;
+    int retryAttempts = 0;
+    do {
+      try {
+        bulkResponse = client.bulk(bulkRequest, RequestOptions.DEFAULT);
+      } catch (ElasticsearchStatusException e) {
+        retryAttempts++;
+
+        if (retryAttempts <= maxRetryAttempts) {
           logger.warn("Could not update documents in index {} because of {}, retrying in {} ms.", getIndexName(),
                   e.getMessage(), retryWaitingPeriod);
           if (retryWaitingPeriod > 0) {
             Thread.sleep(retryWaitingPeriod);
           }
         } else {
-          logger.error("Could not update documents in index {} because of {}, not retrying.", getIndexName(),
-                  e.getMessage());
-          throw e;
+          logger.error("Could not update documents in index {}, not retrying.", getIndexName(),
+                  e);
         }
       }
-    } while (indexResponse == null);
+    } while (bulkResponse == null);
 
-    return indexResponse;
+    return bulkResponse;
   }
 
   /**
@@ -321,9 +372,8 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
             Thread.sleep(retryWaitingPeriod);
           }
         } else {
-          logger.error("Could not remove documents from index {} because of {}, not retrying.", getIndexName(),
-                  e.getMessage());
-          throw e;
+          logger.error("Could not remove documents from index {}, not retrying.", getIndexName(),
+                  e);
         }
       }
     } while (deleteResponse == null);
@@ -616,9 +666,8 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
             Thread.sleep(retryWaitingPeriod);
           }
         } else {
-          logger.error("Could not query documents from index {} because of {}, not retrying.", getIndexName(),
-                  e.getMessage());
-          throw e;
+          logger.error("Could not query documents from index {}, not retrying.", getIndexName(),
+                  e);
         }
       }
     } while (searchResponse == null);

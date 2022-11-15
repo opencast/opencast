@@ -58,6 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -417,6 +418,32 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
   }
 
   /**
+   * Adds the recording events to the search index or updates it accordingly if it is there.
+   *
+   * @param eventList
+   *          The events to update
+   *
+   * @throws SearchIndexException
+   *          If the events cannot be added or updated
+   */
+  public void bulkEventUpdate(List<Event> eventList) throws SearchIndexException {
+    List<ElasticsearchDocument> docs = new ArrayList<>();
+    for (Event event: eventList) {
+      logger.debug("Adding event {} to search index", event.getIdentifier());
+      // Add the resource to the index
+      SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(event);
+      List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
+      docs.add(new ElasticsearchDocument(inputDocument.getIdentifier(),
+              inputDocument.getDocumentType(), resourceMetadata));
+    }
+    try {
+      bulkUpdate(maxRetryAttemptsUpdate, retryWaitingPeriodUpdate, docs);
+    } catch (Throwable t) {
+      throw new SearchIndexException("Cannot write events " + eventList + " to index", t);
+    }
+  }
+
+  /**
    * Adds or updates the series in the search index. Uses a locking mechanism to avoid issues like Lost Update.
    *
    * @param id
@@ -476,6 +503,32 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
   }
 
   /**
+   * Add or update a range of series in the search index.
+   *
+   * @param seriesList
+   *          The series to update
+   *
+   * @throws SearchIndexException
+   *          If the series cannot be added or updated
+   */
+  public void bulkSeriesUpdate(List<Series> seriesList) throws SearchIndexException {
+    List<ElasticsearchDocument> docs = new ArrayList<>();
+    for (Series series: seriesList) {
+      logger.debug("Adding series {} to search index", series.getIdentifier());
+      // Add the resource to the index
+      SearchMetadataCollection inputDocument = SeriesIndexUtils.toSearchMetadata(series);
+      List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
+      docs.add(new ElasticsearchDocument(inputDocument.getIdentifier(),
+              inputDocument.getDocumentType(), resourceMetadata));
+    }
+    try {
+      bulkUpdate(maxRetryAttemptsUpdate, retryWaitingPeriodUpdate, docs);
+    } catch (Throwable t) {
+      throw new SearchIndexException("Cannot write series " + seriesList + " to index", t);
+    }
+  }
+
+  /**
    * Adds or updates the theme in the search index. Uses a locking mechanism to avoid issues like Lost Update.
    *
    * @param id
@@ -531,6 +584,33 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
       update(maxRetryAttemptsUpdate, retryWaitingPeriodUpdate, doc);
     } catch (Throwable t) {
       throw new SearchIndexException("Cannot write theme " + theme + " to index", t);
+    }
+  }
+
+  /**
+   * Adds or updates the themes in the search index.
+   *
+   * @param themeList
+   *          The themes to update
+   *
+   * @throws SearchIndexException
+   *          Thrown if unable to add or update the themes.
+   */
+  public void bulkThemeUpdate(List<IndexTheme> themeList) throws SearchIndexException {
+    List<ElasticsearchDocument> docs = new ArrayList<>();
+    for (IndexTheme theme: themeList) {
+      logger.debug("Adding theme {} to search index", theme.getIdentifier());
+
+      // Add the resource to the index
+      SearchMetadataCollection inputDocument = theme.toSearchMetadata();
+      List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
+      docs.add(new ElasticsearchDocument(inputDocument.getIdentifier(),
+              inputDocument.getDocumentType(), resourceMetadata));
+    }
+    try {
+      bulkUpdate(maxRetryAttemptsUpdate, retryWaitingPeriodUpdate, docs);
+    } catch (Throwable t) {
+      throw new SearchIndexException("Cannot write themes " + themeList + " to index", t);
     }
   }
 
