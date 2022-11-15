@@ -42,7 +42,7 @@
     <jettison.version>1.5.1</jettison.version>
     <joda-time.version>2.10.10</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
-    <karaf.version>4.2.15</karaf.version>
+    <karaf.version>4.2.16</karaf.version>
     <node.version>v16.13.0</node.version>
     <osgi.compendium.version>6.0.0</osgi.compendium.version>
     <osgi.core.version>6.0.0</osgi.core.version>
@@ -703,7 +703,7 @@
             <dependency>
               <groupId>org.ow2.asm</groupId>
               <artifactId>asm</artifactId>
-              <version>7.3.1</version>
+              <version>9.3</version>
             </dependency>
             <dependency>
               <groupId>org.apache.maven.shared</groupId>
