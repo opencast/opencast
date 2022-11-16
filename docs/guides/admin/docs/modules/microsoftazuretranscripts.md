@@ -40,7 +40,24 @@ Configuration
 manage keys. For more information about Cognitive Services resources, see 
 [here](https://docs.microsoft.com/en-us/azure/cognitive-services/cognitive-services-apis-create-account?tabs=multiservice%2Clinux#get-the-keys-for-your-resource)
 
-### Step 2: Configure the Microsoft Azure Transcription Service
+### Step 2: Install GStreamer
+
+The Microsoft speech-to-text client uses GStreamer to transcode audio stream.
+Therefore, GStreamer must be installed on your Opencast admin node.
+On Debian based systems, you can do that by running:
+
+```shell
+sudo apt-get install libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly
+```
+
+On Red Hat based systems, run:
+
+```shell
+sudo yum install gstreamer1 gstreamer1-plugins-base gstreamer1-plugins-good gstreamer1-plugins-bad-free gstreamer1-plugins-ugly-free
+```
+
+
+### Step 3: Configure the Microsoft Azure Transcription Service
 
 Edit  _etc/org.opencastproject.transcription.microsoftazure.MicrosoftAzureTranscriptionServiec.cfg_:
 
@@ -49,7 +66,7 @@ Edit  _etc/org.opencastproject.transcription.microsoftazure.MicrosoftAzureTransc
 * All other settings are optional and explained in the config file
 
 
-### Step 3: Add a workflow operations or create new workflow to start transcription
+### Step 4: Add a workflow operations or create new workflow to start transcription
 
 The workflow below is a minimal working example for an event that has a video file in the `presenter/source` flavor.
 You do not necessarily need an extra workflow, and instead you can integrate the parts you need into your own. The
@@ -168,7 +185,7 @@ workflow can retrieve the mediapackage to attach captions/transcriptions
 
 ```
 
-### Step 4: Add a workflow to attach transcriptions
+### Step 5: Add a workflow to attach transcriptions
 
 A sample attach workflow that works together with the workflow from Step 3. Attaches the generated transcription
 to the mediapackages and republishes it. Copy it into a new file under
