@@ -78,6 +78,20 @@ API changes
 - [[#3002](https://github.com/opencast/opencast/pull/3002)] - Sign publication URL of events in External API
 - [[#3148](https://github.com/opencast/opencast/pull/3148)] - Allow empty track duration
 
+Additional Notes about 11.12
+----------------------------
+
+- Bug Fixes:
+    - Fix for wrong type handling in the encode WOH
+      (cf. [[#4382](https://github.com/opencast/opencast/pull/4382)]).
+    - Fix for live publications not being updated in archive on capture agent change
+      (cf. [[#4316](https://github.com/opencast/opencast/pull/4316)]).
+    - Fix for live publications not being retracted
+      (cf. [[#4250](https://github.com/opencast/opencast/pull/4250)]).
+- New Features and updates:
+    - Initialization of new event ACL with series ACL in the Admin UI is now configurable
+      (cf. [[#4249](https://github.com/opencast/opencast/pull/4249)]).
+
 Additional Notes about 11.11
 ----------------------------
 
