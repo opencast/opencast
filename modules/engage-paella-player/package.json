@@ -17,6 +17,5 @@
     "http-proxy": "^1.18.1",
     "request": "^2.88.2",
     "vinyl-source-stream": "^2.0.0"
-  },
-  "dependencies": {}
+  }
 }
