@@ -20,8 +20,6 @@ Notable changes are:
   (cf. [[#4370](https://github.com/opencast/opencast/pull/4370)]).
 - Fix for wrong type handling in the encode WOH
   (cf. [[#4382](https://github.com/opencast/opencast/pull/4382)]).
-- Fix for live publications not being updated in archive on capture agent change
-  (cf. [[#4316](https://github.com/opencast/opencast/pull/4316)]).
 - Fix for live publications not being retracted
   (cf. [[#4250](https://github.com/opencast/opencast/pull/4250)]).
 - Azure transcription service improvements
