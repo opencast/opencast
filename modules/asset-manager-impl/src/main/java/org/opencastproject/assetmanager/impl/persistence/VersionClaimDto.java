@@ -20,11 +20,12 @@
  */
 package org.opencastproject.assetmanager.impl.persistence;
 
-import org.opencastproject.util.persistencefn.Queries;
+import static org.opencastproject.db.Queries.namedQuery;
 
-import com.entwinemedia.fn.ProductBuilder;
-import com.entwinemedia.fn.Products;
-import com.entwinemedia.fn.data.Opt;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -49,9 +50,7 @@ import javax.persistence.Table;
         query = "update VersionClaim a set a.lastClaimed = :lastClaimed where a.mediaPackageId = :mediaPackageId"
     )
 })
-public final class VersionClaimDto {
-  private static final ProductBuilder p = Products.E;
-
+public class VersionClaimDto {
   @Id
   @Column(name = "mediapackage_id", length = 128)
   private String mediaPackageId;
@@ -76,15 +75,20 @@ public final class VersionClaimDto {
   }
 
   /** Find the last claimed version for a media package. */
-  public static Opt<VersionClaimDto> findLast(EntityManager em, String mediaPackageId) {
-    return Queries.named.findSingle(em, "VersionClaim.last", p.p2("mediaPackageId", mediaPackageId));
+  public static Function<EntityManager, Optional<VersionClaimDto>> findLastQuery(String mediaPackageId) {
+    return namedQuery.findOpt(
+        "VersionClaim.last",
+        VersionClaimDto.class,
+        Pair.of("mediaPackageId", mediaPackageId)
+    );
   }
 
   /** Update the last claimed version of a media package. */
-  public static boolean update(EntityManager em, String mediaPackageId, long lastClaimed) {
-    return Queries.named.update(
-            em, "VersionClaim.update",
-            p.p2("mediaPackageId", mediaPackageId),
-            p.p2("lastClaimed", lastClaimed));
+  public static Function<EntityManager, Integer> updateQuery(String mediaPackageId, long lastClaimed) {
+    return namedQuery.update(
+        "VersionClaim.update",
+        Pair.of("mediaPackageId", mediaPackageId),
+        Pair.of("lastClaimed", lastClaimed)
+    );
   }
 }

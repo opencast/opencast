@@ -11,8 +11,8 @@
     <class>org.opencastproject.assetmanager.aws.persistence.AwsAssetMappingDto</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <properties>
-      <property name="eclipselink.ddl-generation" value="create-tables" />
-      <property name="eclipselink.logging.logger" value="JavaLogger" />
+      <property name="eclipselink.ddl-generation" value="create-tables"/>
+      <property name="eclipselink.logging.logger" value="JavaLogger"/>
       <property name="eclipselink.create-ddl-jdbc-file-name" value="create-asset-aws.jdbc"/>
       <property name="eclipselink.drop-ddl-jdbc-file-name" value="drop-asset-aws.jdbc"/>
     </properties>

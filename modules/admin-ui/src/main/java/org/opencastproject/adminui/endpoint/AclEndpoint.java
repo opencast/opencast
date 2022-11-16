@@ -86,6 +86,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.ws.rs.DELETE;
@@ -311,8 +312,8 @@ public class AclEndpoint {
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unable to parse the ACL") })
   public Response createAcl(@FormParam("name") String name, @FormParam("acl") String accessControlList) {
     final AccessControlList acl = parseAcl.apply(accessControlList);
-    final Opt<ManagedAcl> managedAcl = aclService().createAcl(acl, name).toOpt();
-    if (managedAcl.isNone()) {
+    Optional<ManagedAcl> managedAcl = aclService().createAcl(acl, name);
+    if (managedAcl.isEmpty()) {
       logger.info("An ACL with the same name '{}' already exists", name);
       throw new WebApplicationException(Response.Status.CONFLICT);
     }
@@ -347,8 +348,9 @@ public class AclEndpoint {
           @RestResponse(responseCode = SC_OK, description = "The ACL has successfully been returned"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL has not been found") })
   public Response getAcl(@PathParam("id") long aclId) throws NotFoundException {
-    for (ManagedAcl managedAcl : aclService().getAcl(aclId)) {
-      return RestUtils.okJson(full(managedAcl));
+    Optional<ManagedAcl> managedAcl = aclService().getAcl(aclId);
+    if (managedAcl.isPresent()) {
+      return RestUtils.okJson(full(managedAcl.get()));
     }
     logger.info("No ACL with id '{}' could by found", aclId);
     throw new NotFoundException();

@@ -23,6 +23,8 @@ package org.opencastproject.serviceregistry.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -46,7 +48,6 @@ import org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.JobProduc
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.jmx.JmxUtil;
-import org.opencastproject.util.persistence.PersistenceUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -188,13 +189,14 @@ public class ServiceRegistryJpaImplTest {
   }
 
   public static void setUpEntityManagerFactory() {
-    emf = PersistenceUtil.newTestEntityManagerFactory("org.opencastproject.common");
+    emf = newEntityManagerFactory("org.opencastproject.common");
   }
 
   public static void setUpServiceRegistryJpaImpl()
           throws PropertyVetoException, NotFoundException, TrustedHttpClientException {
     serviceRegistryJpaImpl = new ServiceRegistryJpaImpl();
     serviceRegistryJpaImpl.setEntityManagerFactory(emf);
+    serviceRegistryJpaImpl.setDBSessionFactory(getDbSessionFactory());
 
     Organization organization = new DefaultOrganization();
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
@@ -248,12 +250,14 @@ public class ServiceRegistryJpaImplTest {
     EasyMock.replay(cc);
     jobDispatcher = new JobDispatcher();
     jobDispatcher.setEntityManagerFactory(emf);
+    jobDispatcher.setDBSessionFactory(getDbSessionFactory());
     jobDispatcher.setServiceRegistry(serviceRegistryJpaImpl);
     jobDispatcher.setSecurityService(securityService);
     jobDispatcher.setOrganizationDirectoryService(organizationDirectoryService);
     jobDispatcher.setUserDirectoryService(userDirectoryService);
     jobDispatcher.setTrustedHttpClient(trustedHttpClient);
     try {
+      serviceRegistryJpaImpl.activate(null);
       jobDispatcher.activate(cc);
     } catch (ConfigurationException e) {
       Assert.fail("Job dispatcher activation failed" + e);
@@ -437,7 +441,7 @@ public class ServiceRegistryJpaImplTest {
     Job k = serviceRegistryJpaImpl.getJob(j.getId());
     k.setStatus(Status.RUNNING);
     serviceRegistryJpaImpl.updateJob(k);
-    SystemLoad hostloads = serviceRegistryJpaImpl.getHostLoads(emf.createEntityManager());
+    SystemLoad hostloads = serviceRegistryJpaImpl.getHostLoadsQuery().apply(emf.createEntityManager());
     Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", a, hostloads.get(TEST_HOST).getCurrentLoad()),
             hostloads.get(TEST_HOST).getCurrentLoad() - a >= 0.0f);
     Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", a, hostloads.get(TEST_HOST).getCurrentLoad()),

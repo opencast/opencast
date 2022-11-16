@@ -21,19 +21,25 @@
 
 package org.opencastproject.adopter.registration;
 
+import static org.opencastproject.db.Queries.namedQuery;
+
+import org.opencastproject.db.DBSession;
+import org.opencastproject.db.DBSessionFactory;
+
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
-import javax.persistence.TypedQuery;
 
 /**
  * Repository that handles registration forms for the adopter statistics.
@@ -53,12 +59,30 @@ public class FormRepositoryImpl implements FormRepository {
   /** The factory for creating the entity manager. */
   protected EntityManagerFactory emf = null;
 
+  protected DBSessionFactory dbSessionFactory;
+
+  protected DBSession db;
+
   /** OSGi setter for the entity manager factory. */
   @Reference(target = "(osgi.unit.name=org.opencastproject.adopter)")
-  void setEntityManagerFactory(EntityManagerFactory emf) {
+  public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
 
+  @Reference
+  public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
+    this.dbSessionFactory = dbSessionFactory;
+  }
+
+  @Activate
+  public void activate() {
+    db = dbSessionFactory.createSession(emf);
+  }
+
+  @Deactivate
+  public void deactivate() {
+    db.close();
+  }
 
   //================================================================================
   // Methods
@@ -67,89 +91,49 @@ public class FormRepositoryImpl implements FormRepository {
   @Override
   public void save(IForm f) throws FormRepositoryException {
     Form form = (Form) f;
-    EntityManager em = null;
-    EntityTransaction tx = null;
     try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
-      Form dbForm = getForm(em);
-      if (dbForm == null) {
-        // Null means, that there is no entry in the DB yet, so we create UUIDs for the keys.
-        form.setAdopterKey(UUID.randomUUID().toString());
-        form.setStatisticKey(UUID.randomUUID().toString());
-        form.setDateCreated(new Date());
-        form.setDateModified(new Date());
-        em.persist(form);
-      } else {
-        dbForm.merge(form);
-        em.merge(dbForm);
-      }
-      tx.commit();
+      db.execTx(em -> {
+        Optional<Form> dbForm = getFormQuery().apply(em);
+        if (dbForm.isEmpty()) {
+          // Null means, that there is no entry in the DB yet, so we create UUIDs for the keys.
+          form.setAdopterKey(UUID.randomUUID().toString());
+          form.setStatisticKey(UUID.randomUUID().toString());
+          form.setDateCreated(new Date());
+          form.setDateModified(new Date());
+          em.persist(form);
+        } else {
+          dbForm.get().merge(form);
+          em.merge(dbForm.get());
+        }
+      });
     } catch (Exception e) {
       logger.error("Couldn't update the adopter statistics registration form: {}", e.getMessage());
-      if (tx.isActive()) {
-        tx.rollback();
-      }
       throw new FormRepositoryException(e);
-    } finally {
-      if (em != null) {
-        em.close();
-      }
     }
   }
 
   @Override
   public void delete() {
-    EntityManager em = null;
-    EntityTransaction tx;
     try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
-      em.createNamedQuery("Form.deleteAll", Form.class).executeUpdate();
-      tx.commit();
+      db.execTx(namedQuery.delete("Form.deleteAll"));
     } catch (Exception e) {
       logger.error("Error occurred while deleting the adopter registration table. {}", e.getMessage());
       throw new RuntimeException(e);
-    } finally {
-      if (em != null) {
-        em.close();
-      }
     }
   }
 
   @Override
   public IForm getForm() throws FormRepositoryException {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      return getForm(em);
-    } catch (NoResultException e) {
-      return null;
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    return db.exec(getFormQuery()).orElse(null);
   }
 
   /**
    * Return the adopter registration form from db.
-   * @param em An open entity manager.
    * @return The registration form or <code>null</code> if not found
    * @throws FormRepositoryException If there is a problem communicating
    *                                 with the underlying data store.
    */
-  private Form getForm(EntityManager em) throws FormRepositoryException {
-    TypedQuery<Form> q = em.createNamedQuery("Form.findAll", Form.class);
-    try {
-      return q.getSingleResult();
-    } catch (NoResultException e) {
-      return null;
-    } catch (Exception e) {
-      throw new FormRepositoryException(e);
-    }
+  private Function<EntityManager, Optional<Form>> getFormQuery() {
+    return namedQuery.findOpt("Form.findAll", Form.class);
   }
-
 }

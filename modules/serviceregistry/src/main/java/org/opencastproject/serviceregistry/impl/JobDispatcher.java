@@ -22,9 +22,12 @@
 package org.opencastproject.serviceregistry.impl;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.opencastproject.db.Queries.namedQuery;
 import static org.opencastproject.security.api.SecurityConstants.ORGANIZATION_HEADER;
 import static org.opencastproject.security.api.SecurityConstants.USER_HEADER;
 
+import org.opencastproject.db.DBSession;
+import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.jpa.JpaJob;
 import org.opencastproject.security.api.Organization;
@@ -44,6 +47,7 @@ import org.opencastproject.util.UrlSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -60,7 +64,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Dictionary;
@@ -73,13 +76,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
 
 /**
  * This dispatcher implementation will check for jobs in the QUEUED {@link Job.Status}. If
@@ -121,6 +122,10 @@ public class JobDispatcher {
   /** The factory used to generate the entity manager */
   private EntityManagerFactory emf = null;
 
+  protected DBSessionFactory dbSessionFactory;
+
+  protected DBSession db;
+
   private ScheduledFuture jdfuture = null;
 
   /**
@@ -135,6 +140,12 @@ public class JobDispatcher {
   @Reference(target = "(osgi.unit.name=org.opencastproject.common)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
+  }
+
+  /** OSGi DI */
+  @Reference
+  public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
+    this.dbSessionFactory = dbSessionFactory;
   }
 
   /** OSGi DI */
@@ -166,6 +177,7 @@ public class JobDispatcher {
   @Activate
   public void activate(ComponentContext cc) throws ConfigurationException  {
     logger.info("Activate job dispatcher");
+    db = dbSessionFactory.createSession(emf);
     scheduledExecutor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1);
     scheduledExecutor.setRemoveOnCancelPolicy(true);
     logger.info("Activated");
@@ -239,14 +251,10 @@ public class JobDispatcher {
      */
     @Override
     public void run() {
-
       logger.debug("Starting job dispatch");
 
-      undispatchableJobTypes = new ArrayList<String>();
-      EntityManager em = null;
+      undispatchableJobTypes = new ArrayList<>();
       try {
-        em = emf.createEntityManager();
-
         //GDLGDL: move collectJobStats to the JD config, then this is reasonable
         // FIXME: the stats are not currently used and the queries are very expensive in database time.
         if (serviceRegistry.collectJobstats) {
@@ -256,7 +264,7 @@ public class JobDispatcher {
         if (!dispatchPriorityList.isEmpty()) {
           logger.trace("Checking for outdated jobs in dispatchPriorityList's '{}' jobs", dispatchPriorityList.size());
           // Remove outdated jobs from priority list
-          List<Long> jobIds = getDispatchableJobsWithIdFilter(em, dispatchPriorityList.keySet());
+          List<Long> jobIds = db.exec(getDispatchableJobsWithIdFilterQuery(dispatchPriorityList.keySet()));
           for (Long jobId : new HashSet<>(dispatchPriorityList.keySet())) {
             if (!jobIds.contains(jobId)) {
               logger.debug("Removing outdated dispatchPriorityList job '{}'", jobId);
@@ -266,12 +274,14 @@ public class JobDispatcher {
         }
 
         int jobsOffset = 0;
-        List<JpaJob> dispatchableJobs = null;
-        List<JpaJob> workflowJobs = new ArrayList();
-        boolean jobsFound = false;
+        List<JpaJob> dispatchableJobs;
+        List<JpaJob> workflowJobs = new ArrayList<>();
+        boolean jobsFound;
         do {
           // dispatch all dispatchable jobs with status restarted
-          dispatchableJobs = serviceRegistry.getDispatchableJobsWithStatus(em, jobsOffset, ServiceRegistryJpaImpl.DEFAULT_DISPATCH_JOBS_LIMIT, Job.Status.RESTART);
+          dispatchableJobs = db.exec(serviceRegistry.getDispatchableJobsWithStatusQuery(
+              jobsOffset, ServiceRegistryJpaImpl.DEFAULT_DISPATCH_JOBS_LIMIT, Job.Status.RESTART
+          ));
           jobsOffset += ServiceRegistryJpaImpl.DEFAULT_DISPATCH_JOBS_LIMIT;
           jobsFound = !dispatchableJobs.isEmpty();
 
@@ -285,14 +295,15 @@ public class JobDispatcher {
             continue;
           }
 
-          dispatchDispatchableJobs(em, dispatchableJobs);
+          dispatchDispatchableJobs(dispatchableJobs);
         } while (jobsFound);
 
         jobsOffset = 0;
-        jobsFound = false;
         do {
           // dispatch all dispatchable jobs with status queued
-          dispatchableJobs = serviceRegistry.getDispatchableJobsWithStatus(em, jobsOffset, ServiceRegistryJpaImpl.DEFAULT_DISPATCH_JOBS_LIMIT, Job.Status.QUEUED);
+          dispatchableJobs = db.exec(serviceRegistry.getDispatchableJobsWithStatusQuery(
+              jobsOffset, ServiceRegistryJpaImpl.DEFAULT_DISPATCH_JOBS_LIMIT, Job.Status.QUEUED
+          ));
           jobsOffset += ServiceRegistryJpaImpl.DEFAULT_DISPATCH_JOBS_LIMIT;
           jobsFound = !dispatchableJobs.isEmpty();
 
@@ -306,20 +317,16 @@ public class JobDispatcher {
             continue;
           }
 
-          dispatchDispatchableJobs(em, dispatchableJobs);
+          dispatchDispatchableJobs(dispatchableJobs);
         } while (jobsFound);
 
         if (!workflowJobs.isEmpty()) {
-          dispatchDispatchableJobs(em, workflowJobs);
+          dispatchDispatchableJobs(workflowJobs);
         }
-
       } catch (Throwable t) {
         logger.warn("Error dispatching jobs", t);
       } finally {
         undispatchableJobTypes = null;
-        if (em != null) {
-          em.close();
-        }
       }
 
       logger.debug("Finished job dispatch");
@@ -328,21 +335,19 @@ public class JobDispatcher {
     /**
      * Dispatch the given jobs.
      *
-     * @param em             the entity manager
      * @param jobsToDispatch list with dispatchable jobs to dispatch
      */
-    private void dispatchDispatchableJobs(EntityManager em, List<JpaJob> jobsToDispatch) {
-      //Get the current system load
-      SystemLoad systemLoad = serviceRegistry.getHostLoads(em);
+    private void dispatchDispatchableJobs(List<JpaJob> jobsToDispatch) {
+      // Get the current system load
+      SystemLoad systemLoad = db.exec(serviceRegistry.getHostLoadsQuery());
 
       for (JpaJob job : jobsToDispatch) {
-
         // Remember the job type
         String jobType = job.getJobType();
 
         // Skip jobs that we already know can't be dispatched except of jobs in the priority list
-        String jobSignature = new StringBuilder(jobType).append('@').append(job.getOperation()).toString();
-        if (undispatchableJobTypes.contains(jobSignature) && !dispatchPriorityList.keySet().contains(job.getId())) {
+        String jobSignature = jobType + '@' + job.getOperation();
+        if (undispatchableJobTypes.contains(jobSignature) && !dispatchPriorityList.containsKey(job.getId())) {
           logger.trace("Skipping dispatching of {} with type '{}' for this round of dispatching", job, jobType);
           continue;
         }
@@ -352,7 +357,7 @@ public class JobDispatcher {
         String creatorOrganization = job.getOrganization();
 
         // Try to load the organization.
-        Organization organization = null;
+        Organization organization;
         try {
           organization = organizationDirectoryService.getOrganization(creatorOrganization);
           securityService.setOrganization(organization);
@@ -371,11 +376,12 @@ public class JobDispatcher {
 
         // Start dispatching
         try {
-          List<ServiceRegistration> services = serviceRegistry.getServiceRegistrations(em);
-          List<HostRegistration> hosts = serviceRegistry.getHostRegistrations(em).stream()
-                                           .filter(el -> filterOutPriorityHosts.test(el, job.getId()))
+          List<ServiceRegistration> services = db.exec(serviceRegistry.getServiceRegistrationsQuery());
+          List<HostRegistration> hosts = db.exec(serviceRegistry.getHostRegistrationsQuery()).stream()
+                                           .filter(host -> !dispatchPriorityList.containsValue(host.getBaseUrl())
+                                               || host.getBaseUrl().equals(dispatchPriorityList.get(job.getId())))
                                            .collect(Collectors.toList());
-          List<ServiceRegistration> candidateServices = null;
+          List<ServiceRegistration> candidateServices;
 
           // Depending on whether this running job is trying to reach out to other services or whether this is an
           // attempt to execute the next operation in a workflow, choose either from a limited or from the full list
@@ -412,9 +418,9 @@ public class JobDispatcher {
           }
 
           // Try to dispatch the job
-          String hostAcceptingJob = null;
+          String hostAcceptingJob;
           try {
-            hostAcceptingJob = dispatchJob(em, job, candidateServices);
+            hostAcceptingJob = dispatchJob(job, candidateServices);
             try {
               systemLoad.updateNodeLoad(hostAcceptingJob, job.getJobLoad());
             } catch (NotFoundException e) {
@@ -449,7 +455,6 @@ public class JobDispatcher {
      * Dispatches the job to the least loaded service that will accept the job, or throws a
      * <code>ServiceUnavailableException</code> if there is no such service.
      *
-     * @param em       the current entity manager
      * @param job      the job to dispatch
      * @param services a list of service registrations
      * @return the host that accepted the dispatched job, or <code>null</code> if no services took the job.
@@ -457,9 +462,8 @@ public class JobDispatcher {
      * @throws ServiceUnavailableException if no service is available or if all available services refuse to take on more work
      * @throws UndispatchableJobException  if the current job cannot be processed
      */
-    private String dispatchJob(EntityManager em, JpaJob job, List<ServiceRegistration> services)
+    private String dispatchJob(JpaJob job, List<ServiceRegistration> services)
         throws ServiceRegistryException, ServiceUnavailableException, UndispatchableJobException {
-
       if (services.size() == 0) {
         logger.debug("No service is currently available to handle jobs of type '" + job.getJobType() + "'");
         throw new ServiceUnavailableException("No service of type " + job.getJobType() + " available");
@@ -469,13 +473,14 @@ public class JobDispatcher {
       job.setStatus(Job.Status.DISPATCHING);
 
       boolean triedDispatching = false;
-
       boolean jobLoadExceedsMaximumLoads = false;
+
       final Float highestMaxLoad = services.stream()
-                                           .map(toHostRegistration)
-                                           .map(toMaxLoad)
-                                           .sorted(sortFloatValuesDesc)
-                                           .findFirst().get();
+                                           .map(s -> ((ServiceRegistrationJpaImpl) s).getHostRegistration())
+                                           .map(HostRegistration::getMaxLoad)
+                                           .max(Comparator.naturalOrder())
+                                           .get();
+
       if (job.getJobLoad() > highestMaxLoad) {
         // None of the available hosts is able to accept the job because the largest max load value is less than this job's load value
         jobLoadExceedsMaximumLoads = true;
@@ -491,7 +496,7 @@ public class JobDispatcher {
         }
 
         try {
-          job = serviceRegistry.updateInternal(em, job);
+          job = serviceRegistry.updateInternal(job); // will open a tx
         } catch (Exception e) {
           // In theory, we should catch javax.persistence.OptimisticLockException. Unfortunately, eclipselink throws
           // org.eclipse.persistence.exceptions.OptimisticLockException. In order to avoid importing the implementation
@@ -510,7 +515,7 @@ public class JobDispatcher {
         post.addHeader(ORGANIZATION_HEADER, securityService.getOrganization().getId());
         post.addHeader(USER_HEADER, securityService.getUser().getUsername());
 
-        List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+        List<BasicNameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("id", Long.toString(job.getId())));
         params.add(new BasicNameValuePair("operation", job.getOperation()));
         post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
@@ -533,7 +538,7 @@ public class JobDispatcher {
             continue;
           } else if (responseStatusCode == HttpStatus.SC_PRECONDITION_FAILED) {
             job.setStatus(Job.Status.FAILED);
-            job = serviceRegistry.updateJob(job);
+            job = serviceRegistry.updateJob(job); // will open a tx
             logger.debug("Service {} refused to accept {}", registration, job);
             throw new UndispatchableJobException(IOUtils.toString(response.getEntity().getContent()));
           } else if (responseStatusCode == HttpStatus.SC_METHOD_NOT_ALLOWED) {
@@ -576,7 +581,7 @@ public class JobDispatcher {
         try {
           job.setStatus(Job.Status.QUEUED);
           job.setProcessorServiceRegistration(null);
-          job = serviceRegistry.updateJob(job);
+          job = serviceRegistry.updateJob(job); // will open a tx
         } catch (Exception e) {
           logger.error("Unable to put {} back into queue", job, e);
         }
@@ -589,36 +594,26 @@ public class JobDispatcher {
     /**
      * Return dispatchable job ids, where the job status is RESTART or QUEUED and the job id is listed in the given set.
      *
-     * @param em the entity manager
      * @param jobIds set with job id's interested in
      * @return list with dispatchable job id's from the given set, with job status RESTART or QUEUED
-     * @throws ServiceRegistryException if there is a problem communicating with the jobs database
      */
-    private List<Long> getDispatchableJobsWithIdFilter(EntityManager em, Set<Long> jobIds)
-        throws ServiceRegistryException {
-      if (jobIds == null || jobIds.isEmpty())
-        return Collections.EMPTY_LIST;
-
-      Query query = null;
-      try {
-        query = em.createNamedQuery("Job.dispatchable.status.idfilter");
-        query.setParameter("jobids", dispatchPriorityList.keySet());
-        query.setParameter("statuses", Arrays.asList(Job.Status.RESTART.ordinal(), Job.Status.QUEUED.ordinal()));
-        return query.getResultList();
-      } catch (Exception e) {
-        throw new ServiceRegistryException(e);
-      }
-    }
-
-    private final BiPredicate<HostRegistration, Long> filterOutPriorityHosts = new BiPredicate<HostRegistration, Long>() {
-      @Override
-      public boolean test(HostRegistration host, Long jobId) {
-        if (dispatchPriorityList.values().contains(host.getBaseUrl()) && !host.getBaseUrl().equals(dispatchPriorityList.get(jobId))) {
-          return false;
+    protected Function<EntityManager, List<Long>> getDispatchableJobsWithIdFilterQuery(Set<Long> jobIds) {
+      return em -> {
+        if (jobIds == null || jobIds.isEmpty()) {
+          return Collections.emptyList();
         }
-        return true;
-      }
-    };
+
+        return namedQuery.findAll(
+            "Job.dispatchable.status.idfilter",
+            Long.class,
+            Pair.of("jobids", dispatchPriorityList.keySet()),
+            Pair.of("statuses", List.of(
+                Job.Status.RESTART.ordinal(),
+                Job.Status.QUEUED.ordinal()
+            ))
+        ).apply(em);
+      };
+    }
 
     private final Function<ServiceRegistration, HostRegistration> toHostRegistration = new Function<ServiceRegistration, HostRegistration>() {
       @Override

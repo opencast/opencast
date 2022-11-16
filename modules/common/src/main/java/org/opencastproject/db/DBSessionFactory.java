@@ -19,24 +19,19 @@
  *
  */
 
+package org.opencastproject.db;
 
-package org.opencastproject.oaipmh.util;
-
-import org.opencastproject.util.data.Function;
-
-import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 /**
- * Persistence environment to perform a transaction.
+ * Factory interface for creating DBSessions.
  */
-public interface PersistenceEnv {
+public interface DBSessionFactory {
   /**
-   * Run code inside a transaction.
+   * Creates a new DBSession.
+   *
+   * @param emf EntityManagerFactory that the new DBSession should use.
+   * @return A new DBSession.
    */
-  <A> A tx(Function<EntityManager, A> transactional);
-
-  /**
-   * Close the environment and free all associated resources.
-   */
-  void close();
+  DBSession createSession(EntityManagerFactory emf);
 }

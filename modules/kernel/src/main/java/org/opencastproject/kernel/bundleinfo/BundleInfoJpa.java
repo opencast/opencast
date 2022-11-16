@@ -21,17 +21,15 @@
 
 package org.opencastproject.kernel.bundleinfo;
 
+import static org.opencastproject.db.Queries.namedQuery;
 import static org.opencastproject.kernel.bundleinfo.BundleInfoImpl.bundleInfo;
-import static org.opencastproject.util.data.Collections.toArray;
-import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Tuple.tuple;
-import static org.opencastproject.util.persistence.Queries.named;
 
-import org.opencastproject.util.data.Effect;
-import org.opencastproject.util.data.Function;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -95,50 +93,37 @@ public class BundleInfoJpa {
     return bundleInfo(host, bundleSymbolicName, bundleId, bundleVersion, option(buildNumber), option(dbSchemaVersion));
   }
 
-  /** {@link #toBundleInfo()} as a function. */
-  public static final Function<BundleInfoJpa, BundleInfo> toBundleInfo = new Function<BundleInfoJpa, BundleInfo>() {
-    @Override
-    public BundleInfo apply(BundleInfoJpa dto) {
-      return dto.toBundleInfo();
-    }
-  };
-
   /** Find all in database. */
-  public static final Function<EntityManager, List<BundleInfoJpa>> findAll = named.findAll("BundleInfo.findAll");
+  public static final Function<EntityManager, List<BundleInfoJpa>> findAll = namedQuery
+      .findAll("BundleInfo.findAll", BundleInfoJpa.class);
 
   /** Find all bundles whose symbolic names start with one of the given prefixes. */
   public static Function<EntityManager, List<BundleInfoJpa>> findAll(final String... prefixes) {
-    return new Function<EntityManager, List<BundleInfoJpa>>() {
-      @Override
-      public List<BundleInfoJpa> apply(EntityManager em) {
-        final CriteriaBuilder cb = em.getCriteriaBuilder();
-        final CriteriaQuery<BundleInfoJpa> q = cb.createQuery(BundleInfoJpa.class);
-        final Root<BundleInfoJpa> r = q.from(BundleInfoJpa.class);
-        q.select(r);
-        final Expression<String> symbolicNamePath = r.get("bundleSymbolicName");
-        final Predicate[] likes = toArray(Predicate.class, mlist(prefixes).map(new Function<String, Predicate>() {
-          @Override
-          public Predicate apply(String prefix) {
-            return cb.like(symbolicNamePath, prefix + "%");
-          }
-        }).value());
-        q.where(cb.or(likes));
-        q.orderBy(cb.asc(r.get("host")), cb.asc(symbolicNamePath));
-        return em.createQuery(q).getResultList();
-      }
+    return em -> {
+      final CriteriaBuilder cb = em.getCriteriaBuilder();
+      final CriteriaQuery<BundleInfoJpa> q = cb.createQuery(BundleInfoJpa.class);
+      final Root<BundleInfoJpa> r = q.from(BundleInfoJpa.class);
+      q.select(r);
+      final Expression<String> symbolicNamePath = r.get("bundleSymbolicName");
+      final Predicate[] likes = Stream.of(prefixes)
+          .map(prefix -> cb.like(symbolicNamePath, prefix + "%"))
+          .toArray(Predicate[]::new);
+      q.where(cb.or(likes));
+      q.orderBy(cb.asc(r.get("host")), cb.asc(symbolicNamePath));
+      return em.createQuery(q).getResultList();
     };
   }
 
   /** Delete all entities of BundleInfo from the database. */
-  public static final Effect<EntityManager> deleteAll = named.update("BundleInfo.deleteAll").toEffect();
+  public static final Function<EntityManager, Integer> deleteAll = namedQuery.update("BundleInfo.deleteAll");
 
   /** Delete all entities of BundleInfo of a certain host from the database. */
-  public static Effect<EntityManager> deleteByHost(String host) {
-    return named.update("BundleInfo.deleteByHost", tuple("host", host)).toEffect();
+  public static Function<EntityManager, Integer> deleteByHost(String host) {
+    return namedQuery.update("BundleInfo.deleteByHost", Pair.of("host", host));
   }
 
   /** Delete a bundle info. */
-  public static Effect<EntityManager> delete(final String host, final long bundleId) {
-    return named.update("BundleInfo.delete", tuple("host", host), tuple("bundleId", bundleId)).toEffect();
+  public static Function<EntityManager, Integer> delete(final String host, final long bundleId) {
+    return namedQuery.update("BundleInfo.delete", Pair.of("host", host), Pair.of("bundleId", bundleId));
   }
 }

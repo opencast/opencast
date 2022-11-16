@@ -24,9 +24,10 @@ package org.opencastproject.search.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.security.api.Permissions.Action.READ;
 import static org.opencastproject.security.api.Permissions.Action.WRITE;
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -161,7 +162,7 @@ public class SearchServiceImplTest {
 
   @Before
   public void setUp() throws Exception {
-    EntityManagerFactory emf = newTestEntityManagerFactory(SearchServiceDatabaseImpl.PERSISTENCE_UNIT);
+    EntityManagerFactory emf = newEntityManagerFactory(SearchServiceDatabaseImpl.PERSISTENCE_UNIT);
     EntityManager em = emf.createEntityManager();
     // workspace
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
@@ -201,8 +202,9 @@ public class SearchServiceImplTest {
     // Persistence storage
     searchDatabase = new SearchServiceDatabaseImpl();
     searchDatabase.setEntityManagerFactory(emf);
-    searchDatabase.activate(null);
+    searchDatabase.setDBSessionFactory(getDbSessionFactory());
     searchDatabase.setSecurityService(securityService);
+    searchDatabase.activate(null);
 
     // search service
     service = new SearchServiceImpl();

@@ -20,6 +20,9 @@
  */
 package org.opencastproject.transcription.googlespeech;
 
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
+
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
@@ -51,7 +54,6 @@ import org.opencastproject.transcription.persistence.TranscriptionDatabaseImpl;
 import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -187,8 +189,8 @@ public class GoogleSpeechTranscriptionServiceTest {
         return new TranscriptionProviderControl(PROVIDER_ID, PROVIDER);
       }
     };
-    database.setEntityManagerFactory(
-            PersistenceUtil.newTestEntityManagerFactory("org.opencastproject.transcription.persistence"));
+    database.setEntityManagerFactory(newEntityManagerFactory("org.opencastproject.transcription.persistence"));
+    database.setDBSessionFactory(getDbSessionFactory());
     database.activate(null);
 
     httpClient = EasyMock.createNiceMock(CloseableHttpClient.class);

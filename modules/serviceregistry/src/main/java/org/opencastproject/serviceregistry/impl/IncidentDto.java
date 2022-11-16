@@ -21,6 +21,7 @@
 
 package org.opencastproject.serviceregistry.impl;
 
+import static org.opencastproject.db.Queries.namedQuery;
 import static org.opencastproject.util.JsonVal.asString;
 import static org.opencastproject.util.Jsons.obj;
 import static org.opencastproject.util.Jsons.p;
@@ -31,9 +32,9 @@ import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.JsonVal;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.Jsons.Prop;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Tuple;
-import org.opencastproject.util.persistence.Queries;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -166,7 +168,7 @@ public class IncidentDto {
     return param;
   }
 
-  public static Function<EntityManager, List<IncidentDto>> findByJobId(long jobId) {
-    return Queries.named.findAll("Incident.findByJobId", tuple("jobId", jobId));
+  public static Function<EntityManager, List<IncidentDto>> findByJobIdQuery(long jobId) {
+    return namedQuery.findAll("Incident.findByJobId", IncidentDto.class, Pair.of("jobId", jobId));
   }
 }

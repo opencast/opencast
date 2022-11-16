@@ -37,7 +37,6 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,16 +74,16 @@ public final class AclServiceImpl implements AclService {
   }
 
   @Override
-  public Option<ManagedAcl> getAcl(long id) {
+  public Optional<ManagedAcl> getAcl(long id) {
     return aclDb.getAcl(organization, id);
   }
 
   @Override
   public boolean updateAcl(ManagedAcl acl) {
-    Option<ManagedAcl> oldName = getAcl(acl.getId());
+    Optional<ManagedAcl> oldName = getAcl(acl.getId());
     boolean updateAcl = aclDb.updateAcl(acl);
     if (updateAcl) {
-      if (oldName.isSome() && !(oldName.get().getName().equals(acl.getName()))) {
+      if (oldName.isPresent() && !(oldName.get().getName().equals(acl.getName()))) {
         User user = securityService.getUser();
         updateAclInIndex(oldName.get().getName(), acl.getName(), index, organization.getId(), user);
       }
@@ -93,16 +92,16 @@ public final class AclServiceImpl implements AclService {
   }
 
   @Override
-  public Option<ManagedAcl> createAcl(AccessControlList acl, String name) {
+  public Optional<ManagedAcl> createAcl(AccessControlList acl, String name) {
     // we don't need to update the Elasticsearch indices in this case
     return aclDb.createAcl(organization, acl, name);
   }
 
   @Override
   public boolean deleteAcl(long id) throws AclServiceException, NotFoundException {
-    Option<ManagedAcl> deletedAcl = getAcl(id);
+    Optional<ManagedAcl> deletedAcl = getAcl(id);
     if (aclDb.deleteAcl(organization, id)) {
-      if (deletedAcl.isSome()) {
+      if (deletedAcl.isPresent()) {
         User user = securityService.getUser();
         removeAclFromIndex(deletedAcl.get().getName(), index, organization.getId(), user);
       }

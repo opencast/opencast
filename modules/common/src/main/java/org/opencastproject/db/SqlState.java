@@ -19,20 +19,16 @@
  *
  */
 
-package org.opencastproject.util.persistence;
+package org.opencastproject.db;
 
-import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Function;
+public final class SqlState {
+  // SQL State Class 40 - Transaction rollback
+  public static final String TRANSACTION_ROLLBACK_NO_SUBCLASS = "40000";
+  public static final String TRANSACTION_ROLLBACK_SERIALIZATION_FAILURE = "40001";
+  public static final String TRANSACTION_ROLLBACK_INTEGRITY_CONSTRAINT_VIOLATION = "40002";
+  public static final String TRANSACTION_ROLLBACK_STATEMENT_COMPLETION_UNKNOWN = "40003";
+  public static final String TRANSACTION_ROLLBACK_DEADLOCK_DETECTED = "40P01";
 
-import javax.persistence.EntityManager;
-
-/**
- * Persistence environment that handles errors with an either instead of throwing exceptions.
- *
- * @see PersistenceEnv
- */
-public interface PersistenceEnv2<F> {
-  /** Run code inside a transaction. */
-  <A> Either<F, A> tx(Function<EntityManager, A> transactional);
-
+  private SqlState() {
+  }
 }

@@ -18,13 +18,15 @@
  * the License.
  *
  */
-package org.opencastproject.util.persistencefn;
 
-import com.entwinemedia.fn.Fn;
+package org.opencastproject.db;
+
+import static org.opencastproject.db.Queries.namedQuery;
 
 import org.junit.Ignore;
 
 import java.util.List;
+import java.util.function.Function;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -35,14 +37,14 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-@Entity(name = "Testfn")
-@Table(name = "testfn")
-@NamedQueries(@NamedQuery(name = "Testfn.findAll", query = "select a from Testfn a"))
+@Entity(name = "Test")
+@Table(name = "test")
+@NamedQueries(@NamedQuery(name = "Test.findAll", query = "select a from Test a"))
 @Ignore
 public class TestDto {
   @Id
   @GeneratedValue
-  private Long id;
+  private long id;
 
   @Column(name = "key", length = 128, nullable = false)
   private String key;
@@ -50,22 +52,14 @@ public class TestDto {
   @Column(name = "value", length = 128, nullable = false)
   private String value;
 
-  public static TestDto mk(String key, String value) {
+  public static TestDto create(String key, String value) {
     final TestDto dto = new TestDto();
     dto.key = key;
     dto.value = value;
     return dto;
   }
 
-  public static TestDto mk(long id, String key, String value) {
-    final TestDto dto = new TestDto();
-    dto.id = id;
-    dto.key = key;
-    dto.value = value;
-    return dto;
-  }
-
-  public Long getId() {
+  public long getId() {
     return id;
   }
 
@@ -81,5 +75,6 @@ public class TestDto {
     this.value = value;
   }
 
-  public static final Fn<EntityManager, List<TestDto>> findAll = Queries.named.findAll("Testfn.findAll");
+  public static final Function<EntityManager, List<TestDto>> findAll = namedQuery.findAll("Test.findAll",
+      TestDto.class);
 }

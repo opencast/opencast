@@ -23,9 +23,9 @@ package org.opencastproject.authorization.xacml.manager.api;
 
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * ACL service API for managing ACLs.
@@ -42,7 +42,7 @@ public interface AclService {
    *
    * @return <code>some</code> if the ACL could be found, <code>none</code> if the ACL with the given ID does not exist.
    */
-  Option<ManagedAcl> getAcl(long id);
+  Optional<ManagedAcl> getAcl(long id);
 
   /**
    * Update an existing ACL.
@@ -57,7 +57,7 @@ public interface AclService {
    * @return <code>some</code> if the new ACL could be created successfully, <code>none</code> if an ACL with the same
    *         name already exists
    */
-  Option<ManagedAcl> createAcl(AccessControlList acl, String name);
+  Optional<ManagedAcl> createAcl(AccessControlList acl, String name);
 
   /**
    * Delete an ACL by its ID.

@@ -21,7 +21,8 @@
 
 package org.opencastproject.usertracking.impl;
 
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.usertracking.api.FootprintList;
 import org.opencastproject.usertracking.api.Report;
@@ -47,7 +48,8 @@ public class UserTrackingServiceImplTest {
   public void setUp() throws Exception {
     // Set up the annotation service
     service = new UserTrackingServiceImpl();
-    service.setEntityManagerFactory(newTestEntityManagerFactory(UserTrackingServiceImpl.PERSISTENCE_UNIT));
+    service.setEntityManagerFactory(newEntityManagerFactory(UserTrackingServiceImpl.PERSISTENCE_UNIT));
+    service.setDBSessionFactory(getDbSessionFactory());
     service.activate();
   }
 

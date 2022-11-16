@@ -32,6 +32,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
+import static org.opencastproject.db.DBTestEnv.newDBSession;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_AVAILABLE;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_CONTRIBUTOR;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_CREATED;
@@ -76,6 +79,7 @@ import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.authorization.xacml.XACMLUtils;
+import org.opencastproject.db.DBSession;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
@@ -131,9 +135,6 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Misc;
-import org.opencastproject.util.persistencefn.PersistenceEnv;
-import org.opencastproject.util.persistencefn.PersistenceEnvs;
-import org.opencastproject.util.persistencefn.PersistenceUtil;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
@@ -314,7 +315,9 @@ public class SchedulerServiceImplTest {
 
 
     schedulerDatabase = new SchedulerServiceDatabaseImpl();
-    schedulerDatabase.setEntityManagerFactory(mkEntityManagerFactory(SchedulerServiceDatabaseImpl.PERSISTENCE_UNIT));
+    EntityManagerFactory emf = newEntityManagerFactory(SchedulerServiceDatabaseImpl.PERSISTENCE_UNIT);
+    schedulerDatabase.setEntityManagerFactory(emf);
+    schedulerDatabase.setDBSessionFactory(getDbSessionFactory());
     schedulerDatabase.setSecurityService(securityService);
     schedulerDatabase.activate(null);
     schedSvc.setPersistence(schedulerDatabase);
@@ -1665,9 +1668,8 @@ public class SchedulerServiceImplTest {
   }
 
   AssetManager mkAssetManager() throws Exception {
-    final EntityManagerFactory emf = mkEntityManagerFactory("org.opencastproject.assetmanager.impl");
-    final PersistenceEnv penv = PersistenceEnvs.mk(emf);
-    final Database db = new Database(emf, penv);
+    final DBSession dbSession = newDBSession("org.opencastproject.assetmanager.impl");
+    final Database db = new Database(dbSession);
     HttpAssetProvider httpAssetProvider = new HttpAssetProvider() {
       @Override
       public Snapshot prepareForDelivery(Snapshot snapshot) {
@@ -1803,27 +1805,6 @@ public class SchedulerServiceImplTest {
         return "test_store";
       }
     };
-  }
-
-  static EntityManagerFactory mkEntityManagerFactory(String persistenceUnit) {
-    if ("mysql".equals(System.getProperty("useDatabase"))) {
-      return mkMySqlEntityManagerFactory(persistenceUnit);
-    } else {
-      return mkH2EntityManagerFactory(persistenceUnit);
-    }
-  }
-
-  static EntityManagerFactory mkH2EntityManagerFactory(String persistenceUnit) {
-    return PersistenceUtil.mkTestEntityManagerFactory(persistenceUnit, true);
-  }
-
-  static EntityManagerFactory mkMySqlEntityManagerFactory(String persistenceUnit) {
-    return PersistenceUtil.mkEntityManagerFactory(persistenceUnit, "MySQL", "com.mysql.jdbc.Driver",
-            "jdbc:mysql://localhost/test_scheduler", "matterhorn", "matterhorn",
-            org.opencastproject.util.data.Collections.map(tuple("eclipselink.ddl-generation", "drop-and-create-tables"),
-                    tuple("eclipselink.ddl-generation.output-mode", "database"),
-                    tuple("eclipselink.logging.level.sql", "FINE"), tuple("eclipselink.logging.parameters", "true")),
-            PersistenceUtil.mkTestPersistenceProvider());
   }
 
   /**
