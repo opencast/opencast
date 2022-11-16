@@ -4,6 +4,29 @@ Changelog
 Opencast 11
 ----------
 
+### Opencast 11.12
+
+*Released on November 16th, 2022*
+
+- [[#4382](https://github.com/opencast/opencast/pull/4382)] -
+  Fix Encoding Profile Type Handling in Encode WOH
+- [[#4332](https://github.com/opencast/opencast/pull/4332)] -
+  CVE-2022-42889 library upgrade
+- [[#4316](https://github.com/opencast/opencast/pull/4316)] -
+  Update Live Publication in Archive on Capture Agent Change
+- [[#4250](https://github.com/opencast/opencast/pull/4250)] -
+  Actually Retract Live Publication
+- [[#4249](https://github.com/opencast/opencast/pull/4249)] -
+  Make initialization of new event ACL with series ACL in the Admin UI configurable
+- [[#4242](https://github.com/opencast/opencast/pull/4242)] -
+  Bump eslint from 8.23.1 to 8.24.0 in /modules/engage-paella-player
+- [[#4230](https://github.com/opencast/opencast/pull/4230)] -
+  Opencast 11.11 release notes
+- [[#4208](https://github.com/opencast/opencast/pull/4208)] -
+  Fix composer incident codes and messages for process-smil and multiencode.
+- [[#4169](https://github.com/opencast/opencast/pull/4169)] -
+  Bump express from 4.17.3 to 4.18.1 in /modules/engage-paella-player
+
 ### Opencast 11.11
 
 *Released on September 21th, 2022*
