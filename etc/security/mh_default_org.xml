@@ -784,6 +784,12 @@
   -->
 
   <!--
+  <bean id="userDetailsMapper" class="org.opencastproject.security.ldap.OpencastUserDetailsMapper">
+    <constructor-arg ref="userDetailsService" />
+  </bean>
+  -->
+
+  <!--
   <bean id="ldapAuthProvider"
     class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
     <constructor-arg>
@@ -811,8 +817,11 @@
         - - >
       </bean>
     </constructor-arg>
+    < ! - - Retrieve user and attributes from opencasts user details service - - >
+    <property name="userDetailsContextMapper" ref="userDetailsMapper"/>
     < ! - - Defines how the user attributes are converted to authorities (roles) - - >
-    <constructor-arg ref="authoritiesPopulator" />
+    < ! - - Output is ignored if used together with userDetailsMapper - - >
+    < ! - - constructor-arg ref="authoritiesPopulator" /- - >
   </bean>
   -->
 
@@ -834,7 +843,7 @@
   <osgi:reference id="userDirectoryService" cardinality="1..1"
                   interface="org.opencastproject.security.api.UserDirectoryService" />
 
-  <!-- Uncomment this to enable LDAP -->
+  <!-- Uncomment this as an alternative to the userDetailsMapper -->
   <!-- Make sure you provide the same instanceId you used in org.opencastproject.userdirectory.ldap-….cfg -->
   <!--
   <osgi:reference id="authoritiesPopulator" cardinality="1..1"
