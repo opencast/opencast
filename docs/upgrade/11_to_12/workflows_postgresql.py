@@ -15,6 +15,7 @@ from datetime import datetime
 user = "opencast"
 password = "dbpassword"
 host = "127.0.0.1"
+port = 5432
 database = "opencast"
 
 # Constants
@@ -31,12 +32,13 @@ XML_DECLARATION = "<?xml version='1.0' encoding='UTF-8'?>"
 
 
 # DB functions
-def create_connection(host_name, user_name, user_password, db_name):
+def create_connection(host_name, port_number, user_name, user_password, db_name):
     connection = psycopg2.connect(
         host=host_name,
+        port=port_number,
         user=user_name,
         password=user_password,
-        database=db_name
+        database=db_name,
     )
     print("Connection to database successful")
     return connection
@@ -117,7 +119,7 @@ def parse_bool(value):
 
 # Connect
 print("Creating connection to database...")
-connection = create_connection(host, user, password, database)
+connection = create_connection(host, port, user, password, database)
 
 # Create new tables
 #  Currently added indexes:
@@ -252,10 +254,11 @@ for offset in range(0, workflow_count, 100):
 
         # oc_workflow_configuration
         for configuration in root.find(f"{WORKFLOW_NS}configurations"):
+            value = configuration.text
             workflow_config.append([
                 workflow_id,
                 get_attrib_from_node(configuration, "key"),
-                configuration.text])
+                value if value is not None else ""])
 
         # oc_workflow_operation
         operation_position = 0
@@ -288,10 +291,11 @@ for offset in range(0, workflow_count, 100):
 
             # oc_workflow_operation_configuration
             for op_config in operation.find("{http://workflow.opencastproject.org}configurations"):
+                value = op_config.text
                 workflow_operation_config.append([
                     operation_id,
                     get_attrib_from_node(op_config, "key"),
-                    op_config.text])
+                    value if value is not None else ""])
 
             # Generate ID and position for next operation
             operation_id += 1
