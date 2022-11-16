@@ -342,6 +342,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     MediaPackage tmpMp = (MediaPackage) snapshot.getMediaPackage().clone();
     setDurationForMediaPackage(tmpMp, episodeDC); // duration is used by live tracks
     Map<String, Track> liveTracks = addLiveTracksToMediaPackage(tmpMp, episodeDC);
+    createOrUpdatePublicationTracks(tmpMp, liveTracks);
 
     // if nothing changed, no need to do anything
     if (isSameMediaPackage(mpFromSearch, tmpMp)) {
@@ -359,10 +360,6 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     removeLivePublicationChannel(mpForSearch); // we don't need the live publication in search
     publishToSearch(mpForSearch);
     retractPreviousElements(mpFromSearch, mpForSearch); // cleanup
-
-    // update live publication in archive
-    MediaPackage updatedArchivedMp = updateLivePublication(snapshot.getMediaPackage(), liveTracks);
-    snapshotVersionCache.put(mpId, assetManager.takeSnapshot(updatedArchivedMp).getVersion());
     return true;
   }
 
@@ -379,14 +376,13 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     }
   }
 
-  private MediaPackage updateLivePublication(MediaPackage mediaPackage, Map<String, Track> generatedTracks) {
+  private void createOrUpdatePublicationTracks(MediaPackage mediaPackage, Map<String, Track> generatedTracks) {
     Publication[] publications = mediaPackage.getPublications();
     for (Publication publication : publications) {
       if (publication.getChannel().equals(CHANNEL_ID)) {
         createOrUpdatePublicationTracks(publication, generatedTracks);
       }
     }
-    return mediaPackage;
   }
 
   boolean retractLiveEvent(MediaPackage mp) throws LiveScheduleException {
