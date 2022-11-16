@@ -51,6 +51,7 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchResultImpl;
 import org.opencastproject.search.api.SearchService;
@@ -129,16 +130,9 @@ public class LiveScheduleServiceImplTest {
   private OrganizationDirectoryService organizationService;
   private SecurityService securityService;
 
-  private DublinCoreCatalog episodeDC;
-  private DublinCoreCatalog seriesDC;
-
   @Before
   public void setUp() throws Exception {
     mimeType = MimeTypes.parseMimeType(MIME_TYPE);
-    URI catalogURI = LiveScheduleServiceImplTest.class.getResource("/episode.xml").toURI();
-    episodeDC = DublinCores.read(catalogURI.toURL().openStream());
-    catalogURI = LiveScheduleServiceImplTest.class.getResource("/series.xml").toURI();
-    seriesDC = DublinCores.read(catalogURI.toURL().openStream());
 
     // Osgi Services
     serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
@@ -171,7 +165,7 @@ public class LiveScheduleServiceImplTest {
     // Live service configuration
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
     EasyMock.expect(bc.getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER)).andReturn("system-user");
-    Dictionary<String, Object> props = new Hashtable<>();
+    Dictionary<String, Object> props = new Hashtable<String, Object>();
     props.put(LiveScheduleServiceImpl.LIVE_STREAMING_URL, STREAMING_SERVER_URL);
     props.put(LiveScheduleServiceImpl.LIVE_STREAM_MIME_TYPE, "video/x-flv");
     props.put(LiveScheduleServiceImpl.LIVE_STREAM_NAME, STREAM_NAME);
@@ -212,7 +206,7 @@ public class LiveScheduleServiceImplTest {
     boolean[] presentationFound = new boolean[2];
     // Order may vary so that's why we loop
     for (Track track : liveTracks) {
-      if (track.getURI().toString().contains("presenter")) {
+      if (track.getURI().toString().indexOf("presenter") > -1) {
         if (((VideoStream) track.getStreams()[0]).getFrameHeight() == 270) {
           Assert.assertEquals(
                   STREAMING_SERVER_URL + "/" + MP_ID + "-" + caName + "-presenter-delivery-stream-960x270" + suffix,
@@ -260,7 +254,7 @@ public class LiveScheduleServiceImplTest {
 
   private Job createJob(long id, String elementId, String payload) {
     Job job = EasyMock.createNiceMock(Job.class);
-    List<String> args = new ArrayList<>();
+    List<String> args = new ArrayList<String>();
     args.add("anything");
     args.add("anything");
     args.add(elementId);
@@ -305,7 +299,7 @@ public class LiveScheduleServiceImplTest {
     mp.setIdentifier(new IdImpl(MP_ID));
     mp.setDuration(DURATION);
 
-    service.addLiveTracksToMediaPackage(mp, episodeDC);
+    service.addLiveTracks(mp, CAPTURE_AGENT_NAME);
     assertExpectedLiveTracks(mp.getTracks(), DURATION, CAPTURE_AGENT_NAME, "_suffix", false);
   }
 
@@ -325,13 +319,14 @@ public class LiveScheduleServiceImplTest {
     mp.setIdentifier(new IdImpl(MP_ID));
     mp.setDuration(DURATION);
 
-    episodeDC.set(DublinCore.PROPERTY_SPATIAL, DublinCoreValue.mk("another-capture-agent"));
-    service.addLiveTracksToMediaPackage(mp, episodeDC);
+    service.addLiveTracks(mp, "another-capture-agent");
     assertExpectedLiveTracks(mp.getTracks(), DURATION, "another-capture-agent", "_suffix_from_ca", false);
   }
 
   @Test
   public void testAddAndDistributeElements() throws Exception {
+    URI catalogURI = LiveScheduleServiceImplTest.class.getResource("/series.xml").toURI();
+    DublinCoreCatalog seriesDC = DublinCores.read(catalogURI.toURL().openStream());
     EasyMock.expect(seriesService.getSeries(SERIES_ID)).andReturn(seriesDC).anyTimes();
 
     Job job = createJob(1L, "anything", "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
@@ -364,7 +359,7 @@ public class LiveScheduleServiceImplTest {
     EasyMock.replay(s);
     service.setDownloadDistributionService(downloadDistributionService);
 
-    MediaPackage mp1 = service.distributeAclsAndCatalogs(s);
+    MediaPackage mp1 = service.addAndDistributeElements(s);
 
     Catalog[] catalogs = mp1.getCatalogs(MediaPackageElements.EPISODE);
     Assert.assertNotNull(catalogs);
@@ -456,7 +451,7 @@ public class LiveScheduleServiceImplTest {
     setUpAssetManager(mp);
     replayServices();
 
-    Snapshot s = service.getSnapshotFromArchive(MP_ID);
+    Snapshot s = service.getSnapshot(MP_ID);
 
     Assert.assertNotNull(s);
     MediaPackage mp1 = s.getMediaPackage();
@@ -472,7 +467,7 @@ public class LiveScheduleServiceImplTest {
   public void testGetMediaPackageFromSearch() throws Exception {
     URI searchResultURI = LiveScheduleServiceImplTest.class.getResource("/search-result.xml").toURI();
     SearchResult searchResult = SearchResultImpl.valueOf(searchResultURI.toURL().openStream());
-    EasyMock.expect(searchService.getForAdministrativeRead(EasyMock.anyObject())).andReturn(searchResult);
+    EasyMock.expect(searchService.getForAdministrativeRead((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
     replayServices();
 
     MediaPackage mp = service.getMediaPackageFromSearch(MP_ID);
@@ -484,7 +479,7 @@ public class LiveScheduleServiceImplTest {
   public void testGetMediaPackageFromSearchNotFound() throws Exception {
     URI searchResultURI = LiveScheduleServiceImplTest.class.getResource("/search-result-empty.xml").toURI();
     SearchResult searchResult = SearchResultImpl.valueOf(searchResultURI.toURL().openStream());
-    EasyMock.expect(searchService.getForAdministrativeRead(EasyMock.anyObject())).andReturn(searchResult);
+    EasyMock.expect(searchService.getForAdministrativeRead((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
     replayServices();
 
     MediaPackage mp = service.getMediaPackageFromSearch(MP_ID);
@@ -499,12 +494,12 @@ public class LiveScheduleServiceImplTest {
     setUpAssetManager(mp);
     replayServices();
 
-    MediaPackage mp1 = (MediaPackage) service.getSnapshotFromArchive(MP_ID).getMediaPackage().clone();
+    MediaPackage mp1 = (MediaPackage) service.getSnapshot(MP_ID).getMediaPackage().clone();
     mp1.setDuration(DURATION);
-    service.addLiveTracksToMediaPackage(mp1, episodeDC);
-    MediaPackage mp2 = (MediaPackage) service.getSnapshotFromArchive(MP_ID).getMediaPackage().clone();
+    service.addLiveTracks(mp1, CAPTURE_AGENT_NAME);
+    MediaPackage mp2 = (MediaPackage) service.getSnapshot(MP_ID).getMediaPackage().clone();
     mp2.setDuration(DURATION);
-    service.addLiveTracksToMediaPackage(mp2, episodeDC);
+    service.addLiveTracks(mp2, CAPTURE_AGENT_NAME);
 
     Assert.assertTrue(service.isSameMediaPackage(mp1, mp2));
   }
@@ -517,12 +512,12 @@ public class LiveScheduleServiceImplTest {
     setUpAssetManager(mp);
     replayServices();
 
-    MediaPackage mp1 = (MediaPackage) service.getSnapshotFromArchive(MP_ID).getMediaPackage().clone();
+    MediaPackage mp1 = (MediaPackage) service.getSnapshot(MP_ID).getMediaPackage().clone();
     mp1.setDuration(DURATION);
-    service.addLiveTracksToMediaPackage(mp1, episodeDC);
-    MediaPackage mp2 = (MediaPackage) service.getSnapshotFromArchive(MP_ID).getMediaPackage().clone();
+    service.addLiveTracks(mp1, CAPTURE_AGENT_NAME);
+    MediaPackage mp2 = (MediaPackage) service.getSnapshot(MP_ID).getMediaPackage().clone();
     mp2.setDuration(DURATION);
-    service.addLiveTracksToMediaPackage(mp2, episodeDC);
+    service.addLiveTracks(mp2, CAPTURE_AGENT_NAME);
 
     // Change title
     String previous = mp2.getTitle();
@@ -594,7 +589,7 @@ public class LiveScheduleServiceImplTest {
 
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     mp.setIdentifier(new IdImpl(MP_ID));
-    service.publishToSearch(mp);
+    service.publish(mp);
     Assert.assertEquals(MP_ID, capturedMp.getValue().getIdentifier().toString());
   }
 
@@ -606,12 +601,7 @@ public class LiveScheduleServiceImplTest {
 
     replayServices();
 
-    snapshot = EasyMock.createNiceMock(Snapshot.class);
-    EasyMock.expect(snapshot.getMediaPackage()).andReturn(mp).anyTimes();
-    EasyMock.expect(snapshot.getOrganizationId()).andReturn(ORG_ID).anyTimes();
-    EasyMock.replay(snapshot);
-
-    service.addLivePublicationToMediaPackage(snapshot, new HashMap<>());
+    service.addLivePublicationChannel(org, mp, new HashMap<String, Track>());
     Publication[] publications = mp.getPublications();
     Assert.assertEquals(1, publications.length);
     Assert.assertEquals(LiveScheduleService.CHANNEL_ID, publications[0].getChannel());
@@ -692,6 +682,11 @@ public class LiveScheduleServiceImplTest {
             .loadFromXml(mpURI.toURL().openStream());
     setUpAssetManager(mp);
 
+    URI catalogURI = LiveScheduleServiceImplTest.class.getResource("/episode.xml").toURI();
+    DublinCoreCatalog episodeDC = DublinCores.read(catalogURI.toURL().openStream());
+
+    catalogURI = LiveScheduleServiceImplTest.class.getResource("/series.xml").toURI();
+    DublinCoreCatalog seriesDC = DublinCores.read(catalogURI.toURL().openStream());
     EasyMock.expect(seriesService.getSeries(SERIES_ID)).andReturn(seriesDC).anyTimes();
 
     Job job = createJob(1L, "anything", "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
@@ -758,6 +753,9 @@ public class LiveScheduleServiceImplTest {
     MediaPackage previousMp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
             .loadFromXml(mpURI.toURL().openStream());
 
+    URI catalogURI = LiveScheduleServiceImplTest.class.getResource("/episode.xml").toURI();
+    DublinCoreCatalog episodeDC = DublinCores.read(catalogURI.toURL().openStream());
+
     replayServices();
 
     service.getSnapshotVersionCache().put(MP_ID, version);
@@ -769,18 +767,22 @@ public class LiveScheduleServiceImplTest {
   public void testCreateOuUpdateLiveEventAlreadyPast() throws Exception {
     URI searchResultURI = LiveScheduleServiceImplTest.class.getResource("/search-result-empty.xml").toURI();
     SearchResult searchResult = SearchResultImpl.valueOf(searchResultURI.toURL().openStream());
-    EasyMock.expect(searchService.getForAdministrativeRead(EasyMock.anyObject())).andReturn(searchResult);
+    EasyMock.expect(searchService.getForAdministrativeRead((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
     replayServices();
 
+    URI catalogURI = LiveScheduleServiceImplTest.class.getResource("/episode.xml").toURI();
+    DublinCoreCatalog episodeDC = DublinCores.read(catalogURI.toURL().openStream());
     Assert.assertFalse(service.createOrUpdateLiveEvent(MP_ID, episodeDC));
   }
 
   @Test
   public void testCreateOuUpdateLiveEventAlreadyPublished() throws Exception {
+    URI catalogURI = LiveScheduleServiceImplTest.class.getResource("/episode.xml").toURI();
+    DublinCoreCatalog episodeDC = DublinCores.read(catalogURI.toURL().openStream());
 
     URI searchResultURI = LiveScheduleServiceImplTest.class.getResource("/no-live-search-result.xml").toURI();
     SearchResult searchResult = SearchResultImpl.valueOf(searchResultURI.toURL().openStream());
-    EasyMock.expect(searchService.getForAdministrativeRead(EasyMock.anyObject())).andReturn(searchResult);
+    EasyMock.expect(searchService.getForAdministrativeRead((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
     replayServices();
 
     Assert.assertFalse(service.createOrUpdateLiveEvent(MP_ID, episodeDC));
@@ -797,6 +799,11 @@ public class LiveScheduleServiceImplTest {
     MediaPackage previousMp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
             .loadFromXml(mpURI.toURL().openStream());
 
+    URI catalogURI = LiveScheduleServiceImplTest.class.getResource("/episode.xml").toURI();
+    DublinCoreCatalog episodeDC = DublinCores.read(catalogURI.toURL().openStream());
+
+    catalogURI = LiveScheduleServiceImplTest.class.getResource("/series.xml").toURI();
+    DublinCoreCatalog seriesDC = DublinCores.read(catalogURI.toURL().openStream());
     EasyMock.expect(seriesService.getSeries(SERIES_ID)).andReturn(seriesDC).anyTimes();
 
     Job job = createJob(1L, "anything", "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
@@ -921,6 +928,6 @@ public class LiveScheduleServiceImplTest {
       return null;
     }
 
-  }
+  };
 
 }

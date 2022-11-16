@@ -291,7 +291,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       // Replace and distribute acl, this creates new mp
       MediaPackage newMp = replaceAndDistributeAcl(previousMp, acl);
       // Publish mp to engage search index
-      publishToSearch(newMp);
+      publish(newMp);
       // Don't leave garbage there!
       retractPreviousElements(previousMp, newMp);
       logger.info("Updated live acl for media package {}", newMp);
@@ -303,63 +303,77 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   boolean createLiveEvent(String mpId, DublinCoreCatalog episodeDC) throws LiveScheduleException {
     try {
       logger.info("Creating live media package {}", mpId);
-      Snapshot snapshot = getSnapshotFromArchive(mpId);
-
-      // generate live tracks
-      MediaPackage tmpMp = (MediaPackage) snapshot.getMediaPackage().clone();
-      setDurationForMediaPackage(tmpMp, episodeDC); // duration is used by live tracks
-      Map<String, Track> liveTracks = addLiveTracksToMediaPackage(tmpMp, episodeDC);
-
-      // publish to search
-      MediaPackage mpForSearch = distributeAclsAndCatalogs(snapshot);
-      for (Track t : tmpMp.getTracks()) {
-        mpForSearch.add(t);
+      // Get latest mp from the asset manager
+      Snapshot snapshot = getSnapshot(mpId);
+      // Temporary mp
+      MediaPackage tempMp = (MediaPackage) snapshot.getMediaPackage().clone();
+      // Set duration (used by live tracks)
+      setDuration(tempMp, episodeDC);
+      // Add live tracks to media package
+      Map<String, Track> generatedTracks = addLiveTracks(tempMp, episodeDC.getFirst(DublinCore.PROPERTY_SPATIAL));
+      // Add and distribute catalogs/acl, this creates a new mp object
+      MediaPackage mp = addAndDistributeElements(snapshot);
+      // Add tracks from tempMp
+      for (Track t : tempMp.getTracks()) {
+        mp.add(t);
       }
-      publishToSearch(mpForSearch);
-
-      // add live publication to archive
-      MediaPackage updatedArchivedMp = addLivePublicationToMediaPackage(snapshot, liveTracks);
-      snapshotVersionCache.put(mpId, assetManager.takeSnapshot(updatedArchivedMp).getVersion());
+      // Publish mp to engage search index
+      publish(mp);
+      // Add engage-live publication channel to archived mp
+      Organization currentOrg = null;
+      try {
+        currentOrg = organizationService.getOrganization(snapshot.getOrganizationId());
+      } catch (NotFoundException e) {
+        logger.warn("Organization in snapshot not found: {}", snapshot.getOrganizationId());
+      }
+      MediaPackage archivedMp = snapshot.getMediaPackage();
+      addLivePublicationChannel(currentOrg, archivedMp, generatedTracks);
+      // Take a snapshot with the publication added and put its version in our local cache
+      // so that we ignore notifications for this snapshot version.
+      snapshotVersionCache.put(mpId, assetManager.takeSnapshot(archivedMp).getVersion());
       return true;
     } catch (Exception e) {
       throw new LiveScheduleException(e);
     }
   }
 
-  boolean updateLiveEvent(MediaPackage mpFromSearch, DublinCoreCatalog episodeDC) throws LiveScheduleException {
-    String mpId = mpFromSearch.getIdentifier().toString();
-    Snapshot snapshot = getSnapshotFromArchive(mpId);
-
+  boolean updateLiveEvent(MediaPackage previousMp, DublinCoreCatalog episodeDC) throws LiveScheduleException {
+    // Get latest mp from the asset manager
+    Snapshot snapshot = getSnapshot(previousMp.getIdentifier().toString());
     // If the snapshot version is in our local cache, it means that this snapshot was created by us so
     // nothing to do. Note that this is just to save time; if the entry has already been deleted, the mp
     // will be compared below.
-    if (snapshot.getVersion().equals(snapshotVersionCache.getIfPresent(mpId))) {
+    if (snapshot.getVersion().equals(snapshotVersionCache.getIfPresent(previousMp.getIdentifier().toString()))) {
       logger.debug("Snapshot version {} was created by us so this change is ignored.", snapshot.getVersion());
       return false;
     }
-
-    // generate new live tracks
-    MediaPackage tmpMp = (MediaPackage) snapshot.getMediaPackage().clone();
-    setDurationForMediaPackage(tmpMp, episodeDC); // duration is used by live tracks
-    Map<String, Track> liveTracks = addLiveTracksToMediaPackage(tmpMp, episodeDC);
-    createOrUpdatePublicationTracks(tmpMp, liveTracks);
-
-    // if nothing changed, no need to do anything
-    if (isSameMediaPackage(mpFromSearch, tmpMp)) {
-      logger.debug("Live media package {} seems to be the same. Not updating.", mpFromSearch);
+    // Temporary mp
+    MediaPackage tempMp = (MediaPackage) snapshot.getMediaPackage().clone();
+    // Set duration (used by live tracks)
+    setDuration(tempMp, episodeDC);
+    // Add live tracks to media package
+    Map<String, Track> generatedTracks = addLiveTracks(tempMp, episodeDC.getFirst(DublinCore.PROPERTY_SPATIAL));
+    // Update tracks in the publication
+    createOrUpdatePublicationTracks(tempMp, generatedTracks);
+    // If same mp, no need to do anything
+    if (isSameMediaPackage(previousMp, tempMp)) {
+      logger.debug("Live media package {} seems to be the same. Not updating.", previousMp);
       return false;
     }
-
-    logger.info("Updating live media package {}", mpFromSearch);
-
-    // update mp in search
-    MediaPackage mpForSearch = distributeAclsAndCatalogs(snapshot);
-    for (Track t : tmpMp.getTracks()) {
-      mpForSearch.add(t);
+    logger.info("Updating live media package {}", previousMp);
+    // Add and distribute catalogs/acl, this creates a new mp
+    MediaPackage mp = addAndDistributeElements(snapshot);
+    // Add tracks from tempMp
+    for (Track t : tempMp.getTracks()) {
+      mp.add(t);
     }
-    removeLivePublicationChannel(mpForSearch); // we don't need the live publication in search
-    publishToSearch(mpForSearch);
-    retractPreviousElements(mpFromSearch, mpForSearch); // cleanup
+    // Remove publication element that came with the snapshot mp
+    removeLivePublicationChannel(mp);
+    // Publish mp to engage search index
+    publish(mp);
+    // Publication channel already there so no need to add
+    // Don't leave garbage there!
+    retractPreviousElements(previousMp, mp);
     return true;
   }
 
@@ -391,7 +405,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     // Get latest mp from the asset manager if there to remove the publication
     try {
       String mpId = mp.getIdentifier().toString();
-      Snapshot snapshot = getSnapshotFromArchive(mpId);
+      Snapshot snapshot = getSnapshot(mpId);
       MediaPackage archivedMp = snapshot.getMediaPackage();
       removeLivePublicationChannel(archivedMp);
       logger.debug("Removed live pub channel from archived media package {}", mp);
@@ -404,7 +418,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     return true;
   }
 
-  void publishToSearch(MediaPackage mp) throws LiveScheduleException {
+  void publish(MediaPackage mp) throws LiveScheduleException {
     try {
       // Add media package to the search index
       logger.info("Publishing LIVE media package {} to search index", mp);
@@ -480,7 +494,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     }
   }
 
-  void setDurationForMediaPackage(MediaPackage mp, DublinCoreCatalog dc) {
+  void setDuration(MediaPackage mp, DublinCoreCatalog dc) {
     DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(dc.getFirst(DublinCore.PROPERTY_TEMPORAL));
     long duration = period.getEnd().getTime() - period.getStart().getTime();
     mp.setDuration(duration);
@@ -488,10 +502,8 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
             mp.getDuration());
   }
 
-  Map<String, Track> addLiveTracksToMediaPackage(MediaPackage mp, DublinCoreCatalog episodeDC)
-          throws LiveScheduleException {
-    String caName = episodeDC.getFirst(DublinCore.PROPERTY_SPATIAL);
-    HashMap<String, Track> generatedTracks = new HashMap<>();
+  Map<String, Track> addLiveTracks(MediaPackage mp, String caName) throws LiveScheduleException {
+    HashMap<String, Track> generatedTracks = new HashMap<String, Track>();
     String mpId = mp.getIdentifier().toString();
     try {
       // If capture agent registered the properties:
@@ -626,7 +638,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     return barrier.waitForJobs();
   }
 
-  Snapshot getSnapshotFromArchive(String mpId) throws LiveScheduleException {
+  Snapshot getSnapshot(String mpId) throws LiveScheduleException {
     AQueryBuilder query = assetManager.createQuery();
     AResult result = query.select(query.snapshot()).where(query.mediaPackageId(mpId).and(query.version().isLatest()))
             .run();
@@ -642,11 +654,11 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     return record.get().getSnapshot().get();
   }
 
-  MediaPackage distributeAclsAndCatalogs(Snapshot snapshot) throws LiveScheduleException {
+  MediaPackage addAndDistributeElements(Snapshot snapshot) throws LiveScheduleException {
     try {
       MediaPackage mp = (MediaPackage) snapshot.getMediaPackage().clone();
 
-      Set<String> elementIds = new HashSet<>();
+      Set<String> elementIds = new HashSet<String>();
       // Then, add series catalog if needed
       if (StringUtils.isNotEmpty(mp.getSeries())) {
         DublinCoreCatalog catalog = seriesService.getSeries(mp.getSeries());
@@ -735,17 +747,11 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     }
   }
 
-  MediaPackage addLivePublicationToMediaPackage(Snapshot snapshot, Map<String, Track> generatedTracks)
-          throws LiveScheduleException {
-    MediaPackage mp = snapshot.getMediaPackage();
-
-    Organization currentOrg = null;
-    try {
-      currentOrg = organizationService.getOrganization(snapshot.getOrganizationId());
-    } catch (NotFoundException e) {
-      logger.warn("Organization in snapshot not found: {}", snapshot.getOrganizationId());
-    }
-
+  void addLivePublicationChannel(
+      Organization currentOrg,
+      MediaPackage mp,
+      Map<String, Track> generatedTracks
+  ) throws LiveScheduleException {
     logger.debug("Adding live channel publication element to media package {}", mp);
     String engageUrlString = null;
     if (currentOrg != null) {
@@ -765,7 +771,6 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
               MimeTypes.parseMimeType("text/html"));
       mp.add(publicationElement);
       createOrUpdatePublicationTracks(publicationElement, generatedTracks);
-      return mp;
     } catch (URISyntaxException e) {
       throw new LiveScheduleException(e);
     }
