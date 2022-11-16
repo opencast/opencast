@@ -1,5 +1,43 @@
 # Opencast 12: Release Notes
 
+Opencast 12.5
+-------------
+
+The fifth maintenance release of Opencast 12.
+
+Security related changes are:
+
+- Paella Player 6: Validate redirect to login page
+
+Notable changes are:
+
+- Tobira: The harvesting API now identifies the master playlist of events with
+  multiple HLS streams. This is needed for example when you are using the
+  `multiencode` operation; without this information, the quality selection in
+  Paella can't work in Tobira.
+  (See also [elan-ev/tobira#573](https://github.com/elan-ev/tobira/issues/573).)
+  If this affects you, you need to re-synchronize your Tobira instance
+  (cf. [[#4370](https://github.com/opencast/opencast/pull/4370)]).
+- Fix for wrong type handling in the encode WOH
+  (cf. [[#4382](https://github.com/opencast/opencast/pull/4382)]).
+- Fix for live publications not being retracted
+  (cf. [[#4250](https://github.com/opencast/opencast/pull/4250)]).
+- Azure transcription service improvements
+  (cf. [[#4441](https://github.com/opencast/opencast/pull/4441)]).
+- Editor: Let Editor know if files are available locally
+  (cf. [[#4411](https://github.com/opencast/opencast/pull/4411)]).
+- LDAP: Do not add the roleprefix to extra roles
+  (cf. [[#4377](https://github.com/opencast/opencast/pull/4377)]).
+- E-Mail: Use UTF-8 as charset for HTML mails
+  (cf. [[#4375](https://github.com/opencast/opencast/pull/4375)]).
+
+New Features and updates:
+- Initialization of new event ACL with series ACL in the Admin UI is now configurable
+  (cf. [[#4249](https://github.com/opencast/opencast/pull/4249)]).
+
+There are more bug fixes.
+See [changelog](changelog.md) for a comprehensive list of changes.
+
 Opencast 12.4
 -------------
 
