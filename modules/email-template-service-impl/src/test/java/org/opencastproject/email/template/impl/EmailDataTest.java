@@ -57,6 +57,7 @@ public class EmailDataTest {
   private Incident incident2;
   private List<Incident> incidents;
   private URI uriMP;
+  private Map<String, String> orgProperties;
 
   @Before
   public void setUp() throws Exception {
@@ -104,6 +105,9 @@ public class EmailDataTest {
 
     failedOperation = new WorkflowOperationInstance("operation1", OperationState.FAILED);
 
+    orgProperties = new HashMap<>();
+    orgProperties.put("org.opencastproject.engage.ui.url", "http://engage.my.edu");
+
     WorkflowOperationInstance operation = new WorkflowOperationInstance("email", OperationState.RUNNING);
     List<WorkflowOperationInstance> operationList = new ArrayList<>();
     operationList.add(failedOperation);
@@ -125,7 +129,7 @@ public class EmailDataTest {
 
   @Test
   public void testToMap() throws Exception {
-    EmailData emailData = new EmailData("data1", workflowInstance, catalogs, failedOperation, incidents);
+    EmailData emailData = new EmailData("data1", workflowInstance, catalogs, failedOperation, incidents, orgProperties);
 
     Map<String, Object> map = emailData.toMap();
 
@@ -169,6 +173,11 @@ public class EmailDataTest {
     Assert.assertEquals(2, ((List) inc).size());
     Assert.assertTrue(((List) inc).contains(incident1));
     Assert.assertTrue(((List) inc).contains(incident2));
+
+    Object orgProp = map.get("organization");
+    Assert.assertNotNull(orgProp);
+    Assert.assertTrue(orgProp instanceof Map);
+    Assert.assertEquals("http://engage.my.edu", ((Map) orgProp).get("org.opencastproject.engage.ui.url"));
   }
 
 }

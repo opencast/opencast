@@ -21,14 +21,19 @@
 package org.opencastproject.email.template.impl;
 
 import org.opencastproject.email.template.api.EmailTemplateService;
+import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.metadata.dublincore.CatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.util.doc.DocUtil;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -47,10 +52,16 @@ import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @Component(
     immediate = true,
@@ -72,6 +83,10 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
   /** The incident service (to list errors in email) */
   private IncidentService incidentService = null;
+
+  private IndexService indexService;
+
+  private SecurityService securityService;
 
   @Activate
   protected void activate(ComponentContext context) {
@@ -121,8 +136,14 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
       }
     }
 
-    return DocUtil.generate(new EmailData(templateName, workflowInstance, catalogs, failed, incidentList),
-            templateContent);
+    Map<String, String> orgProperties = null;
+    Organization org = securityService.getOrganization();
+    if (org != null) {
+      orgProperties = org.getProperties();
+    }
+
+    return DocUtil.generate(new EmailData(templateName, workflowInstance, catalogs, failed, incidentList,
+            orgProperties), templateContent);
   }
 
   /**
@@ -130,11 +151,25 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
    */
   private HashMap<String, HashMap<String, String>> initCatalogs(MediaPackage mediaPackage, String delimiter) {
     HashMap<String, HashMap<String, String>> catalogs = new HashMap<String, HashMap<String, String>>();
-    Catalog[] dcs = mediaPackage.getCatalogs(DublinCoreCatalog.ANY_DUBLINCORE);
 
-    for (int i = 0; dcs != null && i < dcs.length; i++) {
+    Set<MediaPackageElementFlavor> catalogFlavors = new HashSet<>();
+    catalogFlavors.add(indexService.getCommonEventCatalogUIAdapter().getFlavor());
+    catalogFlavors.add(indexService.getCommonSeriesCatalogUIAdapter().getFlavor());
+    catalogFlavors.addAll(indexService.getEventCatalogUIAdapters().stream()
+        .map(CatalogUIAdapter::getFlavor)
+        .collect(Collectors.toSet()));
+    catalogFlavors.addAll(indexService.getSeriesCatalogUIAdapters().stream()
+        .map(CatalogUIAdapter::getFlavor)
+        .collect(Collectors.toSet()));
+
+    Set<Catalog> catalogElements = catalogFlavors.stream()
+        .flatMap(f -> Arrays.stream(mediaPackage.getCatalogs(f)))
+        .filter(Objects::nonNull)
+        .collect(Collectors.toSet());
+
+    for (Catalog c : catalogElements) {
       DublinCoreCatalog dc;
-      try (InputStream in = workspace.read(dcs[i].getURI())) {
+      try (InputStream in = workspace.read(c.getURI())) {
         dc = DublinCores.read(in);
       } catch (Exception e) {
         logger.warn("Error when populating catalog data", e);
@@ -142,13 +177,17 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
         continue;
       }
 
-      String catalogFlavor = dcs[i].getFlavor().getSubtype();
       HashMap<String, String> catalogHash = new HashMap<>();
       for (EName ename : dc.getProperties()) {
         String name = ename.getLocalName();
         catalogHash.put(name, dc.getAsText(ename, DublinCore.LANGUAGE_ANY, delimiter));
       }
-      catalogs.put(catalogFlavor, catalogHash);
+
+      catalogs.put(c.getFlavor().toString(), catalogHash);
+      // Backwards compatibility: use only subtype of the flavor as key
+      if (c.getFlavor().getType().equals("dublincore")) {
+        catalogs.put(c.getFlavor().getSubtype(), catalogHash);
+      }
     }
 
     return catalogs;
@@ -242,4 +281,13 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     this.incidentService = incidentService;
   }
 
+  @Reference
+  public void setIndexService(IndexService indexService) {
+    this.indexService = indexService;
+  }
+
+  @Reference
+  protected void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
 }

@@ -28,16 +28,18 @@ Parameter Table
 |------------------|-------|-----------|-------------|
 |body|Email body content.<br>Takes precedence over body-template-file.|`<Recording Title> (<Mediapackage ID>)`|Lecture 1 (4bf316fc-ea78-4903-b00e-9976b0912e4d)|
 |body-template-file|Name of file that will be used as a template for the content of the email body.|EMPTY|templateName|
+|body-html|Email body content send as HTML.<br>Takes precedence over body-html-template-file.|EMPTY|`<h1>${mediapackage.identifier}</h1>`|
+|body-html-template-file|Name of file that will be used as a template for the HTML content of the email body.|EMPTY|templateNameHTML|
 |subject|Email subject.|EMPTY|Operation has been completed|
 |to|The field `to` of the email<br>i.e. the comma separated list of email accounts the email will be sent to.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
 |cc|The field `cc` of the email<br>i.e. the comma separated list of email accounts that will receive a carbon copy of the email.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
 |bcc|The field `bcc` of the email<br>i.e. the comma separated list of email accounts that will receive a blind carbon copy of the email.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
-|use-html|Flag to indicate that the email content should be displayed as 'text/html'|false|true/false|
 |address-separator|Separator to use for splitting a string into separate email addresses|`, <tab>`|`,`|
 |skip-invalid-address|If the operation should skip invalid addresses instead of failing|false|true/false|
 
 **Some other email parameters can be customized in the SMTP Service configuration**
 
+If both a text and HTML body is set, a multipart email body is sent.
 
 Variable Substitution
 ---------------------
@@ -102,17 +104,26 @@ In your email template:
 
 ### Catalog fields
 
-Use `${catalogs['SUBTYPE']['FIELD']}`
+Use `${catalogs['FLAVOR']['FIELD']}`
 
 #### Examples
 
 |Field          |How To Get It|
 |---------------|-------------|
-|episode creator|${catalogs['episode']['creator']}|
-|episode title  |${catalogs['episode']['title']}|
-|series creator |${catalogs['series']['creator']}|
-|series title   |${catalogs['series']['title']}|
+|episode creator|${catalogs['dublincore/episode']['creator']}|
+|episode title  |${catalogs['dublincore/episode']['title']}|
+|series creator |${catalogs['dublincore/series']['creator']}|
+|series title   |${catalogs['dublincore/series']['title']}|
 
+### Organization properties
+
+Use `${organization['PROPERTY']}`
+
+#### Examples
+
+|Property  |How To Get It|
+|----------|-------------|
+|Engage URL|${organization["org.opencastproject.engage.ui.url"]}|
 
 Examples
 --------
@@ -149,9 +160,9 @@ To and subject are inline templates; the email body uses a template file named s
   <configurations>
     <!-- This is going to be replaced with the episode catalog publisher field, which in this example it is assumed
     it contains a notification email address -->
-    <configuration key="to">${catalogs['episode']['publisher']}</configuration>
+    <configuration key="to">${catalogs['dublincore/episode']['publisher']}</configuration>
     <!-- This is going to be replaced with the episode catalog title field -->
-    <configuration key="subject">${catalogs['episode']['title']} is ready for EDIT</configuration>
+    <configuration key="subject">${catalogs['dublincore/episode']['title']} is ready for EDIT</configuration>
     <!-- Email body is going to be built using the sample template found in <config_dir>/etc/email -->
     <configuration key="body-template-file">sample</configuration>
   </configurations>
@@ -164,9 +175,9 @@ The contents of the `…/etc/email/sample` email template:
 
 ```
 Event Details
-<#if catalogs['series']?has_content>
-Series Title: ${catalogs['series']['title']}
-Instructor: ${catalogs['series']['contributor']}
+<#if catalogs['dublincore/series']?has_content>
+Series Title: ${catalogs['dublincore/series']['title']}
+Instructor: ${catalogs['dublincore/series']['contributor']}
 </#if>
 Media Package Id: ${mediaPackage.identifier}
 Title: ${mediaPackage.title}
@@ -256,7 +267,7 @@ In error handling workflow (email-error):
   description="Sends email">
     <configurations>
     <!-- Note that you can use variable substitution in to, subject, body
-         e.g. ${(catalogs['episode']['FIELD']!'root@localhost'}  -->
+         e.g. ${(catalogs['dublincore/episode']['FIELD']!'root@localhost'}  -->
     <configuration key="to">root@localhost</configuration>
     <configuration key="subject">Failure processing a mediapackage</configuration>
     <configuration key="body-template-file">errorDetails</configuration>
@@ -271,11 +282,11 @@ The contents of the <config_dir>/etc/email/errorDetails email template:
 ```
 Error Details
 
-<#if catalogs['series']?has_content>
-Course: ${catalogs['series']['subject']!'series subject missing'}-${catalogs['series']['title']!'series title missing'}
-Instructor: ${catalogs['series']['contributor']!'instructor missing'}
+<#if catalogs['dublincore/series']?has_content>
+Course: ${catalogs['dublincore/series']['subject']!'series subject missing'}-${catalogs['dublincore/series']['title']!'series title missing'}
+Instructor: ${catalogs['dublincore/series']['contributor']!'instructor missing'}
 </#if>
-Title: ${catalogs['episode']['title']!'title missing'}
+Title: ${catalogs['dublincore/episode']['title']!'title missing'}
 Event Date: ${mediaPackage.date?datetime?iso_local}
 
 <#if failedOperation?has_content>
@@ -305,7 +316,7 @@ The user name is stored in the episode dublin core `contributor` field. There's 
       fail-on-error="false"
       description="Notify user associated to this recording that it is ready to be trimmed">
       <configurations>
-        <configuration key="to">${(catalogs['episode']['contributor'])}</configuration>
+        <configuration key="to">${(catalogs['dublincore/episode']['contributor'])}</configuration>
         <configuration key="subject">Recording is ready for EDIT</configuration>
         <configuration key="body-template-file">eventDetails</configuration>
       </configurations>
