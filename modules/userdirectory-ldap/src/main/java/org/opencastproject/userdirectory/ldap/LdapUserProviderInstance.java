@@ -53,6 +53,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServer;
@@ -114,6 +115,10 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
    *          the number of minutes to cache users
    * @param securityService
    *          a reference to Opencast's security service
+   * @param authoritiesPopulator
+   *          a reference to Opencast's authorities populator
+   * @param userDetailsContextMapper
+   *          a reference to Opencast's user details mapper
    */
   // CHECKSTYLE:OFF
   LdapUserProviderInstance(
@@ -128,7 +133,8 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
       int cacheSize,
       int cacheExpiration,
       SecurityService securityService,
-      OpencastLdapAuthoritiesPopulator authoritiesPopulator
+      OpencastLdapAuthoritiesPopulator authoritiesPopulator,
+      OpencastUserDetailsContextMapper userDetailsContextMapper
   ) {
     // CHECKSTYLE:ON
     this.organization = organization;
@@ -154,7 +160,17 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
     }
     FilterBasedLdapUserSearch userSearch = new FilterBasedLdapUserSearch(searchBase, searchFilter, contextSource);
     userSearch.setReturningAttributes(roleAttributesGlob.split(","));
+
     delegate = new LdapUserDetailsService(userSearch, authoritiesPopulator);
+
+    if (userDetailsContextMapper != null) {
+      userSearch.setReturningAttributes(
+          Stream.of(roleAttributesGlob.split(","), userDetailsContextMapper.getAttributes())
+              .flatMap(Stream::of)
+              .collect(Collectors.toList()).toArray(new String[] { })
+      );
+      delegate.setUserDetailsMapper(userDetailsContextMapper);
+    }
 
     // Setup the caches
     cache = CacheBuilder.newBuilder().maximumSize(cacheSize).expireAfterWrite(cacheExpiration, TimeUnit.MINUTES)
@@ -261,7 +277,15 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
           .map(a -> new JaxbRole(a.getAuthority(), jaxbOrganization))
           .collect(Collectors.toUnmodifiableSet());
 
-      User user = new JaxbUser(userDetails.getUsername(), PROVIDER_NAME, jaxbOrganization, roles);
+      User user;
+      if (userDetails instanceof OpencastUserDetails) {
+        user = new JaxbUser(userDetails.getUsername(),null,
+            ((OpencastUserDetails) userDetails).getName(),
+            ((OpencastUserDetails) userDetails).getMail(), PROVIDER_NAME, jaxbOrganization, roles);
+      } else {
+        user = new JaxbUser(userDetails.getUsername(), PROVIDER_NAME, jaxbOrganization, roles);
+      }
+
       cache.put(userName, user);
       return user;
     } finally {
