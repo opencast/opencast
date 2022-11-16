@@ -21,6 +21,8 @@
 
 package org.opencastproject.runtimeinfo.rest;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import org.opencastproject.util.doc.DocData;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;

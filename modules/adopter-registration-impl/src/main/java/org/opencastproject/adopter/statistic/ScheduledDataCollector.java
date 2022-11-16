@@ -218,6 +218,8 @@ public class ScheduledDataCollector extends TimerTask {
       try {
         String generalDataAsJson = collectGeneralData(adopter);
         sender.sendGeneralData(generalDataAsJson);
+        //Note: save the form (unmodified) to update the dates.  Old dates cause warnings to the user!
+        adopterFormService.saveFormData(adopter);
       } catch (Exception e) {
         logger.error("Error occurred while processing adopter general data.", e);
       }
@@ -226,11 +228,26 @@ public class ScheduledDataCollector extends TimerTask {
         try {
           String statisticDataAsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
           sender.sendStatistics(statisticDataAsJson);
+          //Note: save the form (unmodified) (again!) to update the dates.  Old dates cause warnings to the user!
+          adopterFormService.saveFormData(adopter);
         } catch (Exception e) {
           logger.error("Error occurred while processing adopter statistic data.", e);
         }
       }
     }
+  }
+
+  public String getRegistrationDataAsString() throws Exception {
+    Form adopter = (Form) adopterFormService.retrieveFormData();
+    String generalJson = collectGeneralData(adopter);
+    String statsJson;
+    if (adopter.allowsStatistics()) {
+      statsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
+    } else {
+      statsJson = "{}";
+    }
+    //It's not stupid if it works!
+    return "{ \"general\":" + generalJson + ", \"statistics\":" + statsJson + "}";
   }
 
 

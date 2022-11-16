@@ -374,6 +374,21 @@ public class Form implements IForm {
 
   public void delete() {
     this.deleteMe = true;
+    this.organisationName = null;
+    this.departmentName = null;
+    this.firstName = null;
+    this.lastName = null;
+    this.email = null;
+    this.country = null;
+    this.postalCode = null;
+    this.city = null;
+    this.street = null;
+    this.streetNo = null;
+    this.contactMe = false;
+    this.allowsStatistics = false;
+    this.allowsErrorReports = false;
+    this.dateModified = new Date();
+    this.agreedToPolicy = false;
   }
 
   public boolean shouldDelete() {

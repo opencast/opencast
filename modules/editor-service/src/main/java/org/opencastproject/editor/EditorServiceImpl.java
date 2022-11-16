@@ -21,7 +21,6 @@
 
 package org.opencastproject.editor;
 
-import static com.entwinemedia.fn.Stream.$;
 import static java.util.Collections.emptyList;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static org.opencastproject.util.data.Tuple.tuple;
@@ -87,11 +86,11 @@ import org.opencastproject.workflow.api.WorkflowUtil;
 import org.opencastproject.workflow.handler.distribution.InternalPublicationChannel;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -115,6 +114,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -123,6 +123,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -173,6 +174,8 @@ public class EditorServiceImpl implements EditorService {
   private MediaPackageElementFlavor captionsFlavor;
   private String thumbnailWfProperty;
   private List<MediaPackageElementFlavor> thumbnailSourcePrimary;
+  private String distributionDirectory;
+  private Boolean localPublication = null;
 
   private static final String DEFAULT_PREVIEW_SUBTYPE = "prepared";
   private static final String DEFAULT_PREVIEW_TAG = "editor";
@@ -197,6 +200,7 @@ public class EditorServiceImpl implements EditorService {
   public static final String OPT_THUMBNAILSUBTYPE = "thumbnail.subtype";
   public static final String OPT_THUMBNAIL_WF_PROPERTY = "thumbnail.workflow.property";
   public static final String OPT_THUMBNAIL_PRIORITY_FLAVOR = "thumbnail.priority.flavor";
+  public static final String OPT_LOCAL_PUBLICATION = "publication.local";
 
   private final Set<String> smilCatalogTagSet = new HashSet<>();
 
@@ -337,10 +341,41 @@ public class EditorServiceImpl implements EditorService {
       thumbnailSourcePrimary = DEFAULT_THUMBNAIL_PRIORITY_FLAVOR;
     } else {
       thumbnailSourcePrimary = Arrays.stream(thumbnailPriorities.split(",", -1))
-                                .map(s -> MediaPackageElementFlavor.parseFlavor(s))
+                                .map(MediaPackageElementFlavor::parseFlavor)
                                 .collect(Collectors.toList());
     }
+
+    String localPublicationConfig = Objects.toString(properties.get(OPT_LOCAL_PUBLICATION), "auto");
+    if (!"auto".equals(localPublicationConfig)) {
+      // If this is not set to `auto`, we expect this to be a boolean
+      localPublication = BooleanUtils.toBoolean(localPublicationConfig);
+    }
+
+    distributionDirectory = cc.getBundleContext().getProperty("org.opencastproject.download.directory");
+    if (StringUtils.isEmpty(distributionDirectory)) {
+      final String storageDir = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
+      if (StringUtils.isNotEmpty(storageDir)) {
+        distributionDirectory = new File(storageDir, "downloads").getPath();
+      }
+    }
     logger.debug("Thumbnail track priority set to '{}'", thumbnailSourcePrimary);
+  }
+
+  /**
+   * Check if a media URL can be served from this server.
+   *
+   * @param mediaUrl
+   *      URL locating a media file
+   * @return
+   *      If the file is available locally
+   */
+  private boolean isLocal(URI uri) {
+    var path = uri.normalize().getPath();
+    if (!path.startsWith("/static/")) {
+      return false;
+    }
+    var localFile = new File(distributionDirectory, path.substring("/static".length()));
+    return localFile.exists();
   }
 
   private Boolean elementHasPreviewTag(MediaPackageElement element) {
@@ -392,22 +427,13 @@ public class EditorServiceImpl implements EditorService {
       String trackId = trackdata.getId();
       Track track = mediaPackage.getTrack(trackId);
       if (track == null) {
-        Opt<Track> trackOpt = getInternalPublication(mediaPackage).toStream().bind(new Fn<Publication, List<Track>>() {
-          @Override
-          public List<Track> apply(Publication a) {
-            return Arrays.asList(a.getTracks());
-          }
-        }).filter(new Fn<Track, Boolean>() {
-          @Override
-          public Boolean apply(Track a) {
-            return trackId.equals(a.getIdentifier());
-          }
-        }).head();
-        if (trackOpt.isNone()) {
-          throw new IllegalStateException(
-                  String.format("The track '%s' doesn't exist in media package '%s'", trackId, mediaPackage));
-        }
-        track = trackOpt.get();
+        track = Arrays.stream(getInternalPublication(mediaPackage)
+            .orElseThrow(() -> new IllegalStateException("Event has no internal publication"))
+            .getTracks())
+            .filter(t -> trackId.equals(t.getIdentifier()))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException(
+                  String.format("The track '%s' doesn't exist in media package '%s'", trackId, mediaPackage)));
       }
       tracks.add(track);
     }
@@ -660,13 +686,10 @@ public class EditorServiceImpl implements EditorService {
     throw new MimeTypeParseException("No image mimetype found");
   }
 
-  private Opt<Publication> getInternalPublication(MediaPackage mp) {
-    return $(mp.getPublications()).filter(new Fn<Publication, Boolean>() {
-      @Override
-      public Boolean apply(Publication a) {
-        return InternalPublicationChannel.CHANNEL_ID.equals(a.getChannel());
-      }
-    }).head();
+  private Optional<Publication> getInternalPublication(MediaPackage mp) {
+    return Arrays.stream(mp.getPublications())
+        .filter(publication -> InternalPublicationChannel.CHANNEL_ID.equals(publication.getChannel()))
+        .findFirst();
   }
 
   /**
@@ -699,20 +722,14 @@ public class EditorServiceImpl implements EditorService {
    * @return a list of workflow definitions
    */
   private List<WorkflowDefinition> getEditingWorkflows() {
-    List<WorkflowDefinition> workflows;
     try {
-      workflows = workflowService.listAvailableWorkflowDefinitions();
+      return workflowService.listAvailableWorkflowDefinitions().stream()
+          .filter(workflow -> workflow.containsTag(EDITOR_WORKFLOW_TAG))
+          .collect(Collectors.toList());
     } catch (WorkflowDatabaseException e) {
       logger.warn("Error while retrieving list of workflow definitions:", e);
-      return emptyList();
     }
-
-    return $(workflows).filter(new Fn<WorkflowDefinition, Boolean>() {
-      @Override
-      public Boolean apply(WorkflowDefinition a) {
-        return a.containsTag(EDITOR_WORKFLOW_TAG);
-      }
-    }).toList();
+    return emptyList();
   }
 
   /**
@@ -881,8 +898,8 @@ public class EditorServiceImpl implements EditorService {
 
     boolean workflowActive = WorkflowUtil.isActive(event.getWorkflowState());
 
-    final Opt<Publication> internalPubOpt = getInternalPublication(mp);
-    if (internalPubOpt.isNone() || internalPubOpt.isEmpty()) {
+    final Optional<Publication> internalPubOpt = getInternalPublication(mp);
+    if (internalPubOpt.isEmpty()) {
       errorExit("No internal publication", mediaPackageId, ErrorStatus.NO_INTERNAL_PUBLICATION);
     }
     Publication internalPub = internalPubOpt.get();
@@ -962,8 +979,12 @@ public class EditorServiceImpl implements EditorService {
 
       final int priority = thumbnailSourcePrimary.indexOf(track.getFlavor());
 
+      if (localPublication == null) {
+        localPublication = isLocal(track.getURI());
+      }
+
       return new TrackData(track.getFlavor().getType(), track.getFlavor().getSubtype(), audio, video, uri,
-                        track.getIdentifier(), thumbnailURI, priority);
+          track.getIdentifier(), thumbnailURI, priority);
     }).collect(Collectors.toList());
 
     List<String> waveformList = Arrays.stream(internalPub.getAttachments())
@@ -972,7 +993,7 @@ public class EditorServiceImpl implements EditorService {
             .collect(Collectors.toList());
 
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
-            event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList, subtitles);
+            event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList, subtitles, localPublication);
   }
 
 
@@ -1080,7 +1101,7 @@ public class EditorServiceImpl implements EditorService {
         final Map<String, String> workflowParameters = WorkflowPropertiesUtil
                 .getLatestWorkflowProperties(assetManager, mediaPackage.getIdentifier().toString());
         final Workflows workflows = new Workflows(assetManager, workflowService);
-        workflows.applyWorkflowToLatestVersion($(mediaPackage.getIdentifier().toString()),
+        workflows.applyWorkflowToLatestVersion(Collections.singletonList(mediaPackage.getIdentifier().toString()),
                 ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId), workflowParameters))
                 .run();
       } catch (AssetManagerException e) {

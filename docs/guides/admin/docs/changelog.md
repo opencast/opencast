@@ -4,6 +4,49 @@ Changelog
 Opencast 12
 -----------
 
+### Opencast 12.5
+
+*Released on November 16th, 2022*
+
+- [[#4441](https://github.com/opencast/opencast/pull/4441)] -
+  Azure transcription service improvements
+- [[#4439](https://github.com/opencast/opencast/pull/4439)] -
+  Fix Tobira API version
+- [[#4436](https://github.com/opencast/opencast/pull/4436)] -
+  Batch Dependabot Updates for Paella 7
+- [[#4416](https://github.com/opencast/opencast/pull/4416)] -
+  Allow dots in template file names
+- [[#4411](https://github.com/opencast/opencast/pull/4411)] -
+  Let Editor know if files are available locally
+- [[#4410](https://github.com/opencast/opencast/pull/4410)] -
+  Replace Entwine Functional Library in Editor
+- [[#4406](https://github.com/opencast/opencast/pull/4406)] -
+  Batch Dependabot Updates for Paella 7
+- [[#4392](https://github.com/opencast/opencast/pull/4392)] -
+  Batch Dependabot Updates for Paella 7
+- [[#4391](https://github.com/opencast/opencast/pull/4391)] -
+  Batch Dependabot Updates for Paella 7
+- [[#4381](https://github.com/opencast/opencast/pull/4381)] -
+  Fix workflow typo in docs
+- [[#4378](https://github.com/opencast/opencast/pull/4378)] -
+  Drop Hold State Test
+- [[#4377](https://github.com/opencast/opencast/pull/4377)] -
+  Do not add roleprefix to extra roles
+- [[#4375](https://github.com/opencast/opencast/pull/4375)] -
+  Use UTF-8 as charset for HTML mails
+- [[#4373](https://github.com/opencast/opencast/pull/4373)] -
+  Bump html-validate from 7.6.0 to 7.7.1 in /modules/engage-paella-player-7
+- [[#4370](https://github.com/opencast/opencast/pull/4370)] -
+  Correctly identify the master playlist in the Tobira harvest
+- [[#4367](https://github.com/opencast/opencast/pull/4367)] -
+  Bump eslint from 8.25.0 to 8.26.0 in /modules/engage-paella-player-7
+- [[#4353](https://github.com/opencast/opencast/pull/4353)] -
+  Fully Automate GitHub Release
+- [[#4352](https://github.com/opencast/opencast/pull/4352)] -
+  Automate Release Process
+- [[#4350](https://github.com/opencast/opencast/pull/4350)] -
+  Lower JWT error logging to debug level
+
 ### Opencast 12.4
 
 *Released on October 19th, 2022*
@@ -373,6 +416,29 @@ Dependabot's changes are excluded from this log.
 
 Opencast 11
 ----------
+
+### Opencast 11.12
+
+*Released on November 16th, 2022*
+
+- [[#4382](https://github.com/opencast/opencast/pull/4382)] -
+  Fix Encoding Profile Type Handling in Encode WOH
+- [[#4332](https://github.com/opencast/opencast/pull/4332)] -
+  CVE-2022-42889 library upgrade
+- [[#4316](https://github.com/opencast/opencast/pull/4316)] -
+  Update Live Publication in Archive on Capture Agent Change
+- [[#4250](https://github.com/opencast/opencast/pull/4250)] -
+  Actually Retract Live Publication
+- [[#4249](https://github.com/opencast/opencast/pull/4249)] -
+  Make initialization of new event ACL with series ACL in the Admin UI configurable
+- [[#4242](https://github.com/opencast/opencast/pull/4242)] -
+  Bump eslint from 8.23.1 to 8.24.0 in /modules/engage-paella-player
+- [[#4230](https://github.com/opencast/opencast/pull/4230)] -
+  Opencast 11.11 release notes
+- [[#4208](https://github.com/opencast/opencast/pull/4208)] -
+  Fix composer incident codes and messages for process-smil and multiencode.
+- [[#4169](https://github.com/opencast/opencast/pull/4169)] -
+  Bump express from 4.17.3 to 4.18.1 in /modules/engage-paella-player
 
 ### Opencast 11.11
 

@@ -491,6 +491,11 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   }
 
   @Override
+  public Map<String, Object> getReturnValues(String mpId, String jobId) throws TranscriptionServiceException {
+    throw new TranscriptionServiceException("Method not implemented");
+  }
+
+  @Override
   protected String process(Job job) throws Exception {
     Operation op = null;
     String operation = job.getOperation();

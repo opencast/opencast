@@ -48,10 +48,11 @@ public class EditingData {
   private final Boolean workflowActive;
   private final List<String> waveformURIs;
   private final List<Subtitle> subtitles;
+  private final Boolean local;
 
   public EditingData(List<SegmentData> segments, List<TrackData> tracks, List<WorkflowData> workflows, Long duration,
           String title, String recordingStartDate, String seriesId, String seriesName, Boolean workflowActive,
-          List<String> waveformURIs, List<Subtitle> subtitles) {
+          List<String> waveformURIs, List<Subtitle> subtitles, Boolean local) {
     this.segments = segments;
     this.tracks = tracks;
     this.workflows = workflows;
@@ -62,6 +63,7 @@ public class EditingData {
     this.workflowActive = workflowActive;
     this.waveformURIs = waveformURIs;
     this.subtitles = subtitles;
+    this.local = local;
   }
 
   public static EditingData parse(String json) {
