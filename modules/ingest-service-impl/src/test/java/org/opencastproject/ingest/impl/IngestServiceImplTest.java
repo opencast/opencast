@@ -468,6 +468,9 @@ public class IngestServiceImplTest {
 
     Dictionary<String, String> props = new Hashtable<>();
     props.put(IngestServiceImpl.DOWNLOAD_SOURCE, regex);
+    props.put(IngestServiceImpl.DOWNLOAD_USER, "user");
+    props.put(IngestServiceImpl.DOWNLOAD_PASSWORD, "password");
+
     service.updated(props);
 
     try {
