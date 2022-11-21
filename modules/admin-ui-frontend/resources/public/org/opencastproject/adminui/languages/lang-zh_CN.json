@@ -27,6 +27,9 @@
    "SELECT_NO_OPTIONS_AVAILABLE": "无可用的选项",
    "YES": "是",
    "COPY": "复制到剪贴板",
+   "MONITOR": {
+      "REGISTRATION": "Opencast 已在一周多时间内发送注册更新"
+   },
    "LTI": {
       "ERROR_LOADING_METADATA": "加载事件元数据时出错。请稍后再试。",
       "SERIES_TITLE": "查看系列",
@@ -246,16 +249,16 @@
       "ADOPTER_PROFILE_NOT_UPDATED": "哎呀！无法更新资料信息。请重试！",
       "ADOPTER_PROFILE_DELETED": "成功删除资料信息",
       "ADOPTER_PROFILE_NOT_DELETED": "哎呀！无法删除资料信息。请重试！",
-      "TOBIRA_OVERRIDE_NAME": "The title of the selected page will be overridden with the title of the series.",
-      "TOBIRA_NO_PATH_SEGMENT": "Page needs a path segment.",
-      "TOBIRA_NOT_MOUNTED": "Series could not be mounted in Tobira.",
-      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
-      "TOBIRA_PATH_SEGMENT_UNIQUE": "The path segment of a page must be unqiue among all its sibling pages.",
-      "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
-      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and/or try again later.",
-      "TOBIRA_COPIED_DIRECT_LINK": "Copied link to clipboard.",
-      "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Couldn't copy link to clipboard.",
-      "TOBIRA_NOT_FOUND": "Tobira doesn't know about this series (yet). Try again in a few minutes or contact your system administrator."
+      "TOBIRA_OVERRIDE_NAME": "所选页面的标题将被系列的标题覆盖。",
+      "TOBIRA_NO_PATH_SEGMENT": "页面需要路径部分。",
+      "TOBIRA_NOT_MOUNTED": "无法将系列挂载到 tobira。",
+      "TOBIRA_PATH_SEGMENT_INVALID": "路径段无效。 一个有效的路径段长度至少为2个字符，不包含任何空白或控制字符，不能包含 '<>\"[\\]^`{|}#%/? '，不能以字符 '-+~@_!$&;:.,=*'()'。",
+      "TOBIRA_PATH_SEGMENT_UNIQUE": "一个页面的路径部分必须在所有同级页面中保持唯一。",
+      "TOBIRA_PAGE_NOT_FOUND": "您试图访问的页面不存在。您可以尝试从头开始访问。",
+      "TOBIRA_SERVER_ERROR": " 连接到 Tobira 时出错。请联系系统管理员或稍后重试。",
+      "TOBIRA_COPIED_DIRECT_LINK": "链接已复制到剪贴板。",
+      "TOBIRA_FAILED_COPYING_DIRECT_LINK": "无法复制链接到剪贴板。",
+      "TOBIRA_NOT_FOUND": "Tobira 目前不知道这个系列。请几分钟后再试或联系系统管理员。"
    },
    "BULK_ACTIONS": {
       "CAPTION": "操作",
@@ -420,6 +423,11 @@
          "BACK": "返回",
          "LEGAL_INFO_STATE": {
             "HEADER": "服务条款和隐私政策"
+         },
+         "SUMMARY_STATE": {
+            "HEADER": "这是实际要发送到 Opencast 服务器的 JSON 摘要",
+            "GENERAL_HEADER": "部署信息",
+            "STATS_HEADER": "统计信息"
          },
          "INFORMATION_STATE": {
             "HEADER": "感谢您使用Opencast！",
@@ -1126,17 +1134,17 @@
             },
             "TOBIRA": {
                "CAPTION": "Tobira",
-               "DESCRIPTION": "Here you can select where you want the series to show up in the Tobira video portal. You can only select one location here, and it needs to be empty (marked in bold). You can create new pages here, but note that they are only persisted if they are on the path to the selected page.",
-               "SELECT_PAGE": "Select a target page",
-               "PAGE_TITLE": "Subpage title",
-               "PATH_SEGMENT": "Path segment",
-               "SUBPAGES": "Subpages",
-               "ADD_SUBPAGE": "Add subpage",
-               "CANCEL": "Cancel",
-               "HOMEPAGE": "Homepage",
-               "SELECTED_PAGE": "Series will be mounted under the following path",
-               "NO_PAGE_SELECTED": "No page selected. Series will not be mounted in Tobira.",
-               "PATH": "Path"
+               "DESCRIPTION": "您可以在此选择您想要在 Tobira 视频门户中显示系列的位置。 您只能在这里选择一个位置，它必须是空的(用粗体标记)。 您可以在这里创建新的页面，但是请注意，它们只是在选定页面的路径上才会持续存在。",
+               "SELECT_PAGE": "选择目标页面",
+               "PAGE_TITLE": "子页面标题",
+               "PATH_SEGMENT": "路径段",
+               "SUBPAGES": "子页面",
+               "ADD_SUBPAGE": "新建子页面",
+               "CANCEL": "取消",
+               "HOMEPAGE": "首页",
+               "SELECTED_PAGE": "系列将在以下路径中挂载",
+               "NO_PAGE_SELECTED": "没有选择页面。系列将不会在 Tobira 挂载。",
+               "PATH": "路径"
             },
             "SUMMARY": {
                "CAPTION": "摘要"
@@ -1187,10 +1195,10 @@
                   "ACTION": "操作",
                   "NEW": "新建策略",
                   "DETAILS": "详情",
-                  "REPLACE_EVENT_ACLS": "Save & update event permissions",
+                  "REPLACE_EVENT_ACLS": "保存并更新事件权限",
                   "REPLACE_EVENT_ACLS_HINT": "确保此系列中的所有事件都具有这些权限",
-                  "SAVE_SERIES_ACLS": "Save",
-                  "SAVE_SERIES_ACLS_HINT": "Apply permissions only to series",
+                  "SAVE_SERIES_ACLS": "保存",
+                  "SAVE_SERIES_ACLS_HINT": "仅将权限应用于系列",
                   "LOAD_MORE_LIMIT": "显示策略.",
                   "LOAD_MORE_LINK": "载入更多"
                },
@@ -1215,11 +1223,11 @@
                "DESCRIPTION": "说明"
             },
             "TOBIRA": {
-               "HOMEPAGE": "(Homepage)",
-               "DIRECT_LINK": "Direct link to series",
-               "COPY_DIRECT_LINK": "Copy to clipboard",
-               "NOT_MOUNTED": "This series is currently not included the page structure, and can only be reached using the direct link above.",
-               "PAGES": "Pages in Tobira that contain this series"
+               "HOMEPAGE": "(首页)",
+               "DIRECT_LINK": "直接链接到系列",
+               "COPY_DIRECT_LINK": "复制到剪贴板",
+               "NOT_MOUNTED": "该系列目前不在页面结构中，只能使用上面的直接链接。",
+               "PAGES": "Tobira 中包含此系列的页面"
             },
             "EVENTS": {
                "TITLE": "标题",
