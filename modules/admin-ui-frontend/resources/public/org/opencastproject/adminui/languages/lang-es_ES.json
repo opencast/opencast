@@ -27,6 +27,9 @@
    "SELECT_NO_OPTIONS_AVAILABLE": "No hay opciones disponibles",
    "YES": "Sí",
    "COPY": "Copiar en el portapapeles",
+   "MONITOR": {
+      "REGISTRATION": "Opencast has sent a registration update in more than a week"
+   },
    "LTI": {
       "ERROR_LOADING_METADATA": "Error al cargar los metadatos del evento. Inténtalo de nuevo más tarde.",
       "SERIES_TITLE": "Ver series",
@@ -421,6 +424,11 @@
          "LEGAL_INFO_STATE": {
             "HEADER": "Condiciones del servicio y política de privacidad"
          },
+         "SUMMARY_STATE": {
+            "HEADER": "This is a JSON summary of exactly what would be sent to Opencast's servers",
+            "GENERAL_HEADER": "Adopter Information",
+            "STATS_HEADER": "Statistical Information"
+         },
          "INFORMATION_STATE": {
             "HEADER": "¡Gracias por usar Opencast!",
             "INFORMATION_PARAGRAPH_1": "Nuestros desarrolladores están trabajando constantemente para proporcionarle la mejor experiencia de usuario posible. Para eso, necesitamos saber más sobre quién utiliza Opencast y cómo se utiliza. Puedes ayudarnos con un registro rápido.",
@@ -465,7 +473,7 @@
             "TEXT": "Se produjo un error al procesar tu solicitud."
          },
          "DELETE_SUBMIT_STATE": {
-            "TEXT": "Are you sure you want to delete your registration data? Confirming this will also remove your registration data from the Opencast project server with the next update interval."
+            "TEXT": "¿Está seguro que desea eliminar sus datos de registro? Confirmando esto también eliminará sus datos de registro del servidor del proyecto Opencast en el siguiente intervalo de actualización."
          }
       }
    },
@@ -1132,7 +1140,7 @@
                "PATH_SEGMENT": "Path segment",
                "SUBPAGES": "Subpages",
                "ADD_SUBPAGE": "Add subpage",
-               "CANCEL": "Cancel",
+               "CANCEL": "Cancelar",
                "HOMEPAGE": "Homepage",
                "SELECTED_PAGE": "Series will be mounted under the following path",
                "NO_PAGE_SELECTED": "No page selected. Series will not be mounted in Tobira.",
@@ -1189,7 +1197,7 @@
                   "DETAILS": "Detalles",
                   "REPLACE_EVENT_ACLS": "Save & update event permissions",
                   "REPLACE_EVENT_ACLS_HINT": "Asegúrese de que todos los eventos de esta serie tengan estos permisos en vigor",
-                  "SAVE_SERIES_ACLS": "Save",
+                  "SAVE_SERIES_ACLS": "Guardar",
                   "SAVE_SERIES_ACLS_HINT": "Apply permissions only to series",
                   "LOAD_MORE_LIMIT": "políticas mostradas.",
                   "LOAD_MORE_LINK": "Cargar más"
@@ -1217,7 +1225,7 @@
             "TOBIRA": {
                "HOMEPAGE": "(Homepage)",
                "DIRECT_LINK": "Direct link to series",
-               "COPY_DIRECT_LINK": "Copy to clipboard",
+               "COPY_DIRECT_LINK": "Copiar en el portapapeles",
                "NOT_MOUNTED": "This series is currently not included the page structure, and can only be reached using the direct link above.",
                "PAGES": "Pages in Tobira that contain this series"
             },
@@ -2120,7 +2128,7 @@
          "GENERAL": "General",
          "PLAYER": "Reproductor",
          "EDITOR": "Editor",
-         "ADD_MEDIA": "Create Event/Series"
+         "ADD_MEDIA": "Crear Evento/Serie"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2155,8 +2163,8 @@
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Fin de segmento"
          },
          "ADD_MEDIA": {
-            "NEXT_TAB": "Next tab/Create",
-            "PREVIOUS_TAB": "Previous tab"
+            "NEXT_TAB": "Siguiente pestaña/Crear",
+            "PREVIOUS_TAB": "Pestaña anterior"
          }
       }
    },

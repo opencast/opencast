@@ -27,6 +27,9 @@
    "SELECT_NO_OPTIONS_AVAILABLE": "沒有可用的選項",
    "YES": "是",
    "COPY": "複製到剪貼簿",
+   "MONITOR": {
+      "REGISTRATION": "Opencast has sent a registration update in more than a week"
+   },
    "LTI": {
       "ERROR_LOADING_METADATA": "載入事件後設資料時發生錯誤。請稍後再試。",
       "SERIES_TITLE": "瀏覽系列",
@@ -420,6 +423,11 @@
          "BACK": "返回",
          "LEGAL_INFO_STATE": {
             "HEADER": "服務和隱私協議"
+         },
+         "SUMMARY_STATE": {
+            "HEADER": "This is a JSON summary of exactly what would be sent to Opencast's servers",
+            "GENERAL_HEADER": "Adopter Information",
+            "STATS_HEADER": "Statistical Information"
          },
          "INFORMATION_STATE": {
             "HEADER": "謝謝您使用 Opencast!",
