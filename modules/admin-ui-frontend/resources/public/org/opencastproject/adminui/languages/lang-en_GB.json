@@ -27,6 +27,9 @@
    "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Yes",
    "COPY": "Copy to clipboard",
+   "MONITOR": {
+      "REGISTRATION": "Opencast has sent a registration update in more than a week"
+   },
    "LTI": {
       "ERROR_LOADING_METADATA": "Error loading event metadata. Please try again later.",
       "SERIES_TITLE": "View Series",
@@ -420,6 +423,11 @@
          "BACK": "Back",
          "LEGAL_INFO_STATE": {
             "HEADER": "Terms of Service and Privacy Policy"
+         },
+         "SUMMARY_STATE": {
+            "HEADER": "This is a JSON summary of exactly what would be sent to Opencast's servers",
+            "GENERAL_HEADER": "Adopter Information",
+            "STATS_HEADER": "Statistical Information"
          },
          "INFORMATION_STATE": {
             "HEADER": "Thank you for using Opencast!",
