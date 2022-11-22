@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -224,13 +224,6 @@
               javax.ws.rs.ext;version=2.0.1,
               *
             </Import-Package>
-            <Service-Component>
-              OSGI-INF/capture-prolonging-service.xml,
-              OSGI-INF/scheduler-service-cleanup-finished-recordings-scanner.xml,
-              OSGI-INF/scheduler-service-persistence.xml,
-              OSGI-INF/scheduler-service.xml,
-              OSGI-INF/scheduler-service-rest.xml
-            </Service-Component>
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

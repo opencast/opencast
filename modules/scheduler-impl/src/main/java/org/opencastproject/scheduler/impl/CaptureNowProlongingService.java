@@ -53,6 +53,10 @@ import org.joda.time.DateTime;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -69,9 +73,17 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /** Prolong immediate recordings before reaching the end, as long as there are no conflicts */
+@Component(
+    immediate = true,
+    service = { ManagedService.class,CaptureNowProlongingService.class },
+    property = {
+        "service.description=Capture Prolonging Service"
+    }
+)
 public class CaptureNowProlongingService implements ManagedService {
 
   /** Log facility */
@@ -113,26 +125,31 @@ public class CaptureNowProlongingService implements ManagedService {
   private ComponentContext componentContext;
 
   /** Sets the scheduler service */
+  @Reference
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
   }
 
   /** Sets the security service */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** Sets the service registry */
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
   /** Sets the organization directory service */
+  @Reference
   public void setOrgDirectoryService(OrganizationDirectoryService orgDirectoryService) {
     this.orgDirectoryService = orgDirectoryService;
   }
 
   /** Sets the workspace */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -143,6 +160,7 @@ public class CaptureNowProlongingService implements ManagedService {
    * @param cc
    *          the component's context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     componentContext = cc;
     try {
@@ -162,6 +180,7 @@ public class CaptureNowProlongingService implements ManagedService {
   /**
    * Deactivates the component
    */
+  @Deactivate
   public void deactivate(ComponentContext cc) {
     componentContext = null;
     shutdown();
@@ -290,9 +309,10 @@ public class CaptureNowProlongingService implements ManagedService {
         SecurityUtil.runAs(prolongingService.getSecurityService(), organization, user, () -> {
           try {
             MediaPackage mp = prolongingService.getCurrentRecording(agentId);
-            Opt<DublinCoreCatalog> dublinCore = DublinCoreUtil.loadEpisodeDublinCore(prolongingService.getWorkspace(),
-                    mp);
-            if (dublinCore.isSome()
+            Optional<DublinCoreCatalog> dublinCore = DublinCoreUtil.loadEpisodeDublinCore(
+                prolongingService.getWorkspace(),
+                mp);
+            if (dublinCore.isPresent()
                     && EncodingSchemeUtils.decodeMandatoryPeriod(dublinCore.get().getFirst(PROPERTY_TEMPORAL))
                             .getEnd().before(DateTime.now().plusSeconds(90).toDate())) {
               prolong(prolongingService, mp, dublinCore.get(), agentId);
@@ -384,9 +404,10 @@ public class CaptureNowProlongingService implements ManagedService {
       if (eventId.equals(conflictMediaPackage.getIdentifier().toString()))
         continue;
 
-      Opt<DublinCoreCatalog> conflictingDc = DublinCoreUtil.loadEpisodeDublinCore(workspace, conflictMediaPackage);
-      if (conflictingDc.isNone())
+      Optional<DublinCoreCatalog> conflictingDc = DublinCoreUtil.loadEpisodeDublinCore(workspace, conflictMediaPackage);
+      if (conflictingDc.isEmpty()) {
         continue;
+      }
 
       Date conflictingStartDate = EncodingSchemeUtils
               .decodeMandatoryPeriod(conflictingDc.get().getFirst(DublinCore.PROPERTY_TEMPORAL)).getStart();

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -83,9 +83,6 @@
             <Export-Package>
               org.opencastproject.textextractor.tesseract;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/tesseract.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

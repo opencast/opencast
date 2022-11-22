@@ -24,6 +24,8 @@ package org.opencastproject.kernel.security;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +44,17 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * A servlet filter that delegates to the appropriate spring filter chain
  */
+@Component(
+    immediate = true,
+    service = { Filter.class,SecurityFilter.class },
+    property = {
+        "service.description=Security Filter",
+        "httpContext.id=opencast.httpcontext",
+        "httpContext.shared=true",
+        "service.ranking=3",
+        "urlPatterns=*"
+    }
+)
 public final class SecurityFilter implements Filter {
 
   /** The logger */
@@ -57,6 +70,7 @@ public final class SecurityFilter implements Filter {
   private SecurityService securityService;
 
   /** OSGi DI. */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

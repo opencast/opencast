@@ -812,6 +812,12 @@
                   </div>
                 </div>
               </div>
+              <footer>
+                <a ng-click="accessSave(policy)"
+                  class="submit">
+                  {{ "SAVE" | translate}}
+                </a>
+            </footer>
             </div>
           </li>
         </ul>
@@ -1676,8 +1682,7 @@
               <tr>
                 <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTER"><!-- Submitter--></td>
                 <td>
-                  {{ subNavData.creator.name }}
-                  <span ng-if="subNavData.creator.email">{{'&lt;' + subNavData.creator.email + '&gt;' }}</span>
+                  {{ subNavData.creator }}
                 </td>
               </tr>
               <tr>

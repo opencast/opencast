@@ -82,7 +82,7 @@ public class UserEndpoint {
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
-  @Reference(name = "userDirectoryService")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }

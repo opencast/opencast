@@ -28,6 +28,10 @@ import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.list.util.ListProviderUtil;
 import org.opencastproject.security.api.SecurityService;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +42,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Component(
+    immediate = true,
+    service = ListProvidersService.class,
+    property = {
+        "service.description=Resources list providers service",
+        "opencast.service.type=org.opencastproject.list.api.ListProvidersService"
+    }
+)
 public class ListProvidersServiceImpl implements ListProvidersService {
 
   static final String ALL_ORGANIZATIONS = "*";
@@ -86,11 +98,17 @@ public class ListProvidersServiceImpl implements ListProvidersService {
   }
 
     /** OSGi callback for security service */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi callback for provider. */
+  @Reference(
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeProvider"
+  )
   public void addProvider(ResourceListProvider provider) {
     for (String listName : provider.getListNames()) {
       addProvider(listName, provider);
@@ -144,9 +162,14 @@ public class ListProvidersServiceImpl implements ListProvidersService {
       for (Map.Entry<String,String> entry : list.entrySet()) {
         int repeated = Collections.frequency(list.values(), entry.getValue());
         if (repeated > 1) {
+          String newSeriesName = null;
           //If a series name is repeated, will add the first 7 characters of the series ID to the display name on the
           //admin-ui
-          String newSeriesName = entry.getValue() + " " + "(ID: " + entry.getKey().substring(0, 7) + "...)";
+          try {
+            newSeriesName = entry.getValue() + " " + "(ID: " + entry.getKey().substring(0, 7) + "...)";
+          } catch (StringIndexOutOfBoundsException e) {
+            newSeriesName = entry.getValue() + " " + "(ID: " + entry.getKey() + ")";
+          }
           logger.debug(String.format("Repeated series title \"%s\" found, changing to \"%s\" for admin-ui display",
               entry.getValue(), newSeriesName));
           list.put(entry.getKey(), newSeriesName);

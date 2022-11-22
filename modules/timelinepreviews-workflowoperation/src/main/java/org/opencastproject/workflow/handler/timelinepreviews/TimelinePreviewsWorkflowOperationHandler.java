@@ -29,6 +29,7 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.TrackSelector;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.timelinepreviews.api.TimelinePreviewsException;
 import org.opencastproject.timelinepreviews.api.TimelinePreviewsService;
 import org.opencastproject.util.IoSupport;
@@ -37,6 +38,7 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -44,6 +46,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +64,14 @@ import java.util.List;
 /**
  * Workflow operation for the timeline previews service.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Timeline Preview Images Workflow Operation Handler",
+        "workflow.operation=timelinepreviews"
+    }
+)
 public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -92,6 +105,7 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
   private Workspace workspace = null;
 
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
     super.activate(cc);
     logger.info("Registering timeline previews workflow operation handler");
@@ -275,11 +289,20 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
     }
   }
 
+  @Reference
   public void setTimelinePreviewsService(TimelinePreviewsService timelinePreviewsService) {
     this.timelinePreviewsService = timelinePreviewsService;
   }
 
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

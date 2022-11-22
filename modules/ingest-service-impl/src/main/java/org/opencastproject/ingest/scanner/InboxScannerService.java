@@ -33,6 +33,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -56,6 +57,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -134,6 +137,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
   private OrganizationDirectoryService orgDir;
   private SeriesService seriesService;
   private SchedulerService schedulerService;
+  protected Workspace workspace;
 
   private ComponentContext cc;
 
@@ -193,7 +197,11 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
             .map(Pattern::compile);
     var dateFormatter = Optional.ofNullable(properties.get(INBOX_DATETIME_FORMAT))
             .map(Objects::toString)
-            .map(DateTimeFormatter::ofPattern)
+            .map(s -> new DateTimeFormatterBuilder().appendPattern(s)
+                    .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+                    .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+                    .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+                    .toFormatter())
             .orElse(DateTimeFormatter.ISO_DATE_TIME);
     var ffprobe = BooleanUtils.toBoolean((String) properties.get(INBOX_METADATA_FFPROBE))
             ? Objects.toString(cc.getBundleContext().getProperty(FFPROBE_BINARY_CONFIG), FFPROBE_BINARY_DEFAULT)
@@ -203,16 +211,24 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
     var securityContext = getUserAndOrganization(securityService, orgDir, orgId, userDir, userId)
             .map(a -> new SecurityContext(securityService, a.getB(), a.getA()));
-    while (securityContext.isEmpty()) {
-      logger.debug("Could not create security context for user {}, organization {}. "
-              + "Either the organization or the user does not exist (yet).", userId, orgId);
-        try {
-          Thread.sleep(5000);
-        } catch (InterruptedException e) {
-          return;
-        }
+
+    if (securityContext.isEmpty()) {
+      logger.warn("Could not create security context for user {}, organization {}. "
+          + "Either the organization or the user does not exist (yet).", userId, orgId);
+    }
+    for (int attempts = 0; attempts < 25 && securityContext.isEmpty(); attempts++) {
+      logger.info("Waiting for security context...");
+      try {
+        Thread.sleep(5000);
+      } catch (InterruptedException e) {
+        logger.warn("Interrupted while waiting for security context");
+      }
       securityContext = getUserAndOrganization(securityService, orgDir, orgId, userDir, userId)
-              .map(a -> new SecurityContext(securityService, a.getB(), a.getA()));
+          .map(a -> new SecurityContext(securityService, a.getB(), a.getA()));
+    }
+    if (securityContext.isEmpty()) {
+      logger.warn("Security context for user {} and organization {} is still empty. Giving up.", userId, orgId);
+      return;
     }
 
     // remove old file install configuration
@@ -222,7 +238,8 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     // create new scanner
     this.ingestor = new Ingestor(ingestService, securityContext.get(), workflowDefinition,
             workflowConfig, mediaFlavor, inbox, maxThreads, seriesService, maxTries, secondsBetweenTries,
-            metadataPattern, dateFormatter, schedulerService, ffprobe, matchSchedule, matchThreshold);
+            metadataPattern, dateFormatter, schedulerService, ffprobe, matchSchedule, matchThreshold,
+            workspace);
     new Thread(ingestor).start();
     logger.info("Now watching inbox {}", inbox.getAbsolutePath());
   }
@@ -360,5 +377,10 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
   @Reference
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
+  }
+
+  @Reference
+  public void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
   }
 }

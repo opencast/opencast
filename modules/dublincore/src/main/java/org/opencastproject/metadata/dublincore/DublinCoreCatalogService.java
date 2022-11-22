@@ -68,7 +68,7 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
 
   protected Workspace workspace = null;
 
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

@@ -1,0 +1,10 @@
+#player-container {
+    position: relative;
+    font-family: helvetica, arial, sans-serif;
+    bottom: 0px;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    position: absolute;
+    overflow: hidden;
+  }

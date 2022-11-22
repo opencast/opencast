@@ -27,7 +27,6 @@ import static org.junit.Assert.fail;
 import static org.opencastproject.util.data.Collections.set;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityConstants;
@@ -48,7 +47,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -71,13 +69,6 @@ public class JpaGroupRoleProviderTest {
     EasyMock.expect(securityService.getUser()).andReturn(adminUser).anyTimes();
     EasyMock.expect(securityService.getOrganization()).andReturn(org1).anyTimes();
     EasyMock.replay(securityService);
-
-    // Create the message sender service
-    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
-    messageSender.sendObjectMessage(EasyMock.anyObject(String.class),
-            EasyMock.anyObject(MessageSender.DestinationType.class), EasyMock.anyObject(Serializable.class));
-    EasyMock.expectLastCall();
-    EasyMock.replay(messageSender);
 
     provider = new JpaGroupRoleProvider();
     provider.setSecurityService(securityService);
@@ -278,4 +269,44 @@ public class JpaGroupRoleProviderTest {
     Assert.assertEquals(2, IteratorUtils.toList(provider.findRoles("%test%", Role.Target.ALL, 0, 2)).size());
   }
 
+  @Test
+  public void testRemoveUserFromAllGroups() throws UnauthorizedException {
+
+    Set<String> members = new HashSet<String>();
+    members.add("user");
+
+    JpaGroup group1 = new JpaGroup("test1", org1, "Test1", "Test 1 group",
+            new HashSet<JpaRole>(), members);
+    JpaGroup group2 = new JpaGroup("test2", org1, "Test2", "Test 2 group",
+            new HashSet<JpaRole>(), members);
+    JpaGroup group3 = new JpaGroup("test3", org1, "Test3", "Test 3 group",
+            new HashSet<JpaRole>(), members);
+
+    provider.addGroup(group1);
+    provider.addGroup(group2);
+    provider.addGroup(group3);
+
+    List<Role> groupRoles = provider.getRolesForUser("user");
+    Assert.assertEquals("There should be three groupRoles added to the user",3, groupRoles.size());
+    Assert.assertTrue("GroupRole for group1 should be added", groupRoles.contains(new JpaRole(group1.getRole(), org1)));
+    Assert.assertTrue("GroupRole for group2 should be added", groupRoles.contains(new JpaRole(group2.getRole(), org1)));
+    Assert.assertTrue("GroupRole for group3 should be added", groupRoles.contains(new JpaRole(group3.getRole(), org1)));
+
+    provider.removeMemberFromAllGroups("user", "org1");
+
+    groupRoles = provider.getRolesForUser("user");
+    Assert.assertEquals("There should be no more groupRoles for the user",0, groupRoles.size());
+    Assert.assertFalse("GroupRole for group1 should be removed",
+            groupRoles.contains(new JpaRole(group1.getRole(), org1)));
+    Assert.assertFalse("GroupRole for group2 should be removed",
+            groupRoles.contains(new JpaRole(group2.getRole(), org1)));
+    Assert.assertFalse("GroupRole for group3 should be removed",
+            groupRoles.contains(new JpaRole(group3.getRole(), org1)));
+
+    provider.removeMemberFromAllGroups("user", "org1");
+
+    groupRoles = provider.getRolesForUser("user");
+    Assert.assertEquals("Make sure there is no issue with users that are not part of any group",
+            0, groupRoles.size());
+  }
 }

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -53,9 +53,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.sakaiproject.nakamura</groupId>
-      <artifactId>javax.activation-mail</artifactId>
-      <version>1.1.1.1.4.2-1.4.2</version>
+      <groupId>com.sun.mail</groupId>
+      <artifactId>jakarta.mail</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -93,11 +92,6 @@
             <Export-Package>
               org.opencastproject.workflow.handler.notification;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/operations/distribute-mediapackagepost.xml,
-              OSGI-INF/operations/email.xml,
-              OSGI-INF/operations/http-notify.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

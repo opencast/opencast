@@ -43,6 +43,8 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +81,16 @@ import javax.ws.rs.core.Response.ResponseBuilder;
             + "not anticipated. In other words, there is a bug! You should file an error report "
             + "with your server logs from the time when the error occurred: "
             + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
+    }
+)
+@Component(
+    immediate = true,
+    service = SearchRestService.class,
+    property = {
+        "service.description=Search REST Endpoint",
+        "opencast.service.type=org.opencastproject.search",
+        "opencast.service.path=/search",
+        "opencast.service.jobproducer=true"
     }
 )
 public class SearchRestService extends AbstractJobProducerEndpoint {
@@ -272,8 +284,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               name = "limit",
               isRequired = false,
               type = RestParameter.Type.STRING,
-              defaultValue = "20",
-              description = "The maximum number of items to return per page."
+              defaultValue = "100",
+              description = "The maximum number of items to return per page. -1 translates to everything, however, "
+                      + "non-admin users will only ever get a maximum of 2000 results. 0 is equal to 100."
           ),
           @RestParameter(
               name = "offset",
@@ -413,8 +426,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               name = "limit",
               isRequired = false,
               type = RestParameter.Type.STRING,
-              defaultValue = "20",
-              description = "The maximum number of items to return per page."
+              defaultValue = "100",
+              description = "The maximum number of items to return per page. -1 translates to everything, however, "
+                      + "non-admin users will only ever get a maximum of 2000 results. 0 is equal to 100."
           ),
           @RestParameter(
               name = "offset",
@@ -594,8 +608,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               name = "limit",
               isRequired = false,
               type = RestParameter.Type.STRING,
-              defaultValue = "20",
-              description = "The maximum number of items to return per page."
+              defaultValue = "100",
+              description = "The maximum number of items to return per page. -1 translates to everything, however, "
+                      + "non-admin users will only ever get a maximum of 2000 results. 0 is equal to 100."
           ),
           @RestParameter(
               name = "offset",
@@ -683,6 +698,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
    * @param searchService
    *          the service implementation
    */
+  @Reference
   public void setSearchService(SearchServiceImpl searchService) {
     this.searchService = searchService;
   }
@@ -693,6 +709,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

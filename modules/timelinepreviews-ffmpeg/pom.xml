@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -103,9 +103,6 @@
               org.opencastproject.timelinepreviews.ffmpeg;version=${project.version},
               org.opencastproject.timelinepreviews.ffmpeg.endpoint;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/timelinepreviews.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

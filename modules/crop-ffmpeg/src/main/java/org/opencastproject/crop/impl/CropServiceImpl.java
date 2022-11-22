@@ -44,6 +44,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +72,13 @@ import java.util.regex.Pattern;
  *     ffmpeg -i input.file -vf startCropping=wi-2*x:hi:x:0 -max_muxing_queue_size 2000 -y output.file
  * </pre>
  */
+@Component(
+    immediate = true,
+    service = { CropService.class,ManagedService.class },
+    property = {
+        "service.description=Video Scale Service"
+    }
+)
 public class CropServiceImpl extends AbstractJobProducer implements CropService, ManagedService {
 
   /**
@@ -310,8 +319,11 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
     logger.info("Running {}", cropCommandline);
 
     try {
-      pbuilder = new ProcessBuilder(cropCommandline.split(" "));
-      Process process = pbuilder.start();
+      Process process = new ProcessBuilder(cropCommandline.split(" "))
+          .redirectError(ProcessBuilder.Redirect.DISCARD)
+          .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+          .start();
+
       //wait until the task is finished
       exitCode = process.waitFor();
     } catch (InterruptedException | IOException e) {
@@ -475,22 +487,27 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
     return organizationDirectoryService;
   }
 
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

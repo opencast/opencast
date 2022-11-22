@@ -29,6 +29,9 @@ import org.opencastproject.security.api.UserDirectoryService;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +39,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+@Component(
+    immediate = true,
+    service = ResourceListProvider.class,
+    property = {
+        "service.description=Users list provider",
+        "opencast.service.type=org.opencastproject.index.service.resources.list.provider.UsersListProvider"
+    }
+)
 public class UsersListProvider implements ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "USERS";
@@ -58,11 +69,13 @@ public class UsersListProvider implements ResourceListProvider {
 
   private UserDirectoryService userDirectoryService;
 
+  @Activate
   protected void activate(BundleContext bundleContext) {
     logger.info("Users list provider activated!");
   }
 
   /** OSGi callback for users services. */
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }

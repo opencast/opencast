@@ -27,9 +27,11 @@ import org.opencastproject.kernel.mail.SmtpService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -37,6 +39,8 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +53,14 @@ import javax.mail.internet.InternetAddress;
 /**
  * Please describe what this handler does.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Sends an email with the parameters indicated",
+        "workflow.operation=send-email"
+    }
+)
 public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(EmailWorkflowOperationHandler.class);
@@ -201,7 +213,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     } else if (configValue != null && configValue.contains("${")) {
       // If value contains a "${", it may be a template so apply it
       // Give a name to the inline template
-      templateName = workflowInstance.getTemplate() + "_" + operation.getPosition() + "_" + configName;
+      templateName = workflowInstance.getTemplate() + "_" + operation.getId() + "_" + configName;
       // Only alphanumeric and _
       templateName = templateName.replaceAll("[^A-Za-z0-9 ]", "_");
       templateContent = configValue;
@@ -224,6 +236,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * @param smtpService
    *          the smtp service
    */
+  @Reference
   void setSmtpService(SmtpService smtpService) {
     this.smtpService = smtpService;
   }
@@ -234,6 +247,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * @param service
    *          the email template service
    */
+  @Reference
   void setEmailTemplateService(EmailTemplateService service) {
     this.emailTemplateService = service;
   }
@@ -244,7 +258,15 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * @param service
    *          the user directory service
    */
+  @Reference
   void setUserDirectoryService(UserDirectoryService service) {
     this.userDirectoryService = service;
   }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

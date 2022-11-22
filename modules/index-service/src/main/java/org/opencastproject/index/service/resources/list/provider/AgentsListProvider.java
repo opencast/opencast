@@ -28,12 +28,23 @@ import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.TreeMap;
 
+@Component(
+    immediate = true,
+    service = ResourceListProvider.class,
+    property = {
+        "service.description=Capture-agents list provider",
+        "opencast.service.type=org.opencastproject.index.service.resources.list.provider.AgentsListProvider"
+    }
+)
 public class AgentsListProvider implements ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "AGENTS";
@@ -46,11 +57,13 @@ public class AgentsListProvider implements ResourceListProvider {
   /** The capture agent service */
   private CaptureAgentStateService agentsService;
 
+  @Activate
   protected void activate(BundleContext bundleContext) {
     logger.info("Capture-agents list provider activated!");
   }
 
   /** OSGi callback for capture-agents services. */
+  @Reference
   public void setCaptureAgentService(CaptureAgentStateService service) {
     this.agentsService = service;
   }

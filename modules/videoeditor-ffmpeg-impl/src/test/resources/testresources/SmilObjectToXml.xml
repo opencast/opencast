@@ -13,6 +13,11 @@
       <param valuetype="data" name="track-flavor" value="source/presenter"
         xml:id="param-1bd5e839-0a74-4310-b1d2-daba07914f79"/>
     </paramGroup>
+    <paramGroup xml:id="pg-ed341a28-c40e-4ba2-b5d1-bb4df4a5a5be">
+      <param valuetype="data" name="track-id" value="95cf82dd-5238-4caf-b0a0-afdb37fe18c4" xml:id="param-f924a89e-2ccb-41f5-9b68-4b245b8d83a6"/>
+      <param valuetype="data" name="track-src" value="http://localhost:8080/static/mh_default_org/internal/ff870f4b-790d-45ed-8edd-bb77f12ed15c/1824fc8e-688f-42c8-b924-3e5f073d98a5/example.vtt" xml:id="param-c213e134-4535-412e-8897-067f53bcf9fa"/>
+      <param valuetype="data" name="track-flavor" value="captions/source+en" xml:id="param-d542bee2-5af1-4efe-ae3b-f20284c8a89a"/>
+    </paramGroup>
   </head>
   <body xml:id="b-b13fdd53-57ec-4fdf-b78d-6597788145ab">
     <par xml:id="par-7ce4cf7a-a2a2-49b8-8cf0-f3d2e5ddb1cf">
@@ -24,6 +29,14 @@
         paramGroup="pg-a6d8e576-495f-44c7-8ed7-b5b47c807f0f"
         src="file:/Users/karendolan/Projects/mh-opencast/matterhorn/modules/videoeditor-ffmpeg-impl/target/test-classes/testresources/testvideo_320x180.mp4"
         xml:id="v-af0fcf47-a018-48ee-87c4-90b35a69c5a9"/>
+      <ref clipBegin="0ms" clipEnd="5000ms"
+        paramGroup="pg-ed341a28-c40e-4ba2-b5d1-bb4df4a5a5be"
+        src="http://localhost:8080/static/mh_default_org/internal/ff870f4b-790d-45ed-8edd-bb77f12ed15c/1824fc8e-688f-42c8-b924-3e5f073d98a5/example.vtt"
+        xml:id="ref-f1ed5667-13a0-4ffe-9c15-5f3d4b56bf5d"/>
+      <ref clipBegin="15000ms" clipEnd="734167ms"
+        paramGroup="pg-ed341a28-c40e-4ba2-b5d1-bb4df4a5a5be"
+        src="http://localhost:8080/static/mh_default_org/internal/ff870f4b-790d-45ed-8edd-bb77f12ed15c/351fa291-ca26-48b9-9bcd-4ed30cbc8daf/example.vtt"
+        xml:id="ref-2cf3e8d4-fae7-4c0f-8bf1-32242afa1800"/>
     </par>
   </body>
 </smil>

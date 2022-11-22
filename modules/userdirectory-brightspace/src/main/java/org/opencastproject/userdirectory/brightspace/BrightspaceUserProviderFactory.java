@@ -37,6 +37,9 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +55,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+@Component(
+    immediate = true,
+    service = ManagedServiceFactory.class,
+    property = {
+        "service.pid=org.opencastproject.userdirectory.brightspace",
+        "service.description=Provides Brightspace user directory instances"
+    }
+)
 public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
 
   private static final Logger logger = LoggerFactory.getLogger(BrightspaceUserProviderFactory.class);
@@ -101,6 +112,7 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
   /**
    * OSGi callback for setting the organization directory service.
    */
+  @Reference
   public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
     this.orgDirectory = orgDirectory;
   }
@@ -110,6 +122,7 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
    *
    * @param cc the component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.debug("Activate BrightspaceUserProviderFactory");
     this.bundleContext = cc.getBundleContext();
@@ -144,17 +157,17 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
 
     String cacheSizeStr = (String) properties.get(CACHE_SIZE_KEY);
     if (StringUtils.isBlank(cacheSizeStr)) {
-      int cacheSize = DEFAULT_CACHE_SIZE_VALUE;
+      cacheSize = DEFAULT_CACHE_SIZE_VALUE;
     } else {
-      int cacheSize = NumberUtils.toInt(cacheSizeStr);
+      cacheSize = NumberUtils.toInt(cacheSizeStr);
     }
 
 
     String cacheExpirationStr = (String) properties.get(CACHE_EXPIRATION_KEY);
     if (StringUtils.isBlank(cacheExpirationStr)) {
-      int cacheExpiration = DEFAULT_CACHE_EXPIRATION_VALUE;
+      cacheExpiration = DEFAULT_CACHE_EXPIRATION_VALUE;
     } else {
-      int cacheExpiration = NumberUtils.toInt(cacheExpirationStr);
+      cacheExpiration = NumberUtils.toInt(cacheExpirationStr);
     }
 
     String rolesStr = (String) properties.get(BRIGHTSPACE_INSTRUCTOR_ROLES_KEY);

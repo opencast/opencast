@@ -137,7 +137,7 @@ public class OsgiEndpointHttpAssetProvider implements HttpAssetProvider {
   }
 
   /** OSGi DI */
-  @Reference(name = "orgDir")
+  @Reference
   public void setOrgDir(OrganizationDirectoryService orgDir) {
     this.orgDir = orgDir;
   }

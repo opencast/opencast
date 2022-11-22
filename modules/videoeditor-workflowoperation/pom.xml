@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -98,10 +98,6 @@
             <Export-Package>
               org.opencastproject.workflow.handler.videoeditor;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/operations/editor.xml,
-              OSGI-INF/operations/silence.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

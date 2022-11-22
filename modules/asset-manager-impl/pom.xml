@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -265,11 +265,6 @@
               org.opencastproject.assetmanager.impl.query;version=${project.version},
               org.opencastproject.assetmanager.impl.storage;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/asset-manager-rest.xml,
-              OSGI-INF/tiered-storage-job-producer.xml,
-              OSGI-INF/tiered-storage-timed-media-archiver.xml
-            </Service-Component>
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

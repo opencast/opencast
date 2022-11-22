@@ -26,7 +26,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
@@ -44,8 +43,6 @@ import org.apache.http.HttpStatus;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.Serializable;
 
 import javax.ws.rs.core.Response;
 
@@ -66,13 +63,6 @@ public class GroupRoleEndpointTest {
     EasyMock.expect(securityService.getUser()).andReturn(adminUser).anyTimes();
     EasyMock.expect(securityService.getOrganization()).andReturn(org1).anyTimes();
     EasyMock.replay(securityService);
-
-    // Create the message sender service
-    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
-    messageSender.sendObjectMessage(EasyMock.anyObject(String.class),
-            EasyMock.anyObject(MessageSender.DestinationType.class), EasyMock.anyObject(Serializable.class));
-    EasyMock.expectLastCall();
-    EasyMock.replay(messageSender);
 
     provider = new JpaGroupRoleProvider();
     provider.setSecurityService(securityService);

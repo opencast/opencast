@@ -37,6 +37,8 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -71,11 +73,21 @@ import javax.ws.rs.core.Response.Status;
     notes = {},
     abstractText = "Provides operations to LTI clients"
 )
+@Component(
+    immediate = true,
+    service = LtiServiceGuiEndpoint.class,
+    property = {
+        "service.description=LTI Service GUI",
+        "opencast.service.type=org.opencastproject.lti.service.remote",
+        "opencast.service.path=/lti-service-gui"
+    }
+)
 public class LtiServiceGuiEndpoint {
   /* OSGi service references */
   private LtiService service;
 
   /** OSGi DI */
+  @Reference
   public void setService(LtiService service) {
     this.service = service;
   }

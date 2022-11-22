@@ -39,6 +39,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageReference;
 import org.opencastproject.mediapackage.MediaPackageReferenceImpl;
@@ -47,6 +48,9 @@ import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.mediapackage.track.TrackImpl;
+import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreValue;
+import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
@@ -54,6 +58,7 @@ import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
@@ -61,14 +66,19 @@ import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,6 +100,15 @@ import java.util.stream.Collectors;
 /**
  * The workflow definition for handling "engage publication" operations
  */
+
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Engage Publication Workflow Handler",
+        "workflow.operation=publish-engage"
+    }
+)
 public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -126,6 +145,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   /** The search service */
   private SearchService searchService = null;
 
+  private Workspace workspace;
+
   /** The server url */
   private URL serverUrl;
 
@@ -140,6 +161,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param streamingDistributionService
    *          the streaming distribution service
    */
+  @Reference(target = "(distribution.channel=streaming)")
   protected void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
     this.streamingDistributionService = streamingDistributionService;
   }
@@ -150,6 +172,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param downloadDistributionService
    *          the download distribution service
    */
+  @Reference(target = "(distribution.channel=download)")
   protected void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
     this.downloadDistributionService = downloadDistributionService;
   }
@@ -161,13 +184,27 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param searchService
    *          an instance of the search service
    */
+  @Reference
   protected void setSearchService(SearchService searchService) {
     this.searchService = searchService;
   }
 
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
+  @Reference
+  public void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
+  }
+
 
   /** Supported streaming formats */
   private static final Set<TrackImpl.StreamingProtocol> STREAMING_FORMATS = new HashSet<>(Arrays.asList(
@@ -179,6 +216,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           TrackImpl.StreamingProtocol.SMOOTH));
 
   @Override
+  @Activate
   protected void activate(ComponentContext cc) {
     super.activate(cc);
     BundleContext bundleContext = cc.getBundleContext();
@@ -348,6 +386,22 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
             break;
           default:
           // nothing to do here
+        }
+
+        if (StringUtils.isBlank(mediaPackageForSearch.getTitle())) {
+          var dcUri = Arrays.stream(mediaPackageForSearch.getCatalogs(MediaPackageElements.EPISODE))
+              .findFirst()
+              .map(MediaPackageElement::getURI);
+          if (dcUri.isPresent()) {
+            try (var in = workspace.read(dcUri.get())) {
+              DublinCoreXmlFormat.read(in)
+                  .get(DublinCore.PROPERTY_TITLE)
+                  .stream()
+                  .findFirst()
+                  .map(DublinCoreValue::getValue)
+                  .ifPresent(mediaPackageForSearch::setTitle);
+            }
+          }
         }
 
         // Check that the media package meets the criteria for publication

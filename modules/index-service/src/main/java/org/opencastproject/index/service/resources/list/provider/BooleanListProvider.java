@@ -26,11 +26,20 @@ import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /** Boolean list provider. */
+@Component(
+    immediate = true,
+    service = ResourceListProvider.class,
+    property = {
+        "service.description=Boolean list provider",
+        "opencast.service.type=org.opencastproject.index.service.resources.list.provider.BooleanListProvider"
+    }
+)
 public class BooleanListProvider implements ResourceListProvider {
 
   public static final String YES_NO = "YES_NO";

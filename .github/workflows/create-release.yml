@@ -39,18 +39,20 @@ jobs:
 
       - name: Get the version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        run: |
+          echo "::set-output name=VERSION::$GITHUB_REF" | sed 's_refs/tags/\([0-9]*\).\([0-9]*\)$_\1.\2_'
+          echo "::set-output name=VERSION_MAIN::$GITHUB_REF" | sed 's_refs/tags/\([0-9]*\).\([0-9]*\)$_\1_'
+          echo "::set-output name=VERSION_COMBINED::$GITHUB_REF" | sed 's_refs/tags/\([0-9]*\).\([0-9]*\)$_\1\2_'
 
       - name: create new release
         uses: softprops/action-gh-release@v1
         with:
           files: build/opencast-dist-*.tar.gz
-          draft: true
           fail_on_unmatched_files: true
           name: Opencast ${{ steps.get_version.outputs.VERSION }}
           body: |
-            This release …
+            This is an Opencast ${{ steps.get_version.outputs.VERSION_MAIN }} release.
             For further information, please take a look at:
 
-            - [Release notes](#)
-            - [Changelog](#)
+            - [Release notes](https://docs.opencast.org/r/${{ steps.get_version.outputs.VERSION_MAIN }}.x/admin/#releasenotes/#opencast-${{ steps.get_version.outputs.VERSION_COMBINED }})
+            - [Changelog](https://docs.opencast.org/r/${{ steps.get_version.outputs.VERSION_MAIN }}.x/admin/#changelog/#opencast-${{ steps.get_version.outputs.VERSION_COMBINED }})

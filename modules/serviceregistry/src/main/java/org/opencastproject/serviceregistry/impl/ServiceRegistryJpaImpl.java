@@ -302,7 +302,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   protected float localSystemLoad = 0.0f;
 
   /** OSGi DI */
-  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.common)")
+  @Reference(target = "(osgi.unit.name=org.opencastproject.common)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -674,11 +674,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       }
       logger.debug("Deleted all child jobs of job '{}'", jobId);
     } catch (Exception e) {
-      logger.error("Unable to remove child jobs from {}: {}", jobId, e);
       if (tx.isActive()) {
         tx.rollback();
       }
-      throw new ServiceRegistryException(e);
+      throw new ServiceRegistryException("Unable to remove child jobs from " + jobId, e);
     }
   }
 
@@ -2448,7 +2447,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @param client
    *          the trusted http client
    */
-  @Reference(name = "trustedHttpClient")
+  @Reference
   void setTrustedHttpClient(TrustedHttpClient client) {
     this.client = client;
   }
@@ -2459,7 +2458,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -2470,7 +2469,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
-  @Reference(name = "user-directory")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -2481,13 +2480,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @param organizationDirectory
    *          the organization directory
    */
-  @Reference(name = "orgDirectory")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }
 
   /** OSGi DI. */
-  @Reference(name = "incidentService", cardinality = ReferenceCardinality.OPTIONAL, policy =  ReferencePolicy.DYNAMIC, unbind = "unsetIncidentService")
+  @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy =  ReferencePolicy.DYNAMIC, unbind = "unsetIncidentService")
   public void setIncidentService(IncidentService incidentService) {
     // Manually resolve the cyclic dependency between the incident service and the service registry
     ((OsgiIncidentService) incidentService).setServiceRegistry(this);

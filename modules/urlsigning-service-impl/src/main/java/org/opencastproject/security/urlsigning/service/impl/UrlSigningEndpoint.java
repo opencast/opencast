@@ -33,6 +33,8 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -49,11 +51,23 @@ import javax.ws.rs.core.Response;
     notes = "This is a testing endpoint to play around with the URL Signing Service",
     abstractText = ""
 )
+@Component(
+    immediate = true,
+    service = UrlSigningEndpoint.class,
+    property = {
+        "service.description=Url Signing REST Endpoint",
+        "opencast.service.type=org.opencastproject.security.urlsigning.testing",
+        "opencast.service.path=/signing",
+        "opencast.service.publish=false",
+        "opencast.service.jobproducer=false"
+    }
+)
 public class UrlSigningEndpoint {
 
   private UrlSigningService signingService;
 
   /** OSGi DI callback */
+  @Reference
   void setUrlSigningService(UrlSigningService signingService) {
     this.signingService = signingService;
   }

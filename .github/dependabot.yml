@@ -36,6 +36,11 @@ updates:
     interval: daily
   open-pull-requests-limit: 10
 - package-ecosystem: npm
+  directory: "/modules/engage-paella-player-7"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+- package-ecosystem: npm
   directory: "/modules/admin-ui-frontend"
   schedule:
     interval: daily
@@ -44,6 +49,11 @@ updates:
 # Java dependencies
 - package-ecosystem: maven
   directory: "/modules/metrics-exporter"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+- package-ecosystem: maven
+  directory: /modules/db
   schedule:
     interval: daily
   open-pull-requests-limit: 10

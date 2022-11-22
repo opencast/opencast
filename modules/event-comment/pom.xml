@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -127,10 +127,6 @@
               org.w3c.dom;version=0,
               *
             </Import-Package>
-            <Service-Component>
-              OSGI-INF/event-comment-database-service.xml,
-              OSGI-INF/event-comment-service.xml
-            </Service-Component>
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

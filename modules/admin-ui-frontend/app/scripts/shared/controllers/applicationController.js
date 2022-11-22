@@ -23,12 +23,12 @@
 // The main controller that all other scopes inherit from (except isolated scopes).
 angular.module('adminNg.controllers')
 .controller('ApplicationCtrl', ['$scope', '$rootScope', '$location', '$window', 'AuthService', 'Notifications',
-  'ResourceModal', 'VersionResource', 'HotkeysService', '$interval', 'RestServiceMonitor',
+  'ResourceModal', 'VersionResource', 'TermsOfUseResource', 'HotkeysService', '$interval', 'RestServiceMonitor',
   'AdopterRegistrationResource',
   function ($scope, $rootScope, $location, $window, AuthService, Notifications, ResourceModal,
-    VersionResource, HotkeysService, $interval, RestServiceMonitor, AdopterRegistrationResource){
+    VersionResource, TermsOfUseResource, HotkeysService, $interval, RestServiceMonitor, AdopterRegistrationResource){
 
-    $scope.adopter = new AdopterRegistrationResource();
+    $scope.adopter = new AdopterRegistrationResource.get();
 
     $scope.bodyClicked = function () {
       angular.element('[old-admin-ng-dropdown]').removeClass('active');
@@ -49,6 +49,11 @@ angular.module('adminNg.controllers')
     $scope.$on('$locationChangeSuccess', function($event, newUrl) {
       $scope.studioReturnUrl = encodeURIComponent(newUrl);
     });
+    $scope.tou = TermsOfUseResource.get();
+
+    $scope.showAdoptionDialog = function() {
+      ResourceModal.show('registration-modal');
+    };
 
     AuthService.getUser().$promise.then(function (user) {
       $scope.currentUser = user;
@@ -117,19 +122,26 @@ angular.module('adminNg.controllers')
     AdopterRegistrationResource.get({}, function(adopter) {
       // We exclude localhost to not show this to developers all the time.
       // We wouldn't get proper data from such instances anyway.
-      if(adopter.dateModified == null && window.location.hostname != 'localhost') {
+      if (adopter.dateModified == null && window.location.hostname != 'localhost') {
         ResourceModal.show('registration-modal');
         return;
       }
-      if(adopter.registered === false) {
+      if (adopter.registered === false ||
+          !angular.isDefined(adopter['termsVersionAgreed']) ||
+          $scope.tou['latest'] != adopter['termsVersionAgreed']) {
         var now = new Date();
         var lastModified = new Date(adopter.dateModified);
         var numberOfDaysPassed = Math.ceil((now - lastModified) / 8.64e7);
-        if(numberOfDaysPassed > 30) {
+        if (numberOfDaysPassed > 30) {
           ResourceModal.show('registration-modal');
         }
       }
     });
+
+    const checkPermission = (rolesWithPermission) => {
+      let roles = AuthService.getRoles();
+      return rolesWithPermission.some(i => roles.includes(i));
+    };
 
     HotkeysService.activateUniversalHotkey('general.event_view', function (event) {
       event.preventDefault();
@@ -142,13 +154,21 @@ angular.module('adminNg.controllers')
     });
 
     HotkeysService.activateUniversalHotkey('general.new_event', function (event) {
-      event.preventDefault();
-      ResourceModal.show('new-event-modal');
+      let rolesWithPermission = ['ROLE_UI_EVENTS_CREATE', 'ROLE_ADMIN'];
+      // only useres with above roles can trigger the modal
+      if (checkPermission(rolesWithPermission)) {
+        event.preventDefault();
+        ResourceModal.show('new-event-modal');
+      }
     });
 
     HotkeysService.activateUniversalHotkey('general.new_series', function (event) {
-      event.preventDefault();
-      ResourceModal.show('new-series-modal');
+      let rolesWithPermission = ['ROLE_UI_SERIES_CREATE', 'ROLE_ADMIN'];
+      // only useres with above roles can trigger the modal
+      if (checkPermission(rolesWithPermission)) {
+        event.preventDefault();
+        ResourceModal.show('new-series-modal');
+      }
     });
   }
 ]);

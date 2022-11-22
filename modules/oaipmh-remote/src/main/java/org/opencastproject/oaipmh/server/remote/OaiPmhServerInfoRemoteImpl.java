@@ -26,17 +26,28 @@ import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.oaipmh.server.OaiPmhServerInfo;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.UrlSupport;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.util.EntityUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+@Component(
+    immediate = true,
+    service = OaiPmhServerInfo.class,
+    property = {
+        "service.description=OAI-PMH server info remote proxy"
+    }
+)
 public class OaiPmhServerInfoRemoteImpl extends RemoteBase implements OaiPmhServerInfo {
   private static final Logger logger = LoggerFactory.getLogger(OaiPmhServerInfoRemoteImpl.class);
 
@@ -69,4 +80,17 @@ public class OaiPmhServerInfoRemoteImpl extends RemoteBase implements OaiPmhServ
     }
     throw new RuntimeException("Cannot contact remote service");
   }
+
+  @Reference
+  @Override
+  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
+    super.setTrustedHttpClient(trustedHttpClient);
+  }
+
+  @Reference
+  @Override
+  public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
+    super.setRemoteServiceManager(serviceRegistry);
+  }
+
 }

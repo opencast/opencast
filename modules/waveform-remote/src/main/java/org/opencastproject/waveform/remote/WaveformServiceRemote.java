@@ -25,7 +25,9 @@ import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.waveform.api.WaveformService;
 import org.opencastproject.waveform.api.WaveformServiceException;
 
@@ -33,6 +35,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +47,13 @@ import java.util.List;
 /**
  * This is a remote waveform service that will call the waveform service implementation on a remote host.
  */
+@Component(
+    immediate = true,
+    service = WaveformService.class,
+    property = {
+        "service.description=Waveform Remote Service Proxy"
+    }
+)
 public class WaveformServiceRemote extends RemoteBase implements WaveformService {
   private static final Logger logger = LoggerFactory.getLogger(WaveformServiceRemote.class);
 
@@ -103,6 +114,18 @@ public class WaveformServiceRemote extends RemoteBase implements WaveformService
     }
     throw new WaveformServiceException(
         "Unable to create waveform image from " + sourceTrack + " using a remote service");
+  }
+
+  @Reference
+  @Override
+  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
+    super.setTrustedHttpClient(trustedHttpClient);
+  }
+
+  @Reference
+  @Override
+  public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
+    super.setRemoteServiceManager(serviceRegistry);
   }
 
 }

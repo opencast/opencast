@@ -46,6 +46,9 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,8 +67,17 @@ import javax.ws.rs.core.Response;
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
-            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0 })
+            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0 })
 @RestService(name = "externalapisecurity", title = "External API Security Service", notes = {}, abstractText = "Provides security operations related to the external API")
+@Component(
+    immediate = true,
+    service = { SecurityEndpoint.class,ManagedService.class },
+    property = {
+        "service.description=External API - Security Endpoint",
+        "opencast.service.type=org.opencastproject.external.security",
+        "opencast.service.path=/api/security"
+    }
+)
 public class SecurityEndpoint implements ManagedService {
 
   protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
@@ -82,11 +94,13 @@ public class SecurityEndpoint implements ManagedService {
   private UrlSigningService urlSigningService;
 
   /** OSGi DI */
+  @Reference
   void setUrlSigningService(UrlSigningService urlSigningService) {
     this.urlSigningService = urlSigningService;
   }
 
   /** OSGi activation method */
+  @Activate
   void activate() {
     log.info("Activating External API - Security Endpoint");
   }

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -189,10 +189,6 @@
               org.opencastproject.oaipmh.server;version=${project.version};-split-package:=merge-first,
               org.opencastproject.oaipmh.util;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/oai-pmh-server.xml,
-              OSGI-INF/default-repository.xml
-            </Service-Component>
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

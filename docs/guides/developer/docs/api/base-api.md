@@ -119,6 +119,25 @@ __Example__
   "org.opencastproject.external.api.url": "http://api.opencast.org"
 }
 ```
+### GET /api/info/organization/properties/engageuiurl
+
+Returns the engage ui url property.
+
+__Response__
+
+`200 (OK)`: The engage ui url is returned as a JSON object containing the following field:
+
+Field     | Type                       | Description
+:---------|:---------------------------|:-----------
+`org.opencastproject.engage.ui.url `| [`string`](types.md#basic) | Engage ui url
+
+__Example__
+
+```
+{
+  "org.opencastproject.engage.ui.url": "https://opencast.org"
+}
+```
 
 # Versions
 

@@ -25,6 +25,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +39,13 @@ import javax.mail.internet.MimeMessage;
 /**
  * OSGi service that allows to send e-mails using <code>javax.mail</code>.
  */
+@Component(
+    immediate = true,
+    service = { ManagedService.class,SmtpService.class },
+    property = {
+        "service.description=SMTP Service"
+    }
+)
 public class SmtpService extends BaseSmtpService implements ManagedService {
 
   /** The logging facility */
@@ -55,7 +63,7 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
   private static final String SPLIT_PATTERN = "[\\s,]+";
 
   /** Define the MIME type for HTML mail content */
-  private static final String TEXT_HTML = "text/html";
+  private static final String TEXT_HTML = "text/html; charset=UTF-8";
 
   /**
    * Callback from the OSGi <code>ConfigurationAdmin</code> on configuration changes.

@@ -38,6 +38,8 @@ import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkfl
 import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler
     .PROPERTY_NAMESPACES_PROPERTY;
 import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler
+    .SET_TITLE;
+import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler
     .SOURCE_FLAVORS_PROPERTY;
 import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler
     .SOURCE_TAGS_PROPERTY;
@@ -59,12 +61,11 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.handler.distribution.InternalPublicationChannel;
@@ -146,6 +147,7 @@ public class DuplicateEventWorkflowOperationHandlerTest {
     configurations.put(MAX_NUMBER_PROPERTY, "" + 10);
     configurations.put(PROPERTY_NAMESPACES_PROPERTY, "org.opencastproject.assetmanager.security");
     configurations.put(COPY_NUMBER_PREFIX_PROPERTY, "copy");
+    configurations.put(SET_TITLE, "copied_event_title");
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
@@ -153,7 +155,7 @@ public class DuplicateEventWorkflowOperationHandlerTest {
     Assert.assertEquals(Action.CONTINUE, result.getAction());
     Assert.assertEquals(numCopies, clonedMediaPackages.getValues().size());
     for (int i = 1; i <= numCopies; i++) {
-      final String expectedTitle = mp.getTitle()
+      final String expectedTitle = "copied_event_title"
           + " (" + configurations.get(COPY_NUMBER_PREFIX_PROPERTY) + " " + i + ")";
       Assert.assertEquals(expectedTitle, clonedMediaPackages.getValues().get(i - 1).getTitle());
     }
@@ -173,6 +175,7 @@ public class DuplicateEventWorkflowOperationHandlerTest {
     configurations.put(MAX_NUMBER_PROPERTY, "" + 10);
     configurations.put(PROPERTY_NAMESPACES_PROPERTY, "org.opencastproject.assetmanager.security");
     configurations.put(COPY_NUMBER_PREFIX_PROPERTY, "copy");
+    configurations.put(SET_TITLE, "copied_event_title");
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
@@ -194,6 +197,7 @@ public class DuplicateEventWorkflowOperationHandlerTest {
     configurations.put(MAX_NUMBER_PROPERTY, "" + 10);
     configurations.put(PROPERTY_NAMESPACES_PROPERTY, "org.opencastproject.assetmanager.security");
     configurations.put(COPY_NUMBER_PREFIX_PROPERTY, "copy");
+    configurations.put(SET_TITLE, "copied_event_title");
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
@@ -210,11 +214,11 @@ public class DuplicateEventWorkflowOperationHandlerTest {
   private WorkflowOperationResult getWorkflowOperationResult(MediaPackage mp, Map<String, String> configurations)
       throws WorkflowOperationException {
     // Add the mediapackage to a workflow instance
-    WorkflowInstanceImpl workflowInstance = new WorkflowInstanceImpl();
+    WorkflowInstance workflowInstance = new WorkflowInstance();
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowState.RUNNING);
     workflowInstance.setMediaPackage(mp);
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("op", OperationState.RUNNING);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("op", OperationState.RUNNING);
     operation.setTemplate("create-event");
     operation.setState(OperationState.RUNNING);
     for (String key : configurations.keySet()) {

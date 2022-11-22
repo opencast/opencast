@@ -43,7 +43,7 @@ import org.osgi.service.component.annotations.Reference;
 public class MaintenanceCommand {
   protected ServiceRegistry serviceRegistry;
 
-  @Reference(name = "remoteServiceManager")
+  @Reference
   public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
     this.serviceRegistry = remoteServiceManager;
   }

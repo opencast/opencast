@@ -23,6 +23,8 @@ package org.opencastproject.email.template.impl;
 import org.apache.commons.io.IOUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +35,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Component(
+    immediate = true,
+    service = { ArtifactInstaller.class,EmailTemplateScanner.class },
+    property = {
+        "service.description=Email Template Scanner"
+    }
+)
 public class EmailTemplateScanner implements ArtifactInstaller {
 
   /** The templates map */
@@ -56,6 +65,7 @@ public class EmailTemplateScanner implements ArtifactInstaller {
    * @param ctx
    *          the bundle context
    */
+  @Activate
   void activate(BundleContext ctx) {
     logger.info("EmailTemplateScanner activated");
   }

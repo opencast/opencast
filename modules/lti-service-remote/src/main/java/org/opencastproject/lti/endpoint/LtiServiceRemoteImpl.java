@@ -23,8 +23,10 @@ package org.opencastproject.lti.endpoint;
 import org.opencastproject.lti.service.api.LtiFileUpload;
 import org.opencastproject.lti.service.api.LtiJob;
 import org.opencastproject.lti.service.api.LtiService;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 
 import com.google.gson.Gson;
@@ -38,6 +40,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.InputStreamBody;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -49,6 +53,13 @@ import javax.ws.rs.core.Response;
 /**
  * The service calling the LTI REST endpoint (for multi-node setups with LTI)
  */
+@Component(
+    immediate = true,
+    service = LtiService.class,
+    property = {
+        "service.description=LTI Service Remote Service"
+    }
+)
 public class LtiServiceRemoteImpl extends RemoteBase implements LtiService {
   private static final Gson gson = new Gson();
 
@@ -178,4 +189,17 @@ public class LtiServiceRemoteImpl extends RemoteBase implements LtiService {
       throw new RuntimeException("No response from service");
     }
   }
+
+  @Reference
+  @Override
+  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
+    super.setTrustedHttpClient(trustedHttpClient);
+  }
+
+  @Reference
+  @Override
+  public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
+    super.setRemoteServiceManager(serviceRegistry);
+  }
+
 }

@@ -38,6 +38,9 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +78,15 @@ import javax.ws.rs.core.Response.Status;
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
         + "other words, there is a bug! You should file an error report with your server logs from the time when the "
         + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+@Component(
+    immediate = true,
+    service = AnnotationRestService.class,
+    property = {
+        "service.description=Annotation REST Endpoint",
+        "opencast.service.type=org.opencastproject.annotation",
+        "opencast.service.path=/annotation"
+    }
+)
 public class AnnotationRestService {
 
   /** The logger */
@@ -96,6 +108,7 @@ public class AnnotationRestService {
    * @param service
    *          the annotation service implementation
    */
+  @Reference
   public void setService(AnnotationService service) {
     this.annotationService = service;
   }
@@ -106,6 +119,7 @@ public class AnnotationRestService {
    * @param cc
    *          The ComponentContext of this service
    */
+  @Activate
   public void activate(ComponentContext cc) {
     // Get the configured server URL
     if (cc == null) {

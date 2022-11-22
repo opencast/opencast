@@ -27,6 +27,9 @@
    "SELECT_NO_OPTIONS_AVAILABLE": "No hay opciones disponibles",
    "YES": "Sí",
    "COPY": "Copiar en el portapapeles",
+   "MONITOR": {
+      "REGISTRATION": "Opencast has sent a registration update in more than a week"
+   },
    "LTI": {
       "ERROR_LOADING_METADATA": "Error al cargar los metadatos del evento. Inténtalo de nuevo más tarde.",
       "SERIES_TITLE": "Ver series",
@@ -142,7 +145,7 @@
       "HELP": "Ayuda",
       "USERS_GUIDE": "Guía del usuario",
       "DOCUMENTATION": "Documentación",
-      "REST_DOC": "Documentación de la API REST",
+      "REST_DOC": "API REST",
       "HOTKEY_CHEAT_SHEET": "Atajos de Teclado",
       "ADOPTER_REGISTRATION": "Registro de Adopters"
    },
@@ -245,7 +248,17 @@
       "ADOPTER_PROFILE_UPDATED": "El perfil se actualizó correctamente",
       "ADOPTER_PROFILE_NOT_UPDATED": "¡Ups! No se pudo actualizar la información del perfil. ¡Inténtalo de nuevo!",
       "ADOPTER_PROFILE_DELETED": "Información del perfil eliminada correctamente.",
-      "ADOPTER_PROFILE_NOT_DELETED": "¡Ups! No se pudo eliminar la información del perfil. ¡Inténtalo de nuevo!"
+      "ADOPTER_PROFILE_NOT_DELETED": "¡Ups! No se pudo eliminar la información del perfil. ¡Inténtalo de nuevo!",
+      "TOBIRA_OVERRIDE_NAME": "The title of the selected page will be overridden with the title of the series.",
+      "TOBIRA_NO_PATH_SEGMENT": "Page needs a path segment.",
+      "TOBIRA_NOT_MOUNTED": "Series could not be mounted in Tobira.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
+      "TOBIRA_PATH_SEGMENT_UNIQUE": "The path segment of a page must be unqiue among all its sibling pages.",
+      "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
+      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and/or try again later.",
+      "TOBIRA_COPIED_DIRECT_LINK": "Copied link to clipboard.",
+      "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Couldn't copy link to clipboard.",
+      "TOBIRA_NOT_FOUND": "Tobira doesn't know about this series (yet). Try again in a few minutes or contact your system administrator."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Acciones",
@@ -410,6 +423,11 @@
          "BACK": "Atras",
          "LEGAL_INFO_STATE": {
             "HEADER": "Condiciones del servicio y política de privacidad"
+         },
+         "SUMMARY_STATE": {
+            "HEADER": "This is a JSON summary of exactly what would be sent to Opencast's servers",
+            "GENERAL_HEADER": "Adopter Information",
+            "STATS_HEADER": "Statistical Information"
          },
          "INFORMATION_STATE": {
             "HEADER": "¡Gracias por usar Opencast!",
@@ -635,7 +653,8 @@
                "EDITOR_NEEDS_CUTTING": "Abrir editor de vídeo (un comentario indica que se ha solicitado edición)",
                "COMMENTS": "Ver comentarios",
                "PAUSED_WORKFLOW": "Ver Workflows pausados",
-               "PRESENTER": "Filtrar para este presentador"
+               "PRESENTER": "Filtrar para este presentador",
+               "COPY_TO_NEW_EVENT": "Copy metadata to new event"
             }
          },
          "STATUS": {
@@ -1113,6 +1132,20 @@
                "LABEL": "Seleccione tema",
                "EMPTY": "No  hay estilos disponibles"
             },
+            "TOBIRA": {
+               "CAPTION": "Tobira",
+               "DESCRIPTION": "Here you can select where you want the series to show up in the Tobira video portal. You can only select one location here, and it needs to be empty (marked in bold). You can create new pages here, but note that they are only persisted if they are on the path to the selected page.",
+               "SELECT_PAGE": "Select a target page",
+               "PAGE_TITLE": "Subpage title",
+               "PATH_SEGMENT": "Path segment",
+               "SUBPAGES": "Subpages",
+               "ADD_SUBPAGE": "Add subpage",
+               "CANCEL": "Cancelar",
+               "HOMEPAGE": "Homepage",
+               "SELECTED_PAGE": "Series will be mounted under the following path",
+               "NO_PAGE_SELECTED": "No page selected. Series will not be mounted in Tobira.",
+               "PATH": "Path"
+            },
             "SUMMARY": {
                "CAPTION": "Resumen"
             }
@@ -1141,6 +1174,7 @@
                "EVENTS": "Eventos",
                "PERMISSIONS": "Política de acceso",
                "THEME": "Estilo",
+               "TOBIRA": "Tobira",
                "STATISTICS": "Estadísticas"
             },
             "ACCESS": {
@@ -1161,8 +1195,10 @@
                   "ACTION": "Acciones",
                   "NEW": "Nueva política",
                   "DETAILS": "Detalles",
-                  "REPLACE_EVENT_ACLS": "Actualizar permisos de evento",
+                  "REPLACE_EVENT_ACLS": "Save & update event permissions",
                   "REPLACE_EVENT_ACLS_HINT": "Asegúrese de que todos los eventos de esta serie tengan estos permisos en vigor",
+                  "SAVE_SERIES_ACLS": "Guardar",
+                  "SAVE_SERIES_ACLS_HINT": "Apply permissions only to series",
                   "LOAD_MORE_LIMIT": "políticas mostradas.",
                   "LOAD_MORE_LINK": "Cargar más"
                },
@@ -1185,6 +1221,13 @@
                "LANGUAGE": "Idioma",
                "LICENSE": "Licencia",
                "DESCRIPTION": "Descripción"
+            },
+            "TOBIRA": {
+               "HOMEPAGE": "(Homepage)",
+               "DIRECT_LINK": "Direct link to series",
+               "COPY_DIRECT_LINK": "Copiar en el portapapeles",
+               "NOT_MOUNTED": "This series is currently not included the page structure, and can only be reached using the direct link above.",
+               "PAGES": "Pages in Tobira that contain this series"
             },
             "EVENTS": {
                "TITLE": "Título",
@@ -1303,12 +1346,12 @@
                "ADD": "Añadir rol"
             },
             "STRENGTH": {
-               "BAD": "Bad password",
-               "VERYWEAK": "Very weak password",
-               "WEAK": "Weak password",
-               "GOOD": "Good password",
-               "STRONG": "Strong password",
-               "VERYSTRONG": "Very strong password"
+               "BAD": "Contraseña Incorrecta",
+               "VERYWEAK": "Contraseña muy débil",
+               "WEAK": "Contraseña débil",
+               "GOOD": "Buen Password",
+               "STRONG": "Contraseña segura",
+               "VERYSTRONG": "Contraseña muy segura"
             }
          }
       },

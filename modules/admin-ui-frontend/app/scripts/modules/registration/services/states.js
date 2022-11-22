@@ -37,7 +37,7 @@ angular.module('adminNg.services')
               'back': false,
               'skip': true,
               'close': true,
-              'submitButtonText': 'ADOPTER_REGISTRATION.MODAL.CONTINUE'
+              'submitButtonText': 'WIZARD.NEXT_STEP'
             }
           },
           'form': {
@@ -45,7 +45,7 @@ angular.module('adminNg.services')
               0: 'close',
               1: 'save',
               2: 'legal_info',
-              3: 'update',
+              //3: 'update', unused
               4: 'delete_submit',
               5: 'information'
             },
@@ -55,10 +55,37 @@ angular.module('adminNg.services')
               'skip': false,
               'close': true,
               'delete': false,
-              'submitButtonText': 'SUBMIT'
+              'submitButtonText': 'WIZARD.NEXT_STEP'
             }
           },
           'save': {
+            'nextState': {
+              0: 'summary',
+              1: 'error'
+            },
+            'buttons': {
+              'submit': false,
+              'back': false,
+              'skip': false,
+              'close': false,
+              'submitButtonText': null
+            }
+          },
+          'summary': {
+            'nextState': {
+              0: 'close',
+              1: 'finalize',
+              5: 'form'
+            },
+            'buttons': {
+              'submit': true,
+              'back': true,
+              'skip': false,
+              'close': true,
+              'submitButtonText': 'WIZARD.CREATE'
+            }
+          },
+          'finalize': {
             'nextState': {
               0: 'thank_you',
               1: 'error'
@@ -95,7 +122,7 @@ angular.module('adminNg.services')
               'back': true,
               'skip': false,
               'close': true,
-              'submitButtonText': 'CONFIRM'
+              'submitButtonText': 'WIZARD.DELETE'
             }
           },
           'delete': {
@@ -108,7 +135,7 @@ angular.module('adminNg.services')
               'back': false,
               'skip': false,
               'close': false,
-              'submitButtonText': null
+              'submitButtonText': 'WIZARD.DELETE'
             }
           },
           'thank_you': {

@@ -7,13 +7,13 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <prometheus.version>0.12.0</prometheus.version>
+    <prometheus.version>0.15.0</prometheus.version>
   </properties>
   <dependencies>
     <!-- Opencast dependencies -->

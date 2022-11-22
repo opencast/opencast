@@ -27,9 +27,11 @@ import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 import static org.apache.http.HttpStatus.SC_OK;
 
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
@@ -49,6 +51,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +63,14 @@ import java.util.List;
 /**
  * Workflow operation for notifying Mattermost about the status of the current workflow.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Mattermost Notification Operation Handler",
+        "workflow.operation=mattermost-notify"
+    }
+)
 public class MattermostNotificationWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   /**
    * Configuration key for the target URL of the notification request
@@ -172,12 +183,13 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
     logger.debug("Request will be sent using the '{}' method", method);
 
     // Add event parameters as form parameters
+    MediaPackage mp = workflowInstance.getMediaPackage();
     try {
       List<BasicNameValuePair> params = new ArrayList<>();
 
       // Add the subject (if specified)
       if (notificationMessage != null) {
-        params.add(new BasicNameValuePair(HTTP_PARAM_PAYLOAD, makeJson(notificationMessage, workflowInstance)));
+        params.add(new BasicNameValuePair(HTTP_PARAM_PAYLOAD, makeJson(notificationMessage, workflowInstance, mp)));
       }
 
       request.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
@@ -190,7 +202,7 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
       throw new WorkflowOperationException(format("Notification could not be delivered to %s", urlPath));
     }
 
-    return createResult(workflowInstance.getMediaPackage(), Action.CONTINUE);
+    return createResult(mp, Action.CONTINUE);
   }
 
   /**
@@ -199,22 +211,23 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
    *
    * @param s                The notification message to transform to Json-String
    * @param workflowInstance The workflowInstance which getting metadata from
+   * @param mediaPackage     The mediaPackage
    * @return JSON-String containing the information of the workflowInstance
    */
-  private String makeJson(String s, WorkflowInstance workflowInstance) {
+  private String makeJson(String s, WorkflowInstance workflowInstance, MediaPackage mediaPackage) {
     s = s.replace("%t", checkIfNull(workflowInstance.getTitle(), "Title"));
     s = s.replace("%i", String.valueOf(workflowInstance.getId()));
     s = s.replace("%s", String.valueOf(workflowInstance.getState()));
     s = s.replace("%o", String.valueOf(workflowInstance.getCurrentOperation().getId()));
-    s = s.replace("%I", checkIfNull(workflowInstance.getMediaPackage().getIdentifier(), "Mediapackage-ID"));
-    s = s.replace("%T", checkIfNull(workflowInstance.getMediaPackage().getTitle(), "Mediapackage-Title"));
-    s = s.replace("%c", checkIfNull(workflowInstance.getMediaPackage().getContributors(), "Contributors"));
-    s = s.replace("%C", checkIfNull(workflowInstance.getMediaPackage().getCreators(), "Creators"));
-    s = s.replace("%D", checkIfNull(workflowInstance.getMediaPackage().getDate(), "Date"));
-    s = s.replace("%d", checkIfNull(workflowInstance.getMediaPackage().getDuration(), "Duration"));
-    s = s.replace("%l", checkIfNull(workflowInstance.getMediaPackage().getLanguage(), "Language"));
-    s = s.replace("%L", checkIfNull(workflowInstance.getMediaPackage().getLicense(), "License"));
-    s = s.replace("%S", checkIfNull(workflowInstance.getMediaPackage().getSeriesTitle(), "Series-Title"));
+    s = s.replace("%I", checkIfNull(mediaPackage.getIdentifier(), "Mediapackage-ID"));
+    s = s.replace("%T", checkIfNull(mediaPackage.getTitle(), "Mediapackage-Title"));
+    s = s.replace("%c", checkIfNull(mediaPackage.getContributors(), "Contributors"));
+    s = s.replace("%C", checkIfNull(mediaPackage.getCreators(), "Creators"));
+    s = s.replace("%D", checkIfNull(mediaPackage.getDate(), "Date"));
+    s = s.replace("%d", checkIfNull(mediaPackage.getDuration(), "Duration"));
+    s = s.replace("%l", checkIfNull(mediaPackage.getLanguage(), "Language"));
+    s = s.replace("%L", checkIfNull(mediaPackage.getLicense(), "License"));
+    s = s.replace("%S", checkIfNull(mediaPackage.getSeriesTitle(), "Series-Title"));
 
     JsonObject json = new JsonObject();
     json.addProperty("text", s);

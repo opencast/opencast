@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -122,9 +122,6 @@
               *
             </Import-Package>
             <Export-Package> org.opencastproject.distribution.download;version=${project.version} </Export-Package>
-            <Service-Component>
-              OSGI-INF/distribution-service-download.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

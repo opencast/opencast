@@ -21,6 +21,7 @@
 
 package org.opencastproject.coverimage.impl;
 
+import org.opencastproject.coverimage.CoverImageService;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -28,12 +29,22 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link AbstractCoverImageService} for use in OSGi environment
  */
+@Component(
+    immediate = true,
+    service = CoverImageService.class,
+    property = {
+        "service.description=Cover Image Service"
+    }
+)
 public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
 
   /** The logging facility */
@@ -46,6 +57,7 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
    *          the OSGi component context
    */
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
     super.activate(cc);
 
@@ -58,6 +70,7 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
    * @param workspace
    *          the workspace service
    */
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -68,6 +81,7 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
    * @param serviceRegistry
    *          the service registry service
    */
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -78,6 +92,7 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
    * @param securityService
    *          the security service
    */
+  @Reference
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -88,6 +103,7 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
    * @param userDirectoryService
    *          the user directory service
    */
+  @Reference
   protected void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -98,6 +114,7 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
    * @param organizationDirectoryService
    *          the organization directory service
    */
+  @Reference
   protected void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }

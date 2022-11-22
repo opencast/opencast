@@ -9,6 +9,67 @@ The following list contains a list of passed proposals for reference.
 Passed Proposals
 ----------------
 
+### Opensearch Support
+Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Wed, June 22 2022
+```no-highlight
+Hi all,
+
+As we probably all know, Elasticsearch did some goofy things with their
+licensing, and a fork (Opensearch) ended up starting up.  Opensearch 1.x is
+protocol compatible with Elasticsearch 7 series releases, of which 7.10.2
+appears to be the last one with the older license.  There is an Opensearch 2.x
+branch which is not compatible[1].
+
+Since long term we're probably going to be migrating to Opensearch, and
+Opensearch is drop-in compatible I'm going to file a pull request with the
+appropriate bits to enable proper testing going forward.  The pull request for
+this is forthcoming.
+
+I'm also going to #propose that we add formal support for Opensearch to
+Opencast 12.0, deprecate Elasticsearch support in Opencast 13.0, and finally
+remove it in Opencast 14.0.  This gives us the motivation to get 2.x support
+going sooner than later so we don't get hugely behind, while also giving us
+fallback where we can stick to an older version of Opensearch if we don't
+actually get that done.
+
+Proposal closes END 2022-06-22
+
+G
+
+1: https://opensearch.org/faq/#q1.9, also personal testing
+```
+
+### Drop official MySQL support
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Wed, February 16 2022
+
+```no-highlight
+Hi everyone,
+since I'm testing database things once again, I noticed that more and
+more our infrastructure is set-up to test with MariaDB (or now
+PostegreSQL) and no longer with MySQL. We have MySQL left in none of our
+deployments and I feel like something could break compatibility at any
+moment right now and no one would notice during a release cycle.
+
+Overall, the situation is similar to back when we decided to no longer
+officially support PostgreSQL. It technically works and should continue
+to work, but no developers actually test against it and it could easily
+break without someone noticing.
+
+
+That is why, similar to the old decision, I would like to #propose to:
+
+- officially mark MySQL it as unsupported
+- explain that it should technically work, but we do not test it
+- explain that the set-up should be similar to MariaDB but may differ
+  slightly and we have no documentation for that
+
+
+Of course, also similar to PostgreSQL, we can always decide to support
+it again later, if interest picks up and the database landscape changes.
+
+–Lars
+```
+
 ### PR and release process changes
 Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Thu, 17 Jun 2021
 

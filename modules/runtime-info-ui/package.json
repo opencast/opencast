@@ -6,12 +6,12 @@
     "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'src/main/resources/**/*.html'"
   },
   "dependencies": {
-    "angular": "^1.8.2",
-    "angular-route": "^1.8.2",
+    "angular": "^1.8.3",
+    "angular-route": "^1.8.3",
     "jquery": "^3.6.0"
   },
   "devDependencies": {
-    "eslint": "^8.2.0",
+    "eslint": "^8.15.0",
     "eslint-plugin-header": "^3.1.1",
     "html-linter": "^1.1.1"
   }

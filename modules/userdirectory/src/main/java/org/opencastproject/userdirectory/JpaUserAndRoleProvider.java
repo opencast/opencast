@@ -110,7 +110,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   private CustomPasswordEncoder passwordEncoder = new CustomPasswordEncoder();
 
   /** OSGi DI */
-  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.common)")
+  @Reference(target = "(osgi.unit.name=org.opencastproject.common)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -119,7 +119,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -128,7 +128,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    * @param groupRoleProvider
    *          the groupRoleProvider to set
    */
-  @Reference(name = "groupRoleProvider")
+  @Reference
   void setGroupRoleProvider(JpaGroupRoleProvider groupRoleProvider) {
     this.groupRoleProvider = groupRoleProvider;
   }
@@ -493,7 +493,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     }
 
     // Remove the user's group membership
-    groupRoleProvider.updateGroupMembershipFromRoles(username, orgId, new ArrayList<String>());
+    groupRoleProvider.removeMemberFromAllGroups(username, orgId);
 
     // Remove the user
     UserDirectoryPersistenceUtil.deleteUser(username, orgId, emf);

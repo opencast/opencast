@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -72,9 +72,6 @@
             <Export-Package>
               org.opencastproject.transcription.persistence;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/transcription-database-service.xml
-            </Service-Component>
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

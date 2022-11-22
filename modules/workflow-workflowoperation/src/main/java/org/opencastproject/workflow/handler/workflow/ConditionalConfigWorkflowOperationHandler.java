@@ -22,15 +22,20 @@
 package org.opencastproject.workflow.handler.workflow;
 
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.conditionparser.WorkflowConditionInterpreter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +43,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Set a Workflow Configuration based on Conditions Operation Handler",
+        "workflow.operation=conditional-config"
+    }
+)
 public class ConditionalConfigWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   public static final String CONFIGURATION_NAME = "configuration-name";
   public static final String CONDITION_PREFIX = "condition-";
@@ -46,10 +59,17 @@ public class ConditionalConfigWorkflowOperationHandler extends AbstractWorkflowO
 
   private static final Logger logger = LoggerFactory.getLogger(ConditionalConfigWorkflowOperationHandler.class);
 
+  @Activate
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
+  }
+
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
+    MediaPackage mp = workflowInstance.getMediaPackage();
 
     Map<String, String> properties = new HashMap<>();
 
@@ -91,7 +111,7 @@ public class ConditionalConfigWorkflowOperationHandler extends AbstractWorkflowO
          // Replace workflow configuration, even if already set.
         properties.put(wfConfigName, value.trim());
         logger.debug("Configuration key '{}' of workflow {} is set to value '{}'", wfConfigName, id, value.trim());
-        return createResult(workflowInstance.getMediaPackage(), properties, Action.CONTINUE, 0);
+        return createResult(mp, properties, Action.CONTINUE, 0);
       }
     }
 
@@ -100,7 +120,7 @@ public class ConditionalConfigWorkflowOperationHandler extends AbstractWorkflowO
     if (StringUtils.isNotEmpty(NO_MATCH)) {
       properties.put(wfConfigName, noMatch);
       logger.debug("Configuration key '{}' of workflow {} is set to value '{}'", wfConfigName, id, noMatch);
-      return createResult(workflowInstance.getMediaPackage(), properties, Action.CONTINUE, 0);
+      return createResult(mp, properties, Action.CONTINUE, 0);
     }
     return createResult(Action.SKIP);
   }

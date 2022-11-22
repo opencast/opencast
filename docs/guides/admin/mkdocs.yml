@@ -2,9 +2,6 @@ site_name: Administration Guide
 repo_url: https://github.com/opencast/opencast
 edit_uri: edit/develop/docs/guides/admin/docs/
 
-markdown_extensions:
-  - markdown_inline_graphviz
-
 plugins:
   - search:
   - macros:
@@ -53,7 +50,7 @@ nav:
       - Debian/Ubuntu: 'installation/debs.md'
       - Fedora: 'installation/rpm-fedora.md'
       - RHEL/CentOS 7: 'installation/rpm-el7.md'
-      - RHEL/CentOS 8: 'installation/rpm-el8.md'
+      - RHEL/CentOS Stream 8/9: 'installation/rpm-el.md'
    - Installation via script:
       - Ansible: 'installation/ansible.md'
    - Installation with Docker:
@@ -71,8 +68,8 @@ nav:
       - Self-Signed Certificates: 'configuration/https/self-signed-certificates.md'
    - Firewall: 'configuration/firewall.md'
    - Asset Manager: 'configuration/asset-manager.md'
-   - Message Broker: 'configuration/message-broker.md'
    - Elasticsearch: 'configuration/elasticsearch.md'
+   - Opensearch: 'configuration/opensearch.md'
    - Metadata: 'configuration/metadata.md'
    - Encoding: 'configuration/encoding.md'
    - Inbox: 'configuration/inbox.md'
@@ -136,6 +133,8 @@ nav:
         - es.upv.paella.opencast.searchPlugin: 'modules/paella.player/plugins/es.upv.paella.opencast.searchPlugin.md'
         - es.upv.paella.opencast.transcriptionTabBarPlugin: 'modules/paella.player/plugins/es.upv.paella.opencast.transcriptionTabBarPlugin.md'
         - es.upv.paella.opencast.userTrackingSaverPlugIn: 'modules/paella.player/plugins/es.upv.paella.opencast.userTrackingSaverPlugIn.md'
+   - Paella player 7:
+      - Configuration: 'modules/paella.player7/configuration.md'
    - Search Index:
       - Overview: 'modules/searchindex/index.md'
       - Solr: 'modules/searchindex/solr.md'
@@ -151,6 +150,7 @@ nav:
    - Transcripts (AmberScript): 'modules/amberscripttranscripts.md'
    - Transcripts (Google Speech): 'modules/googlespeechtranscripts.md'
    - Transcripts (IBM Watson): 'modules/watsontranscripts.md'
+   - Transcripts (Microsoft Azure): 'modules/microsoftazuretranscripts.md'
    - Video Editor:
       - Setup: 'modules/videoeditor.setup.md'
       - Architecture: 'modules/videoeditor.architecture.md'
@@ -208,6 +208,8 @@ nav:
    - Mattermost Notification Module: 'workflowoperationhandlers/notification.md'
    - Metadata to ACL: 'workflowoperationhandlers/metadata-to-acl.md'
    - Move Storage: 'workflowoperationhandlers/move-storage-woh.md'
+   - Microsoft Azure Attach Transcription: 'workflowoperationhandlers/microsoft-azure-attach-transcription-woh.md'
+   - Microsoft Azure Start Transcription: 'workflowoperationhandlers/microsoft-azure-start-transcription-woh.md'
    - Multiencode: 'workflowoperationhandlers/multiencode-woh.md'
    - Normalize Audio: 'workflowoperationhandlers/normalizeaudio-woh.md'
    - Partial Import: 'workflowoperationhandlers/partial-import-woh.md'
@@ -215,6 +217,7 @@ nav:
    - Prepare A/V: 'workflowoperationhandlers/prepareav-woh.md'
    - Probe Resolution: 'workflowoperationhandlers/probe-resolution-woh.md'
    - Process Smil: 'workflowoperationhandlers/process-smil-woh.md'
+   - Publication to Workspace: 'workflowoperationhandlers/publication-to-workspace-woh.md'
    - Publish Configure AWS: 'workflowoperationhandlers/publish-configure-aws-woh.md'
    - Publish Configure: 'workflowoperationhandlers/publish-configure-woh.md'
    - Publish Engage AWS: 'workflowoperationhandlers/publish-engage-aws-woh.md'
@@ -234,7 +237,7 @@ nav:
    - Sanitize Adaptive: 'workflowoperationhandlers/sanitize-adaptive-woh.md'
    - Segment Previews: 'workflowoperationhandlers/segmentpreviews-woh.md'
    - Segment Video: 'workflowoperationhandlers/segmentvideo-woh.md'
-   - Select Streams: 'workflowoperationhandlers/select-streams-woh.md'
+   - Select Tracks: 'workflowoperationhandlers/select-streams-woh.md'
    - Select Version: 'workflowoperationhandlers/select-version-woh.md'
    - Send Email: 'workflowoperationhandlers/send-email-woh.md'
    - Series: 'workflowoperationhandlers/series-woh.md'

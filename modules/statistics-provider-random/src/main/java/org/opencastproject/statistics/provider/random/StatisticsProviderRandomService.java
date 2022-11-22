@@ -29,6 +29,10 @@ import org.opencastproject.util.ConfigurationException;
 
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +45,13 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Implements statistics providers using random data (showcase).
  */
+@Component(
+    immediate = true,
+    service = ArtifactInstaller.class,
+    property = {
+        "service.description=Statistics Provider Random Service"
+    }
+)
 public class StatisticsProviderRandomService implements ArtifactInstaller {
 
   /** Logging utility */
@@ -49,14 +60,17 @@ public class StatisticsProviderRandomService implements ArtifactInstaller {
   private StatisticsCoordinator statisticsCoordinator;
   private Map<String, StatisticsProvider> fileNameToProvider = new ConcurrentHashMap<>();
 
+  @Reference
   public void setStatisticsCoordinator(StatisticsCoordinator service) {
     this.statisticsCoordinator = service;
   }
 
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating Statistics Provider Random Service");
   }
 
+  @Deactivate
   public void deactivate(ComponentContext cc) {
     logger.info("Deactivating Statistics Provider Random Service");
     fileNameToProvider.values().forEach(provider -> statisticsCoordinator.removeProvider(provider));

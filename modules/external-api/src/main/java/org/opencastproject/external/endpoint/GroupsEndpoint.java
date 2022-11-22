@@ -60,6 +60,9 @@ import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 
 import org.apache.commons.collections4.ComparatorUtils;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,6 +95,15 @@ import javax.ws.rs.core.Response;
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
             ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0 })
 @RestService(name = "externalapigroups", title = "External API Groups Service", notes = {}, abstractText = "Provides resources and operations related to the groups")
+@Component(
+    immediate = true,
+    service = GroupsEndpoint.class,
+    property = {
+        "service.description=External API - Groups Endpoint",
+        "opencast.service.type=org.opencastproject.external.groups",
+        "opencast.service.path=/api/groups"
+    }
+)
 public class GroupsEndpoint {
 
   /** The logging facility */
@@ -103,21 +115,25 @@ public class GroupsEndpoint {
   private SecurityService securityService;
 
   /** OSGi DI */
+  @Reference
   void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
     this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /** OSGi DI. */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI */
+  @Reference
   public void setGroupRoleProvider(JpaGroupRoleProvider jpaGroupRoleProvider) {
     this.jpaGroupRoleProvider = jpaGroupRoleProvider;
   }
 
   /** OSGi activation method */
+  @Activate
   void activate() {
     logger.info("Activating External API - Groups Endpoint");
   }
@@ -125,7 +141,7 @@ public class GroupsEndpoint {
   @GET
   @Path("")
   @RestQuery(name = "getgroups", description = "Returns a list of groups.", returnDescription = "", restParameters = {
-          @RestParameter(name = "filter", isRequired = false, description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form <Filter Name>:<Value to Filter With>.", type = STRING),
+          @RestParameter(name = "filter", isRequired = false, description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form [Filter Name]:[Value to Filter With].", type = STRING),
           @RestParameter(name = "sort", description = "Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory.", isRequired = false, type = STRING),
           @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.", isRequired = false, type = RestParameter.Type.INTEGER),
           @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false, type = RestParameter.Type.INTEGER) }, responses = {

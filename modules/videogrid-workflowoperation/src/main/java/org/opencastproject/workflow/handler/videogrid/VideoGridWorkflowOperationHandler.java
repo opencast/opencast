@@ -39,6 +39,7 @@ import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.mediapackage.track.TrackImpl;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.smil.api.util.SmilUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
@@ -48,6 +49,7 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
@@ -57,6 +59,8 @@ import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -90,6 +94,14 @@ import java.util.stream.Collectors;
  *
  * Returns the final video to the target flavor
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Video Grid Workflow Operation Handler",
+        "workflow.operation=videogrid"
+    }
+)
 public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** Workflow configuration keys */
@@ -125,17 +137,26 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
   private ComposerService composerService = null;
 
   /** Service Callbacks **/
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
+  @Reference
   public void setVideoGridService(VideoGridService videoGridService) {
     this.videoGridService = videoGridService;
   }
+  @Reference
   protected void setMediaInspectionService(MediaInspectionService inspectionService) {
     this.inspectionService = inspectionService;
   }
+  @Reference
   public void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
+  }
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
   /** Structs to store data and make code more readable **/

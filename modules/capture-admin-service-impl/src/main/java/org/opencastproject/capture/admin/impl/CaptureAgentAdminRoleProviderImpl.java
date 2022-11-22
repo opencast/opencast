@@ -57,7 +57,7 @@ public class CaptureAgentAdminRoleProviderImpl implements RoleProvider {
    * @param service
    *          the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(final SecurityService service) {
     this.securityService = service;
   }
@@ -65,7 +65,7 @@ public class CaptureAgentAdminRoleProviderImpl implements RoleProvider {
 
   private CaptureAgentStateService captureAgentService;
 
-  @Reference(name = "CaptureAgentStateService")
+  @Reference
   public void setCaptureAgentStateService(final CaptureAgentStateService service) {
     this.captureAgentService = service;
   }

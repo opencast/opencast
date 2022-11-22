@@ -27,12 +27,11 @@ import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
@@ -49,7 +48,7 @@ import java.util.List;
 public class EmailWorkflowOperationHandlerTest {
   private WorkflowOperationInstance operation;
   private EmailWorkflowOperationHandler operationHandler;
-  private final WorkflowInstanceImpl workflowInstance = new WorkflowInstanceImpl();
+  private final WorkflowInstance workflowInstance = new WorkflowInstance();
   private MediaPackage mp;
   private URI uriMP;
   // private MimeMessage message;
@@ -78,7 +77,7 @@ public class EmailWorkflowOperationHandlerTest {
     operationHandler = new EmailWorkflowOperationHandler();
 
     EmailTemplateService emailTemplateService = EasyMock.createMock(EmailTemplateService.class);
-    EasyMock.expect(emailTemplateService.applyTemplate("DCE_workflow_2_body",
+    EasyMock.expect(emailTemplateService.applyTemplate("DCE_workflow_null_body",
             "This is the media package: ${mediaPackage.identifier}", workflowInstance))
             .andReturn("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557");
     EasyMock.expect(emailTemplateService.applyTemplate("template1", null, workflowInstance))
@@ -117,13 +116,13 @@ public class EmailWorkflowOperationHandlerTest {
     workflowInstance.setState(WorkflowState.RUNNING);
     workflowInstance.setTemplate("DCE-workflow");
     workflowInstance.setMediaPackage(mp);
-    WorkflowOperationInstanceImpl failedOperation1 = new WorkflowOperationInstanceImpl("operation1",
+    WorkflowOperationInstance failedOperation1 = new WorkflowOperationInstance("operation1",
             OperationState.FAILED);
-    failedOperation1.setFailWorkflowOnException(true);
-    WorkflowOperationInstanceImpl failedOperation2 = new WorkflowOperationInstanceImpl("operation2",
+    failedOperation1.setFailOnError(true);
+    WorkflowOperationInstance failedOperation2 = new WorkflowOperationInstance("operation2",
             OperationState.FAILED);
-    failedOperation2.setFailWorkflowOnException(false);
-    operation = new WorkflowOperationInstanceImpl("email", OperationState.RUNNING);
+    failedOperation2.setFailOnError(false);
+    operation = new WorkflowOperationInstance("email", OperationState.RUNNING);
     List<WorkflowOperationInstance> operationList = new ArrayList<WorkflowOperationInstance>();
     operationList.add(failedOperation1);
     operationList.add(failedOperation2);

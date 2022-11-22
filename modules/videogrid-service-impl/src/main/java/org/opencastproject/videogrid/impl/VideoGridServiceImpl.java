@@ -47,6 +47,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +67,14 @@ import java.util.Dictionary;
 import java.util.List;
 
 /** Create video grids */
+@Component(
+    immediate = true,
+    service = { VideoGridService.class,ManagedService.class },
+    property = {
+        "service.description=Video Grid Service",
+        "service.pid=org.opencastproject.videogrid.impl.VideoGridServiceImpl"
+    }
+)
 public class VideoGridServiceImpl extends AbstractJobProducer implements VideoGridService, ManagedService {
 
   /** Configuration key for this operation's job load */
@@ -97,6 +108,7 @@ public class VideoGridServiceImpl extends AbstractJobProducer implements VideoGr
   }
 
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
     super.activate(cc);
     logger.debug("Activated videogrid service");
@@ -283,22 +295,27 @@ public class VideoGridServiceImpl extends AbstractJobProducer implements VideoGr
     return organizationDirectoryService;
   }
 
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
+  @Reference
   public void setServiceRegistry(ServiceRegistry jobManager) {
     this.serviceRegistry = jobManager;
   }
 
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }

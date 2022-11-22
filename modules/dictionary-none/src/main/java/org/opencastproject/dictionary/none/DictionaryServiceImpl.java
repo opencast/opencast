@@ -29,6 +29,8 @@ import org.opencastproject.metadata.mpeg7.TextualImpl;
 import org.opencastproject.util.ReadinessIndicator;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -37,6 +39,13 @@ import java.util.Hashtable;
  * This dictionary implementation is a dummy implementation which which will
  * just let the whole text pass through without any kind of filtering.
  */
+@Component(
+    immediate = true,
+    service = DictionaryService.class,
+    property = {
+        "service.description=Dictionary Service"
+    }
+)
 public class DictionaryServiceImpl implements DictionaryService {
 
   /**
@@ -45,6 +54,7 @@ public class DictionaryServiceImpl implements DictionaryService {
    * @param ctx
    *          the bundle context
    */
+  @Activate
   void activate(BundleContext ctx) {
     Dictionary<String, String> properties = new Hashtable<String, String>();
     properties.put(ARTIFACT, "dictionary");

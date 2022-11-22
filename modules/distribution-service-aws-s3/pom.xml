@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -126,10 +126,6 @@
               javax.ws.rs.core;version=2.0.1,
               *;resolution:=optional
             </Import-Package>
-            <Service-Component>
-              OSGI-INF/distribution-service-aws-s3.xml,
-              OSGI-INF/mediapackage-serializer.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

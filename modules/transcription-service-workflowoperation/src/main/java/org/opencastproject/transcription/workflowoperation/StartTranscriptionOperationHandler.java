@@ -28,24 +28,37 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
 import org.opencastproject.mediapackage.selector.TrackSelector;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.transcription.api.TranscriptionService;
 import org.opencastproject.transcription.api.TranscriptionServiceException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
 
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Start Transcription Workflow Operation Handler",
+        "workflow.operation=start-watson-transcription"
+    }
+)
 public class StartTranscriptionOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -60,6 +73,7 @@ public class StartTranscriptionOperationHandler extends AbstractWorkflowOperatio
   private TranscriptionService service = null;
 
   @Override
+  @Activate
   protected void activate(ComponentContext cc) {
     super.activate(cc);
   }
@@ -137,8 +151,15 @@ public class StartTranscriptionOperationHandler extends AbstractWorkflowOperatio
     return createResult(Action.CONTINUE);
   }
 
+  @Reference(target = "(provider=ibm.watson)")
   public void setTranscriptionService(TranscriptionService service) {
     this.service = service;
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
 }

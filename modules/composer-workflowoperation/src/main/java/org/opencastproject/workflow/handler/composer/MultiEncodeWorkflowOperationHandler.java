@@ -34,11 +34,12 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
 import org.opencastproject.mediapackage.selector.TrackSelector;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -47,6 +48,10 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +68,14 @@ import java.util.stream.Collectors;
  * The workflow definition for handling multiple concurrent outputs in one ffmpeg operation. This allows encoding and
  * tagging to be done in one operation
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=MultiEncode Workflow Operation Handler",
+        "workflow.operation=multiencode"
+    }
+)
 public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -77,12 +90,18 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
   /** The local workspace */
   private Workspace workspace = null;
 
+  @Activate
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
+  }
+
   /**
    * Callback for the OSGi declarative services configuration.
    *
    * @param composerService
    *          the local composer service
    */
+  @Reference
   protected void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -94,6 +113,7 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -129,9 +149,12 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
       List<String> profilelist = asList(profiles);
       for (String profile : profilelist) {
         EncodingProfile encodingprofile = composerService.getProfile(profile);
-        if (encodingprofile != null)
+        if (encodingprofile != null) {
           encodingProfiles.add(encodingprofile.getIdentifier());
-        encodingProfileList.add(encodingprofile);
+          encodingProfileList.add(encodingprofile);
+        } else {
+          throw new IllegalArgumentException("Encoding profile " + profile + " not found.");
+        }
       }
     }
 
@@ -448,7 +471,7 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
     for (EncodingProfile ep : profiles) {
       String suffix = ep.getSuffix();
       // !! workspace.putInCollection renames the file - need to do the same with suffix
-      suffix = PathSupport.toSafeName(suffix);
+      suffix = workspace.toSafeName(suffix);
       if (suffix.length() > 0 && rawfileName.endsWith(suffix)) {
         track.addTag(ep.getIdentifier());
         return;
@@ -524,6 +547,12 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
     public ElementProfileTagFlavor getInfo() {
       return info;
     }
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
 }

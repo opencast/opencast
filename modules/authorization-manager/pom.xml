@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -195,10 +195,6 @@
               org.opencastproject.authorization.xacml.manager.endpoint;version=${project.version},
               org.opencastproject.authorization.xacml.manager.util;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/acl-scanner.xml,
-              OSGI-INF/acl-service-rest.xml
-            </Service-Component>
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

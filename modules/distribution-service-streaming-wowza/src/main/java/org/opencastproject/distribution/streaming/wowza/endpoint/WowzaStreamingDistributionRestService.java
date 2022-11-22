@@ -45,6 +45,9 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +80,16 @@ import javax.ws.rs.core.Response.Status;
             + "not anticipated. In other words, there is a bug! You should file an error report "
             + "with your server logs from the time when the error occurred:"
             + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+@Component(
+    immediate = true,
+    service = WowzaStreamingDistributionRestService.class,
+    property = {
+        "service.description=Streaming Distribution REST Endpoint",
+        "opencast.service.type=org.opencastproject.distribution.streaming",
+        "opencast.service.path=/distribution/streaming",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class WowzaStreamingDistributionRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -97,6 +110,7 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
    * @param cc
    *          this component's context
    */
+  @Activate
   public void activate(ComponentContext cc) {
   }
 
@@ -106,6 +120,7 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -114,6 +129,7 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
    * @param service
    *          the service to set
    */
+  @Reference
   public void setService(StreamingDistributionService service) {
     this.service = service;
   }

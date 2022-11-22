@@ -33,6 +33,7 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
 import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.mediapackage.track.TrackImpl;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.sox.api.SoxException;
 import org.opencastproject.sox.api.SoxService;
 import org.opencastproject.util.NotFoundException;
@@ -40,11 +41,14 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +63,14 @@ import java.util.Map;
 /**
  * The workflow definition for handling "sox" operations
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Analyze Audio Workflow Operation Handler",
+        "workflow.operation=analyze-audio"
+    }
+)
 public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -82,6 +94,7 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param soxService
    *          the SoX service
    */
+  @Reference
   protected void setSoxService(SoxService soxService) {
     this.soxService = soxService;
   }
@@ -92,6 +105,7 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param composerService
    *          the composer service
    */
+  @Reference
   protected void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -102,6 +116,7 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param workspace
    *          the workspace
    */
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -233,6 +248,12 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
     }
 
     return (Track) MediaPackageElementParser.getFromXml(job.getPayload());
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
 }

@@ -30,6 +30,9 @@ import org.opencastproject.workflow.api.WorkflowService;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +40,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /** Jobs list provider. */
+@Component(
+    immediate = true,
+    service = ResourceListProvider.class,
+    property = {
+        "service.description=Jobs list provider",
+        "opencast.service.type=org.opencastproject.index.service.resources.list.provider.JobsListProvider"
+    }
+)
 public class JobsListProvider implements ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(JobsListProvider.class);
@@ -92,11 +103,13 @@ public class JobsListProvider implements ResourceListProvider {
   }
 
   /** OSGi service activation callback. */
+  @Activate
   protected void activate(BundleContext bundleContext) {
     logger.info("Jobs list provider activated!");
   }
 
   /** OSGi callback for the workflow service. */
+  @Reference
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }

@@ -30,11 +30,14 @@ import org.opencastproject.util.MimeType;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,6 +57,14 @@ import java.util.UUID;
  *     three options are supported: 'skip' the adding of the catalog, 'fail' the workflow operation or 'keep'
  *     the new catalog, resulting in two or more catalogs of the same type coexisting
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Add Catalog Operation Handler",
+        "workflow.operation=add-catalog"
+    }
+)
 public class AddCatalogWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** enum used to specify the behavior on detecting a catalog type collision */
@@ -84,6 +95,7 @@ public class AddCatalogWorkflowOperationHandler extends AbstractWorkflowOperatio
    * @param workspace
    *          the workspace
    */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -92,10 +92,6 @@
               org.opencastproject.security.urlsigning.filter,
               org.opencastproject.security.urlsigning.verifier.impl
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/signing-verifier.xml,
-              OSGI-INF/signing-verifier-filter.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

@@ -38,8 +38,14 @@ import org.opencastproject.util.data.Option;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +59,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /** The OAI-PMH server. Backed by an arbitrary amount of OAI-PMH repositories. */
-public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo, ManagedService {
+@Component(
+    immediate = true,
+    service = { OaiPmhServerInfo.class, OaiPmhServer.class },
+    property = {
+        "service.description=OAI-PMH server"
+    }
+)
+public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo {
 
   private static final long serialVersionUID = -7536526468920288612L;
 
@@ -79,6 +92,11 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo,
   private ServiceRegistration<?> serviceRegistration;
 
   /** OSGi DI. */
+  @Reference(
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "unsetRepository"
+  )
   public void setRepository(final OaiPmhRepository r) {
     synchronized (repositories) {
       final String rId = r.getRepositoryId();
@@ -101,12 +119,14 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo,
   }
 
   /** OSGi DI. */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi component activation. */
-  public synchronized void activate(ComponentContext cc) {
+  @Activate
+  public void activate(ComponentContext cc) throws ConfigurationException {
     logger.info("Activate");
     this.componentContext = cc;
     // get mount point
@@ -115,16 +135,25 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo,
     } catch (RuntimeException e) {
         mountPoint = CFG_DEFAULT_OAIPMH_MOUNTPOINT;
     }
+    updated(cc.getProperties());
+  }
 
+  @Modified
+  public void modified(ComponentContext cc) throws ConfigurationException {
+    logger.info("Updated");
+    updated(cc.getProperties());
+  }
+
+  @Deactivate
+  public void deactivate() {
+    tryUnregisterServlet();
   }
 
   /** Called by the ConfigurationAdmin service. This method actually sets up the server. */
-  @Override
   public synchronized void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     // Because the OAI-PMH server implementation is technically not a REST service implemented
     // using JAX-RS annotations the Opencast mechanisms for registering REST endpoints do not work.
     // The server has to register itself with the OSGi HTTP service.
-    logger.info("Updated");
     checkDictionary(properties, componentContext);
     defaultRepo = getCfg(properties, CFG_DEFAULT_REPOSITORY);
     // register servlet
@@ -210,13 +239,7 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo,
     oai.generate(res.getOutputStream());
   }
 
-  @Override
-  public void destroy() {
-    super.destroy();
-    tryUnregisterServlet();
-  }
-
-  private void tryUnregisterServlet() {
+  private synchronized void tryUnregisterServlet() {
     if (serviceRegistration != null) {
       serviceRegistration.unregister();
       serviceRegistration = null;

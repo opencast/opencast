@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -96,9 +96,6 @@
               org.opencastproject.themes;version=${project.version},
               org.opencastproject.themes.persistence;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/themes-service-persistence.xml
-            </Service-Component>
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

@@ -37,6 +37,8 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +60,16 @@ import javax.ws.rs.core.Response;
     title = "Video CROP Service",
     abstractText = "This service is not ready",
     notes = "This is a note"
+)
+@Component(
+    immediate = true,
+    service = CropRestEndpoint.class,
+    property = {
+        "service.description=Video Crop REST Endpoint",
+        "opencast.service.type=org.opencastproject.crop",
+        "opencast.service.path=/crop",
+        "opencast.service.jobproducer=true"
+    }
 )
 public class CropRestEndpoint extends AbstractJobProducerEndpoint {
   /**
@@ -85,6 +97,7 @@ public class CropRestEndpoint extends AbstractJobProducerEndpoint {
    *
    * @param serviceRegistry the service registry
    */
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -94,6 +107,7 @@ public class CropRestEndpoint extends AbstractJobProducerEndpoint {
    *
    * @param cropService the cropper
    */
+  @Reference
   protected void setCropService(CropService cropService) {
     this.cropService = cropService;
   }

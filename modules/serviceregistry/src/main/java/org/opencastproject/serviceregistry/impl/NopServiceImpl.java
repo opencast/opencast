@@ -58,25 +58,25 @@ public final class NopServiceImpl extends OsgiAbstractJobProducer implements Nop
   }
 
   @Override
-  @Reference(name = "serviceRegistry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);
   }
 
   @Override
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     super.setSecurityService(securityService);
   }
 
   @Override
-  @Reference(name = "userDirectoryService")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     super.setUserDirectoryService(userDirectoryService);
   }
 
   @Override
-  @Reference(name = "organizationDirectoryService")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     super.setOrganizationDirectoryService(organizationDirectoryService);
   }

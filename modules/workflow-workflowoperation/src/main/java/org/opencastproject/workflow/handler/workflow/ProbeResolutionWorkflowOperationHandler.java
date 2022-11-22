@@ -30,11 +30,13 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.Fraction;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +51,14 @@ import java.util.Set;
  * Workflow operation handler for setting variables based on video resolutions
  */
 
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Probe Resolution Operation Handler",
+        "workflow.operation=probe-resolution"
+    }
+)
 public class ProbeResolutionWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** Configuration key for the "flavor" of the tracks to use as a source input */

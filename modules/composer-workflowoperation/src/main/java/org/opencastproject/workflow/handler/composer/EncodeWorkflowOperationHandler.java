@@ -34,17 +34,21 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
 import org.opencastproject.mediapackage.selector.TrackSelector;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +62,14 @@ import java.util.Map;
 /**
  * The workflow definition for handling "compose" operations
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Encode Workflow Operation Handler",
+        "workflow.operation=encode"
+    }
+)
 public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -75,6 +87,7 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
    * @param composerService
    *          the local composer service
    */
+  @Reference
   protected void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -86,6 +99,7 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -139,8 +153,8 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
     // Make sure either one of tags or flavors are provided
     if (sourceTagsOption.isEmpty() && sourceFlavorsOption.isEmpty()) {
-      logger.info("No source tags or flavors have been specified, not matching anything");
-      return createResult(mediaPackage, Action.CONTINUE);
+      logger.warn("No source tags or flavors have been specified, not matching anything");
+      return createResult(mediaPackage, Action.SKIP);
     }
 
     // Select the source flavors
@@ -188,12 +202,12 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
       // Encode the track with all profiles
       for (EncodingProfile profile : profiles) {
 
-        // Check if the track supports the output type of the profile
-        MediaType outputType = profile.getOutputType();
-        if (outputType.equals(MediaType.Audio) && !track.hasAudio()) {
+        // Check if the track supports the input type of the profile
+        MediaType inputType = profile.getApplicableMediaType();
+        if (inputType.equals(MediaType.Audio) && !track.hasAudio()) {
           logger.info("Skipping encoding of '{}', since it lacks an audio stream", track);
           continue;
-        } else if (outputType.equals(MediaType.Visual) && !track.hasVideo()) {
+        } else if (inputType.equals(MediaType.Visual) && !track.hasVideo()) {
           logger.info("Skipping encoding of '{}', since it lacks a video stream", track);
           continue;
         }
@@ -207,7 +221,7 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
     if (encodingJobs.isEmpty()) {
       logger.info("No matching tracks found");
-      return createResult(mediaPackage, Action.CONTINUE);
+      return createResult(mediaPackage, Action.SKIP);
     }
 
     // Wait for the jobs to return
@@ -294,6 +308,12 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
       return profile;
     }
 
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
 }

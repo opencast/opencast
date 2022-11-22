@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -138,9 +138,6 @@
             <Private-Package>
               javax.annotation*
             </Private-Package>
-            <Service-Component>
-              OSGI-INF/static-metadata-service.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

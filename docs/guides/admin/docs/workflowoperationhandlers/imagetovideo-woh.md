@@ -1,10 +1,17 @@
-# ImageToVideo Workflow Operation Handler
+Image-to-Video Workflow Operation
+=========================================
 
-## Description
+ID: `image-to-video`
 
-The ImageToVideo Workflow Operation Handler allows to create a video track from a source image.
 
-## Parameters table
+Description
+-----------
+
+The image-to-video operation allows to create a video track from a source image.
+
+
+Parameter Table
+---------------
 
 Tags and flavors can be used in combination. But combined they should match one image.
 
@@ -19,14 +26,14 @@ Tags and flavors can be used in combination. But combined they should match one 
 
 \* **mandatory**
 
-## Operation example
+
+Operation Example
+-----------------
 
 ```xml
 <operation
-  id="image-to-video"
-  fail-on-error="true"
-  exception-handler-workflow="error"
-  description="Composite">
+    id="image-to-video"
+    description="Composite">
   <configurations>
     <configuration key="source-tags">intro</configuration>
     <configuration key="source-flavor">intro/source</configuration>
@@ -38,11 +45,14 @@ Tags and flavors can be used in combination. But combined they should match one 
 </operation>
 ```
 
-## Encoding profile example
+Encoding Profile Example
+------------------------
 
-    # Image to video
-    profile.image-movie.name = image to video
-    profile.image-movie.input = image
-    profile.image-movie.output = visual
-    profile.image-movie.suffix = -image-video.mp4
-    profile.image-movie.ffmpeg.command = -loop 1 -i #{in.video.path} -c:v libx264 -r 25 -t #{time} -pix_fmt yuv420p #{out.dir}/#{out.name}#{out.suffix}
+```properties
+# Image to video
+profile.image-movie.name = image to video
+profile.image-movie.input = image
+profile.image-movie.output = visual
+profile.image-movie.suffix = -image-video.mp4
+profile.image-movie.ffmpeg.command = -loop 1 -i #{in.video.path} -c:v libx264 -r 25 -t #{time} -pix_fmt yuv420p #{out.dir}/#{out.name}#{out.suffix}
+```

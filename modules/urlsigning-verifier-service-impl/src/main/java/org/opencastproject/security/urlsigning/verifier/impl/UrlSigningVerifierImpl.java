@@ -27,6 +27,7 @@ import org.opencastproject.urlsigning.utils.ResourceRequestUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,14 @@ import java.util.Enumeration;
 import java.util.Objects;
 import java.util.Properties;
 
+@Component(
+    immediate = true,
+    service = { ManagedService.class,UrlSigningVerifier.class },
+    property = {
+        "service.description=Url Signing Verifier",
+        "service.pid=org.opencastproject.security.urlsigning.verifier.impl.UrlSigningVerifierImpl"
+    }
+)
 public class UrlSigningVerifierImpl implements UrlSigningVerifier, ManagedService {
   /** Prefix for key entry configuration keys */
   public static final String KEY_PREFIX = "key.";

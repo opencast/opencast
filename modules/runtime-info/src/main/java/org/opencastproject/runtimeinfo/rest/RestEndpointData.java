@@ -21,6 +21,8 @@
 
 package org.opencastproject.runtimeinfo.rest;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import org.opencastproject.util.JaxbXmlSchemaGenerator;
 import org.opencastproject.util.doc.DocData;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -253,7 +255,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
    *           if note is blank (e.g. null, empty string)
    */
   public void addNote(String note) throws IllegalArgumentException {
-    if (DocData.isBlank(note)) {
+    if (isBlank(note)) {
       throw new IllegalArgumentException("Note must not be null or blank.");
     }
     if (notes == null) {

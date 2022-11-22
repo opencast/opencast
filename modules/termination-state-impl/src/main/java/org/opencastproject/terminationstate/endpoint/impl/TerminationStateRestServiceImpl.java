@@ -35,6 +35,8 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.json.simple.JSONObject;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.FormParam;
@@ -57,6 +59,15 @@ import javax.ws.rs.core.Response;
           "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
           + "other words, there is a bug! You should file an error report with your server logs from the time when the "
           + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"})
+@Component(
+    immediate = true,
+    service = TerminationStateRestServiceImpl.class,
+    property = {
+        "service.description=Termination State Rest Service",
+        "opencast.service.type=org.opencastproject.terminationstate.impl",
+        "opencast.service.path=/termination"
+    }
+)
 public class TerminationStateRestServiceImpl implements TerminationStateRestService {
 
   private static final Log logger = new Log(LoggerFactory.getLogger(TerminationStateRestServiceImpl.class));
@@ -155,6 +166,9 @@ public class TerminationStateRestServiceImpl implements TerminationStateRestServ
    OSGI injection callback
    @param service termination state service instance
    */
+  @Reference(
+      target = "(&(vendor.name=opencast)(vendor.service=basic))"
+  )
   public void setService(TerminationStateService service) {
     this.service = service;
   }

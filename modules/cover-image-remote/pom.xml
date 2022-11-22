@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -37,6 +37,11 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi.cmpn</artifactId>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -52,23 +57,9 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Import-Package>
-              org.apache.http,
-              org.apache.http.client.entity,
-              org.apache.http.client.methods,
-              org.apache.http.message,
-              org.apache.http.util,
-              org.opencastproject.coverimage;version=${project.version},
-              org.opencastproject.job.api;version=${project.version},
-              org.opencastproject.serviceregistry.api;version=${project.version},
-              org.slf4j
-            </Import-Package>
             <Export-Package>
               org.opencastproject.coverimage.remote;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/cover-image-service-remote.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

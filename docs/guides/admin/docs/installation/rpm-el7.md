@@ -1,11 +1,16 @@
 Install from Repository (Red Hat Enterprise Linux 7.x, CentOS 7.x, Scientific Linux 7.x)
 ========================================================================================
 
-> *This guide is for EL7 only. There is a separate [CentOS 8 and Red Hat Enterprise Linux 8 guide](rpm-el8.md).*
 
-This guide is based on an RPM software repository available for Red Hat-based Linux distributions provided by [Osnabrück
+<div class=warn>
+While we  continue n to continue support for EL7 until the CentOS 7 EOL in mid 2024,
+most testing happens on more modern platforms and we recommend using EL8 or EL9 instead.
+</div>
+
+This guide is based on an RPM software repository available for Red Hat based Linux distributions provided by [Osnabrück
 University](https://uni-osnabrueck.de). This repository provides preconfigured Opencast installations and all necessary
 3rd-party-tools.
+
 
 Currently Supported
 -------------------
@@ -48,35 +53,6 @@ yum install opencast-allinone
 
 This will install the default distribution of Opencast and all its dependencies.
 For more options, see the [advanced installation section below](#advanced-installation).
-
-
-Install Apache ActiveMQ
------------------------
-
-The Apache ActiveMQ message broker is required by Opencast.
-It can be run on the same machine as Opencast.
-Install ActiveMQ by running:
-
-```sh
-yum install activemq-dist
-```
-
-A prepared configuration file for ActiveMQ comes with Opencast.
-It should suffice for an all-in-one installation and can be copied to replace the default configuration:
-
-```sh
-cp /usr/share/opencast/docs/scripts/activemq/activemq.xml /etc/activemq/activemq.xml
-```
-
-Then start and enable ActiveMQ by running:
-
-```sh
-systemctl start activemq
-systemctl enable activemq
-```
-
-More information about how to properly set up ActiveMQ for Opencast, cluster installations in particular,
-can be found in the [message broker configuration documentation](../configuration/message-broker.md).
 
 
 Install Elasticsearch

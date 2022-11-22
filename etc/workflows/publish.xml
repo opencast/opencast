@@ -8,7 +8,9 @@
     <tag>editor</tag>
   </tags>
   <displayOrder>1000</displayOrder>
-  <description/>
+  <description>
+    Process media files and publish them.
+  </description>
   <configuration_panel/>
   <state-mappings>
     <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.PUBLISHING</state-mapping>

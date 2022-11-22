@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -106,9 +106,6 @@
               org.opencastproject.waveform.ffmpeg;version=${project.version},
               org.opencastproject.waveform.endpoint;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/waveform.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

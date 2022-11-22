@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -89,9 +89,6 @@
               org.opencastproject.textanalyzer.impl;version=${project.version},
               org.opencastproject.textanalyzer.impl.endpoint;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/textanalyzer.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

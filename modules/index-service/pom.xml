@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -261,24 +261,6 @@
               org.opencastproject.index.service.resources.list.query,
               org.opencastproject.index.service.util
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/catalog-ui-adapter-factory.xml,
-              OSGI-INF/index_service.xml,
-              OSGI-INF/list-providers/acl.xml,
-              OSGI-INF/list-providers/agents.xml,
-              OSGI-INF/list-providers/boolean.xml,
-              OSGI-INF/list-providers/comments.xml,
-              OSGI-INF/list-providers/contributors.xml,
-              OSGI-INF/list-providers/events.xml,
-              OSGI-INF/list-providers/groups.xml,
-              OSGI-INF/list-providers/jobs.xml,
-              OSGI-INF/list-providers/series.xml,
-              OSGI-INF/list-providers/servers.xml,
-              OSGI-INF/list-providers/services.xml,
-              OSGI-INF/list-providers/themes.xml,
-              OSGI-INF/list-providers/users.xml,
-              OSGI-INF/list-providers/workflows.xml
-            </Service-Component>
             <JPA-PersistenceUnits>
               org.opencastproject.index.service
             </JPA-PersistenceUnits>

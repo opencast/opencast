@@ -22,8 +22,6 @@
 
 package org.opencastproject.search.api;
 
-import java.util.Optional;
-
 /**
  * A single result of searching.
  */
@@ -69,7 +67,7 @@ public interface SearchResult {
    *
    * @return The limit.
    */
-  Optional<Long> getLimit();
+  long getLimit();
 
   /**
    * Get the search time.

@@ -72,6 +72,12 @@ import org.osgi.framework.ServiceException;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,6 +101,14 @@ import java.util.regex.Pattern;
 /**
  * A Solr-based {@link SearchService} implementation.
  */
+@Component(
+    immediate = true,
+    service = { SearchService.class,SearchServiceImpl.class,ManagedService.class,StaticFileAuthorization.class },
+    property = {
+        "service.description=Search Service",
+        "service.pid=org.opencastproject.search.impl.SearchServiceImpl"
+    }
+)
 public final class SearchServiceImpl extends AbstractJobProducer implements SearchService, ManagedService,
     StaticFileAuthorization {
 
@@ -212,6 +226,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    *          the component context
    */
   @Override
+  @Activate
   public void activate(final ComponentContext cc) throws IllegalStateException {
     super.activate(cc);
     final String solrServerUrlConfig = StringUtils.trimToNull(cc.getBundleContext().getProperty(CONFIG_SOLR_URL));
@@ -263,6 +278,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   /**
    * Service deactivator, called via declarative services configuration.
    */
+  @Deactivate
   public void deactivate() {
     SolrServerFactory.shutdown(solrServer);
   }
@@ -719,6 +735,11 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   }
 
   /** Dynamic reference. */
+  @Reference(
+      cardinality = ReferenceCardinality.AT_LEAST_ONE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "unsetStaticMetadataService"
+  )
   public void setStaticMetadataService(StaticMetadataService mdService) {
     this.mdServices.add(mdService);
     if (indexManager != null) {
@@ -733,26 +754,32 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     }
   }
 
+  @Reference(name = "mpeg7")
   public void setMpeg7CatalogService(Mpeg7CatalogService mpeg7CatalogService) {
     this.mpeg7CatalogService = mpeg7CatalogService;
   }
 
+  @Reference
   public void setPersistence(SearchServiceDatabase persistence) {
     this.persistence = persistence;
   }
 
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
 
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -763,6 +790,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * @param securityService
    *          the securityService to set
    */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -773,6 +801,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -783,6 +812,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * @param organizationDirectory
    *          the organization directory
    */
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectory = organizationDirectory;
   }
@@ -825,6 +855,12 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * @param serializer
    *          the serializer
    */
+  @Reference(
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy = ReferencePolicy.DYNAMIC,
+      target = "(service.pid=org.opencastproject.mediapackage.ChainingMediaPackageSerializer)",
+      unbind = "unsetMediaPackageSerializer"
+  )
   protected void setMediaPackageSerializer(MediaPackageSerializer serializer) {
     this.serializer = serializer;
     if (solrRequester != null) {

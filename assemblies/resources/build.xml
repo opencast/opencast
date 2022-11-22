@@ -26,18 +26,6 @@
     <!-- Special configuration for development -->
     <replaceregexp file="target/classes/package.xml" match="tar\.gz" replace="dir" byline="true"/>
     <replaceregexp file="target/classes/package.xml" match="baseDirectory&gt;.*&lt;/baseDirectory&gt;" replace="includeBaseDirectory&gt;false&lt;/includeBaseDirectory&gt;" byline="true"/>
-    <!-- Log4J -->
-    <replaceregexp file="target/assembly/system/org/apache/karaf/features/framework/4.2.9/framework-4.2.9-features.xml" match="pax-logging-api/1.11.6" replace="pax-logging-api/1.11.14" byline="true"/>
-    <replaceregexp file="target/assembly/system/org/apache/karaf/features/framework/4.2.9/framework-4.2.9-features.xml" match="pax-logging-api/1.11.6" replace="pax-logging-api/1.11.14" byline="true"/>
-    <replaceregexp file="target/assembly/system/org/apache/karaf/features/framework/4.2.9/framework-4.2.9-features.xml" match="pax-logging-log4j2/1.11.6" replace="pax-logging-log4j2/1.11.14" byline="true"/>
-    <replaceregexp file="target/assembly/etc/startup.properties" match="pax-logging-api/1.11.6" replace="pax-logging-api/1.11.14" byline="true"/>
-    <replaceregexp file="target/assembly/etc/startup.properties" match="pax-logging-log4j2/1.11.6" replace="pax-logging-log4j2/1.11.14" byline="true"/>
-    <replaceregexp file="target/assembly/bin/instance" match="1.11.6/pax-logging-api-1.11.6" replace="1.11.14/pax-logging-api-1.11.14" byline="true"/>
-    <replaceregexp file="target/assembly/bin/shell" match="1.11.6/pax-logging-api-1.11.6" replace="1.11.14/pax-logging-api-1.11.14" byline="true"/>
-    <delete>
-      <fileset dir="target/assembly/system/org/ops4j/pax/logging/pax-logging-api/1.11.6" includes="*" />
-      <fileset dir="target/assembly/system/org/ops4j/pax/logging/pax-logging-log4j2/1.11.6" includes="*" />
-    </delete>
   </target>
 
   <target if="disableJobDispatching" name="job dispatching">

@@ -21,16 +21,21 @@
 package org.opencastproject.workflow.handler.workflow;
 
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.presets.api.PresetProvider;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +48,14 @@ import java.util.Map;
  * In cases where a workflow parameters are not specified, e. g. during ad-hoc recordings, this operation handler helps
  * specify the default values.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Defaults Operation Handler",
+        "workflow.operation=defaults"
+    }
+)
 public class DefaultsWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -50,6 +63,7 @@ public class DefaultsWorkflowOperationHandler extends AbstractWorkflowOperationH
 
   private PresetProvider presetProvider;
 
+  @Reference
   void setPresetProvider(PresetProvider presetProvider) {
     this.presetProvider = presetProvider;
   }
@@ -57,7 +71,7 @@ public class DefaultsWorkflowOperationHandler extends AbstractWorkflowOperationH
   /**
    * Gets a series or organization preset if it is present.
    *
-   * @param organization
+   * @param organizationId
    *          The organization to check for organization level presets.
    * @param seriesID
    *          The id of the series to check for series level presets.
@@ -88,7 +102,8 @@ public class DefaultsWorkflowOperationHandler extends AbstractWorkflowOperationH
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     Long id = workflowInstance.getId();
     String organizationId = workflowInstance.getOrganizationId();
-    String seriesID = workflowInstance.getMediaPackage().getSeries();
+    MediaPackage mp = workflowInstance.getMediaPackage();
+    String seriesID = mp.getSeries();
     // Iterate over all configuration keys
     Map<String, String> properties = new HashMap<>();
     logger.debug("Getting properties for {} {} {}", id, organizationId, seriesID);
@@ -111,7 +126,13 @@ public class DefaultsWorkflowOperationHandler extends AbstractWorkflowOperationH
         logger.debug("Configuration key '{}' of workflow {} is set to '{}' specified in event.", key, id, value);
       }
     }
-    return createResult(workflowInstance.getMediaPackage(), properties, Action.CONTINUE, 0);
+    return createResult(mp, properties, Action.CONTINUE, 0);
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
 }

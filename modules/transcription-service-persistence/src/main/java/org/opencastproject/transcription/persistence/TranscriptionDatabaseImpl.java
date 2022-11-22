@@ -21,6 +21,9 @@
 package org.opencastproject.transcription.persistence;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +34,14 @@ import java.util.List;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.spi.PersistenceProvider;
 
+@Component(
+    immediate = true,
+    name = "org.opencastproject.transcription.persistence.TranscriptionDatabase",
+    service = TranscriptionDatabase.class,
+    property = {
+        "service.description=Transcription Persistence"
+    }
+)
 public class TranscriptionDatabaseImpl implements TranscriptionDatabase {
 
   /**
@@ -53,10 +64,12 @@ public class TranscriptionDatabaseImpl implements TranscriptionDatabase {
   /**
    * OSGi callback.
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for transcription service");
   }
 
+  @Reference(target = "(osgi.unit.name=org.opencastproject.transcription.persistence)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }

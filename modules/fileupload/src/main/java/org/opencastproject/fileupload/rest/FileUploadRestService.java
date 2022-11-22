@@ -38,6 +38,9 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +78,15 @@ import javax.ws.rs.core.Response;
             + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
     }
 )
+@Component(
+    immediate = true,
+    service = FileUploadRestService.class,
+    property = {
+        "service.description=File Upload REST Endpoint",
+        "opencast.service.type=org.opencastproject.fileupload",
+        "opencast.service.path=/upload"
+    }
+)
 public class FileUploadRestService {
 
   // message field names
@@ -94,6 +106,9 @@ public class FileUploadRestService {
   }
 
   // <editor-fold defaultstate="collapsed" desc="OSGi Service Stuff" >
+  @Reference(
+      unbind = "unsetFileUploadService"
+  )
   protected void setFileUploadService(FileUploadService service) {
     uploadService = service;
   }
@@ -102,6 +117,7 @@ public class FileUploadRestService {
     uploadService = null;
   }
 
+  @Activate
   protected void activate(ComponentContext cc) {
     log.info("File Upload REST Endpoint activated");
   }

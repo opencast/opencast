@@ -1,7 +1,9 @@
-Concat Workflow Operation Handler
-=================================
+Concat Workflow Operation
+=========================
 
-The *concat* operation handler has been created to concatenate multiple video tracks into one video track.
+ID: `concat`
+
+The concat operation has been created to concatenate multiple video tracks into one video track.
 
 For a concatenation of two video files to work, both files need to have the same format (timebase, resolution, codecs,
 frame rate, etc.). This workflow operation has two modes to deal with this restriction:
@@ -18,56 +20,22 @@ General Mode
 
 This will re-encode the videos first to the same format (framerate/timebase/codec, etc) before concatenation.
 
-```graphviz dot concat.png
+```mermaid
+graph LR
+  outro[outro: source-flavor-part-2]
+  intro[intro: source-flavor-part-0]
+  presenter[presenter: source-flavor-part-1]
 
-/**
-Input                                                   Output
+  concat{Concat}
 
-+----------------------+
-| outro                |--+
-| source-flavor-part-2 |  |
-+----------------------+  |    /------------------\    +---------------------------+
-| intro                |--+--->| concat operation |--->| intro + presenter + outro |
-| source-flavor-part-0 |  |    \------------------/    +---------------------------+
-+----------------------+  |
-| presenter            |--+
-| source-flavor-part-1 |
-+----------------------+
-**/
+  outro     --> concat
+  intro     --> concat
+  presenter --> concat
 
-digraph G {
-  rankdir="LR";
-  bgcolor="transparent";
-  compound=true;
-  fontname=helvetica;
-  fontcolor=black;
-  node[shape=box, fontsize=8.0];
-  edge[weight=2, arrowsize=0.6, color=black, fontsize=8.0];
-
-  subgraph cluster_inputs {
-    label = "Input";
-    color=lightgrey;
-    outro [label="outro\nsource-flavor-part-2"];
-    intro [label="intro\nsource-flavor-part-0"];
-    presenter [label="presenter\nsource-flavor-part-1"];
-  }
-
-  subgraph cluster_output {
-    label = "Output";
-    color=lightgrey;
-    o_intro -> o_presenter -> o_outro ;
-    o_intro    [label=intro];
-    o_presenter[label=presenter];
-    o_outro    [label=outro];
-  }
-
-  concat[shape=ellipse];
-  outro     -> concat;
-  intro     -> concat;
-  presenter -> concat;
-
-  concat -> o_intro [lhead=cluster_output];
-}
+  concat
+    --> o_intro[intro]
+    --> o_presenter[presenter]
+    --> o_outro[outro]
 ```
 
 The internal FFmpeg command for re-encoding is using the following filters: fps, scale, pad and setdar for scaling all
@@ -163,10 +131,8 @@ Example of a concat operation in a workflow definition.
 ```xml
 <!-- Add intro and outro part to the presenter track -->
 <operation
-  id="concat"
-  fail-on-error="true"
-  exception-handler-workflow="error"
-  description="Concatenate the presenter track and the intro/outro videos.">
+    id="concat"
+    description="Concatenate the presenter track and the intro/outro videos.">
   <configurations>
     <configuration key="source-flavor-part-0">intro/source</configuration>
     <configuration key="source-flavor-part-1">presenter/trimmed</configuration>
@@ -187,5 +153,7 @@ Encoding Profile
 The encoding profile command must contain the #{concatCommand} parameter which will set all input and possibly filter
 commands required for this operation:
 
-    profile.concat.ffmpeg.command = #{concatCommand} \
-      … #{out.dir}/#{out.name}#{out.suffix}
+```properties
+profile.concat.ffmpeg.command = #{concatCommand} \
+  … #{out.dir}/#{out.name}#{out.suffix}
+```

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -38,11 +38,6 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-transcription-service-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-transcription-service-amberscript</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -102,14 +97,6 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Service-Component>
-              OSGI-INF/google-speech-attach-transcription.xml,
-              OSGI-INF/google-speech-start-transcription.xml,
-              OSGI-INF/amberscript-attach-transcription.xml,
-              OSGI-INF/amberscript-start-transcription.xml,
-              OSGI-INF/start-watson-transcription.xml,
-              OSGI-INF/attach-watson-transcription.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

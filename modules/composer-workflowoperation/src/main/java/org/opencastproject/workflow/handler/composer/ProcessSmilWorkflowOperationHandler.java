@@ -36,6 +36,7 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
 import org.opencastproject.mediapackage.selector.TrackSelector;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilResponse;
 import org.opencastproject.smil.api.SmilService;
@@ -43,10 +44,10 @@ import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -55,6 +56,10 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +82,14 @@ import java.util.stream.Collectors;
 /**
  * The workflow definition for handling "compose" operations
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Process Smil Workflow Operation Handler",
+        "workflow.operation=process-smil"
+    }
+)
 public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   static final String SEPARATOR = ";";
   /** The logging facility */
@@ -172,12 +185,18 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
     }
   }
 
+  @Activate
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
+  }
+
   /**
    * Callback for the OSGi declarative services configuration.
    *
    * @param composerService
    *          the local composer service
    */
+  @Reference
   protected void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -187,6 +206,7 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
    *
    * @param smilService
    */
+  @Reference
   protected void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }
@@ -198,8 +218,15 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
   /**
@@ -468,7 +495,7 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
     for (EncodingProfile ep : profiles) {
       String suffix = ep.getSuffix();
       // !! workspace.putInCollection renames the file - need to do the same with suffix
-      suffix = PathSupport.toSafeName(suffix);
+      suffix = workspace.toSafeName(suffix);
       if (suffix.length() > 0 && rawfileName.endsWith(suffix)) {
         track.addTag(ep.getIdentifier());
         return;

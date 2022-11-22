@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -56,6 +56,11 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi.cmpn</artifactId>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -78,9 +83,6 @@
             <Export-Package>
               org.opencastproject.scheduler.remote;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/scheduler-remote.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

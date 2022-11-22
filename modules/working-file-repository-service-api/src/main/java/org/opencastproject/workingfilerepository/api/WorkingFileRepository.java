@@ -134,6 +134,8 @@ public interface WorkingFileRepository extends StorageUsage {
    */
   URI getURI(String mediaPackageID, String mediaPackageElementID, String fileName) throws IllegalArgumentException;
 
+  String toSafeName(String fileName);
+
   /**
    * Delete the file stored at the given media package and element IDs.
    *
@@ -230,4 +232,13 @@ public interface WorkingFileRepository extends StorageUsage {
    *          files older than that will be deleted
    */
   boolean cleanupOldFilesFromCollection(String collectionId, long days) throws IOException;
+
+
+  /**
+   * Cleans up media files older than the number of days passed.
+   *
+   * @param days
+   *          files older than that will be deleted
+   */
+  boolean cleanupOldFilesFromMediaPackage(long days) throws IOException;
 }

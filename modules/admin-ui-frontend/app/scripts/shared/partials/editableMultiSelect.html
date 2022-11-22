@@ -1,4 +1,7 @@
-<div ng-click="enterEditMode()" ng-form="innerForm">
+<div ng-click="enterEditMode()"
+     ng-form="innerForm"
+     ng-class="{ dirty: params.dirty }">
+
   &nbsp;<ul ng-show="!editMode">
     <li ng-repeat="value in params.value track by $index">
       <span ng-if="value">{{ getText(value).value | translate }}</span>
@@ -6,7 +9,6 @@
   </ul>
 
   <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-focus="enterEditMode()" tabindex="{{ params.tabindex }}"></i>
-  <i class="changed fa fa-check" ng-show="!editMode" ng-class="{ saved: params.saved, dirty: params.dirty }"></i>
 
   <div class="editable-select" ng-if="editMode">
     <input type="text" ng-blur="onBlur()" ng-required="params.required" tabindex="{{ params.tabindex }}"

@@ -227,10 +227,6 @@ angular.module('adminNg.controllers')
               $scope.policiesUser.push(policy);
             }
           });
-
-          if (!loading) {
-            $scope.accessSave();
-          }
         },
         checkForActiveTransactions = function () {
           EventTransactionResource.hasActiveTransaction({id: $scope.resourceId }, function (data) {
@@ -473,6 +469,7 @@ angular.module('adminNg.controllers')
               var json = angular.fromJson(data.episode_access.acl);
               changePolicies(json.acl.ace, true);
               $scope.baseAclId = data.episode_access.current_acl.toString();
+              getCurrentPolicies();
             }
           });
 
@@ -741,8 +738,6 @@ angular.module('adminNg.controllers')
       if (angular.isDefined(index)) {
         model.splice(index, 1);
       }
-
-      $scope.accessSave();
     };
 
     $scope.getPreview = function (url) {
@@ -841,7 +836,8 @@ angular.module('adminNg.controllers')
 
     $scope.close = function() {
       if (($scope.unsavedChanges([$scope.commonMetadataCatalog]) === false
-           && $scope.unsavedChanges($scope.extendedMetadataCatalogs)  === false)
+           && $scope.unsavedChanges($scope.extendedMetadataCatalogs)  === false
+           && unsavedAccessChanges() === false)
           || confirmUnsaved()) {
         Modal.$scope.close();
       }
@@ -986,11 +982,6 @@ angular.module('adminNg.controllers')
       });
     };
 
-    $scope.accessChanged = function (role) {
-      if (!role) return;
-      $scope.accessSave();
-    };
-
     $scope.accessSave = function () {
       var ace = [],
           hasRights = false,
@@ -1063,7 +1054,47 @@ angular.module('adminNg.controllers')
           override: true
         }, me.accessSaved, me.accessNotSaved);
       }
+      getCurrentPolicies();
     };
+
+    let oldPolicies = {};
+
+    function getCurrentPolicies () {
+
+      oldPolicies = $scope.policies.map(policy => {
+        let newObject = {};
+        Object.keys(policy).forEach(propertyKey => {
+          newObject[propertyKey] = policy[propertyKey];
+        });
+        return newObject;
+      });
+
+      return oldPolicies;
+    }
+
+    function unsavedAccessChanges () {
+      let hasChanges = false;
+
+      if (oldPolicies.length !== $scope.policies.length) {
+        hasChanges = true;
+        return hasChanges;
+      }
+
+      oldPolicies.forEach((oldPolicy, index) => {
+        const policy = $scope.policies[index];
+
+        if(oldPolicy.role !== policy.role) {
+          hasChanges = true;
+        }
+        else if (oldPolicy.read !== policy.read) {
+          hasChanges = true;
+        }
+        else if (oldPolicy.write !== policy.write) {
+          hasChanges = true;
+        }
+      });
+      return hasChanges;
+    }
 
     $scope.statisticsCsvFileName = function (statsTitle) {
       var sanitizedStatsTitle = statsTitle.replace(/[^0-9a-z]/gi, '_').toLowerCase();

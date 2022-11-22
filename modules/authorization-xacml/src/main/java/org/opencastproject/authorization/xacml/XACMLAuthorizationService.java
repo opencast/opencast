@@ -45,13 +45,13 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,8 +60,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.Dictionary;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
@@ -73,9 +71,9 @@ import javax.xml.bind.JAXBException;
     property = {
         "service.description=Provides translation between access control entries and xacml documents"
     },
-    service = { AuthorizationService.class, ManagedService.class }
+    service = { AuthorizationService.class }
 )
-public class XACMLAuthorizationService implements AuthorizationService, ManagedService {
+public class XACMLAuthorizationService implements AuthorizationService {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(XACMLAuthorizationService.class);
@@ -102,30 +100,17 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
   }
 
   @Activate
-  public void activate(ComponentContext cc) {
-    updated(cc.getProperties());
-  }
-
   @Modified
-  public void modified(Map<String, Object> config) {
-    // this prevents the service from restarting on configuration updated.
-    // updated() will handle the configuration update.
-  }
+  public void activate(ComponentContext cc) {
+    var properties = cc.getProperties();
 
-  @Reference(cardinality = ReferenceCardinality.OPTIONAL)
-  public void setMediaPackageSerializer(MediaPackageSerializer serializer) {
-    this.serializer = serializer;
-  }
-
-  @Override
-  public synchronized void updated(Dictionary<String, ?> properties) {
     if (properties == null) {
       mergeMode = MergeMode.OVERRIDE;
       logger.debug("Merge mode set to {}", mergeMode);
       return;
     }
     final String mode = StringUtils.defaultIfBlank((String) properties.get(CONFIG_MERGE_MODE),
-            MergeMode.OVERRIDE.toString());
+        MergeMode.OVERRIDE.toString());
     try {
       mergeMode = MergeMode.valueOf(mode.toUpperCase());
     } catch (IllegalArgumentException e) {
@@ -133,6 +118,22 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
       mergeMode = MergeMode.OVERRIDE;
     }
     logger.debug("Merge mode set to {}", mergeMode);
+  }
+
+  @Reference(
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "unsetMediaPackageSerializer",
+      target = "(service.pid=org.opencastproject.mediapackage.ChainingMediaPackageSerializer)"
+  )
+  public void setMediaPackageSerializer(MediaPackageSerializer serializer) {
+    this.serializer = serializer;
+  }
+
+  protected void unsetMediaPackageSerializer(MediaPackageSerializer serializer) {
+    if (this.serializer == serializer) {
+      this.serializer = null;
+    }
   }
 
   @Override
@@ -149,30 +150,10 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
     // Start with the requested scope but fall back to the less specific scope if it does not exist.
     // The order is: episode -> series -> general (deprecated) -> global
     if (AclScope.Episode.equals(scope) || AclScope.Merged.equals(scope)) {
-      for (Attachment xacml : mp.getAttachments(XACML_POLICY_EPISODE)) {
-        URI uri = xacml.getURI();
-        try {
-          if (serializer != null) {
-            uri = serializer.decodeURI(uri);
-          }
-        } catch (URISyntaxException e) {
-          logger.warn("URI {} syntax error, skip decoding", uri);
-        }
-        episode = loadAcl(uri);
-      }
+      episode = getAclByFlavor(mp, XACML_POLICY_EPISODE);
     }
     if (Arrays.asList(AclScope.Episode, AclScope.Series, AclScope.Merged).contains(scope)) {
-      for (Attachment xacml : mp.getAttachments(XACML_POLICY_SERIES)) {
-        URI uri = xacml.getURI();
-        try {
-          if (serializer != null) {
-            uri = serializer.decodeURI(uri);
-          }
-        } catch (URISyntaxException e) {
-          logger.warn("URI {} syntax error, skip decoding", uri);
-        }
-        series = loadAcl(uri);
-      }
+      series = getAclByFlavor(mp, XACML_POLICY_SERIES);
     }
 
     if (episode.isPresent() && series.isPresent()) {
@@ -200,6 +181,22 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
 
     logger.debug("Falling back to global default ACL");
     return tuple(new AccessControlList(), AclScope.Global);
+  }
+
+  private Optional<AccessControlList> getAclByFlavor(MediaPackage mp, MediaPackageElementFlavor xacmlPolicyFlavor) {
+    Optional<AccessControlList> acl = Optional.empty();
+    for (Attachment xacml : mp.getAttachments(xacmlPolicyFlavor)) {
+      URI uri = xacml.getURI();
+      try {
+        if (serializer != null) {
+          uri = serializer.decodeURI(uri);
+        }
+      } catch (URISyntaxException e) {
+        logger.warn("URI {} syntax error, skip decoding", uri);
+      }
+      acl = loadAcl(uri);
+    }
+    return acl;
   }
 
   @Override
@@ -299,9 +296,7 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
     logger.debug("Load Acl from {}", uri);
     try (InputStream is = workspace.read(uri)) {
       AccessControlList acl = XACMLUtils.parseXacml(is);
-      if (acl != null) {
-        return Optional.of(acl);
-      }
+      return Optional.of(acl);
     } catch (NotFoundException e) {
       logger.debug("URI {} not found", uri);
     } catch (Exception e) {
@@ -342,7 +337,7 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
    * @param workspace
    *          the workspace to set
    */
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -353,7 +348,7 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
    * @param securityService
    *          the security service
    */
-  @Reference(name = "security")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

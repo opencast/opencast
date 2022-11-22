@@ -48,6 +48,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpDelete;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +65,14 @@ import java.util.Optional;
 /**
  * A simple tutorial class to learn about Opencast Services
  */
+@Component(
+    immediate = true,
+    service = IngestDownloadService.class,
+    property = {
+        "service.description=Ingest download service",
+        "service.pid=org.opencastproject.ingestdownloadservice.impl.IngestDownloadServiceImpl"
+    }
+)
 public class IngestDownloadServiceImpl extends AbstractJobProducer implements IngestDownloadService {
 
   public enum Operation {
@@ -117,6 +127,7 @@ public class IngestDownloadServiceImpl extends AbstractJobProducer implements In
    *
    * @param workspace the workspace
    */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -126,6 +137,7 @@ public class IngestDownloadServiceImpl extends AbstractJobProducer implements In
    *
    * @param serviceRegistry the service registry
    */
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -155,6 +167,7 @@ public class IngestDownloadServiceImpl extends AbstractJobProducer implements In
    *
    * @param securityService the securityService to set
    */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -164,6 +177,7 @@ public class IngestDownloadServiceImpl extends AbstractJobProducer implements In
    *
    * @param userDirectoryService the userDirectoryService to set
    */
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -193,6 +207,7 @@ public class IngestDownloadServiceImpl extends AbstractJobProducer implements In
    *
    * @param organizationDirectory the organization directory
    */
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }

@@ -31,8 +31,9 @@ import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowParsingException;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
+
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -113,7 +114,7 @@ public class LoggingWorkflowOperationHandler extends AbstractWorkflowOperationHa
     if (logWorkflowInstance) {
       String filename = String.format("workflow-%d-%d.xml", workflowInstance.getId(), operation.getId());
       try {
-        saveOrLog(WorkflowParser.toXml(workflowInstance), directory, filename);
+        saveOrLog(XmlWorkflowParser.toXml(workflowInstance), directory, filename);
       } catch (WorkflowParsingException e) {
         throw new WorkflowOperationException(e);
       }

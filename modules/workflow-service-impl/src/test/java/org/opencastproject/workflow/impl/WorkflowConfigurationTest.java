@@ -21,35 +21,32 @@
 
 package org.opencastproject.workflow.impl;
 
-import org.opencastproject.workflow.api.WorkflowConfiguration;
-import org.opencastproject.workflow.api.WorkflowConfigurationImpl;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
-import org.opencastproject.workflow.api.WorkflowParser;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 public class WorkflowConfigurationTest {
 
   @Test
   public void testConfigurationSerialization() throws Exception {
-    WorkflowOperationInstanceImpl op = new WorkflowOperationInstanceImpl("op", OperationState.RUNNING);
-    Set<WorkflowConfiguration> config = new HashSet<WorkflowConfiguration>();
-    config.add(new WorkflowConfigurationImpl("this", "that"));
-    op.setConfiguration(config);
-    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    WorkflowOperationInstance op = new WorkflowOperationInstance("op", OperationState.RUNNING);
+    Map<String, String> config = new HashMap<String, String>();
+    config.put("this", "that");
+    op.setConfiguration("this", "that");
+    WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
     ops.add(op);
     instance.setOperations(ops);
-    String xml = WorkflowParser.toXml(instance);
+    String xml = XmlWorkflowParser.toXml(instance);
     Assert.assertTrue(xml.contains("configuration key=\"this\">that</"));
   }
 

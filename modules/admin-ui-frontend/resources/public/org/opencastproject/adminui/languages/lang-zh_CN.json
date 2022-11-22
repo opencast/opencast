@@ -27,6 +27,9 @@
    "SELECT_NO_OPTIONS_AVAILABLE": "无可用的选项",
    "YES": "是",
    "COPY": "复制到剪贴板",
+   "MONITOR": {
+      "REGISTRATION": "Opencast 已在一周多时间内发送注册更新"
+   },
    "LTI": {
       "ERROR_LOADING_METADATA": "加载事件元数据时出错。请稍后再试。",
       "SERIES_TITLE": "查看系列",
@@ -245,7 +248,17 @@
       "ADOPTER_PROFILE_UPDATED": "资料已更新",
       "ADOPTER_PROFILE_NOT_UPDATED": "哎呀！无法更新资料信息。请重试！",
       "ADOPTER_PROFILE_DELETED": "成功删除资料信息",
-      "ADOPTER_PROFILE_NOT_DELETED": "哎呀！无法删除资料信息。请重试！"
+      "ADOPTER_PROFILE_NOT_DELETED": "哎呀！无法删除资料信息。请重试！",
+      "TOBIRA_OVERRIDE_NAME": "所选页面的标题将被系列的标题覆盖。",
+      "TOBIRA_NO_PATH_SEGMENT": "页面需要路径部分。",
+      "TOBIRA_NOT_MOUNTED": "无法将系列挂载到 tobira。",
+      "TOBIRA_PATH_SEGMENT_INVALID": "路径段无效。 一个有效的路径段长度至少为2个字符，不包含任何空白或控制字符，不能包含 '<>\"[\\]^`{|}#%/? '，不能以字符 '-+~@_!$&;:.,=*'()'。",
+      "TOBIRA_PATH_SEGMENT_UNIQUE": "一个页面的路径部分必须在所有同级页面中保持唯一。",
+      "TOBIRA_PAGE_NOT_FOUND": "您试图访问的页面不存在。您可以尝试从头开始访问。",
+      "TOBIRA_SERVER_ERROR": " 连接到 Tobira 时出错。请联系系统管理员或稍后重试。",
+      "TOBIRA_COPIED_DIRECT_LINK": "链接已复制到剪贴板。",
+      "TOBIRA_FAILED_COPYING_DIRECT_LINK": "无法复制链接到剪贴板。",
+      "TOBIRA_NOT_FOUND": "Tobira 目前不知道这个系列。请几分钟后再试或联系系统管理员。"
    },
    "BULK_ACTIONS": {
       "CAPTION": "操作",
@@ -410,6 +423,11 @@
          "BACK": "返回",
          "LEGAL_INFO_STATE": {
             "HEADER": "服务条款和隐私政策"
+         },
+         "SUMMARY_STATE": {
+            "HEADER": "这是实际要发送到 Opencast 服务器的 JSON 摘要",
+            "GENERAL_HEADER": "部署信息",
+            "STATS_HEADER": "统计信息"
          },
          "INFORMATION_STATE": {
             "HEADER": "感谢您使用Opencast！",
@@ -635,7 +653,8 @@
                "EDITOR_NEEDS_CUTTING": "打开视频编辑器（有人通过评论建议剪辑视频）",
                "COMMENTS": "查看评论",
                "PAUSED_WORKFLOW": "查看已暂停的工作流",
-               "PRESENTER": "只显示此演讲者的事件"
+               "PRESENTER": "只显示此演讲者的事件",
+               "COPY_TO_NEW_EVENT": "复制元数据到新事件"
             }
          },
          "STATUS": {
@@ -1113,6 +1132,20 @@
                "LABEL": "请选择主题",
                "EMPTY": "未找到主题"
             },
+            "TOBIRA": {
+               "CAPTION": "Tobira",
+               "DESCRIPTION": "您可以在此选择您想要在 Tobira 视频门户中显示系列的位置。 您只能在这里选择一个位置，它必须是空的(用粗体标记)。 您可以在这里创建新的页面，但是请注意，它们只是在选定页面的路径上才会持续存在。",
+               "SELECT_PAGE": "选择目标页面",
+               "PAGE_TITLE": "子页面标题",
+               "PATH_SEGMENT": "路径段",
+               "SUBPAGES": "子页面",
+               "ADD_SUBPAGE": "新建子页面",
+               "CANCEL": "取消",
+               "HOMEPAGE": "首页",
+               "SELECTED_PAGE": "系列将在以下路径中挂载",
+               "NO_PAGE_SELECTED": "没有选择页面。系列将不会在 Tobira 挂载。",
+               "PATH": "路径"
+            },
             "SUMMARY": {
                "CAPTION": "摘要"
             }
@@ -1141,6 +1174,7 @@
                "EVENTS": "事件",
                "PERMISSIONS": "访问权限",
                "THEME": "主题",
+               "TOBIRA": "Tobira",
                "STATISTICS": "统计"
             },
             "ACCESS": {
@@ -1161,8 +1195,10 @@
                   "ACTION": "操作",
                   "NEW": "新建策略",
                   "DETAILS": "详情",
-                  "REPLACE_EVENT_ACLS": "更新事件权限",
+                  "REPLACE_EVENT_ACLS": "保存并更新事件权限",
                   "REPLACE_EVENT_ACLS_HINT": "确保此系列中的所有事件都具有这些权限",
+                  "SAVE_SERIES_ACLS": "保存",
+                  "SAVE_SERIES_ACLS_HINT": "仅将权限应用于系列",
                   "LOAD_MORE_LIMIT": "显示策略.",
                   "LOAD_MORE_LINK": "载入更多"
                },
@@ -1185,6 +1221,13 @@
                "LANGUAGE": "语言",
                "LICENSE": "许可证",
                "DESCRIPTION": "说明"
+            },
+            "TOBIRA": {
+               "HOMEPAGE": "(首页)",
+               "DIRECT_LINK": "直接链接到系列",
+               "COPY_DIRECT_LINK": "复制到剪贴板",
+               "NOT_MOUNTED": "该系列目前不在页面结构中，只能使用上面的直接链接。",
+               "PAGES": "Tobira 中包含此系列的页面"
             },
             "EVENTS": {
                "TITLE": "标题",

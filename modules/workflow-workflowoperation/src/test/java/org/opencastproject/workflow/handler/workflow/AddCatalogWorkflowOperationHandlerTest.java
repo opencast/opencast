@@ -24,11 +24,10 @@ package org.opencastproject.workflow.handler.workflow;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
@@ -51,8 +50,8 @@ import java.util.List;
 public class AddCatalogWorkflowOperationHandlerTest {
 
   private AddCatalogWorkflowOperationHandler operationHandler;
-  private WorkflowInstanceImpl instance;
-  private WorkflowOperationInstanceImpl operation;
+  private WorkflowInstance instance;
+  private WorkflowOperationInstance operation;
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -64,10 +63,10 @@ public class AddCatalogWorkflowOperationHandlerTest {
   public void setUp() throws Exception {
     operationHandler = new AddCatalogWorkflowOperationHandler();
 
-    instance = new WorkflowInstanceImpl();
+    instance = new WorkflowInstance();
 
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
-    operation = new WorkflowOperationInstanceImpl("test", OperationState.RUNNING);
+    operation = new WorkflowOperationInstance("test", OperationState.RUNNING);
     ops.add(operation);
     instance.setOperations(ops);
     String catalogName = "test-catalog";
@@ -156,15 +155,16 @@ public class AddCatalogWorkflowOperationHandlerTest {
     operation.setConfiguration("catalog-type-collision-behavior", "keep");
 
     // execution
-    operationHandler.start(instance, null);
     WorkflowOperationResult result = operationHandler.start(instance, null);
+    instance.setMediaPackage(result.getMediaPackage()); // Would usually be done by the workflow service
+    result = operationHandler.start(instance, null);
 
     // checks
     Assert.assertEquals(Action.CONTINUE, result.getAction());
 
     MediaPackage mp = result.getMediaPackage();
 
-    Assert.assertEquals(mp.getCatalogs().length, 2);
+    Assert.assertEquals(2, mp.getCatalogs().length);
   }
 
   @Test
@@ -192,7 +192,8 @@ public class AddCatalogWorkflowOperationHandlerTest {
     operation.setConfiguration("catalog-type-collision-behavior", "fail");
 
     // execution
-    operationHandler.start(instance, null);
+    var result = operationHandler.start(instance, null);
+    instance.setMediaPackage(result.getMediaPackage()); // Would usually be done by the workflow service
     expectedException.expect(WorkflowOperationException.class);
     operationHandler.start(instance, null);
   }

@@ -36,6 +36,7 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
@@ -44,6 +45,8 @@ import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.fns.Strings;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +63,14 @@ import java.util.UUID;
 /**
  * Workflow operation handler for exporting workflow properties.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Export Workflow Properties Workflow Operation Handler",
+        "workflow.operation=export-wf-properties"
+    }
+)
 public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandler {
 
   /** Configuration options */
@@ -75,6 +86,7 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
   private Workspace workspace;
 
   /** OSGi DI */
+  @Reference
   void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -96,7 +108,7 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
 
     // Read optional existing workflow properties from mediapackage
     Properties workflowProps = new Properties();
-    Opt<Attachment> existingPropsElem = loadPropertiesElementFromMediaPackage(targetFlavor, workflowInstance);
+    Opt<Attachment> existingPropsElem = loadPropertiesElementFromMediaPackage(targetFlavor, mediaPackage);
     if (existingPropsElem.isSome()) {
       workflowProps = loadPropertiesFromXml(workspace, existingPropsElem.get().getURI());
 

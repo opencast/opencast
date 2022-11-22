@@ -37,6 +37,11 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState
 import org.opencastproject.workspace.api.Workspace;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +52,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+@Component(
+    immediate = true,
+    service = EmailTemplateService.class,
+    property = {
+        "service.description=Email Template Service"
+    }
+)
 public class EmailTemplateServiceImpl implements EmailTemplateService {
   private static final Logger logger = LoggerFactory.getLogger(EmailTemplateServiceImpl.class);
 
@@ -61,6 +73,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
   /** The incident service (to list errors in email) */
   private IncidentService incidentService = null;
 
+  @Activate
   protected void activate(ComponentContext context) {
     logger.info("EmailTemplateServiceImpl activated");
   }
@@ -157,7 +170,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     WorkflowOperationInstance op = null;
     for (; i >= 0; i--) {
       op = operations.get(i);
-      if (OperationState.FAILED.equals(op.getState()) && op.isFailWorkflowOnException()) {
+      if (OperationState.FAILED.equals(op.getState()) && op.isFailOnError()) {
         return op;
       }
     }
@@ -188,6 +201,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
    * @param ws
    *          the workspace
    */
+  @Reference
   void setWorkspace(Workspace ws) {
     this.workspace = ws;
   }
@@ -198,6 +212,11 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
    * @param templateScanner
    *          the template scanner service
    */
+  @Reference(
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "unsetEmailTemplateScanner"
+  )
   void setEmailTemplateScanner(EmailTemplateScanner templateScanner) {
     this.templateScannerRef.compareAndSet(null, templateScanner);
   }
@@ -218,6 +237,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
    * @param incidentService
    *          the incident service
    */
+  @Reference
   public void setIncidentService(IncidentService incidentService) {
     this.incidentService = incidentService;
   }

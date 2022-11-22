@@ -129,6 +129,11 @@ import org.json.simple.parser.ParseException;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,9 +177,18 @@ import javax.ws.rs.core.Response.Status;
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
-            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0 })
+            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0 })
 @RestService(name = "externalapievents", title = "External API Events Service", notes = {},
              abstractText = "Provides resources and operations related to the events")
+@Component(
+    immediate = true,
+    service = { EventsEndpoint.class,ManagedService.class },
+    property = {
+        "service.description=External API - Events Endpoint",
+        "opencast.service.type=org.opencastproject.external.events",
+        "opencast.service.path=/api/events"
+    }
+)
 public class EventsEndpoint implements ManagedService {
 
   protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
@@ -225,26 +239,31 @@ public class EventsEndpoint implements ManagedService {
   private CaptureAgentStateService agentStateService;
 
   /** OSGi DI */
+  @Reference
   void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
     this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /** OSGi DI */
+  @Reference
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
   /** OSGi DI */
+  @Reference
   public void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }
 
   /** OSGi DI */
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI */
+  @Reference
   public void setUrlSigningService(UrlSigningService urlSigningService) {
     this.urlSigningService = urlSigningService;
   }
@@ -257,16 +276,23 @@ public class EventsEndpoint implements ManagedService {
     return schedulerService;
   }
 
+  @Reference
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
   }
 
   /** OSGi DI. */
+  @Reference
   public void setCommonEventCatalogUIAdapter(CommonEventCatalogUIAdapter eventCatalogUIAdapter) {
     this.eventCatalogUIAdapter = eventCatalogUIAdapter;
   }
 
   /** OSGi DI. */
+  @Reference(
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeCatalogUIAdapter"
+  )
   public void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     catalogUIAdapters.add(catalogUIAdapter);
   }
@@ -282,6 +308,7 @@ public class EventsEndpoint implements ManagedService {
   }
 
   /** OSGi DI */
+  @Reference
   public void setAgentStateService(CaptureAgentStateService agentStateService) {
     this.agentStateService = agentStateService;
   }
@@ -301,6 +328,7 @@ public class EventsEndpoint implements ManagedService {
   }
 
   /** OSGi activation method */
+  @Activate
   void activate(ComponentContext cc) {
     logger.info("Activating External API - Events Endpoint");
 
@@ -453,16 +481,9 @@ public class EventsEndpoint implements ManagedService {
     if (event.isNone()) {
       return RestUtil.R.notFound(id);
     }
-    final Runnable doOnNotFound = () -> {
-      try {
-        elasticsearchIndex.delete(Event.DOCUMENT_TYPE, id, getSecurityService().getOrganization().getId());
-      } catch (SearchIndexException e) {
-        logger.error("error removing event {}: {}", id, e);
-      }
-    };
     final IndexService.EventRemovalResult result;
     try {
-      result = indexService.removeEvent(event.get(), doOnNotFound, retractWorkflowId);
+      result = indexService.removeEvent(event.get(), retractWorkflowId);
     } catch (WorkflowDatabaseException e) {
       logger.error("Workflow database is not reachable. This may be a temporary problem.");
       return RestUtil.R.serverError();
@@ -478,7 +499,6 @@ public class EventsEndpoint implements ManagedService {
       case GENERAL_FAILURE:
         return Response.serverError().build();
       case NOT_FOUND:
-        doOnNotFound.run();
         return RestUtil.R.notFound(id);
       default:
         throw new RuntimeException("Unknown EventRemovalResult type: " + result.name());
@@ -677,7 +697,7 @@ public class EventsEndpoint implements ManagedService {
           @RestParameter(name = "withscheduling", isRequired = false, description = "Whether the scheduling information should be included in the response.", type = Type.BOOLEAN),
           @RestParameter(name = "withpublications", isRequired = false, description = "Whether the publication ids and urls should be included in the response.", type = Type.BOOLEAN),
           @RestParameter(name = "onlyWithWriteAccess", isRequired = false, description = "Whether only to get the events to which we have write access.", type = Type.BOOLEAN),
-          @RestParameter(name = "filter", isRequired = false, description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form <Filter Name>:<Value to Filter With>.", type = STRING),
+          @RestParameter(name = "filter", isRequired = false, description = "Usage [Filter Name]:[Value to Filter With]. Multiple filters can be used by combining them with commas \",\". Available Filters: presenters, contributors, location, textFilter, series, subject. If API ver > 1.1.0 also: identifier, title, description, series_name, language, created, license, rightsholder, is_part_of, source, status, agent_id, start, technical_start.", type = STRING),
           @RestParameter(name = "sort", description = "Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory.", isRequired = false, type = STRING),
           @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.", isRequired = false, type = RestParameter.Type.INTEGER),
           @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false, type = RestParameter.Type.INTEGER) }, responses = {
@@ -1829,7 +1849,7 @@ public class EventsEndpoint implements ManagedService {
   @Path("{eventId}/scheduling")
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
               ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
-              ApiMediaType.VERSION_1_7_0 })
+              ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0 })
   @RestQuery(name = "geteventscheduling", description = "Returns an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, responses = {
       @RestResponse(description = "The scheduling information for the specified event is returned.", responseCode = HttpServletResponse.SC_OK),
@@ -1859,7 +1879,7 @@ public class EventsEndpoint implements ManagedService {
   @Path("{eventId}/scheduling")
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
               ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
-              ApiMediaType.VERSION_1_7_0 })
+              ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0 })
   @RestQuery(name = "updateeventscheduling", description = "Update an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = Type.STRING) }, restParameters = {
       @RestParameter(name = "scheduling", isRequired = true, description = "Scheduling Information", type = Type.STRING),

@@ -128,13 +128,13 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
    * @param remoteServiceManager
    */
   @Override
-  @Reference(name = "remoteServiceManager")
+  @Reference
   public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
     super.setRemoteServiceManager(remoteServiceManager);
   }
 
   @Override
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     super.setSecurityService(securityService);
   }
@@ -259,6 +259,20 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
     } catch (Exception e) {
       logger.error("Unable to delete files older than '{}' days from collection '{}': {}",
               days, collectionId, e);
+      return Response.serverError().entity(e.getMessage()).build();
+    }
+  }
+
+  @DELETE
+  @Path(WorkingFileRepository.COLLECTION_PATH_PREFIX + "cleanup/mediapackage/{numberOfDays}")
+  @RestQuery(name = "cleanupOldFilesFromMediaPackage", description = "Remove files and directories from the working file repository under /mediapackage that are older than N days", returnDescription = "No content", pathParameters = {
+          @RestParameter(name = "numberOfDays", description = "files older than this number of days will be deleted", isRequired = true, type = STRING) }, responses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "Files deleted")})
+  public Response restCleanupOldFilesFromMediaPackage(@PathParam("numberOfDays") long days) {
+    try {
+      this.cleanupOldFilesFromMediaPackage(days);
+      return Response.noContent().build();
+    } catch (Exception e) {
       return Response.serverError().entity(e.getMessage()).build();
     }
   }

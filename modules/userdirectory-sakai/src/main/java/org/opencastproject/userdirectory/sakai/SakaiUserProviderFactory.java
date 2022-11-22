@@ -33,6 +33,9 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +53,14 @@ import javax.management.ObjectName;
 /**
  * Sakai implementation of the spring UserDetailsService, taking configuration information from the component context.
  */
+@Component(
+    immediate = true,
+    service = ManagedServiceFactory.class,
+    property = {
+        "service.pid=org.opencastproject.userdirectory.sakai",
+        "service.description=Provides Sakai user directory instances"
+    }
+)
 public class SakaiUserProviderFactory implements ManagedServiceFactory {
 
   /** The logger */
@@ -95,6 +106,7 @@ public class SakaiUserProviderFactory implements ManagedServiceFactory {
   private OrganizationDirectoryService orgDirectory;
 
   /** OSGi callback for setting the organization directory service. */
+  @Reference
   public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
     this.orgDirectory = orgDirectory;
   }
@@ -105,6 +117,7 @@ public class SakaiUserProviderFactory implements ManagedServiceFactory {
    * @param cc
    *          the component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.debug("Activate SakaiUserProviderFactory");
     this.bundleContext = cc.getBundleContext();

@@ -41,7 +41,7 @@ angular.module('adminNg.controllers')
     };
 
     $scope.showAdopterRegistrationModal = function () {
-      ResourceModal.show('registration-modal', 'slim');
+      ResourceModal.show('registration-modal', '');
     };
 
     $rootScope.$on('language-changed', function () {

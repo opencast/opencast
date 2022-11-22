@@ -25,12 +25,8 @@ import org.opencastproject.inspection.ffmpeg.api.MediaAnalyzer;
 import org.opencastproject.inspection.ffmpeg.api.MediaAnalyzerException;
 import org.opencastproject.inspection.ffmpeg.api.MediaContainerMetadata;
 import org.opencastproject.inspection.ffmpeg.api.VideoStreamMetadata;
-import org.opencastproject.util.ProcessRunner;
-import org.opencastproject.util.ProcessRunner.ProcessInfo;
+import org.opencastproject.util.IoSupport;
 
-import com.entwinemedia.fn.Pred;
-
-import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -38,10 +34,11 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -85,10 +82,12 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
 
   @Override
   public MediaContainerMetadata analyze(File media) throws MediaAnalyzerException {
-    if (binary == null)
+    if (binary == null) {
       throw new IllegalStateException("Binary is not set");
+    }
 
     List<String> command = new ArrayList<>();
+    command.add(binary);
     command.add("-show_format");
     command.add("-show_streams");
     if (accurateFrameCount)
@@ -97,31 +96,36 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
     command.add("json");
     command.add(media.getAbsolutePath().replaceAll(" ", "\\ "));
 
-    String commandline = StringUtils.join(command, " ");
-
     /* Execute ffprobe and obtain the result */
-    logger.debug("Running {} {}", binary, commandline);
+    logger.debug("Running {} {}", binary, command);
 
     MediaContainerMetadata metadata = new MediaContainerMetadata();
 
     final StringBuilder sb = new StringBuilder();
+    Process encoderProcess = null;
     try {
-      ProcessInfo info = ProcessRunner.mk(binary, command.toArray(new String[command.size()]));
-      int exitCode = ProcessRunner.run(info, new Pred<String>() {
-        @Override
-        public Boolean apply(String s) {
-          logger.debug(s);
-          sb.append(s);
-          sb.append(System.getProperty("line.separator"));
-          return true;
+      encoderProcess = new ProcessBuilder(command)
+          .redirectError(ProcessBuilder.Redirect.DISCARD)
+          .start();
+
+      // tell encoder listeners about output
+      try (var in = new BufferedReader(new InputStreamReader(encoderProcess.getInputStream()))) {
+        String line;
+        while ((line = in.readLine()) != null) {
+          logger.debug(line);
+          sb.append(line).append(System.getProperty("line.separator"));
         }
-      }, fnLogError);
-      // Windows binary will return -1 when queried for options
-      if (exitCode != -1 && exitCode != 0 && exitCode != 255)
+      }
+      // wait until the task is finished
+      int exitCode = encoderProcess.waitFor();
+      if (exitCode != 0) {
         throw new MediaAnalyzerException("Frame analyzer " + binary + " exited with code " + exitCode);
-    } catch (IOException e) {
+      }
+    } catch (IOException | InterruptedException e) {
       logger.error("Error executing ffprobe", e);
-      throw new MediaAnalyzerException("Error while running ffprobe " + binary, e);
+      throw new MediaAnalyzerException("Error while running " + binary, e);
+    } finally {
+      IoSupport.closeQuietly(encoderProcess);
     }
 
     JSONParser parser = new JSONParser();
@@ -154,7 +158,7 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
       if (obj != null && (Long) obj > 0) {
         obj = jsonFormat.get("duration");
         if (obj != null) {
-          duration = new Double((String) obj) * 1000;
+          duration = Double.parseDouble((String) obj) * 1000;
           metadata.setDuration(duration.longValue());
         }
       }
@@ -162,13 +166,13 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
       /* File Size */
       obj = jsonFormat.get("size");
       if (obj != null) {
-        metadata.setSize(new Long((String) obj));
+        metadata.setSize(Long.parseLong((String) obj));
       }
 
       /* Bitrate */
       obj = jsonFormat.get("bit_rate");
       if (obj != null) {
-        metadata.setBitRate(new Float((String) obj));
+        metadata.setBitRate(Float.parseFloat((String) obj));
       }
 
       /* Loop through streams */
@@ -176,9 +180,7 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
        * FFprobe will return an empty stream array if there are no streams. Thus we do not need to check.
        */
       JSONArray streams = (JSONArray) jsonObject.get("streams");
-      Iterator<JSONObject> iterator = streams.iterator();
-      while (iterator.hasNext()) {
-        JSONObject stream = iterator.next();
+      for (JSONObject stream : (Iterable<JSONObject>) streams) {
         /* Check type of string */
         String codecType = (String) stream.get("codec_type");
 
@@ -311,7 +313,8 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
             if (obj != null) {
               vMetadata.setFrames(Long.parseLong((String) obj));
             } else if (vMetadata.getDuration() != null && vMetadata.getFrameRate() != null) {
-              long framesEstimation = Double.valueOf(vMetadata.getDuration() / 1000.0 * vMetadata.getFrameRate()).longValue();
+              long framesEstimation = Double.valueOf(vMetadata.getDuration() / 1000.0 * vMetadata.getFrameRate())
+                  .longValue();
               if (framesEstimation >= 1) {
                 vMetadata.setFrames(framesEstimation);
               }
@@ -365,13 +368,5 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
       return Float.parseFloat(val);
     }
   }
-
-  private static final Pred<String> fnLogError = new Pred<String>() {
-    @Override
-    public Boolean apply(String s) {
-      logger.debug(s);
-      return true;
-    }
-  };
 
 }

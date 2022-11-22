@@ -53,6 +53,8 @@ import org.opencastproject.workspace.api.Workspace;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,6 +82,13 @@ import java.util.regex.Pattern;
  * ffmpeg -nostats -i in.mp4 -filter:v 'select=gt(scene\,0.04),showinfo' -f null - 2&gt;&amp;1 | grep Parsed_showinfo_1
  * </pre>
  */
+@Component(
+    immediate = true,
+    service = { VideoSegmenterService.class,ManagedService.class },
+    property = {
+        "service.description=VideoSegmenter Service"
+    }
+)
 public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
     VideoSegmenterService, ManagedService {
 
@@ -949,6 +958,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
    * @param workspace
    *            an instance of the workspace
    */
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -959,6 +969,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
    * @param mpeg7CatalogService
    *            an instance of the mpeg7 catalog service
    */
+  @Reference(name = "Mpeg7Service")
   protected void setMpeg7CatalogService(
       Mpeg7CatalogService mpeg7CatalogService) {
     this.mpeg7CatalogService = mpeg7CatalogService;
@@ -970,6 +981,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
    * @param serviceRegistry
    *            the service registry
    */
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -990,6 +1002,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
    * @param securityService
    *            the securityService to set
    */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -1000,6 +1013,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
    * @param userDirectoryService
    *            the userDirectoryService to set
    */
+  @Reference
   public void setUserDirectoryService(
       UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
@@ -1011,6 +1025,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
    * @param organizationDirectory
    *            the organization directory
    */
+  @Reference
   public void setOrganizationDirectoryService(
       OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;

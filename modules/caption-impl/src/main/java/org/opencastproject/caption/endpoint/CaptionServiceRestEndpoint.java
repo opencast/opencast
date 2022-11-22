@@ -38,6 +38,11 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -68,6 +73,16 @@ import javax.xml.transform.stream.StreamResult;
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
                 + "other words, there is a bug! You should file an error report with your server logs from the time when the "
                 + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+@Component(
+    immediate = true,
+    service = CaptionServiceRestEndpoint.class,
+    property = {
+        "service.description=Caption REST Endpoint",
+        "opencast.service.type=org.opencastproject.caption",
+        "opencast.service.path=/caption",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -85,6 +100,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
    * @param cc
    *          OSGi component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     // String serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
   }
@@ -95,6 +111,11 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
    * @param service
    *          the caption service to set
    */
+  @Reference(
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "unsetCaptionService"
+  )
   protected void setCaptionService(CaptionService service) {
     this.service = service;
   }
@@ -115,6 +136,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

@@ -63,7 +63,7 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
 
   @XmlElement(name = "configuration")
   @XmlElementWrapper(name = "configurations")
-  protected Set<WorkflowConfiguration> configurations;
+  protected Set<JaxbWorkflowConfiguration> configurations;
 
   @XmlAttribute(name = "max-attempts")
   protected int maxAttempts;
@@ -178,7 +178,7 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
   public String getConfiguration(String key) {
     if (key == null || configurations == null)
       return null;
-    for (WorkflowConfiguration config : configurations) {
+    for (JaxbWorkflowConfiguration config : configurations) {
       if (config.getKey().equals(key))
         return config.getValue();
     }
@@ -193,8 +193,8 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
   public void removeConfiguration(String key) {
     if (key == null || configurations == null)
       return;
-    for (Iterator<WorkflowConfiguration> configIter = configurations.iterator(); configIter.hasNext();) {
-      WorkflowConfiguration config = configIter.next();
+    for (Iterator<JaxbWorkflowConfiguration> configIter = configurations.iterator(); configIter.hasNext();) {
+      JaxbWorkflowConfiguration config = configIter.next();
       if (config.getKey().equals(key)) {
         configIter.remove();
         return;
@@ -210,14 +210,14 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
   public void setConfiguration(String key, String value) {
     if (key == null || configurations == null)
       return;
-    for (WorkflowConfiguration config : configurations) {
+    for (JaxbWorkflowConfiguration config : configurations) {
       if (config.getKey().equals(key)) {
-        ((WorkflowConfigurationImpl) config).setValue(value);
+        config.setValue(value);
         return;
       }
     }
     // No configurations were found, so add a new one
-    configurations.add(new WorkflowConfigurationImpl(key, value));
+    configurations.add(new JaxbWorkflowConfiguration(key, value));
   }
 
   /**
@@ -229,7 +229,7 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
   public Set<String> getConfigurationKeys() {
     Set<String> set = new TreeSet<String>();
     if (configurations != null) {
-      for (WorkflowConfiguration config : configurations) {
+      for (JaxbWorkflowConfiguration config : configurations) {
         set.add(config.getKey());
       }
     }

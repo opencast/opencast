@@ -45,6 +45,10 @@ import org.apache.commons.io.IOUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +74,13 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 /** A service for big file uploads via HTTP. */
+@Component(
+    immediate = true,
+    service = { ManagedService.class,FileUploadService.class },
+    property = {
+        "service.description=Big File Upload Service"
+    }
+)
 public class FileUploadServiceImpl implements FileUploadService, ManagedService {
 
   private static final Logger logger = LoggerFactory.getLogger(FileUploadServiceImpl.class);
@@ -94,6 +105,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
   private int jobMaxTTL = DEFAULT_CLEANER_MAXTTL;
 
   // <editor-fold defaultstate="collapsed" desc="OSGi Service Stuff" >
+  @Activate
   protected synchronized void activate(ComponentContext cc) throws Exception {
     /* Ensure a working directory is set */
     if (workRoot == null) {
@@ -117,6 +129,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     logger.info("File Upload Service activated.");
   }
 
+  @Deactivate
   protected void deactivate(ComponentContext cc) {
     logger.info("File Upload Service deactivated");
     cleaner.shutdown();
@@ -140,10 +153,12 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     logger.info("Configuration updated. Jobs older than {} hours are deleted.", jobMaxTTL);
   }
 
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
+  @Reference
   protected void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }

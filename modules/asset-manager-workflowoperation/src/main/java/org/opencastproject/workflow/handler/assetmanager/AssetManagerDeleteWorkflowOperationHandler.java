@@ -26,14 +26,20 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +48,14 @@ import org.slf4j.LoggerFactory;
  *
  * @see AssetManager
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Asset Manager Delete Workflow Operation Handler",
+        "workflow.operation=asset-delete"
+    }
+)
 public class AssetManagerDeleteWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerDeleteWorkflowOperationHandler.class);
 
@@ -51,7 +65,14 @@ public class AssetManagerDeleteWorkflowOperationHandler extends AbstractWorkflow
   /** Configuration if last snapshot should not be deleted */
   private static final String OPT_LAST_SNAPSHOT = "keep-last-snapshot";
 
+  @Activate
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
+  }
+
   /** OSGi DI */
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -88,6 +109,12 @@ public class AssetManagerDeleteWorkflowOperationHandler extends AbstractWorkflow
       throw new WorkflowOperationException("Unable to delete episode from the asset manager", e);
     }
     return createResult(mediaPackage, Action.CONTINUE);
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
 }

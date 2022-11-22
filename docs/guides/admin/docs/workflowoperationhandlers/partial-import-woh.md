@@ -1,5 +1,5 @@
-Partial Import Operation
-========================
+Partial Import Workflow Operation
+=================================
 
 ID: `partial-import`
 

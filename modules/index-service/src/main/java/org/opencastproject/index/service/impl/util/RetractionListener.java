@@ -75,7 +75,6 @@ public final class RetractionListener implements WorkflowListener {
           logger.warn("Not authorized to delete retracted media package {}", mpId);
         } catch (NotFoundException e) {
           logger.warn("Unable to delete retracted media package {} because it could not be found", mpId);
-          retraction.getDoOnNotFound().run();
         } catch (Exception e) {
           logger.warn("Unable to delete retracted media package {}:", mpId, e);
         }

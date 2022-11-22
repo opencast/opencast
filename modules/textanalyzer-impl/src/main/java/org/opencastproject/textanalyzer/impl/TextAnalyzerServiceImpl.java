@@ -58,6 +58,9 @@ import org.opencastproject.workspace.api.Workspace;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +76,14 @@ import java.util.List;
 /**
  * Media analysis service that takes takes an image and returns text as extracted from that image.
  */
+@Component(
+    immediate = true,
+    service = { TextAnalyzerService.class,ManagedService.class },
+    property = {
+        "service.description=Text Analysis Service",
+        "service.pid=org.opencastproject.textanalyzer.impl.TextAnalyzerServiceImpl"
+    }
+)
 public class TextAnalyzerServiceImpl extends AbstractJobProducer implements TextAnalyzerService, ManagedService {
 
   /** The logging facility */
@@ -133,6 +144,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    *          the component context
    */
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating Text analyser service");
     super.activate(cc);
@@ -311,6 +323,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -331,6 +344,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @param textExtractor
    *          a text extractor implementation
    */
+  @Reference
   protected void setTextExtractor(TextExtractor textExtractor) {
     this.textExtractor = textExtractor;
   }
@@ -341,6 +355,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -351,6 +366,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @param mpeg7CatalogService
    *          an instance of the mpeg7 catalog service
    */
+  @Reference(name = "mpeg7service")
   protected void setMpeg7CatalogService(Mpeg7CatalogService mpeg7CatalogService) {
     this.mpeg7CatalogService = mpeg7CatalogService;
   }
@@ -361,6 +377,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @param dictionaryService
    *          an instance of the dicitonary service
    */
+  @Reference
   protected void setDictionaryService(DictionaryService dictionaryService) {
     this.dictionaryService = dictionaryService;
   }
@@ -371,6 +388,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @param securityService
    *          the securityService to set
    */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -381,6 +399,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -391,6 +410,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @param organizationDirectory
    *          the organization directory
    */
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }
@@ -431,6 +451,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
             serviceRegistry);
   }
 
+  @Reference(target = "(artifact=dictionary)")
   public void setReadinessIndicator(ReadinessIndicator readinessIndicator) {
     //Only activate service if ReadinessIndicator is registered.
   }

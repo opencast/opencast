@@ -56,6 +56,9 @@ import org.apache.commons.collections4.comparators.ComparatorChain;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,9 +81,18 @@ import javax.ws.rs.core.Response;
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
             ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
-            ApiMediaType.VERSION_1_7_0 })
+            ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0 })
 @RestService(name = "externalapiworkflowdefinitions", title = "External API Workflow Definitions Service", notes = {},
              abstractText = "Provides resources and operations related to the workflow definitions")
+@Component(
+    immediate = true,
+    service = WorkflowDefinitionsEndpoint.class,
+    property = {
+        "service.description=External API - Workflow Definitions Endpoint",
+        "opencast.service.type=org.opencastproject.external.workflows.definitions",
+        "opencast.service.path=/api/workflow-definitions"
+    }
+)
 public class WorkflowDefinitionsEndpoint {
 
   /**
@@ -103,6 +115,7 @@ public class WorkflowDefinitionsEndpoint {
   /**
    * OSGi DI
    */
+  @Reference
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
@@ -110,6 +123,7 @@ public class WorkflowDefinitionsEndpoint {
   /**
    * OSGi activation method
    */
+  @Activate
   void activate(ComponentContext cc) {
     logger.info("Activating External API - Workflow Definitions Endpoint");
   }
@@ -119,7 +133,7 @@ public class WorkflowDefinitionsEndpoint {
   @RestQuery(name = "getworkflowdefinitions", description = "Returns a list of workflow definition.", returnDescription = "", restParameters = {
           @RestParameter(name = "withoperations", description = "Whether the workflow operations should be included in the response", isRequired = false, type = BOOLEAN),
           @RestParameter(name = "withconfigurationpanel", description = "Whether the workflow configuration panel should be included in the response", isRequired = false, type = BOOLEAN),
-          @RestParameter(name = "filter", description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form <Filter Name>:<Value to Filter With>.", isRequired = false, type = STRING),
+          @RestParameter(name = "filter", description = "Usage [Filter Name]:[Value to Filter With]. Available filter: \"tag\"", isRequired = false, type = STRING),
           @RestParameter(name = "sort", description = "Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory.", isRequired = false, type = STRING),
           @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.", isRequired = false, type = INTEGER),
           @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false, type = INTEGER) }, responses = {

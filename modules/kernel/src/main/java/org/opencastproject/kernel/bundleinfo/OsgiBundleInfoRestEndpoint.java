@@ -21,13 +21,26 @@
 
 package org.opencastproject.kernel.bundleinfo;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import javax.ws.rs.Path;
 
 /** OSGi bound implementation. */
 @Path("/")
+@Component(
+    immediate = true,
+    service = OsgiBundleInfoRestEndpoint.class,
+    property = {
+        "service.description=System BundleInfo REST Endpoint",
+        "opencast.service.type=org.opencastproject.kernel.bundleinfo",
+        "opencast.service.path=/sysinfo"
+    }
+)
 public class OsgiBundleInfoRestEndpoint extends BundleInfoRestEndpoint {
   private BundleInfoDb db;
 
+  @Reference
   public void setDb(BundleInfoDb db) {
     this.db = db;
   }

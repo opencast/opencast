@@ -32,16 +32,16 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.MimeTypes;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.handler.inspection.InspectWorkflowOperationHandler;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
@@ -142,8 +142,11 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     String encodedXml2 = MediaPackageElementParser.getArrayAsXml(Arrays.asList(encodedTracks2));
     // set up mock workspace
     workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.moveTo((URI) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-            (String) EasyMock.anyObject(), (String) EasyMock.anyObject())).andReturn(uriMP);
+    final Capture<String> capture = EasyMock.newCapture();
+    EasyMock.expect(workspace.toSafeName(EasyMock.capture(capture))).andAnswer(capture::getValue).anyTimes();
+    EasyMock.expect(
+        workspace.moveTo(EasyMock.anyObject(), EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString()))
+        .andReturn(uriMP);
     EasyMock.replay(workspace);
 
     // set up mock receipt
@@ -194,8 +197,11 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     encodedTracks = mpHLS.getTracks();
     // set up mock workspace
     workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.moveTo((URI) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-            (String) EasyMock.anyObject(), (String) EasyMock.anyObject())).andReturn(uriMPHLS).anyTimes();
+    final Capture<String> capture = EasyMock.newCapture();
+    EasyMock.expect(workspace.toSafeName(EasyMock.capture(capture))).andAnswer(capture::getValue).anyTimes();
+    EasyMock.expect(
+        workspace.moveTo(EasyMock.anyObject(), EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString()))
+        .andReturn(uriMPHLS).anyTimes();
     EasyMock.replay(workspace);
 
     // set up mock receipt for HLS job
@@ -348,7 +354,7 @@ public class MultiEncodeWorkflowOperationHandlerTest {
   public void testComposeEncodedTrackOneFlavor() throws Exception {
     // operation configuration - single segment
     String targetTags = "archive,work";
-    Map<String, String> configurations = new HashMap<String, String>();
+    Map<String, String> configurations = new HashMap<>();
     configurations.put("source-flavors", "presentation/source");
     configurations.put("target-tags", targetTags); // one
     configurations.put("target-flavors", "*/work");
@@ -362,13 +368,13 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     Track[] tracksEncoded = mpNew.getTracks();
     Track trackEncoded;
 
-    Assert.assertTrue(tracksEncoded.length == 4);
+    Assert.assertEquals(4, tracksEncoded.length);
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID1);
-    Assert.assertTrue("presentation/work".equals(trackEncoded.getFlavor().toString()));
+    Assert.assertEquals("presentation/work", trackEncoded.getFlavor().toString());
     String[] tags = (PROFILE1_ID + "," + targetTags).split(",");
     Arrays.sort(tags);
     Assert.assertArrayEquals(tags, trackEncoded.getTags());
-    Assert.assertTrue(SOURCE_TRACK_ID2.equals(trackEncoded.getReference().getIdentifier()));
+    Assert.assertEquals(SOURCE_TRACK_ID2, trackEncoded.getReference().getIdentifier());
 
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID2);
     Assert.assertTrue("presentation/work".equals(trackEncoded.getFlavor().toString()));
@@ -547,11 +553,11 @@ public class MultiEncodeWorkflowOperationHandlerTest {
   private WorkflowOperationResult getWorkflowOperationResult(MediaPackage mp, Map<String, String> configurations)
           throws WorkflowOperationException {
     // Add the mediapackage to a workflow instance
-    WorkflowInstanceImpl workflowInstance = new WorkflowInstanceImpl();
+    WorkflowInstance workflowInstance = new WorkflowInstance();
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowState.RUNNING);
     workflowInstance.setMediaPackage(mp);
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("op", OperationState.RUNNING);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("op", OperationState.RUNNING);
     operation.setTemplate("multiencode");
     operation.setState(OperationState.RUNNING);
     for (String key : configurations.keySet()) {

@@ -29,6 +29,7 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.TrackSelector;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilResponse;
 import org.opencastproject.smil.api.SmilService;
@@ -38,6 +39,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
@@ -47,6 +49,8 @@ import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -68,6 +72,14 @@ import javax.xml.bind.JAXBException;
 /**
  * The workflow definition for converting a smil containing cut marks into a legal smil for cutting
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Cut Marks To Smil Operation Handler",
+        "workflow.operation=cut-marks-to-smil"
+    }
+)
 public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** Workflow configuration keys */
@@ -92,6 +104,7 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -100,6 +113,8 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
    * The SMIL service to modify SMIL files.
    */
   private SmilService smilService;
+
+  @Reference
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }
@@ -289,4 +304,11 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
 
     return mediaFile.getAbsolutePath();
   }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

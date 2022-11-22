@@ -28,23 +28,35 @@ import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.serviceregistry.api.NopService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.Log;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Incident Creator Operation Handler",
+        "workflow.operation=incident"
+    }
+)
 public class IncidentCreatorWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   private static final Log log = Log.mk(IncidentCreatorWorkflowOperationHandler.class);
 
@@ -85,7 +97,15 @@ public class IncidentCreatorWorkflowOperationHandler extends AbstractWorkflowOpe
   }
 
   /** OSGi DI. */
+  @Reference
   public void setNopService(NopService nopService) {
     this.nopService = nopService;
   }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

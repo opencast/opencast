@@ -78,7 +78,7 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
   /**
    * OSGi DI.
    */
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

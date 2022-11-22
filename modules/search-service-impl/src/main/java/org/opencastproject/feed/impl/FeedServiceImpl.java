@@ -41,6 +41,10 @@ import com.rometools.rome.io.SyndFeedOutput;
 import com.rometools.rome.io.WireFeedOutput;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,6 +88,17 @@ import javax.ws.rs.core.Variant;
  * If the feed could not be found because the query is unknown a HTTP error 404 is returned
  * If the feed could not be build (wrong RSS or Atom version, corrupt data, etc) an HTTP error 500 is returned.
  */
+@Component(
+    immediate = true,
+    name = "org.opencastproject.feed.impl.FeedServlet",
+    service = FeedServiceImpl.class,
+    property = {
+        "service.description=Feed Service",
+        "opencast.service.type=org.opencastproject.feed.impl.FeedServiceImpl",
+        "opencast.service.path=/feeds",
+        "opencast.service.jobproducer=false"
+    }
+)
 public class FeedServiceImpl {
 
   /** The serial version uid */
@@ -298,6 +313,11 @@ public class FeedServiceImpl {
    * @param generator
    *          the generator
    */
+  @Reference(
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeFeedGenerator"
+  )
   public void addFeedGenerator(FeedGenerator generator) {
     logger.info("Registering '{}' feed", generator.getIdentifier());
     feeds.add(generator);
@@ -320,10 +340,12 @@ public class FeedServiceImpl {
    * @param securityService
    *          the security service
    */
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference(target = "(artifact=feed)")
   public void setProfilesReadyIndicator(ReadinessIndicator readyIndicator) {
     //Only activate service if ReadinessIndicator is registered.
   }

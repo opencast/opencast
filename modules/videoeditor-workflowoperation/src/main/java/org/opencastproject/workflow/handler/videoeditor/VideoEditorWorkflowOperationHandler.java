@@ -36,6 +36,7 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.mediapackage.selector.TrackSelector;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilResponse;
 import org.opencastproject.smil.api.SmilService;
@@ -49,6 +50,7 @@ import org.opencastproject.videoeditor.api.VideoEditorService;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -60,6 +62,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -77,6 +83,14 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Video Editor Workflow Operation Handler",
+        "workflow.operation=editor"
+    }
+)
 public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperationHandlerBase {
 
   private static final Logger logger = LoggerFactory.getLogger(VideoEditorWorkflowOperationHandler.class);
@@ -131,11 +145,18 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
   private Workspace workspace;
 
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
     super.activate(cc);
     setHoldActionTitle("Review / VideoEdit");
     registerHoldStateUserInterface(HOLD_UI_PATH);
     logger.info("Registering videoEditor hold state ui from classpath {}", HOLD_UI_PATH);
+  }
+
+  @Deactivate
+  @Override
+  public void deactivate() {
+    super.deactivate();
   }
 
   @Override
@@ -298,7 +319,7 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
           throws WorkflowOperationException {
     // If we do not hold for trim, we still need to put tracks in the mediapackage with the target flavor
     MediaPackage mp = workflowInstance.getMediaPackage();
-    logger.info("Skip video editor operation for mediapackage {}", mp.getIdentifier().toString());
+    logger.info("Skip video editor operation for mediapackage {}", mp.getIdentifier());
 
     // Get configuration
     // Check which tags have been configured
@@ -617,15 +638,25 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     return smilResponse.getSmil();
   }
 
+  @Reference
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }
 
+  @Reference
   public void setVideoEditorService(VideoEditorService editor) {
     videoEditorService = editor;
   }
 
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

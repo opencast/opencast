@@ -21,6 +21,8 @@
 
 package org.opencastproject.videoeditor.impl;
 
+import static org.opencastproject.videoeditor.impl.VideoEditorProperties.SUBTITLE_GRACE_PERIOD;
+
 import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.AbstractJobProducer;
@@ -49,6 +51,10 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.videoeditor.api.ProcessFailedException;
 import org.opencastproject.videoeditor.api.VideoEditorService;
 import org.opencastproject.videoeditor.ffmpeg.FFmpegEdit;
+import org.opencastproject.videoeditor.subtitle.webvtt.WebVTTParser;
+import org.opencastproject.videoeditor.subtitle.webvtt.WebVTTSubtitle;
+import org.opencastproject.videoeditor.subtitle.webvtt.WebVTTSubtitleCue;
+import org.opencastproject.videoeditor.subtitle.webvtt.WebVTTWriter;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
@@ -57,11 +63,16 @@ import org.apache.commons.io.IOUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -80,6 +91,13 @@ import javax.xml.bind.JAXBException;
 /**
  * Implementation of VideoeditorService using FFMPEG
  */
+@Component(
+    immediate = true,
+    service = { VideoEditorService.class,ManagedService.class },
+    property = {
+        "service.description=Video Editor Service"
+    }
+)
 public class VideoEditorServiceImpl extends AbstractJobProducer implements VideoEditorService, ManagedService {
 
   public static final String JOB_LOAD_KEY = "job.load.videoeditor";
@@ -154,6 +172,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     SmilMediaParamGroup trackParamGroup;
     ArrayList<String> inputfile = new ArrayList<>();
     ArrayList<VideoClip> videoclips = new ArrayList<>();
+    ArrayList<VideoClip> refElements = new ArrayList<>();
     try {
       trackParamGroup = (SmilMediaParamGroup) smil.get(trackParamGroupId);
     } catch (SmilException ex) {
@@ -194,24 +213,10 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       throw new ProcessFailedException("Deserialization of source track " + sourceTrackUri + " failed", e);
     }
 
-    // get output file extension
-    String outputFileExtension = properties.getProperty(VideoEditorProperties.DEFAULT_EXTENSION, ".mp4");
-    outputFileExtension = properties.getProperty(VideoEditorProperties.OUTPUT_FILE_EXTENSION, outputFileExtension);
-
-    if (!outputFileExtension.startsWith(".")) {
-      outputFileExtension = '.' + outputFileExtension;
-    }
-
     // create working directory
     File tempDirectory = new File(new File(workspace.rootDirectory()), "editor");
     tempDirectory = new File(tempDirectory, Long.toString(job.getId()));
-    String filename = String.format("%s-%s%s", sourceTrackFlavor,
-        FilenameUtils.removeExtension(sourceFile.getName()), outputFileExtension);
-    File outputPath = new File(tempDirectory, filename);
 
-    if (!outputPath.getParentFile().exists()) {
-      outputPath.getParentFile().mkdirs();
-    }
     URI newTrackURI;
     inputfile.add(sourceFile.getAbsolutePath()); // default source - add to source table as 0
     int srcIndex = inputfile.indexOf(sourceFile.getAbsolutePath()); // index = 0
@@ -254,33 +259,120 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
                     index = srcIndex; // default src
                   }
 
-                  videoclips.add(new VideoClip(index, begin / 1000.0, end / 1000.0));
+                  // Sort out ref elements
+                  if (media.getMediaType() == SmilMediaElement.MediaType.REF) {
+                    refElements.add(new VideoClip(index, begin, end));
+                  } else {
+                    videoclips.add(new VideoClip(index, begin, end));
+                  }
                 }
               } else {
                 throw new ProcessFailedException("Smil container '"
                         + ((SmilMediaContainer) elementChild).getContainerType().toString()
-                        + "'is not supportet yet");
+                        + "'is not supported yet");
               }
             }
           } else {
             throw new ProcessFailedException("Smil container '"
-                    + container.getContainerType().toString() + "'is not supportet yet");
+                    + container.getContainerType().toString() + "'is not supported yet");
           }
         }
       }
-      List<VideoClip> cleanclips = sortSegments(videoclips);    // remove very short cuts that will look bad
-      String error = null;
-      String outputResolution = "";    //TODO: fetch the largest output resolution from SMIL.head.layout.root-layout
-      // When outputResolution is set to WxH, all clips are scaled to that size in the output video.
-      // TODO: Each clips could have a region id, relative to the root-layout
-      // Then each clip is zoomed/panned/padded to WxH befor concatenation
-      FFmpegEdit ffmpeg = new FFmpegEdit(properties);
-      error = ffmpeg.processEdits(inputfile, outputPath.getAbsolutePath(), outputResolution, cleanclips,
-              sourceTrack.hasAudio(), sourceTrack.hasVideo());
 
-      if (error != null) {
-        FileUtils.deleteQuietly(tempDirectory);
-        throw new ProcessFailedException("Editing pipeline exited abnormaly! Error: " + error);
+      // Don't mix video/audio and subtitles
+      if (videoclips.size() > 0 && refElements.size() > 0) {
+        throw new ProcessFailedException("Can not process media elements together with ref elements. "
+                + "There likely is an error in the SMIL file");
+      }
+
+      // get output file extension
+      String outputFileExtension = null;
+      if (videoclips.size() > 0) {
+        outputFileExtension = properties.getProperty(VideoEditorProperties.DEFAULT_EXTENSION, ".mp4");
+      }
+      if (refElements.size() > 0) {
+        String extension = FilenameUtils.getExtension(sourceTrackUri);
+        if (VideoEditorProperties.WEBVTT_EXTENSION.equals(extension)) {
+          outputFileExtension = properties.getProperty(VideoEditorProperties.WEBVTT_EXTENSION, ".vtt");
+        }
+      }
+      outputFileExtension = properties.getProperty(VideoEditorProperties.OUTPUT_FILE_EXTENSION, outputFileExtension);
+
+      if (!outputFileExtension.startsWith(".")) {
+        outputFileExtension = '.' + outputFileExtension;
+      }
+
+      String filename = String.format("%s-%s%s", sourceTrackFlavor,
+              FilenameUtils.removeExtension(sourceFile.getName()), outputFileExtension);
+      File outputPath = new File(tempDirectory, filename);
+
+      if (!outputPath.getParentFile().exists()) {
+        outputPath.getParentFile().mkdirs();
+      }
+
+      // If we are cutting video/audio, use ffmpeg
+      if (videoclips.size() > 0) {
+        List<VideoClip> cleanclips = sortSegments(videoclips);    // remove very short cuts that will look bad
+        String error = null;
+        String outputResolution = "";    //TODO: fetch the largest output resolution from SMIL.head.layout.root-layout
+        // When outputResolution is set to WxH, all clips are scaled to that size in the output video.
+        // TODO: Each clips could have a region id, relative to the root-layout
+        // Then each clip is zoomed/panned/padded to WxH before concatenation
+        FFmpegEdit ffmpeg = new FFmpegEdit(properties);
+        error = ffmpeg.processEdits(inputfile, outputPath.getAbsolutePath(), outputResolution, cleanclips,
+                sourceTrack.hasAudio(), sourceTrack.hasVideo());
+
+        if (error != null) {
+          FileUtils.deleteQuietly(tempDirectory);
+          throw new ProcessFailedException("Editing pipeline exited abnormally! Error: " + error);
+        }
+      }
+
+      // If we are cutting ref elements, check if they are subtitle files
+      // Or give up
+      // TODO: It might be better if subtitle tracks were assigned the mediatype "texttrack" in the first place
+      if (refElements.size() > 0) {
+        List<VideoClip> cleanclips = sortSegments(refElements);    // remove very short cuts that will look bad
+        String extension = FilenameUtils.getExtension(sourceTrackUri);
+        if (VideoEditorProperties.WEBVTT_EXTENSION.equals(extension)) {
+          // Parse
+          WebVTTParser parser = new WebVTTParser();
+          WebVTTSubtitle subtitle;
+          try (FileInputStream fin = new FileInputStream(sourceFile)) {
+            subtitle = parser.parse(fin);
+          }
+
+          // Edit
+          List<WebVTTSubtitleCue> cutCues = new ArrayList<>();
+          double removedTime = 0;
+          for (int i = 0; i < cleanclips.size(); i++) {
+            if (i == 0) {
+              removedTime = removedTime
+                  + cleanclips.get(i).getStartInMilliseconds();
+            } else {
+              removedTime = removedTime
+                  + cleanclips.get(i).getStartInMilliseconds()
+                  - cleanclips.get(i - 1).getEndInMilliseconds();
+            }
+            for (WebVTTSubtitleCue cue : subtitle.getCues()) {
+              if ((cleanclips.get(i).getStartInMilliseconds() - SUBTITLE_GRACE_PERIOD) <= cue.getStartTime()
+                      && (cleanclips.get(i).getEndInMilliseconds() + SUBTITLE_GRACE_PERIOD) >= cue.getEndTime()) {
+                cue.setStartTime((long) (cue.getStartTime() - removedTime));
+                cue.setEndTime((long) (cue.getEndTime() - removedTime));
+                cutCues.add(cue);
+              }
+            }
+          }
+          subtitle.setCues(cutCues);
+
+          // Write
+          try (FileOutputStream fos = new FileOutputStream(outputPath)) {
+            WebVTTWriter writer = new WebVTTWriter();
+            writer.write(subtitle, fos);
+          }
+        } else {
+          throw new ProcessFailedException("The video editor does not support the following file: " + sourceTrackUri);
+        }
       }
 
       // create Track for edited file
@@ -305,7 +397,16 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       Track editedTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
       logger.info("Finished editing track {}", editedTrack);
       editedTrack.setIdentifier(newTrackId);
-      editedTrack.setFlavor(new MediaPackageElementFlavor(sourceTrackFlavor.getType(), SINK_FLAVOR_SUBTYPE));
+      if (videoclips.size() > 0) {
+        editedTrack.setFlavor(new MediaPackageElementFlavor(sourceTrackFlavor.getType(), SINK_FLAVOR_SUBTYPE));
+      }
+      if (refElements.size() > 0) {
+        String extension = FilenameUtils.getExtension(sourceTrackUri);
+        if (VideoEditorProperties.WEBVTT_EXTENSION.equals(extension)) {
+          editedTrack.setFlavor(new MediaPackageElementFlavor(sourceTrackFlavor.getType(),
+                  sourceTrackFlavor.getSubtype() + "+" + SINK_FLAVOR_SUBTYPE));
+        }
+      }
 
       return editedTrack;
 
@@ -342,14 +443,14 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
    * Otherwise it can be very slow to run and output will be ugly because of the cross fades
    */
   private static List<VideoClip> sortSegments(List<VideoClip> edits) {
-    LinkedList<VideoClip> ll = new LinkedList<VideoClip>();
-    List<VideoClip> clips = new ArrayList<VideoClip>();
+    LinkedList<VideoClip> ll = new LinkedList<>();
+    List<VideoClip> clips = new ArrayList<>();
     Iterator<VideoClip> it = edits.iterator();
     VideoClip clip;
     VideoClip nextclip;
     while (it.hasNext()) {     // Check for legal durations
       clip = it.next();
-      if (clip.getDuration() > 2) { // Keep segments at least 2 seconds long
+      if (clip.getDurationInSeconds() > 2) { // Keep segments at least 2 seconds long
         ll.add(clip);
       }
     }
@@ -358,8 +459,8 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       if (ll.peek() != null) {
         nextclip = ll.pop();  // check next consecutive segment
         // collapse two segments into one
-        if ((nextclip.getSrc() == clip.getSrc()) && (nextclip.getStart() - clip.getEnd()) < 2) {
-          clip.setEnd(nextclip.getEnd());   // by using inpt of seg 1 and outpoint of seg 2
+        if (nextclip.getSrc() == clip.getSrc() && nextclip.getStartInSeconds() - clip.getEndInSeconds() < 2) {
+          clip.setEnd(nextclip.getEndInMilliseconds());   // by using inpt of seg 1 and outpoint of seg 2
         } else {
           clips.add(clip);   // keep last segment
           clip = nextclip;   // check next segment
@@ -374,7 +475,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
    * {@inheritDoc}
    *
    * @see
-   * org.opencastproject.videoeditor.api.VideoEditorService#processSmil(org.opencastproject.smil.entity.Smil)
+   * org.opencastproject.videoeditor.api.VideoEditorService#processSmil(org.opencastproject.smil.entity.api.Smil)
    */
   @Override
   public List<Job> processSmil(Smil smil) throws ProcessFailedException {
@@ -438,12 +539,14 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
   }
 
   @Override
+  @Activate
   public void activate(ComponentContext context) {
     logger.debug("activating...");
     super.activate(context);
     FFmpegEdit.init(context.getBundleContext());
   }
 
+  @Deactivate
   protected void deactivate(ComponentContext context) {
     logger.debug("deactivating...");
   }
@@ -466,30 +569,37 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     jobload = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_KEY, DEFAULT_JOB_LOAD, serviceRegistry);
   }
 
+  @Reference
   public void setMediaInspectionService(MediaInspectionService inspectionService) {
     this.inspectionService = inspectionService;
   }
 
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
+  @Reference
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }

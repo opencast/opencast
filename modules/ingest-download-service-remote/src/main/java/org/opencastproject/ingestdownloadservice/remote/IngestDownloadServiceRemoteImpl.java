@@ -26,7 +26,9 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 
 import org.apache.http.HttpResponse;
@@ -34,6 +36,8 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +48,13 @@ import java.util.List;
 /**
  * Remote implementation of the ingest download service
  */
+@Component(
+    immediate = true,
+    service = IngestDownloadService.class,
+    property = {
+        "service.description=Calls Ingest Download Service"
+    }
+)
 public class IngestDownloadServiceRemoteImpl extends RemoteBase implements IngestDownloadService {
 
   /** The logger */
@@ -104,5 +115,17 @@ public class IngestDownloadServiceRemoteImpl extends RemoteBase implements Inges
       closeConnection(response);
     }
   }
-}
 
+  @Reference
+  @Override
+  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
+    super.setTrustedHttpClient(trustedHttpClient);
+  }
+
+  @Reference
+  @Override
+  public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
+    super.setRemoteServiceManager(serviceRegistry);
+  }
+
+}

@@ -261,6 +261,98 @@
   </div>
 </div>
 
+<div class="modal-content" ng-if="wizard.step.visible" data-modal-tab-content="tobira">
+  <div class="modal-body">
+
+    <div data-admin-ng-notifications="" context="series-tobira"></div>
+
+    <div class="full-col">
+      <div class="obj">
+        <header class="no-expand" translate="EVENTS.SERIES.NEW.TOBIRA.CAPTION"><!-- Caption --></header>
+        <div class="obj-container padded">
+          <ul>
+            <li>
+              <p translate="EVENTS.SERIES.NEW.TOBIRA.DESCRIPTION">
+                <!-- Tobira Dialog Explanation Text -->
+              </p>
+            </li>
+          </ul>
+        </div>
+        <div class="obj-container padded" ng-if="!wizard.step.error">
+          <div class="obj">
+            <header>
+              <span translate="EVENTS.SERIES.NEW.TOBIRA.SELECT_PAGE"><!-- Select a page --></span>
+            </header>
+            <nav class="breadcrumb">
+              <a class="breadcrumb-link" ng-repeat="breadcrumb in wizard.step.ud.breadcrumbs" ng-click="wizard.step.back($index)">
+                {{breadcrumb.segment === '' ? ('EVENTS.SERIES.NEW.TOBIRA.HOMEPAGE' | translate) : breadcrumb.title}}
+              </a>
+            </nav>
+            <div class="obj-container">
+              <table class="main-tbl highlight-hover">
+                <thead>
+                  <tr>
+                    <th translate="EVENTS.SERIES.NEW.TOBIRA.PAGE_TITLE">
+                      <!-- Page Title -->
+                    </th>
+                    <th translate="EVENTS.SERIES.NEW.TOBIRA.PATH_SEGMENT">
+                      <!-- Path segment -->
+                    </th>
+                    <th class="medium" translate="EVENTS.SERIES.NEW.TOBIRA.SUBPAGES">
+                      <!-- Subpages -->
+                    </th>
+                    <th ng-if="wizard.step.editing" class="tiny"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="page in wizard.step.currentPage.children" ng-class="{ info: page === wizard.step.ud.selectedPage }">
+                    <td ng-switch="!!page.new">
+                      <input ng-switch-when="true" placeholder="{{ 'EVENTS.SERIES.NEW.TOBIRA.PAGE_TITLE' | translate }}" ng-model="page.title">
+                      <a ng-switch-when="false" ng-class="{ 'tobira-selectable': !page.blocks.length }" ng-click="page.blocks.length || wizard.step.select(page)">{{page.title}}</a>
+                    </td>
+                    <td ng-switch="!!page.new">
+                      <code class="tobira-path">
+                        <input ng-switch-when="true" placeholder="{{ 'EVENTS.SERIES.NEW.TOBIRA.PATH_SEGMENT' | translate }}" ng-model="page.segment" ng-change="wizard.step.updatePath(page)">
+                        <span ng-switch-when="false">{{page.segment}}</span>
+                      </code>
+                    </td>
+                    <td>
+                      <a ng-if="!page.new || wizard.step.isValid() && page.title" class="details-link" translate="EVENTS.SERIES.NEW.TOBIRA.SUBPAGES" ng-click="wizard.step.goto(page)"><!-- Subpages --></a>
+                    </td>
+                    <td ng-if="wizard.step.editing">
+                      <a ng-if="page.new" ng-click="wizard.step.select(null)" title="{{ 'EVENTS.SERIES.NEW.TOBIRA.CANCEL' | translate }}" class="remove"></a>
+                    </td>
+                  </tr>
+                  <tr ng-if="!wizard.step.editing">
+                    <td colspan="3">
+                      <a ng-click="wizard.step.addChild()">+ {{'EVENTS.SERIES.NEW.TOBIRA.ADD_SUBPAGE' | translate}}</a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="obj-container padded">
+          <ul>
+            <li ng-switch="!!wizard.step.ud.selectedPage && wizard.step.isValid()">
+              <div data-admin-ng-notifications="" context="series-tobira-new"></div>
+              <div data-admin-ng-notifications="" context="series-tobira-existing"></div>
+              <p ng-switch-when="true">
+                {{'EVENTS.SERIES.NEW.TOBIRA.SELECTED_PAGE' | translate}}:
+                <code class="tobira-path">{{wizard.step.ud.selectedPage.path}}</code>
+              </p>
+              <p ng-switch-when="false" translate="EVENTS.SERIES.NEW.TOBIRA.NO_PAGE_SELECTED">
+                <!-- Series will not be mounted in Tobira -->
+              </p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-content" data-modal-tab-content="summary" data-level="1">
   <div class="modal-body">
     <div class="full-col">
@@ -328,10 +420,26 @@
           <table class="main-tbl">
             <tr>
               <td translate="EVENTS.SERIES.NEW.THEME.CAPTION"><!-- Caption --></td>
-              <td ng-if="wizard.getStateControllerByName('theme').ud.theme && wizard.getStateControllerByName('theme').themes[wizard.getStateControllerByName('theme').ud.theme]">
+              <td>
                 {{wizard.getStateControllerByName('theme').themes[wizard.getStateControllerByName('theme').ud.theme].name}}
               </td>
 
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="obj tbl-list" ng-if="wizard.getStateControllerByName('tobira').ud.selectedPage">
+        <header class="no-expand" translate="EVENTS.SERIES.NEW.TOBIRA.CAPTION"><!-- Caption --></header>
+        <div class="obj-container">
+          <table class="main-tbl">
+            <tr>
+              <td translate="EVENTS.SERIES.NEW.TOBIRA.PATH"><!-- Path --></td>
+              <td>
+                <code class="tobira-path">
+                  {{wizard.getStateControllerByName('tobira').ud.selectedPage.path}}
+                </code>
+              </td>
             </tr>
           </table>
         </div>

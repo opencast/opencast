@@ -171,7 +171,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
   /** LTI roles a user must have, so a JpaUserReference is created */
   private List<String> ltiRolesForUserCreation;
 
-  @Reference(name = "UserDetailsService")
+  @Reference
   public void setUserDetailsService(UserDetailsService userDetailsService) {
     this.userDetailsService = userDetailsService;
   }
@@ -182,7 +182,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
    * @param userReferenceProvider
    *          the user reference provider
    */
-  @Reference(name = "ReferenceProvider")
+  @Reference
   public void setUserReferenceProvider(UserReferenceProvider userReferenceProvider) {
     this.userReferenceProvider = userReferenceProvider;
   }
@@ -193,7 +193,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
    * @param securityService
    *          the security service
    */
-  @Reference(name = "SecurityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

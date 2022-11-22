@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -101,15 +101,6 @@
             <Private-Package>
               org.opencastproject.caption.util
             </Private-Package>
-            <Service-Component>
-              OSGI-INF/caption-service.xml,
-              OSGI-INF/converters/dfxp-caption-converter.xml,
-              OSGI-INF/converters/subrip-caption-converter.xml,
-              OSGI-INF/converters/mpeg7-caption-converter.xml,
-              OSGI-INF/converters/google-speech-caption-converter.xml,
-              OSGI-INF/converters/ibm-watson-caption-converter.xml,
-              OSGI-INF/converters/webvtt-caption-converter.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

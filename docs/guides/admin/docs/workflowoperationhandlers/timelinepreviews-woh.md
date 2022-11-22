@@ -1,5 +1,7 @@
-TimelinePreviewsWorkflowOperationHandler
-========================================
+Timeline Previews Workflow Operation
+====================================
+
+ID: `timelinepreviews`
 
 Description
 -----------
@@ -27,8 +29,8 @@ Operation Example
 
 ```xml
 <operation
-  id="timelinepreviews"
-  description="Creating presentation timeline preview images">
+    id="timelinepreviews"
+    description="Creating presentation timeline preview images">
   <configurations>
     <configuration key="source-flavor">*/trimmed</configuration>
     <configuration key="target-flavor">*/timeline+preview</configuration>

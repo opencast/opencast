@@ -53,7 +53,6 @@ import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
@@ -81,6 +80,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,6 +100,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Component(
+    immediate = true,
+    service = { TranscriptionService.class,GoogleSpeechTranscriptionService.class },
+    property = {
+        "service.description=Google Speech Transcription Service",
+        "provider=google.speech"
+    }
+)
 public class GoogleSpeechTranscriptionService extends AbstractJobProducer implements TranscriptionService {
 
   /**
@@ -208,6 +218,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     super(JOB_TYPE);
   }
 
+  @Activate
   public void activate(ComponentContext cc) {
     // Has this service been enabled?
     enabled = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), ENABLED_CONFIG).get();
@@ -361,15 +372,19 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
   }
 
   @Override
-  public Job startTranscription(String mpId, Track track, String language) throws TranscriptionServiceException {
+  public Job startTranscription(String mpId, Track track, String... args) throws TranscriptionServiceException {
     if (!enabled) {
       throw new TranscriptionServiceException(
               "This service is disabled. If you want to enable it, please update the service configuration.");
     }
 
+    if (args.length == 0) {
+      throw new IllegalArgumentException("Additional language argument is required.");
+    }
+
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.StartTranscription.name(),
-              Arrays.asList(mpId, MediaPackageElementParser.getAsXml(track), language));
+              Arrays.asList(mpId, MediaPackageElementParser.getAsXml(track), args[0]));
     } catch (ServiceRegistryException e) {
       throw new TranscriptionServiceException("Unable to create a job", e);
     } catch (MediaPackageException e) {
@@ -432,6 +447,11 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
   @Override
   public String getLanguage() {
     return defaultLanguage;
+  }
+
+  @Override
+  public Map<String, Object> getReturnValues(String mpId, String jobId) throws TranscriptionServiceException {
+    throw new TranscriptionServiceException("Method not implemented");
   }
 
   @Override
@@ -706,7 +726,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     JSONArray resultsArray = getTranscriptionResult(jsonObj);
     if (resultsArray != null) {
       // Save the results into a collection
-      workspace.putInCollection(TRANSCRIPT_COLLECTION, buildResultsFileName(jobId),
+      workspace.putInCollection(TRANSCRIPT_COLLECTION, jobId + ".json",
               new ByteArrayInputStream(jsonObj.toJSONString().getBytes()));
     }
   }
@@ -732,7 +752,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       }
 
       // Results already saved?
-      URI uri = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, buildResultsFileName(jobId));
+      URI uri = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, jobId + ".json");
       try {
         workspace.get(uri);
       } catch (Exception e) {
@@ -896,10 +916,6 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     }
   }
 
-  private String buildResultsFileName(String jobId) {
-    return PathSupport.toSafeName(jobId + ".json");
-  }
-
   private void cancelTranscription(String jobId, String message) {
     try {
       database.updateJobControl(jobId, TranscriptionJobControl.Status.Canceled.name());
@@ -951,42 +967,52 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     return 0;
   }
 
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
+  @Reference
   public void setSmtpService(SmtpService service) {
     this.smtpService = service;
   }
 
+  @Reference
   public void setWorkspace(Workspace ws) {
     this.workspace = ws;
   }
 
+  @Reference
   public void setWorkingFileRepository(WorkingFileRepository wfr) {
     this.wfr = wfr;
   }
 
+  @Reference
   public void setDatabase(TranscriptionDatabase service) {
     this.database = service;
   }
 
+  @Reference
   public void setAssetManager(AssetManager service) {
     this.assetManager = service;
   }
 
+  @Reference
   public void setWorkflowService(WorkflowService service) {
     this.workflowService = service;
   }

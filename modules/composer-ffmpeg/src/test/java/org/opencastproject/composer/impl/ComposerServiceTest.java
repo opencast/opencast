@@ -181,6 +181,8 @@ public class ComposerServiceTest {
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
 
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
+    final Capture<String> capture = EasyMock.newCapture();
+    EasyMock.expect(workspace.toSafeName(EasyMock.capture(capture))).andAnswer(capture::getValue).anyTimes();
     EasyMock.expect(workspace.get(EasyMock.anyObject())).andReturn(sourceVideoOnly).anyTimes();
     EasyMock.expect(workspace.get(EasyMock.anyObject(), EasyMock.eq(false))).andReturn(sourceVideoOnly).anyTimes();
 
@@ -216,7 +218,7 @@ public class ComposerServiceTest {
     // Create and populate the composer service
     composerService = new ComposerServiceImpl() {
       @Override
-      protected List<Track> inspect(Job job, List<URI> uris) throws EncoderException {
+      protected List<Track> inspect(Job job, List<URI> uris, List<List<String>> tags) throws EncoderException {
         final var result = new ArrayList<Track>(uris.size());
         for (URI uri: uris) {
           result.add(inspectedTrack);

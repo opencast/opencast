@@ -33,6 +33,7 @@ import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +46,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+@Component(
+    immediate = true,
+    service = { CaptionConverter.class },
+    property = {
+        "service.description=Google speech caption converter",
+        "caption.format=google-speech"
+    }
+)
 public class GoogleSpeechCaptionConverter implements CaptionConverter {
 
   /**

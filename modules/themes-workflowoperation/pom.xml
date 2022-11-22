@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -15,6 +15,10 @@
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi.cmpn</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.entwinemedia.common</groupId>
       <artifactId>functional</artifactId>
@@ -80,9 +84,6 @@
             <Export-Package>
               org.opencastproject.workflow.handler.themes;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/operations/theme.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

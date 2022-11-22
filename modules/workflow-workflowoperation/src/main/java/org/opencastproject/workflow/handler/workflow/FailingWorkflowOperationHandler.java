@@ -22,17 +22,29 @@
 package org.opencastproject.workflow.handler.workflow;
 
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Operation to test retry strategies on failing
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Failing Workflow Operation Handler",
+        "workflow.operation=failing"
+    }
+)
 public class FailingWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logger */
@@ -45,4 +57,9 @@ public class FailingWorkflowOperationHandler extends AbstractWorkflowOperationHa
     throw new WorkflowOperationException("Test operation for failed ");
   }
 
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
 }

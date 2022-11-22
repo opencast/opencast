@@ -1,5 +1,7 @@
-Audio Normalization Operation
-=============================
+Audio Normalization Workflow Operation
+======================================
+
+ID: `normalize-audio`
 
 Description
 -----------
@@ -85,10 +87,8 @@ Operation Example
 
 ```xml
 <operation
-  id="normalize-audio"
-  fail-on-error="true"
-  exception-handler-workflow="partial-error"
-  description="Normalize audio stream">
+    id="normalize-audio"
+    description="Normalize audio stream">
   <configurations>
     <configuration key="source-flavor">*/work</configuration>
     <configuration key="target-flavor">*/normalized</configuration>
@@ -99,7 +99,8 @@ Operation Example
 </operation>
 ```
 
-## Missing Encoding Profiles
+Missing Encoding Profiles
+-------------------------
 
 Some of the encoding profiles necessary for this operation are not included
 in Opencast per default, but the operation will not work without them.

@@ -34,6 +34,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +62,16 @@ import javax.ws.rs.core.Response;
         "All paths above are relative to the REST endpoint base (something like http://your.server/transcription)",
     }
 )
+@Component(
+    immediate = true,
+    service = IBMWatsonTranscriptionRestService.class,
+    property = {
+        "service.description=IBM Watson Transcription REST Endpoint",
+        "opencast.service.type=org.opencastproject.transcription.ibmwatson",
+        "opencast.service.path=/transcripts/watson",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class IBMWatsonTranscriptionRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -70,13 +83,16 @@ public class IBMWatsonTranscriptionRestService extends AbstractJobProducerEndpoi
   /** The service registry */
   protected ServiceRegistry serviceRegistry = null;
 
+  @Activate
   public void activate(ComponentContext cc) {
   }
 
+  @Reference
   public void setTranscriptionService(IBMWatsonTranscriptionService service) {
     this.service = service;
   }
 
+  @Reference
   public void setServiceRegistry(ServiceRegistry service) {
     this.serviceRegistry = service;
   }

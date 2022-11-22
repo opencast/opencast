@@ -115,7 +115,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   protected Object nullToken = new Object();
 
   /** OSGi DI */
-  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.capture.admin.impl.CaptureAgentStateServiceImpl)")
+  @Reference(target = "(osgi.unit.name=org.opencastproject.capture.admin.impl.CaptureAgentStateServiceImpl)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -124,7 +124,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -377,6 +377,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     EntityManager em = null;
     User user = securityService.getUser();
     Organization org = securityService.getOrganization();
+
     String orgAdmin = org.getAdminRole();
     Set<Role> roles = user.getRoles();
     try {

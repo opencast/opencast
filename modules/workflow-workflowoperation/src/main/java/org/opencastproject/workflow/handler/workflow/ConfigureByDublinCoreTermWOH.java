@@ -32,12 +32,15 @@ import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +51,14 @@ import java.util.Map;
 /**
  * Take look in specified catalog for specified term, if the value matches the specified value add the target-tags
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Configure by Dublin Core Term Workflow Handler",
+        "workflow.operation=configure-by-dcterm"
+    }
+)
 public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBase {
 
   private static final Logger logger = LoggerFactory.getLogger(ConfigureByDublinCoreTermWOH.class);
@@ -77,6 +88,7 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

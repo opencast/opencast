@@ -37,6 +37,7 @@ import static org.opencastproject.util.data.Prelude.sleep;
 
 import org.opencastproject.assetmanager.util.AssetPathUtils;
 import org.opencastproject.assetmanager.util.DistributionPathUtils;
+import org.opencastproject.cleanup.RecursiveDirectoryCleaner;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
@@ -84,9 +85,10 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -330,6 +332,21 @@ public final class WorkspaceImpl implements Workspace {
     if (workspaceCleaner != null) {
       workspaceCleaner.shutdown();
     }
+  }
+
+  /**
+   * Returns the filename translated into a version that can safely be used as part of a file system path.
+   *
+   * The method shortens both the base file name and the extension to a maximum of 255 characters each,
+   * and replaces unsafe characters with <doce>_</doce>.
+   *
+   * @param fileName
+   *          The file name
+   * @return the safe version
+   */
+  @Override
+  public String toSafeName(String fileName) {
+    return wfr.toSafeName(fileName);
   }
 
   @Override
@@ -647,7 +664,7 @@ public final class WorkspaceImpl implements Workspace {
   @Override
   public URI put(String mediaPackageID, String mediaPackageElementID, String fileName, InputStream in)
           throws IOException {
-    String safeFileName = PathSupport.toSafeName(fileName);
+    String safeFileName = toSafeName(fileName);
     final URI uri = wfr.getURI(mediaPackageID, mediaPackageElementID, fileName);
     notNull(in, "in");
 
@@ -681,7 +698,7 @@ public final class WorkspaceImpl implements Workspace {
 
   @Override
   public URI putInCollection(String collectionId, String fileName, InputStream in) throws IOException {
-    String safeFileName = PathSupport.toSafeName(fileName);
+    String safeFileName = toSafeName(fileName);
     URI uri = wfr.getCollectionURI(collectionId, fileName);
 
     // Determine the target location in the workspace
@@ -763,8 +780,7 @@ public final class WorkspaceImpl implements Workspace {
   private void deleteFromCollection(String collectionId, String fileName, boolean removeCollection)
           throws NotFoundException, IOException {
     // local delete
-    final File f = workspaceFile(WorkingFileRepository.COLLECTION_PATH_PREFIX, collectionId,
-            PathSupport.toSafeName(fileName));
+    final File f = workspaceFile(WorkingFileRepository.COLLECTION_PATH_PREFIX, collectionId, toSafeName(fileName));
     FileUtils.deleteQuietly(f);
     if (removeCollection) {
       FileSupport.delete(f.getParentFile());
@@ -808,7 +824,7 @@ public final class WorkspaceImpl implements Workspace {
     File wsDirectory = new File(wsDirectoryPath);
     wsDirectory.mkdirs();
 
-    String safeFileName = PathSupport.toSafeName(FilenameUtils.getName(uriString));
+    String safeFileName = toSafeName(FilenameUtils.getName(uriString));
     if (StringUtils.isBlank(safeFileName)) {
       safeFileName = UNKNOWN_FILENAME;
     }
@@ -876,7 +892,7 @@ public final class WorkspaceImpl implements Workspace {
     return wfr.getBaseUri();
   }
 
-  @Reference(name = "REPO")
+  @Reference
   public void setRepository(WorkingFileRepository repo) {
     this.wfr = repo;
     if (repo instanceof PathMappable) {
@@ -885,12 +901,12 @@ public final class WorkspaceImpl implements Workspace {
     }
   }
 
-  @Reference(name = "trustedHttpClient")
+  @Reference
   public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
     this.trustedHttpClient = trustedHttpClient;
   }
 
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -930,28 +946,8 @@ public final class WorkspaceImpl implements Workspace {
               + "avoid deleting data in use by running workflows.");
     }
 
-    // Get workspace root directly
-    final File workspaceDirectory = new File(wsRoot);
-    logger.info("Starting cleanup of workspace at {}", workspaceDirectory);
-
-    long now = new Date().getTime();
-    for (File file: FileUtils.listFiles(workspaceDirectory, null, true)) {
-      long fileLastModified = file.lastModified();
-      // Ensure file/dir is older than maxAge
-      long fileAgeInSeconds = (now - fileLastModified) / 1000;
-      if (fileLastModified == 0 || fileAgeInSeconds < maxAgeInSeconds) {
-        logger.debug("File age ({}) < max age ({}) or unknown: Skipping {} ", fileAgeInSeconds, maxAgeInSeconds, file);
-        continue;
-      }
-
-      // Delete old files
-      if (FileUtils.deleteQuietly(file)) {
-        logger.info("Deleted {}", file);
-      } else {
-        logger.warn("Could not delete {}", file);
-      }
-    }
-    logger.info("Finished cleanup of workspace");
+    // Clean workspace root directly
+    RecursiveDirectoryCleaner.cleanDirectory(Paths.get(wsRoot), Duration.ofSeconds(maxAgeInSeconds));
   }
 
   @Override

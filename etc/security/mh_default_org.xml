@@ -85,9 +85,11 @@
     <sec:intercept-url pattern="/admin-ng/series/series.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/series/new/metadata" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_METADATA_VIEW" />
     <sec:intercept-url pattern="/admin-ng/series/new/themes" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_THEMES_EDIT" />
+    <sec:intercept-url pattern="/admin-ng/series/new/tobira/page" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_TOBIRA_EDIT" />
     <sec:intercept-url pattern="/admin-ng/series/*/access.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_ACL_VIEW" />
     <sec:intercept-url pattern="/admin-ng/series/*/metadata.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_METADATA_VIEW" />
     <sec:intercept-url pattern="/admin-ng/series/*/theme.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_THEMES_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/series/*/tobira/pages" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_TOBIRA_VIEW" />
     <sec:intercept-url pattern="/admin-ng/server/servers.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERVERS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/series/*/hasEvents.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/series/configuration.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_VIEW" />
@@ -269,9 +271,12 @@
     <!-- anonymous access to user interface configuration -->
     <sec:intercept-url pattern="/ui/config/**" access="ROLE_ANONYMOUS" />
 
-    <!-- Paella player -->
+    <!-- Paella player 6 -->
     <sec:intercept-url pattern="/paella/ui/auth.html" access="ROLE_USER" />
     <sec:intercept-url pattern="/paella/ui/**" access="ROLE_ANONYMOUS" />
+   <!-- Paella player 7 -->
+    <sec:intercept-url pattern="/paella7/ui/auth.html" access="ROLE_USER" />
+    <sec:intercept-url pattern="/paella7/ui/**" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the engage player and the GET endpoints it requires -->
     <sec:intercept-url pattern="/engage/ui/**" access="ROLE_ANONYMOUS" />
@@ -294,7 +299,11 @@
 
     <!-- Enable access to Opencast Editor -->
     <sec:intercept-url pattern="/editor/**" access="ROLE_ADMIN, ROLE_USER" />
-    <sec:intercept-url pattern="/editor-ui/**" access="ROLE_USER" />
+    <sec:intercept-url pattern="/editor-ui/**" access="ROLE_ADMIN, ROLE_USER" />
+
+    <!-- Enable access to the Tobira module -->
+    <sec:intercept-url pattern="/tobira/**" access="ROLE_ADMIN" />
+    <sec:intercept-url pattern="/tobira/version" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the annotation and the series endpoints -->
     <sec:intercept-url pattern="/series/**" method="GET" access="ROLE_ANONYMOUS, ROLE_CAPTURE_AGENT" />
@@ -482,6 +491,13 @@
   <bean id="userEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
     <property name="loginFormUrl" value="/admin-ng/login.html" />
   </bean>
+
+  <!-- Redirect unauthenticated requests to custom login url with configurable redirect query parameter
+       Example: http://localhost/Shibboleth.sso/Login?target=<RELATIVE_REQUEST_URL> -->
+  <!--bean id="userEntryPoint" class="org.opencastproject.kernel.security.RedirectQueryParamAuthenticationEntryPoint">
+    <constructor-arg index="0" value="/Shibboleth.sso/Login" />
+    <constructor-arg index="1" value="target" />
+  </bean-->
 
   <!-- Returns a 401 request for authentication via digest auth -->
   <bean id="digestEntryPoint" class="org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint">

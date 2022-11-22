@@ -32,6 +32,10 @@ import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +53,13 @@ import java.util.Properties;
 /**
  * Installs feeds matching "*.properties" in the feeds watch directory.
  */
+@Component(
+    immediate = true,
+    service = ArtifactInstaller.class,
+    property = {
+        "service.description=Feed Definition Scanner"
+    }
+)
 public class FeedRegistrationScanner implements ArtifactInstaller {
   public static final String FEED_CLASS = "feed.class";
   public static final String FEED_URI = "feed.uri";
@@ -73,11 +84,13 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
   private int sumInstalledFiles = 0;
 
   /** Sets the search service */
+  @Reference
   public void setSearchService(SearchService searchService) {
     this.searchService = searchService;
   }
 
   /** Sets the series service */
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -88,6 +101,7 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
    * @param cc
    *          the component's context
    */
+  @Activate
   protected void activate(ComponentContext cc) {
     this.bundleContext = cc.getBundleContext();
   }
@@ -95,6 +109,7 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
   /**
    * Deactivates the component
    */
+  @Deactivate
   protected void deactivate() {
     this.bundleContext = null;
   }

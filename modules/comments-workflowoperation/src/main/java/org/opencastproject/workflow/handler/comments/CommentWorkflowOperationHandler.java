@@ -28,11 +28,13 @@ import org.opencastproject.job.api.JobContext;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -40,6 +42,8 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +54,14 @@ import java.util.List;
  * A workflow operation handler for creating, resolving and deleting comments
  * automatically during the workflow process.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Comment Workflow Operation Handler",
+        "workflow.operation=comment"
+    }
+)
 public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   protected static final String ACTION = "action";
   protected static final String DESCRIPTION = "description";
@@ -140,13 +152,12 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
    */
   private void createComment(WorkflowInstance workflowInstance, String reason, String description)
           throws EventCommentException {
-    Opt<EventComment> optComment = findComment(workflowInstance.getMediaPackage().getIdentifier().toString(), reason,
-            description);
+    String mpId = workflowInstance.getMediaPackage().getIdentifier().toString();
+    Opt<EventComment> optComment = findComment(mpId, reason, description);
     if (optComment.isNone()) {
       final User user = userDirectoryService.loadUser(workflowInstance.getCreatorName());
       EventComment comment = EventComment.create(
-          Option.none(),
-          workflowInstance.getMediaPackage().getIdentifier().toString(),
+          Option.none(), mpId,
           securityService.getOrganization().getId(), description, user, reason, false);
       eventCommentService.updateComment(comment);
     } else {
@@ -169,12 +180,12 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
    */
   private void resolveComment(WorkflowInstance workflowInstance, String reason, String description)
           throws EventCommentException {
-    Opt<EventComment> optComment = findComment(workflowInstance.getMediaPackage().getIdentifier().toString(), reason,
-            description);
+    String mpId = workflowInstance.getMediaPackage().getIdentifier().toString();
+    Opt<EventComment> optComment = findComment(mpId, reason, description);
     if (optComment.isSome()) {
       EventComment comment = EventComment.create(
           optComment.get().getId(),
-          workflowInstance.getMediaPackage().getIdentifier().toString(),
+          mpId,
           securityService.getOrganization().getId(), optComment.get().getText(),
           optComment.get().getAuthor(), optComment.get().getReason(), true, optComment.get().getCreationDate(),
           optComment.get().getModificationDate(), optComment.get().getReplies());
@@ -200,8 +211,8 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
    */
   private void deleteComment(WorkflowInstance workflowInstance, String reason, String description)
           throws EventCommentException, NotFoundException {
-    Opt<EventComment> optComment = findComment(workflowInstance.getMediaPackage().getIdentifier().toString(), reason,
-            description);
+    String mpId = workflowInstance.getMediaPackage().getIdentifier().toString();
+    Opt<EventComment> optComment = findComment(mpId, reason, description);
     if (optComment.isSome()) {
       try {
         eventCommentService.deleteComment(optComment.get().getId().get());
@@ -259,16 +270,26 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
    * @param eventCommentService
    *          the workflow service
    */
+  @Reference
   public void setEventCommentService(EventCommentService eventCommentService) {
     this.eventCommentService = eventCommentService;
   }
 
   /** OSGi DI */
+  @Reference
   void setSecurityService(SecurityService service) {
     this.securityService = service;
   }
 
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

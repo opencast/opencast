@@ -30,6 +30,8 @@ import org.opencastproject.util.ReadinessIndicator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +48,13 @@ import java.util.LinkedList;
  * This dictionary service implementation passes the input text
  * to the hunspell spell checker and returns its results.
  */
+@Component(
+    immediate = true,
+    service = DictionaryService.class,
+    property = {
+        "service.description=Dictionary Service"
+    }
+)
 public class DictionaryServiceImpl implements DictionaryService {
 
   /** The logging facility */
@@ -85,6 +94,7 @@ public class DictionaryServiceImpl implements DictionaryService {
    *
    * @param  ctx  the bundle context
    */
+  @Activate
   void activate(BundleContext ctx) throws UnsupportedEncodingException {
     Dictionary<String, String> properties = new Hashtable<String, String>();
     properties.put(ARTIFACT, "dictionary");

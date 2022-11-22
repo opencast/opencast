@@ -26,19 +26,31 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.statistics.api.StatisticsWriter;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Write statistical data about video/audio tracks",
+        "workflow.operation=statistics-writer"
+    }
+)
 public class StatisticsWriterWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   private static final String OPT_FLAVOR = "flavor";
@@ -51,14 +63,22 @@ public class StatisticsWriterWorkflowOperationHandler extends AbstractWorkflowOp
 
   private StatisticsWriter statisticsWriter;
 
+  @Reference
   public void setStatisticsWriter(StatisticsWriter statisticsWriter) {
     this.statisticsWriter = statisticsWriter;
   }
 
   private SecurityService securityService;
 
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
   /**

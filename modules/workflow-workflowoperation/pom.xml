@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -159,29 +159,6 @@
             <Export-Package>
               org.opencastproject.workflow.handler.workflow;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/operations/add-catalog.xml,
-              OSGI-INF/operations/analyze-tracks.xml,
-              OSGI-INF/operations/cleanup.xml,
-              OSGI-INF/operations/clone.xml,
-              OSGI-INF/operations/conditional-config.xml,
-              OSGI-INF/operations/configure-by-dcterm.xml,
-              OSGI-INF/operations/copy.xml,
-              OSGI-INF/operations/defaults.xml,
-              OSGI-INF/operations/duplicate-event.xml,
-              OSGI-INF/operations/error-resolution.xml,
-              OSGI-INF/operations/export-wf-properties.xml,
-              OSGI-INF/operations/failing.xml,
-              OSGI-INF/operations/import-wf-properties.xml,
-              OSGI-INF/operations/include.xml,
-              OSGI-INF/operations/probe-resolution.xml,
-              OSGI-INF/operations/series.xml,
-              OSGI-INF/operations/start-workflow.xml,
-              OSGI-INF/operations/tag.xml,
-              OSGI-INF/operations/tag-by-dcterm.xml,
-              OSGI-INF/operations/transfer-metadata.xml,
-              OSGI-INF/operations/zip.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

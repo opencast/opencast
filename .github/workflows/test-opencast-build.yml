@@ -17,6 +17,8 @@ on:
       - 'docs/log4j/**'
       - 'assemblies/**'
       - '.github/**'
+    branches-ignore:    
+      - 'dependabot/**'  # Don't run dependabot branches, as they are already covered by pull requests
 
 jobs:
   build:

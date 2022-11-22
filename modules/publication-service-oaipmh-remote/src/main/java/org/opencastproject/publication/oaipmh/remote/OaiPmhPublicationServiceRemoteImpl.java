@@ -34,7 +34,9 @@ import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.publication.api.OaiPmhPublicationService;
 import org.opencastproject.publication.api.PublicationException;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +44,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +58,13 @@ import java.util.Set;
 /**
  * A remote publication service invoker.
  */
+@Component(
+    immediate = true,
+    service = OaiPmhPublicationService.class,
+    property = {
+        "service.description=Publication (OAI-PMH) Remote Service Proxy"
+    }
+)
 public class OaiPmhPublicationServiceRemoteImpl extends RemoteBase implements OaiPmhPublicationService {
 
   /** The logger */
@@ -266,4 +277,16 @@ public class OaiPmhPublicationServiceRemoteImpl extends RemoteBase implements Oa
         "Unable to update media package %s metadata in OAI-PMH repository %s using a remote publication service.",
         mediaPackage.getIdentifier().toString(), repository));
   }
+
+  @Reference
+  @Override
+  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
+    super.setTrustedHttpClient(trustedHttpClient);
+  }
+  @Reference
+  @Override
+  public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
+    super.setRemoteServiceManager(serviceRegistry);
+  }
+
 }

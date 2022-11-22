@@ -22,6 +22,9 @@ package org.opencastproject.oaipmh.server;
 
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import javax.ws.rs.Path;
 
 @Path("/")
@@ -31,6 +34,16 @@ import javax.ws.rs.Path;
         abstractText = "This service "
                 + "provides system gateway to the OAI-PMH server.",
         notes = {})
+@Component(
+    immediate = true,
+    service = OsgiOaiPmhServerInfoRestEndpoint.class,
+    property = {
+        "service.description=OAI-PMH server REST endpoint",
+        "opencast.service.type=org.opencastproject.oaipmhinfo",
+        "opencast.service.path=/oaipmhinfo",
+        "opencast.service.jobproducer=false"
+    }
+)
 public class OsgiOaiPmhServerInfoRestEndpoint extends AbstractOaiPmhServerInfoRestEndpoint {
   private OaiPmhServerInfo oaiPmhServerInfo;
 
@@ -39,6 +52,7 @@ public class OsgiOaiPmhServerInfoRestEndpoint extends AbstractOaiPmhServerInfoRe
   }
 
   /** OSGi DI. */
+  @Reference
   public void setOaiPmhServerInfo(OaiPmhServerInfo oaiPmhServerInfo) {
     this.oaiPmhServerInfo = oaiPmhServerInfo;
   }

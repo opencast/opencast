@@ -29,6 +29,7 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
@@ -37,6 +38,7 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -44,6 +46,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +59,14 @@ import java.util.List;
 /**
  * Workflow operation handler for copying video data through NFS
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Copy Workflow Operation Handler",
+        "workflow.operation=copy"
+    }
+)
 public class CopyWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   /** Configuration key for the \"tag\" of the track to use as a source input */
   public static final String OPT_SOURCE_TAGS = "source-tags";
@@ -80,6 +92,7 @@ public class CopyWorkflowOperationHandler extends AbstractWorkflowOperationHandl
    * @param workspace
    *          the workspace
    */
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -144,7 +157,7 @@ public class CopyWorkflowOperationHandler extends AbstractWorkflowOperationHandl
     // Check the the number of element returned
     if (elements.size() == 0) {
       // If no one found, we skip the operation
-      return createResult(workflowInstance.getMediaPackage(), Action.SKIP);
+      return createResult(mediaPackage, Action.SKIP);
     } else if (elements.size() == 1) {
       for (MediaPackageElement element : elements) {
         logger.debug("Copy single element to: {}", targetDirectoryOption);
@@ -181,7 +194,7 @@ public class CopyWorkflowOperationHandler extends AbstractWorkflowOperationHandl
       }
     }
 
-    return createResult(workflowInstance.getMediaPackage(), Action.CONTINUE);
+    return createResult(mediaPackage, Action.CONTINUE);
   }
 
   private void copyElement(MediaPackageElement element, File targetFile) throws WorkflowOperationException {
@@ -202,6 +215,12 @@ public class CopyWorkflowOperationHandler extends AbstractWorkflowOperationHandl
               targetFile.getPath(), e.getMessage()));
     }
     logger.debug("Element {} copied to target {}.", sourceFile.getPath(), targetFile.getPath());
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
 }

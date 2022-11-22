@@ -27,6 +27,9 @@
    "SELECT_NO_OPTIONS_AVAILABLE": "Δεν υπάρχουν διαθέσιμες επιλογές",
    "YES": "Ναί",
    "COPY": "Αντιγραφή στο πρόχειρο",
+   "MONITOR": {
+      "REGISTRATION": "Opencast has sent a registration update in more than a week"
+   },
    "LTI": {
       "ERROR_LOADING_METADATA": "Σφάλμα στην φόρτωση των μεταδεδομένων της εκδήλωσης. Παρακαλώ προσπαθείστε αργότερα.",
       "SERIES_TITLE": "Προβολή σειράς",
@@ -129,7 +132,7 @@
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "Αυτή η σειρά περιέχει εκδηλώσεις. Η διαγραφή της σειράς δεν θα διαγράψει τις εκδηλώσεις.",
          "EVENT_WILL_BE_GONE": "Εάν συνεχίσετε, η εκδήλωση θα διαγραφεί αμετάκλητα.",
-         "UNSAVED_CHANGES": "You have unsaved changes. If you continue, those changes will be discarded. Are you sure that you want to continue?"
+         "UNSAVED_CHANGES": "Έχετε μη αποθηκευμένες αλλαγές. Αν συνεχίσετε, αυτές οι αλλαγές θα απορριφθούν. Είστε βέβαιοι ότι θέλετε να συνεχίσετε?"
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Αυτή η σειρά δεν μπορεί να διαγραφεί, καθώς εξακολουθεί να περιέχει εκδηλώσεις."
@@ -206,7 +209,7 @@
       "INVALID_ACL_RULES": "Οι κανόνες πρέπει να περιέχουν έναν έγκυρο ρόλο και δικαίωμα(τα) ανάγνωσης ή/και εγγραφής.",
       "MISSING_ACL_RULES": "Απαιτείται τουλάχιστον ένας ρόλος με δικαιώματα ανάγνωσης και εγγραφής!",
       "SAVED_ACL_RULES": "Οι κανόνες πρόσβασης έχουν αποθηκευτεί.",
-      "SAVED_METADATA": "The metadata has been saved.",
+      "SAVED_METADATA": "Τα μεταδεδομένα έχουν αποθηκευτεί.",
       "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "Οι υπάρχουσες εκδηλώσεις σε αυτή τη σειρά θα πρέπει να επεξεργαστών ξάνα",
       "SERIES_ACL_LOCKED": "Η επεξεργασία την πολιτικών πρόσβαησς δεν επιτρέπεται όταν εκτελούνται εργασίες σε μία εκδήλωση που αποτελεί μέρος της σειράς",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "Η πολιτική πρόσβασης απαιτεί τουλάχιστον ένα ρόλο με δικαιώματα ανάγνωσης και εγγραφής.",
@@ -245,7 +248,17 @@
       "ADOPTER_PROFILE_UPDATED": "Οι πληροφορίες προφίλ ενημερώθηκαν επιτυχώς.",
       "ADOPTER_PROFILE_NOT_UPDATED": "Δεν ήταν δυνατή η ενημέρωση των πληροφοριών προφίλ.  Παρακαλώ προσπαθησε ξανά!",
       "ADOPTER_PROFILE_DELETED": "Οι πληροφορίες προφίλ διαγράφηκαν με επιτυχία.",
-      "ADOPTER_PROFILE_NOT_DELETED": " Δεν ήταν δυνατή η διαγραφή πληροφοριών προφίλ. Παρακαλώ προσπαθησε ξανα!"
+      "ADOPTER_PROFILE_NOT_DELETED": " Δεν ήταν δυνατή η διαγραφή πληροφοριών προφίλ. Παρακαλώ προσπαθησε ξανα!",
+      "TOBIRA_OVERRIDE_NAME": "The title of the selected page will be overridden with the title of the series.",
+      "TOBIRA_NO_PATH_SEGMENT": "Page needs a path segment.",
+      "TOBIRA_NOT_MOUNTED": "Series could not be mounted in Tobira.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
+      "TOBIRA_PATH_SEGMENT_UNIQUE": "The path segment of a page must be unqiue among all its sibling pages.",
+      "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
+      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and/or try again later.",
+      "TOBIRA_COPIED_DIRECT_LINK": "Copied link to clipboard.",
+      "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Couldn't copy link to clipboard.",
+      "TOBIRA_NOT_FOUND": "Tobira doesn't know about this series (yet). Try again in a few minutes or contact your system administrator."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Ενέργειες",
@@ -410,6 +423,11 @@
          "BACK": "Επιστροφή",
          "LEGAL_INFO_STATE": {
             "HEADER": "Αποδοχή Όρων Παροχής Υπηρεσιών και Πολιτικής Απορρήτου"
+         },
+         "SUMMARY_STATE": {
+            "HEADER": "This is a JSON summary of exactly what would be sent to Opencast's servers",
+            "GENERAL_HEADER": "Adopter Information",
+            "STATS_HEADER": "Statistical Information"
          },
          "INFORMATION_STATE": {
             "HEADER": "Σας ευχαριστούμε για τη χρήση του Opencast!",
@@ -621,7 +639,7 @@
             "NOCONTENT": "Δεν υπάρχουν διαθέσιμα δεδομένα",
             "PUBLISHED": "Δημοσιευμένο",
             "WEEKDAY": "Ημέρες εβδομάδας",
-            "ADMINUI_NOTES": "Notes",
+            "ADMINUI_NOTES": "Σημειώσεις",
             "TOOLTIP": {
                "ASSETS": "Άνοιγμα λεπτομερειών αντικιεμένων",
                "START": "Φίλτρο για αυτήν την ημερομηνία έναρξης",
@@ -635,7 +653,8 @@
                "EDITOR_NEEDS_CUTTING": "Άνοιγμα επεξεργασίας βίντεο (ένα σχόλιο δείχνει ότι έχει ζητηθεί η επεξεργασία του βίντεο)",
                "COMMENTS": "Δείτε σχόλια",
                "PAUSED_WORKFLOW": "Δείτε σταματημένη εκδήλωση",
-               "PRESENTER": "Φίλτρο για αυτόν τον παρουσιαστή"
+               "PRESENTER": "Φίλτρο για αυτόν τον παρουσιαστή",
+               "COPY_TO_NEW_EVENT": "Copy metadata to new event"
             }
          },
          "STATUS": {
@@ -911,7 +930,7 @@
                   "WRONG_SERIES_PUBLICATION": "Λάρθςο σειρά ή κανάλι δημοσίευσης",
                   "WRONG_WORKFLOW": "Λάθος ροής εργασίας",
                   "PROCESSING_FAILURE": "Αποτυχία επεξεργασίας",
-                  "ADMINUI_NOTES": "Notes in Admin UI"
+                  "ADMINUI_NOTES": "Σημειώσεις στο Admin UI"
                }
             },
             "STATISTICS": {
@@ -1113,6 +1132,20 @@
                "LABEL": "Χωρίς θέμα",
                "EMPTY": "Κανένα θέμα δεν βρέθηκε"
             },
+            "TOBIRA": {
+               "CAPTION": "Tobira",
+               "DESCRIPTION": "Here you can select where you want the series to show up in the Tobira video portal. You can only select one location here, and it needs to be empty (marked in bold). You can create new pages here, but note that they are only persisted if they are on the path to the selected page.",
+               "SELECT_PAGE": "Select a target page",
+               "PAGE_TITLE": "Subpage title",
+               "PATH_SEGMENT": "Path segment",
+               "SUBPAGES": "Subpages",
+               "ADD_SUBPAGE": "Add subpage",
+               "CANCEL": "Cancel",
+               "HOMEPAGE": "Homepage",
+               "SELECTED_PAGE": "Series will be mounted under the following path",
+               "NO_PAGE_SELECTED": "No page selected. Series will not be mounted in Tobira.",
+               "PATH": "Path"
+            },
             "SUMMARY": {
                "CAPTION": "Περίληψη"
             }
@@ -1141,6 +1174,7 @@
                "EVENTS": "Εκδηλώσεις",
                "PERMISSIONS": "Πολιτική πρόσβασης",
                "THEME": "Θέμα",
+               "TOBIRA": "Tobira",
                "STATISTICS": "Στατιστικά"
             },
             "ACCESS": {
@@ -1161,8 +1195,10 @@
                   "ACTION": "Ενέργειες",
                   "NEW": "Νέα πολιτική",
                   "DETAILS": "Λεπτομέρειες",
-                  "REPLACE_EVENT_ACLS": "Ενημέρωση δικαιωμάτων εκδήλωσης",
+                  "REPLACE_EVENT_ACLS": "Save & update event permissions",
                   "REPLACE_EVENT_ACLS_HINT": "Επιβεβαίωση ότι όλες οι εκδηλώσεις σε αυτή την σειρά έχουν τα ίδια δικαιώματα σε ισχύ",
+                  "SAVE_SERIES_ACLS": "Save",
+                  "SAVE_SERIES_ACLS_HINT": "Apply permissions only to series",
                   "LOAD_MORE_LIMIT": "Εμφάνιση πολιτικών.",
                   "LOAD_MORE_LINK": "Φόρτωση περισσοτέρων"
                },
@@ -1185,6 +1221,13 @@
                "LANGUAGE": "Γλώσσα",
                "LICENSE": "Άδεια χρήσης",
                "DESCRIPTION": "Περιγραφή"
+            },
+            "TOBIRA": {
+               "HOMEPAGE": "(Homepage)",
+               "DIRECT_LINK": "Direct link to series",
+               "COPY_DIRECT_LINK": "Copy to clipboard",
+               "NOT_MOUNTED": "This series is currently not included the page structure, and can only be reached using the direct link above.",
+               "PAGES": "Pages in Tobira that contain this series"
             },
             "EVENTS": {
                "TITLE": "Τίτλος",
@@ -1303,12 +1346,12 @@
                "ADD": "Προσθήκη ρόλου"
             },
             "STRENGTH": {
-               "BAD": "Bad password",
-               "VERYWEAK": "Very weak password",
-               "WEAK": "Weak password",
-               "GOOD": "Good password",
-               "STRONG": "Strong password",
-               "VERYSTRONG": "Very strong password"
+               "BAD": "Εσφαλμένος κωδικός πρόσβασης",
+               "VERYWEAK": "Πολύ επισφαλής κωδικός πρόσβασης",
+               "WEAK": "Επισφαλής κωδικός πρόσβασης.",
+               "GOOD": "Καλός κωδικός πρόσβασης",
+               "STRONG": "Ισχυρός κωδικός πρόσβασης",
+               "VERYSTRONG": "Πού ισχυρός κωδικός πρόσβασης"
             }
          }
       },

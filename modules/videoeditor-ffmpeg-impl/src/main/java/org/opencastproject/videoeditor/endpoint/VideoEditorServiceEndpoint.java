@@ -34,6 +34,9 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.videoeditor.api.VideoEditorService;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -53,6 +56,16 @@ import javax.ws.rs.core.Response;
     title = "Video Editor Service REST Endpoint",
     abstractText = "Video Editor Service consumes a smil document and create corresponding video files.",
     notes = {"All paths above are relative to the REST endpoint base (something like http://your.server/videoeditor)"}
+)
+@Component(
+    immediate = true,
+    service = VideoEditorServiceEndpoint.class,
+    property = {
+        "service.description=Video Editor Service REST Endpoint",
+        "opencast.service.type=org.opencastproject.videoeditor",
+        "opencast.service.path=/videoeditor",
+        "opencast.service.jobproducer=true"
+    }
 )
 public class VideoEditorServiceEndpoint extends AbstractJobProducerEndpoint {
 
@@ -111,14 +124,17 @@ public class VideoEditorServiceEndpoint extends AbstractJobProducerEndpoint {
     return serviceRegistry;
   }
 
+  @Reference
   public void setVideoEditorService(VideoEditorService videoEditorService) {
     this.videoEditorService = videoEditorService;
   }
 
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
+  @Reference
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }

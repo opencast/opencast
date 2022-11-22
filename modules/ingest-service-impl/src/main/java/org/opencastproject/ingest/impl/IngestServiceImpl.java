@@ -52,7 +52,6 @@ import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
@@ -70,7 +69,6 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesException;
-import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -141,7 +139,6 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -149,7 +146,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import javax.management.ObjectInstance;
 
@@ -314,6 +310,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /** The media inspection service */
   private MediaInspectionService mediaInspectionService = null;
+
+  /** The search index. */
 
   /** The default workflow identifier, if one is configured */
   protected String defaultWorkflowDefinionId;
@@ -855,7 +853,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       logger.info("Start adding catalog {} from URL {} on mediapackage {}", elementId, uri, mediaPackage);
       URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
       if (MediaPackageElements.SERIES.equals(flavor)) {
-        updateSeries(uri);
+        updateSeries(newUrl);
       }
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Catalog,
               flavor);
@@ -1241,6 +1239,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         agentProperties.put(key, properties.get(key));
       }
     }
+
+    // Remove workflow configuration prefixes from the workflow properties
+    workflowProperties = removePrefixFromProperties(workflowProperties);
+
     try {
       schedulerService.addEvent(period.getStart(), period.getEnd(), captureAgent, new HashSet<>(), mediaPackage,
               workflowProperties, agentProperties, Opt.none());
@@ -1595,20 +1597,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     try {
       if (uri.toString().startsWith("http")) {
         HttpGet get = new HttpGet(uri);
-        List<String> clusterUrls = new LinkedList<>();
-        try {
-          // Note that we are not checking ports here.
-          clusterUrls = organizationDirectoryService.getOrganization(uri.toURL()).getServers()
-                          .keySet()
-                          .stream()
-                          .collect(Collectors.toUnmodifiableList());
-        } catch (NotFoundException e) {
-          logger.warn("Unable to determine cluster members, will not be able to authenticate any downloads from them", e);
-        }
+        var clusterUrls = securityService.getOrganization().getServers().keySet();
 
         if (uri.toString().matches(downloadSource)) {
           //NB: We're creating a new client here with *different* auth than the system auth creds
           externalHttpClient = getAuthedHttpClient();
+          get.setHeader("X-Requested-Auth", "Digest");
           response = externalHttpClient.execute(get);
         } else if (clusterUrls.contains(uri.getScheme() + "://" + uri.getHost())) {
           // Only using the system-level httpclient and digest credentials against our own servers
@@ -1821,7 +1815,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     provider.setCredentials(
       new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthSchemes.DIGEST),
       new UsernamePasswordCredentials(downloadUser, downloadPassword));
-    return cb.build();
+    return cb.setDefaultCredentialsProvider(provider).build();
   }
 
   private MediaPackage createSmil(MediaPackage mediaPackage) throws IOException, IngestException {
@@ -1978,7 +1972,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   }
 
   private MediaPackage checkForCASeries(MediaPackage mp, String seriesAppendName) {
-    //Check for mediapackage id and CA series appendix set
+    //Check for media package id and CA series appendix set
     if (mp == null || seriesAppendName == null) {
       logger.debug("No series name provided");
       return mp;
@@ -2000,46 +1994,37 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
 
     String roleName = SecurityUtil.getCaptureAgentRole(captureAgentId);
-    logger.debug("CA Rolename: " + roleName);
+    logger.debug("Capture agent role name: {}", roleName);
 
     // Find or create CA series
+    String seriesId = captureAgentId.replaceAll("[^\\w-_.:;()]+", "_");
     String seriesName = captureAgentId + seriesAppendName;
-    SeriesQuery q = new SeriesQuery().setCount(Integer.MAX_VALUE);
-    q.setSeriesTitle(seriesName);
-    DublinCoreCatalogList seriesList = null;
+
     try {
-      seriesList = seriesService.getSeries(q);
-    } catch (SeriesException e) {
-      logger.error("Exception while searching for series: " + seriesName, e);
-      return mp;
-    } catch (UnauthorizedException e) {
-      logger.error("Not authorized to search for series: " + seriesName, e);
-      return mp;
-    }
-    DublinCoreCatalog series = null;
-    if (seriesList.size() == 0) {
+      seriesService.getSeries(seriesId);
+    } catch (NotFoundException nfe) {
       try {
-        series = createSeries(seriesName, roleName);
+        createSeries(seriesId, seriesName, roleName);
       } catch (Exception e) {
-        logger.error("Unable to create series {} for event {}", seriesName, mp.getIdentifier(), e);
+        logger.error("Unable to create series {} for event {}", seriesName, mp, e);
         return mp;
       }
-    } else if (seriesList.size() == 1) {
-      series = seriesList.getCatalogList().get(0);
-    } else {
-      logger.error("More than one series with name {} found for event {}", seriesName, mp.getIdentifier());
+    } catch (SeriesException | UnauthorizedException e) {
+      logger.error("Exception while searching for series {}", seriesName, e);
       return mp;
     }
+
     // Add the event to CA series
-    mp.setSeries(series.getFirst(PROPERTY_IDENTIFIER));
+    mp.setSeries(seriesId);
     mp.setSeriesTitle(seriesName);
 
     return mp;
   }
 
-  private DublinCoreCatalog createSeries(String seriesName, String roleName) throws SeriesException, UnauthorizedException, NotFoundException {
+  private DublinCoreCatalog createSeries(String seriesId, String seriesName, String roleName)
+      throws SeriesException, UnauthorizedException, NotFoundException {
     DublinCoreCatalog dc = DublinCores.mkOpencastSeries().getCatalog();
-    dc.set(PROPERTY_IDENTIFIER, UUID.randomUUID().toString());
+    dc.set(PROPERTY_IDENTIFIER, seriesId);
     dc.set(PROPERTY_TITLE, seriesName);
     dc.set(DublinCore.PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(new Date(), Precision.Second));
     // set series name
@@ -2049,7 +2034,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     AccessControlEntry aceRead = new AccessControlEntry(roleName, Permissions.Action.READ.toString(), true);
     AccessControlEntry aceWrite = new AccessControlEntry(roleName, Permissions.Action.WRITE.toString(), true);
     AccessControlList acl = new AccessControlList(aceRead, aceWrite);
-    String seriesId = createdSeries.getFirst(PROPERTY_IDENTIFIER);
     seriesService.updateAccessControl(seriesId, acl);
     logger.info("Created capture agent series with name {} and id {}", seriesName, seriesId);
 

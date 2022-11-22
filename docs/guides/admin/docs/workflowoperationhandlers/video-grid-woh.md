@@ -1,12 +1,15 @@
-# VideoGridWorkflowOperationHandler
+Video Grid Workflow Operation
+=============================
 
-## Description
+ID: `video-grid`
 
-The VideoGridWorkflowOperationHandler offers a way to combine several, partially simultaneously
-playing videos into a single video file. For example, the webcam feeds during a video conference
-can be combined by this WOH. The resulting video puts each input video on a grid that dynamically
-resizes based on the number of inputs videos currently active. Which input video is active when
-is defined through a SMIL catalogue from e.g. a partial ingest.
+Description
+-----------
+
+The `video-grid` operation offers a way to combine several, partially simultaneously playing videos into a single video
+file. For example, the webcam feeds during a video conference can be combined by this WOH. The resulting video puts each
+input video on a grid that dynamically resizes based on the number of inputs videos currently active. Which input video
+is active when is defined through a SMIL catalogue from e.g. a partial ingest.
 
 If the SMIL defines a section where there are no videos active, the background color will be shown
 instead for the duration of the section. This also holds true for potentially empty beginning and end 
@@ -33,7 +36,8 @@ a single output file.
 
 \* **required keys**
 
-## Example
+Example
+-------
 
 For this example, let us assume that our source-flavor contains three videos. The SMIL file from our
 source-smil-flavor defines the duration for the final video as 3 (units of time). It also defines the start
@@ -49,13 +53,13 @@ how the videos from our source-flavor are arranged in each section.
 
 Finally, the videos for each section are combined into one final, single video file.
 
-## Operation Example
+Operation Example
+-----------------
+
 ```xml
 <operation
     id="video-grid"
-    description="Generate sections of the final video"
-    fail-on-error="true"
-    exception-handler-workflow="partial-error">
+    description="Generate sections of the final video">
   <configurations>
     <configuration key="source-flavor">presenter/source</configuration>
     <configuration key="source-smil-flavor">smil/source+partial</configuration>
@@ -65,10 +69,12 @@ Finally, the videos for each section are combined into one final, single video f
 </operation>
 ```
 
-## Encoding Profiles
+Encoding Profiles
+-----------------
 
 Although not necessary, it is recommended to use a concat encoding profile that makes use of concat demuxing. This helps with reducing working memory usage.
-```
+
+```properties
 # Concat - lossless concat
 # Source files must be of the same dimension and codecs and they will be used in the target
 # It uses ffmpeg concat demuxer

@@ -25,6 +25,7 @@ import org.opencastproject.metadata.api.CatalogService;
 import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.osgi.service.component.annotations.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -37,6 +38,13 @@ import javax.xml.transform.stream.StreamResult;
 /**
  * Loads {@link Mpeg7Catalog}s
  */
+@Component(
+    immediate = true,
+    service = { Mpeg7CatalogService.class,CatalogService.class },
+    property = {
+        "service.description=Mpeg7 Catalog Service"
+    }
+)
 public class Mpeg7CatalogService implements CatalogService<Mpeg7Catalog> {
 
   public InputStream serialize(Mpeg7Catalog catalog) throws IOException {

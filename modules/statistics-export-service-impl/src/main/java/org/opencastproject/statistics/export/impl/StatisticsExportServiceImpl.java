@@ -56,6 +56,10 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,9 +77,17 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
+@Component(
+    immediate = true,
+    service = { ManagedService.class,StatisticsExportService.class },
+    property = {
+        "service.description=Statistics Export Service"
+    }
+)
 public class StatisticsExportServiceImpl implements StatisticsExportService, ManagedService {
 
   /** Logging utility */
@@ -127,26 +139,32 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
         ));
   }
 
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating Statistics Service");
   }
 
+  @Deactivate
   public void deactivate(ComponentContext cc) {
     logger.info("Deactivating Statistics Service");
   }
 
+  @Reference
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
+  @Reference
   public void setStatisticsService(StatisticsService statisticsService) {
     this.statisticsService = statisticsService;
   }
 
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference
   public void setAssetManager(final AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -316,8 +334,9 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
     if (offset != 0) {
       return;
     }
-    final Opt<Series> series = indexService.getSeries(resourceId, index);
-    if (!series.isSome()) {
+    final Optional<Series> series = index.getSeries(
+            resourceId, securityService.getOrganization().getId(), securityService.getUser());
+    if (!series.isPresent()) {
       throw new NotFoundException("Series not found in index: " + resourceId);
     }
     final TimeSeries dataSeries = statisticsService.getTimeSeriesData(
@@ -667,6 +686,5 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       throw new IllegalArgumentException("Unknown filter :" + name);
     }
   }
-
 
 }

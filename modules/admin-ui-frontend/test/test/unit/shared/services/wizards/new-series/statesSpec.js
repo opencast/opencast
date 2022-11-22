@@ -8,6 +8,6 @@ describe('States for the New Series Wizard', function () {
     }));
 
     it('provides states', function () {
-        expect(NewSeriesStates.get().length).toBe(5);
+        expect(NewSeriesStates.get().length).toBe(6);
     });
 });

@@ -97,7 +97,7 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
   private ComponentContext cc;
 
   /** OSGi DI */
-  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.common)")
+  @Reference(target = "(osgi.unit.name=org.opencastproject.common)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -108,7 +108,7 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
-  @Reference(name = "userDirectoryService")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -117,7 +117,7 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -126,7 +126,7 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
    * @param organizationDirectoryService
    *          the organizationDirectoryService to set
    */
-  @Reference(name = "organization-directory-service")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
@@ -267,9 +267,8 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
 
     logger.debug("updateGroupMembershipFromRoles({}, size={})", userName, roleList.size());
 
-    // The list of groups for this user represented by the roleList is considered authoritative,
-    // so remove the user from any groups which aren't represented in the roleList, and add the
-    // user to all groups which are in the roleList.
+    // Add the user to all groups which are in the roleList, but allow the user to be part of groups
+    // without having the group role
 
     Set<String> membershipRoles = new HashSet<String>();
 
@@ -280,18 +279,9 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
         //ignore groups of other providers
         continue;
       }
-      try {
-        if (roleList.contains(group.getRole())) {
-          // record this membership
-          membershipRoles.add(group.getRole());
-        } else {
-          // remove user from this group
-          logger.debug("Removing user {} from group {}", userName, group.getRole());
-          group.getMembers().remove(userName);
-          addGroup(group);
-        }
-      } catch (UnauthorizedException e) {
-        logger.warn("Unauthorized to add or remove user {} from group {}", userName, group.getRole(), e);
+      if (roleList.contains(group.getRole())) {
+        // record this membership
+        membershipRoles.add(group.getRole());
       }
     }
 
@@ -313,6 +303,29 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
       }
     }
 
+  }
+
+  /**
+   * Removes a user from all groups
+   *
+   * @param userName
+   *          the username
+   * @param orgId
+   *          the user's organization
+   *
+   */
+  public void removeMemberFromAllGroups(String userName, String orgId) {
+    // List of the user's groups
+    List<JpaGroup> membership = UserDirectoryPersistenceUtil.findGroupsByUser(userName, orgId, emf);
+    for (JpaGroup group : membership) {
+      try {
+        logger.debug("Removing user {} from group {}", userName, group.getRole());
+        group.getMembers().remove(userName);
+        addGroup(group);
+      } catch (UnauthorizedException e) {
+        logger.warn("Unauthorized to add or remove user {} from group {}", userName, group.getRole(), e);
+      }
+    }
   }
 
   /**

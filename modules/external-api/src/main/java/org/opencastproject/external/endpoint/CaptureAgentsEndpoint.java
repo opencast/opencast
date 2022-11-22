@@ -37,6 +37,9 @@ import org.opencastproject.util.doc.rest.RestService;
 import com.entwinemedia.fn.data.json.JValue;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,12 +59,21 @@ import javax.ws.rs.core.Response;
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
             ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
-            ApiMediaType.VERSION_1_7_0 })
+            ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0 })
 @RestService(
     name = "externalapicaptureagents",
     title = "External API Capture Agents Service",
     notes = {},
     abstractText = "Provides resources and operations related to the capture agents"
+)
+@Component(
+    immediate = true,
+    service = CaptureAgentsEndpoint.class,
+    property = {
+        "service.description=External API - Capture Agents Endpoint",
+        "opencast.service.type=org.opencastproject.external.agents",
+        "opencast.service.path=/api/agents"
+    }
 )
 public class CaptureAgentsEndpoint {
 
@@ -77,12 +89,14 @@ public class CaptureAgentsEndpoint {
   }
 
   /** OSGi DI */
+  @Reference
   public void setAgentStateService(CaptureAgentStateService agentStateService) {
     this.agentStateService = agentStateService;
   }
 
 
   /** OSGi activation method */
+  @Activate
   void activate(ComponentContext cc) {
     logger.info("Activating External API - Capture Agents Endpoint");
   }

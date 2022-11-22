@@ -37,6 +37,10 @@ import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +56,13 @@ import java.util.concurrent.TimeUnit;
 /**
  * Implements statistics providers using influxdb for permanent storage.
  */
+@Component(
+    immediate = true,
+    service = { ManagedService.class,ArtifactInstaller.class,StatisticsWriter.class },
+    property = {
+        "service.description=Statistics Provider Influx Service"
+    }
+)
 public class StatisticsProviderInfluxService implements ManagedService, ArtifactInstaller, StatisticsWriter {
 
   /** Logging utility */
@@ -74,14 +85,17 @@ public class StatisticsProviderInfluxService implements ManagedService, Artifact
   private Map<String, StatisticsProvider> fileNameToProvider = new ConcurrentHashMap<>();
 
 
+  @Reference
   public void setStatisticsCoordinator(StatisticsCoordinator service) {
     this.statisticsCoordinator = service;
   }
 
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating Statistics Provider Influx Service");
   }
 
+  @Deactivate
   public void deactivate(ComponentContext cc) {
     logger.info("Deactivating Statistics Provider Influx Service");
     disconnectInflux();

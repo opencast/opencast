@@ -62,7 +62,6 @@ import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.opencastproject.workingfilerepository.impl.WorkingFileRepositoryImpl;
@@ -671,7 +670,7 @@ public class IngestServiceImplTest {
     WorkflowService workflowService = EasyMock.createNiceMock(WorkflowService.class);
     EasyMock.expect(workflowService.start(EasyMock.anyObject(WorkflowDefinition.class),
             EasyMock.anyObject(MediaPackage.class), EasyMock.capture(captureConfig)))
-            .andReturn(new WorkflowInstanceImpl()).once();
+            .andReturn(new WorkflowInstance()).once();
     EasyMock.replay(workflowService);
     service.setWorkflowService(workflowService);
 

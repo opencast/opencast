@@ -41,6 +41,8 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,6 +75,15 @@ import javax.ws.rs.core.Response.Status;
     notes = {},
     abstractText = "Provides operations to LTI clients"
 )
+@Component(
+    immediate = true,
+    service = LtiServiceRestEndpoint.class,
+    property = {
+        "service.description=LTI Service",
+        "opencast.service.type=org.opencastproject.lti.service",
+        "opencast.service.path=/lti-service"
+    }
+)
 public class LtiServiceRestEndpoint {
   private static final Gson gson = new Gson();
 
@@ -80,6 +91,7 @@ public class LtiServiceRestEndpoint {
   private LtiService service;
 
   /** OSGi DI */
+  @Reference
   public void setService(LtiService service) {
     this.service = service;
   }

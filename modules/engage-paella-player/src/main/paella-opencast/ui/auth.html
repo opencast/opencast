@@ -12,20 +12,25 @@
 
 			var search = {};
 			window.location.search.slice(1).split("&").forEach(function (x) {
-				var p = x.split("=");
+				var p = x.split(/=(.*)/);
 				search[p[0]] = p[1];
 			});
 
 			var redirect = search['redirect'];
 			var id = search['id'];
 			var series = search['series'] || search['sid'] || search['epFrom'];
-			if (redirect != undefined) {
-				window.location.href = decodeURIComponent(redirect);
+			if (redirect !== undefined) {
+				let redirectDomain = new URL(redirect);
+				if (window.location.hostname.toUpperCase() === redirectDomain.hostname.toUpperCase()) {
+					window.location.href = decodeURIComponent(redirect);
+				} else {
+					window.location.href = "/engage/ui/index.html";
+				}
 			}
-			else if (id != undefined) {
+			else if (id !== undefined) {
 				window.location.href = "watch.html?id=" + id;
 			}
-			else if (series != undefined) {
+			else if (series !== undefined) {
 				window.location.href = "/engage/ui/index.html?epFrom=" + series;
 			}
 			else {

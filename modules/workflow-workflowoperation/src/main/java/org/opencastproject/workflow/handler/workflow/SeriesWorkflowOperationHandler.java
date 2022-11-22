@@ -41,6 +41,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.NotFoundException;
@@ -49,6 +50,7 @@ import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
@@ -62,6 +64,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +83,14 @@ import java.util.UUID;
 /**
  * The workflow definition for handling "series" operations
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Apply Series to Recording Workflow Operation Handler",
+        "workflow.operation=series"
+    }
+)
 public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -118,6 +132,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
    * @param authorizationService
    *          the authorization service
    */
+  @Reference
   protected void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -128,6 +143,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
    * @param seriesService
    *          the series service
    */
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -138,6 +154,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
    * @param workspace
    *          the workspace
    */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -148,11 +165,17 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
    * @param securityService
    *          the securityService
    */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi callback to add {@link SeriesCatalogUIAdapter} instance. */
+  @Reference(
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeCatalogUIAdapter"
+  )
   public void addCatalogUIAdapter(SeriesCatalogUIAdapter catalogUIAdapter) {
     seriesCatalogUIAdapters.add(catalogUIAdapter);
   }
@@ -160,6 +183,12 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
   /** OSGi callback to remove {@link SeriesCatalogUIAdapter} instance. */
   public void removeCatalogUIAdapter(SeriesCatalogUIAdapter catalogUIAdapter) {
     seriesCatalogUIAdapters.remove(catalogUIAdapter);
+  }
+
+  @Reference
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
   /**

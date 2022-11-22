@@ -62,6 +62,11 @@ import org.opencastproject.util.data.functions.Misc;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +80,15 @@ import java.util.Map;
  * This service provides {@link org.opencastproject.metadata.api.StaticMetadata} for a given mediapackage,
  * based on a contained dublin core catalog describing the episode.
  */
+@Component(
+    immediate = true,
+    service = StaticMetadataService.class,
+    property = {
+        "service.description=Static Metadata Service, dublin core based",
+        "metadata.source=dublincore",
+        "priority=1"
+    }
+)
 public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataService {
 
   private static final Logger logger = LoggerFactory.getLogger(StaticMetadataServiceDublinCoreImpl.class);
@@ -93,10 +107,17 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
 
   protected MediaPackageSerializer serializer = null;
 
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
+  @Reference(
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy = ReferencePolicy.DYNAMIC,
+      target = "(service.pid=org.opencastproject.mediapackage.ChainingMediaPackageSerializer)",
+      unbind = "unsetMediaPackageSerializer"
+  )
   public void setMediaPackageSerializer(MediaPackageSerializer serializer) {
     this.serializer = serializer;
   }
@@ -107,6 +128,7 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
     }
   }
 
+  @Activate
   public void activate(@SuppressWarnings("rawtypes") Map properties) {
     logger.debug("activate()");
     if (properties != null) {
