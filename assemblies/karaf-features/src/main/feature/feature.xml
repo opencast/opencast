@@ -123,6 +123,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-metadata-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-metrics-exporter/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-mpeg7/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-redirect/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-runtime-info/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-security-aai/${project.version}</bundle>
