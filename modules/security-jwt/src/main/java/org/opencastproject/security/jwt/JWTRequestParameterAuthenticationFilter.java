@@ -28,9 +28,13 @@ import org.springframework.util.Assert;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Authentication filter for JWTs in query parameters
+ * Authentication filter for JWTs in request parameters.
+ *
+ * What exactly this means depends on the request method.
+ * Specifically, for {@code GET} requests, the JWT is looked up in the query parameters.
+ * For {@code POST} this expects a form body and the JWT is read from there.
  */
-public class JWTQueryParameterAuthenticationFilter extends AbstractPreAuthenticatedProcessingFilter {
+public class JWTRequestParameterAuthenticationFilter extends AbstractPreAuthenticatedProcessingFilter {
   /** Name of the parameter to extract the JWT from. */
   private String parameterName = null;
 
@@ -90,7 +94,7 @@ public class JWTQueryParameterAuthenticationFilter extends AbstractPreAuthentica
   }
 
   /**
-   * Defines whether an exception should be raised if the principal query parameter is missing. Defaults to true.
+   * Defines whether an exception should be raised if the principal parameter is missing. Defaults to true.
    * @param exceptionIfParameterMissing set to {@code false} to override the default behaviour and allow the request to
    *                                    proceed if no parameter is found.
    */

@@ -13,7 +13,8 @@ Prerequisites
 -------------
 
 This guide assumes that a JWT provider is already setup and Opencast receives the JWT within an HTTP request header,
-or in a query parameter. In order to integrate Opencast with an OIDC provider you could use the
+or in a request parameter (i.e. a query parameter for `GET`-requests, and a form parameter for `POST`-requests).
+In order to integrate Opencast with an OIDC provider you could use the
 [oauth2-proxy](https://github.com/oauth2-proxy/oauth2-proxy).
 
 Enable Karaf Feature
@@ -54,15 +55,15 @@ sections found in `etc/security/mh_default_org.xml`. Some of the options are con
 <osgi:reference id="userReferenceProvider" cardinality="1..1"
                 interface="org.opencastproject.userdirectory.api.UserReferenceProvider" />
 ```
-* Add the configured `jwtHeaderFilter` and/or `jwtQueryParameterFilter` to the filters list
+* Add the configured `jwtHeaderFilter` and/or `jwtRequestParameterFilter` to the filters list
   of the `preAuthenticationFilters` bean.
 ```xml
 <!-- Uncomment the line below to support JWT. -->
 <ref bean="jwtHeaderFilter" />
 <!-- Additionally/alternatively uncomment this to support passing a JWT in a URL parameter. -->
-<ref bean="jwtQueryParameterFilter" />
+<ref bean="jwtRequestParameterFilter" />
 ```
-* Configure the `jwtHeaderFilter` and/or `jwtQueryParameterFilter` beans.
+* Configure the `jwtHeaderFilter` and/or `jwtRequestParameterFilter` beans.
 ```xml
 <!-- General JWT header extraction filter -->
 <bean id="jwtHeaderFilter" class="org.opencastproject.security.jwt.JWTRequestHeaderAuthenticationFilter">
@@ -78,9 +79,9 @@ sections found in `etc/security/mh_default_org.xml`. Some of the options are con
   <property name="debug" value="false" />
 </bean>
 
-<!-- General JWT query parameter extraction filter -->
-<bean id="jwtQueryParameterFilter" class="org.opencastproject.security.jwt.JWTQueryParameterAuthenticationFilter">
-  <!-- Name of the query parameter that contains the JWT (default: jwt) -->
+<!-- General JWT request parameter extraction filter -->
+<bean id="jwtRequestParameterFilter" class="org.opencastproject.security.jwt.JWTRequestParameterAuthenticationFilter">
+  <!-- Name of the request parameter that contains the JWT (default: jwt) -->
   <property name="parameterName" value="jwt" />
   <property name="authenticationManager" ref="authenticationManager" />
   <property name="loginHandler" ref="jwtLoginHandler" />

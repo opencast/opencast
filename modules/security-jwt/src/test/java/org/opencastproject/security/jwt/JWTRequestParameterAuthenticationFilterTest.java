@@ -34,11 +34,11 @@ import java.security.NoSuchAlgorithmException;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Tests {@link JWTQueryParameterAuthenticationFilter}.
+ * Tests {@link JWTRequestParameterAuthenticationFilterTest}.
  */
-public class JWTQueryParameterAuthenticationFilterTest extends JWTLoginTest {
-  private JWTQueryParameterAuthenticationFilter parameterAuthenticationFilter =
-          new JWTQueryParameterAuthenticationFilter();
+public class JWTRequestParameterAuthenticationFilterTest extends JWTLoginTest {
+  private JWTRequestParameterAuthenticationFilter parameterAuthenticationFilter =
+          new JWTRequestParameterAuthenticationFilter();
 
   @Override @Before
   public void setUp() throws NoSuchAlgorithmException, JwkException {
@@ -48,12 +48,7 @@ public class JWTQueryParameterAuthenticationFilterTest extends JWTLoginTest {
     parameterAuthenticationFilter.setLoginHandler(loginHandler);
     parameterAuthenticationFilter.setParameterName("jwt");
 
-    authFilter = new TestAbstractPreAuthenticatedProcessingFilter() {
-      @Override
-      public Object getPreAuthenticatedPrincipal(HttpServletRequest request) {
-        return parameterAuthenticationFilter.getPreAuthenticatedPrincipal(request);
-      }
-    };
+    authFilter = request -> parameterAuthenticationFilter.getPreAuthenticatedPrincipal(request);
   }
 
   @Override
