@@ -107,8 +107,27 @@ angular.module('adminNg.controllers')
     }).catch(angular.noop);
 
     $scope.changeBaseAcl = function (id) {
+      // Get the policies which should persist on template change
+      var allPolicies = $scope.getAllPolicies();
+      var remainingPolicies = allPolicies.filter(policy => (
+        $scope.aclCreateDefaults['keep_on_template_switch_role_prefixes'].some(
+          pattern => policy.role.startsWith(pattern)
+        )
+      ));
+
+      var remainingACEs = [];
+      angular.forEach(remainingPolicies, function (policy) {
+        if (policy.read) {
+          remainingACEs.push({role: policy.role, action: 'read', allow: true});
+        }
+        if (policy.write) {
+          remainingACEs.push({role: policy.role, action: 'write', allow: true});
+        }
+      });
+
       $scope.baseAcl = SeriesAccessResource.getManagedAcl({id: id}, function () {
-        changePolicies($scope.baseAcl.acl.ace);
+        var combine = $scope.baseAcl.acl.ace.concat(remainingACEs);
+        changePolicies(combine);
       });
     };
 
@@ -316,6 +335,9 @@ angular.module('adminNg.controllers')
           : 'ROLE_USER_';
         $scope.aclCreateDefaults['sanitize'] = $scope.aclCreateDefaults['sanitize'] !== undefined
           ? ($scope.aclCreateDefaults['sanitize'].toLowerCase() === 'true') : true;
+        $scope.aclCreateDefaults['keep_on_template_switch_role_prefixes'] =
+          $scope.aclCreateDefaults['keep_on_template_switch_role_prefixes'] !== undefined
+            ? $scope.aclCreateDefaults['keep_on_template_switch_role_prefixes'].split(',') : [];
       });
 
       $scope.selectedTheme = {};

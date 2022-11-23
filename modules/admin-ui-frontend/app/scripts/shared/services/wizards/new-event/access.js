@@ -204,10 +204,30 @@ angular.module('adminNg.services')
       };
 
       this.changeBaseAcl = function (id) {
+        // Get the policies which should persist on template change
+        var allPolicies = this.getAllPolicies();
+        var remainingPolicies = allPolicies.filter(policy => (
+          me.aclCreateDefaults['keep_on_template_switch_role_prefixes'].some(
+            pattern => policy.role.startsWith(pattern)
+          )
+        ));
+
+        var remainingACEs = [];
+        angular.forEach(remainingPolicies, function (policy) {
+          if (policy.read) {
+            remainingACEs.push({role: policy.role, action: 'read', allow: true});
+          }
+          if (policy.write) {
+            remainingACEs.push({role: policy.role, action: 'write', allow: true});
+          }
+        });
+
         me.ud.id = id;
         var newPolicies = {};
         me.ud.baseAcl = EventAccessResource.getManagedAcl({id: me.ud.id}, function () {
-          angular.forEach(me.ud.baseAcl.acl.ace, function (acl) {
+          var combine = me.ud.baseAcl.acl.ace.concat(remainingACEs);
+
+          angular.forEach(combine, function (acl) {
             var policy = newPolicies[acl.role];
 
             if (angular.isUndefined(policy)) {
@@ -331,6 +351,9 @@ angular.module('adminNg.services')
           : 'ROLE_USER_';
         me.aclCreateDefaults['sanitize'] = me.aclCreateDefaults['sanitize'] !== undefined
           ? (me.aclCreateDefaults['sanitize'].toLowerCase() === 'true') : true;
+        me.aclCreateDefaults['keep_on_template_switch_role_prefixes'] =
+          me.aclCreateDefaults['keep_on_template_switch_role_prefixes'] !== undefined
+            ? me.aclCreateDefaults['keep_on_template_switch_role_prefixes'].split(',') : [];
       });
 
       me.roles = RolesResource.queryNameOnly({limit: -1, target: 'ACL'});
