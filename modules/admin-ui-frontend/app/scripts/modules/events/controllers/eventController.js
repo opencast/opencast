@@ -731,7 +731,7 @@ angular.module('adminNg.controllers')
           remainingACEs.push({role: policy.role, action: 'write', allow: true});
         }
         for (const action of policy.actions.value) {
-          remainingACEs.push({role: policy.role, action: action, allow: true})
+          remainingACEs.push({role: policy.role, action: action, allow: true});
         }
       });
 
