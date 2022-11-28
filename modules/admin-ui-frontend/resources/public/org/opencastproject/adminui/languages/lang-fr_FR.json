@@ -3,10 +3,10 @@
    "NAV_HOME": "Accueil",
    "NAV_ABOUT": "À propos",
    "BUILD": {
-      "BUILT_ON": "built on",
-      "DATE_DESC": "Date this system's kernel module was built on.",
-      "COMMIT": "Git commit this version was built from.",
-      "VERSION": "Common bundle version"
+      "BUILT_ON": "Basé sur",
+      "DATE_DESC": "Date à laquelle le module noyau de ce système a été construit.",
+      "COMMIT": "Cette version a été construite sur ce commit Git.",
+      "VERSION": "Version commune du bundle"
    },
    "NO": "Non",
    "SUBMIT": "Envoyer",
@@ -28,7 +28,7 @@
    "YES": "Oui",
    "COPY": "Copier dans le presse-papiers",
    "MONITOR": {
-      "REGISTRATION": "Opencast has sent a registration update in more than a week"
+      "REGISTRATION": "Opencast a envoyé une mise à jour d'inscription dans plus d'une semaine"
    },
    "LTI": {
       "ERROR_LOADING_METADATA": "Erreur lors du chargement des métadonnées de l'événement. Veuillez réessayer plus tard.",
@@ -40,10 +40,10 @@
       "CURRENT_JOBS": "Tâches du jour",
       "PRESENTER": "Présentateur",
       "PRESENTER_DESCRIPTION": "Fichier vidéo pour la piste du présentateur",
-      "VIDEOFILE": "Videofile",
-      "VIDEOFILE_DESCRIPTION": "Video file for upload",
+      "VIDEOFILE": "Fichier Vidéo",
+      "VIDEOFILE_DESCRIPTION": "Fichier vidéo à téléverser",
       "CAPTION": "Sous-titres",
-      "CAPTION_DESCRIPTION": "Caption file; VTT or dfxp format is supported",
+      "CAPTION_DESCRIPTION": "Sous-titres; Le format VTT ou dfxp est pris en charge",
       "UPLOAD": "Envoyer",
       "UPLOADING": "Envoi en cours",
       "EDIT": "Enregistrer",
@@ -132,7 +132,7 @@
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "Cette série contient des événements. Suppression de la série ne supprimera pas les événements.",
          "EVENT_WILL_BE_GONE": "Si vous continuez, l'événement disparaîtra irrévocablement.",
-         "UNSAVED_CHANGES": "You have unsaved changes. If you continue, those changes will be discarded. Are you sure that you want to continue?"
+         "UNSAVED_CHANGES": "Vous avez des modifications non enregistrées. Si vous continuez, ces modifications seront annulées. Êtes-vous sûr de vouloir continuer ?"
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Cette série ne peut être supprimée car elle contient toujours des événements."
@@ -209,7 +209,7 @@
       "INVALID_ACL_RULES": "Les règles doivent contenir un rôle valide et un droit d'accès lecture et/ou écriture.",
       "MISSING_ACL_RULES": "Il faut au moins un rôle avec droit d'accès Lecture et Ecriture !",
       "SAVED_ACL_RULES": "Les règles d'accès ont été enregistrées.",
-      "SAVED_METADATA": "The metadata has been saved.",
+      "SAVED_METADATA": "Les métadonnées ont été enregistrées.",
       "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "Les événements existants dans cette série devront être retraités",
       "SERIES_ACL_LOCKED": "Modification des droits d'accès n'est pas autorisée lorsque des opérations sont en cours d'exécution sur un événement appartenant à cette série",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "Sélectionner au moins un role avec permission de lecture et écriture.",
@@ -240,7 +240,7 @@
       "SERVICE_UNAVAILABLE": "Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement.",
       "ACTIVE_TRANSACTION": "Cet événement ne peut pas être modifié, pendant qu’il y a un flux de travail actif ou une transaction.",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "An unexpected error occurred while updating. Some events might have been updated.",
+         "UNEXPECTED_ERROR": "Une erreur inattendue s'est produite lors de la mise à jour. Certains événements peuvent avoir été mis à jour.",
          "ALL_EVENTS_UPDATED": "Tous les événements ont été mis à jour avec succès.",
          "NO_EVENTS_UPDATED": "Toutes les mises à jour ont échoué.",
          "SOME_EVENTS_NOT_UPDATED": "Certains événements n'ont pas pu être mis à jour."
@@ -249,16 +249,16 @@
       "ADOPTER_PROFILE_NOT_UPDATED": "Oups ! Impossible de mettre à jour les informations de profil. Veuillez réessayer !",
       "ADOPTER_PROFILE_DELETED": "Les informations de profil ont bien été supprimées.",
       "ADOPTER_PROFILE_NOT_DELETED": "Oups ! Impossible de supprimer les informations de profil. Veuillez réessayer !",
-      "TOBIRA_OVERRIDE_NAME": "The title of the selected page will be overridden with the title of the series.",
-      "TOBIRA_NO_PATH_SEGMENT": "Page needs a path segment.",
-      "TOBIRA_NOT_MOUNTED": "Series could not be mounted in Tobira.",
-      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
-      "TOBIRA_PATH_SEGMENT_UNIQUE": "The path segment of a page must be unqiue among all its sibling pages.",
-      "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
-      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and/or try again later.",
-      "TOBIRA_COPIED_DIRECT_LINK": "Copied link to clipboard.",
-      "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Couldn't copy link to clipboard.",
-      "TOBIRA_NOT_FOUND": "Tobira doesn't know about this series (yet). Try again in a few minutes or contact your system administrator."
+      "TOBIRA_OVERRIDE_NAME": "Le titre de la page sélectionnée sera remplacé par le titre de la série.",
+      "TOBIRA_NO_PATH_SEGMENT": "La page a besoin d'un segment de chemin.",
+      "TOBIRA_NOT_MOUNTED": "La série n'a pas pu être montée en Tobira.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "Le segment de chemin n'est pas valide. Un segment de chemin valide est d'au moins 2 caractères, ne contient aucun espace ou caractère de contrôle, aucun des caractères '<>\"[\\]^`{|}#%/? ', et ne commence pas par un des caractères '-+~@_! &;:. =*'()'.",
+      "TOBIRA_PATH_SEGMENT_UNIQUE": "Le segment de chemin d'une page doit être unique parmi toutes ses pages frères.",
+      "TOBIRA_PAGE_NOT_FOUND": "La page vers laquelle vous avez essayé de naviguer n'existe pas ou n'existe plus. Essayez peut-être de commencer à partir du début.",
+      "TOBIRA_SERVER_ERROR": " Erreur lors de la conversation avec Tobira. Contactez votre administrateur système et/ou réessayez plus tard.",
+      "TOBIRA_COPIED_DIRECT_LINK": "Le lien a été copié dans votre presse-papiers.",
+      "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Impossible de copier dans le presse-papiers.",
+      "TOBIRA_NOT_FOUND": "Tobira ne connaît pas encore cette série. Réessayez dans quelques minutes ou contactez votre administrateur système."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
@@ -329,7 +329,7 @@
       },
       "EDIT_EVENTS_METADATA": {
          "CAPTION": "Modifier les métadonnées d'événements multiples",
-         "FATAL_ERROR": "A fatal error occurred: {{ fatalError }}",
+         "FATAL_ERROR": "Une erreur fatale s'est produite: {{ fatalError }}",
          "REQUEST_ERRORS": {
             "CANNOT_EDIT_SOME": "Les événements en surbrillance ne peuvent pas être modifiés.",
             "NOTHING_TO_EDIT": "Les événements ne peuvent pas être modifiés.",
@@ -337,24 +337,24 @@
             "RUNNING_WORKFLOW": "Workflow en cours d'exécution",
             "TABLE": {
                "CAPTION": "Événements sélectionnés",
-               "ERRORS": "Errors"
+               "ERRORS": "Erreurs"
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "DESCRIPTION": "Modifier et/ou sélectionner les champs de métadonnées que vous souhaitez mettre à jour. Un champ ne peut pas être sélectionné si cela ne donne pas une valeur modifiée pour au moins un événement, ou si le champ n'est pas valide (e. . Les champs obligatoires ne peuvent pas être vide). Les champs de métadonnées en surbrillance ont des valeurs divergentes pour les événements sélectionnés.",
             "TABLE": {
-               "CAPTION": "Metadata of selected events",
-               "FIELDS": "Metadata",
-               "VALUES": "Values"
+               "CAPTION": "Métadonnées des événements sélectionnés",
+               "FIELDS": "Métadonnées",
+               "VALUES": "Valeurs"
             }
          },
          "UPDATE_FAILURES": {
             "TABLE": {
-               "CAPTION": "Update Failures"
+               "CAPTION": "Échec de la mise à jour"
             },
-            "UPDATE_FAILED": "Update failed",
-            "NO_EVENTS_UPDATED": "All updates failed.",
-            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
+            "UPDATE_FAILED": "La mise à jour a échoué",
+            "NO_EVENTS_UPDATED": "Toutes les mises à jour ont échoué.",
+            "SOME_EVENTS_NOT_UPDATED": "Les événements en surbrillance ne peuvent pas être modifiés."
          }
       }
    },
@@ -417,63 +417,63 @@
    },
    "ADOPTER_REGISTRATION": {
       "MODAL": {
-         "CAPTION": "Registration",
-         "SKIP": "Not now",
-         "CONTINUE": "Continue",
-         "BACK": "Back",
+         "CAPTION": "Inscription",
+         "SKIP": "Pas maintenant",
+         "CONTINUE": "Continuer",
+         "BACK": "Précédent",
          "LEGAL_INFO_STATE": {
-            "HEADER": "Terms of Service and Privacy Policy"
+            "HEADER": "Conditions d'utilisation et Politique de confidentialité"
          },
          "SUMMARY_STATE": {
-            "HEADER": "This is a JSON summary of exactly what would be sent to Opencast's servers",
-            "GENERAL_HEADER": "Adopter Information",
-            "STATS_HEADER": "Statistical Information"
+            "HEADER": "Ceci est un résumé JSON de ce qui serait envoyé aux serveurs d'Opencast",
+            "GENERAL_HEADER": "Information sur l'utilisateur",
+            "STATS_HEADER": "Statistiques"
          },
          "INFORMATION_STATE": {
             "HEADER": "Merci d'avoir utilisé Opencast!",
-            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
-            "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, as even some of the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding and attract more companies to provide services around Opencast."
+            "INFORMATION_PARAGRAPH_1": "Nos développeurs travaillent constamment pour vous offrir la meilleure expérience possible. Pour cela, nous avons besoin de savoir qui utilise Opencast et comment il est utilisé. Vous pouvez nous aider avec une inscription rapide.",
+            "INFORMATION_PARAGRAPH_2": "Nous apprécions vivement tout commentaire, car même certaines des données que nous recueillons sur l'utilisation d'Opencast nous aideront à créer de meilleurs logiciels. ont de meilleures chances d'obtenir un financement supplémentaire et attirent plus d'entreprises pour fournir des services autour d'Opencast."
          },
          "FORM_STATE": {
             "ORGANISATION": "Organisation",
-            "DEPARTMENT": "Department",
-            "COUNTRY": "Country",
-            "POSTAL_CODE": "Postal code",
-            "CITY": "City",
-            "CONTACT_INFO": "Contact information",
-            "GENDER": "Gender",
-            "GENDER_MALE": "male",
-            "GENDER_FEMALE": "female",
-            "FIRST_NAME": "First name",
-            "LAST_NAME": "Last name",
-            "STREET": "Street",
-            "NUMBER": "Number",
-            "ADDITIONAL_ADDRESS_INFO": "Add. address information",
+            "DEPARTMENT": "Service/Département",
+            "COUNTRY": "Pays",
+            "POSTAL_CODE": "Code postal",
+            "CITY": "Ville",
+            "CONTACT_INFO": "Coordonnées",
+            "GENDER": "Sexe",
+            "GENDER_MALE": "masculin",
+            "GENDER_FEMALE": "femme",
+            "FIRST_NAME": "Prénom",
+            "LAST_NAME": "Nom",
+            "STREET": "Rue",
+            "NUMBER": "Numéro",
+            "ADDITIONAL_ADDRESS_INFO": "Ajouter des informations d'adresse",
             "MAIL": "Email",
-            "CONTACT_ME": "Contact me for updates and security issues",
-            "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
-            "POLICY_HEADLINE": "Privacy policy and terms of use",
-            "USAGE_STATISTICS": "Usage statistics",
-            "ERROR_REPORTS": "Error reports",
-            "READ_TERMS_OF_USE_BEFORE": "I have read and agree to the",
-            "READ_TERMS_OF_USE_LINK": "privacy policy and terms of use",
+            "CONTACT_ME": "Contactez-moi pour les mises à jour et les problèmes de sécurité",
+            "WHICH_DATA_TO_SHARE": "Quelles données voulez-vous partager ?",
+            "POLICY_HEADLINE": "Politique de confidentialité et Conditions d'utilisation",
+            "USAGE_STATISTICS": "Statistiques d'utilisation",
+            "ERROR_REPORTS": "Rapports d'erreur",
+            "READ_TERMS_OF_USE_BEFORE": "J'ai lu et j'accepte les",
+            "READ_TERMS_OF_USE_LINK": "Politique de confidentialité et Conditions d'utilisation",
             "READ_TERMS_OF_USE_AFTER": ""
          },
          "SKIP_STATE": {
-            "HEADER": "Maybe next time!",
-            "TEXT": "If you want to register later on, you can do that by pressing the help button in the top right corner."
+            "HEADER": "Peut-être une prochaine fois !",
+            "TEXT": "Si vous voulez vous inscrire plus tard, vous pouvez le faire en appuyant sur le bouton d'aide dans le coin supérieur droit."
          },
          "THANK_YOU_STATE": {
-            "HEADER": "Thank you for your registration!",
-            "TEXT_LEADING_TO_PATH": "You can change your data at ",
-            "TEXT_LEADING_AFTER_PATH": "at any time."
+            "HEADER": "Merci pour votre inscription!",
+            "TEXT_LEADING_TO_PATH": "Vous pouvez modifier vos données sur ",
+            "TEXT_LEADING_AFTER_PATH": "À tout moment"
          },
          "ERROR": {
-            "HEADER": "Error",
-            "TEXT": "An error occurred while processing your request."
+            "HEADER": "Erreur",
+            "TEXT": "Une erreur est survenue lors du traitement de la requête."
          },
          "DELETE_SUBMIT_STATE": {
-            "TEXT": "Are you sure you want to delete your registration data?"
+            "TEXT": "Êtes-vous sûr de vouloir supprimer vos données d'inscription ?"
          }
       }
    },
@@ -648,13 +648,13 @@
                "LOCATION": "Filtrer pour cet emplacement",
                "DETAILS": "Voir les détails de l’évènement",
                "DELETE": "Supprimer l’événement",
-               "EMBEDDING_CODE": "Embedding code",
+               "EMBEDDING_CODE": "Code d'intégration",
                "EDITOR": "Ouvrir l’éditeur vidéo",
                "EDITOR_NEEDS_CUTTING": "Ouvrir l'éditeur vidéo (un commentaire indique que la découpe de la vidéo a été demandée)",
                "COMMENTS": "Voir commentaires",
                "PAUSED_WORKFLOW": "Voir événement en pause",
                "PRESENTER": "Filtrer pour ce présentateur",
-               "COPY_TO_NEW_EVENT": "Copy metadata to new event"
+               "COPY_TO_NEW_EVENT": "Copier les métadonnées dans un nouvel événement"
             }
          },
          "STATUS": {
@@ -668,7 +668,7 @@
             "PROCESSED": "Terminé",
             "RECORDING_FAILURE": "Erreur d'enregistrement",
             "PROCESSING_FAILURE": "Erreur de traitement",
-            "PROCESSING_CANCELLED": "Processing cancelled"
+            "PROCESSING_CANCELLED": "Traitement annulé"
          },
          "STATE_MAPPING": {
             "RETRACTING": "Retrait",
@@ -916,7 +916,7 @@
                   "REVIEW": "Vérification requise",
                   "ASYNC": "Pistes A/V asynchrones",
                   "AUDIO_ISSUE": "Piste audio manquante ou défectueuse",
-                  "CANCELLED": "Cancelled event",
+                  "CANCELLED": "Événement annulé",
                   "CONFLICTING_METADATA": "Conflit de métadonnées",
                   "IMPROPER_POINT": "Point d'entrée ou de sortie incorrect",
                   "MISSING_AGREEMENT": "Accord manquant",
@@ -930,7 +930,7 @@
                   "WRONG_SERIES_PUBLICATION": "Mauvaise série au canal de publication",
                   "WRONG_WORKFLOW": "Mauvais flux de travail",
                   "PROCESSING_FAILURE": "Erreur de traitement",
-                  "ADMINUI_NOTES": "Notes in Admin UI"
+                  "ADMINUI_NOTES": "Notes dans l'interface d'administration"
                }
             },
             "STATISTICS": {
@@ -1134,17 +1134,17 @@
             },
             "TOBIRA": {
                "CAPTION": "Tobira",
-               "DESCRIPTION": "Here you can select where you want the series to show up in the Tobira video portal. You can only select one location here, and it needs to be empty (marked in bold). You can create new pages here, but note that they are only persisted if they are on the path to the selected page.",
-               "SELECT_PAGE": "Select a target page",
-               "PAGE_TITLE": "Subpage title",
-               "PATH_SEGMENT": "Path segment",
-               "SUBPAGES": "Subpages",
-               "ADD_SUBPAGE": "Add subpage",
-               "CANCEL": "Cancel",
-               "HOMEPAGE": "Homepage",
-               "SELECTED_PAGE": "Series will be mounted under the following path",
-               "NO_PAGE_SELECTED": "No page selected. Series will not be mounted in Tobira.",
-               "PATH": "Path"
+               "DESCRIPTION": "Ici vous pouvez sélectionner où vous voulez que la série s'affiche dans le portail vidéo Tobira. Vous ne pouvez sélectionner qu'un seul emplacement ici, et il doit être vide (marqué en gras). Vous pouvez créer de nouvelles pages ici, mais notez qu'elles ne sont persistantes que si elles sont sur le chemin de la page sélectionnée.",
+               "SELECT_PAGE": "Sélectionner la page cible",
+               "PAGE_TITLE": "Titre de la sous-page",
+               "PATH_SEGMENT": "Segment de chemin",
+               "SUBPAGES": "Sous-pages",
+               "ADD_SUBPAGE": "Ajouter une sous-page",
+               "CANCEL": "Annuler",
+               "HOMEPAGE": "Accueil",
+               "SELECTED_PAGE": "Les séries seront montées sous le chemin suivant",
+               "NO_PAGE_SELECTED": "Aucune page sélectionnée. Les séries ne seront pas montées dans Tobira.",
+               "PATH": "Chemin d'accès"
             },
             "SUMMARY": {
                "CAPTION": "Résumé"
@@ -1195,12 +1195,12 @@
                   "ACTION": "Actions",
                   "NEW": "Add row",
                   "DETAILS": "Détails",
-                  "REPLACE_EVENT_ACLS": "Save & update event permissions",
+                  "REPLACE_EVENT_ACLS": "Enregistrer et mettre à jour les autorisations d'événement",
                   "REPLACE_EVENT_ACLS_HINT": "Assurez-vous que tous les événements de cette série ont ces permissions en vigueur",
-                  "SAVE_SERIES_ACLS": "Save",
-                  "SAVE_SERIES_ACLS_HINT": "Apply permissions only to series",
-                  "LOAD_MORE_LIMIT": "policies shown.",
-                  "LOAD_MORE_LINK": "Load more"
+                  "SAVE_SERIES_ACLS": "Enregistrer",
+                  "SAVE_SERIES_ACLS_HINT": "Appliquer les autorisations uniquement aux séries",
+                  "LOAD_MORE_LIMIT": "politiques affichées.",
+                  "LOAD_MORE_LINK": "Afficher plus"
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",
@@ -1223,11 +1223,11 @@
                "DESCRIPTION": "Description"
             },
             "TOBIRA": {
-               "HOMEPAGE": "(Homepage)",
-               "DIRECT_LINK": "Direct link to series",
-               "COPY_DIRECT_LINK": "Copy to clipboard",
-               "NOT_MOUNTED": "This series is currently not included the page structure, and can only be reached using the direct link above.",
-               "PAGES": "Pages in Tobira that contain this series"
+               "HOMEPAGE": "(Accueil)",
+               "DIRECT_LINK": "Lien direct vers la série",
+               "COPY_DIRECT_LINK": "Copier dans le presse-papiers",
+               "NOT_MOUNTED": "Cette série n'est actuellement pas incluse dans la structure des pages, et ne peut être atteinte qu'en utilisant le lien direct ci-dessus.",
+               "PAGES": "Pages dans Tobira qui contiennent cette série"
             },
             "EVENTS": {
                "TITLE": "Titre",
@@ -1346,12 +1346,12 @@
                "ADD": "Ajouter un rôle"
             },
             "STRENGTH": {
-               "BAD": "Bad password",
-               "VERYWEAK": "Very weak password",
-               "WEAK": "Weak password",
-               "GOOD": "Good password",
-               "STRONG": "Strong password",
-               "VERYSTRONG": "Very strong password"
+               "BAD": "Mauvais mot de passe",
+               "VERYWEAK": "Mot de passe très faible",
+               "WEAK": "Mot de passe faible",
+               "GOOD": "Bon mot de passe",
+               "STRONG": "Mot de passe fort",
+               "VERYSTRONG": "Mot de passe très fort"
             }
          }
       },
@@ -1664,7 +1664,7 @@
             "INSTANTIATED": "Instancié",
             "DISPATCHING": "En cours expédition",
             "RESTART": "Redémarrer",
-            "CANCELLED": "Cancelled",
+            "CANCELLED": "Annulé",
             "WAITING": "En Attente"
          }
       },
@@ -2115,14 +2115,14 @@
          "PLUS": "+",
          "TAB": "↹",
          "CAPSLOCK": "⇪",
-         "ESC": "Esc",
-         "ESCAPE": "Esc",
-         "PAGEUP": "Page↑",
-         "PAGEDOWN": "Page↓",
-         "END": "End",
-         "HOME": "Home",
+         "ESC": "Echap",
+         "ESCAPE": "Echap",
+         "PAGEUP": "Page ↑",
+         "PAGEDOWN": "Page ↓",
+         "END": "Fin",
+         "HOME": "Accueil",
          "INS": "Ins",
-         "DEL": "Del"
+         "DEL": "Suppr"
       },
       "GROUPS": {
          "GENERAL": "Général",
