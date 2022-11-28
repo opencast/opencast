@@ -28,7 +28,7 @@
    "YES": "Ναί",
    "COPY": "Αντιγραφή στο πρόχειρο",
    "MONITOR": {
-      "REGISTRATION": "Opencast has sent a registration update in more than a week"
+      "REGISTRATION": "Το Opencast έστειλε μια ενημέρωση εγγραφής σε περισσότερο από μία εβδομάδα"
    },
    "LTI": {
       "ERROR_LOADING_METADATA": "Σφάλμα στην φόρτωση των μεταδεδομένων της εκδήλωσης. Παρακαλώ προσπαθείστε αργότερα.",
@@ -249,16 +249,16 @@
       "ADOPTER_PROFILE_NOT_UPDATED": "Δεν ήταν δυνατή η ενημέρωση των πληροφοριών προφίλ.  Παρακαλώ προσπαθησε ξανά!",
       "ADOPTER_PROFILE_DELETED": "Οι πληροφορίες προφίλ διαγράφηκαν με επιτυχία.",
       "ADOPTER_PROFILE_NOT_DELETED": " Δεν ήταν δυνατή η διαγραφή πληροφοριών προφίλ. Παρακαλώ προσπαθησε ξανα!",
-      "TOBIRA_OVERRIDE_NAME": "The title of the selected page will be overridden with the title of the series.",
-      "TOBIRA_NO_PATH_SEGMENT": "Page needs a path segment.",
-      "TOBIRA_NOT_MOUNTED": "Series could not be mounted in Tobira.",
-      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
-      "TOBIRA_PATH_SEGMENT_UNIQUE": "The path segment of a page must be unqiue among all its sibling pages.",
-      "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
-      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and/or try again later.",
-      "TOBIRA_COPIED_DIRECT_LINK": "Copied link to clipboard.",
-      "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Couldn't copy link to clipboard.",
-      "TOBIRA_NOT_FOUND": "Tobira doesn't know about this series (yet). Try again in a few minutes or contact your system administrator."
+      "TOBIRA_OVERRIDE_NAME": "Ο τίτλος της επιλεγμένης σελίδας θα αντικατασταθεί από τον τίτλο της σειράς.",
+      "TOBIRA_NO_PATH_SEGMENT": "Η σελίδα χρειάζεται ένα τμήμα διαδρομής.",
+      "TOBIRA_NOT_MOUNTED": "Η σειρά δεν μπορεί να προσαρτηθεί στο Tobira.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "Ο τομέας διαδρομής δεν είναι έγκυρος. Ένα έγκυρο τμήμα διαδρομής έχει μήκος τουλάχιστον 2 χαρακτήρες, δεν περιέχει κανένα κενό διάστημα ή χαρακτήρες ελέγχου, κανέναν από τους χαρακτήρες '<>\"[\\]^`{|}#%/? ', και δεν ξεκινά με κανέναν από τους χαρακτήρες '-+~@_! &;:. =*'()'.",
+      "TOBIRA_PATH_SEGMENT_UNIQUE": "Το τμήμα διαδρομής μιας σελίδας πρέπει να είναι μοναδικό μεταξύ όλων των παρόμοιων σελίδων .",
+      "TOBIRA_PAGE_NOT_FOUND": "Η σελίδα που προσπαθήσατε να πλοηγηθείτε  δεν υπάρχει πια. Προσπαθήστε ίσως να ξεκινήσετε από την αρχή.",
+      "TOBIRA_SERVER_ERROR": " Σφάλμα κατά την επικοινωνία με το Tobira. Επικοινωνήστε με το διαχειριστή του συστήματός σας και/ή δοκιμάστε ξανά αργότερα.",
+      "TOBIRA_COPIED_DIRECT_LINK": "Αντιγραφή συνδέσμου στο πρόχειρο",
+      "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Αδυναμία αντιγραφής στο πρόχειρο.",
+      "TOBIRA_NOT_FOUND": "Το Tobira δεν γνωρίζει (ακόμα) για αυτή τη σειρά. Δοκιμάστε ξανά σε λίγα λεπτά ή επικοινωνήστε με το διαχειριστή του συστήματός σας."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Ενέργειες",
@@ -425,9 +425,9 @@
             "HEADER": "Αποδοχή Όρων Παροχής Υπηρεσιών και Πολιτικής Απορρήτου"
          },
          "SUMMARY_STATE": {
-            "HEADER": "This is a JSON summary of exactly what would be sent to Opencast's servers",
-            "GENERAL_HEADER": "Adopter Information",
-            "STATS_HEADER": "Statistical Information"
+            "HEADER": "Αυτή είναι μια δομή JSON για το τι ακριβώς θα σταλεί στους διακομιστές του Opencast",
+            "GENERAL_HEADER": "Πληροφορίες χρήστη",
+            "STATS_HEADER": "Στατιστικές Πληροφορίες"
          },
          "INFORMATION_STATE": {
             "HEADER": "Σας ευχαριστούμε για τη χρήση του Opencast!",
@@ -473,7 +473,7 @@
             "TEXT": "Παρουσιάστηκε μη αναμενόμενο σφάλμα κατά την επεξεργασία του αιτήματος."
          },
          "DELETE_SUBMIT_STATE": {
-            "TEXT": "Are you sure you want to delete your registration data? Confirming this will also remove your registration data from the Opencast project server with the next update interval."
+            "TEXT": "Είστε βέβαιοι ότι θέλετε να διαγράψετε τα δεδομένα εγγραφής σας ? Με την επιβεβαίωση θα αφαιρεθούν τα δεδομένα εγγραφής σας από το διακομιστή του πρότζεκτ μέχρι  το διάστημα της επόμενης ενημέρωσης."
          }
       }
    },
@@ -654,7 +654,7 @@
                "COMMENTS": "Δείτε σχόλια",
                "PAUSED_WORKFLOW": "Δείτε σταματημένη εκδήλωση",
                "PRESENTER": "Φίλτρο για αυτόν τον παρουσιαστή",
-               "COPY_TO_NEW_EVENT": "Copy metadata to new event"
+               "COPY_TO_NEW_EVENT": "Αντιγραφή μεταδεδομένων σε νέα εκδήλωση"
             }
          },
          "STATUS": {
@@ -1134,17 +1134,17 @@
             },
             "TOBIRA": {
                "CAPTION": "Tobira",
-               "DESCRIPTION": "Here you can select where you want the series to show up in the Tobira video portal. You can only select one location here, and it needs to be empty (marked in bold). You can create new pages here, but note that they are only persisted if they are on the path to the selected page.",
-               "SELECT_PAGE": "Select a target page",
-               "PAGE_TITLE": "Subpage title",
-               "PATH_SEGMENT": "Path segment",
-               "SUBPAGES": "Subpages",
-               "ADD_SUBPAGE": "Add subpage",
-               "CANCEL": "Cancel",
-               "HOMEPAGE": "Homepage",
-               "SELECTED_PAGE": "Series will be mounted under the following path",
-               "NO_PAGE_SELECTED": "No page selected. Series will not be mounted in Tobira.",
-               "PATH": "Path"
+               "DESCRIPTION": "Εδώ μπορείτε να επιλέξετε τις σειρες που θέλετε να εμφανιζονται στην πλατφόρμα βίντεο Tobira. Μπορείτε να επιλέξετε μόνο μία τοποθεσία εδώ, και πρέπει να είναι κενή (σημειωμένη με έντονη γραμματοσειρά). Μπορείτε εδώ να δημιουργήσετε νέες σελίδες, αλλά σημειώστε ότι θα αποθηκευτούν μόνο αν βρίσκονται στη διαδρομή  της επιλεγμένης σελίδας.",
+               "SELECT_PAGE": "Επιλέξτε σελίδα προορισμού",
+               "PAGE_TITLE": "Τίτλος υποσελίδας",
+               "PATH_SEGMENT": "Τομέας διαδρομής",
+               "SUBPAGES": "Υποσελίδες",
+               "ADD_SUBPAGE": "Νέα υποσελίδα",
+               "CANCEL": "Ακύρωση",
+               "HOMEPAGE": "Αρχική σελίδα",
+               "SELECTED_PAGE": "Η σειρά θα προσαρτηθεί κάτω από την παρακάτω διαδρομή",
+               "NO_PAGE_SELECTED": "Δεν επιλέχθηκε σελίδα. Η σειρά δεν θα προσαρτηθεί στο Tobira.",
+               "PATH": "Διαδρομή"
             },
             "SUMMARY": {
                "CAPTION": "Περίληψη"
@@ -1195,10 +1195,10 @@
                   "ACTION": "Ενέργειες",
                   "NEW": "Νέα πολιτική",
                   "DETAILS": "Λεπτομέρειες",
-                  "REPLACE_EVENT_ACLS": "Save & update event permissions",
+                  "REPLACE_EVENT_ACLS": "Αποθήκευση & ενημέρωση δικαιωμάτων εκδήλωσης",
                   "REPLACE_EVENT_ACLS_HINT": "Επιβεβαίωση ότι όλες οι εκδηλώσεις σε αυτή την σειρά έχουν τα ίδια δικαιώματα σε ισχύ",
-                  "SAVE_SERIES_ACLS": "Save",
-                  "SAVE_SERIES_ACLS_HINT": "Apply permissions only to series",
+                  "SAVE_SERIES_ACLS": "Αποθήκευση",
+                  "SAVE_SERIES_ACLS_HINT": "Εφαρμογή δικαιωμάτων μόνο στη σειρά",
                   "LOAD_MORE_LIMIT": "Εμφάνιση πολιτικών.",
                   "LOAD_MORE_LINK": "Φόρτωση περισσοτέρων"
                },
@@ -1223,11 +1223,11 @@
                "DESCRIPTION": "Περιγραφή"
             },
             "TOBIRA": {
-               "HOMEPAGE": "(Homepage)",
-               "DIRECT_LINK": "Direct link to series",
-               "COPY_DIRECT_LINK": "Copy to clipboard",
-               "NOT_MOUNTED": "This series is currently not included the page structure, and can only be reached using the direct link above.",
-               "PAGES": "Pages in Tobira that contain this series"
+               "HOMEPAGE": "Αρχική σελίδα",
+               "DIRECT_LINK": "Άμεσος σύνδεσμος με τη σειρά",
+               "COPY_DIRECT_LINK": "Αντιγραφή στο πρόχειρο",
+               "NOT_MOUNTED": "Αυτή η σειρά δεν περιλαμβάνεται στην δομή  της σελίδας  και μπορεί να είναι προσβάσιμη μόνο χρησιμοποιώντας τον παραπάνω σύνδεσμο.",
+               "PAGES": "Σελίδες στο Tobira που περιέχουν αυτή τη σειρά"
             },
             "EVENTS": {
                "TITLE": "Τίτλος",
@@ -2128,7 +2128,7 @@
          "GENERAL": "Γενικά",
          "PLAYER": "Αναπαραγωγέας",
          "EDITOR": "Πρόγραμμα επεξεργασίας",
-         "ADD_MEDIA": "Create Event/Series"
+         "ADD_MEDIA": "Δημιουργία Γεγονότος/Σειράς"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2163,8 +2163,8 @@
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Τέλος του τμήματος"
          },
          "ADD_MEDIA": {
-            "NEXT_TAB": "Next tab/Create",
-            "PREVIOUS_TAB": "Previous tab"
+            "NEXT_TAB": "Επόμενη καρτέλα/Δημιουργία",
+            "PREVIOUS_TAB": "Προηγούμενη καρτέλα"
          }
       }
    },
