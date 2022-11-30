@@ -342,6 +342,12 @@
     <sec:intercept-url pattern="/transcripts/watson/results*" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/transcripts/watson/results*" method="POST" access="ROLE_ANONYMOUS" />
 
+    <!-- Enable access to the redirect routes -->
+    <!-- Note, for this feature to be useful, you probably want to add some variant of the commented out line below. -->
+    <!-- However, we don't want to configure an open redirect vulnerability by default here, -->
+    <!-- so be careful when changing this! -->
+    <!--<sec:intercept-url pattern="/redirect/**" access="ROLE_JWT_USER" />-->
+
     <!-- Everything else is for the admin users -->
     <sec:intercept-url pattern="/admin-ng" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/admin-ng/" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
