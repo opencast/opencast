@@ -43,7 +43,6 @@ import java.util.regex.Pattern;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -117,21 +116,21 @@ public class RedirectEndpoint {
   @Path("get")
   public Response get(@FormParam("target") String target) {
     if (target == null) {
-      throw new WebApplicationException("missing `target` URL", Status.BAD_REQUEST);
+      return Response.status(Status.BAD_REQUEST).entity("missing `target` URL").build();
     }
 
     boolean allowed = allowList.stream()
             .map(pattern -> pattern.matcher(target))
             .anyMatch(Matcher::find);
     if (!allowed) {
-      throw new WebApplicationException("not allowed to redirect to target", Status.BAD_REQUEST);
+      return Response.status(Status.BAD_REQUEST).entity("not allowed to redirect to target").build();
     }
 
     URI targetUri;
     try {
       targetUri = URI.create(target);
     } catch (IllegalArgumentException e) {
-      throw new WebApplicationException("invalid `target` URL", e, Status.BAD_REQUEST);
+      return Response.status(Status.BAD_REQUEST).entity("invalid `target` URL").build();
     }
 
     return Response.seeOther(targetUri).build();
