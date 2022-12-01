@@ -208,15 +208,34 @@ angular.module('adminNg.controllers')
 
     // Type of comments in the notes column
     $scope.table.notesCommentReason = 'EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.ADMINUI_NOTES';
+    // Tmp storage for created comments
+    // Used to avoid creating duplicate comments
+    $scope.table.createdComments = [];
 
     $scope.table.createComment = function(commentText, eventId) {
       if (!commentText || !eventId) {
         return;
       }
-      CommentResource.save(
+
+      // If a comment for this event was already created,
+      // update the existing comment instead
+      const index = $scope.table.createdComments.findIndex(object => {
+        return object.eventId === eventId;
+      })
+      if (index >= 0) {
+        let comment = $scope.table.createdComments[index].comment;
+        comment.text = commentText;
+        $scope.table.updateComment(comment, eventId);
+        return;
+      }
+
+      const comment = CommentResource.save(
         { resource: 'event', resourceId: eventId, type: 'comment' },
         { text: commentText, reason: $scope.table.notesCommentReason }
       );
+
+      // Remember created comment
+      $scope.table.createdComments.push({eventId: eventId, comment: comment});
     };
 
     $scope.table.updateComment = function(comment, eventId) {
