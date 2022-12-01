@@ -134,6 +134,6 @@ public class RedirectEndpoint {
       throw new WebApplicationException("invalid `target` URL", e, Status.BAD_REQUEST);
     }
 
-    return Response.seeOther(URI.create(target)).build();
+    return Response.seeOther(targetUri).build();
   }
 }
