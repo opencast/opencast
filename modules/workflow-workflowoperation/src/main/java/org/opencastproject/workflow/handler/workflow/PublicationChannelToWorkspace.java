@@ -92,7 +92,7 @@ public class PublicationChannelToWorkspace extends AbstractWorkflowOperationHand
 
     // Skip if the media package does not contain a matching publication
     if (publication.isEmpty()) {
-      logger.debug("The media package '{}' contains no publications on channel '{}', skipping.",
+      logger.warn("The media package '{}' contains no publications on channel '{}', skipping.",
           mediaPackage.getIdentifier(), publicationChannel);
       return createResult(mediaPackage, Action.SKIP);
     }
