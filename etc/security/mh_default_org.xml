@@ -346,6 +346,7 @@
     <!-- Note, for this feature to be useful, you probably want to add some variant of the commented out line below. -->
     <!-- However, we don't want to configure an open redirect vulnerability by default here, -->
     <!-- so be careful when changing this! -->
+    <!-- Note, too, that you can also configure an allow list for what URLs are OK to redirect to! -->
     <!--<sec:intercept-url pattern="/redirect/**" access="ROLE_JWT_USER" />-->
 
     <!-- Everything else is for the admin users -->

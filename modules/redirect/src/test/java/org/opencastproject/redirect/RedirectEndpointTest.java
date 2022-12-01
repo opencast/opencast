@@ -24,13 +24,20 @@ package org.opencastproject.redirect;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Map;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 /** Tests for the redirection endpoints */
 public class RedirectEndpointTest {
   /** The endpoint under test */
-  private final RedirectEndpoint endpoint = new RedirectEndpoint();
+  private final RedirectEndpoint endpoint;
+
+  public RedirectEndpointTest() {
+    endpoint = new RedirectEndpoint();
+    endpoint.configure(Map.of("allow.localhost", "^https?://localhost:"));
+  }
 
   /** Test the `POST /redirect/get` endpoint */
   @Test
@@ -55,7 +62,16 @@ public class RedirectEndpointTest {
   public void testPostRedirectGetInvalidTarget() {
     WebApplicationException exception = Assert.assertThrows(
             WebApplicationException.class,
-            () -> endpoint.get("this is not a valid URL"));
+            () -> endpoint.get("https://localhost:invalid URL"));
+    Assert.assertEquals(exception.getResponse().getStatus(), 400);
+  }
+
+  /** Test `POST /redirect/get` with a non-allowed URL */
+  @Test
+  public void testPostRedirectGetNotAllowed() {
+    WebApplicationException exception = Assert.assertThrows(
+            WebApplicationException.class,
+            () -> endpoint.get("https://google.com"));
     Assert.assertEquals(exception.getResponse().getStatus(), 400);
   }
 }
