@@ -720,7 +720,6 @@
     <property name="authenticationManager" ref="authenticationManager" />
     <property name="loginHandler" ref="jwtLoginHandler" />
     <property name="exceptionIfHeaderMissing" value="false" />
-    <property name="debug" value="false" />
   </bean>-->
 
   <!-- General JWT request parameter extraction filter
@@ -729,7 +728,6 @@
     <property name="authenticationManager" ref="authenticationManager" />
     <property name="loginHandler" ref="jwtLoginHandler" />
     <property name="exceptionIfParameterMissing" value="false" />
-    <property name="debug" value="false" />
   </bean>-->
 
   <!-- JWT login handler
