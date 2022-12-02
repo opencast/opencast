@@ -299,7 +299,7 @@ public class SearchServiceImplTest {
     Job job = service.add(mediaPackage);
     JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
-    assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
+    assertEquals("Job to add mediapackage did not finish", Job.Status.FINISHED, job.getStatus());
 
     // Make sure it's properly indexed and returned for authorized users
     SearchQuery q = new SearchQuery();
@@ -316,7 +316,7 @@ public class SearchServiceImplTest {
     job = service.add(mediaPackage);
     barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
-    assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
+    assertEquals("Job to add mediapackage did not finish", Job.Status.FINISHED, job.getStatus());
 
     // This mediapackage should not be readable by the current user (due to the lack of role ROLE_UNKNOWN)
     q = new SearchQuery();
@@ -353,7 +353,7 @@ public class SearchServiceImplTest {
     Job job = service.add(mediaPackage);
     JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
-    assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
+    assertEquals("Job to add mediapackage did not finish", Job.Status.FINISHED, job.getStatus());
 
     SearchResult episodeMetadataResult = service.getByQuery(new SearchQuery().withText("Vegetation"));
     SearchResult seriesMetadataResult = service.getByQuery(new SearchQuery().withText("Atmospheric Science"));
@@ -371,7 +371,7 @@ public class SearchServiceImplTest {
     Job job = service.add(mediaPackage);
     JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
-    assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
+    assertEquals("Job to add mediapackage did not finish", Job.Status.FINISHED, job.getStatus());
 
     assertEquals(1, service.getByQuery(new SearchQuery().withText("Atmo")).size());
     assertEquals(1, service.getByQuery(new SearchQuery().withText("Atmos")).size());
@@ -467,7 +467,7 @@ public class SearchServiceImplTest {
     Job job = service.add(mediaPackage);
     JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
-    assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
+    assertEquals("Job to add mediapackage did not finish", Job.Status.FINISHED, job.getStatus());
 
     // Make sure it's properly indexed and returned
     SearchQuery q = new SearchQuery();
@@ -509,7 +509,7 @@ public class SearchServiceImplTest {
     Job job = service.add(mediaPackage);
     JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
-    assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
+    assertEquals("Job to add mediapackage did not finish", Job.Status.FINISHED, job.getStatus());
 
     // Make sure it's properly indexed and returned
     SearchQuery q = new SearchQuery();
@@ -643,7 +643,7 @@ public class SearchServiceImplTest {
     Job job = service.add(mediaPackage);
     JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
-    assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
+    assertEquals("Job to add mediapackage did not finish", Job.Status.FINISHED, job.getStatus());
 
     User adminUser = new JaxbUser("admin", "test", defaultOrganization,
             new JaxbRole(defaultOrganization.getAdminRole(), defaultOrganization));

@@ -794,6 +794,8 @@ public class SolrIndexManager {
     Schema.setOrganization(doc, securityService.getOrganization().getId());
     Schema.setOcMediatype(doc, SearchResultItemType.Series.toString());
     Schema.setOcModified(doc, new Date());
+    // Reset because series may have been deleted from the search index before
+    Schema.setOcDeleted(doc, null);
 
     // DC fields
     addSeriesMetadata(doc, dc);

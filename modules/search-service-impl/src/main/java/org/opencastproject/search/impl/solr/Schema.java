@@ -326,8 +326,10 @@ public final class Schema {
       throw new IllegalArgumentException("Documents must not be null");
     }
     for (String fieldName : additionalMetadata.getFieldNames()) {
-      for (Object value : additionalMetadata.getFieldValues(fieldName)) {
-        docToEnrich.addField(FULLTEXT, value);
+      if (additionalMetadata.getFieldValues(fieldName) != null) {
+        for (Object value : additionalMetadata.getFieldValues(fieldName)) {
+          docToEnrich.addField(FULLTEXT, value);
+        }
       }
     }
   }
