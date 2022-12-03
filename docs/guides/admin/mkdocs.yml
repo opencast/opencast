@@ -119,8 +119,6 @@ nav:
    - Metrics (OpenMetrics, Prometheus): modules/metrics.md
    - Player:
       - Configuration: 'modules/player.configuration.md'
-      - URL Parameters: 'modules/player.url.parameter.md'
-      - Matomo Tracking: 'modules/player.matomo.tracking.md'
    - Paella player:
       - Configuration: 'modules/paella.player/configuration.md'
       - URL Parameters: 'modules/paella.player/url.parameter.md'

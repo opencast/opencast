@@ -70,7 +70,7 @@ import java.util.Map;
 
 public class ConfigurablePublishWorkflowOperationHandlerTest {
   private Organization org;
-  private String examplePlayer = "/engage/theodul/ui/core.html?id=";
+  private String examplePlayer = "/paella/ui/watch.html?id=";
 
   @Before
   public void setUp() {
