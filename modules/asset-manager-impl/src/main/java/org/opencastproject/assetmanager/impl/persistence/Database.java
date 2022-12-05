@@ -49,12 +49,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.persistence.PersistenceException;
 
 /**
  * Data access object.
@@ -363,12 +365,14 @@ public class Database implements EntityPaths {
    * @return list of {@link SchedulerIndexData}s
    */
   public Map<String, SchedulerIndexData> getSchedulerIndexData() {
-    var result = db.exec(namedQuery.findAll(
-            "SchedulerIndexData.getAll",
-            SchedulerIndexData.class
-    ));
-    return result.stream().collect(
-            Collectors.toMap(data -> data.getMediaPackageId(), data -> data));
+    try {
+      var result = db.exec(namedQuery.findAll("SchedulerIndexData.getAll", SchedulerIndexData.class));
+      return result.stream().collect(Collectors.toMap(data -> data.getMediaPackageId(), data -> data));
+    } catch (PersistenceException e) {
+      // Should only ever happen if the scheduler table does not exist yet
+      logger.warn(e.getMessage());
+      return new HashMap<>();
+    }
   }
 
   //
