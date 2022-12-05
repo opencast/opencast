@@ -22,7 +22,7 @@
     "eslint-plugin-header": "^3.1.1",
     "express": "^4.18.2",
     "html-linter": "^1.1.1",
-    "html-validate": "^7.10.0",
+    "html-validate": "^7.10.1",
     "http-proxy": "^1.18.1",
     "source-map-loader": "^4.0.1",
     "style-loader": "^3.3.1",
