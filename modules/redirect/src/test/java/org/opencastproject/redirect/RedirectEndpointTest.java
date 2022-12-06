@@ -53,7 +53,7 @@ public class RedirectEndpointTest {
   public void testPostRedirectGet() throws MalformedURLException {
     String target = "/studio";
     Response response = endpoint.get(target, uriInfo);
-    Assert.assertEquals(response.getStatus(), 303);
+    Assert.assertEquals(303, response.getStatus());
     String expected = new URL(uriInfo.getBaseUri().toURL(), target).toString();
     Assert.assertEquals(response.getLocation().toString(), expected);
   }
@@ -62,20 +62,20 @@ public class RedirectEndpointTest {
   @Test
   public void testPostRedirectGetMissingTarget() {
     Response response = endpoint.get(null, uriInfo);
-    Assert.assertEquals(response.getStatus(), 400);
+    Assert.assertEquals(400, response.getStatus());
   }
 
   /** Test `POST /redirect/get` with invalid target */
   @Test
   public void testPostRedirectGetInvalidTarget() {
     Response response = endpoint.get("/%", uriInfo);
-    Assert.assertEquals(response.getStatus(), 400);
+    Assert.assertEquals(400, response.getStatus());
   }
 
   /** Test `POST /redirect/get` with a non-relative target */
   @Test
   public void testPostRedirectGetNonRelativeTarget() {
     Response response = endpoint.get("https://opencast.org", uriInfo);
-    Assert.assertEquals(response.getStatus(), 400);
+    Assert.assertEquals(400, response.getStatus());
   }
 }

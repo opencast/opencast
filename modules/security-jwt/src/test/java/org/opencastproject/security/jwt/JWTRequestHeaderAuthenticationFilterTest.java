@@ -81,7 +81,7 @@ public class JWTRequestHeaderAuthenticationFilterTest extends JWTLoginTest {
     username = authFilter.getPreAuthenticatedPrincipal(
             mockRequest(prefix + generator.generateValidSymmetricJWT())
     );
-    assertEquals(username, generator.getUsername());
+    assertEquals(generator.getUsername(), username);
 
     // Missing principal prefix
     username = authFilter.getPreAuthenticatedPrincipal(

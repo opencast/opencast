@@ -138,7 +138,7 @@ public abstract class JWTLoginTest {
     Object username = authFilter.getPreAuthenticatedPrincipal(
         mockRequest(generator.generateValidSymmetricJWT())
     );
-    assertEquals(username, generator.getUsername());
+    assertEquals(generator.getUsername(), username);
   }
 
   @Test
@@ -147,7 +147,7 @@ public abstract class JWTLoginTest {
     Object username = authFilter.getPreAuthenticatedPrincipal(
         mockRequest(generator.generateValidSymmetricJWT())
     );
-    assertEquals(username, generator.getUsername());
+    assertEquals(generator.getUsername(), username);
   }
 
   @Test
@@ -158,7 +158,7 @@ public abstract class JWTLoginTest {
     username = authFilter.getPreAuthenticatedPrincipal(
         mockRequest(jwt)
     );
-    assertEquals(username, generator.getUsername());
+    assertEquals(generator.getUsername(), username);
 
     // Make sure that the cache is used and no calls to the mocked user reference provider are made
     reset(userReferenceProvider);
@@ -166,7 +166,7 @@ public abstract class JWTLoginTest {
     username = authFilter.getPreAuthenticatedPrincipal(
         mockRequest(jwt)
     );
-    assertEquals(username, generator.getUsername());
+    assertEquals(generator.getUsername(), username);
   }
 
   @Test
@@ -177,7 +177,7 @@ public abstract class JWTLoginTest {
     username = authFilter.getPreAuthenticatedPrincipal(
         mockRequest(expiringJwt)
     );
-    assertEquals(username, generator.getUsername());
+    assertEquals(generator.getUsername(), username);
 
     // Wait until JWT expires
     TimeUnit.SECONDS.sleep(1);
@@ -246,7 +246,7 @@ public abstract class JWTLoginTest {
     Object username = authFilter.getPreAuthenticatedPrincipal(
         mockRequest(generator.generateValidAsymmetricJWT())
     );
-    assertEquals(username, generator.getUsername());
+    assertEquals(generator.getUsername(), username);
   }
 
   @Test
@@ -271,7 +271,7 @@ public abstract class JWTLoginTest {
     username = authFilter.getPreAuthenticatedPrincipal(
         mockRequest(jwt)
     );
-    assertEquals(username, generator.getUsername());
+    assertEquals(generator.getUsername(), username);
 
     // Make sure that the cache is used and no calls to the mocked user reference provider are made
     reset(userReferenceProvider);
@@ -279,7 +279,7 @@ public abstract class JWTLoginTest {
     username = authFilter.getPreAuthenticatedPrincipal(
         mockRequest(jwt)
     );
-    assertEquals(username, generator.getUsername());
+    assertEquals(generator.getUsername(), username);
   }
 
 }
