@@ -32,13 +32,18 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.annotations.Component;
 
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 /**
  * Endpoints for redirection schemes.
@@ -72,30 +77,39 @@ public class RedirectEndpoint {
    */
   @RestQuery(
       name = "get",
-      description = "Redirects to the given `target` URL specifically instructing the client to issue a `GET` request.",
+      description = "Redirects to the given `target` URL specifically instructing the client to issue a `GET` request."
+          + " Also verifies that the target lives on the same host as the original request.",
       restParameters = {
           @RestParameter(name = "target", description = "The URL to redirect to", isRequired = true, type = STRING)
       },
       responses = {
           @RestResponse(description = "successful redirect", responseCode = SC_SEE_OTHER),
-          @RestResponse(description = "missing or invalid target URL", responseCode = SC_BAD_REQUEST)
+          @RestResponse(
+              description = "missing or invalid target URL, including URLs pointing to another server",
+              responseCode = SC_BAD_REQUEST
+          )
       },
       returnDescription = "A temporary redirect to the given `target` URL"
   )
   @POST
   @Path("get")
-  public Response get(@FormParam("target") String target) {
+  public Response get(@FormParam("target") String target, @Context UriInfo uriInfo) {
     if (target == null) {
       return Response.status(Status.BAD_REQUEST).entity("missing `target` URL").build();
     }
 
-    URI targetUri;
+    URI baseUri = uriInfo.getBaseUri();
     try {
-      targetUri = URI.create(target);
-    } catch (IllegalArgumentException e) {
+      URI targetUri = new URL(baseUri.toURL(), target).toURI();
+      if (!targetUri.getAuthority().equals(baseUri.getAuthority())
+              || !targetUri.getScheme().equals(baseUri.getScheme())) {
+        return Response.status(Status.BAD_REQUEST).entity("non-relative redirect").build();
+      }
+
+      return Response.seeOther(targetUri).build();
+
+    } catch (MalformedURLException | URISyntaxException e) {
       return Response.status(Status.BAD_REQUEST).entity("invalid `target` URL").build();
     }
-
-    return Response.seeOther(targetUri).build();
   }
 }

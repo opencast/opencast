@@ -21,36 +21,61 @@
 
 package org.opencastproject.redirect;
 
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 /** Tests for the redirection endpoints */
 public class RedirectEndpointTest {
   /** The endpoint under test */
   private final RedirectEndpoint endpoint = new RedirectEndpoint();
+  private final UriInfo uriInfo;
+  {
+    uriInfo = createNiceMock(UriInfo.class);
+    expect(uriInfo.getBaseUri())
+            .andReturn(URI.create("http://localhost:8080"))
+            .anyTimes();
+    replay(uriInfo);
+  }
 
   /** Test the `POST /redirect/get` endpoint */
   @Test
-  public void testPostRedirectGet() {
-    String url = "https://localhost:8080/studio";
-    Response response = endpoint.get(url);
+  public void testPostRedirectGet() throws MalformedURLException {
+    String target = "/studio";
+    Response response = endpoint.get(target, uriInfo);
     Assert.assertEquals(response.getStatus(), 303);
-    Assert.assertEquals(response.getLocation().toString(), url);
+    String expected = new URL(uriInfo.getBaseUri().toURL(), target).toString();
+    Assert.assertEquals(response.getLocation().toString(), expected);
   }
 
   /** Test `POST /redirect/get` with missing target */
   @Test
   public void testPostRedirectGetMissingTarget() {
-    Response response = endpoint.get(null);
+    Response response = endpoint.get(null, uriInfo);
     Assert.assertEquals(response.getStatus(), 400);
   }
 
   /** Test `POST /redirect/get` with invalid target */
   @Test
   public void testPostRedirectGetInvalidTarget() {
-    Response response = endpoint.get("https://localhost:invalid URL");
+    Response response = endpoint.get("/%", uriInfo);
+    Assert.assertEquals(response.getStatus(), 400);
+  }
+
+  /** Test `POST /redirect/get` with a non-relative target */
+  @Test
+  public void testPostRedirectGetNonRelativeTarget() {
+    Response response = endpoint.get("https://opencast.org", uriInfo);
     Assert.assertEquals(response.getStatus(), 400);
   }
 }
