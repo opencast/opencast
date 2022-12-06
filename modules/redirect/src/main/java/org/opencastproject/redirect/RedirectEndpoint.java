@@ -30,15 +30,9 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Modified;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -71,29 +65,6 @@ import javax.ws.rs.core.Response.Status;
 )
 @Path("/")
 public class RedirectEndpoint {
-
-  /** Set of URLs to allow redirection to */
-  private final ArrayList<Pattern> allowList = new ArrayList<>();
-
-  private static final String ALLOW_LIST_PREFIX = "allow.";
-
-  /** Update configuration */
-  @Activate
-  @Modified
-  public void configure(Map<String, Object> properties) {
-    allowList.clear();
-
-    if (properties == null) {
-      return;
-    }
-
-    properties.forEach((key, value) -> {
-      if (key.startsWith(ALLOW_LIST_PREFIX)) {
-        allowList.add(Pattern.compile((String) value));
-      }
-    });
-  }
-
   /**
    * Essentially the Post/Redirect/Get pattern
    *
@@ -107,8 +78,7 @@ public class RedirectEndpoint {
       },
       responses = {
           @RestResponse(description = "successful redirect", responseCode = SC_SEE_OTHER),
-          @RestResponse(description = "missing or invalid target URL", responseCode = SC_BAD_REQUEST),
-          @RestResponse(description = "not allowed to redirect to this URL", responseCode = SC_BAD_REQUEST)
+          @RestResponse(description = "missing or invalid target URL", responseCode = SC_BAD_REQUEST)
       },
       returnDescription = "A temporary redirect to the given `target` URL"
   )
@@ -117,13 +87,6 @@ public class RedirectEndpoint {
   public Response get(@FormParam("target") String target) {
     if (target == null) {
       return Response.status(Status.BAD_REQUEST).entity("missing `target` URL").build();
-    }
-
-    boolean allowed = allowList.stream()
-            .map(pattern -> pattern.matcher(target))
-            .anyMatch(Matcher::find);
-    if (!allowed) {
-      return Response.status(Status.BAD_REQUEST).entity("not allowed to redirect to target").build();
     }
 
     URI targetUri;
