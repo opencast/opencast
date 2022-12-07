@@ -187,5 +187,5 @@ A sample one can be found in etc/workflows/retry-watson-transcripts.xml
 Workflow Operations
 -------------------
 
-* [start-watson-transcription](../workflowoperationhandlers/start-watson-transcription-woh.md)
-* [attach-watson-transcription](../workflowoperationhandlers/attach-watson-transcription-woh.md)
+* [start-watson-transcription](../../workflowoperationhandlers/start-watson-transcription-woh.md)
+* [attach-watson-transcription](../../workflowoperationhandlers/attach-watson-transcription-woh.md)

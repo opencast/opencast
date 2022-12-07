@@ -202,6 +202,6 @@ into your existing workflow:
 Workflow Operations
 -------------------
 
-* [amberscript-start-transcription](../workflowoperationhandlers/amberscript-start-transcription-woh.md)
-* [amberscript-attach-transcription](../workflowoperationhandlers/amberscript-attach-transcription-woh.md)
+* [amberscript-start-transcription](../../workflowoperationhandlers/amberscript-start-transcription-woh.md)
+* [amberscript-attach-transcription](../../workflowoperationhandlers/amberscript-attach-transcription-woh.md)
 

@@ -280,5 +280,5 @@ is cancelled (when something goes wrong).
 Workflow Operations
 -------------------
 
-* [google-speech-attach-transcription](../workflowoperationhandlers/google-speech-attach-transcription-woh.md)
-* [google-speech-start-transcription](../workflowoperationhandlers/google-speech-start-transcription-woh.md)
+* [google-speech-attach-transcription](../../workflowoperationhandlers/google-speech-attach-transcription-woh.md)
+* [google-speech-start-transcription](../../workflowoperationhandlers/google-speech-start-transcription-woh.md)
