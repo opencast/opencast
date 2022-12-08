@@ -378,18 +378,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
         throw new NotFoundException("No series with id=" + seriesId + " exists");
       }
       // Ensure this user is allowed to read this series
-      String accessControlXml = entity.getAccessControl();
-      if (accessControlXml != null) {
-        AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
-        User currentUser = securityService.getUser();
-        Organization currentOrg = securityService.getOrganization();
-        // There are several reasons a user may need to load a series: to read content, to edit it, or add content
-        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.READ.toString())
-                && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg,
-                        Permissions.Action.CONTRIBUTE.toString())
-                && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
-          throw new UnauthorizedException(currentUser + " is not authorized to see series " + seriesId);
-        }
+      if (!userHasReadAccess(entity)) {
+        throw new UnauthorizedException(securityService.getUser() + " is not authorized to see series " + seriesId);
       }
       return dcService.load(IOUtils.toInputStream(entity.getDublinCoreXML(), "UTF-8"));
     } catch (NotFoundException e) {
