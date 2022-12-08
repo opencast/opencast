@@ -274,12 +274,14 @@ angular.module('adminNg.directives')
           scope.submit();
         }
         event.preventDefault();
-      });
+      },
+      ['INPUT', 'TEXTAREA', 'SELECT']);
 
       HotkeysService.activateHotkey(scope, 'add_media.previous_tab', (event) => {
         scope.wizard.toTab(event, 'previous');
         event.preventDefault();
-      });
+      },
+      ['INPUT', 'TEXTAREA', 'SELECT']);
     }
   };
 }]);
