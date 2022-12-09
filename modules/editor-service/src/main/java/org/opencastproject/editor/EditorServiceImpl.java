@@ -364,7 +364,7 @@ public class EditorServiceImpl implements EditorService {
   /**
    * Check if a media URL can be served from this server.
    *
-   * @param mediaUrl
+   * @param uri
    *      URL locating a media file
    * @return
    *      If the file is available locally
@@ -453,7 +453,8 @@ public class EditorServiceImpl implements EditorService {
   }
 
   /**
-   * Adds the SMIL file as {@link Catalog} to the media package and sends the updated media package to the archive.
+   * Adds the SMIL file as {@link Catalog} to the media package
+   * Does not send the updated media package to the archive.
    *
    * @param mediaPackage
    *          the media package to at the SMIL catalog
@@ -462,7 +463,7 @@ public class EditorServiceImpl implements EditorService {
    * @throws IOException
    *           if the SMIL catalog cannot be read or not be written to the archive
    */
-  void addSmilToArchive(MediaPackage mediaPackage, final Smil smil) throws IOException {
+  MediaPackage addSmilToArchive(MediaPackage mediaPackage, final Smil smil) throws IOException {
     MediaPackageElementFlavor mediaPackageElementFlavor = getSmilCatalogFlavor();
     //set default catalog Id if there is none existing
     String catalogId = smil.getId();
@@ -498,14 +499,7 @@ public class EditorServiceImpl implements EditorService {
     }
     // setting the URI to a new source so the checksum will most like be invalid
     catalog.setChecksum(null);
-
-    try {
-      assetManager.takeSnapshot(mediaPackage);
-    } catch (AssetManagerException e) {
-      logger.error("Error while adding the updated media package ({}) to the archive", mediaPackage.getIdentifier(), e);
-      throw new IOException(e);
-    }
-
+    return mediaPackage;
   }
 
   /**
@@ -518,7 +512,7 @@ public class EditorServiceImpl implements EditorService {
    *          the subtitles to be added
    * @throws IOException
    */
-  private void addSubtitleTrack(MediaPackage mediaPackage, List<EditingData.Subtitle> subtitles)
+  private MediaPackage addSubtitleTrack(MediaPackage mediaPackage, List<EditingData.Subtitle> subtitles)
           throws IOException, IllegalArgumentException {
     // Check if any of the provided subtitles fail to match the designated flavor
     for (EditingData.Subtitle subtitle : subtitles) {
@@ -578,13 +572,9 @@ public class EditorServiceImpl implements EditorService {
           }
         }
       }
-
-      try {
-        assetManager.takeSnapshot(mediaPackage);
-      } catch (AssetManagerException e) {
-        throw new IOException("Error while adding the updated media package " + mediaPackage + " to the archive", e);
-      }
     }
+
+    return mediaPackage;
   }
 
   /**
@@ -597,7 +587,7 @@ public class EditorServiceImpl implements EditorService {
    * @throws MimeTypeParseException
    * @throws IOException
    */
-  private void addThumbnailsToArchive(EditingData editingData, MediaPackage mediaPackage)
+  private MediaPackage addThumbnailsToArchive(EditingData editingData, MediaPackage mediaPackage)
           throws MimeTypeParseException, IOException {
     for (TrackData track : editingData.getTracks()) {
       String id = track.getId();
@@ -658,9 +648,7 @@ public class EditorServiceImpl implements EditorService {
                       flavor.getType() + "/" + thumbnailWfProperty, "true");
     }
 
-    // Snapshot
-    // Should we call takeSnapshot just once at the end of setEditData instead?
-    assetManager.takeSnapshot(mediaPackage);
+    return mediaPackage;
   }
 
   /**
@@ -1072,14 +1060,14 @@ public class EditorServiceImpl implements EditorService {
     WorkflowPropertiesUtil.storeProperties(assetManager, mediaPackage, workflowProperties);
 
     try {
-      addSmilToArchive(mediaPackage, smil);
+      mediaPackage = addSmilToArchive(mediaPackage, smil);
     } catch (IOException e) {
       errorExit("Unable to add SMIL cutting catalog to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
     }
 
     try {
       if (editingData.getSubtitles() != null) {
-        addSubtitleTrack(mediaPackage, editingData.getSubtitles());
+        mediaPackage = addSubtitleTrack(mediaPackage, editingData.getSubtitles());
       }
     } catch (IOException e) {
       errorExit("Unable to add subtitle track to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
@@ -1088,11 +1076,19 @@ public class EditorServiceImpl implements EditorService {
     }
 
     try {
-      addThumbnailsToArchive(editingData, mediaPackage);
+      mediaPackage = addThumbnailsToArchive(editingData, mediaPackage);
     } catch (MimeTypeParseException e) {
       errorExit("Thumbnail had an illegal MimeType", mediaPackageId, ErrorStatus.UNKNOWN, e);
     } catch (IOException e) {
       errorExit("Unable to add thumbnail to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
+    }
+
+    try {
+      assetManager.takeSnapshot(mediaPackage);
+    } catch (AssetManagerException e) {
+      logger.error("Error while adding the updated media package ({}) to the archive",
+              mediaPackage.getIdentifier(), e);
+      throw new IOException(e);
     }
 
     if (editingData.getPostProcessingWorkflow() != null) {
