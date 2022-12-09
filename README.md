@@ -26,5 +26,3 @@ More information about the community:
 
 - [Website](https://opencast.org)
 - [Documentation](https://docs.opencast.org)
-- [Twitter](https://twitter.com/openmatter)
-- [Facebook](https://facebook.com/opencast)
