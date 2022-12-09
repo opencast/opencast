@@ -20,9 +20,10 @@
 			var id = search['id'];
 			var series = search['series'] || search['sid'] || search['epFrom'];
 			if (redirect !== undefined) {
-				let redirectDomain = new URL(redirect);
+				const redirectDecoded = decodeURIComponent(redirect);
+				const redirectDomain = new URL(redirectDecoded);
 				if (window.location.hostname.toUpperCase() === redirectDomain.hostname.toUpperCase()) {
-					window.location.href = decodeURIComponent(redirect);
+					window.location.href = redirectDecoded;
 				} else {
 					window.location.href = "/engage/ui/index.html";
 				}
