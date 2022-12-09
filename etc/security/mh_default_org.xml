@@ -342,6 +342,9 @@
     <sec:intercept-url pattern="/transcripts/watson/results*" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/transcripts/watson/results*" method="POST" access="ROLE_ANONYMOUS" />
 
+    <!-- Enable access to the redirect routes -->
+    <sec:intercept-url pattern="/redirect/**" access="ROLE_ANONYMOUS" />
+
     <!-- Everything else is for the admin users -->
     <sec:intercept-url pattern="/admin-ng" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/admin-ng/" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
@@ -360,24 +363,17 @@
     <!-- CAS Auth: Comment this if using CAS authentication -->
     <sec:form-login authentication-failure-url="/admin-ng/login.html?error" authentication-success-handler-ref="authSuccessHandler" />
 
-    <!-- Authentication filter chain -->
+    <!-- (Pre-)Authentication filter chain(s) -->
     <sec:custom-filter position="BASIC_AUTH_FILTER" ref="authenticationFilters" />
+    <sec:custom-filter position="PRE_AUTH_FILTER" ref="preAuthenticationFilters" />
 
     <sec:custom-filter ref="asyncTimeoutRedirectFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
 
     <!-- Opencast is shipping its own implementation of the anonymous filter -->
     <sec:custom-filter ref="anonymousFilter" position="ANONYMOUS_FILTER" />
 
-    <!-- Shibboleth header authentication filter
-    <sec:custom-filter ref="shibbolethHeaderFilter" position="PRE_AUTH_FILTER"/>
-    -->
-
     <!-- CAS Auth:  Uncomment this if using CAS authentication
     <sec:custom-filter position="FORM_LOGIN_FILTER" ref="casFilter" />
-    -->
-
-    <!-- JWT header authentication filter
-    <sec:custom-filter ref="jwtHeaderFilter" position="PRE_AUTH_FILTER"/>
     -->
 
     <!-- Enables "remember me" functionality -->
@@ -444,12 +440,24 @@
         <!-- 2-legged OAuth is used by trusted 3rd party applications, including LTI. -->
         <!-- Uncomment the line below to support LTI or other OAuth clients.          -->
         <!-- <ref bean="oauthProtectedResourceFilter" /> -->
+      </list>
+    </property>
+  </bean>
 
+  <!-- ################################ -->
+  <!-- # Pre-Aauthentication Filters    # -->
+  <!-- ################################ -->
+
+  <bean id="preAuthenticationFilters" class="org.springframework.web.filter.CompositeFilter">
+    <property name="filters">
+      <list>
         <!-- Uncomment the line below to support Shibboleth. -->
         <!-- <ref bean="shibbolethHeaderFilter" /> -->
 
         <!-- Uncomment the line below to support JWT.
         <ref bean="jwtHeaderFilter" /> -->
+        <!-- Additionally/alternatively uncomment this to support passing a JWT in a URL parameter.
+        <ref bean="jwtRequestParameterFilter" /> -->
       </list>
     </property>
   </bean>
@@ -709,6 +717,15 @@
     <property name="authenticationManager" ref="authenticationManager" />
     <property name="loginHandler" ref="jwtLoginHandler" />
     <property name="exceptionIfHeaderMissing" value="false" />
+    <property name="debug" value="false" />
+  </bean>-->
+
+  <!-- General JWT request parameter extraction filter
+  <bean id="jwtRequestParameterFilter" class="org.opencastproject.security.jwt.JWTRequestParameterAuthenticationFilter">
+    <property name="parameterName" value="jwt" />
+    <property name="authenticationManager" ref="authenticationManager" />
+    <property name="loginHandler" ref="jwtLoginHandler" />
+    <property name="exceptionIfParameterMissing" value="false" />
     <property name="debug" value="false" />
   </bean>-->
 
