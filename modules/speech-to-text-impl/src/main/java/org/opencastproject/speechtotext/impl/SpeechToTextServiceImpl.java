@@ -123,7 +123,6 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
     logger.debug("Finished activating/updating speech-to-text service");
   }
 
-
   /**
    * {@inheritDoc}
    *
@@ -214,7 +213,10 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
     return organizationDirectoryService;
   }
 
-  @Reference
+  @Reference(
+          name = "SpeechToTextEngine",
+          target = "(engineType=vosk)"
+  )
   public void setSpeechToTextEngine(SpeechToTextEngine engine) {
     this.speechToTextEngine = engine;
   }

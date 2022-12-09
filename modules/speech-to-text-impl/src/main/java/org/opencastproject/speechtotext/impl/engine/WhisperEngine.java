@@ -39,28 +39,38 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
-/** Vosk implementation of the Speech-to-text engine interface. */
+/** Whisper implementation of the Speech-to-text engine interface. */
 @Component(
     property = {
-        "service.description=Vosk implementation of the SpeechToTextEngine interface",
-        "enginetype=vosk"
+        "service.description=Whisper implementation of the SpeechToTextEngine interface",
+        "enginetype=whisper"
     }
 )
-public class VoskEngine implements SpeechToTextEngine {
 
-  private static final Logger logger = LoggerFactory.getLogger(VoskEngine.class);
+public class WhisperEngine implements SpeechToTextEngine {
+
+  private static final Logger logger = LoggerFactory.getLogger(WhisperEngine.class);
 
   /** Name of the engine. */
-  private static final String engineName = "Vosk";
+  private static final String engineName = "Whisper";
 
-  /** Config key for setting the path to the vosk. */
-  private static final String VOSK_EXECUTABLE_PATH_CONFIG_KEY = "vosk.root.path";
+  /** Config key for setting the path to Whisper. */
+  private static final String WHISPER_EXECUTABLE_PATH_CONFIG_KEY = "whisper.root.path";
 
-  /** Default path to vosk. */
-  public static final String VOSK_EXECUTABLE_DEFAULT_PATH = "vosk-cli";
+  /** Default path to Whisper. */
+  public static final String WHISPER_EXECUTABLE_DEFAULT_PATH = "whisper";
 
-  /** Currently used path of the vosk installation. */
-  private String voskExecutable = VOSK_EXECUTABLE_DEFAULT_PATH;
+  /** Currently used path of the Whisper installation. */
+  private String whisperExecutable = WHISPER_EXECUTABLE_DEFAULT_PATH;
+
+  /** Config key for setting whisper model */
+  private static final String WHISPER_MODEL_CONFIG_KEY = "whisper.model";
+
+  /** Default whisper model */
+  public static final String WHISPER_MODEL_DEFAULT = "base";
+
+  /** Currently used whisper model */
+  private String whisperModel = WHISPER_MODEL_DEFAULT;
 
 
   @Override
@@ -71,10 +81,15 @@ public class VoskEngine implements SpeechToTextEngine {
   @Activate
   @Modified
   public void activate(ComponentContext cc) {
-    logger.debug("Activated/Modified Vosk engine service class");
-    voskExecutable = StringUtils.defaultIfBlank(
-            (String) cc.getProperties().get(VOSK_EXECUTABLE_PATH_CONFIG_KEY), VOSK_EXECUTABLE_DEFAULT_PATH);
-    logger.debug("Set vosk path to {}", voskExecutable);
+    logger.debug("Activated/Modified Whisper engine service class");
+    whisperExecutable = StringUtils.defaultIfBlank(
+        (String) cc.getProperties().get(WHISPER_EXECUTABLE_PATH_CONFIG_KEY), WHISPER_EXECUTABLE_DEFAULT_PATH);
+    logger.debug("Set Whisper path to {}", whisperExecutable);
+
+    whisperModel = StringUtils.defaultIfBlank(
+        (String) cc.getProperties().get(WHISPER_MODEL_CONFIG_KEY), WHISPER_MODEL_DEFAULT);
+    logger.debug("Whisper Language model set to {}", whisperModel);
+
     logger.debug("Finished activating/updating speech-to-text service");
   }
 
@@ -83,16 +98,20 @@ public class VoskEngine implements SpeechToTextEngine {
    *
    * @see org.opencastproject.speechtotext.api.SpeechToTextEngine#generateSubtitlesFile(File, File, String)
    */
+
+  //TODO: Add method for language detection
+  //TODO: Add optional language translation to english
   @Override
   public File generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language)
           throws SpeechToTextEngineException {
 
     final List<String> command = Arrays.asList(
-            voskExecutable,
-            "-i", mediaFile.getAbsolutePath(),
-            "-o", preparedOutputFile.getAbsolutePath(),
-            "-l", language);
-    logger.info("Executing Vosk's transcription command: {}", command);
+        whisperExecutable,
+        mediaFile.getAbsolutePath(),
+        "--model", whisperModel,
+        "--output_dir", preparedOutputFile.getParent()
+    );
+    logger.info("Executing Whisper's transcription command: {}", command);
 
     Process process = null;
     try {
@@ -108,20 +127,25 @@ public class VoskEngine implements SpeechToTextEngine {
           error = "\n Output:\n" + IOUtils.toString(errorStream, StandardCharsets.UTF_8);
         }
         throw new SpeechToTextEngineException(
-                String.format("Vosk exited abnormally with status %d (command: %s)%s", exitCode, command, error));
+            String.format("Whisper exited abnormally with status %d (command: %s)%s", exitCode, command, error));
       }
+
+      File whisperVTT = new File((preparedOutputFile.getParent() + "/" + mediaFile.getName() + ".vtt"));
+      whisperVTT.renameTo(preparedOutputFile);
+
+
       if (!preparedOutputFile.isFile()) {
-        throw new SpeechToTextEngineException("Vosk produced no output");
+        throw new SpeechToTextEngineException("Whisper produced no output");
       }
       logger.info("Subtitles file generated successfully: {}", preparedOutputFile);
     } catch (Exception e) {
-      logger.debug("Transcription failed closing Vosk transcription process for: {}", mediaFile);
+      logger.debug("Transcription failed closing Whisper transcription process for: {}", mediaFile);
       throw new SpeechToTextEngineException(e);
     } finally {
       IoSupport.closeQuietly(process);
     }
 
-    return preparedOutputFile; // now containing subtitles data
-  }
 
+    return preparedOutputFile; // Subtitles data
+  }
 }

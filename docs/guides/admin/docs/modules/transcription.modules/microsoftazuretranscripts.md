@@ -271,5 +271,5 @@ to the mediapackages and republishes it. Copy it into a new file under
 Workflow Operations
 -------------------
 
-* [microsoft-azure-attach-transcription](../workflowoperationhandlers/microsoft-azure-attach-transcription-woh.md)
-* [microsoft-azure-start-transcription](../workflowoperationhandlers/microsoft-azure-start-transcription-woh.md)
+* [microsoft-azure-attach-transcription](../../workflowoperationhandlers/microsoft-azure-attach-transcription-woh.md)
+* [microsoft-azure-start-transcription](../../workflowoperationhandlers/microsoft-azure-start-transcription-woh.md)

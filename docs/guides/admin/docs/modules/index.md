@@ -27,7 +27,7 @@ Documentation for modules included in Opencast.
 * Termination State
     * [Basic](terminationstate.md)
     * [AWS AutoScaling](terminationstate.aws.autoscaling.md)
-* [Transcripts (Google Speech)](googlespeechtranscripts.md)
-* [Transcripts (IBM Watson)](watsontranscripts.md)
-* [Transcripts (Microsoft Azure)](microsoftazuretranscripts.md)
+* [Transcripts (Google Speech)](transcription.modules/googlespeechtranscripts.md)
+* [Transcripts (IBM Watson)](transcription.modules/watsontranscripts.md)
+* [Transcripts (Microsoft Azure)](transcription.modules/microsoftazuretranscripts.md)
 * [YouTube Publication](youtubepublication.md)
