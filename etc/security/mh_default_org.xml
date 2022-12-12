@@ -347,6 +347,7 @@
     <sec:intercept-url pattern="/admin-ng/" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/admin-ng/index.html" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/index.html" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
+    <sec:intercept-url pattern="/index.js" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/**" access="ROLE_ADMIN" />
 
     <!-- ############################# -->
