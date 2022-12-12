@@ -65,6 +65,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -340,7 +341,10 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     if (!InMemoryUserAndRoleProvider.PROVIDER_NAME.equals(user.getProvider())) {
       for (RoleProvider roleProvider : roleProviders) {
         for (Role role : roleProvider.getRolesForUser(user.getUsername())) {
-          roles.add(JaxbRole.fromRole(role));
+          if (Objects.equals(JaxbOrganization.fromOrganization(user.getOrganization()).getId(),
+                  role.getOrganizationId())) {
+            roles.add(JaxbRole.fromRole(role));
+          }
         }
       }
     }
