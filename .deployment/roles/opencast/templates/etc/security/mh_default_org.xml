@@ -85,9 +85,11 @@
     <sec:intercept-url pattern="/admin-ng/series/series.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/series/new/metadata" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_METADATA_VIEW" />
     <sec:intercept-url pattern="/admin-ng/series/new/themes" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_THEMES_EDIT" />
+    <sec:intercept-url pattern="/admin-ng/series/new/tobira/page" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_TOBIRA_EDIT" />
     <sec:intercept-url pattern="/admin-ng/series/*/access.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_ACL_VIEW" />
     <sec:intercept-url pattern="/admin-ng/series/*/metadata.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_METADATA_VIEW" />
     <sec:intercept-url pattern="/admin-ng/series/*/theme.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_THEMES_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/series/*/tobira/pages" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_TOBIRA_VIEW" />
     <sec:intercept-url pattern="/admin-ng/server/servers.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERVERS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/series/*/hasEvents.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/series/configuration.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_VIEW" />
@@ -296,6 +298,10 @@
     <sec:intercept-url pattern="/editor/**" access="ROLE_USER" />
     <sec:intercept-url pattern="/editor-ui/**" access="ROLE_USER" />
 
+    <!-- Enable access to the Tobira module -->
+    <sec:intercept-url pattern="/tobira/**" access="ROLE_ADMIN" />
+    <sec:intercept-url pattern="/tobira/version" access="ROLE_ANONYMOUS" />
+
     <!-- Enable anonymous access to the annotation and the series endpoints -->
     <sec:intercept-url pattern="/series/**" method="GET" access="ROLE_ANONYMOUS, ROLE_CAPTURE_AGENT" />
     <sec:intercept-url pattern="/annotation/**" method="GET" access="ROLE_ANONYMOUS" />
@@ -332,6 +338,9 @@
     <sec:intercept-url pattern="/transcripts/watson/results*" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/transcripts/watson/results*" method="POST" access="ROLE_ANONYMOUS" />
 
+    <!-- Enable access to the redirect routes -->
+    <sec:intercept-url pattern="/redirect/**" access="ROLE_ANONYMOUS" />
+
     <!-- Everything else is for the admin users -->
     <sec:intercept-url pattern="/admin-ng" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/admin-ng/" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
@@ -350,25 +359,18 @@
     <!-- CAS Auth: Comment this if using CAS authentication -->
     <sec:form-login authentication-failure-url="/admin-ng/login.html?error" authentication-success-handler-ref="authSuccessHandler" />
 
-    <!-- Authentication filter chain -->
+    <!-- (Pre-)Authentication filter chain(s) -->
     <sec:custom-filter position="BASIC_AUTH_FILTER" ref="authenticationFilters" />
+    <sec:custom-filter position="PRE_AUTH_FILTER" ref="preAuthenticationFilters" />
 
     <sec:custom-filter ref="asyncTimeoutRedirectFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
 
     <!-- Opencast is shipping its own implementation of the anonymous filter -->
     <sec:custom-filter ref="anonymousFilter" position="ANONYMOUS_FILTER" />
 
-    <!-- Shibboleth header authentication filter
-    <sec:custom-filter ref="shibbolethHeaderFilter" position="PRE_AUTH_FILTER"/>
-    -->
-
     <!-- CAS Auth:  Uncomment this if using CAS authentication
     <sec:custom-filter position="FORM_LOGIN_FILTER" ref="casFilter" />
     -->
-
-    <!-- JWT header authentication filter -->
-    <sec:custom-filter ref="jwtHeaderFilter" position="PRE_AUTH_FILTER"/>
-    
 
     <!-- Enables "remember me" functionality -->
     <sec:remember-me services-ref="rememberMeServices" />
@@ -434,12 +436,24 @@
         <!-- 2-legged OAuth is used by trusted 3rd party applications, including LTI. -->
         <!-- Uncomment the line below to support LTI or other OAuth clients.          -->
         <!-- <ref bean="oauthProtectedResourceFilter" /> -->
+      </list>
+    </property>
+  </bean>
 
+  <!-- ################################ -->
+  <!-- # Pre-Aauthentication Filters    # -->
+  <!-- ################################ -->
+
+  <bean id="preAuthenticationFilters" class="org.springframework.web.filter.CompositeFilter">
+    <property name="filters">
+      <list>
         <!-- Uncomment the line below to support Shibboleth. -->
         <!-- <ref bean="shibbolethHeaderFilter" /> -->
 
         <!-- Uncomment the line below to support JWT. -->
         <ref bean="jwtHeaderFilter" /> 
+        <!-- Additionally/alternatively uncomment this to support passing a JWT in a URL parameter.
+        <ref bean="jwtRequestParameterFilter" /> -->
       </list>
     </property>
   </bean>
@@ -481,6 +495,13 @@
   <bean id="userEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
     <property name="loginFormUrl" value="/admin-ng/login.html" />
   </bean>
+
+  <!-- Redirect unauthenticated requests to custom login url with configurable redirect query parameter
+       Example: http://localhost/Shibboleth.sso/Login?target=<RELATIVE_REQUEST_URL> -->
+  <!--bean id="userEntryPoint" class="org.opencastproject.kernel.security.RedirectQueryParamAuthenticationEntryPoint">
+    <constructor-arg index="0" value="/Shibboleth.sso/Login" />
+    <constructor-arg index="1" value="target" />
+  </bean-->
 
   <!-- Returns a 401 request for authentication via digest auth -->
   <bean id="digestEntryPoint" class="org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint">
@@ -694,6 +715,15 @@
     <property name="exceptionIfHeaderMissing" value="false" />
     <property name="debug" value="false" />
   </bean>
+
+  <!-- General JWT request parameter extraction filter
+  <bean id="jwtRequestParameterFilter" class="org.opencastproject.security.jwt.JWTRequestParameterAuthenticationFilter">
+    <property name="parameterName" value="jwt" />
+    <property name="authenticationManager" ref="authenticationManager" />
+    <property name="loginHandler" ref="jwtLoginHandler" />
+    <property name="exceptionIfParameterMissing" value="false" />
+    <property name="debug" value="false" />
+  </bean>-->
 
   <!-- JWT login handler -->
   <bean id="jwtLoginHandler" class="org.opencastproject.security.jwt.DynamicLoginHandler">
