@@ -452,8 +452,8 @@
 
         <!-- Uncomment the line below to support JWT. -->
         <ref bean="jwtHeaderFilter" /> 
-        <!-- Additionally/alternatively uncomment this to support passing a JWT in a URL parameter.
-        <ref bean="jwtRequestParameterFilter" /> -->
+        <!-- Additionally/alternatively uncomment this to support passing a JWT in a URL parameter. -->
+        <ref bean="jwtRequestParameterFilter" />
       </list>
     </property>
   </bean>
@@ -716,14 +716,14 @@
     <property name="debug" value="false" />
   </bean>
 
-  <!-- General JWT request parameter extraction filter
+  <!-- General JWT request parameter extraction filter -->
   <bean id="jwtRequestParameterFilter" class="org.opencastproject.security.jwt.JWTRequestParameterAuthenticationFilter">
     <property name="parameterName" value="jwt" />
     <property name="authenticationManager" ref="authenticationManager" />
     <property name="loginHandler" ref="jwtLoginHandler" />
     <property name="exceptionIfParameterMissing" value="false" />
     <property name="debug" value="false" />
-  </bean>-->
+  </bean>
 
   <!-- JWT login handler -->
   <bean id="jwtLoginHandler" class="org.opencastproject.security.jwt.DynamicLoginHandler">
