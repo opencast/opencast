@@ -42,7 +42,7 @@ Opencast 13.0
   extended metadata by the Asset Manager. ([#3274](https://github.com/opencast/opencast/pull/3274))
 - Style requirement on all workflow operation handler documentation pages. The pages must have a title ending in
   "Operation Handler".  ([#4330](https://github.com/opencast/opencast/pull/4330))
-  - The page must list the operations identifier in the form: `ID: identifier`
+    - The page must list the operations identifier in the form: `ID: identifier`
 - Theodul Player is disabled by default and will be removed in OC 14 ([#4315](https://github.com/opencast/opencast/pull/4315))
 
 ### API changes
@@ -50,15 +50,15 @@ Opencast 13.0
 - Entwine functional library from the userdirectory removed.
   Replacing the code with Java streams. ([#4109](https://github.com/opencast/opencast/pull/4109))
 - Specialist worker notes added. Adds the ability to define a list of worker nodes that gets preferred when dispatching
-  compilation jobs (Job Type: org.opencastproject.composer). This could for example be useful in a setup with one or 
+  compilation jobs (Job Type: org.opencastproject.composer). This could for example be useful in a setup with one or
   more GPU accelerated nodes. ([#3741](https://github.com/opencast/opencast/pull/3741))
-  This feature is disabled by default and only activated when a list of specialized worker nodes is set. 
+  This feature is disabled by default and only activated when a list of specialized worker nodes is set.
   The comma-separated list of worker nodes is defined in the configuration file:
-  - `(etc/org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg)`
-  To ensure backwards compatibility not defining a list of specialized worker nodes is safe and leaves the behavior of 
+    - `(etc/org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg)`
+  To ensure backwards compatibility not defining a list of specialized worker nodes is safe and leaves the behavior of
   the system unchanged.
-- New endpoint to the External API Events endpoints. It allows uploading a track to an event by sending the updated 
-  media package to the archive. It also allows removing all other tracks of the specified flavor. It does not start 
+- New endpoint to the External API Events endpoints. It allows uploading a track to an event by sending the updated
+  media package to the archive. It also allows removing all other tracks of the specified flavor. It does not start
   a workflow. ([#3670](https://github.com/opencast/opencast/pull/3670))
 
 
