@@ -167,6 +167,14 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
   }
 
   @Override
+  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediaPackage, String elementId)
+          throws DistributionException {
+    Set<String> elementIds = new HashSet<String>();
+    elementIds.add(elementId);
+    return distributeSync(channelId, mediaPackage, elementIds);
+  }
+
+  @Override
   public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds)
           throws DistributionException {
     logger.info("Distributing {} elements to {}@{}", elementIds.size(), channelId, distributionChannel);
@@ -179,6 +187,14 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
     throw new DistributionException(format("Unable to distribute '%s' elements of "
             + "mediapackage '%s' using a remote destribution service proxy",
         elementIds.size(), mediapackage.getIdentifier().toString()));
+  }
+
+  @Override
+  public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediaPackage, String elementId)
+          throws DistributionException {
+    Set<String> elementIds = new HashSet<String>();
+    elementIds.add(elementId);
+    return retractSync(channelId, mediaPackage, elementIds);
   }
 
   @Override
