@@ -24,12 +24,10 @@ package org.opencastproject.security.jwt;
 import org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter;
 import org.springframework.util.Assert;
 
-import java.util.Enumeration;
-
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Authentication filter for JWTs.
+ * Authentication filter for JWTs in request headers.
  */
 public class JWTRequestHeaderAuthenticationFilter extends RequestHeaderAuthenticationFilter {
 
@@ -51,7 +49,7 @@ public class JWTRequestHeaderAuthenticationFilter extends RequestHeaderAuthentic
   @Override
   protected Object getPreAuthenticatedPrincipal(HttpServletRequest request) {
     if (debug) {
-      debug(request);
+      Util.debug(logger, request);
     }
 
     String username = null;
@@ -68,29 +66,6 @@ public class JWTRequestHeaderAuthenticationFilter extends RequestHeaderAuthentic
     }
 
     return username;
-  }
-
-  /**
-   * Logs the headers of a request to the logging facility.
-   *
-   * @param request The request.
-   */
-  protected void debug(HttpServletRequest request) {
-    Enumeration<String> he = request.getHeaderNames();
-    while (he.hasMoreElements()) {
-      String headerName = he.nextElement();
-      StringBuilder builder = new StringBuilder(headerName).append(": ");
-      Enumeration<String> hv = request.getHeaders(headerName);
-      boolean first = true;
-      while (hv.hasMoreElements()) {
-        if (!first) {
-          builder.append(", ");
-        }
-        builder.append(hv.nextElement());
-        first = false;
-      }
-      logger.debug(builder.toString());
-    }
   }
 
   /**

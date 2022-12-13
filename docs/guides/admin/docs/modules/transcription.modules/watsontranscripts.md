@@ -2,7 +2,7 @@ Transcripts (Automated by IBM Watson)
 =====================================
 
 > Using this requires you to turn on an Opencast plugin.
-> Take a look [at the plugin management documentation](plugin-management.md) to find out how you can do that.
+> Take a look [at the plugin management documentation](../plugin-management.md) to find out how you can do that.
 
 Overview
 --------
@@ -187,5 +187,5 @@ A sample one can be found in etc/workflows/retry-watson-transcripts.xml
 Workflow Operations
 -------------------
 
-* [start-watson-transcription](../workflowoperationhandlers/start-watson-transcription-woh.md)
-* [attach-watson-transcription](../workflowoperationhandlers/attach-watson-transcription-woh.md)
+* [start-watson-transcription](../../workflowoperationhandlers/start-watson-transcription-woh.md)
+* [attach-watson-transcription](../../workflowoperationhandlers/attach-watson-transcription-woh.md)

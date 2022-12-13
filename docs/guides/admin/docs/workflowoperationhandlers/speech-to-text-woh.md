@@ -6,28 +6,28 @@ ID: `speechtotext`
 Description
 -----------
 
-The speech to text operation can be used to generate subtitles for Videos or Audio files. Currently, there is
-only [Vosk](https://alphacephei.com/vosk/) available as STT Engine. The subtitles file format ist WebVTT.
+The speech to text operation can be used to generate subtitles for Videos or Audio files. Currently, there are two STT
+engines available, [Whisper](../modules/transcription.modules/whisper.md) and 
+[Vosk](../modules/transcription.modules/vosk.md). The subtitles file format ist WebVTT.
 
 
 Parameter Table
 ---------------
 
-|configuration keys|required| description                                                                                                                             |
-|------------------|--------|-----------------------------------------------------------------------------------------------------------------------------------------|
-|source-flavor     |yes     | The source media package to use                                                                                                         |
-|target-flavor     |yes     | Flavor of the produced subtitle file. The subflavor supports the language-code placeholder `#{lang}`                                    |
-|target-element    |no      | Define where to append the subtitles file. Possibilities are: as a 'track' or as an 'attachment'. The default is "attachment".          |
-|language-code     |no      | The language of the video or audio source (default is "eng"). It has to match the name of the language model directory. See 'vosk-cli'. |
-|language-fallback |no      | The fallback value if the dublin core/media package language field is not present. (default is "eng")                                   |
-|target-tags       |no      | Tags for the subtitle file                                                                                                              |
+|configuration keys|required| description                                                                                                                                        |
+|------------------|--------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+|source-flavor     |yes     | The source media package to use                                                                                                                    |
+|target-flavor     |yes     | Flavor of the produced subtitle file. The subflavor supports the language-code placeholder `#{lang}`                                               |
+|target-element    |no      | Define where to append the subtitles file. Possibilities are: as a 'track' or as an 'attachment'. The default is "attachment".                     |
+|language-code     |no      | The language of the video or audio source (default is "eng"). Vosk only: It has to match the name of the language model directory. See 'vosk-cli'. |
+|language-fallback |no      | The fallback value if the dublin core/media package language field is not present. (default is "eng") (Vosk Only)                                  |
+|target-tags       |no      | Tags for the subtitle file                                                                                                                         |
 
 
 Requirements
 ------------
 
-In order for it to work, you have to install the vosk-cli package. Installation instructions can be found at
-[github.com/elan-ev/vosk-cli](https://github.com/elan-ev/vosk-cli).
+In order for it to work, you have to install the vosk-cli or whisper package
 
 
 Operation Examples

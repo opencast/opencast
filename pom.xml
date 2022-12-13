@@ -171,6 +171,7 @@
     <module>modules/publication-service-oaipmh</module>
     <module>modules/publication-service-youtube-remote</module>
     <module>modules/publication-service-youtube-v3</module>
+    <module>modules/redirect</module>
     <module>modules/rename-files-workflowoperation</module>
     <module>modules/rest-test-environment</module>
     <module>modules/runtime-info-ui-ng</module>

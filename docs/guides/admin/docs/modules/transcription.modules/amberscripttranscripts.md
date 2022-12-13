@@ -2,7 +2,7 @@ AmberScript Transcription Service
 =================================
 
 > Using this requires you to turn on an Opencast plugin.
-> Take a look [at the plugin management documentation](plugin-management.md) to find out how you can do that.
+> Take a look [at the plugin management documentation](../plugin-management.md) to find out how you can do that.
 
 Overview
 --------
@@ -202,6 +202,6 @@ into your existing workflow:
 Workflow Operations
 -------------------
 
-* [amberscript-start-transcription](../workflowoperationhandlers/amberscript-start-transcription-woh.md)
-* [amberscript-attach-transcription](../workflowoperationhandlers/amberscript-attach-transcription-woh.md)
+* [amberscript-start-transcription](../../workflowoperationhandlers/amberscript-start-transcription-woh.md)
+* [amberscript-attach-transcription](../../workflowoperationhandlers/amberscript-attach-transcription-woh.md)
 
