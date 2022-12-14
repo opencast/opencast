@@ -1,5 +1,0 @@
-There is a new `POST /redirect/get` endpoint which will redirect a user to a given URL.
-Note that it only supports redirect to URLs that "live" on the same server (relative URLs).
-This is useful for external applications which can use it to implement
-patterns like Post/Redirect/Get, for example in the context of an authentication scheme
-in combination with the new `JWTRequestParameterAuthenticationFilter`.

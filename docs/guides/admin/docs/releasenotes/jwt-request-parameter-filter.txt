@@ -1,2 +1,0 @@
-With a new authentication filter you can now accept JWTs not only from request headers,
-but also from query and form parameters of a `GET` and `POST`-request, respectively.
