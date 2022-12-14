@@ -1,5 +1,32 @@
 # Opencast 12: Release Notes
 
+Opencast 12.6
+-------------
+
+The sixth maintenance release of Opencast 12.
+
+Notable changes are:
+
+- With a new authentication filter you can now accept JWTs not only from
+  request headers, but also from query and form parameters of a `GET` and
+  `POST`-request, respectively
+  (cf. [[#4412](https://github.com/opencast/opencast/pull/4412)]).
+- There is a new `POST /redirect/get` endpoint which will redirect a user to a
+  given URL. Note that it only supports redirect to URLs that "live" on the
+  same server (relative URLs). This is useful for external applications which
+  can use it to implement patterns like Post/Redirect/Get, for example in the
+  context of an authentication scheme in combination with the new
+  `JWTRequestParameterAuthenticationFilter`
+  (cf. [[#4412](https://github.com/opencast/opencast/pull/4412)]).
+- Fix *Go to Admin* and *Go to Media Module* buttons
+  (cf. [[#3959](https://github.com/opencast/opencast/issues/3959)]).
+- Fix Login redirect from Paella-Player 6
+  (cf. [[#4493](https://github.com/opencast/opencast/issues/4493)]).
+- Fix Paella Player not finding any video if audio or unsupported
+  media is delivered together with supported media in Paella Player 6
+  (cf. [[#4486](https://github.com/opencast/opencast/pull/4486)]).
+
+
 Opencast 12.5
 -------------
 
