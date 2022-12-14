@@ -1,9 +1,0 @@
-New Plugin Management
----------------------
-
-Some parts of Opencast have become plugins and are now disabled by default but can be easily enabled again by flipping a
-single configuration option.
-
-For a list of plugins, take a look at `etc/org.opencastproject.plugin.impl.PluginManagerImpl.cfg` or the documentation:
-
-- [The Plugin Management Documentation](modules/plugin-management.md)

@@ -4,6 +4,25 @@ Changelog
 Opencast 12
 -----------
 
+### Opencast 12.6
+
+*Released on December 14th, 2022*
+
+- [[#4528](https://github.com/opencast/opencast/pull/4528)] -
+  Allow creating releases manually
+- [[#4523](https://github.com/opencast/opencast/pull/4523)] -
+  Allow `ROLE_ADMIN_UI` to run index.js
+- [[#4518](https://github.com/opencast/opencast/pull/4518)] -
+  Remove braces from error message
+- [[#4496](https://github.com/opencast/opencast/pull/4496)] -
+  Fix Firefox install for admin ui tests in GHA
+- [[#4494](https://github.com/opencast/opencast/pull/4494)] -
+  Decode URL before parsing in PaellaPlayer 6
+- [[#4486](https://github.com/opencast/opencast/pull/4486)] -
+  Do not forget videos detected previously in Paella
+- [[#4459](https://github.com/opencast/opencast/pull/4459)] -
+  Update Release Assemblies
+
 ### Opencast 12.5
 
 *Released on November 16th, 2022*
