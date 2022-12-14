@@ -6,7 +6,7 @@
     "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'src/main/resources/**/*.html'"
   },
   "dependencies": {
-    "jquery": "^3.6.1"
+    "jquery": "^3.6.2"
   },
   "devDependencies": {
     "eslint": "^8.29.0",
