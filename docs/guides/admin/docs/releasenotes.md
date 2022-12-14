@@ -18,6 +18,16 @@ Opencast 13.0
 - Support for f4v file type ([#4280](https://github.com/opencast/opencast/pull/4280))
 - Whisper as new Speech-To-Text engine. The new engine comes with additional configuration options and with a config
   file to choose what model to use and the CLI command. ([#4513](https://github.com/opencast/opencast/pull/4513))
+- Specialist worker notes added. Adds the ability to define a list of worker nodes that gets preferred when dispatching
+  compilation jobs (Job Type: org.opencastproject.composer). This could for example be useful in a setup with one or
+  more GPU accelerated nodes. ([#3741](https://github.com/opencast/opencast/pull/3741))
+  This feature is disabled by default and only activated when a list of specialized worker nodes is set.
+  The comma-separated list of worker nodes is defined in the configuration file:
+    - `etc/org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg`
+  To ensure backwards compatibility not defining a list of specialized worker nodes is safe and leaves the behavior of
+  the system unchanged.
+- The new `assert` workflow operation allows asserting that certain expressions are `true` or `false`. This replaces
+  the similar `failing` operation. ([#4358](https://github.com/opencast/opencast/pull/4358))
 
 ### Improvements
 
@@ -28,7 +38,16 @@ Opencast 13.0
   default job dispatch behaviour to not dispatch jobs, and alters the node profiles to enable it by default on
   the expected nodes. This should not change current job dispatcher behaviour, aside from being able to enable
   or disable job dispatch on the fly. ([#3607](https://github.com/opencast/opencast/pull/3607))
-- New workflow implementation and migration fixes ([#4456](https://github.com/opencast/opencast/pull/4456))
+- Multi-tenant clusters can now define a common metadata catalog per tenant. ([#4181](https://github.com/opencast/opencast/pull/4181))
+- PostgreSQL is no longer considered experimental and fully supported. ([#4359](https://github.com/opencast/opencast/pull/4359))
+- The `send-email` workflow operation now has the following improvements:
+    - Templates can now include values from all extended metadata catalogs. Previously, the flavor of the extended
+      catalog had to start with `dublincore/`. ([#4376](https://github.com/opencast/opencast/pull/4376))
+    - Templates can now include values from organization properties.
+      This can be useful for multi-tenant systems. ([#4380](https://github.com/opencast/opencast/pull/4380))
+    - `send-email` can now send multipart emails using text and HTML. ([#4408](https://github.com/opencast/opencast/pull/4408))
+- User details can now be mapped from LDAP attributes. ([#4440](https://github.com/opencast/opencast/pull/4440))
+
 
 ### Behavior changes
 
@@ -36,30 +55,24 @@ Opencast 13.0
   `alt + enter` for next or - if applicable - the create button, and `alt + backspace` for the previous button
   (alt == option on macOS). **Note**: Shortcuts will not be detected while `<input>` or `<select>` elements are focused.
   In most cases, you will need to press the enter-key first. US translations for the hotkey cheatSheet are included and
-  can be seen by pressing the ?key while the modals are open. ([#3998](https://github.com/opencast/opencast/pull/3998))
+  can be seen by pressing the `?` key while the modals are open. ([#3998](https://github.com/opencast/opencast/pull/3998))
 - Extended metadata of events and series are put into the Elasticsearch index. This can be used to filter by extended
   metadata fields via the full text search. The series extended metadata is indexed by the Series Service and the event
   extended metadata by the Asset Manager. ([#3274](https://github.com/opencast/opencast/pull/3274))
-- Style requirement on all workflow operation handler documentation pages. The pages must have a title ending in
-  "Operation Handler".  ([#4330](https://github.com/opencast/opencast/pull/4330))
-    - The page must list the operations identifier in the form: `ID: identifier`
 - Theodul Player is disabled by default and will be removed in OC 14 ([#4315](https://github.com/opencast/opencast/pull/4315))
+- The LDAP implementation has been simplified, which may require adapting the `etc/security/mh_default_org.xml`
+  configuration file. ([#4383](https://github.com/opencast/opencast/pull/4383))
+- Captions are now published in the default workflows. ([#4415](https://github.com/opencast/opencast/pull/4415))
 
 ### API changes
 
-- Entwine functional library from the userdirectory removed.
-  Replacing the code with Java streams. ([#4109](https://github.com/opencast/opencast/pull/4109))
-- Specialist worker notes added. Adds the ability to define a list of worker nodes that gets preferred when dispatching
-  compilation jobs (Job Type: org.opencastproject.composer). This could for example be useful in a setup with one or
-  more GPU accelerated nodes. ([#3741](https://github.com/opencast/opencast/pull/3741))
-  This feature is disabled by default and only activated when a list of specialized worker nodes is set.
-  The comma-separated list of worker nodes is defined in the configuration file:
-    - `(etc/org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg)`
-  To ensure backwards compatibility not defining a list of specialized worker nodes is safe and leaves the behavior of
-  the system unchanged.
 - New endpoint to the External API Events endpoints. It allows uploading a track to an event by sending the updated
   media package to the archive. It also allows removing all other tracks of the specified flavor. It does not start
   a workflow. ([#3670](https://github.com/opencast/opencast/pull/3670))
+- The ingest API now allows setting tags when ingesting attachments or catalogs via URL.
+  ([#4156](https://github.com/opencast/opencast/pull/4156))
+- The ingest API now allows downloading from HTTP sources protected by HTTP basic auth. Previously only digest auth was
+  supported. ([#4180](https://github.com/opencast/opencast/pull/4180))
 
 
 Release Schedule
