@@ -1,41 +1,43 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta content="text/html; charset=utf-8;" http-equiv="Content-type">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
 
-<head>
-  <meta http-equiv="Content-type" content="text/html; charset=utf-8;">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Paella Auth</title>
 
-  <title>Paella Auth</title>
+    <script type="text/javascript">
+        function onLoad() {
 
-  <script type="text/javascript">
-    function onLoad() {
+            var search = {};
+            window.location.search.slice(1).split("&").forEach(function (x) {
+                var p = x.split(/=(.*)/);
+                search[p[0]] = p[1];
+            });
 
-      var search = {};
-      window.location.search.slice(1).split("&").forEach(function (x) {
-        var p = x.split("=");
-        search[p[0]] = p[1];
-      });
+            var redirect = search['redirect'];
+            var id = search['id'];
+            var series = search['series'] || search['sid'] || search['epFrom'];
+            if (redirect !== undefined) {
+                const redirectDecoded = decodeURIComponent(redirect);
+                const redirectDomain = new URL(redirectDecoded);
+                if (window.location.hostname.toUpperCase() === redirectDomain.hostname.toUpperCase()) {
+                    window.location.href = redirectDecoded;
+                } else {
+                    window.location.href = "/engage/ui/index.html";
+                }
+            } else if (id !== undefined) {
+                window.location.href = "watch.html?id=" + id;
+            } else if (series !== undefined) {
+                window.location.href = "/engage/ui/index.html?epFrom=" + series;
+            } else {
+                window.location.href = "/engage/ui/index.html";
+            }
+        }
+    </script>
+  </head>
 
-      var redirect = search['redirect'];
-      var id = search['id'];
-      var series = search['series'] || search['sid'] || search['epFrom'];
-      if (redirect != undefined) {
-        window.location.href = decodeURIComponent(redirect);
-      }
-      else if (id != undefined) {
-        window.location.href = "/paella/ui/watch.html?id=" + id;
-      }
-      else if (series != undefined) {
-        window.location.href = "/engage/ui/index.html?epFrom=" + series;
-      }
-      else {
-        window.location.href = "/engage/ui/index.html";
-      }
-    }
-  </script>
-</head>
-
-<body id="body" onload="onLoad();">
-</body>
+  <body id="body" onload="onLoad();">
+  </body>
 
 </html>
