@@ -5,9 +5,6 @@ This guide is based on an RPM software repository available for Red Hat based Li
 University](https://uni-osnabrueck.de) and [ELAN e.V.](https://elan-ev.de).
 This repository provides preconfigured Opencast installations and all necessary 3rd-party-tools.
 
-<div class=warn>
-  <b>Opencast {{ opencast_major_version() }}</b> is not yet available.
-</div>
 
 > In addition to this guide, we have also recorded [a full installation done in 30 minutes](https://vt.uos.de/71hfc)
 > if you like to see how this works before you try it yourself.
