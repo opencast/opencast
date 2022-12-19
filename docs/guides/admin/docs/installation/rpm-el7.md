@@ -3,7 +3,7 @@ Install from Repository (Red Hat Enterprise Linux 7.x, CentOS 7.x, Scientific Li
 
 
 <div class=warn>
-While we  continue n to continue support for EL7 until the CentOS 7 EOL in mid 2024,
+While we continue to support Opencast for EL7 until the CentOS 7 EOL in mid 2024,
 most testing happens on more modern platforms and we recommend using EL8 or EL9 instead.
 </div>
 
