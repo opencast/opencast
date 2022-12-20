@@ -221,7 +221,7 @@ angular.module('adminNg.controllers')
       // update the existing comment instead
       const index = $scope.table.createdComments.findIndex(object => {
         return object.eventId === eventId;
-      })
+      });
       if (index >= 0) {
         let comment = $scope.table.createdComments[index].comment;
         comment.text = commentText;
