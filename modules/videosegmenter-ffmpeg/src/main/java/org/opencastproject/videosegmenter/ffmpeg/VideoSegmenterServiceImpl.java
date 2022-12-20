@@ -45,10 +45,14 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.LoadUtil;
+import org.opencastproject.util.MimeType;
+import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.videosegmenter.api.VideoSegmenterException;
 import org.opencastproject.videosegmenter.api.VideoSegmenterService;
 import org.opencastproject.workspace.api.Workspace;
+
+import com.entwinemedia.fn.data.Opt;
 
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -64,6 +68,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -71,6 +77,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Media analysis plugin that takes a video stream and extracts video segments
@@ -98,6 +105,12 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
   /** List of available operations on jobs */
   private enum Operation {
     Segment
+  };
+
+  private class Chapter {
+    protected double start;
+    protected double end;
+    protected String title;
   };
 
   /** Path to the executable */
@@ -153,6 +166,21 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
 
   /** Default value for the option whether segments numbers depend on track duration */
   public static final boolean DEFAULT_DURATION_DEPENDENT = false;
+
+  /** Name of the configuration option deciding whether the chapter extraction is used for segmentation */
+  public static final String OPT_USE_CHAPTER_IF_AVAILABLE = "useChapterIfAvailable";
+
+  /** Default value for the chapter extraction option */
+  public static final boolean DEFAULT_USE_CHAPTER_IF_AVAILABLE = false;
+
+  private boolean useChapterIfAvailable = DEFAULT_USE_CHAPTER_IF_AVAILABLE;
+
+  /** Name of the configuration option deciding which tracks should have their chapters extracted based on mime type */
+  public static final String OPT_USE_CHAPTER_MIME_TYPES = "useChapterMimeTypes";
+
+  public static final List<MimeType> DEFAULT_USE_CHAPTER_MIME_TYPES = new ArrayList<>();
+
+  private List<MimeType> useChapterMimeTypes = DEFAULT_USE_CHAPTER_MIME_TYPES;
 
   /** The load introduced on the system by a segmentation job */
   public static final float DEFAULT_SEGMENTER_JOB_LOAD = 0.3f;
@@ -318,6 +346,39 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
       }
     }
 
+    if (properties.get(OPT_USE_CHAPTER_IF_AVAILABLE) != null) {
+      String value = (String) properties.get(OPT_USE_CHAPTER_IF_AVAILABLE);
+      try {
+        useChapterIfAvailable = Boolean.parseBoolean(value);
+        logger.info("Use Chapters if available is set to {}", useChapterIfAvailable);
+      } catch (Exception e) {
+        logger.warn("Found illegal value '{}' for videosegmenter's option: {}",
+                value,
+                OPT_USE_CHAPTER_IF_AVAILABLE);
+      }
+    }
+
+    if (properties.get(OPT_USE_CHAPTER_MIME_TYPES) != null) {
+      String value = (String) properties.get(OPT_USE_CHAPTER_MIME_TYPES);
+      try {
+        List<MimeType> mts = new ArrayList<>();
+        String[] values = value.split(",");
+
+        for (String mimeString : values) {
+          MimeType mt = MimeTypes.parseMimeType(mimeString);
+          mts.add(mt);
+        }
+
+        useChapterMimeTypes = mts;
+      } catch (Exception e) {
+        logger.warn("Found illegal value '{}' for videosegmenter's option: {}",
+                value,
+                OPT_USE_CHAPTER_MIME_TYPES);
+      }
+    } else {
+      useChapterMimeTypes = DEFAULT_USE_CHAPTER_MIME_TYPES;
+    }
+
     segmenterJobLoad = LoadUtil.getConfiguredLoadValue(
         properties, SEGMENTER_JOB_LOAD_KEY, DEFAULT_SEGMENTER_JOB_LOAD, serviceRegistry);
   }
@@ -359,8 +420,6 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
     }
 
     try {
-      Mpeg7Catalog mpeg7;
-
       File mediaFile = null;
       URL mediaUrl = null;
       try {
@@ -379,228 +438,20 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
             + " does not have a duration");
       }
       logger.info("Track {} loaded, duration is {} s", mediaUrl,
-          track.getDuration() / 1000);
+            track.getDuration() / 1000);
 
-      MediaTime contentTime = new MediaRelTimeImpl(0,
-          track.getDuration());
-      MediaLocator contentLocator = new MediaLocatorImpl(track.getURI());
-
-      Video videoContent;
-
-      logger.debug("changesThreshold: {}, stabilityThreshold: {}", changesThreshold, stabilityThreshold);
-      logger.debug("prefNumber: {}, maxCycles: {}", prefNumber, maxCycles);
-
-      boolean endOptimization = false;
-      int cycleCount = 0;
-      LinkedList<Segment> segments;
-      LinkedList<OptimizationStep> optimizationList = new LinkedList<OptimizationStep>();
-      LinkedList<OptimizationStep> unusedResultsList = new LinkedList<OptimizationStep>();
-      OptimizationStep stepBest = new OptimizationStep();
-
-      // local copy of changesThreshold, that can safely be changed over optimization iterations
-      float changesThresholdLocal = changesThreshold;
-
-      // local copies of prefNumber, absoluteMin and absoluteMax, to make a dependency on track length possible
-      int prefNumberLocal = prefNumber;
-      int absoluteMaxLocal = absoluteMax;
-      int absoluteMinLocal = absoluteMin;
-
-      // if the number of segments should depend on the duration of the track, calculate new values for prefNumber,
-      // absoluteMax and absoluteMin with the duration of the track
-      if (durationDependent) {
-        double trackDurationInHours = track.getDuration() / 3600000.0;
-        prefNumberLocal = (int) Math.round(trackDurationInHours * prefNumberLocal);
-        absoluteMaxLocal = (int) Math.round(trackDurationInHours * absoluteMax);
-        absoluteMinLocal = (int) Math.round(trackDurationInHours * absoluteMin);
-
-        //make sure prefNumberLocal will never be 0 or negative
-        if (prefNumberLocal <= 0) {
-          prefNumberLocal = 1;
-        }
-
-        logger.info("Numbers of segments are set to be relative to track duration. Therefore for {} the preferred "
-                + "number of segments is {}", mediaUrl, prefNumberLocal);
+      Mpeg7Catalog mpeg7;
+      Opt<List<Chapter>> chapter = Opt.none();
+      if (useChapterIfAvailable
+          && (useChapterMimeTypes.isEmpty()
+            || useChapterMimeTypes.stream().anyMatch(comp -> track.getMimeType().eq(comp)))) {
+        chapter = Opt.nul(extractChapter(mediaFile));
       }
-
-      logger.info("Starting video segmentation of {}", mediaUrl);
-
-
-      // optimization loop to get a segmentation with a number of segments close
-      // to the desired number of segments
-      while (!endOptimization) {
-
-        mpeg7 = mpeg7CatalogService.newInstance();
-        videoContent = mpeg7.addVideoContent("videosegment",
-            contentTime, contentLocator);
-
-
-        // run the segmentation with FFmpeg
-        segments = runSegmentationFFmpeg(track, videoContent, mediaFile, changesThresholdLocal);
-
-
-        // calculate errors for "normal" and filtered segmentation
-        // and compare them to find better optimization.
-        // "normal"
-        OptimizationStep currentStep = new OptimizationStep(changesThresholdLocal, segments.size(), prefNumberLocal,
-            mpeg7, segments);
-        // filtered
-        LinkedList<Segment> segmentsNew = new LinkedList<Segment>();
-        OptimizationStep currentStepFiltered = new OptimizationStep(
-                changesThresholdLocal, 0,
-                prefNumberLocal, filterSegmentation(segments, track, segmentsNew, stabilityThreshold * 1000), segments);
-        currentStepFiltered.setSegmentNumAndRecalcErrors(segmentsNew.size());
-
-        logger.info("Segmentation yields {} segments after filtering", segmentsNew.size());
-
-        OptimizationStep currentStepBest;
-
-        // save better optimization in optimizationList
-        //
-        // the unfiltered segmentation is better if
-        // - the error is smaller than the error of the filtered segmentation
-        // OR - the filtered number of segments is smaller than the preferred number
-        //    - and the unfiltered number of segments is bigger than a value that should roughly estimate how many
-        //          segments with the length of the stability threshold could maximally be in a video
-        //          (this is to make sure that if there are e.g. 1000 segments and the filtering would yield
-        //           smaller and smaller results, the stability threshold won't be optimized in the wrong direction)
-        //    - and the filtered segmentation is not already better than the maximum error
-        if (currentStep.getErrorAbs() <= currentStepFiltered.getErrorAbs() || (segmentsNew.size() < prefNumberLocal
-                && currentStep.getSegmentNum() > (track.getDuration() / 1000.0f) / (stabilityThreshold / 2)
-                && !(currentStepFiltered.getErrorAbs() <= maxError))) {
-
-          optimizationList.add(currentStep);
-          Collections.sort(optimizationList);
-          currentStepBest = currentStep;
-          unusedResultsList.add(currentStepFiltered);
-        } else {
-          optimizationList.add(currentStepFiltered);
-          Collections.sort(optimizationList);
-          currentStepBest = currentStepFiltered;
-        }
-
-        cycleCount++;
-
-        logger.debug("errorAbs = {}, error = {}", currentStep.getErrorAbs(), currentStep.getError());
-        logger.debug("changesThreshold = {}", changesThresholdLocal);
-        logger.debug("cycleCount = {}", cycleCount);
-
-        // end optimization if maximum number of cycles is reached or if the segmentation is good enough
-        if (cycleCount >= maxCycles || currentStepBest.getErrorAbs() <= maxError) {
-          endOptimization = true;
-          if (optimizationList.size() > 0) {
-            if (optimizationList.getFirst().getErrorAbs() <= optimizationList.getLast().getErrorAbs()
-                && optimizationList.getFirst().getError() >= 0) {
-              stepBest = optimizationList.getFirst();
-            } else {
-              stepBest = optimizationList.getLast();
-            }
-          }
-
-          // just to be sure, check if one of the unused results was better
-          for (OptimizationStep currentUnusedStep : unusedResultsList) {
-            if (currentUnusedStep.getErrorAbs() < stepBest.getErrorAbs()) {
-              stepBest = unusedResultsList.getFirst();
-            }
-          }
-
-
-        // continue optimization, calculate new changes threshold for next iteration of optimization
-        } else {
-          OptimizationStep first = optimizationList.getFirst();
-          OptimizationStep last = optimizationList.getLast();
-          // if this was the first iteration or there are only positive or negative errors,
-          // estimate a new changesThreshold based on the one yielding the smallest error
-          if (optimizationList.size() == 1 || first.getError() < 0 || last.getError() > 0) {
-            if (currentStepBest.getError() >= 0) {
-              // if the error is smaller or equal to 1, increase changes threshold weighted with the error
-              if (currentStepBest.getError() <= 1) {
-                changesThresholdLocal += changesThresholdLocal * currentStepBest.getError();
-              } else {
-                  // if there are more than 2000 segments in the first iteration, set changes threshold to 0.2
-                  // to faster reach reasonable segment numbers
-                if (cycleCount <= 1 && currentStep.getSegmentNum() > 2000) {
-                  changesThresholdLocal = 0.2f;
-                // if the error is bigger than one, double the changes threshold, because multiplying
-                // with a large error can yield a much too high changes threshold
-                } else {
-                  changesThresholdLocal *= 2;
-                }
-              }
-            } else {
-              changesThresholdLocal /= 2;
-            }
-
-            logger.debug("onesided optimization yields new changesThreshold = {}", changesThresholdLocal);
-          // if there are already iterations with positive and negative errors, choose a changesThreshold between those
-          } else {
-            // for simplicity a linear relationship between the changesThreshold
-            // and the number of generated segments is assumed and based on that
-            // the expected correct changesThreshold is calculated
-
-            // the new changesThreshold is calculated by averaging the the mean and the mean weighted with errors
-            // because this seemed to yield better results in several cases
-
-            float x = (first.getSegmentNum() - prefNumberLocal) / (float)(first.getSegmentNum() - last.getSegmentNum());
-            float newX = ((x + 0.5f) * 0.5f);
-            changesThresholdLocal = first.getChangesThreshold() * (1 - newX) + last.getChangesThreshold() * newX;
-            logger.debug("doublesided optimization yields new changesThreshold = {}", changesThresholdLocal);
-          }
-        }
+      if (chapter.isSome() && !chapter.get().isEmpty()) {
+        mpeg7 = segmentFromChapter(chapter.get(), track);
+      } else {
+        mpeg7 = segmentAndOptimize(track, mediaFile, mediaUrl);
       }
-
-
-      // after optimization of the changes threshold, the minimum duration for a segment
-      // (stability threshold) is optimized if the result is still not good enough
-      int threshLow = stabilityThreshold * 1000;
-      int threshHigh = threshLow + (threshLow / 2);
-
-      LinkedList<Segment> tmpSegments;
-      float smallestError = Float.MAX_VALUE;
-      int bestI = threshLow;
-      segments = stepBest.getSegments();
-
-      // if the error is negative (which means there are already too few segments) or if the error
-      // is smaller than the maximum error, the stability threshold will not be optimized
-      if (stepBest.getError() <= maxError) {
-        threshHigh = stabilityThreshold * 1000;
-      }
-      for (int i = threshLow; i <= threshHigh; i = i + 1000) {
-        tmpSegments = new LinkedList<Segment>();
-        filterSegmentation(segments, track, tmpSegments, i);
-        float newError = OptimizationStep.calculateErrorAbs(tmpSegments.size(), prefNumberLocal);
-        if (newError < smallestError) {
-          smallestError = newError;
-          bestI = i;
-        }
-      }
-      tmpSegments = new LinkedList<Segment>();
-      mpeg7 = filterSegmentation(segments, track, tmpSegments, bestI);
-
-      // for debugging: output of final segmentation after optimization
-      logger.debug("result segments:");
-      for (int i = 0; i < tmpSegments.size(); i++) {
-        int[] tmpLog2 = new int[7];
-        tmpLog2[0] = tmpSegments.get(i).getMediaTime().getMediaTimePoint().getHour();
-        tmpLog2[1] = tmpSegments.get(i).getMediaTime().getMediaTimePoint().getMinutes();
-        tmpLog2[2] = tmpSegments.get(i).getMediaTime().getMediaTimePoint().getSeconds();
-        tmpLog2[3] = tmpSegments.get(i).getMediaTime().getMediaDuration().getHours();
-        tmpLog2[4] = tmpSegments.get(i).getMediaTime().getMediaDuration().getMinutes();
-        tmpLog2[5] = tmpSegments.get(i).getMediaTime().getMediaDuration().getSeconds();
-        Object[] tmpLog1 = {tmpLog2[0], tmpLog2[1], tmpLog2[2], tmpLog2[3], tmpLog2[4], tmpLog2[5], tmpLog2[6]};
-        tmpLog1[6] = tmpSegments.get(i).getIdentifier();
-        logger.debug("s:{}:{}:{}, d:{}:{}:{}, {}", tmpLog1);
-      }
-
-      logger.info("Optimized Segmentation yields (after {} iteration" + (cycleCount == 1 ? "" : "s") + ") {} segments",
-          cycleCount, tmpSegments.size());
-
-      // if no reasonable segmentation could be found, instead return a uniform segmentation
-      if (tmpSegments.size() < absoluteMinLocal || tmpSegments.size() > absoluteMaxLocal) {
-        mpeg7 = uniformSegmentation(track, tmpSegments, prefNumberLocal);
-        logger.info("Since no reasonable segmentation could be found, a uniform segmentation was created");
-      }
-
-
 
       Catalog mpeg7Catalog = (Catalog) MediaPackageElementBuilderFactory
           .newInstance().newElementBuilder()
@@ -625,6 +476,460 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
         throw new VideoSegmenterException(e);
       }
     }
+  }
+
+  /**
+   * Extracts the Chapter information from an container, with the help of ffmpeg
+   * @param mediaFile the file, which contains the chapter information
+   * @return The extracted chapters
+   */
+  private List<Chapter> extractChapter(final File mediaFile) throws IOException {
+    String[] command = new String[] {
+        binary,
+        "-nostats", "-nostdin",
+        "-i", mediaFile.getAbsolutePath(),
+        "-f", "FFMETADATA",
+        "-"
+    };
+
+    logger.info("Detecting chapters using command: {}", (Object) command);
+
+    ProcessBuilder pbuilder = new ProcessBuilder(command);
+    Process process = pbuilder.start();
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+      return parseChapter(reader);
+    } catch (IOException e) {
+      logger.error("Error executing ffmpeg: {}", e.getMessage());
+    } catch (ParseException e) {
+      logger.error("Error parsing ffmpeg output: {}", e.getMessage());
+    }
+
+    return null;
+  }
+
+  /**
+   * Parses Chapter information out of a FFMETADATA file (see https://ffmpeg.org/ffmpeg-formats.html section 5 )
+   * @param reader The Reader to parse from
+   * @return List of parsed chapters
+   * @throws IOException When the reading the reader fails
+   * @throws ParseException When the parsing of the FFMETADATA reader fails
+   */
+  private List<Chapter> parseChapter(final BufferedReader reader) throws IOException, ParseException {
+    List<Chapter> chapters = new ArrayList<Chapter>();
+
+    int state = 0;
+    // Nanoseconds are the default timebase
+    final double defaultTimebase = 1e-9f;
+    double timebase = defaultTimebase;
+    long start = -1;
+    long end = -1;
+    StringBuilder title = new StringBuilder();
+
+    String line = reader.readLine();
+    int lineNumber = 1;
+    while (null != line) {
+      // begin parsing
+      if (state == 0 && ";FFMETADATA1".equals(line)) {
+        state++;
+      }
+      // ignore comments, empty lines
+      else if (line.startsWith(";") || line.startsWith("#") || line.isEmpty()) { }
+      // search for chapter begin
+      else if (state == 1 && "[CHAPTER]".equals(line)) {
+        state++;
+      }
+      // check for timebase
+      else if (state == 2) {
+        // timebase is optional
+        if (!line.startsWith("TIMEBASE=")) {
+          state++;
+          continue;
+        }
+
+        String[] timebaseSplit = line.split("=");
+
+        if (timebaseSplit.length != 2) {
+          throw new ParseException("Failed to parse FFMETADATA:"
+                    + " CHAPTER TIMEBASE line not correctly formatted", lineNumber);
+        }
+
+        String ratio = timebaseSplit[1];
+        String[] numbers = ratio.split("/");
+
+        if (numbers.length != 2) {
+          throw new ParseException("Failed to parse FFMETADATA: ratio not correctly formatted", lineNumber);
+        }
+
+        try {
+          // The standard requires Integer here, but this doesn't really matter here
+          timebase = Double.parseDouble(numbers[0]) / Double.parseDouble(numbers[1]);
+        }
+        catch (NumberFormatException e) {
+          throw new ParseException("Failed to parse FFMETADATA:"
+                    + " Couldn't parse timebase as ratio of integer numbers", lineNumber);
+        }
+
+        state++;
+      }
+      // start point of chapter
+      else if (state == 3) {
+        if (!line.startsWith("START=")) {
+          throw new ParseException("Failed to parse FFMETADATA: CHAPTER START field missing", lineNumber);
+        }
+
+        String[] startSplit = line.split("=");
+
+        if (startSplit.length != 2) {
+          throw new ParseException("Failed to parse FFMETADATA:"
+                    + " CHAPTER START line not correctly formatted", lineNumber);
+        }
+
+        try {
+          start = Long.parseLong(startSplit[1]);
+        }
+        catch (NumberFormatException e) {
+          throw new ParseException("Failed to parse FFMETADATA:"
+                    + " CHAPTER START needs to be an Integer", lineNumber);
+        }
+
+        state++;
+      }
+      else if (state == 4) {
+        if (!line.startsWith("END=")) {
+          throw new ParseException("Failed to parse FFMETADATA: CHAPTER END field missing", lineNumber);
+        }
+
+        String[] endSplit = line.split("=");
+
+        if (endSplit.length != 2) {
+          throw new ParseException("Failed to parse FFMETADATA:"
+                    + " CHAPTER END line not correctly formatted", lineNumber);
+        }
+
+        try {
+          end = Long.parseLong(endSplit[1]);
+        }
+        catch (NumberFormatException e) {
+          throw new ParseException("Failed to parse FFMETADATA:"
+                    + " CHAPTER START needs to be an Integer", lineNumber);
+        }
+
+        state++;
+      }
+      // Being processing of title
+      else if (state == 5) {
+        if (!line.startsWith("title=")) {
+          throw new ParseException("Failed to parse FFMETADATA: CHAPTER title field missing", lineNumber);
+        }
+
+        String fakeLine = Arrays.stream(line.split("="))
+                .skip(1)
+                .collect(Collectors.joining());
+
+        // Process title further in next state
+        line = fakeLine;
+        state++;
+        continue;
+      }
+      // Continue processing of title
+      else if (state == 6) {
+        int[] codePoints = line.codePoints().toArray();
+        boolean isEscaped = false;
+        for (int codePoint : codePoints) {
+          if (isEscaped) {
+            title.appendCodePoint(codePoint);
+
+            isEscaped = false;
+          }
+          else {
+            if (codePoint == "\\".codePointAt(0)) {
+              isEscaped = true;
+            }
+            else if (
+                  codePoint == "=".codePointAt(0)
+                  || codePoint == ";".codePointAt(0)
+                  || codePoint == "#".codePointAt(0)
+            ) {
+              throw new ParseException("Failed to parse FFMETADATA:"
+                        + " CHAPTER title field '=' ';' '#' '\\' '\\n' have to be escaped", lineNumber);
+            }
+            else {
+              title.appendCodePoint(codePoint);
+            }
+          }
+        }
+
+        if (!isEscaped) {
+          state = 1;
+
+          Chapter chapter = new Chapter();
+          chapter.title = title.toString();
+          chapter.start = timebase * start;
+          chapter.end = timebase * end;
+
+          chapters.add(chapter);
+
+          timebase = defaultTimebase;
+          start = -1;
+          end = -1;
+          title = new StringBuilder();
+        }
+      }
+
+      line = reader.readLine();
+      lineNumber++;
+    }
+
+    return chapters;
+  }
+
+  private Mpeg7Catalog segmentFromChapter(final List<Chapter> chapters, final Track track) {
+    Mpeg7Catalog mpeg7 = mpeg7CatalogService.newInstance();
+
+    // create videoContent
+    MediaTime contentTime = new MediaRelTimeImpl(0,
+            track.getDuration());
+    MediaLocator contentLocator = new MediaLocatorImpl(track.getURI());
+    Video videoContent = mpeg7.addVideoContent("videosegment",
+            contentTime, contentLocator);
+
+    int segmentNum = 0;
+    for (Chapter chapter : chapters) {
+      segmentNum++;
+
+      Segment s = videoContent.getTemporalDecomposition()
+              .createSegment("segment-" + segmentNum);
+
+      s.setMediaTime(new MediaRelTimeImpl((long) (chapter.start * 1000), (long) (chapter.end * 1000)));
+    }
+
+    return mpeg7;
+  }
+
+  private Mpeg7Catalog segmentAndOptimize(final Track track, final File mediaFile, final URL mediaUrl)
+          throws IOException, VideoSegmenterException {
+    Mpeg7Catalog mpeg7 = null;
+
+    MediaTime contentTime = new MediaRelTimeImpl(0,
+            track.getDuration());
+    MediaLocator contentLocator = new MediaLocatorImpl(track.getURI());
+
+    Video videoContent;
+
+    logger.debug("changesThreshold: {}, stabilityThreshold: {}", changesThreshold, stabilityThreshold);
+    logger.debug("prefNumber: {}, maxCycles: {}", prefNumber, maxCycles);
+
+    boolean endOptimization = false;
+    int cycleCount = 0;
+    LinkedList<Segment> segments;
+    LinkedList<OptimizationStep> optimizationList = new LinkedList<OptimizationStep>();
+    LinkedList<OptimizationStep> unusedResultsList = new LinkedList<OptimizationStep>();
+    OptimizationStep stepBest = new OptimizationStep();
+
+    // local copy of changesThreshold, that can safely be changed over optimization iterations
+    float changesThresholdLocal = changesThreshold;
+
+    // local copies of prefNumber, absoluteMin and absoluteMax, to make a dependency on track length possible
+    int prefNumberLocal = prefNumber;
+    int absoluteMaxLocal = absoluteMax;
+    int absoluteMinLocal = absoluteMin;
+
+    // if the number of segments should depend on the duration of the track, calculate new values for prefNumber,
+    // absoluteMax and absoluteMin with the duration of the track
+    if (durationDependent) {
+      double trackDurationInHours = track.getDuration() / 3600000.0;
+      prefNumberLocal = (int) Math.round(trackDurationInHours * prefNumberLocal);
+      absoluteMaxLocal = (int) Math.round(trackDurationInHours * absoluteMax);
+      absoluteMinLocal = (int) Math.round(trackDurationInHours * absoluteMin);
+
+      //make sure prefNumberLocal will never be 0 or negative
+      if (prefNumberLocal <= 0) {
+        prefNumberLocal = 1;
+      }
+
+      logger.info("Numbers of segments are set to be relative to track duration. Therefore for {} the preferred "
+              + "number of segments is {}", mediaUrl, prefNumberLocal);
+    }
+
+    logger.info("Starting video segmentation of {}", mediaUrl);
+
+
+    // optimization loop to get a segmentation with a number of segments close
+    // to the desired number of segments
+    while (!endOptimization) {
+
+      mpeg7 = mpeg7CatalogService.newInstance();
+      videoContent = mpeg7.addVideoContent("videosegment",
+              contentTime, contentLocator);
+
+
+      // run the segmentation with FFmpeg
+      segments = runSegmentationFFmpeg(track, videoContent, mediaFile, changesThresholdLocal);
+
+
+      // calculate errors for "normal" and filtered segmentation
+      // and compare them to find better optimization.
+      // "normal"
+      OptimizationStep currentStep = new OptimizationStep(changesThresholdLocal, segments.size(), prefNumberLocal,
+              mpeg7, segments);
+      // filtered
+      LinkedList<Segment> segmentsNew = new LinkedList<Segment>();
+      OptimizationStep currentStepFiltered = new OptimizationStep(
+              changesThresholdLocal, 0,
+              prefNumberLocal, filterSegmentation(segments, track, segmentsNew, stabilityThreshold * 1000), segments);
+      currentStepFiltered.setSegmentNumAndRecalcErrors(segmentsNew.size());
+
+      logger.info("Segmentation yields {} segments after filtering", segmentsNew.size());
+
+      OptimizationStep currentStepBest;
+
+      // save better optimization in optimizationList
+      //
+      // the unfiltered segmentation is better if
+      // - the error is smaller than the error of the filtered segmentation
+      // OR - the filtered number of segments is smaller than the preferred number
+      //    - and the unfiltered number of segments is bigger than a value that should roughly estimate how many
+      //          segments with the length of the stability threshold could maximally be in a video
+      //          (this is to make sure that if there are e.g. 1000 segments and the filtering would yield
+      //           smaller and smaller results, the stability threshold won't be optimized in the wrong direction)
+      //    - and the filtered segmentation is not already better than the maximum error
+      if (currentStep.getErrorAbs() <= currentStepFiltered.getErrorAbs() || (segmentsNew.size() < prefNumberLocal
+              && currentStep.getSegmentNum() > (track.getDuration() / 1000.0f) / (stabilityThreshold / 2)
+              && !(currentStepFiltered.getErrorAbs() <= maxError))) {
+
+        optimizationList.add(currentStep);
+        Collections.sort(optimizationList);
+        currentStepBest = currentStep;
+        unusedResultsList.add(currentStepFiltered);
+      } else {
+        optimizationList.add(currentStepFiltered);
+        Collections.sort(optimizationList);
+        currentStepBest = currentStepFiltered;
+      }
+
+      cycleCount++;
+
+      logger.debug("errorAbs = {}, error = {}", currentStep.getErrorAbs(), currentStep.getError());
+      logger.debug("changesThreshold = {}", changesThresholdLocal);
+      logger.debug("cycleCount = {}", cycleCount);
+
+      // end optimization if maximum number of cycles is reached or if the segmentation is good enough
+      if (cycleCount >= maxCycles || currentStepBest.getErrorAbs() <= maxError) {
+        endOptimization = true;
+        if (optimizationList.size() > 0) {
+          if (optimizationList.getFirst().getErrorAbs() <= optimizationList.getLast().getErrorAbs()
+                  && optimizationList.getFirst().getError() >= 0) {
+            stepBest = optimizationList.getFirst();
+          } else {
+            stepBest = optimizationList.getLast();
+          }
+        }
+
+        // just to be sure, check if one of the unused results was better
+        for (OptimizationStep currentUnusedStep : unusedResultsList) {
+          if (currentUnusedStep.getErrorAbs() < stepBest.getErrorAbs()) {
+            stepBest = unusedResultsList.getFirst();
+          }
+        }
+
+
+        // continue optimization, calculate new changes threshold for next iteration of optimization
+      } else {
+        OptimizationStep first = optimizationList.getFirst();
+        OptimizationStep last = optimizationList.getLast();
+        // if this was the first iteration or there are only positive or negative errors,
+        // estimate a new changesThreshold based on the one yielding the smallest error
+        if (optimizationList.size() == 1 || first.getError() < 0 || last.getError() > 0) {
+          if (currentStepBest.getError() >= 0) {
+            // if the error is smaller or equal to 1, increase changes threshold weighted with the error
+            if (currentStepBest.getError() <= 1) {
+              changesThresholdLocal += changesThresholdLocal * currentStepBest.getError();
+            } else {
+              // if there are more than 2000 segments in the first iteration, set changes threshold to 0.2
+              // to faster reach reasonable segment numbers
+              if (cycleCount <= 1 && currentStep.getSegmentNum() > 2000) {
+                changesThresholdLocal = 0.2f;
+                // if the error is bigger than one, double the changes threshold, because multiplying
+                // with a large error can yield a much too high changes threshold
+              } else {
+                changesThresholdLocal *= 2;
+              }
+            }
+          } else {
+            changesThresholdLocal /= 2;
+          }
+
+          logger.debug("onesided optimization yields new changesThreshold = {}", changesThresholdLocal);
+          // if there are already iterations with positive and negative errors, choose a changesThreshold between those
+        } else {
+          // for simplicity a linear relationship between the changesThreshold
+          // and the number of generated segments is assumed and based on that
+          // the expected correct changesThreshold is calculated
+
+          // the new changesThreshold is calculated by averaging the the mean and the mean weighted with errors
+          // because this seemed to yield better results in several cases
+
+          float x = (first.getSegmentNum() - prefNumberLocal) / (float) (first.getSegmentNum() - last.getSegmentNum());
+          float newX = ((x + 0.5f) * 0.5f);
+          changesThresholdLocal = first.getChangesThreshold() * (1 - newX) + last.getChangesThreshold() * newX;
+          logger.debug("doublesided optimization yields new changesThreshold = {}", changesThresholdLocal);
+        }
+      }
+    }
+
+
+    // after optimization of the changes threshold, the minimum duration for a segment
+    // (stability threshold) is optimized if the result is still not good enough
+    int threshLow = stabilityThreshold * 1000;
+    int threshHigh = threshLow + (threshLow / 2);
+
+    LinkedList<Segment> tmpSegments;
+    float smallestError = Float.MAX_VALUE;
+    int bestI = threshLow;
+    segments = stepBest.getSegments();
+
+    // if the error is negative (which means there are already too few segments) or if the error
+    // is smaller than the maximum error, the stability threshold will not be optimized
+    if (stepBest.getError() <= maxError) {
+      threshHigh = stabilityThreshold * 1000;
+    }
+    for (int i = threshLow; i <= threshHigh; i = i + 1000) {
+      tmpSegments = new LinkedList<Segment>();
+      filterSegmentation(segments, track, tmpSegments, i);
+      float newError = OptimizationStep.calculateErrorAbs(tmpSegments.size(), prefNumberLocal);
+      if (newError < smallestError) {
+        smallestError = newError;
+        bestI = i;
+      }
+    }
+    tmpSegments = new LinkedList<Segment>();
+    mpeg7 = filterSegmentation(segments, track, tmpSegments, bestI);
+
+    // for debugging: output of final segmentation after optimization
+    logger.debug("result segments:");
+    for (int i = 0; i < tmpSegments.size(); i++) {
+      int[] tmpLog2 = new int[7];
+      tmpLog2[0] = tmpSegments.get(i).getMediaTime().getMediaTimePoint().getHour();
+      tmpLog2[1] = tmpSegments.get(i).getMediaTime().getMediaTimePoint().getMinutes();
+      tmpLog2[2] = tmpSegments.get(i).getMediaTime().getMediaTimePoint().getSeconds();
+      tmpLog2[3] = tmpSegments.get(i).getMediaTime().getMediaDuration().getHours();
+      tmpLog2[4] = tmpSegments.get(i).getMediaTime().getMediaDuration().getMinutes();
+      tmpLog2[5] = tmpSegments.get(i).getMediaTime().getMediaDuration().getSeconds();
+      Object[] tmpLog1 = {tmpLog2[0], tmpLog2[1], tmpLog2[2], tmpLog2[3], tmpLog2[4], tmpLog2[5], tmpLog2[6]};
+      tmpLog1[6] = tmpSegments.get(i).getIdentifier();
+      logger.debug("s:{}:{}:{}, d:{}:{}:{}, {}", tmpLog1);
+    }
+
+    logger.info("Optimized Segmentation yields (after {} iteration" + (cycleCount == 1 ? "" : "s") + ") {} segments",
+            cycleCount, tmpSegments.size());
+
+    // if no reasonable segmentation could be found, instead return a uniform segmentation
+    if (tmpSegments.size() < absoluteMinLocal || tmpSegments.size() > absoluteMaxLocal) {
+      mpeg7 = uniformSegmentation(track, tmpSegments, prefNumberLocal);
+      logger.info("Since no reasonable segmentation could be found, a uniform segmentation was created");
+    }
+
+    return mpeg7;
   }
 
   /**
