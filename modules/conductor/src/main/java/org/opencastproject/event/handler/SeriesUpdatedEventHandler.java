@@ -201,6 +201,7 @@ public class SeriesUpdatedEventHandler {
     // A series or its ACL has been updated. Find any mediapackages with that series, and update them.
     logger.debug("Handling {}", seriesItem);
     String seriesId = seriesItem.getSeriesId();
+    int jobBarrierPollingRate = 100;    // in ms
 
     // We must be an administrative user to make this query
     final User prevUser = securityService.getUser();

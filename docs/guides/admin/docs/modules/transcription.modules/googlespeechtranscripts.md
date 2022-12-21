@@ -2,7 +2,7 @@ Transcripts (Automated by Google Speech)
 ========================================
 
 > Using this requires you to turn on an Opencast plugin.
-> Take a look [at the plugin management documentation](plugin-management.md) to find out how you can do that.
+> Take a look [at the plugin management documentation](../plugin-management.md) to find out how you can do that.
 
 Overview
 --------
@@ -280,5 +280,5 @@ is cancelled (when something goes wrong).
 Workflow Operations
 -------------------
 
-* [google-speech-attach-transcription](../workflowoperationhandlers/google-speech-attach-transcription-woh.md)
-* [google-speech-start-transcription](../workflowoperationhandlers/google-speech-start-transcription-woh.md)
+* [google-speech-attach-transcription](../../workflowoperationhandlers/google-speech-attach-transcription-woh.md)
+* [google-speech-start-transcription](../../workflowoperationhandlers/google-speech-start-transcription-woh.md)

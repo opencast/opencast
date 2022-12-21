@@ -155,7 +155,7 @@ public abstract class EditorRestEndpointBase {
   protected Response checkErrorState(final String eventId, EditorServiceException e) {
     switch (e.getErrorStatus()) {
       case MEDIAPACKAGE_NOT_FOUND:
-        return RestUtil.R.notFound(String.format("Event '{%s}' not Found", eventId), MediaType.TEXT_PLAIN_TYPE);
+        return RestUtil.R.notFound(String.format("Event '%s' not Found", eventId), MediaType.TEXT_PLAIN_TYPE);
       case WORKFLOW_ACTIVE:
         return RestUtil.R.locked();
       case WORKFLOW_NOT_FOUND:
