@@ -30,6 +30,7 @@ public interface RestConstants {
   String SERVICE_TYPE_PROPERTY = "opencast.service.type";
 
   /** The service property indicating the URL path that the service is attempting to claim */
+  @Deprecated
   String SERVICE_PATH_PROPERTY = "opencast.service.path";
 
   /** The service property indicating whether the service should be published in the service registry */
