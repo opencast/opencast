@@ -57,6 +57,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 import org.osgi.util.tracker.BundleTracker;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
@@ -65,6 +66,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -105,9 +107,7 @@ public class RestPublisher implements RestConstants {
   protected static final Logger logger = LoggerFactory.getLogger(RestPublisher.class);
 
   /** The rest publisher looks for any non-servlet with the 'opencast.service.path' property */
-  public static final String JAX_RS_SERVICE_FILTER = "(&(!(objectClass=javax.servlet.Servlet))(" + SERVICE_PATH_PROPERTY
-          + "=*))";
-  //public static final String JAX_RS_SERVICE_FILTER = "(&(!(objectClass=javax.servlet.Servlet))(opencast.jaxrs.resource=true))";
+  public static final String JAX_RS_SERVICE_FILTER = "(" + JaxrsWhiteboardConstants.JAX_RS_RESOURCE + "=true)";
 
   /** A map that sets default xml namespaces in {@link XMLStreamWriter}s */
   protected static final ConcurrentHashMap<String, String> NAMESPACE_MAP;
@@ -142,10 +142,14 @@ public class RestPublisher implements RestConstants {
   /** The CXF Bus */
   private Bus bus;
 
+  private ServiceRegistration<Servlet> servletServiceRegistration;
+
   private ServiceRegistration<Bus> busServiceRegistration;
 
   /** The List of JAX-RS resources */
   private final List<Object> serviceBeans = new CopyOnWriteArrayList<>();
+
+  private OpenApiFeature openApiFeature;
 
   /** Activates this rest publisher */
   @SuppressWarnings("unchecked")
@@ -183,9 +187,40 @@ public class RestPublisher implements RestConstants {
       }
     });
 
+    // Open API config
+    this.openApiFeature = new OpenApiFeature();
+    openApiFeature.setContactEmail("dev@opencast.org");
+    openApiFeature.setLicense("Educational Community License, Version 2.0");
+    openApiFeature.setLicenseUrl("https://opensource.org/licenses/ecl2.txt");
+    openApiFeature.setScan(false);
+    openApiFeature.setUseContextBasedConfig(true);
+    OpenApiCustomizer customizer = new OpenApiCustomizer();
+    customizer.setDynamicBasePath(false);
+    openApiFeature.setCustomizer(customizer);
+    SwaggerUiConfig config = new SwaggerUiConfig();
+    config.setDeepLinking(true);
+    config.setUrl("/openapi.json");
+    config.setQueryConfigEnabled(false);
+    openApiFeature.setSwaggerUiConfig(config);
+
     this.bus = BusFactory.getDefaultBus();
 
     busServiceRegistration = componentContext.getBundleContext().registerService(Bus.class, bus, new Hashtable<>());
+
+    RestServlet cxf = new RestServlet();
+    cxf.setBus(bus);
+    try {
+      Dictionary<String, Object> props = new Hashtable<>();
+
+      props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT, "(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=" + RestConstants.HTTP_CONTEXT_ID + ")");
+      props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, "/");
+      props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "/*");
+
+      servletServiceRegistration = componentContext.getBundleContext().registerService(Servlet.class, cxf, props);
+    } catch (Exception e) {
+      logger.info("Problem registering REST endpoint {} : {}", "/", e.getMessage());
+      return;
+    }
 
     try {
       jaxRsTracker = new JaxRsServiceTracker();
@@ -206,6 +241,7 @@ public class RestPublisher implements RestConstants {
     jaxRsTracker.close();
     bundleTracker.close();
     busServiceRegistration.unregister();
+    servletServiceRegistration.unregister();
   }
 
   @Reference(policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.OPTIONAL)
@@ -226,19 +262,13 @@ public class RestPublisher implements RestConstants {
    * @param service
    *          The service itself
    */
-  protected void createEndpoint(ServiceReference<?> ref, Object service) {
+  protected synchronized void createEndpoint(ServiceReference<?> ref, Object service) {
     String serviceType = (String) ref.getProperty(SERVICE_TYPE_PROPERTY);
     String servicePath = (String) ref.getProperty(SERVICE_PATH_PROPERTY);
     boolean servicePublishFlag = ref.getProperty(SERVICE_PUBLISH_PROPERTY) == null
             || Boolean.parseBoolean(ref.getProperty(SERVICE_PUBLISH_PROPERTY).toString());
     boolean jobProducer = ref.getProperty(SERVICE_JOBPRODUCER_PROPERTY) != null
             && Boolean.parseBoolean(ref.getProperty(SERVICE_JOBPRODUCER_PROPERTY).toString());
-
-    ServiceRegistration<?> reg = servletRegistrationMap.get(servicePath);
-    if (reg != null) {
-      logger.debug("Rest endpoint {} is still registered, skip registering again", servicePath);
-      return;
-    }
 
     serviceBeans.add(service);
 
@@ -279,21 +309,6 @@ public class RestPublisher implements RestConstants {
 
     sf.setAddress("/");
 
-    // Open API config
-    final OpenApiFeature openApiFeature = new OpenApiFeature();
-    openApiFeature.setContactEmail("dev@opencast.org");
-    openApiFeature.setLicense("Educational Community License, Version 2.0");
-    openApiFeature.setLicenseUrl("https://opensource.org/licenses/ecl2.txt");
-    openApiFeature.setScan(false);
-    openApiFeature.setUseContextBasedConfig(true);
-    OpenApiCustomizer customizer = new OpenApiCustomizer();
-    customizer.setDynamicBasePath(false);
-    openApiFeature.setCustomizer(customizer);
-    SwaggerUiConfig config = new SwaggerUiConfig();
-    config.setDeepLinking(true);
-    config.setUrl("/openapi.json");
-    config.setQueryConfigEnabled(false);
-    openApiFeature.setSwaggerUiConfig(config);
     sf.getFeatures().add(openApiFeature);
 
     sf.setProperties(new HashMap<>());
@@ -374,7 +389,7 @@ public class RestPublisher implements RestConstants {
         logger.info("JAX-RS service {} has not been instantiated yet, or has already been unregistered. Skipping "
                 + "endpoint creation.", reference);
       } else {
-        Path pathAnnotation = service.getClass().getAnnotation(Path.class);
+        Path pathAnnotation = getAnnotationFromType(service.getClass(), Path.class);
         if (pathAnnotation == null) {
           logger.warn(
                   "{} was registered with '{}={}', but the service is not annotated with the JAX-RS "
@@ -386,6 +401,15 @@ public class RestPublisher implements RestConstants {
       }
       return super.addingService(reference);
     }
+  }
+
+  private <A extends Annotation> A getAnnotationFromType(Class<?> classType, final Class<A> annotationClass) {
+    A annotation;
+    do {
+      annotation = classType.getAnnotation(annotationClass);
+      classType = classType.getSuperclass();
+    } while (annotation == null && !classType.equals(Object.class));
+    return annotation;
   }
 
   /**

@@ -86,6 +86,7 @@ import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -2101,8 +2102,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * service on the network to handle new jobs.
    */
   class RestServiceTracker extends ServiceTracker {
-    protected static final String FILTER = "(&(objectClass=javax.servlet.Servlet)("
-            + RestConstants.SERVICE_PATH_PROPERTY + "=*))";
+    protected static final String FILTER = "(" +  JaxrsWhiteboardConstants.JAX_RS_RESOURCE + "=true)";
 
     protected BundleContext bundleContext;
 
@@ -2135,8 +2135,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     public Object addingService(ServiceReference reference) {
       String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
       String servicePath = (String) reference.getProperty(RestConstants.SERVICE_PATH_PROPERTY);
-      boolean publishFlag = (Boolean) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY);
-      boolean jobProducer = (Boolean) reference.getProperty(RestConstants.SERVICE_JOBPRODUCER_PROPERTY);
+
+      boolean publishFlag = Boolean.parseBoolean((String) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY));
+      boolean jobProducer = Boolean.parseBoolean(
+          (String) reference.getProperty(RestConstants.SERVICE_JOBPRODUCER_PROPERTY)
+      );
 
       // Only register services that have the "publish" flag set to "true"
       if (publishFlag) {
