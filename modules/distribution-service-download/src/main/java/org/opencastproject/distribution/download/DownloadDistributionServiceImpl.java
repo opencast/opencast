@@ -560,8 +560,6 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     MediaPackageElement[] distributedElements = distributeElements(channelId, mediapackage, elementIds,
             checkAvailability, preserveReference);
     return Arrays.asList(distributedElements);
-//    return (distributedElements != null)
-//            ? MediaPackageElementParser.getArrayAsXml(Arrays.asList(distributedElements)) : null;
   }
 
   @Override
@@ -602,31 +600,6 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     notNull(channelId, "channelId");
     MediaPackageElement[] retractedElements = retractElements(channelId, mediapackage, elementIds);
     return Arrays.asList(retractedElements);
-//    return (retractedElements != null) ? MediaPackageElementParser.getArrayAsXml(Arrays.asList(retractedElements))
-//            : null;
-  }
-
-//  @Override
-//  public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
-//          throws DistributionException {
-//    Job job = null;
-//    try {
-//      job = serviceRegistry
-//          .createJob(
-//              JOB_TYPE, Operation.Retract.toString(), null, null, false, retractJobLoad);
-//      job.setStatus(Job.Status.RUNNING);
-//      job = serviceRegistry.updateJob(job);
-//      final MediaPackageElement[] mediaPackageElements = this.retractElements(channelId, mediaPackage, elementIds);
-//      job.setStatus(Job.Status.FINISHED);
-//      return Arrays.asList(mediaPackageElements);
-//    } catch (ServiceRegistryException e) {
-//      throw new DistributionException(e);
-//    } catch (NotFoundException e) {
-//      throw new DistributionException("Unable to update retraction job", e);
-//    } finally {
-//      finallyUpdateJob(job);
-//    }
-//  }
 
   /**
    * Retract a media package element from the distribution channel. The retracted element must not necessarily be the
