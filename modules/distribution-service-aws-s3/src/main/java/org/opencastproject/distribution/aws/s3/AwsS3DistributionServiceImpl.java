@@ -601,6 +601,14 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
   }
 
   @Override
+  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, String elementId)
+          throws DistributionException, MediaPackageException {
+    Set<String> elementIds = new HashSet<String>();
+    elementIds.add(elementId);
+    return distributeSync(channelId, mediapackage, elementIds, true);
+  }
+
+  @Override
   public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds,
           boolean checkAvailability) throws DistributionException {
     final MediaPackageElement[] distributedElements = distributeElements(channelId, mediapackage, elementIds,
@@ -609,6 +617,14 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
       return null;
     }
     return Arrays.asList(distributedElements);
+  }
+
+  @Override
+  public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediapackage, String elementId)
+          throws DistributionException {
+    Set<String> elementIds = new HashSet<String>();
+    elementIds.add(elementId);
+    return retractSync(channelId, mediapackage, elementIds);
   }
 
   @Override
