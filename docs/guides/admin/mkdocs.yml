@@ -39,6 +39,7 @@ nav:
 - Release Notes: 'releasenotes.md'
 - Upgrade: 'upgrade.md'
 - Changelog: 'changelog.md'
+- Prerelease Testing: 'prereleases.md'
 - Installation:
    - Overview: 'installation/index.md'
    - Hardware Requirements: installation/server-requirements.md
