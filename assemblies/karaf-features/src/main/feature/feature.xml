@@ -244,6 +244,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-studio/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-solr/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-sox-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-subtitle-parser/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-themes/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-themes-workflowoperation/${project.version}</bundle>
@@ -361,6 +362,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-sox-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-sox-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-sox-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-subtitle-parser/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-workflowoperation/${project.version}</bundle>
@@ -497,6 +499,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-sox-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-sox-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-sox-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-subtitle-parser/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-workflowoperation/${project.version}</bundle>
@@ -558,6 +561,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-smil-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-speech-to-text-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-speech-to-text-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-subtitle-parser/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-ffmpeg-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videogrid-service-api/${project.version}</bundle>
@@ -586,6 +590,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-ffmpeg/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-sox-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-sox-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-subtitle-parser/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textextractor-tesseract/${project.version}</bundle>

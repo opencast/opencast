@@ -18,9 +18,9 @@
  * the License.
  *
  */
-package org.opencastproject.videoeditor.subtitle.webvtt;
+package org.opencastproject.subtitleparser.webvttparser;
 
-import org.opencastproject.videoeditor.subtitle.base.SubtitleParsingException;
+import org.opencastproject.subtitleparser.SubtitleParsingException;
 
 import java.io.BufferedReader;
 import java.io.IOException;

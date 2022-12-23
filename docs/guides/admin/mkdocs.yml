@@ -257,4 +257,5 @@ nav:
    - Theme: 'workflowoperationhandlers/theme-woh.md'
    - Video Grid: 'workflowoperationhandlers/video-grid-woh.md'
    - Waveform: 'workflowoperationhandlers/waveform-woh.md'
+   - WebVTT to CutMarks Operation: 'workflowoperationhandlers/webvtt-to-cutmarks.md'
    - Zip: 'workflowoperationhandlers/zip-woh.md'

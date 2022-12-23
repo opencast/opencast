@@ -18,7 +18,7 @@
  * the License.
  *
  */
-package org.opencastproject.videoeditor.subtitle.base;
+package org.opencastproject.subtitleparser;
 
 import java.util.ArrayList;
 import java.util.List;

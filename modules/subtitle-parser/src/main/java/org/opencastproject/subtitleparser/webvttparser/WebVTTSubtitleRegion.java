@@ -18,15 +18,25 @@
  * the License.
  *
  */
-package org.opencastproject.videoeditor.subtitle.base;
+package org.opencastproject.subtitleparser.webvttparser;
 
-public class SubtitleParsingException extends Exception {
+import java.util.ArrayList;
+import java.util.List;
 
-  public SubtitleParsingException(String message) {
-    super(message);
+public class WebVTTSubtitleRegion {
+  private List<String> lines;
+
+  public WebVTTSubtitleRegion() {
+    this.lines = new ArrayList<>();
   }
 
-  public SubtitleParsingException(String message, Throwable throwable) {
-    super(message, throwable);
+  public List<String> getLines() {
+    return this.lines;
+  }
+  public void setLines(List<String> lines) {
+    this.lines = lines;
+  }
+  public void addLine(String line) {
+    this.lines.add(line);
   }
 }

@@ -19,13 +19,9 @@
  *
  */
 
-package org.opencastproject.videoeditor.subtitle;
+package org.opencastproject.subtitleparser.webvttparser;
 
-import org.opencastproject.videoeditor.subtitle.base.SubtitleParsingException;
-import org.opencastproject.videoeditor.subtitle.webvtt.WebVTTParser;
-import org.opencastproject.videoeditor.subtitle.webvtt.WebVTTSubtitle;
-import org.opencastproject.videoeditor.subtitle.webvtt.WebVTTSubtitleCue;
-import org.opencastproject.videoeditor.subtitle.webvtt.WebVTTWriter;
+import org.opencastproject.subtitleparser.SubtitleParsingException;
 
 import org.junit.Assert;
 import org.junit.Before;
