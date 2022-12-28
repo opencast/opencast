@@ -39,6 +39,10 @@ public final class Util {
    * @param request The request.
    */
   protected static void debug(Log logger, HttpServletRequest request) {
+    if (!logger.isDebugEnabled()) {
+      return;
+    }
+
     Enumeration<String> he = request.getHeaderNames();
     while (he.hasMoreElements()) {
       String headerName = he.nextElement();

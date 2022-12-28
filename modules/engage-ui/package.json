@@ -5,8 +5,8 @@
     "eslint": "eslint --config ../../docs/checkstyle/eslintrc.js src/main/resources/ui/js/app/ src/main/resources/ui/js/*.js --resolve-plugins-relative-to ."
   },
   "dependencies": {
-    "bootbox": "^5.5.2",
-    "jquery": "^3.6.2",
+    "bootbox": "^6.0.0",
+    "jquery": "^3.6.3",
     "js-yaml": "^4.1.0",
     "requirejs": "^2.3.6",
     "seedrandom": "^3.0.5",
