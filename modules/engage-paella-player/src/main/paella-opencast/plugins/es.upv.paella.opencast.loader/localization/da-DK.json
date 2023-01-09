@@ -1,8 +1,4 @@
 {
 	"Error loading video! No video tracks found": "Videoindlæsningsfejl! Igen videospor fundet",
-	"Error loading video {0}": "Videoindlæsningsfejl {0}",
-	"CAPTIONS_undefined": "Ukendt sprog",
-	"CAPTIONS_es": "Spansk",
-	"CAPTIONS_en": "Engelsk",
-	"CAPTIONS_de": "Tysk"
+	"Error loading video {0}": "Videoindlæsningsfejl {0}"
 }
