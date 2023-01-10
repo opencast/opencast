@@ -46,6 +46,10 @@ That is why patches may only be accepted into releases branches (`r/?.x`) if the
 
 Patches which do not meet these criteria should target the branch `develop` to become part of the next major version.
 
+Note: Patches adding features should target the current stable release (`r/{{ opencast_major_version}}.x`), or
+`develop`, and are strongly discouraged from targetting the legacy release.  Features going into the legacy release
+will need a good reason, and must be highly self contained.
+
 To determine the acceptance of patches, all pull requests will be discussed in the technical meeting.
 This protects against inclusion of controversial changes with no broader consent among committers.
 
@@ -72,6 +76,7 @@ of what work has been done. To this end, there are a few expectations for all pu
 * In the case of major user interface changes, it is good practice to include screenshots of the change
 * Any actions that would be required for a version upgrade (e.g: from 3.x to 4.x) must be documented in
   `docs/guides/admin/docs/upgrade.md`
+* New features require a release note in `docs/guides/admin/releasenotes` of at least one line describing the change
 * The commands `mvn clean install`, `mvn javadoc:javadoc javadoc:aggregate`, and `mvn site` should all succeed
 * The licenses of any external libraries used in the pull request comply with the [licensing rules](license.md) both
   in terms of the license itself as well as its listing in NOTICES
