@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<catalog id="d84b6672-ff84-4df5-9ada-f1cdc0f2d901"
+	type="dublincore/episode"
+	xmlns="http://mediapackage.opencastproject.org">
+	<mimetype>text/xml</mimetype>
+	<tags>
+		<tag>archive</tag>
+		<tag>engage</tag>
+	</tags>
+	<url>https://distribution.edu/engage-player/0210084b-8927-4675-8f6b-f0417ce8c5a7/d84b6672-ff84-4df5-9ada-f1cdc0f2d901/dublincore.xml</url>
+</catalog>
+###<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<attachment id="ee8a7e51-0666-45b3-ac5a-77da00b075f4"
+	type="presenter/player+preview"
+	ref="track:df336a55-24a8-4a4e-9eb2-f3277c772913"
+	xmlns="http://mediapackage.opencastproject.org">
+	<mimetype>image/jpeg</mimetype>
+	<tags>
+		<tag>archive</tag>
+		<tag>engage</tag>
+	</tags>
+	<url>https://distribution.edu/engage-player/0210084b-8927-4675-8f6b-f0417ce8c5a7/ee8a7e51-0666-45b3-ac5a-77da00b075f4/presenter.jpg</url>
+	<size>18030</size>
+</attachment>
+###<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<track id="128ba1e6-4553-45c0-8730-4eb954b9f554"
+	type="presenter/delivery"
+	ref="track:8f9c3cfb-8df6-4307-b25e-00cb1faab6b2"
+	xmlns="http://mediapackage.opencastproject.org">
+	<mimetype>video/mp4</mimetype>
+	<tags>
+		<tag>engage</tag>
+	</tags>
+	<url>https://distribution.edu/engage-player/0210084b-8927-4675-8f6b-f0417ce8c5a7/128ba1e6-4553-45c0-8730-4eb954b9f554/presenter.mp4</url>
+	<size>639199</size>
+	<checksum type="md5">29782c69185b6e59afb902707e7b61e2</checksum>
+	<duration>29373</duration>
+	<audio id="audio-1">
+		<device />
+		<encoder type="AAC (Advanced Audio Coding)" />
+		<channels>2</channels>
+		<samplingrate>44100</samplingrate>
+		<bitrate>32201.0</bitrate>
+	</audio>
+	<video id="video-1">
+		<device />
+		<encoder type="H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10" />
+		<framecount>732</framecount>
+		<bitrate>129648.0</bitrate>
+		<framerate>25.0</framerate>
+		<resolution>416x234</resolution>
+	</video>
+	<live>false</live>
+	<master>false</master>
+	<logicalname>243796_segment_0_presenter_160k_25fps.mp4</logicalname>
+</track>
