@@ -1,6 +1,20 @@
 # Opencast 13: Release Notes
 
 
+Opencast 13.1
+-------------
+
+The first maintenance release of Opencast 13.
+
+- Add silient detection based on subtitles (webvtt-to-cutmarks woh) ([#4482](https://github.com/opencast/opencast/pull/4482))
+- Fix: series deleted from search index cannot be re-added ([#4502](https://github.com/opencast/opencast/pull/4502))
+- Adds Whisper STT to SpeechToText WoH ([#4513](https://github.com/opencast/opencast/pull/4513))
+- Reduce number of snapshots taken in the new editor backend ([#4519](https://github.com/opencast/opencast/pull/4519))
+- Avoid using jobs in SeriesUpdatedEventHandler ([#4536](https://github.com/opencast/opencast/pull/4536))
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
+
 Opencast 13.0
 -------------
 
