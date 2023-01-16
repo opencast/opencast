@@ -22,7 +22,6 @@ package org.opencastproject.editor.api;
 
 import static java.util.Objects.requireNonNull;
 
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.util.data.Tuple;
 
 import com.google.gson.Gson;
@@ -105,20 +104,27 @@ public class EditingData {
   }
 
   public static final class Subtitle {
-    private final MediaPackageElementFlavor flavor;
+    private final String id;
+    /** content of the subtitle */
     private final String subtitle;
+    private final String[] tags;
 
-    public Subtitle(MediaPackageElementFlavor flavor, String subtitle) {
-      this.flavor = flavor;
+    public Subtitle(String id, String subtitle, String[] tags) {
+      this.id = id;
       this.subtitle = subtitle;
+      this.tags = tags;
     }
 
-    public MediaPackageElementFlavor getFlavor() {
-      return flavor;
+    public String getId() {
+      return id;
     }
 
     public String getSubtitle() {
       return subtitle;
+    }
+
+    public String[] getTags() {
+      return tags;
     }
   }
 }

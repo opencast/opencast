@@ -514,15 +514,6 @@ public class EditorServiceImpl implements EditorService {
    */
   private MediaPackage addSubtitleTrack(MediaPackage mediaPackage, List<EditingData.Subtitle> subtitles)
           throws IOException, IllegalArgumentException {
-    // Check if any of the provided subtitles fail to match the designated flavor
-    for (EditingData.Subtitle subtitle : subtitles) {
-      if (!subtitle.getFlavor().matches(captionsFlavor)) {
-        throw new IllegalArgumentException(
-                "Given subtitle flavor " + subtitle.getFlavor().toString() + " does match caption flavor "
-                        + captionsFlavor);
-      }
-    }
-
     for (EditingData.Subtitle subtitle : subtitles) {
       // Generate ID for new tracks
       String subtitleId = UUID.randomUUID().toString();
@@ -530,7 +521,7 @@ public class EditorServiceImpl implements EditorService {
 
       // Check if subtitle already exists
       for (Track t : mediaPackage.getTracks()) {
-        if (t.getFlavor().matches(subtitle.getFlavor())) {
+        if (t.getIdentifier().matches(subtitle.getId())) {
           logger.debug("Set Identifier for Subtitle-Track to: {}", t.getIdentifier());
           subtitleId = t.getIdentifier();
           trackId = t.getIdentifier();
@@ -553,14 +544,20 @@ public class EditorServiceImpl implements EditorService {
         // If not exists, create new Track
         if (track == null) {
           MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-          track = (Track) mpeBuilder.elementFromURI(subtitleUri, MediaPackageElement.Type.Track, subtitle.getFlavor());
+          // TODO: Figure out which flavor new subtitles from the editor should have
+          track = (Track) mpeBuilder.elementFromURI(subtitleUri, MediaPackageElement.Type.Track,
+                  new MediaPackageElementFlavor(captionsFlavor.getType(),"source"));
           mediaPackage.add(track);
-          logger.info("Creating new track for flavor: " + track.getFlavor());
+          logger.info("Creating new subtitle track " + track.getIdentifier() + " with tags "
+                  + track.getTags().toString());
         }
 
         track.setURI(subtitleUri);
         track.setIdentifier(subtitleId);
         track.setChecksum(null);
+        for (String tag : subtitle.getTags()) {
+          track.addTag(tag);
+        }
 
         if (oldTrackURI != null && oldTrackURI != subtitleUri) {
           // Delete the old files from the working file repository and workspace if they were in there
@@ -935,7 +932,7 @@ public class EditorServiceImpl implements EditorService {
       try {
         File subtitleFile = workspace.get(t.getURI());
         String subtitleString = FileUtils.readFileToString(subtitleFile, StandardCharsets.UTF_8);
-        subtitles.add(new EditingData.Subtitle(t.getFlavor(), subtitleString));
+        subtitles.add(new EditingData.Subtitle(t.getIdentifier(), subtitleString, t.getTags()));
       } catch (NotFoundException | IOException e) {
         errorExit("Could not read subtitle from file", mediaPackageId, ErrorStatus.UNKNOWN);
       }
