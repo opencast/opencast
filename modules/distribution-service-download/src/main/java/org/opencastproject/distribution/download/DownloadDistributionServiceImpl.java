@@ -600,6 +600,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     notNull(channelId, "channelId");
     MediaPackageElement[] retractedElements = retractElements(channelId, mediapackage, elementIds);
     return Arrays.asList(retractedElements);
+  }
 
   /**
    * Retract a media package element from the distribution channel. The retracted element must not necessarily be the
