@@ -427,7 +427,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   protected InputStream getObject(AwsAssetMapping map) {
     String storageClassId = getObjectStorageClass(map.getObjectKey());
 
-    if (StorageClass.Glacier.equals(storageClassId)) {
+    if (StorageClass.Glacier.name().equals(storageClassId) || StorageClass.DeepArchive.name().equals(storageClassId)) {
       // restore object and wait until available if necessary
       restoreGlacierObject(map.getObjectKey(), restorePeriod, true);
     }
