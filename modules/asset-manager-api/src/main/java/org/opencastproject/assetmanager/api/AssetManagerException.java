@@ -20,8 +20,6 @@
  */
 package org.opencastproject.assetmanager.api;
 
-import static org.opencastproject.util.data.functions.Misc.chuck;
-
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 
@@ -53,16 +51,6 @@ public class AssetManagerException extends RuntimeException {
   /** Returns true if the exception is caused by a {@link org.opencastproject.util.NotFoundException}. */
   public boolean isCauseNotFound() {
     return getCause() instanceof NotFoundException;
-  }
-
-  /**
-   * If the exception is caused by an {@link org.opencastproject.security.api.UnauthorizedException}
-   * rethrow it, otherwise do nothing.
-   */
-  public void rethrowUnauthorizedException() {
-    if (isCauseNotAuthorized()) {
-      chuck(getCause());
-    }
   }
 
 }
