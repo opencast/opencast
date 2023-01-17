@@ -7,6 +7,13 @@ cd docs/guides
 
 for docs in admin developer; do
   cd $docs
+  if test "$( grep -R opencast_major_version | grep '\w}\|{\w' )" != ""; then
+    echo "Error, $docs has a syntax error related to opencast_major_version:"
+    grep -R opencast_major_version | grep '\w}\|{\w'
+    ret=1
+    continue
+  fi
+
   echo "Building $docs documentation…"
   if mkdocs build &> mkdocs.log; then
     if grep \
