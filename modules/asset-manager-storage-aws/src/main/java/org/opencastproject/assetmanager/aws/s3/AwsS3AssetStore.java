@@ -400,8 +400,8 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
         if (storageClass == StorageClass.Glacier || objectStorageClass == StorageClass.DeepArchive) {
           GetObjectTaggingRequest gotr = new GetObjectTaggingRequest(bucketName, objectName);
           GetObjectTaggingResult objectTaggingRequest = s3.getObjectTagging(gotr);
-          logger.info("S3 object {} is not suitable for storage class {}", objectName, storageClass);
           if (!objectTaggingRequest.getTagSet().contains(freezable)) {
+            logger.info("S3 object {} is not suitable for storage class {}", objectName, storageClass);
             return objectStorageClass;
           }
         }
