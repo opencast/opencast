@@ -336,9 +336,9 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   }
 
   /**
-   +   * Return the object key of the asset in S3
-   +   * @param storagePath asset storage path
-   +   */
+   * Return the object key of the asset in S3
+   * @param storagePath asset storage path
+   */
   public String getAssetObjectKey(StoragePath storagePath) throws AssetStoreException {
     try {
       AwsAssetMapping map = database.findMapping(storagePath);
@@ -390,7 +390,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       StorageClass objectStorageClass = StorageClass.fromValue(getObjectStorageClass(objectName));
 
       if (storageClass != objectStorageClass) {
-        /* objects can only be retrived from Glacier not moved */
+        /* objects can only be retrieved from Glacier not moved */
         if (objectStorageClass == StorageClass.Glacier || objectStorageClass == StorageClass.DeepArchive) {
           logger.warn("S3 Object {} can not be moved from storage class {}", objectStorageClass);
           return objectStorageClass;
