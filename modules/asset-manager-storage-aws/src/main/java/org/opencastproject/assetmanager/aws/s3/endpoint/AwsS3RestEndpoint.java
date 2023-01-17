@@ -176,7 +176,7 @@ public class AwsS3RestEndpoint {
               isRequired = true,
               type = RestParameter.Type.STRING,
               description = "The S3 storage class, valid terms STANDARD, STANDARD_IA, INTELLIGENT_TIERING, ONEZONE_IA,"
-                          + "REDUCED_REDUNDANCY and GLACIER. See https://aws.amazon.com/s3/storage-classes/")
+                          + "DEEP_ARCHIVE and GLACIER. See https://aws.amazon.com/s3/storage-classes/")
       },
       responses = {
           @RestResponse(
