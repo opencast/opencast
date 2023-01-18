@@ -39,6 +39,7 @@ nav:
 - Release Notes: 'releasenotes.md'
 - Upgrade: 'upgrade.md'
 - Changelog: 'changelog.md'
+- Prerelease Testing: 'prereleases.md'
 - Installation:
    - Overview: 'installation/index.md'
    - Hardware Requirements: installation/server-requirements.md
@@ -250,9 +251,11 @@ nav:
    - Statistics Writer: 'workflowoperationhandlers/statistics-writer.md'
    - Tag: 'workflowoperationhandlers/tag-woh.md'
    - Tag-By-DCTerm: 'workflowoperationhandlers/tag-by-dcterm-woh.md'
+   - Tag-Engage: 'workflowoperationhandlers/tag-engage-woh.md'
    - Timelinepreviews: 'workflowoperationhandlers/timelinepreviews-woh.md'
    - Transfer Metadata: 'workflowoperationhandlers/transfer-metadata-woh.md'
    - Theme: 'workflowoperationhandlers/theme-woh.md'
    - Video Grid: 'workflowoperationhandlers/video-grid-woh.md'
    - Waveform: 'workflowoperationhandlers/waveform-woh.md'
+   - WebVTT to CutMarks Operation: 'workflowoperationhandlers/webvtt-to-cutmarks.md'
    - Zip: 'workflowoperationhandlers/zip-woh.md'

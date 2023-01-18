@@ -18,15 +18,15 @@
  * the License.
  *
  */
-package org.opencastproject.videoeditor.subtitle.webvtt;
+package org.opencastproject.subtitleparser.webvttparser;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class WebVTTSubtitleRegion {
+public class WebVTTSubtitleStyle {
   private List<String> lines;
 
-  public WebVTTSubtitleRegion() {
+  public WebVTTSubtitleStyle() {
     this.lines = new ArrayList<>();
   }
 

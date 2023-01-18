@@ -18,7 +18,7 @@
  * the License.
  *
  */
-package org.opencastproject.videoeditor.subtitle.webvtt;
+package org.opencastproject.subtitleparser.webvttparser;
 
 import static java.util.Optional.ofNullable;
 

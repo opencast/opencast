@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mediapackage
+	xmlns="http://mediapackage.opencastproject.org" duration="29373"
+	id="0210084b-8927-4675-8f6b-f0417ce8c5a7" start="2022-11-15T20:58:03Z">
+	<title>Test Publish Engage WOH</title>
+	<series>20220229999</series>
+	<seriestitle>Test Series</seriestitle>
+	<type>L01</type>
+	<creators>
+		<creator>John Harvard</creator>
+	</creators>
+	<media>
+		<track id="74442fa2-94cd-43aa-bf2c-31bc9a44c6f0"
+			type="presenter/delivery">
+			<mimetype>video/mp4</mimetype>
+			<tags>
+				<tag>engage</tag>
+			</tags>
+			<url>https://distribution.edu/engage-player/0210084b-8927-4675-8f6b-f0417ce8c5a7/128ba1e6-4553-45c0-8730-4eb954b9f554/presenter.mp4</url>
+			<size>639199</size>
+			<checksum type="md5">29782c69185b6e59afb902707e7b61e2
+			</checksum>
+			<duration>29373</duration>
+		</track>
+	</media>
+	<metadata>
+		<catalog id="1260912e-84a4-468d-af5f-dd55e8c9ac9f"
+			type="dublincore/episode">
+			<mimetype>text/xml</mimetype>
+			<tags>
+				<tag>archive</tag>
+				<tag>engage</tag>
+			</tags>
+			<url>https://distribution.edu/engage-player/0210084b-8927-4675-8f6b-f0417ce8c5a7/d84b6672-ff84-4df5-9ada-f1cdc0f2d901/dublincore.xml</url>
+		</catalog>
+	</metadata>
+	<attachments>
+		<attachment id="918c59e8-ee17-4233-8650-e70c2b757a42"
+			type="presenter/player+preview">
+			<mimetype>image/jpeg</mimetype>
+			<tags>
+				<tag>archive</tag>
+				<tag>engage</tag>
+			</tags>
+			<url>https://distribution.edu/engage-player/0210084b-8927-4675-8f6b-f0417ce8c5a7/ee8a7e51-0666-45b3-ac5a-77da00b075f4/presenter.jpg</url>
+			<size>18030</size>
+		</attachment>
+	</attachments>
+	<publications />
+</mediapackage>

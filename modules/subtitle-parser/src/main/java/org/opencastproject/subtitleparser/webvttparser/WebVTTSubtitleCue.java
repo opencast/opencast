@@ -18,9 +18,9 @@
  * the License.
  *
  */
-package org.opencastproject.videoeditor.subtitle.webvtt;
+package org.opencastproject.subtitleparser.webvttparser;
 
-import org.opencastproject.videoeditor.subtitle.base.SubtitleCue;
+import org.opencastproject.subtitleparser.SubtitleCue;
 
 public class WebVTTSubtitleCue extends SubtitleCue {
   private String cueSettingsList;

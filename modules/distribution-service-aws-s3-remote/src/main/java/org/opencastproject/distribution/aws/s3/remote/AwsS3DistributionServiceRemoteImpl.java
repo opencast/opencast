@@ -152,6 +152,14 @@ public class AwsS3DistributionServiceRemoteImpl extends RemoteBase implements Aw
   }
 
   @Override
+  public List<MediaPackageElement>  distributeSync(String channelId, MediaPackage mediaPackage, String elementId)
+          throws DistributionException {
+    Set<String> elementIds = new HashSet<String>();
+    elementIds.add(elementId);
+    return distributeSync(channelId, mediaPackage, elementIds, true);
+  }
+
+  @Override
   public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds,
          boolean checkAvailability) throws DistributionException {
     logger.info("Distributing {} elements to {}@{}", elementIds.size(), channelId, distributionChannel);
@@ -165,6 +173,14 @@ public class AwsS3DistributionServiceRemoteImpl extends RemoteBase implements Aw
     throw new DistributionException(format("Unable to distribute '%s' elements of "
             + "mediapackage '%s' using a remote destribution service proxy",
         elementIds.size(), mediapackage.getIdentifier().toString()));
+  }
+
+  @Override
+  public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediaPackage, String elementId)
+          throws DistributionException {
+    Set<String> elementIds = new HashSet<String>();
+    elementIds.add(elementId);
+    return retractSync(channelId, mediaPackage, elementIds);
   }
 
   @Override

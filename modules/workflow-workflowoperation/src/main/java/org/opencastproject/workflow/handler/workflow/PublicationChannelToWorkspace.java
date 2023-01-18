@@ -43,7 +43,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -90,67 +89,62 @@ public class PublicationChannelToWorkspace extends AbstractWorkflowOperationHand
 
     Optional<Publication> publication = Arrays.stream(mediaPackage.getPublications())
         .filter(channel -> channel.getChannel().equals(publicationChannel)).findFirst();
-    if (publication.get().getTracks().length >= 0) {
 
-      Collection<MediaPackageElement> tracks =  new ArrayList<MediaPackageElement>();
-
-      //get tracks from publicationchannel with tags and flavors
-      Arrays.stream(publication.get().getTracks())
-          .filter(element -> element.containsTag(configuredSourceTags))
-          .filter(Objects::nonNull)
-          .forEach(element -> tracks.add(element));
-      Arrays.stream(publication.get().getTracks())
-          .filter(element -> configuredSourceFlavors.contains(element.getFlavor()))
-          .filter(Objects::nonNull)
-          .forEach(element -> tracks.add(element));
-
-      if (!configuredTargetTags.isEmpty()) {
-        tracks.stream().forEach(track -> {
-          configuredTargetTags.stream().forEach(targetTag -> track.addTag(targetTag.toString()));
-        });
-      }
-      tracks.stream().forEach(track -> mediaPackage.add(track));
+    // Skip if the media package does not contain a matching publication
+    if (publication.isEmpty()) {
+      logger.warn("The media package '{}' contains no publications on channel '{}', skipping.",
+          mediaPackage.getIdentifier(), publicationChannel);
+      return createResult(mediaPackage, Action.SKIP);
     }
+
+    Collection<MediaPackageElement> tracks = new ArrayList<>();
+
+    //get tracks from publicationchannel with tags and flavors
+    Arrays.stream(publication.get().getTracks())
+        .filter(element -> element.containsTag(configuredSourceTags))
+        .forEach(tracks::add);
+    Arrays.stream(publication.get().getTracks())
+        .filter(element -> configuredSourceFlavors.contains(element.getFlavor()))
+        .forEach(tracks::add);
+
+    if (!configuredTargetTags.isEmpty()) {
+      tracks.forEach(track -> {
+        configuredTargetTags.forEach(targetTag -> track.addTag(targetTag.toString()));
+      });
+    }
+    tracks.forEach(mediaPackage::add);
 
     //get attachements from publicationchannel with tags and flavors
-    if (publication.get().getAttachments().length >= 0) {
-      Collection<MediaPackageElement> attachments = new ArrayList<MediaPackageElement>();
-      Arrays.stream(publication.get().getAttachments())
-          .filter(element -> element.containsTag(configuredSourceTags))
-          .filter(Objects::nonNull)
-          .forEach(element -> attachments.add(element));
-      Arrays.stream(publication.get().getAttachments())
-          .filter(element -> configuredSourceFlavors.contains(element.getFlavor()))
-          .filter(Objects::nonNull)
-          .forEach(element -> attachments.add(element));
+    Collection<MediaPackageElement> attachments = new ArrayList<MediaPackageElement>();
+    Arrays.stream(publication.get().getAttachments())
+        .filter(element -> element.containsTag(configuredSourceTags))
+        .forEach(attachments::add);
+    Arrays.stream(publication.get().getAttachments())
+        .filter(element -> configuredSourceFlavors.contains(element.getFlavor()))
+        .forEach(attachments::add);
 
-      if (!configuredTargetTags.isEmpty()) {
-        attachments.stream().forEach(attachment -> {
-          configuredTargetTags.stream().forEach(targetTag -> attachment.addTag(targetTag.toString()));
-        });
-      }
-      attachments.stream().forEach(attachment -> mediaPackage.add(attachment));
+    if (!configuredTargetTags.isEmpty()) {
+      attachments.forEach(attachment -> {
+        configuredTargetTags.forEach(targetTag -> attachment.addTag(targetTag.toString()));
+      });
     }
+    attachments.forEach(mediaPackage::add);
 
     //get catalogs from publicationchannel with tags and flavors
-    if (publication.get().getCatalogs().length >= 0) {
-      Collection<MediaPackageElement> catalogs = new ArrayList<MediaPackageElement>();
-      Arrays.stream(publication.get().getCatalogs())
-          .filter(element -> element.containsTag(configuredSourceTags))
-          .filter(Objects::nonNull)
-          .forEach(element -> catalogs.add(element));
-      Arrays.stream(publication.get().getCatalogs())
-          .filter(element -> configuredSourceFlavors.contains(element.getFlavor()))
-          .filter(Objects::nonNull)
-          .forEach(element -> catalogs.add(element));
+    Collection<MediaPackageElement> catalogs = new ArrayList<MediaPackageElement>();
+    Arrays.stream(publication.get().getCatalogs())
+        .filter(element -> element.containsTag(configuredSourceTags))
+        .forEach(catalogs::add);
+    Arrays.stream(publication.get().getCatalogs())
+        .filter(element -> configuredSourceFlavors.contains(element.getFlavor()))
+        .forEach(catalogs::add);
 
-      if (!configuredTargetTags.isEmpty()) {
-        catalogs.stream().forEach(catalog -> {
-          configuredTargetTags.stream().forEach(targetTag -> catalog.addTag(targetTag.toString()));
-        });
-      }
-      catalogs.stream().forEach(catalog -> mediaPackage.add(catalog));
+    if (!configuredTargetTags.isEmpty()) {
+      catalogs.forEach(catalog -> {
+        configuredTargetTags.forEach(targetTag -> catalog.addTag(targetTag.toString()));
+      });
     }
+    catalogs.forEach(mediaPackage::add);
 
     return createResult(mediaPackage, Action.CONTINUE, 0);
   }

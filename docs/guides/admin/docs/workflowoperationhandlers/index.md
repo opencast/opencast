@@ -108,6 +108,7 @@ The following table contains the workflow operations that are available in an ou
 | statistics-writer                    | Log statistical data about the video                                                      | [Documentation](statistics-writer.md)                        |
 | tag                                  | Modify the tag sets of media package elements                                             | [Documentation](tag-woh.md)                                  |
 | tag-by-dcterm                        | Modify the tags if dublincore term matches value                                          | [Documentation](tag-by-dcterm-woh.md)                        |
+| tag-engage                           | Modify the tag sets of media package elements in the engage publication                   | [Documentation](tag-engage-woh.md)                           |
 | theme                                | Make settings of themes available to processing                                           | [Documentation](theme-woh.md)                                |
 | timelinepreviews                     | Create a preview image stream from a given video track                                    | [Documentation](timelinepreviews-woh.md)                     |
 | transfer-metadata                    | Transfer metadata fields between catalogs                                                 | [Documentation](transfer-metadata-woh.md)                    |

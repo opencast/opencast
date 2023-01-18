@@ -539,6 +539,30 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
   }
 
   @Override
+  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, String elementId)
+          throws DistributionException, MediaPackageException {
+    Set<String> elementIds = new HashSet<String>();
+    elementIds.add(elementId);
+    return distributeSync(channelId, mediapackage, elementIds, true, false);
+  }
+
+  public List<MediaPackageElement> distributeSync(
+          String channelId,
+          MediaPackage mediapackage,
+          Set<String> elementIds,
+          boolean checkAvailability,
+          boolean preserveReference
+  ) throws DistributionException, MediaPackageException {
+    notNull(mediapackage, "mediapackage");
+    notNull(elementIds, "elementIds");
+    notNull(channelId, "channelId");
+
+    MediaPackageElement[] distributedElements = distributeElements(channelId, mediapackage, elementIds,
+            checkAvailability, preserveReference);
+    return Arrays.asList(distributedElements);
+  }
+
+  @Override
   public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds,
                                                   boolean checkAvailability) throws DistributionException {
     Job job = null;
@@ -562,25 +586,20 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
   }
 
   @Override
-  public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
+  public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediapackage, String elementId)
+          throws DistributionException, MediaPackageException {
+    Set<String> elementIds = new HashSet();
+    elementIds.add(elementId);
+    return retractSync(channelId, mediapackage, elementIds);
+  }
+
+  public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediapackage, Set<String> elementIds)
           throws DistributionException {
-    Job job = null;
-    try {
-      job = serviceRegistry
-          .createJob(
-              JOB_TYPE, Operation.Retract.toString(), null, null, false, retractJobLoad);
-      job.setStatus(Job.Status.RUNNING);
-      job = serviceRegistry.updateJob(job);
-      final MediaPackageElement[] mediaPackageElements = this.retractElements(channelId, mediaPackage, elementIds);
-      job.setStatus(Job.Status.FINISHED);
-      return Arrays.asList(mediaPackageElements);
-    } catch (ServiceRegistryException e) {
-      throw new DistributionException(e);
-    } catch (NotFoundException e) {
-      throw new DistributionException("Unable to update retraction job", e);
-    } finally {
-      finallyUpdateJob(job);
-    }
+    notNull(mediapackage, "mediapackage");
+    notNull(elementIds, "elementIds");
+    notNull(channelId, "channelId");
+    MediaPackageElement[] retractedElements = retractElements(channelId, mediapackage, elementIds);
+    return Arrays.asList(retractedElements);
   }
 
   /**

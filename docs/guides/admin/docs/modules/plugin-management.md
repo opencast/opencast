@@ -24,6 +24,8 @@ List of Available Plugins
     - Module allowing Opencast to look up users in a Moodle LMS
 - opencast-plugin-userdirectory-sakai
     - Module allowing Opencast to look up users in a Sakai LMS
+- opencast-plugin-userdirectory-studip
+    - Module allowing Opencast to look up users in a Stud.IP LMS
 - opencast-plugin-usertracking
     - Legacy user tracking module. We do not recommend turning this on. It also requires additional configuration in
       the player. It's kept for a few legacy use-cases.

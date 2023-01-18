@@ -70,6 +70,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 
 /** Responds to series events by re-distributing metadata and security policy files for published mediapackages. */
 @Component(
@@ -225,10 +226,9 @@ public class SeriesUpdatedEventHandler {
             authorizationService.removeAcl(mp, AclScope.Episode);
 
             for (MediaPackageElement distributedEpisodeAcl : distributedEpisodeAcls) {
-              Job retractJob = distributionService.retract(CHANNEL_ID, mp, distributedEpisodeAcl.getIdentifier());
-              JobBarrier barrier = new JobBarrier(null, serviceRegistry, jobBarrierPollingRate, retractJob);
-              Result jobResult = barrier.waitForJobs();
-              if (!jobResult.getStatus().get(retractJob).equals(FINISHED)) {
+              List<MediaPackageElement> mpes = distributionService.retractSync(CHANNEL_ID, mp,
+                      distributedEpisodeAcl.getIdentifier());
+              if (mpes == null) {
                 logger.error("Unable to retract episode XACML {}", distributedEpisodeAcl.getIdentifier());
               }
             }
@@ -237,12 +237,11 @@ public class SeriesUpdatedEventHandler {
           Attachment fileRepoCopy = authorizationService.setAcl(mp, AclScope.Series, seriesItem.getAcl()).getB();
 
           // Distribute the updated XACML file
-          Job distributionJob = distributionService.distribute(CHANNEL_ID, mp, fileRepoCopy.getIdentifier());
-          JobBarrier barrier = new JobBarrier(null, serviceRegistry, jobBarrierPollingRate, distributionJob);
-          Result jobResult = barrier.waitForJobs();
-          if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
+          List<MediaPackageElement> mpes = distributionService.distributeSync(CHANNEL_ID, mp,
+                  fileRepoCopy.getIdentifier());
+          if (mpes != null && mpes.size() == 1) {
             mp.remove(fileRepoCopy);
-            mp.add(getFromXml(serviceRegistry.getJob(distributionJob.getId()).getPayload()));
+            mp.add(mpes.get(0));
           } else {
             logger.error("Unable to distribute series XACML {}", fileRepoCopy.getIdentifier());
             continue;
@@ -266,12 +265,10 @@ public class SeriesUpdatedEventHandler {
             c.setChecksum(null);
 
             // Distribute the updated series dc
-            Job distributionJob = distributionService.distribute(CHANNEL_ID, mp, c.getIdentifier());
-            JobBarrier barrier = new JobBarrier(null, serviceRegistry, jobBarrierPollingRate, distributionJob);
-            Result jobResult = barrier.waitForJobs();
-            if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
+            List<MediaPackageElement> mpes = distributionService.distributeSync(CHANNEL_ID, mp, c.getIdentifier());
+            if (mpes != null && mpes.size() == 1) {
               mp.remove(c);
-              mp.add(getFromXml(serviceRegistry.getJob(distributionJob.getId()).getPayload()));
+              mp.add(mpes.get(0));
             } else {
               logger.error("Unable to distribute series catalog {}", c.getIdentifier());
               continue;
@@ -293,9 +290,7 @@ public class SeriesUpdatedEventHandler {
         }
 
         // Update the search index with the modified mediapackage
-        Job searchJob = searchService.add(mp);
-        JobBarrier barrier = new JobBarrier(null, serviceRegistry, jobBarrierPollingRate, searchJob);
-        barrier.waitForJobs();
+        searchService.addSynchronously(mp);
       }
     } catch (SearchException e) {
       logger.warn("Unable to find mediapackages for series {} in search: {}", seriesItem, e.getMessage());

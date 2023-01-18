@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mediapackage
+  xmlns="http://mediapackage.opencastproject.org" duration="30200"
+  id="0210084b-8927-4675-8f6b-f0417ce8c5a7" start="2022-11-15T20:58:03Z">
+  <title>Test Publish Engage WOH</title>
+  <series>20220229999</series>
+  <seriestitle>Test Series</seriestitle>
+  <type>L01</type>
+  <creators>
+    <creator>John Harvard</creator>
+  </creators>
+  <media>
+    <track id="55934df4-b73c-46c5-a8bc-664c2b6be85f"
+      type="presenter/source">
+      <mimetype>video/mp4</mimetype>
+      <tags>
+        <tag>archive</tag>
+      </tags>
+      <url>https://opencast.edu/files/mediapackage/0210084b-8927-4675-8f6b-f0417ce8c5a7/55934df4-b73c-46c5-a8bc-664c2b6be85f/presenter.mp4</url>
+      <size>1584583</size>
+      <checksum type="md5">fba1135964b4128d776cb1786890ae88</checksum>
+      <duration>30200</duration>
+    </track>
+    <track id="128ba1e6-4553-45c0-8730-4eb954b9f554"
+      type="presenter/delivery">
+      <mimetype>video/mp4</mimetype>
+      <tags>
+        <tag>engage</tag>
+      </tags>
+      <url>https://opencast.edu/files/mediapackage/0210084b-8927-4675-8f6b-f0417ce8c5a7/128ba1e6-4553-45c0-8730-4eb954b9f554/presenter.mp4</url>
+      <size>639199</size>
+      <checksum type="md5">29782c69185b6e59afb902707e7b61e2</checksum>
+      <duration>29373</duration>
+    </track>
+  </media>
+  <metadata>
+    <catalog id="d84b6672-ff84-4df5-9ada-f1cdc0f2d901"
+      type="dublincore/episode">
+      <mimetype>text/xml</mimetype>
+      <tags>
+        <tag>archive</tag>
+        <tag>engage</tag>
+      </tags>
+      <url>https://opencast.edu/files/mediapackage/0210084b-8927-4675-8f6b-f0417ce8c5a7/d84b6672-ff84-4df5-9ada-f1cdc0f2d901/dublincore.xml</url>
+      <checksum type="md5">6805dfdfdfef464a8e3330b0ac71d4c9</checksum>
+    </catalog>
+  </metadata>
+  <attachments>
+    <attachment id="ee8a7e51-0666-45b3-ac5a-77da00b075f4"
+      type="presenter/player+preview">
+      <mimetype>image/jpeg</mimetype>
+      <tags>
+        <tag>archive</tag>
+        <tag>engage</tag>
+      </tags>
+      <url>https://opencast.edu/files/mediapackage/0210084b-8927-4675-8f6b-f0417ce8c5a7/ee8a7e51-0666-45b3-ac5a-77da00b075f4/presenter.jpg</url>
+      <size>18030</size>
+      <checksum type="md5">61df5894246bdc9f6b6ac971a69e4358</checksum>
+    </attachment>
+    <attachment id="09854172-45aa-4bc0-ad35-50d5d6e226ed"
+      type="captions/dfxp">
+      <mimetype>text/xml</mimetype>
+      <tags>
+        <tag>archive</tag>
+        <tag>engage</tag>
+      </tags>
+      <url>https://opencast.edu/files/mediapackage/0210084b-8927-4675-8f6b-f0417ce8c5a7/09854172-45aa-4bc0-ad35-50d5d6e226ed/captions.xml</url>
+    </attachment>    
+  </attachments>
+  <publications />
+</mediapackage>

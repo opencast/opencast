@@ -80,9 +80,9 @@ public class WowzaUrlSigningProviderTest {
     String ip = "192.168.1.2";
     String encryptionKeyId = "myTokenPrefix";
     String encryptionKey = "mySharedSecret";
-    String startTime = "1395230400";
-    String endTime = "1500000000";
-    String predefinedHash = "TgJft5hsjKyC5Rem_EoUNP7xZvxbqVPhhd0GxIcA2oo=";
+    String startTime = "1395230";
+    String endTime = "1500000";
+    String predefinedHash = "E4mSDMQXutPnj6ApllhzFoONFDQVzhAdV39Q9I9TGsU=";
     String predefinedUri = "http://192.168.1.1:1935/vod/sample.mp4/playlist.m3u8?"
             + encryptionKeyId + "endtime=" + endTime
             + "&" + encryptionKeyId + "starttime=" + startTime
@@ -91,7 +91,7 @@ public class WowzaUrlSigningProviderTest {
 
     Policy policy = Policy.mkPolicyValidFromWithIP(
             "http://192.168.1.1:1935/vod/sample.mp4/playlist.m3u8?CustomParameter=abcdef",
-            new DateTime(Long.parseLong(endTime)), new DateTime(Long.parseLong(startTime)), ip);
+            new DateTime(Long.parseLong(endTime) * 1000), new DateTime(Long.parseLong(startTime) * 1000), ip);
     policy.setResourceStrategy(new WowzaResourceStrategyImpl());
 
     String uri = signer.sign(policy);
