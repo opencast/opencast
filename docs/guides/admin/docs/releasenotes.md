@@ -1,6 +1,23 @@
 # Opencast 13: Release Notes
 
 
+Opencast 13.1
+-------------
+
+The first maintenance release of Opencast 13.
+
+- Bug fix: publish engage woh with merge SKIP the operation if media package not in search index
+([#4478](https://github.com/opencast/opencast/pull/4478))
+- Add silent detection based on subtitles (webvtt-to-cutmarks woh) ([#4482](https://github.com/opencast/opencast/pull/4482))
+- Fix: series deleted from search index cannot be re-added ([#4502](https://github.com/opencast/opencast/pull/4502))
+- Adds Whisper STT to SpeechToText WoH ([#4513](https://github.com/opencast/opencast/pull/4513))
+- Change default hotkeys for create dialogs in admin UI ([#4516](https://github.com/opencast/opencast/pull/4516))
+- Reduce number of snapshots taken in the new editor backend ([#4519](https://github.com/opencast/opencast/pull/4519))
+- Avoid using jobs in SeriesUpdatedEventHandler ([#4536](https://github.com/opencast/opencast/pull/4536))
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
+
 Opencast 13.0
 -------------
 
