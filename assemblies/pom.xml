@@ -130,6 +130,7 @@
               <feature>opencast-plugin-userdirectory-canvas</feature>
               <feature>opencast-plugin-userdirectory-moodle</feature>
               <feature>opencast-plugin-userdirectory-sakai</feature>
+              <feature>opencast-plugin-userdirectory-studip</feature>
               <feature>opencast-plugin-usertracking</feature>
             </installedFeatures>
           </configuration>

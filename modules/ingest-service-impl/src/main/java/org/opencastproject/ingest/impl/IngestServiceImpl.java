@@ -24,6 +24,8 @@ package org.opencastproject.ingest.impl;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 import static org.opencastproject.util.JobUtil.waitForJob;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
@@ -66,6 +68,7 @@ import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesException;
@@ -73,6 +76,7 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.smil.api.util.SmilUtil;
+import org.opencastproject.userdirectory.UserIdRoleProvider;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.LoadUtil;
@@ -135,6 +139,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
@@ -2016,6 +2021,13 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       logger.debug("No series name provided");
       return mp;
     }
+
+    // Verify user is a CA by checking roles and captureAgentId
+    User user = securityService.getUser();
+    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(GLOBAL_CAPTURE_AGENT_ROLE)) {
+      logger.info("User '{}' is missing capture agent roles, won't apply CASeries", user.getUsername());
+      return mp;
+    }
     //Get capture agent name
     String captureAgentId = null;
     Catalog[] catalog = mp.getCatalogs(MediaPackageElementFlavor.flavor("dublincore", "episode"));
@@ -2028,12 +2040,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       }
     }
     if (captureAgentId == null) {
-      logger.info("No Capture Agent ID defined for MediaPackage {}", mp.getIdentifier());
+      logger.info("No Capture Agent ID defined for MediaPackage {}, won't apply CASeries", mp.getIdentifier());
       return mp;
     }
-
-    String roleName = SecurityUtil.getCaptureAgentRole(captureAgentId);
-    logger.debug("Capture agent role name: {}", roleName);
+    logger.info("Applying CASeries to MediaPackage {} for capture agent '{}'", mp.getIdentifier(), captureAgentId);
 
     // Find or create CA series
     String seriesId = captureAgentId.replaceAll("[^\\w-_.:;()]+", "_");
@@ -2043,7 +2053,16 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       seriesService.getSeries(seriesId);
     } catch (NotFoundException nfe) {
       try {
-        createSeries(seriesId, seriesName, roleName);
+        List<String> roleNames = new ArrayList<>();
+        String roleName = SecurityUtil.getCaptureAgentRole(captureAgentId);
+        roleNames.add(roleName);
+        logger.debug("Capture agent role name: {}", roleName);
+
+        String username = user.getUsername();
+        roleNames.add(UserIdRoleProvider.getUserIdRole(username));
+
+        logger.info("Creating new series for capture agent '{}' and user '{}'", captureAgentId, username);
+        createSeries(seriesId, seriesName, roleNames);
       } catch (Exception e) {
         logger.error("Unable to create series {} for event {}", seriesName, mp, e);
         return mp;
@@ -2060,7 +2079,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     return mp;
   }
 
-  private DublinCoreCatalog createSeries(String seriesId, String seriesName, String roleName)
+  private DublinCoreCatalog createSeries(String seriesId, String seriesName, List<String> roleNames)
       throws SeriesException, UnauthorizedException, NotFoundException {
     DublinCoreCatalog dc = DublinCores.mkOpencastSeries().getCatalog();
     dc.set(PROPERTY_IDENTIFIER, seriesId);
@@ -2070,9 +2089,14 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     DublinCoreCatalog createdSeries = seriesService.updateSeries(dc);
 
     // fill acl
-    AccessControlEntry aceRead = new AccessControlEntry(roleName, Permissions.Action.READ.toString(), true);
-    AccessControlEntry aceWrite = new AccessControlEntry(roleName, Permissions.Action.WRITE.toString(), true);
-    AccessControlList acl = new AccessControlList(aceRead, aceWrite);
+    List<AccessControlEntry> aces = new ArrayList();
+    for (String roleName : roleNames) {
+      AccessControlEntry aceRead = new AccessControlEntry(roleName, Permissions.Action.READ.toString(), true);
+      AccessControlEntry aceWrite = new AccessControlEntry(roleName, Permissions.Action.WRITE.toString(), true);
+      aces.add(aceRead);
+      aces.add(aceWrite);
+    }
+    AccessControlList acl = new AccessControlList(aces);
     seriesService.updateAccessControl(seriesId, acl);
     logger.info("Created capture agent series with name {} and id {}", seriesName, seriesId);
 
