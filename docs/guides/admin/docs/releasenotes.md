@@ -1,5 +1,22 @@
 # Opencast 12: Release Notes
 
+Opencast 12.7
+-------------
+
+The seventh maintenance release of Opencast 12.
+
+Notable changes are:
+
+- Added a tag-engage-WOH which can be used to update tags and flavors directly
+  in the engage publication
+  (cf. [[#4590](https://github.com/opencast/opencast/pull/4590)]).
+- Fixed an issue with signed URLs pointing at Wowza
+  (cf. [[#4563](https://github.com/opencast/opencast/pull/4563)]).
+- Make event updating faster after changes to series metadata/ACL
+  (cf. [[#4539](https://github.com/opencast/opencast/pull/4539)]).
+- Fix for segment preview if there is only one in Paella Player 7
+  (cf. [[#4550](https://github.com/opencast/opencast/pull/4550)]).
+
 Opencast 12.6
 -------------
 
