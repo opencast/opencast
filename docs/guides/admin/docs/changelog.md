@@ -4,6 +4,53 @@ Changelog
 Opencast 13
 -----------
 
+### Opencast 13.1
+
+*Released on January 18th, 2023*
+
+- [[#4608](https://github.com/opencast/opencast/pull/4608)] -
+  Bump paella-core from 1.11.3 to 1.14.2 in /modules/engage-paella-player-7
+- [[#4607](https://github.com/opencast/opencast/pull/4607)] -
+  Add Opencast 13.1 release notes
+- [[#4604](https://github.com/opencast/opencast/pull/4604)] -
+  Bump eslint from 8.30.0 to 8.32.0 in /modules/engage-paella-player-7
+- [[#4603](https://github.com/opencast/opencast/pull/4603)] -
+  Bump html-validate from 7.11.1 to 7.13.1 in /modules/engage-paella-player-7
+- [[#4599](https://github.com/opencast/opencast/pull/4599)] -
+  Fix Syntax Error
+- [[#4584](https://github.com/opencast/opencast/pull/4584)] -
+  Bump @babel/core from 7.20.5 to 7.20.12 in /modules/engage-paella-player-7
+- [[#4582](https://github.com/opencast/opencast/pull/4582)] -
+  Bump babel-loader from 9.1.0 to 9.1.2 in /modules/engage-paella-player-7
+- [[#4578](https://github.com/opencast/opencast/pull/4578)] -
+  Bump paella-basic-plugins from 1.8.1 to 1.8.4 in /modules/engage-paella-player-7
+- [[#4558](https://github.com/opencast/opencast/pull/4558)] -
+  Bump html-validate from 7.11.0 to 7.11.1 in /modules/engage-paella-player-7
+- [[#4548](https://github.com/opencast/opencast/pull/4548)] -
+  Mark OC13 RPMs as Stable
+- [[#4547](https://github.com/opencast/opencast/pull/4547)] -
+  Bump eslint from 8.29.0 to 8.30.0 in /modules/engage-paella-player-7
+- [[#4546](https://github.com/opencast/opencast/pull/4546)] -
+  Bump html-validate from 7.10.1 to 7.11.0 in /modules/engage-paella-player-7
+- [[#4541](https://github.com/opencast/opencast/pull/4541)] -
+  Bump paella-core from 1.11.1 to 1.11.3 in /modules/engage-paella-player-7
+- [[#4540](https://github.com/opencast/opencast/pull/4540)] -
+  Bump css-loader from 6.7.2 to 6.7.3 in /modules/engage-paella-player-7
+- [[#4536](https://github.com/opencast/opencast/pull/4536)] -
+  Avoid using jobs in SeriesUpdatedEventHandler
+- [[#4516](https://github.com/opencast/opencast/pull/4516)] -
+  Change default hotkeys for create dialogs in admin UI
+- [[#4512](https://github.com/opencast/opencast/pull/4512)] -
+  Bump webpack-cli from 5.0.0 to 5.0.1 in /modules/engage-paella-player-7
+- [[#4502](https://github.com/opencast/opencast/pull/4502)] -
+  Fix: series deleted from search index cannot be re-added
+- [[#4484](https://github.com/opencast/opencast/pull/4484)] -
+  Prepare release notes for Opencast 13
+- [[#4482](https://github.com/opencast/opencast/pull/4482)] -
+  Add silient detection based on subtitles (webvtt-to-cutmarks woh)
+- [[#4478](https://github.com/opencast/opencast/pull/4478)] -
+  Bug fix: publish engage woh with merge SKIP the operation if media package not in search index
+
 ### Opencast 13.0
 
 *Released on December 14th, 2022*
