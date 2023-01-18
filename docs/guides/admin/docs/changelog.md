@@ -607,6 +607,21 @@ Opencast 13
 Opencast 12
 -----------
 
+### Opencast 12.7
+
+*Released on January 18th, 2023*
+
+- [[#4590](https://github.com/opencast/opencast/pull/4590)] -
+  Add Tag-Engage Workflow Operation Handler
+- [[#4563](https://github.com/opencast/opencast/pull/4563)] -
+  Fix Wowza signing time scale
+- [[#4550](https://github.com/opencast/opencast/pull/4550)] -
+  Ensure segments.segment is array
+- [[#4549](https://github.com/opencast/opencast/pull/4549)] -
+  Sync login script of paella-6 and paella-7
+- [[#4539](https://github.com/opencast/opencast/pull/4539)] -
+  Make event updating faster after changes to series metadata/ACL
+
 ### Opencast 12.6
 
 *Released on December 14th, 2022*
