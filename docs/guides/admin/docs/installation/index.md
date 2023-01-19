@@ -63,3 +63,10 @@ We provide configuration scripts to install and configure Opencast automatically
 packages from the repository above.
 
 * [Ansible](ansible.md)
+
+Prerelease repository testing
+----------------------------
+
+We build nightly packages in all of our packaging types.  The [prerelease documentation](prereleases.md) documents how
+to enable it.  This packaging is only for experts and should not be used by anyone aside from an experienced Opencast
+adopter.
