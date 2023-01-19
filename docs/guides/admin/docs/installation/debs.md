@@ -47,7 +47,7 @@ First you have to install the necessary repositories so that your package manage
     repository. If you need the new release prior to its promotion to stable you can use the testing repository.
     Note that the testing repository is an additional repository and still requires the stable repository to be active.
 
-        echo "deb https://pkg.opencast.org/debian {{ opencast_major_version()}}.x stable testing" | sudo tee /etc/apt/sources.list.d/opencast.list
+        echo "deb https://pkg.opencast.org/debian {{ opencast_major_version() }}.x stable testing" | sudo tee /etc/apt/sources.list.d/opencast.list
 
 * Add the repository key to your apt keyring:
 
