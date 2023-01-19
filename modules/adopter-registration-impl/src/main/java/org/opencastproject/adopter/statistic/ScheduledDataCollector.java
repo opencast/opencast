@@ -290,10 +290,6 @@ public class ScheduledDataCollector extends TimerTask {
     statisticData.setJobCount(serviceRegistry.count(null, null));
 
     AQueryBuilder q = assetManager.createQuery();
-    SecurityUtil.runAs(this.securityService, this.defaultOrganization, this.systemAdminUser, () -> {
-      AResult result = q.select(q.snapshot()).where(q.version().isLatest()).run();
-      statisticData.setEventCount(result.getSize());
-    });
 
     statisticData.setSeriesCount(seriesService.getSeriesCount());
     statisticData.setUserCount(userAndRoleProvider.countAllUsers());
@@ -312,6 +308,9 @@ public class ScheduledDataCollector extends TimerTask {
 
     for (Organization org : orgs) {
       SecurityUtil.runAs(securityService, org, systemAdminUser, () -> {
+        AResult result = q.select(q.snapshot()).where(q.version().isLatest()).run();
+        statisticData.setEventCount(statisticData.getEventCount() + result.getSize());
+
         //Calculate the number of attached CAs for this org, add it to the total
         long current = statisticData.getCACount();
         int orgCAs = caStateService.getKnownAgents().size();
