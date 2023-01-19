@@ -332,7 +332,7 @@ public class ScheduledDataCollector extends TimerTask {
                                        .map(MediaPackage::getDuration)
                                        .mapToLong(Long::valueOf)
                                        .sum() / 1000L;
-          } while (false); //offset + SEARCH_ITERATION_SIZE <= total);
+          } while (offset + SEARCH_ITERATION_SIZE <= total);
         } catch (UnauthorizedException e) {
           //This should never happen, but...
           logger.warn("Unable to calculate total minutes, unauthorized");
