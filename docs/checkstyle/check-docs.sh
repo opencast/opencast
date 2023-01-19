@@ -7,9 +7,9 @@ cd docs/guides
 
 for docs in admin developer; do
   cd $docs
-  if test "$( grep -R opencast_major_version | grep '\w}\|{\w' )" != ""; then
+  if test "$( grep -r 'opencast_major_version[()]*}\|{opencast_major_version' )" != ""; then
     echo "Error, $docs has a syntax error related to opencast_major_version:"
-    grep -R opencast_major_version | grep '\w}\|{\w'
+    grep -r 'opencast_major_version[()]*}\|{opencast_major_version'
     ret=1
     continue
   fi
