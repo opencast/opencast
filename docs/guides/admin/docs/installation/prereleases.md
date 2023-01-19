@@ -10,7 +10,7 @@ anything other than a testing system.  Do not feed the only copy of your recordi
 packages may break their host operating system, and may eat your dog.  Do not feed these packages after midnight.
 </div>
 
-
+<!--
 Redhat Based Distributions
 --------------------------
 
@@ -26,6 +26,7 @@ version must match your distribution's version!
 
 Note: This repo still requires the normal Opencast repository for dependencies (notably ffmpeg).  Configuration for
 these packages should follow the [standard instructions](../configuration/basic.md)
+-->
 
 Debian Based Distributions
 --------------------------
