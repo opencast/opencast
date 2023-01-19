@@ -4,9 +4,11 @@ Shortly after a branch cut we start providing prerelease packages for the new br
 verison any time a pull request has been merged.  This may be more than once a day, or it may be very rare late in the
 life cycle of a branch.
 
+<div class=warn>
 Note: These packages come with *absolutely no support*, and may be broken at any time.  Do not install these on
 anything other than a testing system.  Do not feed the only copy of your recordings to these systems.  These
 packages may break their host operating system, and may eat your dog.  Do not feed these packages after midnight.
+</div>
 
 
 Redhat Based Distributions
