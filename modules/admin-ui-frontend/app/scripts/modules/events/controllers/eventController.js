@@ -471,11 +471,12 @@ angular.module('adminNg.controllers')
 
           $scope.access = EventAccessResource.get({ id: id }, function (data) {
             if (angular.isDefined(data.episode_access)) {
+              $scope.baseAclId = data.episode_access.current_acl.toString();
               var json = angular.fromJson(data.episode_access.acl);
-              changePolicies(json.acl.ace, true);
-              $scope.baseAclId = data.episode_access.current_acl.toString();
-              getCurrentPolicies();
-              $scope.baseAclId = data.episode_access.current_acl.toString();
+              $scope.aclCreateDefaults.$promise.then(function () { // needed for roleUserPrefix
+                changePolicies(json.acl.ace, true);
+                getCurrentPolicies();
+              });
             }
           });
 
@@ -738,7 +739,9 @@ angular.module('adminNg.controllers')
 
       $scope.baseAcl = EventAccessResource.getManagedAcl({id: id}, function () {
         var combine = $scope.baseAcl.acl.ace.concat(remainingACEs);
-        changePolicies(combine);
+        $scope.aclCreateDefaults.$promise.then(function () { // needed for roleUserPrefix
+          changePolicies(combine);
+        });
       });
     };
 
@@ -1004,9 +1007,11 @@ angular.module('adminNg.controllers')
 
       $scope.access = EventAccessResource.get({ id: $scope.resourceId }, function (data) {
         if (angular.isDefined(data.episode_access)) {
-          var json = angular.fromJson(data.episode_access.acl);
-          changePolicies(json.acl.ace, true);
           $scope.baseAclId = data.episode_access.current_acl.toString();
+          var json = angular.fromJson(data.episode_access.acl);
+          $scope.aclCreateDefaults.$promise.then(function () { // needed for roleUserPrefix
+            changePolicies(json.acl.ace, true);
+          });
         }
       });
     };

@@ -130,7 +130,9 @@ angular.module('adminNg.controllers')
 
       $scope.baseAcl = SeriesAccessResource.getManagedAcl({id: id}, function () {
         var combine = $scope.baseAcl.acl.ace.concat(remainingACEs);
-        changePolicies(combine);
+        $scope.aclCreateDefaults.$promise.then(function () { // needed for roleUserPrefix
+          changePolicies(combine);
+        });
       });
     };
 
