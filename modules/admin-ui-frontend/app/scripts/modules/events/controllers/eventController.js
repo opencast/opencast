@@ -1092,44 +1092,54 @@ angular.module('adminNg.controllers')
     };
 
     let oldPolicies = {};
+    let oldPoliciesUser = {};
 
     function getCurrentPolicies () {
       oldPolicies = JSON.parse(JSON.stringify($scope.policies));
+      oldPoliciesUser = JSON.parse(JSON.stringify($scope.policiesUser));
     }
 
     function unsavedAccessChanges () {
-      let hasChanges = false;
+      if (!policiesEqual(oldPolicies, $scope.policies)) {
+        return true;
+      }
+      if (!policiesEqual(oldPoliciesUser, $scope.policiesUser)) {
+        return true;
+      }
+      return false;
+    }
 
-      if (oldPolicies.length !== $scope.policies.length) {
-        hasChanges = true;
-        return hasChanges;
+    function policiesEqual(policies1, policies2) {
+      if (policies1.length !== policies2.length) {
+        return false;
       }
 
-      oldPolicies.forEach((oldPolicy, index) => {
-        const policy = $scope.policies[index];
+      let equal = true;
+      policies1.forEach((policy1, index) => {
+        const policy2 = policies2[index];
 
-        if(oldPolicy.role !== policy.role) {
-          hasChanges = true;
+        if (policy1.role !== policy2.role) {
+          equal = false;
         }
-        else if (oldPolicy.read !== policy.read) {
-          hasChanges = true;
+        else if (policy1.read !== policy2.read) {
+          equal = false;
         }
-        else if (oldPolicy.write !== policy.write) {
-          hasChanges = true;
+        else if (policy1.write !== policy2.write) {
+          equal = false;
         }
 
-        if (oldPolicy.actions.value.length !== policy.actions.value.length) {
-          hasChanges = true;
+        if (policy1.actions.value.length !== policy2.actions.value.length) {
+          equal = false;
           return;
         }
-        oldPolicy.actions.value.forEach((oldAction, index) => {
-          const action = policy.actions.value[index];
-          if (oldAction !== action) {
-            hasChanges = true;
+        policy1.actions.value.forEach((action1, index) => {
+          const action2 = policy2.actions.value[index];
+          if (action1 !== action2) {
+            equal = false;
           }
         });
       });
-      return hasChanges;
+      return equal;
     }
 
     $scope.statisticsCsvFileName = function (statsTitle) {
