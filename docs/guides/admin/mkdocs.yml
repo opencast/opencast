@@ -142,6 +142,7 @@ nav:
    - Stand-alone Video Editor: 'modules/editor.md'
    - Stream Security: 'modules/stream-security.md'
    - Studio: 'modules/studio.md'
+   - Subtitles: 'modules/subtitles.md'
    - Termination State:
       - Basic: 'modules/terminationstate.md'
       - AWS AutoScaling: 'modules/terminationstate.aws.autoscaling.md'
