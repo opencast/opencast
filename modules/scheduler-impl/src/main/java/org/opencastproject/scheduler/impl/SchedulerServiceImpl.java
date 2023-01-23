@@ -1027,7 +1027,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   public List<MediaPackage> search(Opt<String> captureAgentId, Opt<Date> startsFrom, Opt<Date> startsTo,
           Opt<Date> endFrom, Opt<Date> endTo) throws SchedulerException {
     try {
-      return persistence.search(captureAgentId, startsFrom, startsTo, endFrom, endTo, Opt.none()).parallelStream()
+      return persistence.search(captureAgentId, startsFrom, startsTo, endFrom, endTo, Opt.none()).stream()
           .map(ExtendedEventDto::getMediaPackageId)
           .map(this::getEventMediaPackage).collect(Collectors.toList());
     } catch (Exception e) {
