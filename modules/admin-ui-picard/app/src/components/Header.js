@@ -310,7 +310,7 @@ const MenuLang = () => {
 const MenuNotify = ({ healthStatus, redirectToServices }) => {
 	return (
 		<ul className="dropdown-ul">
-			{/* For each service in the serviceList (ActiveMQ and Background Services) one list item */}
+			{/* For each service in the serviceList (Background Services) one list item */}
 			{healthStatus.map((service, key) => (
 				<li key={key}>
 					{!!service.status && (
