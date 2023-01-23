@@ -54,7 +54,7 @@
   <modules>
     <module>modules/admin-ui</module>
 <!--    <module>modules/admin-ui-frontend</module>-->
-    <module>modules/admin-ui-picard</module
+    <module>modules/admin-ui-picard</module>
     <module>modules/adopter-registration-api</module>
     <module>modules/adopter-registration-impl</module>
     <module>modules/analyze-mediapackage-workflowoperation</module>
