@@ -1,5 +1,5 @@
-Partial Import Operation
-========================
+Partial Import Workflow Operation
+=================================
 
 ID: `partial-import`
 
@@ -275,7 +275,7 @@ profile.import.silent.name = Generate silent audio tracks for filling gaps
 profile.import.silent.input = nothing
 profile.import.silent.output = audio
 profile.import.silent.suffix = -silent-audio.mp4
-profile.import.silent.ffmpeg.command = -strict -2 -filter_complex aevalsrc=0:d=#{time} -c:a aac -b:a 8k #{out.dir}/#{out.name}#{out.suffix}
+profile.import.silent.ffmpeg.command = -strict -2 -filter_complex aevalsrc=0:d=#{time} -c:a aac -b:a 8k -ar 44100 #{out.dir}/#{out.name}#{out.suffix}
 
 # Extract last image for partial import operation
 profile.import.image-frame.name = Extract last image
@@ -324,6 +324,6 @@ profile.partial-import-preencode.ffmpeg.command = -i #{in.video.path} \
   -filter:v scale=1920:-2,fps=30 \
   -shortest -c:v libx264 -pix_fmt yuv420p \
   -c:a aac -b:a 196k \
-  -ar 48000 \
+  -ar 44100 \
   #{out.dir}/#{out.name}#{out.suffix}
 ```

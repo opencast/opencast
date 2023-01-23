@@ -21,24 +21,18 @@
 
 package org.opencastproject.workflow.impl;
 
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyId;
-import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Value;
-import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.ARecord;
-import org.opencastproject.assetmanager.api.query.AResult;
-import org.opencastproject.assetmanager.api.query.ASelectQuery;
-import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.assetmanager.api.query.Target;
-import org.opencastproject.assetmanager.api.query.VersionField;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
@@ -68,23 +62,21 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-import org.opencastproject.workflow.api.WorkflowParser;
+import org.opencastproject.workflow.api.WorkflowServiceDatabaseImpl;
 import org.opencastproject.workflow.api.WorkflowStateListener;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -95,8 +87,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.Assert;
-
 public class WorkflowOperationSkippingTest {
 
   private WorkflowServiceImpl service = null;
@@ -104,28 +94,14 @@ public class WorkflowOperationSkippingTest {
   private WorkflowDefinition workingDefinition = null;
   private MediaPackage mediapackage1 = null;
   private SucceedingWorkflowOperationHandler succeedingOperationHandler = null;
-  private WorkflowServiceSolrIndex dao = null;
   protected Set<HandlerRegistration> handlerRegistrations = null;
   private Workspace workspace = null;
   private Property property = null;
 
-  private File sRoot = null;
-
   private AccessControlList acl = new AccessControlList();
-
-  protected static final String getStorageRoot() {
-    return "." + File.separator + "target" + File.separator + System.currentTimeMillis();
-  }
 
   @Before
   public void setUp() throws Exception {
-    sRoot = new File(getStorageRoot());
-    try {
-      FileUtils.forceMkdir(sRoot);
-    } catch (IOException e) {
-      Assert.fail(e.getMessage());
-    }
-
     // create operation handlers for our workflows
     succeedingOperationHandler = new SucceedingWorkflowOperationHandler(mediapackage1);
     handlerRegistrations = new HashSet<HandlerRegistration>();
@@ -147,7 +123,10 @@ public class WorkflowOperationSkippingTest {
 
     workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.getCollectionContents((String) EasyMock.anyObject())).andReturn(new URI[0]);
+    EasyMock.expect(workspace.read(anyObject()))
+            .andAnswer(() -> getClass().getResourceAsStream("/dc-1.xml")).anyTimes();
     EasyMock.replay(workspace);
+    service.setWorkspace(workspace);
 
     // security service
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
@@ -176,9 +155,6 @@ public class WorkflowOperationSkippingTest {
     ServiceRegistryInMemoryImpl serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService,
             userDirectoryService, organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
 
-    dao = new WorkflowServiceSolrIndex();
-    dao.solrRoot = sRoot + File.separator + "solr." + System.currentTimeMillis();
-
     AuthorizationService authzService = EasyMock.createNiceMock(AuthorizationService.class);
     EasyMock.expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
             .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
@@ -197,41 +173,13 @@ public class WorkflowOperationSkippingTest {
       service.setAssetManager(assetManager);
     }
 
-    AssetManager assetManager = EasyMock.createNiceMock(AssetManager.class);
-    Version version = EasyMock.createNiceMock(Version.class);
-    Snapshot snapshot = EasyMock.createNiceMock(Snapshot.class);
-    // Just needs to return a mp, not checking which one
-    EasyMock.expect(snapshot.getMediaPackage()).andReturn(mediapackage1).anyTimes();
-    EasyMock.expect(snapshot.getOrganizationId()).andReturn(securityService.getOrganization().getId()).anyTimes();
-    EasyMock.expect(snapshot.getVersion()).andReturn(version).anyTimes();
-    ARecord aRec = EasyMock.createNiceMock(ARecord.class);
-    EasyMock.expect(aRec.getSnapshot()).andReturn(Opt.some(snapshot)).anyTimes();
-    Stream<ARecord> recStream = Stream.mk(aRec);
-    Predicate p = EasyMock.createNiceMock(Predicate.class);
-    EasyMock.expect(p.and(p)).andReturn(p).anyTimes();
-    AResult r = EasyMock.createNiceMock(AResult.class);
-    EasyMock.expect(r.getRecords()).andReturn(recStream).anyTimes();
-    Target t = EasyMock.createNiceMock(Target.class);
-    ASelectQuery selectQuery = EasyMock.createNiceMock(ASelectQuery.class);
-    EasyMock.expect(selectQuery.where(EasyMock.anyObject(Predicate.class))).andReturn(selectQuery).anyTimes();
-    EasyMock.expect(selectQuery.run()).andReturn(r).anyTimes();
-    AQueryBuilder query = EasyMock.createNiceMock(AQueryBuilder.class);
-    EasyMock.expect(query.snapshot()).andReturn(t).anyTimes();
-    EasyMock.expect(query.mediaPackageId(EasyMock.anyObject(String.class))).andReturn(p).anyTimes();
-    EasyMock.expect(query.select(EasyMock.anyObject(Target.class))).andReturn(selectQuery).anyTimes();
-    VersionField v = EasyMock.createNiceMock(VersionField.class);
-    EasyMock.expect(v.isLatest()).andReturn(p).anyTimes();
-    EasyMock.expect(query.version()).andReturn(v).anyTimes();
-    EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
-    EasyMock.replay(assetManager, version, snapshot, p, r, t, selectQuery, query, v, aRec);
+    WorkflowServiceDatabaseImpl workflowDb = new WorkflowServiceDatabaseImpl();
+    workflowDb.setEntityManagerFactory(newEntityManagerFactory(WorkflowServiceDatabaseImpl.PERSISTENCE_UNIT));
+    workflowDb.setDBSessionFactory(getDbSessionFactory());
+    workflowDb.setSecurityService(securityService);
+    workflowDb.activate(null);
+    service.setPersistence(workflowDb);
 
-    dao.setServiceRegistry(serviceRegistry);
-    dao.setSecurityService(securityService);
-    dao.setAuthorizationService(authzService);
-    dao.setOrgDirectory(organizationDirectoryService);
-    dao.setAssetManager(assetManager);
-    dao.activate("System Admin");
-    service.setDao(dao);
     service.setServiceRegistry(serviceRegistry);
     service.setUserDirectoryService(userDirectoryService);
     service.activate(null);
@@ -239,7 +187,7 @@ public class WorkflowOperationSkippingTest {
     InputStream is;
     try {
       is = getClass().getResourceAsStream("/workflow-definition-skipping.xml");
-      workingDefinition = WorkflowParser.parseWorkflowDefinition(is);
+      workingDefinition = XmlWorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
 
       MediaPackageBuilder mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
@@ -261,12 +209,6 @@ public class WorkflowOperationSkippingTest {
     EasyMock.replay(result, index);
 
     service.setIndex(index);
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    dao.deactivate();
-    service.deactivate();
   }
 
   @Test
@@ -311,10 +253,8 @@ public class WorkflowOperationSkippingTest {
     WorkflowStateListener stateListener = new WorkflowStateListener(stateToWaitFor);
     service.addWorkflowListener(stateListener);
     WorkflowInstance instance = null;
-    synchronized (stateListener) {
-      instance = service.start(definition, mp, properties);
-      stateListener.wait();
-    }
+    instance = service.start(definition, mp, properties);
+    WorkflowTestSupport.poll(stateListener, 1);
     service.removeWorkflowListener(stateListener);
 
     return instance;

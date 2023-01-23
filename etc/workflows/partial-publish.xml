@@ -30,7 +30,6 @@
       <configurations>
         <configuration key="source-flavor">*/source</configuration>
         <configuration key="target-flavor">*/prepared</configuration>
-        <configuration key="target-tags">editor</configuration>
       </configurations>
     </operation>
 
@@ -41,7 +40,7 @@
       exception-handler-workflow="partial-error"
       description="Selecting audio/video streams for processing">
       <configurations>
-        <configuration key="source-flavor">*/source</configuration>
+        <configuration key="source-flavor">*/prepared</configuration>
         <configuration key="target-flavor">*/work</configuration>
         <configuration key="target-tags">-archive</configuration>
         <configuration key="audio-muxing">duplicate</configuration>
@@ -282,7 +281,7 @@
       exception-handler-workflow="partial-error"
       description="Publishing to Opencast Media Module">
       <configurations>
-        <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
+        <configuration key="download-source-flavors">dublincore/*,security/*,captions/*</configuration>
         <configuration key="download-source-tags">engage-download,atom,rss</configuration>
         <configuration key="streaming-source-tags">engage-streaming</configuration>
         <configuration key="check-availability">false</configuration>

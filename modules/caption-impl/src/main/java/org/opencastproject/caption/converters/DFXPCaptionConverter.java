@@ -34,6 +34,7 @@ import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -67,6 +68,14 @@ import javax.xml.transform.stream.StreamResult;
  * This is converter for DFXP, XML based caption format. DOM parser is used for both caption importing and exporting,
  * while SAX parser is used for determining which languages are present (DFXP can contain multiple languages).
  */
+@Component(
+    immediate = true,
+    service = { CaptionConverter.class },
+    property = {
+        "service.description=DFXP caption converter",
+        "caption.format=dfxp"
+    }
+)
 public class DFXPCaptionConverter implements CaptionConverter {
 
   /** logging utility */

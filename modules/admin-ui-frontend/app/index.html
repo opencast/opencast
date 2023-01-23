@@ -49,7 +49,7 @@
         </div>
 
         <div class="nav-dd" title="Studio" with-role="ROLE_STUDIO">
-          <a href="/studio?return.label=Admin%20UI&return.target={{studioReturnUrl}}">
+          <a href="/studio/index.html?return.label=Admin%20UI&return.target={{studioReturnUrl}}">
             <span class="fa fa-video-camera"><!-- Opencast Studio --></span>
           </a>
         </div>
@@ -60,11 +60,16 @@
           <ul class="dropdown-ul">
             <li ng-repeat="(key, value) in services.service"><!-- service directive -->
               <a ng-if="key == 'Latest Version' && (value.error || value.warning)" href="{{ value.docs_url }}" service-name="{{ key }}">
-                <span>Opencast</span>
+                <span>{{ key }}</span>
                 <span ng-if="value.error" class="ng-multi-value ng-multi-value-red">{{ value.status }}</span>
                 <span ng-if="value.warning" class="ng-multi-value ng-multi-value-orange">{{ value.status }}</span>
               </a>
-              <a ng-if="key != 'Latest Version'" ng-click="toServices($event)" service-name="{{ key }}">
+              <a ng-if="key == 'Registration' && (value.error || value.warning)" ng-click="showAdoptionDialog()" service-name="{{ key }}">
+                <span>{{ key }}</span>
+                <span ng-if="value.error" class="ng-multi-value ng-multi-value-red">{{ value.status }}</span>
+                <span ng-if="value.warning" class="ng-multi-value ng-multi-value-orange">{{ value.status }}</span>
+              </a>
+              <a ng-if="key != 'Latest Version' && key != 'Registration'" ng-click="toServices($event)" service-name="{{ key }}">
                 <span>{{ key }}</span>
                 <span class="ng-multi-value ng-multi-value-red" ng-if="value.error">{{ value.status }}</span>
                 <span class="ng-multi-value ng-multi-value-green" ng-if="!value.error">{{ value.status }}</span>
@@ -190,6 +195,7 @@
     <script src="scripts/shared/services/progressBarService.js"></script>
     <script src="scripts/shared/services/hotkeysService.js"></script>
     <script src="scripts/shared/services/restServiceMonitor.js"></script>
+    <script src="scripts/shared/services/metadataSaveService.js"></script>
     <script src="scripts/shared/resources/resources.js"></script>
     <script src="scripts/shared/resources/identityResource.js"></script>
     <script src="scripts/shared/resources/versionResource.js"></script>
@@ -201,6 +207,7 @@
     <script src="scripts/shared/resources/seriesHasEventsResource.js"></script>
     <script src="scripts/shared/resources/seriesConfigurationResource.js"></script>
     <script src="scripts/shared/resources/seriesThemeResource.js"></script>
+    <script src="scripts/shared/resources/seriesTobiraResource.js"></script>
     <script src="scripts/shared/resources/eventMetadataResource.js"></script>
     <script src="scripts/shared/resources/eventsMetadataResource.js"></script>
     <script src="scripts/shared/resources/eventUploadAssetResource.js"></script>
@@ -209,6 +216,7 @@
     <script src="scripts/shared/resources/newEventResource.js"></script>
     <script src="scripts/shared/resources/newSeriesMetadataResource.js"></script>
     <script src="scripts/shared/resources/newSeriesThemeResource.js"></script>
+    <script src="scripts/shared/resources/newSeriesTobiraResource.js"></script>
     <script src="scripts/shared/resources/conflictCheckResource.js"></script>
     <script src="scripts/shared/resources/bulkDeleteResource.js"></script>
     <script src="scripts/shared/resources/eventAssetMediaResource.js"></script>
@@ -257,7 +265,9 @@
     <script src="scripts/shared/resources/newThemeResource.js"></script>
     <script src="scripts/shared/resources/taskResource.js"></script>
     <script src="scripts/shared/resources/adopterRegistrationResource.js"></script>
+    <script src="scripts/shared/resources/adopterStatisticSummaryResource.js"></script>
     <script src="scripts/shared/resources/countryResource.js"></script>
+    <script src="scripts/shared/resources/termsOfUseResource.js"></script>
     <script src="scripts/shared/services/wizards/new-event/access.js"></script>
     <script src="scripts/shared/services/wizards/new-event/metadata.js"></script>
     <script src="scripts/shared/services/wizards/new-event/metadataExtended.js"></script>
@@ -276,6 +286,7 @@
     <script src="scripts/shared/services/wizards/new-series/metadataExtended.js"></script>
     <script src="scripts/shared/services/wizards/new-series/theme.js"></script>
     <script src="scripts/shared/services/wizards/new-series/states.js"></script>
+    <script src="scripts/shared/services/wizards/new-series/tobira.js"></script>
     <script src="scripts/shared/services/wizards/new-series/summary.js"></script>
     <script src="scripts/shared/services/wizards/new-acl/access.js"></script>
     <script src="scripts/shared/services/wizards/new-acl/metadata.js"></script>
@@ -306,6 +317,7 @@
     <script src="scripts/shared/directives/callOnSearchDirective.js"></script>
     <script src="scripts/shared/directives/oldDropdownDirective.js"></script>
     <script src="scripts/shared/directives/passwordCheckDirective.js"></script>
+    <script src="scripts/shared/directives/passwordStrengthDirective.js"></script>
     <script src="scripts/shared/directives/selectBoxDirective.js"></script>
     <script src="scripts/shared/directives/navDirective.js"></script>
     <script src="scripts/shared/directives/tableDirective.js"></script>

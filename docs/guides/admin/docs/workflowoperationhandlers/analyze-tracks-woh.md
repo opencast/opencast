@@ -1,11 +1,12 @@
-AnalyzeTracksWorkflowOperationHandler
-=====================================
+Analyze Tracks Workflow Operation
+=================================
 
+ID: `analyze-tracks`
 
 Description
 -----------
 
-The AnalyzeTracksWorkflowOperationHandler analyzes specified tracks in the mediapackage and sets workflow instance
+The analyze-tracks operation analyzes specified tracks in the mediapackage and sets workflow instance
 variables based on the tracks audio and video properties. These variables can then be used to control if workflow
 operations should be executed.
 
@@ -53,25 +54,27 @@ option, `…_aspect_snap` would be set to 4/3.
 Operation Example
 -----------------
 
-    <operation
-      id="analyze-tracks"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="Analyze tracks in media package and set control variables">
-      <configurations>
-        <configuration key="source-flavor">*/source</configuration>
-        <configuration key="aspect-ratio">4/3,16/9</configuration>
-      </configurations>
-    </operation>
+```xml
+<operation
+    id="analyze-tracks"
+    description="Analyze tracks in media package and set control variables">
+  <configurations>
+    <configuration key="source-flavor">*/source</configuration>
+    <configuration key="aspect-ratio">4/3,16/9</configuration>
+  </configurations>
+</operation>
+```
 
 If a video track with a resolution of 1280x720 and an included audio stream is passed to this operation as
 `presentiation/source`, the resulting variables would be:
 
-    presentation_source_aspect=16/9
-    presentation_source_aspect_snap=16/9
-    presentation_source_audio=true
-    presentation_source_media=true
-    presentation_source_resolution_x=1280
-    presentation_source_resolution_y=720
-    presentation_source_video=true
-    presentation_source_framerate=30.0
+```properties
+presentation_source_aspect=16/9
+presentation_source_aspect_snap=16/9
+presentation_source_audio=true
+presentation_source_media=true
+presentation_source_resolution_x=1280
+presentation_source_resolution_y=720
+presentation_source_video=true
+presentation_source_framerate=30.0
+```

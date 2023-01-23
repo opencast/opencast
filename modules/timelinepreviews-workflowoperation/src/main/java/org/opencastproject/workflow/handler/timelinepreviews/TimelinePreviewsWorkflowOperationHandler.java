@@ -289,17 +289,17 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
     }
   }
 
-  @Reference(name = "TimelinePreviewsService")
+  @Reference
   public void setTimelinePreviewsService(TimelinePreviewsService timelinePreviewsService) {
     this.timelinePreviewsService = timelinePreviewsService;
   }
 
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

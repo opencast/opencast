@@ -23,10 +23,11 @@
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
 .controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource',
-  'SeriesThemeResource', 'ResourcesListResource', 'RolesResource', 'Notifications', 'AuthService',
-  'StatisticsReusable', '$http', 'Modal', '$translate',
+  'SeriesThemeResource', 'SeriesTobiraResource', 'ResourcesListResource', 'RolesResource', 'Notifications',
+  'AuthService', 'StatisticsReusable', '$http', 'Modal', '$translate',
   function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource,
-    ResourcesListResource, RolesResource, Notifications, AuthService, StatisticsReusable, $http, Modal, $translate) {
+    SeriesTobiraResource, ResourcesListResource, RolesResource, Notifications, AuthService, StatisticsReusable, $http,
+    Modal, $translate) {
 
     var metadataChangedFns = {}, aclNotification,
         me = this,
@@ -65,8 +66,6 @@ angular.module('adminNg.controllers')
 
           if (loading) {
             $scope.validAcl = true;
-          } else {
-            $scope.accessSave();
           }
         };
 
@@ -108,8 +107,6 @@ angular.module('adminNg.controllers')
       if (angular.isDefined(index)) {
         $scope.policies.splice(index, 1);
       }
-
-      $scope.accessSave();
     };
 
     $scope.getMatchingRoles = function (value) {
@@ -250,12 +247,36 @@ angular.module('adminNg.controllers')
         });
       });
 
+      Notifications.removeAll('series-tobira-details');
+      SeriesTobiraResource.get({ id: id }, function (tobiraData) {
+        $scope.tobiraData = tobiraData;
+        $scope.directTobiraLink = tobiraData.baseURL + '/!s/:' + $scope.resourceId;
+      }, function (response) {
+        if (response.status === 500) {
+          Notifications.add('error', 'TOBIRA_SERVER_ERROR', 'series-tobira-details', -1);
+        } else if (response.status === 404) {
+          Notifications.add('warning', 'TOBIRA_NOT_FOUND', 'series-tobira-details', -1);
+        }
+
+        if (response.status !== 503) {
+          $scope.tobiraData = { error: true };
+        }
+      });
+      $scope.copyTobiraDirectLink = function () {
+        navigator.clipboard.writeText($scope.directTobiraLink).then(function () {
+          Notifications.add('info', 'TOBIRA_COPIED_DIRECT_LINK', 'series-tobira-details', 3000);
+        }, function () {
+          Notifications.add('error', 'TOBIRA_FAILED_COPYING_DIRECT_LINK', 'series-tobira-details', 3000);
+        });
+      };
+
       $scope.roles = RolesResource.queryNameOnly({limit: -1, target: 'ACL'});
 
       $scope.access = SeriesAccessResource.get({ id: id }, function (data) {
         if (angular.isDefined(data.series_access)) {
           var json = angular.fromJson(data.series_access.acl);
           changePolicies(json.acl.ace, true);
+          getCurrentPolicies();
 
           $scope.aclLocked = data.series_access.locked;
 
@@ -324,7 +345,8 @@ angular.module('adminNg.controllers')
 
     $scope.close = function() {
       if (($scope.unsavedChanges([$scope.commonMetadataCatalog]) === false
-           && $scope.unsavedChanges($scope.extendedMetadataCatalogs) === false)
+           && $scope.unsavedChanges($scope.extendedMetadataCatalogs) === false
+           && unsavedAccessChanges() === false)
           || confirmUnsaved()) {
         Modal.$scope.close();
       }
@@ -420,12 +442,6 @@ angular.module('adminNg.controllers')
       });
     };
 
-    $scope.accessChanged = function (role) {
-      if (role) {
-        $scope.accessSave();
-      }
-    };
-
     $scope.accessSave = function (override) {
       var ace = [],
           hasRights = false,
@@ -494,6 +510,52 @@ angular.module('adminNg.controllers')
         me.notificationRights = undefined;
       }
 
+      return { ace, hasRights, rulesValid, override };
+    };
+
+    let oldPolicies = {};
+
+    function getCurrentPolicies () {
+
+      oldPolicies = $scope.policies.map(policy => {
+        let newObject = {};
+        Object.keys(policy).forEach(propertyKey => {
+          newObject[propertyKey] = policy[propertyKey];
+        });
+        return newObject;
+      });
+
+      return oldPolicies;
+    }
+
+    $scope.saveChanges = function (override) {
+      var access = $scope.accessSave(override);
+
+      var ace = access.ace;
+      var hasRights = access.hasRights;
+      var rulesValid = access.rulesValid;
+
+      if (hasRights && rulesValid) {
+        SeriesAccessResource.save({ id: $scope.resourceId }, {
+          acl: {
+            ace: ace
+          },
+          override: false
+        });
+
+        Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT, 1200);
+      }
+      getCurrentPolicies();
+    };
+
+    $scope.updateEventPermissions = function (override) {
+      var access = $scope.accessSave(override);
+
+      var ace = access.ace;
+      var hasRights = access.hasRights;
+      var rulesValid = access.rulesValid;
+      override = access.override;
+
       if (hasRights && rulesValid) {
         SeriesAccessResource.save({ id: $scope.resourceId }, {
           acl: {
@@ -504,7 +566,32 @@ angular.module('adminNg.controllers')
 
         Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT, 1200);
       }
+      getCurrentPolicies();
     };
+
+    function unsavedAccessChanges () {
+      let hasChanges = false;
+
+      if (oldPolicies.length !== $scope.policies.length) {
+        hasChanges = true;
+        return hasChanges;
+      }
+
+      oldPolicies.forEach((oldPolicy, index) => {
+        const policy = $scope.policies[index];
+
+        if(oldPolicy.role !== policy.role) {
+          hasChanges = true;
+        }
+        else if (oldPolicy.read !== policy.read) {
+          hasChanges = true;
+        }
+        else if (oldPolicy.write !== policy.write) {
+          hasChanges = true;
+        }
+      });
+      return hasChanges;
+    }
 
     $scope.themeSave = function () {
       var selectedThemeID = $scope.selectedTheme.id;

@@ -92,7 +92,7 @@ public class CopyWorkflowOperationHandler extends AbstractWorkflowOperationHandl
    * @param workspace
    *          the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -157,7 +157,7 @@ public class CopyWorkflowOperationHandler extends AbstractWorkflowOperationHandl
     // Check the the number of element returned
     if (elements.size() == 0) {
       // If no one found, we skip the operation
-      return createResult(workflowInstance.getMediaPackage(), Action.SKIP);
+      return createResult(mediaPackage, Action.SKIP);
     } else if (elements.size() == 1) {
       for (MediaPackageElement element : elements) {
         logger.debug("Copy single element to: {}", targetDirectoryOption);
@@ -194,7 +194,7 @@ public class CopyWorkflowOperationHandler extends AbstractWorkflowOperationHandl
       }
     }
 
-    return createResult(workflowInstance.getMediaPackage(), Action.CONTINUE);
+    return createResult(mediaPackage, Action.CONTINUE);
   }
 
   private void copyElement(MediaPackageElement element, File targetFile) throws WorkflowOperationException {
@@ -217,7 +217,7 @@ public class CopyWorkflowOperationHandler extends AbstractWorkflowOperationHandl
     logger.debug("Element {} copied to target {}.", sourceFile.getPath(), targetFile.getPath());
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

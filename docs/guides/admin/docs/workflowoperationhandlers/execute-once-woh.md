@@ -1,5 +1,10 @@
 Execute Once Workflow Operation
--------------------------------
+===============================
+
+ID: `execute-once`
+
+Description
+-----------
 
 This operation handler runs a single command with multiple MediaPackage elements as arguments. The command
 may be used to create a new mediapackage element, or to add configuration properties to the running workflow.
@@ -9,7 +14,9 @@ To run a command for each element in a MediaPackage, use the [Execute Many](exec
 Commands run by this operation handler must first be included in the `commands.allowed` list in the
 [Execute Service](../modules/execute.md#service-configuration) configuration.
 
-### Parameter table
+
+Parameter Table
+---------------
 
 All parameters are empty by default if not specified. The special parameters `#id`, `#flavor` and `#out` are described
 in [Execute Service: Parameter Substitution](../modules/execute.md#parameter-substitution)
@@ -29,21 +36,20 @@ If `set-workflow-properties` is true, the command should write a plain-text prop
 `#{out}` in the key-value format supported by the [Java
 Properties](http://docs.oracle.com/javase/8/docs/api/java/util/Properties.html#load-java.io.Reader-) class, for example:
 
-````
+```properties
 key1=value1
 key2=value2
-````
+```
 
-### Operation Examples
+Operation Example
+-----------------
 
 Run a command which combines two tracks into a new track:
 
-````
+```xml
 <operation
-  id="execute-once"
-  fail-on-error="true"
-  exception-handler-workflow="error"
-  description="Run command">
+    id="execute-once"
+    description="Run command">
   <configurations>
     <configuration key="exec">ges-launch</configuration>
     <configuration key="params">-e #{flavor(presenter/source)} 0 5m14s #{flavor(presentation/source)} 0 14s</configuration>
@@ -53,17 +59,15 @@ Run a command which combines two tracks into a new track:
     <configuration key="expected-type">Track</configuration>
   </configurations>
 </operation>
-````
+```
 
 Run a command which inspects a mediapackage and adds new configuration properties to the running workflow, leaving the
 mediapackage unchanged:
 
-````
+```xml
 <operation
-  id="execute-once"
-  fail-on-error="true"
-  exception-handler-workflow="error"
-  description="Inspect media and update workflow properties">
+    id="execute-once"
+    description="Inspect media and update workflow properties">
   <configurations>
     <configuration key="exec">/usr/local/bin/oc-inspect.sh</configuration>
     <configuration key="params">#{out} #{id}</configuration>
@@ -72,4 +76,4 @@ mediapackage unchanged:
     <configuration key="expected-type">Attachment</configuration>
   </configurations>
 </operation>
-````
+```

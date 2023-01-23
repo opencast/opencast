@@ -1,0 +1,71 @@
+name: Auto-update npm libraries
+
+# Be carefuly for which modules you activate auto-updates.
+# Braking changes *MUST* be caught in the CI or they will cause errors.
+# Updating test libraries like eslint should be safe however.
+
+# Perform updates at 3am every day
+on:
+  schedule:
+  - cron: "0 3 * * *"
+
+jobs:
+  update-npm-libs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: prepare git
+        run: |
+          git config --global user.email 'update-bot@opencast.org'
+          git config --global user.name 'Update Bot'
+
+      - name: use node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+
+      - name: update engage-ui test libraries
+        working-directory: modules/engage-ui
+        run: |
+          set -eu
+          npm update --save --dev eslint eslint-plugin-header
+          npm audit fix || true
+          npm run eslint
+          git add package.json package-lock.json
+
+      - name: update paella-player test libraries
+        working-directory: modules/engage-paella-player
+        run: |
+          set -eu
+          npm install --save --dev eslint@latest eslint-plugin-header@latest
+          npm audit fix || true
+          npm run eslint
+          git add package.json package-lock.json
+
+      - name: update runtime-info-ui test libraries
+        working-directory: modules/runtime-info-ui
+        run: |
+          set -eu
+          npm install --save --dev eslint@latest eslint-plugin-header@latest html-linter@latest
+          npm audit fix || true
+          npm run eslint
+          npm run html-linter
+          git add package.json package-lock.json
+
+      - name: update runtime-info-ui-ng test libraries
+        working-directory: modules/runtime-info-ui-ng
+        run: |
+          set -eu
+          npm install --save --dev eslint@latest eslint-plugin-header@latest html-linter@latest
+          npm audit fix || true
+          npm run eslint
+          npm run html-linter
+          git add package.json package-lock.json
+
+      #NB: The || true after the commit ensures that the pipeline doesn't fail
+      # (and send emails) if there are no updates available
+      - name: push changes
+        run: |
+          git commit -m 'Auto-update npm packages' || true
+          git push

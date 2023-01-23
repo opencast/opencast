@@ -130,24 +130,18 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
   static final boolean RETRACT_STREAMING_DEFAULT = false;
 
   /** OSGi DI */
-  @Reference(
-      name = "DownloadDistributionService",
-      target = "(distribution.channel=download)"
-  )
+  @Reference(target = "(distribution.channel=download)")
   void setDownloadDistributionService(DownloadDistributionService distributionService) {
     this.downloadDistributionService = distributionService;
   }
 
-  @Reference(
-      name = "StreamingDistributionService",
-      target = "(distribution.channel=streaming)"
-  )
+  @Reference(target = "(distribution.channel=streaming)")
   void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
     this.streamingDistributionService = streamingDistributionService;
   }
 
   /** OSGi DI */
-  @Reference(name = "SecurityService")
+  @Reference
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -459,7 +453,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     throw new WorkflowOperationException("There is already a Published Media, fail Stragy for Mediapackage ");
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

@@ -12,7 +12,7 @@
       fail-on-error="false"
       description="Preserve the current recording state">
       <configurations>
-        <configuration key="source-flavors">*/source,dublincore/*,security/*</configuration>
+        <configuration key="source-flavors">*/source,dublincore/*,security/*,captions/*</configuration>
         <configuration key="source-tags">archive</configuration>
       </configurations>
     </operation>

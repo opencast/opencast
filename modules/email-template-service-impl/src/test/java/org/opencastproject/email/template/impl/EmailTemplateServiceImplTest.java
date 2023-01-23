@@ -20,19 +20,24 @@
  */
 package org.opencastproject.email.template.impl;
 
+import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
+import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
@@ -53,7 +58,7 @@ import java.util.Map;
 public class EmailTemplateServiceImplTest {
 
   private EmailTemplateServiceImpl service;
-  private WorkflowInstanceImpl workflowInstance;
+  private WorkflowInstance workflowInstance;
   private MediaPackage mp;
   private URI uriMP;
 
@@ -83,12 +88,15 @@ public class EmailTemplateServiceImplTest {
                     + "date: ${mediaPackage.date?datetime?iso_utc}");
     EasyMock.expect(templateScanner.getTemplate("templateCatalog"))
         .andReturn(
-            "EPISODE creator: ${catalogs[\"episode\"][\"creator\"]}, "
-                + "isPartOf: ${catalogs[\"episode\"][\"isPartOf\"]}, "
-                + "title: ${catalogs[\"episode\"][\"title\"]}, created: ${catalogs[\"episode\"][\"created\"]}, "
-                + "SERIES creator: ${catalogs[\"series\"][\"creator\"]}, "
-                + "description: ${catalogs[\"series\"][\"description\"]}, "
-                + "subject: ${catalogs[\"series\"][\"subject\"]}");
+            "EPISODE creator: ${catalogs[\"dublincore/episode\"][\"creator\"]}, "
+                + "isPartOf: ${catalogs[\"dublincore/episode\"][\"isPartOf\"]}, "
+                + "title: ${catalogs[\"dublincore/episode\"][\"title\"]}, "
+                + "created: ${catalogs[\"dublincore/episode\"][\"created\"]}, "
+                + "SERIES creator: ${catalogs[\"dublincore/series\"][\"creator\"]}, "
+                + "description: ${catalogs[\"dublincore/series\"][\"description\"]}, "
+                + "subject: ${catalogs[\"dublincore/series\"][\"subject\"]}");
+    EasyMock.expect(templateScanner.getTemplate("templateOrganization")).andReturn(
+            "Engage URL is: ${organization[\"org.opencastproject.engage.ui.url\"]}");
     EasyMock.expect(templateScanner.getTemplate("templateFailed")).andReturn(
             "<#if failedOperation?has_content>Workflow failed in operation: ${failedOperation.template}</#if>, "
                     + "Workflow errors: <#list incident as inc><#list inc.details as de>${de.b} </#list></#list>");
@@ -145,29 +153,61 @@ public class EmailTemplateServiceImplTest {
 
     service.setIncidentService(is);
 
-    workflowInstance = new WorkflowInstanceImpl(def, null, null, null, null, props);
+    IndexService indexService = EasyMock.createNiceMock(IndexService.class);
+    EventCatalogUIAdapter commonEventCatalogUIAdapter = EasyMock.createNiceMock(EventCatalogUIAdapter.class);
+    EasyMock.expect(commonEventCatalogUIAdapter.getFlavor())
+        .andReturn(new MediaPackageElementFlavor("dublincore", "episode"))
+        .anyTimes();
+    EasyMock.expect(indexService.getCommonEventCatalogUIAdapter())
+        .andReturn(commonEventCatalogUIAdapter)
+        .anyTimes();
+    EasyMock.expect(indexService.getEventCatalogUIAdapters())
+        .andReturn(List.of(commonEventCatalogUIAdapter))
+        .anyTimes();
+    SeriesCatalogUIAdapter commonSeriesCatalogUIAdapter = EasyMock.createNiceMock(SeriesCatalogUIAdapter.class);
+    EasyMock.expect(commonSeriesCatalogUIAdapter.getFlavor())
+        .andReturn(new MediaPackageElementFlavor("dublincore", "series"))
+        .anyTimes();
+    EasyMock.expect(indexService.getCommonSeriesCatalogUIAdapter())
+        .andReturn(commonSeriesCatalogUIAdapter)
+        .anyTimes();
+    EasyMock.expect(indexService.getSeriesCatalogUIAdapters())
+        .andReturn(List.of(commonSeriesCatalogUIAdapter))
+        .anyTimes();
+    service.setIndexService(indexService);
+
+    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    Organization organization = EasyMock.createNiceMock(Organization.class);
+    Map<String, String> orgProperties = new HashMap<>();
+    orgProperties.put("org.opencastproject.engage.ui.url", "http://engage.my.edu");
+    EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
+    EasyMock.expect(organization.getProperties()).andReturn(orgProperties).anyTimes();
+    service.setSecurityService(securityService);
+
+    workflowInstance = new WorkflowInstance(def, null, null, null, props);
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowState.RUNNING);
     workflowInstance.setMediaPackage(mp);
 
-    WorkflowOperationInstanceImpl failedOperation1 = new WorkflowOperationInstanceImpl("operation1",
+    WorkflowOperationInstance failedOperation1 = new WorkflowOperationInstance("operation1",
             OperationState.FAILED);
-    failedOperation1.setFailWorkflowOnException(true);
+    failedOperation1.setFailOnError(true);
     failedOperation1.setId(1L);
     EasyMock.expect(is.getIncidentsOfJob(1L, true)).andReturn(subtree).anyTimes();
-    WorkflowOperationInstanceImpl failedOperation2 = new WorkflowOperationInstanceImpl("operation2",
+    WorkflowOperationInstance failedOperation2 = new WorkflowOperationInstance("operation2",
             OperationState.FAILED);
-    failedOperation2.setFailWorkflowOnException(false);
+    failedOperation2.setFailOnError(false);
     failedOperation1.setId(2L);
     EasyMock.expect(is.getIncidentsOfJob(2L, true)).andReturn(job1Tree).anyTimes();
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("email", OperationState.RUNNING);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("email", OperationState.RUNNING);
     List<WorkflowOperationInstance> operationList = new ArrayList<WorkflowOperationInstance>();
     operationList.add(failedOperation1);
     operationList.add(failedOperation2);
     operationList.add(operation);
     workflowInstance.setOperations(operationList);
 
-    EasyMock.replay(is, subtree, job1Tree, incident1, incident2);
+    EasyMock.replay(is, subtree, job1Tree, incident1, incident2, indexService, commonEventCatalogUIAdapter,
+        commonSeriesCatalogUIAdapter, securityService, organization);
   }
 
   @Test
@@ -199,6 +239,15 @@ public class EmailTemplateServiceImplTest {
             + "title: Test Media Package, created: 2013-11-19T15:20:00Z, "
             + "SERIES creator: Harvard Extension School, description: http://extension.harvard.edu, "
             + "subject: TEST E-19997", result);
+  }
+
+  @Test
+  public void testTemplateUsingOrganizationFields() throws Exception {
+    String templateName = "templateOrganization";
+    String templateContent = null;
+
+    String result = service.applyTemplate(templateName, templateContent, workflowInstance);
+    Assert.assertEquals("Engage URL is: http://engage.my.edu", result);
   }
 
   @Test

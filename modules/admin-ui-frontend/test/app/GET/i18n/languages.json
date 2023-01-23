@@ -335,6 +335,27 @@
         }
       },
       "displayLanguage":"中文"
+    },
+    {
+      "code":"zh_TW",
+      "dateFormats":{
+        "dateTime":{
+          "short":"yyyy\/M\/d a h:mm",
+          "medium":"yyyy\/M\/d a hh:mm:ss",
+          "full":"yyyy'年'M'月'd'日' EEEE ahh'時'mm'分'ss'秒' z"
+        },
+        "date":{
+          "short":"yyyy\/M\/d",
+          "medium":"yyyy\/M\/d",
+          "full":"yyyy'年'M'月'd'日' EEEE"
+        },
+        "time":{
+          "short":"a h:mm",
+          "medium":"a hh:mm:ss",
+          "full":"ahh'時'mm'分'ss'秒' z"
+        }
+      },
+      "displayLanguage":"中文"
     }
   ],
   "fallbackLanguage":{

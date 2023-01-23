@@ -21,10 +21,10 @@
 
 package org.opencastproject.serviceregistry.impl;
 
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.persistence.Queries;
+import static org.opencastproject.db.Queries.namedQuery;
 
 import java.util.List;
+import java.util.function.Function;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -63,6 +63,6 @@ public class IncidentTextDto {
     return dto;
   }
 
-  public static final Function<EntityManager, List<IncidentTextDto>> findAll =
-          Queries.named.findAll("IncidentText.findAll");
+  public static final Function<EntityManager, List<IncidentTextDto>> findAllQuery = namedQuery
+      .findAll("IncidentText.findAll", IncidentTextDto.class);
 }

@@ -156,12 +156,12 @@ public class CaptionServiceRemoteImpl extends RemoteBase implements CaptionServi
     throw new CaptionConverterException("Unable to get catalog languages" + input + " using a remote caption service");
   }
 
-  @Reference(name = "trustedHttpClient")
+  @Reference
   @Override
   public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
     super.setTrustedHttpClient(trustedHttpClient);
   }
-  @Reference(name = "remoteServiceManager")
+  @Reference
   @Override
   public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
     super.setRemoteServiceManager(serviceRegistry);

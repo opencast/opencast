@@ -67,12 +67,12 @@ public class RetractYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
    * @param publicationService
    *          the publication service
    */
-  @Reference(name = "PublicationService")
+  @Reference
   public void setPublicationService(YouTubePublicationService publicationService) {
     this.publicationService = publicationService;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

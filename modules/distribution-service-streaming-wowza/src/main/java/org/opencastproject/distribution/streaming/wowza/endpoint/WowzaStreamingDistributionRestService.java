@@ -120,7 +120,7 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -129,7 +129,7 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
    * @param service
    *          the service to set
    */
-  @Reference(name = "distributionService")
+  @Reference
   public void setService(StreamingDistributionService service) {
     this.service = service;
   }

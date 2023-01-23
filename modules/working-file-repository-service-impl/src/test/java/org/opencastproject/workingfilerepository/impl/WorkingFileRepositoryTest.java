@@ -34,6 +34,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,8 +43,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import junit.framework.Assert;
 
 public class WorkingFileRepositoryTest {
 
@@ -245,6 +244,30 @@ public class WorkingFileRepositoryTest {
   public void testCleanupOldFilesFromNonExistentCollection() throws Exception {
     boolean result = repo.cleanupOldFilesFromCollection("UNKNOWN", 0);
     Assert.assertFalse(result);
+  }
+
+  @Test
+  public void testCleanupOldFilesFromMediaPackageNothingToDelete() throws Exception {
+    // Cleanup files older than 1 day, nothing should be deleted
+    boolean result = repo.cleanupOldFilesFromMediaPackage(1);
+    Assert.assertTrue(result);
+    File file = null;
+    file = repo.getFile(mediaPackageID, mediaPackageElementID);
+    Assert.assertNotNull(file);
+  }
+
+  @Test
+  public void testCleanupOldFilesFromMediaPackageSomethingToDelete() throws Exception {
+    // Cleanup files older than 1 day, something should be deleted
+    boolean result = repo.cleanupOldFilesFromMediaPackage(0);
+    Assert.assertTrue(result);
+    File file = null;
+    try {
+      file = repo.getFile(mediaPackageID, mediaPackageElementID);
+      Assert.fail();
+    } catch (NotFoundException e) {
+      Assert.assertNull(file);
+    }
   }
 
 }

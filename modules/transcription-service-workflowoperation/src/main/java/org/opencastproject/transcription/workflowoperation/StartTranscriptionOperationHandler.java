@@ -151,15 +151,12 @@ public class StartTranscriptionOperationHandler extends AbstractWorkflowOperatio
     return createResult(Action.CONTINUE);
   }
 
-  @Reference(
-      name = "TranscriptionService",
-      target = "(provider=ibm.watson)"
-  )
+  @Reference(target = "(provider=ibm.watson)")
   public void setTranscriptionService(TranscriptionService service) {
     this.service = service;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

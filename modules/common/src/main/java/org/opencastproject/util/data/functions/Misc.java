@@ -27,6 +27,7 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
 import java.util.List;
+import java.util.Optional;
 
 /** Various functions not directly bound to any type. */
 public final class Misc {
@@ -102,6 +103,11 @@ public final class Misc {
   /** Widening cast. */
   public static <A> Option<A> widen(Option<? extends A> xs) {
     return (Option<A>) xs;
+  }
+
+  /** Widening cast. */
+  public static <A> Optional<A> widen(Optional<? extends A> xs) {
+    return (Optional<A>) xs;
   }
 
   public static <A> Function<A, A> ifThen(final A predicate, final A b) {

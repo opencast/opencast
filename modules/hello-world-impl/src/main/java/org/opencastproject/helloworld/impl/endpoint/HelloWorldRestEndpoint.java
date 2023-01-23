@@ -153,7 +153,7 @@ public class HelloWorldRestEndpoint {
     return docs;
   }
 
-  @Reference(name = "helloworld-service")
+  @Reference
   public void setHelloWorldService(HelloWorldService service) {
     this.helloWorldService = service;
   }

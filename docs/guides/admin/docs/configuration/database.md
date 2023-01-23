@@ -1,11 +1,17 @@
 Database Configuration
 ======================
 
-Opencast ships with embedded JDBC drivers for the H2, MySQL, MariaDB and PostgreSQL databases.
+Opencast ships with embedded H2, MariaDB and PostgreSQL JDBC drivers.
 The built-in H2 database is used by default and needs no configuration,
 but is not suited for production.
 
-> __H2__ is not supported for updates or distributed systems. Use it for testing only!
+The MariaDB driver also supports connecting to MySQL.
+But this may need additional setting and it not part of Opencast's documentation.
+We also do not test this, and hence do not guarantee that this will work.
+
+<div class=warn>
+  __H2__ is not supported for updates or distributed systems. Use it for testing only!
+</div>
 
 
 ### Requirements
@@ -21,13 +27,12 @@ Step 1: Select a Database
 
 The EclipseLink JPA implementation which is used in Opencast supports several different databases, although
 some databases might require additional drivers.
-Official support only exists for MariaDB, MySQL, PostgreSQL and H2.
+Official support only exists for MariaDB, PostgreSQL and H2.
 Other database engines are not tested and specific issues will likely not be addressed.
 
 - __MariaDB__ is the recommended database engine.
   It is used by most adopters and is well tested.
-- __MySQL__ is supported but tested less than MariaDB.
-- __PostgreSQL__ support is experimental.
+- __PostgreSQL__ is fully supported and a production ready alternative.
 - __H2__ is not suitable for anything but testing and development.
   It cannot be used in distributed environments.
 
@@ -105,8 +110,6 @@ Finally, leave the client and restart the database server to enable the new user
 
 ### PostgreSQL
 
-Opencast's official PostgreSQL support is still marked as experimental.
-
 Install PostgreSQL, create a database and a user.
 You may need to enable password authentication in your `pg_hba.conf` first.
 Please refer to the PostgreSQL documentation for more details.
@@ -123,20 +126,20 @@ Step 4: Configure Opencast
 --------------------------
 
 The following changes must be made in `etc/custom.properties`.
-Examples are provided for MariaDB/MySQL and PostgreSQL.
+Examples are provided for MariaDB and PostgreSQL.
 
 1. Configure Opencast to use the JDBC driver for MariaDB or PostgreSQL.
    The MariaDB driver will also work for MySQL.
 
-        # MariaDB/MySQL
+        # MariaDB
         org.opencastproject.db.jdbc.driver=org.mariadb.jdbc.Driver
         # PostgreSQL
         org.opencastproject.db.jdbc.driver=org.postgresql.Driver
 
 2. Configure the host where Opencast will find the database (`127.0.0.1`) and the database name (`opencast`).
 
-        # MariaDB/MySQL
-        org.opencastproject.db.jdbc.url=jdbc:mysql://127.0.0.1/opencast?useMysqlMetadata=true
+        # MariaDB
+        org.opencastproject.db.jdbc.url=jdbc:mariadb://127.0.0.1/opencast?useMysqlMetadata=true
         # PostgreSQL
         org.opencastproject.db.jdbc.url=jdbc:postgresql://127.0.0.1/opencast
 
@@ -156,7 +159,7 @@ Trying to generate the schema automatically will most likely fail.
 
 If you want to use OAI-PMH, you must create the necessary table manually.
 
-Use the following code to generate the OAI-PMH database table on MariaDB/MySQL.
+Use the following code to generate the OAI-PMH database table on MariaDB.
 PostgreSQL is not yet supported.
 
 ```sql

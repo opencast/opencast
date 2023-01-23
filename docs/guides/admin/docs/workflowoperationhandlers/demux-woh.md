@@ -1,6 +1,8 @@
 Demux Workflow Operation
 ========================
 
+ID: `demux`
+
 Description
 -----------
 
@@ -27,9 +29,8 @@ Operation Example
 
 ```xml
 <operation
-  id="demux"
-  exception-handler-workflow="partial-error"
-  description="Extract presenter and presentation video from multitrack source">
+    id="demux"
+    description="Extract presenter and presentation video from multitrack source">
   <configurations>
     <configuration key="source-flavors">multitrack/source</configuration>
     <configuration key="target-flavors">presenter/source,presentation/source</configuration>
@@ -42,7 +43,7 @@ Operation Example
 Example Profile
 ---------------
 
-```
+```properties
 profile.demux.name = demux
 profile.demux.input = visual
 profile.demux.output = visual

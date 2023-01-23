@@ -109,7 +109,7 @@ public class OrganizationEndpoint {
    * @param orgDirectoryService
    *          the orgDirectoryService to set
    */
-  @Reference(name = "orgDirectoryService")
+  @Reference
   public void setOrgDirectoryService(OrganizationDirectoryService orgDirectoryService) {
     this.orgDirectoryService = orgDirectoryService;
   }

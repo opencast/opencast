@@ -71,13 +71,13 @@ public class ThemesListProvider implements ResourceListProvider {
   }
 
   /** OSGi callback for the search index. */
-  @Reference(name = "ElasticsearchIndex")
+  @Reference
   public void setIndex(ElasticsearchIndex index) {
     this.searchIndex = index;
   }
 
   /** OSGi callback for the security service. */
-  @Reference(name = "SecurityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

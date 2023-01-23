@@ -22,8 +22,9 @@
 
 angular.module('adminNg.services')
 .factory('NewSeriesStates', ['NewSeriesMetadata', 'NewSeriesMetadataExtended', 'NewSeriesAccess', 'NewSeriesTheme',
-  'NewSeriesSummary',
-  function (NewSeriesMetadata, NewSeriesMetadataExtended, NewSeriesAccess, NewSeriesTheme, NewSeriesSummary) {
+  'NewSeriesTobira', 'NewSeriesSummary',
+  function (NewSeriesMetadata, NewSeriesMetadataExtended, NewSeriesAccess, NewSeriesTheme, NewSeriesTobira,
+    NewSeriesSummary) {
     return {
       get: function () {
         return [{
@@ -42,8 +43,11 @@ angular.module('adminNg.services')
           translation: 'EVENTS.SERIES.NEW.THEME.CAPTION',
           name: 'theme',
           stateController: NewSeriesTheme
-        },
-        {
+        }, {
+          translation: 'EVENTS.SERIES.NEW.TOBIRA.CAPTION',
+          name: 'tobira',
+          stateController: NewSeriesTobira
+        }, {
           translation: 'EVENTS.SERIES.NEW.SUMMARY.CAPTION',
           name: 'summary',
           stateController: NewSeriesSummary

@@ -43,7 +43,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.sox.api.SoxService;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
@@ -62,7 +62,7 @@ public class AnalyzeAudioWorkflowOperationHandlerTest {
   private MediaPackage mp;
   private URI uriMP;
   private WorkflowInstance instance;
-  private WorkflowOperationInstanceImpl operationInstance = new WorkflowOperationInstanceImpl();
+  private WorkflowOperationInstance operationInstance = new WorkflowOperationInstance();
 
   @Before
   public void setUp() throws Exception {

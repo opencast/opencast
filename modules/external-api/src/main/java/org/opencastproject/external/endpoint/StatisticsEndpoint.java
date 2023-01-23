@@ -83,7 +83,8 @@ import javax.ws.rs.core.Response;
 
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
-            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0 })
+            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
+            ApiMediaType.VERSION_1_9_0 })
 @RestService(
   name = "externalapistatistics", title = "External API Statistics Endpoint",
   notes = {}, abstractText = "Provides statistics")
@@ -107,27 +108,27 @@ public class StatisticsEndpoint {
   private StatisticsService statisticsService;
   private StatisticsExportService statisticsExportService;
 
-  @Reference(name = "SecurityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  @Reference(name = "IndexService")
+  @Reference
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
-  @Reference(name = "ElasticsearchIndex")
+  @Reference
   public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
     this.elasticsearchIndex = elasticsearchIndex;
   }
 
-  @Reference(name = "StatisticsService")
+  @Reference
   public void setStatisticsService(StatisticsService statisticsService) {
     this.statisticsService = statisticsService;
   }
 
-  @Reference(name = "StatisticsExportCSV")
+  @Reference
   public void setStatisticsExportService(StatisticsExportService statisticsExportService) {
     this.statisticsExportService = statisticsExportService;
   }
@@ -147,7 +148,7 @@ public class StatisticsEndpoint {
     restParameters = {
       @RestParameter(
         name = "filter", isRequired = false,
-        description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form <Filter Name>:<Value to Filter With>.",
+        description = "Usage [Filter Name]:[Value to Filter With]. Available filter: \"resourceType\"",
         type = RestParameter.Type.STRING),
       @RestParameter(
         name = "withparameters", isRequired = false,
@@ -281,7 +282,7 @@ public class StatisticsEndpoint {
 
   @POST
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
-              ApiMediaType.VERSION_1_7_0 })
+              ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0 })
   @Path("data/export.csv")
   @RestQuery(
           name = "getexportcsv",
@@ -298,7 +299,7 @@ public class StatisticsEndpoint {
                           name = "offset", description = "Offset for pagination.",
                           isRequired = false, type = RestParameter.Type.INTEGER),
                   @RestParameter(
-                          name = "filter", description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form <Filter Name>:<Value to Filter With>.",
+                          name = "filter", description = "Usage [Filter Name]:[Value to Filter With]. Multiple filters can be used by combining them with commas \",\".",
                           isRequired = false, type = RestParameter.Type.STRING)
           },
           responses = {
@@ -384,8 +385,8 @@ public class StatisticsEndpoint {
   }
 
   private void checkSeriesAccess(final String seriesId) throws UnauthorizedException, SearchIndexException {
-    final Opt<Series> series = indexService.getSeries(seriesId, elasticsearchIndex);
-    if (series.isNone()) {
+    final Optional<Series> series = elasticsearchIndex.getSeries(seriesId, securityService.getOrganization().getId(), securityService.getUser());
+    if (series.isEmpty()) {
       // IndexService checks permissions and returns None if user is unauthorized
       throw new UnauthorizedException(securityService.getUser(), "read");
     }

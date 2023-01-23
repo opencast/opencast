@@ -176,7 +176,6 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
    *          the user provider to add
    */
   @Reference(
-      name = "userProviders",
       cardinality = ReferenceCardinality.AT_LEAST_ONE,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "removeUserProvider"
@@ -208,7 +207,6 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
    *          the role provider to add
    */
   @Reference(
-      name = "roleProviders",
       cardinality = ReferenceCardinality.AT_LEAST_ONE,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "removeRoleProvider"
@@ -457,7 +455,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

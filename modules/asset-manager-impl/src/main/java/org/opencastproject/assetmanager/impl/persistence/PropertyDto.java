@@ -33,12 +33,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
@@ -161,33 +161,35 @@ public class PropertyDto {
         }.toFn());
   }
 
-  public static int delete(EntityManager em, final String mediaPackageId) {
-    return delete(em, mediaPackageId, null);
+  public static Function<EntityManager, Integer> deleteQuery(final String mediaPackageId) {
+    return deleteQuery(mediaPackageId, null);
   }
 
-  public static int delete(EntityManager em, final String mediaPackageId, final String namespace) {
-    TypedQuery<PropertyDto> query;
-    if (namespace == null) {
-      query = em.createNamedQuery("Property.delete", PropertyDto.class)
-              .setParameter("mediaPackageId", mediaPackageId);
-    } else {
-      query = em.createNamedQuery("Property.deleteByNamespace", PropertyDto.class)
-              .setParameter("mediaPackageId", mediaPackageId)
-              .setParameter("namespace", namespace);
-    }
-    logger.debug("Executing query {}", query);
-    EntityTransaction tx = em.getTransaction();
-    tx.begin();
-    final int num = query.executeUpdate();
-    tx.commit();
-    return num;
+  public static Function<EntityManager, Integer> deleteQuery(final String mediaPackageId, final String namespace) {
+    return em -> {
+      TypedQuery<PropertyDto> query;
+      if (namespace == null) {
+        query = em.createNamedQuery("Property.delete", PropertyDto.class)
+            .setParameter("mediaPackageId", mediaPackageId);
+      } else {
+        query = em.createNamedQuery("Property.deleteByNamespace", PropertyDto.class)
+            .setParameter("mediaPackageId", mediaPackageId)
+            .setParameter("namespace", namespace);
+      }
+      logger.debug("Executing query {}", query);
+      return query.executeUpdate();
+    };
   }
 
-  public static List<Property> select(EntityManager em, final String mediaPackageId, final String namespace) {
-    TypedQuery<PropertyDto> query = em.createNamedQuery("Property.selectByMediaPackageAndNamespace", PropertyDto.class)
-              .setParameter("mediaPackageId", mediaPackageId)
-              .setParameter("namespace", namespace);
-    logger.debug("Executing query {}", query);
-    return query.getResultList().parallelStream().map(PropertyDto::toProperty).collect(Collectors.toList());
+  public static Function<EntityManager, List<Property>> selectQuery(final String mediaPackageId,
+      final String namespace) {
+    return em -> {
+      TypedQuery<PropertyDto> query = em.createNamedQuery("Property.selectByMediaPackageAndNamespace",
+              PropertyDto.class)
+          .setParameter("mediaPackageId", mediaPackageId)
+          .setParameter("namespace", namespace);
+      logger.debug("Executing query {}", query);
+      return query.getResultList().parallelStream().map(PropertyDto::toProperty).collect(Collectors.toList());
+    };
   }
 }

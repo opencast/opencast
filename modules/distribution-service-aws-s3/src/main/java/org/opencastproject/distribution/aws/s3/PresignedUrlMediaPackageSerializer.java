@@ -54,7 +54,7 @@ public class PresignedUrlMediaPackageSerializer implements MediaPackageSerialize
     logger.info("Init PresignedUrlMediaPackageSerializer");
   }
 
-  @Reference(name = "distributionService")
+  @Reference
   public void setService(AwsS3DistributionService service) {
     this.service = service;
   }

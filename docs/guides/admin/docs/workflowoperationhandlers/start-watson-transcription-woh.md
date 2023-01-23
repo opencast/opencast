@@ -1,10 +1,16 @@
-# Start Watson Transcription
-## Description
+Start Watson Transcription Workflow Operation
+=============================================
 
-The Start Watson Transcription invokes the IBM Watson Speech-to-Text service, passing an audio file to be translated to
-text.
+ID: `start-watson-transcription`
 
-## Parameter Table
+Description
+-----------
+
+The start watson transcription operation invokes the IBM Watson Speech-to-Text service,
+passing an audio file to be translated to text.
+
+Parameter Table
+---------------
 
 |configuration keys|description|default value|example|
 |------------------|-------|-----------|-------------|
@@ -14,7 +20,9 @@ text.
 
 **One of source-flavor or source-tag must be specified.**
 
-## Example
+Example
+-------
+
 ```xml
 <!-- Extract audio from video in ogg/opus format -->
 
@@ -49,8 +57,9 @@ text.
 </operation>
 ```
 
-#### Encoding profile used in example above
-```
+### Encoding profile used in example above
+
+```properties
 profile.audio-opus.name = audio-opus
 profile.audio-opus.input = stream
 profile.audio-opus.output = audio

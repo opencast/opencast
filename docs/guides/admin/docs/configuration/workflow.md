@@ -23,7 +23,7 @@ values allows workflows to dynamically adapt to a given input or user decision.
 
 ### Document
 
-Opencast workflows are defined in XML.  The structure of a Opencast workflow looks like this:
+Opencast workflows are defined in XML, or alternatively in [YAML](workflow.md#using-yaml-files-with-workflows) .  The structure of a Opencast workflow looks like this:
 
     <definition xmlns="http://workflow.opencastproject.org">
 
@@ -395,5 +395,33 @@ and be consistent to the Admin UI thumbnail configuration (see [Thumbnail Config
 
 ## Test the Workflow
 
-The easiest way to test a workflow is to just put it into the workflow folder where it will be picked up by Opencast
+The easiest way to test a workflow is to just put it into the workflows folder where it will be picked up by Opencast
 automatically and will be available in Opencast a few seconds later.
+
+## Using YAML Files with Workflows
+
+As an alternative to XML workflow configuration files, it is possible to use YAML files with the following structure.
+
+### YAML Workflow Definition Structure
+
+    ---
+    id:
+    title:
+    tags: []
+    displayOrder:
+    description:
+    operations: []
+    state-mappings:
+      - state:
+        value:
+
+### YAML Operation Structure
+
+    - id:
+      if:
+      fail-on-error:
+      exception-handler-workflow:
+      description:
+      configurations:
+        - key1: value1
+        - key2: value2

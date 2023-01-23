@@ -47,7 +47,9 @@ import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Dictionary;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.MalformedObjectNameException;
@@ -65,6 +67,9 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
 
   private static final Logger logger = LoggerFactory.getLogger(BrightspaceUserProviderFactory.class);
 
+  private static final String LTI_LEARNER_ROLE = "Learner";
+  private static final String LTI_INSTRUCTOR_ROLE = "Instructor";
+
   private static final String ORGANIZATION_KEY = "org.opencastproject.userdirectory.brightspace.org";
   private static final String BRIGHTSPACE_USER_ID = "org.opencastproject.userdirectory.brightspace.systemuser.id";
   private static final String BRIGHTSPACE_USER_KEY = "org.opencastproject.userdirectory.brightspace.systemuser.key";
@@ -72,15 +77,25 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
   private static final String BRIGHTSPACE_APP_ID = "org.opencastproject.userdirectory.brightspace.application.id";
   private static final String BRIGHTSPACE_APP_KEY = "org.opencastproject.userdirectory.brightspace.application.key";
 
-  private static final String CACHE_SIZE = "org.opencastproject.userdirectory.brightspace.cache.size";
-  private static final String CACHE_EXPIRATION = "org.opencastproject.userdirectory.brightspace.cache.expiration";
+  private static final String CACHE_SIZE_KEY = "org.opencastproject.userdirectory.brightspace.cache.size";
+  private static final String CACHE_EXPIRATION_KEY = "org.opencastproject.userdirectory.brightspace.cache.expiration";
   private static final String BRIGHTSPACE_NAME = "org.opencastproject.userdirectory.brightspace";
   private static final int DEFAULT_CACHE_SIZE_VALUE = 1000;
   private static final int DEFAULT_CACHE_EXPIRATION_VALUE = 60;
 
+  /** The keys to look up which roles in Brightspace should be considered as instructor roles */
+  private static final String BRIGHTSPACE_INSTRUCTOR_ROLES_KEY =
+                                "org.opencastproject.userdirectory.brightspace.instructor.roles";
+  private static final String DEFAULT_BRIGHTSPACE_INSTRUCTOR_ROLES = "teacher,ta";
+  /** The keys to look up which users should be ignored */
+  private static final String IGNORED_USERNAMES_KEY = "org.opencastproject.userdirectory.brightspace.ignored.usernames";
+  private static final String DEFAULT_IGNORED_USERNAMES = "admin,anonymous";
+
   protected BundleContext bundleContext;
   private Map<String, ServiceRegistration> providerRegistrations = new ConcurrentHashMap<>();
   private OrganizationDirectoryService orgDirectory;
+  private int cacheSize;
+  private int cacheExpiration;
 
   /**
    * Builds a JMX object name for a given PID
@@ -97,7 +112,7 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
   /**
    * OSGi callback for setting the organization directory service.
    */
-  @Reference(name = "orgDirectory")
+  @Reference
   public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
     this.orgDirectory = orgDirectory;
   }
@@ -140,8 +155,34 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
     final String applicationId = (String) properties.get(BRIGHTSPACE_APP_ID);
     final String applicationKey = (String) properties.get(BRIGHTSPACE_APP_KEY);
 
-    int cacheSize = parseCacheSizeProperty(properties);
-    int cacheExpiration = parseCacheExpirationProperty(properties);
+    String cacheSizeStr = (String) properties.get(CACHE_SIZE_KEY);
+    if (StringUtils.isBlank(cacheSizeStr)) {
+      cacheSize = DEFAULT_CACHE_SIZE_VALUE;
+    } else {
+      cacheSize = NumberUtils.toInt(cacheSizeStr);
+    }
+
+
+    String cacheExpirationStr = (String) properties.get(CACHE_EXPIRATION_KEY);
+    if (StringUtils.isBlank(cacheExpirationStr)) {
+      cacheExpiration = DEFAULT_CACHE_EXPIRATION_VALUE;
+    } else {
+      cacheExpiration = NumberUtils.toInt(cacheExpirationStr);
+    }
+
+    String rolesStr = (String) properties.get(BRIGHTSPACE_INSTRUCTOR_ROLES_KEY);
+    if (StringUtils.isBlank(rolesStr)) {
+      rolesStr = DEFAULT_BRIGHTSPACE_INSTRUCTOR_ROLES;
+    }
+    Set instructorRoles = parsePropertyLineAsSet(rolesStr);
+    logger.debug("Brightspace instructor roles: {}", instructorRoles);
+
+    String ignoredUsersStr = (String) properties.get(IGNORED_USERNAMES_KEY);
+    if (StringUtils.isBlank(ignoredUsersStr)) {
+      ignoredUsersStr = DEFAULT_IGNORED_USERNAMES;
+    }
+    Set ignoredUsernames = parsePropertyLineAsSet(ignoredUsersStr);
+    logger.debug("Ignored users: {}", ignoredUsernames);
 
     validateUrl(urlStr);
     validateConfigurationKey(ORGANIZATION_KEY, organization);
@@ -168,7 +209,8 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
     BrightspaceClientImpl clientImpl
         = new BrightspaceClientImpl(urlStr, applicationId, applicationKey, systemUserId, systemUserKey);
     BrightspaceUserProviderInstance provider
-        = new BrightspaceUserProviderInstance(pid, clientImpl, org, cacheSize, cacheExpiration, adminUserName);
+        = new BrightspaceUserProviderInstance(pid, clientImpl, org, cacheSize, cacheExpiration  ,
+            instructorRoles, ignoredUsernames);
     this.providerRegistrations
         .put(pid, this.bundleContext.registerService(UserProvider.class.getName(), provider, null));
     this.providerRegistrations
@@ -195,14 +237,6 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
     }
   }
 
-  private int parseCacheExpirationProperty(Dictionary properties) {
-    return NumberUtils.toInt(properties.get(CACHE_EXPIRATION). toString(), DEFAULT_CACHE_EXPIRATION_VALUE);
-  }
-
-  private int parseCacheSizeProperty(Dictionary properties) {
-    return NumberUtils.toInt(properties.get(CACHE_SIZE). toString(), DEFAULT_CACHE_SIZE_VALUE);
-  }
-
   private void validateConfigurationKey(String key, String value) throws ConfigurationException {
     if (StringUtils.isBlank(value)) {
       throw new ConfigurationException(key, "is not set");
@@ -219,6 +253,15 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
         throw new ConfigurationException(BRIGHTSPACE_URL, "not a URL");
       }
     }
+  }
+
+  private Set<String> parsePropertyLineAsSet(String configLine) {
+    Set<String> set = new HashSet<>();
+    String[] configs = configLine.split(",");
+    for (String config: configs) {
+      set.add(config.trim());
+    }
+    return set;
   }
 
 }

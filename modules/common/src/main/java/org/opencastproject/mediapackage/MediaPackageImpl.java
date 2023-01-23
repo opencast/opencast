@@ -1090,13 +1090,8 @@ public final class MediaPackageImpl implements MediaPackage {
   }
 
   /**
-   * Returns a media package element identifier with the given prefix and the given number or a higher one as the
-   * suffix. The identifier will be unique within the media package.
+   * Returns a unique media package element identifier.
    *
-   * @param prefix
-   *          the identifier prefix
-   * @param count
-   *          the number
    * @return the element identifier
    */
   private String createElementIdentifier() {
@@ -1125,7 +1120,11 @@ public final class MediaPackageImpl implements MediaPackage {
    * @throws MediaPackageException
    */
   public static MediaPackageImpl valueOf(String xml) throws MediaPackageException {
-    return MediaPackageImpl.valueOf(IOUtils.toInputStream(xml, "UTF-8"));
+    try {
+      return MediaPackageImpl.valueOf(IOUtils.toInputStream(xml, "UTF-8"));
+    } catch (IOException e) {
+      throw new MediaPackageException(e);
+    }
   }
 
 
@@ -1486,30 +1485,18 @@ public final class MediaPackageImpl implements MediaPackage {
   private void addInternal(MediaPackageElement element) {
     if (element == null)
       throw new IllegalArgumentException("Media package element must not be null");
-    String id = null;
-    if (elements.add(element)) {
-      if (element instanceof Track) {
-        tracks++;
-        id = "track-" + tracks;
-        recalculateDuration();
-      } else if (element instanceof Attachment) {
-        attachments++;
-        id = "attachment-" + attachments;
-      } else if (element instanceof Catalog) {
-        catalogs++;
-        id = "catalog-" + catalogs;
-      } else {
-        others++;
-        id = "unknown-" + others;
-      }
+
+    elements.add(element);
+    if (element instanceof Track) {
+      recalculateDuration();
     }
 
     // Check if element has an id
     if (element.getIdentifier() == null) {
       if (element instanceof AbstractMediaPackageElement) {
-        element.setIdentifier(id);
+        element.setIdentifier(createElementIdentifier());
       } else
-        throw new UnsupportedElementException(element, "Found unkown element without id");
+        throw new UnsupportedElementException(element, "Found unknown element without id");
     }
   }
 
@@ -1522,16 +1509,9 @@ public final class MediaPackageImpl implements MediaPackage {
   void removeInternal(MediaPackageElement element) {
     if (element == null)
       throw new IllegalArgumentException("Media package element must not be null");
-    if (elements.remove(element)) {
-      if (element instanceof Track) {
-        tracks--;
-        recalculateDuration();
-      } else if (element instanceof Attachment)
-        attachments--;
-      else if (element instanceof Catalog)
-        catalogs--;
-      else
-        others--;
+
+    if (elements.remove(element) && element instanceof Track) {
+      recalculateDuration();
     }
   }
 

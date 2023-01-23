@@ -80,7 +80,7 @@ public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkfl
   }
 
   /** OSGi DI */
-  @Reference(name = "asset-manager")
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -203,7 +203,7 @@ public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkfl
     return mp;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

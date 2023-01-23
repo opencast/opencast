@@ -111,12 +111,12 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param composerService
    *          the local composer service
    */
-  @Reference(name = "ComposerService")
+  @Reference
   protected void setComposerService(final ComposerService composerService) {
     this.composerService = composerService;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);
@@ -129,7 +129,7 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(final Workspace workspace) {
     this.workspace = workspace;
   }

@@ -133,7 +133,7 @@ public class IncidentServiceEndpoint {
   protected String serviceUrl = "/incidents";
 
   /** OSGi callback for setting the incident service. */
-  @Reference(name = "incidentService")
+  @Reference
   public void setIncidentService(IncidentService incidentService) {
     this.svc = incidentService;
   }

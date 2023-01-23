@@ -319,8 +319,11 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
     logger.info("Running {}", cropCommandline);
 
     try {
-      pbuilder = new ProcessBuilder(cropCommandline.split(" "));
-      Process process = pbuilder.start();
+      Process process = new ProcessBuilder(cropCommandline.split(" "))
+          .redirectError(ProcessBuilder.Redirect.DISCARD)
+          .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+          .start();
+
       //wait until the task is finished
       exitCode = process.waitFor();
     } catch (InterruptedException | IOException e) {
@@ -484,27 +487,27 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
     return organizationDirectoryService;
   }
 
-  @Reference(name = "serviceRegistry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(name = "user-directory")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
-  @Reference(name = "orgDirectory")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

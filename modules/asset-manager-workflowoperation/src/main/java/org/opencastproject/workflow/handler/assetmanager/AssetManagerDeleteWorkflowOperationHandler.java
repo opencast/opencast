@@ -72,7 +72,7 @@ public class AssetManagerDeleteWorkflowOperationHandler extends AbstractWorkflow
   }
 
   /** OSGi DI */
-  @Reference(name = "asset-manager")
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -111,7 +111,7 @@ public class AssetManagerDeleteWorkflowOperationHandler extends AbstractWorkflow
     return createResult(mediaPackage, Action.CONTINUE);
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

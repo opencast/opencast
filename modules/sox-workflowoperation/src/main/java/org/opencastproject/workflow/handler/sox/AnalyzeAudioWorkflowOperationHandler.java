@@ -94,7 +94,7 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param soxService
    *          the SoX service
    */
-  @Reference(name = "SoxService")
+  @Reference
   protected void setSoxService(SoxService soxService) {
     this.soxService = soxService;
   }
@@ -105,7 +105,7 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param composerService
    *          the composer service
    */
-  @Reference(name = "ComposerService")
+  @Reference
   protected void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -116,7 +116,7 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param workspace
    *          the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -250,7 +250,7 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
     return (Track) MediaPackageElementParser.getFromXml(job.getPayload());
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

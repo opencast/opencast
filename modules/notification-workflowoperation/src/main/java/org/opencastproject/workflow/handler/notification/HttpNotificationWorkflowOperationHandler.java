@@ -246,7 +246,7 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
     }
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

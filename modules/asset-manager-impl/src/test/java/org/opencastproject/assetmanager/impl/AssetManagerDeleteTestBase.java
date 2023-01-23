@@ -22,15 +22,14 @@ package org.opencastproject.assetmanager.impl;
 
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
+import static org.opencastproject.db.Queries.nativeQuery;
 
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.persistence.EntityPaths;
-import org.opencastproject.util.persistencefn.PersistenceEnv;
-import org.opencastproject.util.persistencefn.PersistenceEnvs;
-import org.opencastproject.util.persistencefn.PersistenceUtil;
-import org.opencastproject.util.persistencefn.Queries;
+import org.opencastproject.db.DBSession;
+import org.opencastproject.db.DBTestEnv;
+import org.opencastproject.util.data.Function;
 
-import com.entwinemedia.fn.Fn;
 import com.mysema.query.jpa.impl.JPADeleteClause;
 import com.mysema.query.jpa.impl.JPAQuery;
 import com.mysema.query.types.EntityPath;
@@ -40,34 +39,28 @@ import javax.persistence.EntityManager;
 
 public class AssetManagerDeleteTestBase extends AssetManagerTestBase implements EntityPaths {
 
-  protected PersistenceEnv penv;
+  protected DBSession db;
 
   @Override
   public AssetManagerImpl makeAssetManager() throws Exception {
-    penv = PersistenceEnvs.mkTestEnvFromSystemProperties(PERSISTENCE_UNIT);
+    db = DBTestEnv.newDBSession(PERSISTENCE_UNIT);
     // empty database
-    penv.tx(new Fn<EntityManager, Object>() {
-      @Override public Object apply(EntityManager entityManager) {
-        Queries.sql.update(entityManager, "delete from oc_assets_asset");
-        Queries.sql.update(entityManager, "delete from oc_assets_properties");
-        Queries.sql.update(entityManager, "delete from oc_assets_snapshot");
-        Queries.sql.update(entityManager, "delete from oc_assets_version_claim");
-        return null;
-      }
+    db.execTx(em -> {
+      nativeQuery.delete("delete from oc_assets_asset").apply(em);
+      nativeQuery.delete("delete from oc_assets_properties").apply(em);
+      nativeQuery.delete("delete from oc_assets_snapshot").apply(em);
+      nativeQuery.delete("delete from oc_assets_version_claim").apply(em);
     });
 
-    final Database db = new Database(PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT),
-            penv);
+    final Database database = new Database(db);
     am = super.makeAssetManager();
-    am.setDatabase(db);
+    am.setDatabase(database);
     return am;
   }
 
   long runCount(final JPAQuery q) {
-    return penv.tx(new Fn<EntityManager, Long>() {
-      @Override public Long apply(EntityManager em) {
-        return q.clone(em, Database.TEMPLATES).count();
-      }
+    return db.execTx(em -> {
+      return q.clone(em, Database.TEMPLATES).count();
     });
   }
 
@@ -98,37 +91,37 @@ public class AssetManagerDeleteTestBase extends AssetManagerTestBase implements 
     assertPropertiesTotal(properties);
   }
 
-  static Fn<EntityManager, JPADeleteClause> deleteFrom(final EntityPath<?> from) {
-    return new Fn<EntityManager, JPADeleteClause>() {
+  static Function<EntityManager, JPADeleteClause> deleteFrom(final EntityPath<?> from) {
+    return new Function<EntityManager, JPADeleteClause>() {
       @Override public JPADeleteClause apply(EntityManager em) {
         return new JPADeleteClause(em, from, Database.TEMPLATES);
       }
     };
   }
 
-  static final Fn<JPADeleteClause, Long> execute = new Fn<JPADeleteClause, Long>() {
+  static final Function<JPADeleteClause, Long> execute = new Function<JPADeleteClause, Long>() {
     @Override public Long apply(JPADeleteClause delete) {
       return delete.execute();
     }
   };
 
-  static Fn<JPADeleteClause, JPADeleteClause> where(final Predicate... p) {
-    return new Fn<JPADeleteClause, JPADeleteClause>() {
+  static Function<JPADeleteClause, JPADeleteClause> where(final Predicate... p) {
+    return new Function<JPADeleteClause, JPADeleteClause>() {
       @Override public JPADeleteClause apply(JPADeleteClause delete) {
         return delete.where(p);
       }
     };
   }
 
-  static Fn<EntityManager, Long> deleteFromWhere(final EntityPath<?> from, final Predicate... where) {
-    return new Fn<EntityManager, Long>() {
-      @Override public Long apply(EntityManager em) {
-        return deleteFrom(from).then(where(where)).then(execute).apply(em);
-      }
-    };
+  static java.util.function.Function<EntityManager, Long> deleteFromWhere(final EntityPath<?> from,
+      final Predicate... where) {
+    return em -> deleteFrom(from)
+        .then(where(where))
+        .then(execute)
+        .apply(em);
   }
 
   long delete(final EntityPath<?> from, final Predicate... where) {
-    return penv.tx(deleteFromWhere(from, where));
+    return db.execTx(deleteFromWhere(from, where));
   }
 }

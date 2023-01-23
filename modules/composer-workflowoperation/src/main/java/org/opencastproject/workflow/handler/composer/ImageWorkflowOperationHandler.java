@@ -54,7 +54,6 @@ import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.MimeTypes;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -89,6 +88,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.IllegalFormatException;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -129,7 +129,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * @param composerService
    *          the composer service
    */
-  @Reference(name = "ComposerService")
+  @Reference
   protected void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -141,7 +141,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -151,8 +151,9 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
           throws WorkflowOperationException {
     logger.debug("Running image workflow operation on {}", wi);
     try {
-      final Extractor e = new Extractor(this, configure(wi.getMediaPackage(), wi));
-      return e.main(MediaPackageSupport.copy(wi.getMediaPackage()));
+      MediaPackage mp = wi.getMediaPackage();
+      final Extractor e = new Extractor(this, configure(mp, wi));
+      return e.main(MediaPackageSupport.copy(mp));
     } catch (Exception e) {
       throw new WorkflowOperationException(e);
     }
@@ -295,13 +296,9 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   /**
    * Format a filename and make it "safe".
-   *
-   * @see org.opencastproject.util.PathSupport#toSafeName(String)
    */
   static String formatFileName(String format, double position, String suffix) {
-    // #toSafeName will be applied to the file name anyway when moving to the working file repository
-    // but doing it here make the tests more readable and useful for documentation
-    return PathSupport.toSafeName(format(format, position, suffix));
+    return format(Locale.ROOT, format, position, suffix);
   }
 
 
@@ -621,7 +618,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     }
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

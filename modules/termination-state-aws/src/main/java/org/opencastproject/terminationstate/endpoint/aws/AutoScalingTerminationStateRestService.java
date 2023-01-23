@@ -168,7 +168,6 @@ public class AutoScalingTerminationStateRestService implements TerminationStateR
    @param service termination state service instance
   */
   @Reference(
-      name = "termination-state-service",
       target = "(&(vendor.name=aws)(vendor.service=autoscaling))"
   )
   public void setService(TerminationStateService service) {

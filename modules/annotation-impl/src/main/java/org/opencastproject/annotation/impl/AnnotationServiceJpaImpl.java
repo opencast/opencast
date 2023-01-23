@@ -21,22 +21,29 @@
 
 package org.opencastproject.annotation.impl;
 
+import static org.opencastproject.db.Queries.namedQuery;
+
 import org.opencastproject.annotation.api.Annotation;
 import org.opencastproject.annotation.api.AnnotationList;
 import org.opencastproject.annotation.api.AnnotationService;
+import org.opencastproject.db.DBSession;
+import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.function.Function;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 
@@ -58,16 +65,32 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
 
+  protected DBSessionFactory dbSessionFactory;
+
+  protected DBSession db;
+
   /** Opencast's security service */
   protected SecurityService securityService;
 
   /** OSGi DI */
-  @Reference(
-      name = "entityManagerFactory",
-      target = "(osgi.unit.name=org.opencastproject.annotation)"
-  )
+  @Reference(target = "(osgi.unit.name=org.opencastproject.annotation)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
+  }
+
+  @Reference
+  public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
+    this.dbSessionFactory = dbSessionFactory;
+  }
+
+  @Activate
+  public void activate() {
+    db = dbSessionFactory.createSession(emf);
+  }
+
+  @Deactivate
+  public void deactivate() {
+    db.close();
   }
 
   /**
@@ -76,122 +99,62 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
-  }
-
-  private int getTotal() {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("findTotal");
-      q.setParameter("userId", securityService.getUser().getUsername());
-      return ((Long) q.getSingleResult()).intValue();
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
   }
 
   public Annotation addAnnotation(Annotation a) {
     // set the User ID on the annotation
     a.setUserId(securityService.getUser().getUsername());
-    EntityManager em = null;
-    EntityTransaction tx = null;
-    try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
-      em.persist(a);
-      tx.commit();
-      return a;
-    } finally {
-      if (tx.isActive()) {
-        tx.rollback();
-      }
-      if (em != null) {
-        em.close();
-      }
-    }
+    return db.execTx(namedQuery.persist(a));
   }
 
   public boolean removeAnnotation(Annotation a) {
-    EntityManager em = null;
-    EntityTransaction tx = null;
     try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
-      // first merge then remove element
-      em.remove(em.merge(a));
-      tx.commit();
+      db.execTxChecked(em -> {
+        // first merge then remove element
+        em.remove(em.merge(a));
+      });
       return true;
     } catch (Exception e) {
       return false;
-    } finally {
-      if (tx.isActive()) {
-        tx.rollback();
-      }
-      em.close();
     }
   }
 
   public Annotation changeAnnotation(Annotation a) throws NotFoundException {
-    EntityTransaction tx = null;
-    EntityManager em = null;
-    AnnotationImpl b = null;
     long id = a.getAnnotationId();
-    try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
+    return db.execTx(em -> {
       Query q = em.createNamedQuery("updateAnnotation");
       q.setParameter("value", a.getValue());
       q.setParameter("annotationId", id);
       int no = q.executeUpdate();
+
+      AnnotationImpl b = null;
       if (no == 1) {
         b = em.find(AnnotationImpl.class, id);
       }
-      tx.commit();
       return b;
-    } finally {
-      if (tx.isActive()) {
-        tx.rollback();
-      }
-      em.close();
-    }
+    });
   }
 
   public Annotation getAnnotation(long id) throws NotFoundException {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      AnnotationImpl a = em.find(AnnotationImpl.class, id);
-      if (a == null) {
-        throw new NotFoundException("Annotation '" + id + "' not found");
-      } else {
-        return a;
-      }
-    } finally {
-      if (em != null) {
-        em.close();
-      }
+    AnnotationImpl a = db.exec(namedQuery.findById(AnnotationImpl.class, id));
+    if (a == null) {
+      throw new NotFoundException("Annotation '" + id + "' not found");
     }
+    return a;
   }
 
   @SuppressWarnings("unchecked")
   public AnnotationList getAnnotations(int offset, int limit) {
     AnnotationListImpl result = new AnnotationListImpl();
 
-    result.setTotal(getTotal());
-    result.setOffset(offset);
-    result.setLimit(limit);
+    db.exec(em -> {
+      result.setTotal(getTotalQuery().apply(em));
+      result.setOffset(offset);
+      result.setLimit(limit);
 
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
       Query q = em.createNamedQuery("findAnnotations");
       q.setParameter("userId", securityService.getUser().getUsername());
       q.setFirstResult(offset);
@@ -200,26 +163,17 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
       for (Annotation a : annotations) {
         result.add(a);
       }
-      return result;
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    });
+
+    return result;
   }
 
-  public AnnotationList getAnnotationsByTypeAndMediapackageId(
-      String type,
-      String mediapackageId,
-      int offset,
-      int limit
-  ) {
+  public AnnotationList getAnnotationsByTypeAndMediapackageId(String type, String mediapackageId, int offset,
+      int limit) {
     AnnotationListImpl result = new AnnotationListImpl();
 
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      result.setTotal(getTotal(type, mediapackageId, em));
+    db.exec(em -> {
+      result.setTotal(getTotalQuery(type, mediapackageId).apply(em));
       result.setOffset(offset);
       result.setLimit(limit);
 
@@ -235,22 +189,16 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
       for (Annotation a : annotations) {
         result.add(a);
       }
+    });
 
-      return result;
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    return result;
   }
 
   public AnnotationList getAnnotationsByMediapackageId(String mediapackageId, int offset, int limit) {
     AnnotationListImpl result = new AnnotationListImpl();
 
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      result.setTotal(getTotalByMediapackageID(mediapackageId, em));
+    db.exec(em -> {
+      result.setTotal(getTotalByMediapackageIDQuery(mediapackageId).apply(em));
       result.setOffset(offset);
       result.setLimit(limit);
 
@@ -265,11 +213,9 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
       for (Annotation a : annotations) {
         result.add(a);
       }
+    });
 
-      return result;
-    } finally {
-      em.close();
-    }
+    return result;
   }
 
   @SuppressWarnings("unchecked")
@@ -284,10 +230,9 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
     calEnd.set(year, month, date, 23, 59);
 
     AnnotationListImpl result = new AnnotationListImpl();
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      result.setTotal(getTotal(type, calBegin, calEnd, em));
+
+    db.exec(em -> {
+      result.setTotal(getTotalQuery(type, calBegin, calEnd).apply(em));
       result.setOffset(offset);
       result.setLimit(limit);
 
@@ -302,13 +247,9 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
       for (Annotation a : annotations) {
         result.add(a);
       }
-      return result;
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    });
 
+    return result;
   }
 
   @SuppressWarnings("unchecked")
@@ -324,10 +265,8 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
     Calendar calEnd = new GregorianCalendar();
     calEnd.set(year, month, date, 23, 59);
 
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      result.setTotal(getTotal(calBegin, calEnd, em));
+    db.exec(em -> {
+      result.setTotal(getTotalQuery(calBegin, calEnd).apply(em));
       result.setOffset(offset);
       result.setLimit(limit);
 
@@ -341,25 +280,20 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
       for (Annotation a : annotations) {
         result.add(a);
       }
-      return result;
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    });
+
+    return result;
   }
 
   @SuppressWarnings("unchecked")
   public AnnotationList getAnnotationsByType(String type, int offset, int limit) {
     AnnotationListImpl result = new AnnotationListImpl();
 
-    result.setOffset(offset);
-    result.setLimit(limit);
+    db.exec(em -> {
+      result.setTotal(getTotalQuery(type).apply(em));
+      result.setOffset(offset);
+      result.setLimit(limit);
 
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      result.setTotal(getTotal(type, em));
       Query q = em.createNamedQuery("findAnnotationsByType");
       q.setParameter("userId", securityService.getUser().getUsername());
       q.setParameter("type", type);
@@ -369,50 +303,65 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
       for (Annotation a : annotations) {
         result.add(a);
       }
-      return result;
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    });
+
+    return result;
   }
 
-  private int getTotal(String type, EntityManager em) {
-    Query q = em.createNamedQuery("findTotalByType");
-    q.setParameter("userId", securityService.getUser().getUsername());
-    q.setParameter("type", type);
-    return ((Long) q.getSingleResult()).intValue();
+  private Function<EntityManager, Integer> getTotalQuery() {
+    return namedQuery.find(
+        "findTotal",
+        Long.class,
+        Pair.of("userId", securityService.getUser().getUsername())
+    ).andThen(Long::intValue);
   }
 
-  private int getTotal(String type, String mediapackageId, EntityManager em) {
-    Query q = em.createNamedQuery("findTotalByTypeAndMediapackageId");
-    q.setParameter("userId", securityService.getUser().getUsername());
-    q.setParameter("type", type);
-    q.setParameter("mediapackageId", mediapackageId);
-    return ((Long) q.getSingleResult()).intValue();
+  private Function<EntityManager, Integer> getTotalQuery(String type) {
+    return namedQuery.find(
+        "findTotalByType",
+        Long.class,
+        Pair.of("userId", securityService.getUser().getUsername()),
+        Pair.of("type", type)
+    ).andThen(Long::intValue);
   }
 
-  private int getTotalByMediapackageID(String mediapackageId, EntityManager em) {
-    Query q = em.createNamedQuery("findTotalByMediapackageId");
-    q.setParameter("userId", securityService.getUser().getUsername());
-    q.setParameter("mediapackageId", mediapackageId);
-    return ((Long) q.getSingleResult()).intValue();
+  private Function<EntityManager, Integer> getTotalQuery(String type, String mediapackageId) {
+    return namedQuery.find(
+        "findTotalByTypeAndMediapackageId",
+        Long.class,
+        Pair.of("userId", securityService.getUser().getUsername()),
+        Pair.of("type", type),
+        Pair.of("mediapackageId", mediapackageId)
+    ).andThen(Long::intValue);
   }
 
-  private int getTotal(String type, Calendar calBegin, Calendar calEnd, EntityManager em) {
-    Query q = em.createNamedQuery("findTotalByTypeAndIntervall");
-    q.setParameter("userId", securityService.getUser().getUsername());
-    q.setParameter("type", type);
-    q.setParameter("begin", calBegin, TemporalType.TIMESTAMP);
-    q.setParameter("end", calEnd, TemporalType.TIMESTAMP);
-    return ((Long) q.getSingleResult()).intValue();
+  private Function<EntityManager, Integer> getTotalByMediapackageIDQuery(String mediapackageId) {
+    return namedQuery.find(
+        "findTotalByMediapackageId",
+        Long.class,
+        Pair.of("userId", securityService.getUser().getUsername()),
+        Pair.of("mediapackageId", mediapackageId)
+    ).andThen(Long::intValue);
   }
 
-  private int getTotal(Calendar calBegin, Calendar calEnd, EntityManager em) {
-    Query q = em.createNamedQuery("findTotalByIntervall");
-    q.setParameter("userId", securityService.getUser().getUsername());
-    q.setParameter("begin", calBegin, TemporalType.TIMESTAMP);
-    q.setParameter("end", calEnd, TemporalType.TIMESTAMP);
-    return ((Long) q.getSingleResult()).intValue();
+  private Function<EntityManager, Integer> getTotalQuery(String type, Calendar calBegin, Calendar calEnd) {
+    return namedQuery.find(
+        "findTotalByTypeAndIntervall",
+        Long.class,
+        Pair.of("userId", securityService.getUser().getUsername()),
+        Pair.of("type", type),
+        Pair.of("begin", calBegin),
+        Pair.of("end", calEnd)
+    ).andThen(Long::intValue);
+  }
+
+  private Function<EntityManager, Integer> getTotalQuery(Calendar calBegin, Calendar calEnd) {
+    return namedQuery.find(
+        "findTotalByIntervall",
+        Long.class,
+        Pair.of("userId", securityService.getUser().getUsername()),
+        Pair.of("begin", calBegin),
+        Pair.of("end", calEnd)
+    ).andThen(Long::intValue);
   }
 }

@@ -54,7 +54,6 @@ import org.opencastproject.transcription.persistence.TranscriptionProviderContro
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
@@ -422,7 +421,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   }
 
   @Override
-  public Job startTranscription(String mpId, Track track, String language) {
+  public Job startTranscription(String mpId, Track track, String... args) {
     throw new UnsupportedOperationException("Not supported.");
   }
 
@@ -489,6 +488,11 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   @Override
   public String getLanguage() {
     return language;
+  }
+
+  @Override
+  public Map<String, Object> getReturnValues(String mpId, String jobId) throws TranscriptionServiceException {
+    throw new TranscriptionServiceException("Method not implemented");
   }
 
   @Override
@@ -768,7 +772,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   private void saveResults(String jobId, JSONObject jsonObj) throws IOException {
     if (jsonObj.get("results") != null) {
       // Save the results into a collection
-      workspace.putInCollection(TRANSCRIPT_COLLECTION, buildResultsFileName(jobId),
+      workspace.putInCollection(TRANSCRIPT_COLLECTION, jobId + ".json",
               new ByteArrayInputStream(jsonObj.toJSONString().getBytes()));
     }
   }
@@ -793,7 +797,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       }
 
       // Results already saved?
-      URI uri = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, buildResultsFileName(jobId));
+      URI uri = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, jobId + ".json");
       try {
         workspace.get(uri);
       } catch (Exception e) {
@@ -853,60 +857,56 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     }
   }
 
-  private String buildResultsFileName(String jobId) {
-    return PathSupport.toSafeName(jobId + ".json");
-  }
-
   public boolean isCallbackAlreadyRegistered() {
     return callbackAlreadyRegistered;
   }
 
-  @Reference(name = "serviceRegistry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  @Reference(name = "userDirectoryService")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
-  @Reference(name = "organizationDirectoryService")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
-  @Reference(name = "smtpService")
+  @Reference
   public void setSmtpService(SmtpService service) {
     this.smtpService = service;
   }
 
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace ws) {
     this.workspace = ws;
   }
 
-  @Reference(name = "workingFileRepository")
+  @Reference
   public void setWorkingFileRepository(WorkingFileRepository wfr) {
     this.wfr = wfr;
   }
 
-  @Reference(name = "database")
+  @Reference
   public void setDatabase(TranscriptionDatabase service) {
     this.database = service;
   }
 
-  @Reference(name = "assetManager")
+  @Reference
   public void setAssetManager(AssetManager service) {
     this.assetManager = service;
   }
 
-  @Reference(name = "workflowService")
+  @Reference
   public void setWorkflowService(WorkflowService service) {
     this.workflowService = service;
   }

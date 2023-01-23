@@ -1,11 +1,12 @@
-ProbeResolutionWorkflowOperationHandler
-=======================================
+Probe Resolution Workflow Operation
+===================================
 
+ID: `probe-resolution`
 
 Description
 -----------
 
-The ProbeResolutionWorkflowOperationHandler analyzes specified tracks in the mediapackage and sets workflow instance
+The probe-resolution operation analyzes specified tracks in the mediapackage and sets workflow instance
 variables based on the video resolution and the mapping set-up.
 
 
@@ -34,22 +35,24 @@ taken.
 Operation Example
 -----------------
 
-    <operation
-      id="probe-resolution"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="Set control variables based on video resolution">
-      <configurations>
-        <configuration key="source-flavor">*/source</configuration>
-        <configuration key="var:aspect">1280x720,1920x1080,2592x1080</configuration>
-        <configuration key="val:aspect">16/9</configuration>
-        <configuration key="var:is_720">1280x720</configuration>
-        <configuration key="var:is_1080">1920x1080,2592x1080</configuration>
-      </configurations>
-    </operation>
+```xml
+<operation
+    id="probe-resolution"
+    description="Set control variables based on video resolution">
+  <configurations>
+    <configuration key="source-flavor">*/source</configuration>
+    <configuration key="var:aspect">1280x720,1920x1080,2592x1080</configuration>
+    <configuration key="val:aspect">16/9</configuration>
+    <configuration key="var:is_720">1280x720</configuration>
+    <configuration key="var:is_1080">1920x1080,2592x1080</configuration>
+  </configurations>
+</operation>
+```
 
 If a video track with a resolution of 1280x720 is passed to this operation as `presentation/source`, the resulting
 variables would be:
 
-    presentation_source_is_720=true
-    presentation_source_aspect=16/9
+```properties
+presentation_source_is_720=true
+presentation_source_aspect=16/9
+```

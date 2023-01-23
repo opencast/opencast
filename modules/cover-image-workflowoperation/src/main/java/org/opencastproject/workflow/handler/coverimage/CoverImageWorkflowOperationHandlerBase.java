@@ -97,6 +97,9 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
   /** Returns a dublin core catalog service */
   protected abstract DublinCoreCatalogService getDublinCoreCatalogService();
 
+  /** Returns value of karaf.etc */
+  protected abstract String getKarafEtc();
+
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
@@ -167,17 +170,8 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
       }
 
       mediaPackage.add(coverImage);
-    } catch (MediaPackageException e) {
-      throw new WorkflowOperationException(e);
-    } catch (NotFoundException e) {
-      throw new WorkflowOperationException(e);
-    } catch (ServiceRegistryException e) {
-      throw new WorkflowOperationException(e);
-    } catch (CoverImageException e) {
-      throw new WorkflowOperationException(e);
-    } catch (IllegalArgumentException e) {
-      throw new WorkflowOperationException(e);
-    } catch (IOException e) {
+    } catch (MediaPackageException | NotFoundException | ServiceRegistryException | CoverImageException
+             | IllegalArgumentException | IOException e) {
       throw new WorkflowOperationException(e);
     }
 
@@ -215,9 +209,7 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
     }
     try {
       return getWorkspace().get(atts[0].getURI()).getAbsolutePath();
-    } catch (NotFoundException e) {
-      throw new WorkflowOperationException(e);
-    } catch (IOException e) {
+    } catch (NotFoundException | IOException e) {
       throw new WorkflowOperationException(e);
     }
   }
@@ -279,6 +271,9 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
 
   protected String loadXsl(WorkflowOperationInstance operation) throws WorkflowOperationException {
     String xslUriString = operation.getConfiguration(XSL_FILE_URL);
+    if (getKarafEtc() != null) {
+      xslUriString = xslUriString.replace("${karaf.etc}", getKarafEtc());
+    }
     if (StringUtils.isBlank(xslUriString)) {
       throw new WorkflowOperationException("Configuration option '" + XSL_FILE_URL + "' must not be empty");
     }

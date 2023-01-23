@@ -28,6 +28,7 @@ import static org.opencastproject.util.RestUtil.R.serverError;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.adopter.statistic.ScheduledDataCollector;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -39,6 +40,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Calendar;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -82,12 +85,19 @@ public class Controller {
   /** The service that provides methods for the registration */
   protected Service registrationService;
 
+  /** The scheduled data collector so we can pull the current stats on demand */
+  protected ScheduledDataCollector dataCollector;
+
   /** OSGi setter for the registration service */
-  @Reference(name = "registrationService")
+  @Reference
   public void setRegistrationService(Service registrationService) {
     this.registrationService = registrationService;
   }
 
+  @Reference
+  public void setDataCollector(ScheduledDataCollector collector) {
+    this.dataCollector = collector;
+  }
 
   @GET
   @Path("registration")
@@ -103,6 +113,23 @@ public class Controller {
     return gson.toJson(registrationService.retrieveFormData());
   }
 
+  @GET
+  @Path("summary")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "getsummary", description = "GETs the adopter registration statistics data.", responses = {
+      @RestResponse(description = "Retrieved statistic data.",
+          responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "Error while retrieving adopter statistic data.",
+          responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
+      returnDescription = "GETs the adopter registration statistics data.")
+  public Response getAdopterStatistics() {
+    logger.debug("Retrieving adopter registration statistics data.");
+    try {
+      return Response.ok(dataCollector.getRegistrationDataAsString()).build();
+    } catch (Exception e) {
+      return Response.serverError().build();
+    }
+  }
 
   @POST
   @Path("registration")
@@ -163,7 +190,7 @@ public class Controller {
     logger.debug("Saving adopter registration data.");
 
     Form form = new Form(organisationName, departmentName, firstName, lastName, email, country, postalCode, city,
-            street, streetNo, contactMe, agreedToPolicy, allowsErrorReports, allowsStatistics, registered
+            street, streetNo, contactMe, allowsStatistics, allowsErrorReports, agreedToPolicy, registered
     );
     try {
       registrationService.saveFormData(form);
@@ -174,6 +201,46 @@ public class Controller {
     return Response.ok().build();
   }
 
+  @POST
+  @Path("registration/finalize")
+  @RestQuery(name = "finalizeRegistration",
+      description = "Finalizes the registration and starts sending data.",
+      returnDescription = "Status",
+      restParameters = {},
+      responses = { @RestResponse(responseCode = SC_OK, description = "Registration finalized.") })
+  public Response register() {
+    logger.debug("Finalizing adopter registration.");
+
+    Form form = (Form) registrationService.retrieveFormData();
+    form.setRegistered(true);
+
+    try {
+      registrationService.saveFormData(form);
+    } catch (Exception e) {
+      logger.error("Error while saving adopter registration data.", e);
+      return Response.serverError().build();
+    }
+    return Response.ok().build();
+  }
+
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("isUpToDate")
+  @RestQuery(name = "isUpToDate", description = "Returns true if Opencast has been able to register", responses = {
+      @RestResponse(description = "Registratino status",
+          responseCode = HttpServletResponse.SC_OK)
+      },
+      returnDescription = "true if registration has been updated in the last week, false otherwise")
+  public Response isUpToDate() {
+    Form data = (Form) registrationService.retrieveFormData();
+    Calendar cal = Calendar.getInstance();
+    cal.add(Calendar.DAY_OF_MONTH, -7);
+    //A fresh install might have no data at all, so we null check everything
+    if (data != null && data.getDateModified() != null && data.getDateModified().after(cal.getTime())) {
+      return Response.ok("true").build();
+    }
+    return Response.ok("false").build();
+  }
 
   @DELETE
   @Path("registration")
@@ -186,12 +253,23 @@ public class Controller {
   public Response deleteRegistrationData() {
     logger.debug("Deleting adopter registration data.");
     try {
-      registrationService.deleteFormData();
+      registrationService.markForDeletion();
       return ok();
     } catch (Exception e) {
       logger.error("Error while deleting adopter registration data.", e);
       return serverError();
     }
+  }
+
+
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("latestToU")
+  @RestQuery(name = "getLatestTermsOfUse", description = "Gets the latest terms of use version.", responses = {
+      @RestResponse(description = "Retrieved statistic data.", responseCode = HttpServletResponse.SC_OK) },
+      returnDescription = "The latest terms of use version.")
+  public String getLatestTermsofUse() {
+    return Form.getLatestTermsOfUse().name();
   }
 
 

@@ -32,6 +32,7 @@ import org.opencastproject.caption.util.TimeUtil;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,14 @@ import java.util.Scanner;
  * annotations). Advanced format will be parsed but all annotations will be stripped off.
  *
  */
+@Component(
+    immediate = true,
+    service = { CaptionConverter.class },
+    property = {
+        "service.description=SubRip caption converter",
+        "caption.format=subrip"
+    }
+)
 public class SubRipCaptionConverter implements CaptionConverter {
 
   /** Logging utility */

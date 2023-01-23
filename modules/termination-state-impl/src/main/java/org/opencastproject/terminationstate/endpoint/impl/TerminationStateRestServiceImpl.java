@@ -167,7 +167,6 @@ public class TerminationStateRestServiceImpl implements TerminationStateRestServ
    @param service termination state service instance
    */
   @Reference(
-      name = "termination-state-service",
       target = "(&(vendor.name=opencast)(vendor.service=basic))"
   )
   public void setService(TerminationStateService service) {

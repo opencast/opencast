@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Handles execution of a workflow operation.
@@ -51,7 +52,7 @@ final class WorkflowOperationWorker {
 
   private WorkflowOperationHandler handler;
   private WorkflowInstance workflow;
-  private WorkflowServiceImpl service;
+  private final WorkflowServiceImpl service;
   private Map<String, String> properties = null;
 
   /**
@@ -136,19 +137,14 @@ final class WorkflowOperationWorker {
       // Don't log it as error because it was aborted by the user
       logger.info("Workflow operation '" + operation + "' aborted by user");
     } catch (Exception e) {
-      Throwable t = e.getCause();
-      if (t != null) {
-        logger.error("Workflow operation '" + operation + "' failed", t);
-      } else {
-        logger.error("Workflow operation '" + operation + "' failed", e);
-      }
+      logger.error("Workflow operation '" + operation + "' failed", e);
       // the associated job shares operation's id
       service.getServiceRegistry().incident().unhandledException(operation.getId(), Severity.FAILURE, e);
     }
     try {
       workflow = service.handleOperationException(workflow, operation);
-    } catch (Exception e2) {
-      logger.error("Error handling workflow operation '{}' failure: {}", operation, e2.getMessage(), e2);
+    } catch (Exception e) {
+      logger.error("Error handling workflow operation '{}'", operation, e);
     }
     return workflow;
   }
@@ -164,18 +160,41 @@ final class WorkflowOperationWorker {
    */
   public WorkflowOperationResult start() throws WorkflowOperationException, WorkflowException, UnauthorizedException {
     final WorkflowOperationInstance operation = workflow.getCurrentOperation();
+
+    // Update execution condition and metadata
+    final var organization = service.securityService.getOrganization();
+    final Function<String, String> variables = key -> {
+      if (properties != null && properties.containsKey(key)) {
+        return properties.get(key);
+      }
+      if (workflow.getConfigurations().containsKey(key)) {
+        return workflow.getConfiguration(key);
+      }
+      if (key.startsWith("org_")) {
+        return organization.getProperties().get(key.substring(4));
+      }
+      return null;
+    };
+    final String executionCondition = WorkflowConditionInterpreter.replaceVariables(
+        operation.getExecutionCondition(), variables, null, false);
+    operation.setExecutionCondition(executionCondition);
+    operation.setDescription(WorkflowConditionInterpreter.replaceVariables(
+        operation.getDescription(), variables, null, false));
+    for (var cfg: operation.getConfigurations().entrySet()) {
+      var value = WorkflowConditionInterpreter.replaceVariables(
+          cfg.getValue(), variables, null, false);
+      operation.setConfiguration(cfg.getKey(), value);
+    }
+
     // Do we need to execute the operation?
-    final String executionCondition = operation.getExecutionCondition(); // if
-    final boolean execute;
-    if (executionCondition == null) {
-      execute = true;
-    } else {
+    boolean execute = true;
+    if (executionCondition != null) {
       try {
         execute = WorkflowConditionInterpreter.interpret(executionCondition);
       } catch (IllegalArgumentException e) {
         operation.setState(OperationState.FAILED);
         throw new WorkflowOperationException(
-                format("Unable to parse execution condition '%s': %s", executionCondition, e.getMessage()));
+                format("Unable to parse execution condition '%s'", executionCondition), e);
       }
     }
 

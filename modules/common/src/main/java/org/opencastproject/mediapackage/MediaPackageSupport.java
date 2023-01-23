@@ -21,7 +21,6 @@
 
 package org.opencastproject.mediapackage;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.opencastproject.util.IoSupport.withResource;
 import static org.opencastproject.util.data.Collections.list;
@@ -295,14 +294,6 @@ public final class MediaPackageSupport {
       }
     };
 
-    public static final Function<MediaPackageElement, Boolean> isEpisodeAcl = new Function<MediaPackageElement, Boolean>() {
-      @Override
-      public Boolean apply(MediaPackageElement mpe) {
-        // match is commutative
-        return MediaPackageElements.XACML_POLICY_EPISODE.matches(mpe.getFlavor());
-      }
-    };
-
     public static final Function<MediaPackageElement, Boolean> isEpisodeDublinCore = new Function<MediaPackageElement, Boolean>() {
       @Override
       public Boolean apply(MediaPackageElement mpe) {
@@ -345,17 +336,6 @@ public final class MediaPackageSupport {
                 return MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().loadFromXml(is);
               }
             });
-  }
-
-  /**
-   * Media package must have a title and contain tracks in order to be published.
-   *
-   * @param mp
-   *          the media package
-   * @return <code>true</code> if the media package can be published
-   */
-  public static boolean isPublishable(MediaPackage mp) {
-    return !isBlank(mp.getTitle()) && mp.hasTracks();
   }
 
   /**

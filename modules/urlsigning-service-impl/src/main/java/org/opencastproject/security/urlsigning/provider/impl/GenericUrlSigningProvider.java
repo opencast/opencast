@@ -59,7 +59,7 @@ public class GenericUrlSigningProvider extends AbstractUrlSigningProvider {
     return "Generic URL Signing Provider";
   }
 
-  @Reference(name = "security-service")
+  @Reference
   @Override
   public void setSecurityService(SecurityService securityService) {
     super.setSecurityService(securityService);

@@ -1,6 +1,8 @@
 name: Update translations
 
+# Update every Monday at 5am
 on:
+  workflow_dispatch:
   schedule:
   - cron: "0 5 * * 1"
 

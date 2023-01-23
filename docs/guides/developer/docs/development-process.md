@@ -41,11 +41,14 @@ That is why patches may only be accepted into releases branches (`r/?.x`) if the
 
 * Patches must not modify existing database tables
 * Patches must not modify the indexes or otherwise cause re-indexing
-* Patches must not require a different ActiveMQ configuration
 * Patches must not modify existing translation keys
 * Patches must work with the same configuration within a major version
 
 Patches which do not meet these criteria should target the branch `develop` to become part of the next major version.
+
+Note: Patches adding features should target the current stable release (`r/{{ opencast_major_version}}.x`), or
+`develop`, and are strongly discouraged from targetting the legacy release.  Features going into the legacy release
+will need a good reason, and must be highly self contained.
 
 To determine the acceptance of patches, all pull requests will be discussed in the technical meeting.
 This protects against inclusion of controversial changes with no broader consent among committers.
@@ -73,6 +76,7 @@ of what work has been done. To this end, there are a few expectations for all pu
 * In the case of major user interface changes, it is good practice to include screenshots of the change
 * Any actions that would be required for a version upgrade (e.g: from 3.x to 4.x) must be documented in
   `docs/guides/admin/docs/upgrade.md`
+* New features require a release note in `docs/guides/admin/releasenotes` of at least one line describing the change
 * The commands `mvn clean install`, `mvn javadoc:javadoc javadoc:aggregate`, and `mvn site` should all succeed
 * The licenses of any external libraries used in the pull request comply with the [licensing rules](license.md) both
   in terms of the license itself as well as its listing in NOTICES
@@ -86,6 +90,20 @@ modules/admin-ui/src/main/java | In case the interface of the Admin UI facade ch
 
 While a committer may accept a patch even if it does not meet these expectations, it is encouraged that anyone filing
 a pull request ensures that they meet these expectations.
+
+#### Merging Pull Requests
+
+After a pull request has received at least one approving review and passes the automated tests, it is ready for merging.
+Only a committer can perform a merge, so if a reviewed pull request has not yet received attention from a committer
+feel free to contact one.
+
+There are a couple of rules that committers must follow when merging pull requests. These are:
+* A pull request requires at least one approving review before merging.
+    * More reviews are always welcome.
+* A pull request must be approved at the weekly technical meeting before merging (visit https://docs.opencast.org/ for
+the time and place of the technical meeting).
+* Reviewing or merging your own pull requests is strongly discouraged, but technically allowed.
+    * It is advised to be pragmatic and only do so if necessary.
 
 
 Git Repository Branching Model
@@ -109,56 +127,7 @@ Swift overview:
 
 To get a closer look at the branching model, let us consider a simple example with a single release:
 
-
-```graphviz dot branching-simple.png
-
-/**
-    develop ---*----*----*------*------- ... -----------*-->
-                \       /      /                       /
-          r/6.x  *-----*------*-------------*---------*----- ... ---*-->
-                               \             \         \             \
-                            6.0 *         6.1 *     6.2 *         6.3 *
-**/
-
-digraph G {
-  rankdir="LR";
-  bgcolor="transparent";
-  node[width=0.1, height=0.1, shape=point,fontsize=8.0,color=black,fontcolor=black];
-  edge[weight=2, arrowhead=none,color=black];
-  node[group=develop];
-  dbegin -> d1 -> d2 -> d3 -> d4 -> d5 -> d6 -> d7 -> d8 -> d9;
-  node[group=releasebranch];
-  edge[color=transparent];
-  rbegin -> r1;
-  edge[color=black];
-  r1 -> r2 -> r3 -> r4 -> r5 -> r6;
-  d1 -> r1;
-
-
-  // releases
-  node[group=released]
-  edge[color=gray];
-  release1[shape=point, xlabel="7.0", color=gray]
-  r3 -> release1;
-  release2[shape=point, xlabel="7.1", color=gray]
-  r5 -> release2;
-
-  // end arrows
-  edge[arrowhead=normal, color=black];
-  dend,rend[shape=none, label=""];
-  d9 -> dend;
-  r6 -> rend;
-
-  // branch names
-  dbegin[shape=plaintext,label=develop];
-  rbegin[shape=plain,label="r/7.x"];
-
-  // merge backs
-  edge[style=dashed, arrowhead=none, color=black];
-  r2 -> d4;
-  r5 -> d7;
-}
-```
+![Git branching model with a single versions](git-branching-model-simple.svg)
 
 As described above, `develop` is the branch used for preparing the next version. At some point marked in the release
 schedule, the release branch is cut from `develop`. This action also marks the feature freeze for that version since
@@ -186,70 +155,8 @@ to create a new maintenance release. The version `6.1` above is an example of th
 
 With Opencast supporting two major releases, you may find not one, but up to three active release branches.
 
-```graphviz dot branching-two-versions.png
+![Git branching model with two versions](git-branching-model-two-versions.svg)
 
-/**
-    develop ---*-----*-----*------*-----*- ... -----------*------*------*---->
-                \         /      /       \               /             /
-                 \       /      /   r/7.x *---*---*-----*----- ... ---*--->
-                  \     /      /             /         /
-            r/6.x  *---*------*------*------*------*--*----- ... ---*-->
-                              \              \         \             \
-                           6.0 *          6.1 *     6.2 *         6.3 *
-**/
-
-digraph G {
-  rankdir="LR";
-  bgcolor="transparent";
-  node[width=0.1, height=0.1, shape=point,fontsize=8.0,color=black,fontcolor=black];
-  edge[weight=2, arrowhead=none,color=black];
-  node[group=develop];
-  dbegin -> d1 -> d2 -> d3 -> d4 -> d5 -> d6 -> d7 -> d8 -> d9 -> d10 -> d11;
-  node[group=releasebranch];
-  edge[color=transparent];
-  rbegin -> r1;
-  edge[color=black];
-  r1 -> r2 -> r3 -> r4 -> r5 -> r6;
-  d1 -> r1;
-
-  node[group=releasebranch2];
-  edge[color=transparent];
-  r2begin -> r21;
-  edge[color=black];
-  r21 -> r22 -> r23 -> r24 -> r25;
-  d5 -> r21;
-
-
-  // releases
-  node[group=released]
-  edge[color=gray];
-  release1[shape=point, xlabel="7.0", color=gray]
-  r3 -> release1;
-  release2[shape=point, xlabel="7.1", color=gray]
-  r5 -> release2;
-  release3[shape=point, xlabel="8.0", color=gray]
-  r24 -> release3;
-
-  // end arrows
-  edge[arrowhead=normal, color=black];
-  dend,rend,r2end[shape=none, label=""];
-  d11 -> dend;
-  r6 -> rend;
-  r25 -> r2end;
-
-  // branch names
-  dbegin[shape=plaintext,label=develop];
-  rbegin[shape=plain,label="r/7.x"];
-  r2begin[shape=plain,label="r/8.x"];
-
-  // merge backs
-  edge[style=dashed, arrowhead=none, color=black];
-  r2 -> d4;
-  r5 -> r22;
-  r23 -> d9;
-  r25 -> d11;
-}
-```
 
 Mostly, this is just the same as the simpler model from before. The branches exist separately from each other and only
 interact through merges from older to newer versions so that bug fixes from a release branch will automatically become
@@ -308,34 +215,7 @@ the next release branch is cut.
 
 Git tags are used to mark Opencast releases. Here is how a release looks like in the history:
 
-```graphviz dot branching-tags.png
-
-/**
-    r/7.x  ------------(A)---->
-                         \
-                     7.0 (B)
-**/
-
-digraph G {
-  rankdir="LR";
-  bgcolor="transparent";
-  node[shape=circle, fixedsize=true, width=0.2, fontsize=8.0, fontcolor=black, group=branch, fontname=helvetica];
-  edge[weight=2, arrowhead=none, color=black];
-  begin -> A;
-
-  // end arrows
-  end[shape=none, label=""];
-  A -> end [arrowhead=normal, color=black, minlen=3];
-
-
-  // releases
-  B[group=release, xlabel="7.0", color=gray, fontcolor=gray]
-  A -> B [color=gray];
-
-  // branch names
-  begin[shape=plaintext, label="r/7.x", fixedsize=false];
-}
-```
+![Opencast version tag in git](git-version-tag.svg)
 
 To create a version based on a given state of the release branch (commit `A`), the release manager will branch off from
 this commit, make the necessary version changes to all `pom.xml` files and create a commit which is then finally tagged.

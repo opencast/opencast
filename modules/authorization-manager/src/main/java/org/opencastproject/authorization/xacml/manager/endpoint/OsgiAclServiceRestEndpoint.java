@@ -79,25 +79,25 @@ public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndp
   }
 
   /** OSGi callback for setting persistence. */
-  @Reference(name = "acl-service-factory")
+  @Reference
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
 
   /** OSGi callback for setting security service. */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI callback. */
-  @Reference(name = "authorization-service")
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
 
   /** OSGi DI callback. */
-  @Reference(name = "asset-manager")
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }

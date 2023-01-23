@@ -91,7 +91,7 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -102,7 +102,7 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
-  @Reference(name = "userDirectoryService")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<attachment id="bdb7b046-0b08-4ffb-bf02-bc194876e47b" type="captions/dfxp" xmlns="http://mediapackage.opencastproject.org">
+  <mimetype>text/xml</mimetype>
+  <tags>
+    <tag>archive</tag>
+    <tag>engage</tag>
+  </tags>
+  <url>https://distribution.edu/engage-player/0210084b-8927-4675-8f6b-f0417ce8c5a7/bdb7b046-0b08-4ffb-bf02-bc194876e47b/captions.xml</url>
+</attachment>

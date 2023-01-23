@@ -62,13 +62,26 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 
 /** Responds to series events by re-distributing metadata and security policy files for published mediapackages. */
+@Component(
+    immediate = true,
+    service = {
+        SeriesUpdatedEventHandler.class
+    },
+    property = {
+        "service.description=Series Updated Event Handler"
+    }
+)
 public class SeriesUpdatedEventHandler {
 
   /** The logger */
@@ -107,6 +120,7 @@ public class SeriesUpdatedEventHandler {
    * @param bundleContext
    *          the OSGI bundle context
    */
+  @Activate
   protected void activate(BundleContext bundleContext) {
     this.systemAccount = bundleContext.getProperty("org.opencastproject.security.digest.user");
   }
@@ -115,6 +129,7 @@ public class SeriesUpdatedEventHandler {
    * @param serviceRegistry
    *          the serviceRegistry to set
    */
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -123,6 +138,7 @@ public class SeriesUpdatedEventHandler {
    * @param workspace
    *          the workspace to set
    */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -131,6 +147,7 @@ public class SeriesUpdatedEventHandler {
    * @param dublinCoreService
    *          the dublin core service to set
    */
+  @Reference
   public void setDublinCoreCatalogService(DublinCoreCatalogService dublinCoreService) {
     this.dublinCoreService = dublinCoreService;
   }
@@ -139,6 +156,7 @@ public class SeriesUpdatedEventHandler {
    * @param distributionService
    *          the distributionService to set
    */
+  @Reference(target = "(distribution.channel=download)")
   public void setDistributionService(DistributionService distributionService) {
     this.distributionService = distributionService;
   }
@@ -147,6 +165,7 @@ public class SeriesUpdatedEventHandler {
    * @param searchService
    *          the searchService to set
    */
+  @Reference
   public void setSearchService(SearchService searchService) {
     this.searchService = searchService;
   }
@@ -155,6 +174,7 @@ public class SeriesUpdatedEventHandler {
    * @param securityService
    *          the securityService to set
    */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -163,6 +183,7 @@ public class SeriesUpdatedEventHandler {
    * @param authorizationService
    *          the authorizationService to set
    */
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -171,6 +192,7 @@ public class SeriesUpdatedEventHandler {
    * @param organizationDirectoryService
    *          the organizationDirectoryService to set
    */
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
@@ -179,6 +201,7 @@ public class SeriesUpdatedEventHandler {
     // A series or its ACL has been updated. Find any mediapackages with that series, and update them.
     logger.debug("Handling {}", seriesItem);
     String seriesId = seriesItem.getSeriesId();
+    int jobBarrierPollingRate = 100;    // in ms
 
     // We must be an administrative user to make this query
     final User prevUser = securityService.getUser();
@@ -186,7 +209,7 @@ public class SeriesUpdatedEventHandler {
     try {
       securityService.setUser(SecurityUtil.createSystemUser(systemAccount, prevOrg));
 
-      SearchQuery q = new SearchQuery().withSeriesId(seriesId);
+      SearchQuery q = new SearchQuery().withSeriesId(seriesId).withLimit(-1);
       SearchResult result = searchService.getForAdministrativeRead(q);
 
       for (SearchResultItem item : result.getItems()) {
@@ -203,10 +226,9 @@ public class SeriesUpdatedEventHandler {
             authorizationService.removeAcl(mp, AclScope.Episode);
 
             for (MediaPackageElement distributedEpisodeAcl : distributedEpisodeAcls) {
-              Job retractJob = distributionService.retract(CHANNEL_ID, mp, distributedEpisodeAcl.getIdentifier());
-              JobBarrier barrier = new JobBarrier(null, serviceRegistry, retractJob);
-              Result jobResult = barrier.waitForJobs();
-              if (!jobResult.getStatus().get(retractJob).equals(FINISHED)) {
+              List<MediaPackageElement> mpes = distributionService.retractSync(CHANNEL_ID, mp,
+                      distributedEpisodeAcl.getIdentifier());
+              if (mpes == null) {
                 logger.error("Unable to retract episode XACML {}", distributedEpisodeAcl.getIdentifier());
               }
             }
@@ -215,12 +237,11 @@ public class SeriesUpdatedEventHandler {
           Attachment fileRepoCopy = authorizationService.setAcl(mp, AclScope.Series, seriesItem.getAcl()).getB();
 
           // Distribute the updated XACML file
-          Job distributionJob = distributionService.distribute(CHANNEL_ID, mp, fileRepoCopy.getIdentifier());
-          JobBarrier barrier = new JobBarrier(null, serviceRegistry, distributionJob);
-          Result jobResult = barrier.waitForJobs();
-          if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
+          List<MediaPackageElement> mpes = distributionService.distributeSync(CHANNEL_ID, mp,
+                  fileRepoCopy.getIdentifier());
+          if (mpes != null && mpes.size() == 1) {
             mp.remove(fileRepoCopy);
-            mp.add(getFromXml(serviceRegistry.getJob(distributionJob.getId()).getPayload()));
+            mp.add(mpes.get(0));
           } else {
             logger.error("Unable to distribute series XACML {}", fileRepoCopy.getIdentifier());
             continue;
@@ -244,12 +265,10 @@ public class SeriesUpdatedEventHandler {
             c.setChecksum(null);
 
             // Distribute the updated series dc
-            Job distributionJob = distributionService.distribute(CHANNEL_ID, mp, c.getIdentifier());
-            JobBarrier barrier = new JobBarrier(null, serviceRegistry, distributionJob);
-            Result jobResult = barrier.waitForJobs();
-            if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
+            List<MediaPackageElement> mpes = distributionService.distributeSync(CHANNEL_ID, mp, c.getIdentifier());
+            if (mpes != null && mpes.size() == 1) {
               mp.remove(c);
-              mp.add(getFromXml(serviceRegistry.getJob(distributionJob.getId()).getPayload()));
+              mp.add(mpes.get(0));
             } else {
               logger.error("Unable to distribute series catalog {}", c.getIdentifier());
               continue;
@@ -271,9 +290,7 @@ public class SeriesUpdatedEventHandler {
         }
 
         // Update the search index with the modified mediapackage
-        Job searchJob = searchService.add(mp);
-        JobBarrier barrier = new JobBarrier(null, serviceRegistry, searchJob);
-        barrier.waitForJobs();
+        searchService.addSynchronously(mp);
       }
     } catch (SearchException e) {
       logger.warn("Unable to find mediapackages for series {} in search: {}", seriesItem, e.getMessage());

@@ -40,7 +40,7 @@ import javax.ws.rs.Path;
 public class OsgiBundleInfoRestEndpoint extends BundleInfoRestEndpoint {
   private BundleInfoDb db;
 
-  @Reference(name = "bundleInfoDb")
+  @Reference
   public void setDb(BundleInfoDb db) {
     this.db = db;
   }

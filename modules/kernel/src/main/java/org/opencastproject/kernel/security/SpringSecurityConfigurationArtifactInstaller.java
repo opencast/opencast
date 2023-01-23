@@ -63,7 +63,7 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
   protected Map<String, OsgiBundleXmlApplicationContext> appContexts = null;
 
   /** OSGi DI. */
-  @Reference(name = "securityFilter")
+  @Reference
   public void setSecurityFilter(SecurityFilter securityFilter) {
     this.securityFilter = securityFilter;
   }

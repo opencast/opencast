@@ -29,6 +29,9 @@ import java.util.Date;
  * Represents a query to find search results
  */
 public class SearchQuery {
+
+  public static final int DEFAULT_LIMIT = 100;
+
   protected boolean includeEpisode = true;
   protected boolean includeSeries = false;
   protected boolean includeDeleted = false;
@@ -36,7 +39,7 @@ public class SearchQuery {
   protected String seriesId;
   protected String text;
   protected String query;
-  protected int limit = 0;
+  protected int limit = DEFAULT_LIMIT;
   protected int offset = 0;
   protected String[] tags = null;
   protected MediaPackageElementFlavor[] flavors = null;

@@ -500,7 +500,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
   /**
    * Setter for workspace via declarative activation
    */
-  @Reference(name = "workspace")
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -508,7 +508,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
   /**
    * Setter for remote service manager via declarative activation
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -519,7 +519,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -530,7 +530,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
-  @Reference(name = "user-directory")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -541,7 +541,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
    * @param organizationDirectory
    *          the organization directory
    */
-  @Reference(name = "orgDirectory")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }

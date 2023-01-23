@@ -105,7 +105,7 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param publicationService
    *          the publication service
    */
-  @Reference(name = "PublicationService")
+  @Reference
   public void setPublicationService(OaiPmhPublicationService publicationService) {
     this.publicationService = publicationService;
   }
@@ -116,15 +116,12 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param streamingDistributionService
    *          the streaming distribution service
    */
-  @Reference(
-      name = "StreamingDistributionService",
-      target = "(distribution.channel=streaming)"
-  )
+  @Reference(target = "(distribution.channel=streaming)")
   protected void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
     this.streamingDistributionService = streamingDistributionService;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

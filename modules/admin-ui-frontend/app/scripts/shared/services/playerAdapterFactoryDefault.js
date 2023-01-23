@@ -39,6 +39,7 @@ angular.module('adminNg.services')
                 .map(PlayerAdapter.EVENTS.PAUSE, 'pause')
                 .map(PlayerAdapter.EVENTS.PLAY, 'play')
                 .map(PlayerAdapter.EVENTS.READY, 'ready')
+                .map(PlayerAdapter.EVENTS.SEEKED, 'seeked')
                 .map(PlayerAdapter.EVENTS.TIMEUPDATE, 'timeupdate')
                 .map(PlayerAdapter.EVENTS.DURATION_CHANGE, 'durationchange')
                 .map(PlayerAdapter.EVENTS.CAN_PLAY, 'canplay')
@@ -118,6 +119,12 @@ angular.module('adminNg.services')
           me.state.status = PlayerAdapter.STATUS.SEEKING;
         });
 
+        targetElement.addEventListener('seeked', function () {
+          if (me.state.status == PlayerAdapter.STATUS.SEEKING) {
+            me.state.status = me.state.oldStatus;
+          }
+        });
+
         targetElement.addEventListener('error', function () {
           me.state.status = PlayerAdapter.STATUS.ERROR_NETWORK;
         });
@@ -134,8 +141,8 @@ angular.module('adminNg.services')
              * @param type
              * @param listener
              */
-      this.addListener = function (type, listener) {
-        targetElement.addEventListener(eventMapping.resolveNativeName(type), listener);
+      this.addListener = function (type, listener, configuration) {
+        targetElement.addEventListener(eventMapping.resolveNativeName(type), listener, configuration);
       };
 
       /**

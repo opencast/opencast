@@ -37,6 +37,7 @@ import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
@@ -91,6 +92,38 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
         Job job = JobParser.parseJob(response.getEntity().getContent());
         logger.info("Publishing mediapackage '{}' using a remote search service", mediaPackage.getIdentifier());
         return job;
+      }
+    } catch (Exception e) {
+      throw new SearchException("Unable to publish " + mediaPackage.getIdentifier() + " using a remote search service",
+              e);
+    } finally {
+      closeConnection(response);
+    }
+
+    throw new SearchException("Unable to publish " + mediaPackage.getIdentifier() + " using a remote search service");
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.search.api.SearchService#add(org.opencastproject.mediapackage.MediaPackage)
+   */
+  @Override
+  public void addSynchronously(MediaPackage mediaPackage) throws SearchException {
+    HttpPost post = new HttpPost("/addSynchronously");
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("mediapackage", MediaPackageParser.getAsXml(mediaPackage)));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+    } catch (Exception e) {
+      throw new SearchException("Unable to assemble a remote search request for mediapackage " + mediaPackage, e);
+    }
+
+    HttpResponse response = getResponse(post);
+    try {
+      if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+        logger.info("Publishing mediapackage '{}' using a remote search service", mediaPackage.getIdentifier());
+        return;
       }
     } catch (Exception e) {
       throw new SearchException("Unable to publish " + mediaPackage.getIdentifier() + " using a remote search service",
@@ -278,13 +311,13 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
     return url.toString();
   }
 
-  @Reference(name = "trustedHttpClient")
+  @Reference
   @Override
   public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
     super.setTrustedHttpClient(trustedHttpClient);
   }
 
-  @Reference(name = "remoteServiceManager")
+  @Reference
   @Override
   public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
     super.setRemoteServiceManager(serviceRegistry);

@@ -38,10 +38,6 @@ public final class SeriesItem implements MessageItem, Serializable {
 
   private static final long serialVersionUID = 3275142857854793612L;
 
-  public static final String SERIES_QUEUE_PREFIX = "SERIES.";
-
-  public static final String SERIES_QUEUE = SERIES_QUEUE_PREFIX + "QUEUE";
-
   private final Type type;
   private final String seriesId;
   private final String series;

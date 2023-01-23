@@ -1,5 +1,7 @@
-Encode Workflow Operation Handler
+Encode Workflow Operation
 =================================
+
+ID: `encode`
 
 > Parallel FFmpeg encoding
 
@@ -43,10 +45,9 @@ Operation Example
 
 ```xml
 <operation
-  id="encode"
-  exception-handler-workflow="partial-error"
-  description="encoding media files">
-    <configurations>
+    id="encode"
+    description="encoding media files">
+  <configurations>
     <configuration key="source-flavor">*/trimmed</configuration>
     <configuration key="target-flavor">*/delivery</configuration>
     <configuration key="target-tags">engage-download,engage-streaming</configuration>

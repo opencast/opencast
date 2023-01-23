@@ -22,9 +22,12 @@
 
 // Controller for all event screens.
 angular.module('adminNg.controllers')
-.controller('ToolsCtrl', ['$scope', '$route', '$location', 'Storage', '$window', 'ToolsResource', 'Notifications',
-  'EventHelperService',
-  function ($scope, $route, $location, Storage, $window, ToolsResource, Notifications, EventHelperService) {
+.controller('ToolsCtrl', ['$scope', '$route', '$location', 'Storage', '$window',
+  'ToolsResource', 'Notifications', 'EventHelperService', 'MetadataSaveService',
+  'PlayerAdapter', '$q',
+  function ($scope, $route, $location, Storage, $window, ToolsResource,
+    Notifications, EventHelperService, MetadataSaveService, PlayerAdapter, $q) {
+
     var thumbnailErrorMessageId = null;
     var trackErrorMessageId = null;
 
@@ -65,11 +68,54 @@ angular.module('adminNg.controllers')
       return undefined;
     };
 
-    $scope.changeThumbnail = function (file, track, position) {
+    $scope.changeThumbnailPreviewJump = function(track, position) {
+      $scope.player.adapter.addListener(PlayerAdapter.EVENTS.SEEKED, function() {
+        $scope.changeThumbnailPreview(track);
+      }, { once: true });
+      $scope.player.adapter.setCurrentTime(position);
+    };
+
+    $scope.changeThumbnailPreview = function (track) {
+      var position = $scope.player.adapter.getCurrentTime();
+
+      // generate preview image
+      var canvas = document.createElement('canvas');
+      var video = document.getElementById('player');
+      var vidWidth = video.videoWidth;
+      var vidHeight = video.videoHeight;
+      if (vidWidth > vidHeight) {
+        canvas.width = 640;
+        canvas.height = 640 * vidHeight / vidWidth;
+      } else {
+        canvas.height = 480;
+        canvas.width = 480 * vidWidth / vidHeight;
+      }
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      ctx.font = '80px Noto Sans';
+      ctx.fillStyle = 'gray';
+      ctx.textAlign = 'center';
+      ctx.fillText('@' + position.toFixed(2) , canvas.width / 2, canvas.height / 2);
+
+      var preview_data = canvas.toDataURL();
+      var preview_bin = atob(preview_data.split(',')[1]);
+      var preview_type = preview_data.split(':')[1].split(';')[0];
+      var preview_ab = new ArrayBuffer(preview_bin.length);
+      var preview_ia = new Uint8Array(preview_ab);
+      for (var i = 0; i < preview_bin.length; i++) {
+        preview_ia[i] = preview_bin.charCodeAt(i);
+      }
+      var preview_blob = new Blob([preview_ab], {type: preview_type});
+
+      $scope.changeThumbnail(undefined, track, position, preview_blob);
+    };
+
+    $scope.changeThumbnail = function (file, track, position, previewfile) {
       $scope.video.thumbnail.loading = true;
       ToolsResource.thumbnail(
         { id: $scope.id, tool: 'thumbnail' },
-        { file: file, track: $scope.getTrackFlavorType(track), position: position },
+        { file: file, track: $scope.getTrackFlavorType(track), position: position, previewfile: previewfile },
         function(response) {
           $scope.video.thumbnail = response.thumbnail;
           $scope.video.thumbnail.defaultThumbnailPositionChanged = false;
@@ -169,39 +215,49 @@ angular.module('adminNg.controllers')
 
     $scope.activeSubmission = false;
 
-    $scope.submit = function () {
+    $scope.submit = function (catalogs, commonMetadataCatalog) {
       $scope.activeSubmission = true;
       $scope.video.thumbnail.loading = $scope.video.thumbnail && $scope.video.thumbnail.type &&
               ($scope.video.thumbnail.type === 'DEFAULT');
       // Remember $scope.video.workflow as $scope.video.$save will potentially overwrite this value
       var closeVideoEditor = $scope.video.workflow;
-      $scope.video.$save({ id: $scope.id, tool: $scope.tab }, function (response) {
-        $scope.activeSubmission = false;
-        if (closeVideoEditor) {
-          Notifications.add('success', 'VIDEO_CUT_PROCESSING');
-          Storage.put('pagination', $scope.resource, 'resume', true);
-          $location.url('/events/' + $scope.resource);
-        } else {
-          Notifications.add('success', 'VIDEO_CUT_SAVED');
-        }
-        $scope.unsavedChanges = false;
-        if (response.segments) {
-          $scope.$root.originalSegments = angular.copy(response.segments);
-        }
-        $scope.video.thumbnail.defaultThumbnailPositionChanged = false;
-        if (response.thumbnail && response.thumbnail.type === 'DEFAULT') {
-          $scope.$root.originalDefaultThumbnailPosition = response.thumbnail.position;
-        }
-        $scope.video.thumbnail.loading = false;
-        if (trackErrorMessageId !== null) {
-          Notifications.remove(trackErrorMessageId);
-          trackErrorMessageId = null;
-        }
-      }, function () {
-        $scope.activeSubmission = false;
-        $scope.video.thumbnail.loading = false;
-        trackErrorMessageId = Notifications.add('error', 'VIDEO_CUT_NOT_SAVED');
-      });
+      var metadataSavePromises = MetadataSaveService.save(
+        catalogs,
+        commonMetadataCatalog,
+        $scope.id);
+
+      var saveEditorState = function() {
+        $scope.video.$save({ id: $scope.id, tool: $scope.tab }, function (response) {
+          $scope.activeSubmission = false;
+          if (closeVideoEditor) {
+            Notifications.add('success', 'VIDEO_CUT_PROCESSING');
+            Storage.put('pagination', $scope.resource, 'resume', true);
+            $location.url('/events/' + $scope.resource);
+          } else {
+            Notifications.add('success', 'VIDEO_CUT_SAVED');
+          }
+          $scope.unsavedChanges = false;
+          if (response.segments) {
+            $scope.$root.originalSegments = angular.copy(response.segments);
+          }
+          $scope.video.thumbnail.defaultThumbnailPositionChanged = false;
+          if (response.thumbnail && response.thumbnail.type === 'DEFAULT') {
+            $scope.$root.originalDefaultThumbnailPosition = response.thumbnail.position;
+          }
+          $scope.video.thumbnail.loading = false;
+          if (trackErrorMessageId !== null) {
+            Notifications.remove(trackErrorMessageId);
+            trackErrorMessageId = null;
+          }
+        }, function () {
+          $scope.activeSubmission = false;
+          $scope.video.thumbnail.loading = false;
+          trackErrorMessageId = Notifications.add('error', 'VIDEO_CUT_NOT_SAVED');
+        });
+      };
+
+      // Save the editor state, no matter what happened to the metadata save op
+      $q.all(metadataSavePromises).then(saveEditorState, saveEditorState);
     };
 
     $scope.leave = function () {

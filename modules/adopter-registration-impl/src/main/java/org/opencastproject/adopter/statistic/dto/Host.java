@@ -23,6 +23,8 @@ package org.opencastproject.adopter.statistic.dto;
 
 import org.opencastproject.serviceregistry.api.HostRegistration;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * DTO that contains information about a host machine of an adopter. It's a simplified version
  * of the HostRegistration class {@link org.opencastproject.serviceregistry.api.HostRegistration}.
@@ -33,16 +35,26 @@ public class Host {
   private int cores;
 
   /** The maximum load this host can run. */
+  @SerializedName("max_load")
   private float maxLoad;
 
   /** The allocated memory of this host. */
   private long memory;
 
+  /** The hostname of this node. */
+  private String hostname;
+
+  @SerializedName("disk_space")
+  private long diskspace;
+
+  private String services;
 
   public Host(HostRegistration host) {
     this.cores = host.getCores();
     this.maxLoad = host.getMaxLoad();
     this.memory = host.getMemory();
+    this.hostname = host.getBaseUrl();
+    //FIXME: Need disk space
   }
 
 
@@ -72,6 +84,22 @@ public class Host {
 
   public void setMemory(long memory) {
     this.memory = memory;
+  }
+
+  public String getHostname() {
+    return hostname;
+  }
+
+  public void setHostname(String hostname) {
+    this.hostname = hostname;
+  }
+
+  public String getServices() {
+    return this.services;
+  }
+
+  public void setServices(String services) {
+    this.services = services;
   }
 
 }

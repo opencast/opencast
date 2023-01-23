@@ -114,7 +114,7 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
   private OrgCache cache;
 
   /** OSGi DI */
-  @Reference(name = "persistence")
+  @Reference
   public void setOrgPersistence(OrganizationDatabase setOrgPersistence) {
     this.persistence = setOrgPersistence;
     this.cache = new OrgCache(60000, persistence);
@@ -124,7 +124,7 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
    * @param configAdmin
    *          the configAdmin to set
    */
-  @Reference(name = "configAdmin")
+  @Reference
   public void setConfigurationAdmin(ConfigurationAdmin configAdmin) {
     this.configAdmin = configAdmin;
   }

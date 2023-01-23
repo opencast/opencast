@@ -25,12 +25,11 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
@@ -137,13 +136,13 @@ public class CloneWorkflowOperationHandlerTest {
 
     Assert.assertEquals(Action.CONTINUE, result.getAction());
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("targettype/source");
-    Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 2);
+    Assert.assertEquals(2, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
   }
 
   @Test
   public void testWildcardTargetFlavorTypeAndSubtype() throws Exception {
     // operation configuration
-    Map<String, String> configurations = new HashMap<String, String>();
+    Map<String, String> configurations = new HashMap<>();
     configurations.put(CloneWorkflowOperationHandler.OPT_SOURCE_FLAVOR, "*/source");
     configurations.put(CloneWorkflowOperationHandler.OPT_TARGET_FLAVOR, "*/*");
 
@@ -152,11 +151,11 @@ public class CloneWorkflowOperationHandlerTest {
 
     Assert.assertEquals(Action.CONTINUE, result.getAction());
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("presentation/source");
-    Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 2);
+    Assert.assertEquals(2, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
 
 
     newFlavor = MediaPackageElementFlavor.parseFlavor("presenter/source");
-    Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 2);
+    Assert.assertEquals(2, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
   }
 
   @Test
@@ -171,7 +170,7 @@ public class CloneWorkflowOperationHandlerTest {
 
     Assert.assertEquals(Action.CONTINUE, result.getAction());
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("*/target");
-    Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 1);
+    Assert.assertEquals(1, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
   }
 
   @Test
@@ -185,18 +184,18 @@ public class CloneWorkflowOperationHandlerTest {
 
     Assert.assertEquals(Action.SKIP, result.getAction());
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("*/target");
-    Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 0);
+    Assert.assertEquals(0, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
   }
 
 
   private WorkflowOperationResult getWorkflowOperationResult(MediaPackage mp, Map<String, String> configurations)
           throws WorkflowOperationException {
     // Add the mediapackage to a workflow instance
-    WorkflowInstanceImpl workflowInstance = new WorkflowInstanceImpl();
+    WorkflowInstance workflowInstance = new WorkflowInstance();
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowState.RUNNING);
     workflowInstance.setMediaPackage(mp);
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("op", OperationState.RUNNING);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("op", OperationState.RUNNING);
     operation.setTemplate("clone");
     operation.setState(OperationState.RUNNING);
     for (String key : configurations.keySet()) {

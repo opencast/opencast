@@ -2,9 +2,6 @@ site_name: Administration Guide
 repo_url: https://github.com/opencast/opencast
 edit_uri: edit/develop/docs/guides/admin/docs/
 
-markdown_extensions:
-  - markdown_inline_graphviz
-
 plugins:
   - search:
   - macros:
@@ -28,6 +25,8 @@ extra_css:
 # The javascript files in this list will extend the existing javascript from the default theme
 extra_javascript:
    - javascript/extra.js
+   - javascript/popper.js
+   - javascript/tippy.js
 
 # The logo in the header
 extra:
@@ -40,6 +39,7 @@ nav:
 - Release Notes: 'releasenotes.md'
 - Upgrade: 'upgrade.md'
 - Changelog: 'changelog.md'
+- Prerelease Testing: 'prereleases.md'
 - Installation:
    - Overview: 'installation/index.md'
    - Hardware Requirements: installation/server-requirements.md
@@ -51,7 +51,7 @@ nav:
       - Debian/Ubuntu: 'installation/debs.md'
       - Fedora: 'installation/rpm-fedora.md'
       - RHEL/CentOS 7: 'installation/rpm-el7.md'
-      - RHEL/CentOS 8: 'installation/rpm-el8.md'
+      - RHEL/CentOS Stream 8/9: 'installation/rpm-el.md'
    - Installation via script:
       - Ansible: 'installation/ansible.md'
    - Installation with Docker:
@@ -69,8 +69,8 @@ nav:
       - Self-Signed Certificates: 'configuration/https/self-signed-certificates.md'
    - Firewall: 'configuration/firewall.md'
    - Asset Manager: 'configuration/asset-manager.md'
-   - Message Broker: 'configuration/message-broker.md'
    - Elasticsearch: 'configuration/elasticsearch.md'
+   - Opensearch: 'configuration/opensearch.md'
    - Metadata: 'configuration/metadata.md'
    - Encoding: 'configuration/encoding.md'
    - Inbox: 'configuration/inbox.md'
@@ -108,6 +108,7 @@ nav:
 - Version Support: 'version-support.md'
 - Modules:
    - Overview: 'modules/index.md'
+   - Plugin Management: modules/plugin-management.md
    - Atom/RSS Feed: 'modules/atomrss.md'
    - Amazon Services:
       - Amazon S3 Archive Storage: 'modules/awss3archive.md'
@@ -119,8 +120,6 @@ nav:
    - Metrics (OpenMetrics, Prometheus): modules/metrics.md
    - Player:
       - Configuration: 'modules/player.configuration.md'
-      - URL Parameters: 'modules/player.url.parameter.md'
-      - Matomo Tracking: 'modules/player.matomo.tracking.md'
    - Paella player:
       - Configuration: 'modules/paella.player/configuration.md'
       - URL Parameters: 'modules/paella.player/url.parameter.md'
@@ -134,6 +133,8 @@ nav:
         - es.upv.paella.opencast.searchPlugin: 'modules/paella.player/plugins/es.upv.paella.opencast.searchPlugin.md'
         - es.upv.paella.opencast.transcriptionTabBarPlugin: 'modules/paella.player/plugins/es.upv.paella.opencast.transcriptionTabBarPlugin.md'
         - es.upv.paella.opencast.userTrackingSaverPlugIn: 'modules/paella.player/plugins/es.upv.paella.opencast.userTrackingSaverPlugIn.md'
+   - Paella player 7:
+      - Configuration: 'modules/paella.player7/configuration.md'
    - Search Index:
       - Overview: 'modules/searchindex/index.md'
       - Solr: 'modules/searchindex/solr.md'
@@ -146,9 +147,13 @@ nav:
       - AWS AutoScaling: 'modules/terminationstate.aws.autoscaling.md'
    - Text Extraction: 'modules/textextraction.md'
    - Timeline Previews: 'modules/timelinepreviews.md'
-   - Transcripts (AmberScript): 'modules/amberscripttranscripts.md'
-   - Transcripts (Google Speech): 'modules/googlespeechtranscripts.md'
-   - Transcripts (IBM Watson): 'modules/watsontranscripts.md'
+   - Transcription modules:
+      - AmberScript: 'modules/transcription.modules/amberscripttranscripts.md'
+      - Google Speech: 'modules/transcription.modules/googlespeechtranscripts.md'
+      - IBM Watson: 'modules/transcription.modules/watsontranscripts.md'
+      - Microsoft Azure: 'modules/transcription.modules/microsoftazuretranscripts.md'
+      - Vosk: 'modules/transcription.modules/vosk.md'
+      - Whisper: 'modules/transcription.modules/whisper.md'
    - Video Editor:
       - Setup: 'modules/videoeditor.setup.md'
       - Architecture: 'modules/videoeditor.architecture.md'
@@ -166,6 +171,7 @@ nav:
    - Animate: 'workflowoperationhandlers/animate-woh.md'
    - AmberScript Start Transcription: 'workflowoperationhandlers/amberscript-start-transcription-woh.md'
    - AmberScript Attach Transcription: 'workflowoperationhandlers/amberscript-attach-transcription-woh.md'
+   - Assert: 'workflowoperationhandlers/assert-woh.md'
    - Asset Snapshot: 'workflowoperationhandlers/snapshot-woh.md'
    - Asset Delete: 'workflowoperationhandlers/asset-delete-woh.md'
    - Attach Watson Transcription: 'workflowoperationhandlers/attach-watson-transcription-woh.md'
@@ -190,7 +196,6 @@ nav:
    - Execute Many: 'workflowoperationhandlers/execute-many-woh.md'
    - Export Workflow Properties: 'workflowoperationhandlers/export-wf-properties-woh.md'
    - Extract Text: 'workflowoperationhandlers/extracttext-woh.md'
-   - Failing: 'workflowoperationhandlers/failing-woh.md'
    - Google Speech Attach Transcription: 'workflowoperationhandlers/google-speech-attach-transcription-woh.md'
    - Google Speech Start Transcription: 'workflowoperationhandlers/google-speech-start-transcription-woh.md'
    - HTTP Notify: 'workflowoperationhandlers/httpnotify-woh.md'
@@ -206,6 +211,8 @@ nav:
    - Mattermost Notification Module: 'workflowoperationhandlers/notification.md'
    - Metadata to ACL: 'workflowoperationhandlers/metadata-to-acl.md'
    - Move Storage: 'workflowoperationhandlers/move-storage-woh.md'
+   - Microsoft Azure Attach Transcription: 'workflowoperationhandlers/microsoft-azure-attach-transcription-woh.md'
+   - Microsoft Azure Start Transcription: 'workflowoperationhandlers/microsoft-azure-start-transcription-woh.md'
    - Multiencode: 'workflowoperationhandlers/multiencode-woh.md'
    - Normalize Audio: 'workflowoperationhandlers/normalizeaudio-woh.md'
    - Partial Import: 'workflowoperationhandlers/partial-import-woh.md'
@@ -213,6 +220,7 @@ nav:
    - Prepare A/V: 'workflowoperationhandlers/prepareav-woh.md'
    - Probe Resolution: 'workflowoperationhandlers/probe-resolution-woh.md'
    - Process Smil: 'workflowoperationhandlers/process-smil-woh.md'
+   - Publication to Workspace: 'workflowoperationhandlers/publication-to-workspace-woh.md'
    - Publish Configure AWS: 'workflowoperationhandlers/publish-configure-aws-woh.md'
    - Publish Configure: 'workflowoperationhandlers/publish-configure-woh.md'
    - Publish Engage AWS: 'workflowoperationhandlers/publish-engage-aws-woh.md'
@@ -232,7 +240,7 @@ nav:
    - Sanitize Adaptive: 'workflowoperationhandlers/sanitize-adaptive-woh.md'
    - Segment Previews: 'workflowoperationhandlers/segmentpreviews-woh.md'
    - Segment Video: 'workflowoperationhandlers/segmentvideo-woh.md'
-   - Select Streams: 'workflowoperationhandlers/select-streams-woh.md'
+   - Select Tracks: 'workflowoperationhandlers/select-streams-woh.md'
    - Select Version: 'workflowoperationhandlers/select-version-woh.md'
    - Send Email: 'workflowoperationhandlers/send-email-woh.md'
    - Series: 'workflowoperationhandlers/series-woh.md'
@@ -243,9 +251,11 @@ nav:
    - Statistics Writer: 'workflowoperationhandlers/statistics-writer.md'
    - Tag: 'workflowoperationhandlers/tag-woh.md'
    - Tag-By-DCTerm: 'workflowoperationhandlers/tag-by-dcterm-woh.md'
+   - Tag-Engage: 'workflowoperationhandlers/tag-engage-woh.md'
    - Timelinepreviews: 'workflowoperationhandlers/timelinepreviews-woh.md'
    - Transfer Metadata: 'workflowoperationhandlers/transfer-metadata-woh.md'
    - Theme: 'workflowoperationhandlers/theme-woh.md'
    - Video Grid: 'workflowoperationhandlers/video-grid-woh.md'
    - Waveform: 'workflowoperationhandlers/waveform-woh.md'
+   - WebVTT to CutMarks Operation: 'workflowoperationhandlers/webvtt-to-cutmarks.md'
    - Zip: 'workflowoperationhandlers/zip-woh.md'

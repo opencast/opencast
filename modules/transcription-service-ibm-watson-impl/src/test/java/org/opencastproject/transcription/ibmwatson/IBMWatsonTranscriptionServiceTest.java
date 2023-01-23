@@ -20,6 +20,9 @@
  */
 package org.opencastproject.transcription.ibmwatson;
 
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
+
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
@@ -54,13 +57,11 @@ import org.opencastproject.transcription.persistence.TranscriptionDatabaseImpl;
 import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -194,8 +195,8 @@ public class IBMWatsonTranscriptionServiceTest {
         return new TranscriptionProviderControl(PROVIDER_ID, PROVIDER);
       }
     };
-    database.setEntityManagerFactory(
-            PersistenceUtil.newTestEntityManagerFactory("org.opencastproject.transcription.persistence"));
+    database.setEntityManagerFactory(newEntityManagerFactory("org.opencastproject.transcription.persistence"));
+    database.setDBSessionFactory(getDbSessionFactory());
     database.activate(null);
 
     httpClient = EasyMock.createNiceMock(CloseableHttpClient.class);
@@ -638,7 +639,7 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.expect(wfService.getWorkflowDefinitionById(wfDefId)).andReturn(wfDef);
     List<WorkflowInstance> wfList = new ArrayList<WorkflowInstance>();
     if (wfStarted) {
-      wfList.add(new WorkflowInstanceImpl());
+      wfList.add(new WorkflowInstance());
     }
     Stream<WorkflowInstance> wfListStream = Stream.mk(wfList);
     Workflows wfs = EasyMock.createNiceMock(Workflows.class);

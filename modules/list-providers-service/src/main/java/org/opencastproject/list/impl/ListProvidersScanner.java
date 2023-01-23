@@ -74,7 +74,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
   /** The list providers service to add the list provider to. **/
   private ListProvidersService listProvidersService;
 
-  @Reference(name = "listProvidersService")
+  @Reference
   public void setListProvidersService(ListProvidersService listProvidersService) {
     this.listProvidersService = listProvidersService;
   }

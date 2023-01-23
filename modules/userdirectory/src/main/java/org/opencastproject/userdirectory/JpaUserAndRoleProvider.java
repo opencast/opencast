@@ -21,6 +21,10 @@
 
 package org.opencastproject.userdirectory;
 
+import static org.opencastproject.db.Queries.namedQuery;
+
+import org.opencastproject.db.DBSession;
+import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.kernel.security.CustomPasswordEncoder;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.Role;
@@ -34,14 +38,13 @@ import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.userdirectory.utils.UserDirectoryUtils;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Monadics;
-import org.opencastproject.util.data.Option;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -51,16 +54,16 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.TypedQuery;
 
 /**
  * Manages and locates users using JPA.
@@ -109,17 +112,29 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   /** Password encoder for storing user passwords */
   private CustomPasswordEncoder passwordEncoder = new CustomPasswordEncoder();
 
+  /** The factory used to generate the entity manager */
+  protected EntityManagerFactory emf = null;
+
+  protected DBSessionFactory dbSessionFactory;
+
+  protected DBSession db;
+
   /** OSGi DI */
-  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.common)")
+  @Reference(target = "(osgi.unit.name=org.opencastproject.common)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
+  }
+
+  @Reference
+  public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
+    this.dbSessionFactory = dbSessionFactory;
   }
 
   /**
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -128,13 +143,10 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    * @param groupRoleProvider
    *          the groupRoleProvider to set
    */
-  @Reference(name = "groupRoleProvider")
+  @Reference
   void setGroupRoleProvider(JpaGroupRoleProvider groupRoleProvider) {
     this.groupRoleProvider = groupRoleProvider;
   }
-
-  /** The factory used to generate the entity manager */
-  protected EntityManagerFactory emf = null;
 
   /**
    * Callback for activation of this component.
@@ -147,7 +159,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     logger.debug("activate");
 
     // Setup the caches
-    cache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<String, Object>() {
+    cache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<>() {
       @Override
       public Object load(String id) {
         String[] key = id.split(DELIMITER);
@@ -156,6 +168,8 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
         return user == null ? nullToken : user;
       }
     });
+
+    db = dbSessionFactory.createSession(emf);
   }
 
   /**
@@ -165,7 +179,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    */
   @Override
   public List<Role> getRolesForUser(String userName) {
-    ArrayList<Role> roles = new ArrayList<Role>();
+    ArrayList<Role> roles = new ArrayList<>();
     User user = loadUser(userName);
     if (user == null) {
       return roles;
@@ -185,15 +199,19 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
       throw new IllegalArgumentException("Query must be set");
     }
     String orgId = securityService.getOrganization().getId();
-    List<JpaUser> users = UserDirectoryPersistenceUtil.findUsersByQuery(orgId, query, limit, offset, emf);
-    return Monadics.mlist(users).map(addProviderName).iterator();
+    return db.exec(UserDirectoryPersistenceUtil.findUsersByQuery(orgId, query, limit, offset)).stream()
+        .map(JpaUserAndRoleProvider::addProviderName)
+        .collect(Collectors.toList())
+        .iterator();
   }
 
   @Override
   public Iterator<User> findUsers(Collection<String> userNames) {
     String orgId = securityService.getOrganization().getId();
-    List<JpaUser> users = UserDirectoryPersistenceUtil.findUsersByUserName(userNames, orgId, emf);
-    return Monadics.mlist(users).map(addProviderName).iterator();
+    return db.exec(UserDirectoryPersistenceUtil.findUsersByUserNameQuery(userNames, orgId)).stream()
+        .map(JpaUserAndRoleProvider::addProviderName)
+        .collect(Collectors.toList())
+        .iterator();
   }
 
   /**
@@ -201,17 +219,11 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    */
   public List<User> findInsecurePasswordHashes() {
     final String orgId = securityService.getOrganization().getId();
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      TypedQuery<User> q = em.createNamedQuery("User.findInsecureHash", User.class);
-      q.setParameter("org", orgId);
-      return q.getResultList();
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    return db.exec(namedQuery.findAll(
+        "User.findInsecureHash",
+        User.class,
+        Pair.of("org", orgId)
+    ));
   }
 
   /**
@@ -226,7 +238,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     }
 
     // This provider persists roles but is not authoritative for any roles, so return an empty set
-    return new ArrayList<Role>().iterator();
+    return Collections.emptyIterator();
   }
 
   /**
@@ -248,8 +260,10 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   @Override
   public Iterator<User> getUsers() {
     String orgId = securityService.getOrganization().getId();
-    List<JpaUser> users = UserDirectoryPersistenceUtil.findUsers(orgId, 0, 0, emf);
-    return Monadics.mlist(users).map(addProviderName).iterator();
+    return db.exec(UserDirectoryPersistenceUtil.findUsersQuery(orgId, 0, 0)).stream()
+        .map(JpaUserAndRoleProvider::addProviderName)
+        .collect(Collectors.toList())
+        .iterator();
   }
 
   /**
@@ -282,8 +296,9 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    * @return the loaded user or <code>null</code> if not found
    */
   public User loadUser(String userName, String organization) {
-    JpaUser user = UserDirectoryPersistenceUtil.findUser(userName, organization, emf);
-    return Option.option(user).map(addProviderName).getOrElseNull();
+    return db.exec(UserDirectoryPersistenceUtil.findUserQuery(userName, organization))
+        .map(JpaUserAndRoleProvider::addProviderName)
+        .orElse(null);
   }
 
   /**
@@ -296,8 +311,9 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    * @return the loaded user or <code>null</code> if not found
    */
   public User loadUser(long userId, String organization) {
-    JpaUser user = UserDirectoryPersistenceUtil.findUser(userId, organization, emf);
-    return Option.option(user).map(addProviderName).getOrElseNull();
+    return db.exec(UserDirectoryPersistenceUtil.findUserQuery(userId, organization))
+        .map(JpaUserAndRoleProvider::addProviderName)
+        .orElse(null);
   }
 
   /**
@@ -330,37 +346,24 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     }
 
     // Create a JPA user with an encoded password.
-    String encodedPassword = passwordEncoded ? user.getPassword() : passwordEncoder.encodePassword(user.getPassword());
+    String encodedPassword = passwordEncoded
+        ? user.getPassword()
+        : passwordEncoder.encodePassword(user.getPassword());
 
-    // Only save internal roles
-    Set<JpaRole> roles = UserDirectoryPersistenceUtil.saveRoles(filterRoles(user.getRoles()), emf);
-    JpaOrganization organization = UserDirectoryPersistenceUtil.saveOrganization(
-            (JpaOrganization) user.getOrganization(), emf);
+    db.execTx(em -> {
+      // Only save internal roles
+      Set<JpaRole> roles = UserDirectoryPersistenceUtil.saveRolesQuery(filterRoles(user.getRoles())).apply(em);
+      JpaOrganization organization = UserDirectoryPersistenceUtil.saveOrganizationQuery(
+          (JpaOrganization) user.getOrganization()).apply(em);
 
-    JpaUser newUser = new JpaUser(user.getUsername(), encodedPassword, organization, user.getName(), user.getEmail(),
-            user.getProvider(), user.isManageable(), roles);
+      JpaUser newUser = new JpaUser(user.getUsername(), encodedPassword, organization, user.getName(), user.getEmail(),
+          user.getProvider(), user.isManageable(), roles);
 
-    // Then save the user
-    EntityManager em = null;
-    EntityTransaction tx = null;
-    try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
+      // Then save the user
       em.persist(newUser);
-      tx.commit();
       cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), newUser);
-    } finally {
-      if (tx.isActive()) {
-        tx.rollback();
-      }
-      if (em != null) {
-        em.close();
-      }
-    }
-
+    });
     updateGroupMembership(user);
-
   }
 
   /**
@@ -392,43 +395,52 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
       throw new UnauthorizedException("The user is not allowed to set the admin role on other users");
     }
 
-    JpaUser updateUser = UserDirectoryPersistenceUtil.findUser(user.getUsername(), user.getOrganization().getId(), emf);
-    if (updateUser == null) {
-      throw new NotFoundException("User " + user.getUsername() + " not found.");
-    }
+    try {
+      return db.execTxChecked(em -> {
+        Optional<JpaUser> updateUser = UserDirectoryPersistenceUtil.findUserQuery(user.getUsername(),
+            user.getOrganization().getId()).apply(em);
+        if (updateUser.isEmpty()) {
+          throw new NotFoundException("User " + user.getUsername() + " not found.");
+        }
 
-    logger.debug("updateUser({})", user.getUsername());
+        logger.debug("updateUser({})", user.getUsername());
 
-    if (!UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, updateUser.getRoles())) {
-      throw new UnauthorizedException("The user is not allowed to update an admin user");
-    }
+        if (!UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, updateUser.get().getRoles())) {
+          throw new UnauthorizedException("The user is not allowed to update an admin user");
+        }
 
-    String encodedPassword;
-    //only update Password if a value is set
-    if (StringUtils.isEmpty(user.getPassword())) {
-      encodedPassword = updateUser.getPassword();
-    } else  {
-      // Update an JPA user with an encoded password.
-      if (passwordEncoded) {
-        encodedPassword = user.getPassword();
-      } else {
-        encodedPassword = passwordEncoder.encodePassword(user.getPassword());
-      }
-    }
+        String encodedPassword;
+        //only update Password if a value is set
+        if (StringUtils.isEmpty(user.getPassword())) {
+          encodedPassword = updateUser.get().getPassword();
+        } else  {
+          // Update an JPA user with an encoded password.
+          if (passwordEncoded) {
+            encodedPassword = user.getPassword();
+          } else {
+            encodedPassword = passwordEncoder.encodePassword(user.getPassword());
+          }
+        }
 
-    // Only save internal roles
-    Set<JpaRole> roles = UserDirectoryPersistenceUtil.saveRoles(filterRoles(user.getRoles()), emf);
-    JpaOrganization organization = UserDirectoryPersistenceUtil.saveOrganization(
-            (JpaOrganization) user.getOrganization(), emf);
+        // Only save internal roles
+        Set<JpaRole> roles = UserDirectoryPersistenceUtil.saveRolesQuery(filterRoles(user.getRoles())).apply(em);
+        JpaOrganization organization = UserDirectoryPersistenceUtil.saveOrganizationQuery(
+            (JpaOrganization) user.getOrganization()).apply(em);
 
-    JpaUser updatedUser = UserDirectoryPersistenceUtil.saveUser(
+        JpaUser updatedUser = UserDirectoryPersistenceUtil.saveUserQuery(
             new JpaUser(user.getUsername(), encodedPassword, organization, user.getName(), user.getEmail(), user
-                    .getProvider(), true, roles), emf);
-    cache.put(user.getUsername() + DELIMITER + organization.getId(), updatedUser);
+                .getProvider(), true, roles)).apply(em);
+        cache.put(user.getUsername() + DELIMITER + organization.getId(), updatedUser);
 
-    updateGroupMembership(user);
+        updateGroupMembership(user);
 
-    return updatedUser;
+        return updatedUser;
+      });
+    } catch (NotFoundException | UnauthorizedException | RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
+    }
   }
 
   /**
@@ -438,7 +450,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    *          the user's full set of roles
    */
   private Set<JpaRole> filterRoles(Set<Role> userRoles) {
-    Set<JpaRole> roles = new HashSet<JpaRole>();
+    Set<JpaRole> roles = new HashSet<>();
     for (Role role : userRoles) {
       if (Role.Type.INTERNAL.equals(role.getType()) && !role.getName().startsWith(Group.ROLE_PREFIX)) {
         JpaRole jpaRole = (JpaRole) role;
@@ -453,13 +465,10 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    *
    * @param user
    *          the user for whom groups should be updated
-   * @throws NotFoundException
    */
   private void updateGroupMembership(JpaUser user) {
-
     logger.debug("updateGroupMembership({}, roles={})", user.getUsername(), user.getRoles().size());
-
-    List<String> internalGroupRoles = new ArrayList<String>();
+    List<String> internalGroupRoles = new ArrayList<>();
 
     for (Role role : user.getRoles()) {
       if (Role.Type.GROUP.equals(role.getType())
@@ -469,8 +478,10 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     }
 
     groupRoleProvider.updateGroupMembershipFromRoles(
-        user.getUsername(), user.getOrganization().getId(), internalGroupRoles);
-
+        user.getUsername(),
+        user.getOrganization().getId(),
+        internalGroupRoles
+    );
   }
 
   /**
@@ -493,10 +504,10 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     }
 
     // Remove the user's group membership
-    groupRoleProvider.updateGroupMembershipFromRoles(username, orgId, new ArrayList<String>());
+    groupRoleProvider.removeMemberFromAllGroups(username, orgId);
 
     // Remove the user
-    UserDirectoryPersistenceUtil.deleteUser(username, orgId, emf);
+    db.execTxChecked(UserDirectoryPersistenceUtil.deleteUserQuery(username, orgId));
 
     cache.invalidate(username + DELIMITER + orgId);
   }
@@ -508,9 +519,9 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    *          the role
    */
   public void addRole(JpaRole jpaRole) {
-    HashSet<JpaRole> roles = new HashSet<JpaRole>();
+    HashSet<JpaRole> roles = new HashSet<>();
     roles.add(jpaRole);
-    UserDirectoryPersistenceUtil.saveRoles(roles, emf);
+    db.execTx(UserDirectoryPersistenceUtil.saveRolesQuery(roles));
   }
 
   @Override
@@ -518,19 +529,15 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     return PROVIDER_NAME;
   }
 
-  private static org.opencastproject.util.data.Function<JpaUser, User> addProviderName
-      = new org.opencastproject.util.data.Function<JpaUser, User>() {
-        @Override
-        public User apply(JpaUser a) {
-          a.setProvider(PROVIDER_NAME);
-          return a;
-        }
-      };
+  private static User addProviderName(JpaUser u) {
+    u.setProvider(PROVIDER_NAME);
+    return u;
+  }
 
   @Override
   public long countUsers() {
     String orgId = securityService.getOrganization().getId();
-    return UserDirectoryPersistenceUtil.countUsers(orgId, emf);
+    return db.exec(UserDirectoryPersistenceUtil.countUsersQuery(orgId));
   }
 
   /**
@@ -539,7 +546,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    * @return the count of all users in the database
    */
   public long countAllUsers() {
-    return UserDirectoryPersistenceUtil.countUsers(emf);
+    return db.exec(UserDirectoryPersistenceUtil.countUsersQuery());
   }
 
   @Override

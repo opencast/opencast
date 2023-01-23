@@ -92,12 +92,12 @@ public class ConfigurablePublicationRestService extends AbstractJobProducerEndpo
   private ConfigurablePublicationService service;
   private ServiceRegistry serviceRegistry;
 
-  @Reference(name = "publicationService")
+  @Reference
   public void setService(final ConfigurablePublicationService service) {
     this.service = service;
   }
 
-  @Reference(name = "serviceRegistry")
+  @Reference
   public void setServiceRegistry(final ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

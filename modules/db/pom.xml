@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>12-SNAPSHOT</version>
+    <version>14-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -27,12 +27,26 @@
     <dependency>
       <groupId>com.typesafe</groupId>
       <artifactId>config</artifactId>
-      <version>1.2.1</version>
+      <version>1.4.2</version>
     </dependency>
     <dependency>
       <groupId>com.mchange</groupId>
       <artifactId>mchange-commons-java</artifactId>
-      <version>0.2.11</version>
+      <version>0.2.20</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.logging.log4j</groupId>
+          <artifactId>log4j-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.logging.log4j</groupId>
+          <artifactId>log4j-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.mchange</groupId>
@@ -45,15 +59,23 @@
     <dependency>
       <groupId>org.mariadb.jdbc</groupId>
       <artifactId>mariadb-java-client</artifactId>
+      <version>3.1.1</version>
     </dependency>
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
+      <version>42.5.1</version>
+    </dependency>
+    <dependency>
+      <!-- runtime dependency for postgresql -->
+      <groupId>org.checkerframework</groupId>
+      <artifactId>checker-qual</artifactId>
+      <version>3.29.0</version>
     </dependency>
     <dependency>
       <groupId>net.java.dev.jna</groupId>
       <artifactId>jna</artifactId>
-      <version>4.1.0</version>
+      <version>5.13.0</version>
     </dependency>
   </dependencies>
   <build>
@@ -69,6 +91,7 @@
             <ignoredUnusedDeclaredDependency>com.mchange:mchange-commons-java</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.mariadb.jdbc:mariadb-java-client</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.postgresql:postgresql</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.checkerframework:checker-qual</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>net.java.dev.jna:jna</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
@@ -87,8 +110,10 @@
               !com.sun.*,
               !com.vividsolutions.jts.*,
               !org.apache.lucene.*,
+              !org.apache.logging.*,
               !org.hibernate.*,
               !org.jboss.resource.adapter.jdbc.*,
+              !software.amazon.awssdk.*,
               !waffle.*,
               org.w3c.dom;version=0,
               *
@@ -100,7 +125,8 @@
               mchange-commons-java;inline=true,
               mariadb-java-client;inline=true,
               jna,
-              postgresql;inline=true
+              postgresql;inline=true,
+              checker-qual;inline=true
             </Embed-Dependency>
             <Export-Package>
               org.opencastproject.db;version=${project.version}

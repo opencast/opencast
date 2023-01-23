@@ -17,10 +17,10 @@ jobs:
           URL_LOGOUT: 'https://matrix.org/_matrix/client/r0/logout'
           URL_TOPIC: 'https://matrix-client.matrix.org/_matrix/client/r0/rooms/!HBsLKoOIEEOkxAeQvC%3Amatrix.org/state/m.room.topic/'
         run: |
-          TAGS="$(curl https://api.github.com/repos/opencast/opencast/releases | jq -r '.[].tag_name')"
-          MAJOR="$(echo "$TAGS" | sed 's/\..*$//' | sort -h | tail -n1)"
-          STABLE="$(echo "$TAGS" | sort -h | tail -n1)"
-          LEGACY="$(echo "$TAGS" | grep -v "^${MAJOR}" | sort -h | tail -n1)"
+          TAGS="$(curl https://api.github.com/repos/opencast/opencast/tags | jq -r '.[].name')"
+          MAJOR="$(echo "$TAGS" | sed 's/\..*$//' | sort --version-sort | tail -n1)"
+          STABLE="$(echo "$TAGS" | sort --version-sort | tail -n1)"
+          LEGACY="$(echo "$TAGS" | grep -v "^${MAJOR}" | sort --version-sort | tail -n1)"
           TOPIC='{"topic":"opencast.org\n–\nLatest releases: '"$STABLE, $LEGACY"'\n–\nJoin the technical meeting: Tuesday, 3:15 pm UTC at meet.opencast.video (p: welcome)"}'
           TOKEN="$(curl -s -XPOST -d '{"type":"m.login.password", "user":"'"$MATRIX_USER"'", "password":"'"$MATRIX_PASS"'", "initial_device_display_name":"GitHub Actions"}' "$URL_LOGIN" | jq -r .access_token)"
           curl -s -XPUT -d "${TOPIC}" "${URL_TOPIC}?access_token=${TOKEN}"

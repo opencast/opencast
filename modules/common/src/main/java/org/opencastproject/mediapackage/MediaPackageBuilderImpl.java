@@ -32,6 +32,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -103,10 +104,6 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
   public MediaPackage loadFromXml(InputStream is) throws MediaPackageException {
     try {
       Document xml = XmlSafeParser.parse(is);
-      if (serializer != null) {
-        //Convert InputStream to XML document to rewrite the URLs
-        rewriteUrls(xml, serializer);
-      }
       return loadFromXml(xml);
     } catch (Exception e) {
       throw new MediaPackageException("Error deserializing paths in media package", e);
@@ -138,6 +135,8 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
     try {
       in = IOUtils.toInputStream(xml, "UTF-8");
       return loadFromXml(in);
+    } catch (IOException e) {
+      throw new MediaPackageException(e);
     } finally {
       IOUtils.closeQuietly(in);
     }

@@ -51,6 +51,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,9 +120,20 @@ public class XACMLAuthorizationService implements AuthorizationService {
     logger.debug("Merge mode set to {}", mergeMode);
   }
 
-  @Reference(cardinality = ReferenceCardinality.OPTIONAL)
+  @Reference(
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "unsetMediaPackageSerializer",
+      target = "(service.pid=org.opencastproject.mediapackage.ChainingMediaPackageSerializer)"
+  )
   public void setMediaPackageSerializer(MediaPackageSerializer serializer) {
     this.serializer = serializer;
+  }
+
+  protected void unsetMediaPackageSerializer(MediaPackageSerializer serializer) {
+    if (this.serializer == serializer) {
+      this.serializer = null;
+    }
   }
 
   @Override
@@ -325,7 +337,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
    * @param workspace
    *          the workspace to set
    */
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -336,7 +348,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
    * @param securityService
    *          the security service
    */
-  @Reference(name = "security")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

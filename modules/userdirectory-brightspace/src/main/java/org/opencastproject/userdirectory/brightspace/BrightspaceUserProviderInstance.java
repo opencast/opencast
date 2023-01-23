@@ -23,6 +23,7 @@
 package org.opencastproject.userdirectory.brightspace;
 
 import org.opencastproject.security.api.CachingUserProviderMXBean;
+import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
@@ -30,7 +31,6 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.Role.Target;
 import org.opencastproject.security.api.RoleProvider;
-import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.userdirectory.brightspace.client.BrightspaceClient;
@@ -43,20 +43,19 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
-import org.apache.commons.lang3.StringUtils;
+//import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServer;
@@ -66,6 +65,9 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
 
   private static final Logger logger = LoggerFactory.getLogger(BrightspaceUserProviderInstance.class);
 
+  private static final String LTI_LEARNER_ROLE = "Learner";
+  private static final String LTI_INSTRUCTOR_ROLE = "Instructor";
+
   private String pid;
   private BrightspaceClient client;
   private Organization organization;
@@ -73,7 +75,8 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
   private Object nullToken = new Object();
   private AtomicLong loadUserRequests;
   private AtomicLong brightspaceWebServiceRequests;
-  private final List<String> ignoredUsernames;
+  private final Set<String> instructorRoles;
+  private final Set<String> ignoredUsernames;
 
   /**
    * Constructs a Brighspace user provider with the needed settings
@@ -84,19 +87,25 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
    * @param cacheSize       The number of users to cache.
    * @param cacheExpiration The number of minutes to cache users.
    */
-  public BrightspaceUserProviderInstance(String pid, BrightspaceClient client, Organization organization, int cacheSize,
-          int cacheExpiration, String adminUserName) {
+  public BrightspaceUserProviderInstance(
+      String pid,
+      BrightspaceClient client,
+      Organization organization,
+      int cacheSize,
+      int cacheExpiration,
+      Set instructorRoles,
+      Set ignoredUsernames
+  ) {
+
     this.pid = pid;
     this.client = client;
     this.organization = organization;
-    this.ignoredUsernames = Arrays.asList("", SecurityConstants.GLOBAL_ANONYMOUS_USERNAME);
+    this.instructorRoles = instructorRoles;
+    this.ignoredUsernames = ignoredUsernames;
 
-    if (StringUtils.isNoneEmpty(adminUserName)) {
-      ignoredUsernames.add(adminUserName);
-    }
-
-    logger.info("Creating new BrightspaceUserProviderInstance(pid={}, url={}, cacheSize={}, cacheExpiration={})", pid,
-            client.getURL(), cacheSize, cacheExpiration);
+    logger.info("Creating new BrightspaceUserProviderInstance(pid={}, url={}, cacheSize={}, cacheExpiration={}, "
+                  + "InstructorRoles={}, ignoredUserNames={})", pid, client.getURL(), cacheSize, cacheExpiration,
+                  instructorRoles, ignoredUsernames);
 
     cache = CacheBuilder.newBuilder().maximumSize(cacheSize).expireAfterWrite(cacheExpiration, TimeUnit.MINUTES)
             .build(new CacheLoader<String, Object>() {
@@ -242,6 +251,8 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
       logger.debug("We don't answer for: " + username);
       return null;
     } else {
+
+      logger.debug("In loadUserFromBrightspace, currently processing user: {}", username);
       JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
 
       this.brightspaceWebServiceRequests.incrementAndGet();
@@ -251,24 +262,42 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
 
       try {
         brightspaceUser = this.client.findUser(username);
+
         if (brightspaceUser != null) {
+          logger.info("Retrieved user {}", brightspaceUser.getUserId());
           String brightspaceUserId = brightspaceUser.getUserId();
 
-          Set<String> courseIds = client.findCourseIds(brightspaceUserId);
+          List<String> roleList = client.getRolesFromBrightspace(brightspaceUserId, instructorRoles);
+          logger.debug("Brightspace user {} with id {} with roles: {}", username, brightspaceUserId, roleList);
 
-          Set<JaxbRole> roles = courseIds.stream()
-                  .map(courseId -> new JaxbRole(String.format("ROLE_%s", courseId), jaxbOrganization))
-                  .collect(Collectors.toSet());
+          Set<JaxbRole> roles = new HashSet<>();
+          boolean isInstructor = false;
+          for (String roleStr: roleList) {
+            roles.add(new JaxbRole(roleStr, jaxbOrganization, "Brightspace external role", Role.Type.EXTERNAL));
+            if (roleStr.endsWith(LTI_INSTRUCTOR_ROLE)) {
+              isInstructor = true;
+            }
+          }
+          roles.add(new JaxbRole(Group.ROLE_PREFIX + "BRIGHTSPACE", jaxbOrganization, "Brightspace User",
+                  Role.Type.EXTERNAL_GROUP));
+          if (isInstructor) {
+            roles.add(new JaxbRole(Group.ROLE_PREFIX + "BRIGHTSPACE_INSTRUCTOR", jaxbOrganization,
+                      "Brightspace Instructor", Role.Type.EXTERNAL_GROUP));
+          }
+          logger.debug("Returning JaxbRoles: {}", roles);
 
-          return new JaxbUser(brightspaceUser.getUserName(), null, brightspaceUser.getDisplayName(),
+          User user =  new JaxbUser(username, null, brightspaceUser.getDisplayName(),
                   brightspaceUser.getExternalEmail(), this.getName(), jaxbOrganization, roles);
+          cache.put(username, user);
+          logger.debug("Returning user {}", user);
+          return user;
         } else {
           cache.put(username, nullToken);
           logger.debug("User {} not found in Brightspace system", username);
           return null;
         }
       } catch (BrightspaceClientException e) {
-        logger.error("A Brightspace API error occurred, user {} could not be retrieved", username);
+        logger.error("A Brightspace API error ( {} ) occurred, user {} could not be retrieved", e, username);
         return null;
       } finally {
         currentThread.setContextClassLoader(originalClassloader);

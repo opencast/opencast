@@ -1,131 +1,109 @@
-# Opencast 11: Release Notes
+# Opencast 13: Release Notes
 
 
-Features
---------
+Opencast 13.1
+-------------
 
-- New Elasticsearch architecture, now there is one elastic search for the admin ui and the external api. This
-  simplifies the maintenance and double the speed of index rebuild.
-- New *select-version* workflow operation handler, used to replace the media package in the currently
-  running workflow with an older version from the asset manager.
-- Additional S3 distribution workflow operation handlers: *retract-partial-aws*, *publish-configure-aws*,
-  *retract-configure-aws*
-- Wowza stream security configuration now allows the configuration "prefix:secret"
-- Allows upload of tracks (e.g. subtitles) as assets for new and existing
-  events.
+The first maintenance release of Opencast 13.
 
-Improvements
-------------
+- Bug fix: publish engage woh with merge SKIP the operation if media package not in search index
+([#4478](https://github.com/opencast/opencast/pull/4478))
+- Add silent detection based on subtitles (webvtt-to-cutmarks woh) ([#4482](https://github.com/opencast/opencast/pull/4482))
+- Fix: series deleted from search index cannot be re-added ([#4502](https://github.com/opencast/opencast/pull/4502))
+- Adds Whisper STT to SpeechToText WoH ([#4513](https://github.com/opencast/opencast/pull/4513))
+- Change default hotkeys for create dialogs in admin UI ([#4516](https://github.com/opencast/opencast/pull/4516))
+- Reduce number of snapshots taken in the new editor backend ([#4519](https://github.com/opencast/opencast/pull/4519))
+- Avoid using jobs in SeriesUpdatedEventHandler ([#4536](https://github.com/opencast/opencast/pull/4536))
 
-- Save buttons for the metadata of existing series and events in the Admin UI.
-- Moved the configuration of the user interface configuration service (providing the /ui-config endpoint)
-  from the global configuration to a service configuration file.
-- Extracting preview images are now from the source material instead, instead of processed files.
-- The groups are always updated regarded their user reference provider.
-- `execute-many` and `execute-once` now print all the output in the logs
-- Add support for `WebP` and `Advanced SubStation Alpha` mime types
-
-Behavior changes
------------------
-
-- There is now only one Elasticsearch index for both the Admin UI and the External API. Its structure is identical
-  to the old Admin UI index, thus migration is possible, alternatively the index has to be rebuilt or the old Admin UI
-  index can be configured (see upgrade guide).
-  With this change the index rebuild should now be twice as fast as before. The index endpoints to clear and rebuild
-  the index were moved to `/index`.
-- There is a completely new set of workflows. Please make sure to check your local configuration and adapt
-  it accordingly if you made changes to your workflows before. Opencast will also continue to work with the old set of
-  workflows. The new ones just remove a lot of redundancies, making the whole process more efficient.
-  Some of the new workflows (e.g. `fast`) now use slightly different workflow configurations. This could potentially
-  cause problems if you scheduled recordings using the old workflows but have the events processed using the new
-  workflows. Please make sure the workflow you use work fine, or do not have anything scheduled via the upgrade.
-- Changes to the service registry config at `ServiceRegistryJpaImpl.cfg`:
-    - The usage of `max.attempts` is modified in the sense that if you set -1, you can disable services going into error
-      state completely. Before, this was equivalent to 0, which would have the service go into error state after one
-      attempt, though this was undocumented. Check your configuration to be sure you didn't rely on this behavior.
-    - `no.error.state.service.types` was added. With this, you can define service types that should never go into error
-      state.
-- The default location of the user interface configuration service configuration is now
-  `etc/org.opencastproject.uiconfig.UIConfigRest.cfg`. For more details, take a look at
-  [pull request #2860](https://github.com/opencast/opencast/pull/2860).
-- There are changes to how hosts are mapped to tenants. If you use a multi-tenant system you therefore need to update
-  your `org.opencastproject.organization-*.cfg` configuration files:
-  Before Opencast 11 the domain names were mapped to tenants and a common port number was assumed for all domains. Now
-  you need to configure a URL per instance you want to map to a tenant.
-```
-# Before:
-port=8080
-prop.org.opencastproject.host.admin.example.org=tenant1-admin.example.org 
-prop.org.opencastproject.host.presentation.example.org=tenant1-presentation.example.org
-# Now:
-prop.org.opencastproject.host.admin.example.org=https://tenant1-admin.example.org
-prop.org.opencastproject.host.presentation.example.org=https://tenant1-presentation.example.org:8443
-```
-- Support for automatically setting up an HLS encoding ladder via the `{video,audio}.bitrates.mink`
-  and `{video,audio}.bitrates.maxk` encoding profile options was removed. Instead, users should now explicitly specify
-  the bit rate and bit rate control mechanism in the `ffmpeg.command`.
-- Some S3 distribution workflow operation handlers have been renamed: *publish-aws* to *publish-engage-aws* and
-  *retract-aws* to *retract-engage-aws*.
-- The amount of job statistics for servers displayed in the admin interface was reduced to running and queued jobs to
-  avoid performance problems and remove incorrect and/or misleading data.
+See [changelog](changelog.md) for a comprehensive list of changes.
 
 
-API changes
------------
-- [[#2814](https://github.com/opencast/opencast/pull/2814)] - Add track fields `is_master_playlist` and `is_live` to
-  external API
-- [[#2878](https://github.com/opencast/opencast/pull/2878)] - Add endpoint to resume Index Rebuild for specified service
-- [[#3002](https://github.com/opencast/opencast/pull/3002)] - Sign publication URL of events in External API
-- [[#3148](https://github.com/opencast/opencast/pull/3148)] - Allow empty track duration
+Opencast 13.0
+-------------
 
-Additional Notes about 11.3
----------------------------
+### Features
 
-This release fixes several bugs and a security issue related to logging which was fixed in 10.9 and forward merged to
-this release (cf. [[#3305](https://github.com/opencast/opencast/pull/3305)]). A notable new feature is the
-`speechtotext` workflow operation introducing support for the STT Engine Vosk (cf. the
-[corresponding docs section](workflowoperationhandlers/speech-to-text-woh.md) and
-[[#2855](https://github.com/opencast/opencast/pull/2855)]). Additionally, the design of the embed code selection
-within the Admin UI was updated (cf. [[#3273](https://github.com/opencast/opencast/pull/3273)]). Furthermore,
-[[#3152](https://github.com/opencast/opencast/pull/3152)] and [[#3154](https://github.com/opencast/opencast/pull/3154)]
-introduced enhancements to the `execute-once` and `execute-many` workflow operations.
+- New Plugin Management. Some parts of Opencast have become plugins and are now disabled by default but can be easily
+  enabled again by flipping a single configuration option. ([#3218](https://github.com/opencast/opencast/pull/3218))
+  For a list of plugins, take a look at
+    - `etc/org.opencastproject.plugin.impl.PluginManagerImpl.cfg` or the
+    - documentation: [The Plugin Management Documentation](modules/plugin-management.md)
+- Comments in the event index. Adds comment reason, text and resolvedStatus to the events index. This allows for
+  filtering events by certain comments in the Admin UI by using the searchbar. For example, if you are using the notes
+  column in the events table, you could search for all events that have a note that contains "silent". This requires
+  an index rebuild. ([#4029](https://github.com/opencast/opencast/pull/4029))
+- Support for f4v file type ([#4280](https://github.com/opencast/opencast/pull/4280))
+- Whisper as new Speech-To-Text engine. The new engine comes with additional configuration options and with a config
+  file to choose what model to use and the CLI command. ([#4513](https://github.com/opencast/opencast/pull/4513))
+- Specialist worker notes added. Adds the ability to define a list of worker nodes that gets preferred when dispatching
+  compilation jobs (Job Type: org.opencastproject.composer). This could for example be useful in a setup with one or
+  more GPU accelerated nodes. ([#3741](https://github.com/opencast/opencast/pull/3741))
+  This feature is disabled by default and only activated when a list of specialized worker nodes is set.
+  The comma-separated list of worker nodes is defined in the configuration file:
+    - `etc/org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg`
+  To ensure backwards compatibility not defining a list of specialized worker nodes is safe and leaves the behavior of
+  the system unchanged.
+- The new `assert` workflow operation allows asserting that certain expressions are `true` or `false`. This replaces
+  the similar `failing` operation. ([#4358](https://github.com/opencast/opencast/pull/4358))
 
-Additional Notes about 11.2
----------------------------
+### Improvements
 
-This release contains a security fix:
+- Much faster fading effect for cuts from the video editor. ([#4013](https://github.com/opencast/opencast/pull/4013))
+- Default resolution of live schedule impl changed to standard 16:9 ([#4098](https://github.com/opencast/opencast/pull/4098))
+- JobDispatcher extracted from inside the ServiceRegistry into its own class. This makes the JobDispatcher a
+  configurable OSGi service, such that dispatching can be enabled or disabled during runtime. Also changes the
+  default job dispatch behaviour to not dispatch jobs, and alters the node profiles to enable it by default on
+  the expected nodes. This should not change current job dispatcher behaviour, aside from being able to enable
+  or disable job dispatch on the fly. ([#3607](https://github.com/opencast/opencast/pull/3607))
+- Multi-tenant clusters can now define a common metadata catalog per tenant. ([#4181](https://github.com/opencast/opencast/pull/4181))
+- PostgreSQL is no longer considered experimental and fully supported. ([#4359](https://github.com/opencast/opencast/pull/4359))
+- The `send-email` workflow operation now has the following improvements:
+    - Templates can now include values from all extended metadata catalogs. Previously, the flavor of the extended
+      catalog had to start with `dublincore/`. ([#4376](https://github.com/opencast/opencast/pull/4376))
+    - Templates can now include values from organization properties.
+      This can be useful for multi-tenant systems. ([#4380](https://github.com/opencast/opencast/pull/4380))
+    - `send-email` can now send multipart emails using text and HTML. ([#4408](https://github.com/opencast/opencast/pull/4408))
+- User details can now be mapped from LDAP attributes. ([#4440](https://github.com/opencast/opencast/pull/4440))
 
-- Further mitigation for Log4Shell (CVE-2021-45105)
 
-Like the previous release this is an out-of-order patch to address and resolve a further vulnerability discovered
-by security researchers. Unlike the previous release it not only provides an updated version of Pax Logging, but
-also entirely removes the replaced bundles from Opencast's assemblies to avoid confusion if people do find the old,
-vulnerable version of Log4J somewhere on the filesystem, even though it is not used.
+### Behavior changes
 
-Additional Notes about 11.1
----------------------------
+- Navigation shortcuts to switch tabs in modals for new events and new series in admin-ui. The combinations are:
+  `alt + enter` for next or - if applicable - the create button, and `alt + backspace` for the previous button
+  (alt == option on macOS). **Note**: Shortcuts will not be detected while `<input>` or `<select>` elements are focused.
+  In most cases, you will need to press the enter-key first. US translations for the hotkey cheatSheet are included and
+  can be seen by pressing the `?` key while the modals are open. ([#3998](https://github.com/opencast/opencast/pull/3998))
+- Extended metadata of events and series are put into the Elasticsearch index. This can be used to filter by extended
+  metadata fields via the full text search. The series extended metadata is indexed by the Series Service and the event
+  extended metadata by the Asset Manager. ([#3274](https://github.com/opencast/opencast/pull/3274))
+- Theodul Player is disabled by default and will be removed in OC 14 ([#4315](https://github.com/opencast/opencast/pull/4315))
+- The LDAP implementation has been simplified, which may require adapting the `etc/security/mh_default_org.xml`
+  configuration file. ([#4383](https://github.com/opencast/opencast/pull/4383))
+- Captions are now published in the default workflows. ([#4415](https://github.com/opencast/opencast/pull/4415))
 
-This release contains an updated version of Pax Logging, which provides Opencast's Log4j functionality.  Earlier
-versions are affected by the Log4Shell vulnerability, which was partially mitigated in 11.0 by
-[GHSA-mf4f-j588-5xm8](https://github.com/opencast/opencast/security/advisories/GHSA-mf4f-j588-5xm8).  Further
-vulnerability discoveries by security researchers have rendered the previous mitigations ineffective.  Normally
-we would wait for our underlying runtime (Apache Karaf) to update, however in light of the severity of these issues
-we have issued an out-of-order patch to address, and resolve, these concerns immediately.
+### API changes
+
+- New endpoint to the External API Events endpoints. It allows uploading a track to an event by sending the updated
+  media package to the archive. It also allows removing all other tracks of the specified flavor. It does not start
+  a workflow. ([#3670](https://github.com/opencast/opencast/pull/3670))
+- The ingest API now allows setting tags when ingesting attachments or catalogs via URL.
+  ([#4156](https://github.com/opencast/opencast/pull/4156))
+- The ingest API now allows downloading from HTTP sources protected by HTTP basic auth. Previously only digest auth was
+  supported. ([#4180](https://github.com/opencast/opencast/pull/4180))
 
 
 Release Schedule
 ----------------
 
-| Date                        | Phase                    |
-|-----------------------------|--------------------------|
-| November 17, 2021           | Feature freeze           |
-| November 22, 2021           | Translation week         |
-| November 29, 2021           | Public QA phase          |
-| December 15, 2021           | Release of Opencast 11.0 |
+| Date                        | Phase                       |
+|-----------------------------|-----------------------------|
+| November 16, 2022           | Cutting the release branch  |
+| November 21, 2022           | Translation week            |
+| November 28, 2022           | Public QA phase             |
+| December 14, 2022           | Release of Opencast 13.0    |
 
-
-Release managers
+Release Managers
 ----------------
 
-- Maximiliano Lira Del Canto (University of Cologne)
-- Jonathan Neugebauer (University of Münster)
+- Nadine Weidner (ELAN e.V.)
+- Matthias Neugebauer (University of Münster / educast.nrw)

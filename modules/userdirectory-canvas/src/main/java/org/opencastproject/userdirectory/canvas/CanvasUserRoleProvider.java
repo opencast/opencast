@@ -134,14 +134,14 @@ public class CanvasUserRoleProvider implements UserProvider, RoleProvider {
 
   private OrganizationDirectoryService orgDirectory;
 
-  @Reference(name = "orgDirectory")
+  @Reference
   public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
     this.orgDirectory = orgDirectory;
   }
 
   private SecurityService securityService;
 
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

@@ -23,20 +23,32 @@ package org.opencastproject.videoeditor.impl;
 
 public class VideoClip {
   private final int srcId;
-  private final double start;
-  private double end;
+  private final long start;
+  private long end;
   // if layout regions are supported, it will be resolved and stored here,
   // defaults to root layout
   private String region;
 
-  public VideoClip(int indx, double start, double end) {
-    this.srcId = indx;
+  /**
+   * Video clip constructor.
+   *
+   * @param id Source identifier of the video clip
+   * @param start Start time in milliseconds
+   * @param end End time in milliseconds
+   */
+  public VideoClip(int id, long start, long end) {
+    this.srcId = id;
     this.start = start;
     this.end = end;
   }
 
-  void setEnd(double newend) {
-    this.end = newend;
+  /**
+   * Update the video clip's end time.
+   *
+   * @param end New end time in milliseconds.
+   */
+  void setEnd(long end) {
+    this.end = end;
   }
 
   void setRegion(String region) { // Regions are relative to root-layout,
@@ -46,17 +58,63 @@ public class VideoClip {
   public int getSrc() {
     return srcId;
   }
-  public double getStart() {
+
+  /**
+   * Get the video clip's start time in milliseconds.
+   *
+   * @return Start time in milliseconds.
+   */
+  public long getStartInMilliseconds() {
     return start;
   }
-  public double getEnd() {
+
+  /**
+   * Get the video clip's start time in fractions of seconds.
+   *
+   * @return Start time in seconds.
+   */
+  public double getStartInSeconds() {
+    return start / 1000.0;
+  }
+
+  /**
+   * Get the video clip's end time in milliseconds.
+   *
+   * @return End time in milliseconds.
+   */
+  public long getEndInMilliseconds() {
     return end;
   }
+
+  /**
+   * Get the video clip's end time in fractions of seconds.
+   *
+   * @return End time in seconds.
+   */
+  public double getEndInSeconds() {
+    return end / 1000.0;
+  }
+
   public String getRegion() {
     return region;
   }
-  public double getDuration() {
+
+  /**
+   * Get the video clip's duration in milliseconds.
+   *
+   * @return Duration in milliseconds.
+   */
+  public long getDurationInMilliseconds() {
     return end - start;
+  }
+
+  /**
+   * Get the video clip's duration in fractions of seconds.
+   *
+   * @return Duration in seconds.
+   */
+  public double getDurationInSeconds() {
+    return (end - start) / 1000.0;
   }
 
 }

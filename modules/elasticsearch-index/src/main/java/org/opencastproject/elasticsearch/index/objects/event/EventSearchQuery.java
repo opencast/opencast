@@ -21,6 +21,8 @@
 
 package org.opencastproject.elasticsearch.index.objects.event;
 
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+
 import org.opencastproject.elasticsearch.impl.AbstractSearchQuery;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.Permissions.Action;
@@ -73,6 +75,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private String eventStatus = null;
   private Boolean hasComments = null;
   private Boolean hasOpenComments = null;
+  private final List<String> comments = new ArrayList<>();
   private Boolean needsCutting = null;
   private final List<String> publications = new ArrayList<String>();
   private Long archiveVersion = null;
@@ -93,8 +96,10 @@ public class EventSearchQuery extends AbstractSearchQuery {
     this.organization = organization;
     this.user = user;
     this.actions.add(Permissions.Action.READ.toString());
-    if (!user.getOrganization().getId().equals(organization)) {
-      throw new IllegalStateException("User's organization must match search organization");
+    if (!user.hasRole(GLOBAL_ADMIN_ROLE)) {
+      if (!user.getOrganization().getId().equals(organization)) {
+        throw new IllegalStateException("User's organization must match search organization");
+      }
     }
   }
 
@@ -799,6 +804,18 @@ public class EventSearchQuery extends AbstractSearchQuery {
    */
   public Boolean getHasOpenComments() {
     return hasOpenComments;
+  }
+
+  public EventSearchQuery withComments(String comment) {
+    if (StringUtils.isBlank(comment)) {
+      throw new IllegalArgumentException("Comment cannot be null");
+    }
+    this.comments.add(comment);
+    return this;
+  }
+
+  public String[] getComments() {
+    return comments.toArray(new String[comments.size()]);
   }
 
   /**

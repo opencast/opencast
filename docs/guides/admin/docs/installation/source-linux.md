@@ -53,7 +53,6 @@ Required:
 
 Required (not necessarily on the same machine):
 
-    ActiveMQ >= 5.10 (older versions untested)
     Elasticsearch 7.9.x
 
 Required for text extraction (recommended):
@@ -79,7 +78,6 @@ website:
 
 * [Get FFmpeg](http://ffmpeg.org/download.html)
 * [Get Apache Maven](https://maven.apache.org/download.cgi)
-* [Get Apache ActiveMQ](http://activemq.apache.org/download.html)
 * [Get Elasticsearch](https://elastic.co)
 
 Building Opencast
@@ -110,7 +108,6 @@ hostname, login information, etc.
 
 <!-- _Up to here, the MacOS source install is pretty similar, but now the steps aren't homogenous anymore... Is running OC so different in the two OSs that in MacOS it doesn't mention running as a service? -->
 
-<!-- _No mention of running ActiveMQ first here!! -->
 Running Opencast
 ------------------
 

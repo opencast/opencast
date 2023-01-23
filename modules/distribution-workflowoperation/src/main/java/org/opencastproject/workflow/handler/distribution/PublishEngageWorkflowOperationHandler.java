@@ -39,6 +39,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageReference;
 import org.opencastproject.mediapackage.MediaPackageReferenceImpl;
@@ -47,6 +48,9 @@ import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.mediapackage.track.TrackImpl;
+import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreValue;
+import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
@@ -66,6 +70,7 @@ import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIUtils;
@@ -110,26 +115,29 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final Logger logger = LoggerFactory.getLogger(PublishEngageWorkflowOperationHandler.class);
 
   /** Configuration properties id */
-  private static final String ENGAGE_URL_PROPERTY = "org.opencastproject.engage.ui.url";
-  private static final String STREAMING_PUBLISH_PROPERTY = "org.opencastproject.publish.streaming.formats";
+  static final String ENGAGE_URL_PROPERTY = "org.opencastproject.engage.ui.url";
+  static final String STREAMING_PUBLISH_PROPERTY = "org.opencastproject.publish.streaming.formats";
 
   /** Workflow configuration option keys */
-  private static final String DOWNLOAD_SOURCE_FLAVORS = "download-source-flavors";
-  private static final String DOWNLOAD_TARGET_SUBFLAVOR = "download-target-subflavor";
-  private static final String DOWNLOAD_SOURCE_TAGS = "download-source-tags";
-  private static final String DOWNLOAD_TARGET_TAGS = "download-target-tags";
-  private static final String STREAMING_SOURCE_TAGS = "streaming-source-tags";
-  private static final String STREAMING_TARGET_TAGS = "streaming-target-tags";
-  private static final String STREAMING_SOURCE_FLAVORS = "streaming-source-flavors";
-  private static final String STREAMING_TARGET_SUBFLAVOR = "streaming-target-subflavor";
-  private static final String CHECK_AVAILABILITY = "check-availability";
-  private static final String STRATEGY = "strategy";
-  private static final String MERGE_FORCE_FLAVORS = "merge-force-flavors";
+  static final String DOWNLOAD_SOURCE_FLAVORS = "download-source-flavors";
+  static final String DOWNLOAD_TARGET_SUBFLAVOR = "download-target-subflavor";
+  static final String DOWNLOAD_SOURCE_TAGS = "download-source-tags";
+  static final String DOWNLOAD_TARGET_TAGS = "download-target-tags";
+  static final String STREAMING_SOURCE_TAGS = "streaming-source-tags";
+  static final String STREAMING_TARGET_TAGS = "streaming-target-tags";
+  static final String STREAMING_SOURCE_FLAVORS = "streaming-source-flavors";
+  static final String STREAMING_TARGET_SUBFLAVOR = "streaming-target-subflavor";
+  static final String CHECK_AVAILABILITY = "check-availability";
+  static final String STRATEGY = "strategy";
+  static final String MERGE_FORCE_FLAVORS = "merge-force-flavors";
 
   private static final String MERGE_FORCE_FLAVORS_DEFAULT = "dublincore/*,security/*";
 
   /** Path the REST endpoint which will re-direct users to the currently configured video player **/
   static final String PLAYER_PATH = "/play/";
+
+  /** Merge strategy **/
+  static final String MERGE_STRATEGY = "merge";
 
   /** The streaming distribution service */
   private StreamingDistributionService streamingDistributionService = null;
@@ -139,6 +147,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /** The search service */
   private SearchService searchService = null;
+
+  private Workspace workspace;
 
   /** The server url */
   private URL serverUrl;
@@ -154,10 +164,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param streamingDistributionService
    *          the streaming distribution service
    */
-  @Reference(
-      name = "StreamingDistributionService",
-      target = "(distribution.channel=streaming)"
-  )
+  @Reference(target = "(distribution.channel=streaming)")
   protected void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
     this.streamingDistributionService = streamingDistributionService;
   }
@@ -168,10 +175,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param downloadDistributionService
    *          the download distribution service
    */
-  @Reference(
-      name = "DownloadDistributionService",
-      target = "(distribution.channel=download)"
-  )
+  @Reference(target = "(distribution.channel=download)")
   protected void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
     this.downloadDistributionService = downloadDistributionService;
   }
@@ -183,21 +187,27 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param searchService
    *          an instance of the search service
    */
-  @Reference(name = "SearchService")
+  @Reference
   protected void setSearchService(SearchService searchService) {
     this.searchService = searchService;
   }
 
-  @Reference(name = "organizationDirectoryService")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);
   }
+
+  @Reference
+  public void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
+  }
+
 
   /** Supported streaming formats */
   private static final Set<TrackImpl.StreamingProtocol> STREAMING_FORMATS = new HashSet<>(Arrays.asList(
@@ -243,6 +253,15 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
     boolean checkAvailability = option(op.getConfiguration(CHECK_AVAILABILITY)).bind(trimToNone).map(toBool)
             .getOrElse(true);
+
+    // First check if mp exists in the search index and strategy is merge
+    // to avoid leaving distributed elements around.
+    MediaPackage distributedMp = getDistributedMediapackage(mediaPackage.getIdentifier().toString());
+    if (MERGE_STRATEGY.equals(republishStrategy) && distributedMp == null) {
+      logger.info("Skipping republish for {} since it is not currently published",
+              mediaPackage.getIdentifier().toString());
+      return createResult(mediaPackage, Action.SKIP);
+    }
 
     String[] sourceDownloadTags = StringUtils.split(downloadSourceTags, ",");
     String[] targetDownloadTags = StringUtils.split(downloadTargetTags, ",");
@@ -318,11 +337,11 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
       removePublicationElement(mediaPackage);
       switch (republishStrategy) {
-        case ("merge"):
+        case (MERGE_STRATEGY):
           // nothing to do here. other publication strategies can be added to this list later on
           break;
         default:
-          retractFromEngage(mediaPackage);
+          retractFromEngage(distributedMp);
       }
 
       List<Job> jobs = new ArrayList<Job>();
@@ -368,17 +387,27 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         // MH-10216, check if only merging into existing mediapackage
         removePublicationElement(mediaPackage);
         switch (republishStrategy) {
-          case ("merge"):
-            // merge() returns merged mediapackage or null mediaPackage is not published
-            mediaPackageForSearch = merge(mediaPackageForSearch, mergeForceFlavors);
-            if (mediaPackageForSearch == null) {
-              logger.info("Skipping republish for {} since it is not currently published",
-                  mediaPackage.getIdentifier().toString());
-              return createResult(mediaPackage, Action.SKIP);
-            }
+          case (MERGE_STRATEGY):
+            mediaPackageForSearch = mergePackages(mediaPackageForSearch, distributedMp, mergeForceFlavors);
             break;
           default:
           // nothing to do here
+        }
+
+        if (StringUtils.isBlank(mediaPackageForSearch.getTitle())) {
+          var dcUri = Arrays.stream(mediaPackageForSearch.getCatalogs(MediaPackageElements.EPISODE))
+              .findFirst()
+              .map(MediaPackageElement::getURI);
+          if (dcUri.isPresent()) {
+            try (var in = workspace.read(dcUri.get())) {
+              DublinCoreXmlFormat.read(in)
+                  .get(DublinCore.PROPERTY_TITLE)
+                  .stream()
+                  .findFirst()
+                  .map(DublinCoreValue::getValue)
+                  .ifPresent(mediaPackageForSearch::setTitle);
+            }
+          }
         }
 
         // Check that the media package meets the criteria for publication
@@ -679,21 +708,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
 
   /**
-   * MH-10216, method copied from the original RepublishWorkflowOperationHandler
-   * Merges mediapackage with published mediapackage.
-   *
-   * @param mediaPackageForSearch
-   * @return merged mediapackage or null if a published medipackage was not found
-   * @throws WorkflowOperationException
-   */
-  protected MediaPackage merge(MediaPackage mediaPackageForSearch, List<MediaPackageElementFlavor> forceFlavors)
-          throws WorkflowOperationException {
-    return mergePackages(mediaPackageForSearch,
-            getDistributedMediapackage(mediaPackageForSearch.toString()),
-            forceFlavors);
-  }
-
-  /**
    * MH-10216, Copied from the original RepublishWorkflowOperationHandler
    *
    * Merges the updated mediapackage with the one that is currently published in a way where the updated elements
@@ -744,16 +758,16 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   }
 
   /**
- * Removes every Publication for Searchindex from Mediapackage
- * Removes Mediapackage from Searchindex
-   * @param mediaPackage Mediapackage
+   * Removes Mediapackage from Searchindex
+   *
+   * @param distributedMediaPackage
+   *          The media package gotten from the search index
    * @throws WorkflowOperationException
    */
-  private void retractFromEngage(MediaPackage mediaPackage) throws WorkflowOperationException {
+  private void retractFromEngage(MediaPackage distributedMediaPackage) throws WorkflowOperationException {
     List<Job> jobs = new ArrayList<Job>();
     Set<String> elementIds = new HashSet<String>();
     try {
-      MediaPackage distributedMediaPackage = getDistributedMediapackage(mediaPackage.toString());
       if (distributedMediaPackage != null) {
 
         for (MediaPackageElement element : distributedMediaPackage.getElements()) {
@@ -780,8 +794,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
         Job deleteSearchJob = null;
         logger.info("Retracting already published Elements for Mediapackage: {}",
-            mediaPackage.getIdentifier().toString());
-        deleteSearchJob = searchService.delete(mediaPackage.getIdentifier().toString());
+                distributedMediaPackage.getIdentifier().toString());
+        deleteSearchJob = searchService.delete(distributedMediaPackage.getIdentifier().toString());
         if (deleteSearchJob != null) {
           jobs.add(deleteSearchJob);
         }
@@ -795,7 +809,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     } catch (SearchException e) {
       throw new WorkflowOperationException("Error retracting media package", e);
     } catch (UnauthorizedException | NotFoundException ex) {
-      logger.error("Retraction failed of Mediapackage: { }", mediaPackage.getIdentifier().toString(), ex);
+      logger.error("Retraction failed of Mediapackage: { }", distributedMediaPackage.getIdentifier().toString(), ex);
     }
   }
 }

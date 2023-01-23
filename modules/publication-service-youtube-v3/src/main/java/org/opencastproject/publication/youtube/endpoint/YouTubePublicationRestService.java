@@ -176,7 +176,7 @@ public class YouTubePublicationRestService extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(final ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -197,7 +197,7 @@ public class YouTubePublicationRestService extends AbstractJobProducerEndpoint {
    * @param service
    *          the service to set
    */
-  @Reference(name = "publicationService")
+  @Reference
   protected void setService(final YouTubePublicationService service) {
     this.service = service;
   }

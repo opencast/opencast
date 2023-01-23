@@ -64,7 +64,7 @@ public class GroupsListProvider implements ResourceListProvider {
   }
 
   /** OSGi callback for groups services. */
-  @Reference(name = "groupProvider")
+  @Reference
   public void setGroupProvider(JpaGroupRoleProvider groupRoleProvider) {
     this.groupRoleProvider = groupRoleProvider;
   }

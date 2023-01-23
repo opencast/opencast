@@ -24,9 +24,9 @@ package org.opencastproject.authorization.xacml.manager.impl;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.util.data.Option;
 
 import java.util.List;
+import java.util.Optional;
 
 /** The ACL DB stores ACLs on a per organization basis. */
 public interface AclDb {
@@ -38,7 +38,7 @@ public interface AclDb {
    *
    * @return <code>some</code> if the ACL could be found, <code>none</code> if the ACL with the given ID does not exist.
    */
-  Option<ManagedAcl> getAcl(Organization org, long id);
+  Optional<ManagedAcl> getAcl(Organization org, long id);
 
   /**
    * Update an existing ACL.
@@ -53,7 +53,7 @@ public interface AclDb {
    * @return <code>some</code> if the new ACL could be created successfully, <code>none</code> if an ACL with the same
    *         name already exists
    */
-  Option<ManagedAcl> createAcl(Organization org, AccessControlList acl, String name);
+  Optional<ManagedAcl> createAcl(Organization org, AccessControlList acl, String name);
 
   /**
    * Delete an ACL by its ID.

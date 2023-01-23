@@ -35,28 +35,25 @@ import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
-import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.Series;
 import org.opencastproject.series.api.SeriesException;
-import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil.R;
-import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
@@ -88,7 +85,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -104,7 +100,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -152,6 +147,9 @@ public class SeriesRestService {
 
   /** Dublin Core Catalog service */
   private DublinCoreCatalogService dcService;
+
+  /** The security service */
+  private SecurityService securityService;
 
   /** Default server URL */
   protected String serverUrl = "http://localhost:8080";
@@ -211,7 +209,7 @@ public class SeriesRestService {
    *
    * @param seriesService
    */
-  @Reference(name = "service-impl")
+  @Reference
   public void setService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -221,10 +219,17 @@ public class SeriesRestService {
    *
    * @param dcService
    */
-  @Reference(name = "dc")
+  @Reference
   public void setDublinCoreService(DublinCoreCatalogService dcService) {
     this.dcService = dcService;
   }
+
+  /** OSGi callback for the security service */
+  @Reference
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
+
 
   /**
    * Activates REST service.
@@ -502,12 +507,6 @@ public class SeriesRestService {
           @RestParameter(
               description = "Series metadata value",
               isRequired = false,
-              name = "abstract",
-              type = RestParameter.Type.STRING
-          ),
-          @RestParameter(
-              description = "Series metadata value",
-              isRequired = false,
               name = "accessRights",
               type = RestParameter.Type.STRING
           ),
@@ -697,7 +696,6 @@ public class SeriesRestService {
   public Response addOrUpdateSeries(
       @FormParam("series") String series,
       @FormParam("acl") String accessControl,
-      @FormParam("abstract") String dcAbstract,
       @FormParam("accessRights") String dcAccessRights,
       @FormParam("available") String dcAvailable,
       @FormParam("contributor") String dcContributor,
@@ -740,7 +738,6 @@ public class SeriesRestService {
       }
     } else if (StringUtils.isNotBlank(dcTitle)) {
       dc = DublinCores.mkOpencastSeries().getCatalog();
-      addDcData(dc, "abstract", dcAbstract);
       addDcData(dc, "accessRights", dcAccessRights);
       addDcData(dc, "available", dcAvailable);
       addDcData(dc, "contributor", dcContributor);
@@ -938,347 +935,6 @@ public class SeriesRestService {
       logger.warn("Could not count series: {}", se.getMessage());
       throw new WebApplicationException(se);
     }
-  }
-
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("series.json")
-  @RestQuery(
-      name = "listSeriesAsJson",
-      description = "Returns the series matching the query parameters",
-      returnDescription = "Returns the series search results as JSON",
-      restParameters = {
-          @RestParameter(
-              name = "q",
-              isRequired = false,
-              description = "Free text search",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "edit",
-              isRequired = false,
-              description = "Whether this query should return only series that are editable",
-              type = BOOLEAN
-          ),
-          @RestParameter(
-              name = "fuzzyMatch",
-              isRequired = false,
-              description = "Whether the seriesId can be used for a partial match. The default is an exact match",
-              type = BOOLEAN
-          ),
-          @RestParameter(
-              name = "seriesId",
-              isRequired = false,
-              description = "The series identifier",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "seriesTitle",
-              isRequired = false,
-              description = "The series title",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "creator",
-              isRequired = false,
-              description = "The series creator",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "contributor",
-              isRequired = false,
-              description = "The series contributor",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "publisher",
-              isRequired = false,
-              description = "The series publisher",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "rightsholder",
-              isRequired = false,
-              description = "The series rights holder",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "createdfrom",
-              isRequired = false,
-              description = "Filter results by created from (yyyy-MM-dd'T'HH:mm:ss'Z')",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "createdto",
-              isRequired = false,
-              description = "Filter results by created to (yyyy-MM-dd'T'HH:mm:ss'Z')",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "language",
-              isRequired = false,
-              description = "The series language",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "license",
-              isRequired = false,
-              description = "The series license",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "subject",
-              isRequired = false,
-              description = "The series subject",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "abstract",
-              isRequired = false,
-              description = "The series abstract",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "description",
-              isRequired = false,
-              description = "The series description",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "sort",
-              isRequired = false,
-              description = "The sort order. May include any of the following: TITLE, SUBJECT, "
-                  + "CREATOR, PUBLISHER, CONTRIBUTOR, ABSTRACT, DESCRIPTION, CREATED, "
-                  + "AVAILABLE_FROM, AVAILABLE_TO, LANGUAGE, RIGHTS_HOLDER, SPATIAL, TEMPORAL, "
-                  + "IS_PART_OF, REPLACES, TYPE, ACCESS, LICENCE.  Add '_DESC' to reverse the "
-                  + "sort order (e.g. TITLE_DESC).",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "startPage",
-              isRequired = false,
-              description = "The page offset",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "count",
-              isRequired = false,
-              description = "Results per page (max 100)",
-              type = STRING
-          )
-      },
-      responses = {
-          @RestResponse(responseCode = SC_OK, description = "The access control list."),
-          @RestResponse(
-              responseCode = SC_UNAUTHORIZED,
-              description = "If the current user is not authorized to perform this action"
-          )
-      }
-  )
-  public Response getSeriesAsJson(
-      @QueryParam("q") String text,
-      @QueryParam("seriesId") String seriesId,
-      @QueryParam("edit") Boolean edit,
-      @QueryParam("fuzzyMatch") Boolean fuzzyMatch,
-      @QueryParam("seriesTitle") String seriesTitle,
-      @QueryParam("creator") String creator,
-      @QueryParam("contributor") String contributor,
-      @QueryParam("publisher") String publisher,
-      @QueryParam("rightsholder") String rightsHolder,
-      @QueryParam("createdfrom") String createdFrom,
-      @QueryParam("createdto") String createdTo,
-      @QueryParam("language") String language,
-      @QueryParam("license") String license,
-      @QueryParam("subject") String subject,
-      @QueryParam("abstract") String seriesAbstract,
-      @QueryParam("description") String description,
-      @QueryParam("sort") String sort,
-      @QueryParam("startPage") String startPage,
-      @QueryParam("count") String count
-  ) throws UnauthorizedException {
-    try {
-      DublinCoreCatalogList result = getSeries(text, seriesId, edit, seriesTitle, creator, contributor, publisher,
-              rightsHolder, createdFrom, createdTo, language, license, subject, seriesAbstract, description, sort,
-              startPage, count, fuzzyMatch);
-      return Response.ok(result.getResultsAsJson()).build();
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (Exception e) {
-      logger.warn("Could not perform search query: {}", e.getMessage());
-    }
-    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-  }
-
-  @GET
-  @Produces(MediaType.TEXT_XML)
-  @Path("series.xml")
-  @RestQuery(
-      name = "listSeriesAsXml",
-      description = "Returns the series matching the query parameters",
-      returnDescription = "Returns the series search results as XML",
-      restParameters = {
-          @RestParameter(
-              name = "q",
-              isRequired = false,
-              description = "Free text search",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "edit",
-              isRequired = false,
-              description = "Whether this query should return only series that are editable",
-              type = BOOLEAN
-          ),
-          @RestParameter(
-              name = "fuzzyMatch",
-              isRequired = false,
-              description = "Whether the seriesId can be used for a partial match. The default is an exact match",
-              type = BOOLEAN
-          ),
-          @RestParameter(
-              name = "seriesId",
-              isRequired = false,
-              description = "The series identifier",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "seriesTitle",
-              isRequired = false,
-              description = "The series title",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "creator",
-              isRequired = false,
-              description = "The series creator",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "contributor",
-              isRequired = false,
-              description = "The series contributor",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "publisher",
-              isRequired = false,
-              description = "The series publisher",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "rightsholder",
-              isRequired = false,
-              description = "The series rights holder",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "createdfrom",
-              isRequired = false,
-              description = "Filter results by created from (yyyy-MM-dd'T'HH:mm:ss'Z')",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "createdto",
-              isRequired = false,
-              description = "Filter results by created to (yyyy-MM-dd'T'HH:mm:ss'Z')",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "language",
-              isRequired = false,
-              description = "The series language",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "license",
-              isRequired = false,
-              description = "The series license",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "subject",
-              isRequired = false,
-              description = "The series subject",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "abstract",
-              isRequired = false,
-              description = "The series abstract",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "description",
-              isRequired = false,
-              description = "The series description",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "sort",
-              isRequired = false,
-              description = "The sort order.  May include any of the following: TITLE, SUBJECT, "
-                  + "CREATOR, PUBLISHER, CONTRIBUTOR, ABSTRACT, DESCRIPTION, CREATED, "
-                  + "AVAILABLE_FROM, AVAILABLE_TO, LANGUAGE, RIGHTS_HOLDER, SPATIAL, TEMPORAL, "
-                  + "IS_PART_OF, REPLACES, TYPE, ACCESS, LICENCE.  Add '_DESC' to reverse the "
-                  + "sort order (e.g. TITLE_DESC).",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "startPage",
-              isRequired = false,
-              description = "The page offset",
-              type = STRING
-          ),
-          @RestParameter(
-              name = "count",
-              isRequired = false,
-              description = "Results per page (max 100)",
-              type = STRING
-          )
-      },
-      responses = {
-          @RestResponse(
-              responseCode = SC_OK,
-              description = "The access control list."
-          ),
-          @RestResponse(
-              responseCode = SC_UNAUTHORIZED,
-              description = "If the current user is not authorized to perform this action"
-          )
-      }
-  )
-  public Response getSeriesAsXml(
-      @QueryParam("q") String text,
-      @QueryParam("seriesId") String seriesId,
-      @QueryParam("edit") Boolean edit,
-      @QueryParam("fuzzyMatch") Boolean fuzzyMatch,
-      @QueryParam("seriesTitle") String seriesTitle,
-      @QueryParam("creator") String creator,
-      @QueryParam("contributor") String contributor,
-      @QueryParam("publisher") String publisher,
-      @QueryParam("rightsholder") String rightsHolder,
-      @QueryParam("createdfrom") String createdFrom,
-      @QueryParam("createdto") String createdTo,
-      @QueryParam("language") String language,
-      @QueryParam("license") String license,
-      @QueryParam("subject") String subject,
-      @QueryParam("abstract") String seriesAbstract,
-      @QueryParam("description") String description,
-      @QueryParam("sort") String sort,
-      @QueryParam("startPage") String startPage,
-      @QueryParam("count") String count
-  ) throws UnauthorizedException {
-    try {
-      DublinCoreCatalogList result = getSeries(text, seriesId, edit, seriesTitle, creator, contributor, publisher,
-              rightsHolder, createdFrom, createdTo, language, license, subject, seriesAbstract, description, sort,
-              startPage, count, fuzzyMatch);
-      return Response.ok(result.getResultsAsXML()).build();
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (Exception e) {
-      logger.warn("Could not perform search query: {}", e.getMessage());
-    }
-    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
   }
 
   @SuppressWarnings("unchecked")
@@ -1503,163 +1159,6 @@ public class SeriesRestService {
     throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
   }
 
-  private DublinCoreCatalogList getSeries(
-      String text,
-      String seriesId,
-      Boolean edit,
-      String seriesTitle,
-      String creator,
-      String contributor,
-      String publisher,
-      String rightsHolder,
-      String createdFrom,
-      String createdTo,
-      String language,
-      String license,
-      String subject,
-      String seriesAbstract,
-      String description,
-      String sort,
-      String startPageString,
-      String countString,
-      Boolean fuzzyMatch
-  ) throws SeriesException, UnauthorizedException {
-    int startPage = 0;
-    if (StringUtils.isNotEmpty(startPageString)) {
-      try {
-        startPage = Integer.parseInt(startPageString);
-      } catch (NumberFormatException e) {
-        logger.warn("Bad start page parameter");
-      }
-      if (startPage < 0) {
-        startPage = 0;
-      }
-    }
-
-    int count = DEFAULT_LIMIT;
-    if (StringUtils.isNotEmpty(countString)) {
-      try {
-        count = Integer.parseInt(countString);
-      } catch (NumberFormatException e) {
-        logger.warn("Bad count parameter");
-      }
-      if (count < 1) {
-        count = DEFAULT_LIMIT;
-      }
-    }
-
-    SeriesQuery q = new SeriesQuery();
-    q.setCount(count);
-    q.setStartPage(startPage);
-    if (edit != null) {
-      q.setEdit(edit);
-    }
-    if (StringUtils.isNotEmpty(text)) {
-      q.setText(text);
-    }
-    if (StringUtils.isNotEmpty(seriesId)) {
-      q.setSeriesId(seriesId);
-    }
-    if (StringUtils.isNotEmpty(seriesTitle)) {
-      q.setSeriesTitle(seriesTitle);
-    }
-    if (StringUtils.isNotEmpty(creator)) {
-      q.setCreator(creator);
-    }
-    if (StringUtils.isNotEmpty(contributor)) {
-      q.setContributor(contributor);
-    }
-    if (StringUtils.isNotEmpty(language)) {
-      q.setLanguage(language);
-    }
-    if (StringUtils.isNotEmpty(license)) {
-      q.setLicense(license);
-    }
-    if (StringUtils.isNotEmpty(subject)) {
-      q.setSubject(subject);
-    }
-    if (StringUtils.isNotEmpty(publisher)) {
-      q.setPublisher(publisher);
-    }
-    if (StringUtils.isNotEmpty(seriesAbstract)) {
-      q.setSeriesAbstract(seriesAbstract);
-    }
-    if (StringUtils.isNotEmpty(description)) {
-      q.setDescription(description);
-    }
-    if (StringUtils.isNotEmpty(rightsHolder)) {
-      q.setRightsHolder(rightsHolder);
-    }
-    if (fuzzyMatch != null) {
-      q.setFuzzyMatch(fuzzyMatch.booleanValue());
-    }
-    try {
-      if (StringUtils.isNotEmpty(createdFrom)) {
-        q.setCreatedFrom(SolrUtils.parseDate(createdFrom));
-      }
-      if (StringUtils.isNotEmpty(createdTo)) {
-        q.setCreatedTo(SolrUtils.parseDate(createdTo));
-      }
-    } catch (ParseException e1) {
-      logger.warn("Could not parse date parameter: {}", e1);
-    }
-
-    if (StringUtils.isNotBlank(sort)) {
-      SeriesQuery.Sort sortField = null;
-      if (sort.endsWith("_DESC")) {
-        String enumKey = sort.substring(0, sort.length() - "_DESC".length()).toUpperCase();
-        try {
-          sortField = SeriesQuery.Sort.valueOf(enumKey);
-          q.withSort(sortField, false);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", enumKey);
-        }
-      } else {
-        try {
-          sortField = SeriesQuery.Sort.valueOf(sort);
-          q.withSort(sortField);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", sort);
-        }
-      }
-    }
-
-    return seriesService.getSeries(q);
-  }
-
-  @GET
-  @Path("allSeriesIdTitle.json")
-  @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(
-      name = "getAll",
-      description = "Returns a list of identifier and title of all series",
-      returnDescription = "Json list of identifier and title of all series",
-      responses = {
-          @RestResponse(responseCode = SC_OK, description = "A list with series"),
-          @RestResponse(responseCode = SC_FORBIDDEN, description = "A user is not allowed to list all series"),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error while processing the request")
-      }
-  )
-  public Response getAllSeriesIdTitle() {
-    try {
-      Map<String, String> allSeries = seriesService.getIdTitleMapOfAllSeries();
-      JSONArray seriesJsonArr = new JSONArray();
-      for (String seriesId : allSeries.keySet()) {
-        JSONObject seriesJsonObj = new JSONObject();
-        seriesJsonObj.put("identifier", seriesId);
-        seriesJsonObj.put("title", allSeries.get(seriesId));
-        seriesJsonArr.add(seriesJsonObj);
-      }
-      JSONObject resultJson = new JSONObject();
-      resultJson.put("series", seriesJsonArr);
-      return Response.ok(resultJson.toJSONString()).build();
-    } catch (SeriesException ex) {
-      return R.serverError();
-    } catch (UnauthorizedException ex) {
-      return R.forbidden();
-    }
-  }
-
   @GET
   @Path("{seriesId}/elements.json")
   @Produces(MediaType.APPLICATION_JSON)
@@ -1738,6 +1237,57 @@ public class SeriesRestService {
   }
 
   @PUT
+  @Path("{seriesId}/extendedMetadata/{type}")
+  @RestQuery(
+          name = "updateExtendedMetadata",
+          description = "Updates extended metadata of a series",
+          returnDescription = "An empty response",
+          pathParameters = {
+                  @RestParameter(name = "seriesId", description = "The series identifier", type = STRING,
+                          isRequired = true),
+                  @RestParameter(name = "type", description = "The type of the catalog flavor", type = STRING,
+                          isRequired = true)
+          },
+          restParameters = {
+                  @RestParameter(name = "dc", description = "The catalog with extended metadata.", type = TEXT,
+                          isRequired = true, defaultValue = SAMPLE_DUBLIN_CORE
+                  )
+          },
+          responses = {
+                  @RestResponse(responseCode = SC_NO_CONTENT, description = "Extended metadata updated"),
+                  @RestResponse(responseCode = SC_CREATED, description = "Extended metadata created"),
+                  @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR,
+                          description = "Error while processing the request")
+          }
+  )
+  public Response putSeriesExtendedMetadata(
+          @PathParam("seriesId") String seriesId,
+          @PathParam("type") String type,
+          @FormParam("dc") String dcString
+  ) {
+    try {
+      DublinCoreCatalog dc = dcService.load(new ByteArrayInputStream(dcString.getBytes(StandardCharsets.UTF_8)));
+      boolean elementExists = seriesService.getSeriesElementData(seriesId, type).isSome();
+      if (seriesService.updateExtendedMetadata(seriesId, type, dc)) {
+        if (elementExists) {
+          return R.noContent();
+        } else {
+          return R.created(URI.create(UrlSupport.concat(serverUrl, serviceUrl, seriesId, "elements", type)));
+        }
+      } else {
+        return R.serverError();
+      }
+    } catch (IOException e) {
+      logger.warn("Could not deserialize dublin core catalog", e);
+      return Response.status(BAD_REQUEST).build();
+    } catch (SeriesException e) {
+      logger.warn("Error while updating extended metadata of series '{}'", seriesId, e);
+      return R.serverError();
+    }
+  }
+
+
+  @PUT
   @Path("{seriesId}/elements/{elementType}")
   @RestQuery(
       name = "updateSeriesElement",
@@ -1762,18 +1312,15 @@ public class SeriesRestService {
     try {
       is = request.getInputStream();
       final byte[] data = IOUtils.toByteArray(is);
-      if (seriesService.getSeriesElementData(seriesId, elementType).isSome()) {
-        if (seriesService.updateSeriesElement(seriesId, elementType, data)) {
+      boolean elementExists = seriesService.getSeriesElementData(seriesId, elementType).isSome();
+      if (seriesService.updateSeriesElement(seriesId, elementType, data)) {
+        if (elementExists) {
           return R.noContent();
         } else {
-          return R.serverError();
+          return R.created(URI.create(UrlSupport.concat(serverUrl, serviceUrl, seriesId, "elements", elementType)));
         }
       } else {
-        if (seriesService.addSeriesElement(seriesId, elementType, data)) {
-          return R.created(URI.create(UrlSupport.concat(serverUrl, serviceUrl, seriesId, "elements", elementType)));
-        } else {
-          return R.serverError();
-        }
+        return R.serverError();
       }
     } catch (IOException e) {
       logger.error("Error while trying to read from request", e);

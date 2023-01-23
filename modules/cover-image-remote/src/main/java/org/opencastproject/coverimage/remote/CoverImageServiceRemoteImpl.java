@@ -97,12 +97,12 @@ public class CoverImageServiceRemoteImpl extends RemoteBase implements CoverImag
     throw new CoverImageException("Unable to generate cover image using a remote generation service");
   }
 
-  @Reference(name = "trustedHttpClient")
+  @Reference
   @Override
   public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
     super.setTrustedHttpClient(trustedHttpClient);
   }
-  @Reference(name = "remoteServiceManager")
+  @Reference
   @Override
   public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
     super.setRemoteServiceManager(serviceRegistry);

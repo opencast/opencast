@@ -99,7 +99,7 @@ public class TimelinePreviewsRestEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -110,7 +110,7 @@ public class TimelinePreviewsRestEndpoint extends AbstractJobProducerEndpoint {
    * @param timelinePreviewsService
    *          the timeline previews service
    */
-  @Reference(name = "timelinepreviews")
+  @Reference
   protected void setTimelinePreviewsService(TimelinePreviewsService timelinePreviewsService) {
     this.service = timelinePreviewsService;
   }

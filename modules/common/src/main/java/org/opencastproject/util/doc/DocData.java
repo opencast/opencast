@@ -21,6 +21,9 @@
 
 package org.opencastproject.util.doc;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,24 +106,9 @@ public class DocData {
     }
   }
 
-  public static boolean isBlank(String str) {
-    boolean blank = false;
-    if (str == null || "".equals(str)) {
-      blank = true;
-    }
-    return blank;
-  }
-
   public static boolean isValidName(String name) {
-    boolean valid = true;
-    if (isBlank(name)) {
-      valid = false;
-    } else {
-      if (!name.matches("^(\\w|-)+$")) {
-        valid = false;
-      }
-    }
-    return valid;
+    return isNotBlank(name)
+        && name.matches("^(\\w|-|\\.)+$");
   }
 
   public String getMetaData(String key) {

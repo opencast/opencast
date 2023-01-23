@@ -67,3 +67,11 @@
    title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.EMBEDDING_CODE' | translate }}"
    with-role="ROLE_UI_EVENTS_EMBEDDING_CODE_VIEW">
 </a>
+
+<!-- Copy metadata from exisiting event to new event modal -->
+<a data-open-modal="new-event-modal"
+   data-resource-id="{{ row.id }}"
+   class="fa fa-copy"
+   title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.COPY_TO_NEW_EVENT' | translate }}"
+   with-role="ROLE_UI_EVENTS_CREATE">
+</a>

@@ -153,12 +153,12 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     logger.info("Configuration updated. Jobs older than {} hours are deleted.", jobMaxTTL);
   }
 
-  @Reference(name = "workspace")
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(name = "ingest-service")
+  @Reference
   protected void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }

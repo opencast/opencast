@@ -87,7 +87,7 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
    * @param composerService
    *          the local composer service
    */
-  @Reference(name = "ComposerService")
+  @Reference
   protected void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -99,7 +99,7 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -153,8 +153,8 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
     // Make sure either one of tags or flavors are provided
     if (sourceTagsOption.isEmpty() && sourceFlavorsOption.isEmpty()) {
-      logger.info("No source tags or flavors have been specified, not matching anything");
-      return createResult(mediaPackage, Action.CONTINUE);
+      logger.warn("No source tags or flavors have been specified, not matching anything");
+      return createResult(mediaPackage, Action.SKIP);
     }
 
     // Select the source flavors
@@ -202,12 +202,12 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
       // Encode the track with all profiles
       for (EncodingProfile profile : profiles) {
 
-        // Check if the track supports the output type of the profile
-        MediaType outputType = profile.getOutputType();
-        if (outputType.equals(MediaType.Audio) && !track.hasAudio()) {
+        // Check if the track supports the input type of the profile
+        MediaType inputType = profile.getApplicableMediaType();
+        if (inputType.equals(MediaType.Audio) && !track.hasAudio()) {
           logger.info("Skipping encoding of '{}', since it lacks an audio stream", track);
           continue;
-        } else if (outputType.equals(MediaType.Visual) && !track.hasVideo()) {
+        } else if (inputType.equals(MediaType.Visual) && !track.hasVideo()) {
           logger.info("Skipping encoding of '{}', since it lacks a video stream", track);
           continue;
         }
@@ -221,7 +221,7 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
     if (encodingJobs.isEmpty()) {
       logger.info("No matching tracks found");
-      return createResult(mediaPackage, Action.CONTINUE);
+      return createResult(mediaPackage, Action.SKIP);
     }
 
     // Wait for the jobs to return
@@ -310,7 +310,7 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

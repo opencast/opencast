@@ -21,7 +21,8 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
@@ -76,7 +77,7 @@ public class TestThemesEndpoint extends ThemesEndpoint {
   }
 
   private void addData() throws ThemesServiceDatabaseException {
-    Theme theme = new Theme(Option.some(theme1Id), creationDate, true, user, "The Theme name", "The Theme description",
+    Theme theme = new Theme(Option.none(), creationDate, true, user, "The Theme name", "The Theme description",
             true, "bumper-file", true, "trailer-file", true, "title,room,date", "title-background-file", true,
             "license-background-file", "The license description", true, "watermark-file", "top-left");
     themesServiceDatabaseImpl.updateTheme(theme);
@@ -110,7 +111,8 @@ public class TestThemesEndpoint extends ThemesEndpoint {
 
     themesServiceDatabaseImpl = new ThemesServiceDatabaseImpl();
     themesServiceDatabaseImpl
-            .setEntityManagerFactory(newTestEntityManagerFactory(ThemesServiceDatabaseImpl.PERSISTENCE_UNIT));
+            .setEntityManagerFactory(newEntityManagerFactory(ThemesServiceDatabaseImpl.PERSISTENCE_UNIT));
+    themesServiceDatabaseImpl.setDBSessionFactory(getDbSessionFactory());
     themesServiceDatabaseImpl.setUserDirectoryService(userDirectoryService);
     themesServiceDatabaseImpl.setSecurityService(securityService);
     themesServiceDatabaseImpl.setIndex(elasticsearchIndex);

@@ -21,10 +21,12 @@
 
 package org.opencastproject.serviceregistry.impl;
 
+import static org.opencastproject.db.Queries.namedQuery;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
 
+import org.opencastproject.db.DBSession;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.IncidentImpl;
 import org.opencastproject.job.api.IncidentTree;
@@ -42,8 +44,6 @@ import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Functions;
 import org.opencastproject.util.data.functions.Strings;
-import org.opencastproject.util.persistence.PersistenceEnv;
-import org.opencastproject.util.persistence.Queries;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowService;
@@ -58,6 +58,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public abstract class AbstractIncidentService implements IncidentService {
   public static final String PERSISTENCE_UNIT_NAME = "org.opencastproject.serviceregistry";
@@ -74,7 +76,7 @@ public abstract class AbstractIncidentService implements IncidentService {
 
   protected abstract WorkflowService getWorkflowService();
 
-  protected abstract PersistenceEnv getPenv();
+  protected abstract DBSession getDBSession();
 
   @Override
   public Incident storeIncident(Job job, Date timestamp, String code, Incident.Severity severity,
@@ -83,8 +85,9 @@ public abstract class AbstractIncidentService implements IncidentService {
     try {
       job = getServiceRegistry().getJob(job.getId());
 
-      final IncidentDto dto = getPenv().tx(
-              Queries.persist(IncidentDto.mk(job.getId(), timestamp, code, severity, descriptionParameters, details)));
+      final IncidentDto dto = getDBSession().execTx(namedQuery.persist(
+          IncidentDto.mk(job.getId(), timestamp, code, severity, descriptionParameters, details)
+      ));
       return toIncident(job, dto);
     } catch (NotFoundException e) {
       throw new IllegalStateException("Can't create incident for not-existing job");
@@ -96,10 +99,11 @@ public abstract class AbstractIncidentService implements IncidentService {
 
   @Override
   public Incident getIncident(long id) throws IncidentServiceException, NotFoundException {
-    for (IncidentDto dto : getPenv().tx(Queries.find(IncidentDto.class, id))) {
-      final Job job = findJob(dto.getJobId());
+    Optional<IncidentDto> dto = getDBSession().execTx(namedQuery.findByIdOpt(IncidentDto.class, id));
+    if (dto.isPresent()) {
+      final Job job = findJob(dto.get().getJobId());
       if (job != null) {
-        return toIncident(job, dto);
+        return toIncident(job, dto.get());
       }
     }
     throw new NotFoundException();
@@ -107,7 +111,7 @@ public abstract class AbstractIncidentService implements IncidentService {
 
   @Override
   public List<Incident> getIncidentsOfJob(List<Long> jobIds) throws IncidentServiceException {
-    List<Incident> incidents = new ArrayList<Incident>();
+    List<Incident> incidents = new ArrayList<>();
     for (long jobId : jobIds) {
       try {
         incidents.addAll(getIncidentsOfJob(jobId));
@@ -120,7 +124,7 @@ public abstract class AbstractIncidentService implements IncidentService {
   @Override
   public IncidentTree getIncidentsOfJob(long jobId, boolean cascade) throws NotFoundException, IncidentServiceException {
     List<Incident> incidents = getIncidentsOfJob(jobId);
-    List<IncidentTree> childIncidents = new ArrayList<IncidentTree>();
+    List<IncidentTree> childIncidents = new ArrayList<>();
 
     try {
       Job job = getServiceRegistry().getJob(jobId);
@@ -199,7 +203,7 @@ public abstract class AbstractIncidentService implements IncidentService {
     return none();
   }
 
-  private final Map<String, String> textCache = new HashMap<String, String>();
+  private final Map<String, String> textCache = new HashMap<>();
 
   /** Get a text. */
   private Option<String> getText(String key) {
@@ -214,7 +218,7 @@ public abstract class AbstractIncidentService implements IncidentService {
   /** Fetch all localizations from the database. */
   private Map<String, String> fetchTextsFromDb() {
     final Map<String, String> locs = new HashMap<String, String>();
-    for (IncidentTextDto a : getPenv().tx(IncidentTextDto.findAll)) {
+    for (IncidentTextDto a : getDBSession().execTx(IncidentTextDto.findAllQuery)) {
       locs.put(a.getId(), a.getText());
     }
     return locs;
@@ -223,7 +227,7 @@ public abstract class AbstractIncidentService implements IncidentService {
   private List<IncidentTree> getChildIncidents(long jobId) throws NotFoundException, ServiceRegistryException,
           IncidentServiceException {
     List<Job> childJobs = getServiceRegistry().getChildJobs(jobId);
-    List<IncidentTree> incidentResults = new ArrayList<IncidentTree>();
+    List<IncidentTree> incidentResults = new ArrayList<>();
     for (Job childJob : childJobs) {
       if (childJob.getParentJobId() != jobId)
         continue;
@@ -238,7 +242,9 @@ public abstract class AbstractIncidentService implements IncidentService {
   private List<Incident> getIncidentsOfJob(long jobId) throws NotFoundException, IncidentServiceException {
     final Job job = findJob(jobId);
     try {
-      return mlist(getPenv().tx(IncidentDto.findByJobId(jobId))).map(toIncident(job)).value();
+      return getDBSession().execTx(IncidentDto.findByJobIdQuery(jobId)).stream()
+          .map(i -> toIncident(job, i))
+          .collect(Collectors.toList());
     } catch (Exception e) {
       logger.error("Could not retrieve incidents of job '{}': {}", job.getId(), e.getMessage());
       throw new IncidentServiceException(e);
@@ -260,15 +266,6 @@ public abstract class AbstractIncidentService implements IncidentService {
   private static Incident toIncident(Job job, IncidentDto dto) {
     return new IncidentImpl(dto.getId(), job.getId(), job.getJobType(), job.getProcessingHost(), dto.getTimestamp(),
             dto.getSeverity(), dto.getCode(), dto.getTechnicalInformation(), dto.getParameters());
-  }
-
-  private static Function<IncidentDto, Incident> toIncident(final Job job) {
-    return new Function<IncidentDto, Incident>() {
-      @Override
-      public Incident apply(IncidentDto dto) {
-        return toIncident(job, dto);
-      }
-    };
   }
 
   /**

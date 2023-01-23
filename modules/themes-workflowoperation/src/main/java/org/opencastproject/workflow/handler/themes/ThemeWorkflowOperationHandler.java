@@ -132,30 +132,30 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
   private Workspace workspace;
 
   /** OSGi callback for the series service. */
-  @Reference(name = "SeriesService")
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
   /** OSGi callback for the themes database service. */
-  @Reference(name = "ThemesServiceDatabase")
+  @Reference
   public void setThemesServiceDatabase(ThemesServiceDatabase themesServiceDatabase) {
     this.themesServiceDatabase = themesServiceDatabase;
   }
 
   /** OSGi callback for the static file service. */
-  @Reference(name = "StaticFileService")
+  @Reference
   public void setStaticFileService(StaticFileService staticFileService) {
     this.staticFileService = staticFileService;
   }
 
   /** OSGi callback for the workspace. */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

@@ -396,8 +396,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    *           if the user does not have the rights to add the mediapackage
    */
   public void addSynchronously(MediaPackage mediaPackage)
-          throws SearchException, IllegalArgumentException, UnauthorizedException, NotFoundException,
-          SearchServiceDatabaseException {
+          throws SearchException, IllegalArgumentException, UnauthorizedException {
     if (mediaPackage == null) {
       throw new IllegalArgumentException("Unable to add a null mediapackage");
     }
@@ -405,9 +404,14 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     logger.debug("Attempting to add media package {} to search index", mediaPackageId);
     AccessControlList acl = authorizationService.getActiveAcl(mediaPackage).getA();
 
-    AccessControlList seriesAcl = persistence.getAccessControlLists(mediaPackage.getSeries(), mediaPackageId).stream()
-        .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
-    logger.debug("Updating series with merged access control list: {}", seriesAcl);
+    AccessControlList seriesAcl;
+    try {
+      seriesAcl = persistence.getAccessControlLists(mediaPackage.getSeries(), mediaPackageId).stream()
+              .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
+      logger.debug("Updating series with merged access control list: {}", seriesAcl);
+    } catch (SearchServiceDatabaseException e) {
+      throw new SearchException(e);
+    }
 
     Date now = new Date();
 
@@ -736,7 +740,6 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /** Dynamic reference. */
   @Reference(
-      name = "staticMetadata",
       cardinality = ReferenceCardinality.AT_LEAST_ONE,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "unsetStaticMetadataService"
@@ -760,27 +763,27 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     this.mpeg7CatalogService = mpeg7CatalogService;
   }
 
-  @Reference(name = "search-persistence")
+  @Reference
   public void setPersistence(SearchServiceDatabase persistence) {
     this.persistence = persistence;
   }
 
-  @Reference(name = "series")
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(name = "authorization")
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
 
-  @Reference(name = "serviceRegistry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -791,7 +794,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -802,7 +805,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
-  @Reference(name = "user-directory")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -813,7 +816,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * @param organizationDirectory
    *          the organization directory
    */
-  @Reference(name = "orgDirectory")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectory = organizationDirectory;
   }
@@ -857,9 +860,9 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    *          the serializer
    */
   @Reference(
-      name = "url-rewriter",
       cardinality = ReferenceCardinality.OPTIONAL,
       policy = ReferencePolicy.DYNAMIC,
+      target = "(service.pid=org.opencastproject.mediapackage.ChainingMediaPackageSerializer)",
       unbind = "unsetMediaPackageSerializer"
   )
   protected void setMediaPackageSerializer(MediaPackageSerializer serializer) {

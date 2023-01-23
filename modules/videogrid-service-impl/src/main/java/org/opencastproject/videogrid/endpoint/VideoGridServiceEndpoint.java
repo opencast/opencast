@@ -100,7 +100,7 @@ public class VideoGridServiceEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -111,7 +111,7 @@ public class VideoGridServiceEndpoint extends AbstractJobProducerEndpoint {
    * @param videoGridService
    *          the videoGridService
    */
-  @Reference(name = "VideoGridService")
+  @Reference
   public void setVideoGridService(VideoGridService videoGridService) {
     this.videoGridService = videoGridService;
   }

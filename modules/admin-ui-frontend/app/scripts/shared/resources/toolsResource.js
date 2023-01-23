@@ -99,6 +99,7 @@ angular.module('adminNg.resources')
         if (data.file) fd.append('File', data.file);
         if (data.track) fd.append('Track', data.track);
         if (angular.isNumber(data.position)) fd.append('Position', data.position);
+        if(data.previewfile) fd.append('PreviewFile', data.previewfile);
         return fd;
       }
     },

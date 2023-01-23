@@ -854,6 +854,26 @@ __Response__
 ]
 ```
 
+### POST /api/events/{event_id}/track
+
+Adds the given track to the given flavor in the event. 
+
+Path Parameters |Type                        | Description
+:---------------|:---------------------------|:-----------
+`event_id`      | [`string`](types.md#basic) | Event identifier
+
+Multipart Form Parameters  |Type                             | Description
+:--------------------------|:--------------------------------|:-----------
+`flavor`                   | [`string`](types.md#basic)      | Denotes type and subtype, e.g. 'captions/source+en'
+`overwriteExisting`        | [`boolean`](types.md#basic)     | If true, all other tracks in the specified flavor are REMOVED
+`track`                    | [`file`](types.md#file)         | The track file
+
+__Response__
+
+`200 (OK)`: The track was added successfully.<br/>
+`400 (BAD REQUEST)`: The request is invalid or inconsistent.<br/>
+`404 (NOT FOUND)`: The specified event does not exist.<br/>
+
 
 # Metadata
 

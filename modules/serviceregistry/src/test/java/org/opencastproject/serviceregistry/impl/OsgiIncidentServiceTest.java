@@ -25,14 +25,13 @@ import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.opencastproject.db.DBTestEnv.newDBSession;
 
+import org.opencastproject.db.DBSession;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.serviceregistry.api.Incidents;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.persistence.PersistenceEnv;
-import org.opencastproject.util.persistence.PersistenceEnvs;
-import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import org.easymock.EasyMock;
@@ -48,8 +47,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.persistence.EntityManagerFactory;
-
 /** Tests persistence: storing, merging, retrieving and removing. */
 public class OsgiIncidentServiceTest {
 
@@ -57,16 +54,14 @@ public class OsgiIncidentServiceTest {
   private static final String JOB_TYPE = "inspect";
 
   private AbstractIncidentService incidentService;
-  private PersistenceEnv penv;
+  private DBSession db;
   private Map<Long, Job> jobs = new HashMap<>();
   private Incidents incidents;
 
   /** @throws java.lang.Exception */
   @Before
   public void setUp() throws Exception {
-    final EntityManagerFactory emf = PersistenceUtil
-            .newTestEntityManagerFactory(AbstractIncidentService.PERSISTENCE_UNIT_NAME);
-    penv = PersistenceEnvs.persistenceEnvironment(emf);
+    db = newDBSession(AbstractIncidentService.PERSISTENCE_UNIT_NAME);
 
     // Mock up a job
     Job job = createNiceMock(Job.class);
@@ -103,8 +98,8 @@ public class OsgiIncidentServiceTest {
       }
 
       @Override
-      protected PersistenceEnv getPenv() {
-        return PersistenceEnvs.persistenceEnvironment(emf);
+      protected DBSession getDBSession() {
+        return db;
       }
     };
     incidents = new Incidents(serviceRegistry, incidentService);
@@ -113,7 +108,7 @@ public class OsgiIncidentServiceTest {
   /** @throws java.lang.Exception */
   @After
   public void tearDown() throws Exception {
-    penv.close();
+    db.close();
   }
 
   @Test

@@ -319,7 +319,7 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
           throws WorkflowOperationException {
     // If we do not hold for trim, we still need to put tracks in the mediapackage with the target flavor
     MediaPackage mp = workflowInstance.getMediaPackage();
-    logger.info("Skip video editor operation for mediapackage {}", mp.getIdentifier().toString());
+    logger.info("Skip video editor operation for mediapackage {}", mp.getIdentifier());
 
     // Get configuration
     // Check which tags have been configured
@@ -638,22 +638,22 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     return smilResponse.getSmil();
   }
 
-  @Reference(name = "smil-service")
+  @Reference
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }
 
-  @Reference(name = "videoeditor-service")
+  @Reference
   public void setVideoEditorService(VideoEditorService editor) {
     videoEditorService = editor;
   }
 
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

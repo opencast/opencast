@@ -76,7 +76,7 @@ public class EventsListProvider implements ResourceListProvider {
     logger.info("Events list provider activated!");
   }
 
-  @Reference(name = "ElasticsearchIndex")
+  @Reference
   public void setIndex(ElasticsearchIndex index) {
     this.index = index;
   }

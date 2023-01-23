@@ -173,25 +173,22 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
     return createResult(mediaPackage, Action.CONTINUE);
   }
 
-  @Reference(
-      name = "TranscriptionService",
-      target = "(provider=google.speech)"
-  )
+  @Reference(target = "(provider=google.speech)")
   public void setTranscriptionService(TranscriptionService service) {
     this.service = service;
   }
 
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace service) {
     this.workspace = service;
   }
 
-  @Reference(name = "captionService")
+  @Reference
   public void setCaptionService(CaptionService service) {
     this.captionService = service;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

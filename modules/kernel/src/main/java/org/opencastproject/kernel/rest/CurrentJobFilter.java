@@ -23,6 +23,7 @@ package org.opencastproject.kernel.rest;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
@@ -71,7 +72,7 @@ public class CurrentJobFilter implements Filter {
    * @param serviceRegistry
    *          the serviceRegistry to set
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -121,6 +122,8 @@ public class CurrentJobFilter implements Filter {
         Job currentJob = serviceRegistry.getJob(Long.parseLong(currentJobId));
         serviceRegistry.setCurrentJob(currentJob);
       }
+    } catch (NotFoundException e) {
+      logger.debug("Unable to set non-existing current job {}: {}", currentJobId, e);
     } catch (Exception e) {
       logger.error("Unable to set the current job {}: {}", currentJobId, e);
       httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,

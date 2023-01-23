@@ -21,7 +21,6 @@
 package org.opencastproject.liveschedule.message;
 
 import org.opencastproject.liveschedule.api.LiveScheduleService;
-import org.opencastproject.message.broker.api.MessageItem;
 
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -31,25 +30,13 @@ public abstract class UpdateHandler {
 
   protected static final String PUBLISH_LIVE_PROPERTY = "publishLive";
 
-  private static final Logger logger = LoggerFactory.getLogger(SchedulerUpdateHandler.class);
+  private static final Logger logger = LoggerFactory.getLogger(UpdateHandler.class);
 
   /** Services */
   protected LiveScheduleService liveScheduleService;
 
-  protected String destinationId;
-
   public void activate(ComponentContext cc) {
     logger.info("Activating {}", this.getClass().getName());
-  }
-
-  public UpdateHandler(String destinationId) {
-    this.destinationId = destinationId;
-  }
-
-  protected abstract void execute(MessageItem message);
-
-  public String getDestinationId() {
-    return destinationId;
   }
 
   // === Set by OSGI begin

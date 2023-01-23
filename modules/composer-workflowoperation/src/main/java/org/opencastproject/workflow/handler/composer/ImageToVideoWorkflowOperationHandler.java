@@ -91,7 +91,7 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param composerService
    *          the local composer service
    */
-  @Reference(name = "ComposerService")
+  @Reference
   public void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -103,7 +103,7 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -189,7 +189,7 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
     };
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);
   }

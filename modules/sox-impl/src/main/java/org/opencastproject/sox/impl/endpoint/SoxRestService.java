@@ -105,7 +105,7 @@ public class SoxRestService extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -116,7 +116,7 @@ public class SoxRestService extends AbstractJobProducerEndpoint {
    * @param soxService
    *          the SoX service
    */
-  @Reference(name = "composerService")
+  @Reference
   public void setSoxService(SoxService soxService) {
     this.soxService = soxService;
   }

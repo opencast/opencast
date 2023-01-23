@@ -149,7 +149,7 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -160,7 +160,7 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
    * @param textAnalyzer
    *          the text analyzer
    */
-  @Reference(name = "textAnalyzer")
+  @Reference
   protected void setTextAnalyzer(TextAnalyzerService textAnalyzer) {
     this.service = textAnalyzer;
   }

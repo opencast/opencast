@@ -13,5 +13,5 @@
 /// @return {Number (Unitless)}
 
 @function strip-units($value) {
-  @return ($value / ($value * 0 + 1));
+  @return calc($value / ($value * 0 + 1px));
 }

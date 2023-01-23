@@ -67,13 +67,13 @@ public class NopServiceEndpoint extends OsgiAbstractJobProducerEndpoint<NopServi
     return RestUtil.R.ok(getSvc().nop());
   }
 
-  @Reference(name = "serviceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);
   }
 
-  @Reference(name = "nopService")
+  @Reference
   public void setService(NopService nopService) {
     super.setService((NopServiceImpl)nopService);
   }

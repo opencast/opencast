@@ -81,10 +81,11 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
   static final String SUBJECT_PROPERTY = "subject";
   static final String BODY_PROPERTY = "body";
   static final String BODY_TEMPLATE_FILE_PROPERTY = "body-template-file";
+  static final String BODY_HTML_PROPERTY = "body-html";
+  static final String BODY_HTML_TEMPLATE_FILE_PROPERTY = "body-html-template-file";
   static final String ADDRESS_SEPARATOR_PROPERTY = "address-separator";
   static final String ADDRESS_SEPARATOR_DEFAULT = ", \t";
   static final String SKIP_INVALID_ADDRESS_PROPERTY = "skip-invalid-address";
-  static final String IS_HTML = "use-html";
 
   /*
    * (non-Javadoc)
@@ -122,26 +123,39 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     }
 
     String subject = applyTemplateIfNecessary(workflowInstance, operation, SUBJECT_PROPERTY);
-    String bodyText;
-    String body = operation.getConfiguration(BODY_PROPERTY);
-    boolean isHTML = BooleanUtils.toBoolean(operation.getConfiguration(IS_HTML));
-    // If specified, templateFile is a file that contains the Freemarker template
-    String bodyTemplateFile = operation.getConfiguration(BODY_TEMPLATE_FILE_PROPERTY);
+
+    String bodyCfg = operation.getConfiguration(BODY_PROPERTY);
+    String bodyTemplateFileCfg = operation.getConfiguration(BODY_TEMPLATE_FILE_PROPERTY);
+    String bodyHtmlCfg = operation.getConfiguration(BODY_HTML_PROPERTY);
+    String bodyHtmlTemplateFileCfg = operation.getConfiguration(BODY_HTML_TEMPLATE_FILE_PROPERTY);
+
+    String bodyText = null;
+    String bodyHTML = null;
+
     // Body informed? If not, use the default.
-    if (body == null && bodyTemplateFile == null) {
+    if (bodyCfg == null && bodyHtmlCfg == null && bodyTemplateFileCfg == null && bodyHtmlTemplateFileCfg == null) {
       // Set the body of the message to be the ID of the media package
       bodyText = String.format("%s (%s)", srcPackage.getTitle(), srcPackage.getIdentifier());
-    } else if (body != null) {
+    }
+
+    if (bodyCfg != null) {
       bodyText = applyTemplateIfNecessary(workflowInstance, operation, BODY_PROPERTY);
-    } else {
+    } else if (bodyTemplateFileCfg != null) {
       bodyText = applyTemplateIfNecessary(workflowInstance, operation, BODY_TEMPLATE_FILE_PROPERTY);
     }
 
+    if (bodyHtmlCfg != null) {
+      bodyHTML = applyTemplateIfNecessary(workflowInstance, operation, BODY_HTML_PROPERTY);
+    } else if (bodyHtmlTemplateFileCfg != null) {
+      bodyHTML = applyTemplateIfNecessary(workflowInstance, operation, BODY_HTML_TEMPLATE_FILE_PROPERTY);
+    }
+
     try {
-      logger.debug("Sending e-mail notification with subject '{}' and body '{}' to '{}', CC '{}' and BCC '{}'",
-              subject, bodyText, to, cc, bcc);
+      logger.debug("Sending e-mail notification with subject '{}' and text body '{}' / HTML body '{}' "
+              + "to '{}', CC '{}' and BCC '{}'",
+              subject, bodyText, bodyHTML, to, cc, bcc);
       // "To", "CC" and "BCC" can be comma- or space-separated lists of emails
-      smtpService.send(to, cc, bcc, subject, bodyText, isHTML);
+      smtpService.send(to, cc, bcc, subject, bodyText, bodyHTML);
       logger.info("E-mail notification sent to {}, CC addresses {} and BCC addresses {}", to, cc, bcc);
     } catch (MessagingException e) {
       throw new WorkflowOperationException(e);
@@ -208,12 +222,12 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     String templateName = null;
     String templateContent = null;
 
-    if (BODY_TEMPLATE_FILE_PROPERTY.equals(configName)) {
+    if (BODY_TEMPLATE_FILE_PROPERTY.equals(configName) || BODY_HTML_TEMPLATE_FILE_PROPERTY.equals(configName)) {
       templateName = configValue; // Use body template file name
     } else if (configValue != null && configValue.contains("${")) {
       // If value contains a "${", it may be a template so apply it
       // Give a name to the inline template
-      templateName = workflowInstance.getTemplate() + "_" + operation.getPosition() + "_" + configName;
+      templateName = workflowInstance.getTemplate() + "_" + operation.getId() + "_" + configName;
       // Only alphanumeric and _
       templateName = templateName.replaceAll("[^A-Za-z0-9 ]", "_");
       templateContent = configValue;
@@ -236,7 +250,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * @param smtpService
    *          the smtp service
    */
-  @Reference(name = "smtpservice")
+  @Reference
   void setSmtpService(SmtpService smtpService) {
     this.smtpService = smtpService;
   }
@@ -247,7 +261,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * @param service
    *          the email template service
    */
-  @Reference(name = "EmailTemplateService")
+  @Reference
   void setEmailTemplateService(EmailTemplateService service) {
     this.emailTemplateService = service;
   }
@@ -258,12 +272,12 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * @param service
    *          the user directory service
    */
-  @Reference(name = "userDirectoryService")
+  @Reference
   void setUserDirectoryService(UserDirectoryService service) {
     this.userDirectoryService = service;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

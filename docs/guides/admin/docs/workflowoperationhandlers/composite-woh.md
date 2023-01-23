@@ -1,8 +1,13 @@
-# Composite Workflow Operation Handler
+Composite Workflow Operation
+============================
 
-## Description
+ID: `composite`
 
-The CompositeWorkflowOperationHandler is used to composite two videos (upper and lower) and an optional watermark into
+
+Description
+-----------
+
+The composite operation is used to composite two videos (upper and lower) and an optional watermark into
 one video, including encoding to different formats. The audio track is taken from both videos by default. Everything is
 done using FFmpeg. The composition can be done in various layout formats e.g. side by side or picture in picture. The
 layout has to be defined in JSON format and is described in section "Layout Definition". For some general information
@@ -19,7 +24,10 @@ to choose only the audio from one track or both tracks for the composite video.
 
     -filter:v "[in]scale=640:480,pad=1920:1080:20:20:black[lower];movie=test.mp4,scale=640:480[upper];movie=watermark.jpg[watermark];[lower][upper]overlay=200:200[video];[video][watermark]overlay=main_w-overlay_w-20:20[out]" sidebyside.mp4
 
-## Parameter Table
+
+Parameter Table
+---------------
+
 Tags and flavors can be used in combination.
 
 
@@ -50,13 +58,18 @@ Notes:
 
 * At least one of the configuration keys *layout*, *layout-single*, or *layout-multiple* must be set
 
-## Output Resolution
+
+Output Resolution
+-----------------
+
 The output resolution must be specified using the configuration key *output-resolution*. The output resolution can be
 either explicitly specified (e.g. 1920x1080) or selected from the lower or upper input video (lower or higher).
 In case that only a single input track is available, both part-lower and part-higher will refer to that
 single input track.
 
-## Layout Definition
+
+Layout Definition
+-----------------
 
 The layout definitions are provided as JSON. Each definition consist of the layout specifications for the lower and
 upper video and an optional specification for the watermark. The specifications have to be separated by comma.
@@ -132,37 +145,38 @@ A single layout is specified as follows:
       }
     }
 
-## Operation Example
 
-    <operation
-      id="composite"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Composite">
-      <configurations>
-        <configuration key="source-flavor-upper">presentation/trimmed</configuration>
-        <configuration key="source-flavor-lower">presenter/trimmed</configuration>
-        <configuration key="source-tags-upper">comp,rss</configuration>
-        <configuration key="source-tags-lower">comp,rss</configuration>
-        <configuration key="source-tags-watermark">branding</configuration>
-        <configuration key="source-flavor-watermark">image/work</configuration>
-        <configuration key="source-url-watermark">file:///Users/me/logo.jpg</configuration>
-        <configuration key="encoding-profile">composite</configuration>
-        <configuration key="target-tags">composite,rss,atom,archive</configuration>
-        <configuration key="target-flavor">composite/delivery</configuration>
-        <configuration key="output-resolution">1920x1080</configuration>
-        <configuration key="output-background">red</configuration>
-        <configuration key="layout">topleft</configuration>
-        <configuration key="layout-topleft">
-          {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":1.0,"top":1.0},"offset":{"y":-20,"x":-20},"reference":{"left":1.0,"top":1.0}}};
-          {"horizontalCoverage":0.2,"anchorOffset":{"referring":{"left":0.0,"top":0.0},"offset":{"y":-20,"x":-20},"reference":{"left":0.0,"top":0.0}}};
-          {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":1.0,"top":0.0},"offset":{"y":20,"x":20},"reference":{"left":1.0,"top":0.0}}}
-        </configuration>
-        <configuration key="layout-topright">
-          {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":1.0,"top":1.0},"offset":{"y":-20,"x":-20},"reference":{"left":1.0,"top":1.0}}};
-          {"horizontalCoverage":0.2,"anchorOffset":{"referring":{"left":1.0,"top":0.0},"offset":{"y":-20,"x":-20},"reference":{"left":1.0,"top":0.0}}};
-          {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":0.0,"top":0.0},"offset":{"y":20,"x":20},"reference":{"left":0.0,"top":0.0}}}
-        </configuration>
-      </configurations>
-    </operation>
+Operation Example
+-----------------
 
+```xml
+<operation
+    id="composite"
+    description="Composite">
+  <configurations>
+    <configuration key="source-flavor-upper">presentation/trimmed</configuration>
+    <configuration key="source-flavor-lower">presenter/trimmed</configuration>
+    <configuration key="source-tags-upper">comp,rss</configuration>
+    <configuration key="source-tags-lower">comp,rss</configuration>
+    <configuration key="source-tags-watermark">branding</configuration>
+    <configuration key="source-flavor-watermark">image/work</configuration>
+    <configuration key="source-url-watermark">file:///Users/me/logo.jpg</configuration>
+    <configuration key="encoding-profile">composite</configuration>
+    <configuration key="target-tags">composite,rss,atom,archive</configuration>
+    <configuration key="target-flavor">composite/delivery</configuration>
+    <configuration key="output-resolution">1920x1080</configuration>
+    <configuration key="output-background">red</configuration>
+    <configuration key="layout">topleft</configuration>
+    <configuration key="layout-topleft">
+      {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":1.0,"top":1.0},"offset":{"y":-20,"x":-20},"reference":{"left":1.0,"top":1.0}}};
+      {"horizontalCoverage":0.2,"anchorOffset":{"referring":{"left":0.0,"top":0.0},"offset":{"y":-20,"x":-20},"reference":{"left":0.0,"top":0.0}}};
+      {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":1.0,"top":0.0},"offset":{"y":20,"x":20},"reference":{"left":1.0,"top":0.0}}}
+    </configuration>
+    <configuration key="layout-topright">
+      {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":1.0,"top":1.0},"offset":{"y":-20,"x":-20},"reference":{"left":1.0,"top":1.0}}};
+      {"horizontalCoverage":0.2,"anchorOffset":{"referring":{"left":1.0,"top":0.0},"offset":{"y":-20,"x":-20},"reference":{"left":1.0,"top":0.0}}};
+      {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":0.0,"top":0.0},"offset":{"y":20,"x":20},"reference":{"left":0.0,"top":0.0}}}
+    </configuration>
+  </configurations>
+</operation>
+```

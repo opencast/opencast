@@ -19,6 +19,11 @@ org.opencastproject.userdirectory.brightspace.application.key=application-key
 # The maximum number of minutes to cache a user
 #org.opencastproject.userdirectory.brightspace.cache.expiration=60
 
+# Optional comma-separated list of Brightspace roles which are mapped to Instructor role suffix in Opencast
+# default: TEACHER
+#org.opencastproject.userdirectory.brightspace.instructor.roles=TEACHER
 
-
+# Optional comma-separated list of usernames, which opencast wouldn't ask Brightspace for user's detail.
+# default: admin,anonymous
+#org.opencastproject.userdirectory.brightspace.ignored.usernames=admin,anonymous
 

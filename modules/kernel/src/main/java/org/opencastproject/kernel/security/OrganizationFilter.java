@@ -78,7 +78,7 @@ public class OrganizationFilter implements Filter {
    * @param organizationDirectory
    *          the organization directory
    */
-  @Reference(name = "orgDirectory")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectory = organizationDirectory;
   }
@@ -161,7 +161,7 @@ public class OrganizationFilter implements Filter {
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

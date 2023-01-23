@@ -52,10 +52,7 @@ public class RetractEngageAWSS3WorkflowOperationHandler extends RetractEngageWor
    * @param downloadDistributionService
    *          the download distribution service
    */
-  @Reference(
-      name = "DownloadDistributionService",
-      target = "(distribution.channel=aws.s3)"
-  )
+  @Reference(target = "(distribution.channel=aws.s3)")
   protected void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
     super.setDownloadDistributionService(downloadDistributionService);
   }
@@ -67,7 +64,7 @@ public class RetractEngageAWSS3WorkflowOperationHandler extends RetractEngageWor
    * @param searchService
    *          an instance of the search service
    */
-  @Reference(name = "SearchService")
+  @Reference
   protected void setSearchService(SearchService searchService) {
     super.setSearchService(searchService);
   }

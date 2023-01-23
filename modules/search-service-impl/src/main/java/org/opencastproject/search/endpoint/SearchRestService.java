@@ -157,6 +157,39 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     }
   }
 
+  @POST
+  @Path("addSynchronously")
+  @RestQuery(
+          name = "add",
+          description = "Adds a mediapackage to the search index.",
+          restParameters = {
+              @RestParameter(
+                      description = "The media package to add to the search index.",
+                      isRequired = true,
+                      name = "mediapackage",
+                      type = RestParameter.Type.TEXT,
+                      defaultValue = SAMPLE_MEDIA_PACKAGE
+              )
+          },
+          responses = {
+              @RestResponse(description = "OK", responseCode = HttpServletResponse.SC_OK),
+              @RestResponse(
+                      description = "There has been an internal error and the mediapackage could not be added",
+                      responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR
+              )
+          },
+          returnDescription = "Nothing"
+  )
+  public Response addSynchronously(@FormParam("mediapackage") MediaPackageImpl mediaPackage) throws SearchException {
+    try {
+      searchService.addSynchronously(mediaPackage);
+      return Response.ok().build();
+    } catch (Exception e) {
+      logger.warn("Unable to add mediapackage to search index: {}", e.getMessage());
+      return Response.serverError().build();
+    }
+  }
+
   @DELETE
   @Path("{id}")
   @Produces(MediaType.APPLICATION_XML)
@@ -284,8 +317,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               name = "limit",
               isRequired = false,
               type = RestParameter.Type.STRING,
-              defaultValue = "20",
-              description = "The maximum number of items to return per page."
+              defaultValue = "100",
+              description = "The maximum number of items to return per page. -1 translates to everything, however, "
+                      + "non-admin users will only ever get a maximum of 2000 results. 0 is equal to 100."
           ),
           @RestParameter(
               name = "offset",
@@ -425,8 +459,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               name = "limit",
               isRequired = false,
               type = RestParameter.Type.STRING,
-              defaultValue = "20",
-              description = "The maximum number of items to return per page."
+              defaultValue = "100",
+              description = "The maximum number of items to return per page. -1 translates to everything, however, "
+                      + "non-admin users will only ever get a maximum of 2000 results. 0 is equal to 100."
           ),
           @RestParameter(
               name = "offset",
@@ -606,8 +641,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               name = "limit",
               isRequired = false,
               type = RestParameter.Type.STRING,
-              defaultValue = "20",
-              description = "The maximum number of items to return per page."
+              defaultValue = "100",
+              description = "The maximum number of items to return per page. -1 translates to everything, however, "
+                      + "non-admin users will only ever get a maximum of 2000 results. 0 is equal to 100."
           ),
           @RestParameter(
               name = "offset",
@@ -695,7 +731,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
    * @param searchService
    *          the service implementation
    */
-  @Reference(name = "service-impl")
+  @Reference
   public void setSearchService(SearchServiceImpl searchService) {
     this.searchService = searchService;
   }
@@ -706,7 +742,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceregistry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

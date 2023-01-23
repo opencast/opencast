@@ -38,7 +38,9 @@ public interface Service {
    */
   IForm retrieveFormData();
 
-  /** Deletes the registration form of the adopter. */
-  void deleteFormData();
+  /** Marks the adopter registration for deletion */
+  void markForDeletion();
 
+  /** Deletes teh local copy of the registration data */
+  void deleteRegistration();
 }

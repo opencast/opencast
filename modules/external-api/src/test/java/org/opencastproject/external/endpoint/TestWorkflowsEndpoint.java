@@ -51,6 +51,7 @@ import com.google.common.collect.Sets;
 import org.junit.Ignore;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Date;
 
 import javax.ws.rs.Path;
@@ -76,7 +77,7 @@ public class TestWorkflowsEndpoint extends WorkflowsEndpoint {
     expect(woi1.getTimeInQueue()).andReturn(20L);
     expect(woi1.getExecutionHost()).andReturn("http://localhost:8080");
     expect(woi1.getExecutionCondition()).andReturn("${letfail}");
-    expect(woi1.isFailWorkflowOnException()).andReturn(true);
+    expect(woi1.isFailOnError()).andReturn(true);
     expect(woi1.getExceptionHandlingWorkflow()).andReturn("fail");
     expect(woi1.getRetryStrategy()).andReturn(RetryStrategy.RETRY);
     expect(woi1.getMaxAttempts()).andReturn(42);
@@ -94,8 +95,7 @@ public class TestWorkflowsEndpoint extends WorkflowsEndpoint {
     expect(woi2.getState()).andReturn(WorkflowOperationInstance.OperationState.SUCCEEDED);
     expect(woi2.getTimeInQueue()).andReturn(30L);
     expect(woi2.getExecutionHost()).andReturn("http://localhost:8080");
-    expect(woi2.getSkipCondition()).andReturn("${letfail}");
-    expect(woi2.isFailWorkflowOnException()).andReturn(false);
+    expect(woi2.isFailOnError()).andReturn(false);
     expect(woi2.getRetryStrategy()).andReturn(RetryStrategy.HOLD);
     expect(woi2.getMaxAttempts()).andReturn(0);
     expect(woi2.getFailedAttempts()).andReturn(0);
@@ -152,13 +152,11 @@ public class TestWorkflowsEndpoint extends WorkflowsEndpoint {
     replay(startedStoppedWorkflow);
 
     WorkflowSet workflows = createNiceMock(WorkflowSet.class);
-    expect(workflows.getItems()).andReturn(new WorkflowInstance[] { runningWorkflow, stoppedWorkflow });
+    expect(workflows.getItems()).andReturn(Arrays.asList(runningWorkflow, stoppedWorkflow));
     replay(workflows);
 
     // WorkflowService
     WorkflowService ws = createNiceMock(WorkflowService.class);
-    //all workflows
-    expect(ws.getWorkflowInstances(anyObject())).andReturn(workflows);
     //create
     WorkflowDefinition fastWorkflowDefinition = new WorkflowDefinitionImpl();
     expect(ws.getWorkflowDefinitionById("missing")).andThrow(new NotFoundException());

@@ -33,13 +33,13 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleDirectoryService;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.util.data.Option;
 
 import org.easymock.EasyMock;
 import org.junit.Ignore;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.ws.rs.Path;
 
@@ -63,7 +63,7 @@ public class TestAclEndpoint extends AclEndpoint {
     AccessControlList publicAcl = new AccessControlList(ace1, ace2);
     AccessControlList privateAcl = new AccessControlList(ace3, ace4);
 
-    List<ManagedAcl> managedAcls = new ArrayList<ManagedAcl>();
+    List<ManagedAcl> managedAcls = new ArrayList<>();
     managedAcls.add(new ManagedAclImpl(1L, "public", org.getId(), publicAcl));
     managedAcls.add(new ManagedAclImpl(2L, "private", org.getId(), privateAcl));
 
@@ -79,7 +79,7 @@ public class TestAclEndpoint extends AclEndpoint {
 
     AclService aclService = EasyMock.createNiceMock(AclService.class);
     EasyMock.expect(aclService.getAcls()).andReturn(managedAcls).anyTimes();
-    EasyMock.expect(aclService.getAcl(EasyMock.anyLong())).andReturn(Option.some(managedAcls.get(0))).anyTimes();
+    EasyMock.expect(aclService.getAcl(EasyMock.anyLong())).andReturn(Optional.of(managedAcls.get(0))).anyTimes();
     EasyMock.replay(aclService);
 
     AclServiceFactory aclServiceFactory = EasyMock.createNiceMock(AclServiceFactory.class);

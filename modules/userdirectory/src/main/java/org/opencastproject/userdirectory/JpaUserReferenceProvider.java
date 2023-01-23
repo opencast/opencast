@@ -21,6 +21,10 @@
 
 package org.opencastproject.userdirectory;
 
+import static org.opencastproject.db.Queries.namedQuery;
+
+import org.opencastproject.db.DBSession;
+import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
@@ -32,12 +36,12 @@ import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUserReference;
 import org.opencastproject.userdirectory.api.AAIRoleProvider;
 import org.opencastproject.userdirectory.api.UserReferenceProvider;
-import org.opencastproject.util.NotFoundException;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -51,14 +55,15 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 /**
  * Manages and locates users references using JPA.
@@ -107,17 +112,26 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
 
+  protected DBSessionFactory dbSessionFactory;
+
+  protected DBSession db;
+
   /** OSGi DI */
-  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.common)")
+  @Reference(target = "(osgi.unit.name=org.opencastproject.common)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
+  }
+
+  @Reference
+  public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
+    this.dbSessionFactory = dbSessionFactory;
   }
 
   /**
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -126,7 +140,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    * @param groupRoleProvider
    *          the GroupRoleProvider to set
    */
-  @Reference(name = "groupRoleProvider")
+  @Reference
   public void setGroupRoleProvider(JpaGroupRoleProvider groupRoleProvider) {
     this.groupRoleProvider = groupRoleProvider;
   }
@@ -142,7 +156,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
     logger.debug("activate");
 
     // Setup the caches
-    cache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<String, Object>() {
+    cache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<>() {
       @Override
       public Object load(String id) {
         String[] key = id.split(DELIMITER);
@@ -153,6 +167,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
     });
 
     // Set up persistence
+    db = dbSessionFactory.createSession(emf);
   }
 
   @Override
@@ -181,7 +196,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
       return roleProvider.getRolesForUser(userName);
     }
 
-    ArrayList<Role> roles = new ArrayList<Role>();
+    ArrayList<Role> roles = new ArrayList<>();
     User user = loadUser(userName);
     if (user != null) {
       roles.addAll(user.getRoles());
@@ -200,22 +215,19 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
       throw new IllegalArgumentException("Query must be set");
     }
     String orgId = securityService.getOrganization().getId();
-    List<User> users = new ArrayList<User>();
-    for (JpaUserReference userRef : findUserReferencesByQuery(orgId, query, limit, offset, emf)) {
-      users.add(userRef.toUser(PROVIDER_NAME));
-    }
-    return users.iterator();
+    return db.exec(findUserReferencesByQueryQuery(orgId, query, limit, offset)).stream()
+        .map(ref -> ref.toUser(PROVIDER_NAME))
+        .collect(Collectors.toList())
+        .iterator();
   }
 
   @Override
   public Iterator<User> findUsers(Collection<String> userNames) {
     String orgId = securityService.getOrganization().getId();
-    List<User> users = new ArrayList<>();
-    final List<JpaUserReference> usersByName = findUsersByUserName(orgId, userNames, emf);
-    for (JpaUserReference userRef : usersByName) {
-      users.add(userRef.toUser(PROVIDER_NAME));
-    }
-    return users.iterator();
+    return db.exec(findUsersByUserNameQuery(orgId, userNames)).stream()
+        .map(ref -> ref.toUser(PROVIDER_NAME))
+        .collect(Collectors.toList())
+        .iterator();
   }
 
   /**
@@ -226,7 +238,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
   @Override
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
     if (roleProvider == null) {
-      return Collections.<Role> emptyList().iterator();
+      return Collections.emptyIterator();
     }
     return roleProvider.findRoles(query, target, offset, limit);
   }
@@ -257,21 +269,18 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    * @return the loaded user or <code>null</code> if not found
    */
   private User loadUser(String userName, String organization) {
-    JpaUserReference userReference = findUserReference(userName, organization, emf);
-    if (userReference != null) {
-      return userReference.toUser(PROVIDER_NAME);
-    }
-    return null;
+    return db.exec(findUserReferenceQuery(userName, organization))
+        .map(ref -> ref.toUser(PROVIDER_NAME))
+        .orElse(null);
   }
 
   @Override
   public Iterator<User> getUsers() {
     String orgId = securityService.getOrganization().getId();
-    List<User> users = new ArrayList<User>();
-    for (JpaUserReference userRef : findUserReferences(orgId, 0, 0, emf)) {
-      users.add(userRef.toUser(PROVIDER_NAME));
-    }
-    return users.iterator();
+    return db.exec(findUserReferences(orgId, 0, 0)).stream()
+        .map(ref -> ref.toUser(PROVIDER_NAME))
+        .collect(Collectors.toList())
+        .iterator();
   }
 
   /**
@@ -281,7 +290,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    */
   public Iterator<Role> getRoles() {
     if (roleProvider == null) {
-      return Collections.<Role> emptyList().iterator();
+      return Collections.emptyIterator();
     }
     return roleProvider.getRoles();
   }
@@ -300,36 +309,23 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    * {@inheritDoc}
    */
   public void addUserReference(JpaUserReference user, String mechanism) {
-    // Create a JPA user with an encoded password.
-    Set<JpaRole> roles = UserDirectoryPersistenceUtil.saveRoles(user.getRoles(), emf);
-    JpaOrganization organization = UserDirectoryPersistenceUtil.saveOrganization(
-            (JpaOrganization) user.getOrganization(), emf);
-    JpaUserReference userReference = new JpaUserReference(user.getUsername(), user.getName(), user.getEmail(),
-            mechanism, new Date(), organization, roles);
+    db.execTx(em -> {
+      // Create a JPA user with an encoded password.
+      Set<JpaRole> roles = UserDirectoryPersistenceUtil.saveRolesQuery(user.getRoles()).apply(em);
+      JpaOrganization organization = UserDirectoryPersistenceUtil.saveOrganizationQuery(
+          (JpaOrganization) user.getOrganization()).apply(em);
+      JpaUserReference userReference = new JpaUserReference(user.getUsername(), user.getName(), user.getEmail(),
+          mechanism, new Date(), organization, roles);
 
-    // Then save the user reference
-    EntityManager em = null;
-    EntityTransaction tx = null;
-    try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
-      JpaUserReference foundUserRef = findUserReference(user.getUsername(), user.getOrganization().getId(), emf);
-      if (foundUserRef == null) {
-        em.persist(userReference);
-      } else {
+      // Then save the user reference
+      Optional<JpaUserReference> foundUserRef = findUserReferenceQuery(user.getUsername(),
+          user.getOrganization().getId()).apply(em);
+      if (foundUserRef.isPresent()) {
         throw new IllegalStateException("User '" + user.getUsername() + "' already exists");
       }
-      tx.commit();
+      em.persist(userReference);
       cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), user.toUser(PROVIDER_NAME));
-    } finally {
-      if (tx.isActive()) {
-        tx.rollback();
-      }
-      if (em != null) {
-        em.close();
-      }
-    }
+    });
     updateGroupMembership(user);
   }
 
@@ -337,32 +333,19 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    * {@inheritDoc}
    */
   public void updateUserReference(JpaUserReference user) {
-    EntityManager em = null;
-    EntityTransaction tx = null;
-    try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
-      JpaUserReference foundUserRef = findUserReference(user.getUsername(), user.getOrganization().getId(), emf);
-      if (foundUserRef == null) {
+    db.execTx(em -> {
+      Optional<JpaUserReference> foundUserRef = findUserReferenceQuery(user.getUsername(),
+          user.getOrganization().getId()).apply(em);
+      if (foundUserRef.isEmpty()) {
         throw new IllegalStateException("User '" + user.getUsername() + "' does not exist");
-      } else {
-        foundUserRef.setName(user.getName());
-        foundUserRef.setEmail(user.getEmail());
-        foundUserRef.setLastLogin(new Date());
-        foundUserRef.setRoles(UserDirectoryPersistenceUtil.saveRoles(user.getRoles(), emf));
-        em.merge(foundUserRef);
       }
-      tx.commit();
+      foundUserRef.get().setName(user.getName());
+      foundUserRef.get().setEmail(user.getEmail());
+      foundUserRef.get().setLastLogin(new Date());
+      foundUserRef.get().setRoles(UserDirectoryPersistenceUtil.saveRolesQuery(user.getRoles()).apply(em));
+      em.merge(foundUserRef.get());
       cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), user.toUser(PROVIDER_NAME));
-    } finally {
-      if (tx.isActive()) {
-        tx.rollback();
-      }
-      if (em != null) {
-        em.close();
-      }
-    }
+    });
     updateGroupMembership(user);
   }
 
@@ -371,13 +354,10 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    *
    * @param user
    *          the user for whom groups should be updated
-   * @throws NotFoundException
    */
   private void updateGroupMembership(JpaUserReference user) {
-
     logger.debug("updateGroupMembership({}, roles={})", user.getUsername(), user.getRoles().size());
-
-    List<String> internalGroupRoles = new ArrayList<String>();
+    List<String> internalGroupRoles = new ArrayList<>();
 
     for (Role role : user.getRoles()) {
       if (Role.Type.GROUP.equals(role.getType())
@@ -403,7 +383,8 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    * @return the user or <code>null</code> if not found
    */
   public JpaUserReference findUserReference(String userName, String organizationId) {
-    return findUserReference(userName, organizationId, emf);
+    return db.exec(findUserReferenceQuery(userName, organizationId))
+        .orElse(null);
   }
 
   /**
@@ -413,25 +394,16 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    *          the user name
    * @param organizationId
    *          the organization id
-   * @param emf
-   *          the entity manager factory
    * @return the user or <code>null</code> if not found
    */
-  private JpaUserReference findUserReference(String userName, String organizationId, EntityManagerFactory emf) {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("UserReference.findByUsername");
-      q.setParameter("u", userName);
-      q.setParameter("org", organizationId);
-      return (JpaUserReference) q.getSingleResult();
-    } catch (NoResultException e) {
-      return null;
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+  private Function<EntityManager, Optional<JpaUserReference>> findUserReferenceQuery(String userName,
+      String organizationId) {
+    return namedQuery.findOpt(
+        "UserReference.findByUsername",
+        JpaUserReference.class,
+        Pair.of("u", userName),
+        Pair.of("org", organizationId)
+    );
   }
 
   /**
@@ -446,50 +418,37 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    *          the limit
    * @param offset
    *          the offset
-   * @param emf
-   *          the entity manager factory
    * @return the user references list
    */
-  @SuppressWarnings("unchecked")
-  private List<JpaUserReference> findUserReferencesByQuery(String orgId, String query, int limit, int offset,
-          EntityManagerFactory emf) {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("UserReference.findByQuery").setMaxResults(limit).setFirstResult(offset);
+  private Function<EntityManager, List<JpaUserReference>> findUserReferencesByQueryQuery(String orgId, String query,
+      int limit, int offset) {
+    return em -> {
+      TypedQuery<JpaUserReference> q = em.createNamedQuery("UserReference.findByQuery", JpaUserReference.class)
+          .setMaxResults(limit)
+          .setFirstResult(offset);
       q.setParameter("query", query.toUpperCase());
       q.setParameter("org", orgId);
       return q.getResultList();
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    };
   }
 
   /**
    * Returns user references for specific user names (and an organization)
    * @param orgId The organization to search for
    * @param names The names to search for
-   * @param emf the entity manager factory
    * @return the user references list
    */
-  private List<JpaUserReference> findUsersByUserName(String orgId, Collection<String> names, EntityManagerFactory emf) {
-    if (names.isEmpty()) {
-      return Collections.<JpaUserReference>emptyList();
-    }
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("UserReference.findAllByUserNames");
+  private Function<EntityManager, List<JpaUserReference>> findUsersByUserNameQuery(String orgId,
+      Collection<String> names) {
+    return em -> {
+      if (names.isEmpty()) {
+        return Collections.emptyList();
+      }
+      TypedQuery<JpaUserReference> q = em.createNamedQuery("UserReference.findAllByUserNames", JpaUserReference.class);
       q.setParameter("org", orgId);
       q.setParameter("names", names);
       return q.getResultList();
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    };
   }
 
   /**
@@ -501,39 +460,26 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    *          the limit
    * @param offset
    *          the offset
-   * @param emf
-   *          the entity manager factory
    * @return the user references list
    */
-  @SuppressWarnings("unchecked")
-  private List<JpaUserReference> findUserReferences(String orgId, int limit, int offset, EntityManagerFactory emf) {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("UserReference.findAll").setMaxResults(limit).setFirstResult(offset);
+  private Function<EntityManager, List<JpaUserReference>> findUserReferences(String orgId, int limit, int offset) {
+    return em -> {
+      TypedQuery<JpaUserReference> q = em.createNamedQuery("UserReference.findAll", JpaUserReference.class)
+          .setMaxResults(limit)
+          .setFirstResult(offset);
       q.setParameter("org", orgId);
       return q.getResultList();
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    };
   }
 
   @Override
   public long countUsers() {
     String orgId = securityService.getOrganization().getId();
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("UserReference.countAll");
-      q.setParameter("org", orgId);
-      return ((Number) q.getSingleResult()).longValue();
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    return db.exec(namedQuery.find(
+        "UserReference.countAll",
+        Number.class,
+        Pair.of("org", orgId)
+    )).longValue();
   }
 
   @Override
@@ -545,5 +491,4 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
   public void setRoleProvider(RoleProvider roleProvider) {
     this.roleProvider = (AAIRoleProvider) roleProvider;
   }
-
 }

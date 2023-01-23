@@ -34,7 +34,9 @@ import java.util.Dictionary;
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 /**
  * OSGi service that allows to send e-mails using <code>javax.mail</code>.
@@ -62,8 +64,11 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    */
   private static final String SPLIT_PATTERN = "[\\s,]+";
 
+  /** Define the MIME type for text mail content */
+  private static final String TEXT_PLAIN = "text/plain; charset=UTF-8";
+
   /** Define the MIME type for HTML mail content */
-  private static final String TEXT_HTML = "text/html";
+  private static final String TEXT_HTML = "text/html; charset=UTF-8";
 
   /**
    * Callback from the OSGi <code>ConfigurationAdmin</code> on configuration changes.
@@ -171,13 +176,13 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    *          Recipient of the message
    * @param subject
    *          Subject of the message
-   * @param body
-   *          Body of the message
+   * @param bodyText
+   *          Text body of the message (null if there should be no text part)
    * @throws MessagingException
    *           if sending the message failed
    */
-  public void send(String to, String subject, String body) throws MessagingException {
-    send(to, subject, body, false);
+  public void send(String to, String subject, String bodyText) throws MessagingException {
+    send(to, subject, bodyText, null);
   }
 
   /**
@@ -187,24 +192,15 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    *          Recipient of the message
    * @param subject
    *          Subject of the message
-   * @param body
-   *          Body of the message
-   * @param isHTML
-   *          Is the body of the message in HTML
+   * @param bodyText
+   *          Text body of the message (null if there should be no text part)
+   * @param bodyHTML
+   *          HTML body of the message (null if there should be no HTML part)
    * @throws MessagingException
    *           if sending the message failed
    */
-  public void send(String to, String subject, String body, Boolean isHTML) throws MessagingException {
-    MimeMessage message = createMessage();
-    message.addRecipient(RecipientType.TO, new InternetAddress(to));
-    message.setSubject(subject);
-    if (isHTML) {
-        message.setContent(body, TEXT_HTML);
-    } else {
-        message.setText(body);
-    }
-    message.saveChanges();
-    send(message);
+  public void send(String to, String subject, String bodyText, String bodyHTML) throws MessagingException {
+    send(to, null, null, subject, bodyText, bodyHTML);
   }
 
   /**
@@ -218,13 +214,13 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    *          "BCC:" message recipient(s), separated by commas and/or spaces
    * @param subject
    *          Subject of the message
-   * @param body
-   *          Body of the message
+   * @param bodyText
+   *          Text body of the message (null if there should be no text part)
    * @throws MessagingException
    *           if sending the message failed
    */
-  public void send(String to, String cc, String bcc, String subject, String body) throws MessagingException {
-    send(to, cc, bcc, subject, body, false);
+  public void send(String to, String cc, String bcc, String subject, String bodyText) throws MessagingException {
+    send(to, cc, bcc, subject, bodyText, null);
   }
 
   /**
@@ -238,14 +234,14 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    *          "BCC:" message recipient(s), separated by commas and/or spaces
    * @param subject
    *          Subject of the message
-   * @param body
-   *          Body of the message
-   * @param isHTML
-   *          Is the body of the message in HTML
+   * @param bodyText
+   *          Text body of the message (null if there should be no text part)
+   * @param bodyHTML
+   *          HTML body of the message (null if there should be no HTML part)
    * @throws MessagingException
    *           if sending the message failed
    */
-  public void send(String to, String cc, String bcc, String subject, String body, Boolean isHTML) throws MessagingException {
+  public void send(String to, String cc, String bcc, String subject, String bodyText, String bodyHTML) throws MessagingException {
     String[] toArray = null;
     String[] ccArray = null;
     String[] bccArray = null;
@@ -259,7 +255,7 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
     if (bcc != null)
       bccArray = bcc.trim().split(SPLIT_PATTERN, 0);
 
-    send(toArray, ccArray, bccArray, subject, body, isHTML);
+    send(toArray, ccArray, bccArray, subject, bodyText, bodyHTML);
   }
 
   /**
@@ -273,13 +269,13 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    *          Array with the "BCC:" recipients of the message
    * @param subject
    *          Subject of the message
-   * @param body
-   *          Body of the message
+   * @param bodyText
+   *          Text body of the message (null if there should be no text part)
    * @throws MessagingException
    *           if sending the message failed
    */
-  public void send(String[] to, String[] cc, String[] bcc, String subject, String body) throws MessagingException {
-    send(to, cc, bcc, subject, body, false);
+  public void send(String[] to, String[] cc, String[] bcc, String subject, String bodyText) throws MessagingException {
+    send(to, cc, bcc, subject, bodyText, null);
   }
 
   /**
@@ -293,24 +289,39 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    *          Array with the "BCC:" recipients of the message
    * @param subject
    *          Subject of the message
-   * @param body
-   *          Body of the message
-   * @param isHTML
-   *          Is the body of the message in HTML
+   * @param bodyText
+   *          Text body of the message (null if there should be no text part)
+   * @param bodyHTML
+   *          HTML body of the message (null if there should be no HTML part)
    * @throws MessagingException
-   *           if sending the message failed
+   *          if sending the message failed
+   * @throws IllegalArgumentException
+   *          if both bodyText and bodyHTML are null
    */
-  public void send(String[] to, String[] cc, String[] bcc, String subject, String body, boolean isHTML) throws MessagingException {
+  public void send(String[] to, String[] cc, String[] bcc, String subject, String bodyText, String bodyHTML) throws MessagingException {
+    if (bodyText == null && bodyHTML == null) {
+      throw new IllegalArgumentException("bodyText and bodyHTML cannot both be empty");
+    }
+
     MimeMessage message = createMessage();
     addRecipients(message, RecipientType.TO, to);
     addRecipients(message, RecipientType.CC, cc);
     addRecipients(message, RecipientType.BCC, bcc);
     message.setSubject(subject);
-    if (isHTML) {
-        message.setContent(body, TEXT_HTML);
-    } else {
-        message.setText(body);
+
+    MimeMultipart mp = new MimeMultipart("alternative");
+    // the text/plain part needs to be added first!
+    if (bodyText != null) {
+      MimeBodyPart part = new MimeBodyPart();
+      part.setContent(bodyText, TEXT_PLAIN);
+      mp.addBodyPart(part);
     }
+    if (bodyHTML != null) {
+      MimeBodyPart part = new MimeBodyPart();
+      part.setContent(bodyHTML, TEXT_HTML);
+      mp.addBodyPart(part);
+    }
+    message.setContent(mp);
     message.saveChanges();
     send(message);
   }
@@ -322,7 +333,7 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    *          The message to add the recipients to
    * @param type
    *          The type of recipient
-   * @param addresses
+   * @param strAddresses
    * @throws MessagingException
    */
   private static void addRecipients(MimeMessage message, RecipientType type, String... strAddresses)

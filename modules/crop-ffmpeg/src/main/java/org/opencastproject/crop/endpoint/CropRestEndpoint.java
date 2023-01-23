@@ -97,7 +97,7 @@ public class CropRestEndpoint extends AbstractJobProducerEndpoint {
    *
    * @param serviceRegistry the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -107,7 +107,7 @@ public class CropRestEndpoint extends AbstractJobProducerEndpoint {
    *
    * @param cropService the cropper
    */
-  @Reference(name = "cropService")
+  @Reference
   protected void setCropService(CropService cropService) {
     this.cropService = cropService;
   }

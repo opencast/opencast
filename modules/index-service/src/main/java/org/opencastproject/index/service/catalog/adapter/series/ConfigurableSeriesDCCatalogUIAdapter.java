@@ -39,11 +39,15 @@ import org.opencastproject.util.RequireUtil;
 
 import com.entwinemedia.fn.data.Opt;
 
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.util.Arrays;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * A series catalog UI adapter that is managed by a configuration.
@@ -100,25 +104,17 @@ public class ConfigurableSeriesDCCatalogUIAdapter extends ConfigurableDCCatalogU
         dc.setFlavor(flavor);
         return Opt.some(dc);
       }
-    } catch (SeriesException e) {
-      logger.error("Error while loading DublinCore catalog of series '{}': {}", seriesId, e);
+    } catch (SeriesException | IOException | ParseException | ParserConfigurationException | SAXException e) {
+      logger.error("Error while loading DublinCore catalog {} of series '{}'", flavor, seriesId, e);
       return Opt.none();
     }
   }
 
   protected boolean saveDublinCoreCatalog(String seriesId, DublinCoreCatalog dc) {
     try {
-      final byte[] dcData = dc.toXmlString().getBytes("UTF-8");
-      if (getSeriesService().getSeriesElementData(seriesId, flavor.getType()).isSome()) {
-        return getSeriesService().updateSeriesElement(seriesId, flavor.getType(), dcData);
-      } else {
-        return getSeriesService().addSeriesElement(seriesId, flavor.getType(), dcData);
-      }
-    } catch (IOException e) {
-      logger.error("Error while serializing the dublin core catalog to XML", e);
-      return false;
+      return getSeriesService().updateExtendedMetadata(seriesId, flavor.getType(), dc);
     } catch (SeriesException e) {
-      logger.error("Error while saving the series element", e);
+      logger.error("Error while saving the series Dublin Core catalog", e);
       return false;
     }
   }

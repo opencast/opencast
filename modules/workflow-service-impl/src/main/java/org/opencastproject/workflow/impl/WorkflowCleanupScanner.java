@@ -257,25 +257,25 @@ public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner implem
     }
   }
 
-  @Reference(name = "WorkflowService")
+  @Reference
   @Override
   public void bindWorkflowService(WorkflowService workflowService) {
     super.bindWorkflowService(workflowService);
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void bindServiceRegistry(ServiceRegistry serviceRegistry) {
     super.bindServiceRegistry(serviceRegistry);
   }
 
-  @Reference(name = "OrganizationDirectoryService")
+  @Reference
   @Override
   public void bindOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     super.bindOrganizationDirectoryService(organizationDirectoryService);
   }
 
-  @Reference(name = "SecurityService")
+  @Reference
   @Override
   public void bindSecurityService(SecurityService securityService) {
     super.bindSecurityService(securityService);

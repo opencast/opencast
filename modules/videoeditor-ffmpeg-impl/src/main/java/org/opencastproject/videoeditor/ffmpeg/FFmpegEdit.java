@@ -53,9 +53,9 @@ public class FFmpegEdit {
   private static final String FFMPEG_BINARY_DEFAULT = "ffmpeg";
   private static final String CONFIG_FFMPEG_PATH = "org.opencastproject.composer.ffmpeg.path";
 
-  private static final String DEFAULT_FFMPEG_PROPERTIES = "-strict -2 -preset faster -crf 18";
-  private static final String DEFAULT_AUDIO_FADE = "2.0";
-  private static final String DEFAULT_VIDEO_FADE = "2.0";
+  private static final String DEFAULT_FFMPEG_PROPERTIES = "-preset faster -crf 18";
+  private static final String DEFAULT_AUDIO_FADE = "0.2";
+  private static final String DEFAULT_VIDEO_FADE = "0.2";
   private static String binary = FFMPEG_BINARY_DEFAULT;
 
   protected float vfade;
@@ -84,19 +84,9 @@ public class FFmpegEdit {
    */
   public FFmpegEdit(Properties properties) {
     String fade = properties.getProperty(VideoEditorProperties.AUDIO_FADE, DEFAULT_AUDIO_FADE);
-    try {
-      this.afade = Float.parseFloat(fade);
-    } catch (Exception e) {
-      logger.error("Unable to parse audio fade duration {}. Falling back to default value.", DEFAULT_AUDIO_FADE);
-      this.afade = Float.parseFloat(DEFAULT_AUDIO_FADE);
-    }
+    this.afade = Float.parseFloat(fade);
     fade = properties.getProperty(VideoEditorProperties.VIDEO_FADE, DEFAULT_VIDEO_FADE);
-    try {
-      this.vfade = Float.parseFloat(fade);
-    } catch (Exception e) {
-      logger.error("Unable to parse video fade duration {}. Falling back to default value.", DEFAULT_VIDEO_FADE);
-      this.vfade = Float.parseFloat(DEFAULT_VIDEO_FADE);
-    }
+    this.vfade = Float.parseFloat(fade);
     this.ffmpegProperties = properties.getProperty(VideoEditorProperties.FFMPEG_PROPERTIES, DEFAULT_FFMPEG_PROPERTIES);
     this.ffmpegScaleFilter = properties.getProperty(VideoEditorProperties.FFMPEG_SCALE_FILTER, null);
     this.videoCodec = properties.getProperty(VideoEditorProperties.VIDEO_CODEC, null);
@@ -205,8 +195,8 @@ public class FFmpegEdit {
       // get clip and add fades to each clip
       VideoClip vclip = clips.get(i);
       int fileindx = vclip.getSrc();   // get source file by index
-      double inpt = vclip.getStart();     // get in points
-      double duration = vclip.getDuration();
+      double inpt = vclip.getStartInSeconds();     // get in points
+      double duration = vclip.getDurationInSeconds();
 
       String clip = "";
       if (hasVideo) {

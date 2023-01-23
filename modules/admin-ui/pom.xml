@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>12-SNAPSHOT</version>
+    <version>14-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -28,11 +28,6 @@
     <!-- opencast -->
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-message-broker-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
@@ -46,6 +41,11 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-index-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-message-broker-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -391,6 +391,7 @@
               org.opencastproject.adminui.endpoint;version=${project.version},
               org.opencastproject.adminui.exception;version=${project.version},
               org.opencastproject.adminui.impl;version=${project.version},
+              org.opencastproject.adminui.tobira;version=${project.version},
               org.opencastproject.adminui.userdirectory;version=${project.version},
               org.opencastproject.adminui.usersettings;version=${project.version},
               org.opencastproject.adminui.usersettings.persistence;version=${project.version},

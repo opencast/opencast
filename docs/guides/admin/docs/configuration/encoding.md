@@ -107,7 +107,7 @@ Once defined, use your encoding profile in your workflow by setting the encoding
         <configuration key="target-flavor">presenter/delivery</configuration>
         <configuration key="target-tags">rss, atom, captioning</configuration>
         <configuration key="encoding-profile">my-av-profile.http</configuration>
-      </configuration>
+      </configurations>
     </operation>
 
 Have a look at the [Workflow Configuration section](workflow.md) for more details about workflows and workflow

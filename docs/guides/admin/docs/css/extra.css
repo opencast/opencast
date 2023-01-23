@@ -178,3 +178,14 @@ div.warn {
   padding: 15px;
   margin-bottom: 10px;
 }
+
+.tippy-box[data-theme~='opencast'] {
+  background-color: #24425c;
+  color: white;
+  line-height: normal;
+  font-size: 12px;
+  font-family: 'Open Sans';
+}
+.tippy-box[data-theme~='opencast'][data-placement^='top'] > .tippy-arrow::before {
+  color: #24425c;
+}

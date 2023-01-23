@@ -105,7 +105,7 @@ public class UserTrackingRestService {
    *
    * @param service
    */
-  @Reference(name = "service-impl")
+  @Reference
   public void setService(UserTrackingService service) {
     this.usertrackingService = service;
   }
@@ -116,7 +116,7 @@ public class UserTrackingRestService {
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

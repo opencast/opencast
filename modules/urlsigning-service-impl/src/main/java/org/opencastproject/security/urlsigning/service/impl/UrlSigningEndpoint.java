@@ -67,7 +67,7 @@ public class UrlSigningEndpoint {
   private UrlSigningService signingService;
 
   /** OSGi DI callback */
-  @Reference(name = "urlSigningService")
+  @Reference
   void setUrlSigningService(UrlSigningService signingService) {
     this.signingService = signingService;
   }

@@ -123,7 +123,6 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
     logger.debug("Finished activating/updating speech-to-text service");
   }
 
-
   /**
    * {@inheritDoc}
    *
@@ -154,17 +153,16 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
       FileUtils.forceMkdirParent(subtitlesFile);
 
       subtitlesFile = speechToTextEngine.generateSubtitlesFile(
-              workspace.get(mediaFile).toURI(), subtitlesFile, language);
+              workspace.get(mediaFile), subtitlesFile, language);
 
       // we need to call the "putInCollection" method to get
-      // an URI, that can be used in the following processes
+      // a URI, that can be used in the following processes
       try (FileInputStream subtitlesFileIS = new FileInputStream(subtitlesFile)) {
         subtitleFilesURI = workspace.putInCollection(COLLECTION,
                 vttFileName.replaceFirst(TMP_PREFIX, ""), subtitlesFileIS);
       }
     } catch (Exception e) {
-      logger.error("Error while creating necessary subtitles tmp files and folders for mediafile '{}'", mediaFile);
-      throw e;
+      throw new SpeechToTextServiceException("Error while generating subtitle from " + mediaFile, e);
     } finally {
       if (subtitlesFile != null && subtitlesFile.exists()) {
         FileUtils.deleteQuietly(subtitlesFile);
@@ -215,7 +213,10 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
     return organizationDirectoryService;
   }
 
-  @Reference
+  @Reference(
+          name = "SpeechToTextEngine",
+          target = "(engineType=vosk)"
+  )
   public void setSpeechToTextEngine(SpeechToTextEngine engine) {
     this.speechToTextEngine = engine;
   }

@@ -28,6 +28,8 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -56,13 +58,20 @@ public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperat
   /** The dublin core catalog service */
   private DublinCoreCatalogService dcService;
 
+  private String karafEtc = null;
+
+  @Activate
+  public void activate(BundleContext bundleContext) {
+    karafEtc = bundleContext.getProperty("karaf.etc");
+  }
+
   /**
    * OSGi callback to set the cover image service
    *
    * @param coverImageService
    *          an instance of the cover image service
    */
-  @Reference(name = "CoverImageService")
+  @Reference
   protected void setCoverImageService(CoverImageService coverImageService) {
     this.coverImageService = coverImageService;
   }
@@ -73,7 +82,7 @@ public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperat
    * @param workspace
    *          an instance of the workspace service
    */
-  @Reference(name = "Workspace")
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -84,10 +93,7 @@ public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperat
    * @param srv
    *          an instance of the static metadata service
    */
-  @Reference(
-      name = "MetadataService",
-      target = "(metadata.source=dublincore)"
-  )
+  @Reference(target = "(metadata.source=dublincore)")
   protected void setStaticMetadataService(StaticMetadataService srv) {
     this.metadataService = srv;
   }
@@ -98,12 +104,12 @@ public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperat
    * @param dcService
    *          an instance of the dublin core catalog service
    */
-  @Reference(name = "DublinCoreCatalogService")
+  @Reference
   protected void setDublinCoreCatalogService(DublinCoreCatalogService dcService) {
     this.dcService = dcService;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);
@@ -129,4 +135,8 @@ public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperat
     return dcService;
   }
 
+  @Override
+  protected String getKarafEtc() {
+    return karafEtc;
+  }
 }

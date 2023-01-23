@@ -171,14 +171,14 @@ $segment-deleted-selected: saturate(darken($segment-deleted, 25%), 5%);
             $sliver-active-stops: ();
             $sliver-deleted-stops: ();
 
-            @for $j from 0 through floor($segment-sliver-vert-length/$num-colors) {
+            @for $j from 0 through floor(calc($segment-sliver-vert-length/$num-colors)) {
               @for $i from 1 through $num-colors {
                 $active-color: nth($segment-sliver-active-colors, $i);
                 $deleted-color: nth($segment-sliver-deleted-colors, $i);
-                $new-active-stops: $active-color percentage(($i - 1) / $segment-sliver-vert-length + $j * $num-colors / $segment-sliver-vert-length),
-                                 $active-color percentage($i / $segment-sliver-vert-length + $j * $num-colors / $segment-sliver-vert-length);
-                $new-deleted-stops: $deleted-color percentage(($i - 1) / $segment-sliver-vert-length + $j * $num-colors / $segment-sliver-vert-length),
-                                 $deleted-color percentage($i / $segment-sliver-vert-length + $j * $num-colors / $segment-sliver-vert-length);
+                $new-active-stops: $active-color percentage(calc(($i - 1) / $segment-sliver-vert-length) + calc($j * $num-colors / $segment-sliver-vert-length)),
+                                 $active-color percentage(calc($i / $segment-sliver-vert-length) + calc($j * $num-colors / $segment-sliver-vert-length));
+                $new-deleted-stops: $deleted-color percentage(calc(($i - 1) / $segment-sliver-vert-length) + calc($j * $num-colors / $segment-sliver-vert-length)),
+                                 $deleted-color percentage(calc($i / $segment-sliver-vert-length) + calc($j * $num-colors / $segment-sliver-vert-length));
                 $sliver-active-stops: join($sliver-active-stops, $new-active-stops, comma);
                 $sliver-deleted-stops: join($sliver-deleted-stops, $new-deleted-stops, comma);
               }
@@ -465,8 +465,8 @@ $segment-deleted-selected: saturate(darken($segment-deleted, 25%), 5%);
 
             $handle-size: 14px;
             .handle {
-                bottom: ($handle-size/-2) + 1;
-                left: ($handle-size/-2);
+                bottom: calc($handle-size/-2) + 1;
+                left: calc($handle-size/-2);
                 width: $handle-size;
                 height: $handle-size;
                 border-radius: $handle-size;

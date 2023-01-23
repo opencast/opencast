@@ -130,25 +130,6 @@ public interface IngestService extends JobProducer {
   MediaPackage createMediaPackage(String mediaPackageID) throws MediaPackageException, ConfigurationException,
           IOException, IngestException;
 
-
-  /**
-   * Add a media track to an existing MediaPackage in the repository
-   *
-   * @param uri
-   *          The URL of the file to add
-   * @param flavor
-   *          The flavor of the media that is being added
-   * @param mediaPackage
-   *          The specific Opencast MediaPackage to which Media is being added
-   * @return MediaPackageManifest The manifest of a specific Opencast MediaPackage element
-   * @throws MediaPackageException
-   * @throws IOException
-   * @throws IngestException
-   *           if an unexpected error occurs
-   */
-  MediaPackage addTrack(URI uri, MediaPackageElementFlavor flavor, MediaPackage mediaPackage)
-          throws MediaPackageException, IOException, IngestException;
-
     /**
    * Add a media track to an existing MediaPackage in the repository
    *
@@ -256,6 +237,8 @@ public interface IngestService extends JobProducer {
    *          The URL of the file to add
    * @param flavor
    *          The flavor of the media that is being added
+   * @param tags
+   *           Tags to add to the catalog
    * @param mediaPackage
    *          The specific Opencast MediaPackage to which Media is being added
    * @return MediaPackage The updated Opencast MediaPackage element
@@ -264,7 +247,7 @@ public interface IngestService extends JobProducer {
    * @throws IngestException
    *           if an unexpected error occurs
    */
-  MediaPackage addCatalog(URI uri, MediaPackageElementFlavor flavor, MediaPackage mediaPackage)
+  MediaPackage addCatalog(URI uri, MediaPackageElementFlavor flavor, String[] tags, MediaPackage mediaPackage)
           throws MediaPackageException, IOException, IngestException;
 
   /**
@@ -313,6 +296,8 @@ public interface IngestService extends JobProducer {
    *          The URL of the file to add
    * @param flavor
    *          The flavor of the media that is being added
+   * @param tags
+   *           Tags to add to the attachment
    * @param mediaPackage
    *          The specific Opencast MediaPackage to which Media is being added
    * @return MediaPackage The updated Opencast MediaPackage element
@@ -321,7 +306,7 @@ public interface IngestService extends JobProducer {
    * @throws IngestException
    *           if an unexpected error occurs
    */
-  MediaPackage addAttachment(URI uri, MediaPackageElementFlavor flavor, MediaPackage mediaPackage)
+  MediaPackage addAttachment(URI uri, MediaPackageElementFlavor flavor, String[] tags, MediaPackage mediaPackage)
           throws MediaPackageException, IOException, IngestException;
 
   /**

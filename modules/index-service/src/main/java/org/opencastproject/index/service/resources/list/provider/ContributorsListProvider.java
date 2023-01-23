@@ -102,13 +102,13 @@ public class ContributorsListProvider implements ResourceListProvider {
   }
 
   /** OSGi callback for users services. */
-  @Reference(name = "userDirectoryService")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
   /** OSGi callback for the search index. */
-  @Reference(name = "ElasticsearchIndex")
+  @Reference
   public void setIndex(ElasticsearchIndex index) {
     this.searchIndex = index;
   }
