@@ -29,14 +29,14 @@ export const eventsTableConfig = {
 		},
 		{
 			template: "EventsPresentersCell",
-			name: "presenters",
+			name: "presenter",
 			label: "EVENTS.EVENTS.TABLE.PRESENTERS",
 			sortable: true,
 			translate: false,
 		},
 		{
 			template: "EventsSeriesCell",
-			name: "series",
+			name: "series_name",
 			label: "EVENTS.EVENTS.TABLE.SERIES",
 			sortable: true,
 			translate: false,

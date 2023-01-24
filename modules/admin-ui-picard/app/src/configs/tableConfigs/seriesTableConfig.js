@@ -36,7 +36,7 @@ export const seriesTableConfig = {
 		},
 		{
 			template: "SeriesDateTimeCell",
-			name: "creation_date",
+			name: "createdDateTime",
 			label: "EVENTS.SERIES.TABLE.CREATED",
 			sortable: true,
 		},
