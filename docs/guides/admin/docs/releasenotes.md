@@ -183,7 +183,7 @@ Opencast 12.0
 - Workflows' data is now atomically stored in the database instead of XML to
   improve access speed. [[#3376](https://github.com/opencast/opencast/pull/3376)]
 - You can now specify a fallback language and use a placeholder in the Vosk-based
-  [Speech to Text Workflow Operation Handler](workflowoperationhandlers/speech-to-text-woh.md).
+  [Speech to Text Workflow Operation Handler](workflowoperationhandlers/speechtotext-woh.md).
 - Improved performance when rebuilding the Elasticsearch event index. [[#3775](https://github.com/opencast/opencast/pull/3775)]
 - Documentation for developers and testers has been added explaining how to
   [explore Opencast's H2 database](https://docs.opencast.org/r/12.x/developer/explore-h2-database/).
