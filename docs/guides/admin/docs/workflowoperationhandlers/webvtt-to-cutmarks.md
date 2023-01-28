@@ -33,10 +33,8 @@ Operation Example
 
 ```xml
 <operation
-        id="webvtt-to-cutmarks"
-    description="Use WebVTT as a silence detection"
-    fail-on-error="true"
-    exception-handler-workflow="partial-error">
+    id="webvtt-to-cutmarks"
+    description="Use WebVTT as a silence detection">
   <configurations>
     <configuration key="source-flavor">captions/vtt+en</configuration>
     <configuration key="target-flavor">cut-marks/json</configuration>

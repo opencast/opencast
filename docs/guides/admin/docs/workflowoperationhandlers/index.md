@@ -117,6 +117,7 @@ The following table contains the workflow operations that are available in an ou
 | transfer-metadata                    | Transfer metadata fields between catalogs                                                 | [Documentation](transfer-metadata-woh.md)                    |
 | video-grid                           | Put parallel video streams on a single video canvas                                       | [Documentation](video-grid-woh.md)                           |
 | waveform                             | Create a waveform image of the audio of the mediapackage                                  | [Documentation](waveform-woh.md)                             |
+| webvtt-to-cutmarks                   | Create cutting suggestions from subtitles                                                 | [Documentation](webvtt-to-cutmarks.md)                       |
 | zip                                  | Create zipped archive of the current state of the mediapackage                            | [Documentation](zip-woh.md)                                  |
 
 ## State Mappings
