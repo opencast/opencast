@@ -4,7 +4,7 @@ Vosk Transcription Engine
 Overview
 --------
 [Vosk](https://alphacephei.com/vosk/) is an offline open-source speech recognition toolkit. It enables speech recognition for 20+ languages.
-This engine is use by [SpeechToText WoH](../../workflowoperationhandlers/speech-to-text-woh.md)
+This engine is use by [SpeechToText WoH](../../workflowoperationhandlers/speechtotext-woh.md)
 
 Enable Vosk in Opencast
 -----------------------
