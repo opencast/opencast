@@ -21,6 +21,8 @@
 
 package org.opencastproject.editor.api;
 
+import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
+import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
@@ -36,10 +38,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -84,6 +88,63 @@ public abstract class EditorRestEndpointBase {
       return checkErrorState(mediaPackageId, e);
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).entity("No write access to this event.").build();
+    }
+  }
+
+  @POST
+  @Path("{mediaPackageId}/lock")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "lockMediapackage",
+          description = "Creates and updates the lock for a mediapackage in the editor",
+          returnDescription = "",
+          pathParameters = {
+            @RestParameter(name = "mediaPackageId", description = "The id of the media package", isRequired = true,
+                    type = RestParameter.Type.STRING)
+          },
+          responses = {
+            @RestResponse(description = "Lock obtained", responseCode = SC_CREATED),
+            @RestResponse(description = "Lock not obtained", responseCode = SC_CONFLICT),
+            @RestResponse(description = "Mediapackage not found", responseCode = SC_NOT_FOUND)
+          })
+  public Response lockMediapackage(@PathParam("mediaPackageId") final String mediaPackageId,
+         @Context HttpServletRequest request) {
+    try {
+      String details = readInputStream(request);
+      LockData lockData = LockData.parse(details);
+      editorService.lockMediaPackage(mediaPackageId, lockData);
+      return RestUtil.R.created(new URI(request.getRequestURI() + "/" + lockData.getUUID()));
+    } catch (EditorServiceException e) {
+      return checkErrorState(mediaPackageId, e);
+    } catch (Exception e) {
+      logger.debug("Unable to create lock {}",  e);
+      return RestUtil.R.badRequest();
+    }
+  }
+
+  @DELETE
+  @Path("{mediaPackageId}/lock/{uuid}")
+  @RestQuery(name = "unlockMediapackage",
+          description = "Releases the lock for a mediapackage in the editor",
+          returnDescription = "",
+          pathParameters = {
+            @RestParameter(name = "mediaPackageId", description = "The id of the media package", isRequired = true,
+                    type = RestParameter.Type.STRING),
+            @RestParameter(name = "uuid", description = "Identifier of editor session", isRequired = true,
+                    type = RestParameter.Type.STRING)
+          },
+          responses = {
+            @RestResponse(description = "Lock deleted", responseCode = SC_OK),
+            @RestResponse(description = "Lock not obtained", responseCode = SC_CONFLICT),
+            @RestResponse(description = "Lock not found", responseCode = SC_NOT_FOUND)
+          })
+
+  public Response unlockMediapackage(@PathParam("mediaPackageId") final String mediaPackageId,
+          @PathParam("uuid") final String uuid)  {
+    try {
+      editorService.unlockMediaPackage(mediaPackageId, new LockData(uuid, ""));
+      return RestUtil.R.ok();
+    } catch (EditorServiceException e) {
+      return checkErrorState(mediaPackageId, e);
     }
   }
 
@@ -156,6 +217,8 @@ public abstract class EditorRestEndpointBase {
     switch (e.getErrorStatus()) {
       case MEDIAPACKAGE_NOT_FOUND:
         return RestUtil.R.notFound(String.format("Event '%s' not Found", eventId), MediaType.TEXT_PLAIN_TYPE);
+      case MEDIAPACKAGE_LOCKED:
+        return RestUtil.R.conflict(String.format("Event '%s' is %s", eventId, e.getMessage()));
       case WORKFLOW_ACTIVE:
         return RestUtil.R.locked();
       case WORKFLOW_NOT_FOUND:

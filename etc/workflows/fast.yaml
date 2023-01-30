@@ -98,16 +98,16 @@ operations:
       - url-pattern: "${org_org_opencastproject_admin_ui_url!'http://localhost:8080'}/admin-ng/index.html#/events/events/${event_id}/tools/editor"
       - check-availability: false
 
-  - id: publish-engage
+  - id: publish-engage-aws
     if: "${straightToPublishing}"
     max-attempts: 2
     fail-on-error: true
     exception-handler-workflow: "partial-error"
-    description: "Publishing to Engage"
+    description: "Publishing to AWS"
     configurations:
       - download-source-flavors: "dublincore/*,security/*,captions/*"
       - download-source-tags: "engage-download"
-      - check-availability: false
+      - check-availability: true
 
   - id: snapshot
     fail-on-error: true
