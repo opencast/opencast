@@ -7,7 +7,7 @@
     "chromedriver": "^109.0.0",
     "eslint": "^8.32.0",
     "eslint-plugin-header": "^3.1.1",
-    "grunt": "^1.5.3",
+    "grunt": "^1.6.0",
     "grunt-cli": "^1.4.3",
     "grunt-concurrent": "^3.0.0",
     "grunt-contrib-clean": "^2.0.1",
