@@ -4,6 +4,40 @@ Changelog
 Opencast 12
 -----------
 
+### Opencast 12.7
+
+*Released on January 18th, 2023*
+
+- [[#4590](https://github.com/opencast/opencast/pull/4590)] -
+  Add Tag-Engage Workflow Operation Handler
+- [[#4563](https://github.com/opencast/opencast/pull/4563)] -
+  Fix Wowza signing time scale
+- [[#4550](https://github.com/opencast/opencast/pull/4550)] -
+  Ensure segments.segment is array
+- [[#4549](https://github.com/opencast/opencast/pull/4549)] -
+  Sync login script of paella-6 and paella-7
+- [[#4539](https://github.com/opencast/opencast/pull/4539)] -
+  Make event updating faster after changes to series metadata/ACL
+
+### Opencast 12.6
+
+*Released on December 14th, 2022*
+
+- [[#4528](https://github.com/opencast/opencast/pull/4528)] -
+  Allow creating releases manually
+- [[#4523](https://github.com/opencast/opencast/pull/4523)] -
+  Allow `ROLE_ADMIN_UI` to run index.js
+- [[#4518](https://github.com/opencast/opencast/pull/4518)] -
+  Remove braces from error message
+- [[#4496](https://github.com/opencast/opencast/pull/4496)] -
+  Fix Firefox install for admin ui tests in GHA
+- [[#4494](https://github.com/opencast/opencast/pull/4494)] -
+  Decode URL before parsing in PaellaPlayer 6
+- [[#4486](https://github.com/opencast/opencast/pull/4486)] -
+  Do not forget videos detected previously in Paella
+- [[#4459](https://github.com/opencast/opencast/pull/4459)] -
+  Update Release Assemblies
+
 ### Opencast 12.5
 
 *Released on November 16th, 2022*

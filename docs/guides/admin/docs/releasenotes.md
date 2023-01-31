@@ -1,5 +1,49 @@
 # Opencast 12: Release Notes
 
+Opencast 12.7
+-------------
+
+The seventh maintenance release of Opencast 12.
+
+Notable changes are:
+
+- Added a tag-engage-WOH which can be used to update tags and flavors directly
+  in the engage publication
+  (cf. [[#4590](https://github.com/opencast/opencast/pull/4590)]).
+- Fixed an issue with signed URLs pointing at Wowza
+  (cf. [[#4563](https://github.com/opencast/opencast/pull/4563)]).
+- Make event updating faster after changes to series metadata/ACL
+  (cf. [[#4539](https://github.com/opencast/opencast/pull/4539)]).
+- Fix for segment preview if there is only one in Paella Player 7
+  (cf. [[#4550](https://github.com/opencast/opencast/pull/4550)]).
+
+Opencast 12.6
+-------------
+
+The sixth maintenance release of Opencast 12.
+
+Notable changes are:
+
+- With a new authentication filter you can now accept JWTs not only from
+  request headers, but also from query and form parameters of a `GET` and
+  `POST`-request, respectively
+  (cf. [[#4412](https://github.com/opencast/opencast/pull/4412)]).
+- There is a new `POST /redirect/get` endpoint which will redirect a user to a
+  given URL. Note that it only supports redirect to URLs that "live" on the
+  same server (relative URLs). This is useful for external applications which
+  can use it to implement patterns like Post/Redirect/Get, for example in the
+  context of an authentication scheme in combination with the new
+  `JWTRequestParameterAuthenticationFilter`
+  (cf. [[#4412](https://github.com/opencast/opencast/pull/4412)]).
+- Fix *Go to Admin* and *Go to Media Module* buttons
+  (cf. [[#3959](https://github.com/opencast/opencast/issues/3959)]).
+- Fix Login redirect from Paella-Player 6
+  (cf. [[#4493](https://github.com/opencast/opencast/issues/4493)]).
+- Fix Paella Player not finding any video if audio or unsupported
+  media is delivered together with supported media in Paella Player 6
+  (cf. [[#4486](https://github.com/opencast/opencast/pull/4486)]).
+
+
 Opencast 12.5
 -------------
 
@@ -139,7 +183,7 @@ Opencast 12.0
 - Workflows' data is now atomically stored in the database instead of XML to
   improve access speed. [[#3376](https://github.com/opencast/opencast/pull/3376)]
 - You can now specify a fallback language and use a placeholder in the Vosk-based
-  [Speech to Text Workflow Operation Handler](workflowoperationhandlers/speech-to-text-woh.md).
+  [Speech to Text Workflow Operation Handler](workflowoperationhandlers/speechtotext-woh.md).
 - Improved performance when rebuilding the Elasticsearch event index. [[#3775](https://github.com/opencast/opencast/pull/3775)]
 - Documentation for developers and testers has been added explaining how to
   [explore Opencast's H2 database](https://docs.opencast.org/r/12.x/developer/explore-h2-database/).

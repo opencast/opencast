@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0">
+
+  <OCD description="StudIPProvider" name="org.opencastproject.userdirectory.studIP"
+       id="org.opencastproject.userdirectory.studIP">
+
+    <AD name="StudIP Server URL" id="org.opencastproject.userdirectory.studIP.url" required="true" type="String"
+        default=""/>
+    <AD name="Organization ID" id="org.opencastproject.userdirectory.studIP.org" required="true" type="String"
+        default="mh_default_org"/>
+    <AD name="StudIP User" id="org.opencastproject.userdirectory.studIP.user" required="false" type="String"
+        default=""/>
+    <AD name="StudIP User Token" id="org.opencastproject.userdirectory.studIP.token" required="true" type="String"
+        default=""/>
+    <AD name="Cache size" id="org.opencastproject.userdirectory.studIP.cache.size" required="false" type="Integer"
+        default="1000"/>
+    <AD name="Cache expiration (minutes)" id="org.opencastproject.userdirectory.studIP.cache.expiration"
+        required="false" type="Integer" default="60"/>
+
+
+  </OCD>
+
+  <Designate pid="org.opencastproject.userdirectory.studIP">
+    <Object ocdref="org.opencastproject.userdirectory.studIP"/>
+  </Designate>
+
+</metatype:MetaData>

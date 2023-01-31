@@ -420,7 +420,7 @@
                   </div>
                 </div>
               </div>
-              <footer ng-if="updateMode === 'optional'">
+              <footer>
                 <div style="float: right">
                   <a ng-click="saveChanges(true)"
                     class="submit" style="float: left"
@@ -429,7 +429,8 @@
                     <!-- Save -->
                   </a>
                   <!-- Button to remove all episode ACLs to ensure only the series ACL applies -->
-                  <a ng-click="updateEventPermissions(true)"
+                  <a ng-if="updateMode === 'optional'"
+                    ng-click="updateEventPermissions(true)"
                     class="submit"
                     ng-class="{disabled: !validAcl}"
                     translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.REPLACE_EVENT_ACLS"

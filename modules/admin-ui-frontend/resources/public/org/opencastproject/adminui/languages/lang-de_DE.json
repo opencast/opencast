@@ -1163,7 +1163,7 @@
                "PATH_SEGMENT": "Path segment",
                "SUBPAGES": "Subpages",
                "ADD_SUBPAGE": "Add subpage",
-               "CANCEL": "Cancel",
+               "CANCEL": "Abbrechen",
                "HOMEPAGE": "Homepage",
                "SELECTED_PAGE": "Series will be mounted under the following path",
                "NO_PAGE_SELECTED": "No page selected. Series will not be mounted in Tobira.",
@@ -1220,7 +1220,7 @@
                   "DETAILS": "Weitere Zugriffsrichtlinien",
                   "REPLACE_EVENT_ACLS": "Zugriffsrechte des Videos aktualisieren",
                   "REPLACE_EVENT_ACLS_HINT": "Sicherstellen, dass alle Videos dieser Serie genau diese Zugriffsrechte haben",
-                  "SAVE_SERIES_ACLS": "Save",
+                  "SAVE_SERIES_ACLS": "Speichern",
                   "SAVE_SERIES_ACLS_HINT": "Apply permissions only to series",
                   "LOAD_MORE_LIMIT": "angezeigte Richtlinien.",
                   "LOAD_MORE_LINK": "Mehr laden",
@@ -1260,7 +1260,7 @@
             "TOBIRA": {
                "HOMEPAGE": "(Homepage)",
                "DIRECT_LINK": "Direct link to series",
-               "COPY_DIRECT_LINK": "Copy to clipboard",
+               "COPY_DIRECT_LINK": "In die Zwischenablage kopieren",
                "NOT_MOUNTED": "This series is currently not included the page structure, and can only be reached using the direct link above.",
                "PAGES": "Pages in Tobira that contain this series"
             },

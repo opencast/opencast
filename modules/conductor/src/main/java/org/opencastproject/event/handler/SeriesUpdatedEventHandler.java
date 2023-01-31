@@ -200,6 +200,7 @@ public class SeriesUpdatedEventHandler {
     // A series or its ACL has been updated. Find any mediapackages with that series, and update them.
     logger.debug("Handling {}", seriesItem);
     String seriesId = seriesItem.getSeriesId();
+    int jobBarrierPollingRate = 100;    // in ms
 
     // We must be an administrative user to make this query
     final User prevUser = securityService.getUser();
@@ -225,7 +226,7 @@ public class SeriesUpdatedEventHandler {
 
             for (MediaPackageElement distributedEpisodeAcl : distributedEpisodeAcls) {
               Job retractJob = distributionService.retract(CHANNEL_ID, mp, distributedEpisodeAcl.getIdentifier());
-              JobBarrier barrier = new JobBarrier(null, serviceRegistry, retractJob);
+              JobBarrier barrier = new JobBarrier(null, serviceRegistry, jobBarrierPollingRate, retractJob);
               Result jobResult = barrier.waitForJobs();
               if (!jobResult.getStatus().get(retractJob).equals(FINISHED)) {
                 logger.error("Unable to retract episode XACML {}", distributedEpisodeAcl.getIdentifier());
@@ -237,7 +238,7 @@ public class SeriesUpdatedEventHandler {
 
           // Distribute the updated XACML file
           Job distributionJob = distributionService.distribute(CHANNEL_ID, mp, fileRepoCopy.getIdentifier());
-          JobBarrier barrier = new JobBarrier(null, serviceRegistry, distributionJob);
+          JobBarrier barrier = new JobBarrier(null, serviceRegistry, jobBarrierPollingRate, distributionJob);
           Result jobResult = barrier.waitForJobs();
           if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
             mp.remove(fileRepoCopy);
@@ -266,7 +267,7 @@ public class SeriesUpdatedEventHandler {
 
             // Distribute the updated series dc
             Job distributionJob = distributionService.distribute(CHANNEL_ID, mp, c.getIdentifier());
-            JobBarrier barrier = new JobBarrier(null, serviceRegistry, distributionJob);
+            JobBarrier barrier = new JobBarrier(null, serviceRegistry, jobBarrierPollingRate, distributionJob);
             Result jobResult = barrier.waitForJobs();
             if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
               mp.remove(c);
@@ -293,7 +294,7 @@ public class SeriesUpdatedEventHandler {
 
         // Update the search index with the modified mediapackage
         Job searchJob = searchService.add(mp);
-        JobBarrier barrier = new JobBarrier(null, serviceRegistry, searchJob);
+        JobBarrier barrier = new JobBarrier(null, serviceRegistry, jobBarrierPollingRate, searchJob);
         barrier.waitForJobs();
       }
     } catch (SearchException e) {

@@ -11,68 +11,68 @@
    "NO": "Nie",
    "SUBMIT": "Prześlij",
    "UPDATE": {
-      "MINOR": "Minor update available",
-      "MAJOR": "Major update available",
-      "UNSUPPORTED": "Version {{ version }} no longer supported",
-      "UNDETERMINED": "Indeterminable version"
+      "MINOR": "Dostępna drobna aktualizacja",
+      "MAJOR": "Dostępna duża aktualizacja",
+      "UNSUPPORTED": "Wersja {{ version }} nie jest już obsługiwana",
+      "UNDETERMINED": "Wersja nieokreślona"
    },
    "CANCEL": "Anuluj",
    "CONFIRM": "Zatwierdź",
    "SAVE": "Zapisz",
-   "CONTINUE": "Continue",
-   "CLOSE": "Close",
+   "CONTINUE": "Kontynuuj",
+   "CLOSE": "Zamknij",
    "LOGOUT": "Wyloguj",
    "RESET": "Wyzeruj",
-   "SELECT_NO_OPTION_SELECTED": "No option selected",
-   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
+   "SELECT_NO_OPTION_SELECTED": "Nie wybrano opcji",
+   "SELECT_NO_OPTIONS_AVAILABLE": "Brak dostępnych opcji",
    "YES": "Tak",
-   "COPY": "Copy to clipboard",
+   "COPY": "Kopiuj do schowka",
    "MONITOR": {
       "REGISTRATION": "Opencast has sent a registration update in more than a week"
    },
    "LTI": {
-      "ERROR_LOADING_METADATA": "Error loading event metadata. Please try again later.",
-      "SERIES_TITLE": "View Series",
-      "UPLOAD_TITLE": "Upload event",
-      "LOADING": "Loading…",
-      "NEW_UPLOAD": "Upload new event",
-      "EDIT_UPLOAD": "Edit event",
-      "CURRENT_JOBS": "Today's jobs",
-      "PRESENTER": "Presenter",
-      "PRESENTER_DESCRIPTION": "Video file for the presenter track",
-      "VIDEOFILE": "Videofile",
-      "VIDEOFILE_DESCRIPTION": "Video file for upload",
-      "CAPTION": "Captions",
+      "ERROR_LOADING_METADATA": "Błąd ładowania metadanych wydarzenia. Spróbuj ponownie później.",
+      "SERIES_TITLE": "Zobacz serię",
+      "UPLOAD_TITLE": "Prześlij wydarzenie",
+      "LOADING": "Ładowanie…",
+      "NEW_UPLOAD": "Prześlij nowe wydarzenie",
+      "EDIT_UPLOAD": "Edytuj wydarzenie",
+      "CURRENT_JOBS": "Dzisiejsze zadania",
+      "PRESENTER": "Prezenter",
+      "PRESENTER_DESCRIPTION": "Plik wideo dla ścieżki prezentera",
+      "VIDEOFILE": "Plik wideo",
+      "VIDEOFILE_DESCRIPTION": "Plik wideo do przesłania",
+      "CAPTION": "Napisy",
       "CAPTION_DESCRIPTION": "Caption file; VTT or dfxp format is supported",
-      "UPLOAD": "Upload",
-      "UPLOADING": "Uploading",
-      "EDIT": "Save",
-      "EDIT_TITLE": "Edit event",
-      "NO_OPTION_SELECTED": "No option selected",
-      "EDITING": "Saving…",
-      "SELECT_OPTION": "Select option",
-      "JOB_TITLE": "Title",
+      "UPLOAD": "Prześlij",
+      "UPLOADING": "Przesyłanie",
+      "EDIT": "Zapisz",
+      "EDIT_TITLE": "Edytuj wydarzenie",
+      "NO_OPTION_SELECTED": "Nie wybrano opcji",
+      "EDITING": "Zapisywanie…",
+      "SELECT_OPTION": "Wybierz opcję",
+      "JOB_TITLE": "Tytuł",
       "JOB_STATUS": "Status",
-      "UPLOAD_SUCCESS": "Upload succeeded!",
-      "UPLOAD_FAILURE": "Upload failed!",
-      "UPLOAD_FAILURE_DESCRIPTION": "Please try again later.",
-      "EDIT_SUCCESS": "Edit succeeded, beginning republishing.",
-      "EDIT_FAILURE": "Edit failed!",
-      "COPY_SUCCESS": "Copying started…",
-      "COPY_SUCCESS_DESCRIPTION": "Please wait a moment…",
-      "GENERIC_ERROR": "Error: {{message}}",
-      "DELETION_SUCCESS": "Event deletion successful",
-      "DELETION_SUCCESS_DESCRIPTION": "The event will be removed from the list in a few moments…",
-      "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
-      "DELETION_FAILURE": "Event deletion failed",
-      "DELETION_FAILURE_DESCRIPTION": "Please try again later…",
-      "RESULT_HEADING": "Results {{range.begin}}-{{range.end}} of {{total}}",
-      "CONFIRM_DELETION": "Really delete this event?",
-      "COPY_TO_SERIES": "Copy event to series",
-      "SELECT_COPY_TARGET": "Select destination series",
-      "COPY": "Copy",
-      "COPY_IN_PROGRESS": "Starting copy…",
-      "CREATOR": "by {{creator}}"
+      "UPLOAD_SUCCESS": "Przesyłanie powiodło się!",
+      "UPLOAD_FAILURE": "Błąd wysyłania.",
+      "UPLOAD_FAILURE_DESCRIPTION": "Spróbuj ponownie później.",
+      "EDIT_SUCCESS": "Edycja powiodła się, początek ponownej publikacji.",
+      "EDIT_FAILURE": "Edycja nieudana!",
+      "COPY_SUCCESS": "Kopiowanie rozpoczęte…",
+      "COPY_SUCCESS_DESCRIPTION": "Proszę poczekać chwilę…",
+      "GENERIC_ERROR": "Błąd: {{message}}",
+      "DELETION_SUCCESS": "Pomyślnie usunięto wydarzenie",
+      "DELETION_SUCCESS_DESCRIPTION": "Wydarzenie zostanie usunięte z listy za kilka chwil…",
+      "EVENT_LOCKED": "Wydarzenie jest obecnie opracowywane. Poczekaj na wprowadzenie dalszych zmian…",
+      "DELETION_FAILURE": "Usunięcie zdarzenia nie powiodło się",
+      "DELETION_FAILURE_DESCRIPTION": "Spróbuj ponownie później…",
+      "RESULT_HEADING": "Wyniki {{range.begin}}-{{range.end}} z {{total}}",
+      "CONFIRM_DELETION": "Naprawdę usunąć to wydarzenie?",
+      "COPY_TO_SERIES": "Skopiuj wydarzenie do serii",
+      "SELECT_COPY_TARGET": "Wybierz serię docelową",
+      "COPY": "Kopiuj",
+      "COPY_IN_PROGRESS": "Uruchamianie kopii…",
+      "CREATOR": "przez {{creator}}"
    },
    "LANGUAGES": {
       "ARABIC": "Arabski",
@@ -131,8 +131,8 @@
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "Ta seria zawiera wydarzenia. Usunięcie tej serii nie spowoduje ich usunięcia.",
-         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone.",
-         "UNSAVED_CHANGES": "You have unsaved changes. If you continue, those changes will be discarded. Are you sure that you want to continue?"
+         "EVENT_WILL_BE_GONE": "Jeśli będziesz kontynuować, wydarzenie nieodwołalnie zniknie.",
+         "UNSAVED_CHANGES": "Masz niezapisane zmiany. Jeśli będziesz kontynuować, te zmiany zostaną odrzucone. Czy na pewno chcesz kontynuować?"
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Nie można usunąć tej serii, ponieważ nadal zawiera wydarzenia."
@@ -147,7 +147,7 @@
       "DOCUMENTATION": "Dokumentacja",
       "REST_DOC": "Dokumentacja interfejsu API REST",
       "HOTKEY_CHEAT_SHEET": "Skróty Klawiaturowe",
-      "ADOPTER_REGISTRATION": "Adopter Registration"
+      "ADOPTER_REGISTRATION": "Rejestracja adoptera"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Zasady dostępu zostały utworzone",
@@ -191,11 +191,11 @@
       "SERIES_NOT_UPDATED": "Nie udało się zapisać serii",
       "SERIES_NOT_UPDATED_ID": "Nie można zapisać serii {{ id }}",
       "SERIES_NOT_UPDATED_ALL": "Żadna seria nie została zapisana",
-      "EVENT_DELETED": "The event has been deleted.",
-      "EVENT_WILL_BE_DELETED": "The event is being deleted",
-      "EVENTS_DELETED": "The events are being deleted.",
-      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
+      "EVENT_DELETED": "Wydarzenie zostało usunięte.",
+      "EVENT_WILL_BE_DELETED": "Wydarzenie jest usuwane",
+      "EVENTS_DELETED": "Wydarzenia są usuwane.",
+      "EVENTS_NOT_DELETED": "Wydarzenie/wydarzenia nie mogły być usunięte",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Wydarzenie (wydarzenia) nie może zostać usunięte, ponieważ nie masz do tego uprawnień.",
       "SERIES_DELETED": "Seria została skasowana",
       "SERIES_NOT_DELETED": "Seria nie mogła zostać usunięta",
       "LOCATION_DELETED": "Lokalizacja została usunięta",
@@ -209,7 +209,7 @@
       "INVALID_ACL_RULES": "Reguły dostępu muszą zawierać poprawne role użytkownika z określonymi zasadami odczytu i/lub zapisu.",
       "MISSING_ACL_RULES": "Przynajmniej jedna rola, z uprawnieniem do zapisu lub odczytu jest wymagana!",
       "SAVED_ACL_RULES": "Reguły dostępu zostały zapisane.",
-      "SAVED_METADATA": "The metadata has been saved.",
+      "SAVED_METADATA": "Metadane zostały zapisane.",
       "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "Wydarzenia w tej serii będą musiały być przetworzone ponownie",
       "SERIES_ACL_LOCKED": "Edytowanie zasad dostępu jest niedozwolone, jeśli wykonywane są operacje dotyczące zdarzenia, które jest częścią serii",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "Zasada dostępu musi zawierać przynajmniej jedną rolę użytkownika z uprawnieniem do zapisu lub odczytu.",
@@ -230,8 +230,8 @@
       "THEME_NOT_DELETED": "Nie można usunąć motywu",
       "TASK_CREATED": "Zadanie zostało utworzone",
       "TASK_NOT_CREATED": "Nie można utworzyć zadania",
-      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
-      "VIDEO_CUT_SAVED": "The changes have been saved",
+      "VIDEO_CUT_NOT_SAVED": "Zmiany nie mogły zostać zapisane",
+      "VIDEO_CUT_SAVED": "Zmiany zostały zapisane",
       "VIDEO_CUT_PROCESSING": "Nagranie jest przetwarzane…",
       "THUMBNAIL_CHANGE_FAILED": "Nie udało się zmienić obrazka.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Nie wybrałeś filmu ze ścieżkami, które można przetwarzać",
@@ -240,23 +240,23 @@
       "SERVICE_UNAVAILABLE": "Oops! Serwer nie odpowiada. Proszę spróbować ponownie później.",
       "ACTIVE_TRANSACTION": "Wydarzenie nie może być modyfikowane, ponieważ w chwili obecnej system wykonuje operacje z jego udziałem.",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "An unexpected error occurred while updating. Some events might have been updated.",
-         "ALL_EVENTS_UPDATED": "All events were successfully updated.",
-         "NO_EVENTS_UPDATED": "All updates failed.",
-         "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
+         "UNEXPECTED_ERROR": "Wystąpił nieoczekiwany błąd podczas aktualizacji. Niektóre wydarzenia mogły zostać zaktualizowane.",
+         "ALL_EVENTS_UPDATED": "Wszystkie wydarzenia zostały pomyślnie zaktualizowane.",
+         "NO_EVENTS_UPDATED": "Wszystkie aktualizacje się nie powiodły.",
+         "SOME_EVENTS_NOT_UPDATED": "Niektóre wydarzenia nie mogły zostać zaktualizowane."
       },
-      "ADOPTER_PROFILE_UPDATED": "Profile information successfully updated.",
-      "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
-      "ADOPTER_PROFILE_DELETED": "Profile information successfully deleted.",
-      "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!",
+      "ADOPTER_PROFILE_UPDATED": "Informacje o profilu zostały pomyślnie zaktualizowane.",
+      "ADOPTER_PROFILE_NOT_UPDATED": "Ups! Nie można zaktualizować informacji o profilu. Spróbuj ponownie!",
+      "ADOPTER_PROFILE_DELETED": "Usunięto informacje o profilu.",
+      "ADOPTER_PROFILE_NOT_DELETED": "Ups! Nie można usunąć informacji o profilu. Spróbuj ponownie!",
       "TOBIRA_OVERRIDE_NAME": "The title of the selected page will be overridden with the title of the series.",
-      "TOBIRA_NO_PATH_SEGMENT": "Page needs a path segment.",
-      "TOBIRA_NOT_MOUNTED": "Series could not be mounted in Tobira.",
+      "TOBIRA_NO_PATH_SEGMENT": "Strona potrzebuje segmentu ścieżki.",
+      "TOBIRA_NOT_MOUNTED": "Seria nie mogła być zamontowana w Tobira.",
       "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
       "TOBIRA_PATH_SEGMENT_UNIQUE": "The path segment of a page must be unqiue among all its sibling pages.",
       "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
-      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and/or try again later.",
-      "TOBIRA_COPIED_DIRECT_LINK": "Copied link to clipboard.",
+      "TOBIRA_SERVER_ERROR": " Wystąpił błąd podczas rozmowy z Tobira. Skontaktuj się z administratorem systemu i/lub spróbuj ponownie później.",
+      "TOBIRA_COPIED_DIRECT_LINK": "Skopiowano link do schowka.",
       "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Couldn't copy link to clipboard.",
       "TOBIRA_NOT_FOUND": "Tobira doesn't know about this series (yet). Try again in a few minutes or contact your system administrator."
    },
@@ -322,39 +322,39 @@
             "CAPTION": "Edycja",
             "EVENT": "wydarzenie",
             "EVENTS": "wydarzenia",
-            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
+            "HEADER": "Ta strona pozwala na edycję zaplanowanych wydarzeń pogrupowanych według dni roboczych. Pola wejściowe są wypełnione, jeżeli wszystkie zaplanowane zdarzenia mają tę samą wartość dla określonego pola. W przeciwnym razie pola wejściowe są puste. Pozostawianie pustych pól wejściowych oznacza, że odpowiednie wartości nie powinny być zmieniane.",
             "METADATA": "Metadane",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} : {{ eventOrEvents }})"
          }
       },
       "EDIT_EVENTS_METADATA": {
-         "CAPTION": "Edit the metadata of multiple events",
-         "FATAL_ERROR": "A fatal error occurred: {{ fatalError }}",
+         "CAPTION": "Edytuj metadane wielu wydarzeń",
+         "FATAL_ERROR": "Wystąpił błąd krytyczny: {{ fatalError }}",
          "REQUEST_ERRORS": {
-            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
-            "NOTHING_TO_EDIT": "The events cannot be edited.",
-            "NOT_FOUND": "Not found",
-            "RUNNING_WORKFLOW": "Running workflow",
+            "CANNOT_EDIT_SOME": "Wyróżnione wydarzenia nie mogą być edytowane.",
+            "NOTHING_TO_EDIT": "Nie można edytować wydarzeń.",
+            "NOT_FOUND": "Nie znaleziono",
+            "RUNNING_WORKFLOW": "Uruchamianie przepływu pracy",
             "TABLE": {
-               "CAPTION": "Selected events",
-               "ERRORS": "Errors"
+               "CAPTION": "Wybrane wydarzenia",
+               "ERRORS": "Błędy"
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "DESCRIPTION": "Edytuj i/lub wybierz pola metadanych, które chcesz zaktualizować. Pole nie może być zaznaczone, jeśli nie powoduje to zmiany wartości dla co najmniej jednego wydarzenia lub jeśli pole jest nieprawidłowe (e. . wymagane pola nie mogą być puste. Zaznaczone pola metadanych mają różne wartości dla wybranych zdarzeń.",
             "TABLE": {
-               "CAPTION": "Metadata of selected events",
-               "FIELDS": "Metadata",
-               "VALUES": "Values"
+               "CAPTION": "Metadane wybranych wydarzeń",
+               "FIELDS": "Metadane",
+               "VALUES": "Wartości"
             }
          },
          "UPDATE_FAILURES": {
             "TABLE": {
                "CAPTION": "Update Failures"
             },
-            "UPDATE_FAILED": "Update failed",
-            "NO_EVENTS_UPDATED": "All updates failed.",
-            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
+            "UPDATE_FAILED": "Aktualizacja nieudana",
+            "NO_EVENTS_UPDATED": "Wszystkie aktualizacje się nie powiodły.",
+            "SOME_EVENTS_NOT_UPDATED": "Wyróżnione zdarzenia nie mogły zostać zaktualizowane."
          }
       }
    },
@@ -412,65 +412,65 @@
          "TITLE": "Konfiguracja"
       },
       "STATISTICS": {
-         "TITLE": "Statistics"
+         "TITLE": "Statystyki"
       }
    },
    "ADOPTER_REGISTRATION": {
       "MODAL": {
-         "CAPTION": "Registration",
-         "SKIP": "Not now",
-         "CONTINUE": "Continue",
-         "BACK": "Back",
+         "CAPTION": "Rejestracja",
+         "SKIP": "Nie teraz",
+         "CONTINUE": "Kontynuuj",
+         "BACK": "Powrót",
          "LEGAL_INFO_STATE": {
             "HEADER": "Terms of Service and Privacy Policy"
          },
          "SUMMARY_STATE": {
-            "HEADER": "This is a JSON summary of exactly what would be sent to Opencast's servers",
-            "GENERAL_HEADER": "Adopter Information",
-            "STATS_HEADER": "Statistical Information"
+            "HEADER": "To jest podsumowanie JSON dokładnie tego, co zostanie wysłane na serwery Opencast.",
+            "GENERAL_HEADER": "Informacje o adopterze",
+            "STATS_HEADER": "Informacje statystyczne"
          },
          "INFORMATION_STATE": {
-            "HEADER": "Thank you for using Opencast!",
-            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
-            "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, as even some of the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding and attract more companies to provide services around Opencast."
+            "HEADER": "Dziękujemy za korzystanie z Opencast!",
+            "INFORMATION_PARAGRAPH_1": "Nasi deweloperzy nieustannie pracują, aby zapewnić Ci jak najlepsze doświadczenie użytkowników. W tym celu musimy wiedzieć więcej o tym, kto używa Opencast i jak jest używany. Możesz pomóc nam poprzez szybką rejestrację.",
+            "INFORMATION_PARAGRAPH_2": "Bardzo doceniamy każdą opinię, ponieważ nawet niektóre dane, które gromadzimy na temat korzystania z Opencast pomogą nam stworzyć lepsze oprogramowanie, większe szanse na dodatkowe finansowanie i przyciągnięcie większej liczby przedsiębiorstw do świadczenia usług w okolicach Opencast."
          },
          "FORM_STATE": {
-            "ORGANISATION": "Organisation",
-            "DEPARTMENT": "Department",
-            "COUNTRY": "Country",
-            "POSTAL_CODE": "Postal code",
-            "CITY": "City",
-            "CONTACT_INFO": "Contact information",
-            "GENDER": "Gender",
-            "GENDER_MALE": "male",
-            "GENDER_FEMALE": "female",
-            "FIRST_NAME": "First name",
-            "LAST_NAME": "Last name",
-            "STREET": "Street",
-            "NUMBER": "Number",
+            "ORGANISATION": "Organizacja",
+            "DEPARTMENT": "Dział",
+            "COUNTRY": "Państwo",
+            "POSTAL_CODE": "Kod pocztowy",
+            "CITY": "Miejscowość",
+            "CONTACT_INFO": "Dane kontaktowe",
+            "GENDER": "Płeć",
+            "GENDER_MALE": "męski",
+            "GENDER_FEMALE": "Żeńska",
+            "FIRST_NAME": "Imię",
+            "LAST_NAME": "Nazwisko",
+            "STREET": "Ulica",
+            "NUMBER": "Numer",
             "ADDITIONAL_ADDRESS_INFO": "Add. address information",
-            "MAIL": "Email",
-            "CONTACT_ME": "Contact me for updates and security issues",
-            "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
-            "POLICY_HEADLINE": "Privacy policy and terms of use",
-            "USAGE_STATISTICS": "Usage statistics",
-            "ERROR_REPORTS": "Error reports",
-            "READ_TERMS_OF_USE_BEFORE": "I have read and agree to the",
-            "READ_TERMS_OF_USE_LINK": "privacy policy and terms of use",
+            "MAIL": "E-mail",
+            "CONTACT_ME": "Skontaktuj się ze mną w celu aktualizacji i problemów z bezpieczeństwem",
+            "WHICH_DATA_TO_SHARE": "Które dane chcesz udostępnić?",
+            "POLICY_HEADLINE": "Polityka prywatności i warunki użytkowania",
+            "USAGE_STATISTICS": "Statystyki użytkowania",
+            "ERROR_REPORTS": "Raporty o błędach",
+            "READ_TERMS_OF_USE_BEFORE": "Przeczytałem i zgadzam się na",
+            "READ_TERMS_OF_USE_LINK": "polityka prywatności i warunki użytkowania",
             "READ_TERMS_OF_USE_AFTER": ""
          },
          "SKIP_STATE": {
-            "HEADER": "Maybe next time!",
-            "TEXT": "If you want to register later on, you can do that by pressing the help button in the top right corner."
+            "HEADER": "Może następnym razem!",
+            "TEXT": "Jeśli chcesz zarejestrować się później, możesz to zrobić naciskając przycisk pomocy w prawym górnym rogu."
          },
          "THANK_YOU_STATE": {
-            "HEADER": "Thank you for your registration!",
-            "TEXT_LEADING_TO_PATH": "You can change your data at ",
-            "TEXT_LEADING_AFTER_PATH": "at any time."
+            "HEADER": "Dziękuję za rejestrację!",
+            "TEXT_LEADING_TO_PATH": "Możesz zmienić swoje dane na ",
+            "TEXT_LEADING_AFTER_PATH": "w każdej chwili."
          },
          "ERROR": {
-            "HEADER": "Error",
-            "TEXT": "An error occurred while processing your request."
+            "HEADER": "Błąd",
+            "TEXT": "Wystąpił błąd podczas przetwarzania żądania."
          },
          "DELETE_SUBMIT_STATE": {
             "TEXT": "Are you sure you want to delete your registration data?"
@@ -513,10 +513,10 @@
                   "HOUR": "Godzina",
                   "MINUTE": "Minuta",
                   "REPEATS": "Powtórzeń",
-                  "START_DATE": "yyyy-mm-dd",
-                  "START_DATE_FORMAT": "yyyy-mm-dd",
-                  "END_DATE": "yyyy-mm-dd",
-                  "END_DATE_FORMAT": "yyyy-mm-dd"
+                  "START_DATE": "rrrr-mm-dd",
+                  "START_DATE_FORMAT": "rrrr-mm-dd",
+                  "END_DATE": "rrrr-mm-dd",
+                  "END_DATE_FORMAT": "rrrr-mm-dd"
                },
                "UPLOAD": {
                   "CAPTION": "Wgraj na serwer",
@@ -570,7 +570,7 @@
                "CAPTION": "Napisy",
                "SELECT_TYPE": "Wybierz typ zasobu",
                "ADD": "Dodaj zasób",
-               "NO_OPTIONS": "A list of asset options was not provided to this section of the web page!",
+               "NO_OPTIONS": "Lista opcji zasobów nie została dostarczona do tej sekcji strony internetowej!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Materiały uzupełniające",
                   "CAPTIONS_DFXP": "Napisy w formacie DFXP",
@@ -624,7 +624,7 @@
             "PRESENTERS": "Prezenter(rzy)",
             "SERIES": "Serie",
             "DATE": "Data",
-            "START": "Start",
+            "START": "Rozpocznij",
             "END": "Koniec",
             "STOP": "Zatrzymaj",
             "STATUS": "Status",
@@ -639,9 +639,9 @@
             "NOCONTENT": "Brak danych",
             "PUBLISHED": "Opublikowano",
             "WEEKDAY": "Dzień tygodnia",
-            "ADMINUI_NOTES": "Notes",
+            "ADMINUI_NOTES": "Uwagi",
             "TOOLTIP": {
-               "ASSETS": "Open asset details",
+               "ASSETS": "Otwórz szczegóły aktywów",
                "START": "Filtr do tej daty rozpoczęcia",
                "SERIES": "Filtr dla tej serii",
                "STATUS": "Filtr dla statusu tego wydarzenia",
@@ -653,8 +653,8 @@
                "EDITOR_NEEDS_CUTTING": "Otwórz w Edytorze (komenarz wskazuje, że ktoś domaga się wycięcia fragmentu filmu)",
                "COMMENTS": "Pokaż komentarze",
                "PAUSED_WORKFLOW": "Zobacz zatrzymane procesy zadań",
-               "PRESENTER": "Filter for this presenter",
-               "COPY_TO_NEW_EVENT": "Copy metadata to new event"
+               "PRESENTER": "Filtruj dla tego prezentera",
+               "COPY_TO_NEW_EVENT": "Skopiuj metadane do nowego wydarzenia"
             }
          },
          "STATUS": {
@@ -668,16 +668,16 @@
             "PROCESSED": "Zakończone",
             "RECORDING_FAILURE": "Błąd nagrywania",
             "PROCESSING_FAILURE": "Błąd przetwarzania",
-            "PROCESSING_CANCELLED": "Processing cancelled"
+            "PROCESSING_CANCELLED": "Przetwarzanie anulowane"
          },
          "STATE_MAPPING": {
-            "RETRACTING": "Retracting",
-            "DELETING": "Deleting",
-            "DUPLICATING": "Duplicating",
-            "PUBLISHING": "Publishing",
-            "IMPORTING": "Importing",
+            "RETRACTING": "Wycofaj",
+            "DELETING": "Usuwanie",
+            "DUPLICATING": "Duplikowanie",
+            "PUBLISHING": "Publikowanie",
+            "IMPORTING": "Importowanie",
             "REPUBLISHING_METADATA": "Republishing metadata",
-            "UPDATING_PREVIEWS": "Updating previews"
+            "UPDATING_PREVIEWS": "Aktualizowanie podglądu"
          },
          "DETAILS": {
             "HEADER": "Szczegóły wydarzenia - {{resourceId}}",
@@ -690,7 +690,7 @@
                "WORKFLOWS": "Przepływy pracy",
                "ACCESS": "Zasady dostępu",
                "COMMENTS": "Komentarze",
-               "STATISTICS": "Statistics"
+               "STATISTICS": "Statystyki"
             },
             "PUBLICATIONS": {
                "CAPTION": "Publikacje",
@@ -712,7 +712,7 @@
                "ID": "Identyfikator",
                "TYPE": "Typ",
                "MIMETYPE": "Właściwość MIMEType",
-               "URL": "URL",
+               "URL": "Adres URL",
                "DETAILS": "Szczegóły"
             },
             "ATTACHMENTS": {
@@ -732,7 +732,7 @@
                   "HOUR": "Godzina",
                   "MINUTE": "Minuta",
                   "REPEATS": "Powtórzeń",
-                  "START_DATE": "yyyy-mm-dd",
+                  "START_DATE": "rrrr-mm-dd",
                   "END_DATE": "yyyy-mm-dd"
                },
                "UPLOAD": {
@@ -813,7 +813,7 @@
                      "TYPE": "Typ",
                      "MIMETYPE": "Właściwość MIMEType",
                      "TAGS": "Tagi",
-                     "URL": "URL",
+                     "URL": "Adres URL",
                      "SIZE": "Rozmiar",
                      "CHECKSUM": "Suma kontrolna",
                      "REFERENCE": "Odnośnik"
@@ -832,7 +832,7 @@
                      "ID": "Identyfikator",
                      "TYPE": "Typ",
                      "MIMETYPE": "Właściwość MIMEType",
-                     "URL": "URL",
+                     "URL": "Adres URL",
                      "RECORDING_DATE": "Data nagrania",
                      "FLAVOR": "Rodzaj",
                      "TAGS": "Tagi",
@@ -870,7 +870,7 @@
                      "TYPE": "Typ",
                      "MIMETYPE": "Właściwość MIMEType",
                      "TAGS": "Tagi",
-                     "URL": "URL",
+                     "URL": "Adres URL",
                      "SIZE": "Rozmiar",
                      "CHANNEL": "Kanał",
                      "REFERENCE": "Odwołanie"
@@ -916,7 +916,7 @@
                   "REVIEW": "Wymaga przeglądu",
                   "ASYNC": "Ścieżki A/V asynchroniczne",
                   "AUDIO_ISSUE": "Brakująca lub uszkodzona ścieżka dżwiękowa",
-                  "CANCELLED": "Cancelled event",
+                  "CANCELLED": "Anulowane wydarzenie",
                   "CONFLICTING_METADATA": "Konflikt w metadanych",
                   "IMPROPER_POINT": "Niewłaściwy punkt rozpoczęcia lub zakończenia",
                   "MISSING_AGREEMENT": "Brak umowy",
@@ -930,11 +930,11 @@
                   "WRONG_SERIES_PUBLICATION": "Zła seria lub kanał publikacji",
                   "WRONG_WORKFLOW": "Zły przepływ pracy",
                   "PROCESSING_FAILURE": "Błąd przetwarzania",
-                  "ADMINUI_NOTES": "Notes in Admin UI"
+                  "ADMINUI_NOTES": "Notatki w interfejsie administratora"
                }
             },
             "STATISTICS": {
-               "CAPTION": "Statistics"
+               "CAPTION": "Statystyki"
             },
             "METADATA": {
                "CAPTION": "Szczegóły wydarzenia",
@@ -975,7 +975,7 @@
                "ACTIONS": "Działania",
                "DETAILS": "Szczegóły",
                "DESCRIPTION": "Opis",
-               "MORE_INFO": "More Information",
+               "MORE_INFO": "Więcej informacji",
                "ID": "Identyfikator",
                "TYPE": "Typ",
                "TITLE": "Tytuł",
@@ -983,20 +983,20 @@
                "STARTED": "Rozpoczęte",
                "SERIES": "Seria",
                "SUBMITTED": "Wysłano",
-               "SUBMITTER": "Submitter",
-               "EXECUTION_TIME": "Execution time",
+               "SUBMITTER": "Autor",
+               "EXECUTION_TIME": "Czas wykonania",
                "WDID": "Definicja przepływu pracy",
                "MIMETYPE": "Właściwość MIMEType",
-               "URL": "URL",
+               "URL": "Adres URL",
                "CONFIGURATION": "Konfiguracja",
                "NO_CONFIGURATION": "Nie ma parametrów dla wybranej definicji przepływu pracy.",
                "WORKFLOW": "Przepływ pracy",
                "TOOLTIP": {
-                  "STOP": "Stop workflow",
-                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow",
-                  "DELETE": "Delete workflow",
-                  "DETAILS": "Open workflow details"
+                  "STOP": "Zatrzymaj przepływ pracy",
+                  "ABORT": "Przerwij wykonanie przepływu pracy (nie ponawiaj nieudanej operacji ponownie)",
+                  "RETRY": "Ponów próbę wykonania przepływu pracy",
+                  "DELETE": "Usuń przepływ pracy",
+                  "DETAILS": "Otwórz szczegóły przepływu pracy"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Uruchomione",
@@ -1052,7 +1052,7 @@
                "ID": "Identyfikator",
                "TYPE": "Typ",
                "MIMETYPE": "Właściwość MIMEType",
-               "URL": "URL",
+               "URL": "Adres URL",
                "RECORDING_DATE": "Data nagrania",
                "TAGS": "Tagi",
                "DURATION": "Czas trwania",
@@ -1134,17 +1134,17 @@
             },
             "TOBIRA": {
                "CAPTION": "Tobira",
-               "DESCRIPTION": "Here you can select where you want the series to show up in the Tobira video portal. You can only select one location here, and it needs to be empty (marked in bold). You can create new pages here, but note that they are only persisted if they are on the path to the selected page.",
-               "SELECT_PAGE": "Select a target page",
+               "DESCRIPTION": "Tutaj możesz wybrać, gdzie seria ma się pojawić na portalu wideo Tobira. Możesz wybrać tylko jedną lokalizację i musi być pusta (zaznaczona pogrubioną czcionką). Możesz utworzyć nowe strony tutaj, ale pamiętaj, że są one utrzymywane tylko wtedy, gdy znajdują się na ścieżce do wybranej strony.",
+               "SELECT_PAGE": "Wybierz stronę docelową",
                "PAGE_TITLE": "Subpage title",
-               "PATH_SEGMENT": "Path segment",
-               "SUBPAGES": "Subpages",
-               "ADD_SUBPAGE": "Add subpage",
-               "CANCEL": "Cancel",
-               "HOMEPAGE": "Homepage",
-               "SELECTED_PAGE": "Series will be mounted under the following path",
-               "NO_PAGE_SELECTED": "No page selected. Series will not be mounted in Tobira.",
-               "PATH": "Path"
+               "PATH_SEGMENT": "Segment ścieżki",
+               "SUBPAGES": "Podstrony",
+               "ADD_SUBPAGE": "Dodaj podstronę",
+               "CANCEL": "Anuluj",
+               "HOMEPAGE": "Strona główna",
+               "SELECTED_PAGE": "Serie zostaną zamontowane pod następującą ścieżką",
+               "NO_PAGE_SELECTED": "Nie wybrano strony. Seria nie będzie zamontowana w Tobira.",
+               "PATH": "Ścieżka"
             },
             "SUMMARY": {
                "CAPTION": "Podsumowanie"
@@ -1175,7 +1175,7 @@
                "PERMISSIONS": "Zasady dostępu",
                "THEME": "Motyw",
                "TOBIRA": "Tobira",
-               "STATISTICS": "Statistics"
+               "STATISTICS": "Statystyki"
             },
             "ACCESS": {
                "CAPTION": "Zasady dostępu",
@@ -1196,11 +1196,11 @@
                   "NEW": "Nowe zasada",
                   "DETAILS": "Szczegóły",
                   "REPLACE_EVENT_ACLS": "Save & update event permissions",
-                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect",
-                  "SAVE_SERIES_ACLS": "Save",
-                  "SAVE_SERIES_ACLS_HINT": "Apply permissions only to series",
-                  "LOAD_MORE_LIMIT": "policies shown.",
-                  "LOAD_MORE_LINK": "Load more"
+                  "REPLACE_EVENT_ACLS_HINT": "Upewnij się, że wszystkie zdarzenia tej serii mają te uprawnienia w mocy",
+                  "SAVE_SERIES_ACLS": "Zapisz",
+                  "SAVE_SERIES_ACLS_HINT": "Zastosuj uprawnienia tylko do serii",
+                  "LOAD_MORE_LIMIT": "zaprezentowane zasady.",
+                  "LOAD_MORE_LINK": "Załaduj więcej"
                },
                "ROLES": {
                   "LABEL": "Wybierz rolę",
@@ -1223,11 +1223,11 @@
                "DESCRIPTION": "Opis"
             },
             "TOBIRA": {
-               "HOMEPAGE": "(Homepage)",
-               "DIRECT_LINK": "Direct link to series",
-               "COPY_DIRECT_LINK": "Copy to clipboard",
-               "NOT_MOUNTED": "This series is currently not included the page structure, and can only be reached using the direct link above.",
-               "PAGES": "Pages in Tobira that contain this series"
+               "HOMEPAGE": "(Strona główna)",
+               "DIRECT_LINK": "Bezpośredni link do serii",
+               "COPY_DIRECT_LINK": "Kopiuj do schowka",
+               "NOT_MOUNTED": "Ta seria nie jest obecnie dołączona do struktury strony i może być osiągnięta tylko za pomocą łącza bezpośredniego powyżej.",
+               "PAGES": "Strony w Tobirze zawierające tę serię"
             },
             "EVENTS": {
                "TITLE": "Tytuł",
@@ -1308,7 +1308,7 @@
             "CAPTION": "Użytkownicy",
             "NAME": "Nazwa",
             "USERNAME": "Nazwa Użytkownika",
-            "EMAIL": "Email",
+            "EMAIL": "E-mail",
             "ROLES": "Role",
             "TYPE": "Typ",
             "PROVIDER": "Dostawca",
@@ -1335,7 +1335,7 @@
             "FORM": {
                "USERNAME": "Nazwa Użytkownika",
                "NAME": "Nazwa",
-               "EMAIL": "Email",
+               "EMAIL": "E-mail",
                "PASSWORD": "Hasło",
                "REPEAT_PASSWORD": "Potwierdź hasło"
             },
@@ -1346,12 +1346,12 @@
                "ADD": "Dodaj rolę"
             },
             "STRENGTH": {
-               "BAD": "Bad password",
-               "VERYWEAK": "Very weak password",
-               "WEAK": "Weak password",
-               "GOOD": "Good password",
-               "STRONG": "Strong password",
-               "VERYSTRONG": "Very strong password"
+               "BAD": "Niewłaściwe hasło",
+               "VERYWEAK": "Bardzo słabe hasło",
+               "WEAK": "Słabe hasło",
+               "GOOD": "Dobre hasło",
+               "STRONG": "Silne hasło",
+               "VERYSTRONG": "Bardzo silne hasło"
             }
          }
       },
@@ -1647,7 +1647,7 @@
             "CREATED": "Utworzono",
             "CREATOR": "Twórca",
             "HOST_NAME": "Nazwa hosta",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Nazwa węzła",
             "OPERATION": "Operacje",
             "STARTED": "Rozpoczęte",
             "STATUS": "Status",
@@ -1664,7 +1664,7 @@
             "INSTANTIATED": "Uruchomione",
             "DISPATCHING": "Uruchamiane",
             "RESTART": "Restartowane",
-            "CANCELLED": "Cancelled",
+            "CANCELLED": "Anulowane",
             "WAITING": "Oczekujące"
          }
       },
@@ -1673,7 +1673,7 @@
             "CAPTION": "Serwery",
             "STATUS": "Status",
             "HOST_NAME": "Nazwa hosta",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Nazwa węzła",
             "CORES": "Rdzenie",
             "RUNNING": "Uruchomione zadania",
             "QUEUED": "Zadania w kolejce",
@@ -1688,7 +1688,7 @@
             "STATUS": "Status",
             "NAME": "Nazwa usługi",
             "HOST_NAME": "Nazwa hosta",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Nazwa węzła",
             "COMPLETED": "Zadania wykonane",
             "RUNNING": "Uruchomione zadania",
             "QUEUED": "Zadania w kolejce",
@@ -1734,25 +1734,25 @@
       },
       "ACTIONS": {
          "SPLIT": "Podziel",
-         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
-         "CUT": "Hide/Show",
-         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
-         "REPLAY_SEGMENT": "Play Start of Segment",
-         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
-         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
-         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
-         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
+         "SPLIT_TOOLTIP": "Podziel segment w bieżącej pozycji kursora.",
+         "CUT": "Ukryj/Pokaż",
+         "CUT_TOOLTIP": "Ukryj lub pokaż wybraną część wideo.",
+         "REPLAY_SEGMENT": "Odtwórz początek segmentu",
+         "REPLAY_SEGMENT_TOOLTIP": "Odtwarzaj bieżący segment od początku.",
+         "REPLAY_END_OF_SEGMENT": "Odtwórz koniec segmentu",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Zagraj kilka sekund na końcu bieżącego segmentu.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Odtwórz przejście",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Zagraj kilka sekund z końcem poprzedniego i początkiem następnego segmentu.",
          "UNDO": "Cofnij",
          "REDO": "Wykonaj ponownie",
-         "CLEAR_SEGMENTS": "Clear All Segments",
-         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
+         "CLEAR_SEGMENTS": "Wyczyść wszystkie segmenty",
+         "CLEAR_SEGMENTS_TOOLTIP": "Wyczyść wszystkie segmenty, pozostawiając jeden duży segment."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Usuń segment",
-         "SHOW_SEGMENT": "Show this Segment",
-         "HIDE_SEGMENT": "Hide this Segment",
-         "START": "Start",
+         "SHOW_SEGMENT": "Pokaż ten segment",
+         "HIDE_SEGMENT": "Ukryj ten segment",
+         "START": "Rozpocznij",
          "END": "Koniec"
       },
       "THUMBNAIL": {
@@ -1792,10 +1792,10 @@
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
+         "DESCRIPTION": "Możesz odznaczyć utwory, aby wykluczyć je z dalszego przetwarzania. Pamiętaj, że musisz (ponownie) opublikować wydarzenie, aby faktycznie zastosować zmiany.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "You must enable at least one video track",
-            "NO_AUDIO_TRACK_SELECTED": "You must enable at least one audio track"
+            "NO_VIDEO_TRACK_SELECTED": "Musisz włączyć co najmniej jedną ścieżkę wideo",
+            "NO_AUDIO_TRACK_SELECTED": "Musisz włączyć co najmniej jedną ścieżkę audio"
          },
          "TRACK": {
             "HEADER": "Ścieżka"
@@ -1806,8 +1806,8 @@
             "NO_PREVIEW_AVAILABLE": "Nie znaleziono obrazka podglądu",
             "NO_TRACK_SELECTED": "Nie wybrano ścieżki wideo",
             "TOOLTIPS": {
-               "HIDE": "This video track is currently enabled. Click to disable",
-               "UNHIDE": "This video track is currently disabled. Click to enable."
+               "HIDE": "Ta ścieżka wideo jest obecnie włączona. Kliknij, aby wyłączyć",
+               "UNHIDE": "Ta ścieżka wideo jest obecnie wyłączona. Kliknij, aby włączyć."
             }
          },
          "AUDIO": {
@@ -1970,7 +1970,7 @@
             "LABEL": "Nazwa hosta"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Nazwa węzła"
          },
          "STATUS": {
             "LABEL": "Status",
@@ -2014,7 +2014,7 @@
             "LABEL": "Nazwa hosta"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Nazwa węzła"
          },
          "STATUS": {
             "LABEL": "Status",
@@ -2031,7 +2031,7 @@
             "LABEL": "Nazwa hosta"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Nazwa węzła"
          },
          "NAME": {
             "LABEL": "Imię"
@@ -2126,29 +2126,29 @@
       },
       "GROUPS": {
          "GENERAL": "Ogólne",
-         "PLAYER": "Player",
+         "PLAYER": "Odtwarzacz",
          "EDITOR": "Edytor"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
-            "MAIN_MENU": "Main menu",
-            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
-            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
+            "MAIN_MENU": "Menu główne",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Wybierz następny filtr pulpitu nawigacyjnego",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Wybierz poprzedni filtr pulpitu nawigacyjnego",
             "REMOVE_FILTERS": "Wyczyść wszystkie filtry",
             "EVENT_VIEW": "Wydarzenia",
             "SERIES_VIEW": "Serie",
             "NEW_EVENT": "Dodaj wydarzenie",
             "NEW_SERIES": "Dodaj serię",
-            "CHEAT_SHEET": "Keyboard shortcuts"
+            "CHEAT_SHEET": "Skróty klawiszowe"
          },
          "PLAYER": {
-            "PLAY_PAUSE": "Play/pause",
+            "PLAY_PAUSE": "Odtwórz/wstrzymaj",
             "PREVIOUS_FRAME": "Poprzednia ramka",
             "NEXT_FRAME": "Następna klatka",
-            "STEP_BACKWARD": "Jump 10s back",
-            "STEP_FORWARD": "Jump 10s forward",
-            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
-            "NEXT_SEGMENT": "Next segment/jump to end",
+            "STEP_BACKWARD": "Skocz 10s wstecz",
+            "STEP_FORWARD": "Skok 10s do przodu",
+            "PREVIOUS_SEGMENT": "Poprzedni segment/skok do rozpoczęcia",
+            "NEXT_SEGMENT": "Następny segment/skok do końca",
             "VOLUME_UP": "Głośniej",
             "VOLUME_DOWN": "Ciszej",
             "MUTE": "Wycisz/włącz dźwięk"
@@ -2176,30 +2176,30 @@
    },
    "EDITABLE": {
       "MULTI": {
-         "PLACEHOLDER": "To insert multiple values press Enter in between"
+         "PLACEHOLDER": "Aby wstawić wiele wartości, naciśnij Enter pomiędzy nimi"
       }
    },
    "STATISTICS": {
       "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
       "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
       "FROM": "Od",
-      "TO": "To",
+      "TO": "Do",
       "TOTAL": "Total",
       "GRANULARITY": "Granularity",
       "NAVIGATION": {
-         "ORGANIZATION": "Organisation"
+         "ORGANIZATION": "Organizacja"
       },
       "TITLE": {
-         "RANDOM": "Random Data",
-         "VIEWS_SUM": "Total Number of Views",
-         "VIEWS_AVG": "Average Number of Views",
-         "PUBLISHEDHOURS": "Published Hours of Video"
+         "RANDOM": "Losowe dane",
+         "VIEWS_SUM": "Całkowita liczba wyświetleń",
+         "VIEWS_AVG": "Średnia liczba wyświetleń",
+         "PUBLISHEDHOURS": "Opublikowane godziny wideo"
       },
       "DESCRIPTION": {
-         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
-         "VIEWS_SUM": "This displays the total number of views per time unit.",
+         "RANDOM": "Wyświetla losowe dane jako prezentację. Możesz wyłączyć ten wykres usuwając definicję json dostawcy statystyk z etc/providers",
+         "VIEWS_SUM": "Wyświetla całkowitą liczbę wyświetleń na jednostkę czasu.",
          "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
-         "PUBLISHEDHOURS": "This displays the published hours of video"
+         "PUBLISHEDHOURS": "Wyświetla opublikowane godziny wideo"
       }
    }
 }

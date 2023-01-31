@@ -274,7 +274,7 @@ class OpencastToPaellaConverter {
           if (videoCanvas) {
             currentStream.canvas = [videoCanvas];
           }
-        } else {
+        } else if (currentStream.type === undefined) {
           // Explicitly set the type, else Paella will assume this track to be 'video' type (Causing an exception
           // if it is actually not)
           currentStream.type = 'noType';

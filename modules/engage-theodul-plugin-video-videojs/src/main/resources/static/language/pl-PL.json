@@ -12,5 +12,5 @@
     "msg_waitToSeek": "Przewijanie nie jest możliwe, przed załadowaniem filmu.",
     "msg_startPlayingToSeek": "Przewijanie i wyszukiwanie nie jest możliwe przed rozpoczęciem odtwarzania.",
     "chromeBuffer": "Kontrola buforowanie wideo została wyłączona ze względu na ograniczenia przeglądarki Google Chrome. Z tego powodu mogą wystąpić problemy podczas odtwarzania.",
-    "scroll_overlay_text": "Use shift + scroll to zoom."
+    "scroll_overlay_text": "Użyj Shift + Scroll do powiększenia."
 }

@@ -183,6 +183,7 @@
     <module>modules/publication-service-oaipmh</module>
     <module>modules/publication-service-youtube-remote</module>
     <module>modules/publication-service-youtube-v3</module>
+    <module>modules/redirect</module>
     <module>modules/rename-files-workflowoperation</module>
     <module>modules/rest-test-environment</module>
     <module>modules/runtime-info-ui-ng</module>
@@ -268,6 +269,7 @@
     <module>modules/userdirectory-ldap</module>
     <module>modules/userdirectory-moodle</module>
     <module>modules/userdirectory-sakai</module>
+    <module>modules/userdirectory-studip</module>
     <module>modules/userdirectory</module>
     <module>modules/usertracking-api</module>
     <module>modules/usertracking-impl</module>

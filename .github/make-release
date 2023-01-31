@@ -48,7 +48,7 @@ curl -fsS --retry 30 --retry-delay 10 --retry-all-errors "http://127.0.0.1:8080/
 test "$(jq .consistent < version.json)" = "true"
 
 # commit changes
-git add pom.xml modules/*/pom.xml
+git add pom.xml modules/*/pom.xml assemblies/pom.xml assemblies/*/pom.xml
 git commit -m "Opencast ${VERSION}"
 git tag "${VERSION}" -m "Opencast ${VERSION}"
 

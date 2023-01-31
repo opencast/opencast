@@ -125,6 +125,7 @@
               <feature>opencast-sakai</feature>
               <feature>opencast-canvas</feature>
               <feature>opencast-brightspace</feature>
+              <feature>opencast-studip</feature>
             </installedFeatures>
           </configuration>
         </plugin>
