@@ -243,7 +243,6 @@
                                     ng-disabled="(tab == 'permissions') && (!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked)"
                                     data-width="'360px'"
                                     ng-model="policy.role"
-                                    ng-change="accessChanged(policy.role)"
                                     ng-options="user.userRole as userToStringForDetails(user) for user in users"
                                     call-on-search="getMatchingUsers"
                                     placeholder-text-single="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.USERS.LABEL' | translate }}'"
