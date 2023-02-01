@@ -369,7 +369,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
       } else {
         // Ensure this user is allowed to update this media package
         String accessControlXml = entity.getAccessControl();
-        if (accessControlXml != null) {
+        if (accessControlXml != null && entity.getDeletionDate() == null) {
           AccessControlList accessList = AccessControlParser.parseAcl(accessControlXml);
           User currentUser = securityService.getUser();
           Organization currentOrg = securityService.getOrganization();
