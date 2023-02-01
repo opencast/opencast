@@ -24,6 +24,7 @@ package org.opencastproject.search.impl.persistence;
 import static org.opencastproject.security.api.Permissions.Action.CONTRIBUTE;
 import static org.opencastproject.security.api.Permissions.Action.READ;
 import static org.opencastproject.security.api.Permissions.Action.WRITE;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageException;
@@ -168,19 +169,23 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
       }
 
       // Ensure this user is allowed to delete this episode
+      User currentUser = securityService.getUser();
+      Organization currentOrg = securityService.getOrganization();
+      MediaPackage searchMp = MediaPackageParser.getFromXml(searchEntity.getMediaPackageXML());
       String accessControlXml = searchEntity.getAccessControl();
-      if (accessControlXml != null) {
+
+      // allow ca users to retract live publications without putting them into the ACL
+      if (!(searchMp.isLive() && currentUser.hasRole(GLOBAL_CAPTURE_AGENT_ROLE))
+              && accessControlXml != null) {
         AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
-        User currentUser = securityService.getUser();
-        Organization currentOrg = securityService.getOrganization();
         if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, WRITE.toString())) {
           throw new UnauthorizedException(currentUser + " is not authorized to delete media package " + mediaPackageId);
         }
-
-        searchEntity.setDeletionDate(deletionDate);
-        searchEntity.setModificationDate(deletionDate);
-        em.merge(searchEntity);
       }
+
+      searchEntity.setDeletionDate(deletionDate);
+      searchEntity.setModificationDate(deletionDate);
+      em.merge(searchEntity);
       tx.commit();
     } catch (NotFoundException e) {
       throw e;
