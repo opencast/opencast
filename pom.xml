@@ -175,7 +175,6 @@
     <module>modules/redirect</module>
     <module>modules/rename-files-workflowoperation</module>
     <module>modules/rest-test-environment</module>
-    <module>modules/runtime-info-ui-ng</module>
     <module>modules/runtime-info-ui</module>
     <module>modules/runtime-info</module>
     <module>modules/scheduler-api</module>
