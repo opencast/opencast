@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import Select from "react-select";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { DateTimePicker } from "@material-ui/pickers";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core";

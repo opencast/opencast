@@ -94,6 +94,7 @@ const Acls = ({
 		let fetchAclInterval = setInterval(loadAcls, 5000);
 
 		return () => clearInterval(fetchAclInterval);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const toggleNavigation = () => {

@@ -96,7 +96,7 @@ const FileUpload = ({
 										isEdit ? { padding: "0px 10px" } : { padding: "4px 10px" }
 									}
 								>
-									<a href={file.url} target="_blank">
+									<a href={file.url} target="_blank" rel="noreferrer">
 										{formik.values[fileName]}
 									</a>
 								</p>

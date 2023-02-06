@@ -26,7 +26,7 @@ const GeneralDetailsTab = ({ agent }) => {
 									<tr>
 										<td>{t("RECORDINGS.RECORDINGS.DETAILS.GENERAL.URL")}</td>
 										<td>
-											<a href={agent.url} target="_blank">
+											<a href={agent.url} target="_blank" rel="noreferrer">
 												{agent.url}
 											</a>
 										</td>

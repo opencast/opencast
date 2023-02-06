@@ -106,6 +106,7 @@ export const useClickOutsideField = (childRef, isFirstField) => {
 		return () => {
 			window.removeEventListener("mousedown", handleClickOutside);
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [editMode]);
 
 	return [editMode, setEditMode];

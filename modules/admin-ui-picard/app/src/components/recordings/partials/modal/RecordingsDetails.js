@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
 import { connect } from "react-redux";
 import GeneralDetailsTab from "../wizards/GeneralDetailsTab";
 import ConfigurationDetailsTab from "../wizards/ConfigurationDetailsTab";
@@ -11,8 +10,6 @@ import ModalNavigation from "../../../shared/modals/ModalNavigation";
  * This component manages the pages of the recording details
  */
 const RecordingsDetails = ({ agent }) => {
-	const { t } = useTranslation();
-
 	const [page, setPage] = useState(0);
 
 	// information about tabs

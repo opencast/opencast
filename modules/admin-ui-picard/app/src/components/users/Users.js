@@ -94,6 +94,7 @@ const Users = ({
 		let fetchUsersInterval = setInterval(loadUsers, 5000);
 
 		return () => clearInterval(fetchUsersInterval);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const toggleNavigation = () => {

@@ -15,7 +15,7 @@ const DeleteEventsModal = ({ close, selectedRows, deleteMultipleEvent }) => {
 	const [selectedEvents, setSelectedEvents] = useState(selectedRows);
 
 	const deleteSelectedEvents = () => {
-		const response = deleteMultipleEvent(selectedEvents);
+		deleteMultipleEvent(selectedEvents);
 		close();
 	};
 

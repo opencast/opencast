@@ -1,7 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { availableHotkeys } from "../../configs/hotkeysConfig";
-import { getApplicationKeyMap } from "react-hotkeys";
 
 /**
  * This component renders the hotkey cheat sheet showing all available hotkeys

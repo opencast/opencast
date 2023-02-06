@@ -72,6 +72,7 @@ const EventDetailsSchedulingTab = ({
 			source.end.date,
 			source.device.id
 		).then((r) => {});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	// Get info about the current language and its date locale

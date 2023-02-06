@@ -1,7 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { connect } from "react-redux";
-import { Field } from "formik";
 import { getSeriesThemes } from "../../../../selectors/seriesSeletctor";
 import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
 import DropDown from "../../../shared/DropDown";

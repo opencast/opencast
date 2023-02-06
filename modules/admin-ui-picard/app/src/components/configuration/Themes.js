@@ -60,6 +60,7 @@ const Themes = ({
 		let fetchThemesInterval = setInterval(loadThemes, 5000);
 
 		return () => clearInterval(fetchThemesInterval);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const toggleNavigation = () => {

@@ -4,7 +4,6 @@ import {
 	style_nav,
 	style_nav_hierarchy,
 	style_nav_hierarchy_inactive,
-	error_detail_style,
 } from "../../../../utils/eventDetailsUtils";
 
 /**

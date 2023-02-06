@@ -136,6 +136,7 @@ const Events = ({
 			window.removeEventListener("mousedown", handleClickOutside);
 			clearInterval(fetchEventsInterval);
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [location.hash]);
 
 	const toggleNavigation = () => {

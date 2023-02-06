@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
-import { Field, Formik } from "formik";
+import { Formik } from "formik";
 import {
 	deleteWorkflow,
 	fetchWorkflowDetails,
@@ -64,6 +64,7 @@ const EventDetailsWorkflowTab = ({
 	useEffect(() => {
 		removeNotificationWizardForm();
 		loadWorkflows(eventId).then((r) => {});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const isCurrentWorkflow = (workflowId) => {

@@ -40,6 +40,7 @@ const EventDetailsCommentsTab = ({
 }) => {
 	useEffect(() => {
 		loadComments(eventId).then((r) => logger.info(r));
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const [replyToComment, setReplyToComment] = useState(false);

@@ -21,6 +21,7 @@ const EditScheduledEventsSummaryPage = ({
 	useEffect(() => {
 		// Check on mount if changes on events where applied on page before
 		checkForChanges();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const checkForChanges = () => {

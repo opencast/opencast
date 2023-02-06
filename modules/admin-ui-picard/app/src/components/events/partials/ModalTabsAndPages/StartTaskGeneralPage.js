@@ -29,6 +29,7 @@ const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
 		if (formik.values.events.length === 0) {
 			formik.setFieldValue("events", selectedEvents);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (

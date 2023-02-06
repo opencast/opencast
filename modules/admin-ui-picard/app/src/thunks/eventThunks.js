@@ -18,7 +18,7 @@ import {
 	prepareMetadataFieldsForPost,
 	transformMetadataCollection,
 } from "../utils/resourceUtils";
-import { getTimezoneOffset, makeTwoDigits } from "../utils/utils";
+import { makeTwoDigits } from "../utils/utils";
 import { sourceMetadata } from "../configs/sourceConfig";
 import {
 	NOTIFICATION_CONTEXT,
@@ -731,7 +731,7 @@ export const checkConflicts = (values) => async (dispatch) => {
 		values.sourceMode === "SCHEDULE_MULTIPLE"
 	) {
 		// Get timezone offset; Checks should be performed on UTC times
-		let offset = getTimezoneOffset();
+		// let offset = getTimezoneOffset();
 
 		// Prepare start date of event for check
 		let startDate = new Date(values.scheduleStartDate);

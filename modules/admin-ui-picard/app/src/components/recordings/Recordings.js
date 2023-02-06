@@ -53,6 +53,7 @@ const Recordings = ({
 
 		// Load recordings on mount
 		loadRecordings().then((r) => logger.info(r));
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const toggleNavigation = () => {
