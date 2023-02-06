@@ -26,7 +26,10 @@ import org.opencastproject.caption.api.CaptionConverterException;
 import org.opencastproject.caption.util.TimeUtil;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
+import org.opencastproject.util.OsgiUtil;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +55,18 @@ public class WebVttCaptionConverter implements CaptionConverter {
   private static final Logger logger = LoggerFactory.getLogger(WebVttCaptionConverter.class);
 
   private static final String EXTENSION = "vtt";
+
+  /** This configuration key defines the mediapackage element type of the captions file (Attachment, Track) */
+  static final String MEDIAPACKAGE_ELEMENT_TYPE_CONFIG_KEY = "mediapackage-element-type";
+  static final Type DEFAULT_MEDIAPACKAGE_ELEMENT_TYPE = Type.Attachment;
+  private static Type mediapackageElementType = DEFAULT_MEDIAPACKAGE_ELEMENT_TYPE;
+
+
+  @Activate
+  public void activate(ComponentContext cc) {
+    mediapackageElementType = getConfiguredMediapackageElementType(cc);
+    logger.info("Mediapackage element type is set to '{}'.", mediapackageElementType);
+  }
 
   /**
    * {@inheritDoc} Language parameter is ignored.
@@ -107,7 +122,28 @@ public class WebVttCaptionConverter implements CaptionConverter {
 
   @Override
   public Type getElementType() {
-    return MediaPackageElement.Type.Attachment;
+    return mediapackageElementType;
+  }
+
+  /**
+   * Converts the configured property 'mediapackage-element-type' into the corresponding enum 'MediapackageElement.Type'
+   *
+   * @param cc ComponentContext
+   * @return the configured mediapackage element type
+   */
+  private MediaPackageElement.Type getConfiguredMediapackageElementType(ComponentContext cc) {
+    String mediapackageElementType = null;
+    try {
+      mediapackageElementType = OsgiUtil.getOptCfg(cc.getProperties(), MEDIAPACKAGE_ELEMENT_TYPE_CONFIG_KEY).get();
+      // capitalize the first letter
+      mediapackageElementType = mediapackageElementType.substring(0, 1).toUpperCase()
+          + mediapackageElementType.substring(1);
+      return MediaPackageElement.Type.valueOf(mediapackageElementType);
+    } catch (Exception e) {
+      logger.warn("Couldn't convert configuration '{}'='{}' into enum. Using default '{}'.",
+          MEDIAPACKAGE_ELEMENT_TYPE_CONFIG_KEY, mediapackageElementType, DEFAULT_MEDIAPACKAGE_ELEMENT_TYPE);
+      return DEFAULT_MEDIAPACKAGE_ELEMENT_TYPE;
+    }
   }
 
 }
