@@ -55,6 +55,7 @@ const EditScheduledEventsModal = ({
 	useEffect(() => {
 		// Load recordings that can be used for input
 		loadingInputDevices();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const steps = [
@@ -124,6 +125,7 @@ const EditScheduledEventsModal = ({
 						// eslint-disable-next-line react-hooks/rules-of-hooks
 						useEffect(() => {
 							formik.validateForm().then();
+							// eslint-disable-next-line react-hooks/exhaustive-deps
 						}, [page]);
 
 						return (

@@ -5,7 +5,7 @@ import {
 	getTableDirection,
 	getTableSorting,
 } from "../selectors/tableSelectors";
-import { hasAccess, hasOrgAdminAccess } from "./utils";
+import { hasAccess } from "./utils";
 
 /**
  * This file contains methods that are needed in more than one resource thunk

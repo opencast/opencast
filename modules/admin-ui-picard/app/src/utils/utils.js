@@ -66,26 +66,6 @@ export const transformToIdValueArray = (data) => {
 };
 
 /*
- * Compare two arrays
- * returns true, if content of sorted arrays is the same,
- * returns false if length or at least one entry is different
- */
-const isArrayChanged = (oldArray, newArray) => {
-	if (newArray.length !== oldArray.length) {
-		return true;
-	}
-
-	const sortedNewArray = [...newArray].sort();
-	const sortedOldArray = [...oldArray].sort();
-	for (let i = 0; i < sortedNewArray.length; i++) {
-		if (sortedNewArray[i] !== sortedOldArray[i]) {
-			return true;
-		}
-	}
-	return false;
-};
-
-/*
  * transforms an object of form { id1: object1, id2: object2 }
  * to [
    {

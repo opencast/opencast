@@ -45,6 +45,7 @@ const Statistics = ({
 		fetchUserInfo().then((e) => {
 			loadStatistics(organizationId).then();
 		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const toggleNavigation = () => {

@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import cn from "classnames";
-import { Field } from "formik";
 import { connect } from "react-redux";
 import { fetchWorkflowDef } from "../../../../thunks/workflowThunks";
 import { getWorkflowDef } from "../../../../selectors/workflowSelectors";
@@ -24,6 +23,7 @@ const NewProcessingPage = ({
 	useEffect(() => {
 		// Load workflow definitions for selecting
 		loadingWorkflowDef();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const previous = () => {

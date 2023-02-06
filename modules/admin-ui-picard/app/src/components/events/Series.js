@@ -121,6 +121,7 @@ const Series = ({
 			window.removeEventListener("mousedown", handleClickOutside);
 			clearInterval(fetchSeriesInterval);
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [location.hash]);
 
 	const toggleNavigation = () => {

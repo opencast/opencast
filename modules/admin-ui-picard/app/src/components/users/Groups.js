@@ -94,6 +94,7 @@ const Groups = ({
 		let fetchGroupsInterval = setInterval(loadGroups, 5000);
 
 		return () => clearInterval(fetchGroupsInterval);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const toggleNavigation = () => {

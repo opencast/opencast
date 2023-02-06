@@ -43,6 +43,7 @@ const EventDetailsAssetsTab = ({
 	useEffect(() => {
 		removeNotificationWizardForm();
 		fetchAssets(eventId).then((r) => {});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const openSubTab = (

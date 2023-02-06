@@ -77,6 +77,7 @@ const NewThemeWizard = ({ close, postNewTheme }) => {
 					// eslint-disable-next-line react-hooks/rules-of-hooks
 					useEffect(() => {
 						formik.validateForm();
+						// eslint-disable-next-line react-hooks/exhaustive-deps
 					}, [page]);
 
 					return (

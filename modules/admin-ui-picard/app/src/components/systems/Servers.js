@@ -92,6 +92,7 @@ const Servers = ({
 		let fetchServersInterval = setInterval(loadServers, 5000);
 
 		return () => clearInterval(fetchServersInterval);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const toggleNavigation = () => {

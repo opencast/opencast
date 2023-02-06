@@ -33,7 +33,7 @@ const EditMetadataEventsModal = ({
 }) => {
 	const { t } = useTranslation();
 
-	const [selectedEvents, setSelectedEvents] = useState(selectedRows);
+	const [selectedEvents] = useState(selectedRows);
 	const [metadataFields, setMetadataFields] = useState({});
 	const [loading, setLoading] = useState(true);
 	const [fatalError, setFatalError] = useState({});
@@ -61,6 +61,7 @@ const EditMetadataEventsModal = ({
 			setLoading(false);
 		}
 		fetchData();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const handleSubmit = (values) => {

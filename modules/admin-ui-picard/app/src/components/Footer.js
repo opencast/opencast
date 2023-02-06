@@ -9,10 +9,6 @@ import { hasAccess } from "../utils/utils";
 /**
  * Component that renders the footer
  */
-const version = {
-	version: "8.03",
-	buildNumber: "42",
-};
 
 const Footer = ({ user, orgProperties }) => {
 	const feedbackUrlPropertyId = "org.opencastproject.admin.feedback.url";

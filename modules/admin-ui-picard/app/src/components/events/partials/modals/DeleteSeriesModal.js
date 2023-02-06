@@ -37,10 +37,11 @@ const DeleteSeriesModal = ({ close, selectedRows, deleteMultipleSeries }) => {
 			setSelectedSeries(series);
 		}
 		fetchData();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const deleteSelectedSeries = () => {
-		const response = deleteMultipleSeries(selectedSeries);
+		deleteMultipleSeries(selectedSeries);
 		close();
 	};
 

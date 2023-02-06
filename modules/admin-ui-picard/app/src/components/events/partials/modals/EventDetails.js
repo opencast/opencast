@@ -2,10 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import cn from "classnames";
 import { connect } from "react-redux";
-import {
-	getCurrentLanguageInformation,
-	hasAccess,
-} from "../../../../utils/utils";
+import { hasAccess } from "../../../../utils/utils";
 import EventDetailsCommentsTab from "../ModalTabsAndPages/EventDetailsCommentsTab";
 import EventDetailsAccessPolicyTab from "../ModalTabsAndPages/EventDetailsAccessPolicyTab";
 import EventDetailsWorkflowTab from "../ModalTabsAndPages/EventDetailsWorkflowTab";
@@ -51,9 +48,6 @@ import { fetchAssetUploadOptions } from "../../../../thunks/assetsThunks";
 import { hasAnyDeviceAccess } from "../../../../utils/resourceUtils";
 import { getRecordings } from "../../../../selectors/recordingSelectors";
 
-// Get info about the current language and its date locale
-const currentLanguage = getCurrentLanguageInformation();
-
 /**
  * This component manages the pages of the event details
  */
@@ -86,6 +80,7 @@ const EventDetails = ({
 		loadScheduling(eventId).then();
 		loadStatistics(eventId).then();
 		fetchAssetUploadOptions().then();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const [page, setPage] = useState(tabIndex);
