@@ -20,16 +20,14 @@ import "react-datepicker/dist/react-datepicker.css";
 // create redux store
 const store = configureStore();
 // todo: comment persistent stuff in, only out commented because for debugging purposes
-//const persistor = persistStore(store);
+const persistor = persistStore(store);
 
 ReactDOM.render(
 	<React.StrictMode>
 		<Provider store={store}>
-			{/*<PersistGate*/}
-			{/*    loading={<div>loading...</div>}*/}
-			{/*    persistor={persistor} >*/}
-			<App />
-			{/*</PersistGate>*/}
+			<PersistGate loading={<div>loading...</div>} persistor={persistor}>
+				<App />
+			</PersistGate>
 		</Provider>
 	</React.StrictMode>,
 	document.getElementById("root")
