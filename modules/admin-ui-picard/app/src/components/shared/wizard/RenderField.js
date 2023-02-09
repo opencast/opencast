@@ -1,13 +1,17 @@
 import React, { useState } from "react";
 import Select from "react-select";
 import { useTranslation } from "react-i18next";
-import { DateTimePicker } from "@material-ui/pickers";
+import { DateTimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
+import DateFnsUtils from "@date-io/date-fns";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core";
 import cn from "classnames";
 import { useClickOutsideField } from "../../../hooks/wizardHooks";
-import { isJson } from "../../../utils/utils";
+import { getCurrentLanguageInformation, isJson } from "../../../utils/utils";
 import { getMetadataCollectionFieldName } from "../../../utils/resourceUtils";
 import DropDown from "../DropDown";
+
+// Get info about the current language and its date locale
+const currentLanguage = getCurrentLanguageInformation();
 
 const childRef = React.createRef();
 /**
@@ -179,14 +183,18 @@ const EditableDateValue = ({
 	return editMode ? (
 		<div>
 			<ThemeProvider theme={theme}>
-				<DateTimePicker
-					name={field.name}
-					value={field.value}
-					onChange={(value) => setFieldValue(field.name, value)}
-					onClose={() => setEditMode(false)}
-					fullWidth
-					format="MM/dd/yyyy"
-				/>
+				<MuiPickersUtilsProvider
+					utils={DateFnsUtils}
+					locale={currentLanguage.dateLocale}
+				>
+					<DateTimePicker
+						name={field.name}
+						value={field.value}
+						onChange={(value) => setFieldValue(field.name, value)}
+						onClose={() => setEditMode(false)}
+						fullWidth
+					/>
+				</MuiPickersUtilsProvider>
 			</ThemeProvider>
 		</div>
 	) : (
@@ -351,13 +359,18 @@ const EditableSingleValueTime = ({
 	return editMode ? (
 		<div>
 			<ThemeProvider theme={theme}>
-				<DateTimePicker
-					name={field.name}
-					value={field.value}
-					onChange={(value) => setFieldValue(field.name, value)}
-					onClose={() => setEditMode(false)}
-					fullWidth
-				/>
+				<MuiPickersUtilsProvider
+					utils={DateFnsUtils}
+					locale={currentLanguage.dateLocale}
+				>
+					<DateTimePicker
+						name={field.name}
+						value={field.value}
+						onChange={(value) => setFieldValue(field.name, value)}
+						onClose={() => setEditMode(false)}
+						fullWidth
+					/>
+				</MuiPickersUtilsProvider>
 			</ThemeProvider>
 		</div>
 	) : (
