@@ -44,6 +44,7 @@ const SeriesDetails = ({
 
 	useEffect(() => {
 		loadStatistics(seriesId).then();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const [page, setPage] = useState(0);

@@ -75,6 +75,7 @@ const NewSourcePage = ({
 
 		// validate form because dependent default values need to be checked
 		formik.validateForm().then((r) => logger.info(r));
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	// Remove old notifications of context event-form

@@ -23,12 +23,6 @@ const RenderWorkflowConfig = (props) => {
 	const displayDescription = !!props.displayDescription;
 	let formik = props.formik;
 
-	let ref = React.useRef();
-
-	if (ref.current?.childNodes !== undefined) {
-		let array = [...ref.current?.childNodes];
-	}
-
 	const descriptionBoxStyle = {
 		margin: "15px 0 0 0",
 		position: "relative",

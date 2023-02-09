@@ -7,11 +7,6 @@ import {
 	isFetchingWorkflowOperations,
 } from "../../../../selectors/eventDetailsSelectors";
 import { fetchWorkflowOperationDetails } from "../../../../thunks/eventDetailsThunks";
-import {
-	style_nav,
-	style_nav_hierarchy,
-	style_nav_hierarchy_inactive,
-} from "../../../../utils/eventDetailsUtils";
 import { removeNotificationWizardForm } from "../../../../actions/notificationActions";
 import EventDetailsTabHierarchyNavigation from "./EventDetailsTabHierarchyNavigation";
 

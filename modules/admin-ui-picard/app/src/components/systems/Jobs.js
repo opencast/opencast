@@ -92,6 +92,7 @@ const Jobs = ({
 		let fetchJobInterval = setInterval(loadJobs, 5000);
 
 		return () => clearInterval(fetchJobInterval);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const toggleNavigation = () => {

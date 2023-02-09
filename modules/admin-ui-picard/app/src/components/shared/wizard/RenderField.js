@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import Select from "react-select";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { DateTimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";

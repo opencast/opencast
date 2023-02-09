@@ -77,4 +77,4 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 // Todo: Change rootReducer to persistedReducer for actually saving state even if reloads occur. At the moment it is
 //  commented out because of debugging purposes.
 export const configureStore = () =>
-	createStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)));
+	createStore(persistedReducer, composeWithDevTools(applyMiddleware(thunk)));

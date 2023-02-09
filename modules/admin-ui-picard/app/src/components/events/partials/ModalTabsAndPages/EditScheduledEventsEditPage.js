@@ -55,28 +55,8 @@ const EditScheduledEventsEditPage = ({
 			fetchEventInfos,
 			formik.setFieldValue
 		);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [formik.values.events]);
-
-	// Render input device options of currently chosen input device
-	const renderInputDeviceOptions = (eventKey) => {
-		if (!!formik.values.editedEvents[eventKey].changedLocation) {
-			let inputDevice = inputDevices.find(
-				({ name }) =>
-					name === formik.values.editedEvents[eventKey].changedLocation
-			);
-			return inputDevice.inputs.map((input, key) => (
-				<label key={key}>
-					<Field
-						type="checkbox"
-						name={`editedEvents.${eventKey}.changedDeviceInputs`}
-						value={input.id}
-						tabIndex="12"
-					/>
-					{t(input.value)}
-				</label>
-			));
-		}
-	};
 
 	return (
 		<>

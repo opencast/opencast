@@ -92,6 +92,7 @@ const Services = ({
 		let fetchServicesInterval = setInterval(loadServices, 5000);
 
 		return () => clearInterval(fetchServicesInterval);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const toggleNavigation = () => {

@@ -8,7 +8,7 @@ const UserEffectiveRolesTab = ({ formik }) => {
 	const { t } = useTranslation();
 
 	const [searchField, setSearchField] = useState("");
-	const [defaultItems, setDefaultItems] = useState(formik.values.roles);
+	const [defaultItems] = useState(formik.values.roles);
 	const [items, setItems] = useState(formik.values.roles);
 
 	const clearSearchField = () => {

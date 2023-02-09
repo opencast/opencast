@@ -30,6 +30,8 @@ const EventDetailsWorkflowErrors = ({
 				return "green";
 			case "WARNING":
 				return "yellow";
+			default:
+				return "red";
 		}
 	};
 

@@ -101,6 +101,7 @@ const ResourceDetailsAccessPolicyTab = ({
 		}
 
 		fetchData().then((r) => {});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	/* resets the formik form and hides the save and cancel buttons */
@@ -169,7 +170,7 @@ const ResourceDetailsAccessPolicyTab = ({
 		let roleWithFullRightsExists = false;
 		let allRulesValid = true;
 
-		values.policies.map((policy) => {
+		values.policies.forEach((policy) => {
 			if (policy.read && policy.write) {
 				roleWithFullRightsExists = true;
 			}

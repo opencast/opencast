@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { Field } from "formik";
 import { useTranslation } from "react-i18next";
 import RenderWorkflowConfig from "../wizards/RenderWorkflowConfig";
 import { fetchWorkflowDef } from "../../../../thunks/workflowThunks";
@@ -25,6 +24,7 @@ const StartTaskWorkflowPage = ({
 	useEffect(() => {
 		// Load workflow definitions for selecting
 		loadingWorkflowDef();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const setDefaultValues = (value) => {
