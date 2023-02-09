@@ -29,12 +29,13 @@
 
     <!-- Allow anonymous access to the login form -->
     <sec:intercept-url pattern="/" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/admin-ng/login.html" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/login.html" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/sysinfo/bundles/version" method="GET" access="ROLE_ANONYMOUS" />
 
     <!-- Allow anonymous access to resources from runtime info ui -->
     <sec:intercept-url pattern="/img/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/js/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/scripts/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/styles/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/docs.*" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/rest_docs.*" access="ROLE_ANONYMOUS" />
 
@@ -367,7 +368,7 @@
 
     <!-- Enable and configure the failure URL for form-based logins -->
     <!-- CAS Auth: Comment this if using CAS authentication -->
-    <sec:form-login authentication-failure-url="/admin-ng/login.html?error" authentication-success-handler-ref="authSuccessHandler" />
+    <sec:form-login authentication-failure-url="/login.html?error" authentication-success-handler-ref="authSuccessHandler" />
 
     <!-- (Pre-)Authentication filter chain(s) -->
     <sec:custom-filter position="BASIC_AUTH_FILTER" ref="authenticationFilters" />
@@ -504,7 +505,7 @@
 
   <!-- Redirects unauthenticated requests to the login form -->
   <bean id="userEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
-    <property name="loginFormUrl" value="/admin-ng/login.html" />
+    <property name="loginFormUrl" value="/login.html" />
   </bean>
 
   <!-- Redirect unauthenticated requests to custom login url with configurable redirect query parameter

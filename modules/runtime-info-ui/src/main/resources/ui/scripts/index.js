@@ -21,34 +21,27 @@
 
 /* global $ */
 
-function search() {
-  var value = $('input').val();
-  $('li').each(function() {
-    $(this).toggle($(this).text().toLowerCase().indexOf(value.toLowerCase()) >= 0);
-  });
-}
-
-$(document).ready(function($) {
-  $('input').change(search);
-  $('input').keyup(search);
-
-  $.getJSON('/info/components.json', function(data) {
-    var docs = $('#docs'),
-        tpl = $('#template').html();
-    $.each(data, function(section) {
-      if ('rest' == section) {
-        data.rest.sort((a,b) => a.path > b.path ? 1 : -1);
-        $.each(data.rest, function(i) {
-          let path = data.rest[i].path,
-              service = $(tpl);
-          $('a', service).attr('href', '/docs.html?path=' + path);
-          $('.path', service).text(path);
-          $('.desc', service).text(data.rest[i].description);
-          docs.append(service);
+$(document).ready(function () {
+  $.ajax({
+    url: '/admin-ui/index.html',
+    type: 'HEAD',
+    error: function (xhr){
+      if (xhr.status == 404) {
+        // Go to rest docs instead
+        $.ajax({
+          url: '/rest_docs.html',
+          type: 'HEAD',
+          error: function () {
+            // Give up
+          },
+          success: function () {
+            window.location.replace('/rest_docs.html');
+          }
         });
-        return;
       }
-    });
-    search();
+    },
+    success: function () {
+      window.location.replace('/admin-ui/index.html');
+    }
   });
 });

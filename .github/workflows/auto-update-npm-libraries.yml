@@ -53,16 +53,6 @@ jobs:
           npm run html-linter
           git add package.json package-lock.json
 
-      - name: update runtime-info-ui-ng test libraries
-        working-directory: modules/runtime-info-ui-ng
-        run: |
-          set -eu
-          npm install --save --dev eslint@latest eslint-plugin-header@latest html-linter@latest
-          npm audit fix || true
-          npm run eslint
-          npm run html-linter
-          git add package.json package-lock.json
-
       #NB: The || true after the commit ensures that the pipeline doesn't fail
       # (and send emails) if there are no updates available
       - name: push changes
