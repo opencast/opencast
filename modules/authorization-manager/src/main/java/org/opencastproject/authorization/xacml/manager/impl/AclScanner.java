@@ -32,7 +32,6 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -52,6 +51,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
 
@@ -101,19 +101,19 @@ public class AclScanner implements ArtifactInstaller {
   }
 
   /** OSGi DI. */
-  @Reference(name = "organizationDirectoryService")
+  @Reference
   void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
   /** OSGi callback for setting persistence. */
-  @Reference(name = "acl-service-factory")
+  @Reference
   void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
 
   /** OSGi DI */
-  @Reference(name = "SecurityService")
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -143,7 +143,7 @@ public class AclScanner implements ArtifactInstaller {
 
     String fileName = FilenameUtils.removeExtension(artifact.getName());
     AccessControlList acl = parseToAcl(artifact);
-    Option<ManagedAcl> managedAcl = Option.<ManagedAcl> none();
+    Optional<ManagedAcl> managedAcl;
 
     // Add the Acl to all the organizations
     for (Organization org : organizations) {
@@ -161,7 +161,7 @@ public class AclScanner implements ArtifactInstaller {
       }
       if (!skip) {
         managedAcl = getAclService(org).createAcl(acl, fileName);
-        if (managedAcl.isSome()) {
+        if (managedAcl.isPresent()) {
           managedAcls.put(generateAclId(fileName, org), managedAcl.get().getId());
           logger.debug("Acl from '{}' has been added for the organisation {}", fileName, org.getName());
         } else {

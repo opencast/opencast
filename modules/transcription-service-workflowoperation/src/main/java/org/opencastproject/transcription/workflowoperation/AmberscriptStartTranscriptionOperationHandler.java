@@ -29,7 +29,6 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
 import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.transcription.amberscript.AmberscriptTranscriptionService;
 import org.opencastproject.transcription.api.TranscriptionService;
 import org.opencastproject.transcription.api.TranscriptionServiceException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -140,8 +139,7 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
     Job job = null;
     for (Track track : elements) {
       try {
-        job = ((AmberscriptTranscriptionService)service)
-            .startTranscription(mediaPackage.getIdentifier().toString(), track, language, jobtype);
+        job = service.startTranscription(mediaPackage.getIdentifier().toString(), track, language, jobtype);
         // Only one job per media package
         break;
       } catch (TranscriptionServiceException e) {
@@ -166,15 +164,12 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
     return createResult(Action.CONTINUE);
   }
 
-  @Reference(
-      name = "TranscriptionService",
-      target = "(provider=amberscript)"
-  )
+  @Reference(target = "(provider=amberscript)")
   public void setTranscriptionService(TranscriptionService service) {
     this.service = service;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

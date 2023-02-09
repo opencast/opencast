@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>12-SNAPSHOT</version>
+    <version>14-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -44,8 +44,9 @@
                 </goals>
                 <phase>initialize</phase>
                 <configuration>
-                  <executable>node_modules/.bin/bower</executable>
+                  <executable>npx</executable>
                   <arguments>
+                    <argument>bower</argument>
                     <argument>--allow-root</argument>
                     <argument>install</argument>
                   </arguments>
@@ -56,17 +57,18 @@
                 <goals>
                   <goal>exec</goal>
                 </goals>
-                <phase>compile</phase>
+                <phase>initialize</phase>
                 <configuration>
-                  <executable>node_modules/grunt-cli/bin/grunt</executable>
+                  <executable>npx</executable>
                   <arguments>
+                    <argument>grunt</argument>
                     <argument>build</argument>
                     <argument>--skipTests=${skipTests}</argument>
                   </arguments>
                 </configuration>
               </execution>
               <execution>
-                <id>esline</id>
+                <id>eslint</id>
                 <goals>
                   <goal>exec</goal>
                 </goals>

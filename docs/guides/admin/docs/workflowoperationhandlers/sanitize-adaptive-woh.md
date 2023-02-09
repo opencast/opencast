@@ -1,14 +1,20 @@
-# SanitizeAdaptiveWorkflowHandler
+Sanitize Adaptive Workflow Operation
+====================================
 
-## Description
-The SanitizeAdaptiveWorkflowHandler is used to fix references to media files in a playlist.
+ID: `sanitize-adaptive`
+
+Description
+-----------
+
+The sanitize adaptive operation is used to fix references to media files in a playlist.
 When files are ingested, they are put into system created and uniquely named directories.
 This code will attempt to match the referenced files by changing the references in the playlists.
 All the file names must be unique.
 This will allow the inspection to parse and inspect all the renditions in an adaptive playlist.
 Currently only HLS is supported
 
-## Parameter Table
+Parameter Table
+---------------
 
 |configuration keys|example             |description                                                                    |
 |------------------|--------------------|-------------------------------------------------------------------------------|
@@ -17,16 +23,17 @@ Currently only HLS is supported
 |target-tags       | sometag            | Specifies the tags of the new media                                           |
 
 
-## Operation Example
+Operation Example
+-----------------
 
-    <operation
-        id="sanitize-adaptive"
-        fail-on-error="true"
-        exception-handler-workflow="error"
-        description="Fix uploaded HLS files ">
-        <configurations>
-            <configuration key="source-flavor">presenter/ingested</configuration>
-            <configuration key="target-flavor">presenter/delivery</configuration>
-            <configuration key="target-tags">engage</configuration>
-        </configurations>
-    </operation>
+```xml
+<operation
+    id="sanitize-adaptive"
+    description="Fix uploaded HLS files ">
+  <configurations>
+    <configuration key="source-flavor">presenter/ingested</configuration>
+    <configuration key="target-flavor">presenter/delivery</configuration>
+    <configuration key="target-tags">engage</configuration>
+  </configurations>
+</operation>
+```

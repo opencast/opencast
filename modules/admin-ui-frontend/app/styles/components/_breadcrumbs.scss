@@ -20,9 +20,8 @@
  */
 
 
-#breadcrumb {
+.breadcrumb {
     $height: 35px;
-    display: none;
     background: lighten($modal-nav-bg-color, 4%);
     border-bottom: 1px solid $modal-nav-border-color;
     line-height: $height;
@@ -69,4 +68,10 @@
             display: none;
         }
     }
+}
+
+/* The main breadcrumbs in the resource modals */
+#breadcrumb {
+    @extend .breadcrumb;
+    display: none;
 }

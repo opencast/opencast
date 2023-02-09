@@ -112,7 +112,8 @@ Opencast hosts its maven artifacts on Maven Central.  There are a few steps prio
     </settings>
 ```
 
-##### Pushing Snapshots
+Pushing Snapshots
+-----------------
 
 Snapshots are pushed automatically by the CI servers.  For historical purposes, this is accomplished by:
 
@@ -124,7 +125,8 @@ To verify, your artifacts can be found [here](https://oss.sonatype.org/content/r
 and [here](https://oss.sonatype.org/content/groups/staging/org/opencastproject/).  Note that you cannot (easily) drop
 bad snapshots.  Instead, fix it and redeploy!
 
-##### Pushing Releases
+Pushing Releases
+----------------
 
 Note: Please read this section entirely before running any commands.  Maven Central does not allow you to change a
 release once it has been closed!
@@ -163,7 +165,8 @@ mvn nexus-staging:release
 
 to permanently release the binaries in their current states.
 
-##### Troubleshooting
+Troubleshooting
+---------------
 
 Sometimes the deploy or close will fail, timing out after 5 minutes waiting for Sonatype.  It will complain about
 violations of deploy rules - this may or may not actually be true.  If you're confident that this is caused by a simple

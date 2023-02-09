@@ -84,6 +84,9 @@ The current list of committers in aplhabetical order:
 <li><a href=https://github.com/CGreweling><img style="width: 40px; margin: 0"
  src=https://avatars.githubusercontent.com/u/3499600?u=27138059f4750ec5ce6ea6f4e80d08443b75367a&v=4
  /> CGreweling</a></li>
+<li><a href=https://github.com/geichelberger><img style="width: 40px; margin: 0"
+ src=https://avatars.githubusercontent.com/u/35195803?v=4
+ /> geichelberger</a></li>
 <li><a href=https://github.com/gregorydlogan><img style="width: 40px; margin: 0"
  src=https://avatars.githubusercontent.com/u/5639561?u=3980a41f51a9b4fcaa988a80e561de14913d062d&v=4
  /> gregorydlogan</a></li>
@@ -126,4 +129,7 @@ The current list of committers in aplhabetical order:
 <li><a href=https://github.com/wsmirnow><img style="width: 40px; margin: 0"
  src=https://avatars.githubusercontent.com/u/26736?u=ac49366f1834d1b32c6e0c0f330cc2ec4b640e04&v=4
  /> wsmirnow</a></li>
+<li><a href=https://github.com/ziegenberg><img style="width: 40px; margin: 0"
+ src=https://avatars.githubusercontent.com/u/856916?u=b23b2023c858cca58565a0e762a1d4bef3e8999d&v=4
+ /> ziegenberg</a></li>
 </ul>

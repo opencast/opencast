@@ -1091,52 +1091,49 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
   }
 
   /** OSGI DI */
-  @Reference(name = "serviceRegistry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
   /** OSGI DI */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGI DI */
-  @Reference(name = "user-directory")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
   /** OSGI DI */
-  @Reference(name = "orgDirectory")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
   /** OSGI DI */
-  @Reference(
-      name = "downloadDistributionService",
-      target = "(distribution.channel=download)"
-  )
+  @Reference(target = "(distribution.channel=download)")
   public void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
     this.downloadDistributionService = downloadDistributionService;
   }
 
   /** OSGI DI */
-  @Reference(name = "streamingDistributionService")
+  @Reference
   public void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
     this.streamingDistributionService = streamingDistributionService;
   }
 
   /** OSGI DI */
-  @Reference(name = "oaiPmhServerInfo")
+  @Reference
   public void setOaiPmhServerInfo(OaiPmhServerInfo oaiPmhServerInfo) {
     this.oaiPmhServerInfo = oaiPmhServerInfo;
   }
 
   /** OSGI DI */
-  @Reference(name = "persistence")
+  @Reference
   public void setOaiPmhDatabase(OaiPmhDatabase oaiPmhDatabase) {
     this.oaiPmhDatabase = oaiPmhDatabase;
   }

@@ -26,22 +26,15 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
-import org.opencastproject.adminui.util.ServiceEndpointTestsUtil;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import io.restassured.http.ContentType;
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
@@ -50,17 +43,6 @@ public class JobEndpointTest {
   private static final RestServiceTestEnv rt = testEnvForClasses(TestJobEndpoint.class);
 
   private JSONParser parser;
-
-  @Test
-  public void testSimpleTasksRequest() throws ParseException, IOException {
-    InputStream stream = JobEndpointTest.class.getResourceAsStream("/tasks.json");
-    InputStreamReader reader = new InputStreamReader(stream);
-    JSONObject expected = (JSONObject) new JSONParser().parse(reader);
-    JSONObject actual = (JSONObject) parser.parse(given().expect().statusCode(HttpStatus.SC_OK)
-            .contentType(ContentType.JSON).when().get(rt.host("/tasks.json")).asString());
-
-    ServiceEndpointTestsUtil.testJSONObjectEquality(expected, actual);
-  }
 
   @Test
   public void testJobsRequest() throws Exception {

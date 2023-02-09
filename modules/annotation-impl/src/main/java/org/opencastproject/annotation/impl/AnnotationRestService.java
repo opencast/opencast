@@ -108,7 +108,7 @@ public class AnnotationRestService {
    * @param service
    *          the annotation service implementation
    */
-  @Reference(name = "service-impl")
+  @Reference
   public void setService(AnnotationService service) {
     this.annotationService = service;
   }

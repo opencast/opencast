@@ -32,10 +32,8 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 
 import org.easymock.EasyMock;
 import org.junit.Assert;
@@ -59,6 +57,7 @@ public class EmailDataTest {
   private Incident incident2;
   private List<Incident> incidents;
   private URI uriMP;
+  private Map<String, String> orgProperties;
 
   @Before
   public void setUp() throws Exception {
@@ -78,36 +77,39 @@ public class EmailDataTest {
 
     WorkflowDefinitionImpl def = new WorkflowDefinitionImpl();
     def.setId("wfdef");
-    Map<String, String> props = new HashMap<String, String>();
+    Map<String, String> props = new HashMap<>();
     props.put("emailAddress", "user@domain.com");
 
     // Create some incidents
     incident1 = EasyMock.createNiceMock(Incident.class);
-    List<Tuple<String, String>> details = new LinkedList<Tuple<String, String>>();
-    Tuple<String, String> detail = new Tuple<String, String>("detail-type", "error in operation1");
+    List<Tuple<String, String>> details = new LinkedList<>();
+    Tuple<String, String> detail = new Tuple<>("detail-type", "error in operation1");
     details.add(detail);
     EasyMock.expect(incident1.getDetails()).andReturn(details);
 
     incident2 = EasyMock.createNiceMock(Incident.class);
-    details = new LinkedList<Tuple<String, String>>();
-    detail = new Tuple<String, String>("detail-type", "error in operation2");
+    details = new LinkedList<>();
+    detail = new Tuple<>("detail-type", "error in operation2");
     details.add(detail);
     EasyMock.expect(incident2.getDetails()).andReturn(details);
 
     // Link the incident and the subtree
-    incidents = new LinkedList<Incident>();
+    incidents = new LinkedList<>();
     incidents.add(incident1);
     incidents.add(incident2);
 
-    workflowInstance = new WorkflowInstanceImpl(def, null, null, null, null, props);
+    workflowInstance = new WorkflowInstance(def, null, null, null, props);
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowState.RUNNING);
     workflowInstance.setMediaPackage(mp);
 
-    failedOperation = new WorkflowOperationInstanceImpl("operation1", OperationState.FAILED);
+    failedOperation = new WorkflowOperationInstance("operation1", OperationState.FAILED);
 
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("email", OperationState.RUNNING);
-    List<WorkflowOperationInstance> operationList = new ArrayList<WorkflowOperationInstance>();
+    orgProperties = new HashMap<>();
+    orgProperties.put("org.opencastproject.engage.ui.url", "http://engage.my.edu");
+
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("email", OperationState.RUNNING);
+    List<WorkflowOperationInstance> operationList = new ArrayList<>();
     operationList.add(failedOperation);
     operationList.add(operation);
     workflowInstance.setOperations(operationList);
@@ -127,7 +129,7 @@ public class EmailDataTest {
 
   @Test
   public void testToMap() throws Exception {
-    EmailData emailData = new EmailData("data1", workflowInstance, catalogs, failedOperation, incidents);
+    EmailData emailData = new EmailData("data1", workflowInstance, catalogs, failedOperation, incidents, orgProperties);
 
     Map<String, Object> map = emailData.toMap();
 
@@ -171,6 +173,11 @@ public class EmailDataTest {
     Assert.assertEquals(2, ((List) inc).size());
     Assert.assertTrue(((List) inc).contains(incident1));
     Assert.assertTrue(((List) inc).contains(incident2));
+
+    Object orgProp = map.get("organization");
+    Assert.assertNotNull(orgProp);
+    Assert.assertTrue(orgProp instanceof Map);
+    Assert.assertEquals("http://engage.my.edu", ((Map) orgProp).get("org.opencastproject.engage.ui.url"));
   }
 
 }

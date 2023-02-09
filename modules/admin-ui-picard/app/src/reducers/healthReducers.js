@@ -6,7 +6,7 @@ import {
 	RESET_NUM_ERROR,
 	SET_ERROR,
 } from "../actions/healthActions";
-import { AMQ_NAME, BACKEND_NAMES, STATES_NAMES } from "../thunks/healthThunks";
+import { BACKEND_NAMES, STATES_NAMES } from "../thunks/healthThunks";
 
 /**
  * This file contains redux reducer for actions affecting the state of information about health status
@@ -16,11 +16,6 @@ import { AMQ_NAME, BACKEND_NAMES, STATES_NAMES } from "../thunks/healthThunks";
 const initialState = {
 	loading: false,
 	service: [
-		{
-			name: AMQ_NAME,
-			error: false,
-			status: "",
-		},
 		{
 			name: STATES_NAMES,
 			error: false,

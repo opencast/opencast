@@ -118,7 +118,7 @@ public class ErrorResolutionWorkflowOperationHandler extends ResumableWorkflowOp
     }
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

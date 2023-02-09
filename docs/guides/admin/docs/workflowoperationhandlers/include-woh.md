@@ -1,7 +1,7 @@
 Include Workflow Operation
-===================================
+==========================
 
-```Id: include```
+ID: `include`
 
 Description
 -----------
@@ -19,11 +19,19 @@ Parameter Table
 Operation Example
 -----------------
 
-    <operation
-      id="include"
-      description="Remove temporary processing artifacts">
-      <configurations>
-        <configuration key="workflow-id">partial-cleanup</configuration>
-      </configurations>
-    </operation>
+```xml
+<operation
+    id="include"
+    description="Remove temporary processing artifacts">
+  <configurations>
+    <configuration key="workflow-id">partial-cleanup</configuration>
+  </configurations>
+</operation>
+```
 
+```yml
+- id: include
+  description: Include clean-up workflow
+  configurations:
+    workflow-id: partial-cleanup
+```

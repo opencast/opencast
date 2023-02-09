@@ -21,13 +21,18 @@
 
 package org.opencastproject.userdirectory;
 
+import static org.opencastproject.db.Queries.namedQuery;
+
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.impl.jpa.JpaGroup;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.function.ThrowingConsumer;
 import org.opencastproject.util.requests.SortCriterion;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,12 +41,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -64,41 +66,26 @@ public final class UserDirectoryPersistenceUtil {
    *
    * @param roles
    *          the roles to persist
-   * @param emf
-   *          the entity manager factory
    * @return the persisted roles
    */
-  public static Set<JpaRole> saveRoles(Set<? extends Role> roles, EntityManagerFactory emf) {
-    Set<JpaRole> updatedRoles = new HashSet<JpaRole>();
-    EntityManager em = null;
-    EntityTransaction tx = null;
-    try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
+  public static Function<EntityManager, Set<JpaRole>> saveRolesQuery(Set<? extends Role> roles) {
+    return em -> {
+      Set<JpaRole> updatedRoles = new HashSet<>();
       // Save or update roles
       for (Role role : roles) {
         JpaRole jpaRole = (JpaRole) role;
-        saveOrganization(jpaRole.getJpaOrganization(), emf);
-        JpaRole findRole = findRole(jpaRole.getName(), jpaRole.getOrganizationId(), emf);
-        if (findRole == null) {
+        saveOrganizationQuery(jpaRole.getJpaOrganization()).apply(em);
+        Optional<JpaRole> findRole = findRoleQuery(jpaRole.getName(), jpaRole.getOrganizationId()).apply(em);
+        if (findRole.isEmpty()) {
           em.persist(jpaRole);
           updatedRoles.add(jpaRole);
         } else {
-          findRole.setDescription(jpaRole.getDescription());
-          updatedRoles.add(em.merge(findRole));
+          findRole.get().setDescription(jpaRole.getDescription());
+          updatedRoles.add(em.merge(findRole.get()));
         }
       }
-      tx.commit();
       return updatedRoles;
-    } finally {
-      if (tx.isActive()) {
-        tx.rollback();
-      }
-      if (em != null) {
-        em.close();
-      }
-    }
+    };
   }
 
   /**
@@ -106,68 +93,38 @@ public final class UserDirectoryPersistenceUtil {
    *
    * @param organization
    *          the organization to persist
-   * @param emf
-   *          the entity manager factory
    * @return the persisted organization
    */
-  public static JpaOrganization saveOrganization(JpaOrganization organization, EntityManagerFactory emf) {
-    EntityManager em = null;
-    EntityTransaction tx = null;
-    try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
-      JpaOrganization org = findOrganization(organization, emf);
-      if (org == null) {
+  public static Function<EntityManager, JpaOrganization> saveOrganizationQuery(JpaOrganization organization) {
+    return em -> {
+      Optional<JpaOrganization> dbOrganization = findOrganizationQuery(organization).apply(em);
+      if (dbOrganization.isEmpty()) {
         em.persist(organization);
+        return organization;
       } else {
-        organization = em.merge(org);
+        return em.merge(dbOrganization.get());
       }
-      tx.commit();
-      return organization;
-    } finally {
-      if (tx.isActive()) {
-        tx.rollback();
-      }
-      if (em != null) {
-        em.close();
-      }
-    }
+    };
   }
 
   /**
    * Persist an user
-   * 
+   *
    * @param user
    *          the user to persist
-   * @param emf
-   *          the entity manager factory
    * @return the persisted organization
    */
-  public static JpaUser saveUser(JpaUser user, EntityManagerFactory emf) {
-    EntityManager em = null;
-    EntityTransaction tx = null;
-    try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
-      JpaUser u = findUser(user.getUsername(), user.getOrganization().getId(), emf);
-      if (u == null) {
+  public static Function<EntityManager, JpaUser> saveUserQuery(JpaUser user) {
+    return em -> {
+      Optional<JpaUser> dbUser = findUserQuery(user.getUsername(), user.getOrganization().getId()).apply(em);
+      if (dbUser.isEmpty()) {
         em.persist(user);
+        return user;
       } else {
-        user.setId(u.getId());
-        user = em.merge(user);
+        user.setId(dbUser.get().getId());
+        return em.merge(user);
       }
-      tx.commit();
-      return user;
-    } finally {
-      if (tx.isActive()) {
-        tx.rollback();
-      }
-      if (em != null) {
-        em.close();
-      }
-    }
+    };
   }
 
   /**
@@ -179,23 +136,16 @@ public final class UserDirectoryPersistenceUtil {
    *          the limit
    * @param offset
    *          the offset
-   * @param emf
-   *          the entity manager factory
    * @return the group list
    */
-  @SuppressWarnings("unchecked")
-  public static List<JpaGroup> findGroups(String organization, int limit, int offset, EntityManagerFactory emf) {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query query = em.createNamedQuery("Group.findAll").setMaxResults(limit).setFirstResult(offset);
+  public static Function<EntityManager, List<JpaGroup>> findGroupsQuery(String organization, int limit, int offset) {
+    return em -> {
+      TypedQuery<JpaGroup> query = em.createNamedQuery("Group.findAll", JpaGroup.class)
+          .setMaxResults(limit)
+          .setFirstResult(offset);
       query.setParameter("organization", organization);
       return query.getResultList();
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    };
   }
 
   /**
@@ -207,16 +157,12 @@ public final class UserDirectoryPersistenceUtil {
    *          filter by group name (optional)
    * @param textFilter
    *          fulltext filter (optional)
-   * @param emf
-   *          the entity manager factory
    * @return the group list
    * @throws IllegalArgumentException
    */
-  public static long countTotalGroups(String orgId, Optional<String> nameFilter, Optional<String> textFilter,
-          EntityManagerFactory emf) {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
+  public static Function<EntityManager, Long> countTotalGroupsQuery(String orgId, Optional<String> nameFilter,
+      Optional<String> textFilter) {
+    return em -> {
       CriteriaBuilder cb = em.getCriteriaBuilder();
       final CriteriaQuery<Long> query = cb.createQuery(Long.class);
       Root<JpaGroup> group = query.from(JpaGroup.class);
@@ -226,11 +172,7 @@ public final class UserDirectoryPersistenceUtil {
 
       TypedQuery<Long> typedQuery = em.createQuery(query);
       return typedQuery.getSingleResult();
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    };
   }
 
   /**
@@ -249,9 +191,9 @@ public final class UserDirectoryPersistenceUtil {
    * @param textFilter
    *          fulltext filter (optional)
    */
-  private static void addWhereToQuery(CriteriaQuery query, CriteriaBuilder cb, Root<JpaGroup> group,
+  private static <E> void addWhereToQuery(CriteriaQuery<E> query, CriteriaBuilder cb, Root<JpaGroup> group,
           String orgId, Optional<String> nameFilter, Optional<String> textFilter) {
-    List<Predicate> conditions = new ArrayList();
+    List<Predicate> conditions = new ArrayList<>();
     conditions.add(cb.equal(group.join("organization").get("id"), orgId));
 
     // exact match, case sensitive
@@ -260,10 +202,10 @@ public final class UserDirectoryPersistenceUtil {
     }
     // not exact match, case-insensitive, each token needs to match at least one field
     if (textFilter.isPresent()) {
-      List<Predicate> fulltextConditions = new ArrayList();
+      List<Predicate> fulltextConditions = new ArrayList<>();
       String[] tokens = textFilter.get().split("\\s+");
       for (String token: tokens) {
-        List<Predicate> fieldConditions = new ArrayList();
+        List<Predicate> fieldConditions = new ArrayList<>();
         Expression<String> literal = cb.literal("%" + token + "%");
 
         fieldConditions.add(cb.like(cb.lower(group.get("groupId")), cb.lower(literal)));
@@ -276,13 +218,13 @@ public final class UserDirectoryPersistenceUtil {
                 cb.lower(literal)));
 
         // token needs to match at least one field
-        fulltextConditions.add(cb.or(fieldConditions.toArray(new Predicate[fieldConditions.size()])));
+        fulltextConditions.add(cb.or(fieldConditions.toArray(new Predicate[0])));
       }
       // all token have to match something
       // (different to fulltext search for Elasticsearch, where only one token has to match!)
-      conditions.add(cb.and(fulltextConditions.toArray(new Predicate[fulltextConditions.size()])));
+      conditions.add(cb.and(fulltextConditions.toArray(new Predicate[0])));
     }
-    query.where(cb.and(conditions.toArray(new Predicate[conditions.size()])));
+    query.where(cb.and(conditions.toArray(new Predicate[0])));
   }
 
   /**
@@ -300,18 +242,12 @@ public final class UserDirectoryPersistenceUtil {
    *          fulltext filter (optional)
    * @param sortCriteria
    *          the sorting criteria (name, role or description)
-   * @param emf
-   *          the entity manager factory
    * @return the group list
-   * @throws IllegalArgumentException
    */
-  public static List<JpaGroup> findGroups(String orgId, Optional<Integer> limit, Optional<Integer> offset,
-          Optional<String> nameFilter, Optional<String> textFilter, Set<SortCriterion> sortCriteria,
-          EntityManagerFactory emf) throws IllegalArgumentException {
-
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
+  public static Function<EntityManager, List<JpaGroup>> findGroupsQuery(String orgId, Optional<Integer> limit,
+      Optional<Integer> offset, Optional<String> nameFilter, Optional<String> textFilter,
+      Set<SortCriterion> sortCriteria) {
+    return em -> {
       CriteriaBuilder cb = em.getCriteriaBuilder();
       final CriteriaQuery<JpaGroup> query = cb.createQuery(JpaGroup.class);
       Root<JpaGroup> group = query.from(JpaGroup.class);
@@ -337,7 +273,7 @@ public final class UserDirectoryPersistenceUtil {
             break;
           default:
             throw new IllegalArgumentException("Sorting criterion " + criterion.getFieldName() + " is not supported "
-                    + "for groups.");
+                + "for groups.");
         }
       }
       query.orderBy(orders);
@@ -351,12 +287,7 @@ public final class UserDirectoryPersistenceUtil {
       }
 
       return typedQuery.getResultList();
-
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    };
   }
 
   /**
@@ -368,23 +299,16 @@ public final class UserDirectoryPersistenceUtil {
    *          the limit
    * @param offset
    *          the offset
-   * @param emf
-   *          the entity manager factory
    * @return the roles list
    */
-  @SuppressWarnings("unchecked")
-  public static List<JpaRole> findRoles(String organization, int limit, int offset, EntityManagerFactory emf) {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("Role.findAll").setMaxResults(limit).setFirstResult(offset);
+  public static Function<EntityManager, List<JpaRole>> findRolesQuery(String organization, int limit, int offset) {
+    return em -> {
+      TypedQuery<JpaRole> q = em.createNamedQuery("Role.findAll", JpaRole.class)
+          .setMaxResults(limit)
+          .setFirstResult(offset);
       q.setParameter("org", organization);
       return q.getResultList();
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    };
   }
 
   /**
@@ -398,25 +322,18 @@ public final class UserDirectoryPersistenceUtil {
    *          the limit
    * @param offset
    *          the offset
-   * @param emf
-   *          the entity manager factory
    * @return the roles list
    */
-  @SuppressWarnings("unchecked")
-  public static List<JpaRole> findRolesByQuery(String orgId, String query, int limit, int offset,
-          EntityManagerFactory emf) {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("Role.findByQuery").setMaxResults(limit).setFirstResult(offset);
+  public static Function<EntityManager, List<JpaRole>> findRolesByQuery(String orgId, String query, int limit,
+      int offset) {
+    return em -> {
+      TypedQuery<JpaRole> q = em.createNamedQuery("Role.findByQuery", JpaRole.class)
+          .setMaxResults(limit)
+          .setFirstResult(offset);
       q.setParameter("query", query.toUpperCase());
       q.setParameter("org", orgId);
       return q.getResultList();
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    };
   }
 
   /**
@@ -426,24 +343,15 @@ public final class UserDirectoryPersistenceUtil {
    *          the user name
    * @param orgId
    *          the user's organization
-   * @param emf
-   *          the entity manager factory
    * @return the group list
    */
-  @SuppressWarnings("unchecked")
-  public static List<JpaGroup> findGroupsByUser(String userName, String orgId, EntityManagerFactory emf) {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query query = em.createNamedQuery("Group.findByUser");
-      query.setParameter("username", userName);
-      query.setParameter("organization", orgId);
-      return query.getResultList();
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+  public static Function<EntityManager, List<JpaGroup>> findGroupsByUserQuery(String userName, String orgId) {
+    return namedQuery.findAll(
+        "Group.findByUser",
+        JpaGroup.class,
+        Pair.of("username", userName),
+        Pair.of("organization", orgId)
+    );
   }
 
   /**
@@ -451,53 +359,33 @@ public final class UserDirectoryPersistenceUtil {
    *
    * @param organization
    *          the organization
-   * @param emf
-   *          the entity manager factory
    * @return the organization or <code>null</code> if not found
    */
-  public static JpaOrganization findOrganization(JpaOrganization organization, EntityManagerFactory emf) {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query query = em.createNamedQuery("Organization.findById");
-      query.setParameter("id", organization.getId());
-      return (JpaOrganization) query.getSingleResult();
-    } catch (NoResultException e) {
-      return null;
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+  public static Function<EntityManager, Optional<JpaOrganization>> findOrganizationQuery(JpaOrganization organization) {
+    return namedQuery.findOpt(
+        "Organization.findById",
+        JpaOrganization.class,
+        Pair.of("id", organization.getId())
+    );
   }
 
   /**
    * Return specific users by their user names
    * @param userNames list of user names
    * @param organizationId organization to search for
-   * @param emf the entity manager factory
    * @return the list of users that was found
    */
-  public static List<JpaUser> findUsersByUserName(
-      Collection<String> userNames,
-      String organizationId,
-      EntityManagerFactory emf
-  ) {
-    if (userNames.isEmpty()) {
-      return Collections.<JpaUser>emptyList();
-    }
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("User.findAllByUserNames");
+  public static Function<EntityManager, List<JpaUser>> findUsersByUserNameQuery(Collection<String> userNames,
+      String organizationId) {
+    return em -> {
+      if (userNames.isEmpty()) {
+        return Collections.emptyList();
+      }
+      TypedQuery<JpaUser> q = em.createNamedQuery("User.findAllByUserNames", JpaUser.class);
       q.setParameter("names", userNames);
       q.setParameter("org", organizationId);
       return q.getResultList();
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    };
   }
 
   /**
@@ -507,25 +395,15 @@ public final class UserDirectoryPersistenceUtil {
    *          the user name
    * @param organizationId
    *          the organization id
-   * @param emf
-   *          the entity manager factory
    * @return the user or <code>null</code> if not found
    */
-  public static JpaUser findUser(String userName, String organizationId, EntityManagerFactory emf) {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("User.findByUsername");
-      q.setParameter("u", userName);
-      q.setParameter("org", organizationId);
-      return (JpaUser) q.getSingleResult();
-    } catch (NoResultException e) {
-      return null;
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+  public static Function<EntityManager, Optional<JpaUser>> findUserQuery(String userName, String organizationId) {
+    return namedQuery.findOpt(
+        "User.findByUsername",
+        JpaUser.class,
+        Pair.of("u", userName),
+        Pair.of("org", organizationId)
+    );
   }
 
   /**
@@ -535,25 +413,15 @@ public final class UserDirectoryPersistenceUtil {
    *          the user's unique id
    * @param organizationId
    *          the organization id
-   * @param emf
-   *          the entity manager factory
    * @return the user or <code>null</code> if not found
    */
-  public static JpaUser findUser(long id, String organizationId, EntityManagerFactory emf) {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("User.findByIdAndOrg");
-      q.setParameter("id", id);
-      q.setParameter("org", organizationId);
-      return (JpaUser) q.getSingleResult();
-    } catch (NoResultException e) {
-      return null;
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+  public static Function<EntityManager, Optional<JpaUser>> findUserQuery(long id, String organizationId) {
+    return namedQuery.findOpt(
+        "User.findByIdAndOrg",
+        JpaUser.class,
+        Pair.of("id", id),
+        Pair.of("org", organizationId)
+    );
   }
 
   /**
@@ -561,41 +429,23 @@ public final class UserDirectoryPersistenceUtil {
    *
    * @param organizationId
    *          the organization id
-   * @param emf
-   *          the entity manager factory
    * @return the total number of users
    */
-  public static long countUsers(String organizationId, EntityManagerFactory emf) {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("User.countAllByOrg");
-      q.setParameter("org", organizationId);
-      return ((Number) q.getSingleResult()).longValue();
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+  public static Function<EntityManager, Long> countUsersQuery(String organizationId) {
+    return namedQuery.find(
+        "User.countAllByOrg",
+        Long.class,
+        Pair.of("org", organizationId)
+    );
   }
 
   /**
    * Returns the total number of users
    *
-   * @param emf the entity manager factory
    * @return the total number of users
    */
-  public static long countUsers(EntityManagerFactory emf) {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("User.countAll");
-      return ((Number) q.getSingleResult()).longValue();
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+  public static Function<EntityManager, Long> countUsersQuery() {
+    return namedQuery.find("User.countAll", Long.class);
   }
 
   /**
@@ -609,25 +459,18 @@ public final class UserDirectoryPersistenceUtil {
    *          the limit
    * @param offset
    *          the offset
-   * @param emf
-   *          the entity manager factory
    * @return the users list
    */
-  @SuppressWarnings("unchecked")
-  public static List<JpaUser> findUsersByQuery(String orgId, String query, int limit, int offset,
-          EntityManagerFactory emf) {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("User.findByQuery").setMaxResults(limit).setFirstResult(offset);
+  public static Function<EntityManager, List<JpaUser>> findUsersByQuery(String orgId, String query, int limit,
+      int offset) {
+    return em -> {
+      TypedQuery<JpaUser> q = em.createNamedQuery("User.findByQuery", JpaUser.class)
+          .setMaxResults(limit)
+          .setFirstResult(offset);
       q.setParameter("query", query.toUpperCase());
       q.setParameter("org", orgId);
       return q.getResultList();
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    };
   }
 
   /**
@@ -639,23 +482,16 @@ public final class UserDirectoryPersistenceUtil {
    *          the limit
    * @param offset
    *          the offset
-   * @param emf
-   *          the entity manager factory
    * @return the users list
    */
-  @SuppressWarnings("unchecked")
-  public static List<JpaUser> findUsers(String orgId, int limit, int offset, EntityManagerFactory emf) {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("User.findAll").setMaxResults(limit).setFirstResult(offset);
+  public static Function<EntityManager, List<JpaUser>> findUsersQuery(String orgId, int limit, int offset) {
+    return em -> {
+      TypedQuery<JpaUser> q = em.createNamedQuery("User.findAll", JpaUser.class)
+          .setMaxResults(limit)
+          .setFirstResult(offset);
       q.setParameter("org", orgId);
       return q.getResultList();
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    };
   }
 
   /**
@@ -665,25 +501,15 @@ public final class UserDirectoryPersistenceUtil {
    *          the role name
    * @param organization
    *          the organization id
-   * @param emf
-   *          the entity manager factory
    * @return the user or <code>null</code> if not found
    */
-  public static JpaRole findRole(String name, String organization, EntityManagerFactory emf) {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query query = em.createNamedQuery("Role.findByName");
-      query.setParameter("name", name);
-      query.setParameter("org", organization);
-      return (JpaRole) query.getSingleResult();
-    } catch (NoResultException e) {
-      return null;
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+  public static Function<EntityManager, Optional<JpaRole>> findRoleQuery(String name, String organization) {
+    return namedQuery.findOpt(
+        "Role.findByName",
+        JpaRole.class,
+        Pair.of("name", name),
+        Pair.of("org", organization)
+    );
   }
 
   /**
@@ -693,25 +519,15 @@ public final class UserDirectoryPersistenceUtil {
    *          the group id
    * @param orgId
    *          the organization id
-   * @param emf
-   *          the entity manager factory
    * @return the group or <code>null</code> if not found
    */
-  public static JpaGroup findGroup(String groupId, String orgId, EntityManagerFactory emf) {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("Group.findById");
-      q.setParameter("groupId", groupId);
-      q.setParameter("organization", orgId);
-      return (JpaGroup) q.getSingleResult();
-    } catch (NoResultException e) {
-      return null;
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+  public static Function<EntityManager, Optional<JpaGroup>> findGroupQuery(String groupId, String orgId) {
+    return namedQuery.findOpt(
+        "Group.findById",
+        JpaGroup.class,
+        Pair.of("groupId", groupId),
+        Pair.of("organization", orgId)
+    );
   }
 
   /**
@@ -721,90 +537,42 @@ public final class UserDirectoryPersistenceUtil {
    *          the role name
    * @param orgId
    *          the organization id
-   * @param emf
-   *          the entity manager factory
    * @return the group or <code>null</code> if not found
    */
-  public static JpaGroup findGroupByRole(String role, String orgId, EntityManagerFactory emf) {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("Group.findByRole");
-      q.setParameter("role", role);
-      q.setParameter("organization", orgId);
-      return (JpaGroup) q.getSingleResult();
-    } catch (NoResultException e) {
-      return null;
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+  public static Function<EntityManager, Optional<JpaGroup>> findGroupByRoleQuery(String role, String orgId) {
+    return namedQuery.findOpt(
+        "Group.findByRole",
+        JpaGroup.class,
+        Pair.of("role", role),
+        Pair.of("organization", orgId)
+    );
   }
 
-
-  public static void removeGroup(String groupId, String orgId, EntityManagerFactory emf)
-          throws NotFoundException, Exception {
-    EntityManager em = null;
-    EntityTransaction tx = null;
-    try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
-      JpaGroup group = findGroup(groupId, orgId, emf);
-      if (group == null) {
+  public static ThrowingConsumer<EntityManager, NotFoundException> removeGroupQuery(String groupId, String orgId) {
+    return em -> {
+      Optional<JpaGroup> group = findGroupQuery(groupId, orgId).apply(em);
+      if (group.isEmpty()) {
         throw new NotFoundException("Group with ID " + groupId + " does not exist");
       }
-      em.remove(em.merge(group));
-      tx.commit();
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (Exception e) {
-      if (tx.isActive()) {
-        tx.rollback();
-      }
-      throw e;
-    } finally {
-      em.close();
-    }
+      em.remove(em.merge(group.get()));
+    };
   }
 
   /**
    * Delete the user with given name in the given organization
-   * 
+   *
    * @param username
    *          the name of the user to delete
    * @param orgId
    *          the organization id
-   * @param emf
-   *          the entity manager factory
-   * @throws NotFoundException
-   * @throws Exception
    */
-  public static void deleteUser(String username, String orgId, EntityManagerFactory emf) throws NotFoundException,
-          Exception {
-    EntityManager em = null;
-    EntityTransaction tx = null;
-    try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
-      JpaUser user = findUser(username, orgId, emf);
-      if (user == null) {
+  public static ThrowingConsumer<EntityManager, NotFoundException> deleteUserQuery(String username, String orgId) {
+    return em -> {
+      Optional<JpaUser> user = findUserQuery(username, orgId).apply(em);
+      if (user.isEmpty()) {
         throw new NotFoundException("User with name " + username + " does not exist");
       }
-      em.remove(em.merge(user));
-      tx.commit();
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (Exception e) {
-      if (tx.isActive()) {
-        tx.rollback();
-      }
-      throw e;
-    } finally {
-      em.close();
-    }
+      em.remove(em.merge(user.get()));
+    };
   }
-
 }

@@ -25,6 +25,7 @@ import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
+import static org.opencastproject.db.DBTestEnv.newDBSession;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -37,13 +38,14 @@ import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.AssetManagerImpl;
 import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.assetmanager.impl.persistence.Database;
+import org.opencastproject.db.DBSession;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.mediapackage.identifier.IdImpl;
-import org.opencastproject.message.broker.api.MessageSender;
+import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -57,13 +59,10 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.persistencefn.PersistenceEnv;
-import org.opencastproject.util.persistencefn.PersistenceEnvs;
-import org.opencastproject.util.persistencefn.PersistenceUtil;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -84,7 +83,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
-import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.Path;
 
 @Path("/")
@@ -111,11 +109,11 @@ public class TestTasksEndpoint extends TasksEndpoint {
     wfD3.setTitle("Hidden");
     wfD3.setId("hidden");
 
-    WorkflowInstanceImpl wI1 = new WorkflowInstanceImpl();
+    WorkflowInstance wI1 = new WorkflowInstance();
     wI1.setTitle(wfD.getTitle());
     wI1.setTemplate(wfD.getId());
     wI1.setId(5);
-    WorkflowInstanceImpl wI2 = new WorkflowInstanceImpl();
+    WorkflowInstance wI2 = new WorkflowInstance();
     wI2.setTitle(wfD2.getTitle());
     wI2.setTemplate(wfD2.getId());
     wI2.setId(10);
@@ -157,9 +155,8 @@ public class TestTasksEndpoint extends TasksEndpoint {
   }
 
   AssetManager mkAssetManager(final Workspace workspace) throws Exception {
-    final EntityManagerFactory emf = mkEntityManagerFactory("org.opencastproject.assetmanager.impl");
-    final PersistenceEnv penv = PersistenceEnvs.mk(emf);
-    final Database db = new Database(emf, penv);
+    final DBSession dbSession = newDBSession("org.opencastproject.assetmanager.impl");
+    final Database db = new Database(dbSession);
     HttpAssetProvider httpAssetProvider = new HttpAssetProvider() {
       @Override
       public Snapshot prepareForDelivery(Snapshot snapshot) {
@@ -182,9 +179,6 @@ public class TestTasksEndpoint extends TasksEndpoint {
             .anyTimes();
     EasyMock.replay(authorizationService);
 
-    MessageSender ms = EasyMock.createNiceMock(MessageSender.class);
-    EasyMock.replay(ms);
-
     ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
             EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
@@ -197,8 +191,10 @@ public class TestTasksEndpoint extends TasksEndpoint {
     am.setAssetStore(mkAssetStore(workspace));
     am.setSecurityService(securityService);
     am.setAuthorizationService(authorizationService);
-    am.setMessageSender(ms);
     am.setIndex(esIndex);
+    //We need two handlers
+    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
+    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
 
     return am;
   }
@@ -277,26 +273,4 @@ public class TestTasksEndpoint extends TasksEndpoint {
       }
     };
   }
-
-  static EntityManagerFactory mkEntityManagerFactory(String persistenceUnit) {
-    if ("mysql".equals(System.getProperty("useDatabase"))) {
-      return mkMySqlEntityManagerFactory(persistenceUnit);
-    } else {
-      return mkH2EntityManagerFactory(persistenceUnit);
-    }
-  }
-
-  static EntityManagerFactory mkH2EntityManagerFactory(String persistenceUnit) {
-    return PersistenceUtil.mkTestEntityManagerFactory(persistenceUnit, true);
-  }
-
-  static EntityManagerFactory mkMySqlEntityManagerFactory(String persistenceUnit) {
-    return PersistenceUtil.mkEntityManagerFactory(persistenceUnit, "MySQL", "com.mysql.jdbc.Driver",
-            "jdbc:mysql://localhost/test_scheduler", "matterhorn", "matterhorn",
-            org.opencastproject.util.data.Collections.map(tuple("eclipselink.ddl-generation", "drop-and-create-tables"),
-                    tuple("eclipselink.ddl-generation.output-mode", "database"),
-                    tuple("eclipselink.logging.level.sql", "FINE"), tuple("eclipselink.logging.parameters", "true")),
-            PersistenceUtil.mkTestPersistenceProvider());
-  }
-
 }

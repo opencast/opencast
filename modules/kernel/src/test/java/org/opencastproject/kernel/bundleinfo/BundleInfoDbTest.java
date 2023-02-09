@@ -27,9 +27,9 @@ import static org.opencastproject.util.ReflectionUtil.run;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 
+import org.opencastproject.db.DBSession;
+import org.opencastproject.db.DBTestEnv;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.persistence.PersistenceEnv;
-import org.opencastproject.util.persistence.PersistenceUtil;
 
 import org.junit.Test;
 
@@ -137,11 +137,11 @@ public class BundleInfoDbTest {
   }
 
   private BundleInfoDb db() {
-    final PersistenceEnv penv = PersistenceUtil.newTestPersistenceEnv(OsgiBundleInfoDb.PERSISTENCE_UNIT);
+    final DBSession db = DBTestEnv.newDBSession(OsgiBundleInfoDb.PERSISTENCE_UNIT);
     return new AbstractBundleInfoDb() {
       @Override
-      protected PersistenceEnv getPersistenceEnv() {
-        return penv;
+      protected DBSession getDBSession() {
+        return db;
       }
     };
   }

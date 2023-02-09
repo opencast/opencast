@@ -21,12 +21,13 @@
 'use strict';
 
 angular.module('adminNg.services')
-.factory('NewEventMetadataExtended', ['NewEventMetadataResource',
-  function (NewEventMetadataResource) {
+.factory('NewEventMetadataExtended', ['NewEventMetadataResource', 'EventMetadataResource',
+  function (NewEventMetadataResource, EventMetadataResource) {
     var MetadataExtended = function () {
-      var me = this, i;
+      var me = this, mainMetadataName = 'dublincore/episode', i;
       this.ud = {};
       this.requiredMetadata = {};
+      this.copyEventId = undefined;
 
       me.isMetadataExtendedState = true;
 
@@ -35,6 +36,29 @@ angular.module('adminNg.services')
           me.requiredMetadata[fieldId] = true;
         } else {
           me.requiredMetadata[fieldId] = false;
+        }
+      };
+
+      // Set Id of the event used as a template for this new one
+      this.setCopyEventId = function(copyEventId) {
+        me.copyEventId = copyEventId;
+      };
+
+      // Fetch additional information if we've got a template event
+      this.findRequiredMetadata = function (data) {
+        if(me.copyEventId === undefined) {
+          me.postProcessMetadata(data);
+        } else {
+          EventMetadataResource.get({ id: me.copyEventId }, function (copyMetadata) {
+            var copyExtendedMetadata = {};
+            angular.forEach(copyMetadata.entries, function (catalog, index) {
+              if (catalog.flavor !== mainMetadataName) {
+                copyExtendedMetadata[catalog.flavor] = catalog;
+              }
+            });
+
+            me.postProcessMetadata(copyExtendedMetadata);
+          });
         }
       };
 
@@ -48,7 +72,7 @@ angular.module('adminNg.services')
           if (Object.prototype.hasOwnProperty.call(data, chunk)) {
             // extended metadata is every object in the returned data which
             // does not start with a dollar sign and which isn't dublincore/episode
-            if (chunk !== 'dublincore/episode' && chunk.charAt(0) !== '$') {
+            if (chunk !== mainMetadataName && chunk.charAt(0) !== '$') {
               me.ud[chunk] = {fields: data[chunk].fields};
               me.ud[chunk].flavor = data[chunk].flavor;
               me.ud[chunk].title = data[chunk].title;
@@ -78,7 +102,7 @@ angular.module('adminNg.services')
         }
       };
 
-      this.metadata = NewEventMetadataResource.get(this.postProcessMetadata);
+      this.metadata = NewEventMetadataResource.get(this.findRequiredMetadata);
 
       // Checks if the current state of this wizard is valid and we are
       // ready to move on.
@@ -122,7 +146,7 @@ angular.module('adminNg.services')
 
       this.reset = function () {
         me.ud = {};
-        me.metadata = NewEventMetadataResource.get(me.postProcessMetadata);
+        me.metadata = NewEventMetadataResource.get(me.findRequiredMetadata);
       };
 
       this.getFiledCatalogs = function () {

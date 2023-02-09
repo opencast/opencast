@@ -259,17 +259,17 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
     }
   }
 
-  @Reference(name = "WaveformService")
+  @Reference
   public void setWaveformService(WaveformService waveformService) {
     this.waveformService = waveformService;
   }
 
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

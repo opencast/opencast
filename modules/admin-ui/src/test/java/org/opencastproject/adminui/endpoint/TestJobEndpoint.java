@@ -32,8 +32,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
-import org.opencastproject.workflow.api.WorkflowQuery;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSetImpl;
 
@@ -54,37 +53,33 @@ import javax.ws.rs.Path;
 public class TestJobEndpoint extends JobEndpoint {
 
   private ServiceRegistry serviceRegistry;
-  private WorkflowService workflowService;
   private MediaPackageBuilderImpl mpBuilder;
 
   public TestJobEndpoint() throws Exception {
     mpBuilder = new MediaPackageBuilderImpl();
     this.serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
-    this.workflowService = EasyMock.createNiceMock(WorkflowService.class);
     Job job = new JobImpl(12L);
 
     WorkflowDefinition wfD = new WorkflowDefinitionImpl();
     wfD.setTitle("Full");
     wfD.setId("full");
 
-    WorkflowSetImpl workflowSet = new WorkflowSetImpl();
+    final WorkflowSetImpl workflowSet = new WorkflowSetImpl();
 
-    WorkflowInstanceImpl workflowInstanceImpl1 = new WorkflowInstanceImpl(wfD,
-            loadMpFromResource("jobs_mediapackage1"), 2L, null, null, new HashMap<String, String>());
-    WorkflowInstanceImpl workflowInstanceImpl2 = new WorkflowInstanceImpl(wfD,
-            loadMpFromResource("jobs_mediapackage2"), 2L, null, null, new HashMap<String, String>());
-    WorkflowInstanceImpl workflowInstanceImpl3 = new WorkflowInstanceImpl(wfD,
-            loadMpFromResource("jobs_mediapackage3"), 2L, null, null, new HashMap<String, String>());
+    WorkflowInstance workflowInstance1 = new WorkflowInstance(wfD,
+            loadMpFromResource("jobs_mediapackage1"), null, null, new HashMap<String, String>());
+    WorkflowInstance workflowInstance2 = new WorkflowInstance(wfD,
+            loadMpFromResource("jobs_mediapackage2"), null, null, new HashMap<String, String>());
+    WorkflowInstance workflowInstance3 = new WorkflowInstance(wfD,
+            loadMpFromResource("jobs_mediapackage3"), null, null, new HashMap<String, String>());
 
-    workflowInstanceImpl1.setId(1);
-    workflowInstanceImpl2.setId(2);
-    workflowInstanceImpl3.setId(3);
+    workflowInstance1.setId(1);
+    workflowInstance2.setId(2);
+    workflowInstance3.setId(3);
 
-    workflowSet.addItem(workflowInstanceImpl1);
-    workflowSet.addItem(workflowInstanceImpl2);
-    workflowSet.addItem(workflowInstanceImpl3);
-
-    workflowSet.setTotalCount(3);
+    workflowSet.addItem(workflowInstance1);
+    workflowSet.addItem(workflowInstance2);
+    workflowSet.addItem(workflowInstance3);
 
     List<HostRegistration> hosts = new ArrayList<>();
     hosts.add(new JaxbHostRegistration("host1", "1.1.1.1", "node1", 100000, 8, 8, true, false));
@@ -105,17 +100,12 @@ public class TestJobEndpoint extends JobEndpoint {
 
 
     EasyMock.expect(serviceRegistry.getJob(EasyMock.anyLong())).andReturn(job).anyTimes();
-    EasyMock.expect(workflowService.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class)))
-            .andReturn(workflowSet).anyTimes();
-    EasyMock.expect(workflowService.countWorkflowInstances()).andReturn(workflowSet.size()).anyTimes();
     EasyMock.expect(serviceRegistry.getHostRegistrations()).andReturn(hosts).anyTimes();
     EasyMock.expect(serviceRegistry.getActiveJobs()).andReturn(jobs).anyTimes();
 
-    EasyMock.replay(workflowService);
     EasyMock.replay(serviceRegistry);
 
     this.setServiceRegistry(serviceRegistry);
-    this.setWorkflowService(workflowService);
     this.activate(null);
   }
 

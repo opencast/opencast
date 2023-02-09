@@ -22,19 +22,10 @@ jobs:
       with:
         python-version: 3.9
 
-    - name: install graphviz
-      env:
-        DEBIAN_FRONTEND: noninteractive
-      run: |
-        sudo apt update -y
-        sudo apt install -yq graphviz
-
     - name: install dependencies
       working-directory: docs/guides/
       run: |
-        sed -i /markdown-inline-graphviz-extension-png/d  requirements.txt
         pip install -q -r requirements.txt
-        pip install -q markdown-inline-graphviz-extension-png
 
     - name: build admin docs
       working-directory: docs/guides/admin/

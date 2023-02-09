@@ -84,13 +84,13 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
   private int sumInstalledFiles = 0;
 
   /** Sets the search service */
-  @Reference(name = "search-service-impl")
+  @Reference
   public void setSearchService(SearchService searchService) {
     this.searchService = searchService;
   }
 
   /** Sets the series service */
-  @Reference(name = "series-service-impl")
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }

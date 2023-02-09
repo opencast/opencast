@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
-  <version>12-SNAPSHOT</version>
+  <version>14-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>opencast</name>
   <description>Opencast is a media capture, processing, management and distribution system</description>
@@ -22,11 +22,11 @@
     <commons-compress.version>1.21</commons-compress.version>
     <commons-csv.version>1.9.0</commons-csv.version>
     <commons-fileupload.version>1.4</commons-fileupload.version>
-    <commons-io.version>2.11.0</commons-io.version>
+    <commons-io.version>2.8.0</commons-io.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
-    <commons-text.version>1.9</commons-text.version>
-    <cxf.version>3.4.3</cxf.version>
-    <eclipselink.version>2.7.5</eclipselink.version>
+    <commons-text.version>1.10.0</commons-text.version>
+    <cxf.version>3.4.6</cxf.version>
+    <eclipselink.version>2.7.8</eclipselink.version>
     <failureaccess.version>1.0.1</failureaccess.version>
     <freemarker.version>2.3.31</freemarker.version>
     <functional.version>1.4.2</functional.version>
@@ -34,15 +34,15 @@
     <guava.version>30.1.1-jre</guava.version>
     <httpcomponents-httpclient.version>4.5.13</httpcomponents-httpclient.version>
     <httpcomponents-httpcore.version>4.4.15</httpcomponents-httpcore.version>
-    <jackson.version>2.12.3</jackson.version>
+    <jackson.version>2.14.1</jackson.version>
     <jakarta.mail.version>1.6.7</jakarta.mail.version>
     <java.release>11</java.release>
     <javadoc-plugin.version>3.3.1</javadoc-plugin.version>
     <jersey.version>2.29.1</jersey.version>
-    <jettison.version>1.4.1</jettison.version>
+    <jettison.version>1.5.2</jettison.version>
     <joda-time.version>2.10.10</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
-    <karaf.version>4.2.9</karaf.version>
+    <karaf.version>4.2.16</karaf.version>
     <node.version>v16.13.0</node.version>
     <osgi.compendium.version>6.0.0</osgi.compendium.version>
     <osgi.core.version>6.0.0</osgi.core.version>
@@ -55,25 +55,21 @@
     <module>modules/admin-ui</module>
 <!--    <module>modules/admin-ui-frontend</module>-->
     <module>modules/admin-ui-picard</module>
+    <module>modules/adopter-registration-api</module>
+    <module>modules/adopter-registration-impl</module>
     <module>modules/analyze-mediapackage-workflowoperation</module>
     <module>modules/animate-api</module>
     <module>modules/animate-impl</module>
     <module>modules/animate-remote</module>
     <module>modules/animate-workflowoperation</module>
-    <module>modules/speech-to-text-api</module>
-    <module>modules/speech-to-text-impl</module>
-    <module>modules/speech-to-text-workflowoperation</module>
-    <module>modules/speech-to-text-remote</module>
     <module>modules/annotation-api</module>
     <module>modules/annotation-impl</module>
-    <module>modules/elasticsearch-index</module>
     <module>modules/asset-manager-api</module>
     <module>modules/asset-manager-impl</module>
-    <module>modules/asset-manager-workflowoperation</module>
+    <module>modules/asset-manager-static-file-authorization</module>
     <module>modules/asset-manager-storage-aws</module>
     <module>modules/asset-manager-storage-fs</module>
-    <module>modules/asset-manager-static-file-authorization</module>
-    <module>modules/shared-filesystem-utils</module>
+    <module>modules/asset-manager-workflowoperation</module>
     <module>modules/authorization-manager</module>
     <module>modules/authorization-xacml</module>
     <module>modules/caption-api</module>
@@ -82,8 +78,8 @@
     <module>modules/capture-admin-service-api</module>
     <module>modules/capture-admin-service-impl</module>
     <module>modules/comments-workflowoperation</module>
-    <module>modules/common</module>
     <module>modules/common-jpa-impl</module>
+    <module>modules/common</module>
     <module>modules/composer-ffmpeg</module>
     <module>modules/composer-service-api</module>
     <module>modules/composer-service-remote</module>
@@ -103,36 +99,28 @@
     <module>modules/dictionary-none</module>
     <module>modules/dictionary-regexp</module>
     <module>modules/distribution-service-api</module>
-    <module>modules/distribution-service-aws-s3</module>
     <module>modules/distribution-service-aws-s3-api</module>
     <module>modules/distribution-service-aws-s3-remote</module>
-    <module>modules/distribution-service-download</module>
+    <module>modules/distribution-service-aws-s3</module>
     <module>modules/distribution-service-download-remote</module>
-    <module>modules/distribution-service-streaming-wowza</module>
+    <module>modules/distribution-service-download</module>
     <module>modules/distribution-service-streaming-remote</module>
+    <module>modules/distribution-service-streaming-wowza</module>
     <module>modules/distribution-workflowoperation</module>
     <module>modules/dublincore</module>
-    <module>modules/editor-service</module>
     <module>modules/editor-service-api</module>
     <module>modules/editor-service-remote</module>
+    <module>modules/editor-service</module>
+    <module>modules/editor</module>
+    <module>modules/elasticsearch-api</module>
+    <module>modules/elasticsearch-impl</module>
+    <module>modules/elasticsearch-index</module>
     <module>modules/email-template-service-api</module>
     <module>modules/email-template-service-impl</module>
-    <module>modules/event-comment</module>
+    <module>modules/engage-paella-player-7</module>
     <module>modules/engage-paella-player</module>
-    <module>modules/engage-theodul-api</module>
-    <module>modules/engage-theodul-core</module>
-    <module>modules/engage-theodul-plugin-archetype</module>
-    <module>modules/engage-theodul-plugin-controls</module>
-    <module>modules/engage-theodul-plugin-custom-mhConnection</module>
-    <module>modules/engage-theodul-plugin-custom-notifications</module>
-    <module>modules/engage-theodul-plugin-custom-matomo</module>
-    <module>modules/engage-theodul-plugin-description</module>
-    <module>modules/engage-theodul-plugin-tab-description</module>
-    <module>modules/engage-theodul-plugin-tab-shortcuts</module>
-    <module>modules/engage-theodul-plugin-tab-slidetext</module>
-    <module>modules/engage-theodul-plugin-tab-downloads</module>
-    <module>modules/engage-theodul-plugin-video-videojs</module>
     <module>modules/engage-ui</module>
+    <module>modules/event-comment</module>
     <module>modules/execute-api</module>
     <module>modules/execute-impl</module>
     <module>modules/execute-remote</module>
@@ -142,63 +130,58 @@
     <module>modules/hello-world-api</module>
     <module>modules/hello-world-impl</module>
     <module>modules/hello-world-workflowoperation</module>
-    <module>modules/adopter-registration-api</module>
-    <module>modules/adopter-registration-impl</module>
     <module>modules/incident-workflowoperation</module>
     <module>modules/index-service</module>
     <module>modules/ingest-download-service-api</module>
     <module>modules/ingest-download-service-impl</module>
     <module>modules/ingest-download-service-remote</module>
+    <module>modules/ingest-download-service-workflowoperation</module>
     <module>modules/ingest-service-api</module>
     <module>modules/ingest-service-impl</module>
-    <module>modules/ingest-download-service-workflowoperation</module>
     <module>modules/inspection-service-api</module>
     <module>modules/inspection-service-ffmpeg</module>
     <module>modules/inspection-service-remote</module>
     <module>modules/inspection-workflowoperation</module>
-    <module>modules/statistics-writer-workflowoperation</module>
     <module>modules/kernel</module>
-    <module>modules/editor</module>
     <module>modules/list-providers-service</module>
     <module>modules/live-schedule-api</module>
     <module>modules/live-schedule-impl</module>
     <module>modules/logging-workflowoperation</module>
-    <module>modules/lti</module>
-    <module>modules/lti-service-remote</module>
-    <module>modules/lti-service-impl</module>
     <module>modules/lti-service-api</module>
+    <module>modules/lti-service-impl</module>
+    <module>modules/lti-service-remote</module>
+    <module>modules/lti</module>
     <module>modules/mattermost-notification-workflowoperation</module>
     <module>modules/message-broker-api</module>
-    <module>modules/message-broker-impl</module>
-    <module>modules/metadata</module>
     <module>modules/metadata-api</module>
     <module>modules/metadata-to-acl-workflowoperation</module>
+    <module>modules/metadata</module>
     <module>modules/metrics-exporter</module>
     <module>modules/mpeg7</module>
     <module>modules/notification-workflowoperation</module>
-    <module>modules/oaipmh</module>
     <module>modules/oaipmh-api</module>
     <module>modules/oaipmh-persistence</module>
     <module>modules/oaipmh-remote</module>
+    <module>modules/oaipmh</module>
+    <module>modules/plugin-manager</module>
     <module>modules/presets</module>
     <module>modules/publication-service-api</module>
-    <module>modules/publication-service-configurable</module>
     <module>modules/publication-service-configurable-remote</module>
-    <module>modules/publication-service-oaipmh</module>
+    <module>modules/publication-service-configurable</module>
     <module>modules/publication-service-oaipmh-remote</module>
+    <module>modules/publication-service-oaipmh</module>
     <module>modules/publication-service-youtube-remote</module>
     <module>modules/publication-service-youtube-v3</module>
+    <module>modules/redirect</module>
     <module>modules/rename-files-workflowoperation</module>
     <module>modules/rest-test-environment</module>
-    <module>modules/runtime-info</module>
-    <module>modules/runtime-info-ui</module>
     <module>modules/runtime-info-ui-ng</module>
+    <module>modules/runtime-info-ui</module>
+    <module>modules/runtime-info</module>
     <module>modules/scheduler-api</module>
     <module>modules/scheduler-impl</module>
     <module>modules/scheduler-remote</module>
     <module>modules/schema</module>
-    <module>modules/elasticsearch-impl</module>
-    <module>modules/elasticsearch-api</module>
     <module>modules/search-service-api</module>
     <module>modules/search-service-feeds</module>
     <module>modules/search-service-impl</module>
@@ -206,14 +189,15 @@
     <module>modules/security-aai</module>
     <module>modules/security-cas-client-wrapper</module>
     <module>modules/security-cas</module>
+    <module>modules/security-jwt</module>
     <module>modules/security-ldap</module>
     <module>modules/security-lti</module>
     <module>modules/security-shibboleth</module>
-    <module>modules/security-jwt</module>
     <module>modules/series-service-api</module>
     <module>modules/series-service-impl</module>
     <module>modules/series-service-remote</module>
     <module>modules/serviceregistry</module>
+    <module>modules/shared-filesystem-utils</module>
     <module>modules/silencedetection-api</module>
     <module>modules/silencedetection-impl</module>
     <module>modules/silencedetection-remote</module>
@@ -225,16 +209,22 @@
     <module>modules/sox-impl</module>
     <module>modules/sox-remote</module>
     <module>modules/sox-workflowoperation</module>
-    <module>modules/static</module>
+    <module>modules/speech-to-text-api</module>
+    <module>modules/speech-to-text-impl</module>
+    <module>modules/speech-to-text-remote</module>
+    <module>modules/speech-to-text-workflowoperation</module>
+    <module>modules/subtitle-parser</module>
     <module>modules/static-file-service-api</module>
     <module>modules/static-file-service-impl</module>
+    <module>modules/static</module>
     <module>modules/statistics-export-service-api</module>
     <module>modules/statistics-export-service-impl</module>
+    <module>modules/statistics-provider-influx</module>
+    <module>modules/statistics-provider-random</module>
     <module>modules/statistics-service-api</module>
     <module>modules/statistics-service-impl</module>
     <module>modules/statistics-service-remote</module>
-    <module>modules/statistics-provider-influx</module>
-    <module>modules/statistics-provider-random</module>
+    <module>modules/statistics-writer-workflowoperation</module>
     <module>modules/studio</module>
     <module>modules/termination-state-api</module>
     <module>modules/termination-state-aws</module>
@@ -244,16 +234,18 @@
     <module>modules/textanalyzer-remote</module>
     <module>modules/textanalyzer-workflowoperation</module>
     <module>modules/textextractor-tesseract</module>
-    <module>modules/themes</module>
     <module>modules/themes-workflowoperation</module>
+    <module>modules/themes</module>
     <module>modules/timelinepreviews-api</module>
     <module>modules/timelinepreviews-ffmpeg</module>
     <module>modules/timelinepreviews-remote</module>
     <module>modules/timelinepreviews-workflowoperation</module>
+    <module>modules/tobira</module>
+    <module>modules/transcription-service-amberscript</module>
     <module>modules/transcription-service-api</module>
     <module>modules/transcription-service-google-speech-impl</module>
     <module>modules/transcription-service-ibm-watson-impl</module>
-    <module>modules/transcription-service-amberscript</module>
+    <module>modules/transcription-service-microsoft-azure</module>
     <module>modules/transcription-service-persistence</module>
     <module>modules/transcription-service-workflowoperation</module>
     <module>modules/urlsigning-common</module>
@@ -261,22 +253,23 @@
     <module>modules/urlsigning-service-impl</module>
     <module>modules/urlsigning-verifier-service-api</module>
     <module>modules/urlsigning-verifier-service-impl</module>
-    <module>modules/userdirectory</module>
+    <module>modules/user-interface-configuration</module>
+    <module>modules/userdirectory-brightspace</module>
+    <module>modules/userdirectory-canvas</module>
     <module>modules/userdirectory-ldap</module>
     <module>modules/userdirectory-moodle</module>
     <module>modules/userdirectory-sakai</module>
-    <module>modules/userdirectory-brightspace</module>
-    <module>modules/userdirectory-canvas</module>
-    <module>modules/user-interface-configuration</module>
+    <module>modules/userdirectory-studip</module>
+    <module>modules/userdirectory</module>
     <module>modules/usertracking-api</module>
     <module>modules/usertracking-impl</module>
     <module>modules/videoeditor-api</module>
     <module>modules/videoeditor-ffmpeg-impl</module>
     <module>modules/videoeditor-remote</module>
     <module>modules/videoeditor-workflowoperation</module>
+    <module>modules/videogrid-remote</module>
     <module>modules/videogrid-service-api</module>
     <module>modules/videogrid-service-impl</module>
-    <module>modules/videogrid-remote</module>
     <module>modules/videogrid-workflowoperation</module>
     <module>modules/videosegmenter-api</module>
     <module>modules/videosegmenter-ffmpeg</module>
@@ -293,7 +286,6 @@
     <module>modules/workflow-workflowoperation</module>
     <module>modules/working-file-repository-service-api</module>
     <module>modules/working-file-repository-service-impl</module>
-    <module>modules/working-file-repository-service-remote</module>
     <module>modules/workspace-api</module>
     <module>modules/workspace-impl</module>
     <module>assemblies</module>
@@ -702,7 +694,7 @@
             <dependency>
               <groupId>org.ow2.asm</groupId>
               <artifactId>asm</artifactId>
-              <version>7.3.1</version>
+              <version>9.3</version>
             </dependency>
             <dependency>
               <groupId>org.apache.maven.shared</groupId>
@@ -710,6 +702,20 @@
               <version>1.11.1</version>
             </dependency>
           </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.karaf.tooling</groupId>
+          <artifactId>karaf-services-maven-plugin</artifactId>
+          <version>${karaf.version}</version>
+          <executions>
+            <execution>
+              <id>service-metadata-generate</id>
+              <phase>process-classes</phase>
+              <goals>
+                <goal>service-metadata-generate</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -812,11 +818,6 @@
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
         <version>3.1.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-client</artifactId>
-        <version>5.16.2</version>
       </dependency>
       <dependency>
         <groupId>org.apache.geronimo.specs</groupId>
@@ -1066,7 +1067,7 @@
       <dependency>
         <groupId>org.owasp.esapi</groupId>
         <artifactId>esapi</artifactId>
-        <version>2.1.0.1</version>
+        <version>2.3.0.0</version>
       </dependency>
       <dependency>
         <groupId>org.opensaml</groupId>
@@ -1102,7 +1103,7 @@
         <groupId>org.easymock</groupId>
         <artifactId>easymock</artifactId>
         <scope>test</scope>
-        <version>4.2</version>
+        <version>4.3</version>
       </dependency>
       <dependency>
         <groupId>org.easymock</groupId>
@@ -1281,16 +1282,6 @@
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
         <version>${gson.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mariadb.jdbc</groupId>
-        <artifactId>mariadb-java-client</artifactId>
-        <version>2.7.2</version>
-      </dependency>
-      <dependency>
-        <groupId>org.postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-        <version>42.2.19.jre7</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
@@ -1885,6 +1876,12 @@
       <id>mvn.opencast.org</id>
       <name>Opencast 3rd-Party Repository</name>
       <url>https://mvn.opencast.org/</url>
+    </repository>
+    <!-- Used by the Microsoft Azure Transcription Service-->
+    <repository>
+      <id>maven-cognitiveservices-speech</id>
+      <name>Microsoft Cognitive Services Speech Maven Repository</name>
+      <url>https://csspeechstorage.blob.core.windows.net/maven/</url>
     </repository>
   </repositories>
   <distributionManagement>

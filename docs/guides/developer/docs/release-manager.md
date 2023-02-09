@@ -19,6 +19,26 @@ meetings. It is important to note that, while release managers drive the release
 charge of both the work and the decision making, meaning that votes and successful proposals from this body take
 precedence over release manager decisions.
 
+Recommended practices for release managers
+------------------------------
+
+This is a recommendation of best practices to help to organize the duties of the release managers after they have been choosen
+these recomendations came from the experience of past release managers.
+
+### After the election of the release manager
+- Create a draft pull request for the release notes early
+- Create a draft article as a draft opencast.org Wordpress.
+- Create draft slides for presentation in summits and adopters meetings
+
+### After the end or begining of each month
+- Check the merged pull requests
+    - Update the release notes (If necessary)
+    - Add any missing tag from each pull request
+- Update the slides (If necessary)
+
+### After the end of translation week
+- Add/Remove languages acording the translation criteria
+
 
 Responsibilities
 ----------------
@@ -68,27 +88,49 @@ Example on how to create the Opencast 7 release branch:
         git checkout develop
         git pull <remote> develop
 
-2. Make sure you did not modify any files. If you did, stash those changes:
+2. Modify the Paella target branch (For Paella 6.x and 7.x), found in the dependabot configuration
+   file `.github/dependabot.yml` to target the latest supported version when this version will released.
+
+        Example:
+        - package-ecosystem: npm
+          directory: "/modules/engage-paella-player-7"
+          schedule:
+          interval: daily
+          target-branch: "r/12.x"
+          open-pull-requests-limit: 10
+        
+        to
+
+        - package-ecosystem: npm
+          directory: "/modules/engage-paella-player-7"
+          schedule:
+          interval: daily
+          target-branch: "r/13.x"
+          open-pull-requests-limit: 10
+
+  make a PR then merge this change to `develop` branch.
+
+3. Make sure you did not modify any files. If you did, stash those changes:
 
         git status   # check for modified files
         git stash    # stash them if necessary
 
-3. Create and push the new release branch:
+4. Create and push the new release branch:
 
         git checkout -b r/7.x
         git push <remote> r/7.x
 
-4. That is it for the release branch. Now update the versions in `develop` in preparation for the next release:
+5. That is it for the release branch. Now update the versions in `develop` in preparation for the next release:
 
         git checkout develop
         mvn versions:set -DnewVersion=8-SNAPSHOT versions:commit
 
-5. Have a look at the changes. Make sure that nothing else was modified:
+6. Have a look at the changes. Make sure that nothing else was modified:
 
         git diff
         git status | grep modified: | grep -v pom.xml   # this should have no output
 
-6. If everything looks fine, commit the changes and push it to the community repository:
+7. If everything looks fine, commit the changes and push it to the community repository:
 
         git add $(git status | grep 'modified:.*pom.xml' | awk '{print $2;}')
         git commit -s -m 'Bumping pom.xml Version Numbers'
@@ -103,10 +145,13 @@ To: dev@opencast.org
 Subject: Release Branch for Opencast <version> Cut
 
 Hi everyone,
-the Opencast <version> release branch (r/<version>) has been
-cut.  Pull requests for bug fixes may still be made against
-this branch but, as usual, features should go into develop
-instead.
+the Opencast <version> release branch (r/<version>.x) has been
+cut.  Please check if pull requests point to the correct branch.
+
+For a guide on what you can still add to release branches, please refer to
+
+  https://docs.opencast.org/develop/developer/development-process/#acceptance-criteria-for-patches-in-different-versions
+
 
 Remember the release schedule for this release:
 
@@ -325,7 +370,7 @@ The following steps outline the necessary steps for cutting the final release:
 
         git push <remote> 6.0:6.0
 
-8 Check the “Create new release” GitHub Actions workflow.
+8. Check the “Create new release” GitHub Actions workflow.
    It will automatically build and upload the release tarballs and create a new release draft.
    Once it is finished, review the draft, adjust the description and publish the release.
 

@@ -63,7 +63,7 @@
 
   @if $display-table  {
     display: table-cell;
-    width: percentage($columns / $container-columns);
+    width: percentage(calc($columns / $container-columns));
   } @else {
     float: #{$opposite-direction};
 

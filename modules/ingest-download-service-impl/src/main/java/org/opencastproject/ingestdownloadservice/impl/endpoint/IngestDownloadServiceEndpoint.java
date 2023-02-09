@@ -116,7 +116,7 @@ public class IngestDownloadServiceEndpoint extends AbstractJobProducerEndpoint {
   }
 
 
-  @Reference(name = "ingest-download-service")
+  @Reference
   public void setIngestDownloadService(IngestDownloadService service) {
     this.service = service;
   }
@@ -145,7 +145,7 @@ public class IngestDownloadServiceEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

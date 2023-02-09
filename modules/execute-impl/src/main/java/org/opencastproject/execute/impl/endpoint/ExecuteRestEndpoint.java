@@ -165,7 +165,7 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
    *
    * @param service
    */
-  @Reference(name = "execute")
+  @Reference
   public void setExecuteService(ExecuteService service) {
     this.service = service;
   }
@@ -205,7 +205,7 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

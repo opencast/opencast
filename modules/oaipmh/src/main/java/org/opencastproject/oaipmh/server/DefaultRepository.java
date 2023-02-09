@@ -60,7 +60,7 @@ public class DefaultRepository extends OaiPmhRepository {
           Collections.list(new MatterhornMetadataProvider(), new MatterhornInlinedMetadataProvider());
 
   /** OSGi DI */
-  @Reference(name = "persistence")
+  @Reference
   public void setPersistence(OaiPmhDatabase persistence) {
     this.persistence = persistence;
   }

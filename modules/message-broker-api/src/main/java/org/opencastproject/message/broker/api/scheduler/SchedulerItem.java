@@ -47,10 +47,6 @@ public class SchedulerItem implements Serializable {
 
   private static final Gson gson = new Gson();
 
-  public static final String SCHEDULER_QUEUE_PREFIX = "SCHEDULER.";
-
-  public static final String SCHEDULER_QUEUE = SCHEDULER_QUEUE_PREFIX + "QUEUE";
-
   private final String event;
   private final String properties;
   private final String acl;

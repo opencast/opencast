@@ -128,22 +128,32 @@ angular.module('adminNg.services')
       me.ud.policies = addUserRolePolicy(me.ud.policies);
       me.ud.baseAcl = {};
 
+      AuthService.getUser().$promise.then(function (user) {
+        var ADMIN_INIT_EVENT_ACL_WITH_SERIES_ACL = 'admin.init.event.acl.with.series.acl';
+        if (angular.isDefined(user.org.properties[ADMIN_INIT_EVENT_ACL_WITH_SERIES_ACL])) {
+          me.initEventAclWithSeriesAcl = user.org.properties[ADMIN_INIT_EVENT_ACL_WITH_SERIES_ACL] === 'true';
+        } else {
+          me.initEventAclWithSeriesAcl = true;
+        }
+      }).catch(angular.noop);
+
       this.setMetadata = function (metadata) {
         me.metadata = metadata;
-        me.loadSeriesAcl();
       };
 
       this.loadSeriesAcl = function () {
-        angular.forEach(me.metadata.getUserEntries(), function (m) {
-          if (m.id === 'isPartOf' && angular.isDefined(m.value) && m.value !== '') {
-            SeriesAccessResource.get({ id: m.value }, function (data) {
-              if (angular.isDefined(data.series_access)) {
-                var json = angular.fromJson(data.series_access.acl);
-                changePolicies(json.acl.ace, true);
-              }
-            });
-          }
-        });
+        if (me.initEventAclWithSeriesAcl) {
+          angular.forEach(me.metadata.getUserEntries(), function (m) {
+            if (m.id === 'isPartOf' && angular.isDefined(m.value) && m.value !== '') {
+              SeriesAccessResource.get({ id: m.value }, function (data) {
+                if (angular.isDefined(data.series_access)) {
+                  var json = angular.fromJson(data.series_access.acl);
+                  changePolicies(json.acl.ace, true);
+                }
+              });
+            }
+          });
+        }
       };
 
       this.changeBaseAcl = function () {
@@ -201,14 +211,12 @@ angular.module('adminNg.services')
             rulesValid = true;
 
         angular.forEach(me.ud.policies, function (policy) {
-          rulesValid = false;
-
           if (policy.read && policy.write) {
             hasRights = true;
           }
 
-          if ((policy.read || policy.write || policy.actions.value.length > 0) && !angular.isUndefined(policy.role)) {
-            rulesValid = true;
+          if (!(policy.read || policy.write || policy.actions.value.length > 0) || angular.isUndefined(policy.role)) {
+            rulesValid = false;
           }
         });
 

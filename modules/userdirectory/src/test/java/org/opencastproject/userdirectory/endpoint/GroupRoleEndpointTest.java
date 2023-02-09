@@ -24,9 +24,9 @@ package org.opencastproject.userdirectory.endpoint;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
@@ -36,7 +36,6 @@ import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
-import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Collections;
 
@@ -44,8 +43,6 @@ import org.apache.http.HttpStatus;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.Serializable;
 
 import javax.ws.rs.core.Response;
 
@@ -67,21 +64,14 @@ public class GroupRoleEndpointTest {
     EasyMock.expect(securityService.getOrganization()).andReturn(org1).anyTimes();
     EasyMock.replay(securityService);
 
-    // Create the message sender service
-    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
-    messageSender.sendObjectMessage(EasyMock.anyObject(String.class),
-            EasyMock.anyObject(MessageSender.DestinationType.class), EasyMock.anyObject(Serializable.class));
-    EasyMock.expectLastCall();
-    EasyMock.replay(messageSender);
-
     provider = new JpaGroupRoleProvider();
     provider.setSecurityService(securityService);
-    provider.setEntityManagerFactory(newTestEntityManagerFactory(JpaUserAndRoleProvider.PERSISTENCE_UNIT));
+    provider.setEntityManagerFactory(newEntityManagerFactory(JpaGroupRoleProvider.PERSISTENCE_UNIT));
+    provider.setDBSessionFactory(getDbSessionFactory());
     provider.activate(null);
 
     endpoint = new GroupRoleEndpoint();
     endpoint.setJpaGroupRoleProvider(provider);
-
   }
 
   @Test

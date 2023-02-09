@@ -25,19 +25,26 @@ import static java.lang.String.format;
 import static org.opencastproject.scheduler.api.RecordingState.UPLOAD_FINISHED;
 
 import org.opencastproject.ingest.api.IngestService;
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
+import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workspace.api.Workspace;
 
 import com.google.common.util.concurrent.RateLimiter;
 import com.google.gson.Gson;
@@ -57,11 +64,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -101,6 +110,7 @@ public class Ingestor implements Runnable {
 
   private final SeriesService seriesService;
   private final SchedulerService schedulerService;
+  private final Workspace workspace;
 
   private final int maxTries;
 
@@ -239,6 +249,33 @@ public class Ingestor implements Runnable {
                   mediaPackage = mediaPackages.get(0);
                   var id = mediaPackage.getIdentifier().toString();
                   var eventConfiguration = schedulerService.getCaptureAgentConfiguration(id);
+
+                  // Check if the scheduled event already has a recording associated with it
+                  // If so, ingest the file as a new event
+                  try {
+                    Recording recordingState = schedulerService.getRecordingState(id);
+                    if (recordingState.getState().equals(UPLOAD_FINISHED)) {
+                      var referenceId = mediaPackage.getIdentifier().toString();
+                      mediaPackage = (MediaPackage) mediaPackage.clone();
+                      mediaPackage.setIdentifier(IdImpl.fromUUID());
+
+                      // Update dublincore title and set reference to originally scheduled event
+                      try {
+                        DublinCoreCatalog dc = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage).get();
+                        var newTitle = dc.get(DublinCore.PROPERTY_TITLE).get(0).getValue()
+                                + " (" + Instant.now().getEpochSecond() + ")";
+                        dc.set(DublinCore.PROPERTY_TITLE, newTitle);
+                        dc.set(DublinCore.PROPERTY_REFERENCES, referenceId);
+                        mediaPackage = updateDublincCoreCatalog(mediaPackage, dc);
+                        mediaPackage.setTitle(newTitle);
+                      } catch (Exception e) {
+                        // Don't fail the ingest if we could not set metadata for some reason
+                      }
+                    }
+                  } catch (NotFoundException e) {
+                    // Occurs if a scheduled event has not started yet
+                  }
+
                   currentWorkflowDefinition = eventConfiguration.getOrDefault(
                           "org.opencastproject.workflow.definition",
                           workflowDefinition);
@@ -328,7 +365,10 @@ public class Ingestor implements Runnable {
       String output;
       Process process = null;
       try {
-        process = new ProcessBuilder(command).start();
+        process = new ProcessBuilder(command)
+            .redirectError(ProcessBuilder.Redirect.DISCARD)
+            .start();
+
         try (InputStream in = process.getInputStream()) {
           output = IOUtils.toString(in, StandardCharsets.UTF_8);
         }
@@ -415,7 +455,7 @@ public class Ingestor implements Runnable {
           String workflowDefinition, Map<String, String> workflowConfig, String mediaFlavor, File inbox, int maxThreads,
           SeriesService seriesService, int maxTries, int secondsBetweenTries, Optional<Pattern> metadataPattern,
           DateTimeFormatter dateFormatter, SchedulerService schedulerService, String ffprobe, boolean matchSchedule,
-          float matchThreshold) {
+          float matchThreshold, Workspace workspace) {
     this.ingestService = ingestService;
     this.secCtx = secCtx;
     this.workflowDefinition = workflowDefinition;
@@ -433,6 +473,7 @@ public class Ingestor implements Runnable {
     this.ffprobe = ffprobe;
     this.matchSchedule = matchSchedule;
     this.matchThreshold = matchThreshold;
+    this.workspace = workspace;
   }
 
   /**
@@ -475,6 +516,36 @@ public class Ingestor implements Runnable {
     } catch (Exception e) {
       logger.error("Unable to cleanup inbox for the artifact {}", artifact, e);
     }
+  }
+
+  /**
+   *
+   * @param mp
+   *          the mediapackage to update
+   * @param dc
+   *          the dublincore metadata to use to update the mediapackage
+   * @return the updated mediapackage
+   * @throws IOException
+   *           Thrown if an IO error occurred adding the dc catalog file
+   * @throws MediaPackageException
+   *           Thrown if an error occurred updating the mediapackage or the mediapackage does not contain a catalog
+   */
+  private MediaPackage updateDublincCoreCatalog(MediaPackage mp, DublinCoreCatalog dc)
+          throws IOException, MediaPackageException {
+    try (InputStream inputStream = IOUtils.toInputStream(dc.toXmlString(), "UTF-8")) {
+      // Update dublincore catalog
+      Catalog[] catalogs = mp.getCatalogs(MediaPackageElements.EPISODE);
+      if (catalogs.length > 0) {
+        Catalog catalog = catalogs[0];
+        URI uri = workspace.put(mp.getIdentifier().toString(), catalog.getIdentifier(), "dublincore.xml", inputStream);
+        catalog.setURI(uri);
+        // setting the URI to a new source so the checksum will most like be invalid
+        catalog.setChecksum(null);
+      } else {
+        throw new MediaPackageException("Unable to find catalog");
+      }
+    }
+    return mp;
   }
 
   public String myInfo() {

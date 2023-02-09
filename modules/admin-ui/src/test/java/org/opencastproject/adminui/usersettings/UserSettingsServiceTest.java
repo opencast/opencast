@@ -22,6 +22,7 @@
 package org.opencastproject.adminui.usersettings;
 
 import static org.junit.Assert.assertEquals;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 
 import org.opencastproject.adminui.usersettings.persistence.UserSettingDto;
 import org.opencastproject.adminui.usersettings.persistence.UserSettingsServiceException;
@@ -42,6 +43,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 public class UserSettingsServiceTest {
   private static final String KEY_PREFIX = "Key-";
@@ -82,7 +84,7 @@ public class UserSettingsServiceTest {
   }
 
   private EntityManager setupUserSettingEntityManager(int signatureCount, int offset, int limit) {
-    Query userSettingsQuery = EasyMock.createMock(Query.class);
+    TypedQuery userSettingsQuery = EasyMock.createMock(TypedQuery.class);
     EasyMock.expect(userSettingsQuery.setParameter(EasyMock.anyObject(String.class), EasyMock.anyObject())).andReturn(userSettingsQuery).anyTimes();
     EasyMock.expect(userSettingsQuery.setFirstResult(offset)).andReturn(userSettingsQuery).anyTimes();
     EasyMock.expect(userSettingsQuery.setMaxResults(limit)).andReturn(userSettingsQuery).anyTimes();
@@ -90,7 +92,8 @@ public class UserSettingsServiceTest {
     EasyMock.replay(userSettingsQuery);
 
     EntityManager findSettings = EasyMock.createMock(EntityManager.class);
-    EasyMock.expect(findSettings.createNamedQuery("UserSettings.findByUserName")).andReturn(userSettingsQuery);
+    EasyMock.expect(findSettings.createNamedQuery("UserSettings.findByUserName", UserSettingDto.class)).andReturn(userSettingsQuery);
+    EasyMock.expect(findSettings.isOpen()).andReturn(true);
     findSettings.close();
     EasyMock.expectLastCall();
     EasyMock.replay(findSettings);
@@ -102,13 +105,14 @@ public class UserSettingsServiceTest {
     EasyMock.expect(totalNumber.intValue()).andReturn(total);
     EasyMock.replay(totalNumber);
 
-    Query userSettingsQuery = EasyMock.createMock(Query.class);
+    TypedQuery userSettingsQuery = EasyMock.createMock(TypedQuery.class);
     EasyMock.expect(userSettingsQuery.setParameter(EasyMock.anyObject(String.class), EasyMock.anyObject())).andReturn(userSettingsQuery).anyTimes();
     EasyMock.expect(userSettingsQuery.getSingleResult()).andReturn(totalNumber);
     EasyMock.replay(userSettingsQuery);
 
     EntityManager findSettings = EasyMock.createMock(EntityManager.class);
-    EasyMock.expect(findSettings.createNamedQuery("UserSettings.countByUserName")).andReturn(userSettingsQuery);
+    EasyMock.expect(findSettings.createNamedQuery("UserSettings.countByUserName", Number.class)).andReturn(userSettingsQuery);
+    EasyMock.expect(findSettings.isOpen()).andReturn(true);
     findSettings.close();
     EasyMock.expectLastCall();
     EasyMock.replay(findSettings);
@@ -127,7 +131,9 @@ public class UserSettingsServiceTest {
     UserSettingsService userSettingsService = new UserSettingsService();
     userSettingsService.setSecurityService(securityService);
     userSettingsService.setEntityManagerFactory(emf);
+    userSettingsService.setDBSessionFactory(getDbSessionFactory());
     userSettingsService.setUserDirectoryService(userDirectoryService);
+    userSettingsService.activate(null);
     return userSettingsService;
   }
 
@@ -181,7 +187,9 @@ public class UserSettingsServiceTest {
     UserSettingsService userSettingsService = new UserSettingsService();
     userSettingsService.setSecurityService(securityService);
     userSettingsService.setEntityManagerFactory(emf);
+    userSettingsService.setDBSessionFactory(getDbSessionFactory());
     userSettingsService.setUserDirectoryService(userDirectoryService);
+    userSettingsService.activate(null);
     userSettingsService.addUserSetting(key, value);
 
     assertEquals(userSettingDto.getValues().get(0).getKey(), key);
@@ -202,7 +210,7 @@ public class UserSettingsServiceTest {
     EntityTransaction tx = EasyMock.createNiceMock(EntityTransaction.class);
     EasyMock.replay(tx);
 
-    Query query = EasyMock.createNiceMock(Query.class);
+    TypedQuery query = EasyMock.createNiceMock(TypedQuery.class);
     EasyMock.expect(query.setParameter("key", key)).andReturn(query);
     EasyMock.expect(query.setParameter("username", securityService.getUser().getUsername())).andReturn(query);
     EasyMock.expect(query.setParameter("org", securityService.getOrganization().getId())).andReturn(query);
@@ -210,7 +218,7 @@ public class UserSettingsServiceTest {
     EasyMock.replay(query);
 
     EntityManager em = EasyMock.createNiceMock(EntityManager.class);
-    EasyMock.expect(em.createNamedQuery("UserSettings.findByKey")).andReturn(query);
+    EasyMock.expect(em.createNamedQuery("UserSettings.findByKey", UserSettingDto.class)).andReturn(query);
     EasyMock.expectLastCall();
     EasyMock.expect(em.getTransaction()).andReturn(tx);
     EasyMock.expect(em.find(UserSettingDto.class, id)).andReturn(userSettingDto);
@@ -223,7 +231,9 @@ public class UserSettingsServiceTest {
     UserSettingsService userSettingsService = new UserSettingsService();
     userSettingsService.setSecurityService(securityService);
     userSettingsService.setEntityManagerFactory(emf);
+    userSettingsService.setDBSessionFactory(getDbSessionFactory());
     userSettingsService.setUserDirectoryService(userDirectoryService);
+    userSettingsService.activate(null);
     UserSetting result = userSettingsService.updateUserSetting(key, value, oldValue);
 
     assertEquals(result.getId(), id);
@@ -265,7 +275,9 @@ public class UserSettingsServiceTest {
     UserSettingsService userSettingsService = new UserSettingsService();
     userSettingsService.setSecurityService(securityService);
     userSettingsService.setEntityManagerFactory(emf);
+    userSettingsService.setDBSessionFactory(getDbSessionFactory());
     userSettingsService.setUserDirectoryService(userDirectoryService);
+    userSettingsService.activate(null);
     userSettingsService.deleteUserSetting(id);
   }
 }

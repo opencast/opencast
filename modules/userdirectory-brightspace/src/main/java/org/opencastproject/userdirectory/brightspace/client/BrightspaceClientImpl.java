@@ -22,11 +22,11 @@
 package org.opencastproject.userdirectory.brightspace.client;
 
 import org.opencastproject.userdirectory.brightspace.client.api.BrightspaceUser;
+import org.opencastproject.userdirectory.brightspace.client.api.OrgUnitItem;
 import org.opencastproject.userdirectory.brightspace.client.api.OrgUnitResponse;
 import org.opencastproject.userdirectory.brightspace.client.api.PagingInfo;
 import org.opencastproject.userdirectory.brightspace.client.api.UsersResponse;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.slf4j.Logger;
@@ -40,10 +40,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -55,13 +54,14 @@ public class BrightspaceClientImpl implements BrightspaceClient {
 
   private static final Logger logger = LoggerFactory.getLogger(BrightspaceClientImpl.class);
 
-  private static final String GET_USER_BY_USERNAME = "/d2l/api/lp/1.0/users/?orgDefinedId=";
-  private static final String GET_ALL_USERS = "/d2l/api/lp/1.0/users/";
+  private static final String GET_USER_BY_USERNAME = "/d2l/api/lp/1.31/users/?UserName=";
+  private static final String GET_ALL_USERS = "/d2l/api/lp/1.31/users/";
   private static final String GET_COURSES_BY_BRIGHTSPACE_USER_ID
-      = "/d2l/api/lp/1.0/enrollments/users/{brightspace-userid}/orgUnits/";
+      = "/d2l/api/lp/1.31/enrollments/users/{brightspace-userid}/orgUnits/?orgUnitTypeId=3";
   private static final String UNEXPECTED_JSON_RESPONSE = "The brightspace API returned a unexpected json response";
   private static final String SUPER_ADMIN = "Super Administrator";
-
+  private static final String LTI_LEARNER_ROLE = "Learner";
+  private static final String LTI_INSTRUCTOR_ROLE = "Instructor";
 
   private final String url;
   private final String applicationId;
@@ -84,54 +84,70 @@ public class BrightspaceClientImpl implements BrightspaceClient {
 
   public BrightspaceUser findUser(String userName) throws BrightspaceClientException {
     String request = GET_USER_BY_USERNAME + userName;
-    String response = httpGetRequest(request);
 
     try {
-      List<BrightspaceUser> brightspaceUserList = objectMapper
-              .readValue(response, new TypeReference<List<BrightspaceUser>>() {
-              });
-      return brightspaceUserList.stream().findFirst().orElse(null);
+      String response = httpGetRequest(request);
+      logger.debug(response);
+
+      BrightspaceUser brightspaceUser = objectMapper
+              .readerFor(BrightspaceUser.class)
+              .readValue(response);
+      return brightspaceUser;
+    } catch (BrightspaceNotFoundException nfe) {
+      return null;
     } catch (IOException e) {
+      logger.debug(e.toString());
       throw new BrightspaceClientException(UNEXPECTED_JSON_RESPONSE, e);
     }
   }
 
-  @Override
-  public Set<String> findCourseIds(String brightspaceUserId) throws BrightspaceClientException {
-    Set<String> courseIds = new HashSet<>();
+  @Override public List<String> getRolesFromBrightspace(String userid, Set<String> instructorRoles)
+                            throws BrightspaceClientException {
+    logger.debug("Retrieving subscribed courses for user: {}", userid);
+
     boolean hasMoreItems;
     String bookmark = null;
-    do {
-      String request = composePagedUrl(bookmark, brightspaceUserId);
-      OrgUnitResponse orgUnitPage = findOrgUnitPage(request);
-      if (SUPER_ADMIN.equals(orgUnitPage.getItems().get(0).getRole().getName())) {
-        courseIds.add("BRIGHTSPACE_ADMIN");
-        return courseIds;
-      }
+    List<String> roleList = new ArrayList<>();
+    try {
+      do {
+        String request = composePagedUrl(bookmark, userid);
+        OrgUnitResponse orgUnitPage = findOrgUnitPage(request);
+        if (SUPER_ADMIN.equals(orgUnitPage.getItems().get(0).getRole().getName())) {
+          roleList.add("BRIGHTSPACE_ADMIN");
+          return roleList;
+        }
 
-      Set<String> pagedCourseIds = orgUnitPage.getItems()
-              .stream()
-              .map(orgUnitItem -> orgUnitItem.getOrgUnit().getCode())
-              .collect(Collectors.toSet());
-      courseIds.addAll(pagedCourseIds);
+        for (OrgUnitItem course: orgUnitPage.getItems()) {
+          String brightspaceRole = course.getRole().getName();
+          String ltiRole = instructorRoles.contains(brightspaceRole) ? LTI_INSTRUCTOR_ROLE : LTI_LEARNER_ROLE;
+          String opencastRole = String.format("%s_%s", course.getOrgUnit().getId(), ltiRole);
+          roleList.add(opencastRole);
+        }
 
-      PagingInfo pagingInfo = orgUnitPage.getPagingInfo();
-      hasMoreItems = pagingInfo.hasMoreItems();
-      bookmark = pagingInfo.getBookmark();
+        PagingInfo pagingInfo = orgUnitPage.getPagingInfo();
+        hasMoreItems = pagingInfo.hasMoreItems();
+        bookmark = pagingInfo.getBookmark();
 
-    } while (hasMoreItems);
+      } while (hasMoreItems);
 
-    return courseIds;
+      return roleList;
+    } catch (BrightspaceClientException e) {
+      logger.warn("Exception getting site/role membership for brightspace user {}: {}", userid, e);
+      throw new BrightspaceClientException(UNEXPECTED_JSON_RESPONSE, e);
+    }
+
   }
 
   @Override
   public List<BrightspaceUser> findAllUsers() throws BrightspaceClientException {
-    String response = httpGetRequest(GET_ALL_USERS);
     try {
+      String response = httpGetRequest(GET_ALL_USERS);
       UsersResponse usersResponse = objectMapper.readValue(response, UsersResponse.class);
       return usersResponse.getItems();
     } catch (IOException e) {
-      throw new BrightspaceClientException(UNEXPECTED_JSON_RESPONSE);
+      throw new BrightspaceClientException(UNEXPECTED_JSON_RESPONSE, e);
+    } catch (BrightspaceNotFoundException nfe) {
+      throw new BrightspaceClientException(UNEXPECTED_JSON_RESPONSE, nfe);
     }
 
   }
@@ -140,14 +156,21 @@ public class BrightspaceClientImpl implements BrightspaceClient {
     return this.url;
   }
 
-  private String httpGetRequest(String request) throws BrightspaceClientException {
+  private String httpGetRequest(String request) throws BrightspaceClientException, BrightspaceNotFoundException {
     URL url = createUrl(request);
 
-    HttpsURLConnection urlConnection = (HttpsURLConnection) getURLConnection(url);
-    try (InputStream inputStream = urlConnection.getInputStream()) {
+    try {
+      HttpsURLConnection urlConnection = (HttpsURLConnection) getURLConnection(url);
+
+      if (urlConnection.getResponseCode() == 404) {
+        logger.debug("Not found, 404 response");
+        throw new BrightspaceNotFoundException("not found");
+      }
+
+      InputStream inputStream = urlConnection.getInputStream();
       return readInputStream(inputStream);
     } catch (IOException io) {
-      logger.error("error in brightspace data fetching", io);
+      logger.warn("error in brightspace data fetching", io);
       throw new BrightspaceClientException("could not read response");
     }
   }
@@ -200,19 +223,22 @@ public class BrightspaceClientImpl implements BrightspaceClient {
   }
 
   private OrgUnitResponse findOrgUnitPage(String request) throws BrightspaceClientException {
-    String response = httpGetRequest(request);
     try {
+      String response = httpGetRequest(request);
       return objectMapper.readValue(response, OrgUnitResponse.class);
     } catch (IOException e) {
       logger.error(UNEXPECTED_JSON_RESPONSE);
       throw new BrightspaceClientException(UNEXPECTED_JSON_RESPONSE, e);
+    } catch (BrightspaceNotFoundException nfe) {
+      logger.error(UNEXPECTED_JSON_RESPONSE);
+      throw new BrightspaceClientException(UNEXPECTED_JSON_RESPONSE, nfe);
     }
   }
 
   private String composePagedUrl(String bookmark, String brightspaceUserId) {
     String request = GET_COURSES_BY_BRIGHTSPACE_USER_ID.replaceAll("\\{\\S+}", brightspaceUserId);
     if (bookmark != null) {
-      request += "?bookmark=" + bookmark + "&orgUnitTypeId=3";
+      request += "&bookmark=" + bookmark;
     }
     return request;
   }

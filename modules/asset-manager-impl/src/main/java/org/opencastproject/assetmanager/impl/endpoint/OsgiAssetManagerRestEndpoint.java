@@ -49,18 +49,18 @@ public class OsgiAssetManagerRestEndpoint extends AbstractTieredStorageAssetMana
   }
 
   /** OSGi DI */
-  @Reference(name = "asset-manager")
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
-  @Reference(name = "job-producer")
+  @Reference
   @Override
   public void setJobProducer(AssetManagerJobProducer assetManagerJobProducer) {
     super.setJobProducer(assetManagerJobProducer);
   }
 
-  @Reference(name = "service-registry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

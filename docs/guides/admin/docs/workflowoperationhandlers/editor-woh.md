@@ -1,5 +1,7 @@
-VideoEditorWorkflowOperationHandler
-===================================
+Video Editor Workflow Operation
+===============================
+
+ID: `editor`
 
 Description
 -----------
@@ -21,19 +23,20 @@ distributed systems) to be installed.
 |*preview_flavors*|*`*/preview`*|*(Legacy) Flavors used to preview the video in the editor.*<br/>***Currently has no effect. Preview flavors are now configured in the file `etc/org.opencastproject.adminui.cfg`***|
 |*interactive*|*`false`*|*(Legacy) If `true` make the operation interactive, i.e. pause and wait for user input.*<br/>***Do not use. Interactive operations are deprecated in the current API.***|
 
-## Operation Example
 
-    <operation
-      id="editor"
-      if="${trimHold}"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Waiting for user to review / video edit recording">
-      <configurations>
-        <configuration key="source-flavors">*/work</configuration>
-        <configuration key="skipped-flavors">*/work</configuration>
-        <configuration key="smil-flavors">*/smil</configuration>
-        <configuration key="target-smil-flavor">smil/cutting</configuration>
-        <configuration key="target-flavor-subtype">trimmed</configuration>
-      </configurations>
-    </operation>
+Operation Example
+-----------------
+
+````xml
+<operation
+    id="editor"
+    description="Waiting for user to review / video edit recording">
+  <configurations>
+    <configuration key="source-flavors">*/work</configuration>
+    <configuration key="skipped-flavors">*/work</configuration>
+    <configuration key="smil-flavors">*/smil</configuration>
+    <configuration key="target-smil-flavor">smil/cutting</configuration>
+    <configuration key="target-flavor-subtype">trimmed</configuration>
+  </configurations>
+</operation>
+```

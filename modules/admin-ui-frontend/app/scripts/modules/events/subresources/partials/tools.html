@@ -44,7 +44,7 @@
         </nav>
         </div>
       -->
-      <div class="video-container">
+      <div class="video-container" ng-controller="EventCtrl">
 
         <div data-video-player
              data-player="player"
@@ -56,7 +56,7 @@
         <div class="tool-tab" ng-if="tab === 'editor' && player.adapter">
           <div data-admin-ng-timeline="" data-video="video" data-player="player"></div>
         </div>
-        <div class="event-container" ng-controller="EventCtrl">
+        <div class="event-container">
           <div>
             <nav class="modal-nav view-controller-secondary">
               <a ng-class="{active: area === 'segments'}"
@@ -81,11 +81,11 @@
                   <header><span translate="EVENTS.EVENTS.DETAILS.METADATA.CAPTION"><!-- Event details --></span></header>
                   <div class="obj-container">
                     <table class="main-tbl">
-                      <tr ng-repeat="row in episodeCatalog.fields track by $index">
+                      <tr ng-repeat="(idx, row) in commonMetadataCatalog.fields">
                         <td translate="{{ row.label }}"></td>
                         <td admin-ng-editable
                             required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
-                            params="row" save="getSaveFunction(episodeCatalog.flavor)">
+                            params="row" save="getMetadataChangedFunction(commonMetadataCatalog.flavor)">
                         </td>
                       </tr>
                     </table>
@@ -135,7 +135,7 @@
                          ng-if="video.source_tracks.length === 1"
                          translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_VIDEO.LABEL"
                          title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_VIDEO.TOOLTIP' |translate  }}"
-                         ng-click="changeThumbnail(undefined, 'single', player.adapter.getCurrentTime())"
+                         ng-click="changeThumbnailPreview('single')"
                          ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
                         <!-- Extract -->
                       </a>
@@ -143,7 +143,7 @@
                          ng-if="video.source_tracks.length > 1"
                          translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_LEFT_VIDEO.LABEL"
                          title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_LEFT_VIDEO.TOOLTIP' |translate  }}"
-                         ng-click="changeThumbnail(undefined, 'left', player.adapter.getCurrentTime())"
+                         ng-click="changeThumbnailPreview('left')"
                          ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
                         <!-- Extract -->
                       </a>
@@ -151,7 +151,7 @@
                          ng-if="video.source_tracks.length > 1"
                          translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_RIGHT_VIDEO.LABEL"
                          title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_RIGHT_VIDEO.TOOLTIP' | translate }}"
-                         ng-click="changeThumbnail(undefined, 'right', player.adapter.getCurrentTime())"
+                         ng-click="changeThumbnailPreview('right')"
                          ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
                         <!-- Extract from video -->
                       </a>
@@ -168,13 +168,13 @@
                           class="hidden"
                           type="file"
                           accept="image/*"
-                          onchange="angular.element(this).scope().changeThumbnail(this.files[0], undefined, undefined)"
+                          onchange="angular.element(this).scope().changeThumbnail(this.files[0], undefined, undefined, undefined)"
                           ng-disabled="video.thumbnail.loading"/>
                       </form>
                       <a class="use-default-thumbnail"
                          translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.USE_DEFAULT.LABEL"
                          title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.USE_DEFAULT.TOOLTIP' | translate }}"
-                         ng-click="changeThumbnail(undefined, 'DEFAULT', calculateDefaultThumbnailPosition())"
+                         ng-click="changeThumbnailPreviewJump('DEFAULT', calculateDefaultThumbnailPosition())"
                          ng-if="video.thumbnail.url && video.thumbnail.type !== 'DEFAULT'"
                          ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
                         <!-- Use default thumbnail -->
@@ -402,7 +402,7 @@
                       ng-options="workflow.id as workflow.name for workflow in video.workflows | orderBy: 'displayOrder':true" >
               </select>
 
-              <a ng-click="submit()"
+              <a ng-click="submit([commonMetadataCatalog], commonMetadataCatalog)"
                  ng-class="{disabled: activeTransaction || activeSubmission || sanityCheckFlags()}"
                  class="save-and-close-button"
                  translate="{{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' }}">

@@ -70,7 +70,7 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
    * @param workspace
    *          the workspace service
    */
-  @Reference(name = "Workspace")
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -81,7 +81,7 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
    * @param serviceRegistry
    *          the service registry service
    */
-  @Reference(name = "ServiceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -92,7 +92,7 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
    * @param securityService
    *          the security service
    */
-  @Reference(name = "SecurityService")
+  @Reference
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -103,7 +103,7 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
    * @param userDirectoryService
    *          the user directory service
    */
-  @Reference(name = "UserDirectoryService")
+  @Reference
   protected void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -114,7 +114,7 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
    * @param organizationDirectoryService
    *          the organization directory service
    */
-  @Reference(name = "OrganizationDirectoryService")
+  @Reference
   protected void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }

@@ -35,13 +35,17 @@ import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
+import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -49,6 +53,9 @@ import java.util.stream.Collectors;
  * properties)
  */
 public final class WorkflowPropertiesUtil {
+  private static final Set<MediaPackageElementFlavor> SECURITY_FLAVORS = new HashSet<>(
+          Arrays.asList(XACML_POLICY_EPISODE, XACML_POLICY_SERIES));
+
   private WorkflowPropertiesUtil() {
   }
 
@@ -101,18 +108,20 @@ public final class WorkflowPropertiesUtil {
           final Map<String, String> properties) {
 
     // Properties can only be created if a snapshot exists. Hence, we create a snapshot if there is none right now.
-    // Although, to avoid lots of potentially slow IO operations, we archive an empty media package.
+    // Although, to avoid lots of potentially slow IO operations, we archive a slimmer version of the media package,
+    // containing only metadata and security attachments.
     if (!assetManager.snapshotExists(mediaPackage.getIdentifier().toString())) {
-      MediaPackage simplifiedMediaPackage = new MediaPackageBuilderImpl().createNew(mediaPackage.getIdentifier());
-      for (Catalog catalog: mediaPackage.getCatalogs()) {
-        simplifiedMediaPackage.add(catalog);
+      MediaPackage simplifiedMediaPackage = (MediaPackage) mediaPackage.clone();
+      for (MediaPackageElement element : mediaPackage.getElements()) {
+        if (element instanceof Catalog) {
+          continue;
+        }
+        if (element instanceof Attachment && SECURITY_FLAVORS.contains(element.getFlavor())) {
+          continue;
+        }
+        simplifiedMediaPackage.remove(element);
       }
-      for (Attachment attachment: mediaPackage.getAttachments(XACML_POLICY_EPISODE)) {
-        simplifiedMediaPackage.add(attachment);
-      }
-      for (Attachment attachment: mediaPackage.getAttachments(XACML_POLICY_SERIES)) {
-        simplifiedMediaPackage.add(attachment);
-      }
+
       assetManager.takeSnapshot(DEFAULT_OWNER, simplifiedMediaPackage);
     }
 

@@ -20,23 +20,29 @@
  */
 package org.opencastproject.transcription.persistence;
 
+import static org.opencastproject.db.Queries.namedQuery;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
-import javax.persistence.Query;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -136,160 +142,94 @@ public class TranscriptionJobControlDto implements Serializable {
   /**
    * Store new job control
    */
-  public static TranscriptionJobControlDto store(
-      EntityManager em,
+  public static Function<EntityManager, TranscriptionJobControlDto> storeQuery(
       String mediaPackageId,
       String trackId,
       String transcriptionJobId,
       String jobStatus,
       long trackDuration,
       Date dateExpected,
-      long providerId
-  ) throws TranscriptionDatabaseException {
-    TranscriptionJobControlDto dto = new TranscriptionJobControlDto(mediaPackageId, trackId, transcriptionJobId,
-            new Date(), dateExpected, null, jobStatus, trackDuration, providerId);
-
-    EntityTransaction tx = em.getTransaction();
-    try {
-      tx.begin();
+      long providerId) {
+    return em -> {
+      TranscriptionJobControlDto dto = new TranscriptionJobControlDto(mediaPackageId, trackId, transcriptionJobId,
+          new Date(), dateExpected, null, jobStatus, trackDuration, providerId);
       em.persist(dto);
-      tx.commit();
       return dto;
-    } catch (Exception e) {
-      if (tx.isActive()) {
-        tx.rollback();
-      }
-      throw new TranscriptionDatabaseException(e);
-    } finally {
-      em.close();
-    }
+    };
   }
 
   /**
    * Find a job control by its number.
    */
-  public static TranscriptionJobControlDto findByJob(EntityManager em, String jobId)
-          throws TranscriptionDatabaseException {
-    Query query = null;
-    try {
-      query = em.createNamedQuery("TranscriptionJobControl.findByJob");
-      query.setParameter("transcriptionJobId", jobId);
-      return (TranscriptionJobControlDto) query.getSingleResult();
-    } catch (NoResultException e) {
-      return null; // Not found
-    } catch (Exception e) {
-      throw new TranscriptionDatabaseException(e);
-    }
+  public static Function<EntityManager, Optional<TranscriptionJobControlDto>> findByJobQuery(String jobId) {
+    return namedQuery.findOpt(
+        "TranscriptionJobControl.findByJob",
+        TranscriptionJobControlDto.class,
+        Pair.of("transcriptionJobId", jobId)
+    );
   }
 
   /**
    * Find all job controls by media package.
    */
-  @SuppressWarnings("unchecked")
-  public static List<TranscriptionJobControlDto> findByMediaPackage(EntityManager em, final String mediaPackageId)
-          throws TranscriptionDatabaseException {
-    Query query = null;
-    try {
-      query = em.createNamedQuery("TranscriptionJobControl.findByMediaPackage");
-      query.setParameter("mediaPackageId", mediaPackageId);
-      return query.getResultList();
-    } catch (Exception e) {
-      throw new TranscriptionDatabaseException(e);
-    }
+  public static Function<EntityManager, List<TranscriptionJobControlDto>> findByMediaPackageQuery(
+      final String mediaPackageId) {
+    return namedQuery.findAll(
+        "TranscriptionJobControl.findByMediaPackage",
+        TranscriptionJobControlDto.class,
+        Pair.of("mediaPackageId", mediaPackageId)
+    );
   }
 
   /**
    * Find all job controls by status.
    */
-  @SuppressWarnings("unchecked")
-  public static List<TranscriptionJobControlDto> findByStatus(EntityManager em, final String... status)
-          throws TranscriptionDatabaseException {
-    Collection<String> statusCol = new HashSet<String>();
+  public static Function<EntityManager, List<TranscriptionJobControlDto>> findByStatusQuery(final String... status) {
     if (status == null) {
-      throw new TranscriptionDatabaseException("status is null");
+      throw new IllegalArgumentException("status is null");
     }
-    for (String st : status) {
-      statusCol.add(st);
-    }
-    Query query = null;
-    try {
-      query = em.createNamedQuery("TranscriptionJobControl.findByStatus");
-      query.setParameter("status", statusCol);
-      return query.getResultList();
-    } catch (Exception e) {
-      throw new TranscriptionDatabaseException(e);
-    }
+    Collection<String> statusCol = new HashSet<>(Arrays.asList(status));
+    return namedQuery.findAll(
+        "TranscriptionJobControl.findByStatus",
+        TranscriptionJobControlDto.class,
+        Pair.of("status", statusCol)
+    );
   }
 
   /**
    * Find all job controls by media package and status.
    */
-  @SuppressWarnings("unchecked")
-  public static List<TranscriptionJobControlDto> findByMediaPackageTrackAndStatus(EntityManager em,
-          final String mediaPackageId, String trackId, final String... status) throws TranscriptionDatabaseException {
-    Collection<String> statusCol = new HashSet<String>();
-    for (String st : status) {
-      statusCol.add(st);
-    }
-    Query query = null;
-    try {
-      query = em.createNamedQuery("TranscriptionJobControl.findByMediaPackageTrackAndStatus");
-      query.setParameter("mediaPackageId", mediaPackageId);
-      query.setParameter("trackId", trackId);
-      query.setParameter("status", statusCol);
-      return query.getResultList();
-    } catch (Exception e) {
-      throw new TranscriptionDatabaseException(e);
-    }
+  public static Function<EntityManager, List<TranscriptionJobControlDto>> findByMediaPackageTrackAndStatusQuery(
+      final String mediaPackageId, String trackId, final String... status) {
+    Collection<String> statusCol = new HashSet<>(Arrays.asList(status));
+    return namedQuery.findAll(
+        "TranscriptionJobControl.findByMediaPackageTrackAndStatus",
+        TranscriptionJobControlDto.class,
+        Pair.of("mediaPackageId", mediaPackageId),
+        Pair.of("trackId", trackId),
+        Pair.of("status", statusCol)
+    );
   }
 
   /**
    * Update job status
    */
-  public static void updateStatus(EntityManager em, String jobId, String status) throws TranscriptionDatabaseException {
-    TranscriptionJobControlDto dto = findByJob(em, jobId);
-    if (dto == null) {
-      throw new TranscriptionDatabaseException("Job not found in database: " + jobId);
-    }
-
-    EntityTransaction tx = em.getTransaction();
-    try {
-      tx.begin();
+  public static Consumer<EntityManager> updateStatusQuery(String jobId, String status) {
+    return em -> {
+      TranscriptionJobControlDto dto = findByJobQuery(jobId).apply(em)
+          .orElseThrow(NoResultException::new);
       dto.setStatus(status);
       if (TranscriptionJobControl.Status.TranscriptionComplete.name().equals(status)) {
         dto.setDateCompleted(new Date());
       }
       em.merge(dto);
-      tx.commit();
-    } catch (Exception e) {
-      if (tx.isActive()) {
-        tx.rollback();
-      }
-      throw new TranscriptionDatabaseException(e);
-    } finally {
-      em.close();
-    }
+    };
   }
 
-  public static void delete(EntityManager em, String jobId) throws TranscriptionDatabaseException {
-    TranscriptionJobControlDto dto = findByJob(em, jobId);
-    if (dto == null) {
-      return;
-    }
-
-    EntityTransaction tx = em.getTransaction();
-    try {
-      tx.begin();
-      em.remove(dto);
-      tx.commit();
-    } catch (Exception e) {
-      if (tx.isActive()) {
-        tx.rollback();
-      }
-      throw new TranscriptionDatabaseException(e);
-    } finally {
-      em.close();
-    }
+  public static Consumer<EntityManager> delete(String jobId) {
+    return em -> findByJobQuery(jobId)
+        .apply(em)
+        .ifPresent(em::remove);
   }
 
   public void setStatus(String status) {
@@ -299,5 +239,4 @@ public class TranscriptionJobControlDto implements Serializable {
   public void setDateCompleted(Date dateCompleted) {
     this.dateCompleted = dateCompleted;
   }
-
 }

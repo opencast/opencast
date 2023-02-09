@@ -84,17 +84,17 @@ public class AmberscriptTranscriptionRestService extends AbstractJobProducerEndp
     logger.debug("activate()");
   }
 
-  @Reference(name = "transcriptionService")
+  @Reference
   public void setTranscriptionService(AmberscriptTranscriptionService service) {
     this.service = service;
   }
 
-  @Reference(name = "serviceRegistry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry service) {
     this.serviceRegistry = service;
   }
 
-  @Reference(name = "workingFileRepository")
+  @Reference
   public void setWorkingFileRepository(WorkingFileRepository wfr) {
     this.wfr = wfr;
   }

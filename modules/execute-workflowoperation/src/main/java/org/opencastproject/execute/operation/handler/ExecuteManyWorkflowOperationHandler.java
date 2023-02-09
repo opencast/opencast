@@ -372,7 +372,7 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
    *
    * @param service
    */
-  @Reference(name = "execute")
+  @Reference
   public void setExecuteService(ExecuteService service) {
     executeService = service;
   }
@@ -382,7 +382,7 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
    *
    * @param workspace
    */
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -393,12 +393,12 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
    * @param mediaInspectionService
    *          an instance of the media inspection service
    */
-  @Reference(name = "inspection-service")
+  @Reference
   protected void setMediaInspectionService(MediaInspectionService mediaInspectionService) {
     inspectionService = mediaInspectionService;
   }
 
-  @Reference(name = "registry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

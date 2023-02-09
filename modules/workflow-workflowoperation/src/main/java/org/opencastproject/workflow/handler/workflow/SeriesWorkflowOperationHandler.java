@@ -132,7 +132,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
    * @param authorizationService
    *          the authorization service
    */
-  @Reference(name = "authorization")
+  @Reference
   protected void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -143,7 +143,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
    * @param seriesService
    *          the series service
    */
-  @Reference(name = "series")
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -154,7 +154,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
    * @param workspace
    *          the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -165,14 +165,13 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
    * @param securityService
    *          the securityService
    */
-  @Reference(name = "SecurityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi callback to add {@link SeriesCatalogUIAdapter} instance. */
   @Reference(
-      name = "SeriesCatalogUIAdapter",
       cardinality = ReferenceCardinality.MULTIPLE,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "removeCatalogUIAdapter"
@@ -186,7 +185,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
     seriesCatalogUIAdapters.remove(catalogUIAdapter);
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);
@@ -375,7 +374,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
   private static final Fn2<SeriesCatalogUIAdapter, String, Boolean> seriesOrganizationFilter = new Fn2<SeriesCatalogUIAdapter, String, Boolean>() {
     @Override
     public Boolean apply(SeriesCatalogUIAdapter catalogUIAdapter, String organization) {
-      return catalogUIAdapter.getOrganization().equals(organization);
+      return catalogUIAdapter.handlesOrganization(organization);
     }
   };
 

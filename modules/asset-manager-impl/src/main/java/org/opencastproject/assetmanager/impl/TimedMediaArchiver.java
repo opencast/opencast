@@ -187,7 +187,7 @@ public class TimedMediaArchiver extends AbstractScanner implements ManagedServic
     return SCANNER_NAME;
   }
 
-  @Reference(name = "AssetManager")
+  @Reference
   public void setAssetManager(AssetManager am) {
     this.assetManager = am;
   }
@@ -214,19 +214,19 @@ public class TimedMediaArchiver extends AbstractScanner implements ManagedServic
     }
   }
 
-  @Reference(name = "OrganizationDirectoryService")
+  @Reference
   @Override
   public void bindOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     super.bindOrganizationDirectoryService(organizationDirectoryService);
   }
 
-  @Reference(name = "SecurityService")
+  @Reference
   @Override
   public void bindSecurityService(SecurityService securityService) {
     super.bindSecurityService(securityService);
   }
 
-  @Reference(name = "serviceRegistry")
+  @Reference
   @Override
   public void bindServiceRegistry(ServiceRegistry serviceRegistry) {
     super.bindServiceRegistry(serviceRegistry);

@@ -1,1 +1,0 @@
-/* This is a example Javascript library. Please remove! */

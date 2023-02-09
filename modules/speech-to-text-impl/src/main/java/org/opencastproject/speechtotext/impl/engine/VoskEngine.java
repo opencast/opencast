@@ -25,6 +25,7 @@ import org.opencastproject.speechtotext.api.SpeechToTextEngine;
 import org.opencastproject.speechtotext.api.SpeechToTextEngineException;
 import org.opencastproject.util.IoSupport;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -34,19 +35,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
 /** Vosk implementation of the Speech-to-text engine interface. */
 @Component(
-    immediate = true,
-    service = {
-        SpeechToTextEngine.class
-    },
     property = {
         "service.description=Vosk implementation of the SpeechToTextEngine interface",
-        "service.pid=org.opencastproject.speechtotext.impl.engine.VoskEngine"
+        "enginetype=vosk"
     }
 )
 public class VoskEngine implements SpeechToTextEngine {
@@ -84,15 +81,15 @@ public class VoskEngine implements SpeechToTextEngine {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.speechtotext.api.SpeechToTextEngine#generateSubtitlesFile(URI, File, String)
+   * @see org.opencastproject.speechtotext.api.SpeechToTextEngine#generateSubtitlesFile(File, File, String)
    */
   @Override
-  public File generateSubtitlesFile(URI mediaFile, File preparedOutputFile, String language)
+  public File generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language)
           throws SpeechToTextEngineException {
 
     final List<String> command = Arrays.asList(
             voskExecutable,
-            "-i", mediaFile.toString(),
+            "-i", mediaFile.getAbsolutePath(),
             "-o", preparedOutputFile.getAbsolutePath(),
             "-l", language);
     logger.info("Executing Vosk's transcription command: {}", command);
@@ -106,8 +103,12 @@ public class VoskEngine implements SpeechToTextEngine {
       // wait until the task is finished
       int exitCode = process.waitFor();
       if (exitCode != 0) {
+        var error = "";
+        try (var errorStream = process.getInputStream()) {
+          error = "\n Output:\n" + IOUtils.toString(errorStream, StandardCharsets.UTF_8);
+        }
         throw new SpeechToTextEngineException(
-                String.format("Vosk exited abnormally with status %d (command: %s)", exitCode, command));
+                String.format("Vosk exited abnormally with status %d (command: %s)%s", exitCode, command, error));
       }
       if (!preparedOutputFile.isFile()) {
         throw new SpeechToTextEngineException("Vosk produced no output");

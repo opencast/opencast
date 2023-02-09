@@ -116,7 +116,7 @@ public class UserEndpoint {
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -125,7 +125,7 @@ public class UserEndpoint {
    * @param jpaUserAndRoleProvider
    *          the persistenceProperties to set
    */
-  @Reference(name = "JpaUserAndRoleProvider")
+  @Reference
   public void setJpaUserAndRoleProvider(JpaUserAndRoleProvider jpaUserAndRoleProvider) {
     this.jpaUserAndRoleProvider = jpaUserAndRoleProvider;
   }

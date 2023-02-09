@@ -32,12 +32,24 @@ import java.util.Map;
 public interface CatalogUIAdapter {
 
   /**
-   * Returns the name of the organization (tenant) this catalog UI adapter belongs to or {@code Opt.none()} if this is a
+   * Wildcard to specify tenant-agnostic catalog UI adaptors.
+   */
+  String ORGANIZATION_WILDCARD = "*";
+
+  /**
+   * Returns the name of the organization (tenant) this catalog UI adapter belongs to or {@value #ORGANIZATION_WILDCARD} if this is a
    * tenant-agnostic adapter.
    *
-   * @return The organization name or {@code Opt.none()}
+   * @return The organization name or {@value #ORGANIZATION_WILDCARD}
    */
   String getOrganization();
+
+  /**
+   * Check if the catalog UI adapter belongs to a tenant.
+   *
+   * @return true if adapter belongs to tenant.
+   */
+  boolean handlesOrganization(String organization);
 
   /**
    * Returns the media type of catalogs managed by this catalog UI adapter.

@@ -37,6 +37,8 @@ import static org.opencastproject.external.util.SchedulingUtils.getConflictingEv
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
@@ -54,7 +56,6 @@ import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.ExternalMetadataUtils;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
-import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.util.EventHttpServletRequest;
 import org.opencastproject.index.service.impl.util.EventUtils;
@@ -110,6 +111,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workflow.api.WorkflowService;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
@@ -119,6 +121,11 @@ import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 import com.entwinemedia.fn.data.json.Jsons.Functions;
 
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -177,7 +184,8 @@ import javax.ws.rs.core.Response.Status;
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
-            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0 })
+            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
+            ApiMediaType.VERSION_1_9_0 })
 @RestService(name = "externalapievents", title = "External API Events Service", notes = {},
              abstractText = "Provides resources and operations related to the events")
 @Component(
@@ -228,42 +236,49 @@ public class EventsEndpoint implements ManagedService {
   };
 
   /* OSGi service references */
+  private AssetManager assetManager;
   private ElasticsearchIndex elasticsearchIndex;
   private IndexService indexService;
   private IngestService ingestService;
   private SecurityService securityService;
-  private CommonEventCatalogUIAdapter eventCatalogUIAdapter;
   private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<>();
   private UrlSigningService urlSigningService;
   private SchedulerService schedulerService;
   private CaptureAgentStateService agentStateService;
+  private WorkflowService workflowService;
 
   /** OSGi DI */
-  @Reference(name = "ElasticsearchIndex")
+  @Reference
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
+  }
+
+  /** OSGi DI */
+  @Reference
   void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
     this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /** OSGi DI */
-  @Reference(name = "IndexService")
+  @Reference
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
   /** OSGi DI */
-  @Reference(name = "IngestService")
+  @Reference
   public void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }
 
   /** OSGi DI */
-  @Reference(name = "SecurityService")
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI */
-  @Reference(name = "UrlSigningService")
+  @Reference
   public void setUrlSigningService(UrlSigningService urlSigningService) {
     this.urlSigningService = urlSigningService;
   }
@@ -276,20 +291,13 @@ public class EventsEndpoint implements ManagedService {
     return schedulerService;
   }
 
-  @Reference(name = "SchedulerService")
+  @Reference
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
   }
 
   /** OSGi DI. */
-  @Reference(name = "CommonEventCatalogUIAdapter")
-  public void setCommonEventCatalogUIAdapter(CommonEventCatalogUIAdapter eventCatalogUIAdapter) {
-    this.eventCatalogUIAdapter = eventCatalogUIAdapter;
-  }
-
-  /** OSGi DI. */
   @Reference(
-      name = "EventCatalogUIAdapter",
       cardinality = ReferenceCardinality.MULTIPLE,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "removeCatalogUIAdapter"
@@ -309,10 +317,17 @@ public class EventsEndpoint implements ManagedService {
   }
 
   /** OSGi DI */
-  @Reference(name = "agentStateService")
+  @Reference
   public void setAgentStateService(CaptureAgentStateService agentStateService) {
     this.agentStateService = agentStateService;
   }
+
+  /** OSGi DI */
+  @Reference
+  public void setWorkflowService(WorkflowService workflowService) {
+    this.workflowService = workflowService;
+  }
+
 
   private List<EventCatalogUIAdapter> getEventCatalogUIAdapters() {
     return new ArrayList<>(getEventCatalogUIAdapters(getSecurityService().getOrganization().getId()));
@@ -321,7 +336,7 @@ public class EventsEndpoint implements ManagedService {
   public List<EventCatalogUIAdapter> getEventCatalogUIAdapters(String organization) {
     List<EventCatalogUIAdapter> adapters = new ArrayList<>();
     for (EventCatalogUIAdapter adapter : catalogUIAdapters) {
-      if (organization.equals(adapter.getOrganization())) {
+      if (adapter.handlesOrganization(organization)) {
         adapters.add(adapter);
       }
     }
@@ -482,16 +497,9 @@ public class EventsEndpoint implements ManagedService {
     if (event.isNone()) {
       return RestUtil.R.notFound(id);
     }
-    final Runnable doOnNotFound = () -> {
-      try {
-        elasticsearchIndex.delete(Event.DOCUMENT_TYPE, id, getSecurityService().getOrganization().getId());
-      } catch (SearchIndexException e) {
-        logger.error("error removing event {}: {}", id, e);
-      }
-    };
     final IndexService.EventRemovalResult result;
     try {
-      result = indexService.removeEvent(event.get(), doOnNotFound, retractWorkflowId);
+      result = indexService.removeEvent(event.get(), retractWorkflowId);
     } catch (WorkflowDatabaseException e) {
       logger.error("Workflow database is not reachable. This may be a temporary problem.");
       return RestUtil.R.serverError();
@@ -507,7 +515,6 @@ public class EventsEndpoint implements ManagedService {
       case GENERAL_FAILURE:
         return Response.serverError().build();
       case NOT_FOUND:
-        doOnNotFound.run();
         return RestUtil.R.notFound(id);
       default:
         throw new RuntimeException("Unknown EventRemovalResult type: " + result.name());
@@ -706,7 +713,7 @@ public class EventsEndpoint implements ManagedService {
           @RestParameter(name = "withscheduling", isRequired = false, description = "Whether the scheduling information should be included in the response.", type = Type.BOOLEAN),
           @RestParameter(name = "withpublications", isRequired = false, description = "Whether the publication ids and urls should be included in the response.", type = Type.BOOLEAN),
           @RestParameter(name = "onlyWithWriteAccess", isRequired = false, description = "Whether only to get the events to which we have write access.", type = Type.BOOLEAN),
-          @RestParameter(name = "filter", isRequired = false, description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form <Filter Name>:<Value to Filter With>.", type = STRING),
+          @RestParameter(name = "filter", isRequired = false, description = "Usage [Filter Name]:[Value to Filter With]. Multiple filters can be used by combining them with commas \",\". Available Filters: presenters, contributors, location, textFilter, series, subject. If API ver > 1.1.0 also: identifier, title, description, series_name, language, created, license, rightsholder, is_part_of, source, status, agent_id, start, technical_start.", type = STRING),
           @RestParameter(name = "sort", description = "Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory.", isRequired = false, type = STRING),
           @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.", isRequired = false, type = RestParameter.Type.INTEGER),
           @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false, type = RestParameter.Type.INTEGER) }, responses = {
@@ -1338,7 +1345,8 @@ public class EventsEndpoint implements ManagedService {
   protected Opt<MetadataList> getEventMetadata(Event event) throws IndexServiceException, Exception {
     MetadataList metadataList = new MetadataList();
     List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
-    catalogUIAdapters.remove(this.eventCatalogUIAdapter);
+    EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
+    catalogUIAdapters.remove(eventCatalogUIAdapter);
     MediaPackage mediaPackage = indexService.getEventMediapackage(event);
     if (catalogUIAdapters.size() > 0) {
       for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
@@ -1375,6 +1383,7 @@ public class EventsEndpoint implements ManagedService {
                 String.format("Unable to parse type '%s' as a flavor so unable to find the matching catalog.", type));
       }
       // Try the main catalog first as we load it from the index.
+      EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
       if (flavor.get().equals(eventCatalogUIAdapter.getFlavor())) {
         DublinCoreMetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter);
         ExternalMetadataUtils.changeSubjectToSubjects(collection);
@@ -1441,6 +1450,7 @@ public class EventsEndpoint implements ManagedService {
     for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
       MetadataList metadataList = new MetadataList();
       // Try the main catalog first as we load it from the index.
+      EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
       if (flavor.get().equals(eventCatalogUIAdapter.getFlavor())) {
         collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter);
         adapter = eventCatalogUIAdapter;
@@ -1570,6 +1580,7 @@ public class EventsEndpoint implements ManagedService {
         return R.badRequest(
                 String.format("Unable to parse type '%s' as a flavor so unable to find the matching catalog.", type));
       }
+      EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
       if (flavor.get().equals(eventCatalogUIAdapter.getFlavor())) {
         return Response
                 .status(Status.FORBIDDEN).entity(String
@@ -1858,7 +1869,7 @@ public class EventsEndpoint implements ManagedService {
   @Path("{eventId}/scheduling")
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
               ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
-              ApiMediaType.VERSION_1_7_0 })
+              ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0 })
   @RestQuery(name = "geteventscheduling", description = "Returns an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, responses = {
       @RestResponse(description = "The scheduling information for the specified event is returned.", responseCode = HttpServletResponse.SC_OK),
@@ -1888,7 +1899,7 @@ public class EventsEndpoint implements ManagedService {
   @Path("{eventId}/scheduling")
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
               ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
-              ApiMediaType.VERSION_1_7_0 })
+              ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0 })
   @RestQuery(name = "updateeventscheduling", description = "Update an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = Type.STRING) }, restParameters = {
       @RestParameter(name = "scheduling", isRequired = true, description = "Scheduling Information", type = Type.STRING),
@@ -1963,5 +1974,102 @@ public class EventsEndpoint implements ManagedService {
           arr(convertConflictingEvents(Optional.of(id), conflictingEvents, indexService, elasticsearchIndex))));
     }
     return Optional.empty();
+  }
+
+  @POST
+  @Path("{eventId}/track")
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
+  @RestQuery(name = "updateFlavorWithTrack", description = "Update an events track for a given flavor", returnDescription = "",
+          pathParameters = {
+                  @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) },
+          restParameters = {
+                  @RestParameter(description = "Flavor to add track to, e.g. captions/source+en", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+                  @RestParameter(description = "If true, all other tracks in the specified flavor are REMOVED", isRequired = true, name = "overwriteExisting", type = RestParameter.Type.BOOLEAN),
+                  @RestParameter(description = "The track file", isRequired = true, name = "track", type = RestParameter.Type.FILE),
+          },
+          responses = {
+                  @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND),
+                  @RestResponse(description = "The track has been added to the event.", responseCode = HttpServletResponse.SC_OK),
+                  @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          })
+  public Response updateFlavorWithTrack(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
+          @Context HttpServletRequest request) {
+    logger.debug("updateFlavorWithTrack called");
+    try {
+      boolean overwriteExisting = false;
+      MediaPackageElementFlavor tmpFlavor = MediaPackageElementFlavor.parseFlavor("addTrack/temporary");
+      MediaPackageElementFlavor newFlavor = null;
+      Opt<Event> event;
+
+      try {
+        event = indexService.getEvent(id, elasticsearchIndex);
+      } catch (SearchIndexException e) {
+        return RestUtil.R.badRequest(String.format("Error while searching for event with id %s; %s", id, e.getMessage()));
+      }
+
+      if (event.isNone()) {
+        return ApiResponses.notFound(String.format("Unable to find event with id '%s'", id));
+      }
+      MediaPackage mp = indexService.getEventMediapackage(event.get());
+
+      try {
+        if (workflowService.mediaPackageHasActiveWorkflows(mp.getIdentifier().toString())) {
+          return RestUtil.R.conflict(String.format("Cannot update while a workflow is running on event '%s'", id));
+        }
+      } catch (WorkflowDatabaseException e) {
+        return RestUtil.R.serverError();
+      }
+
+      if (!ServletFileUpload.isMultipartContent(request)) {
+        throw new IllegalArgumentException("No multipart content");
+      }
+      for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
+        FileItemStream item = iter.next();
+        String fieldName = item.getFieldName();
+        if (item.isFormField()) {
+          if ("flavor".equals(fieldName)) {
+            String flavorString = Streams.asString(item.openStream());
+            try {
+              newFlavor = MediaPackageElementFlavor.parseFlavor(flavorString);
+            } catch (IllegalArgumentException e) {
+              return RestUtil.R.badRequest(String.format("Could not parse flavor %s; %s", flavorString, e.getMessage()));
+            }
+          } else if ("overwriteExisting".equals(fieldName)) {
+            overwriteExisting = Boolean.parseBoolean(Streams.asString(item.openStream()));
+          }
+        } else {
+          // Add track with temporary flavor
+          if ("track".equals(item.getFieldName())) {
+            mp = ingestService.addTrack(item.openStream(), item.getName(), tmpFlavor, mp);
+          }
+        }
+      }
+
+      if (overwriteExisting) {
+        // remove existing attachments of the new flavor
+        Track[] existing = mp.getTracks(newFlavor);
+        for (int i = 0; i < existing.length; i++) {
+          mp.remove(existing[i]);
+          logger.debug("Overwriting existing asset {} {}", tmpFlavor, newFlavor);
+        }
+      }
+      // correct the flavor of the new attachment
+      for (Track track : mp.getTracks(tmpFlavor)) {
+        track.setFlavor(newFlavor);
+      }
+      logger.debug("Updated asset {} {}", tmpFlavor, newFlavor);
+
+      try {
+        assetManager.takeSnapshot(mp);
+      } catch (AssetManagerException e) {
+        logger.error("Error while adding the updated media package ({}) to the archive", mp.getIdentifier(), e);
+        return RestUtil.R.badRequest(e.getMessage());
+      }
+
+      return Response.status(Status.OK).build();
+    } catch (IllegalArgumentException | IOException | FileUploadException | IndexServiceException | IngestException
+            | MediaPackageException e) {
+      return RestUtil.R.badRequest(String.format("Could not add track: %s", e.getMessage()));
+    }
   }
 }

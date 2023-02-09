@@ -14,7 +14,6 @@ import { logger } from "../utils/logger";
  * This information is shown in the bell in the header.
  * */
 
-export const AMQ_NAME = "ActiveMQ";
 export const STATES_NAMES = "Service States";
 export const BACKEND_NAMES = "Backend Services";
 
@@ -36,40 +35,6 @@ export const fetchHealthStatus = () => async (dispatch) => {
 		await dispatch(loadHealthStatus(healthStatus));
 		await dispatch(resetNumError());
 		await dispatch(setError(false));
-
-		// Get current state of Broker
-		axios
-			.get("/broker/status")
-			.then(function (response) {
-				let healthStatus;
-				if (response.status === 204) {
-					healthStatus = {
-						name: AMQ_NAME,
-						status: OK,
-						error: false,
-					};
-				} else {
-					healthStatus = {
-						name: AMQ_NAME,
-						status: response.statusText,
-						error: true,
-					};
-
-					dispatch(addNumError(1));
-				}
-				dispatch(loadHealthStatus(healthStatus));
-			})
-			.catch(function (err) {
-				let healthStatus = {
-					name: AMQ_NAME,
-					status: err.message,
-					error: true,
-				};
-				dispatch(loadHealthStatus(healthStatus));
-
-				dispatch(setError(true));
-				dispatch(addNumError(1));
-			});
 
 		// Get current state of services
 		axios

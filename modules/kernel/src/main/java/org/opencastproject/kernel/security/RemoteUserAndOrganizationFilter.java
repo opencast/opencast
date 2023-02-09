@@ -278,7 +278,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "securityService")
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -289,7 +289,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
    * @param organizationDirectory
    *          the organization directory
    */
-  @Reference(name = "orgDirectory")
+  @Reference
   void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectory = organizationDirectory;
   }
@@ -300,7 +300,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
    * @param userDirectory
    *          the user directory
    */
-  @Reference(name = "userDirectoryService")
+  @Reference
   void setUserDirectoryService(UserDirectoryService userDirectory) {
     this.userDirectory = userDirectory;
   }

@@ -138,7 +138,7 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
         exportSegmentsDuration = BooleanUtils.toBoolean(exportSegmentsDurationString);
       } catch (IllegalArgumentException e) {
         exportSegmentsDuration = false;
-        logger.warn("Unable to parse %s option value %s. Deactivating export of workflow properties.",
+        logger.warn("Unable to parse {} option value {}. Deactivating export of workflow properties.",
                 EXPORT_SEGMENTS_DURATION, exportSegmentsDurationString);
       }
     }
@@ -261,7 +261,7 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
                 "Failed to get smil from silence detection job for track %s", sourceTrack.getIdentifier()));
       }
     }
-    logger.debug("Finished silence detection workflow operation for mediapackage {}", mp.getIdentifier().toString());
+    logger.debug("Finished silence detection workflow operation for media package {}", mp.getIdentifier());
     return createResult(mp, exportWorkflowProperties, Action.CONTINUE, 0);
   }
 
@@ -288,22 +288,22 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
     logger.info("Registering silence detection workflow operation handler");
   }
 
-  @Reference(name = "detectionService")
+  @Reference
   public void setDetectionService(SilenceDetectionService detectionService) {
     this.detetionService = detectionService;
   }
 
-  @Reference(name = "SmilService")
+  @Reference
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }
 
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

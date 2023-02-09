@@ -21,7 +21,6 @@
 
 package org.opencastproject.editor;
 
-import static com.entwinemedia.fn.Stream.$;
 import static java.util.Collections.emptyList;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static org.opencastproject.util.data.Tuple.tuple;
@@ -44,6 +43,7 @@ import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.util.EventUtils;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -52,6 +52,7 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataJson;
@@ -72,6 +73,7 @@ import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.smil.entity.media.api.SmilMediaObject;
 import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
 import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
+import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
@@ -84,10 +86,11 @@ import org.opencastproject.workflow.api.WorkflowUtil;
 import org.opencastproject.workflow.handler.distribution.InternalPublicationChannel;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -98,14 +101,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import java.awt.datatransfer.MimeTypeParseException;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -114,7 +123,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.WebApplicationException;
@@ -156,23 +167,40 @@ public class EditorServiceImpl implements EditorService {
   private String previewVideoSubtype;
   private String previewTag;
   private String previewSubtype;
+  private String waveformSubtype;
+  private String thumbnailSubType;
   private MediaPackageElementFlavor smilSilenceFlavor;
   private ElasticsearchIndex searchIndex;
+  private MediaPackageElementFlavor captionsFlavor;
+  private String thumbnailWfProperty;
+  private List<MediaPackageElementFlavor> thumbnailSourcePrimary;
+  private String distributionDirectory;
+  private Boolean localPublication = null;
 
   private static final String DEFAULT_PREVIEW_SUBTYPE = "prepared";
   private static final String DEFAULT_PREVIEW_TAG = "editor";
+  private static final String DEFAULT_WAVEFORM_SUBTYPE = "waveform";
   private static final String DEFAULT_SMIL_CATALOG_FLAVOR = "smil/cutting";
   private static final String DEFAULT_SMIL_CATALOG_TAGS = "archive";
   private static final String DEFAULT_SMIL_SILENCE_FLAVOR = "*/silence";
   private static final String DEFAULT_PREVIEW_VIDEO_SUBTYPE = "video+preview";
+  private static final String DEFAULT_CAPTIONS_FLAVOR = "captions/*";
+  private static final String DEFAULT_THUMBNAIL_SUBTYPE = "player+preview";
+  private static final String DEFAULT_THUMBNAIL_WF_PROPERTY = "thumbnail_edited";
+  private static final List<MediaPackageElementFlavor> DEFAULT_THUMBNAIL_PRIORITY_FLAVOR = new ArrayList<>();
 
   public static final String OPT_PREVIEW_SUBTYPE = "preview.subtype";
   public static final String OPT_PREVIEW_TAG = "preview.tag";
+  public static final String OPT_WAVEFORM_SUBTYPE = "waveform.subtype";
   public static final String OPT_SMIL_CATALOG_FLAVOR = "smil.catalog.flavor";
   public static final String OPT_SMIL_CATALOG_TAGS = "smil.catalog.tags";
   public static final String OPT_SMIL_SILENCE_FLAVOR = "smil.silence.flavor";
-
   public static final String OPT_PREVIEW_VIDEO_SUBTYPE = "preview.video.subtype";
+  public static final String OPT_CAPTIONS_FLAVOR = "captions.flavor";
+  public static final String OPT_THUMBNAILSUBTYPE = "thumbnail.subtype";
+  public static final String OPT_THUMBNAIL_WF_PROPERTY = "thumbnail.workflow.property";
+  public static final String OPT_THUMBNAIL_PRIORITY_FLAVOR = "thumbnail.priority.flavor";
+  public static final String OPT_LOCAL_PUBLICATION = "publication.local";
 
   private final Set<String> smilCatalogTagSet = new HashSet<>();
 
@@ -245,6 +273,14 @@ public class EditorServiceImpl implements EditorService {
     return previewTag;
   }
 
+  private String getWaveformSubtype() {
+    return waveformSubtype;
+  }
+
+  private String getThumbnailSubtype() {
+    return thumbnailSubType;
+  }
+
   @Activate
   @Modified
   public void activate(ComponentContext cc) {
@@ -262,6 +298,10 @@ public class EditorServiceImpl implements EditorService {
     // Preview subtype
     previewSubtype = Objects.toString(properties.get(OPT_PREVIEW_SUBTYPE), DEFAULT_PREVIEW_SUBTYPE);
     logger.debug("Preview subtype configuration set to '{}'", previewSubtype);
+
+    // Waveform subtype
+    waveformSubtype = Objects.toString(properties.get(OPT_WAVEFORM_SUBTYPE), DEFAULT_WAVEFORM_SUBTYPE);
+    logger.debug("Waveform subtype configuration set to '{}'", waveformSubtype);
 
     // SMIL catalog flavor
     smilCatalogFlavor = MediaPackageElementFlavor.parseFlavor(
@@ -284,6 +324,58 @@ public class EditorServiceImpl implements EditorService {
     // Preview Video subtype
     previewVideoSubtype =  Objects.toString(properties.get(OPT_PREVIEW_VIDEO_SUBTYPE), DEFAULT_PREVIEW_VIDEO_SUBTYPE);
     logger.debug("Preview video subtype set to '{}'", previewVideoSubtype);
+
+    // Flavor for captions
+    captionsFlavor = MediaPackageElementFlavor.parseFlavor(
+            StringUtils.defaultString((String) properties.get(OPT_CAPTIONS_FLAVOR), DEFAULT_CAPTIONS_FLAVOR));
+    logger.debug("Caption flavor set to '{}'", captionsFlavor);
+
+    thumbnailSubType =  Objects.toString(properties.get(OPT_THUMBNAILSUBTYPE), DEFAULT_THUMBNAIL_SUBTYPE);
+    logger.debug("Thumbnail subtype set to '{}'", thumbnailSubType);
+
+    thumbnailWfProperty = Objects.toString(properties.get(OPT_THUMBNAIL_WF_PROPERTY), DEFAULT_THUMBNAIL_WF_PROPERTY);
+    logger.debug("Thumbnail workflow property set to '{}'", thumbnailWfProperty);
+
+    String thumbnailPriorities = Objects.toString(properties.get(OPT_THUMBNAIL_PRIORITY_FLAVOR));
+    if ("null".equals(thumbnailPriorities)  || thumbnailPriorities.isEmpty()) {
+      thumbnailSourcePrimary = DEFAULT_THUMBNAIL_PRIORITY_FLAVOR;
+    } else {
+      thumbnailSourcePrimary = Arrays.stream(thumbnailPriorities.split(",", -1))
+                                .map(MediaPackageElementFlavor::parseFlavor)
+                                .collect(Collectors.toList());
+    }
+
+    String localPublicationConfig = Objects.toString(properties.get(OPT_LOCAL_PUBLICATION), "auto");
+    if (!"auto".equals(localPublicationConfig)) {
+      // If this is not set to `auto`, we expect this to be a boolean
+      localPublication = BooleanUtils.toBoolean(localPublicationConfig);
+    }
+
+    distributionDirectory = cc.getBundleContext().getProperty("org.opencastproject.download.directory");
+    if (StringUtils.isEmpty(distributionDirectory)) {
+      final String storageDir = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
+      if (StringUtils.isNotEmpty(storageDir)) {
+        distributionDirectory = new File(storageDir, "downloads").getPath();
+      }
+    }
+    logger.debug("Thumbnail track priority set to '{}'", thumbnailSourcePrimary);
+  }
+
+  /**
+   * Check if a media URL can be served from this server.
+   *
+   * @param uri
+   *      URL locating a media file
+   * @return
+   *      If the file is available locally
+   */
+  private boolean isLocal(URI uri) {
+    var path = uri.normalize().getPath();
+    if (!path.startsWith("/static/")) {
+      return false;
+    }
+    var localFile = new File(distributionDirectory, path.substring("/static".length()));
+    return localFile.exists();
   }
 
   private Boolean elementHasPreviewTag(MediaPackageElement element) {
@@ -294,6 +386,11 @@ public class EditorServiceImpl implements EditorService {
   private Boolean elementHasPreviewFlavor(MediaPackageElement element) {
     return element.getFlavor() != null
             && getPreviewSubtype().equals(element.getFlavor().getSubtype());
+  }
+
+  private Boolean elementHasWaveformFlavor(MediaPackageElement element) {
+    return element.getFlavor() != null
+            && getWaveformSubtype().equals(element.getFlavor().getSubtype());
   }
 
   private String signIfNecessary(final URI uri) {
@@ -330,22 +427,13 @@ public class EditorServiceImpl implements EditorService {
       String trackId = trackdata.getId();
       Track track = mediaPackage.getTrack(trackId);
       if (track == null) {
-        Opt<Track> trackOpt = getInternalPublication(mediaPackage).toStream().bind(new Fn<Publication, List<Track>>() {
-          @Override
-          public List<Track> apply(Publication a) {
-            return Arrays.asList(a.getTracks());
-          }
-        }).filter(new Fn<Track, Boolean>() {
-          @Override
-          public Boolean apply(Track a) {
-            return trackId.equals(a.getIdentifier());
-          }
-        }).head();
-        if (trackOpt.isNone()) {
-          throw new IllegalStateException(
-                  String.format("The track '%s' doesn't exist in media package '%s'", trackId, mediaPackage));
-        }
-        track = trackOpt.get();
+        track = Arrays.stream(getInternalPublication(mediaPackage)
+            .orElseThrow(() -> new IllegalStateException("Event has no internal publication"))
+            .getTracks())
+            .filter(t -> trackId.equals(t.getIdentifier()))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException(
+                  String.format("The track '%s' doesn't exist in media package '%s'", trackId, mediaPackage)));
       }
       tracks.add(track);
     }
@@ -365,7 +453,8 @@ public class EditorServiceImpl implements EditorService {
   }
 
   /**
-   * Adds the SMIL file as {@link Catalog} to the media package and sends the updated media package to the archive.
+   * Adds the SMIL file as {@link Catalog} to the media package
+   * Does not send the updated media package to the archive.
    *
    * @param mediaPackage
    *          the media package to at the SMIL catalog
@@ -374,7 +463,7 @@ public class EditorServiceImpl implements EditorService {
    * @throws IOException
    *           if the SMIL catalog cannot be read or not be written to the archive
    */
-  void addSmilToArchive(MediaPackage mediaPackage, final Smil smil) throws IOException {
+  MediaPackage addSmilToArchive(MediaPackage mediaPackage, final Smil smil) throws IOException {
     MediaPackageElementFlavor mediaPackageElementFlavor = getSmilCatalogFlavor();
     //set default catalog Id if there is none existing
     String catalogId = smil.getId();
@@ -410,23 +499,185 @@ public class EditorServiceImpl implements EditorService {
     }
     // setting the URI to a new source so the checksum will most like be invalid
     catalog.setChecksum(null);
-
-    try {
-      assetManager.takeSnapshot(mediaPackage);
-    } catch (AssetManagerException e) {
-      logger.error("Error while adding the updated media package ({}) to the archive", mediaPackage.getIdentifier(), e);
-      throw new IOException(e);
-    }
-
+    return mediaPackage;
   }
 
-  private Opt<Publication> getInternalPublication(MediaPackage mp) {
-    return $(mp.getPublications()).filter(new Fn<Publication, Boolean>() {
-      @Override
-      public Boolean apply(Publication a) {
-        return InternalPublicationChannel.CHANNEL_ID.equals(a.getChannel());
+  /**
+   * Adds subtitles {@link EditingData.Subtitle} to the media package and sends the updated media package
+   * to the archive. If a subtitle flavor already exists, the subtitle is overwritten
+   *
+   * @param mediaPackage
+   *          the media package to at the SMIL catalog
+   * @param subtitles
+   *          the subtitles to be added
+   * @throws IOException
+   */
+  private MediaPackage addSubtitleTrack(MediaPackage mediaPackage, List<EditingData.Subtitle> subtitles)
+          throws IOException, IllegalArgumentException {
+    // Check if any of the provided subtitles fail to match the designated flavor
+    for (EditingData.Subtitle subtitle : subtitles) {
+      if (!subtitle.getFlavor().matches(captionsFlavor)) {
+        throw new IllegalArgumentException(
+                "Given subtitle flavor " + subtitle.getFlavor().toString() + " does match caption flavor "
+                        + captionsFlavor);
       }
-    }).head();
+    }
+
+    for (EditingData.Subtitle subtitle : subtitles) {
+      // Generate ID for new tracks
+      String subtitleId = UUID.randomUUID().toString();
+      String trackId = null;
+
+      // Check if subtitle already exists
+      for (Track t : mediaPackage.getTracks()) {
+        if (t.getFlavor().matches(subtitle.getFlavor())) {
+          logger.debug("Set Identifier for Subtitle-Track to: {}", t.getIdentifier());
+          subtitleId = t.getIdentifier();
+          trackId = t.getIdentifier();
+          break;
+        }
+      }
+
+      Track track = mediaPackage.getTrack(trackId);
+
+      // Memorize uri of the previous track file for deletion
+      URI oldTrackURI = null;
+      if (track != null) {
+        oldTrackURI = track.getURI();
+      }
+
+      // Put updated filename in working file repository and update the track.
+      try (InputStream is = IOUtils.toInputStream(subtitle.getSubtitle(), "UTF-8")) {
+        URI subtitleUri = workspace.put(mediaPackage.getIdentifier().toString(), subtitleId, "subtitle.vtt", is);
+
+        // If not exists, create new Track
+        if (track == null) {
+          MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
+          track = (Track) mpeBuilder.elementFromURI(subtitleUri, MediaPackageElement.Type.Track, subtitle.getFlavor());
+          mediaPackage.add(track);
+          logger.info("Creating new track for flavor: " + track.getFlavor());
+        }
+
+        track.setURI(subtitleUri);
+        track.setIdentifier(subtitleId);
+        track.setChecksum(null);
+
+        if (oldTrackURI != null && oldTrackURI != subtitleUri) {
+          // Delete the old files from the working file repository and workspace if they were in there
+          logger.info("Removing old track file {}", oldTrackURI);
+          try {
+            workspace.delete(oldTrackURI);
+          } catch (NotFoundException | IOException e) {
+            logger.info("Could not remove track from workspace. Could be it was never there.");
+          }
+        }
+      }
+    }
+
+    return mediaPackage;
+  }
+
+  /**
+   * Adds base64 encoded thumbnail images to the mediapackage and takes a snapshot
+   *
+   * @param editingData
+   *          the editing information
+   * @param mediaPackage
+   *          the media package
+   * @throws MimeTypeParseException
+   * @throws IOException
+   */
+  private MediaPackage addThumbnailsToArchive(EditingData editingData, MediaPackage mediaPackage)
+          throws MimeTypeParseException, IOException {
+    for (TrackData track : editingData.getTracks()) {
+      String id = track.getId();
+      MediaPackageElementFlavor flavor = new MediaPackageElementFlavor(track.getFlavor().getType(),
+              getThumbnailSubtype());
+      String uri = track.getThumbnailURI();
+
+      // If no uri, what do?
+      if (uri == null || uri.isEmpty()) {
+        continue;
+      }
+      // If uri not base64 encoded, what do?
+      if (!uri.startsWith("data")) {
+        continue;
+      }
+
+      // Decode
+      uri = uri.substring(uri.indexOf(",") + 1);
+      byte[] byteArray = Base64.getMimeDecoder().decode(uri);
+      InputStream inputStream = new ByteArrayInputStream(byteArray);
+
+      // Get MimeType
+      String stringMimeType = detectMimeType(uri);
+      MimeType mimeType = MimeType.mimeType(stringMimeType.split("/")[0], stringMimeType.split("/")[1]);
+
+      // Store image in workspace
+      final String filename = "thumbnail_" + id + "." + mimeType.getSubtype();
+      final String originalThumbnailId = UUID.randomUUID().toString();
+      URI tempThumbnail = null;
+      try {
+        tempThumbnail = workspace
+                .put(mediaPackage.getIdentifier().toString(), originalThumbnailId, filename, inputStream);
+      } catch (IOException e) {
+        throw new IOException("Could not add thumbnail to workspace", e);
+      }
+
+      // Build thumbnail attachment
+      final Attachment attachment = AttachmentImpl.fromURI(tempThumbnail);
+      attachment.setFlavor(flavor);
+      attachment.setMimeType(mimeType);
+      Arrays.stream(mediaPackage.getElementsByFlavor(flavor))
+          .map(MediaPackageElement::getTags)
+          .flatMap(Arrays::stream)
+          .distinct()
+          .forEach(attachment::addTag);
+
+      // Remove old thumbnails
+      Arrays.stream(mediaPackage.getElementsByFlavor(flavor)).forEach(mediaPackage::remove);
+
+      // Add new thumbnail
+      mediaPackage.add(attachment);
+
+      // Update publications here in the future?
+
+      // Set workflow property
+      WorkflowPropertiesUtil
+              .storeProperty(assetManager, mediaPackage,
+                      flavor.getType() + "/" + thumbnailWfProperty, "true");
+    }
+
+    return mediaPackage;
+  }
+
+  /**
+   * Determines if mimetype of a base64 encoded string is one of the listed image mimetypes and returns it.
+   *
+   * @param b64
+   *          the encoded string that is supposed to be an image
+   * @return
+   *          the mimetype
+   * @throws MimeTypeParseException
+   */
+  private String detectMimeType(String b64) throws MimeTypeParseException {
+    var signatures = new HashMap<String, String>();
+    signatures.put("R0lGODdh", "image/gif");
+    signatures.put("iVBORw0KGgo", "image/png");
+    signatures.put("/9j/", "image/jpg");
+
+    for (var s : signatures.entrySet()) {
+      if (b64.indexOf(s.getKey()) == 0) {
+        return s.getValue();
+      }
+    }
+    throw new MimeTypeParseException("No image mimetype found");
+  }
+
+  private Optional<Publication> getInternalPublication(MediaPackage mp) {
+    return Arrays.stream(mp.getPublications())
+        .filter(publication -> InternalPublicationChannel.CHANNEL_ID.equals(publication.getChannel()))
+        .findFirst();
   }
 
   /**
@@ -459,20 +710,14 @@ public class EditorServiceImpl implements EditorService {
    * @return a list of workflow definitions
    */
   private List<WorkflowDefinition> getEditingWorkflows() {
-    List<WorkflowDefinition> workflows;
     try {
-      workflows = workflowService.listAvailableWorkflowDefinitions();
+      return workflowService.listAvailableWorkflowDefinitions().stream()
+          .filter(workflow -> workflow.containsTag(EDITOR_WORKFLOW_TAG))
+          .collect(Collectors.toList());
     } catch (WorkflowDatabaseException e) {
       logger.warn("Error while retrieving list of workflow definitions:", e);
-      return emptyList();
     }
-
-    return $(workflows).filter(new Fn<WorkflowDefinition, Boolean>() {
-      @Override
-      public Boolean apply(WorkflowDefinition a) {
-        return a.containsTag(EDITOR_WORKFLOW_TAG);
-      }
-    }).toList();
+    return emptyList();
   }
 
   /**
@@ -641,8 +886,8 @@ public class EditorServiceImpl implements EditorService {
 
     boolean workflowActive = WorkflowUtil.isActive(event.getWorkflowState());
 
-    final Opt<Publication> internalPubOpt = getInternalPublication(mp);
-    if (internalPubOpt.isNone() || internalPubOpt.isEmpty()) {
+    final Optional<Publication> internalPubOpt = getInternalPublication(mp);
+    if (internalPubOpt.isEmpty()) {
       errorExit("No internal publication", mediaPackageId, ErrorStatus.NO_INTERNAL_PUBLICATION);
     }
     Publication internalPub = internalPubOpt.get();
@@ -683,6 +928,21 @@ public class EditorServiceImpl implements EditorService {
       }
     }
 
+    // Get subtitles from the asset manager, so they are guaranteed to be up-to-date after saving
+    Track[] subtitleTracks = mp.getTracks(captionsFlavor);
+    List<EditingData.Subtitle> subtitles = new ArrayList<>();
+    for (Track t: subtitleTracks) {
+      try {
+        File subtitleFile = workspace.get(t.getURI());
+        String subtitleString = FileUtils.readFileToString(subtitleFile, StandardCharsets.UTF_8);
+        subtitles.add(new EditingData.Subtitle(t.getFlavor(), subtitleString));
+      } catch (NotFoundException | IOException e) {
+        errorExit("Could not read subtitle from file", mediaPackageId, ErrorStatus.UNKNOWN);
+      }
+    }
+
+    // Get tracks from the internal publication because it is a lot faster than getting them from the asset manager
+    // for some reason.
     final List<TrackData> tracks = trackList.stream().map(track -> {
       final String uri = signIfNecessary(track.getURI());
       final boolean audioEnabled = !hiddens.contains(tuple(track.getFlavor().getType(), "audio"));
@@ -698,12 +958,30 @@ public class EditorServiceImpl implements EditorService {
       final TrackSubData video = new TrackSubData(track.hasVideo(), videoPreview,
                         videoEnable);
 
+      final String thumbnailURI = Arrays.stream(internalPub.getAttachments())
+              .filter(attachment -> attachment.getFlavor().getType().equals(track.getFlavor().getType()))
+              .filter(attachment -> attachment.getFlavor().getSubtype().equals(getThumbnailSubtype()))
+              .map(MediaPackageElement::getURI).map(this::signIfNecessary)
+              .findAny()
+              .orElse(null);
+
+      final int priority = thumbnailSourcePrimary.indexOf(track.getFlavor());
+
+      if (localPublication == null) {
+        localPublication = isLocal(track.getURI());
+      }
+
       return new TrackData(track.getFlavor().getType(), track.getFlavor().getSubtype(), audio, video, uri,
-                        track.getIdentifier());
+          track.getIdentifier(), thumbnailURI, priority);
     }).collect(Collectors.toList());
 
+    List<String> waveformList = Arrays.stream(internalPub.getAttachments())
+            .filter(this::elementHasWaveformFlavor)
+            .map(Attachment::getURI).map(this::signIfNecessary)
+            .collect(Collectors.toList());
+
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
-            event.getSeriesId(), event.getSeriesName(), workflowActive);
+            event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList, subtitles, localPublication);
   }
 
 
@@ -746,7 +1024,8 @@ public class EditorServiceImpl implements EditorService {
   }
 
   @Override
-  public void setEditData(String mediaPackageId, EditingData editingData) throws EditorServiceException {
+  public void setEditData(String mediaPackageId, EditingData editingData) throws EditorServiceException,
+          IOException {
     final Event event = getEvent(mediaPackageId);
 
     if (WorkflowUtil.isActive(event.getWorkflowState())) {
@@ -781,9 +1060,35 @@ public class EditorServiceImpl implements EditorService {
     WorkflowPropertiesUtil.storeProperties(assetManager, mediaPackage, workflowProperties);
 
     try {
-      addSmilToArchive(mediaPackage, smil);
+      mediaPackage = addSmilToArchive(mediaPackage, smil);
     } catch (IOException e) {
       errorExit("Unable to add SMIL cutting catalog to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
+    }
+
+    try {
+      if (editingData.getSubtitles() != null) {
+        mediaPackage = addSubtitleTrack(mediaPackage, editingData.getSubtitles());
+      }
+    } catch (IOException e) {
+      errorExit("Unable to add subtitle track to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
+    } catch (IllegalArgumentException e) {
+      errorExit("Illegal subtitle given", mediaPackageId, ErrorStatus.UNKNOWN, e);
+    }
+
+    try {
+      mediaPackage = addThumbnailsToArchive(editingData, mediaPackage);
+    } catch (MimeTypeParseException e) {
+      errorExit("Thumbnail had an illegal MimeType", mediaPackageId, ErrorStatus.UNKNOWN, e);
+    } catch (IOException e) {
+      errorExit("Unable to add thumbnail to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
+    }
+
+    try {
+      assetManager.takeSnapshot(mediaPackage);
+    } catch (AssetManagerException e) {
+      logger.error("Error while adding the updated media package ({}) to the archive",
+              mediaPackage.getIdentifier(), e);
+      throw new IOException(e);
     }
 
     if (editingData.getPostProcessingWorkflow() != null) {
@@ -792,7 +1097,7 @@ public class EditorServiceImpl implements EditorService {
         final Map<String, String> workflowParameters = WorkflowPropertiesUtil
                 .getLatestWorkflowProperties(assetManager, mediaPackage.getIdentifier().toString());
         final Workflows workflows = new Workflows(assetManager, workflowService);
-        workflows.applyWorkflowToLatestVersion($(mediaPackage.getIdentifier().toString()),
+        workflows.applyWorkflowToLatestVersion(Collections.singletonList(mediaPackage.getIdentifier().toString()),
                 ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId), workflowParameters))
                 .run();
       } catch (AssetManagerException e) {

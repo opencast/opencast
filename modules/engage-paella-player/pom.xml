@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>12-SNAPSHOT</version>
+    <version>14-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -37,11 +37,11 @@
                 </configuration>
               </execution>
               <execution>
-                <id>esline</id>
+                <id>eslint</id>
                 <goals>
                   <goal>exec</goal>
                 </goals>
-                <phase>validate</phase>
+                <phase>test</phase>
                 <configuration>
                   <executable>npm</executable>
                   <arguments>
@@ -55,10 +55,11 @@
                 <goals>
                   <goal>exec</goal>
                 </goals>
-                <phase>compile</phase>
+                <phase>generate-resources</phase>
                 <configuration>
-                  <executable>node_modules/gulp/bin/gulp.js</executable>
+                  <executable>npx</executable>
                   <arguments>
+                    <argument>gulp</argument>
                     <argument>paella-opencast:build</argument>
                   </arguments>
                 </configuration>

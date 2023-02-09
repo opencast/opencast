@@ -519,4 +519,9 @@
     <Description>Camtasia TREC video</Description>
     <Extensions>trec</Extensions>
   </MimeType>
+  <MimeType>
+    <Type>video/x-f4v"</Type>
+    <Description>Flash mp4</Description>
+    <Extensions>f4v</Extensions>
+  </MimeType>
 </MimeTypes>

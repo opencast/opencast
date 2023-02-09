@@ -36,7 +36,6 @@ import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSele
 import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -102,7 +101,7 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
    * @param composerService
    *          the local composer service
    */
-  @Reference(name = "ComposerService")
+  @Reference
   protected void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -114,7 +113,7 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -150,9 +149,12 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
       List<String> profilelist = asList(profiles);
       for (String profile : profilelist) {
         EncodingProfile encodingprofile = composerService.getProfile(profile);
-        if (encodingprofile != null)
+        if (encodingprofile != null) {
           encodingProfiles.add(encodingprofile.getIdentifier());
-        encodingProfileList.add(encodingprofile);
+          encodingProfileList.add(encodingprofile);
+        } else {
+          throw new IllegalArgumentException("Encoding profile " + profile + " not found.");
+        }
       }
     }
 
@@ -469,7 +471,7 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
     for (EncodingProfile ep : profiles) {
       String suffix = ep.getSuffix();
       // !! workspace.putInCollection renames the file - need to do the same with suffix
-      suffix = PathSupport.toSafeName(suffix);
+      suffix = workspace.toSafeName(suffix);
       if (suffix.length() > 0 && rawfileName.endsWith(suffix)) {
         track.addTag(ep.getIdentifier());
         return;
@@ -547,7 +549,7 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
     }
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

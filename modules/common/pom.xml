@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>12-SNAPSHOT</version>
+    <version>14-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -274,6 +274,7 @@
             </_exportcontents>
             <Export-Package>
               org.opencastproject.util.*;version=${project.version};-split-package:=merge-first,
+              org.opencastproject.db;version=${project.version},
               org.opencastproject.capture;version=${project.version},
               org.opencastproject.mediapackage;version=${project.version},
               org.opencastproject.mediapackage.attachment;version=${project.version},
@@ -289,7 +290,8 @@
               org.opencastproject.security.api;version=${project.version},
               org.opencastproject.storage;version=${project.version},
               org.opencastproject.systems;version=${project.version},
-              org.opencastproject.security.util;version=${project.version}
+              org.opencastproject.security.util;version=${project.version},
+              org.opencastproject.cleanup;version=${project.version}
             </Export-Package>
             <Provide-Capability>
               osgi.service;objectClass="org.opencastproject.util.ReadinessIndicator"

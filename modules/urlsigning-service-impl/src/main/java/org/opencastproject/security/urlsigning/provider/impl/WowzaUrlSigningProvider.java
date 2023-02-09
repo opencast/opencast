@@ -132,7 +132,7 @@ public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
    */
   private String addSignutureToRequest(Policy policy, String encryptionKeyId, String encryptionKey) throws Exception  {
     final String startTime;
-    final String endTime = Long.toString(policy.getValidUntil().getMillis());
+    final String endTime = Long.toString(policy.getValidUntil().getMillis() / 1000);
     final String ip;
 
     String baseUrl = policy.getBaseUrl();
@@ -148,7 +148,7 @@ public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
     }
 
     if (policy.getValidFrom().isPresent()) {
-      startTime = Long.toString(policy.getValidFrom().get().getMillis());
+      startTime = Long.toString(policy.getValidFrom().get().getMillis() / 1000);
     } else {
       startTime = "";
     }
@@ -244,7 +244,7 @@ public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
     return base64Hash;
   }
 
-  @Reference(name = "security-service")
+  @Reference
   @Override
   public void setSecurityService(SecurityService securityService) {
     super.setSecurityService(securityService);

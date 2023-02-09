@@ -50,7 +50,7 @@
 
 .popover.popover-left {
     &:after {
-        @include popover-arrow()
+        @include popover-arrow();
         border-left-color: $main-border-color;
         left: 100%;
     }
@@ -58,7 +58,7 @@
 
 .popover.popover-right {
     &:after {
-        @include popover-arrow()
+        @include popover-arrow();
         right: 100%;
         border-right-color: $main-border-color;
     }

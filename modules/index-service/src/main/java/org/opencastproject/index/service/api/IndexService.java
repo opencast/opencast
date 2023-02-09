@@ -45,6 +45,8 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 
 import com.entwinemedia.fn.data.Opt;
 
+import org.json.simple.JSONObject;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
@@ -122,8 +124,6 @@ public interface IndexService {
    *
    * @param event
    *          The event to remove.
-   * @param doOnNotFound
-   *      What to do when the event could not be found.
    * @param retractWorkflowId
    *          The id of the workflow to use to retract the event if necessary.
    * @return A result which tells if the event was removed, removal failed, or the event is being retracted and will be removed later.
@@ -134,8 +134,8 @@ public interface IndexService {
    * @throws NotFoundException
    *           If the configured retract workflow cannot be found. This is most likely a configuration issue.
    */
-  EventRemovalResult removeEvent(Event event, Runnable doOnNotFound, String retractWorkflowId)
-      throws UnauthorizedException, WorkflowDatabaseException, NotFoundException;
+  EventRemovalResult removeEvent(Event event, String retractWorkflowId) throws UnauthorizedException,
+          WorkflowDatabaseException, NotFoundException;
 
   /**
    * Removes an event.
@@ -300,19 +300,6 @@ public interface IndexService {
   EventCatalogUIAdapter getCommonEventCatalogUIAdapter();
 
   /**
-   * Get a single series
-   *
-   * @param seriesId
-   *          the series id
-   * @param searchIndex
-   *          the abstract search index
-   * @return a series or none if not found wrapped in an option
-   * @throws SearchIndexException
-   *           Thrown if there is an error when using the search index.
-   */
-  Opt<Series> getSeries(String seriesId, ElasticsearchIndex searchIndex) throws SearchIndexException;
-
-  /**
    * Create a new series.
    *
    * @param metadata
@@ -325,7 +312,7 @@ public interface IndexService {
    * @throws UnauthorizedException
    *           Thrown if the user cannot create a new series.
    */
-  String createSeries(String metadata) throws IllegalArgumentException, IndexServiceException, UnauthorizedException;
+  String createSeries(JSONObject metadata) throws IllegalArgumentException, IndexServiceException, UnauthorizedException;
 
   /**
    * Create a series from a set of metadata and options.

@@ -236,7 +236,7 @@ public class TransferMetadataWorkflowOperationHandler extends AbstractWorkflowOp
   }
 
   /** OSGi callback to inject the workspace */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

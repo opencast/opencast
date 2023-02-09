@@ -101,7 +101,7 @@ public class StatisticsRestService {
    *
    * @param statisticsService
    */
-  @Reference(name = "service-impl")
+  @Reference
   public void setService(StatisticsService statisticsService) {
     this.statisticsService = statisticsService;
   }

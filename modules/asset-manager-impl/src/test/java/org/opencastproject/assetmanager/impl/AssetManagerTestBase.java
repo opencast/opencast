@@ -39,6 +39,7 @@ import org.opencastproject.assetmanager.api.storage.Source;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.util.TestUser;
+import org.opencastproject.db.DBTestEnv;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -47,7 +48,7 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
-import org.opencastproject.message.broker.api.MessageSender;
+import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -59,7 +60,6 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.persistencefn.PersistenceUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn;
@@ -88,11 +88,6 @@ import java.util.function.Function;
 
 /**
  * Base class for {@link org.opencastproject.assetmanager.api.AssetManager} tests.
- * <p>
- * See {@link org.opencastproject.util.persistencefn.PersistenceUtil
- * #mkTestEntityManagerFactoryFromSystemProperties(String)} for command line
- * configuration options.
- * <p>
  */
 // CHECKSTYLE:OFF
 public abstract class AssetManagerTestBase {
@@ -122,12 +117,18 @@ public abstract class AssetManagerTestBase {
     p2 = new Props(q, "org.opencastproject.service.sub");
   }
 
+  protected AssetManagerImpl makeAssetManager() throws Exception {
+    AssetManagerImpl am = makeAssetManagerWithoutHandlers();
+    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
+    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
+    return am;
+  }
+
   /**
    * Create a new test asset manager.
    */
-  protected AssetManagerImpl makeAssetManager() throws Exception {
-    final Database db = new Database(
-            PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT));
+  protected AssetManagerImpl makeAssetManagerWithoutHandlers() throws Exception {
+    final Database db = new Database(DBTestEnv.newDBSession(PERSISTENCE_UNIT));
 
     final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
@@ -165,9 +166,6 @@ public abstract class AssetManagerTestBase {
             .anyTimes();
     EasyMock.replay(authorizationService);
 
-    MessageSender ms = EasyMock.createNiceMock(MessageSender.class);
-    EasyMock.replay(ms);
-
     ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
             EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
@@ -182,7 +180,6 @@ public abstract class AssetManagerTestBase {
     am.setSecurityService(securityService);
     am.setDatabase(db);
     am.setAuthorizationService(authorizationService);
-    am.setMessageSender(ms);
     am.setIndex(esIndex);
     return am;
   }

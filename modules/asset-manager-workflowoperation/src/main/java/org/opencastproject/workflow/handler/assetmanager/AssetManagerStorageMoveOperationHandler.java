@@ -74,13 +74,13 @@ public class AssetManagerStorageMoveOperationHandler extends AbstractWorkflowOpe
   }
 
   /** OSGi DI */
-  @Reference(name = "asset-manager-job-producer")
+  @Reference
   public void setJobProducer(AssetManagerJobProducer tsamjp) {
     this.tsamjp = tsamjp;
   }
 
   /** OSGi DI */
-  @Reference(name = "asset-manager")
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -140,7 +140,7 @@ public class AssetManagerStorageMoveOperationHandler extends AbstractWorkflowOpe
     }
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

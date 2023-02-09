@@ -26,15 +26,12 @@ import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.opencastproject.authorization.xacml.manager.util.Util.getManagedAcl;
-import static org.opencastproject.authorization.xacml.manager.util.Util.toAcl;
 import static org.opencastproject.util.RestUtil.R.conflict;
 import static org.opencastproject.util.RestUtil.R.noContent;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.RestUtil.R.serverError;
 import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
@@ -59,7 +56,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Functions;
-import org.opencastproject.util.data.functions.Options;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -69,6 +65,8 @@ import com.entwinemedia.fn.data.Opt;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -110,8 +108,8 @@ public abstract class AbstractAclServiceRestEndpoint {
       }
   )
   public String getAcl(@PathParam("aclId") long aclId) throws NotFoundException {
-    final Option<ManagedAcl> managedAcl = aclService().getAcl(aclId);
-    if (managedAcl.isNone()) {
+    final Optional<ManagedAcl> managedAcl = aclService().getAcl(aclId);
+    if (managedAcl.isEmpty()) {
       logger.info("No ACL with id '{}' could be found", aclId);
       throw new NotFoundException();
     }
@@ -229,8 +227,8 @@ public abstract class AbstractAclServiceRestEndpoint {
       @FormParam("acl") String accessControlList
   ) {
     final AccessControlList acl = parseAcl.apply(accessControlList);
-    final Option<ManagedAcl> managedAcl = aclService().createAcl(acl, name);
-    if (managedAcl.isNone()) {
+    final Optional<ManagedAcl> managedAcl = aclService().createAcl(acl, name);
+    if (managedAcl.isEmpty()) {
       logger.info("An ACL with the same name '{}' already exists", name);
       throw new WebApplicationException(Response.Status.CONFLICT);
     }
@@ -331,12 +329,12 @@ public abstract class AbstractAclServiceRestEndpoint {
   )
   public Response applyAclToEpisode(@PathParam("episodeId") String episodeId, @FormParam("aclId") Long aclId) {
     final AclService aclService = aclService();
-    final Option<Option<ManagedAcl>> macl = option(aclId).map(getManagedAcl(aclService));
-    if (macl.isSome() && macl.get().isNone()) {
+    Optional<ManagedAcl> macl = aclService.getAcl(aclId);
+    if (macl.isEmpty()) {
       return notFound();
     }
     try {
-      Option<AccessControlList> aclOpt = Options.join(macl).map(toAcl);
+      Option<AccessControlList> aclOpt = Option.some(macl.get().getAcl());
       Opt<MediaPackage> mediaPackage = getAssetManager().getMediaPackage(episodeId);
       // the episode service is the source of authority for the retrieval of media packages
       if (mediaPackage.isSome()) {

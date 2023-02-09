@@ -43,10 +43,7 @@ import org.osgi.service.component.annotations.Reference;
 public class ConfigurableAWSS3RetractWorkflowOperationHandler extends ConfigurableRetractWorkflowOperationHandler {
 
   /** OSGi DI */
-  @Reference(
-      name = "DownloadDistributionService",
-      target = "(distribution.channel=aws.s3)"
-  )
+  @Reference(target = "(distribution.channel=aws.s3)")
   void setDownloadDistributionService(DownloadDistributionService distributionService) {
     super.setDownloadDistributionService(distributionService);
   }

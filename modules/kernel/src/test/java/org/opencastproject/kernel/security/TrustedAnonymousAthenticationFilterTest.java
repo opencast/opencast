@@ -29,12 +29,11 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 
 import org.easymock.EasyMock;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
-
-import junit.framework.Assert;
 
 /**
  * Tests the {@link TrustedAnonymousAuthenticationFilter}

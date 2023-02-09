@@ -55,7 +55,6 @@ public class UrlSigningServiceImpl implements UrlSigningService {
 
   /** OSGi callback for registering {@link UrlSigningProvider} */
   @Reference(
-      name = "urlSigningProviders",
       cardinality = ReferenceCardinality.MULTIPLE,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "unregisterSigningProvider"

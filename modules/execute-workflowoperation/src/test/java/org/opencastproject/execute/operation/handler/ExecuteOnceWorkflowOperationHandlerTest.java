@@ -40,9 +40,6 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.Stream;
-
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -123,14 +120,10 @@ public class ExecuteOnceWorkflowOperationHandlerTest {
     execOnceWOH = new ExecuteOnceWorkflowOperationHandler() {
       @Override
       protected Result waitForStatus(long timeout, Job... jobs) {
-        HashMap<Job, Status> map = Stream.mk(jobs).foldl(new HashMap<Job, Status>(),
-                new Fn2<HashMap<Job, Status>, Job, HashMap<Job, Status>>() {
-          @Override
-          public HashMap<Job, Status> apply(HashMap<Job, Status> a, Job b) {
-            a.put(b, Status.FINISHED);
-            return a;
-          }
-        });
+        var map = new HashMap<Job, Status>();
+        for (var job: jobs) {
+          map.put(job, Status.FINISHED);
+        }
         return new Result(map);
       }
     };

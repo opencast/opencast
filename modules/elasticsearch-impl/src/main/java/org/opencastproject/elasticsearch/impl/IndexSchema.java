@@ -23,7 +23,7 @@
 package org.opencastproject.elasticsearch.impl;
 
 /**
- * Standard fields for an API index.
+ * Standard fields for an Elasticsearch index.
  */
 public interface IndexSchema {
 

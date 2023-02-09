@@ -186,6 +186,57 @@ __Example__
 
 ```
 
+### GET /api/series/series.json
+
+Returns the series matching the query parameters
+
+The following query string parameters are supported to filter, sort and paginate the returned list:
+
+Query String Parameter |Type                         | Description
+:----------------------|:----------------------------|:-----------
+`q`                    | [`string`](types.md#basic)  | Free text search
+`edit`                 | [`boolean`](types.md#basic) | Whether this query should return only series that are editable
+`fuzzyMatch`           | [`boolean`](types.md#basic) | Whether a partial match on series id is allowed
+`seriesId`             | [`string`](types.md#basic)  | The series identifier
+`seriesTitle`          | [`string`](types.md#basic)  | The series title
+`creator`              | [`string`](types.md#basic)  | The series creator
+`contributor`          | [`string`](types.md#basic)  | The series contributor
+`publisher`            | [`string`](types.md#basic)  | The series publisher
+`rightsholder`         | [`string`](types.md#basic)  | The series rights holder
+`createdfrom`          | [`string`](types.md#basic)  | Filter results by created from (yyyy-MM-dd'T'HH:mm:ss'Z')
+`createdto`            | [`string`](types.md#basic)  | Filter results by created to (yyyy-MM-dd'T'HH:mm:ss'Z')
+`language`             | [`string`](types.md#basic)  | The series language
+`license`              | [`string`](types.md#basic)  | The series license
+`subject`              | [`string`](types.md#basic)  | The series subject
+`abstract`             | [`string`](types.md#basic)  | The series abstract
+`sort`                 | [`string`](types.md#basic)  | The sort order. May include any of the following: TITLE, SUBJECT, CREATOR, PUBLISHERS, CONTRIBUTORS, DESCRIPTION, CREATED_DATE_TIME, LANGUAGE, RIGHTS_HOLDER, MANAGED_ACL, LICENCE. Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).
+`offset`               | [`string`](types.md#basic)  | The offset
+`count`                | [`string`](types.md#basic)  | Maximum number of results
+
+__Sample request__
+
+https://opencast.domain.com/api/series/series.json?creator:Administrator&sort=title_DESC&limit=2
+
+
+__Response__
+
+`200 (OK)`: A (potentially empty) list of series is returned as JSON array contained JSON objects describing the series:
+
+Field            | Type                                 | Description
+:----------------|:-------------------------------------|:-----------
+`identifier`     | [`string`](types.md#basic)           | The unique identifier of the series
+`license`\*      | [`string`](types.md#basic)           | The license of the series (version 1.1.0 and higher)
+`created`\*      | [`datetime`](types.md#date-and-time) | The data when the series was created
+`creator`        | [`string`](types.md#basic)           | The name of the user that has created the series
+`title`\*        | [`string`](types.md#basic)           | The title of the series
+`contributors`\* | [`array[string]`](types.md#array)    | The contributors of the series
+`publishers`\*   | [`array[string]`](types.md#array)    | The publishers of the series
+`subjects`\*     | [`array[string]`](types.md#array)    | The subjects of the series
+`organizers`\*   | [`array[string]`](types.md#array)    | The organizers of the series
+`description`\*  | [`string`](types.md#basic)           | The description of the series (version 1.1.0 and higher)
+`language`\*     | [`string`](types.md#basic)           | The language of the series (version 1.1.0 and higher)
+`rightsholder`\* | [`string`](types.md#basic)           | The rights holder of the series (version 1.1.0 and higher)
+
 ### POST /api/series
 
 Creates a series.

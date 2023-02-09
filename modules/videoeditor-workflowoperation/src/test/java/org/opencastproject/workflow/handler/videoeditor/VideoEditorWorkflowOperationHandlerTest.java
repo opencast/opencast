@@ -41,10 +41,8 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.videoeditor.api.ProcessFailedException;
 import org.opencastproject.videoeditor.api.VideoEditorService;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -116,12 +114,12 @@ public class VideoEditorWorkflowOperationHandlerTest {
     return configuration;
   }
 
-  private WorkflowInstanceImpl getWorkflowInstance(MediaPackage mp, Map<String, String> configurations) {
-    WorkflowInstanceImpl workflowInstance = new WorkflowInstanceImpl();
+  private WorkflowInstance getWorkflowInstance(MediaPackage mp, Map<String, String> configurations) {
+    WorkflowInstance workflowInstance = new WorkflowInstance();
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowInstance.WorkflowState.RUNNING);
     workflowInstance.setMediaPackage(mp);
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("op",
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("op",
             WorkflowOperationInstance.OperationState.RUNNING);
     operation.setTemplate("editor");
     operation.setState(WorkflowOperationInstance.OperationState.RUNNING);
@@ -149,7 +147,7 @@ public class VideoEditorWorkflowOperationHandlerTest {
                     (String) EasyMock.anyObject(), (InputStream) EasyMock.anyObject())).andReturn(
             URI.create(episodeSmilUri));
     EasyMock.replay(workspaceMock);
-    WorkflowInstanceImpl workflowInstance = getWorkflowInstance(mp, getDefaultConfiguration(true));
+    WorkflowInstance workflowInstance = getWorkflowInstance(mp, getDefaultConfiguration(true));
 
     WorkflowOperationResult result = videoEditorWorkflowOperationHandler.start(workflowInstance, null);
     Assert.assertNotNull(
@@ -194,7 +192,7 @@ public class VideoEditorWorkflowOperationHandlerTest {
 
   @Test
   public void testEditorOperationSkip() throws WorkflowOperationException {
-    WorkflowInstanceImpl workflowInstance = getWorkflowInstance(mp, getDefaultConfiguration(true));
+    WorkflowInstance workflowInstance = getWorkflowInstance(mp, getDefaultConfiguration(true));
     WorkflowOperationResult result = videoEditorWorkflowOperationHandler.skip(workflowInstance, null);
     Assert.assertNotNull(
         "VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult", result);
@@ -221,7 +219,7 @@ public class VideoEditorWorkflowOperationHandlerTest {
 
   @Test
   public void testEditorOperationInteractiveSkip() throws WorkflowOperationException {
-    WorkflowInstanceImpl workflowInstance = getWorkflowInstance(mp, getDefaultConfiguration(false));
+    WorkflowInstance workflowInstance = getWorkflowInstance(mp, getDefaultConfiguration(false));
     WorkflowOperationResult result = videoEditorWorkflowOperationHandler.start(workflowInstance, null);
     Assert.assertNotNull(
         "VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult", result);
@@ -275,7 +273,7 @@ public class VideoEditorWorkflowOperationHandlerTest {
 
     EasyMock.replay(workspaceMock, job, serviceRegistry, videoEditorServiceMock);
 
-    WorkflowInstanceImpl workflowInstance = getWorkflowInstance(mpSmil, getDefaultConfiguration(true));
+    WorkflowInstance workflowInstance = getWorkflowInstance(mpSmil, getDefaultConfiguration(true));
     // run test
     WorkflowOperationResult result = videoEditorWorkflowOperationHandler.resume(workflowInstance, null, null);
     Assert.assertNotNull(

@@ -23,6 +23,7 @@ package org.opencastproject.userdirectory.ldap;
 
 import org.opencastproject.security.api.CachingUserProviderMXBean;
 import org.opencastproject.security.api.JaxbOrganization;
+import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
@@ -41,17 +42,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
-import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServer;
@@ -68,7 +70,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   public static final String PROVIDER_NAME = "ldap";
 
   /** The spring ldap userdetails service delegate */
-  private LdapUserDetailsService delegate = null;
+  private final LdapUserDetailsService delegate;
 
   /** The organization id */
   private Organization organization = null;
@@ -86,7 +88,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   protected Object nullToken = new Object();
 
   /** Opencast's security service */
-  private SecurityService securityService;
+  private final SecurityService securityService;
 
   /**
    * Constructs an ldap user provider with the needed settings.
@@ -107,19 +109,33 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
    *          the user credentials
    * @param roleAttributesGlob
    *          the comma separate list of ldap attributes to treat as roles or to consider for the ldapAssignmentRoleMap
-   * @param convertToUppercase
-   *          whether or not the role names will be converted to uppercase
    * @param cacheSize
    *          the number of users to cache
    * @param cacheExpiration
    *          the number of minutes to cache users
    * @param securityService
    *          a reference to Opencast's security service
+   * @param authoritiesPopulator
+   *          a reference to Opencast's authorities populator
+   * @param userDetailsContextMapper
+   *          a reference to Opencast's user details mapper
    */
   // CHECKSTYLE:OFF
-  LdapUserProviderInstance(String pid, Organization organization, String searchBase, String searchFilter, String url,
-          String userDn, String password, String roleAttributesGlob,
-          boolean convertToUppercase, int cacheSize, int cacheExpiration, SecurityService securityService) {
+  LdapUserProviderInstance(
+      String pid,
+      Organization organization,
+      String searchBase,
+      String searchFilter,
+      String url,
+      String userDn,
+      String password,
+      String roleAttributesGlob,
+      int cacheSize,
+      int cacheExpiration,
+      SecurityService securityService,
+      OpencastLdapAuthoritiesPopulator authoritiesPopulator,
+      OpencastUserDetailsContextMapper userDetailsContextMapper
+  ) {
     // CHECKSTYLE:ON
     this.organization = organization;
     this.securityService = securityService;
@@ -144,19 +160,16 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
     }
     FilterBasedLdapUserSearch userSearch = new FilterBasedLdapUserSearch(searchBase, searchFilter, contextSource);
     userSearch.setReturningAttributes(roleAttributesGlob.split(","));
-    delegate = new LdapUserDetailsService(userSearch);
 
-    if (StringUtils.isNotBlank(roleAttributesGlob)) {
-      LdapUserDetailsMapper mapper = new LdapUserDetailsMapper();
+    delegate = new LdapUserDetailsService(userSearch, authoritiesPopulator);
 
-      mapper.setConvertToUpperCase(convertToUppercase);
-
-      mapper.setRoleAttributes(roleAttributesGlob.split(","));
-
-      // The default prefix value is "ROLE_", so we must explicitly set it to "" by default
-      // Because of the parameters extraRoles and excludePrefixes, we must add the prefix manually
-      mapper.setRolePrefix("");
-      delegate.setUserDetailsMapper(mapper);
+    if (userDetailsContextMapper != null) {
+      userSearch.setReturningAttributes(
+          Stream.of(roleAttributesGlob.split(","), userDetailsContextMapper.getAttributes())
+              .flatMap(Stream::of)
+              .collect(Collectors.toList()).toArray(new String[] { })
+      );
+      delegate.setUserDetailsMapper(userDetailsContextMapper);
     }
 
     // Setup the caches
@@ -257,9 +270,22 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
         cache.put(userName, nullToken);
         return null;
       }
-
       JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
-      User user = new JaxbUser(userDetails.getUsername(), PROVIDER_NAME, jaxbOrganization, new HashSet());
+
+      Set<JaxbRole> roles = userDetails.getAuthorities()
+          .stream()
+          .map(a -> new JaxbRole(a.getAuthority(), jaxbOrganization))
+          .collect(Collectors.toUnmodifiableSet());
+
+      User user;
+      if (userDetails instanceof OpencastUserDetails) {
+        user = new JaxbUser(userDetails.getUsername(),null,
+            ((OpencastUserDetails) userDetails).getName(),
+            ((OpencastUserDetails) userDetails).getMail(), PROVIDER_NAME, jaxbOrganization, roles);
+      } else {
+        user = new JaxbUser(userDetails.getUsername(), PROVIDER_NAME, jaxbOrganization, roles);
+      }
+
       cache.put(userName, user);
       return user;
     } finally {
@@ -300,7 +326,8 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   @Override
   public Iterator<User> getUsers() {
     // TODO implement LDAP get all users
-    // FIXME We return the current user, rather than an empty list, to make sure the current user's role is displayed in
+    // FIXME We return the current user, rather than an empty list,
+    // to make sure the current user's role is displayed in
     // the admin UI (MH-12526).
     User currentUser = securityService.getUser();
     if (loadUser(currentUser.getUsername()) != null) {

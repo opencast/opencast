@@ -21,14 +21,14 @@
 
 package org.opencastproject.serviceregistry.impl;
 
+import static org.opencastproject.db.Queries.namedQuery;
 import static org.opencastproject.util.IoSupport.loadPropertiesFromUrl;
 import static org.opencastproject.util.data.Monadics.mlist;
 
+import org.opencastproject.db.DBSession;
+import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.persistence.PersistenceEnv;
-import org.opencastproject.util.persistence.PersistenceEnvs;
-import org.opencastproject.util.persistence.Queries;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import org.apache.commons.io.FilenameUtils;
@@ -69,8 +69,9 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
   /** Reference to the receipt workflow service */
   private WorkflowService workflowService;
 
+  private DBSessionFactory dbSessionFactory;
   private EntityManagerFactory emf;
-  private PersistenceEnv penv;
+  private DBSession db;
 
   @Override
   protected ServiceRegistry getServiceRegistry() {
@@ -83,8 +84,8 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
   }
 
   @Override
-  protected PersistenceEnv getPenv() {
-    return penv;
+  protected DBSession getDBSession() {
+    return db;
   }
 
   /**
@@ -93,7 +94,7 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -115,7 +116,7 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
   @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for job incidents");
-    penv = PersistenceEnvs.persistenceEnvironment(emf);
+    db = dbSessionFactory.createSession(emf);
     // scan bundles for incident localizations
     cc.getBundleContext().addBundleListener(this);
     for (Bundle b : cc.getBundleContext().getBundles()) {
@@ -128,13 +129,18 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
    */
   @Deactivate
   public void deactivate() {
-    penv.close();
+    db.close();
   }
 
   /** OSGi DI */
-  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.serviceregistry)")
+  @Reference(target = "(osgi.unit.name=org.opencastproject.serviceregistry)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
+  }
+
+  @Reference
+  public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
+    this.dbSessionFactory = dbSessionFactory;
   }
 
   @Override
@@ -175,7 +181,7 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
         final String text = texts.getProperty(key);
         final String dbKey = mlist(keyBase, key).concat(locale).mkString(".");
         logger.debug("Storing text {}={}", dbKey, text);
-        penv.tx(Queries.persistOrUpdate(IncidentTextDto.mk(dbKey, text)));
+        db.execTx(namedQuery.persistOrUpdate(IncidentTextDto.mk(dbKey, text)));
       }
     }
   }

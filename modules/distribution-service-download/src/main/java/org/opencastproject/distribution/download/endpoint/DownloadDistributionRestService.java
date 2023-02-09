@@ -104,7 +104,7 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -113,10 +113,7 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
    * @param service
    *          the service to set
    */
-  @Reference(
-      name = "distributionService",
-      target = "(distribution.channel=download)"
-  )
+  @Reference(target = "(distribution.channel=download)")
   public void setService(DownloadDistributionService service) {
     this.service = service;
   }

@@ -148,13 +148,13 @@ public class ConfigurablePublicationServiceRemoteImpl extends RemoteBase impleme
         "Unable to publish mediapackage " + mediaPackage + " using a remote publication service.");
   }
 
-  @Reference(name = "trustedHttpClient")
+  @Reference
   @Override
   public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
     super.setTrustedHttpClient(trustedHttpClient);
   }
 
-  @Reference(name = "remoteServiceManager")
+  @Reference
   @Override
   public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
     super.setRemoteServiceManager(serviceRegistry);

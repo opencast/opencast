@@ -35,11 +35,10 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
@@ -108,12 +107,14 @@ public class SeriesWorkflowOperationHandlerTest {
 
     SeriesCatalogUIAdapter adapter = EasyMock.createNiceMock(SeriesCatalogUIAdapter.class);
     EasyMock.expect(adapter.getOrganization()).andReturn(new DefaultOrganization().getId()).anyTimes();
+    EasyMock.expect(adapter.handlesOrganization(EasyMock.eq(DefaultOrganization.DEFAULT_ORGANIZATION_ID))).andReturn(true).anyTimes();
     EasyMock.expect(adapter.getFlavor()).andReturn(MediaPackageElementFlavor.parseFlavor("creativecommons/series"))
             .anyTimes();
     EasyMock.replay(adapter);
 
     SeriesCatalogUIAdapter seriesAdapter = EasyMock.createNiceMock(SeriesCatalogUIAdapter.class);
     EasyMock.expect(seriesAdapter.getOrganization()).andReturn(new DefaultOrganization().getId()).anyTimes();
+    EasyMock.expect(seriesAdapter.handlesOrganization(EasyMock.eq(DefaultOrganization.DEFAULT_ORGANIZATION_ID))).andReturn(true).anyTimes();
     EasyMock.expect(seriesAdapter.getFlavor()).andReturn(MediaPackageElementFlavor.parseFlavor("dublincore/series"))
             .anyTimes();
     EasyMock.replay(seriesAdapter);
@@ -130,9 +131,9 @@ public class SeriesWorkflowOperationHandlerTest {
 
   @Test
   public void testNoSeries() throws Exception {
-    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("test", OperationState.INSTANTIATED);
     ops.add(operation);
     instance.setOperations(ops);
     instance.setMediaPackage(mp);
@@ -146,9 +147,9 @@ public class SeriesWorkflowOperationHandlerTest {
 
   @Test
   public void testAclOnly() throws Exception {
-    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("test", OperationState.INSTANTIATED);
     ops.add(operation);
     instance.setOperations(ops);
     instance.setMediaPackage(mp);
@@ -163,9 +164,9 @@ public class SeriesWorkflowOperationHandlerTest {
 
   @Test
   public void testChangeSeries() throws Exception {
-    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("test", OperationState.INSTANTIATED);
     ops.add(operation);
     instance.setOperations(ops);
     instance.setMediaPackage(mp);
@@ -185,9 +186,9 @@ public class SeriesWorkflowOperationHandlerTest {
 
   @Test
   public void testAttachExtendedOnly() throws Exception {
-    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("test", OperationState.INSTANTIATED);
     ops.add(operation);
     instance.setOperations(ops);
     instance.setMediaPackage(mp);
@@ -227,9 +228,9 @@ public class SeriesWorkflowOperationHandlerTest {
             // Field that does not exist in the series catalog
             "does-not-exist" };
 
-    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("test", OperationState.INSTANTIATED);
     ops.add(operation);
     instance.setOperations(ops);
     instance.setMediaPackage(mp);
@@ -285,9 +286,9 @@ public class SeriesWorkflowOperationHandlerTest {
             customProperty.getLocalName()
     };
 
-    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("test", OperationState.INSTANTIATED);
     ops.add(operation);
     instance.setOperations(ops);
     instance.setMediaPackage(mp);

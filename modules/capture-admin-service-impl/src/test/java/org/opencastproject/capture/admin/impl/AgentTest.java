@@ -28,10 +28,9 @@ import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.security.api.DefaultOrganization;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import junit.framework.Assert;
 
 public class AgentTest {
   private Agent agent = null;

@@ -33,7 +33,6 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.selector.AttachmentSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -93,7 +92,7 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param composerService
    *          the composer service
    */
-  @Reference(name = "ComposerService")
+  @Reference
   protected void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -104,7 +103,7 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -200,7 +199,7 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
         List<Attachment> targetElements =
                 (List<Attachment>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
         for (Attachment targetElement : targetElements) {
-          String targetFileName = PathSupport.toSafeName(FilenameUtils.getName(targetElement.getURI().getPath()));
+          String targetFileName = FilenameUtils.getName(targetElement.getURI().getPath());
           URI newTargetElementUri = workspace.moveTo(targetElement.getURI(), mediaPackage.getIdentifier().toString(),
                   targetElement.getIdentifier(), targetFileName);
           targetElement.setURI(newTargetElementUri);
@@ -267,7 +266,7 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
     }
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

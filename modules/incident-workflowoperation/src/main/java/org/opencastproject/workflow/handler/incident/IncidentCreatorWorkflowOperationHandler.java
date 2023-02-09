@@ -97,12 +97,12 @@ public class IncidentCreatorWorkflowOperationHandler extends AbstractWorkflowOpe
   }
 
   /** OSGi DI. */
-  @Reference(name = "nopService")
+  @Reference
   public void setNopService(NopService nopService) {
     this.nopService = nopService;
   }
 
-  @Reference(name = "serviceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

@@ -147,13 +147,13 @@ public class StaticFileServiceImpl implements StaticFileService {
   }
 
   /** OSGi DI */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI */
-  @Reference(name = "OrganizationDirectoryService")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService directoryService) {
     orgDirectory = directoryService;
   }

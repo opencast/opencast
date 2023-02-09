@@ -37,7 +37,6 @@ import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -115,7 +114,7 @@ public class CleanupWorkflowOperationHandlerTest {
   }
 
   private WorkflowInstance createWorkflowInstance(Map<String, String> configuration, MediaPackage mp) {
-    WorkflowOperationInstance wfOpInst = new WorkflowOperationInstanceImpl();
+    WorkflowOperationInstance wfOpInst = new WorkflowOperationInstance();
     if (configuration != null) {
       for (String confKey : configuration.keySet()) {
         wfOpInst.setConfiguration(confKey, configuration.get(confKey));

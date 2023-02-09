@@ -22,6 +22,7 @@
 
 package org.opencastproject.search.impl.solr;
 
+import static org.opencastproject.search.api.SearchQuery.DEFAULT_LIMIT;
 import static org.opencastproject.security.api.Permissions.Action.READ;
 import static org.opencastproject.security.api.Permissions.Action.WRITE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
@@ -69,7 +70,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -81,7 +81,7 @@ import java.util.stream.Collectors;
  */
 public class SolrRequester {
 
-  private static final int QUERY_MAX_ROWS = 2000;
+  private static final int NONADMIN_QUERY_LIMIT = 2000;
 
   /**
    * Logging facility
@@ -175,7 +175,7 @@ public class SolrRequester {
     final SearchResultImpl result = new SearchResultImpl(query.getQuery());
     result.setSearchTime(solrResponse.getQTime());
     result.setOffset(solrResponse.getResults().getStart());
-    result.setLimit(Optional.ofNullable(query.getRows()).map(i -> Long.valueOf(i)));
+    result.setLimit(query.getRows());
     result.setTotal(solrResponse.getResults().getNumFound());
 
     // Walk through response and create new items with title, creator, etc:
@@ -807,16 +807,29 @@ public class SolrRequester {
 
     String orgAdminRole = user.getOrganization().getAdminRole();
     boolean isAdmin = user.hasRole(GLOBAL_ADMIN_ROLE) || user.hasRole(orgAdminRole);
-    if (isAdmin) {
-      if (q.getLimit() > 0) {
-        query.setRows(q.getLimit());
+
+    // be compatible to Elasticsearch here by allowing -1 to mean 'give me everything'
+    // admins can request as many results as they want
+    // everyone else can only get the default maximum
+    if (q.getLimit() == 0) {
+      query.setRows(DEFAULT_LIMIT);
+    }
+    else if (q.getLimit() < 0) {
+      if (isAdmin) {
+        query.setRows(Integer.MAX_VALUE);
+      } else {
+        logger.debug("Non-admin users can only request " + NONADMIN_QUERY_LIMIT + " results at once from solr.");
+        query.setRows(NONADMIN_QUERY_LIMIT);
       }
-    } else {
-      if ((q.getLimit() > 0) && (q.getLimit() < QUERY_MAX_ROWS)) {
+    } else if (q.getLimit() > NONADMIN_QUERY_LIMIT) {
+      if (isAdmin) {
         query.setRows(q.getLimit());
       } else {
-        query.setRows(QUERY_MAX_ROWS);
+        logger.debug("Non-admin users can only request " + NONADMIN_QUERY_LIMIT + " results at once from solr.");
+        query.setRows(NONADMIN_QUERY_LIMIT);
       }
+    } else {
+      query.setRows(q.getLimit());
     }
 
     if (q.getOffset() > 0) {

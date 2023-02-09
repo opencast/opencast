@@ -149,7 +149,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   /** The smil service */
   protected SmilService smilService = null;
 
-  @Reference(name = "smil-service")
+  @Reference
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }
@@ -160,7 +160,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -171,7 +171,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
    * @param composerService
    *          the composer service
    */
-  @Reference(name = "composerService")
+  @Reference
   public void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }

@@ -79,7 +79,7 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
    *      JobContext)
    */
 
-  @Reference(name = "IngestDownloadService")
+  @Reference
   public void setIngestDownloadService(IngestDownloadService ingestDownloadService) {
     this.ingestDownloadService = ingestDownloadService;
   }
@@ -121,7 +121,7 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
     }
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

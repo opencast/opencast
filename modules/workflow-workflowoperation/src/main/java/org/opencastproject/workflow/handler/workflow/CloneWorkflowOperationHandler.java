@@ -89,7 +89,7 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * @param workspace
    *          the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -147,11 +147,11 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
     // Look for elements matching the tags and the flavor
     Collection<MediaPackageElement> elements = elementSelector.select(mediaPackage, true);
 
-    // Check the the number of element returned
+    // Check the number of element returned
     if (elements.size() == 0) {
       // If no one found, we skip the operation
       logger.debug("No matching elements found, skipping operation.");
-      return createResult(workflowInstance.getMediaPackage(), Action.SKIP);
+      return createResult(mediaPackage, Action.SKIP);
     } else {
       logger.debug("Copy " + elements.size() + " elements to new flavor: {}", targetFlavorOption);
 
@@ -168,7 +168,7 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
       }
     }
 
-    return createResult(workflowInstance.getMediaPackage(), Action.CONTINUE);
+    return createResult(mediaPackage, Action.CONTINUE);
   }
 
   private MediaPackageElement copyElement(MediaPackageElement element) throws WorkflowOperationException {
@@ -204,7 +204,7 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
     return newElement;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

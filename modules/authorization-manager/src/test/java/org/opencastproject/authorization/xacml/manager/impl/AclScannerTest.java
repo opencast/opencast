@@ -45,7 +45,6 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
-import org.opencastproject.util.data.Option;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -56,6 +55,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 public class AclScannerTest {
 
@@ -120,7 +120,7 @@ public class AclScannerTest {
     File file = new File(AclScannerTest.class.getResource("/xacml_correct.xml").toURI());
 
     ManagedAcl acl = new ManagedAclImpl(1L, "TestAcl", "org", new AccessControlList());
-    Option<ManagedAcl> managedAcl = Option.some(acl);
+    Optional<ManagedAcl> managedAcl = Optional.of(acl);
     EasyMock.expect(aclDb.createAcl(anyObject(Organization.class), anyObject(AccessControlList.class), anyString()))
             .andReturn(managedAcl).times(3);
     EasyMock.expect(aclDb.getAcls(anyObject(Organization.class))).andReturn(new ArrayList<ManagedAcl>()).times(3);
@@ -148,7 +148,7 @@ public class AclScannerTest {
     File file = new File(AclScannerTest.class.getResource("/xacml_correct.xml").toURI());
 
     ManagedAcl acl = new ManagedAclImpl(1L, "TestAcl", "org", new AccessControlList());
-    Option<ManagedAcl> managedAcl = Option.some(acl);
+    Optional<ManagedAcl> managedAcl = Optional.of(acl);
     EasyMock.expect(aclDb.createAcl(anyObject(Organization.class), anyObject(AccessControlList.class), anyString()))
             .andReturn(managedAcl).times(3);
     EasyMock.expect(aclDb.getAcl(anyObject(Organization.class), anyLong())).andReturn(managedAcl).times(3);
@@ -169,7 +169,7 @@ public class AclScannerTest {
     File file2 = new File(AclScannerTest.class.getResource("/xacml_correct2.xml").toURI());
 
     ManagedAcl acl = new ManagedAclImpl(1L, "TestAcl", "org", new AccessControlList());
-    Option<ManagedAcl> managedAcl = Option.some(acl);
+    Optional<ManagedAcl> managedAcl = Optional.of(acl);
     EasyMock.expect(aclDb.createAcl(anyObject(Organization.class), anyObject(AccessControlList.class), anyString()))
             .andReturn(managedAcl).times(3);
     EasyMock.expect(aclDb.getAcls(anyObject(Organization.class))).andReturn(new ArrayList<ManagedAcl>()).times(3);
@@ -200,7 +200,7 @@ public class AclScannerTest {
     Long id = 1L;
     String org = "org";
     ManagedAcl acl = new ManagedAclImpl(id, "TestAcl", org, new AccessControlList());
-    Option<ManagedAcl> managedAcl = Option.some(acl);
+    Optional<ManagedAcl> managedAcl = Optional.of(acl);
     EasyMock.expect(aclDb.createAcl(anyObject(Organization.class), anyObject(AccessControlList.class), anyString()))
             .andReturn(managedAcl).times(3);
     EasyMock.expect(aclDb.getAcl(EasyMock.anyObject(Organization.class), anyLong())).andReturn(managedAcl).times(3);
@@ -219,7 +219,7 @@ public class AclScannerTest {
     File file1 = new File(AclScannerTest.class.getResource("/xacml_correct.xml").toURI());
     File file2 = new File(AclScannerTest.class.getResource("/xacml_correct2.xml").toURI());
     ManagedAcl acl = new ManagedAclImpl(1L, "TestAcl", "org", new AccessControlList());
-    Option<ManagedAcl> managedAcl = Option.some(acl);
+    Optional<ManagedAcl> managedAcl = Optional.of(acl);
     EasyMock.expect(aclDb.createAcl(anyObject(Organization.class), anyObject(AccessControlList.class), anyString()))
             .andReturn(managedAcl).times(3);
     EasyMock.expect(aclDb.getAcls(anyObject(Organization.class))).andReturn(new ArrayList<ManagedAcl>()).times(3);

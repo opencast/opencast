@@ -27,6 +27,7 @@ import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -82,7 +83,7 @@ public class StartWorkflowWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param assetManager
    *          the asset manager
    */
-  @Reference(name = "asset-manager")
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -93,7 +94,7 @@ public class StartWorkflowWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param workflowService
    *          the workflow service
    */
-  @Reference(name = "workflowService")
+  @Reference
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
@@ -109,7 +110,7 @@ public class StartWorkflowWorkflowOperationHandler extends AbstractWorkflowOpera
     }
     final String configuredMediaPackageIDs = mediaPackageIDs;
     final String configuredWorkflowDefinition = trimToEmpty(operation.getConfiguration(WORKFLOW_DEFINITION));
-    final Boolean failOnError = operation.isFailWorkflowOnException();
+    final Boolean failOnError = operation.isFailOnError();
     // Get workflow parameter
     final Map<String, String> properties = new HashMap<>();
     for (String key : operation.getConfigurationKeys()) {
@@ -151,7 +152,7 @@ public class StartWorkflowWorkflowOperationHandler extends AbstractWorkflowOpera
         logger.info("Starting '{}' workflow for media package '{}'", configuredWorkflowDefinition,
                 mpId);
         workflowService.start(workflowDefinition, mp, properties);
-      } catch (WorkflowDatabaseException | WorkflowParsingException e) {
+      } catch (WorkflowDatabaseException | WorkflowParsingException | UnauthorizedException e) {
         if (failOnError) {
           throw new WorkflowOperationException(e);
         } else {

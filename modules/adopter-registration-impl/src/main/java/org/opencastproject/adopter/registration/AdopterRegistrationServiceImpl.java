@@ -70,7 +70,13 @@ public class AdopterRegistrationServiceImpl implements Service {
   }
 
   @Override
-  public void deleteFormData() {
+  public void markForDeletion() {
+    Form form = ((Form) formRepository.getForm());
+    form.delete();
+    formRepository.save(form);
+  }
+
+  public void deleteRegistration() {
     formRepository.delete();
   }
 
@@ -80,13 +86,13 @@ public class AdopterRegistrationServiceImpl implements Service {
   //================================================================================
 
   /** OSGi setter for the security service. */
-  @Reference(name = "securityService")
+  @Reference
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi setter for the form repository. */
-  @Reference(name = "formRepository")
+  @Reference
   protected void setFormRepository(FormRepository formRepository) {
     this.formRepository = formRepository;
   }

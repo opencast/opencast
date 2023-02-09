@@ -137,23 +137,23 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
   private ComposerService composerService = null;
 
   /** Service Callbacks **/
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
-  @Reference(name = "VideoGridService")
+  @Reference
   public void setVideoGridService(VideoGridService videoGridService) {
     this.videoGridService = videoGridService;
   }
-  @Reference(name = "MediaInspectionService")
+  @Reference
   protected void setMediaInspectionService(MediaInspectionService inspectionService) {
     this.inspectionService = inspectionService;
   }
-  @Reference(name = "ComposerService")
+  @Reference
   public void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

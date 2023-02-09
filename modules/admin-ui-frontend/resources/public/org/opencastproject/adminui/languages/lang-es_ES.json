@@ -27,6 +27,9 @@
    "SELECT_NO_OPTIONS_AVAILABLE": "No hay opciones disponibles",
    "YES": "Sí",
    "COPY": "Copiar en el portapapeles",
+   "MONITOR": {
+      "REGISTRATION": "Opencast ha enviado una actualización de registro hace más de una semana"
+   },
    "LTI": {
       "ERROR_LOADING_METADATA": "Error al cargar los metadatos del evento. Inténtalo de nuevo más tarde.",
       "SERIES_TITLE": "Ver series",
@@ -142,7 +145,7 @@
       "HELP": "Ayuda",
       "USERS_GUIDE": "Guía del usuario",
       "DOCUMENTATION": "Documentación",
-      "REST_DOC": "Documentación de la API REST",
+      "REST_DOC": "API REST",
       "HOTKEY_CHEAT_SHEET": "Atajos de Teclado",
       "ADOPTER_REGISTRATION": "Registro de Adopters"
    },
@@ -245,7 +248,17 @@
       "ADOPTER_PROFILE_UPDATED": "El perfil se actualizó correctamente",
       "ADOPTER_PROFILE_NOT_UPDATED": "¡Ups! No se pudo actualizar la información del perfil. ¡Inténtalo de nuevo!",
       "ADOPTER_PROFILE_DELETED": "Información del perfil eliminada correctamente.",
-      "ADOPTER_PROFILE_NOT_DELETED": "¡Ups! No se pudo eliminar la información del perfil. ¡Inténtalo de nuevo!"
+      "ADOPTER_PROFILE_NOT_DELETED": "¡Ups! No se pudo eliminar la información del perfil. ¡Inténtalo de nuevo!",
+      "TOBIRA_OVERRIDE_NAME": "El título de la página seleccionada se sobrescribirá con el título de la serie.",
+      "TOBIRA_NO_PATH_SEGMENT": "La página necesita un segmento de ruta.",
+      "TOBIRA_NOT_MOUNTED": "No se pudo montar la serie en Tobira.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "El segmento de ruta no es válido. Un segmento de ruta válido tiene al menos 2 caracteres, no contiene ningún espacio en blanco o caracteres de control, ninguno de los caracteres '<>\"[\\]^`{|}#%/? ', y no empieza con ninguno de los caracteres '-+~@_! &;:. =*'()'.",
+      "TOBIRA_PATH_SEGMENT_UNIQUE": "El segmento de ruta de una página debe ser única entre todas sus páginas hermanas.",
+      "TOBIRA_PAGE_NOT_FOUND": "La página a la que intentó navegar no existe o ya no existe. Intente comenzar desde el principio.",
+      "TOBIRA_SERVER_ERROR": " Error al comunicarse con Tobira. Contacte a su administrador del sistema y/o vuelva a intentarlo más tarde.",
+      "TOBIRA_COPIED_DIRECT_LINK": "Enlace copiado al portapapeles.",
+      "TOBIRA_FAILED_COPYING_DIRECT_LINK": "No se pudo copiar el enlace al portapapeles.",
+      "TOBIRA_NOT_FOUND": "Tobira no conoce esta serie (todavía). Inténtalo de nuevo en unos minutos o, contacte con el administrador del sistema."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Acciones",
@@ -411,6 +424,11 @@
          "LEGAL_INFO_STATE": {
             "HEADER": "Condiciones del servicio y política de privacidad"
          },
+         "SUMMARY_STATE": {
+            "HEADER": "Este es un resumen JSON de exactamente lo que se enviaría a los servidores de Opencast",
+            "GENERAL_HEADER": "Información del adoptante",
+            "STATS_HEADER": "Información estadística"
+         },
          "INFORMATION_STATE": {
             "HEADER": "¡Gracias por usar Opencast!",
             "INFORMATION_PARAGRAPH_1": "Nuestros desarrolladores están trabajando constantemente para proporcionarle la mejor experiencia de usuario posible. Para eso, necesitamos saber más sobre quién utiliza Opencast y cómo se utiliza. Puedes ayudarnos con un registro rápido.",
@@ -455,7 +473,7 @@
             "TEXT": "Se produjo un error al procesar tu solicitud."
          },
          "DELETE_SUBMIT_STATE": {
-            "TEXT": "¿Está seguro de que desea eliminar sus datos de registro?"
+            "TEXT": "¿Está seguro que desea eliminar sus datos de registro? Confirmando esto también eliminará sus datos de registro del servidor del proyecto Opencast en el siguiente intervalo de actualización."
          }
       }
    },
@@ -635,7 +653,8 @@
                "EDITOR_NEEDS_CUTTING": "Abrir editor de vídeo (un comentario indica que se ha solicitado edición)",
                "COMMENTS": "Ver comentarios",
                "PAUSED_WORKFLOW": "Ver Workflows pausados",
-               "PRESENTER": "Filtrar para este presentador"
+               "PRESENTER": "Filtrar para este presentador",
+               "COPY_TO_NEW_EVENT": "Copiar metadatos al nuevo evento"
             }
          },
          "STATUS": {
@@ -1113,6 +1132,20 @@
                "LABEL": "Seleccione tema",
                "EMPTY": "No  hay estilos disponibles"
             },
+            "TOBIRA": {
+               "CAPTION": "Tobira",
+               "DESCRIPTION": "Aquí puede seleccionar dónde desea que la serie aparezca en el portal de vídeo de Tobira. Solo puede seleccionar una ubicación aquí, y debe estar vacía (marcada en negrita). Puede crear nuevas páginas aquí, pero tenga en cuenta que solo persisten si están en la ruta a la página seleccionada.",
+               "SELECT_PAGE": "Seleccione una página de destino",
+               "PAGE_TITLE": "Título de subpágina",
+               "PATH_SEGMENT": "Segmento de ruta",
+               "SUBPAGES": "Subpáginas",
+               "ADD_SUBPAGE": "Añadir subpágina",
+               "CANCEL": "Cancelar",
+               "HOMEPAGE": "Página principal",
+               "SELECTED_PAGE": "La serie será montada bajo la siguiente ruta",
+               "NO_PAGE_SELECTED": "No hay página seleccionada. La serie no se publicará en Tobira.",
+               "PATH": "Ruta"
+            },
             "SUMMARY": {
                "CAPTION": "Resumen"
             }
@@ -1141,6 +1174,7 @@
                "EVENTS": "Eventos",
                "PERMISSIONS": "Política de acceso",
                "THEME": "Estilo",
+               "TOBIRA": "Tobira",
                "STATISTICS": "Estadísticas"
             },
             "ACCESS": {
@@ -1161,8 +1195,10 @@
                   "ACTION": "Acciones",
                   "NEW": "Nueva política",
                   "DETAILS": "Detalles",
-                  "REPLACE_EVENT_ACLS": "Actualizar permisos de evento",
+                  "REPLACE_EVENT_ACLS": "Guardar y actualizar permisos del evento",
                   "REPLACE_EVENT_ACLS_HINT": "Asegúrese de que todos los eventos de esta serie tengan estos permisos en vigor",
+                  "SAVE_SERIES_ACLS": "Guardar",
+                  "SAVE_SERIES_ACLS_HINT": "Aplicar permisos sólo a series",
                   "LOAD_MORE_LIMIT": "políticas mostradas.",
                   "LOAD_MORE_LINK": "Cargar más"
                },
@@ -1185,6 +1221,13 @@
                "LANGUAGE": "Idioma",
                "LICENSE": "Licencia",
                "DESCRIPTION": "Descripción"
+            },
+            "TOBIRA": {
+               "HOMEPAGE": "(Página principal)",
+               "DIRECT_LINK": "Enlace directo a la serie",
+               "COPY_DIRECT_LINK": "Copiar en el portapapeles",
+               "NOT_MOUNTED": "Esta serie no está actualmente incluida en la estructura de la página, y solo se puede alcanzar utilizando el enlace directo de arriba.",
+               "PAGES": "Páginas en Tobira que contienen esta serie"
             },
             "EVENTS": {
                "TITLE": "Título",
@@ -1301,6 +1344,14 @@
                "RIGHT": "Roles seleccionados",
                "REMOVE": "Eliminar rol",
                "ADD": "Añadir rol"
+            },
+            "STRENGTH": {
+               "BAD": "Contraseña Incorrecta",
+               "VERYWEAK": "Contraseña muy débil",
+               "WEAK": "Contraseña débil",
+               "GOOD": "Buen Password",
+               "STRONG": "Contraseña segura",
+               "VERYSTRONG": "Contraseña muy segura"
             }
          }
       },
@@ -2076,7 +2127,8 @@
       "GROUPS": {
          "GENERAL": "General",
          "PLAYER": "Reproductor",
-         "EDITOR": "Editor"
+         "EDITOR": "Editor",
+         "ADD_MEDIA": "Crear Evento/Serie"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2109,6 +2161,10 @@
             "CLEAR_LIST": "Borrar segmento",
             "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Reproducir segmento con previo",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Fin de segmento"
+         },
+         "ADD_MEDIA": {
+            "NEXT_TAB": "Siguiente pestaña/Crear",
+            "PREVIOUS_TAB": "Pestaña anterior"
          }
       }
    },

@@ -142,13 +142,13 @@ public class StaticFileRestService {
   protected boolean useWebserver = false;
 
   /** OSGi callback to bind service instance. */
-  @Reference(name = "UploadStaticFileService")
+  @Reference
   public void setStaticFileService(StaticFileService staticFileService) {
     this.staticFileService = staticFileService;
   }
 
   /** OSGi callback to bind service instance. */
-  @Reference(name = "SecurityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

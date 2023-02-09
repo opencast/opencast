@@ -21,12 +21,17 @@
 
 package org.opencastproject.adminui.usersettings;
 
+import static org.opencastproject.db.Queries.namedQuery;
+
 import org.opencastproject.adminui.usersettings.persistence.UserSettingDto;
 import org.opencastproject.adminui.usersettings.persistence.UserSettingsServiceException;
+import org.opencastproject.db.DBSession;
+import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -35,11 +40,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.function.Function;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Query;
 
 /**
  * Finds the user settings and message signatures from the current user.
@@ -61,6 +65,10 @@ public class UserSettingsService {
   /** Factory used to create {@link EntityManager}s for transactions */
   protected EntityManagerFactory emf;
 
+  protected DBSessionFactory dbSessionFactory;
+
+  protected DBSession db;
+
   /** The user directory service */
   protected UserDirectoryService userDirectoryService;
 
@@ -78,12 +86,18 @@ public class UserSettingsService {
   @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for user settings");
+    db = dbSessionFactory.createSession(emf);
   }
 
   /** OSGi DI */
   @Reference(target = "(osgi.unit.name=org.opencastproject.adminui)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
+  }
+
+  @Reference
+  public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
+    this.dbSessionFactory = dbSessionFactory;
   }
 
   /**
@@ -129,37 +143,30 @@ public class UserSettingsService {
    * @throws UserSettingsServiceException
    */
   public UserSettings findUserSettings(int limit, int offset) throws UserSettingsServiceException {
-    UserSettings userSettings = getUserSettings(limit, offset);
-    if (userSettings == null) {
-      userSettings = new UserSettings();
+    try {
+      UserSettings userSettings = db.exec(getUserSettingsQuery(limit, offset));
+      userSettings.setTotal(db.exec(getUserSettingsTotalQuery()));
+      userSettings.setLimit(limit);
+      userSettings.setOffset(offset);
+      return userSettings;
+    } catch (Exception e) {
+      logger.error("Could not get user settings:", e);
+      throw new UserSettingsServiceException(e);
     }
-    userSettings.setTotal(getUserSettingsTotal());
-    userSettings.setLimit(limit);
-    userSettings.setOffset(offset);
-    return userSettings;
   }
 
   /**
-   * @return Finds the total number of user settings for the current user.
-   * @throws UserSettingsServiceException
+   * @return Function that finds the total number of user settings for the current user.
    */
-  private int getUserSettingsTotal() throws UserSettingsServiceException {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      String orgId = securityService.getOrganization().getId();
-      String username = securityService.getUser().getUsername();
-      Query q = em.createNamedQuery("UserSettings.countByUserName").setParameter("username", username).setParameter("org", orgId);
-      Number countResult = (Number) q.getSingleResult();
-      return countResult.intValue();
-    }  catch (Exception e) {
-      logger.error("Could not count message signatures:", e);
-      throw new UserSettingsServiceException(e);
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+  private Function<EntityManager, Integer> getUserSettingsTotalQuery() {
+    String orgId = securityService.getOrganization().getId();
+    String username = securityService.getUser().getUsername();
+    return namedQuery.find(
+        "UserSettings.countByUserName",
+        Number.class,
+        Pair.of("username", username),
+        Pair.of("org", orgId)
+    ).andThen(Number::intValue);
   }
 
   /**
@@ -167,39 +174,34 @@ public class UserSettingsService {
    *          The number of limits to page to.
    * @param limit
    *          The maximum number of settings to return.
-   * @return Find all of the user settings for the current user.
-   * @throws UserSettingsServiceException
-   *           Thrown if there is a problem getting the user settings.
+   * @return Function that finds all of the user settings for the current user.
    */
-  private UserSettings getUserSettings(int limit, int offset) throws UserSettingsServiceException {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
+  private Function<EntityManager, UserSettings> getUserSettingsQuery(int limit, int offset) {
+    return em -> {
       String orgId = securityService.getOrganization().getId();
       String username = securityService.getUser().getUsername();
       logger.debug("Getting user settings for '%s' in org '%s'", username, orgId);
-      Query q = em.createNamedQuery("UserSettings.findByUserName").setParameter("username", username)
-              .setParameter("org", orgId).setMaxResults(limit).setFirstResult(offset);
-      List<UserSettingDto> result = q.getResultList();
+
+      List<UserSettingDto> result = em
+          .createNamedQuery("UserSettings.findByUserName", UserSettingDto.class)
+          .setParameter("username", username)
+          .setParameter("org", orgId)
+          .setMaxResults(limit)
+          .setFirstResult(offset)
+          .getResultList();
       if (result.size() == 0) {
         logger.debug("Found no user settings.");
       }
+
       UserSettings userSettings = new UserSettings();
       for (UserSettingDto userSettingsDto : result) {
         UserSetting userSetting = userSettingsDto.toUserSetting();
-        logger.debug("Found user setting id: %d key: %s value: %s", userSetting.getId(), userSetting.getKey()
-                .toString(), userSetting.getValue().toString());
+        logger.debug("Found user setting id: %d key: %s value: %s", userSetting.getId(), userSetting.getKey(),
+            userSetting.getValue());
         userSettings.addUserSetting(userSetting);
       }
       return userSettings;
-    } catch (Exception e) {
-      logger.error("Could not get user settings:", e);
-      throw new UserSettingsServiceException(e);
-    } finally {
-      if (em != null) {
-        em.close();
-      }
-    }
+    };
   }
 
   /**
@@ -213,66 +215,41 @@ public class UserSettingsService {
    * @throws UserSettingsServiceException
    */
   public UserSetting addUserSetting(String key, String value) throws UserSettingsServiceException {
-    EntityManager em = null;
-    EntityTransaction tx = null;
-    String orgId = "";
-    String username = "";
+    String orgId = securityService.getOrganization().getId();
+    String username = securityService.getUser().getUsername();
     try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
-      orgId = securityService.getOrganization().getId();
-      username = securityService.getUser().getUsername();
-      UserSettingDto userSettingDto = new UserSettingDto();
-      userSettingDto.setKey(key);
-      userSettingDto.setValue(value);
-      userSettingDto.setUsername(username);
-      userSettingDto.setOrganization(orgId);
-      em.persist(userSettingDto);
-      tx.commit();
-      return userSettingDto.toUserSetting();
+      return db.execTx(em -> {
+        UserSettingDto userSettingDto = new UserSettingDto();
+        userSettingDto.setKey(key);
+        userSettingDto.setValue(value);
+        userSettingDto.setUsername(username);
+        userSettingDto.setOrganization(orgId);
+        em.persist(userSettingDto);
+        return userSettingDto.toUserSetting();
+      });
     } catch (Exception e) {
-      logger.error("Could not update user setting username '%s' org:'%s' key:'%s' value:'%s':",
-        username, orgId, key, value, e);
-      if (tx.isActive()) {
-        tx.rollback();
-      }
+      logger.error("Could not update user setting username '%s' org:'%s' key:'%s' value:'%s':", username, orgId, key,
+          value, e);
       throw new UserSettingsServiceException(e);
-    } finally {
-      if (em != null) {
-        em.close();
-      }
     }
   }
 
   /**
    * Get all user settings based upon its key.
    * @param key The key to search for.
-   * @return A {@link UserSettingDto} that matches the key.
-   * @throws UserSettingsServiceException
+   * @return A function returning {@link UserSettingDto} that matches the key.
    */
-  private List<UserSettingDto> getUserSettingsByKey(String key) throws UserSettingsServiceException {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      String orgId = securityService.getOrganization().getId();
-      String username = securityService.getUser().getUsername();
-      logger.debug("Getting user settings for '%s' in org '%s'", username, orgId);
-      Query q = em.createNamedQuery("UserSettings.findByKey").setParameter("key", key).setParameter("username", username).setParameter("org", orgId);
-      List<UserSettingDto> result = q.getResultList();
-      if (result.size() == 0) {
-        logger.debug("Found no user settings.");
-        return null;
-      }
-
-      return result;
-    } catch (Exception e) {
-      logger.error("Could not get user setting", e);
-      throw new UserSettingsServiceException(e);
-    } finally {
-      if (em != null)
-        em.close();
-    }
+  private Function<EntityManager, List<UserSettingDto>> getUserSettingsByKeyQuery(String key) {
+    String orgId = securityService.getOrganization().getId();
+    String username = securityService.getUser().getUsername();
+    logger.debug("Getting user settings for '%s' in org '%s'", username, orgId);
+    return namedQuery.findAll(
+        "UserSettings.findByKey",
+        UserSettingDto.class,
+        Pair.of("key", key),
+        Pair.of("username", username),
+        Pair.of("org", orgId)
+    );
   }
 
   /**
@@ -283,17 +260,18 @@ public class UserSettingsService {
    * @throws UserSettingsServiceException
    */
   public UserSetting updateUserSetting(String key, String value, String oldValue) throws UserSettingsServiceException {
-    UserSettingDto userSettingDto = null;
-    List<UserSettingDto> userSettings = getUserSettingsByKey(key);
-    for (UserSettingDto currentUserSetting : userSettings) {
-      if (currentUserSetting.getKey().equalsIgnoreCase(key) && currentUserSetting.getValue().equalsIgnoreCase(oldValue)) {
-        userSettingDto = currentUserSetting;
-      }
+    try {
+      UserSettingDto userSettingDto = db.exec(getUserSettingsByKeyQuery(key)).stream()
+          .filter(setting -> setting.getKey().equalsIgnoreCase(key) && setting.getValue().equalsIgnoreCase(oldValue))
+          .findFirst()
+          .orElseThrow(() -> new UserSettingsServiceException("Unable to find user setting with key " + key + " value "
+              + value + " and old value " + oldValue));
+
+      return updateUserSetting(userSettingDto.getId(), key, value);
+    } catch (Exception e) {
+      logger.error("Could not update user setting", e);
+      throw new UserSettingsServiceException(e);
     }
-    if (userSettingDto == null) {
-      throw new UserSettingsServiceException("Unable to find user setting with key " + key + " value " + value + " and old value " + oldValue);
-    }
-    return updateUserSetting(userSettingDto.getId(), key, value);
   }
 
   /**
@@ -305,34 +283,22 @@ public class UserSettingsService {
    * @throws UserSettingsServiceException
    */
   public UserSetting updateUserSetting(long id, String key, String value) throws UserSettingsServiceException {
-    EntityManager em = null;
-    EntityTransaction tx = null;
-    String orgId = "";
-    String username = "";
+    String orgId = securityService.getOrganization().getId();
+    String username = securityService.getUser().getUsername();
     logger.debug("Updating user setting id: %d key: %s value: %s", id, key, value);
+
     try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
-      orgId = securityService.getOrganization().getId();
-      username = securityService.getUser().getUsername();
-      UserSettingDto userSettingDto = em.find(UserSettingDto.class, id);
-      em.persist(userSettingDto);
-      userSettingDto.setKey(key);
-      userSettingDto.setValue(value);
-      tx.commit();
-      return userSettingDto.toUserSetting();
+      return db.execTx(em -> {
+        UserSettingDto userSettingDto = em.find(UserSettingDto.class, id);
+        userSettingDto.setKey(key);
+        userSettingDto.setValue(value);
+        em.persist(userSettingDto);
+        return userSettingDto.toUserSetting();
+      });
     } catch (Exception e) {
       logger.error("Could not update user setting username '%s' org:'%s' id:'%d' key:'%s' value:'%s':",
         username, orgId, id, key, value, e);
-      if (tx.isActive()) {
-        tx.rollback();
-      }
       throw new UserSettingsServiceException(e);
-    } finally {
-      if (em != null) {
-        em.close();
-      }
     }
   }
 
@@ -344,23 +310,14 @@ public class UserSettingsService {
    * @throws UserSettingsServiceException
    */
   public void deleteUserSetting(long id) throws UserSettingsServiceException {
-    EntityManager em = null;
-    EntityTransaction tx = null;
     try {
-      em = emf.createEntityManager();
-      UserSettingDto userSettingsDto = em.find(UserSettingDto.class, id);
-      tx = em.getTransaction();
-      tx.begin();
-      em.remove(userSettingsDto);
-      tx.commit();
+      db.execTx(em -> {
+        UserSettingDto userSettingsDto = em.find(UserSettingDto.class, id);
+        em.remove(userSettingsDto);
+      });
     } catch (Exception e) {
       logger.error("Could not delete user setting '%d':", id, e);
-      if (tx.isActive())
-        tx.rollback();
       throw new UserSettingsServiceException(e);
-    } finally {
-      if (em != null)
-        em.close();
     }
   }
 }

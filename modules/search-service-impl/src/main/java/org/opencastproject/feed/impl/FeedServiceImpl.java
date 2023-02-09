@@ -314,7 +314,6 @@ public class FeedServiceImpl {
    *          the generator
    */
   @Reference(
-      name = "feed",
       cardinality = ReferenceCardinality.MULTIPLE,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "removeFeedGenerator"
@@ -341,15 +340,12 @@ public class FeedServiceImpl {
    * @param securityService
    *          the security service
    */
-  @Reference(name = "security")
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  @Reference(
-      name = "profilesReadyIndicator",
-      target = "(artifact=feed)"
-  )
+  @Reference(target = "(artifact=feed)")
   public void setProfilesReadyIndicator(ReadinessIndicator readyIndicator) {
     //Only activate service if ReadinessIndicator is registered.
   }

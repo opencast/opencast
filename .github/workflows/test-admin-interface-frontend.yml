@@ -17,14 +17,25 @@ jobs:
         browser:
           - chrome
           - firefox
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
 
     - name: use node.js
       uses: actions/setup-node@v1
       with:
-        node-version: 14.x
+        node-version: 16.x
+
+    # Ubuntu 22.04 lies wrt to firefox in its repo
+    # the 'firefox' package is just a script which tells you to use snap
+    # This adds Mozilla's PPA, and installs it from there
+    - name: install firefox manually
+      run: |
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository -y ppa:mozillateam/ppa
+        echo -e 'Package: *\nPin: release o=LP-PPA-mozillateam\nPin-Priority: 1001' | sudo tee /etc/apt/preferences.d/mozilla-firefox
+        sudo apt-get install -y firefox
+        firefox --version
 
     - name: install dependencies
       run: |

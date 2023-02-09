@@ -133,12 +133,12 @@ public class WaveformServiceEndpoint extends AbstractJobProducerEndpoint {
     return serviceRegistry;
   }
 
-  @Reference(name = "serviceRegistry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
-  @Reference(name = "WaveformService")
+  @Reference
   public void setWaveformService(WaveformService waveformService) {
     this.waveformService = waveformService;
   }

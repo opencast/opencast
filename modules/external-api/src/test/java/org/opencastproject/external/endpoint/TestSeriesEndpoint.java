@@ -20,7 +20,6 @@
  */
 package org.opencastproject.external.endpoint;
 
-import static com.entwinemedia.fn.data.Opt.some;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
@@ -49,8 +48,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
 import org.opencastproject.util.data.Arrays;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.Ignore;
@@ -61,6 +58,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
@@ -130,6 +128,9 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
     ElasticsearchIndex elasticsearchIndex = createMock(ElasticsearchIndex.class);
     expect(elasticsearchIndex.getByQuery(anyObject(SeriesSearchQuery.class))).andStubReturn(searchResult);
+    expect(elasticsearchIndex.getSeries("4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f", org.getId(), user)).andStubReturn(
+            Optional.of(series1));
+    expect(elasticsearchIndex.getSeries("unknown-series-id", org.getId(), user)).andStubReturn(Optional.empty());
     replay(elasticsearchIndex);
 
     Map<String, String> series1Props = new HashMap<>();
@@ -143,8 +144,6 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     adapters.add(commonAdapter);
 
     IndexService indexService = createNiceMock(IndexService.class);
-    expect(indexService.getSeries("4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f", elasticsearchIndex)).andStubReturn(some(series1));
-    expect(indexService.getSeries("unknown-series-id", elasticsearchIndex)).andStubReturn(Opt.<Series> none());
     expect(indexService.getSeriesCatalogUIAdapters()).andStubReturn(adapters);
     expect(indexService.getCommonSeriesCatalogUIAdapter()).andStubReturn(commonAdapter);
     expect(indexService

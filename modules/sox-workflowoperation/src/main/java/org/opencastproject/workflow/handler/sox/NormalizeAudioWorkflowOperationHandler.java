@@ -101,7 +101,7 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
    * @param soxService
    *          the SoX service
    */
-  @Reference(name = "SoxService")
+  @Reference
   protected void setSoxService(SoxService soxService) {
     this.soxService = soxService;
   }
@@ -112,7 +112,7 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
    * @param composerService
    *          the composer service
    */
-  @Reference(name = "ComposerService")
+  @Reference
   protected void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -124,12 +124,12 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

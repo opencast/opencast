@@ -44,6 +44,7 @@ import org.opencastproject.metadata.mpeg7.TemporalDecomposition;
 import org.opencastproject.metadata.mpeg7.TextAnnotation;
 import org.opencastproject.util.XmlSafeParser;
 
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +70,14 @@ import javax.xml.transform.stream.StreamResult;
 /**
  * This is converter for Mpeg7 caption format.
  */
+@Component(
+    immediate = true,
+    service = { CaptionConverter.class },
+    property = {
+        "service.description=Mpeg7 caption converter",
+        "caption.format=mpeg7"
+    }
+)
 public class Mpeg7CaptionConverter implements CaptionConverter {
 
   /** File extension for mpeg 7 catalogs */

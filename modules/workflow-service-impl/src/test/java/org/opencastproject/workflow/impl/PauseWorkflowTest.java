@@ -21,17 +21,13 @@
 
 package org.opencastproject.workflow.impl;
 
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createNiceMock;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.ARecord;
-import org.opencastproject.assetmanager.api.query.AResult;
-import org.opencastproject.assetmanager.api.query.ASelectQuery;
-import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.assetmanager.api.query.Target;
-import org.opencastproject.assetmanager.api.query.VersionField;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
@@ -54,23 +50,21 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowParser;
+import org.opencastproject.workflow.api.WorkflowServiceDatabaseImpl;
 import org.opencastproject.workflow.api.WorkflowStateListener;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -80,8 +74,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.Assert;
-
 public class PauseWorkflowTest {
 
   private WorkflowServiceImpl service = null;
@@ -89,31 +81,15 @@ public class PauseWorkflowTest {
   private WorkflowDefinition def = null;
   private WorkflowInstance workflow = null;
   private MediaPackage mp = null;
-  private WorkflowServiceSolrIndex dao = null;
   private Workspace workspace = null;
   private SecurityService securityService = null;
   private ResumableTestWorkflowOperationHandler firstHandler = null;
   private ResumableTestWorkflowOperationHandler secondHandler = null;
 
-  private File sRoot = null;
-
   private AccessControlList acl = new AccessControlList();
-
-  protected static final String getStorageRoot() {
-    return "." + File.separator + "target" + File.separator + System.currentTimeMillis();
-  }
 
   @Before
   public void setUp() throws Exception {
-    // always start with a fresh solr root directory
-    sRoot = new File(getStorageRoot());
-    try {
-      FileUtils.deleteDirectory(sRoot);
-      FileUtils.forceMkdir(sRoot);
-    } catch (IOException e) {
-      Assert.fail(e.getMessage());
-    }
-
     MediaPackageBuilder mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
     mediaPackageBuilder.setSerializer(new DefaultMediaPackageSerializerImpl(new File("target/test-classes")));
     InputStream is = PauseWorkflowTest.class.getResourceAsStream("/mediapackage-1.xml");
@@ -139,39 +115,20 @@ public class PauseWorkflowTest {
     service.addWorkflowDefinitionScanner(scanner);
 
     final AssetManager assetManager = createNiceMock(AssetManager.class);
-    final AQueryBuilder query = EasyMock.createNiceMock(AQueryBuilder.class);
-    final Target t = EasyMock.createNiceMock(Target.class);
-    final Predicate p = EasyMock.createNiceMock(Predicate.class);
-    EasyMock.expect(p.and(EasyMock.anyObject(Predicate.class))).andReturn(p).anyTimes();
-    EasyMock.expect(query.snapshot()).andReturn(t).anyTimes();
-    EasyMock.expect(query.propertiesOf(EasyMock.anyString())).andReturn(t).anyTimes();
-    final VersionField v = EasyMock.createNiceMock(VersionField.class);
-    EasyMock.expect(v.isLatest()).andReturn(p).anyTimes();
-    EasyMock.expect(query.version()).andReturn(v).anyTimes();
     EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.none()).anyTimes();
-    EasyMock.expect(query.mediaPackageId(EasyMock.anyString())).andReturn(p).anyTimes();
-    final ASelectQuery selectQuery = EasyMock.createNiceMock(ASelectQuery.class);
-    EasyMock.expect(selectQuery.where(EasyMock.anyObject(Predicate.class))).andReturn(selectQuery).anyTimes();
-    final AResult r = EasyMock.createNiceMock(AResult.class);
-    EasyMock.expect(selectQuery.run()).andReturn(r).anyTimes();
-    final Stream<ARecord> recStream = Stream.mk();
-    EasyMock.expect(r.getRecords()).andReturn(recStream).anyTimes();
-    EasyMock.expect(query.select(EasyMock.anyObject(Target.class), EasyMock.anyObject(Target.class)))
-            .andReturn(selectQuery).anyTimes();
-    EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
-    EasyMock.replay(query, t, r, selectQuery, assetManager, p, v);
+    EasyMock.replay(assetManager);
     service.setAssetManager(assetManager);
 
     // security service
     DefaultOrganization organization = new DefaultOrganization();
-    securityService = EasyMock.createNiceMock(SecurityService.class);
+    securityService = createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(SecurityServiceStub.DEFAULT_ORG_ADMIN).anyTimes();
     EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
     EasyMock.replay(securityService);
 
     service.setSecurityService(securityService);
 
-    AuthorizationService authzService = EasyMock.createNiceMock(AuthorizationService.class);
+    AuthorizationService authzService = createNiceMock(AuthorizationService.class);
     EasyMock.expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
             .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
     EasyMock.replay(authzService);
@@ -183,7 +140,7 @@ public class PauseWorkflowTest {
     EasyMock.replay(userDirectoryService);
     service.setUserDirectoryService(userDirectoryService);
 
-    MediaPackageMetadataService mds = EasyMock.createNiceMock(MediaPackageMetadataService.class);
+    MediaPackageMetadataService mds = createNiceMock(MediaPackageMetadataService.class);
     EasyMock.replay(mds);
     service.addMetadataService(mds);
 
@@ -197,41 +154,37 @@ public class PauseWorkflowTest {
     service.setOrganizationDirectoryService(organizationDirectoryService);
 
     ServiceRegistryInMemoryImpl serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService,
-            userDirectoryService, organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
+            userDirectoryService, organizationDirectoryService, createNiceMock(IncidentService.class));
 
-    workspace = EasyMock.createNiceMock(Workspace.class);
+    workspace = createNiceMock(Workspace.class);
     EasyMock.expect(workspace.getCollectionContents((String) EasyMock.anyObject())).andReturn(new URI[0]);
+    EasyMock.expect(workspace.read(anyObject()))
+            .andAnswer(() -> getClass().getResourceAsStream("/dc-1.xml")).anyTimes();
     EasyMock.replay(workspace);
+    service.setWorkspace(workspace);
 
-    dao = new WorkflowServiceSolrIndex();
-    dao.setServiceRegistry(serviceRegistry);
-    dao.setAuthorizationService(authzService);
-    dao.solrRoot = sRoot + File.separator + "solr";
-    dao.setSecurityService(securityService);
-    dao.setOrgDirectory(organizationDirectoryService);
-    dao.activate("System Admin");
-    service.setDao(dao);
+    WorkflowServiceDatabaseImpl workflowDb = new WorkflowServiceDatabaseImpl();
+    workflowDb.setEntityManagerFactory(newEntityManagerFactory(WorkflowServiceDatabaseImpl.PERSISTENCE_UNIT));
+    workflowDb.setDBSessionFactory(getDbSessionFactory());
+    workflowDb.setSecurityService(securityService);
+    workflowDb.activate(null);
+    service.setPersistence(workflowDb);
+
     service.setServiceRegistry(serviceRegistry);
     service.activate(null);
 
     is = PauseWorkflowTest.class.getResourceAsStream("/workflow-definition-pause.xml");
-    def = WorkflowParser.parseWorkflowDefinition(is);
+    def = XmlWorkflowParser.parseWorkflowDefinition(is);
     IOUtils.closeQuietly(is);
 
-    SearchResult result = EasyMock.createNiceMock(SearchResult.class);
+    SearchResult result = createNiceMock(SearchResult.class);
 
-    final ElasticsearchIndex index = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    final ElasticsearchIndex index = createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
     EasyMock.replay(result, index);
 
     service.setIndex(index);
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    dao.deactivate();
-    service.deactivate();
   }
 
   @Test
@@ -240,10 +193,8 @@ public class PauseWorkflowTest {
     // Start a new workflow
     WorkflowStateListener pauseListener = new WorkflowStateListener(WorkflowState.PAUSED);
     service.addWorkflowListener(pauseListener);
-    synchronized (pauseListener) {
-      workflow = service.start(def, mp, null);
-      pauseListener.wait();
-    }
+    workflow = service.start(def, mp, null);
+    WorkflowTestSupport.poll(pauseListener, 1);
 
     // Ensure that the first operation handler was called, but not the second
     Assert.assertTrue(firstHandler.isStarted());
@@ -257,9 +208,12 @@ public class PauseWorkflowTest {
     properties.put("key", "value");
 
     service.addWorkflowListener(pauseListener);
-    synchronized (pauseListener) {
-      service.resume(workflow.getId(), properties);
-      pauseListener.wait();
+    service.resume(workflow.getId(), properties);
+    WorkflowTestSupport.poll(pauseListener, 1);
+    //Workflow takes some time internally, so poll until things match, or we time out (and the assert fails below)
+    // sleep time, and counter size are set arbitrarily.  Should be large enough to work, but not force a huge wait
+    for (int counter = 0; counter < 100 && !properties.equals(firstHandler.getProperties()); counter++) {
+      Thread.sleep(100);
     }
     service.removeWorkflowListener(pauseListener);
 

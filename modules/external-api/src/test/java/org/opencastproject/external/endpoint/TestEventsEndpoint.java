@@ -27,18 +27,22 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatalogProperties;
 
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
+import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageBuilder;
+import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.PublicationImpl;
-import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.scheduler.api.SchedulerService;
@@ -51,13 +55,14 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
+import org.opencastproject.workflow.api.WorkflowService;
 
 import com.entwinemedia.fn.data.Opt;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.osgi.service.cm.ConfigurationException;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Collections;
@@ -86,6 +91,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
   public static final String METADATA_GET_EVENT = "metadatagetevent";
   public static final String SCHEDULING_GET_EVENT = "schedulinggetevent";
   public static final String SCHEDULING_UPDATE_EVENT = "schedulingupdateevent";
+  public static final String TRACK_UPDATE_EVENT = "trackupdateevent";
 
   private static Capture<MetadataList> capturedMetadataList1;
   private static Capture<MetadataList> capturedMetadataList2;
@@ -93,6 +99,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
   private static Capture<Opt<Date>> capturedEndDate;
   private static Capture<Opt<String>> capturedAgentId;
   private static Capture<Opt<Map<String, String>>> capturedAgentConfig;
+  private static Capture<MediaPackage> capturedMediaPackage;
 
   private static Organization defaultOrg = new DefaultOrganization();
 
@@ -107,26 +114,6 @@ public class TestEventsEndpoint extends EventsEndpoint {
     setSecurityService(securityService);
   }
 
-  private void setupEventCatalogUIAdapters() throws ConfigurationException {
-    // Setup common event catalog
-    CommonEventCatalogUIAdapter commonEventCatalogUIAdapter = new CommonEventCatalogUIAdapter();
-    Properties episodeCatalogProperties = getCatalogProperties(getClass(), "/episode-catalog.properties");
-    commonEventCatalogUIAdapter.updated(PropertiesUtil.toDictionary(episodeCatalogProperties));
-    this.setCommonEventCatalogUIAdapter(commonEventCatalogUIAdapter);
-    addCatalogUIAdapter(commonEventCatalogUIAdapter);
-
-    // Setup catalog to be deleted.
-    EventCatalogUIAdapter deleteAdapter = EasyMock.createMock(EventCatalogUIAdapter.class);
-    EasyMock.expect(deleteAdapter.getFlavor()).andReturn(new MediaPackageElementFlavor(DELETE_CATALOG_TYPE, "episode"))
-            .anyTimes();
-    DublinCoreMetadataCollection collectionMock = EasyMock.createNiceMock(DublinCoreMetadataCollection.class);
-    EasyMock.expect(deleteAdapter.getOrganization()).andReturn(defaultOrg.getId()).anyTimes();
-    EasyMock.expect(deleteAdapter.getFields(EasyMock.anyObject(MediaPackage.class))).andReturn(null).anyTimes();
-    EasyMock.expect(deleteAdapter.getUITitle()).andReturn(null).anyTimes();
-    EasyMock.replay(deleteAdapter);
-    addCatalogUIAdapter(deleteAdapter);
-  }
-
   public TestEventsEndpoint() throws Exception {
     this.endpointBaseUrl = "https://api.opencast.org";
 
@@ -136,6 +123,35 @@ public class TestEventsEndpoint extends EventsEndpoint {
     EasyMock.expect(indexService.getEvent(MISSING_ID, elasticsearchIndex)).andReturn(Opt.<Event> none()).anyTimes();
 
     SchedulerService schedulerService = EasyMock.createMock(SchedulerService.class);
+
+    IngestService ingestService = EasyMock.createMock(IngestService.class);
+
+    AssetManager assetManager = EasyMock.createMock(AssetManager.class);
+
+    WorkflowService workflowService = EasyMock.createNiceMock(WorkflowService.class);
+
+    /**
+     * Setup CommonEventCatalog
+     */
+    CommonEventCatalogUIAdapter commonEventCatalogUIAdapter = new CommonEventCatalogUIAdapter();
+    Properties episodeCatalogProperties = getCatalogProperties(getClass(), "/episode-catalog.properties");
+    commonEventCatalogUIAdapter.updated(PropertiesUtil.toDictionary(episodeCatalogProperties));
+    addCatalogUIAdapter(commonEventCatalogUIAdapter);
+    EasyMock.expect(indexService.getCommonEventCatalogUIAdapter())
+        .andReturn(commonEventCatalogUIAdapter).anyTimes();
+
+    /**
+     * Setup catalog to be deleted.
+     */
+    EventCatalogUIAdapter deleteAdapter = EasyMock.createMock(EventCatalogUIAdapter.class);
+    EasyMock.expect(deleteAdapter.getFlavor()).andReturn(new MediaPackageElementFlavor(DELETE_CATALOG_TYPE, "episode"))
+        .anyTimes();
+    EasyMock.expect(deleteAdapter.getOrganization()).andReturn(defaultOrg.getId()).anyTimes();
+    EasyMock.expect(deleteAdapter.handlesOrganization(EasyMock.eq(defaultOrg.getId()))).andReturn(true).anyTimes();
+    EasyMock.expect(deleteAdapter.getFields(EasyMock.anyObject(MediaPackage.class))).andReturn(null).anyTimes();
+    EasyMock.expect(deleteAdapter.getUITitle()).andReturn(null).anyTimes();
+    EasyMock.replay(deleteAdapter);
+    addCatalogUIAdapter(deleteAdapter);
 
     /**
      * Delete Metadata external service mocking
@@ -180,13 +196,13 @@ public class TestEventsEndpoint extends EventsEndpoint {
     // Two Pubs
     Event twoPublicationsEvent = new Event(TWO_PUBLICATIONS, defaultOrg.getId());
     MediaPackage twoPublicationsMP = EasyMock.createMock(MediaPackage.class);
-    Publication theodulPublication = new PublicationImpl(ENGAGE_PUBLICATION_ID, "EVENTS.EVENTS.DETAILS.PUBLICATIONS.ENGAGE",
-            new URI("http://mh-allinone.localdomain/engage/theodul/ui/core.html?id=af1a51ce-fb61-4dae-9d5a-f85b9e4fcc99"),
+    Publication paellaPublication = new PublicationImpl(ENGAGE_PUBLICATION_ID, "EVENTS.EVENTS.DETAILS.PUBLICATIONS.ENGAGE",
+            new URI("http://mh-allinone.localdomain/paella/ui/watch.html?id=af1a51ce-fb61-4dae-9d5a-f85b9e4fcc99"),
             MimeType.mimeType("not", "used"));
     Publication oaipmh = new PublicationImpl(OAIPMH_PUBLICATION_ID, "oaipmh",
             new URI("http://mh-allinone.localdomain/oaipmh/default?verb=ListMetadataFormats&identifier=af1a51ce-fb61-4dae-9d5a-f85b9e4fcc99"),
             MimeType.mimeType("not", "used"));
-    EasyMock.expect(twoPublicationsMP.getPublications()).andReturn(new Publication[] { theodulPublication, oaipmh })
+    EasyMock.expect(twoPublicationsMP.getPublications()).andReturn(new Publication[] { paellaPublication, oaipmh })
             .anyTimes();
     EasyMock.expect(indexService.getEvent(TWO_PUBLICATIONS, elasticsearchIndex)).andReturn(Opt.some(twoPublicationsEvent))
             .anyTimes();
@@ -209,6 +225,26 @@ public class TestEventsEndpoint extends EventsEndpoint {
     EasyMock.expect(indexService.getEvent(METADATA_UPDATE_EVENT, elasticsearchIndex)).andReturn(Opt.some(updateEventMetadata)).anyTimes();
     EasyMock.expect(indexService.updateEventMetadata(eq(METADATA_UPDATE_EVENT), capture(capturedMetadataList2), eq(elasticsearchIndex))).andReturn(null).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(updateEventMetadata)).andReturn(null).anyTimes();
+
+    /**
+     * Update event track data
+     */
+    capturedMediaPackage = Capture.newInstance();
+    Event updateEventTrack = new Event(TRACK_UPDATE_EVENT, defaultOrg.getId());
+
+    MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
+    URI uriMP = TestEventsEndpoint.class.getResource("/event-track-update-mediapackage.xml").toURI();
+    URI uriMPUpdated = TestEventsEndpoint.class.getResource("/event-track-update-mediapackage-updated.xml").toURI();
+    MediaPackage mp = builder.loadFromXml(uriMP.toURL().openStream());
+    MediaPackage mpUpdated = builder.loadFromXml(uriMPUpdated.toURL().openStream());
+
+    EasyMock.expect(indexService.getEvent(TRACK_UPDATE_EVENT, elasticsearchIndex)).andReturn(Opt.some(updateEventTrack)).anyTimes();
+    EasyMock.expect(indexService.getEventMediapackage(updateEventTrack)).andReturn(mp).anyTimes();
+    EasyMock.expect(ingestService.addTrack((InputStream) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (MediaPackageElementFlavor) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject()))
+            .andReturn(mpUpdated);
+    EasyMock.expect(assetManager.takeSnapshot(EasyMock.capture(capturedMediaPackage))).andReturn(EasyMock.createNiceMock(Snapshot.class));
+    EasyMock.expect(workflowService.mediaPackageHasActiveWorkflows(mp.getIdentifier().toString())).andReturn(false).anyTimes();
 
     /**
      * Get event metadata external service mocking
@@ -270,13 +306,15 @@ public class TestEventsEndpoint extends EventsEndpoint {
 
 
     // Replay all mocks
-    EasyMock.replay(deleteMetadataMP, indexService, schedulerService, noPublicationsMP, twoPublicationsMP);
+    EasyMock.replay(deleteMetadataMP, indexService, schedulerService, ingestService, assetManager, workflowService, noPublicationsMP, twoPublicationsMP);
 
     setElasticsearchIndex(elasticsearchIndex);
     setIndexService(indexService);
     setSchedulerService(schedulerService);
+    setIngestService(ingestService);
+    setAssetManager(assetManager);
+    setWorkflowService(workflowService);
     setupSecurityService();
-    setupEventCatalogUIAdapters();
     Properties properties = new Properties();
     properties.load(getClass().getResourceAsStream("/events-endpoint.properties"));
     updated((Hashtable) properties);
@@ -304,5 +342,9 @@ public class TestEventsEndpoint extends EventsEndpoint {
 
   public static Capture<Opt<Map<String, String>>> getCapturedAgentConfig() {
     return capturedAgentConfig;
+  }
+
+  public static Capture<MediaPackage> getCapturedMediaPackage() {
+    return capturedMediaPackage;
   }
 }

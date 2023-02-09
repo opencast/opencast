@@ -185,7 +185,7 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
    * @param cropService
    *          the crop service
    */
-  @Reference(name = "CropService")
+  @Reference
   protected void setCropService(CropService cropService) {
     this.cropService = cropService;
   }
@@ -197,12 +197,12 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

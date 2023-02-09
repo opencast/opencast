@@ -49,6 +49,9 @@ public interface SchedulerService {
    */
   String JOB_TYPE = "org.opencastproject.scheduler";
 
+  /** The workflow configuration prefix */
+  String WORKFLOW_CONFIG_PREFIX = "org.opencastproject.workflow.config.";
+
   /**
    * Creates new event using specified mediapackage, workflow configuration and capture agent configuration. The
    * mediapackage id is used as the event's identifier.

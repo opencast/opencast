@@ -119,12 +119,12 @@ public final class RepublishOaiPmhWorkflowOperationHandler extends AbstractWorkf
   }
 
   /** OSGI DI */
-  @Reference(name = "oaiPmhPublicationService")
+  @Reference
   public void setOaiPmhPublicationService(OaiPmhPublicationService oaiPmhPublicationService) {
     this.oaiPmhPublicationService = oaiPmhPublicationService;
   }
 
-  @Reference(name = "serviceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

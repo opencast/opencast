@@ -60,8 +60,9 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.workflow.api.JaxbWorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowParser;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -301,7 +302,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "addTrackURL", description = "Add a media track to a given media package using an URL", restParameters = {
           @RestParameter(description = "The location of the media", isRequired = true, name = "url", type = RestParameter.Type.STRING),
           @RestParameter(description = "The kind of media", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-          @RestParameter(description = "The Tags of the  media track", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
+          @RestParameter(description = "The tags of the  media track", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
           @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
@@ -334,7 +335,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     description = "Add a media track to a given media package using an input stream",
     restParameters = {
       @RestParameter(description = "The kind of media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-      @RestParameter(description = "The Tags of the  media track", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
+      @RestParameter(description = "The tags of the media track", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
       @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) },
     bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE),
     responses = {
@@ -397,19 +398,24 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "addCatalogURL", description = "Add a metadata catalog to a given media package using an URL", restParameters = {
           @RestParameter(description = "The location of the catalog", isRequired = true, name = "url", type = RestParameter.Type.STRING),
           @RestParameter(description = "The kind of catalog", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+          @RestParameter(description = "The tags of the catalog", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
           @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
   public Response addMediaPackageCatalog(@FormParam("url") String url, @FormParam("flavor") String flavor,
-          @FormParam("mediaPackage") String mpx) {
-    logger.trace("add catalog with url: {} flavor: {} mediaPackage: {}", url, flavor, mpx);
+      @FormParam("tags") String tags, @FormParam("mediaPackage") String mpx) {
+    logger.trace("add catalog with url: {} flavor: {} tags: {} mediaPackage: {}", url, flavor, tags, mpx);
     try {
       MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
       if (MediaPackageSupport.sanityCheck(mp).isSome())
         return Response.serverError().status(Status.BAD_REQUEST).build();
+      String[] tagsArray = null;
+      if (tags != null) {
+        tagsArray = tags.split(",");
+      }
       MediaPackage resultingMediaPackage = ingestService.addCatalog(new URI(url),
-              MediaPackageElementFlavor.parseFlavor(flavor), mp);
+              MediaPackageElementFlavor.parseFlavor(flavor), tagsArray, mp);
       return Response.ok(resultingMediaPackage).build();
     } catch (Exception e) {
       logger.warn("Unable to add catalog", e);
@@ -423,6 +429,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @Path("addCatalog")
   @RestQuery(name = "addCatalogInputStream", description = "Add a metadata catalog to a given media package using an input stream", restParameters = {
           @RestParameter(description = "The kind of media catalog", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+          @RestParameter(description = "The tags of the attachment", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
           @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, bodyParameter = @RestParameter(description = "The metadata catalog file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
@@ -438,18 +445,23 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "addAttachmentURL", description = "Add an attachment to a given media package using an URL", restParameters = {
           @RestParameter(description = "The location of the attachment", isRequired = true, name = "url", type = RestParameter.Type.STRING),
           @RestParameter(description = "The kind of attachment", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+          @RestParameter(description = "The tags of the attachment", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
           @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
   public Response addMediaPackageAttachment(@FormParam("url") String url, @FormParam("flavor") String flavor,
-          @FormParam("mediaPackage") String mpx) {
+      @FormParam("tags") String tags, @FormParam("mediaPackage") String mpx) {
     logger.trace("add attachment with url: {} flavor: {} mediaPackage: {}", url, flavor, mpx);
     try {
       MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
       if (MediaPackageSupport.sanityCheck(mp).isSome())
         return Response.serverError().status(Status.BAD_REQUEST).build();
-      mp = ingestService.addAttachment(new URI(url), MediaPackageElementFlavor.parseFlavor(flavor), mp);
+      String[] tagsArray = null;
+      if (tags != null) {
+        tagsArray = tags.split(",");
+      }
+      mp = ingestService.addAttachment(new URI(url), MediaPackageElementFlavor.parseFlavor(flavor), tagsArray, mp);
       return Response.ok(mp).build();
     } catch (Exception e) {
       logger.warn("Unable to add attachment", e);
@@ -463,6 +475,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @Path("addAttachment")
   @RestQuery(name = "addAttachmentInputStream", description = "Add an attachment to a given media package using an input stream", restParameters = {
           @RestParameter(description = "The kind of attachment", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+          @RestParameter(description = "The tags of the attachment", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
           @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, bodyParameter = @RestParameter(description = "The attachment file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
@@ -727,6 +740,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       responses = {
           @RestResponse(description = "Ingest successful. Returns workflow instance as XML", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Ingest failed due to invalid requests.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "Ingest failed. A workflow is currently active on the media package", responseCode = HttpServletResponse.SC_CONFLICT),
           @RestResponse(description = "Ingest failed. Something went wrong internally. Please have a look at the log files",
               responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
       returnDescription = "")
@@ -782,7 +796,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             } else if ("episodeDCCatalogUri".equals(fieldName)) {
               try {
                 URI dcUrl = new URI(value);
-                ingestService.addCatalog(dcUrl, MediaPackageElements.EPISODE, mp);
+                ingestService.addCatalog(dcUrl, MediaPackageElements.EPISODE, null, mp);
                 updateMediaPackageID(mp, dcUrl);
                 episodeDCCatalogNumber += 1;
               } catch (java.net.URISyntaxException e) {
@@ -807,7 +821,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             } else if ("seriesDCCatalogUri".equals(fieldName)) {
               try {
                 URI dcUrl = new URI(value);
-                ingestService.addCatalog(dcUrl, MediaPackageElements.SERIES, mp);
+                ingestService.addCatalog(dcUrl, MediaPackageElements.SERIES, null, mp);
               } catch (java.net.URISyntaxException e) {
                 return badRequest(String.format("Invalid URI %s for episodeDCCatalogUri", value), e);
               } catch (Exception e) {
@@ -899,11 +913,13 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
         WorkflowInstance workflow = (wdID == null)
             ? ingestService.ingest(mp)
             : ingestService.ingest(mp, wdID, workflowProperties);
-        return Response.ok(workflow).build();
+        return Response.ok(new JaxbWorkflowInstance(workflow)).build();
       }
       return Response.serverError().status(Status.BAD_REQUEST).build();
     } catch (IllegalArgumentException e) {
       return badRequest(e.getMessage(), e);
+    } catch (IllegalStateException e) {
+      return Response.status(Status.CONFLICT).entity(e.getMessage()).build();
     } catch (Exception e) {
       logger.warn("Unable to add mediapackage", e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
@@ -1088,7 +1104,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       } else {
         workflow = ingestService.addZippedMediaPackage(in, workflowDefinitionId, workflowConfig);
       }
-      return Response.ok(WorkflowParser.toXml(workflow)).build();
+      return Response.ok(XmlWorkflowParser.toXml(workflow)).build();
     } catch (NotFoundException e) {
       logger.info("Not found: {}", e.getMessage());
       return Response.status(Status.NOT_FOUND).build();
@@ -1118,7 +1134,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     restParameters = {
       @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) },
     responses = {
-      @RestResponse(description = "Returns the media package", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "Returns the workflow instance", responseCode = HttpServletResponse.SC_OK),
       @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) },
     returnDescription = "")
   public Response ingest(@Context HttpServletRequest request, @PathParam("wdID") String wdID) {
@@ -1140,7 +1156,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       @RestParameter(description = "Workflow definition id", isRequired = false, name = WORKFLOW_DEFINITION_ID_PARAM, type = RestParameter.Type.STRING),
       @RestParameter(description = "The workflow instance ID to associate this ingest with scheduled events.", isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING) },
     responses = {
-      @RestResponse(description = "Returns the media package", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "Returns the workflow instance", responseCode = HttpServletResponse.SC_OK),
       @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) },
     returnDescription = "")
   public Response ingest(@Context HttpServletRequest request) {
@@ -1226,7 +1242,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     try {
       WorkflowInstance workflow = ingest.apply();
       startCache.asMap().remove(mp.getIdentifier().toString());
-      return Response.ok(WorkflowParser.toXml(workflow)).build();
+      return Response.ok(XmlWorkflowParser.toXml(workflow)).build();
     } catch (Exception e) {
       Throwable cause = e.getCause();
       if (cause instanceof NotFoundException) {

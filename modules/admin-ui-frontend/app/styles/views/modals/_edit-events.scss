@@ -15,14 +15,3 @@ td.weekdays {
     }
 }
 
-table.3-col-tbl {
-
-  th:first-child {
-    width:20%;
-  }
-  th:not(:first-child) {
-    width:40%;
-  }
-  table-layout:fixed;
-
-}

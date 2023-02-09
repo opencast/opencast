@@ -28,6 +28,9 @@
      "UNSUPPORTED": "Version {{ version }} no longer supported",
      "UNDETERMINED": "Indeterminable version"
    },
+   "MONITOR": {
+     "REGISTRATION": "Opencast has sent a registration update in more than a week"
+   },
    "LTI": {
      "ERROR_LOADING_METADATA": "Error loading event metadata. Please try again later.",
      "SERIES_TITLE": "Edit series",
@@ -247,7 +250,17 @@
      "ADOPTER_PROFILE_UPDATED": "Profile information successfully updated.",
      "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
      "ADOPTER_PROFILE_DELETED": "Profile information successfully deleted.",
-     "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!"
+     "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!",
+     "TOBIRA_OVERRIDE_NAME": "The title of the selected page will be overridden with the title of the series.",
+     "TOBIRA_NO_PATH_SEGMENT": "Page needs a path segment.",
+     "TOBIRA_NOT_MOUNTED": "Series could not be mounted in Tobira.",
+     "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%\/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
+     "TOBIRA_PATH_SEGMENT_UNIQUE": "The path segment of a page must be unqiue among all its sibling pages.",
+     "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
+     "TOBIRA_SERVER_ERROR":" Error talking to Tobira. Contact your system administrator and/or try again later.",
+     "TOBIRA_COPIED_DIRECT_LINK": "Copied link to clipboard.",
+     "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Couldn't copy link to clipboard.",
+     "TOBIRA_NOT_FOUND": "Tobira doesn't know about this series (yet). Try again in a few minutes or contact your system administrator."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
@@ -414,6 +427,11 @@
          "LEGAL_INFO_STATE": {
            "HEADER": "Terms of Service and Privacy Policy"
          },
+         "SUMMARY_STATE": {
+           "HEADER": "This is a JSON summary of exactly what would be sent to Opencast's servers",
+           "GENERAL_HEADER": "Adopter Information",
+           "STATS_HEADER": "Statistical Information"
+         },
          "INFORMATION_STATE": {
            "HEADER": "Thank you for using Opencast!",
            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
@@ -458,7 +476,7 @@
           "TEXT": "An error occurred while processing your request."
         },
          "DELETE_SUBMIT_STATE": {
-          "TEXT": "Are you sure you want to delete your registration data?"
+          "TEXT": "Are you sure you want to delete your registration data? Confirming this will also remove your registration data from the Opencast project server with the next update interval."
          }
       }
    },
@@ -638,7 +656,8 @@
            "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
            "COMMENTS": "View comments",
            "PAUSED_WORKFLOW": "View paused workflow",
-           "PRESENTER": "Filter for this presenter"
+           "PRESENTER": "Filter for this presenter",
+           "COPY_TO_NEW_EVENT": "Copy metadata to new event"
          }
        },
        "STATUS": {
@@ -1116,6 +1135,20 @@
            "LABEL": "Please select a theme",
            "EMPTY": "No theme found"
          },
+         "TOBIRA": {
+           "CAPTION": "Tobira",
+           "DESCRIPTION": "Here you can select where you want the series to show up in the Tobira video portal. You can only select one location here, and it needs to be empty (marked in bold). You can create new pages here, but note that they are only persisted if they are on the path to the selected page.",
+           "SELECT_PAGE": "Select a target page",
+           "PAGE_TITLE": "Subpage title",
+           "PATH_SEGMENT": "Path segment",
+           "SUBPAGES": "Subpages",
+           "ADD_SUBPAGE": "Add subpage",
+           "CANCEL": "Cancel",
+           "HOMEPAGE": "Homepage",
+           "SELECTED_PAGE": "Series will be mounted under the following path",
+           "NO_PAGE_SELECTED": "No page selected. Series will not be mounted in Tobira.",
+           "PATH": "Path"
+         },
          "SUMMARY": {
            "CAPTION": "Summary"
          }
@@ -1144,6 +1177,7 @@
            "EVENTS":      "Events",
            "PERMISSIONS": "Access policy",
            "THEME": "Theme",
+           "TOBIRA": "Tobira",
            "STATISTICS": "Statistics"
          },
          "ACCESS": {
@@ -1164,8 +1198,10 @@
              "ACTION"      : "Actions",
              "NEW"         : "New policy",
              "DETAILS"     : "Details",
-             "REPLACE_EVENT_ACLS": "Update event permissions",
+             "REPLACE_EVENT_ACLS": "Save & update event permissions",
              "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect",
+             "SAVE_SERIES_ACLS": "Save",
+             "SAVE_SERIES_ACLS_HINT": "Apply permissions only to series",
              "LOAD_MORE_LIMIT": "policies shown.",
              "LOAD_MORE_LINK": "Load more"
            },
@@ -1188,6 +1224,13 @@
            "LANGUAGE":       "Language",
            "LICENSE":        "License",
            "DESCRIPTION":    "Description"
+         },
+         "TOBIRA": {
+           "HOMEPAGE": "(Homepage)",
+           "DIRECT_LINK": "Direct link to series",
+           "COPY_DIRECT_LINK": "Copy to clipboard",
+           "NOT_MOUNTED": "This series is currently not included the page structure, and can only be reached using the direct link above.",
+           "PAGES": "Pages in Tobira that contain this series"
          },
          "EVENTS": {
            "TITLE":     "Title",
@@ -1304,7 +1347,15 @@
            "RIGHT":   "Selected roles",
            "REMOVE":  "Remove role",
            "ADD":     "Add role"
-         }
+         },
+         "STRENGTH": {
+           "BAD": "Bad password",
+           "VERYWEAK": "Very weak password",
+           "WEAK": "Weak password",
+           "GOOD": "Good password",
+           "STRONG": "Strong password",
+           "VERYSTRONG": "Very strong password"
+          }
        }
      },
      "GROUPS": {
@@ -2079,7 +2130,8 @@
        "GROUPS": {
            "GENERAL": "General",
            "PLAYER": "Player",
-           "EDITOR": "Editor"
+           "EDITOR": "Editor",
+           "ADD_MEDIA": "Create Event/Series"
        },
        "DESCRIPTIONS": {
            "GENERAL": {
@@ -2112,6 +2164,10 @@
                "CLEAR_LIST": "Clear segment",
                "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
                "PLAY_ENDING_OF_CURRENT_SEGMENT": "End of segment"
+           },
+           "ADD_MEDIA": {
+               "NEXT_TAB": "Next tab/Create",
+               "PREVIOUS_TAB": "Previous tab"
            }
        }
    },

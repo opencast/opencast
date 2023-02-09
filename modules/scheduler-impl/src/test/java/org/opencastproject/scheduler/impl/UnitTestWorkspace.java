@@ -56,6 +56,11 @@ public class UnitTestWorkspace implements Workspace {
     baseDir.deleteOnExit();
   }
 
+  @Override
+  public String toSafeName(String fileName) {
+    return fileName;
+  }
+
   public void clean() {
     logger.info("Cleaning workspace " + baseDir.getAbsolutePath());
     FileSupport.deleteQuietly(baseDir, true);

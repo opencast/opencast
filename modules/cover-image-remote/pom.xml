@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>12-SNAPSHOT</version>
+    <version>14-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -57,17 +57,6 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Import-Package>
-              org.apache.http,
-              org.apache.http.client.entity,
-              org.apache.http.client.methods,
-              org.apache.http.message,
-              org.apache.http.util,
-              org.opencastproject.coverimage;version=${project.version},
-              org.opencastproject.job.api;version=${project.version},
-              org.opencastproject.serviceregistry.api;version=${project.version},
-              org.slf4j
-            </Import-Package>
             <Export-Package>
               org.opencastproject.coverimage.remote;version=${project.version}
             </Export-Package>

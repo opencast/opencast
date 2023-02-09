@@ -18,6 +18,10 @@ The value must be set to the URL from which the server can be accessed later.
 
     org.opencastproject.server.url=https://example.opencast.org
 
+It is not supported for Opencast to be hosted in a subpath.
+Opencast needs to be served from the root path element.
+The RFC 3986 URI path component needs to be empty.
+
 *Note:* This value will be written to all generated media packages and thus cannot be changed easily for already
 processed media. Please think about this setting carefully.
 
@@ -44,16 +48,7 @@ For this, the important keys in the `etc/custom.properties` configuration file a
 Make sure that these settings are identical on all nodes of the cluster.
 
 
-Step 3: Setting up Apache ActiveMQ Message Broker
--------------------------------------------------
-
-Opencast requires Apache ActiveMQ to relay messages between micro-services.
-For configuration details, please follow the:
-
-- [Apache ActiveMQ configuration guide](message-broker.md)
-
-
-Step 4: Database Configuration
+Step 3: Database Configuration
 ------------------------------
 
 Opencast uses an integrated H2 database by default, which has certain drawbacks:
@@ -67,14 +62,14 @@ Details about the configuration can be found at:
 - [Database Configuration](database.md)
 
 
-Step 5: Setting up Elasticsearch
+Step 4: Setting up Elasticsearch
 --------------------------------
 
 Opencast requires Elasticsearch. Instructions for installing Elasticsearch can be found in the
 [installation documentation](../installation/index.md).
 
 
-Step 6: HTTPS Configuration
+Step 5: HTTPS Configuration
 ---------------------------
 
 This configuration is required in order to:
@@ -87,7 +82,7 @@ For this, follow one of the
 - [configuration guides for HTTPS](https/index.md).
 
 
-Step 7: Setting the Storage Directory (optional)
+Step 6: Setting the Storage Directory (optional)
 ------------------------------------------------
 
 If you want to use a specific location for storing media, metadata and other data,

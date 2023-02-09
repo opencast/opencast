@@ -22,6 +22,10 @@
 package org.opencastproject.ingest.impl;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 import static org.opencastproject.util.JobUtil.waitForJob;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
@@ -34,6 +38,7 @@ import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -51,18 +56,27 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
+import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
+import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
+import org.opencastproject.security.api.AccessControlEntry;
+import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.security.util.SecurityUtil;
+import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.smil.api.util.SmilUtil;
+import org.opencastproject.userdirectory.UserIdRoleProvider;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.LoadUtil;
@@ -95,6 +109,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -124,12 +139,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -137,7 +153,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import javax.management.ObjectInstance;
 
@@ -216,6 +231,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The password for download from external sources */
   public static final String DOWNLOAD_PASSWORD = "org.opencastproject.download.password";
 
+  /** The authentication method for download from external sources */
+  public static final String DOWNLOAD_AUTH_METHOD = "org.opencastproject.download.auth.method";
+
+  /** Force basic authentication even if download host does not ask for it */
+  public static final String DOWNLOAD_AUTH_FORCE_BASIC = "org.opencastproject.download.auth.force_basic";
+
   /** By default, do not allow event ingest to modify existing series metadata */
   public static final boolean DEFAULT_ALLOW_SERIES_MODIFICATIONS = false;
 
@@ -224,6 +245,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /** The default is not to automatically skip attachments and catalogs from capture agent */
   public static final boolean DEFAULT_SKIP = false;
+
+  /** The default for force basic authentication even if download host does not ask for it */
+  public static final boolean DEFAULT_DOWNLOAD_AUTH_FORCE_BASIC = false;
 
   /** The maximum length of filenames ingested by Opencast */
   public static final int FILENAME_LENGTH_MAX = 75;
@@ -246,6 +270,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** Control if attachments sent by capture agents for scheduled events are skipped. */
   public static final String SKIP_ATTACHMENTS_KEY = "skip.attachments.for.existing.events";
 
+  /** The appendix added to autogenerated CA series. CA series creation deactivated if not configured */
+  private static final String SERIES_APPENDIX = "add.series.to.event.appendix";
+
   /** The approximate load placed on the system by ingesting a file */
   private float ingestFileJobLoad = DEFAULT_INGEST_FILE_JOB_LOAD;
 
@@ -257,6 +284,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /** The password for download from external sources */
   private static String downloadPassword = DOWNLOAD_PASSWORD;
+
+  /** The authentication method for download from external sources */
+  private static String downloadAuthMethod = DOWNLOAD_AUTH_METHOD;
+
+  /** Force basic authentication even if download host does not ask for it */
+  private static boolean downloadAuthForceBasic = DEFAULT_DOWNLOAD_AUTH_FORCE_BASIC;
 
   /** The external source dns name */
   private static String downloadSource = DOWNLOAD_SOURCE;
@@ -300,6 +333,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The media inspection service */
   private MediaInspectionService mediaInspectionService = null;
 
+  /** The search index. */
+
   /** The default workflow identifier, if one is configured */
   protected String defaultWorkflowDefinionId;
 
@@ -314,6 +349,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   private boolean skipCatalogs = DEFAULT_SKIP;
   private boolean skipAttachments = DEFAULT_SKIP;
+
+  /** Create name appendix for autogenerated CA series */
+  private String createSeriesAppendix = null;
 
   protected boolean testMode = false;
 
@@ -364,9 +402,21 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       return;
     }
 
+    downloadAuthMethod = StringUtils.trimToEmpty((String)properties.get(DOWNLOAD_AUTH_METHOD));
+    if (!"Digest".equals(downloadAuthMethod) && !"Basic".equals(downloadAuthMethod)) {
+      logger.warn("Download authentication method is neither Digest nor Basic; setting to Digest");
+      downloadAuthMethod = "Digest";
+    }
+    downloadAuthForceBasic = BooleanUtils.toBoolean(Objects.toString(properties.get(DOWNLOAD_AUTH_FORCE_BASIC),
+        BooleanUtils.toStringTrueFalse(DEFAULT_DOWNLOAD_AUTH_FORCE_BASIC)));
     downloadPassword = StringUtils.trimToEmpty((String)properties.get(DOWNLOAD_PASSWORD));
     downloadUser = StringUtils.trimToEmpty(((String) properties.get(DOWNLOAD_USER)));
     downloadSource = StringUtils.trimToEmpty(((String) properties.get(DOWNLOAD_SOURCE)));
+    if (!isBlank(downloadSource) && (isBlank(downloadUser) || isBlank(downloadPassword))) {
+      logger.warn("Configured ingest download source has no configured user or password; deactivating authenticated"
+          + "download");
+      downloadSource = "";
+    }
 
     skipAttachments = BooleanUtils.toBoolean(Objects.toString(properties.get(SKIP_ATTACHMENTS_KEY),
             BooleanUtils.toStringTrueFalse(DEFAULT_SKIP)));
@@ -386,6 +436,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             BooleanUtils.toStringTrueFalse(DEFAULT_ALLOW_ONLY_NEW_FLAVORS)));
     logger.info("Only allow new flavored catalogs and attachments on ingest:'{}'", isAddOnlyNew);
     logger.info("Allowing series modification:'{}'", isAllowModifySeries);
+    createSeriesAppendix = StringUtils.trimToNull(((String) properties.get(SERIES_APPENDIX)));
   }
 
   /**
@@ -641,20 +692,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * {@inheritDoc}
    *
    * @see org.opencastproject.ingest.api.IngestService#addTrack(java.net.URI,
-   *      org.opencastproject.mediapackage.MediaPackageElementFlavor, org.opencastproject.mediapackage.MediaPackage)
-   */
-  @Override
-  public MediaPackage addTrack(URI uri, MediaPackageElementFlavor flavor, MediaPackage mediaPackage)
-          throws IOException, IngestException {
-    String[] tags = null;
-    return this.addTrack(uri, flavor, tags, mediaPackage);
-
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.ingest.api.IngestService#addTrack(java.net.URI,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor, String[] ,
    *      org.opencastproject.mediapackage.MediaPackage)
    */
@@ -678,7 +715,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       if (tags != null && tags.length > 0) {
         MediaPackageElement trackElement = mp.getTrack(elementId);
         for (String tag : tags) {
-          logger.info("Adding Tag: " + tag + " to Element: " + elementId);
+          logger.info("Adding tag: " + tag + " to Element: " + elementId);
           trackElement.addTag(tag);
         }
       }
@@ -823,7 +860,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor, org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
-  public MediaPackage addCatalog(URI uri, MediaPackageElementFlavor flavor, MediaPackage mediaPackage)
+  public MediaPackage addCatalog(URI uri, MediaPackageElementFlavor flavor, String[] tags, MediaPackage mediaPackage)
           throws IOException, IngestException {
     Job job = null;
     try {
@@ -836,10 +873,17 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       logger.info("Start adding catalog {} from URL {} on mediapackage {}", elementId, uri, mediaPackage);
       URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
       if (MediaPackageElements.SERIES.equals(flavor)) {
-        updateSeries(uri);
+        updateSeries(newUrl);
       }
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Catalog,
               flavor);
+      if (tags != null && tags.length > 0) {
+        MediaPackageElement catalogElement = mp.getCatalog(elementId);
+        for (String tag : tags) {
+          logger.info("Adding tag: " + tag + " to Element: " + elementId);
+          catalogElement.addTag(tag);
+        }
+      }
       job.setStatus(Job.Status.FINISHED);
       logger.info("Successful added catalog {} on mediapackage {} at URL {}", elementId, mediaPackage, newUrl);
       return mp;
@@ -991,7 +1035,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor, org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
-  public MediaPackage addAttachment(URI uri, MediaPackageElementFlavor flavor, MediaPackage mediaPackage)
+  public MediaPackage addAttachment(URI uri, MediaPackageElementFlavor flavor, String[] tags, MediaPackage mediaPackage)
           throws IOException, IngestException {
     Job job = null;
     try {
@@ -1005,6 +1049,13 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Attachment,
               flavor);
+      if (tags != null && tags.length > 0) {
+        MediaPackageElement attachmentElement = mp.getAttachment(elementId);
+        for (String tag : tags) {
+          logger.debug("Adding tag: " + tag + " to Element: " + elementId);
+          attachmentElement.addTag(tag);
+        }
+      }
       job.setStatus(Job.Status.FINISHED);
       logger.info("Successful added attachment {} on mediapackage {} at URL {}", elementId, mediaPackage, newUrl);
       return mp;
@@ -1039,7 +1090,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       if (tags != null && tags.length > 0) {
         MediaPackageElement trackElement = mp.getAttachment(elementId);
         for (String tag : tags) {
-          logger.info("Adding Tag: " + tag + " to Element: " + elementId);
+          logger.info("Adding tag: " + tag + " to Element: " + elementId);
           trackElement.addTag(tag);
         }
       }
@@ -1147,6 +1198,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
       // Merge scheduled mediapackage with ingested
       mp = mergeScheduledMediaPackage(mp);
+      if (mp.getSeries() == null) {
+        mp = checkForCASeries(mp, createSeriesAppendix);
+      }
+
 
       ingestStatistics.successful();
       if (workflowDef != null) {
@@ -1206,14 +1261,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       logger.debug("There can be only one created date");
       throw new IngestException("There can be only one created date");
     }
-    // spatial
-    EName spatial = new EName(DublinCore.TERMS_NS_URI, "spatial");
-    List<DublinCoreValue> captureAgents = dublinCoreCatalog.get(spatial);
-    if (captureAgents.size() != 1) {
-      logger.debug("Exactly one capture agent needs to be set");
-      throw new IngestException("Exactly one capture agent needs to be set");
-    }
-    String captureAgent = captureAgents.get(0).getValue();
+    String captureAgent = getCaptureAgent(dublinCoreCatalog);
 
     // Go through properties
     Map<String, String> agentProperties = new HashMap<>();
@@ -1225,6 +1273,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         agentProperties.put(key, properties.get(key));
       }
     }
+
+    // Remove workflow configuration prefixes from the workflow properties
+    workflowProperties = removePrefixFromProperties(workflowProperties);
+
     try {
       schedulerService.addEvent(period.getStart(), period.getEnd(), captureAgent, new HashSet<>(), mediaPackage,
               workflowProperties, agentProperties, Opt.none());
@@ -1237,6 +1289,17 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         }
       }
     }
+  }
+
+    private String getCaptureAgent(DublinCoreCatalog dublinCoreCatalog) throws IngestException {
+    // spatial
+    EName spatial = new EName(DublinCore.TERMS_NS_URI, "spatial");
+    List<DublinCoreValue> captureAgents = dublinCoreCatalog.get(spatial);
+    if (captureAgents.size() != 1) {
+      logger.debug("Exactly one capture agent needs to be set");
+      throw new IngestException("Exactly one capture agent needs to be set");
+    }
+    return captureAgents.get(0).getValue();
   }
 
   /**
@@ -1568,20 +1631,18 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     try {
       if (uri.toString().startsWith("http")) {
         HttpGet get = new HttpGet(uri);
-        List<String> clusterUrls = new LinkedList<>();
-        try {
-          // Note that we are not checking ports here.
-          clusterUrls = organizationDirectoryService.getOrganization(uri.toURL()).getServers()
-                          .keySet()
-                          .stream()
-                          .collect(Collectors.toUnmodifiableList());
-        } catch (NotFoundException e) {
-          logger.warn("Unable to determine cluster members, will not be able to authenticate any downloads from them", e);
-        }
+        var clusterUrls = securityService.getOrganization().getServers().keySet();
 
-        if (uri.toString().matches(downloadSource)) {
-          //NB: We're creating a new client here with *different* auth than the system auth creds
+        if (!isBlank(downloadSource) && uri.toString().matches(downloadSource)) {
+          // NB: We're creating a new client here with *different* auth than the system auth creds
           externalHttpClient = getAuthedHttpClient();
+          get.setHeader("X-Requested-Auth", downloadAuthMethod);
+          if ("Basic".equals(downloadAuthMethod) && downloadAuthForceBasic) {
+            String auth = downloadUser + ":" + downloadPassword;
+            byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.ISO_8859_1));
+            String authHeader = "Basic " + new String(encodedAuth);
+            get.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+          }
           response = externalHttpClient.execute(get);
         } else if (clusterUrls.contains(uri.getScheme() + "://" + uri.getHost())) {
           // Only using the system-level httpclient and digest credentials against our own servers
@@ -1791,10 +1852,14 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   protected CloseableHttpClient getAuthedHttpClient() {
     HttpClientBuilder cb = HttpClientBuilder.create();
     CredentialsProvider provider = new BasicCredentialsProvider();
+    String schema = AuthSchemes.DIGEST;
+    if ("Basic".equals(downloadAuthMethod)) {
+      schema = AuthSchemes.BASIC;
+    }
     provider.setCredentials(
-      new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthSchemes.DIGEST),
+      new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, schema),
       new UsernamePasswordCredentials(downloadUser, downloadPassword));
-    return cb.build();
+    return cb.setDefaultCredentialsProvider(provider).build();
   }
 
   private MediaPackage createSmil(MediaPackage mediaPackage) throws IOException, IngestException {
@@ -1948,5 +2013,93 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         return (Track) MediaPackageElementParser.getFromXml(job.getPayload());
       }
     };
+  }
+
+  private MediaPackage checkForCASeries(MediaPackage mp, String seriesAppendName) {
+    //Check for media package id and CA series appendix set
+    if (mp == null || seriesAppendName == null) {
+      logger.debug("No series name provided");
+      return mp;
+    }
+
+    // Verify user is a CA by checking roles and captureAgentId
+    User user = securityService.getUser();
+    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(GLOBAL_CAPTURE_AGENT_ROLE)) {
+      logger.info("User '{}' is missing capture agent roles, won't apply CASeries", user.getUsername());
+      return mp;
+    }
+    //Get capture agent name
+    String captureAgentId = null;
+    Catalog[] catalog = mp.getCatalogs(MediaPackageElementFlavor.flavor("dublincore", "episode"));
+    if (catalog.length == 1) {
+      try (InputStream catalogInputStream = workingFileRepository.get(mp.getIdentifier().toString(), catalog[0].getIdentifier())) {
+        DublinCoreCatalog dc = dublinCoreService.load(catalogInputStream);
+        captureAgentId = getCaptureAgent(dc);
+      } catch (Exception e) {
+        logger.info("Unable to determine capture agent name");
+      }
+    }
+    if (captureAgentId == null) {
+      logger.info("No Capture Agent ID defined for MediaPackage {}, won't apply CASeries", mp.getIdentifier());
+      return mp;
+    }
+    logger.info("Applying CASeries to MediaPackage {} for capture agent '{}'", mp.getIdentifier(), captureAgentId);
+
+    // Find or create CA series
+    String seriesId = captureAgentId.replaceAll("[^\\w-_.:;()]+", "_");
+    String seriesName = captureAgentId + seriesAppendName;
+
+    try {
+      seriesService.getSeries(seriesId);
+    } catch (NotFoundException nfe) {
+      try {
+        List<String> roleNames = new ArrayList<>();
+        String roleName = SecurityUtil.getCaptureAgentRole(captureAgentId);
+        roleNames.add(roleName);
+        logger.debug("Capture agent role name: {}", roleName);
+
+        String username = user.getUsername();
+        roleNames.add(UserIdRoleProvider.getUserIdRole(username));
+
+        logger.info("Creating new series for capture agent '{}' and user '{}'", captureAgentId, username);
+        createSeries(seriesId, seriesName, roleNames);
+      } catch (Exception e) {
+        logger.error("Unable to create series {} for event {}", seriesName, mp, e);
+        return mp;
+      }
+    } catch (SeriesException | UnauthorizedException e) {
+      logger.error("Exception while searching for series {}", seriesName, e);
+      return mp;
+    }
+
+    // Add the event to CA series
+    mp.setSeries(seriesId);
+    mp.setSeriesTitle(seriesName);
+
+    return mp;
+  }
+
+  private DublinCoreCatalog createSeries(String seriesId, String seriesName, List<String> roleNames)
+      throws SeriesException, UnauthorizedException, NotFoundException {
+    DublinCoreCatalog dc = DublinCores.mkOpencastSeries().getCatalog();
+    dc.set(PROPERTY_IDENTIFIER, seriesId);
+    dc.set(PROPERTY_TITLE, seriesName);
+    dc.set(DublinCore.PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(new Date(), Precision.Second));
+    // set series name
+    DublinCoreCatalog createdSeries = seriesService.updateSeries(dc);
+
+    // fill acl
+    List<AccessControlEntry> aces = new ArrayList();
+    for (String roleName : roleNames) {
+      AccessControlEntry aceRead = new AccessControlEntry(roleName, Permissions.Action.READ.toString(), true);
+      AccessControlEntry aceWrite = new AccessControlEntry(roleName, Permissions.Action.WRITE.toString(), true);
+      aces.add(aceRead);
+      aces.add(aceWrite);
+    }
+    AccessControlList acl = new AccessControlList(aces);
+    seriesService.updateAccessControl(seriesId, acl);
+    logger.info("Created capture agent series with name {} and id {}", seriesName, seriesId);
+
+    return dc;
   }
 }

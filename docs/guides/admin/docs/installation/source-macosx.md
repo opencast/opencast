@@ -59,7 +59,6 @@ Required:
 
 Required (not necessarily on the same machine):
 
-    ActiveMQ >= 5.10 (older versions untested)
     Elasticsearch 7.9.x
 
 Required for text extraction:
@@ -89,7 +88,6 @@ Homebrew is a package manager for OS X. For installation instruction see [their 
 
     brew install maven
     brew install ffmpeg
-    brew install apache-activemq
 
     brew install tesseract
     brew install hunspell
@@ -107,7 +105,6 @@ Pre-built versions of most dependencies can be downloaded from the respective pr
 
 * [Get Apache Maven](https://maven.apache.org/download.cgi)
 * [Get FFmpeg](http://ffmpeg.org/download.html)
-* [Get Apache ActiveMQ](http://activemq.apache.org/download.html)
 
 
 Building Opencast
@@ -129,10 +126,6 @@ name, login information, etc. Be aware that the config files now reside in the b
 distribution. For the all-in-one distribution, this would be
 `/your/path/to/opencast/build/opencast-dist-allinone-[…]/etc/`, again with `[…]` representing the selected version.
 
-As specified in the guide, make sure you replace the default ActiveMQ configuration with the one provided in
-`docs/scripts/activemq/activemq.xml`. If you installed ActiveMQ using homebrew, you can find the installation path with
-`brew info activemq`. The configuration is probably located in `/usr/local/Cellar/activemq/<version>/libexec/conf/`.
-
 ffprobe is used to analyze new videos. It is installed with FFmpeg but usually not on the path to be automatically
 executed. You have to link the ffprobe to `/usr/local/bin/`. You can find the FFmpeg install directory with
 `brew info ffmpeg`. Usually you would link the file with
@@ -141,10 +134,8 @@ executed. You have to link the ffprobe to `/usr/local/bin/`. You can find the FF
 Running Opencast
 ----------------
 
-Make sure you have ActiveMQ running (unless you're running it on a different machine). Then you can start Opencast using
-the start-opencast script:
+You can start Opencast using the start-opencast script:
 
-    activemq start
     cd /your/path/to/opencast/
     cd build/opencast-dist-allinone-[…]
     ./bin/start-opencast

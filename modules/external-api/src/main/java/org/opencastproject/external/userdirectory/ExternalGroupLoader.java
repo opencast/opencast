@@ -36,6 +36,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -45,7 +46,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Dictionary;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -63,6 +66,9 @@ public class ExternalGroupLoader {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ExternalGroupLoader.class);
+
+  /** The config key, which specifies whether default groups should be created */
+  public static final String SHOULD_CREATE_DEFAULT_GROUPS_CONFIG_KEY = "create_default_groups";
 
   /** The external applications group suffix */
   public static final String EXTERNAL_GROUP_SUFFIX = "_EXTERNAL_APPLICATIONS";
@@ -86,7 +92,7 @@ public class ExternalGroupLoader {
    * @param groupRoleProvider
    *          the groupRoleProvider to set
    */
-  @Reference(name = "groupRoleProvider")
+  @Reference
   public void setGroupRoleProvider(JpaGroupRoleProvider groupRoleProvider) {
     this.groupRoleProvider = groupRoleProvider;
   }
@@ -95,12 +101,12 @@ public class ExternalGroupLoader {
    * @param organizationDirectoryService
    *          the organizationDirectoryService to set
    */
-  @Reference(name = "organizationDirectoryService")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -115,7 +121,14 @@ public class ExternalGroupLoader {
   public void activate(ComponentContext cc) throws Exception {
     logger.debug("Activate external group loader");
 
-    createDefaultGroups(cc);
+    Dictionary properties = cc.getProperties();
+    boolean shouldCreateDefaultGroups = BooleanUtils.toBoolean(Objects.toString(properties.get(SHOULD_CREATE_DEFAULT_GROUPS_CONFIG_KEY), "true"));
+
+    if (shouldCreateDefaultGroups) {
+      createDefaultGroups(cc);
+    } else {
+      logger.info("Disabled generation of External Application group");
+    }
   }
 
   /**

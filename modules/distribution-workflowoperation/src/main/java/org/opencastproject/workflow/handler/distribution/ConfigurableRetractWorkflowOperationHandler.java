@@ -63,18 +63,12 @@ public class ConfigurableRetractWorkflowOperationHandler extends ConfigurableWor
   private StreamingDistributionService streamingDistributionService;
 
   /** OSGi DI */
-  @Reference(
-      name = "DownloadDistributionService",
-      target = "(distribution.channel=download)"
-  )
+  @Reference(target = "(distribution.channel=download)")
   void setDownloadDistributionService(DownloadDistributionService distributionService) {
     this.downloadDistributionService = distributionService;
   }
 
-  @Reference(
-      name = "StreamingDistributionService",
-      target = "(distribution.channel=streaming)"
-  )
+  @Reference(target = "(distribution.channel=streaming)")
   void setStreamingDistributionService(StreamingDistributionService distributionService) {
     this.streamingDistributionService = distributionService;
   }
@@ -116,7 +110,7 @@ public class ConfigurableRetractWorkflowOperationHandler extends ConfigurableWor
     return createResult(mp, Action.CONTINUE);
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

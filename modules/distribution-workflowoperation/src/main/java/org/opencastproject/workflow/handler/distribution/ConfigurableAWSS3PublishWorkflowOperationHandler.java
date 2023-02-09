@@ -45,24 +45,18 @@ import org.osgi.service.component.annotations.Reference;
 public class ConfigurableAWSS3PublishWorkflowOperationHandler extends ConfigurablePublishWorkflowOperationHandler {
 
   /** OSGi DI */
-  @Reference(
-      name = "DownloadDistributionService",
-      target = "(distribution.channel=aws.s3)"
-  )
+  @Reference(target = "(distribution.channel=aws.s3)")
   void setDownloadDistributionService(DownloadDistributionService distributionService) {
     super.setDownloadDistributionService(distributionService);
   }
 
-  @Reference(
-      name = "StreamingDistributionService",
-      target = "(distribution.channel=streaming)"
-  )
+  @Reference(target = "(distribution.channel=streaming)")
   void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
     super.setStreamingDistributionService(streamingDistributionService);
   }
 
   /** OSGi DI */
-  @Reference(name = "SecurityService")
+  @Reference
   protected void setSecurityService(SecurityService securityService) {
     super.setSecurityService(securityService);
   }

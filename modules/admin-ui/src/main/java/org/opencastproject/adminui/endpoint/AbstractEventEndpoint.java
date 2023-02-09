@@ -144,7 +144,7 @@ import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowQuery;
+import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowUtil;
@@ -232,6 +232,8 @@ public abstract class AbstractEventEndpoint {
   /** The configuration key that defines the default workflow definition */
   //TODO Move to a constants file instead of declaring it at the top of multiple files?
   protected static final String WORKFLOW_DEFINITION_DEFAULT = "org.opencastproject.workflow.default.definition";
+
+  private static final String WORKFLOW_STATUS_TRANSLATION_PREFIX = "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.";
 
   /** The default time before a piece of signed content expires. 2 Hours. */
   protected static final long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60;
@@ -393,16 +395,9 @@ public abstract class AbstractEventEndpoint {
     if (event.isNone()) {
       return RestUtil.R.notFound(id);
     }
-    final Runnable doOnNotFound = () -> {
-      try {
-        getIndex().delete(Event.DOCUMENT_TYPE,id,getSecurityService().getOrganization().getId());
-      } catch (SearchIndexException e) {
-        logger.error("error removing event {}: {}", id, e);
-      }
-    };
     final IndexService.EventRemovalResult result;
     try {
-      result = getIndexService().removeEvent(event.get(), doOnNotFound, getAdminUIConfiguration().getRetractWorkflowId());
+      result = getIndexService().removeEvent(event.get(), getAdminUIConfiguration().getRetractWorkflowId());
     } catch (WorkflowDatabaseException e) {
       logger.error("Workflow database is not reachable. This may be a temporary problem.");
       return RestUtil.R.serverError();
@@ -418,7 +413,6 @@ public abstract class AbstractEventEndpoint {
       case GENERAL_FAILURE:
         return Response.serverError().build();
       case NOT_FOUND:
-        doOnNotFound.run();
         return RestUtil.R.notFound(id);
       default:
         throw new RuntimeException("Unknown EventRemovalResult type: " + result.name());
@@ -453,19 +447,11 @@ public abstract class AbstractEventEndpoint {
 
     for (Object eventIdObject : eventIdsJsonArray) {
       final String eventId = eventIdObject.toString();
-      final Runnable doOnNotFound = () -> {
-        try {
-          getIndex().delete(Event.DOCUMENT_TYPE,eventId, getSecurityService().getOrganization().getId());
-        } catch (SearchIndexException e) {
-          logger.error("error removing event {}: {}", eventId, e);
-        }
-      };
       try {
         final Opt<Event> event = checkAgentAccessForEvent(eventId);
         if (event.isSome()) {
-          final IndexService.EventRemovalResult  currentResult = getIndexService().removeEvent(event.get(), doOnNotFound,
-            getAdminUIConfiguration().getRetractWorkflowId()
-          );
+          final IndexService.EventRemovalResult currentResult = getIndexService().removeEvent(event.get(),
+                  getAdminUIConfiguration().getRetractWorkflowId());
           switch (currentResult) {
             case SUCCESS:
               result.addOk(eventId);
@@ -477,7 +463,6 @@ public abstract class AbstractEventEndpoint {
               result.addServerError(eventId);
               break;
             case NOT_FOUND:
-              doOnNotFound.run();
               result.addNotFound(eventId);
               break;
             default:
@@ -1172,6 +1157,29 @@ public abstract class AbstractEventEndpoint {
     }
   }
 
+  /**
+   * Removes emtpy series titles from the collection of the isPartOf Field
+   * @param ml the list to modify
+   */
+  private void removeSeriesWithNullTitlesFromFieldCollection(MetadataList ml) {
+    // get Series MetadataField from MetadataList
+    MetadataField seriesField = Optional.ofNullable(ml.getMetadataList().get("dublincore/episode"))
+            .flatMap(titledMetadataCollection -> Optional.ofNullable(titledMetadataCollection.getCollection()))
+            .flatMap(dcMetadataCollection -> Optional.ofNullable(dcMetadataCollection.getOutputFields()))
+            .flatMap(metadataFields -> Optional.ofNullable(metadataFields.get("isPartOf")))
+            .orElse(null);
+    if (seriesField == null || seriesField.getCollection() == null) {
+      return;
+    }
+
+    // Remove null keys
+    Map<String, String> seriesCollection = seriesField.getCollection();
+    seriesCollection.remove(null);
+    seriesField.setCollection(seriesCollection);
+
+    return;
+  }
+
   @GET
   @Path("{eventId}/metadata.json")
   @Produces(MediaType.APPLICATION_JSON)
@@ -1214,6 +1222,9 @@ public abstract class AbstractEventEndpoint {
     DublinCoreMetadataCollection metadataCollection = eventCatalogUiAdapter.getRawFields(getCollectionQueryOverrides());
     EventUtils.setEventMetadataValues(event, metadataCollection);
     metadataList.add(eventCatalogUiAdapter, metadataCollection);
+
+    // remove series with empty titles from the collection of the isPartOf field as these can't be converted to json
+    removeSeriesWithNullTitlesFromFieldCollection(metadataList);
 
     // lock metadata?
     final String wfState = event.getWorkflowState();
@@ -1796,13 +1807,29 @@ public abstract class AbstractEventEndpoint {
         return okJson(obj(f("workflowId", v(agentConfiguration.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION), Jsons.BLANK)),
                 f("configuration", obj(fields))));
       } else {
-        return okJson(getJobService().getTasksAsJSON(new WorkflowQuery().withCount(999999).withMediaPackage(id)));
+        List<WorkflowInstance> workflowInstances = getWorkflowService().getWorkflowInstancesByMediaPackage(id);
+        List<JValue> jsonList = new ArrayList<>();
+
+        for (WorkflowInstance instance : workflowInstances) {
+          long instanceId = instance.getId();
+          Date created = instance.getDateCreated();
+          String creatorName = instance.getCreatorName();
+          jsonList.add(obj(f("id", v(instanceId)), f("title", v(instance.getTitle(), Jsons.BLANK)),
+                  f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + instance.getState().toString())),
+                  f("submitted", v(created != null ? DateTimeSupport.toUTC(created.getTime()) : "", Jsons.BLANK)),
+                  f("submitter", v(creatorName, Jsons.BLANK))));
+        }
+        JObject json = obj(f("results", arr(jsonList)), f("count", v(workflowInstances.size())));
+        return okJson(json);
       }
     } catch (NotFoundException e) {
       return notFound("Cannot find workflows for event %s", id);
     } catch (SchedulerException e) {
       logger.error("Unable to get workflow data for event with id {}", id);
       throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+    } catch (WorkflowDatabaseException e) {
+      throw new JobEndpointException(String.format("Not able to get the list of job from the database: %s", e),
+              e.getCause());
     }
   }
 
@@ -1874,7 +1901,7 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "Unable to parse workflowId", responseCode = HttpServletResponse.SC_BAD_REQUEST),
                   @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventWorkflow(@PathParam("eventId") String eventId, @PathParam("workflowId") String workflowId)
-          throws JobEndpointException, SearchIndexException {
+          throws SearchIndexException {
     Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", eventId);
@@ -1889,9 +1916,39 @@ public abstract class AbstractEventEndpoint {
     }
 
     try {
-      return okJson(getJobService().getTasksAsJSON(workflowInstanceId));
+      WorkflowInstance instance = getWorkflowService().getWorkflowById(workflowInstanceId);
+
+      // Retrieve submission date with the workflow instance main job
+      Date created = instance.getDateCreated();
+
+      Date completed = instance.getDateCompleted();
+      if (completed == null)
+        completed = new Date();
+
+      long executionTime = completed.getTime() - created.getTime();
+
+      var fields = instance.getConfigurations()
+          .entrySet()
+          .stream()
+          .map(e -> f(e.getKey(), v(e.getValue(), Jsons.BLANK)))
+          .collect(Collectors.toList());
+
+      return okJson(obj(
+              f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + instance.getState(), Jsons.BLANK)),
+              f("description", v(instance.getDescription(), Jsons.BLANK)),
+              f("executionTime", v(executionTime, Jsons.BLANK)),
+              f("wiid", v(instance.getId(), Jsons.BLANK)), f("title", v(instance.getTitle(), Jsons.BLANK)),
+              f("wdid", v(instance.getTemplate(), Jsons.BLANK)),
+              f("configuration", obj(fields)),
+              f("submittedAt", v(toUTC(created.getTime()), Jsons.BLANK)),
+              f("creator", v(instance.getCreatorName(), Jsons.BLANK))));
     } catch (NotFoundException e) {
       return notFound("Cannot find workflow  %s", workflowId);
+    } catch (WorkflowDatabaseException e) {
+      logger.error("Unable to get workflow {} of event {}", workflowId, eventId, e);
+      return serverError();
+    } catch (UnauthorizedException e) {
+      return forbidden();
     }
   }
 
@@ -1905,7 +1962,7 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "Unable to parse workflowId", responseCode = HttpServletResponse.SC_BAD_REQUEST),
                   @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventOperations(@PathParam("eventId") String eventId, @PathParam("workflowId") String workflowId)
-          throws JobEndpointException, SearchIndexException {
+          throws SearchIndexException {
     Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", eventId);
@@ -1919,9 +1976,34 @@ public abstract class AbstractEventEndpoint {
     }
 
     try {
-      return okJson(getJobService().getOperationsAsJSON(workflowInstanceId));
+      WorkflowInstance instance = getWorkflowService().getWorkflowById(workflowInstanceId);
+
+      List<WorkflowOperationInstance> operations = instance.getOperations();
+      List<JValue> operationsJSON = new ArrayList<>();
+
+      for (WorkflowOperationInstance wflOp : operations) {
+        List<Field> fields = new ArrayList<>();
+        for (String key : wflOp.getConfigurationKeys()) {
+          fields.add(f(key, v(wflOp.getConfiguration(key), Jsons.BLANK)));
+        }
+        operationsJSON.add(obj(
+                f("status",
+                v(WORKFLOW_STATUS_TRANSLATION_PREFIX + wflOp.getState(), Jsons.BLANK)),
+                f("title", v(wflOp.getTemplate(), Jsons.BLANK)),
+                f("description", v(wflOp.getDescription(), Jsons.BLANK)),
+                f("id", v(wflOp.getId(), Jsons.BLANK)),
+                f("configuration", obj(fields))
+        ));
+      }
+
+      return okJson(arr(operationsJSON));
     } catch (NotFoundException e) {
       return notFound("Cannot find workflow %s", workflowId);
+    } catch (WorkflowDatabaseException e) {
+      logger.error("Unable to get workflow operations of event %s and workflow %s", eventId, workflowId, e);
+      return serverError();
+    } catch (UnauthorizedException e) {
+      return forbidden();
     }
   }
 
@@ -1936,7 +2018,7 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "Unable to parse workflowId or operationPosition", responseCode = HttpServletResponse.SC_BAD_REQUEST),
                   @RestResponse(description = "No operation with these identifiers was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventOperation(@PathParam("eventId") String eventId, @PathParam("workflowId") String workflowId,
-          @PathParam("operationPosition") Integer operationPosition) throws JobEndpointException, SearchIndexException {
+          @PathParam("operationPosition") Integer operationPosition) throws SearchIndexException {
     Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", eventId);
@@ -1949,11 +2031,39 @@ public abstract class AbstractEventEndpoint {
       return RestUtil.R.badRequest();
     }
 
+    WorkflowInstance instance;
     try {
-      return okJson(getJobService().getOperationAsJSON(workflowInstanceId, operationPosition));
+      instance = getWorkflowService().getWorkflowById(workflowInstanceId);
     } catch (NotFoundException e) {
       return notFound("Cannot find workflow %s", workflowId);
+    } catch (WorkflowDatabaseException e) {
+      logger.error("Unable to get workflow operation of event %s and workflow %s at position %s", eventId, workflowId,
+              operationPosition, e);
+      return serverError();
+    } catch (UnauthorizedException e) {
+      return forbidden();
     }
+
+    List<WorkflowOperationInstance> operations = instance.getOperations();
+
+    if (operations.size() > operationPosition) {
+      WorkflowOperationInstance wflOp = operations.get(operationPosition);
+      return okJson(obj(f("retry_strategy", v(wflOp.getRetryStrategy(), Jsons.BLANK)),
+              f("execution_host", v(wflOp.getExecutionHost(), Jsons.BLANK)),
+              f("failed_attempts", v(wflOp.getFailedAttempts())),
+              f("max_attempts", v(wflOp.getMaxAttempts())),
+              f("exception_handler_workflow", v(wflOp.getExceptionHandlingWorkflow(), Jsons.BLANK)),
+              f("fail_on_error", v(wflOp.isFailOnError())),
+              f("description", v(wflOp.getDescription(), Jsons.BLANK)),
+              f("state", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + wflOp.getState(), Jsons.BLANK)),
+              f("job", v(wflOp.getId(), Jsons.BLANK)),
+              f("name", v(wflOp.getTemplate(), Jsons.BLANK)),
+              f("time_in_queue", v(wflOp.getTimeInQueue(), v(0))),
+              f("started", wflOp.getDateStarted() != null ? v(toUTC(wflOp.getDateStarted().getTime())) : Jsons.BLANK),
+              f("completed", wflOp.getDateCompleted() != null ? v(toUTC(wflOp.getDateCompleted().getTime())) : Jsons.BLANK))
+      );
+    }
+    return notFound("Cannot find workflow operation of workflow %s at position %s", workflowId, operationPosition);
   }
 
   @GET
@@ -2145,6 +2255,9 @@ public abstract class AbstractEventEndpoint {
     }
 
     metadataList.add(commonCatalogUiAdapter, commonMetadata);
+
+    // remove series with empty titles from the collection of the isPartOf field as these can't be converted to json
+    removeSeriesWithNullTitlesFromFieldCollection(metadataList);
 
     return okJson(MetadataJson.listToJson(metadataList, true));
   }
@@ -2669,6 +2782,9 @@ public abstract class AbstractEventEndpoint {
   }
 
   private URI signUrl(URI url) {
+    if (url == null) {
+      return null;
+    }
     if (getUrlSigningService().accepts(url.toString())) {
       try {
         String clientIP = null;

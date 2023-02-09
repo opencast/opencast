@@ -59,7 +59,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -79,9 +78,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -109,12 +109,12 @@ import java.util.stream.Collectors;
  */
 @Component(
     immediate = true,
-    service = { LtiService.class,ManagedService.class },
+    service = { LtiService.class },
     property = {
         "service.description=LTI Service"
     }
 )
-public class LtiServiceImpl implements LtiService, ManagedService {
+public class LtiServiceImpl implements LtiService {
   private static final Logger logger = LoggerFactory.getLogger(LtiServiceImpl.class);
 
   private static final Gson gson = new Gson();
@@ -133,64 +133,64 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   private String retractWorkflowId;
   private String copyWorkflowId;
   private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<>();
+  private boolean listAllJobsInSeries;
 
   /** OSGi DI */
-  @Reference(name = "authorization-service")
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
 
   /** OSGI DI */
-  @Reference(name = "series-service")
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
   /** OSGi DI */
-  @Reference(name = "asset-manager")
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
   /** OSGi DI */
-  @Reference(name = "workflow-service")
+  @Reference
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
 
   /** OSGi DI */
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
   /** OSGi DI */
-  @Reference(name = "search-index")
+  @Reference
   public void setSearchIndex(ElasticsearchIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 
   /** OSGi DI */
-  @Reference(name = "IndexService")
+  @Reference
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
   /** OSGi DI */
-  @Reference(name = "IngestService")
+  @Reference
   public void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }
 
   /** OSGi DI */
-  @Reference(name = "SecurityService")
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI. */
   @Reference(
-      name = "EventCatalogUIAdapter",
       cardinality = ReferenceCardinality.MULTIPLE,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "removeCatalogUIAdapter"
@@ -204,6 +204,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
     catalogUIAdapters.remove(catalogUIAdapter);
   }
 
+  @Activate
   public void activate(ComponentContext cc) {
     workflowService.addWorkflowListener(new WorkflowListener() {
       @Override
@@ -237,13 +238,22 @@ public class LtiServiceImpl implements LtiService, ManagedService {
         }
       }
     });
+    updated(cc.getProperties());
+  }
+
+  @Modified
+  public void modified(ComponentContext cc) {
+    updated(cc.getProperties());
   }
 
   @Override
   public List<LtiJob> listJobs(String seriesId) {
     final User user = securityService.getUser();
     final EventSearchQuery query = new EventSearchQuery(securityService.getOrganization().getId(), user)
-            .withCreator(user.getName()).withSeriesId(StringUtils.trimToNull(seriesId));
+            .withSeriesId(StringUtils.trimToNull(seriesId));
+    if (!listAllJobsInSeries) {
+      query.withCreator(user.getName());
+    }
     try {
       SearchResult<Event> results = this.searchIndex.getByQuery(query);
       ZonedDateTime startOfDay = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS);
@@ -528,8 +538,8 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       if (event.isNone()) {
         throw new RuntimeException("Event '" + id + "' not found");
       }
-      final IndexService.EventRemovalResult eventRemovalResult = indexService.removeEvent(event.get(), () -> {
-      }, retractWorkflowId);
+      final IndexService.EventRemovalResult eventRemovalResult = indexService.removeEvent(event.get(),
+              retractWorkflowId);
       if (eventRemovalResult == IndexService.EventRemovalResult.GENERAL_FAILURE) {
         throw new RuntimeException("Error deleting event: " + eventRemovalResult);
       }
@@ -539,8 +549,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   }
 
   /** OSGi callback if properties file is present */
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  private void updated(Dictionary<String, ?> properties) {
     // Ensure properties is not null
     if (properties == null) {
       throw new IllegalArgumentException("No configuration specified for events endpoint");
@@ -562,5 +571,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
     } catch (JsonSyntaxException e) {
       throw new IllegalArgumentException("Invalid JSON specified for workflow configuration");
     }
+    String listAllJobsInSeriesStr = Objects.toString(properties.get("list-all-jobs-in-series"), "false");
+    this.listAllJobsInSeries = Boolean.parseBoolean(listAllJobsInSeriesStr);
   }
 }

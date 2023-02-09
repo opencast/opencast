@@ -53,11 +53,6 @@ angular.module('adminNg.resources')
         }
 
         return $.param({metadata: angular.toJson(data)});
-      },
-      transformResponse: function (response) {
-        // if this method is missing, the angular default is to interpret the response as JSON
-        // in our case, the response is just a uuid string which causes angular to break.
-        return response;
       }
     }
   });

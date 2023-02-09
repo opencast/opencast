@@ -78,12 +78,6 @@ describe('Login Controller', function () {
         });
     });
 
-    describe('#toLanguageClass', function () {
-        beforeEach(function () {
-            $controller('LoginCtrl', {$scope: $scope});
-        });
-    });
-
     describe('#changeLanguage', function () {
         beforeEach(function () {
             $controller('LoginCtrl', {$scope: $scope});

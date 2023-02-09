@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>12-SNAPSHOT</version>
+    <version>14-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -95,6 +95,7 @@
               org.opencastproject.message.broker.api.scheduler;version=${project.version},
               org.opencastproject.message.broker.api.series;version=${project.version},
               org.opencastproject.message.broker.api.theme;version=${project.version},
+              org.opencastproject.message.broker.api.update;version=${project.version},
               org.opencastproject.message.broker.api.workflow;version=${project.version}
             </Export-Package>
           </instructions>

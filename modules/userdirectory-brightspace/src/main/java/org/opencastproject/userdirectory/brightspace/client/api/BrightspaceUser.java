@@ -37,6 +37,8 @@ public class BrightspaceUser {
   private String uniqueIdentifier;
   private Activation activation;
   private String displayName;
+  private String lastAccessedDate;
+  private String pronouns;
 
   @JsonCreator
   public BrightspaceUser(
@@ -50,7 +52,9 @@ public class BrightspaceUser {
       @JsonProperty("OrgDefinedId") String orgDefinedId,
       @JsonProperty("UniqueIdentifier") String uniqueIdentifier,
       @JsonProperty("Activation") Activation activation,
-      @JsonProperty("DisplayName") String displayName
+      @JsonProperty("DisplayName") String displayName,
+      @JsonProperty("LastAccessedDate") String lastAccessedDate,
+      @JsonProperty("Pronouns") String pronouns
   ) {
     this.orgId = orgId;
     this.userId = userId;
@@ -63,6 +67,9 @@ public class BrightspaceUser {
     this.uniqueIdentifier = uniqueIdentifier;
     this.activation = activation;
     this.displayName = displayName;
+    this.lastAccessedDate = lastAccessedDate;
+    this.pronouns = pronouns;
+
   }
 
   public String getOrgId() {
@@ -107,6 +114,14 @@ public class BrightspaceUser {
 
   public String getDisplayName() {
     return this.displayName;
+  }
+
+  public String getLastAccessedDate() {
+    return this.lastAccessedDate;
+  }
+
+  public String getPronouns() {
+    return this.pronouns;
   }
 
   public String getFullName() {

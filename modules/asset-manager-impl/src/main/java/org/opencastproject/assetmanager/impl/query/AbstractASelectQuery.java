@@ -36,6 +36,7 @@ import org.opencastproject.assetmanager.impl.persistence.PropertyDto;
 import org.opencastproject.assetmanager.impl.persistence.QPropertyDto;
 import org.opencastproject.assetmanager.impl.persistence.SnapshotDto;
 import org.opencastproject.util.RequireUtil;
+import org.opencastproject.util.data.Function;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Fn2;
@@ -103,7 +104,7 @@ public abstract class AbstractASelectQuery implements ASelectQuery, SelectQueryC
   }
 
   @Override public AResult run() {
-    return am.getDatabase().run(new Fn<JPAQueryFactory, AResult>() {
+    return am.getDatabase().run(new Function<JPAQueryFactory, AResult>() {
       @Override public AResult apply(JPAQueryFactory f) {
         return run(f);
       }
