@@ -181,6 +181,7 @@ export const fetchStatistics = (
 						// put statistics list into redux store
 						dispatch(loadStatisticsSuccess(newStatistics, false));
 					}
+					dispatch(loadStatisticsSuccess(newStatistics, false));
 				})
 				.catch((response) => {
 					// put unfinished statistics list into redux store but set flag that an error occurred
