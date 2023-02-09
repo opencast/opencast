@@ -138,13 +138,11 @@ const Table = ({
 	};
 
 	const sortByColumn = (colName) => {
-		requestSort(colName);
+		const direction = requestSort(colName);
 		setSortBy(colName);
-		if (sortConfig) {
-			reverseTable(sortConfig.direction);
-		} else {
-			reverseTable("ASC");
-		}
+		// Usually we could just use *sortConfig* here, but it seems that does not
+		// get updated until the next rerender
+		reverseTable(direction);
 	};
 
 	const showEditTableViewModal = async () => {
@@ -398,6 +396,7 @@ const useSortRows = (resources, config = null) => {
 			direction = "DESC";
 		}
 		setSortConfig({ key, direction });
+		return direction;
 	};
 
 	return { resources: sortedResources, requestSort, sortConfig };
