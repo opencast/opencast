@@ -118,7 +118,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   protected String servicePath = null;
 
   /** The default pattern for characters forbidden in filenames */
-  private static final String FILENAME_REGEX_DEFAULT = "(^\\W|[^\\w-.])";
+  private static final String FILENAME_REGEX_DEFAULT = "(^\\W|[^\\w-.]|\\.\\.|\\.$)";
 
   /** Key for configuring the filename pattern specifying forbidden characters */
   private static final String FILENAME_REGEX_KEY = "filename.forbidden.pattern";
