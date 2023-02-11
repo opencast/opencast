@@ -484,21 +484,31 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     }
   }
 
-  private void restoreGlacierObject(String objectName, Integer objectRestorePeriod, Boolean wait) {
+  private boolean isRestoring(String objectName) {
     Boolean prevOngoingRestore = s3.getObjectMetadata(bucketName, objectName).getOngoingRestore();
     //FIXME: prevOngoingRestore is null when the object isn't being restored for some reason
     // The javadocs for getOngoingRestore don't say anything about retuning null, and it doesn't make a ton of sense
     // so I'm guessing this is a bug in the library itself that's not present in the version Manchester is using
-    if (prevOngoingRestore != null) {
-      if (prevOngoingRestore && wait) {
-        logger.info("Object {} is already being restored, waiting", objectName);
-      } else if (prevOngoingRestore && !wait) {
-        logger.info("Object {} is already being restored", objectName);
+    if (prevOngoingRestore != null && prevOngoingRestore) {
+      logger.info("Object {} is already being restored", objectName);
+      return true;
+    }
+    logger.info("Object {} is not currently being restored", objectName);
+    return false;
+  }
+
+  private void restoreGlacierObject(String objectName, Integer objectRestorePeriod, Boolean wait) {
+    boolean newRestore = false;
+    if (isRestoring(objectName)) {
+      if (!wait) {
         return;
       }
+      logger.info("Waiting for object {}", objectName);
+    } else {
+      RestoreObjectRequest requestRestore = new RestoreObjectRequest(bucketName, objectName, objectRestorePeriod);
+      s3.restoreObjectV2(requestRestore);
+      newRestore = true;
     }
-    RestoreObjectRequest requestRestore = new RestoreObjectRequest(bucketName, objectName, objectRestorePeriod);
-    s3.restoreObjectV2(requestRestore);
 
     // if the object had already been restored the restore request will just
     // increase the expiration time
@@ -513,8 +523,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       // Check the restoration status of the object.
       // Wait min restore time and then poll ofter that
       try {
-        // Check as restore might have already been initiated
-        if (prevOngoingRestore != null && !prevOngoingRestore) {
+        if (newRestore) {
           Thread.sleep(RESTORE_MIN_WAIT);
         }
 
