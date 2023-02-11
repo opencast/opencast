@@ -390,9 +390,11 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       StorageClass objectStorageClass = StorageClass.fromValue(getObjectStorageClass(objectName));
 
       if (storageClass != objectStorageClass) {
+        boolean restored = null != s3.getObjectMetadata(bucketName, objectName).getRestoreExpirationTime();
         /* objects can only be retrieved from Glacier not moved */
-        if (objectStorageClass == StorageClass.Glacier || objectStorageClass == StorageClass.DeepArchive) {
-          logger.warn("S3 Object {} can not be moved from storage class {}", objectStorageClass);
+        if (objectStorageClass == StorageClass.Glacier || objectStorageClass == StorageClass.DeepArchive && !restored) {
+          logger.warn("S3 Object {} can not be moved from storage class {} to {} without restoring the object first",
+              objectStorageClass, storageClass);
           return objectStorageClass;
         }
 
