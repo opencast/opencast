@@ -176,7 +176,7 @@ final class WorkflowOperationWorker {
       return null;
     };
     final String executionCondition = WorkflowConditionInterpreter.replaceVariables(
-        operation.getExecutionCondition(), variables, null, false);
+        operation.getExecutionCondition(), variables, null, true);
     operation.setExecutionCondition(executionCondition);
     operation.setDescription(WorkflowConditionInterpreter.replaceVariables(
         operation.getDescription(), variables, null, false));
