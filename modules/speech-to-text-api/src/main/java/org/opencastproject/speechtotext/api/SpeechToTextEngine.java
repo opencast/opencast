@@ -36,13 +36,19 @@ public interface SpeechToTextEngine {
   /**
    * Generates the subtitles file.
    *
-   * @param mediaFile The media package containing the audio track.
+   * @param mediaFile          The media package containing the audio track.
    * @param preparedOutputFile The prepared output file where the subtitle's data should be saved.
-   * @param language The language of the audio track.
+   * @param language           The language of the audio track.
    * @return The generated subtitles file.
    * @throws SpeechToTextEngineException Thrown when an error occurs at the process.
    */
-  File generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language)
-          throws SpeechToTextEngineException;
+  default File generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language)
+      throws SpeechToTextEngineException {
+    return null;
+  }
 
+  default File generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language, Boolean translate)
+      throws SpeechToTextEngineException {
+    return null;
+  }
 }

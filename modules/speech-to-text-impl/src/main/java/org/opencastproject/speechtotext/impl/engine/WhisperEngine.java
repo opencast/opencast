@@ -27,6 +27,8 @@ import org.opencastproject.util.IoSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -35,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -93,17 +96,19 @@ public class WhisperEngine implements SpeechToTextEngine {
     logger.debug("Finished activating/updating speech-to-text service");
   }
 
+  //TODO: Add method for language detection
+  //TODO: Add optional language translation to english
+
   /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.speechtotext.api.SpeechToTextEngine#generateSubtitlesFile(File, File, String)
    */
 
-  //TODO: Add method for language detection
-  //TODO: Add optional language translation to english
   @Override
-  public File generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language)
+  public File generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language, Boolean translate)
           throws SpeechToTextEngineException {
+
 
     final List<String> command = Arrays.asList(
         whisperExecutable,
@@ -111,6 +116,19 @@ public class WhisperEngine implements SpeechToTextEngine {
         "--model", whisperModel,
         "--output_dir", preparedOutputFile.getParent()
     );
+
+    if (translate){
+      command.add("--task translate");
+      logger.debug("Translation enabled");
+      language = "en";
+    }
+
+    if ((language != null) || (language != "en")){
+      logger.debug("Using set language {} from workflow", language);
+      String lang = "--language " + language;
+      command.add(lang);
+    }
+
     logger.info("Executing Whisper's transcription command: {}", command);
 
     Process process = null;
@@ -133,7 +151,6 @@ public class WhisperEngine implements SpeechToTextEngine {
       File whisperVTT = new File((preparedOutputFile.getParent() + "/" + mediaFile.getName() + ".vtt"));
       whisperVTT.renameTo(preparedOutputFile);
 
-
       if (!preparedOutputFile.isFile()) {
         throw new SpeechToTextEngineException("Whisper produced no output");
       }
@@ -145,7 +162,21 @@ public class WhisperEngine implements SpeechToTextEngine {
       IoSupport.closeQuietly(process);
     }
 
-
-    return preparedOutputFile; // Subtitles data
+    // Detect language if not set
+    if(language == null) {
+      JSONParser jsonParser = new JSONParser();
+      try {
+        String jsonLanguage = null;
+        FileReader reader = new FileReader((preparedOutputFile.getParent() + "/" + mediaFile.getName() + ".json"));
+        Object obj = jsonParser.parse(reader);
+        JSONObject jsonObject = (JSONObject) obj;
+        jsonLanguage = (String) jsonObject.get("language");
+      } catch (Exception e) {
+        logger.debug("Error reading Whisper JSON file for: {}", mediaFile);
+        throw new SpeechToTextEngineException(e);
+      }
+    }
+      return preparedOutputFile; // Subtitles data
+    }
   }
-}
+
