@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -106,7 +107,7 @@ public class WhisperEngine implements SpeechToTextEngine {
    */
 
   @Override
-  public File generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language, Boolean translate)
+  public List<Object> generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language, Boolean translate)
           throws SpeechToTextEngineException {
 
 
@@ -123,8 +124,8 @@ public class WhisperEngine implements SpeechToTextEngine {
       language = "en";
     }
 
-    if ((language != null) || (language != "en")){
-      logger.debug("Using set language {} from workflow", language);
+    if (!language.isBlank()){
+      logger.debug("Using language {} from workflows", language);
       String lang = "--language " + language;
       command.add(lang);
     }
@@ -163,7 +164,7 @@ public class WhisperEngine implements SpeechToTextEngine {
     }
 
     // Detect language if not set
-    if(language == null) {
+    if(language.isBlank()) {
       JSONParser jsonParser = new JSONParser();
       try {
         String jsonLanguage = null;
@@ -171,12 +172,16 @@ public class WhisperEngine implements SpeechToTextEngine {
         Object obj = jsonParser.parse(reader);
         JSONObject jsonObject = (JSONObject) obj;
         jsonLanguage = (String) jsonObject.get("language");
+        language = jsonLanguage;
       } catch (Exception e) {
         logger.debug("Error reading Whisper JSON file for: {}", mediaFile);
         throw new SpeechToTextEngineException(e);
       }
     }
-      return preparedOutputFile; // Subtitles data
+     List<Object> returnValues = new ArrayList<>();
+    returnValues.add(preparedOutputFile);
+    returnValues.add(language);
+      return returnValues; // Subtitles data
     }
   }
 
