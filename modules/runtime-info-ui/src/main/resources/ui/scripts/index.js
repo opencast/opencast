@@ -23,25 +23,35 @@
 
 $(document).ready(function () {
   $.ajax({
-    url: '/admin-ui/index.html',
-    type: 'HEAD',
-    error: function (xhr){
-      if (xhr.status == 404) {
-        // Go to rest docs instead
-        $.ajax({
-          url: '/rest_docs.html',
-          type: 'HEAD',
-          error: function () {
-            // Give up
-          },
-          success: function () {
-            window.location.replace('/rest_docs.html');
-          }
-        });
-      }
-    },
-    success: function () {
+    url: '/ui/config/runtime-info-ui/settings.json',
+    type: 'GET',
+    error: function () {
       window.location.replace('/admin-ui/index.html');
+    },
+    success: function (data) {
+      const adminUIUrl = data.adminUIUrl;
+      $.ajax({
+        url: adminUIUrl,
+        type: 'HEAD',
+        error: function (xhr){
+          if (xhr.status == 404) {
+            // Go to rest docs instead
+            $.ajax({
+              url: '/rest_docs.html',
+              type: 'HEAD',
+              error: function () {
+                // Give up
+              },
+              success: function () {
+                window.location.replace('/rest_docs.html');
+              }
+            });
+          }
+        },
+        success: function () {
+          window.location.replace(adminUIUrl);
+        }
+      });
     }
   });
 });
