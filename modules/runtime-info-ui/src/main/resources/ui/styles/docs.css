@@ -1,0 +1,96 @@
+body {
+  font-family: "Open Sans", Helvetica, sans-serif;
+  font-size: 14px;
+  padding: 0px;
+  margin: 0px;
+}
+
+header {
+  padding: 20px;
+}
+
+h1 {
+  background-color: #2075b1;
+  margin: 0px;
+  padding: 15px;
+  font-size: larger;
+  color: white;
+}
+
+h2 {
+  font-size: larger;
+  margin-top: 35px;
+}
+
+summary {
+  background-color: #24425c;
+  padding: 20px;
+  padding-top:30px;
+  color: #ccc;
+}
+
+.toc li {
+  padding: 2px 0;
+}
+
+.toc a {
+  color: #333;
+  padding: 1px 0;
+  text-decoration: underline;
+}
+
+.center {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: small
+}
+
+table.method {
+  width: 100%;
+  margin-bottom:15px;
+}
+
+table.testing {
+  width: 96%;
+  border: 1px solid #CCC;
+  padding: 5px;
+}
+
+th, td {
+  padding: 7px;
+  vertical-align: middle;
+  border-bottom: 1px solid #ccc;
+  text-align: left;
+}
+
+th:first-of-type {
+  width: 20%;
+  text-align: right;
+}
+
+thead th {
+  background-color: #ddd;
+  font-weight: bold;
+}
+
+table ul {
+  margin: 0;
+  padding: 0 20px;
+}
+
+.hidden {
+  display: none;
+}
+
+div.spaced {
+  margin: 4px 0px;
+}
+
+td.form_label {
+  width: 10%;
+}
