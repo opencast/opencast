@@ -4,6 +4,29 @@ Changelog
 Opencast 13
 -----------
 
+### Opencast 13.2
+
+*Released on February 15th, 2023*
+
+- [[#4616](https://github.com/opencast/opencast/pull/4616)] -
+  Fix adopter data gathering bugs
+- [[#4687](https://github.com/opencast/opencast/pull/4687)] -
+  Bump eslint from 8.33.0 to 8.34.0 in /modules/engage-paella-player-7
+- [[#4680](https://github.com/opencast/opencast/pull/4680)] -
+  Bump html-validate from 7.13.1 to 7.13.2 in /modules/engage-paella-player-7
+- [[#4657](https://github.com/opencast/opencast/pull/4657)] -
+  Bump eslint from 8.32.0 to 8.33.0 in /modules/engage-paella-player-7
+- [[#4654](https://github.com/opencast/opencast/pull/4654)] -
+  Add webvtt-to-cutmarks to list of workflow operations
+- [[#4648](https://github.com/opencast/opencast/pull/4648)] -
+  Bump paella-core from 1.14.2 to 1.16.0 in /modules/engage-paella-player-7
+- [[#4628](https://github.com/opencast/opencast/pull/4628)] -
+  Add missing expected response code
+- [[#4619](https://github.com/opencast/opencast/pull/4619)] -
+  Fix calendar.json endpoint
+- [[#4607](https://github.com/opencast/opencast/pull/4607)] -
+  Add Opencast 13.1 release notes
+
 ### Opencast 13.1
 
 *Released on January 18th, 2023*

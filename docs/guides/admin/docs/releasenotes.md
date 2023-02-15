@@ -1,6 +1,19 @@
 # Opencast 13: Release Notes
 
 
+Opencast 13.2
+-------------
+
+The second maintenance release of Opencast 13.
+
+-  Fix calendar.json endpoint ([#4619](https://github.com/opencast/opencast/pull/4619))
+-  Add missing expected response code ([#4628](https://github.com/opencast/opencast/pull/4628))
+-  Add webvtt-to-cutmarks to list of workflow operations ([#4654](https://github.com/opencast/opencast/pull/4654))
+-  Fix multiple bugs in the adopters registration resulting in incorrect counts ([#4616](https://github.com/opencast/opencast/pull/4616))
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
+
 Opencast 13.1
 -------------
 
