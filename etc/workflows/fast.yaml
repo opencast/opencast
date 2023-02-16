@@ -34,6 +34,16 @@ operations:
       - overwrite: false
       - accept-no-media: false
 
+  - id: speechtotext
+    fail-on-error: true
+    exception-handler-workflow: "partial-error"
+    description: "Generating subtitles with Whisper"
+    configurations:
+      - source-flavor: "presenter/source"
+      - target-flavor: "captions/vtt"
+      - target-tags: "archive,engage-download,lang:en"
+      - target-element: "track"
+
   - id: encode
     fail-on-error: true
     exception-handler-workflow: "partial-error"

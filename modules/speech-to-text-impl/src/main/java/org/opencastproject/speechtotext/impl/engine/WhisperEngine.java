@@ -111,20 +111,20 @@ public class WhisperEngine implements SpeechToTextEngine {
           throws SpeechToTextEngineException {
 
 
-    final List<String> command = Arrays.asList(
+    List<String> command = Arrays.asList(
         whisperExecutable,
         mediaFile.getAbsolutePath(),
         "--model", whisperModel,
         "--output_dir", preparedOutputFile.getParent()
     );
 
-    if (translate){
+    if (translate) {
       command.add("--task translate");
       logger.debug("Translation enabled");
       language = "en";
     }
 
-    if (!language.isBlank()){
+    if (!language.isBlank()) {
       logger.debug("Using language {} from workflows", language);
       String lang = "--language " + language;
       command.add(lang);
@@ -164,10 +164,10 @@ public class WhisperEngine implements SpeechToTextEngine {
     }
 
     // Detect language if not set
-    if(language.isBlank()) {
+    if (language.isBlank()) {
       JSONParser jsonParser = new JSONParser();
       try {
-        String jsonLanguage = null;
+        String jsonLanguage;
         FileReader reader = new FileReader((preparedOutputFile.getParent() + "/" + mediaFile.getName() + ".json"));
         Object obj = jsonParser.parse(reader);
         JSONObject jsonObject = (JSONObject) obj;
@@ -178,10 +178,10 @@ public class WhisperEngine implements SpeechToTextEngine {
         throw new SpeechToTextEngineException(e);
       }
     }
-     List<Object> returnValues = new ArrayList<>();
+    List<Object> returnValues = new ArrayList<>();
     returnValues.add(preparedOutputFile);
     returnValues.add(language);
-      return returnValues; // Subtitles data
-    }
+    return returnValues; // Subtitles data
   }
+}
 

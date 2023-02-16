@@ -60,7 +60,7 @@ import java.util.List;
     property = {
         "service.description=Speech to Text Service",
         "service.pid=org.opencastproject.speechtotext.impl.SpeechToTextServiceImpl"
-})
+    })
 public class SpeechToTextServiceImpl extends AbstractJobProducer implements SpeechToTextService {
 
   private static final Logger logger = LoggerFactory.getLogger(SpeechToTextServiceImpl.class);
@@ -151,9 +151,11 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
               workspace.rootDirectory(), COLLECTION, vttFileName));
       subtitlesFile.deleteOnExit();
       FileUtils.forceMkdirParent(subtitlesFile);
+      Boolean translate = false;
+      List <Object> subOutput = speechToTextEngine.generateSubtitlesFile(
+              workspace.get(mediaFile), subtitlesFile, language, translate);
 
-      subtitlesFile = speechToTextEngine.generateSubtitlesFile(
-              workspace.get(mediaFile), subtitlesFile, language);
+      subtitlesFile = (File) subOutput.get(0);
 
       // we need to call the "putInCollection" method to get
       // a URI, that can be used in the following processes

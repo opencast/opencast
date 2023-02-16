@@ -44,12 +44,12 @@ public interface SpeechToTextEngine {
    * @throws SpeechToTextEngineException Thrown when an error occurs at the process.
    */
   default File generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language)
-      throws SpeechToTextEngineException {
+          throws SpeechToTextEngineException {
     return null;
   }
 
-  default List<Object> generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language, Boolean translate)
-      throws SpeechToTextEngineException {
+  default List<Object> generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language,
+          Boolean translate) throws SpeechToTextEngineException {
     return null;
   }
 }
