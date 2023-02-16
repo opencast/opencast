@@ -2198,8 +2198,18 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
               }
               current++;
 
-              var updatedWorkflowData = index.getEvent(indexData.getMediaPackageId(), indexData.getOrganizationId(),
-                        securityService.getUser());
+              String orgid = indexData.getOrganizationId();
+              if (null == orgid) {
+                //NB: This version of getWorkflow takes the org id, which in this case is null
+                // Using the normal version filters by org, and since this workflow has a NULL org it can't be found
+                WorkflowInstance instance = persistence.getWorkflow(indexData.getId(), orgid);
+                //We're assuming here that mediapackages don't change orgs
+                orgid = assetManager.getSnapshotsById(indexData.getMediaPackageId())
+                    .getSnapshots().head2().getOrganizationId();
+                instance.setOrganizationId(orgid);
+                persistence.updateInDatabase(instance);
+              }
+              var updatedWorkflowData = index.getEvent(indexData.getMediaPackageId(), orgid, securityService.getUser());
               updatedWorkflowData = getStateUpdateFunction(indexData).apply(updatedWorkflowData);
               updatedWorkflowRange.add(updatedWorkflowData.get());
 
