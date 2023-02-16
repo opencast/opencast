@@ -118,6 +118,7 @@ nav:
    - LTI Module: 'modules/ltimodule.md'
    - Media Module: 'modules/mediamodule.configuration.md'
    - Metrics (OpenMetrics, Prometheus): modules/metrics.md
+   - New Admin UI: 'modules/admin-ui.md'
    - Player:
       - Configuration: 'modules/player.configuration.md'
    - Paella player:
