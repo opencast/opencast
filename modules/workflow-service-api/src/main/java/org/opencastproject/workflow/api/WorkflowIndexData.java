@@ -21,6 +21,7 @@
 
 package org.opencastproject.workflow.api;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityResult;
 import javax.persistence.FieldResult;
@@ -62,7 +63,11 @@ public class WorkflowIndexData {
   @Id
   private Long id;
   private int state;
+
+  @Column(name = "mediapackage_id", length = 128) //NB: This column definition needs to match WorkflowInstance!
   private String mediaPackageId;
+
+  @Column(name = "organization_id") //NB: This column definition needs to match WorkflowInstance!
   private String organizationId;
 
 
