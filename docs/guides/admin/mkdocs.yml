@@ -39,7 +39,6 @@ nav:
 - Release Notes: 'releasenotes.md'
 - Upgrade: 'upgrade.md'
 - Changelog: 'changelog.md'
-- Prerelease Testing: 'prereleases.md'
 - Installation:
    - Overview: 'installation/index.md'
    - Hardware Requirements: installation/server-requirements.md
@@ -56,6 +55,7 @@ nav:
       - Ansible: 'installation/ansible.md'
    - Installation with Docker:
       - Testing Locally: 'installation/docker-local.md'
+   - Prerelease Testing: 'installation/prereleases.md'
 - Configuration:
    - Overview: 'configuration/index.md'
    - Basic: 'configuration/basic.md'
@@ -208,7 +208,7 @@ nav:
    - Ingest-Download: 'workflowoperationhandlers/ingestdownload-woh.md'
    - Inspect: 'workflowoperationhandlers/inspect-woh.md'
    - Log: 'workflowoperationhandlers/log-woh.md'
-   - Mattermost Notification Module: 'workflowoperationhandlers/notification.md'
+   - Mattermost Notification Module: 'workflowoperationhandlers/mattermost-notify-woh.md'
    - Metadata to ACL: 'workflowoperationhandlers/metadata-to-acl.md'
    - Move Storage: 'workflowoperationhandlers/move-storage-woh.md'
    - Microsoft Azure Attach Transcription: 'workflowoperationhandlers/microsoft-azure-attach-transcription-woh.md'
@@ -245,7 +245,7 @@ nav:
    - Send Email: 'workflowoperationhandlers/send-email-woh.md'
    - Series: 'workflowoperationhandlers/series-woh.md'
    - Silence: 'workflowoperationhandlers/silence-woh.md'
-   - Speech to Text: 'workflowoperationhandlers/speech-to-text-woh.md'
+   - Speech to Text: 'workflowoperationhandlers/speechtotext-woh.md'
    - Start Watson Transcription: 'workflowoperationhandlers/start-watson-transcription-woh.md'
    - Start Workflow: 'workflowoperationhandlers/start-workflow-woh.md'
    - Statistics Writer: 'workflowoperationhandlers/statistics-writer.md'

@@ -4,11 +4,13 @@ Shortly after a branch cut we start providing prerelease packages for the new br
 verison any time a pull request has been merged.  This may be more than once a day, or it may be very rare late in the
 life cycle of a branch.
 
+<div class=warn>
 Note: These packages come with *absolutely no support*, and may be broken at any time.  Do not install these on
 anything other than a testing system.  Do not feed the only copy of your recordings to these systems.  These
 packages may break their host operating system, and may eat your dog.  Do not feed these packages after midnight.
+</div>
 
-
+<!--
 Redhat Based Distributions
 --------------------------
 
@@ -23,7 +25,8 @@ version must match your distribution's version!
     gpgkey = http://ci.opencast.org/keys/public-signing-key.gpg
 
 Note: This repo still requires the normal Opencast repository for dependencies (notably ffmpeg).  Configuration for
-these packages should follow the [standard instructions](configuration/basic.md)
+these packages should follow the [standard instructions](../configuration/basic.md)
+-->
 
 Debian Based Distributions
 --------------------------
@@ -37,7 +40,7 @@ The insert the following into `/etc/apt/sources.list.d/opencast-unstable.list`
     deb [signed-by=/usr/share/keyrings/opencast-unstable.gpg] http://ci.opencast.org/debian {{ opencast_major_version() }}.x unstable
 
 Note: This repo still requires the normal Opencast repository for dependencies (notably ffmpeg).  Configuration for
-these packages should follow the [standard instructions](configuration/basic.md)
+these packages should follow the [standard instructions](../configuration/basic.md)
 
 Docker Images
 -------------
@@ -46,4 +49,4 @@ All container images provide a `next` tag, e.g. `quay.io/opencast/allinone:next`
 next upcoming major version. As such, it follows the latest release branch `r/Y.x` until `Y.0` is released. After that,
 it builds from `develop` until the next release branch is cut. This change is announced on list.
 
-Configuration for these images should follow the [standard instructions](configuration/basic.md)
+Configuration for these images should follow the [standard instructions](../configuration/basic.md)

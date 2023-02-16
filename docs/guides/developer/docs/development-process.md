@@ -46,7 +46,7 @@ That is why patches may only be accepted into releases branches (`r/?.x`) if the
 
 Patches which do not meet these criteria should target the branch `develop` to become part of the next major version.
 
-Note: Patches adding features should target the current stable release (`r/{{ opencast_major_version}}.x`), or
+Note: Patches adding features should target the current stable release (`r/{{ opencast_major_version }}.x`), or
 `develop`, and are strongly discouraged from targetting the legacy release.  Features going into the legacy release
 will need a good reason, and must be highly self contained.
 

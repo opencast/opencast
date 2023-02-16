@@ -5,7 +5,7 @@ Overview
 --------
 
 Opencast can take advantage of [Open AI's Whisper Project]() to generate automatic transcriptions on premise through 
-[SpeechToText WoH](../../workflowoperationhandlers/speech-to-text-woh.md).
+[SpeechToText WoH](../../workflowoperationhandlers/speechtotext-woh.md).
 
 Advantages
 ----------

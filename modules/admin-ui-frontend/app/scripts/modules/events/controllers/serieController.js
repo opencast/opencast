@@ -516,16 +516,7 @@ angular.module('adminNg.controllers')
     let oldPolicies = {};
 
     function getCurrentPolicies () {
-
-      oldPolicies = $scope.policies.map(policy => {
-        let newObject = {};
-        Object.keys(policy).forEach(propertyKey => {
-          newObject[propertyKey] = policy[propertyKey];
-        });
-        return newObject;
-      });
-
-      return oldPolicies;
+      oldPolicies = JSON.parse(JSON.stringify($scope.policies));
     }
 
     $scope.saveChanges = function (override) {
@@ -589,6 +580,17 @@ angular.module('adminNg.controllers')
         else if (oldPolicy.write !== policy.write) {
           hasChanges = true;
         }
+
+        if (oldPolicy.actions.value.length !== policy.actions.value.length) {
+          hasChanges = true;
+          return;
+        }
+        oldPolicy.actions.value.forEach((oldAction, index) => {
+          const action = policy.actions.value[index];
+          if (oldAction !== action) {
+            hasChanges = true;
+          }
+        });
       });
       return hasChanges;
     }
