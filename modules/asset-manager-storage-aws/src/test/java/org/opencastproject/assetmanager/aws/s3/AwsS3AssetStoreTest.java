@@ -65,6 +65,7 @@ import org.osgi.service.component.ComponentContext;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Date;
 import java.util.List;
 
 public class AwsS3AssetStoreTest {
@@ -326,13 +327,15 @@ public class AwsS3AssetStoreTest {
     EasyMock.expect(gotr.getTagSet()).andReturn(tags).once();
     ObjectMetadata metadata = EasyMock.createStrictMock(ObjectMetadata.class);
     EasyMock.expect(metadata.getVersionId()).andReturn(AWS_VERSION_1).anyTimes();
+
     EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Standard.toString()).times(4);
     EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Glacier.toString()).once();
     EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Standard.toString()).once();
+    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Glacier.toString()).once();
+    EasyMock.expect(metadata.getOngoingRestore()).andReturn(false);
+    EasyMock.expect(metadata.getRestoreExpirationTime()).andReturn(new Date()).once();
+    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Standard.toString()).once();
     EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.DeepArchive.toString()).once();
-    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Standard.toString()).once();
-    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.ReducedRedundancy.toString()).once();
-    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Standard.toString()).once();
     EasyMock.expect(s3Client.getObjectTagging(EasyMock.anyObject(GetObjectTaggingRequest.class)))
         .andReturn(gotr).once();
     //FIXME: Mock appropriate results, not that they're checked.
@@ -356,14 +359,19 @@ public class AwsS3AssetStoreTest {
     //Set the storage class to the same thing -> should be a noop, and not change the class
     store.modifyAssetStorageClass(path, StorageClass.Standard.toString());
     Assert.assertEquals(StorageClass.Standard.toString(), store.getAssetStorageClass(path));
+
     //change the storage type to glacier or deep archive
-    for (String sc : new String[] { StorageClass.Glacier.toString(), StorageClass.DeepArchive.toString() }) {
-      store.modifyAssetStorageClass(path, sc);
-      Assert.assertEquals(sc, store.getAssetStorageClass(path));
-    }
-    //change the type to some other type that does not have special handling
+    store.modifyAssetStorageClass(path, StorageClass.Glacier.toString());
+    Assert.assertEquals(StorageClass.Glacier.toString(), store.getAssetStorageClass(path));
+
+    //We're in Glacier, which means we have to restore before we can move classes
     store.modifyAssetStorageClass(path, StorageClass.ReducedRedundancy.toString());
-    Assert.assertEquals(StorageClass.ReducedRedundancy.toString(), store.getAssetStorageClass(path));
+    Assert.assertEquals(StorageClass.Glacier.toString(), store.getAssetStorageClass(path));
+    //'Restore' the object.  NB: The mock here is skipping a whole bunch of logic
+    store.initiateRestoreAsset(path, Integer.MAX_VALUE);
+    //Asset is now in regular S3, sooo...
+    store.modifyAssetStorageClass(path, StorageClass.DeepArchive.toString());
+    Assert.assertEquals(StorageClass.DeepArchive.toString(), store.getAssetStorageClass(path));
 
     EasyMock.verify();
   }
