@@ -630,6 +630,25 @@ Opencast 13
 Opencast 12
 -----------
 
+### Opencast 12.8
+
+*Released on February 20th, 2023*
+
+- [[#4699](https://github.com/opencast/opencast/pull/4699)] -
+  Emphasize need to configure debs
+- [[#4659](https://github.com/opencast/opencast/pull/4659)] -
+  Do not allow consecutive dots in file names
+- [[#4653](https://github.com/opencast/opencast/pull/4653)] -
+  Document all available workflow operations
+- [[#4620](https://github.com/opencast/opencast/pull/4620)] -
+  Also check custom actions for unsaved ACL changes
+- [[#4616](https://github.com/opencast/opencast/pull/4616)] -
+  Fix adopter data gathering bugs
+- [[#4614](https://github.com/opencast/opencast/pull/4614)] -
+  Remove RPM instructions from nightly documentation
+- [[#4596](https://github.com/opencast/opencast/pull/4596)] -
+  Always show save button for series access rights
+
 ### Opencast 12.7
 
 *Released on January 18th, 2023*
