@@ -28,7 +28,7 @@
    "YES": "Ja",
    "COPY": "In die Zwischenablage kopieren",
    "MONITOR": {
-      "REGISTRATION": "Opencast has sent a registration update in more than a week"
+      "REGISTRATION": "Out of date"
    },
    "LTI": {
       "ERROR_LOADING_METADATA": "Fehler beim Laden der Videometadaten. Bitte versuchen Sie es später noch einmal.",
