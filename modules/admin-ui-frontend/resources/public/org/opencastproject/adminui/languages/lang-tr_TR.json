@@ -28,7 +28,7 @@
    "YES": "Evet",
    "COPY": "Panoya kopyala",
    "MONITOR": {
-      "REGISTRATION": "Opencast has sent a registration update in more than a week"
+      "REGISTRATION": "Out of date"
    },
    "LTI": {
       "ERROR_LOADING_METADATA": "Sohbet yüklenirken hata oluştu. Lütfen daha sonra tekrar deneyin.",

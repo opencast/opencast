@@ -28,7 +28,7 @@
    "YES": "Oui",
    "COPY": "Copier dans le presse-papiers",
    "MONITOR": {
-      "REGISTRATION": "Opencast a envoyé une mise à jour d'inscription dans plus d'une semaine"
+      "REGISTRATION": "Out of date"
    },
    "LTI": {
       "ERROR_LOADING_METADATA": "Erreur lors du chargement des métadonnées de l'événement. Veuillez réessayer plus tard.",

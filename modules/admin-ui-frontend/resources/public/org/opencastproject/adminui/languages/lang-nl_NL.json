@@ -28,7 +28,7 @@
    "YES": "Ja",
    "COPY": "Naar klembord kopiëren",
    "MONITOR": {
-      "REGISTRATION": "Opencast has sent a registration update in more than a week"
+      "REGISTRATION": "Out of date"
    },
    "LTI": {
       "ERROR_LOADING_METADATA": "Fout bij het laden van de metadata van dit event. Probeer het later aub opnieuw.",

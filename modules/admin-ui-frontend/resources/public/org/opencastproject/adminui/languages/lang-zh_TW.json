@@ -28,7 +28,7 @@
    "YES": "是",
    "COPY": "複製到剪貼簿",
    "MONITOR": {
-      "REGISTRATION": "Opencast has sent a registration update in more than a week"
+      "REGISTRATION": "Out of date"
    },
    "LTI": {
       "ERROR_LOADING_METADATA": "載入事件後設資料時發生錯誤。請稍後再試。",
