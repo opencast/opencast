@@ -97,7 +97,14 @@ public final class WorkflowConditionInterpreter {
               result.append(toAppend);
             }
           } catch (NumberFormatException e) {
-            result.append("'").append(toAppend.replace("''", "'")).append("'");
+            // quote string value if variable not already quoted
+            if (matchStart == 0 || source.charAt(matchStart - 1) != '\'') {
+              result.append("'");
+            }
+            result.append(toAppend.replace("''", "'"));
+            if (matchEnd == source.length() || source.charAt(matchEnd) != '\'') {
+              result.append("'");
+            }
           }
         }
       } else {
