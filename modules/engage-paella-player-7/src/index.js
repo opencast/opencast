@@ -113,6 +113,11 @@ const initParams = {
       }
     }
 
+    // Add event title to browser tab
+    var videoTitle = data?.metadata?.title ?? 'Unknown video title';
+    var seriesTitle = data?.metadata?.seriestitle ?? 'No series';
+    document.title =  videoTitle + ' - ' + seriesTitle + ' | Opencast';
+
     // Load stats
     const stats = await loadStats();
     if (stats) {

@@ -141,10 +141,6 @@ function getMetadata(episode) {
     UID: episode?.id
   };
 
-
-  //Add event title to browser tab
-  document.title = title;
-
   return result;
 }
 
