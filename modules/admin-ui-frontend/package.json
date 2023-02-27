@@ -5,7 +5,7 @@
     "autoprefixer": "^9.8.8",
     "bower": "^1.8.14",
     "chromedriver": "^110.0.0",
-    "eslint": "^8.34.0",
+    "eslint": "^8.35.0",
     "eslint-plugin-header": "^3.1.1",
     "grunt": "^1.5.3",
     "grunt-cli": "^1.4.3",
