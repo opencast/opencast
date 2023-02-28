@@ -46,13 +46,33 @@ The Opencast AWS S3 Archive service configuration can be found in the
 Using S3 Archiving
 ------------------
 
-There are two major methods to access S3 archiving features: manually, and via a workflow.  Amazon S3 archiving is not
-part of the default workflows and manual S3 offload is disabled by default.  To enable manual S3 offload you must edit
-the `offload.xml` workflow configuration file and change `var s3Enabled = false;` to `var s3Enabled = true;`.  To
-manually offload a media package follow the directions in the user documentation.
+Moving assets to S3 is done via a workflow operation handler added as part of a workflow.  This can be part of your
+main workflow that runs on all of your recordings, or a small manually activated workflow accessed on-demand from the
+tasks menu.  The workflow operation handler definition looks like this
+```
+    <operation
+      id="move-storage"
+      description="Offloading to AWS S3">
+      <configurations>
+        <configuration key="target-storage">aws-s3</configuration>
+      </configurations>
+    </operation>
+```
 
-To automatically offload a media package to S3 you must add the `move-storage` workflow operation to your workflow.
-The operation documentation can be found [here](../workflowoperationhandlers/move-storage-woh.md).
+Assets in S3 continue to be accessible to Opencast, however there may be cases where you wish to restore your content
+back to your local storage.  This can be accomplished using the same workflow operation definition as above, and
+changing the `target-storage` configuration value from `aws-s3` to `local-filesystem` like so
+```
+    <operation
+      id="move-storage"
+      description="Restoring from AWS S3">
+      <configurations>
+        <configuration key="target-storage">local-filesystem</configuration>
+      </configurations>
+    </operation>
+```
+
+
 
 Migrating to S3 Archiving with Pre-Existing Data
 ---------------------------------------------------
