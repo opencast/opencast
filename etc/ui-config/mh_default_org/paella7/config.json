@@ -366,7 +366,7 @@
             }
         },
         "org.opencast.paella.cookieconsent": {
-            "enabled": false,
+            "enabled": true,
             "side": "right"
         },
         "org.opencast.paella.breaksPlugin": {
