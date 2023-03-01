@@ -11,7 +11,7 @@
     "bootstrap": "^5.2.3",
     "i18next": "^22.0.4",
     "i18next-browser-languagedetector": "^7.0.1",
-    "iframe-resizer": "^4.3.3",
+    "iframe-resizer": "^4.3.4",
     "query-string": "^7.1.1",
     "react": "^18.1.0",
     "react-bootstrap": "^2.7.0",
