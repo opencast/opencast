@@ -28,7 +28,7 @@
    "YES": "Tak",
    "COPY": "Kopiuj do schowka",
    "MONITOR": {
-      "REGISTRATION": "Opencast has sent a registration update in more than a week"
+      "REGISTRATION": "Out of date"
    },
    "LTI": {
       "ERROR_LOADING_METADATA": "Błąd ładowania metadanych wydarzenia. Spróbuj ponownie później.",

@@ -28,7 +28,7 @@
    "YES": "是",
    "COPY": "复制到剪贴板",
    "MONITOR": {
-      "REGISTRATION": "Opencast 已在一周多时间内发送注册更新"
+      "REGISTRATION": "Out of date"
    },
    "LTI": {
       "ERROR_LOADING_METADATA": "加载事件元数据时出错。请稍后再试。",
