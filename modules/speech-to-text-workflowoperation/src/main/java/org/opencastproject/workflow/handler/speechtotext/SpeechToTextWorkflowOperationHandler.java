@@ -70,7 +70,8 @@ import java.util.UUID;
         "workflow.operation=speechtotext"
     }
 )
-public class SpeechToTextWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
+public class
+    SpeechToTextWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(SpeechToTextWorkflowOperationHandler.class);
 
@@ -287,11 +288,6 @@ public class SpeechToTextWorkflowOperationHandler extends AbstractWorkflowOperat
     if (language.isEmpty()) {
       // If there is still no language, we look in the media package itself
       language = StringUtils.trimToEmpty(mediaPackage.getLanguage());
-    }
-
-    if (language.isEmpty()) {
-      // default value when nothing worked
-      language = StringUtils.defaultIfBlank(operation.getConfiguration(LANGUAGE_FALLBACK), "eng");
     }
 
     return language;

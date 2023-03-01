@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -81,11 +82,12 @@ public class VoskEngine implements SpeechToTextEngine {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.speechtotext.api.SpeechToTextEngine#generateSubtitlesFile(File, File, String)
+   * @see org.opencastproject.speechtotext.api.SpeechToTextEngine#generateSubtitlesFile(File, File, String, Boolean)
    */
   @Override
-  public File generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language)
+  public List<Object> generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language, Boolean translate)
           throws SpeechToTextEngineException {
+
 
     final List<String> command = Arrays.asList(
             voskExecutable,
@@ -120,8 +122,11 @@ public class VoskEngine implements SpeechToTextEngine {
     } finally {
       IoSupport.closeQuietly(process);
     }
+    List<Object> returnValues = new ArrayList<>();
+    returnValues.add(preparedOutputFile);
+    returnValues.add(language);
 
-    return preparedOutputFile; // now containing subtitles data
+    return returnValues; // List containing the output File and language parameter
   }
 
 }

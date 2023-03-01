@@ -103,7 +103,7 @@ public class WhisperEngine implements SpeechToTextEngine {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.speechtotext.api.SpeechToTextEngine#generateSubtitlesFile(File, File, String)
+   * @see org.opencastproject.speechtotext.api.SpeechToTextEngine#generateSubtitlesFile(File, File, String, Boolean)
    */
 
   @Override
@@ -150,7 +150,7 @@ public class WhisperEngine implements SpeechToTextEngine {
       }
 
       File whisperVTT = new File((preparedOutputFile.getParent() + "/" + mediaFile.getName() + ".vtt"));
-      whisperVTT.renameTo(preparedOutputFile);
+      preparedOutputFile.renameTo(whisperVTT);
 
       if (!preparedOutputFile.isFile()) {
         throw new SpeechToTextEngineException("Whisper produced no output");
