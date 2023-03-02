@@ -75,16 +75,16 @@ import java.net.URI;
 @Component(
     immediate = true,
     service = {
-        SeriesUpdatedEventHandler.class
+        SearchUpdatedEventHandler.class
     },
     property = {
-        "service.description=Series Updated Event Handler"
+        "service.description=Search Updated Event Handler"
     }
 )
-public class SeriesUpdatedEventHandler {
+public class SearchUpdatedEventHandler {
 
   /** The logger */
-  protected static final Logger logger = LoggerFactory.getLogger(SeriesUpdatedEventHandler.class);
+  protected static final Logger logger = LoggerFactory.getLogger(SearchUpdatedEventHandler.class);
 
   /** The service registry */
   protected ServiceRegistry serviceRegistry = null;
