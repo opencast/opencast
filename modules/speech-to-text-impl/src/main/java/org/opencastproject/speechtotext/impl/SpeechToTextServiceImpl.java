@@ -177,13 +177,13 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.speechtotext.api.SpeechToTextService#transcribe(URI, String)
+   * @see org.opencastproject.speechtotext.api.SpeechToTextService#transcribe(URI, String, Boolean)
    */
   @Override
-  public Job transcribe(URI mediaFile, String language) throws SpeechToTextServiceException {
+  public Job transcribe(URI mediaFile, String language, Boolean translate) throws SpeechToTextServiceException {
     try {
       logger.debug("Creating speechToText service job");
-      List<String> jobArguments = Arrays.asList(mediaFile.toString(), language);
+      List<String> jobArguments = Arrays.asList(mediaFile.toString(), language, translate.toString());
       return serviceRegistry.createJob(JOB_TYPE, OPERATION, jobArguments, jobLoad);
     } catch (ServiceRegistryException e) {
       throw new SpeechToTextServiceException(e);
