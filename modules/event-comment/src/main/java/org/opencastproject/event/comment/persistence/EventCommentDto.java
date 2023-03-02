@@ -25,8 +25,11 @@ import static org.opencastproject.util.RequireUtil.notNull;
 
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentReply;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
+import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.data.Option;
 
 import java.util.ArrayList;
@@ -364,8 +367,16 @@ public class EventCommentDto {
    *
    * @return the business object model of this comment
    */
-  public EventComment toComment(UserDirectoryService userDirectoryService) {
+  public EventComment toComment(UserDirectoryService userDirectoryService,
+      OrganizationDirectoryService organizationDirectoryService) {
     User user = userDirectoryService.loadUser(author);
+    if (user == null) {
+      JpaOrganization org = null;
+      try {
+        org = (JpaOrganization) organizationDirectoryService.getOrganization(organization);
+      } catch (Exception ignore) { }
+      user = new JpaUser(author, null, org, author, "ghost@localhost", "ghost", false);
+    }
     EventComment comment = EventComment.create(Option.option(id), eventId, organization, text, user, reason,
             resolvedStatus, creationDate, modificationDate);
     for (EventCommentReplyDto reply : replies) {
@@ -373,5 +384,4 @@ public class EventCommentDto {
     }
     return comment;
   }
-
 }
