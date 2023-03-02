@@ -138,8 +138,11 @@ public class WhisperEngine implements SpeechToTextEngine {
       processBuilder.redirectErrorStream(true);
       process = processBuilder.start();
 
+
       // wait until the task is finished
       int exitCode = process.waitFor();
+      logger.debug("Whisper process finished with exit code {}",exitCode);
+
       if (exitCode != 0) {
         var error = "";
         try (var errorStream = process.getInputStream()) {
@@ -149,8 +152,9 @@ public class WhisperEngine implements SpeechToTextEngine {
             String.format("Whisper exited abnormally with status %d (command: %s)%s", exitCode, command, error));
       }
 
+      // Renaming output whisper filename to the expected output filename
       File whisperVTT = new File((preparedOutputFile.getParent() + "/" + mediaFile.getName() + ".vtt"));
-      preparedOutputFile.renameTo(whisperVTT);
+      whisperVTT.renameTo(preparedOutputFile);
 
       if (!preparedOutputFile.isFile()) {
         throw new SpeechToTextEngineException("Whisper produced no output");
