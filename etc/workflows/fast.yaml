@@ -43,7 +43,7 @@ operations:
       - target-flavor: "captions/vtt"
       - target-tags: "archive,engage-download,lang:en"
       - target-element: "track"
-      - translate: "true"
+      - translate: true
 
   - id: encode
     fail-on-error: true

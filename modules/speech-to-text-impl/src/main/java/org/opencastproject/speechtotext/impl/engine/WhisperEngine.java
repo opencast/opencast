@@ -98,7 +98,6 @@ public class WhisperEngine implements SpeechToTextEngine {
   }
 
   //TODO: Add method for language detection
-  //TODO: Add optional language translation to english
 
   /**
    * {@inheritDoc}
@@ -110,24 +109,26 @@ public class WhisperEngine implements SpeechToTextEngine {
   public List<Object> generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language, Boolean translate)
           throws SpeechToTextEngineException {
 
-
-    List<String> command = Arrays.asList(
-        whisperExecutable,
-        mediaFile.getAbsolutePath(),
+    String[] baseCommands = { whisperExecutable,
+    mediaFile.getAbsolutePath(),
         "--model", whisperModel,
-        "--output_dir", preparedOutputFile.getParent()
-    );
+        "--output_dir", preparedOutputFile.getParent()};
+
+    List<String> command = new ArrayList<>(Arrays.asList(baseCommands));
 
     if (translate) {
-      command.add("--task translate");
+      command.add("--task");
+      command.add("translate");
       logger.debug("Translation enabled");
       language = "en";
     }
 
     if (!language.isBlank()) {
-      logger.debug("Using language {} from workflows", language);
-      String lang = "--language " + language;
-      command.add(lang);
+      if (!translate) {
+        logger.debug("Using language {} from workflows", language);
+      }
+      command.add("--language");
+      command.add(language);
     }
 
     logger.info("Executing Whisper's transcription command: {}", command);

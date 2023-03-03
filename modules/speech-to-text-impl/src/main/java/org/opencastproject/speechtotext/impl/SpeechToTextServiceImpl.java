@@ -139,6 +139,8 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
     List<String> arguments = job.getArguments();
     String language = arguments.get(1);
     URI mediaFile = new URI(arguments.get(0));
+    Boolean translate = Boolean.parseBoolean(arguments.get(2));
+
 
     URI subtitleFilesURI;
     File subtitlesFile = null;
@@ -151,7 +153,6 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
               workspace.rootDirectory(), COLLECTION, vttFileName));
       subtitlesFile.deleteOnExit();
       FileUtils.forceMkdirParent(subtitlesFile);
-      Boolean translate = false;
       List <Object> subOutput = speechToTextEngine.generateSubtitlesFile(
               workspace.get(mediaFile), subtitlesFile, language, translate);
 
