@@ -123,10 +123,8 @@ public class WhisperEngine implements SpeechToTextEngine {
       language = "en";
     }
 
-    if (!language.isBlank()) {
-      if (!translate) {
-        logger.debug("Using language {} from workflows", language);
-      }
+    if (!language.isBlank() && !translate) {
+      logger.debug("Using language {} from workflows", language);
       command.add("--language");
       command.add(language);
     }
