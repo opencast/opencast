@@ -27,14 +27,14 @@
     "source-map-loader": "^4.0.1",
     "style-loader": "^3.3.1",
     "svg-inline-loader": "^0.8.2",
-    "webpack": "^5.75.0",
+    "webpack": "^5.76.0",
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.11.1",
     "xml-loader": "^1.2.1"
   },
   "dependencies": {
     "paella-basic-plugins": "^1.18.0",
-    "paella-core": "^1.20.2",
+    "paella-core": "^1.21.2",
     "paella-slide-plugins": "^1.8.0",
     "paella-user-tracking": "^1.8.0",
     "paella-zoom-plugin": "^1.2.0"
