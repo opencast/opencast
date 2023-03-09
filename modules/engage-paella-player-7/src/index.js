@@ -48,6 +48,18 @@ function addDictionaries(player) {
   });
 }
 
+function myWebsiteCheckConsentFunction(type) {
+  const cookie_consent_level = utils.getCookie('cookie_consent_level');
+  var consent_level = {};
+  try {
+    consent_level = JSON.parse(cookie_consent_level);
+  }
+  catch(e) {
+    paella.log.debug('Error parsing "cookie_consent_level" cookie');
+  }
+  return consent_level[type] || false;
+}
+
 const initParams = {
   customPluginContext: [
     require.context('./plugins', true, /\.js/),
@@ -56,6 +68,9 @@ const initParams = {
     getZoomPluginContext(),
     getUserTrackingPluginContext()
   ],
+  getCookieConsentFunction: (type) => {
+    return myWebsiteCheckConsentFunction(type);
+  },
   configResourcesUrl: '/ui/config/paella7/',
   configUrl: '/ui/config/paella7/config.json',
 
