@@ -4,6 +4,19 @@
 Opencast 13.2
 -------------
 
+The third maintenance release of Opencast 13.
+
+-  Batch Dependabot Updates for Paella 7 ([#4734](https://github.com/opencast/opencast/pull/4734))
+-  Paella 7 matomo plugin ([#4722](https://github.com/opencast/opencast/pull/4722))
+-  Dependabot-batcher update ([#4707](https://github.com/opencast/opencast/pull/4707))
+-  Fix typo and adds recomendations to whisper doc ([#4683](https://github.com/opencast/opencast/pull/4683))
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
+
+Opencast 13.2
+-------------
+
 The second maintenance release of Opencast 13.
 
 -  Fix calendar.json endpoint ([#4619](https://github.com/opencast/opencast/pull/4619))
