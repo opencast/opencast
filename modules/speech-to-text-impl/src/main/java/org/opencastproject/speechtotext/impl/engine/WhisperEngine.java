@@ -176,12 +176,11 @@ public class WhisperEngine implements SpeechToTextEngine {
     if (language.isBlank()) {
       JSONParser jsonParser = new JSONParser();
       try {
-        String jsonLanguage;
         FileReader reader = new FileReader((preparedOutputFile.getParent() + "/" + mediaFile.getName() + ".json"));
         Object obj = jsonParser.parse(reader);
         JSONObject jsonObject = (JSONObject) obj;
-        jsonLanguage = (String) jsonObject.get("language");
-        language = jsonLanguage;
+        language = (String) jsonObject.get("language");
+        logger.debug("Language detected by Whisper: {}", language);
       } catch (Exception e) {
         logger.debug("Error reading Whisper JSON file for: {}", mediaFile);
         throw new SpeechToTextEngineException(e);
