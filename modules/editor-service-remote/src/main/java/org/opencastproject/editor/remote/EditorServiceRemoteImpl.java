@@ -41,7 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 @Component(
     property = {
@@ -116,7 +116,7 @@ public class EditorServiceRemoteImpl extends RemoteBase implements EditorService
     HttpPost post = new HttpPost(mediaPackageId + urlSuffix);
     HttpResponse response = null;
     try {
-      StringEntity editJson = new StringEntity(data);
+      StringEntity editJson = new StringEntity(data, StandardCharsets.UTF_8);
       post.setEntity(editJson);
       post.setHeader("Content-type", "application/json");
       response = getResponse(post, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND, HttpStatus.SC_BAD_REQUEST);
@@ -126,8 +126,6 @@ public class EditorServiceRemoteImpl extends RemoteBase implements EditorService
       if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
         evaluateResponseCode(response);
       }
-    } catch (UnsupportedEncodingException e) {
-      throw new EditorServiceException("Editor Remote call failed", ErrorStatus.UNKNOWN, e);
     } finally {
       closeConnection(response);
     }
