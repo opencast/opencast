@@ -165,6 +165,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerImpl.class);
 
+  private static final int PAGE_SIZE = 100;
+
   enum AdminRole {
     GLOBAL, ORGANIZATION, NONE
   }
@@ -947,49 +949,54 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       securityService.setOrganization(defaultOrg);
       securityService.setUser(defaultSystemUser);
 
+      int offset = 0;
+      int total = (int) countEvents(null);
       final AQueryBuilder q = createQuery();
-      final RichAResult r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).run());
-      final int total = r.countSnapshots();
-      logIndexRebuildBegin(logger, index.getIndexName(), total, "snapshot(s)");
+      RichAResult r;
       int current = 0;
-      int n = 16;
-      var updatedEventRange = new ArrayList<Event>();
+      do {
+        r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).page(offset, PAGE_SIZE).run());
+        offset += PAGE_SIZE;
+        logIndexRebuildBegin(logger, index.getIndexName(), total, "snapshot(s)");
+        int n = 16;
+        var updatedEventRange = new ArrayList<Event>();
 
-      final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
-      for (String orgId : byOrg.keySet()) {
-        final Organization snapshotOrg;
-        try {
-          snapshotOrg = orgDir.getOrganization(orgId);
-          User snapshotSystemUser = SecurityUtil.createSystemUser(systemUserName, snapshotOrg);
-          securityService.setOrganization(snapshotOrg);
-          securityService.setUser(snapshotSystemUser);
-          for (Snapshot snapshot : byOrg.get(orgId)) {
-            try {
-              current++;
+        final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
+        for (String orgId : byOrg.keySet()) {
+          final Organization snapshotOrg;
+          try {
+            snapshotOrg = orgDir.getOrganization(orgId);
+            User snapshotSystemUser = SecurityUtil.createSystemUser(systemUserName, snapshotOrg);
+            securityService.setOrganization(snapshotOrg);
+            securityService.setUser(snapshotSystemUser);
+            for (Snapshot snapshot : byOrg.get(orgId)) {
+              try {
+                current++;
 
-              var updatedEventData = index.getEvent(snapshot.getMediaPackage().getIdentifier().toString(), orgId,
-                  snapshotSystemUser);
-              updatedEventData = getEventUpdateFunction(snapshot, orgId, snapshotSystemUser).apply(updatedEventData);
-              updatedEventRange.add(updatedEventData.get());
+                var updatedEventData = index.getEvent(snapshot.getMediaPackage().getIdentifier().toString(), orgId,
+                    snapshotSystemUser);
+                updatedEventData = getEventUpdateFunction(snapshot, orgId, snapshotSystemUser).apply(updatedEventData);
+                updatedEventRange.add(updatedEventData.get());
 
-              if (updatedEventRange.size() >= n || current >= byOrg.get(orgId).size()) {
-                index.bulkEventUpdate(updatedEventRange);
-                logIndexRebuildProgress(logger, index.getIndexName(), total, current);
-                updatedEventRange.clear();
+                if (updatedEventRange.size() >= n || current >= byOrg.get(orgId).size()) {
+                  index.bulkEventUpdate(updatedEventRange);
+                  logIndexRebuildProgress(logger, index.getIndexName(), total, current);
+                  updatedEventRange.clear();
+                }
+              } catch (Throwable t) {
+                logSkippingElement(logger, "event", snapshot.getMediaPackage().getIdentifier().toString(),
+                        snapshotOrg, t);
               }
-            } catch (Throwable t) {
-              logSkippingElement(logger, "event", snapshot.getMediaPackage().getIdentifier().toString(),
-                      snapshotOrg, t);
             }
+          } catch (Throwable t) {
+            logIndexRebuildError(logger, index.getIndexName(), t, originalOrg);
+            throw new IndexRebuildException(index.getIndexName(), getService(), originalOrg, t);
+          } finally {
+            securityService.setOrganization(defaultOrg);
+            securityService.setUser(defaultSystemUser);
           }
-        } catch (Throwable t) {
-          logIndexRebuildError(logger, index.getIndexName(), t, originalOrg);
-          throw new IndexRebuildException(index.getIndexName(), getService(), originalOrg, t);
-        } finally {
-          securityService.setOrganization(defaultOrg);
-          securityService.setUser(defaultSystemUser);
         }
-      }
+      } while (offset + r.getSize() < total);
     } finally {
       securityService.setOrganization(originalOrg);
       securityService.setUser(originalUser);
