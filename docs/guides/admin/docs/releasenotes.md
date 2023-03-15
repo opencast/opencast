@@ -1,12 +1,13 @@
 # Opencast 13: Release Notes
 
 
-Opencast 13.2
+Opencast 13.3
 -------------
 
 The third maintenance release of Opencast 13.
 
--  Batch Dependabot Updates for Paella 7 ([#4734](https://github.com/opencast/opencast/pull/4734))
+-  Fix reindex of multi-tanant systems ([#4740](https://github.com/opencast/opencast/pull/4740))
+-  Fix exception when retrieving comments where the author is missing ([#4739](https://github.com/opencast/opencast/pull/4739))
 -  Paella 7 matomo plugin ([#4722](https://github.com/opencast/opencast/pull/4722))
 -  Dependabot-batcher update ([#4707](https://github.com/opencast/opencast/pull/4707))
 -  Fix typo and adds recomendations to whisper doc ([#4683](https://github.com/opencast/opencast/pull/4683))
