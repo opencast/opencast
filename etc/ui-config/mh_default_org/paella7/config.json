@@ -5,6 +5,9 @@
     "defaultLayout": "presenter-presentation",
 
     "opencast": {
+        "cookieConsent": {
+            "enable": true
+        },
         "previewAttachment": "presentation/segment+preview",
         "mainAudioContent": "presenter",
         "contentTypes": {
