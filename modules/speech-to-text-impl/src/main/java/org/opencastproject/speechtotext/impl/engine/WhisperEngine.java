@@ -152,7 +152,10 @@ public class WhisperEngine implements SpeechToTextEngine {
       }
 
       // Renaming output whisper filename to the expected output filename
-      File whisperVTT = new File((preparedOutputFile.getParent() + "/" + mediaFile.getName() + ".vtt"));
+      String mediaFileName = mediaFile.getName();
+      String mediaFileNameWithoutExtension = mediaFileName.lastIndexOf('.') != -1
+          ? mediaFileName.substring(0, mediaFileName.lastIndexOf('.')) : mediaFileName;
+      File whisperVTT = new File((preparedOutputFile.getParent() + "/" + mediaFileNameWithoutExtension + ".vtt"));
       whisperVTT.renameTo(preparedOutputFile);
 
       if (!preparedOutputFile.isFile()) {
