@@ -128,6 +128,11 @@ const initParams = {
       }
     }
 
+    // Add event title to browser tab
+    const videoTitle = data?.metadata?.title ?? 'Unknown video title';
+    const seriesTitle = data?.metadata?.seriestitle ?? 'No series';
+    document.title = `${videoTitle} - ${seriesTitle} | Opencast`;
+
     // Load stats
     const stats = await loadStats();
     if (stats) {
