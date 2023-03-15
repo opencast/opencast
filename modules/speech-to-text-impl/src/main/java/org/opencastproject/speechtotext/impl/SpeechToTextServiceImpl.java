@@ -50,6 +50,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 
 /** Creates a subtitles file for a video. */
 @Component(
@@ -153,11 +154,10 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
               workspace.rootDirectory(), COLLECTION, vttFileName));
       subtitlesFile.deleteOnExit();
       FileUtils.forceMkdirParent(subtitlesFile);
-      List <Object> subOutput = speechToTextEngine.generateSubtitlesFile(
+      Map<String,Object> subOutput = speechToTextEngine.generateSubtitlesFile(
               workspace.get(mediaFile), subtitlesFile, language, translate);
 
-      subtitlesFile = (File) subOutput.get(0);
-
+      subtitlesFile = (File) subOutput.get("subFile");
       // we need to call the "putInCollection" method to get
       // a URI, that can be used in the following processes
       try (FileInputStream subtitlesFileIS = new FileInputStream(subtitlesFile)) {

@@ -22,7 +22,7 @@
 package org.opencastproject.speechtotext.api;
 
 import java.io.File;
-import java.util.List;
+import java.util.Map;
 
 /** Interface for speech-to-text implementations. */
 public interface SpeechToTextEngine {
@@ -44,7 +44,7 @@ public interface SpeechToTextEngine {
    * @return The generated subtitles file.
    * @throws SpeechToTextEngineException Thrown when an error occurs at the process.
    */
-  List<Object> generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language,
+  Map<String, Object> generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language,
           Boolean translate) throws SpeechToTextEngineException;
 
 }

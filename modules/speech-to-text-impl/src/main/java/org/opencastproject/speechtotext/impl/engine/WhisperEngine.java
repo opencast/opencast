@@ -41,7 +41,9 @@ import java.io.FileReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /** Whisper implementation of the Speech-to-text engine interface. */
 @Component(
@@ -106,7 +108,8 @@ public class WhisperEngine implements SpeechToTextEngine {
    */
 
   @Override
-  public List<Object> generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language, Boolean translate)
+  public Map<String, Object> generateSubtitlesFile(File mediaFile,
+      File preparedOutputFile, String language, Boolean translate)
           throws SpeechToTextEngineException {
 
     String[] baseCommands = { whisperExecutable,
@@ -184,9 +187,11 @@ public class WhisperEngine implements SpeechToTextEngine {
         throw new SpeechToTextEngineException(e);
       }
     }
-    List<Object> returnValues = new ArrayList<>();
-    returnValues.add(preparedOutputFile);
-    returnValues.add(language);
+
+    Map<String,Object> returnValues = new HashMap<>();
+    returnValues.put("subFile",preparedOutputFile);
+    returnValues.put("language",language);
+
     return returnValues; // Subtitles data
   }
 }

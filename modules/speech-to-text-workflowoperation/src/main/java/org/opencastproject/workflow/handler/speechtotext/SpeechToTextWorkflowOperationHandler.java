@@ -165,7 +165,7 @@ public class
    * @param parentMediaPackage The media package where the track is located.
    * @param tagsAndFlavors Tags and flavors instance (to get target flavor information)
    * @param appendSubtitleAs Tells how the subtitles file has to be appended.
-   * @param translate Allows
+   * @param translate Enable translation to english.
    * @throws WorkflowOperationException Get thrown if an error occurs.
    */
   private void createSubtitle(Track track, String languageCode, MediaPackage parentMediaPackage,
