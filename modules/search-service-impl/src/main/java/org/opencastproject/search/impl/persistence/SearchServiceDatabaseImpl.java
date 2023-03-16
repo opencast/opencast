@@ -177,7 +177,8 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
             && accessControlXml != null) {
           AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
           if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, WRITE.toString())) {
-            throw new UnauthorizedException(currentUser + " is not authorized to delete media package " + mediaPackageId);
+            throw new UnauthorizedException(currentUser + " is not authorized to delete media package "
+                + mediaPackageId);
           }
         }
 
