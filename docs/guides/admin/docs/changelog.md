@@ -630,6 +630,15 @@ Opencast 13
 Opencast 12
 -----------
 
+### Opencast 12.9
+
+*Released on March 16th, 2023*
+
+- [[#4764](https://github.com/opencast/opencast/pull/4764)] -
+  Editor remote enforce charset for StringEntity
+- [[#4757](https://github.com/opencast/opencast/pull/4757)] -
+  added missing publish-uploaded-assets.xml workflow
+
 ### Opencast 12.8
 
 *Released on February 20th, 2023*

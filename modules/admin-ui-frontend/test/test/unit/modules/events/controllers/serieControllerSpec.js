@@ -45,6 +45,10 @@ describe('Serie controller', function () {
         $httpBackend.whenGET('/admin-ng/resources/THEMES.DESCRIPTION.json')
             .respond({901: 'theme1 description', 902: 'theme2 desc\nsecond line'});
         $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/resources/ACL.DEFAULTS.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/users/users.json?limit=2147483647').respond(JSON.stringify(getJSONFixture('admin-ng/users/users.json')));
+        $httpBackend.whenGET('/admin-ng/users/admin.json')
+        .respond(JSON.stringify(getJSONFixture('admin-ng/users/admin.json')));
         $httpBackend.whenGET('/admin-ng/feeds/feeds').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/ACL.ACTIONS.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/acl/roles.json?target=ACL&limit=-1').respond('[{"name": "ROLE_ANONYMOUS"}]');
@@ -271,6 +275,8 @@ describe('Serie controller', function () {
                     value : []
                 }
             };
+
+            $scope.getAllPolicies = function () { return $scope.policies }
 
             spyOn(SeriesAccessResource, 'save');
             $scope.updateEventPermissions.call(this);

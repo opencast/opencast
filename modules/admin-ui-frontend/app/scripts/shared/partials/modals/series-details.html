@@ -180,11 +180,11 @@
                             <p translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION">
                             <!-- Description -->
                             </p>
-                            <select chosen
+                            <select
                                     pre-select-from="acls"
                                     ng-disabled="(tab == 'permissions') && (!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked)"
                                     data-width="'200px'"
-                                    ng-change="changeBaseAcl()"
+                                    ng-change="changeBaseAcl(baseAclId)"
                                     ng-model="baseAclId"
                                     ng-options="id as name for (id, name) in acls"
                                     placeholder-text-single="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
@@ -199,7 +199,141 @@
               </div>
 
               <!-- ACL rules -->
-              <div class="obj-container">
+              <div class="obj-container" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_USER_ROLES_VIEW')">
+                <div class="obj tbl-list">
+                  <header translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.USERS"><!-- Details --></header>
+                  <div class="obj-container">
+                    <table class="main-tbl">
+                      <thead>
+                        <tr>
+                          <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.USER">
+                            <!-- User -->
+                          </th>
+                          <th class="fit">
+                            <!-- Read -->
+                            {{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.READ' | translate }}
+                            <span title="{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.HELP.READ' | translate}}"
+                                  class="fa fa-question-circle">
+                            </span>
+                          </th>
+                          <th class="fit">
+                            <!-- Write -->
+                            {{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.WRITE' | translate }}
+                            <span title="{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.HELP.WRITE' | translate}}"
+                                  class="fa fa-question-circle">
+                            </span>
+                          </th>
+                          <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS"
+                              class="fit"
+                              ng-if="hasActions">
+                            <!--Additional Actions-->
+                          </th>
+                          <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ACTION"
+                              ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked"
+                              class="fit">
+                            <!-- Action -->
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr ng-repeat="policy in policiesUser | limitTo: limit | filter: userExists">
+                          <td>
+                            <select chosen
+                                    pre-select-from="users"
+                                    ng-disabled="(tab == 'permissions') && (!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked)"
+                                    data-width="'360px'"
+                                    ng-model="policy.role"
+                                    ng-options="user.userRole as userToStringForDetails(user) for user in users"
+                                    call-on-search="getMatchingUsers"
+                                    placeholder-text-single="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.USERS.LABEL' | translate }}'"
+                                    no-results-text="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.USERS.EMPTY' | translate }}'"
+                                    ></select>
+                          </td>
+                          <td class="fit text-center">
+                            <input type="checkbox"
+                                   ng-model="policy.read"
+                                   ng-change="accessSave()"
+                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked || aclCreateDefaults['read_readonly']"/>
+                          </td>
+                          <td class="fit text-center">
+                            <input type="checkbox"
+                                   ng-model="policy.write"
+                                   ng-change="accessSave()"
+                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked || aclCreateDefaults['write_readonly']"/>
+                          </td>
+                          <td class="fit editable" ng-if="hasActions">
+                            <div ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked"
+                                 save="accessSave"
+                                 admin-ng-editable-multi-select
+                                 mixed="false"
+                                 params="::policy.actions"
+                                 collection="::actions">
+                            </div>
+                            <div ng-if="(!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')) || aclLocked"
+                                 ng-repeat="customAction in ::policy.actions.value">
+                              {{ customAction }}
+                            </div>
+                          </td>
+                          <td class="fit" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked">
+                            <a ng-click="deletePolicy(policiesUser, policy)" class="remove"></a>
+                          </td>
+                        </tr>
+                        <!-- Another loop specifically to show user roles for which no user exists -->
+                        <tr ng-repeat="policy in policiesUser | filter: not(userExists)">
+                          <td>
+                            <p>{{'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.NONEXISTENT_USER' | translate}}: {{policy.userDoesNotExist}}</p>
+                          </td>
+                          <td class="fit text-center">
+                            <input type="checkbox"
+                                  ng-model="policy.read"
+                                  ng-change="accessSave()"
+                                  ng-disabled="true"/>
+                          </td>
+                          <td class="fit text-center">
+                            <input type="checkbox"
+                                  ng-model="policy.write"
+                                  ng-change="accessSave()"
+                                  ng-disabled="true"/>
+                          </td>
+                          <td class="fit editable" ng-if="hasActions">
+                            <div ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT') && !transactions.read_only"
+                                save="accessSave"
+                                admin-ng-editable-multi-select
+                                mixed="false"
+                                params="policy.actions"
+                                collection="actions">
+                            </div>
+                            <div ng-if="((!$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')) || transactions.read_only)"
+                                ng-repeat="customAction in policy.actions.value">
+                              {{ customAction }}
+                            </div>
+                          </td>
+                          <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"
+                              class="fit">
+                            <a ng-show="!transactions.read_only"
+                              ng-click="deletePolicy(policiesUser, policy)"
+                              class="remove"></a>
+                          </td>
+                        </tr>
+                        <tr ng-if="limit < policiesUser.length">
+                          <td colspan="5" >
+                            {{ limit }} / {{ policiesUser.length }} {{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.LOAD_MORE_LIMIT' | translate }}
+                            <a ng-click="loadmore()">{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.LOAD_MORE_LINK' | translate }}</a>
+                          </td>
+                        </tr>
+                        <tr ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked">
+                          <td colspan="5">
+                            <a ng-click="addPolicy(policiesUser)">
+                              + {{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.NEW_USER' | translate }}
+                            </a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="obj-container" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_NONUSER_ROLES_VIEW')">
                 <div class="obj tbl-list">
                   <header translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.DETAILS"><!-- Details --></header>
                   <div class="obj-container">
@@ -235,7 +369,7 @@
                                     ng-disabled="(tab == 'permissions') && (!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked)"
                                     data-width="'360px'"
                                     ng-model="policy.role"
-                                    ng-options="role as role for role in roles"
+                                    ng-options="role as role for role in roles | filter: filterUserRoles"
                                     call-on-search="getMatchingRoles"
                                     placeholder-text-single="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.LABEL' | translate }}'"
                                     no-results-text="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
@@ -244,12 +378,12 @@
                           <td class="fit text-center">
                             <input type="checkbox"
                                    ng-model="policy.read"
-                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked"/>
+                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked || aclCreateDefaults['read_readonly']"/>
                           </td>
                           <td class="fit text-center">
                             <input type="checkbox"
                                    ng-model="policy.write"
-                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked"/>
+                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked || aclCreateDefaults['write_readonly']"/>
                           </td>
                           <td class="fit editable" ng-if="hasActions">
                             <div ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked"
@@ -264,7 +398,7 @@
                             </div>
                           </td>
                           <td class="fit" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked">
-                            <a ng-click="deletePolicy(policy)" class="remove"></a>
+                            <a ng-click="deletePolicy(policies, policy)" class="remove"></a>
                           </td>
                         </tr>
                         <tr ng-if="limit < policies.length">
@@ -275,7 +409,7 @@
                         </tr>
                         <tr ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked">
                           <td colspan="5">
-                            <a ng-click="addPolicy()">
+                            <a ng-click="addPolicy(policies)">
                               + {{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.NEW' | translate }}
                             </a>
                           </td>
