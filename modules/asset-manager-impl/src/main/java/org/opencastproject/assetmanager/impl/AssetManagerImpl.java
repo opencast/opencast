@@ -954,10 +954,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       final AQueryBuilder q = createQuery();
       RichAResult r;
       int current = 0;
+      logIndexRebuildBegin(logger, index.getIndexName(), total, "snapshot(s)");
       do {
         r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).page(offset, PAGE_SIZE).run());
         offset += PAGE_SIZE;
-        logIndexRebuildBegin(logger, index.getIndexName(), total, "snapshot(s)");
         int n = 16;
         var updatedEventRange = new ArrayList<Event>();
 
