@@ -32,8 +32,10 @@ import org.osgi.service.component.annotations.Modified;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -122,6 +124,7 @@ public class AdminUIConfiguration {
   public static final String OPT_PREVIEW_AUDIO_SUBTYPE = "preview.audio.subtype";
   public static final String OPT_PREVIEW_VIDEO_SUBTYPE = "preview.video.subtype";
   private static final String OPT_RETRACT_WORKFLOW_ID = "retract.workflow.id";
+  private static final String OPT_MATCH_MANAGED_ACL_ROLE_PREFIXES = "match.managed.acl.role.prefixes";
 
   private static final String DEFAULT_PREVIEW_SUBTYPE = "preview";
   private static final String DEFAULT_WAVEFORM_SUBTYPE = "waveform";
@@ -154,6 +157,7 @@ public class AdminUIConfiguration {
   private static final String DEFAULT_SOURCE_TRACK_RIGHT_FLAVOR = "presentation/source";
 
   private static final String DEFAULT_RETRACT_WORKFLOW_ID = "delete";
+  private static final String DEFAULT_MATCH_MANAGED_ACL_ROLE_PREFIXES = "";
 
   private String previewSubtype = DEFAULT_PREVIEW_SUBTYPE;
   private String waveformSubtype = DEFAULT_WAVEFORM_SUBTYPE;
@@ -179,6 +183,8 @@ public class AdminUIConfiguration {
   private MediaPackageElementFlavor sourceTrackRightFlavor = MediaPackageElementFlavor.parseFlavor(
     DEFAULT_SOURCE_TRACK_RIGHT_FLAVOR);
   private String retractWorkflowId = DEFAULT_RETRACT_WORKFLOW_ID;
+  private List<String> matchManagedAclRolePrefixes = new ArrayList<String>(Arrays.asList(
+          DEFAULT_MATCH_MANAGED_ACL_ROLE_PREFIXES.split(",")));
 
   public String getPreviewSubtype() {
     return previewSubtype;
@@ -266,6 +272,8 @@ public class AdminUIConfiguration {
   public String getRetractWorkflowId() {
     return retractWorkflowId;
   }
+
+  public List<String> getMatchManagedAclRolePrefixes() { return matchManagedAclRolePrefixes; }
 
   @Activate
   @Modified
@@ -402,6 +410,12 @@ public class AdminUIConfiguration {
     retractWorkflowId = StringUtils.defaultString((String) properties.get(OPT_RETRACT_WORKFLOW_ID),
       DEFAULT_RETRACT_WORKFLOW_ID);
     logger.debug("Retract workflow ID set to {}", retractWorkflowId);
+
+    // Retract workflow ID
+    String tmp = StringUtils.defaultString((String) properties.get(OPT_MATCH_MANAGED_ACL_ROLE_PREFIXES),
+            DEFAULT_MATCH_MANAGED_ACL_ROLE_PREFIXES);
+    matchManagedAclRolePrefixes = new ArrayList<String>(Arrays.asList(tmp.split(",")));
+    logger.debug("Match managed acl role prefixes set to {}", matchManagedAclRolePrefixes);
     logger.info("Configuration updated");
   }
 }

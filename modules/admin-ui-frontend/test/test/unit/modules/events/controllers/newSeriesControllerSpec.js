@@ -33,6 +33,8 @@ describe('New Series Controller', function () {
             $httpBackend.whenGET('/admin-ng/series/new/metadata').respond('{}');
             $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond('{}');
             $httpBackend.whenGET('/admin-ng/resources/ACL.ACTIONS.json').respond('{}');
+            $httpBackend.whenGET('/admin-ng/resources/ACL.DEFAULTS.json').respond('{}');
+            $httpBackend.whenGET('/admin-ng/users/users.json?limit=2147483647').respond(JSON.stringify(getJSONFixture('admin-ng/users/users.json')));
             $httpBackend.whenGET('/admin-ng/acl/roles.json').respond('[]');
             $httpBackend.whenGET('/admin-ng/resources/components.json').respond('{}');
             $httpBackend.whenGET('/admin-ng/series/new/themes').respond('{}');
@@ -48,7 +50,7 @@ describe('New Series Controller', function () {
                 stateController: { ud: { metadata: { title: 'meta data' } } }
             }, {
                 name: 'access',
-                stateController: { ud: { id: 345 } }
+                stateController: { ud: { id: 345 }, getAllPolicies: function () { return [] } }
             }, {
                 name: 'theme',
                 stateController: { ud: { theme: '2' } }
@@ -75,6 +77,7 @@ describe('New Series Controller', function () {
         describe('on success', function () {
             beforeEach(function () {
                 $httpBackend.whenPOST('/admin-ng/series/new').respond(201);
+                // $scope.access.getAllPolicies = function () { return [] }
             });
 
             it('shows a notification and refreshes the table', function () {
