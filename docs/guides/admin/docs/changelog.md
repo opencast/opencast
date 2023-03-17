@@ -6,7 +6,7 @@ Opencast 13
 
 ### Opencast 13.3
 
-*Released on February 16th, 2023*
+*Released on March 16th, 2023*
 
 - [[#4783](https://github.com/opencast/opencast/pull/4783)] -
   Add paging to asset manager index rebuild
