@@ -39,6 +39,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Utility class around access information like ACL.
@@ -157,5 +159,51 @@ public final class AccessInformationUtil {
         return AccessControlUtil.equals(acl, macl.getAcl());
       }
     });
+  }
+
+  /**
+   * Matches the given ACL against the given list of managed ACLs returning the first match.
+   *
+   * @param acls
+   *          the list of managed ACLs
+   * @param acl
+   *          the ACL to search
+   * @param ignorePrefixes
+   *          list of prefixes that will cause all roles matching a prefix to be ignored in the matching
+   * @return an {@link Option} wrapping the matching ACL or none if not found
+   */
+  public static Option<ManagedAcl> matchAclsLenient(List<ManagedAcl> acls, final AccessControlList acl,
+          List<String> ignorePrefixes) {
+    // No prefixes? Just do the usual matching
+    if (ignorePrefixes == null || ignorePrefixes.size() <= 0) {
+      return matchAcls(acls, acl);
+    }
+
+    for (ManagedAcl managedAcl : acls) {
+      AccessControlList aclCopy = acl;
+
+      for (String prefix : ignorePrefixes) {
+        // If there are no roles with prefix in the managedAcl, don't check for roles with prefix
+        List<AccessControlEntry> managedEntries = managedAcl.getAcl().getEntries();
+        Optional<AccessControlEntry> managedEntry = managedEntries.stream()
+                .filter(s -> s.getRole().startsWith(prefix))
+                .findFirst();
+
+        if (managedEntry.isEmpty()) {
+          List<AccessControlEntry> entries = aclCopy.getEntries().stream()
+                  .filter(s -> !s.getRole().startsWith(prefix))
+                  .collect(Collectors.toList());
+
+          aclCopy = new AccessControlList(entries);
+        }
+      }
+
+      // Lastly, compare
+      if (AccessControlUtil.equals(aclCopy, managedAcl.getAcl())) {
+        return Option.some(managedAcl);
+      }
+    }
+
+    return Option.none();
   }
 }
