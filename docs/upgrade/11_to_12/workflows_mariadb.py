@@ -17,6 +17,7 @@ from datetime import datetime
 user = "opencast"
 password = "dbpassword"
 host = "127.0.0.1"
+port = 3306
 database = "opencast"
 
 # Constants
@@ -33,12 +34,13 @@ XML_DECLARATION = "<?xml version='1.0' encoding='UTF-8'?>"
 
 
 # DB functions
-def create_connection(host_name, user_name, user_password, db_name):
+def create_connection(host_name, port_number, user_name, user_password, db_name):
     connection = mysql.connector.connect(
         host=host_name,
+        port=port_number,
         user=user_name,
         passwd=user_password,
-        database=db_name
+        database=db_name,
     )
     connection.row_factory = lambda cursor, row: row[0]
     print("Connection to database successful")
@@ -120,7 +122,7 @@ def parse_bool(value):
 
 # Connect
 print("Creating connection to database...")
-connection = create_connection(host, user, password, database)
+connection = create_connection(host, port, user, password, database)
 
 # Create new tables
 #  Currently added indexes:
@@ -233,12 +235,20 @@ for offset in range(0, workflow_count, 100):
         workflow_operations = []
         workflow_operation_config = []
         workflow_config = []
+        description_limited = get_node_value(root, 'description', WORKFLOW_NS)
+        if description_limited is None:
+          description_limited = None
+        else:
+          description_limited = description_limited.lstrip().rstrip()
+          description_limited = description_limited.replace('\n','').replace('    ', ' ')
+          if (len(description_limited) > 255):
+            description_limited = description_limited[0:252] + "..."
         workflow = [
             workflow_id,
             get_node_value(root, 'creator-id', SECURITY_NS),
             date_completed,
             date_created,
-            get_node_value(root, 'description', WORKFLOW_NS),
+            description_limited,
             get_node_value(root, 'organization-id', SECURITY_NS),
             parse_workflow_state(get_attrib_from_node(root, "state")),
             get_node_value(root, 'template', WORKFLOW_NS),
@@ -255,10 +265,11 @@ for offset in range(0, workflow_count, 100):
 
         # oc_workflow_configuration
         for configuration in root.find(f"{WORKFLOW_NS}configurations"):
+            value = configuration.text
             workflow_config.append([
                 workflow_id,
                 get_attrib_from_node(configuration, "key"),
-                configuration.text])
+                value if value is not None else ""])
 
         # oc_workflow_operation
         operation_position = 0
@@ -291,10 +302,11 @@ for offset in range(0, workflow_count, 100):
 
             # oc_workflow_operation_configuration
             for op_config in operation.find("{http://workflow.opencastproject.org}configurations"):
+                value = op_config.text
                 workflow_operation_config.append([
                     operation_id,
                     get_attrib_from_node(op_config, "key"),
-                    op_config.text])
+                    value if value is not None else ""])
 
             # Generate ID and position for next operation
             operation_id += 1
