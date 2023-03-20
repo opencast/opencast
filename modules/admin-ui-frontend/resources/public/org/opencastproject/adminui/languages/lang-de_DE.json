@@ -894,24 +894,24 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "NEW_USER": "Neuer Benutzer",
-                  "DETAILS": "Weitere Zugriffsrichtlinien",
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
                   "USER": "Benutzer",
-                  "USERS": "Für das Video authorisierte Benutzer",
-                  "NONEXISTENT_USER": "Nicht existierender Benutzer",
+                  "USERS": "Users who are authorized for the event",
+                  "NONEXISTENT_USER": "Nonexistent user",
                   "HELP": {
-                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Benutzer das Video zu sehen",
-                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Benutzer das Video zu bearbeiten"
+                     "READ": "By setting read rights, the event becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the event"
                   }
                },
                "ROLES": {
                   "LABEL": "Rolle auswählen",
                   "EMPTY": "Keine Rolle gefunden"
-                },
-                "USERS": {
-                  "LABEL": "Wähle einen Benutzer",
-                  "EMPTY": "Kein Benutzer gefunden"
-                }
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
+               }
             },
             "COMMENTS": {
                "CAPTION": "Kommentare",
@@ -1128,23 +1128,23 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "NEW_USER": "Neuer Benutzer",
-                  "DETAILS": "Weitere Zugriffsrichtlinien",
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
                   "USER": "Benutzer",
-                  "USERS": "Für die Serie authorisierte Benutzer",
+                  "USERS": "Users who are authorized for the series",
                   "HELP": {
-                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Benutzer die Serie zu sehen",
-                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Benutzer die Serie zu bearbeiten"
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
                   }
                },
                "ROLES": {
                   "LABEL": "Rolle auswählen",
                   "EMPTY": "Keine Rolle gefunden"
-                },
-                "USERS": {
-                  "LABEL": "Wähle einen Benutzer",
-                  "EMPTY": "Kein Benutzer gefunden"
-                }
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
+               }
             },
             "THEME": {
                "CAPTION": "Branding",
@@ -1217,20 +1217,20 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "DETAILS": "Weitere Zugriffsrichtlinien",
+                  "DETAILS": "Non-user roles",
                   "REPLACE_EVENT_ACLS": "Zugriffsrechte des Videos aktualisieren",
                   "REPLACE_EVENT_ACLS_HINT": "Sicherstellen, dass alle Videos dieser Serie genau diese Zugriffsrechte haben",
                   "SAVE_SERIES_ACLS": "Speichern",
                   "SAVE_SERIES_ACLS_HINT": "Apply permissions only to series",
                   "LOAD_MORE_LIMIT": "angezeigte Richtlinien.",
                   "LOAD_MORE_LINK": "Mehr laden",
-                  "NEW_USER": "Neuer Benutzer",
+                  "NEW_USER": "New user",
                   "USER": "Benutzer",
-                  "USERS": "Für die Serie authorisierte Benutzer",
-                  "NONEXISTENT_USER": "Nicht existierender Benutzer",
+                  "USERS": "Users who are authorized for the series",
+                  "NONEXISTENT_USER": "Nonexistent user",
                   "HELP": {
-                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Benutzer die Serie zu sehen",
-                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Benutzer die Serie zu bearbeiten"
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
                   }
                },
                "ROLES": {
@@ -1238,9 +1238,9 @@
                   "EMPTY": "Keine Rolle gefunden"
                },
                "USERS": {
-                "LABEL": "Wähle einen Benutzer",
-                "EMPTY": "Kein Benutzer gefunden"
-              }
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
+               }
             },
             "METADATA": {
                "TITLE": "Titel",
@@ -1478,14 +1478,14 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "DETAILS": "Weitere Zugriffsrichtlinien",
+                  "DETAILS": "Non-user roles",
                   "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu",
-                  "NEW_USER": "Neuer Benutzer",
+                  "NEW_USER": "New user",
                   "USER": "Benutzer",
-                  "USERS": "Für die Richtlinie authorisierte Benutzer",
+                  "USERS": "Users who are authorized for the access policy",
                   "HELP": {
-                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Benutzer die Richtlinie zu sehen",
-                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Benutzer die Richtlinie zu bearbeiten"
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
                   }
                },
                "ROLES": {
@@ -1493,9 +1493,9 @@
                   "EMPTY": "Keine Rolle gefunden"
                },
                "USERS": {
-                "LABEL": "Wähle einen Benutzer",
-                "EMPTY": "Kein Benutzer gefunden"
-              }
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
+               }
             }
          },
          "DETAILS": {
@@ -1527,15 +1527,15 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "DETAILS": "Weitere Zugriffsrichtlinien",
+                  "DETAILS": "Non-user roles",
                   "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu",
-                  "NEW_USER": "Neuer Benutzer",
+                  "NEW_USER": "New user",
                   "USER": "Benutzer",
-                  "USERS": "Für die Richtlinie authorisierte Benutzer",
-                  "NONEXISTENT_USER": "Nicht existierender Benutzer",
+                  "USERS": "Users who are authorized for the access policy",
+                  "NONEXISTENT_USER": "Nonexistent user",
                   "HELP": {
-                    "READ": "Das Setzen von Leserechten erlaubt es dem gewählten Benutzer die Richtlinie zu sehen",
-                    "WRITE": "Das Setzen von Schreibrechten erlaubt es dem gewählten Benutzer die Richtlinie zu bearbeiten"
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
                   }
                },
                "ROLES": {
@@ -1543,9 +1543,9 @@
                   "EMPTY": "Keine Rolle gefunden"
                },
                "USERS": {
-                "LABEL": "Wähle einen Benutzer",
-                "EMPTY": "Kein Benutzer gefunden"
-              }
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
+               }
             }
          }
       }
