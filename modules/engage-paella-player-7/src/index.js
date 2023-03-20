@@ -29,7 +29,7 @@ import packagePom from '../pom.xml';
 
 import EpisodeConversor from './js/EpisodeConversor.js';
 
-const dictionaries = require.context('./i18n/dict/', true, /\.json$/);
+const dictionaries = require.context('./i18n/', true, /\.json$/);
 const languages = {};
 function addDictionaries(player) {
   dictionaries.keys().forEach(k => {
