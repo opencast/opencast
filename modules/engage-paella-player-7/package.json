@@ -27,7 +27,7 @@
     "source-map-loader": "^4.0.1",
     "style-loader": "^3.3.1",
     "svg-inline-loader": "^0.8.2",
-    "webpack": "^5.76.1",
+    "webpack": "^5.76.3",
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.11.1",
     "xml-loader": "^1.2.1"
