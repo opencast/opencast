@@ -48,7 +48,7 @@
     <osgi.core.version>6.0.0</osgi.core.version>
     <querydsl.version>3.7.4</querydsl.version>
     <rest-assured.version>4.4.0</rest-assured.version>
-    <spring.version>3.1.4.RELEASE</spring.version>
+    <spring.version>5.2.23.RELEASE</spring.version>
     <spring-security.version>3.1.7.RELEASE</spring-security.version>
   </properties>
   <modules>
