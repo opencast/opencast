@@ -40,7 +40,7 @@
     <javadoc-plugin.version>3.3.1</javadoc-plugin.version>
     <jersey.version>2.29.1</jersey.version>
     <jettison.version>1.5.2</jettison.version>
-    <joda-time.version>2.10.10</joda-time.version>
+    <joda-time.version>2.12.4</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
     <karaf.version>4.2.16</karaf.version>
     <node.version>v16.13.0</node.version>
