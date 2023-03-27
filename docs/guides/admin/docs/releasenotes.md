@@ -1,5 +1,13 @@
 # Opencast 12: Release Notes
 
+Opencast 12.10
+--------------
+
+The tenth maintenance release of Opencast 12.
+The release fixes a problem with the default configuration.
+
+For more details, please take a look at [the changelog](changelog.md).
+
 Opencast 12.9
 -------------
 
