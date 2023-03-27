@@ -30,7 +30,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -55,12 +59,37 @@ public final class AssetPathUtils {
    *        The OSGI component context
    * @return Path to the local asset manager directory if it exists
    */
-  public static String getAssetManagerPath(final ComponentContext componentContext) {
+  public static List<String> getAssetManagerPath(final ComponentContext componentContext) {
     if (componentContext == null || componentContext.getBundleContext() == null) {
       return null;
     }
     final BundleContext bundleContext = componentContext.getBundleContext();
 
+    // Read in multiple directories
+    List<String> assetManagerDirs = new ArrayList<>();
+    int index = 1;
+    boolean isAssetManagerDir = true;
+    while (isAssetManagerDir) {
+      String directory;
+      try {
+        directory = StringUtils.trimToNull(bundleContext.getProperty(CONFIG_ASSET_MANAGER_ROOT + "." + index));
+      } catch (Exception e) {
+        isAssetManagerDir = false;
+        throw e;
+      }
+
+      if (directory != null) {
+        assetManagerDirs.add(directory);
+      } else {
+        isAssetManagerDir = false;
+      }
+      index++;
+    }
+    if (assetManagerDirs.size() > 0) {
+      return assetManagerDirs;
+    }
+
+    // Read in single directory
     String assetManagerDir = StringUtils.trimToNull(bundleContext.getProperty(CONFIG_ASSET_MANAGER_ROOT));
     if (assetManagerDir == null) {
       assetManagerDir = StringUtils.trimToNull(bundleContext.getProperty(CONFIG_STORAGE_DIR));
@@ -72,7 +101,8 @@ public final class AssetPathUtils {
     // Is the asset manager available locally?
     if (assetManagerDir != null && new File(assetManagerDir).isDirectory()) {
       logger.debug("Found local asset manager directory at {}", assetManagerDir);
-      return assetManagerDir;
+      assetManagerDirs.add(assetManagerDir);
+      return assetManagerDirs;
     }
 
     return null;
@@ -81,16 +111,16 @@ public final class AssetPathUtils {
   /**
    * Splits up an asset manager URI and returns a local path instead.
    *
-   * @param localPath
-   *          Path to the local asset manager directory
+   * @param localPaths
+   *          Potential paths to the local asset manager directory
    * @param organizationId
    *          Organization identifier
    * @param uri
    *          URI to the asset
    * @return Local file
    */
-  public static File getLocalFile(final String localPath, final String organizationId, final URI uri) {
-    if (localPath == null
+  public static File getLocalFile(final List<String> localPaths, final String organizationId, final URI uri) {
+    if (localPaths == null
             || organizationId == null
             || !uri.getScheme().startsWith("http")
             || !uri.getPath().startsWith("/assets/assets/")) {
@@ -107,6 +137,14 @@ public final class AssetPathUtils {
     final String mediaPackageElementID = assetPath[4];
     final String version = assetPath[5];
     final String filename = mediaPackageElementID + '.' + FilenameUtils.getExtension(assetPath[6]);
+    // Check under which path the mediapackage exists
+    String localPath = null;
+    for (String path : localPaths) {
+      Path dirPath = Path.of(path, organizationId, mediaPackageID);
+      if (Files.exists(dirPath) && Files.isDirectory(dirPath)) {
+        localPath = path;
+      }
+    }
     final File file = Paths.get(localPath, organizationId, mediaPackageID, version, filename).toFile();
     if (file.isFile()) {
       logger.debug("Converted {} to local file at {}", uri, file);

@@ -95,6 +95,9 @@ public class AbstractFileSystemAssetStoreTest {
       @Override protected String getRootDirectory() {
         return tmpRoot.getAbsolutePath();
       }
+      @Override protected String getRootDirectory(String orgId, String mpId) {
+        return tmpRoot.getAbsolutePath();
+      }
     };
 
     sampleElemDir = new File(

@@ -69,6 +69,7 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
   protected abstract Workspace getWorkspace();
 
   protected abstract String getRootDirectory();
+  protected abstract String getRootDirectory(String orgId, String mpId);
 
   @Override
   public void put(StoragePath storagePath, Source source) throws AssetStoreException {
@@ -147,7 +148,8 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
     try {
       FileUtils.deleteDirectory(dir);
       // also delete the media package directory if all versions have been deleted
-      FileSupport.deleteHierarchyIfEmpty(file(path(getRootDirectory(), sel.getOrganizationId())), dir.getParentFile());
+      FileSupport.deleteHierarchyIfEmpty(file(path(getRootDirectory(sel.getOrganizationId(), sel.getMediaPackageId()),
+              sel.getOrganizationId())), dir.getParentFile());
       return true;
     } catch (IOException e) {
       logger.error("Error deleting directory from archive {}", dir);
@@ -163,7 +165,8 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
    * @return the directory file
    */
   private File getDeletionSelectorDir(DeletionSelector sel) {
-    final String basePath = path(getRootDirectory(), sel.getOrganizationId(), sel.getMediaPackageId());
+    final String basePath = path(getRootDirectory(sel.getOrganizationId(), sel.getMediaPackageId()),
+            sel.getOrganizationId(), sel.getMediaPackageId());
     for (Version v : sel.getVersion()) {
       return file(basePath, v.toString());
     }
@@ -223,6 +226,20 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
                     .getMediaPackageElementId());
   }
 
+  private File getExistingFile(StoragePath p, Opt<String> extension) {
+    String rootDirectory = getRootDirectory(p.getOrganizationId(), p.getMediaPackageId());
+    if (rootDirectory == null) {
+      return null;
+    }
+    return file(
+            rootDirectory,
+            p.getOrganizationId(),
+            p.getMediaPackageId(),
+            p.getVersion().toString(),
+            extension.isSome() ? p.getMediaPackageElementId() + EXTENSION_SEPARATOR + extension.get() : p
+                    .getMediaPackageElementId());
+  }
+
   /**
    * Returns a file {@link Option} from a storage path if one is found or an empty {@link Option}
    *
@@ -237,7 +254,7 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
         return FilenameUtils.getBaseName(name).equals(storagePath.getMediaPackageElementId());
       }
     };
-    final File containerDir = createFile(storagePath, Opt.none(String.class)).getParentFile();
+    final File containerDir = getExistingFile(storagePath, Opt.none(String.class)).getParentFile();
     return nul(containerDir.listFiles(filter)).bind(new Fn<File[], Opt<File>>() {
       @Override
       public Opt<File> apply(File[] files) {
@@ -254,19 +271,29 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
     });
   }
 
+  //TODO: Fix or remove these
   @Override
+//  public Option<Long> getUsedSpace() {
+//    return Option.some(FileUtils.sizeOfDirectory(new File(getRootDirectory())));
+//  }
   public Option<Long> getUsedSpace() {
-    return Option.some(FileUtils.sizeOfDirectory(new File(getRootDirectory())));
+    return Option.some(1L);
   }
 
   @Override
+//  public Option<Long> getUsableSpace() {
+//    return Option.some(new File(getRootDirectory()).getUsableSpace());
+//  }
   public Option<Long> getUsableSpace() {
-    return Option.some(new File(getRootDirectory()).getUsableSpace());
+    return Option.some(1L);
   }
 
   @Override
+//  public Option<Long> getTotalSpace() {
+//    return Option.some(new File(getRootDirectory()).getTotalSpace());
+//  }
   public Option<Long> getTotalSpace() {
-    return Option.some(new File(getRootDirectory()).getTotalSpace());
+    return Option.some(1L);
   }
 
   @Override
