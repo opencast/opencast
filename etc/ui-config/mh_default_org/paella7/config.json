@@ -6,7 +6,7 @@
 
     "opencast": {
         "cookieConsent": {
-            "enable": true
+            "enable": false
         },
         "previewAttachment": "presentation/segment+preview",
         "mainAudioContent": "presenter",
