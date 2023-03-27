@@ -678,6 +678,13 @@ Opencast 13
 Opencast 12
 -----------
 
+### Opencast 12.10
+
+*Released on March 27th, 2023*
+
+- [[#4799](https://github.com/opencast/opencast/pull/4799)] -
+  Sets values in specific config file to default
+
 ### Opencast 12.9
 
 *Released on March 16th, 2023*
