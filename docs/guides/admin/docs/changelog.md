@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Opencast 14
+-----------
+
+### Opencast 14.0
+
+*Released on June ??th, 2023*
+
 Opencast 13
 -----------
 
