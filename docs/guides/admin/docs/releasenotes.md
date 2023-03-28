@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+# Opencast 14: Release Notes
+
+>>>>>>> 7d1162c006 (Clean up and prepare Opencast 14 Release Notes)
 Opencast 14.0
 -------------
 
