@@ -48,7 +48,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 @Component(
     property = {
@@ -167,18 +166,25 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
     storeType = (String) cc.getProperties().get(AssetStore.STORE_TYPE_PROPERTY);
     logger.info("{} is: {}", AssetStore.STORE_TYPE_PROPERTY, storeType);
 
-    // Read in multiple directories
     rootDirectories = new ArrayList<>();
+
+    // Read in single directory
+    String rootDirectory = StringUtils.trimToNull(cc.getBundleContext().getProperty(CONFIG_STORE_ROOT_DIR));
+    if (rootDirectory == null) {
+      final String storageDir = StringUtils.trimToNull(cc.getBundleContext().getProperty(CFG_OPT_STORAGE_DIR));
+      if (storageDir == null) {
+        throw new IllegalArgumentException("Storage directory must be set");
+      }
+      rootDirectory = Paths.get(storageDir, DEFAULT_STORE_DIRECTORY).toFile().getAbsolutePath();
+    }
+    mkDirs(file(rootDirectory));
+    rootDirectories.add(rootDirectory);
+
+    // Read in multiple directories
     int index = 1;
     boolean isRootDirectory = true;
     while (isRootDirectory) {
-      String directory;
-      try {
-        directory = StringUtils.trimToNull(cc.getBundleContext().getProperty(CONFIG_STORE_ROOT_DIR + "." + index));
-      } catch (Exception e) {
-        isRootDirectory = false;
-        throw e;
-      }
+      String directory = StringUtils.trimToNull(cc.getBundleContext().getProperty(CONFIG_STORE_ROOT_DIR + "." + index));
 
       if (directory != null) {
         rootDirectories.add(directory);
@@ -191,24 +197,10 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
       mkDirs(file(directory));
     }
 
-    // Read in single directory
-    if (rootDirectories.size() == 0) {
-      String rootDirectory = StringUtils.trimToNull(cc.getBundleContext().getProperty(CONFIG_STORE_ROOT_DIR));
-      if (rootDirectory == null) {
-        final String storageDir = StringUtils.trimToNull(cc.getBundleContext().getProperty(CFG_OPT_STORAGE_DIR));
-        if (storageDir == null) {
-          throw new IllegalArgumentException("Storage directory must be set");
-        }
-        rootDirectory = Paths.get(storageDir, DEFAULT_STORE_DIRECTORY).toFile().getAbsolutePath();
-      }
-      mkDirs(file(rootDirectory));
-      rootDirectories.add(rootDirectory);
-    }
-
     logger.info("Start asset manager files system store at {}", rootDirectories);
 
     // Setup rootDirectory cache
-    // Remembers the rootdirectory for a given mediapackage
+    // Remembers the root directory for a given mediapackage
     cache = CacheBuilder.newBuilder().maximumSize(cacheSize).expireAfterWrite(cacheExpiration, TimeUnit.MINUTES)
             .build(new CacheLoader<String, Object>() {
               @Override

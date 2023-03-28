@@ -65,29 +65,7 @@ public final class AssetPathUtils {
     }
     final BundleContext bundleContext = componentContext.getBundleContext();
 
-    // Read in multiple directories
     List<String> assetManagerDirs = new ArrayList<>();
-    int index = 1;
-    boolean isAssetManagerDir = true;
-    while (isAssetManagerDir) {
-      String directory;
-      try {
-        directory = StringUtils.trimToNull(bundleContext.getProperty(CONFIG_ASSET_MANAGER_ROOT + "." + index));
-      } catch (Exception e) {
-        isAssetManagerDir = false;
-        throw e;
-      }
-
-      if (directory != null) {
-        assetManagerDirs.add(directory);
-      } else {
-        isAssetManagerDir = false;
-      }
-      index++;
-    }
-    if (assetManagerDirs.size() > 0) {
-      return assetManagerDirs;
-    }
 
     // Read in single directory
     String assetManagerDir = StringUtils.trimToNull(bundleContext.getProperty(CONFIG_ASSET_MANAGER_ROOT));
@@ -97,11 +75,25 @@ public final class AssetPathUtils {
         assetManagerDir = new File(assetManagerDir, "archive").getAbsolutePath();
       }
     }
+    assetManagerDirs.add(assetManagerDir);
+
+    // Read in multiple directories
+    int index = 1;
+    boolean isAssetManagerDir = true;
+    while (isAssetManagerDir) {
+      String directory = StringUtils.trimToNull(bundleContext.getProperty(CONFIG_ASSET_MANAGER_ROOT + "." + index));
+
+      if (directory != null) {
+        assetManagerDirs.add(directory);
+      } else {
+        isAssetManagerDir = false;
+      }
+      index++;
+    }
 
     // Is the asset manager available locally?
     if (assetManagerDir != null && new File(assetManagerDir).isDirectory()) {
       logger.debug("Found local asset manager directory at {}", assetManagerDir);
-      assetManagerDirs.add(assetManagerDir);
       return assetManagerDirs;
     }
 
