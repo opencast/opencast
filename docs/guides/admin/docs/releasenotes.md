@@ -27,6 +27,7 @@ Release Schedule
 | May 30, 2023                | Public QA phase             |
 | June 15, 2023               | Release of Opencast 14.0    |
 
+
 Release Managers
 ----------------
 
