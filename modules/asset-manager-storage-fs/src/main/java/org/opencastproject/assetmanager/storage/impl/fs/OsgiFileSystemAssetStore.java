@@ -91,6 +91,10 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
   }
 
   @Override
+  /**
+   * Returns the root directory with the most usable space left
+   * @return The root directory path
+   */
   protected String getRootDirectory() {
     // Determine which storage to return by amount of remaining usable space
     long usableSpace = 0;
@@ -134,6 +138,12 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
     }
   }
 
+  /**
+   * Looks for the root directory that contains the given mediapackage id.
+   * Used by the cache.
+   * @param orgAndMpId The part of the path that contains the organization id and mediapacakge id
+   * @return The root directory path of the given mediapackage
+   */
   private String getRootDirectoryForMediaPackage(String orgAndMpId) {
     // Search the mediapackage on all storages
     for (String path : rootDirectories) {

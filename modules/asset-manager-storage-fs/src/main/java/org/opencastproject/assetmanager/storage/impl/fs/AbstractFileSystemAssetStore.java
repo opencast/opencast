@@ -226,6 +226,7 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
                     .getMediaPackageElementId());
   }
 
+  /** Returns a file from a storage path if it exists, null otherwise */
   private File getExistingFile(StoragePath p, Opt<String> extension) {
     String rootDirectory = getRootDirectory(p.getOrganizationId(), p.getMediaPackageId());
     if (rootDirectory == null) {
