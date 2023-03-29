@@ -272,31 +272,6 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
     });
   }
 
-  //TODO: Fix or remove these
-  @Override
-//  public Option<Long> getUsedSpace() {
-//    return Option.some(FileUtils.sizeOfDirectory(new File(getRootDirectory())));
-//  }
-  public Option<Long> getUsedSpace() {
-    return Option.some(1L);
-  }
-
-  @Override
-//  public Option<Long> getUsableSpace() {
-//    return Option.some(new File(getRootDirectory()).getUsableSpace());
-//  }
-  public Option<Long> getUsableSpace() {
-    return Option.some(1L);
-  }
-
-  @Override
-//  public Option<Long> getTotalSpace() {
-//    return Option.some(new File(getRootDirectory()).getTotalSpace());
-//  }
-  public Option<Long> getTotalSpace() {
-    return Option.some(1L);
-  }
-
   @Override
   public String getStoreType() {
     return storeType;

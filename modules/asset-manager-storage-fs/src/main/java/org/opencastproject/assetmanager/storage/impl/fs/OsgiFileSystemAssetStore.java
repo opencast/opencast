@@ -32,6 +32,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -156,6 +157,10 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
     return null;
   }
 
+  private List<String> getRootDirectories() {
+    return rootDirectories;
+  }
+
   protected void setupCache() {
     cache = CacheBuilder.newBuilder().maximumSize(cacheSize).expireAfterWrite(cacheExpiration, TimeUnit.MINUTES)
             .build(new CacheLoader<String, Object>() {
@@ -224,4 +229,36 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
     // Remembers the root directory for a given mediapackage
     setupCache();
   }
+
+  // Depending on how these functions are used, it may not make sense to just sum over all root directories.
+  // It would likely be more proper to return the individual values for each directory in a collection.
+  // However, that would require a major rewrite of the StorageUsage interface, which is a lot of work for some
+  // functions that seem to see no use anyhow.
+  @Override
+  public Option<Long> getUsedSpace() {
+    long usedSpace = 0;
+    for (String path : rootDirectories) {
+      usedSpace += FileUtils.sizeOfDirectory(new File(path));
+    }
+    return Option.some(usedSpace);
+  }
+
+  @Override
+  public Option<Long> getUsableSpace() {
+    long usableSpace = 0;
+    for (String path : rootDirectories) {
+      usableSpace += new File(path).getUsableSpace();
+    }
+    return Option.some(usableSpace);
+  }
+
+  @Override
+  public Option<Long> getTotalSpace() {
+    long totalSpace = 0;
+    for (String path : rootDirectories) {
+      totalSpace += new File(path).getTotalSpace();
+    }
+    return Option.some(totalSpace);
+  }
+
 }
