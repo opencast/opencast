@@ -110,6 +110,22 @@ const initParams = {
       }
     };
 
+    // check cookie consent (if enabled)
+    const cookieConsent = config?.opencast?.cookieConsent?.enable ?? true;
+    const cookieConsentConfig = config?.opencast?.cookieConsent?.config ?? {
+      'notice_banner_type':'headline',
+      'consent_type':'express',
+      'palette':'dark',
+      'language':'en',
+      'page_load_consent_levels':['strictly-necessary'],
+      'notice_banner_reject_button_hide':false,
+      'preferences_center_close_button_hide':false,
+      'page_refresh_confirmation_buttons':false,
+      'website_name': 'Paella - opencast player'
+    };
+    if (cookieConsent == true) {
+      cookieconsent.run(cookieConsentConfig);
+    }
     // Load episode
     const data = await loadEpisode();
     if (data === null) {
