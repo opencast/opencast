@@ -82,7 +82,7 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
     CONFIG_OPTIONS.put(TRANSCRIPTION_JOB_ID, "The job id that identifies the file to be attached");
     CONFIG_OPTIONS.put(TARGET_FLAVOR, "The target \"flavor\" of the transcription file");
     CONFIG_OPTIONS.put(TARGET_TAGS, "The target \"tags\" of the transcription file");
-    CONFIG_OPTIONS.put(TARGET_CAPTION_FORMAT, "The target caption format of the transcription file (dfxp, etc)");
+    CONFIG_OPTIONS.put(TARGET_CAPTION_FORMAT, "The target caption format of the transcription file (vtt, etc)");
   }
 
   @Override
@@ -105,40 +105,26 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
     }
 
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(
-        workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.many);
-    List<MediaPackageElementFlavor> targetFlavorOption = tagsAndFlavors.getTargetFlavors();
+        workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
+    MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
     List<String> targetTagOption = tagsAndFlavors.getTargetTags();
     String captionFormatOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_CAPTION_FORMAT));
 
-    MediaPackageElementFlavor flavor = null;
-    if (!targetFlavorOption.isEmpty()) {
-      flavor = targetFlavorOption.get(0);
-    } else {
-      // If the target format is not specified, we will leave it as is (srt).
-      String format = (captionFormatOption != null) ? captionFormatOption : "srt";
-      if (service.getLanguage() != null) {
-        flavor = new MediaPackageElementFlavor("captions", format + "+" + service.getLanguage());
-      } else {
-        flavor = new MediaPackageElementFlavor("captions", format);
-      }
-    }
+    // If the target format is not specified, convert to vtt (default output format is srt)
+    String format = (captionFormatOption != null) ? captionFormatOption : "vtt";
 
     try {
       MediaPackageElement transcription
           = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId);
 
-      MediaPackageElement convertedTranscription = null;
-      if (captionFormatOption != null) {
-        Job job = captionService.convert(transcription, "subrip", captionFormatOption, service.getLanguage());
-        if (!waitForStatus(job).isSuccess()) {
-          throw new WorkflowOperationException("Transcription format conversion job did not complete successfully.");
-        }
-        convertedTranscription = MediaPackageElementParser.getFromXml(job.getPayload());
-        workspace.delete(transcription.getURI());
-      } else {
-        convertedTranscription = transcription;
+      Job job = captionService.convert(transcription, "subrip", format, service.getLanguage());
+      if (!waitForStatus(job).isSuccess()) {
+        throw new WorkflowOperationException("Transcription format conversion job did not complete successfully.");
       }
-      convertedTranscription.setFlavor(flavor);
+      MediaPackageElement convertedTranscription = MediaPackageElementParser.getFromXml(job.getPayload());
+      workspace.delete(transcription.getURI());
+
+      convertedTranscription.setFlavor(targetFlavor);
       for (String tag : targetTagOption) {
         convertedTranscription.addTag(tag);
       }
