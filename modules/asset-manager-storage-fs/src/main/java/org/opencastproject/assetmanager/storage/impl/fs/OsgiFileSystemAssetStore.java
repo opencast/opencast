@@ -146,6 +146,17 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
     return null;
   }
 
+  protected void setupCache() {
+    cache = CacheBuilder.newBuilder().maximumSize(cacheSize).expireAfterWrite(cacheExpiration, TimeUnit.MINUTES)
+            .build(new CacheLoader<String, Object>() {
+              @Override
+              public Object load(String orgAndMpId) throws Exception {
+                String rootDirectory = getRootDirectoryForMediaPackage(orgAndMpId);
+                return rootDirectory == null ? null : rootDirectory;
+              }
+            });
+  }
+
   /**
    * OSGi DI.
    */
@@ -201,13 +212,6 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
 
     // Setup rootDirectory cache
     // Remembers the root directory for a given mediapackage
-    cache = CacheBuilder.newBuilder().maximumSize(cacheSize).expireAfterWrite(cacheExpiration, TimeUnit.MINUTES)
-            .build(new CacheLoader<String, Object>() {
-              @Override
-              public Object load(String orgAndMpId) throws Exception {
-                String rootDirectory = getRootDirectoryForMediaPackage(orgAndMpId);
-                return rootDirectory == null ? null : rootDirectory;
-              }
-            });
+    setupCache();
   }
 }

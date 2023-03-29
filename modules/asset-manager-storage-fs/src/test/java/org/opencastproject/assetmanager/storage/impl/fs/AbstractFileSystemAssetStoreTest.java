@@ -48,6 +48,9 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class AbstractFileSystemAssetStoreTest {
   private static final String XML_EXTENSTION = ".xml";
@@ -65,13 +68,17 @@ public class AbstractFileSystemAssetStoreTest {
   private static final VersionImpl VERSION_2 = new VersionImpl(2);
 
   private File tmpRoot;
+  private File tmpRoot2;
 
-  private AbstractFileSystemAssetStore repo;
+  private OsgiFileSystemAssetStore repo;
 
   private File sampleElemDir;
 
   @Rule
   public TemporaryFolder tmpFolder = new TemporaryFolder();
+
+  @Rule
+  public TemporaryFolder tmpFolder2 = new TemporaryFolder();
 
   @Before
   public void setUp() throws Exception {
@@ -86,19 +93,17 @@ public class AbstractFileSystemAssetStoreTest {
     EasyMock.replay(workspace);
 
     tmpRoot = tmpFolder.newFolder();
+    tmpRoot2 = tmpFolder2.newFolder();
 
-    repo = new AbstractFileSystemAssetStore() {
+    repo = new OsgiFileSystemAssetStore() {
       @Override protected Workspace getWorkspace() {
         return workspace;
       }
-
-      @Override protected String getRootDirectory() {
-        return tmpRoot.getAbsolutePath();
-      }
-      @Override protected String getRootDirectory(String orgId, String mpId) {
-        return tmpRoot.getAbsolutePath();
-      }
     };
+    Field rootDirectories = OsgiFileSystemAssetStore.class.getDeclaredField("rootDirectories");
+    rootDirectories.setAccessible(true);
+    rootDirectories.set(repo, new ArrayList(Arrays.asList(tmpRoot.getAbsolutePath(), tmpRoot2.getAbsolutePath())));
+    repo.setupCache();
 
     sampleElemDir = new File(
             PathSupport.concat(new String[] { tmpRoot.toString(), ORG_ID, MP_ID, VERSION_2.toString() }));
