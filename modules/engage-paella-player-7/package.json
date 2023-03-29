@@ -8,7 +8,7 @@
     "dev": "webpack serve --mode development --host=0.0.0.0",
     "eslint": "eslint --config .eslintrc.js src --resolve-plugins-relative-to .",
     "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'src/**/*.html'",
-    "html-validate": "html-validate 'src/**/*.html'",
+    "html-validate": "html-validate 'public/*.html'",
     "check": "npm run eslint && npm run html-linter && npm run html-validate"
   },
   "devDependencies": {
@@ -18,7 +18,7 @@
     "babel-loader": "^9.1.2",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.3",
-    "eslint": "^8.36.0",
+    "eslint": "^8.37.0",
     "eslint-plugin-header": "^3.1.1",
     "express": "^4.18.2",
     "html-linter": "^1.1.1",
