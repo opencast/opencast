@@ -14,28 +14,29 @@ into the desired caption format and adds it to the media package.
 Parameter Table
 ---------------
 
-|configuration keys|description|default value|example|
-|------------------|-------|-----------|-------------|
-|transcription-job-id|This is filled out by the transcription service when starting the workflow.|EMPTY|**Should always be "${transcriptionJobId}"**|
-|line-size|The line size (number of characters) of the transcripts to display at a time. Optional.|EMPTY|100|
-|target-flavor|The flavor of the caption/transcription file generated. Mandatory.|EMPTY|captions/timedtext|
-|target-tag|The tag to apply to the caption/transcription file generated. Optional.|EMPTY|archive|
-|target-caption-format|The caption format to be generated. Optional. If not entered, the raw resulting file will be attached to the media package.|EMPTY|vtt|
+|configuration keys    |required |description                                                                                                                 |default value|example|
+|----------------------|---------|----------------------------------------------------------------------------------------------------------------------------|-------------|-------------|
+|transcription-job-id  |yes      |This is filled out by the transcription service when starting the workflow.                                                 |EMPTY        |**Should always be "${transcriptionJobId}"**|
+|line-size             |no       |The line size (number of characters) of the transcripts to display at a time.                                               |EMPTY        |100|
+|target-flavor         |yes      |The flavor of the caption/transcription file generated.                                                                     |EMPTY        |captions/source|
+|target-tag            |no       |The tag to apply to the caption/transcription file generated.*                                                              |EMPTY        |archive,generator-type:auto   |
+|target-caption-format |no       |The caption format to be generated. If not entered, the raw resulting file will be attached to the media package.           |EMPTY        |vtt|
 
+*For conventionally used tags see the general page on [Subtitles](../../modules/subtitles).
 
 Example
 -------
 
 ```xml
-<!-- Attach caption/transcript --><G
+<!-- Attach caption/transcript -->
 <operation id="google-speech-attach-transcription"
     description="Attach captions/transcription">
   <configurations>
     <!-- This is filled out by the transcription service when starting this workflow -->
     <configuration key="transcription-job-id">${transcriptionJobId}</configuration>
     <configuration key="line-size">100</configuration>
-    <configuration key="target-flavor">captions/timedtext</configuration>
-    <configuration key="target-tag">archive</configuration>
+    <configuration key="target-flavor">captions/source</configuration>
+    <configuration key="target-tag">archive,generator-type:auto</configuration>
     <configuration key="target-caption-format">vtt</configuration>
   </configurations>
 </operation>
