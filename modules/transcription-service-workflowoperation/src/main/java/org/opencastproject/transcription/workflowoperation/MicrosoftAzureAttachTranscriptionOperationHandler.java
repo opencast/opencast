@@ -38,6 +38,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -65,13 +66,12 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
   /** Workflow configuration option keys */
   static final String TRANSCRIPTION_JOB_ID = "transcription-job-id";
   static final String TARGET_CAPTION_FORMAT = "target-caption-format";
-  static final String OPT_LANGUAGE = "replace-with-language";
+  static final String OPT_AUTO_SET_LANGUAGE_TAG = "auto-set-language-tag";
 
   /** The transcription service */
   private TranscriptionService service = null;
   private Workspace workspace;
 
-  private static final String REPLACE_THIS_WITH_LANGUAGE = "____";
   private String autoDetectedLanguage = null;
 
   @Override
@@ -100,7 +100,7 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
     List<String> targetTags = tagsAndFlavors.getTargetTags();
     // Target flavor is mandatory
     MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
-    String language = StringUtils.trimToNull(operation.getConfiguration(OPT_LANGUAGE));
+    Boolean autoSetLanguageTag = BooleanUtils.toBoolean(operation.getConfiguration(OPT_AUTO_SET_LANGUAGE_TAG));
 
     try {
       // Get transcription file from the service
@@ -118,19 +118,12 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
       }
 
       // Set the target flavor
-      if (language != null) {
-        targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavor.toString()
-                .replace(REPLACE_THIS_WITH_LANGUAGE, language));
-      } else if (autoDetectedLanguage != null) {
-        targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavor.toString()
-                .replace(REPLACE_THIS_WITH_LANGUAGE, autoDetectedLanguage));
-      } else {
-        targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavor.toString()
-                .replace(REPLACE_THIS_WITH_LANGUAGE, ""));
-      }
       transcription.setFlavor(targetFlavor);
 
       // Add tags
+      if (autoSetLanguageTag && autoDetectedLanguage != null) {
+        transcription.addTag("lang:" + autoDetectedLanguage);
+      }
       for (String tag : targetTags) {
         transcription.addTag(tag);
       }
