@@ -95,20 +95,10 @@ public class AttachTranscriptionOperationHandler extends AbstractWorkflowOperati
 
     // Check which tags/flavors have been configured
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(
-        workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.many);
+        workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
     List<String> targetTagOption = tagsAndFlavors.getTargetTags();
-    List<MediaPackageElementFlavor> targetFlavorOption = tagsAndFlavors.getTargetFlavors();
+    MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
     String captionFormatOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_CAPTION_FORMAT));
-    // Target flavor is mandatory if target-caption-format was NOT informed and no conversion is done
-    if (targetFlavorOption.isEmpty() && captionFormatOption == null) {
-      throw new WorkflowOperationException(TARGET_FLAVOR + " missing");
-    }
-    // Target flavor is optional if target-caption-format was informed because the default flavor
-    // will be "captions/<format>". If informed, will override the default.
-    MediaPackageElementFlavor flavor = null;
-    if (!targetFlavorOption.isEmpty()) {
-      flavor = targetFlavorOption.get(0);
-    }
 
     try {
       // Get transcription file from the service
@@ -125,9 +115,7 @@ public class AttachTranscriptionOperationHandler extends AbstractWorkflowOperati
       }
 
       // Set the target flavor if informed
-      if (flavor != null) {
-        transcription.setFlavor(flavor);
-      }
+      transcription.setFlavor(targetFlavor);
 
       // Add tags
       for (String tag : targetTagOption) {

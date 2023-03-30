@@ -151,7 +151,7 @@ public class AttachTranscriptionOperationHandlerTest {
     EasyMock.replay(captionService);
 
     operation.setConfiguration(AttachTranscriptionOperationHandler.TRANSCRIPTION_JOB_ID, "transcriptionJob");
-    // operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/timedtext");
+    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/source");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TAGS, "tag1,tag2");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_CAPTION_FORMAT, "dfxp");
 
@@ -159,7 +159,7 @@ public class AttachTranscriptionOperationHandlerTest {
     Assert.assertEquals(Action.CONTINUE, result.getAction());
 
     MediaPackage updatedMp = result.getMediaPackage();
-    Attachment[] attachments = updatedMp.getAttachments(MediaPackageElementFlavor.parseFlavor("captions/dfxp+en"));
+    Attachment[] attachments = updatedMp.getAttachments(MediaPackageElementFlavor.parseFlavor("captions/source"));
 
     Assert.assertNotNull(attachments);
     Assert.assertEquals(1, attachments.length);
@@ -177,7 +177,7 @@ public class AttachTranscriptionOperationHandlerTest {
     EasyMock.replay(captionService);
 
     operation.setConfiguration(AttachTranscriptionOperationHandler.TRANSCRIPTION_JOB_ID, "transcriptionJob");
-    // operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/timedtext");
+    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/source");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TAGS, "tag1,tag2");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_CAPTION_FORMAT, "vtt");
 
@@ -185,7 +185,7 @@ public class AttachTranscriptionOperationHandlerTest {
     Assert.assertEquals(Action.CONTINUE, result.getAction());
 
     MediaPackage updatedMp = result.getMediaPackage();
-    Attachment[] attachments = updatedMp.getAttachments(MediaPackageElementFlavor.parseFlavor("captions/vtt+en"));
+    Attachment[] attachments = updatedMp.getAttachments(MediaPackageElementFlavor.parseFlavor("captions/source"));
 
     Assert.assertNotNull(attachments);
     Assert.assertEquals(1, attachments.length);
