@@ -78,7 +78,7 @@ of what work has been done. To this end, there are a few expectations for all pu
   `docs/guides/admin/docs/upgrade.md`
 * New features require a release note in `docs/guides/admin/releasenotes` of at least one line describing the change
 * The commands `mvn clean install`, `mvn javadoc:javadoc javadoc:aggregate`, and `mvn site` should all succeed
-* The licenses of any external libraries used in the pull request comply with the [licensing rules](license.md) both
+* The licenses of any external libraries used in the pull request comply with the [licensing rules](../license.md) both
   in terms of the license itself as well as its listing in NOTICES
 
 Some changes require special attention:
@@ -127,7 +127,7 @@ Swift overview:
 
 To get a closer look at the branching model, let us consider a simple example with a single release:
 
-![Git branching model with a single versions](git-branching-model-simple.svg)
+![Git branching model with a single versions](../img/git-branching-model-simple.svg)
 
 As described above, `develop` is the branch used for preparing the next version. At some point marked in the release
 schedule, the release branch is cut from `develop`. This action also marks the feature freeze for that version since
@@ -155,7 +155,7 @@ to create a new maintenance release. The version `6.1` above is an example of th
 
 With Opencast supporting two major releases, you may find not one, but up to three active release branches.
 
-![Git branching model with two versions](git-branching-model-two-versions.svg)
+![Git branching model with two versions](../img/git-branching-model-two-versions.svg)
 
 
 Mostly, this is just the same as the simpler model from before. The branches exist separately from each other and only
@@ -215,7 +215,7 @@ the next release branch is cut.
 
 Git tags are used to mark Opencast releases. Here is how a release looks like in the history:
 
-![Opencast version tag in git](git-version-tag.svg)
+![Opencast version tag in git](../img/git-version-tag.svg)
 
 To create a version based on a given state of the release branch (commit `A`), the release manager will branch off from
 this commit, make the necessary version changes to all `pom.xml` files and create a commit which is then finally tagged.

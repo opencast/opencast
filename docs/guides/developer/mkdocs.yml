@@ -33,11 +33,31 @@ extra:
 # Items will appear in this order
 nav:
 - Home: 'index.md'
+- Participate:
+   - Development process: 'participate/development-process.md'
+   - Committers: 'participate/committer.md'
+   - Release manager: 'participate/release-manager.md'
+   - QA coordinator: 'participate/qa-coordinator.md'
+   - Translators: 'participate/translators.md'
+   - Submit issues/PRs: 
+      - Overview: 'participate/submit-issues-prs.md'
+      - Security issues: participate/security.md
+   - Decision making:
+      - Overview: 'participate/decision-making/index.md'
+      - Lazy consensus: 'participate/decision-making/lazy-consensus.md'
+      - Consensus building: 'participate/decision-making/consensus-building.md'
+      - Voting: 'participate/decision-making/voting.md'
+   - Governance: 'participate/governance.md'
+   - Services infrastructure:
+      - Overview: 'participate/infrastructure/index.md'
+      - Maven repository: 'participate/infrastructure/maven-repository.md'
+      - Packaging: 'participate/infrastructure/packaging.md'
+   - Proposal log: 'participate/proposal-log.md'
 - Develop:
    - Setup dev environment:
-      - General: 'develop/development-environment.md'
+      - General: 'develop/setup-opencast-for-develop.md'
       - With Docker: 'develop/development-environment-docker.md'
-   - Setup Opencast for develop: 'develop/setup-opencast-for-develop.md'
+   - Tips for developing: 'develop/development-environment.md'
    - Dev ops:
       - Local cluster for testing: 'develop/devops/local-cluster.md'
       - Explore H2 database: 'develop/devops/explore-h2-database.md'
@@ -90,26 +110,6 @@ nav:
       - Workflow API: 'architecture/api/workflow-api.md'
       - Data Types: 'architecture/api/types.md'
       - Glossary: 'architecture/api/glossary.md'
-- Participate:
-   - Development process: 'participate/development-process.md'
-   - Committers: 'participate/committer.md'
-   - Release manager: 'participate/release-manager.md'
-   - QA coordinator: 'participate/qa-coordinator.md'
-   - Translators: 'participate/translators.md'
-   - Submit issues/PRs: 
-      - Overview: 'participate/submit-issues-prs.md'
-      - Security issues: participate/security.md
-   - Decision making:
-      - Overview: 'participate/decision-making/index.md'
-      - Lazy consensus: 'participate/decision-making/lazy-consensus.md'
-      - Consensus building: 'participate/decision-making/consensus-building.md'
-      - Voting: 'participate/decision-making/voting.md'
-   - Governance: 'participate/governance.md'
-   - Services infrastructure:
-      - Overview: 'participate/infrastructure/index.md'
-      - Maven repository: 'participate/infrastructure/maven-repository.md'
-      - Packaging: 'participate/infrastructure/packaging.md'
-   - Proposal log: 'participate/proposal-log.md'
 - Licenses and Legal Matters: 'license.md'
 - Glossary: 'glossary.md'
 
