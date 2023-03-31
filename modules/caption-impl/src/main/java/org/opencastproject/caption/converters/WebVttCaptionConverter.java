@@ -137,7 +137,7 @@ public class WebVttCaptionConverter implements CaptionConverter {
       mediapackageElementType = OsgiUtil.getOptCfg(cc.getProperties(), MEDIAPACKAGE_ELEMENT_TYPE_CONFIG_KEY).get();
       // capitalize the first letter
       mediapackageElementType = mediapackageElementType.substring(0, 1).toUpperCase()
-          + mediapackageElementType.substring(1);
+          + mediapackageElementType.substring(1).toLowerCase();
       return MediaPackageElement.Type.valueOf(mediapackageElementType);
     } catch (Exception e) {
       logger.warn("Couldn't convert configuration '{}'='{}' into enum. Using default '{}'.",
