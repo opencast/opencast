@@ -29,7 +29,7 @@
     "svg-inline-loader": "^0.8.2",
     "webpack": "^5.77.0",
     "webpack-cli": "^5.0.1",
-    "webpack-dev-server": "^4.13.1",
+    "webpack-dev-server": "^4.13.2",
     "xml-loader": "^1.2.1"
   },
   "dependencies": {
