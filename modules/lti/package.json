@@ -5,7 +5,7 @@
   "homepage": "/ltitools",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.4.0",
-    "@fortawesome/free-solid-svg-icons": "^6.3.0",
+    "@fortawesome/free-solid-svg-icons": "^6.4.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "axios": "^0.27.2",
     "bootstrap": "^5.2.3",
