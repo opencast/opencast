@@ -38,6 +38,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -236,7 +237,7 @@ public class MicrosoftAzureTranscriptionServiceTest {
     EasyMock.expect(workspace.get(uri)).andReturn(null); // Doesn't matter what is returned
     EasyMock.replay(workspace);
 
-    MediaPackageElement mpe = service.getGeneratedTranscription(MP_ID, null);
+    MediaPackageElement mpe = service.getGeneratedTranscription(MP_ID, null, Track.TYPE);
     Assert.assertEquals("captions", mpe.getFlavor().getType());
     Assert.assertEquals("microsoft-azure", mpe.getFlavor().getSubtype());
   }

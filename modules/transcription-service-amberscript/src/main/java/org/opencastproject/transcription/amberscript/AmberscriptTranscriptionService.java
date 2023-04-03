@@ -27,7 +27,6 @@ import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
-import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
@@ -679,7 +678,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
 
   @Override
   // Called by the attach workflow operation
-  public MediaPackageElement getGeneratedTranscription(String mpId, String jobId)
+  public MediaPackageElement getGeneratedTranscription(String mpId, String jobId, MediaPackageElement.Type type)
           throws TranscriptionServiceException {
     try {
       // If jobId is unknown, look for all jobs associated to that mpId
@@ -713,7 +712,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
       }
       MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
       logger.debug("Returning MPE with results file URI: {}", uri);
-      return builder.elementFromURI(uri, Attachment.TYPE, new MediaPackageElementFlavor("captions", "srt"));
+      return builder.elementFromURI(uri, type, new MediaPackageElementFlavor("captions", "srt"));
     } catch (TranscriptionDatabaseException e) {
       throw new TranscriptionServiceException("Job id not informed and could not find transcription", e);
     }

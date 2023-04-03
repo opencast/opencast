@@ -430,7 +430,7 @@ public class GoogleSpeechTranscriptionServiceTest {
     EasyMock.expect(workspace.get(uri)).andReturn(null); // Doesn't matter what is returned
     EasyMock.replay(workspace);
 
-    MediaPackageElement mpe = service.getGeneratedTranscription(MP_ID, null);
+    MediaPackageElement mpe = service.getGeneratedTranscription(MP_ID, null, Track.TYPE);
     Assert.assertEquals("captions", mpe.getFlavor().getType());
     Assert.assertEquals("google-speech-json", mpe.getFlavor().getSubtype());
     Assert.assertEquals(uri.toString(), mpe.getURI().toString());
@@ -469,7 +469,7 @@ public class GoogleSpeechTranscriptionServiceTest {
     EasyMock.expect(httpClient.execute(EasyMock.anyObject(HttpGet.class))).andReturn(response).anyTimes();
     EasyMock.replay(httpClient);
 
-    MediaPackageElement mpe = service.getGeneratedTranscription(MP_ID, JOB_ID);
+    MediaPackageElement mpe = service.getGeneratedTranscription(MP_ID, JOB_ID, Track.TYPE);
     Assert.assertEquals("captions", mpe.getFlavor().getType());
     Assert.assertEquals("google-speech-json", mpe.getFlavor().getSubtype());
     Assert.assertEquals(uri.toString(), mpe.getURI().toString());

@@ -21,6 +21,7 @@ Parameter Table
 |target-flavor         |yes      |The flavor of the caption/transcription file generated.                                                                     |EMPTY        |captions/source|
 |target-tag            |no       |The tag to apply to the caption/transcription file generated.*                                                              |EMPTY        |archive,generator-type:auto   |
 |target-caption-format |no       |The caption format to be generated. If not entered, the raw resulting file will be attached to the media package.           |EMPTY        |vtt|
+|target-element-type   |no       |Define where to append the subtitles file. Accepted values: 'track', 'attachment'.                                          |track        |track                                        |
 
 *For conventionally used tags see the general page on [Subtitles](../../modules/subtitles).
 

@@ -22,9 +22,11 @@
 package org.opencastproject.transcription.workflowoperation;
 
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.transcription.api.TranscriptionService;
 import org.opencastproject.transcription.api.TranscriptionServiceException;
@@ -67,6 +69,7 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
   static final String TRANSCRIPTION_JOB_ID = "transcription-job-id";
   static final String TARGET_CAPTION_FORMAT = "target-caption-format";
   static final String OPT_AUTO_SET_LANGUAGE_TAG = "auto-set-language-tag";
+  static final String TARGET_TYPE = "target-element-type";
 
   /** The transcription service */
   private TranscriptionService service = null;
@@ -101,11 +104,27 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
     // Target flavor is mandatory
     MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
     Boolean autoSetLanguageTag = BooleanUtils.toBoolean(operation.getConfiguration(OPT_AUTO_SET_LANGUAGE_TAG));
+    String typeUnparsed = StringUtils.trimToEmpty(operation.getConfiguration(TARGET_TYPE));
+    MediaPackageElement.Type type = null;
+    if (!typeUnparsed.isEmpty()) {
+      // Case insensitive matching between user input (workflow config key) and enum value
+      for (MediaPackageElement.Type t : MediaPackageElement.Type.values()) {
+        if (t.name().equalsIgnoreCase(typeUnparsed)) {
+          type = t;
+        }
+      }
+      if (type == null || (type != Track.TYPE && type != Attachment.TYPE)) {
+        throw new IllegalArgumentException(String.format("The given type '%s' for mediapackage %s was illegal. Please"
+                + "check the operations' configuration keys.", type, mediaPackage.getIdentifier()));
+      }
+    } else {
+      type = Track.TYPE;
+    }
 
     try {
       // Get transcription file from the service
       MediaPackageElement transcription = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(),
-              jobId);
+              jobId, type);
 
       // Get return values from the service
       try {

@@ -109,9 +109,11 @@ public class AttachTranscriptionOperationHandlerTest {
     // Transcription service set up
     service = EasyMock.createStrictMock(TranscriptionService.class);
 
-    EasyMock.expect(service.getGeneratedTranscription("mpId1", "transcriptionJob")).andReturn(captionDfxp);
+    EasyMock.expect(service.getGeneratedTranscription("mpId1", "transcriptionJob", Attachment.TYPE)).
+            andReturn(captionDfxp);
     EasyMock.expect(service.getLanguage()).andReturn("en").once();
-    EasyMock.expect(service.getGeneratedTranscription("mpId2", "transcriptionJob")).andReturn(captionVtt);
+    EasyMock.expect(service.getGeneratedTranscription("mpId2", "transcriptionJob", Attachment.TYPE)).
+            andReturn(captionVtt);
     EasyMock.expect(service.getLanguage()).andReturn("en").once();
     EasyMock.replay(service);
 
@@ -154,6 +156,7 @@ public class AttachTranscriptionOperationHandlerTest {
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/source");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TAGS, "tag1,tag2");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_CAPTION_FORMAT, "dfxp");
+    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TYPE, "attachment");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
     Assert.assertEquals(Action.CONTINUE, result.getAction());
@@ -180,6 +183,7 @@ public class AttachTranscriptionOperationHandlerTest {
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/source");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TAGS, "tag1,tag2");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_CAPTION_FORMAT, "vtt");
+    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TYPE, "attachment");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
     Assert.assertEquals(Action.CONTINUE, result.getAction());
