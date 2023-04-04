@@ -83,6 +83,7 @@ nav:
    - Localization: 'develop/localization.md'
 - Opencast architecture:
    - Overview: 'architecture/overview.md'
+   - Filesystem: 'architecture/filesystem.md'
    - Asset manager: 'architecture/asset-manager.md'
    - Scheduler: 'architecture/scheduler.md'
    - Statistics: 'architecture/statistics.md'
