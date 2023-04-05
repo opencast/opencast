@@ -123,9 +123,7 @@ module.exports = function (env) {
       }),
       new CopyWebpackPlugin({
         patterns: [
-          { from: './src/style.css', to: '' },
-          { from: './src/auth.html', to: '' },
-          { from: './src/watch.html', to: '' }
+          { from: 'public', to: '' }
         ]
       })
     ],

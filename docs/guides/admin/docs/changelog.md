@@ -4,6 +4,13 @@ Changelog
 Opencast 13
 -----------
 
+### Opencast 13.4
+
+*Released on March 21th, 2023*
+
+- [[#4780](https://github.com/opencast/opencast/pull/4780)] -
+  Bump @babel/eslint-parser from 7.19.1 to 7.21.3 in /modules/engage-paella-player-7
+
 ### Opencast 13.3
 
 *Released on March 16th, 2023*
@@ -670,6 +677,13 @@ Opencast 13
 
 Opencast 12
 -----------
+
+### Opencast 12.10
+
+*Released on March 27th, 2023*
+
+- [[#4799](https://github.com/opencast/opencast/pull/4799)] -
+  Sets values in specific config file to default
 
 ### Opencast 12.9
 

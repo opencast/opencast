@@ -894,11 +894,23 @@
                   "ADDITIONAL_ACTIONS": "פעולות נוספות",
                   "ACTION": "פעולות",
                   "NEW": "מדיניות חדשה",
-                  "DETAILS": "פרטים"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the event",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the event becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the event"
+                  }
                },
                "ROLES": {
                   "LABEL": "בחר תפקיד",
                   "EMPTY": "לא נצאו תפקידים"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "COMMENTS": {
@@ -1116,11 +1128,22 @@
                   "ADDITIONAL_ACTIONS": "פעולות נוספות",
                   "ACTION": "פעולות",
                   "NEW": "מדיניות חדשה",
-                  "DETAILS": "פרטים"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "בחר תפקיד",
                   "EMPTY": "לא נצאו תפקידים"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "THEME": {
@@ -1194,17 +1217,29 @@
                   "ADDITIONAL_ACTIONS": "פעולות נוספות",
                   "ACTION": "פעולות",
                   "NEW": "מדיניות חדשה",
-                  "DETAILS": "פרטים",
-                  "REPLACE_EVENT_ACLS": "Save & update event permissions",
+                  "DETAILS": "Non-user roles",
+                  "REPLACE_EVENT_ACLS": "עדכון הרשאות אירוע",
                   "REPLACE_EVENT_ACLS_HINT": "בדיקה שכל האירועים של סדרה זו יש הרשאות אלה בתוקף",
                   "SAVE_SERIES_ACLS": "Save",
                   "SAVE_SERIES_ACLS_HINT": "Apply permissions only to series",
                   "LOAD_MORE_LIMIT": "policies shown.",
-                  "LOAD_MORE_LINK": "Load more"
+                  "LOAD_MORE_LINK": "Load more",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "בחר תפקיד",
                   "EMPTY": "לא נמצא תפקיד"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "METADATA": {
@@ -1443,12 +1478,23 @@
                   "ADDITIONAL_ACTIONS": "פעולות נוספות",
                   "ACTION": "פעולות",
                   "NEW": "מדיניות חדשה",
-                  "DETAILS": "פרטים",
-                  "DESCRIPTION": "נא לבחור סט מדיניויות מוגדרות מראש או להוסיף מדיניות מותאמת אישית להלן"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "נא לבחור סט מדיניויות מוגדרות מראש או להוסיף מדיניות מותאמת אישית להלן",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the access policy",
+                  "HELP": {
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                  }
                },
                "ROLES": {
                   "LABEL": "בחר תפקיד",
                   "EMPTY": "לא נצאו תפקידים"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          },
@@ -1481,12 +1527,24 @@
                   "ADDITIONAL_ACTIONS": "פעולות נוספות",
                   "ACTION": "פעולות",
                   "NEW": "מדיניות חדשה",
-                  "DETAILS": "פרטים",
-                  "DESCRIPTION": "נא לבחור סט מדיניויות מוגדרות מראש או להוסיף מדיניות מותאמת אישית להלן"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "נא לבחור סט מדיניויות מוגדרות מראש או להוסיף מדיניות מותאמת אישית להלן",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the access policy",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                  }
                },
                "ROLES": {
                   "LABEL": "בחר תפקיד",
                   "EMPTY": "לא נמצאו תפקידים"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          }
