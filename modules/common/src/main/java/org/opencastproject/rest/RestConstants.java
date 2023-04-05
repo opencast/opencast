@@ -39,7 +39,7 @@ public interface RestConstants {
   String SERVICE_JOBPRODUCER_PROPERTY = "opencast.service.jobproducer";
 
   /** The ID by which this http context is known by the extended http service */
-  String HTTP_CONTEXT_ID = "opencast.httpcontext";
+  String HTTP_CONTEXT_ID = "opencast";
 
   /** The OSGI service filter that returns all registered services published as REST endpoints */
   String SERVICES_FILTER = "(&(!(objectClass=javax.servlet.Servlet))(" + RestConstants.SERVICE_PATH_PROPERTY + "=*))";

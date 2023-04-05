@@ -32,7 +32,6 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.service.component.annotations</artifactId>
@@ -41,12 +40,17 @@
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.service.cm</artifactId>
     </dependency>
-    <!-- Opencast -->
     <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-common</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.http.whiteboard</artifactId>
+      <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.component</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <!-- Opencast -->
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-urlsigning-common</artifactId>

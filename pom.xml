@@ -25,7 +25,7 @@
     <commons-io.version>2.8.0</commons-io.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
     <commons-text.version>1.10.0</commons-text.version>
-    <cxf.version>3.4.6</cxf.version>
+    <cxf.version>3.5.5</cxf.version>
     <eclipselink.version>2.7.8</eclipselink.version>
     <failureaccess.version>1.0.1</failureaccess.version>
     <freemarker.version>2.3.31</freemarker.version>
@@ -45,11 +45,15 @@
     <karaf.version>4.4.3</karaf.version>
     <node.version>v16.13.0</node.version>
     <osgi.core.version>8.0.0</osgi.core.version>
+    <osgi.annotation.version>8.1.0</osgi.annotation.version>
     <org.osgi.service.component.version>1.5.0</org.osgi.service.component.version>
     <org.osgi.service.component.annotations.version>1.5.0</org.osgi.service.component.annotations.version>
     <org.osgi.service.cm.version>1.6.0</org.osgi.service.cm.version>
     <org.osgi.service.log.version>1.5.0</org.osgi.service.log.version>
     <org.osgi.service.http.version>1.2.1</org.osgi.service.http.version>
+    <org.osgi.service.http.whiteboard.version>1.1.1</org.osgi.service.http.whiteboard.version>
+    <org.osgi.service.jaxrs.version>1.0.1</org.osgi.service.jaxrs.version>
+    <pax.web.version>8.0.15</pax.web.version>
     <querydsl.version>3.7.4</querydsl.version>
     <rest-assured.version>4.4.0</rest-assured.version>
     <spring.version>3.1.4.RELEASE</spring.version>
@@ -896,9 +900,25 @@
       </dependency>
       <dependency>
         <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.http.whiteboard</artifactId>
+        <version>${org.osgi.service.http.whiteboard.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
         <artifactId>org.osgi.service.component.annotations</artifactId>
         <version>${org.osgi.service.component.annotations.version}</version>
         <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.jaxrs</artifactId>
+        <version>${org.osgi.service.jaxrs.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>osgi.annotation</artifactId>
+        <version>${osgi.annotation.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.felix</groupId>
@@ -1368,8 +1388,14 @@
       </dependency>
       <dependency>
         <groupId>org.ops4j.pax.web</groupId>
+        <artifactId>pax-web-api</artifactId>
+        <version>${pax.web.version}</version>
+        <scope>compile</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.ops4j.pax.web</groupId>
         <artifactId>pax-web-extender-whiteboard</artifactId>
-        <version>8.0.15</version>
+        <version>${pax.web.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

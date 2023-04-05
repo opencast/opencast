@@ -34,19 +34,21 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContextSelect;
+import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardServletName;
+import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardServletPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
 import javax.servlet.Servlet;
@@ -59,10 +61,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 /** A bundle activator that registers the REST documentation servlet. */
-public class Activator extends HttpServlet implements BundleActivator {
+@Component(service = Servlet.class)
+@HttpWhiteboardServletName(RestDocsServlet.SERVLET_PATH)
+@HttpWhiteboardServletPattern(RestDocsServlet.SERVLET_PATH)
+@HttpWhiteboardContextSelect("(osgi.http.whiteboard.context.name=opencast)")
+public class RestDocsServlet extends HttpServlet {
 
   /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(Activator.class);
+  private static final Logger logger = LoggerFactory.getLogger(RestDocsServlet.class);
+
+  /** The servlet path */
+  public static final String SERVLET_PATH = "/docs.html";
 
   /** The query string parameter used to specify a specific service */
   private static final String PATH_PARAM = "path";
@@ -76,13 +85,10 @@ public class Activator extends HttpServlet implements BundleActivator {
   /** A map of global macro values for REST documentation. */
   private Map<String, String> globalMacro;
 
-  @Override
+  @Activate
   public void start(BundleContext bundleContext) throws Exception {
     this.bundleContext = bundleContext;
-    Dictionary<String, String> props = new Hashtable<String, String>();
-    props.put("alias", "/docs.html");
     prepareMacros();
-    bundleContext.registerService(Servlet.class.getName(), this, props);
   }
 
   /** Add a list of global information, such as the server URL, to the globalMacro map. */
@@ -93,7 +99,6 @@ public class Activator extends HttpServlet implements BundleActivator {
     globalMacro.put("LOCAL_STORAGE_DIRECTORY", bundleContext.getProperty("org.opencastproject.storage.dir"));
   }
 
-  @Override
   public void stop(BundleContext bundleContext) throws Exception {
   }
 

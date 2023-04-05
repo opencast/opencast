@@ -54,6 +54,10 @@
       <artifactId>org.osgi.service.cm</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.http.whiteboard</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
@@ -99,7 +103,6 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Bundle-Activator>org.opencastproject.runtimeinfo.Activator</Bundle-Activator>
             <Private-Package>
               org.opencastproject.runtimeinfo.rest
             </Private-Package>

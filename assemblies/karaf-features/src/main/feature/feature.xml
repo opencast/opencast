@@ -15,6 +15,7 @@
     <!-- Base features -->
     <feature>http</feature>
     <feature>http-whiteboard</feature>
+    <feature>pax-web-http-whiteboard</feature>
     <feature>scr</feature>
     <feature>cxf-jaxrs</feature>
     <feature>cxf-http-jetty</feature>
@@ -107,7 +108,7 @@
   </feature>
 
   <feature name="opencast-core" version="${project.version}">
-    <feature start-level="80">ext-core</feature>
+    <feature>ext-core</feature>
 
     <!-- Opencast -->
     <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-api/${project.version}</bundle>
@@ -153,9 +154,9 @@
   </feature>
 
   <feature name="opencast-allinone" version="${project.version}">
-    <feature start-level="80">opencast-core</feature>
-    <feature start-level="80">opencast-services-processing-heavy-load</feature>
-    <feature start-level="80">opencast-services-processing-light-load</feature>
+    <feature>opencast-core</feature>
+    <feature>opencast-services-processing-heavy-load</feature>
+    <feature>opencast-services-processing-light-load</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui-frontend/${project.version}</bundle>
@@ -263,7 +264,7 @@
   </feature>
 
   <feature name="opencast-admin" version="${project.version}">
-    <feature start-level="80">opencast-core</feature>
+    <feature>opencast-core</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui-frontend/${project.version}</bundle>
@@ -393,7 +394,7 @@
   </feature>
 
   <feature name="opencast-adminpresentation" version="${project.version}">
-    <feature start-level="80">opencast-core</feature>
+    <feature>opencast-core</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui-frontend/${project.version}</bundle>
@@ -532,7 +533,7 @@
   </feature>
 
   <feature name="opencast-ingest" version="${project.version}">
-    <feature start-level="80">opencast-core</feature>
+    <feature>opencast-core</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-remote/${project.version}</bundle>
@@ -548,7 +549,7 @@
   </feature>
 
   <feature name="opencast-services-processing-heavy-load" version="${project.version}">
-    <feature start-level="80">opencast-core</feature>
+    <feature>opencast-core</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-animate-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-animate-impl/${project.version}</bundle>
@@ -574,7 +575,7 @@
   </feature>
 
   <feature name="opencast-services-processing-light-load" version="${project.version}">
-    <feature start-level="80">opencast-core</feature>
+    <feature>opencast-core</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-caption-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-caption-impl/${project.version}</bundle>
@@ -606,9 +607,9 @@
   </feature>
 
   <feature name="opencast-worker" version="${project.version}">
-    <feature start-level="80">opencast-core</feature>
-    <feature start-level="80">opencast-services-processing-heavy-load</feature>
-    <feature start-level="80">opencast-services-processing-light-load</feature>
+    <feature>opencast-core</feature>
+    <feature>opencast-services-processing-heavy-load</feature>
+    <feature>opencast-services-processing-light-load</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-youtube-v3/${project.version}</bundle>
@@ -619,7 +620,7 @@
   </feature>
 
   <feature name="opencast-presentation" version="${project.version}">
-    <feature start-level="80">opencast-core</feature>
+    <feature>opencast-core</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-api/${project.version}</bundle>
@@ -666,32 +667,32 @@
   </feature>
 
   <feature name="opencast-security-jwt" version="${project.version}">
-    <feature start-level="80">opencast-core</feature>
+    <feature>opencast-core</feature>
     <bundle start-level="82">mvn:org.opencastproject/opencast-security-jwt/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-plugin-userdirectory-moodle" version="${project.version}">
-    <feature start-level="80">opencast-core</feature>
+    <feature>opencast-core</feature>
     <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-moodle/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-plugin-userdirectory-sakai" version="${project.version}">
-    <feature start-level="80">opencast-core</feature>
+    <feature>opencast-core</feature>
     <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-sakai/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-plugin-userdirectory-brightspace" version="${project.version}">
-    <feature start-level="80">opencast-core</feature>
+    <feature>opencast-core</feature>
     <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-brightspace/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-plugin-userdirectory-canvas" version="${project.version}">
-    <feature start-level="80">opencast-core</feature>
+    <feature>opencast-core</feature>
     <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-canvas/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-plugin-userdirectory-studip" version="${project.version}">
-    <feature start-level="80">opencast-core</feature>
+    <feature>opencast-core</feature>
     <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-studip/${project.version}</bundle>
   </feature>
 

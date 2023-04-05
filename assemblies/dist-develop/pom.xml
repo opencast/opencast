@@ -104,6 +104,7 @@
             <feature>service</feature>
             <feature>system</feature>
             <feature>config</feature>
+            <feature>pax-web-karaf</feature>
             <!-- Opencast external features -->
             <feature>jpa</feature>
             <feature>http</feature>
