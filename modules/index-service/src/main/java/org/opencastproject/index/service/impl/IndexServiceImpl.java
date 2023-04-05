@@ -439,7 +439,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   public List<EventCatalogUIAdapter> getEventCatalogUIAdapters(String organization) {
-    return eventCatalogUIAdapters.stream().filter(a -> organization.equals(a.getOrganization()))
+    return eventCatalogUIAdapters.stream().filter(a -> a.handlesOrganization(organization))
             .collect(Collectors.toList());
   }
 
@@ -449,19 +449,19 @@ public class IndexServiceImpl implements IndexService {
    * @return A {@link List} of {@link SeriesCatalogUIAdapter} that provide the metadata to the front end.
    */
   public List<SeriesCatalogUIAdapter> getSeriesCatalogUIAdapters(String organization) {
-    return seriesCatalogUIAdapters.stream().filter(a -> organization.equals(a.getOrganization()))
+    return seriesCatalogUIAdapters.stream().filter(a -> a.handlesOrganization(organization))
             .collect(Collectors.toList());
   }
 
   public EventCatalogUIAdapter getCommonEventCatalogUIAdapter(String organization) {
     Optional<EventCatalogUIAdapter> orgEventCatalogUIAdapter = eventCatalogUIAdapters.stream()
             .filter(a -> a instanceof CommonEventCatalogUIAdapter)
-            .filter(a -> organization.equals(a.getOrganization()))
+            .filter(a -> a.handlesOrganization(organization))
             .findFirst();
 
     if (orgEventCatalogUIAdapter.isPresent()) {
       return orgEventCatalogUIAdapter.get();
-    } else if (organization != DEFAULT_ORGANIZATION_ID) {
+    } else if (!organization.equals(DEFAULT_ORGANIZATION_ID)) {
       return getCommonEventCatalogUIAdapter(DEFAULT_ORGANIZATION_ID);
     } else {
        throw new IllegalStateException("Common event metadata for " + DEFAULT_ORGANIZATION_ID + " needs to be "
@@ -472,12 +472,12 @@ public class IndexServiceImpl implements IndexService {
   public SeriesCatalogUIAdapter getCommonSeriesCatalogUIAdapter(String organization) {
     Optional<SeriesCatalogUIAdapter> orgSeriesCatalogUIAdapter = seriesCatalogUIAdapters.stream()
             .filter(a -> a instanceof CommonSeriesCatalogUIAdapter)
-            .filter(a -> organization.equals(a.getOrganization()))
+            .filter(a -> a.handlesOrganization(organization))
             .findFirst();
 
     if (orgSeriesCatalogUIAdapter.isPresent()) {
       return orgSeriesCatalogUIAdapter.get();
-    } else if (organization != DEFAULT_ORGANIZATION_ID) {
+    } else if (!organization.equals(DEFAULT_ORGANIZATION_ID)) {
       return getCommonSeriesCatalogUIAdapter(DEFAULT_ORGANIZATION_ID);
     } else {
       throw new IllegalStateException("Common series metadata for " + DEFAULT_ORGANIZATION_ID + " needs to be "
@@ -494,7 +494,7 @@ public class IndexServiceImpl implements IndexService {
   public List<EventCatalogUIAdapter> getExtendedEventCatalogUIAdapters() {
     String organization = securityService.getOrganization().getId();
     return eventCatalogUIAdapters.stream().filter(a -> !(a instanceof CommonEventCatalogUIAdapter))
-            .filter(a -> organization.equals(a.getOrganization())).collect(Collectors.toList());
+            .filter(a -> a.handlesOrganization(organization)).collect(Collectors.toList());
   }
 
   @Override

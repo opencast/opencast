@@ -75,6 +75,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private String eventStatus = null;
   private Boolean hasComments = null;
   private Boolean hasOpenComments = null;
+  private final List<String> comments = new ArrayList<>();
   private Boolean needsCutting = null;
   private final List<String> publications = new ArrayList<String>();
   private Long archiveVersion = null;
@@ -803,6 +804,18 @@ public class EventSearchQuery extends AbstractSearchQuery {
    */
   public Boolean getHasOpenComments() {
     return hasOpenComments;
+  }
+
+  public EventSearchQuery withComments(String comment) {
+    if (StringUtils.isBlank(comment)) {
+      throw new IllegalArgumentException("Comment cannot be null");
+    }
+    this.comments.add(comment);
+    return this;
+  }
+
+  public String[] getComments() {
+    return comments.toArray(new String[comments.size()]);
   }
 
   /**

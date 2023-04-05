@@ -473,7 +473,7 @@
             "TEXT": "Παρουσιάστηκε μη αναμενόμενο σφάλμα κατά την επεξεργασία του αιτήματος."
          },
          "DELETE_SUBMIT_STATE": {
-            "TEXT": "Είστε βέβαιοι ότι θέλετε να διαγράψετε τα στοιχεία εγγραφής σας;"
+            "TEXT": "Είστε βέβαιοι ότι θέλετε να διαγράψετε τα δεδομένα εγγραφής σας ? Με την επιβεβαίωση θα αφαιρεθούν τα δεδομένα εγγραφής σας από το διακομιστή του πρότζεκτ μέχρι  το διάστημα της επόμενης ενημέρωσης."
          }
       }
    },
@@ -894,11 +894,23 @@
                   "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
                   "ACTION": "Ενέργειες",
                   "NEW": "Νέα πολιτική",
-                  "DETAILS": "Λεπτομέρειες"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the event",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the event becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the event"
+                  }
                },
                "ROLES": {
                   "LABEL": "Επιλέξτε ένα ρόλο",
                   "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "COMMENTS": {
@@ -1116,11 +1128,22 @@
                   "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
                   "ACTION": "Ενέργειες",
                   "NEW": "Νέα πολιτική",
-                  "DETAILS": "Λεπτομέρειες"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "Επιλέξτε ένα ρόλο",
                   "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "THEME": {
@@ -1194,17 +1217,29 @@
                   "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
                   "ACTION": "Ενέργειες",
                   "NEW": "Νέα πολιτική",
-                  "DETAILS": "Λεπτομέρειες",
-                  "REPLACE_EVENT_ACLS": "Αποθήκευση & ενημέρωση δικαιωμάτων εκδήλωσης",
+                  "DETAILS": "Non-user roles",
+                  "REPLACE_EVENT_ACLS": "Ενημέρωση δικαιωμάτων εκδήλωσης",
                   "REPLACE_EVENT_ACLS_HINT": "Επιβεβαίωση ότι όλες οι εκδηλώσεις σε αυτή την σειρά έχουν τα ίδια δικαιώματα σε ισχύ",
                   "SAVE_SERIES_ACLS": "Αποθήκευση",
                   "SAVE_SERIES_ACLS_HINT": "Εφαρμογή δικαιωμάτων μόνο στη σειρά",
                   "LOAD_MORE_LIMIT": "Εμφάνιση πολιτικών.",
-                  "LOAD_MORE_LINK": "Φόρτωση περισσοτέρων"
+                  "LOAD_MORE_LINK": "Φόρτωση περισσοτέρων",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "Επιλέξτε ένα ρόλο",
                   "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "METADATA": {
@@ -1443,12 +1478,23 @@
                   "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
                   "ACTION": "Ενέργειες",
                   "NEW": "Νέα πολιτική",
-                  "DETAILS": "Λεπτομέρειες",
-                  "DESCRIPTION": "Παρακαλώ επιλέξτε ένα σύνολο προ-διαμορφωμένων πολιτικών ή να προσθέσετε τις ακόλουθες προσαρμοσμένες πολιτικές"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "Παρακαλώ επιλέξτε ένα σύνολο προ-διαμορφωμένων πολιτικών ή να προσθέσετε τις ακόλουθες προσαρμοσμένες πολιτικές",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the access policy",
+                  "HELP": {
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                  }
                },
                "ROLES": {
                   "LABEL": "Επιλέξτε ένα ρόλο",
                   "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          },
@@ -1481,12 +1527,24 @@
                   "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
                   "ACTION": "Ενέργειες",
                   "NEW": "Νέα πολιτική",
-                  "DETAILS": "Λεπτομέρειες",
-                  "DESCRIPTION": "Παρακαλώ επιλέξτε ένα σύνολο προ-διαμορφωμένων πολιτικών ή να προσθέσετε τις ακόλουθες προσαρμοσμένες πολιτικές"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "Παρακαλώ επιλέξτε ένα σύνολο προ-διαμορφωμένων πολιτικών ή να προσθέσετε τις ακόλουθες προσαρμοσμένες πολιτικές",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the access policy",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                  }
                },
                "ROLES": {
                   "LABEL": "Επιλέξτε ένα ρόλο",
                   "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          }
@@ -2127,7 +2185,8 @@
       "GROUPS": {
          "GENERAL": "Γενικά",
          "PLAYER": "Αναπαραγωγέας",
-         "EDITOR": "Πρόγραμμα επεξεργασίας"
+         "EDITOR": "Πρόγραμμα επεξεργασίας",
+         "ADD_MEDIA": "Δημιουργία Γεγονότος/Σειράς"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2160,6 +2219,10 @@
             "CLEAR_LIST": "Καθαρισμός τμήματος",
             "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Επανάληψη τμήματος με pre-roll",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Τέλος του τμήματος"
+         },
+         "ADD_MEDIA": {
+            "NEXT_TAB": "Επόμενη καρτέλα/Δημιουργία",
+            "PREVIOUS_TAB": "Προηγούμενη καρτέλα"
          }
       }
    },

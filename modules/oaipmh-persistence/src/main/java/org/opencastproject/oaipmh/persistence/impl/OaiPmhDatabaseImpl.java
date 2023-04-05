@@ -20,6 +20,8 @@
  */
 package org.opencastproject.oaipmh.persistence.impl;
 
+import org.opencastproject.db.DBSession;
+import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.workspace.api.Workspace;
@@ -27,6 +29,7 @@ import org.opencastproject.workspace.api.Workspace;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,14 +55,18 @@ public class OaiPmhDatabaseImpl extends AbstractOaiPmhDatabase {
   /** Factory used to create {@link javax.persistence.EntityManager}s for transactions */
   private EntityManagerFactory emf;
 
+  private DBSessionFactory dbSessionFactory;
+
+  private DBSession db;
+
   private SecurityService securityService;
 
   /** The workspace */
   private Workspace workspace;
 
   @Override
-  public EntityManagerFactory getEmf() {
-    return emf;
+  public DBSession getDBSession() {
+    return db;
   }
 
   @Override
@@ -80,12 +87,23 @@ public class OaiPmhDatabaseImpl extends AbstractOaiPmhDatabase {
   @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for OAI-PMH");
+    db = dbSessionFactory.createSession(emf);
+  }
+
+  @Deactivate
+  public void deactivate() {
+    db.close();
   }
 
   /** OSGi DI */
   @Reference(target = "(osgi.unit.name=org.opencastproject.oaipmh)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
+  }
+
+  @Reference
+  public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
+    this.dbSessionFactory = dbSessionFactory;
   }
 
   /**

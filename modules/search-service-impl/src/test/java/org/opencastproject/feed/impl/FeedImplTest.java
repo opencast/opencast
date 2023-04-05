@@ -33,6 +33,7 @@ import org.opencastproject.feed.api.Person;
 
 import org.easymock.EasyMock;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -42,8 +43,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-
-import junit.framework.Assert;
 
 public class FeedImplTest {
   private static final Logger logger = LoggerFactory.getLogger(FeedImplTest.class);

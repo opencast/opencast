@@ -607,11 +607,6 @@ public class OpencastLdapAuthoritiesPopulatorTest {
       }
     }
 
-    // Add the internal roles
-    for (Role role : DEFAULT_INTERNAL_ROLES) {
-      expectedResult.add(new SimpleGrantedAuthority(role.getName()));
-    }
-
     // Add the additional authorities
     // no prefix for roles added this way (prefix = "")
     // no group resolve for roles added this way (groupRoleProvider = null)

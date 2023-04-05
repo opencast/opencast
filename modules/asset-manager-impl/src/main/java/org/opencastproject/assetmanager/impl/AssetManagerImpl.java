@@ -64,6 +64,7 @@ import org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
+import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
@@ -81,6 +82,7 @@ import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
@@ -132,6 +134,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -162,6 +165,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerImpl.class);
 
+  private static final int PAGE_SIZE = 100;
+
   enum AdminRole {
     GLOBAL, ORGANIZATION, NONE
   }
@@ -182,8 +187,11 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   private HttpAssetProvider httpAssetProvider;
   private String systemUserName;
   private Database db;
+  private DBSessionFactory dbSessionFactory;
+  private EntityManagerFactory emf;
   private AclServiceFactory aclServiceFactory;
   private ElasticsearchIndex index;
+  private Map<String, List<EventCatalogUIAdapter>> extendedEventCatalogUIAdapters = new HashMap<>();
 
   // Settings for role filter
   private boolean includeAPIRoles;
@@ -204,6 +212,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Activate
   public synchronized void activate(ComponentContext cc) {
     logger.info("Activating AssetManager.");
+    db = new Database(dbSessionFactory.createSession(emf));
     systemUserName = SecurityUtil.getSystemUserName(cc);
 
     includeAPIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeAPIRoles"), null));
@@ -217,7 +226,12 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   @Reference(target = "(osgi.unit.name=org.opencastproject.assetmanager.impl)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
-    this.db = new Database(emf);
+    this.emf = emf;
+  }
+
+  @Reference
+  public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
+    this.dbSessionFactory = dbSessionFactory;
   }
 
   @Reference
@@ -284,6 +298,20 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Reference
   public void setIndex(ElasticsearchIndex index) {
     this.index = index;
+  }
+
+  @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC,
+          target = "(common-metadata=false)")
+  public synchronized void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
+    List<EventCatalogUIAdapter> list = extendedEventCatalogUIAdapters.computeIfAbsent(
+            catalogUIAdapter.getOrganization(), k -> new ArrayList());
+    list.add(catalogUIAdapter);
+  }
+
+  public synchronized void removeCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
+    if (extendedEventCatalogUIAdapters.containsKey(catalogUIAdapter.getOrganization())) {
+      extendedEventCatalogUIAdapters.get(catalogUIAdapter.getOrganization()).remove(catalogUIAdapter);
+    }
   }
 
   /**
@@ -473,12 +501,12 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   /**
-   * Update the event in the API index.
+   * Update the event in the Elasticsearch index.
    *
    * @param snapshot
    *         The newest snapshot of the event to update
    * @param index
-   *         The API index to update
+   *         The Elasticsearch index to update
    */
   private void updateEventInIndex(Snapshot snapshot) {
     final MediaPackage mp = snapshot.getMediaPackage();
@@ -502,12 +530,28 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       }
       EventIndexUtils.updateEvent(event, mp);
 
+      // common metadata
       for (Catalog catalog: mp.getCatalogs(MediaPackageElements.EPISODE)) {
         try (InputStream in = workspace.read(catalog.getURI())) {
           EventIndexUtils.updateEvent(event, DublinCores.read(in));
         } catch (IOException | NotFoundException e) {
-          throw new IllegalStateException(String.format("Unable to load dublin core catalog for event '%s'",
+          throw new IllegalStateException(String.format("Unable to load common dublin core catalog for event '%s'",
                   mp.getIdentifier()), e);
+        }
+      }
+
+      // extended metadata
+      event.resetExtendedMetadata();  // getting rid of old data
+      for (EventCatalogUIAdapter extendedCatalogUIAdapter : extendedEventCatalogUIAdapters.getOrDefault(organization,
+              Collections.emptyList())) {
+        for (Catalog catalog: mp.getCatalogs(extendedCatalogUIAdapter.getFlavor())) {
+          try (InputStream in = workspace.read(catalog.getURI())) {
+            EventIndexUtils.updateEventExtendedMetadata(event, DublinCores.read(in),
+                    extendedCatalogUIAdapter.getFlavor());
+          } catch (IOException | NotFoundException e) {
+            throw new IllegalStateException(String.format("Unable to load extended dublin core catalog '%s' for event "
+                            + "'%s'", catalog.getFlavor(), mp.getIdentifier()), e);
+          }
         }
       }
 
@@ -531,12 +575,12 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   /**
-   * Remove the event from the API index
+   * Remove the event from the Elasticsearch index
    *
    * @param eventId
    *         The id of the event to remove
    * @param index
-   *         The API index to update
+   *         The Elasticsearch index to update
    */
   private void removeArchivedVersionFromIndex(String eventId) {
     final String orgId = securityService.getOrganization().getId();
@@ -897,48 +941,65 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   @Override
   public void repopulate() throws IndexRebuildException {
-    final Organization org = securityService.getOrganization();
-    final User user = (org != null ? securityService.getUser() : null);
+    final Organization originalOrg = securityService.getOrganization();
+    final User originalUser = (originalOrg != null ? securityService.getUser() : null);
     try {
       final Organization defaultOrg = new DefaultOrganization();
-      final User systemUser = SecurityUtil.createSystemUser(systemUserName, defaultOrg);
+      final User defaultSystemUser = SecurityUtil.createSystemUser(systemUserName, defaultOrg);
       securityService.setOrganization(defaultOrg);
-      securityService.setUser(systemUser);
+      securityService.setUser(defaultSystemUser);
 
+      int offset = 0;
+      int total = (int) countEvents(null);
       final AQueryBuilder q = createQuery();
-      final RichAResult r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).run());
-      final int total = r.countSnapshots();
+      RichAResult r;
       int current = 0;
       logIndexRebuildBegin(logger, index.getIndexName(), total, "snapshot(s)");
+      do {
+        r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).page(offset, PAGE_SIZE).run());
+        offset += PAGE_SIZE;
+        int n = 16;
+        var updatedEventRange = new ArrayList<Event>();
 
-      final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
-      for (String orgId : byOrg.keySet()) {
-        final Organization snapshotOrg;
-        try {
-          snapshotOrg = orgDir.getOrganization(orgId);
-          securityService.setOrganization(snapshotOrg);
-          securityService.setUser(SecurityUtil.createSystemUser(systemUserName, snapshotOrg));
+        final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
+        for (String orgId : byOrg.keySet()) {
+          final Organization snapshotOrg;
+          try {
+            snapshotOrg = orgDir.getOrganization(orgId);
+            User snapshotSystemUser = SecurityUtil.createSystemUser(systemUserName, snapshotOrg);
+            securityService.setOrganization(snapshotOrg);
+            securityService.setUser(snapshotSystemUser);
+            for (Snapshot snapshot : byOrg.get(orgId)) {
+              try {
+                current++;
 
-          for (Snapshot snapshot : byOrg.get(orgId)) {
-            current += 1;
-            try {
-              updateEventInIndex(snapshot);
-            } catch (Throwable t) {
-              logSkippingElement(logger, "event", snapshot.getMediaPackage().getIdentifier().toString(), org, t);
+                var updatedEventData = index.getEvent(snapshot.getMediaPackage().getIdentifier().toString(), orgId,
+                    snapshotSystemUser);
+                updatedEventData = getEventUpdateFunction(snapshot, orgId, snapshotSystemUser).apply(updatedEventData);
+                updatedEventRange.add(updatedEventData.get());
+
+                if (updatedEventRange.size() >= n || current >= byOrg.get(orgId).size()) {
+                  index.bulkEventUpdate(updatedEventRange);
+                  logIndexRebuildProgress(logger, index.getIndexName(), total, current);
+                  updatedEventRange.clear();
+                }
+              } catch (Throwable t) {
+                logSkippingElement(logger, "event", snapshot.getMediaPackage().getIdentifier().toString(),
+                        snapshotOrg, t);
+              }
             }
-            logIndexRebuildProgress(logger, index.getIndexName(), total, current);
+          } catch (Throwable t) {
+            logIndexRebuildError(logger, index.getIndexName(), t, originalOrg);
+            throw new IndexRebuildException(index.getIndexName(), getService(), originalOrg, t);
+          } finally {
+            securityService.setOrganization(defaultOrg);
+            securityService.setUser(defaultSystemUser);
           }
-        } catch (Throwable t) {
-          logIndexRebuildError(logger, index.getIndexName(), t, org);
-          throw new IndexRebuildException(index.getIndexName(), getService(), org, t);
-        } finally {
-          securityService.setOrganization(defaultOrg);
-          securityService.setUser(systemUser);
         }
-      }
+      } while (offset + r.getSize() < total);
     } finally {
-      securityService.setOrganization(org);
-      securityService.setUser(user);
+      securityService.setOrganization(originalOrg);
+      securityService.setUser(originalUser);
     }
   }
 
@@ -1501,5 +1562,51 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     protected ADeleteQueryDecorator mkDecorator(ADeleteQuery delegate) {
       return new ADeleteQueryWithMessaging(delegate);
     }
+  }
+
+  /**
+   * Get the function to update a commented event in the Elasticsearch index.
+   *
+   * @param eventId
+   *          The id of the current event
+   * @return the function to do the update
+   */
+  private Function<Optional<Event>, Optional<Event>> getEventUpdateFunction(Snapshot snapshot,
+          String orgId, User user) {
+    return (Optional<Event> eventOpt) -> {
+      MediaPackage mp = snapshot.getMediaPackage();
+      String eventId = mp.getIdentifier().toString();
+      Event event = eventOpt.orElse(new Event(eventId, orgId));
+
+      AccessControlList acl = authorizationService.getActiveAcl(mp).getA();
+      List<ManagedAcl> acls = aclServiceFactory.serviceFor(securityService.getOrganization()).getAcls();
+      for (final ManagedAcl managedAcl : AccessInformationUtil.matchAcls(acls, acl)) {
+        event.setManagedAcl(managedAcl.getName());
+      }
+      event.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
+      event.setArchiveVersion(Long.parseLong(snapshot.getVersion().toString()));
+      if (StringUtils.isBlank(event.getCreator())) {
+        event.setCreator(securityService.getUser().getName());
+      }
+      EventIndexUtils.updateEvent(event, mp);
+
+      for (Catalog catalog: mp.getCatalogs(MediaPackageElements.EPISODE)) {
+        try (InputStream in = workspace.read(catalog.getURI())) {
+          EventIndexUtils.updateEvent(event, DublinCores.read(in));
+        } catch (IOException | NotFoundException e) {
+          throw new IllegalStateException(String.format("Unable to load dublin core catalog for event '%s'",
+                  mp.getIdentifier()), e);
+        }
+      }
+
+      // Update series name if not already done
+      try {
+        EventIndexUtils.updateSeriesName(event, orgId, user, index);
+      } catch (SearchIndexException e) {
+        logger.error("Error updating the series name of the event {} in the {} index.", eventId, index.getIndexName(),
+                e);
+      }
+      return Optional.of(event);
+    };
   }
 }

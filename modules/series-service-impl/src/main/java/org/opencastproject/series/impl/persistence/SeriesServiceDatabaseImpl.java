@@ -21,8 +21,11 @@
 
 package org.opencastproject.series.impl.persistence;
 
+import static org.opencastproject.db.Queries.namedQuery;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
+import org.opencastproject.db.DBSession;
+import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
@@ -46,6 +49,7 @@ import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -61,12 +65,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 /**
@@ -90,6 +92,10 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
   /** Factory used to create {@link EntityManager}s for transactions */
   protected EntityManagerFactory emf;
 
+  protected DBSessionFactory dbSessionFactory;
+
+  protected DBSession db;
+
   /** Dublin core service for serializing and deserializing Dublin cores */
   protected DublinCoreCatalogService dcService;
 
@@ -102,6 +108,11 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     this.emf = emf;
   }
 
+  @Reference
+  public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
+    this.dbSessionFactory = dbSessionFactory;
+  }
+
   /**
    * Creates {@link EntityManagerFactory} using persistence provider and properties passed via OSGi.
    *
@@ -110,6 +121,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
   @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for series");
+    db = dbSessionFactory.createSession(emf);
   }
 
   /**
@@ -159,40 +171,33 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    */
   @Override
   public void deleteSeries(String seriesId) throws SeriesServiceDatabaseException, NotFoundException {
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
     try {
-      tx.begin();
-      SeriesEntity entity = getSeriesEntity(seriesId, em);
-      if (entity == null) {
-        throw new NotFoundException("Series with ID " + seriesId + " does not exist");
-      }
-      // Ensure this user is allowed to delete this series
-      String accessControlXml = entity.getAccessControl();
-      if (accessControlXml != null) {
-        AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
-        User currentUser = securityService.getUser();
-        Organization currentOrg = securityService.getOrganization();
-        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
-          throw new UnauthorizedException(currentUser + " is not authorized to update series " + seriesId);
+      db.execTxChecked(em -> {
+        Optional<SeriesEntity> entity = getSeriesEntity(seriesId).apply(em);
+        if (entity.isEmpty()) {
+          throw new NotFoundException("Series with ID " + seriesId + " does not exist");
         }
-      }
+        // Ensure this user is allowed to delete this series
+        String accessControlXml = entity.get().getAccessControl();
+        if (accessControlXml != null) {
+          AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
+          User currentUser = securityService.getUser();
+          Organization currentOrg = securityService.getOrganization();
+          if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
+            throw new UnauthorizedException(currentUser + " is not authorized to update series " + seriesId);
+          }
+        }
 
-      Date now = new Date();
-      entity.setModifiedDate(now);
-      entity.setDeletionDate(now);
-      em.merge(entity);
-      tx.commit();
+        Date now = new Date();
+        entity.get().setModifiedDate(now);
+        entity.get().setDeletionDate(now);
+        em.merge(entity.get());
+      });
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
       logger.error("Could not delete series", e);
-      if (tx.isActive()) {
-        tx.rollback();
-      }
       throw new SeriesServiceDatabaseException(e);
-    } finally {
-      em.close();
     }
   }
 
@@ -204,41 +209,34 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
   @Override
   public void deleteSeriesProperty(String seriesId, String propertyName)
           throws SeriesServiceDatabaseException, NotFoundException {
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
     try {
-      tx.begin();
-      SeriesEntity entity = getSeriesEntity(seriesId, em);
-      if (entity == null) {
-        throw new NotFoundException("Series with ID " + seriesId + " does not exist");
-      }
-      Map<String, String> properties = entity.getProperties();
-      String propertyValue = properties.get(propertyName);
-      if (propertyValue == null) {
-        throw new NotFoundException(
-                "Series with ID " + seriesId + " doesn't have a property with name '" + propertyName + "'");
-      }
+      db.execTxChecked(em -> {
+        Optional<SeriesEntity> entity = getSeriesEntity(seriesId).apply(em);
+        if (entity.isEmpty()) {
+          throw new NotFoundException("Series with ID " + seriesId + " does not exist");
+        }
+        Map<String, String> properties = entity.get().getProperties();
+        String propertyValue = properties.get(propertyName);
+        if (propertyValue == null) {
+          throw new NotFoundException(
+              "Series with ID " + seriesId + " doesn't have a property with name '" + propertyName + "'");
+        }
 
-      if (!userHasWriteAccess(entity)) {
-        throw new UnauthorizedException(securityService.getUser() + " is not authorized to delete series " + seriesId
-                + " property " + propertyName);
-      }
+        if (!userHasWriteAccess(entity.get())) {
+          throw new UnauthorizedException(securityService.getUser() + " is not authorized to delete series " + seriesId
+              + " property " + propertyName);
+        }
 
-      properties.remove(propertyName);
-      entity.setProperties(properties);
-      entity.setModifiedDate(new Date());
-      em.merge(entity);
-      tx.commit();
+        properties.remove(propertyName);
+        entity.get().setProperties(properties);
+        entity.get().setModifiedDate(new Date());
+        em.merge(entity.get());
+      });
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
       logger.error("Could not delete property for series '{}'", seriesId, e);
-      if (tx.isActive()) {
-        tx.rollback();
-      }
       throw new SeriesServiceDatabaseException(e);
-    } finally {
-      em.close();
     }
   }
 
@@ -247,18 +245,13 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    *
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#getAllSeries()
    */
-  @SuppressWarnings("unchecked")
   @Override
   public List<SeriesEntity> getAllSeries() throws SeriesServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
-    Query query = em.createNamedQuery("Series.findAll");
     try {
-      return query.getResultList();
+      return db.exec(namedQuery.findAll("Series.findAll", SeriesEntity.class));
     } catch (Exception e) {
       logger.error("Could not retrieve all series", e);
       throw new SeriesServiceDatabaseException(e);
-    } finally {
-      em.close();
     }
   }
 
@@ -270,24 +263,23 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
   @Override
   public AccessControlList getAccessControlList(String seriesId)
           throws NotFoundException, SeriesServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
     try {
-      SeriesEntity entity = getSeriesEntity(seriesId, em);
-      if (entity == null) {
-        throw new NotFoundException("Could not found series with ID " + seriesId);
-      }
-      if (entity.getAccessControl() == null) {
-        return null;
-      } else {
-        return AccessControlParser.parseAcl(entity.getAccessControl());
-      }
+      return db.execChecked(em -> {
+        Optional<SeriesEntity> entity = getSeriesEntity(seriesId).apply(em);
+        if (entity.isEmpty()) {
+          throw new NotFoundException("Could not found series with ID " + seriesId);
+        }
+        if (entity.get().getAccessControl() == null) {
+          return null;
+        } else {
+          return AccessControlParser.parseAcl(entity.get().getAccessControl());
+        }
+      });
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
       logger.error("Could not retrieve ACL for series '{}'", seriesId, e);
       throw new SeriesServiceDatabaseException(e);
-    } finally {
-      em.close();
     }
   }
 
@@ -303,63 +295,57 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     if (dc == null) {
       throw new SeriesServiceDatabaseException("Invalid value for Dublin core catalog: null");
     }
+
     String seriesId = dc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
     String seriesXML;
     try {
       seriesXML = serializeDublinCore(dc);
     } catch (Exception e1) {
-      logger.error("Could not serialize Dublin Core: {}", e1);
+      logger.error("Could not serialize Dublin Core:", e1);
       throw new SeriesServiceDatabaseException(e1);
     }
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
-    DublinCoreCatalog newSeries = null;
-    try {
-      tx.begin();
-      SeriesEntity entity = getPotentiallyDeletedSeriesEntity(seriesId, em);
-      if (entity == null || entity.isDeleted()) {
-        // If the series existed but is marked deleted, we completely delete it
-        // here to make sure no remains of the old series linger.
-        if (entity != null) {
-          em.remove(entity);
-          em.flush();
-        }
 
-        // no series stored, create new entity
-        entity = new SeriesEntity();
-        entity.setOrganization(securityService.getOrganization().getId());
-        entity.setSeriesId(seriesId);
-        entity.setSeries(seriesXML);
-        entity.setModifiedDate(new Date());
-        em.persist(entity);
-        newSeries = dc;
-      } else {
-        // Ensure this user is allowed to update this series
-        String accessControlXml = entity.getAccessControl();
-        if (accessControlXml != null) {
-          AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
-          User currentUser = securityService.getUser();
-          Organization currentOrg = securityService.getOrganization();
-          if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
-            throw new UnauthorizedException(currentUser + " is not authorized to update series " + seriesId);
+    try {
+      return db.execTxChecked(em -> {
+        DublinCoreCatalog newSeries = null;
+        Optional<SeriesEntity> entity = getPotentiallyDeletedSeriesEntity(seriesId).apply(em);
+        if (entity.isEmpty() || entity.get().isDeleted()) {
+          // If the series existed but is marked deleted, we completely delete it
+          // here to make sure no remains of the old series linger.
+          if (entity.isPresent()) {
+            em.remove(entity.get());
+            em.flush();
           }
+
+          // no series stored, create new entity
+          SeriesEntity newEntity = new SeriesEntity();
+          newEntity.setOrganization(securityService.getOrganization().getId());
+          newEntity.setSeriesId(seriesId);
+          newEntity.setSeries(seriesXML);
+          newEntity.setModifiedDate(new Date());
+          em.persist(newEntity);
+          newSeries = dc;
+        } else {
+          // Ensure this user is allowed to update this series
+          String accessControlXml = entity.get().getAccessControl();
+          if (accessControlXml != null) {
+            AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
+            User currentUser = securityService.getUser();
+            Organization currentOrg = securityService.getOrganization();
+            if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
+              throw new UnauthorizedException(currentUser + " is not authorized to update series " + seriesId);
+            }
+          }
+          entity.get().setSeries(seriesXML);
+          entity.get().setModifiedDate(new Date());
+          em.merge(entity.get());
         }
-        entity.setSeries(seriesXML);
-        entity.setModifiedDate(new Date());
-        em.merge(entity);
-      }
-      tx.commit();
-      return newSeries;
+        return newSeries;
+      });
     } catch (Exception e) {
       logger.error("Could not update series", e);
-      if (tx.isActive()) {
-        tx.rollback();
-      }
       throw new SeriesServiceDatabaseException(e);
-    } finally {
-      em.close();
     }
-
   }
 
   /**
@@ -369,29 +355,23 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    */
   @Override
   public DublinCoreCatalog getSeries(String seriesId) throws NotFoundException, SeriesServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
     try {
-      tx.begin();
-      SeriesEntity entity = getSeriesEntity(seriesId, em);
-      if (entity == null) {
-        throw new NotFoundException("No series with id=" + seriesId + " exists");
-      }
-      // Ensure this user is allowed to read this series
-      if (!userHasReadAccess(entity)) {
-        throw new UnauthorizedException(securityService.getUser() + " is not authorized to see series " + seriesId);
-      }
-      return dcService.load(IOUtils.toInputStream(entity.getDublinCoreXML(), "UTF-8"));
+      return db.execTxChecked(em -> {
+        Optional<SeriesEntity> entity = getSeriesEntity(seriesId).apply(em);
+        if (entity.isEmpty()) {
+          throw new NotFoundException("No series with id=" + seriesId + " exists");
+        }
+        // Ensure this user is allowed to read this series
+        if (entity == null) {
+          throw new NotFoundException("No series with id=" + seriesId + " exists");
+        }
+        return dcService.load(IOUtils.toInputStream(entity.get().getDublinCoreXML(), "UTF-8"));
+      });
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
       logger.error("Could not retrieve series with ID '{}'", seriesId, e);
-      if (tx.isActive()) {
-        tx.rollback();
-      }
       throw new SeriesServiceDatabaseException(e);
-    } finally {
-      em.close();
     }
   }
 
@@ -410,28 +390,30 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     }
 
     // Load series from DB.
-    EntityManager em = emf.createEntityManager();
     try {
-      TypedQuery<SeriesEntity> q;
-      if (to.isPresent()) {
-        if (from.after(to.get())) {
-          throw new IllegalArgumentException("`from` is after `to`");
-        }
+      List<SeriesEntity> result = db.exec(em -> {
+        TypedQuery<SeriesEntity> q;
+        if (to.isPresent()) {
+          if (from.after(to.get())) {
+            throw new IllegalArgumentException("`from` is after `to`");
+          }
 
-        q = em.createNamedQuery("Series.getAllModifiedInRange", SeriesEntity.class)
-            .setParameter("from", from)
-            .setParameter("to", to.get())
-            .setParameter("organization", user.getOrganization().getId())
-            .setMaxResults(limit);
-      } else {
-        q = em.createNamedQuery("Series.getAllModifiedSince", SeriesEntity.class)
-            .setParameter("since", from)
-            .setParameter("organization", user.getOrganization().getId())
-            .setMaxResults(limit);
-      }
+          q = em.createNamedQuery("Series.getAllModifiedInRange", SeriesEntity.class)
+              .setParameter("from", from)
+              .setParameter("to", to.get())
+              .setParameter("organization", user.getOrganization().getId())
+              .setMaxResults(limit);
+        } else {
+          q = em.createNamedQuery("Series.getAllModifiedSince", SeriesEntity.class)
+              .setParameter("since", from)
+              .setParameter("organization", user.getOrganization().getId())
+              .setMaxResults(limit);
+        }
+        return q.getResultList();
+      });
 
       final List<Series> out = new ArrayList<>();
-      for (SeriesEntity entity : q.getResultList()) {
+      for (SeriesEntity entity : result) {
         final Series series = new Series();
         series.setId(entity.getSeriesId());
         series.setOrganization(entity.getOrganization());
@@ -446,8 +428,6 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     } catch (Exception e) {
       String msg = String.format("Could not retrieve series modified between '%s' and '%s'", from, to);
       throw new SeriesServiceDatabaseException(msg, e);
-    } finally {
-      em.close();
     }
   }
 
@@ -459,29 +439,23 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
   @Override
   public Map<String, String> getSeriesProperties(String seriesId)
           throws NotFoundException, SeriesServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
     try {
-      tx.begin();
-      SeriesEntity entity = getSeriesEntity(seriesId, em);
-      if (entity == null) {
-        throw new NotFoundException("No series with id=" + seriesId + " exists");
-      }
-      if (!userHasReadAccess(entity)) {
-        throw new UnauthorizedException(
-                securityService.getUser() + " is not authorized to see series " + seriesId + " properties");
-      }
-      return entity.getProperties();
+      return db.execTxChecked(em -> {
+        Optional<SeriesEntity> entity = getSeriesEntity(seriesId).apply(em);
+        if (entity.isEmpty()) {
+          throw new NotFoundException("No series with id=" + seriesId + " exists");
+        }
+        if (!userHasReadAccess(entity.get())) {
+          throw new UnauthorizedException(
+              securityService.getUser() + " is not authorized to see series " + seriesId + " properties");
+        }
+        return entity.get().getProperties();
+      });
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
       logger.error("Could not retrieve properties of series '{}'", seriesId, e);
-      if (tx.isActive()) {
-        tx.rollback();
-      }
       throw new SeriesServiceDatabaseException(e);
-    } finally {
-      em.close();
     }
   }
 
@@ -493,33 +467,28 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
   @Override
   public String getSeriesProperty(String seriesId, String propertyName)
           throws NotFoundException, SeriesServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
     try {
-      tx.begin();
-      SeriesEntity entity = getSeriesEntity(seriesId, em);
-      if (entity == null) {
-        throw new NotFoundException("No series with id=" + seriesId + " exists");
-      }
-      if (!userHasReadAccess(entity)) {
-        throw new UnauthorizedException(
-                securityService.getUser() + " is not authorized to see series " + seriesId + " properties");
-      }
-      if (entity.getProperties() == null || StringUtils.isBlank(entity.getProperties().get(propertyName))) {
-        throw new NotFoundException(
-                "No series property for series with id=" + seriesId + " and property name " + propertyName);
-      }
-      return entity.getProperties().get(propertyName);
+      return db.execTxChecked(em -> {
+        Optional<SeriesEntity> entity = getSeriesEntity(seriesId).apply(em);
+        if (entity.isEmpty()) {
+          throw new NotFoundException("No series with id=" + seriesId + " exists");
+        }
+        if (!userHasReadAccess(entity.get())) {
+          throw new UnauthorizedException(
+              securityService.getUser() + " is not authorized to see series " + seriesId + " properties");
+        }
+        if (entity.get().getProperties() == null
+            || StringUtils.isBlank(entity.get().getProperties().get(propertyName))) {
+          throw new NotFoundException(
+              "No series property for series with id=" + seriesId + " and property name " + propertyName);
+        }
+        return entity.get().getProperties().get(propertyName);
+      });
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
       logger.error("Could not retrieve property '{}' of series '{}'", propertyName, seriesId, e);
-      if (tx.isActive()) {
-        tx.rollback();
-      }
       throw new SeriesServiceDatabaseException(e);
-    } finally {
-      em.close();
     }
   }
 
@@ -530,9 +499,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
       User currentUser = securityService.getUser();
       Organization currentOrg = securityService.getOrganization();
-      if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
-        return false;
-      }
+      return AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString());
     }
     return true;
   }
@@ -549,11 +516,9 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
         return true;
       }
       // There are several reasons a user may need to load a series: to read content, to edit it, or add content
-      if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.READ.toString())
-              && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.CONTRIBUTE.toString())
-              && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
-        return false;
-      }
+      return AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.READ.toString())
+          || AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.CONTRIBUTE.toString())
+          || AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString());
     }
     return true;
   }
@@ -579,98 +544,77 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       logger.error("Could not serialize access control parameter", e);
       throw new SeriesServiceDatabaseException(e);
     }
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
-    boolean updated = false;
+
     try {
-      tx.begin();
-      SeriesEntity entity = getSeriesEntity(seriesId, em);
-      if (entity == null) {
-        throw new NotFoundException("Series with ID " + seriesId + " does not exist.");
-      }
-      if (entity.getAccessControl() != null) {
-        // Ensure this user is allowed to update this series
-        String accessControlXml = entity.getAccessControl();
-        if (accessControlXml != null) {
-          AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
-          User currentUser = securityService.getUser();
-          Organization currentOrg = securityService.getOrganization();
-          if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
-            throw new UnauthorizedException(currentUser + " is not authorized to update ACLs on series " + seriesId);
-          }
+      return db.execTxChecked(em -> {
+        boolean updated = false;
+
+        Optional<SeriesEntity> entity = getSeriesEntity(seriesId).apply(em);
+        if (entity.isEmpty()) {
+          throw new NotFoundException("Series with ID " + seriesId + " does not exist.");
         }
-        updated = true;
-      }
-      entity.setAccessControl(serializedAC);
-      entity.setModifiedDate(new Date());
-      em.merge(entity);
-      tx.commit();
-      return updated;
+        if (entity.get().getAccessControl() != null) {
+          // Ensure this user is allowed to update this series
+          String accessControlXml = entity.get().getAccessControl();
+          if (accessControlXml != null) {
+            AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
+            User currentUser = securityService.getUser();
+            Organization currentOrg = securityService.getOrganization();
+            if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
+              throw new UnauthorizedException(currentUser + " is not authorized to update ACLs on series " + seriesId);
+            }
+          }
+          updated = true;
+        }
+        entity.get().setAccessControl(serializedAC);
+        entity.get().setModifiedDate(new Date());
+        em.merge(entity.get());
+        return updated;
+      });
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
       logger.error("Could not store ACL for series '{}'", seriesId, e);
-      if (tx.isActive()) {
-        tx.rollback();
-      }
       throw new SeriesServiceDatabaseException(e);
-    } finally {
-      em.close();
     }
   }
 
   @Override
   public int countSeries() throws SeriesServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
-    Query query = em.createNamedQuery("Series.getCount");
     try {
-      Long total = (Long) query.getSingleResult();
-      return total.intValue();
+      return db.exec(namedQuery.find("Series.getCount", Long.class)).intValue();
     } catch (Exception e) {
       logger.error("Could not find number of series.", e);
       throw new SeriesServiceDatabaseException(e);
-    } finally {
-      em.close();
     }
   }
 
   @Override
   public void updateSeriesProperty(String seriesId, String propertyName, String propertyValue)
           throws NotFoundException, SeriesServiceDatabaseException {
-    EntityManager em = null;
-    EntityTransaction tx = null;
     try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
-      SeriesEntity entity = getSeriesEntity(seriesId, em);
-      if (entity == null) {
-        throw new NotFoundException("Series with ID " + seriesId + " doesn't exist");
-      }
+      db.execTxChecked(em -> {
+        Optional<SeriesEntity> entity = getSeriesEntity(seriesId).apply(em);
+        if (entity.isEmpty()) {
+          throw new NotFoundException("Series with ID " + seriesId + " doesn't exist");
+        }
 
-      if (!userHasWriteAccess(entity)) {
-        throw new UnauthorizedException(securityService.getUser() + " is not authorized to update series " + seriesId
-                + " property " + propertyName + " to " + propertyValue);
-      }
+        if (!userHasWriteAccess(entity.get())) {
+          throw new UnauthorizedException(securityService.getUser() + " is not authorized to update series " + seriesId
+              + " property " + propertyName + " to " + propertyValue);
+        }
 
-      Map<String, String> properties = entity.getProperties();
-      properties.put(propertyName, propertyValue);
-      entity.setProperties(properties);
-      entity.setModifiedDate(new Date());
-      em.merge(entity);
-      tx.commit();
+        Map<String, String> properties = entity.get().getProperties();
+        properties.put(propertyName, propertyValue);
+        entity.get().setProperties(properties);
+        entity.get().setModifiedDate(new Date());
+        em.merge(entity.get());
+      });
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      if (tx.isActive()) {
-        tx.rollback();
-      }
       logger.error("Couldn't update series {} with property: {}:{} because", seriesId, propertyName, propertyValue, e);
       throw new SeriesServiceDatabaseException(e);
-    } finally {
-      if (em != null) {
-        em.close();
-      }
     }
   }
 
@@ -679,13 +623,10 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    *
    * @param id
    *          the series identifier
-   * @param em
-   *          an open entity manager
    * @return the series entity, or null if not found or if the series is deleted.
    */
-  protected SeriesEntity getSeriesEntity(String id, EntityManager em) {
-    SeriesEntity entity = getPotentiallyDeletedSeriesEntity(id, em);
-    return entity == null || entity.isDeleted() ? null : entity;
+  protected Function<EntityManager, Optional<SeriesEntity>> getSeriesEntity(String id) {
+    return em -> getPotentiallyDeletedSeriesEntity(id).apply(em).filter(e -> !e.isDeleted());
   }
 
   /**
@@ -693,139 +634,98 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    *
    * @param id
    *          the series identifier
-   * @param em
-   *          an open entity manager
    * @return the series entity, or null if not found
    */
-  protected SeriesEntity getPotentiallyDeletedSeriesEntity(String id, EntityManager em) {
+  protected Function<EntityManager, Optional<SeriesEntity>> getPotentiallyDeletedSeriesEntity(String id) {
     String orgId = securityService.getOrganization().getId();
-    Query q = em.createNamedQuery("seriesById").setParameter("seriesId", id).setParameter("organization", orgId);
-    try {
-      return (SeriesEntity) q.getSingleResult();
-    } catch (NoResultException e) {
-      return null;
-    }
+    return namedQuery.findOpt(
+        "seriesById",
+        SeriesEntity.class,
+        Pair.of("seriesId", id),
+        Pair.of("organization", orgId)
+    );
   }
 
   @Override
   public boolean storeSeriesElement(String seriesId, String type, byte[] data) throws SeriesServiceDatabaseException {
-    EntityManager em = null;
-    EntityTransaction tx = null;
-    final boolean success;
     try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
-      SeriesEntity series = getSeriesEntity(seriesId, em);
-      if (series == null) {
-        success = false;
-      } else {
-        series.addElement(type, data);
-        series.setModifiedDate(new Date());
-        em.merge(series);
-        tx.commit();
-        success = true;
-      }
+      return db.execTx(em -> {
+        Optional<SeriesEntity> series = getSeriesEntity(seriesId).apply(em);
+        if (series.isEmpty()) {
+          return false;
+        }
+        series.get().addElement(type, data);
+        series.get().setModifiedDate(new Date());
+        em.merge(series.get());
+        return true;
+      });
     } catch (Exception e) {
-      if (tx.isActive()) {
-        tx.rollback();
-      }
       throw new SeriesServiceDatabaseException(e);
-    } finally {
-      if (em != null) {
-        em.close();
-      }
     }
-    return success;
   }
 
   @Override
   public boolean deleteSeriesElement(String seriesId, String type) throws SeriesServiceDatabaseException {
-    final boolean success;
-    EntityManager em = null;
-    EntityTransaction tx = null;
     try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
-      SeriesEntity series = getSeriesEntity(seriesId, em);
-      if (series == null) {
-        success = false;
-      } else {
-        if (series.getElements().containsKey(type)) {
-          series.removeElement(type);
-          series.setModifiedDate(new Date());
-          em.merge(series);
-          tx.commit();
-          success = true;
-        } else {
-          success = false;
+      return db.execTx(em -> {
+        Optional<SeriesEntity> series = getSeriesEntity(seriesId).apply(em);
+        if (series.isEmpty()) {
+          return false;
         }
-      }
+
+        if (!series.get().getElements().containsKey(type)) {
+          return false;
+        }
+
+        series.get().removeElement(type);
+        series.get().setModifiedDate(new Date());
+        em.merge(series.get());
+        return true;
+      });
     } catch (Exception e) {
-      if (tx.isActive()) {
-        tx.rollback();
-      }
       throw new SeriesServiceDatabaseException(e);
-    } finally {
-      if (em != null) {
-        em.close();
-      }
     }
-    return success;
   }
 
   @Override
   public Opt<byte[]> getSeriesElement(String seriesId, String type) throws SeriesServiceDatabaseException {
-    final Opt<byte[]> data;
-    EntityManager em = null;
     try {
-      em = emf.createEntityManager();
-      SeriesEntity series = getSeriesEntity(seriesId, em);
-      if (series == null) {
-        data = Opt.none();
-      } else {
-        Map<String, byte[]> elements = series.getElements();
-        if (elements.containsKey(type)) {
-          data = Opt.some(elements.get(type));
-        } else {
-          data = Opt.none();
+      return db.exec(em -> {
+        Optional<SeriesEntity> series = getSeriesEntity(seriesId).apply(em);
+        if (series.isEmpty()) {
+          return Opt.none();
         }
-      }
+
+        Map<String, byte[]> elements = series.get().getElements();
+        if (!elements.containsKey(type)) {
+          return Opt.none();
+        }
+
+        return Opt.some(elements.get(type));
+      });
+
     } catch (Exception e) {
       throw new SeriesServiceDatabaseException(e);
-    } finally {
-      if (em != null) {
-        em.close();
-      }
     }
-    return data;
   }
 
   @Override
   public Opt<Map<String, byte[]>> getSeriesElements(String seriesId) throws SeriesServiceDatabaseException {
-    final Opt<Map<String, byte[]>> elements;
-    EntityManager em = null;
     try {
-      em = emf.createEntityManager();
-      SeriesEntity series = getSeriesEntity(seriesId, em);
-      if (series == null) {
-        elements = Opt.none();
-      } else {
-        elements = Opt.some(series.getElements());
-      }
+      return db.exec(em -> {
+        Optional<SeriesEntity> series = getSeriesEntity(seriesId).apply(em);
+        if (series.isEmpty()) {
+          return Opt.none();
+        }
+        return Opt.some(series.get().getElements());
+      });
     } catch (Exception e) {
       throw new SeriesServiceDatabaseException(e);
-    } finally {
-      if (em != null) {
-        em.close();
-      }
     }
-    return elements;
   }
 
   @Override
   public boolean existsSeriesElement(String seriesId, String type) throws SeriesServiceDatabaseException {
-    return (getSeriesElement(seriesId, type).isSome()) ? true : false;
+    return getSeriesElement(seriesId, type).isSome();
   }
 }

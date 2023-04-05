@@ -57,6 +57,21 @@ public interface SearchService {
           ServiceRegistryException;
 
   /**
+   * Immediately adds the mediapackage to the search index.
+   *
+   * @param mediaPackage
+   *          the media package
+   * @throws SearchException
+   *           if the media package cannot be added to the search index
+   * @throws IllegalArgumentException
+   *           if the mediapackage is <code>null</code>
+   * @throws UnauthorizedException
+   *           if the user does not have the rights to add the mediapackage
+   */
+  void addSynchronously(MediaPackage mediaPackage)
+          throws SearchException, IllegalArgumentException, UnauthorizedException;
+
+  /**
    * Removes the media package identified by <code>mediaPackageId</code> from the search index.
    *
    * @param mediaPackageId

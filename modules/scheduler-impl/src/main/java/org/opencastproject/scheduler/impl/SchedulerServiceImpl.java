@@ -351,10 +351,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * OSgi callback to set the API index.
+   * OSgi callback to set the Elasticsearch index.
    *
    * @param index
-   *          the API index.
+   *          the Elasticsearch index.
    */
   @Reference
   public void setIndex(ElasticsearchIndex index) {
@@ -479,7 +479,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       updateLiveEvent(mediaPackageId, Opt.some(acl), dublinCore, Opt.some(startDateTime),
               Opt.some(endDateTime), Opt.some(captureAgentId), Opt.some(finalCaProperties));
 
-      // Update API index
+      // Update Elasticsearch index
       updateEventInIndex(mediaPackageId, Opt.some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
           Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties), Opt.none());
 
@@ -625,7 +625,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         updateLiveEvent(mediaPackageId, some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
                 Opt.some(captureAgentId), Opt.some(finalCaProperties));
 
-        // Update API index
+        // Update Elasticsearch index
         updateEventInIndex(mediaPackageId, some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
                 Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties), Opt.none());
 
@@ -827,7 +827,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       updateLiveEvent(mpId, changedAclOpt, changedDublinCoreOpt, startDateTime, endDateTime, Opt.some(agentId),
               finalCaProperties);
 
-      // Update API index
+      // Update Elasticsearch index
       updateEventInIndex(mpId, changedAclOpt, changedDublinCoreOpt, startDateTime, endDateTime, userIds,
               Opt.some(agentId), finalCaProperties, Opt.none());
 
@@ -907,7 +907,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       // Update live event
       sendSchedulerUpdate(new SchedulerItemList(mediaPackageId, SchedulerItem.delete()));
 
-      // Update API index
+      // Update Elasticsearch index
       removeSchedulingInfoFromIndex(mediaPackageId);
     } catch (Exception e) {
       logger.error("Could not remove event '{}' from persistent storage: {}", mediaPackageId, e);
@@ -1027,7 +1027,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   public List<MediaPackage> search(Opt<String> captureAgentId, Opt<Date> startsFrom, Opt<Date> startsTo,
           Opt<Date> endFrom, Opt<Date> endTo) throws SchedulerException {
     try {
-      return persistence.search(captureAgentId, startsFrom, startsTo, endFrom, endTo, Opt.none()).parallelStream()
+      return persistence.search(captureAgentId, startsFrom, startsTo, endFrom, endTo, Opt.none()).stream()
           .map(ExtendedEventDto::getMediaPackageId)
           .map(this::getEventMediaPackage).collect(Collectors.toList());
     } catch (Exception e) {
@@ -1302,7 +1302,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         sendSchedulerUpdate(new SchedulerItemList(r.getID(), Collections.singletonList(SchedulerItem
                 .updateRecordingStatus(r.getState(), r.getLastCheckinTime()))));
 
-        // Update API index
+        // Update Elasticsearch index
         updateEventInIndex(r.getID(), Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none(),
                 Opt.none(), Opt.none(), Opt.some(r.getState()));
       } else {
@@ -1362,7 +1362,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       // Update live event
       sendSchedulerUpdate(new SchedulerItemList(id, SchedulerItem.deleteRecordingState()));
 
-      // Update API index
+      // Update Elasticsearch index
       removeRecordingStatusFromIndex(id);
     } catch (NotFoundException e) {
       throw e;
@@ -1413,7 +1413,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * Update the event in the API index. Fields will only be updated of the corresponding Opt is not none.
+   * Update the event in the Elasticsearch index. Fields will only be updated of the corresponding Opt is not none.
    *
    * @param mediaPackageId
    * @param index
@@ -1485,7 +1485,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * Set recording status to null for this event in the API index.
+   * Set recording status to null for this event in the Elasticsearch index.
    *
    * @param mediaPackageId
    * @param index
@@ -1510,7 +1510,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * Remove scheduling information for this event from the API index.
+   * Remove scheduling information for this event from the Elasticsearch index.
    *
    * @param mediaPackageId
    * @param index
@@ -1712,51 +1712,54 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   @Override
   public void repopulate() throws IndexRebuildException {
-    final int[] current = {0};
-    final int total;
     try {
-       total = persistence.countEvents();
-    } catch (SchedulerServiceDatabaseException e) {
+      final int total;
+      try {
+        total = persistence.countEvents();
+      } catch (SchedulerServiceDatabaseException e) {
+        logIndexRebuildError(logger, index.getIndexName(), e);
+        throw new IndexRebuildException(index.getIndexName(), getService(), e);
+      }
+      logIndexRebuildBegin(logger, index.getIndexName(), total, "scheduled events");
+      final int[] current = {0};
+      int n = 16;
+      var updatedEventRange = new ArrayList<Event>();
+
+      for (Organization organization: orgDirectoryService.getOrganizations()) {
+        final User user = SecurityUtil.createSystemUser(systemUserName, organization);
+        SecurityUtil.runAs(securityService, organization, user,
+                () -> {
+                  final List<ExtendedEventDto> events;
+                  try {
+                    events = persistence.getEvents();
+                  } catch (SchedulerServiceDatabaseException e) {
+                    logIndexRebuildError(logger, index.getIndexName(), e, organization);
+                    return;
+                  }
+
+                  for (ExtendedEventDto event : events) {
+                    try {
+                      current[0]++;
+
+                      var updatedEventData = Optional.of(new Event(event.getMediaPackageId(), organization.getId()));
+                      updatedEventData = getEventUpdateFunction(event, organization.getId(),
+                                  securityService.getUser()).apply(updatedEventData);
+                      updatedEventRange.add(updatedEventData.get());
+
+                      if (updatedEventRange.size() >= n || current[0] >= events.size()) {
+                        index.bulkEventUpdate(updatedEventRange);
+                        logIndexRebuildProgress(logger, index.getIndexName(), total, current[0]);
+                        updatedEventRange.clear();
+                      }
+                    } catch (SearchIndexException e) {
+                      logger.error("Error while updating event '{}' from search index:", event.getMediaPackageId(), e);
+                    }
+                  }
+               });
+      }
+    } catch (Exception e) {
       logIndexRebuildError(logger, index.getIndexName(), e);
       throw new IndexRebuildException(index.getIndexName(), getService(), e);
-    }
-    logIndexRebuildBegin(logger, index.getIndexName(), total, "scheduled events");
-
-    for (Organization organization: orgDirectoryService.getOrganizations()) {
-      final User user = SecurityUtil.createSystemUser(systemUserName, organization);
-      SecurityUtil.runAs(securityService, organization, user, () -> {
-        final List<ExtendedEventDto> events;
-        try {
-          events = persistence.getEvents();
-        } catch (SchedulerServiceDatabaseException e) {
-          logIndexRebuildError(logger, index.getIndexName(), e, organization);
-          return;
-        }
-
-        for (ExtendedEventDto event : events) {
-          String mpId = event.getMediaPackageId();
-          current[0] = current[0] + 1;
-          try {
-            final Set<String> presenters = getPresenters(Opt.nul(event.getPresenters()).getOr(""));
-            final Map<String, String> caMetadata = deserializeExtendedEventProperties(event.getCaptureAgentProperties());
-
-            AQueryBuilder query = assetManager.createQuery();
-            final AResult result = query.select(query.snapshot())
-                    .where(query.mediaPackageId(mpId).and(query.version().isLatest())).run();
-            final Snapshot snapshot = result.getRecords().head().get().getSnapshot().get();
-            final Opt<AccessControlList> acl = Opt.some(authorizationService.getActiveAcl(snapshot.getMediaPackage()).getA());
-
-            final Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(snapshot);
-
-            updateEventInIndex(mpId, acl, dublinCore, Opt.some(event.getStartDate()),
-                    Opt.some(event.getEndDate()), Opt.some(presenters), Opt.some(event.getCaptureAgentId()),
-                    Opt.some(caMetadata), Opt.nul(event.getRecordingState()));
-            logIndexRebuildProgress(logger, index.getIndexName(), total, current[0]);
-          } catch (Exception e) {
-            logSkippingElement(logger, "scheduled event", mpId, e);
-          }
-        }
-      });
     }
   }
 
@@ -1767,5 +1770,77 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   public SecurityService getSecurityService() {
     return securityService;
+  }
+  /**
+   * Get the function to update a scheduled event in the Elasticsearch index.
+   *
+   * @param scheduledEvent
+   *          The theme to update
+   * @param orgId
+   *          The id of the current organization
+   * @param user
+   *          The user
+   * @return the function to do the update
+   */
+  private Function<Optional<Event>, Optional<Event>> getEventUpdateFunction(ExtendedEventDto scheduledEvent,
+          String orgId, User user) {
+    return (Optional<Event> eventOpt) -> {
+      Event event = eventOpt.orElse(new Event(scheduledEvent.getMediaPackageId(), orgId));
+      final Set<String> presenters = getPresenters(Opt.nul(scheduledEvent.getPresenters()).getOr(""));
+      final Map<String, String> caMetadata = deserializeExtendedEventProperties(scheduledEvent.
+              getCaptureAgentProperties());
+      AQueryBuilder query = assetManager.createQuery();
+      final AResult result = query.select(query.snapshot())
+              .where(query.mediaPackageId(scheduledEvent.getMediaPackageId()).and(query.version().isLatest())).run();
+      final Snapshot snapshot = result.getRecords().head().get().getSnapshot().get();
+
+      Opt<AccessControlList> acl = Opt.some(authorizationService.getActiveAcl(snapshot.getMediaPackage()).getA());
+      Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(snapshot);
+      Opt<Date> startTime = Opt.some(scheduledEvent.getStartDate());
+      Opt<Date> endTime = Opt.some(scheduledEvent.getEndDate());
+      Opt<Set<String>> presentersOpt = Opt.some(presenters);
+      Opt<String> agentId = Opt.some(scheduledEvent.getCaptureAgentId());
+      Opt<Map<String, String>> properties = Opt.some(caMetadata);
+      Opt<String> recordingStatus = Opt.nul(scheduledEvent.getRecordingState());
+
+      if (acl.isSome()) {
+        event.setAccessPolicy(AccessControlParser.toJsonSilent(acl.get()));
+      }
+      if (dublinCore.isSome()) {
+        EventIndexUtils.updateEvent(event, dublinCore.get());
+        if (isBlank(event.getCreator()))
+          event.setCreator(getSecurityService().getUser().getName());
+
+        // Update series name if not already done
+        try {
+          EventIndexUtils.updateSeriesName(event, orgId, user, index);
+        } catch (SearchIndexException e) {
+          logger.error("Error updating the series name of the event {} in the {} index.",
+                  scheduledEvent.getMediaPackageId(), index.getIndexName(), e);
+        }
+      }
+      if (presentersOpt.isSome()) {
+        event.setTechnicalPresenters(new ArrayList<>(presentersOpt.get()));
+      }
+      if (agentId.isSome()) {
+        event.setAgentId(agentId.get());
+      }
+      if (recordingStatus.isSome() && !recordingStatus.get().equals(RecordingState.UNKNOWN)) {
+        event.setRecordingStatus(recordingStatus.get());
+      }
+      if (properties.isSome()) {
+        event.setAgentConfiguration(properties.get());
+      }
+      if (startTime.isSome()) {
+        String startTimeStr = startTime == null ? null : DateTimeSupport.toUTC(startTime.get().getTime());
+        event.setTechnicalStartTime(startTimeStr);
+      }
+      if (endTime.isSome()) {
+        String endTimeStr = endTime == null ? null : DateTimeSupport.toUTC(endTime.get().getTime());
+        event.setTechnicalEndTime(endTimeStr);
+      }
+
+      return Optional.of(event);
+    };
   }
 }

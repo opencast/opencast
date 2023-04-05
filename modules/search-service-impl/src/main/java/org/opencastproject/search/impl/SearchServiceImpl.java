@@ -397,8 +397,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    *           if the user does not have the rights to add the mediapackage
    */
   public void addSynchronously(MediaPackage mediaPackage)
-          throws SearchException, IllegalArgumentException, UnauthorizedException, NotFoundException,
-          SearchServiceDatabaseException {
+          throws SearchException, IllegalArgumentException, UnauthorizedException {
     if (mediaPackage == null) {
       throw new IllegalArgumentException("Unable to add a null mediapackage");
     }
@@ -406,9 +405,14 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     logger.debug("Attempting to add media package {} to search index", mediaPackageId);
     AccessControlList acl = authorizationService.getActiveAcl(mediaPackage).getA();
 
-    AccessControlList seriesAcl = persistence.getAccessControlLists(mediaPackage.getSeries(), mediaPackageId).stream()
-        .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
-    logger.debug("Updating series with merged access control list: {}", seriesAcl);
+    AccessControlList seriesAcl;
+    try {
+      seriesAcl = persistence.getAccessControlLists(mediaPackage.getSeries(), mediaPackageId).stream()
+              .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
+      logger.debug("Updating series with merged access control list: {}", seriesAcl);
+    } catch (SearchServiceDatabaseException e) {
+      throw new SearchException(e);
+    }
 
     Date now = new Date();
 

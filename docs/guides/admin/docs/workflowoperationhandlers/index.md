@@ -30,6 +30,7 @@ The following table contains the workflow operations that are available in an ou
 | animate                              | Create animated video sequence                                                            | [Documentation](animate-woh.md)                              |
 | amberscript-start-transcription      | Start AmberScript Transcription                                                           | [Documentation](amberscript-start-transcription-woh.md)      |
 | amberscript-attach-transcription     | Attach AmberScript Transcription                                                          | [Documentation](amberscript-attach-transcription-woh.md)     |
+| assert                               | Verify preconditions with assertion                                                       | [Documentation](assert-woh.md)                               |
 | asset-delete                         | Deletes the current mediapackage from the Archive                                         | [Documentation](asset-delete-woh.md)                         |
 | attach-watson-transcription          | Attaches automated transcripts to mediapackage                                            | [Documentation](attach-watson-transcription-woh.md)          |
 | cleanup                              | Cleanup the working file repository                                                       | [Documentation](cleanup-woh.md)                              |
@@ -53,7 +54,6 @@ The following table contains the workflow operations that are available in an ou
 | execute-once                         | Execute a command for a MediaPackage                                                      | [Documentation](execute-once-woh.md)                         |
 | export-wf-properties                 | Export workflow properties                                                                | [Documentation](export-wf-properties-woh.md)                 |
 | extract-text                         | Extracting text from presentation segments                                                | [Documentation](extracttext-woh.md)                          |
-| failing                              | Operations that always fails                                                              | [Documentation](failing-woh.md)                              |
 | google-speech-attach-transcription   | Attaches automated transcripts to mediapackage                                            | [Documentation](google-speech-attach-transcription-woh.md)   |
 | google-speech-start-transcription    | Starts automated transcription provided by Google Speech                                  | [Documentation](google-speech-start-transcription-woh.md)    |
 | http-notify                          | Notifies an HTTP endpoint about the process of the workflow                               | [Documentation](httpnotify-woh.md)                           |
@@ -117,6 +117,7 @@ The following table contains the workflow operations that are available in an ou
 | transfer-metadata                    | Transfer metadata fields between catalogs                                                 | [Documentation](transfer-metadata-woh.md)                    |
 | video-grid                           | Put parallel video streams on a single video canvas                                       | [Documentation](video-grid-woh.md)                           |
 | waveform                             | Create a waveform image of the audio of the mediapackage                                  | [Documentation](waveform-woh.md)                             |
+| webvtt-to-cutmarks                   | Create cutting suggestions from subtitles                                                 | [Documentation](webvtt-to-cutmarks.md)                       |
 | zip                                  | Create zipped archive of the current state of the mediapackage                            | [Documentation](zip-woh.md)                                  |
 
 ## State Mappings

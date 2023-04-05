@@ -32,6 +32,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
+import static org.opencastproject.db.DBTestEnv.newDBSession;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_AVAILABLE;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_CONTRIBUTOR;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_CREATED;
@@ -76,6 +79,7 @@ import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.authorization.xacml.XACMLUtils;
+import org.opencastproject.db.DBSession;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
@@ -92,6 +96,7 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.message.broker.api.update.SchedulerUpdateHandler;
+import org.opencastproject.metadata.dublincore.CatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCores;
@@ -130,9 +135,6 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Misc;
-import org.opencastproject.util.persistencefn.PersistenceEnv;
-import org.opencastproject.util.persistencefn.PersistenceEnvs;
-import org.opencastproject.util.persistencefn.PersistenceUtil;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
@@ -153,6 +155,7 @@ import net.fortuna.ical4j.model.property.RRule;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.After;
@@ -250,11 +253,16 @@ public class SchedulerServiceImplTest {
     EasyMock.expect(episodeAdapter.getFlavor()).andReturn(new MediaPackageElementFlavor("dublincore", "episode"))
             .anyTimes();
     EasyMock.expect(episodeAdapter.getOrganization()).andReturn(new DefaultOrganization().getId()).anyTimes();
+    final Capture<String> stringCapture = EasyMock.newCapture();
+    EasyMock.expect(episodeAdapter.handlesOrganization(EasyMock.capture(stringCapture)))
+        .andAnswer(() -> DefaultOrganization.DEFAULT_ORGANIZATION_ID.equals(stringCapture.getValue())).anyTimes();
 
     EventCatalogUIAdapter extendedAdapter = EasyMock.createMock(EventCatalogUIAdapter.class);
     EasyMock.expect(extendedAdapter.getFlavor()).andReturn(new MediaPackageElementFlavor("extended", "episode"))
             .anyTimes();
     EasyMock.expect(extendedAdapter.getOrganization()).andReturn(new DefaultOrganization().getId()).anyTimes();
+    EasyMock.expect(extendedAdapter.handlesOrganization(EasyMock.capture(stringCapture)))
+        .andAnswer(() -> DefaultOrganization.DEFAULT_ORGANIZATION_ID.equals(stringCapture.getValue())).anyTimes();
 
     BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
     EasyMock.expect(bundleContext.getProperty(EasyMock.anyString())).andReturn("adminuser").anyTimes();
@@ -307,7 +315,9 @@ public class SchedulerServiceImplTest {
 
 
     schedulerDatabase = new SchedulerServiceDatabaseImpl();
-    schedulerDatabase.setEntityManagerFactory(mkEntityManagerFactory(SchedulerServiceDatabaseImpl.PERSISTENCE_UNIT));
+    EntityManagerFactory emf = newEntityManagerFactory(SchedulerServiceDatabaseImpl.PERSISTENCE_UNIT);
+    schedulerDatabase.setEntityManagerFactory(emf);
+    schedulerDatabase.setDBSessionFactory(getDbSessionFactory());
     schedulerDatabase.setSecurityService(securityService);
     schedulerDatabase.activate(null);
     schedSvc.setPersistence(schedulerDatabase);
@@ -1456,7 +1466,8 @@ public class SchedulerServiceImplTest {
 
     EventCatalogUIAdapter episodeAdapter = EasyMock.createMock(EventCatalogUIAdapter.class);
     EasyMock.expect(episodeAdapter.getFlavor()).andReturn(MediaPackageElements.EPISODE).anyTimes();
-    EasyMock.expect(episodeAdapter.getOrganization()).andAnswer(() -> { return currentOrg.getId(); }).anyTimes();
+    EasyMock.expect(episodeAdapter.getOrganization()).andReturn(CatalogUIAdapter.ORGANIZATION_WILDCARD).anyTimes();
+    EasyMock.expect(episodeAdapter.handlesOrganization(EasyMock.anyString())).andReturn(true).anyTimes();
     EasyMock.replay(episodeAdapter);
     schedSvc.addCatalogUIAdapter(episodeAdapter);
 
@@ -1657,9 +1668,8 @@ public class SchedulerServiceImplTest {
   }
 
   AssetManager mkAssetManager() throws Exception {
-    final EntityManagerFactory emf = mkEntityManagerFactory("org.opencastproject.assetmanager.impl");
-    final PersistenceEnv penv = PersistenceEnvs.mk(emf);
-    final Database db = new Database(emf, penv);
+    final DBSession dbSession = newDBSession("org.opencastproject.assetmanager.impl");
+    final Database db = new Database(dbSession);
     HttpAssetProvider httpAssetProvider = new HttpAssetProvider() {
       @Override
       public Snapshot prepareForDelivery(Snapshot snapshot) {
@@ -1795,27 +1805,6 @@ public class SchedulerServiceImplTest {
         return "test_store";
       }
     };
-  }
-
-  static EntityManagerFactory mkEntityManagerFactory(String persistenceUnit) {
-    if ("mysql".equals(System.getProperty("useDatabase"))) {
-      return mkMySqlEntityManagerFactory(persistenceUnit);
-    } else {
-      return mkH2EntityManagerFactory(persistenceUnit);
-    }
-  }
-
-  static EntityManagerFactory mkH2EntityManagerFactory(String persistenceUnit) {
-    return PersistenceUtil.mkTestEntityManagerFactory(persistenceUnit, true);
-  }
-
-  static EntityManagerFactory mkMySqlEntityManagerFactory(String persistenceUnit) {
-    return PersistenceUtil.mkEntityManagerFactory(persistenceUnit, "MySQL", "com.mysql.jdbc.Driver",
-            "jdbc:mysql://localhost/test_scheduler", "matterhorn", "matterhorn",
-            org.opencastproject.util.data.Collections.map(tuple("eclipselink.ddl-generation", "drop-and-create-tables"),
-                    tuple("eclipselink.ddl-generation.output-mode", "database"),
-                    tuple("eclipselink.logging.level.sql", "FINE"), tuple("eclipselink.logging.parameters", "true")),
-            PersistenceUtil.mkTestPersistenceProvider());
   }
 
   /**

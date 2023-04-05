@@ -43,11 +43,12 @@ public class EmailData extends DocData {
   private final Map<String, String> workflowConfig;
   private final MediaPackage mediaPackage;
   // The hash map below looks like this:
-  // "episode" --> { "creator": "John Harvard", "type": "L05", "isPartOf": "20140224038"... }
-  // "series" --> { "creator": "Harvard", "identifier": "20140224038"... }
+  // "dublincore/episode" --> { "creator": "John Harvard", "type": "L05", "isPartOf": "20140224038"... }
+  // "dublincore/series" --> { "creator": "Harvard", "identifier": "20140224038"... }
   private final HashMap<String, HashMap<String, String>> catalogs;
   private final WorkflowOperationInstance failed;
   private final List<Incident> incidents;
+  private final Map<String, String> orgProperties;
 
   /**
    * Create the base data object for populating email fields.
@@ -62,9 +63,11 @@ public class EmailData extends DocData {
    *          workflow operation that caused the workflow to fail
    * @param incidents
    *          incidents
+   * @param orgProperties
+   *          organization properties
    */
   public EmailData(String name, WorkflowInstance workflow, HashMap<String, HashMap<String, String>> catalogs,
-          WorkflowOperationInstance failed, List<Incident> incidents) {
+          WorkflowOperationInstance failed, List<Incident> incidents, Map<String, String> orgProperties) {
     super(name, null, null);
 
     this.workflow = workflow;
@@ -76,6 +79,7 @@ public class EmailData extends DocData {
     this.catalogs = catalogs;
     this.failed = failed;
     this.incidents = incidents;
+    this.orgProperties = orgProperties;
   }
 
   /**
@@ -100,6 +104,7 @@ public class EmailData extends DocData {
     m.put("catalogs", catalogs);
     m.put("failedOperation", failed); // Will be null if no errors
     m.put("incident", incidents); // Will be null if no incidents
+    m.put("organization", orgProperties);
     return m;
   }
 

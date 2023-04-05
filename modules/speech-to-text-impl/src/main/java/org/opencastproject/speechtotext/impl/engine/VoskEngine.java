@@ -41,13 +41,9 @@ import java.util.List;
 
 /** Vosk implementation of the Speech-to-text engine interface. */
 @Component(
-    immediate = true,
-    service = {
-        SpeechToTextEngine.class
-    },
     property = {
         "service.description=Vosk implementation of the SpeechToTextEngine interface",
-        "service.pid=org.opencastproject.speechtotext.impl.engine.VoskEngine"
+        "enginetype=vosk"
     }
 )
 public class VoskEngine implements SpeechToTextEngine {

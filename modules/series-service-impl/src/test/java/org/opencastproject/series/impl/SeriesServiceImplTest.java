@@ -25,8 +25,9 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.message.broker.api.update.SeriesUpdateHandler;
@@ -103,11 +104,12 @@ public class SeriesServiceImplTest {
     EasyMock.replay(securityService);
 
     seriesDatabase = new SeriesServiceDatabaseImpl();
-    seriesDatabase.setEntityManagerFactory(newTestEntityManagerFactory(SeriesServiceDatabaseImpl.PERSISTENCE_UNIT));
+    seriesDatabase.setEntityManagerFactory(newEntityManagerFactory(SeriesServiceDatabaseImpl.PERSISTENCE_UNIT));
+    seriesDatabase.setDBSessionFactory(getDbSessionFactory());
     dcService = new DublinCoreCatalogService();
     seriesDatabase.setDublinCoreService(dcService);
-    seriesDatabase.activate(null);
     seriesDatabase.setSecurityService(securityService);
+    seriesDatabase.activate(null);
 
     root = PathSupport.concat("target", Long.toString(currentTime));
 
@@ -344,8 +346,8 @@ public class SeriesServiceImplTest {
     seriesService.updateSeries(testCatalog);
     final String seriesId = testCatalog.getFirst(DublinCoreCatalog.PROPERTY_IDENTIFIER);
 
-    assertTrue(seriesService.addSeriesElement(seriesId, ELEMENT_TYPE, ELEMENT_DATA_1));
-    assertFalse(seriesService.addSeriesElement(seriesId, ELEMENT_TYPE, ELEMENT_DATA_1));
+    assertTrue(seriesService.updateSeriesElement(seriesId, ELEMENT_TYPE, ELEMENT_DATA_1)); // creating
+    assertTrue(seriesService.updateSeriesElement(seriesId, ELEMENT_TYPE, ELEMENT_DATA_1));  // updating
     assertArrayEquals(ELEMENT_DATA_1, seriesService.getSeriesElementData(seriesId, ELEMENT_TYPE).get());
 
     assertTrue(seriesService.updateSeriesElement(seriesId, ELEMENT_TYPE, ELEMENT_DATA_2));

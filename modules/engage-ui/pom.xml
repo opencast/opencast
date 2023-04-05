@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>12-SNAPSHOT</version>
+    <version>14-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -59,7 +59,7 @@
               </execution>
 
               <execution>
-                <id>esline</id>
+                <id>eslint</id>
                 <goals>
                   <goal>exec</goal>
                 </goals>

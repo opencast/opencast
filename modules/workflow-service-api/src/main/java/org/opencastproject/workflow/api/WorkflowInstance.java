@@ -137,6 +137,7 @@ public class WorkflowInstance {
   private String title;
 
   @Column(name = "description")
+  @Lob
   private String description;
 
   @Column(name = "creator_id")
@@ -172,7 +173,10 @@ public class WorkflowInstance {
   @ElementCollection
   @CollectionTable(
           name = "oc_workflow_configuration",
-          joinColumns = @JoinColumn(name = "workflow_id")
+          joinColumns = @JoinColumn(name = "workflow_id"),
+          indexes = {
+                @Index(name = "IX_oc_workflow_configuration_workflow_id", columnList = ("workflow_id")),
+          }
   )
   @MapKeyColumn(name = "configuration_key")
   @Lob

@@ -4,12 +4,11 @@
   <parent>
     <groupId>org.opencastproject.assemblies</groupId>
     <artifactId>opencast-assemblies</artifactId>
-    <version>12-SNAPSHOT</version>
+    <version>14-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <disableJobDispatching>true</disableJobDispatching>
   </properties>
   <artifactId>opencast-dist-presentation</artifactId>
   <packaging>karaf-assembly</packaging>
@@ -110,6 +109,7 @@
             <feature>wrap</feature>
             <!-- Opencast features -->
             <feature>opencast-presentation</feature>
+            <feature>opencast-pluginmanager</feature>
           </bootFeatures>
         </configuration>
       </plugin>

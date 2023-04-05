@@ -21,6 +21,9 @@
 
 package org.opencastproject.assetmanager.aws.s3;
 
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
+
 import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
 import org.opencastproject.assetmanager.api.storage.Source;
@@ -29,7 +32,6 @@ import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabaseImpl;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetMapping;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.util.MimeType;
-import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.amazonaws.AmazonServiceException;
@@ -108,8 +110,8 @@ public class AwsS3AssetStoreTest {
     EasyMock.replay(bc, cc);
 
     database = new AwsAssetDatabaseImpl();
-    database.setEntityManagerFactory(
-        PersistenceUtil.newTestEntityManagerFactory(AwsAssetDatabaseImpl.PERSISTENCE_UNIT));
+    database.setEntityManagerFactory(newEntityManagerFactory(AwsAssetDatabaseImpl.PERSISTENCE_UNIT));
+    database.setDBSessionFactory(getDbSessionFactory());
     database.activate(cc);
 
     uri = getClass().getClassLoader().getResource(FILE_NAME).toURI();

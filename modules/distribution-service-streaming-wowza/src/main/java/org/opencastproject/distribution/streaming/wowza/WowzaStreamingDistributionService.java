@@ -816,6 +816,14 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
   }
 
   @Override
+  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediaPackage, String elementId)
+          throws DistributionException {
+    Set<String> elementIds = new HashSet<String>();
+    elementIds.add(elementId);
+    return distributeSync(channelId, mediaPackage, elementIds);
+  }
+
+  @Override
   public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
           throws DistributionException {
 
@@ -832,6 +840,14 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
 
     URI streamingURL = getStreamingURLforCurrentOrg();
     return distributeElements(channelId, mediaPackage, elementIds, streamingURL);
+  }
+
+  @Override
+  public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediaPackage, String elementId)
+          throws DistributionException {
+    Set<String> elementIds = new HashSet<String>();
+    elementIds.add(elementId);
+    return retractSync(channelId, mediaPackage, elementIds);
   }
 
   @Override

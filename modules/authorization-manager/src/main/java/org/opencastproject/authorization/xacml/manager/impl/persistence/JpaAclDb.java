@@ -21,30 +21,25 @@
 
 package org.opencastproject.authorization.xacml.manager.impl.persistence;
 
-import static org.opencastproject.authorization.xacml.manager.impl.persistence.ManagedAclEntity.findByIdAndOrg;
-import static org.opencastproject.util.data.functions.Misc.chuck;
-import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
-import static org.opencastproject.util.persistence.PersistenceUtil.equip2;
-import static org.opencastproject.util.persistence.PersistenceUtil.persist;
+import static org.opencastproject.authorization.xacml.manager.impl.persistence.ManagedAclEntity.findByIdAndOrgQuery;
+import static org.opencastproject.db.Queries.namedQuery;
 
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.impl.AclDb;
+import org.opencastproject.db.DBSession;
+import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Monadics;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Misc;
-import org.opencastproject.util.persistence.PersistenceEnv;
-import org.opencastproject.util.persistence.PersistenceEnv2;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 import java.util.List;
+import java.util.Optional;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.RollbackException;
 
@@ -57,62 +52,71 @@ import javax.persistence.RollbackException;
         service = { AclDb.class }
 )
 public final class JpaAclDb implements AclDb {
-  private PersistenceEnv penv;
-  private PersistenceEnv2<Void> penvf;
+  private DBSessionFactory dbSessionFactory;
+  private EntityManagerFactory emf;
+  private DBSession db;
+
+  @Activate
+  public void activate() {
+    db = dbSessionFactory.createSession(emf);
+  }
 
   @Deactivate
   public synchronized void deactivate() {
-    penv.close();
+    db.close();
+  }
+
+  @Reference
+  public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
+    this.dbSessionFactory = dbSessionFactory;
   }
 
   @Reference(target = "(osgi.unit.name=org.opencastproject.authorization.xacml.manager)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
-    this.penv = persistenceEnvironment(emf);
-    this.penvf = equip2(penv, uniqueConstraintViolationHandler);
+    this.emf = emf;
   }
 
-  @Override public List<ManagedAcl> getAcls(Organization org) {
-    return Misc.widen(Monadics.mlist(penv.tx(ManagedAclEntity.findByOrg(org.getId()))).value());
+  @Override
+  public List<ManagedAcl> getAcls(Organization org) {
+    return Misc.widen(db.execTx(ManagedAclEntity.findByOrgQuery(org.getId())));
   }
 
-  @Override public Option<ManagedAcl> getAcl(Organization org, long id) {
-    return Misc.widen(penv.tx(findByIdAndOrg(org.getId(), id)));
+  @Override
+  public Optional<ManagedAcl> getAcl(Organization org, long id) {
+    return Misc.widen(db.execTx(ManagedAclEntity.findByIdAndOrgQuery(org.getId(), id)));
   }
 
-  @Override public boolean updateAcl(final ManagedAcl acl) {
-    return penv.tx(new Function<EntityManager, Boolean>() {
-      @Override public Boolean apply(final EntityManager em) {
-        for (ManagedAclEntity e : ManagedAclEntity.findByIdAndOrg(acl.getOrganizationId(), acl.getId()).apply(em)) {
-          final ManagedAclEntity updated = e.update(acl.getName(), acl.getAcl(), acl.getOrganizationId());
-          em.merge(updated);
-          return true;
-        }
+  @Override
+  public boolean updateAcl(final ManagedAcl acl) {
+    return db.execTx(em -> {
+      Optional<ManagedAclEntity> e = findByIdAndOrgQuery(acl.getOrganizationId(), acl.getId()).apply(em);
+      if (e.isEmpty()) {
         return false;
       }
+      final ManagedAclEntity updated = e.get().update(acl.getName(), acl.getAcl(), acl.getOrganizationId());
+      em.merge(updated);
+      return true;
     });
   }
 
-  @Override public Option<ManagedAcl> createAcl(Organization org, AccessControlList acl, String name) {
-    final ManagedAcl e = new ManagedAclEntity().update(name, acl, org.getId());
-    return penvf.tx(persist(e)).right().toOption();
-  }
-
-  @Override public boolean deleteAcl(Organization org, long id) {
-    return penv.tx(ManagedAclEntity.deleteByIdAndOrg(org.getId(), id));
-  }
-
-  /** DB exception handler that takes care of unique constraint violation and rethrows any other exception. */
-  public static final Function<Exception, Void> uniqueConstraintViolationHandler = new Function<Exception, Void>() {
-    @Override
-    public Void apply(Exception e) {
-      if (e instanceof RollbackException) {
-        final Throwable cause = e.getCause();
-        String message = cause.getMessage().toLowerCase();
-        if (message.contains("unique") || message.contains("duplicate")) {
-          return null;
-        }
+  @Override
+  public Optional<ManagedAcl> createAcl(Organization org, AccessControlList acl, String name) {
+    try {
+      final ManagedAcl e = new ManagedAclEntity().update(name, acl, org.getId());
+      return db.execTx(namedQuery.persistOpt(e));
+    } catch (RollbackException e) {
+      // DB exception handler that takes care of unique constraint violation and rethrows any other exception.
+      final Throwable cause = e.getCause();
+      String message = cause.getMessage().toLowerCase();
+      if (message.contains("unique") || message.contains("duplicate")) {
+        return Optional.empty();
       }
-      return chuck(e);
+      throw e;
     }
-  };
+  }
+
+  @Override
+  public boolean deleteAcl(Organization org, long id) {
+    return db.execTx(ManagedAclEntity.deleteByIdAndOrgQuery(org.getId(), id)) > 0;
+  }
 }

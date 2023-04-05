@@ -473,7 +473,7 @@
             "TEXT": "An error occurred while processing your request."
          },
          "DELETE_SUBMIT_STATE": {
-            "TEXT": "Are you sure you want to delete your registration data?"
+            "TEXT": "Are you sure you want to delete your registration data? Confirming this will also remove your registration data from the Opencast project server with the next update interval."
          }
       }
    },
@@ -894,11 +894,23 @@
                   "ADDITIONAL_ACTIONS": "Azioni aggiuntive",
                   "ACTION": "Azioni",
                   "NEW": "Nuova politica",
-                  "DETAILS": "Dettagli"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the event",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the event becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the event"
+                  }
                },
                "ROLES": {
                   "LABEL": "Seleziona un ruolo",
                   "EMPTY": "Nessun ruolo trovato"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "COMMENTS": {
@@ -1116,11 +1128,22 @@
                   "ADDITIONAL_ACTIONS": "Azioni aggiuntive",
                   "ACTION": "Azioni",
                   "NEW": "Nuova politica",
-                  "DETAILS": "Dettagli"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "Seleziona un ruolo",
                   "EMPTY": "Nessun ruolo trovato"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "THEME": {
@@ -1194,17 +1217,29 @@
                   "ADDITIONAL_ACTIONS": "Azioni aggiuntive",
                   "ACTION": "Azioni",
                   "NEW": "Nuova politica",
-                  "DETAILS": "Dettagli",
-                  "REPLACE_EVENT_ACLS": "Save & update event permissions",
+                  "DETAILS": "Non-user roles",
+                  "REPLACE_EVENT_ACLS": "Aggiorna permessi evento",
                   "REPLACE_EVENT_ACLS_HINT": "Assicurarsi che tutti gli eventi di questa serie abbiano questi permessi in vigore",
                   "SAVE_SERIES_ACLS": "Save",
                   "SAVE_SERIES_ACLS_HINT": "Apply permissions only to series",
                   "LOAD_MORE_LIMIT": "policies shown.",
-                  "LOAD_MORE_LINK": "Load more"
+                  "LOAD_MORE_LINK": "Load more",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "Seleziona un ruolo",
                   "EMPTY": "Nessun ruolo trovato"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "METADATA": {
@@ -1443,12 +1478,23 @@
                   "ADDITIONAL_ACTIONS": "Azioni aggiuntive",
                   "ACTION": "Azioni",
                   "NEW": "Nuova politica",
-                  "DETAILS": "Dettagli",
-                  "DESCRIPTION": "Scegli un insieme di politiche pre-configurate o aggiungi politiche personalizzate qui sotto"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "Scegli un insieme di politiche pre-configurate o aggiungi politiche personalizzate qui sotto",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the access policy",
+                  "HELP": {
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                  }
                },
                "ROLES": {
                   "LABEL": "Seleziona un ruolo",
                   "EMPTY": "Nessun ruolo trovato"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          },
@@ -1481,12 +1527,24 @@
                   "ADDITIONAL_ACTIONS": "Azioni aggiuntive",
                   "ACTION": "Azioni",
                   "NEW": "Nuova politica",
-                  "DETAILS": "Dettagli",
-                  "DESCRIPTION": "Scegli un insieme di politiche pre-configurate o aggiungi politiche personalizzate qui sotto"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "Scegli un insieme di politiche pre-configurate o aggiungi politiche personalizzate qui sotto",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the access policy",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                  }
                },
                "ROLES": {
                   "LABEL": "Seleziona un ruolo",
                   "EMPTY": "Nessun ruolo trovato"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          }
@@ -2127,7 +2185,8 @@
       "GROUPS": {
          "GENERAL": "Generale",
          "PLAYER": "Player",
-         "EDITOR": "Editor"
+         "EDITOR": "Editor",
+         "ADD_MEDIA": "Create Event/Series"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2160,6 +2219,10 @@
             "CLEAR_LIST": "Cancella segmento",
             "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Ritarda segmento con pre-roll",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Fine del segmento"
+         },
+         "ADD_MEDIA": {
+            "NEXT_TAB": "Next tab/Create",
+            "PREVIOUS_TAB": "Previous tab"
          }
       }
    },

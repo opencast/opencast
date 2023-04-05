@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence
-    version="2.1"
-    xmlns="http://xmlns.jcp.org/xml/ns/persistence"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
+  version="2.1"
+  xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
     http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
   <persistence-unit name="org.opencastproject.adopter" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
@@ -11,10 +11,10 @@
     <class>org.opencastproject.adopter.registration.Form</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <properties>
-      <property name="eclipselink.ddl-generation" value="create-or-extend-tables" />
-      <property name="eclipselink.logging.logger" value="JavaLogger" />
-      <property name="eclipselink.create-ddl-jdbc-file-name" value="create-kernel-jpa.jdbc"/>
-      <property name="eclipselink.drop-ddl-jdbc-file-name" value="drop-kernel-jpa.jdbc"/>
+      <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
+      <property name="eclipselink.logging.logger" value="JavaLogger"/>
+      <property name="eclipselink.create-ddl-jdbc-file-name" value="create-adopter-registration-impl.jdbc"/>
+      <property name="eclipselink.drop-ddl-jdbc-file-name" value="drop-adopter-registration-impl.jdbc"/>
     </properties>
   </persistence-unit>
 </persistence>

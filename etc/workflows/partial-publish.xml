@@ -280,7 +280,7 @@
       exception-handler-workflow="partial-error"
       description="Publishing to Opencast Media Module">
       <configurations>
-        <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
+        <configuration key="download-source-flavors">dublincore/*,security/*,captions/*</configuration>
         <configuration key="download-source-tags">engage-download,atom,rss</configuration>
         <configuration key="streaming-source-tags">engage-streaming</configuration>
         <configuration key="check-availability">false</configuration>

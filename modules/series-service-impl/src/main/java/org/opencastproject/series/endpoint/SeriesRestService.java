@@ -1237,6 +1237,57 @@ public class SeriesRestService {
   }
 
   @PUT
+  @Path("{seriesId}/extendedMetadata/{type}")
+  @RestQuery(
+          name = "updateExtendedMetadata",
+          description = "Updates extended metadata of a series",
+          returnDescription = "An empty response",
+          pathParameters = {
+                  @RestParameter(name = "seriesId", description = "The series identifier", type = STRING,
+                          isRequired = true),
+                  @RestParameter(name = "type", description = "The type of the catalog flavor", type = STRING,
+                          isRequired = true)
+          },
+          restParameters = {
+                  @RestParameter(name = "dc", description = "The catalog with extended metadata.", type = TEXT,
+                          isRequired = true, defaultValue = SAMPLE_DUBLIN_CORE
+                  )
+          },
+          responses = {
+                  @RestResponse(responseCode = SC_NO_CONTENT, description = "Extended metadata updated"),
+                  @RestResponse(responseCode = SC_CREATED, description = "Extended metadata created"),
+                  @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR,
+                          description = "Error while processing the request")
+          }
+  )
+  public Response putSeriesExtendedMetadata(
+          @PathParam("seriesId") String seriesId,
+          @PathParam("type") String type,
+          @FormParam("dc") String dcString
+  ) {
+    try {
+      DublinCoreCatalog dc = dcService.load(new ByteArrayInputStream(dcString.getBytes(StandardCharsets.UTF_8)));
+      boolean elementExists = seriesService.getSeriesElementData(seriesId, type).isSome();
+      if (seriesService.updateExtendedMetadata(seriesId, type, dc)) {
+        if (elementExists) {
+          return R.noContent();
+        } else {
+          return R.created(URI.create(UrlSupport.concat(serverUrl, serviceUrl, seriesId, "elements", type)));
+        }
+      } else {
+        return R.serverError();
+      }
+    } catch (IOException e) {
+      logger.warn("Could not deserialize dublin core catalog", e);
+      return Response.status(BAD_REQUEST).build();
+    } catch (SeriesException e) {
+      logger.warn("Error while updating extended metadata of series '{}'", seriesId, e);
+      return R.serverError();
+    }
+  }
+
+
+  @PUT
   @Path("{seriesId}/elements/{elementType}")
   @RestQuery(
       name = "updateSeriesElement",
@@ -1261,18 +1312,15 @@ public class SeriesRestService {
     try {
       is = request.getInputStream();
       final byte[] data = IOUtils.toByteArray(is);
-      if (seriesService.getSeriesElementData(seriesId, elementType).isSome()) {
-        if (seriesService.updateSeriesElement(seriesId, elementType, data)) {
+      boolean elementExists = seriesService.getSeriesElementData(seriesId, elementType).isSome();
+      if (seriesService.updateSeriesElement(seriesId, elementType, data)) {
+        if (elementExists) {
           return R.noContent();
         } else {
-          return R.serverError();
+          return R.created(URI.create(UrlSupport.concat(serverUrl, serviceUrl, seriesId, "elements", elementType)));
         }
       } else {
-        if (seriesService.addSeriesElement(seriesId, elementType, data)) {
-          return R.created(URI.create(UrlSupport.concat(serverUrl, serviceUrl, seriesId, "elements", elementType)));
-        } else {
-          return R.serverError();
-        }
+        return R.serverError();
       }
     } catch (IOException e) {
       logger.error("Error while trying to read from request", e);

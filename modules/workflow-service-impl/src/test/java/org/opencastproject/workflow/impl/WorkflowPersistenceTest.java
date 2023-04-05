@@ -21,7 +21,8 @@
 
 package org.opencastproject.workflow.impl;
 
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
@@ -59,7 +60,8 @@ public class WorkflowPersistenceTest {
     EasyMock.replay(securityService);
 
     workflowDatabase = new WorkflowServiceDatabaseImpl();
-    workflowDatabase.setEntityManagerFactory(newTestEntityManagerFactory(WorkflowServiceDatabaseImpl.PERSISTENCE_UNIT));
+    workflowDatabase.setEntityManagerFactory(newEntityManagerFactory(WorkflowServiceDatabaseImpl.PERSISTENCE_UNIT));
+    workflowDatabase.setDBSessionFactory(getDbSessionFactory());
     workflowDatabase.setSecurityService(securityService);
     workflowDatabase.activate(null);
 

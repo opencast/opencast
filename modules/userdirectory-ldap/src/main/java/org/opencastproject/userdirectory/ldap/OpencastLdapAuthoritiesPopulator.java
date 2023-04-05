@@ -20,9 +20,6 @@
  */
 package org.opencastproject.userdirectory.ldap;
 
-import org.opencastproject.security.api.JaxbOrganization;
-import org.opencastproject.security.api.JaxbRole;
-import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
@@ -58,8 +55,8 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
   private String groupCheckPrefix = null;
   private boolean applyAttributesAsRoles = true;
   private boolean applyAttributesAsGroups = true;
-  private Map<String, String[]> ldapAssignmentRoleMap = new HashMap();
-  private Map<String, String[]> ldapAssignmentGroupMap = new HashMap();
+  private Map<String, String[]> ldapAssignmentRoleMap = new HashMap<>();
+  private Map<String, String[]> ldapAssignmentGroupMap = new HashMap<>();
   private boolean uppercase = true;
   private Organization organization;
   private SecurityService securityService;
@@ -270,22 +267,6 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
     }
 
     // Update the user in the security service if it matches the user whose authorities are being returned
-    if ((securityService.getOrganization().equals(organization))
-            && ((securityService.getUser() == null) || (securityService.getUser().getUsername().equals(username)))) {
-      Set<JaxbRole> roles = new HashSet<>();
-      // Get the current roles
-      for (Role existingRole : securityService.getUser().getRoles()) {
-        authorities.add(new SimpleGrantedAuthority(existingRole.getName()));
-      }
-      // Convert GrantedAuthority's into JaxbRole's
-      for (GrantedAuthority authority : authorities) {
-        roles.add(new JaxbRole(authority.getAuthority(), JaxbOrganization.fromOrganization(organization)));
-      }
-      JaxbUser user = new JaxbUser(username, LdapUserProviderInstance.PROVIDER_NAME,
-              JaxbOrganization.fromOrganization(organization), roles.toArray(new JaxbRole[0]));
-
-      securityService.setUser(user);
-    }
 
     return authorities;
   }

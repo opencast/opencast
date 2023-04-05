@@ -23,6 +23,8 @@ package org.opencastproject.serviceregistry.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -42,12 +44,10 @@ import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceState;
 import org.opencastproject.serviceregistry.api.SystemLoad;
-import org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.JobDispatcher;
 import org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.JobProducerHeartbeat;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.jmx.JmxUtil;
-import org.opencastproject.util.persistence.PersistenceUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -97,6 +97,8 @@ public class ServiceRegistryJpaImplTest {
   private static BundleContext bundleContext = null;
   private static ComponentContext cc = null;
   private static ServiceRegistryJpaImpl serviceRegistryJpaImpl = null;
+  private static JobDispatcher jobDispatcher = null;
+
 
   private static final String TEST_SERVICE = "ingest";
   private static final String TEST_SERVICE_2 = "compose";
@@ -140,11 +142,6 @@ public class ServiceRegistryJpaImplTest {
     // reset the scheduledExecutor
     if (serviceRegistryJpaImpl.scheduledExecutor != null)
       serviceRegistryJpaImpl.scheduledExecutor.shutdown();
-    if (!serviceRegistryJpaImpl.dispatchPriorityList.isEmpty()) {
-      for (Long key : serviceRegistryJpaImpl.dispatchPriorityList.keySet()) {
-        serviceRegistryJpaImpl.dispatchPriorityList.remove(key);
-      }
-    }
     if (!serviceRegistryJpaImpl.getActiveJobs().isEmpty()) {
       List<Long> jobIds = new ArrayList();
       for (Job job : serviceRegistryJpaImpl.getActiveJobs()) {
@@ -192,13 +189,14 @@ public class ServiceRegistryJpaImplTest {
   }
 
   public static void setUpEntityManagerFactory() {
-    emf = PersistenceUtil.newTestEntityManagerFactory("org.opencastproject.common");
+    emf = newEntityManagerFactory("org.opencastproject.common");
   }
 
   public static void setUpServiceRegistryJpaImpl()
           throws PropertyVetoException, NotFoundException, TrustedHttpClientException {
     serviceRegistryJpaImpl = new ServiceRegistryJpaImpl();
     serviceRegistryJpaImpl.setEntityManagerFactory(emf);
+    serviceRegistryJpaImpl.setDBSessionFactory(getDbSessionFactory());
 
     Organization organization = new DefaultOrganization();
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
@@ -206,7 +204,6 @@ public class ServiceRegistryJpaImplTest {
             .anyTimes();
 
     EasyMock.replay(organizationDirectoryService);
-    serviceRegistryJpaImpl.setOrganizationDirectoryService(organizationDirectoryService);
 
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
     User anonymous = new JaxbUser("anonymous", "test", jaxbOrganization,
@@ -220,7 +217,6 @@ public class ServiceRegistryJpaImplTest {
     UserDirectoryService userDirectoryService = EasyMock.createNiceMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser(EasyMock.anyString())).andReturn(anonymous).anyTimes();
     EasyMock.replay(userDirectoryService);
-    serviceRegistryJpaImpl.setUserDirectoryService(userDirectoryService);
 
     final Capture<HttpUriRequest> request = EasyMock.newCapture();
     final BasicHttpResponse successResponse = new BasicHttpResponse(
@@ -245,6 +241,27 @@ public class ServiceRegistryJpaImplTest {
     }).anyTimes();
     EasyMock.replay(trustedHttpClient);
     serviceRegistryJpaImpl.setTrustedHttpClient(trustedHttpClient);
+
+    // Setup the job dispatcher
+    ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
+    Dictionary<String, Object> jdProps = new Hashtable<>();
+    jdProps.put(JobDispatcher.OPT_DISPATCHINTERVAL, "0");
+    EasyMock.expect(cc.getProperties()).andReturn(jdProps).anyTimes();
+    EasyMock.replay(cc);
+    jobDispatcher = new JobDispatcher();
+    jobDispatcher.setEntityManagerFactory(emf);
+    jobDispatcher.setDBSessionFactory(getDbSessionFactory());
+    jobDispatcher.setServiceRegistry(serviceRegistryJpaImpl);
+    jobDispatcher.setSecurityService(securityService);
+    jobDispatcher.setOrganizationDirectoryService(organizationDirectoryService);
+    jobDispatcher.setUserDirectoryService(userDirectoryService);
+    jobDispatcher.setTrustedHttpClient(trustedHttpClient);
+    try {
+      serviceRegistryJpaImpl.activate(null);
+      jobDispatcher.activate(cc);
+    } catch (ConfigurationException e) {
+      Assert.fail("Job dispatcher activation failed" + e);
+    }
   }
 
   private void unregisterTestHostAndServices() {
@@ -283,7 +300,6 @@ public class ServiceRegistryJpaImplTest {
     EasyMock.expect(bundleContext.getProperty(ServiceRegistryJpaImpl.OPT_MAXLOAD)).andReturn("");
     EasyMock.expect(bundleContext.createFilter((String) EasyMock.anyObject()))
             .andReturn(EasyMock.createNiceMock(Filter.class));
-    EasyMock.expect(bundleContext.getProperty(ServiceRegistryJpaImpl.OPT_DISPATCHINTERVAL)).andReturn("0");
   }
 
   private static void setupComponentContext() {
@@ -300,8 +316,7 @@ public class ServiceRegistryJpaImplTest {
       serviceRegistryJpaImpl.scheduledExecutor.shutdown();
     }
     serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
-    JobDispatcher jd = serviceRegistryJpaImpl.new JobDispatcher();
-    serviceRegistryJpaImpl.scheduledExecutor.schedule(jd, DISPATCH_START_DELAY, TimeUnit.MILLISECONDS);
+    jobDispatcher.scheduledExecutor.schedule(jobDispatcher.getJobDispatcherRunnable(), DISPATCH_START_DELAY, TimeUnit.MILLISECONDS);
 
     if (withProducerHeartBeat) {
       JobProducerHeartbeat jph = serviceRegistryJpaImpl.new JobProducerHeartbeat();
@@ -347,7 +362,7 @@ public class ServiceRegistryJpaImplTest {
       barrier.waitForJobs(JOB_BARRIER_TIMEOUT);
       Assert.fail("Did not receive a timeout exception");
     } catch (Exception e) {
-      Assert.assertEquals(1, serviceRegistryJpaImpl.dispatchPriorityList.size());
+      Assert.assertEquals(1, jobDispatcher.dispatchPriorityList.size());
     }
   }
 
@@ -361,7 +376,7 @@ public class ServiceRegistryJpaImplTest {
       barrier.waitForJobs(JOB_BARRIER_TIMEOUT);
       Assert.fail("Did not receive a timeout exception");
     } catch (Exception e) {
-      Assert.assertEquals(0, serviceRegistryJpaImpl.dispatchPriorityList.size());
+      Assert.assertEquals(0, jobDispatcher.dispatchPriorityList.size());
     } finally {
       // extra clean up
       serviceRegistryJpaImpl.unRegisterService(TEST_SERVICE_3, TEST_HOST);
@@ -370,7 +385,7 @@ public class ServiceRegistryJpaImplTest {
 
   @Test
   public void testHostsBeingRemovedFromPriorityList() throws Exception {
-    serviceRegistryJpaImpl.dispatchPriorityList.put(0L, TEST_HOST);
+    jobDispatcher.dispatchPriorityList.put(0L, TEST_HOST);
     Job testJob = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_2, TEST_OPERATION, null, null, true, null);
     JobBarrier barrier = new JobBarrier(null, serviceRegistryJpaImpl, testJob);
     launchDispatcherOnce(false);
@@ -378,7 +393,7 @@ public class ServiceRegistryJpaImplTest {
       barrier.waitForJobs(JOB_BARRIER_TIMEOUT);
       Assert.fail("Did not receive a timeout exception");
     } catch (Exception e) {
-      Assert.assertEquals(0, serviceRegistryJpaImpl.dispatchPriorityList.size());
+      Assert.assertEquals(0, jobDispatcher.dispatchPriorityList.size());
     } finally {
       logger.debug("end testHostsBeingRemovedFromPriorityList");
     }
@@ -388,7 +403,7 @@ public class ServiceRegistryJpaImplTest {
   public void testIgnoreHostsInPriorityList() throws Exception {
     Job testJob = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_2, TEST_OPERATION, null, null, true, null);
     Job testJob2 = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_OPERATION, null, null, true, null);
-    serviceRegistryJpaImpl.dispatchPriorityList.put(testJob2.getId(), TEST_HOST);
+    jobDispatcher.dispatchPriorityList.put(testJob2.getId(), TEST_HOST);
     JobBarrier barrier = new JobBarrier(null, serviceRegistryJpaImpl, testJob, testJob2);
     launchDispatcherOnce(false);
     try {
@@ -397,8 +412,8 @@ public class ServiceRegistryJpaImplTest {
     } catch (Exception e) {
       logger.debug("job1: '{}'", serviceRegistryJpaImpl.getJob(testJob.getId()));
       logger.debug("job2: '{}'", serviceRegistryJpaImpl.getJob(testJob2.getId()));
-      for (Long jobId :serviceRegistryJpaImpl.dispatchPriorityList.keySet()) {
-        logger.debug("job in priority queue: {}, {}", jobId, serviceRegistryJpaImpl.dispatchPriorityList.get(jobId));
+      for (Long jobId :jobDispatcher.dispatchPriorityList.keySet()) {
+        logger.debug("job in priority queue: {}, {}", jobId, jobDispatcher.dispatchPriorityList.get(jobId));
       }
       // Mock http client always returns 503 for this path so it won't be dispatched anyway
       testJob = serviceRegistryJpaImpl.getJob(testJob.getId());
@@ -411,8 +426,8 @@ public class ServiceRegistryJpaImplTest {
       Assert.assertTrue("Second job should not have a processing host", StringUtils.isBlank(testJob2.getProcessingHost()));
       Assert.assertEquals("Second job is queued", Job.Status.QUEUED, testJob2.getStatus());
 
-      Assert.assertEquals(1, serviceRegistryJpaImpl.dispatchPriorityList.size());
-      String blockingHost = serviceRegistryJpaImpl.dispatchPriorityList.get(testJob2.getId());
+      Assert.assertEquals(1, jobDispatcher.dispatchPriorityList.size());
+      String blockingHost = jobDispatcher.dispatchPriorityList.get(testJob2.getId());
       Assert.assertEquals(TEST_HOST, blockingHost);
     } finally {
       logger.debug("end testIgnoreHostsInPriorityList");
@@ -426,7 +441,7 @@ public class ServiceRegistryJpaImplTest {
     Job k = serviceRegistryJpaImpl.getJob(j.getId());
     k.setStatus(Status.RUNNING);
     serviceRegistryJpaImpl.updateJob(k);
-    SystemLoad hostloads = serviceRegistryJpaImpl.getHostLoads(emf.createEntityManager());
+    SystemLoad hostloads = serviceRegistryJpaImpl.getHostLoadsQuery().apply(emf.createEntityManager());
     Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", a, hostloads.get(TEST_HOST).getCurrentLoad()),
             hostloads.get(TEST_HOST).getCurrentLoad() - a >= 0.0f);
     Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", a, hostloads.get(TEST_HOST).getCurrentLoad()),
@@ -600,5 +615,4 @@ public class ServiceRegistryJpaImplTest {
     Assert.assertEquals(dateCompleted, updatedJob.getDateCompleted());
     Assert.assertEquals(runTime, updatedJob.getRunTime());
   }
-
 }

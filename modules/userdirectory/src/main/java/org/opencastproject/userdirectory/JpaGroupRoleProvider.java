@@ -21,6 +21,8 @@
 
 package org.opencastproject.userdirectory;
 
+import org.opencastproject.db.DBSession;
+import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.GroupProvider;
 import org.opencastproject.security.api.JaxbGroupList;
@@ -59,9 +61,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
 
 /**
  * Manages and locates users using JPA.
@@ -87,6 +87,10 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
 
+  protected DBSessionFactory dbSessionFactory;
+
+  protected DBSession db;
+
   /** The organization directory service */
   protected OrganizationDirectoryService organizationDirectoryService;
 
@@ -100,6 +104,11 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
   @Reference(target = "(osgi.unit.name=org.opencastproject.common)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
+  }
+
+  @Reference
+  public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
+    this.dbSessionFactory = dbSessionFactory;
   }
 
   /**
@@ -141,6 +150,7 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
   public void activate(ComponentContext cc) {
     logger.debug("Activate group role provider");
     this.cc = cc;
+    db = dbSessionFactory.createSession(emf);
   }
 
   /**
@@ -151,7 +161,8 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
   @Override
   public Iterator<Role> getRoles() {
     String orgId = securityService.getOrganization().getId();
-    return getGroupsRoles(UserDirectoryPersistenceUtil.findGroups(orgId, 0, 0, emf)).iterator();
+    List<JpaGroup> roles = db.exec(UserDirectoryPersistenceUtil.findGroupsQuery(orgId, 0, 0));
+    return getGroupsRoles(roles).iterator();
   }
 
   /**
@@ -162,7 +173,8 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
   @Override
   public List<Role> getRolesForUser(String userName) {
     String orgId = securityService.getOrganization().getId();
-    return getGroupsRoles(UserDirectoryPersistenceUtil.findGroupsByUser(userName, orgId, emf));
+    List<JpaGroup> roles = db.exec(UserDirectoryPersistenceUtil.findGroupsByUserQuery(userName, orgId));
+    return getGroupsRoles(roles);
   }
 
   /**
@@ -174,9 +186,9 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
   public List<Role> getRolesForGroup(String groupName) {
     List<Role> roles = new ArrayList<>();
     String orgId = securityService.getOrganization().getId();
-    Group group = UserDirectoryPersistenceUtil.findGroupByRole(groupName, orgId, emf);
-    if (group != null) {
-      for (Role role : group.getRoles()) {
+    Optional<JpaGroup> group = db.exec(UserDirectoryPersistenceUtil.findGroupByRoleQuery(groupName, orgId));
+    if (group.isPresent()) {
+      for (Role role : group.get().getRoles()) {
         roles.add(new JaxbRole(role.getName(), role.getOrganizationId(), role.getDescription(), Role.Type.DERIVED));
       }
     } else {
@@ -209,9 +221,9 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
     String orgId = securityService.getOrganization().getId();
 
     //  Here we want to return only the ROLE_GROUP_ names, not the roles associated with a group
-    List<JpaGroup> groups = UserDirectoryPersistenceUtil.findGroups(orgId, 0, 0, emf);
+    List<JpaGroup> groups = db.exec(UserDirectoryPersistenceUtil.findGroupsQuery(orgId, 0, 0));
 
-    List<Role> roles = new ArrayList<Role>();
+    List<Role> roles = new ArrayList<>();
     for (JpaGroup group : groups) {
       if (like(group.getRole(), query)) {
         roles.add(new JaxbRole(
@@ -223,7 +235,7 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
       }
     }
 
-    Set<Role> result = new HashSet<Role>();
+    Set<Role> result = new HashSet<>();
     int i = 0;
     for (Role entry : roles) {
       if (limit != 0 && result.size() >= limit) {
@@ -264,16 +276,15 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
    *          handle only roles with given prefix
    */
   public void updateGroupMembershipFromRoles(String userName, String orgId, List<String> roleList, String prefix) {
-
     logger.debug("updateGroupMembershipFromRoles({}, size={})", userName, roleList.size());
 
     // Add the user to all groups which are in the roleList, but allow the user to be part of groups
     // without having the group role
 
-    Set<String> membershipRoles = new HashSet<String>();
+    Set<String> membershipRoles = new HashSet<>();
 
     // List of the user's groups
-    List<JpaGroup> membership = UserDirectoryPersistenceUtil.findGroupsByUser(userName, orgId, emf);
+    List<JpaGroup> membership = db.exec(UserDirectoryPersistenceUtil.findGroupsByUserQuery(userName, orgId));
     for (JpaGroup group : membership) {
       if (StringUtils.isNotBlank(prefix) && !group.getRole().startsWith(prefix)) {
         //ignore groups of other providers
@@ -288,21 +299,20 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
     // Now add the user to any groups that they are not already a member of
     for (String rolename : roleList) {
       if (!membershipRoles.contains(rolename)) {
-        JpaGroup group = UserDirectoryPersistenceUtil.findGroupByRole(rolename, orgId, emf);
-        try {
-          if (group != null) {
+        Optional<JpaGroup> group = db.exec(UserDirectoryPersistenceUtil.findGroupByRoleQuery(rolename, orgId));
+        if (group.isPresent()) {
+          try {
             logger.debug("Adding user {} to group {}", userName, rolename);
-            group.getMembers().add(userName);
-            addGroup(group);
-          } else {
-            logger.warn("Cannot add user {} to group {} - no group found with that role", userName, rolename);
+            group.get().getMembers().add(userName);
+            addGroup(group.get());
+          } catch (UnauthorizedException e) {
+            logger.warn("Unauthorized to add user {} to group {}", userName, group.get().getRole(), e);
           }
-        } catch (UnauthorizedException e) {
-          logger.warn("Unauthorized to add user {} to group {}", userName, group.getRole(), e);
+        } else {
+          logger.warn("Cannot add user {} to group {} - no group found with that role", userName, rolename);
         }
       }
     }
-
   }
 
   /**
@@ -316,7 +326,7 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
    */
   public void removeMemberFromAllGroups(String userName, String orgId) {
     // List of the user's groups
-    List<JpaGroup> membership = UserDirectoryPersistenceUtil.findGroupsByUser(userName, orgId, emf);
+    List<JpaGroup> membership = db.exec(UserDirectoryPersistenceUtil.findGroupsByUserQuery(userName, orgId));
     for (JpaGroup group : membership) {
       try {
         logger.debug("Removing user {} from group {}", userName, group.getRole());
@@ -338,7 +348,8 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
    * @return the loaded group or <code>null</code> if not found
    */
   public JpaGroup loadGroup(String groupId, String orgId) {
-    return UserDirectoryPersistenceUtil.findGroup(groupId, orgId, emf);
+    return db.exec(UserDirectoryPersistenceUtil.findGroupQuery(groupId, orgId))
+        .orElse(null);
   }
 
   /**
@@ -371,48 +382,36 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
       throw new UnauthorizedException("The user is not allowed to update a group with the admin role");
     }
 
-    Set<JpaRole> roles = UserDirectoryPersistenceUtil.saveRoles(group.getRoles(), emf);
-    JpaOrganization organization = UserDirectoryPersistenceUtil.saveOrganization(group.getOrganization(), emf);
+    db.execTx(em -> {
+      Set<JpaRole> roles = UserDirectoryPersistenceUtil.saveRolesQuery(group.getRoles()).apply(em);
+      JpaOrganization organization = UserDirectoryPersistenceUtil.saveOrganizationQuery(group.getOrganization())
+          .apply(em);
 
-    JpaGroup jpaGroup = new JpaGroup(group.getGroupId(), organization, group.getName(), group.getDescription(), roles,
-            group.getMembers());
+      JpaGroup jpaGroup = new JpaGroup(group.getGroupId(), organization, group.getName(), group.getDescription(), roles,
+          group.getMembers());
 
-    // Then save the jpaGroup
-    EntityManager em = null;
-    EntityTransaction tx = null;
-    try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
-      JpaGroup foundGroup = UserDirectoryPersistenceUtil.findGroup(jpaGroup.getGroupId(), jpaGroup.getOrganization()
-              .getId(), emf);
-      if (foundGroup == null) {
+      // Then save the jpaGroup
+      Optional<JpaGroup> foundGroup = UserDirectoryPersistenceUtil.findGroupQuery(jpaGroup.getGroupId(),
+          jpaGroup.getOrganization().getId()).apply(em);
+      if (foundGroup.isEmpty()) {
         em.persist(jpaGroup);
       } else {
-        foundGroup.setName(jpaGroup.getName());
-        foundGroup.setDescription(jpaGroup.getDescription());
-        foundGroup.setMembers(jpaGroup.getMembers());
-        foundGroup.setRoles(roles);
-        em.merge(foundGroup);
+        foundGroup.get().setName(jpaGroup.getName());
+        foundGroup.get().setDescription(jpaGroup.getDescription());
+        foundGroup.get().setMembers(jpaGroup.getMembers());
+        foundGroup.get().setRoles(roles);
+        em.merge(foundGroup.get());
       }
-      tx.commit();
-    } finally {
-      if (tx.isActive()) {
-        tx.rollback();
-      }
-      if (em != null) {
-        em.close();
-      }
-    }
+    });
   }
 
-  private void removeGroup(String groupId, String orgId) throws NotFoundException, UnauthorizedException, Exception {
+  private void removeGroup(String groupId, String orgId) throws NotFoundException, UnauthorizedException {
     Group group = loadGroup(groupId, orgId);
     if (group != null && !UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, group.getRoles())) {
       throw new UnauthorizedException("The user is not allowed to delete a group with the admin role");
     }
 
-    UserDirectoryPersistenceUtil.removeGroup(groupId, orgId, emf);
+    db.execTxChecked(UserDirectoryPersistenceUtil.removeGroupQuery(groupId, orgId));
   }
 
   /**
@@ -423,7 +422,7 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
    * @return the role list
    */
   private List<Role> getGroupsRoles(List<JpaGroup> groups) {
-    List<Role> roles = new ArrayList<Role>();
+    List<Role> roles = new ArrayList<>();
     for (Group group : groups) {
       roles.add(new JaxbRole(
           group.getRole(),
@@ -434,14 +433,14 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
       for (Role role : group.getRoles()) {
         roles.add(new JaxbRole(role.getName(), role.getOrganizationId(), role.getDescription(), Role.Type.DERIVED));
       }
-
     }
     return roles;
   }
 
   public Iterator<Group> getGroups() {
     String orgId = securityService.getOrganization().getId();
-    return new ArrayList<Group>(UserDirectoryPersistenceUtil.findGroups(orgId, 0, 0, emf)).iterator();
+    return new ArrayList<Group>(db.exec(UserDirectoryPersistenceUtil.findGroupsQuery(orgId, 0, 0)))
+        .iterator();
   }
 
   private boolean like(final String str, final String expr) {
@@ -464,14 +463,13 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
    * @throws IOException
    *           if unexpected IO exception occurs
    */
-  public JaxbGroupList getGroups(int limit, int offset)
-          throws IOException {
+  public JaxbGroupList getGroups(int limit, int offset) throws IOException {
     if (limit < 1) {
       limit = 100;
     }
     String orgId = securityService.getOrganization().getId();
     JaxbGroupList groupList = new JaxbGroupList();
-    List<JpaGroup> groups = UserDirectoryPersistenceUtil.findGroups(orgId, limit, offset, emf);
+    List<JpaGroup> groups = db.exec(UserDirectoryPersistenceUtil.findGroupsQuery(orgId, limit, offset));
     for (JpaGroup group : groups) {
       groupList.add(group);
     }
@@ -497,7 +495,8 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
   public List<JpaGroup> getGroups(Optional<Integer> limit, Optional<Integer> offset, Optional<String> nameFilter,
           Optional<String> textFilter, Set<SortCriterion> sortCriteria) {
     String orgId = securityService.getOrganization().getId();
-    return UserDirectoryPersistenceUtil.findGroups(orgId, limit, offset, nameFilter, textFilter, sortCriteria, emf);
+    return db.exec(UserDirectoryPersistenceUtil.findGroupsQuery(orgId, limit, offset, nameFilter, textFilter,
+        sortCriteria));
   }
 
   /**
@@ -512,7 +511,7 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
    */
   public long countTotalGroups(Optional<String> nameFilter, Optional<String> textFilter) {
     String orgId = securityService.getOrganization().getId();
-    return UserDirectoryPersistenceUtil.countTotalGroups(orgId, nameFilter, textFilter, emf);
+    return db.exec(UserDirectoryPersistenceUtil.countTotalGroupsQuery(orgId, nameFilter, textFilter));
   }
 
   /**
@@ -554,14 +553,14 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
           throws IllegalArgumentException, UnauthorizedException, ConflictException {
     JpaOrganization organization = (JpaOrganization) securityService.getOrganization();
 
-    HashSet<JpaRole> roleSet = new HashSet<JpaRole>();
+    HashSet<JpaRole> roleSet = new HashSet<>();
     if (roles != null) {
       for (String role : StringUtils.split(roles, ",")) {
         roleSet.add(new JpaRole(StringUtils.trim(role), organization));
       }
     }
 
-    HashSet<String> members = new HashSet<String>();
+    HashSet<String> members = new HashSet<>();
     if (users != null) {
       for (String member : StringUtils.split(users, ",")) {
         members.add(StringUtils.trim(member));
@@ -570,13 +569,13 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
 
     final String groupId = name.toLowerCase().replaceAll("\\W", "_");
 
-    JpaGroup existingGroup = UserDirectoryPersistenceUtil.findGroup(groupId, organization.getId(), emf);
-    if (existingGroup != null) {
+    Optional<JpaGroup> existingGroup = db.exec(UserDirectoryPersistenceUtil.findGroupQuery(groupId,
+        organization.getId()));
+    if (existingGroup.isPresent()) {
       throw new ConflictException("group already exists");
     }
 
     addGroup(new JpaGroup(groupId, organization, name, description, roleSet, members));
-
   }
 
   /**
@@ -643,10 +642,11 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
           throws NotFoundException, UnauthorizedException {
     JpaOrganization organization = (JpaOrganization) securityService.getOrganization();
 
-    JpaGroup group = UserDirectoryPersistenceUtil.findGroup(groupId, organization.getId(), emf);
-    if (group == null) {
+    Optional<JpaGroup> groupOpt = db.exec(UserDirectoryPersistenceUtil.findGroupQuery(groupId, organization.getId()));
+    if (groupOpt.isEmpty()) {
       throw new NotFoundException();
     }
+    JpaGroup group = groupOpt.get();
 
     if (StringUtils.isNotBlank(name)) {
       group.setName(StringUtils.trim(name));
@@ -657,18 +657,18 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
     }
 
     if (StringUtils.isNotBlank(roles)) {
-      HashSet<JpaRole> roleSet = new HashSet<JpaRole>();
+      HashSet<JpaRole> roleSet = new HashSet<>();
       for (String role : StringUtils.split(roles, ",")) {
         roleSet.add(new JpaRole(StringUtils.trim(role), organization));
       }
       group.setRoles(roleSet);
     } else {
-      group.setRoles(new HashSet<JpaRole>());
+      group.setRoles(new HashSet<>());
     }
 
     if (users != null) {
-      HashSet<String> members = new HashSet<String>();
-      HashSet<String> invalidateUsers = new HashSet<String>();
+      HashSet<String> members = new HashSet<>();
+      HashSet<String> invalidateUsers = new HashSet<>();
 
       Set<String> groupMembers = group.getMembers();
 

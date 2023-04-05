@@ -476,7 +476,7 @@
           "TEXT": "An error occurred while processing your request."
         },
          "DELETE_SUBMIT_STATE": {
-          "TEXT": "Are you sure you want to delete your registration data?"
+          "TEXT": "Are you sure you want to delete your registration data? Confirming this will also remove your registration data from the Opencast project server with the next update interval."
          }
       }
    },
@@ -2188,7 +2188,8 @@
        "GROUPS": {
            "GENERAL": "General",
            "PLAYER": "Player",
-           "EDITOR": "Editor"
+           "EDITOR": "Editor",
+           "ADD_MEDIA": "Create Event/Series"
        },
        "DESCRIPTIONS": {
            "GENERAL": {
@@ -2221,6 +2222,10 @@
                "CLEAR_LIST": "Clear segment",
                "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
                "PLAY_ENDING_OF_CURRENT_SEGMENT": "End of segment"
+           },
+           "ADD_MEDIA": {
+               "NEXT_TAB": "Next tab/Create",
+               "PREVIOUS_TAB": "Previous tab"
            }
        }
    },

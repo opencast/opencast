@@ -20,6 +20,7 @@
  */
 package org.opencastproject.oaipmh.persistence.impl;
 
+import org.opencastproject.db.DBSession;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageParser;
@@ -55,8 +56,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Pattern;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -70,7 +69,7 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
 
   private ReadWriteLock dbAccessLock = new ReentrantReadWriteLock();
 
-  public abstract EntityManagerFactory getEmf();
+  public abstract DBSession getDBSession();
 
   public abstract SecurityService getSecurityService();
 
@@ -87,16 +86,8 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
   }
 
   private void storeInternal(MediaPackage mediaPackage, String repository) throws OaiPmhDatabaseException {
-    int i = 0;
-    boolean success = false;
-    while (!success && i < 5) {
-      EntityManager em = null;
-      EntityTransaction tx = null;
-      try {
-        em = getEmf().createEntityManager();
-        tx = em.getTransaction();
-        tx.begin();
-
+    try {
+      getDBSession().execTx(em -> {
         OaiPmhEntity entity = getOaiPmhEntity(mediaPackage.getIdentifier().toString(), repository, em);
         if (entity == null) {
           // no entry found, create new entity
@@ -108,36 +99,15 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
           updateEntity(entity, mediaPackage, repository);
           em.merge(entity);
         }
-        tx.commit();
-        success = true;
-      } catch (Exception e) {
-        final String message = e.getCause().getMessage().toLowerCase();
-        if (message.contains("unique") || message.contains("duplicate")) {
-          try {
-            Thread.sleep(1100L);
-          } catch (InterruptedException e1) {
-            throw new OaiPmhDatabaseException(e1);
-          }
-          i++;
-          logger.info("Storing OAI-PMH entry '{}' from  repository '{}' failed, retry {} times.",
-                  mediaPackage.getIdentifier(), repository, i);
-        } else {
-          logger.error("Could not store mediapackage '{}' to OAI-PMH repository '{}'", mediaPackage.getIdentifier(),
-                  repository, e);
-          if (tx != null && tx.isActive())
-            tx.rollback();
-
-          throw new OaiPmhDatabaseException(e);
-        }
-      } finally {
-        if (em != null)
-          em.close();
-      }
+      });
+    } catch (Exception e) {
+      logger.error("Could not store mediapackage '{}' to OAI-PMH repository '{}'", mediaPackage.getIdentifier(),
+            repository, e);
+      throw new OaiPmhDatabaseException(e);
     }
   }
 
-  public void updateEntity(OaiPmhEntity entity, MediaPackage mediaPackage,
-                            String repository) throws OaiPmhDatabaseException {
+  public void updateEntity(OaiPmhEntity entity, MediaPackage mediaPackage, String repository) {
     entity.setOrganization(getSecurityService().getOrganization().getId());
     entity.setDeleted(false);
     entity.setRepositoryId(repository);
@@ -194,49 +164,20 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
   }
 
   private void deleteInternal(String mediaPackageId, String repository) throws OaiPmhDatabaseException, NotFoundException {
-    int i = 0;
-    boolean success = false;
-    while (!success && i < 5) {
-      EntityManager em = null;
-      EntityTransaction tx = null;
-      try {
-        em = getEmf().createEntityManager();
-        tx = em.getTransaction();
-        tx.begin();
-
+    try {
+      getDBSession().execTxChecked(em -> {
         OaiPmhEntity oaiPmhEntity = getOaiPmhEntity(mediaPackageId, repository, em);
         if (oaiPmhEntity == null)
           throw new NotFoundException("No media package with id " + mediaPackageId + " exists");
 
         oaiPmhEntity.setDeleted(true);
         em.merge(oaiPmhEntity);
-        tx.commit();
-        success = true;
-      } catch (NotFoundException e) {
-        throw e;
-      } catch (Exception e) {
-        final String message = e.getCause().getMessage().toLowerCase();
-        if (message.contains("unique") || message.contains("duplicate")) {
-          try {
-            Thread.sleep(1100L);
-          } catch (InterruptedException e1) {
-            throw new OaiPmhDatabaseException(e1);
-          }
-          i++;
-          logger.info("Deleting OAI-PMH entry '{}' from  repository '{}' failed, retry {} times.",
-                  mediaPackageId, repository, i);
-        } else {
-          logger.error("Could not delete mediapackage '{}' from OAI-PMH repository '{}'",
-                  mediaPackageId, repository, e);
-          if (tx != null && tx.isActive())
-            tx.rollback();
-
-          throw new OaiPmhDatabaseException(e);
-        }
-      } finally {
-        if (em != null)
-          em.close();
-      }
+      });
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Could not delete mediapackage '{}' from OAI-PMH repository '{}'", mediaPackageId, repository, e);
+      throw new OaiPmhDatabaseException(e);
     }
   }
 
@@ -252,22 +193,20 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
   }
 
   private SearchResult searchInternal(Query query, int chunkSize) {
-    EntityManager em = null;
     final String requestSetSpec = query.getSetSpec().getOrElseNull();
     final List<SearchResultItem> filteredItems = new ArrayList<>();
     Date lastDate = new Date();
     long resultSize;
     long resultOffset;
     long resultLimit;
-    try {
-      em = getEmf().createEntityManager();
+    SearchResult result = getDBSession().exec(em -> {
       CriteriaBuilder cb = em.getCriteriaBuilder();
       CriteriaQuery<OaiPmhEntity> q = cb.createQuery(OaiPmhEntity.class);
       Root<OaiPmhEntity> c = q.from(OaiPmhEntity.class);
       q.select(c);
 
       // create predicates joined in an "and" expression
-      final List<Predicate> predicates = new ArrayList<Predicate>();
+      final List<Predicate> predicates = new ArrayList<>();
       predicates.add(cb.equal(c.get("organization"), getSecurityService().getOrganization().getId()));
 
       for (String p : query.getMediaPackageId())
@@ -300,35 +239,34 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
         typedQuery.setFirstResult(startPosition);
       }
 
-      SearchResult result = createSearchResult(typedQuery);
+      return createSearchResult(typedQuery);
+    });
 
-      if (requestSetSpec != null) {
-        Optional<OaiPmhSetDefinition> requestedSetDef = query.getSetDefinitions().stream().filter(def -> StringUtils.equals(def.getSetSpec(), requestSetSpec)).findFirst();
-        // return empty result if there is no definition for a requested setSpec
-        if (!requestedSetDef.isPresent()) {
-          return new SearchResultImpl(result.getOffset(), result.getLimit(), new ArrayList<>());
-        }
+    if (requestSetSpec != null) {
+      Optional<OaiPmhSetDefinition> requestedSetDef = query.getSetDefinitions().stream()
+          .filter(def -> StringUtils.equals(def.getSetSpec(), requestSetSpec))
+          .findFirst();
+      // return empty result if there is no definition for a requested setSpec
+      if (requestedSetDef.isEmpty()) {
+        return new SearchResultImpl(result.getOffset(), result.getLimit(), new ArrayList<>());
       }
+    }
 
-      for (SearchResultItem item : result.getItems()) {
-        for (OaiPmhSetDefinition setDef : query.getSetDefinitions()) {
-          if (matchSetDef(setDef, item.getElements())) {
-            item.addSetSpec(setDef.getSetSpec());
-          }
-        }
-        if (requestSetSpec == null || item.getSetSpecs().contains(requestSetSpec)) {
-          filteredItems.add(item);
+    for (SearchResultItem item : result.getItems()) {
+      for (OaiPmhSetDefinition setDef : query.getSetDefinitions()) {
+        if (matchSetDef(setDef, item.getElements())) {
+          item.addSetSpec(setDef.getSetSpec());
         }
       }
-      resultSize = result.size();
-      resultOffset = result.getOffset();
-      resultLimit = result.getLimit();
-      if (requestSetSpec != null && resultSize == chunkSize) {
-        lastDate = result.getItems().get(result.getItems().size() - 1).getModificationDate();
+      if (requestSetSpec == null || item.getSetSpecs().contains(requestSetSpec)) {
+        filteredItems.add(item);
       }
-    } finally {
-      if (em != null)
-        em.close();
+    }
+    resultSize = result.size();
+    resultOffset = result.getOffset();
+    resultLimit = result.getLimit();
+    if (requestSetSpec != null && resultSize == chunkSize) {
+      lastDate = result.getItems().get(result.getItems().size() - 1).getModificationDate();
     }
 
     if (requestSetSpec != null) {

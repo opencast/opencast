@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
-  <version>12-SNAPSHOT</version>
+  <version>14-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>opencast</name>
   <description>Opencast is a media capture, processing, management and distribution system</description>
@@ -26,23 +26,23 @@
     <commons-lang3.version>3.12.0</commons-lang3.version>
     <commons-text.version>1.10.0</commons-text.version>
     <cxf.version>3.4.6</cxf.version>
-    <eclipselink.version>2.7.5</eclipselink.version>
+    <eclipselink.version>2.7.8</eclipselink.version>
     <failureaccess.version>1.0.1</failureaccess.version>
     <freemarker.version>2.3.31</freemarker.version>
     <functional.version>1.4.2</functional.version>
-    <gson.version>2.8.9</gson.version>
+    <gson.version>2.10.1</gson.version>
     <guava.version>30.1.1-jre</guava.version>
     <httpcomponents-httpclient.version>4.5.13</httpcomponents-httpclient.version>
-    <httpcomponents-httpcore.version>4.4.15</httpcomponents-httpcore.version>
-    <jackson.version>2.13.2</jackson.version>
+    <httpcomponents-httpcore.version>4.4.16</httpcomponents-httpcore.version>
+    <jackson.version>2.14.1</jackson.version>
     <jakarta.mail.version>1.6.7</jakarta.mail.version>
     <java.release>11</java.release>
     <javadoc-plugin.version>3.3.1</javadoc-plugin.version>
     <jersey.version>2.29.1</jersey.version>
-    <jettison.version>1.4.1</jettison.version>
-    <joda-time.version>2.10.10</joda-time.version>
+    <jettison.version>1.5.4</jettison.version>
+    <joda-time.version>2.12.5</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
-    <karaf.version>4.2.15</karaf.version>
+    <karaf.version>4.2.16</karaf.version>
     <node.version>v16.13.0</node.version>
     <osgi.compendium.version>6.0.0</osgi.compendium.version>
     <osgi.core.version>6.0.0</osgi.core.version>
@@ -118,19 +118,6 @@
     <module>modules/email-template-service-impl</module>
     <module>modules/engage-paella-player-7</module>
     <module>modules/engage-paella-player</module>
-    <module>modules/engage-theodul-api</module>
-    <module>modules/engage-theodul-core</module>
-    <module>modules/engage-theodul-plugin-archetype</module>
-    <module>modules/engage-theodul-plugin-controls</module>
-    <module>modules/engage-theodul-plugin-custom-matomo</module>
-    <module>modules/engage-theodul-plugin-custom-mhConnection</module>
-    <module>modules/engage-theodul-plugin-custom-notifications</module>
-    <module>modules/engage-theodul-plugin-description</module>
-    <module>modules/engage-theodul-plugin-tab-description</module>
-    <module>modules/engage-theodul-plugin-tab-downloads</module>
-    <module>modules/engage-theodul-plugin-tab-shortcuts</module>
-    <module>modules/engage-theodul-plugin-tab-slidetext</module>
-    <module>modules/engage-theodul-plugin-video-videojs</module>
     <module>modules/engage-ui</module>
     <module>modules/event-comment</module>
     <module>modules/execute-api</module>
@@ -175,6 +162,7 @@
     <module>modules/oaipmh-persistence</module>
     <module>modules/oaipmh-remote</module>
     <module>modules/oaipmh</module>
+    <module>modules/plugin-manager</module>
     <module>modules/presets</module>
     <module>modules/publication-service-api</module>
     <module>modules/publication-service-configurable-remote</module>
@@ -224,6 +212,7 @@
     <module>modules/speech-to-text-impl</module>
     <module>modules/speech-to-text-remote</module>
     <module>modules/speech-to-text-workflowoperation</module>
+    <module>modules/subtitle-parser</module>
     <module>modules/static-file-service-api</module>
     <module>modules/static-file-service-impl</module>
     <module>modules/static</module>
@@ -323,7 +312,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.11.0</version>
         <configuration>
           <release>${java.release}</release>
           <encoding>UTF-8</encoding>
@@ -333,7 +322,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.0.0-M2</version>
+        <version>3.3.0</version>
         <executions>
           <execution>
             <id>enforce-maven</id>
@@ -618,7 +607,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>3.3.0</version>
+          <version>3.5.0</version>
         </plugin>
         <plugin>
           <groupId>com.googlecode.maven-download-plugin</groupId>
@@ -628,7 +617,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>3.2.0</version>
+          <version>3.3.1</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -678,7 +667,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-install-plugin</artifactId>
-          <version>2.5.2</version>
+          <version>3.1.1</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -704,7 +693,7 @@
             <dependency>
               <groupId>org.ow2.asm</groupId>
               <artifactId>asm</artifactId>
-              <version>7.3.1</version>
+              <version>9.3</version>
             </dependency>
             <dependency>
               <groupId>org.apache.maven.shared</groupId>
@@ -712,6 +701,20 @@
               <version>1.11.1</version>
             </dependency>
           </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.karaf.tooling</groupId>
+          <artifactId>karaf-services-maven-plugin</artifactId>
+          <version>${karaf.version}</version>
+          <executions>
+            <execution>
+              <id>service-metadata-generate</id>
+              <phase>process-classes</phase>
+              <goals>
+                <goal>service-metadata-generate</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -725,7 +728,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>2.2.1</version>
+            <version>3.2.1</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
@@ -753,7 +756,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.5</version>
+            <version>3.0.1</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -1063,7 +1066,7 @@
       <dependency>
         <groupId>org.owasp.esapi</groupId>
         <artifactId>esapi</artifactId>
-        <version>2.1.0.1</version>
+        <version>2.3.0.0</version>
       </dependency>
       <dependency>
         <groupId>org.opensaml</groupId>
@@ -1292,7 +1295,7 @@
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>${jackson.version}.2</version>
+        <version>${jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -1794,7 +1797,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.20</version>
+        <version>2.22.2</version>
         <configuration>
           <aggregate>true</aggregate>
         </configuration>

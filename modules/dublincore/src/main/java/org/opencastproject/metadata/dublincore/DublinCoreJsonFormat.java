@@ -33,7 +33,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -59,7 +58,7 @@ public final class DublinCoreJsonFormat {
    * Read a JSON encoded catalog from a string.
    */
   @Nonnull
-  public static DublinCoreCatalog read(String json) throws IOException, ParseException {
+  public static DublinCoreCatalog read(String json) throws ParseException {
     return read((JSONObject) new JSONParser().parse(json));
   }
 
@@ -159,5 +158,17 @@ public final class DublinCoreJsonFormat {
       }
     }
     return json;
+  }
+
+  /**
+   * Checks if the catalog string is in JSON format.
+   *
+   * @param catalogString
+   *         Dublin Core catalog as a string
+   * @return
+   *         true if it's in JSON format
+   */
+  public static boolean isJson(String catalogString) {
+    return catalogString.startsWith("{");
   }
 }

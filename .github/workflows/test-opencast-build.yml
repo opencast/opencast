@@ -28,7 +28,7 @@ jobs:
           - 11
           - 13
     name: build (java ${{ matrix.java }})
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
 
@@ -70,6 +70,7 @@ jobs:
         run: |
           mvn clean install -Pnone \
             --batch-mode \
+            -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
             -Dhttp.keepAlive=false \
             -Dmaven.wagon.http.pool=false \
@@ -81,6 +82,7 @@ jobs:
         run: |
           mvn clean install -Pallinone  \
             --batch-mode \
+            -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
             -Dhttp.keepAlive=false \
             -Dmaven.wagon.http.pool=false \
@@ -98,23 +100,17 @@ jobs:
         run: |
           docker-compose up -d
 
-      - name: get new curl
-        if: matrix.java == 11
-        run: |
-          curl -OL https://github.com/moparisthebest/static-curl/releases/download/v7.77.0/curl-amd64
-          chmod +x curl-amd64
-
       - name: wait for elasticsearch to boot
         if: matrix.java == 11
         run: >
-          ./curl-amd64 -fisS --retry 60 --retry-delay 1 --retry-all-errors
+          curl -fisS --retry 60 --retry-delay 1 --retry-all-errors
           http://localhost:9200/
 
       - name: integration test
         if: matrix.java == 11
         run: |
           ./build/opencast-dist-allinone/bin/start-opencast daemon &
-          ./curl-amd64 -fisS --retry 30 --retry-delay 10 --retry-all-errors -u admin:opencast http://localhost:8080/sysinfo/bundles/version
+          curl -fisS --retry 30 --retry-delay 10 --retry-all-errors -u admin:opencast http://localhost:8080/sysinfo/bundles/version
 
       - name: show logs on failure
         if: ${{ failure() }}

@@ -6,11 +6,6 @@ updates:
     interval: daily
   open-pull-requests-limit: 10
 - package-ecosystem: npm
-  directory: "/modules/engage-theodul-core"
-  schedule:
-    interval: daily
-  open-pull-requests-limit: 10
-- package-ecosystem: npm
   directory: "/modules/engage-ui"
   schedule:
     interval: daily
@@ -39,6 +34,7 @@ updates:
   directory: "/modules/engage-paella-player-7"
   schedule:
     interval: daily
+  target-branch: "r/13.x"
   open-pull-requests-limit: 10
 - package-ecosystem: npm
   directory: "/modules/admin-ui-frontend"

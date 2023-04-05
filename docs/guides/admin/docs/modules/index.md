@@ -11,9 +11,6 @@ Documentation for modules included in Opencast.
 * [LTI Module](ltimodule.md)
 * [Media Module](mediamodule.configuration.md)
 * [Metrics (OpenMetrics, Prometheus)](metrics.md)
-* Player
-    * [Configuration](player.configuration.md)
-    * [URL Parameter](player.url.parameter.md)
 * [Search Indexes](searchindex/index.md)
     * [Solr](searchindex/solr.md)
 * [Stream Security](stream-security.md)
@@ -27,7 +24,8 @@ Documentation for modules included in Opencast.
 * Termination State
     * [Basic](terminationstate.md)
     * [AWS AutoScaling](terminationstate.aws.autoscaling.md)
-* [Transcripts (Google Speech)](googlespeechtranscripts.md)
-* [Transcripts (IBM Watson)](watsontranscripts.md)
-* [Transcripts (Microsoft Azure)](microsoftazuretranscripts.md)
+* [Transcripts (Amberscript)](transcription.modules/amberscripttranscripts.md)
+* [Transcripts (Google Speech)](transcription.modules/googlespeechtranscripts.md)
+* [Transcripts (IBM Watson)](transcription.modules/watsontranscripts.md)
+* [Transcripts (Microsoft Azure)](transcription.modules/microsoftazuretranscripts.md)
 * [YouTube Publication](youtubepublication.md)

@@ -21,7 +21,8 @@
 
 package org.opencastproject.search.impl.persistence;
 
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -66,7 +67,7 @@ public class SearchServicePersistenceTest {
    */
   @Before
   public void setUp() throws Exception {
-    EntityManagerFactory emf = newTestEntityManagerFactory(SearchServiceDatabaseImpl.PERSISTENCE_UNIT);
+    EntityManagerFactory emf = newEntityManagerFactory(SearchServiceDatabaseImpl.PERSISTENCE_UNIT);
     EntityManager em = emf.createEntityManager();
     securityService = EasyMock.createNiceMock(SecurityService.class);
     DefaultOrganization defaultOrganization = new DefaultOrganization();
@@ -84,6 +85,7 @@ public class SearchServicePersistenceTest {
 
     searchDatabase = new SearchServiceDatabaseImpl();
     searchDatabase.setEntityManagerFactory(emf);
+    searchDatabase.setDBSessionFactory(getDbSessionFactory());
     searchDatabase.setSecurityService(securityService);
     searchDatabase.activate(null);
 

@@ -25,6 +25,7 @@ import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
+import static org.opencastproject.db.DBTestEnv.newDBSession;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -37,6 +38,7 @@ import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.AssetManagerImpl;
 import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.assetmanager.impl.persistence.Database;
+import org.opencastproject.db.DBSession;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -57,9 +59,6 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.persistencefn.PersistenceEnv;
-import org.opencastproject.util.persistencefn.PersistenceEnvs;
-import org.opencastproject.util.persistencefn.PersistenceUtil;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
@@ -84,7 +83,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
-import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.Path;
 
 @Path("/")
@@ -156,9 +154,8 @@ public class TestTasksEndpoint extends TasksEndpoint {
   }
 
   AssetManager mkAssetManager(final Workspace workspace) throws Exception {
-    final EntityManagerFactory emf = mkEntityManagerFactory("org.opencastproject.assetmanager.impl");
-    final PersistenceEnv penv = PersistenceEnvs.mk(emf);
-    final Database db = new Database(emf, penv);
+    final DBSession dbSession = newDBSession("org.opencastproject.assetmanager.impl");
+    final Database db = new Database(dbSession);
     HttpAssetProvider httpAssetProvider = new HttpAssetProvider() {
       @Override
       public Snapshot prepareForDelivery(Snapshot snapshot) {
@@ -275,26 +272,4 @@ public class TestTasksEndpoint extends TasksEndpoint {
       }
     };
   }
-
-  static EntityManagerFactory mkEntityManagerFactory(String persistenceUnit) {
-    if ("mysql".equals(System.getProperty("useDatabase"))) {
-      return mkMySqlEntityManagerFactory(persistenceUnit);
-    } else {
-      return mkH2EntityManagerFactory(persistenceUnit);
-    }
-  }
-
-  static EntityManagerFactory mkH2EntityManagerFactory(String persistenceUnit) {
-    return PersistenceUtil.mkTestEntityManagerFactory(persistenceUnit, true);
-  }
-
-  static EntityManagerFactory mkMySqlEntityManagerFactory(String persistenceUnit) {
-    return PersistenceUtil.mkEntityManagerFactory(persistenceUnit, "MySQL", "com.mysql.jdbc.Driver",
-            "jdbc:mysql://localhost/test_scheduler", "matterhorn", "matterhorn",
-            org.opencastproject.util.data.Collections.map(tuple("eclipselink.ddl-generation", "drop-and-create-tables"),
-                    tuple("eclipselink.ddl-generation.output-mode", "database"),
-                    tuple("eclipselink.logging.level.sql", "FINE"), tuple("eclipselink.logging.parameters", "true")),
-            PersistenceUtil.mkTestPersistenceProvider());
-  }
-
 }

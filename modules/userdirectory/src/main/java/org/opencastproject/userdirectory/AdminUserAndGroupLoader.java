@@ -32,12 +32,7 @@ import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.security.util.SecurityUtil;
-import org.opencastproject.util.UrlSupport;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Stream;
-
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -48,12 +43,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
@@ -89,12 +82,6 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
 
   /** The administrator group's suffix */
   public static final String SYSTEM_ADMIN_GROUP_SUFFIX = "_SYSTEM_ADMINS";
-
-  /** Path to the list of roles */
-  public static final String ROLES_PATH_PREFIX = "/roles";
-
-  /** The path to the organization admin's list of roles */
-  public static final String SYSTEM_ADMIN_FILE = "system-admins";
 
   /** The configuration value of the administrator username */
   private String adminUserName = null;
@@ -227,12 +214,6 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
           systemAdminRolesIds.add(role);
         }
 
-        // Add roles as defined in the code base
-        for (String role : loadGroupRoles(SYSTEM_ADMIN_FILE)) {
-          systemAdminRoles.add(new JpaRole(role, org));
-          systemAdminRolesIds.add(role);
-        }
-
         // Add roles as defined by the organization
         if (StringUtils.isNotBlank(org.getAdminRole())) {
           systemAdminRoles.add(new JpaRole(org.getAdminRole(), org));
@@ -277,42 +258,6 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
         logger.error("Unable to load system administrator group", t);
       }
     });
-  }
-
-  /**
-   * Loads the set of roles from the properties file, located at {@link #MEMBERS_PATH_PREFIX}.
-   *
-   * @param roleFileName
-   *          name of the properties file containing the roles
-   * @return the set of roles
-   */
-  private Set<String> loadGroupRoles(String roleFileName) throws IllegalStateException, IOException {
-    String propertiesFile = UrlSupport.concat(ROLES_PATH_PREFIX, roleFileName);
-
-    InputStream rolesIS = null;
-    try {
-      // Load the properties
-      rolesIS = AdminUserAndGroupLoader.class.getResourceAsStream(propertiesFile);
-      if (null == rolesIS) {
-        return new TreeSet<>(); // if file doesn't exits assume it's empty
-      }
-      Stream<String> stream = Stream.$(IOUtils.readLines(rolesIS)).filter(new Fn<String, Boolean>() {
-        @Override
-        public Boolean apply(String line) {
-          if (StringUtils.trimToEmpty(line).startsWith("#")) {
-            return false;
-          }
-          return true;
-        }
-      });
-      return new TreeSet<>(stream.toSet());
-    } catch (IOException e) {
-      logger.error("Error loading system roles from file {}", propertiesFile);
-      throw e;
-    } finally {
-      IOUtils.closeQuietly(rolesIS);
-    }
-
   }
 
   @Override

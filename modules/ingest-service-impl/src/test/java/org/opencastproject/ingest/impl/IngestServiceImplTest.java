@@ -360,9 +360,10 @@ public class IngestServiceImplTest {
     service.updated(properties);
 
     mediaPackage = service.createMediaPackage();
-    mediaPackage = service.addTrack(urlTrack, MediaPackageElements.PRESENTATION_SOURCE, mediaPackage);
-    mediaPackage = service.addCatalog(urlCatalog1, MediaPackageElements.EPISODE, mediaPackage);
-    mediaPackage = service.addAttachment(urlAttachment, MediaPackageElements.MEDIAPACKAGE_COVER_FLAVOR, mediaPackage);
+    mediaPackage = service.addTrack(urlTrack, MediaPackageElements.PRESENTATION_SOURCE, null, mediaPackage);
+    mediaPackage = service.addCatalog(urlCatalog1, MediaPackageElements.EPISODE, null, mediaPackage);
+    mediaPackage = service.addAttachment(urlAttachment, MediaPackageElements.MEDIAPACKAGE_COVER_FLAVOR, null,
+        mediaPackage);
     WorkflowInstance instance = service.ingest(mediaPackage);
     Assert.assertEquals(1, mediaPackage.getTracks().length);
     Assert.assertEquals(1, mediaPackage.getCatalogs().length);
@@ -418,13 +419,13 @@ public class IngestServiceImplTest {
 
     mediaPackage = service.createMediaPackage();
     try {
-      mediaPackage = service.addTrack(URI.create("http://www.test.com/testfile"), null, mediaPackage);
+      mediaPackage = service.addTrack(URI.create("http://www.test.com/testfile"), null, null, mediaPackage);
     } catch (Exception e) {
       Assert.fail("Unable to read content dispostion filename: " + e.getMessage());
     }
 
     try {
-      mediaPackage = service.addTrack(urlTrackNoFilename, null, mediaPackage);
+      mediaPackage = service.addTrack(urlTrackNoFilename, null, null, mediaPackage);
       Assert.fail("Allowed adding content without filename!");
     } catch (Exception e) {
       Assert.assertNotNull(e);
@@ -467,10 +468,13 @@ public class IngestServiceImplTest {
 
     Dictionary<String, String> props = new Hashtable<>();
     props.put(IngestServiceImpl.DOWNLOAD_SOURCE, regex);
+    props.put(IngestServiceImpl.DOWNLOAD_USER, "user");
+    props.put(IngestServiceImpl.DOWNLOAD_PASSWORD, "password");
+
     service.updated(props);
 
     try {
-      service.addTrack(URI.create(url), null, mediaPackage);
+      service.addTrack(URI.create(url), null, null, mediaPackage);
     } catch (IOException e) {
       if (!shouldFail) {
         Assert.fail("Should not have failed!");
@@ -713,11 +717,11 @@ public class IngestServiceImplTest {
   public void testFailedJobs() throws Exception {
     Assert.assertEquals(0, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FINISHED).size());
     Assert.assertEquals(0, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FAILED).size());
-    service.addTrack(urlTrack, MediaPackageElements.PRESENTATION_SOURCE, service.createMediaPackage());
+    service.addTrack(urlTrack, MediaPackageElements.PRESENTATION_SOURCE, null, service.createMediaPackage());
     Assert.assertEquals(1, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FINISHED).size());
     Assert.assertEquals(0, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FAILED).size());
     try {
-      service.addTrack(URI.create("file//baduri"), MediaPackageElements.PRESENTATION_SOURCE,
+      service.addTrack(URI.create("file//baduri"), MediaPackageElements.PRESENTATION_SOURCE, null,
               service.createMediaPackage());
     } catch (Exception e) {
       // Ignore exception

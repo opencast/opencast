@@ -108,6 +108,7 @@ nav:
 - Version Support: 'version-support.md'
 - Modules:
    - Overview: 'modules/index.md'
+   - Plugin Management: modules/plugin-management.md
    - Atom/RSS Feed: 'modules/atomrss.md'
    - Amazon Services:
       - Amazon S3 Archive Storage: 'modules/awss3archive.md'
@@ -119,8 +120,6 @@ nav:
    - Metrics (OpenMetrics, Prometheus): modules/metrics.md
    - Player:
       - Configuration: 'modules/player.configuration.md'
-      - URL Parameters: 'modules/player.url.parameter.md'
-      - Matomo Tracking: 'modules/player.matomo.tracking.md'
    - Paella player:
       - Configuration: 'modules/paella.player/configuration.md'
       - URL Parameters: 'modules/paella.player/url.parameter.md'
@@ -148,10 +147,13 @@ nav:
       - AWS AutoScaling: 'modules/terminationstate.aws.autoscaling.md'
    - Text Extraction: 'modules/textextraction.md'
    - Timeline Previews: 'modules/timelinepreviews.md'
-   - Transcripts (AmberScript): 'modules/amberscripttranscripts.md'
-   - Transcripts (Google Speech): 'modules/googlespeechtranscripts.md'
-   - Transcripts (IBM Watson): 'modules/watsontranscripts.md'
-   - Transcripts (Microsoft Azure): 'modules/microsoftazuretranscripts.md'
+   - Transcription modules:
+      - AmberScript: 'modules/transcription.modules/amberscripttranscripts.md'
+      - Google Speech: 'modules/transcription.modules/googlespeechtranscripts.md'
+      - IBM Watson: 'modules/transcription.modules/watsontranscripts.md'
+      - Microsoft Azure: 'modules/transcription.modules/microsoftazuretranscripts.md'
+      - Vosk: 'modules/transcription.modules/vosk.md'
+      - Whisper: 'modules/transcription.modules/whisper.md'
    - Video Editor:
       - Setup: 'modules/videoeditor.setup.md'
       - Architecture: 'modules/videoeditor.architecture.md'
@@ -169,6 +171,7 @@ nav:
    - Animate: 'workflowoperationhandlers/animate-woh.md'
    - AmberScript Start Transcription: 'workflowoperationhandlers/amberscript-start-transcription-woh.md'
    - AmberScript Attach Transcription: 'workflowoperationhandlers/amberscript-attach-transcription-woh.md'
+   - Assert: 'workflowoperationhandlers/assert-woh.md'
    - Asset Snapshot: 'workflowoperationhandlers/snapshot-woh.md'
    - Asset Delete: 'workflowoperationhandlers/asset-delete-woh.md'
    - Attach Watson Transcription: 'workflowoperationhandlers/attach-watson-transcription-woh.md'
@@ -193,7 +196,6 @@ nav:
    - Execute Many: 'workflowoperationhandlers/execute-many-woh.md'
    - Export Workflow Properties: 'workflowoperationhandlers/export-wf-properties-woh.md'
    - Extract Text: 'workflowoperationhandlers/extracttext-woh.md'
-   - Failing: 'workflowoperationhandlers/failing-woh.md'
    - Google Speech Attach Transcription: 'workflowoperationhandlers/google-speech-attach-transcription-woh.md'
    - Google Speech Start Transcription: 'workflowoperationhandlers/google-speech-start-transcription-woh.md'
    - HTTP Notify: 'workflowoperationhandlers/httpnotify-woh.md'
@@ -255,4 +257,5 @@ nav:
    - Theme: 'workflowoperationhandlers/theme-woh.md'
    - Video Grid: 'workflowoperationhandlers/video-grid-woh.md'
    - Waveform: 'workflowoperationhandlers/waveform-woh.md'
+   - WebVTT to CutMarks Operation: 'workflowoperationhandlers/webvtt-to-cutmarks.md'
    - Zip: 'workflowoperationhandlers/zip-woh.md'

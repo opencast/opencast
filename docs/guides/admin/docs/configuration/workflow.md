@@ -395,7 +395,7 @@ and be consistent to the Admin UI thumbnail configuration (see [Thumbnail Config
 
 ## Test the Workflow
 
-The easiest way to test a workflow is to just put it into the workflow folder where it will be picked up by Opencast
+The easiest way to test a workflow is to just put it into the workflows folder where it will be picked up by Opencast
 automatically and will be available in Opencast a few seconds later.
 
 ## Using YAML Files with Workflows

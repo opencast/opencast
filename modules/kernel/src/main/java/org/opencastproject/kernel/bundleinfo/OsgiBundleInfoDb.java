@@ -20,9 +20,8 @@
  */
 package org.opencastproject.kernel.bundleinfo;
 
-import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
-
-import org.opencastproject.util.persistence.PersistenceEnv;
+import org.opencastproject.db.DBSession;
+import org.opencastproject.db.DBSessionFactory;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -42,8 +41,9 @@ public class OsgiBundleInfoDb extends AbstractBundleInfoDb {
 
   public static final String PERSISTENCE_UNIT = "org.opencastproject.kernel";
 
+  private DBSessionFactory dbSessionFactory;
   private EntityManagerFactory emf;
-  private PersistenceEnv penv;
+  private DBSession db;
 
   /** OSGi DI */
   @Reference(target = "(osgi.unit.name=org.opencastproject.kernel)")
@@ -51,18 +51,24 @@ public class OsgiBundleInfoDb extends AbstractBundleInfoDb {
     this.emf = emf;
   }
 
-  @Override protected PersistenceEnv getPersistenceEnv() {
-    return penv;
+  @Reference
+  public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
+    this.dbSessionFactory = dbSessionFactory;
+  }
+
+  @Override
+  protected DBSession getDBSession() {
+    return db;
   }
 
   /** OSGi callback */
   @Activate
   public void activate() {
-    penv = persistenceEnvironment(emf);
+    db = dbSessionFactory.createSession(emf);
   }
 
   public void deactivate() {
     logger.info("Closing persistence environment");
-    penv.close();
+    db.close();
   }
 }
