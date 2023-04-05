@@ -33,7 +33,11 @@ Release Schedule
 | May 10, 2023                | Cutting the release branch  |
 | May 15, 2023                | Translation week            |
 | May 30, 2023                | Public QA phase             |
+<<<<<<< HEAD
 | June 15, 2023               | Release of Opencast 14.0    |
+=======
+| June 15, 2023               | Release of Opencast 13.0    |
+>>>>>>> eaf8648603 (Update the release schedule)
 
 Release Managers
 ----------------
