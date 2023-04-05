@@ -22,9 +22,9 @@ Release Schedule
 
 | Date                        | Phase                       |
 |-----------------------------|-----------------------------|
-| April ?, 2023              | Cutting the release branch  |
-| May ?, 2023                | Translation week            |
-| May ?, 2023                 | Public QA phase             |
+| May 10, 2023                | Cutting the release branch  |
+| May 15, 2023                | Translation week            |
+| May 30, 2023                | Public QA phase             |
 | June 15, 2023               | Release of Opencast 13.0    |
 
 Release Managers
