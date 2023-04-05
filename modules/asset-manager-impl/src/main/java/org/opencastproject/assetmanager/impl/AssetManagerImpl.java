@@ -165,7 +165,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerImpl.class);
 
-  private static final int PAGE_SIZE = 100;
+  private static final int PAGE_SIZE = 1000;
 
   enum AdminRole {
     GLOBAL, ORGANIZATION, NONE
