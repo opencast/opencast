@@ -21,6 +21,9 @@
 
 package org.opencastproject.studio.endpoint;
 
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
+
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
@@ -28,6 +31,7 @@ import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.studio.endpoint.assembler.SeriesAssembler;
+import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
@@ -37,6 +41,8 @@ import com.google.gson.GsonBuilder;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -45,6 +51,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -63,6 +70,8 @@ import javax.ws.rs.core.Response;
     "opencast.service.type=org.opencastproject.studio", "opencast.service.path=/studio-api" })
 public class StudioEndpoint {
 
+  private static final Logger logger = LoggerFactory.getLogger(StudioEndpoint.class);
+
   private final Gson gson;
 
   private ElasticsearchIndex elasticsearchIndex;
@@ -77,15 +86,41 @@ public class StudioEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "getSeries", description = "Returns series where the current user has write permissions.",
       returnDescription = "A list of JSON series objects",
+      restParameters = {
+         @RestParameter(name = "filter", isRequired = false,
+          description = "Usage <Filter Name>:<Value to Filter With>. Filters can combine using a comma \",\"."
+            + " Available Filters: title, textFilter.", type = STRING),
+      },
       responses = {
       @RestResponse(description = "Returns a list of series.",
           responseCode = HttpServletResponse.SC_OK)
   })
-  public Response getSeries() {
+  public Response getSeries(@QueryParam("filter") String filter) {
     SeriesSearchQuery query = new SeriesSearchQuery(securityService.getOrganization().getId(),
         securityService.getUser());
     query.withoutActions();
     query.withAction(Permissions.Action.WRITE);
+
+    if (filter != null && !filter.isBlank()) {
+      for (String f : filter.split(",")) {
+        String[] filterTuple = f.split(":",2);
+        if (filterTuple.length < 2) {
+          logger.info("Filter {} not valid: {}", filterTuple[0], filter);
+          continue;
+        }
+        String name = filterTuple[0];
+        String value = filterTuple[1];
+
+        if ("title".equals(name)) {
+          query.withTitle(value);
+        } else if ("textFilter".equals(name)) {
+          query.withText("*" + value + "*");
+        } else {
+          logger.warn("Unknown filter criteria {}", name);
+          return Response.status(SC_BAD_REQUEST).build();
+        }
+      }
+    }
 
     try {
       return Response.ok(gson.toJson(Arrays.stream(elasticsearchIndex.getByQuery(query).getItems())
