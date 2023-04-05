@@ -50,6 +50,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 
 /** Creates a subtitles file for a video. */
 @Component(
@@ -60,7 +61,7 @@ import java.util.List;
     property = {
         "service.description=Speech to Text Service",
         "service.pid=org.opencastproject.speechtotext.impl.SpeechToTextServiceImpl"
-})
+    })
 public class SpeechToTextServiceImpl extends AbstractJobProducer implements SpeechToTextService {
 
   private static final Logger logger = LoggerFactory.getLogger(SpeechToTextServiceImpl.class);
@@ -139,6 +140,8 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
     List<String> arguments = job.getArguments();
     String language = arguments.get(1);
     URI mediaFile = new URI(arguments.get(0));
+    Boolean translate = Boolean.parseBoolean(arguments.get(2));
+
 
     URI subtitleFilesURI;
     File subtitlesFile = null;
@@ -151,10 +154,10 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
               workspace.rootDirectory(), COLLECTION, vttFileName));
       subtitlesFile.deleteOnExit();
       FileUtils.forceMkdirParent(subtitlesFile);
+      Map<String,Object> subOutput = speechToTextEngine.generateSubtitlesFile(
+              workspace.get(mediaFile), subtitlesFile, language, translate);
 
-      subtitlesFile = speechToTextEngine.generateSubtitlesFile(
-              workspace.get(mediaFile), subtitlesFile, language);
-
+      subtitlesFile = (File) subOutput.get("subFile");
       // we need to call the "putInCollection" method to get
       // a URI, that can be used in the following processes
       try (FileInputStream subtitlesFileIS = new FileInputStream(subtitlesFile)) {
@@ -175,13 +178,13 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.speechtotext.api.SpeechToTextService#transcribe(URI, String)
+   * @see org.opencastproject.speechtotext.api.SpeechToTextService#transcribe(URI, String, Boolean)
    */
   @Override
-  public Job transcribe(URI mediaFile, String language) throws SpeechToTextServiceException {
+  public Job transcribe(URI mediaFile, String language, Boolean translate) throws SpeechToTextServiceException {
     try {
       logger.debug("Creating speechToText service job");
-      List<String> jobArguments = Arrays.asList(mediaFile.toString(), language);
+      List<String> jobArguments = Arrays.asList(mediaFile.toString(), language, translate.toString());
       return serviceRegistry.createJob(JOB_TYPE, OPERATION, jobArguments, jobLoad);
     } catch (ServiceRegistryException e) {
       throw new SpeechToTextServiceException(e);
