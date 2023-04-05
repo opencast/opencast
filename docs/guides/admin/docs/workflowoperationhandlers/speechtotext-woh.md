@@ -14,15 +14,15 @@ engines available, [Whisper](../modules/transcription.modules/whisper.md) and
 Parameter Table
 ---------------
 
-| configuration keys   | required | description                                                                                                                                        |
-|----------------------|----------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| source-flavor        | yes      | The source media package to use                                                                                                                    |
-| target-flavor        | yes      | Flavor of the produced subtitle file. The subflavor supports the language-code placeholder `#{lang}`                                               |
-| target-element       | no       | Define where to append the subtitles file. Possibilities are: as a 'track' or as an 'attachment'. The default is "attachment".                     |
-| language-code        | no       | The language of the video or audio source (default is "eng"). Vosk only: It has to match the name of the language model directory. See 'vosk-cli'. |
-| language-fallback    | yes*     | The fallback value if the dublin core/media package language field is not present.                                                                 |
-| target-tags          | no       | Tags for the subtitle file                                                                                                                         |
- | translate            | no       | Transcription is translated into English (Whisper Only)                                                                                            |
+| configuration keys | required | description                                                                                                                                             |
+|--------------------|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| source-flavor      | yes      | The source media package to use                                                                                                                         |
+| target-flavor      | yes      | Flavor of the produced subtitle file. The subflavor supports the language-code placeholder `#{lang}`                                                    |
+| target-element     | no       | Define where to append the subtitles file. Possibilities are: as a 'track' or as an 'attachment'. The default is "attachment".                          |
+| language-code      | no       | The language of the video or audio source (default is "eng"). Vosk only: It has to match the name of the language model directory. See 'vosk-cli'.      |
+| language-fallback  | yes*     | The fallback value if the dublin core/media package language field is not present.                                                                      |
+| target-tags        | no       | Tags for the subtitle file (Whisper only: Will add always the tag `lang:{code}` Where `code` can be by autodetection or from `language-code` parameter) |
+ | translate          | no       | Transcription is translated into English (Whisper Only)                                                                                                 |
 
  *Vosk Only, default value can be modified on Vosk config file.
 
@@ -39,6 +39,8 @@ If you want to display the subtitles in the Paella player, the WebVTT files have
 the target SubFlavor has to be configured like this: `vtt+LANG`, where `LANG` is
 the language option, that will be displayed in the Paella player. Please note the description above
 for the `language-code` field.
+
+Paella Player also can detect the tag `lang:{code}` to show the language in the subtitle menu.
 
 ```XML
 <operation

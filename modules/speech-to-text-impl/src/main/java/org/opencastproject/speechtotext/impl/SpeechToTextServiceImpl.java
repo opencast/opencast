@@ -158,6 +158,8 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
               workspace.get(mediaFile), subtitlesFile, language, translate);
 
       subtitlesFile = (File) subOutput.get("subFile");
+      language = (String) subOutput.get("language");
+
       // we need to call the "putInCollection" method to get
       // a URI, that can be used in the following processes
       try (FileInputStream subtitlesFileIS = new FileInputStream(subtitlesFile)) {
@@ -171,7 +173,7 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
         FileUtils.deleteQuietly(subtitlesFile);
       }
     }
-    return subtitleFilesURI.toString();
+    return subtitleFilesURI.toString() + "," + language;
   }
 
 

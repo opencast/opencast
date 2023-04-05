@@ -191,7 +191,10 @@ public class
 
     // subtitles file is generated now, put it into the media package
     try {
-      URI output = new URI(job.getPayload());
+      String[] jobOutput = job.getPayload().split(",");
+      URI output = new URI(jobOutput[0]);
+      String outputLanguage = jobOutput[1];
+
       String mediaPackageIdentifier = UUID.randomUUID().toString();
 
       MediaPackageElement subtitleMediaPackageElement;
@@ -218,6 +221,7 @@ public class
       subtitleMediaPackageElement.setFlavor(targetFlavor);
 
       List<String> targetTags = tagsAndFlavors.getTargetTags();
+      targetTags.add("lang:" + outputLanguage);
 
       // this is used to set some values automatically, like the correct mimetype
       Job inspection = mediaInspectionService.enrich(subtitleMediaPackageElement, true);
