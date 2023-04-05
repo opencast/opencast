@@ -926,6 +926,7 @@ public class Event implements IndexObject {
       eventStatus = "EVENTS.EVENTS.STATUS.SCHEDULED";
     } else {
       /* This can be the case if all workflows of an event have been deleted */
+      /* It also happens to events with running workflows while rebuilding the index */
       eventStatus = "EVENTS.EVENTS.STATUS.PROCESSED";
     }
   }
