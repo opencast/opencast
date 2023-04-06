@@ -27,7 +27,9 @@ import org.opencastproject.caption.util.TimeUtil;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.util.OsgiUtil;
+import org.opencastproject.util.data.Option;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -132,18 +134,31 @@ public class WebVttCaptionConverter implements CaptionConverter {
    * @return the configured mediapackage element type
    */
   private MediaPackageElement.Type getConfiguredMediapackageElementType(ComponentContext cc) {
-    String mediapackageElementType = null;
-    try {
-      mediapackageElementType = OsgiUtil.getOptCfg(cc.getProperties(), MEDIAPACKAGE_ELEMENT_TYPE_CONFIG_KEY).get();
-      // capitalize the first letter
-      mediapackageElementType = mediapackageElementType.substring(0, 1).toUpperCase()
-          + mediapackageElementType.substring(1).toLowerCase();
-      return MediaPackageElement.Type.valueOf(mediapackageElementType);
-    } catch (Exception e) {
-      logger.warn("Couldn't convert configuration '{}'='{}' into enum. Using default '{}'.",
-          MEDIAPACKAGE_ELEMENT_TYPE_CONFIG_KEY, mediapackageElementType, DEFAULT_MEDIAPACKAGE_ELEMENT_TYPE);
-      return DEFAULT_MEDIAPACKAGE_ELEMENT_TYPE;
+    Option<String> mediapackageElementTypeOption = OsgiUtil.getOptCfg(
+        cc.getProperties(), MEDIAPACKAGE_ELEMENT_TYPE_CONFIG_KEY);
+    if (mediapackageElementTypeOption.isNone()) {
+      return DEFAULT_MEDIAPACKAGE_ELEMENT_TYPE; // returning default if config isn't set
     }
+    return convertStringToEnum(mediapackageElementTypeOption.get());
+  }
+
+  /**
+   * Helps to convert a configured mediaPackageElementType.
+   * Converts from a string to the corresponding enum.
+   *
+   * @param mediaPackageElementType The string that will be converted to the enum.
+   * @return The resulting enum after the conversion.
+   */
+  private Type convertStringToEnum(String mediaPackageElementType) {
+    if (EnumUtils.isValidEnumIgnoreCase(MediaPackageElement.Type.class, mediaPackageElementType)) {
+      return EnumUtils.getEnumIgnoreCase(MediaPackageElement.Type.class, mediaPackageElementType);
+    }
+    // Conversion didn't work. Print an error and throw an exception
+    String additionalErrorInfo = String.format("Please check the config file '%s'.", this.getClass().getName());
+    String errorMessage = String.format("Couldn't convert configuration '%s'='%s' into enum. " + additionalErrorInfo,
+        MEDIAPACKAGE_ELEMENT_TYPE_CONFIG_KEY, mediaPackageElementType);
+    logger.error(errorMessage);
+    throw new IllegalArgumentException(errorMessage);
   }
 
 }
