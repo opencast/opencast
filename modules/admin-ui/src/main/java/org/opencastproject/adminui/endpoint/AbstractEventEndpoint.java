@@ -2160,7 +2160,8 @@ public abstract class AbstractEventEndpoint {
     } catch (Exception e) {
       logger.error("Unable to parse access policy", e);
     }
-    Option<ManagedAcl> currentAcl = AccessInformationUtil.matchAcls(acls, activeAcl);
+    Option<ManagedAcl> currentAcl = AccessInformationUtil.matchAclsLenient(acls, activeAcl,
+            getAdminUIConfiguration().getMatchManagedAclRolePrefixes());
 
     JSONObject episodeAccessJson = new JSONObject();
     episodeAccessJson.put("current_acl", currentAcl.isSome() ? currentAcl.get().getId() : 0L);

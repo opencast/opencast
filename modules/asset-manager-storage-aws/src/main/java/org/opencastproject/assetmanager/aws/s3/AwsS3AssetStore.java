@@ -21,14 +21,19 @@
 
 package org.opencastproject.assetmanager.aws.s3;
 
+import static java.lang.String.format;
+
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
+import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.aws.AwsAbstractArchive;
 import org.opencastproject.assetmanager.aws.AwsUploadOperationResult;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabase;
+import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabaseException;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetMapping;
 import org.opencastproject.util.ConfigurationException;
+import org.opencastproject.util.MimeType;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
@@ -36,6 +41,7 @@ import org.opencastproject.workspace.api.Workspace;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.HttpMethod;
+import com.amazonaws.SdkClientException;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -44,11 +50,21 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.BucketVersioningConfiguration;
+import com.amazonaws.services.s3.model.CopyObjectRequest;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.amazonaws.services.s3.model.GetObjectTaggingRequest;
+import com.amazonaws.services.s3.model.GetObjectTaggingResult;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.ObjectTagging;
+import com.amazonaws.services.s3.model.RestoreObjectRequest;
 import com.amazonaws.services.s3.model.SetBucketVersioningConfigurationRequest;
+import com.amazonaws.services.s3.model.SetObjectTaggingRequest;
+import com.amazonaws.services.s3.model.StorageClass;
+import com.amazonaws.services.s3.model.Tag;
 import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
+import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -63,8 +79,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.List;
 
 @Component(
     property = {
@@ -79,6 +97,11 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(AwsS3AssetStore.class);
 
+  private static final Tag freezable = new Tag("Freezable", "true");
+  private static final Integer RESTORE_MIN_WAIT = 1080000; // 3h
+  private static final Integer RESTORE_POLL = 900000; // 15m
+
+
   // Service configuration
   public static final String AWS_S3_ENABLED = "org.opencastproject.assetmanager.aws.s3.enabled";
   public static final String AWS_S3_ACCESS_KEY_ID_CONFIG = "org.opencastproject.assetmanager.aws.s3.access.id";
@@ -90,6 +113,9 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   public static final String AWS_S3_MAX_CONNECTIONS = "org.opencastproject.assetmanager.aws.s3.max.connections";
   public static final String AWS_S3_CONNECTION_TIMEOUT = "org.opencastproject.assetmanager.aws.s3.connection.timeout";
   public static final String AWS_S3_MAX_RETRIES = "org.opencastproject.assetmanager.aws.s3.max.retries";
+  public static final String AWS_GLACIER_RESTORE_DAYS = "org.opencastproject.assetmanager.aws.s3.glacier.restore.days";
+
+  public static final Integer AWS_S3_GLACIER_RESTORE_DAYS_DEFAULT = 2;
 
   // defaults
   public static final int DEFAULT_MAX_CONNECTIONS = 50;
@@ -109,7 +135,10 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
 
   private boolean pathStyle = false;
 
-  private boolean bucketCreated = false;
+  /** The Glacier storage class, restore period **/
+  private Integer restorePeriod;
+
+  protected boolean bucketCreated = false;
 
   /** OSGi Di */
   @Override
@@ -132,7 +161,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
    *          the component context
    */
   @Activate
-  public void activate(final ComponentContext cc) throws IllegalStateException, IOException, ConfigurationException {
+  public void activate(final ComponentContext cc) throws IllegalStateException, ConfigurationException {
     // Get the configuration
     if (cc != null) {
       @SuppressWarnings("rawtypes")
@@ -165,6 +194,10 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
 
       pathStyle = BooleanUtils.toBoolean(OsgiUtil.getComponentContextProperty(cc, AWS_S3_PATH_STYLE_CONFIG, "false"));
       logger.info("AWS path style is {}", pathStyle);
+
+      // Glacier storage class restore period
+      restorePeriod = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_GLACIER_RESTORE_DAYS)
+          .getOrElse(AWS_S3_GLACIER_RESTORE_DAYS_DEFAULT);
 
       // Explicit credentials are optional.
       AWSCredentialsProvider provider = null;
@@ -208,7 +241,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
               .withCredentials(provider)
               .build();
 
-      s3TransferManager = new TransferManager(s3);
+      s3TransferManager = TransferManagerBuilder.standard().withS3Client(s3).build();
 
       logger.info("AwsS3ArchiveAssetStore activated!");
     }
@@ -218,7 +251,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   /**
    * Creates the AWS S3 bucket if it doesn't exist yet.
    */
-  private void createAWSBucket() {
+  void createAWSBucket() {
     // Does bucket exist?
     try {
       s3.listObjects(bucketName);
@@ -250,7 +283,8 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
    * Returns the aws s3 object id created by aws
    */
   @Override
-  protected AwsUploadOperationResult uploadObject(File origin, String objectName) throws AssetStoreException {
+  protected AwsUploadOperationResult uploadObject(File origin, String objectName, Opt<MimeType> mimeType)
+          throws AssetStoreException {
     // Check first if bucket is there.
     if (!bucketCreated) {
       createAWSBucket();
@@ -270,6 +304,24 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
               new Object[] { objectName, bucketName, (System.currentTimeMillis() - start) / 1000 });
       ObjectMetadata objMetadata = s3.getObjectMetadata(bucketName, objectName);
       logger.trace("Got object metadata for: {}, version is {}", objectName, objMetadata.getVersionId());
+
+      // Tag objects that are suitable for Glacier storage class
+      // NOTE: Use of S3TransferManager means that tagging has to be done as a separate request
+      if (mimeType.isSome()) {
+        switch (mimeType.get().getType()) {
+          case "audio":
+          case "image":
+          case "video":
+            logger.debug("Tagging S3 object {} as Freezable", objectName);
+            List<Tag> tags = new ArrayList<>();
+            tags.add(freezable);
+            s3.setObjectTagging(new SetObjectTaggingRequest(bucketName, objectName, new ObjectTagging(tags)));
+            break;
+          default:
+            break;
+        }
+      }
+
       // If bucket versioning is disabled the versionId is null, so return a -1 to indicate no version
       String versionId = objMetadata.getVersionId();
       if (null == versionId) {
@@ -284,10 +336,107 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   }
 
   /**
+   * Return the object key of the asset in S3
+   * @param storagePath asset storage path
+   */
+  public String getAssetObjectKey(StoragePath storagePath) throws AssetStoreException {
+    try {
+      AwsAssetMapping map = database.findMapping(storagePath);
+      return map.getObjectKey();
+    } catch (AwsAssetDatabaseException e) {
+      throw new AssetStoreException(e);
+    }
+  }
+
+  /**
+   * Return the storage class of the asset in S3
+   * @param storagePath asset storage path
+   */
+  public String getAssetStorageClass(StoragePath storagePath) throws AssetStoreException {
+    if (!contains(storagePath)) {
+      return "NONE";
+    }
+    return getObjectStorageClass(getAssetObjectKey(storagePath));
+  }
+
+  private String getObjectStorageClass(String objectName) throws AssetStoreException {
+    try {
+      String storageClass = s3.getObjectMetadata(bucketName, objectName).getStorageClass();
+      return storageClass == null ? StorageClass.Standard.toString() : storageClass;
+    } catch (SdkClientException e) {
+      throw new AssetStoreException(e);
+    }
+  }
+
+  /**
+   * Change the storage class of the object if possible
+   * @param storagePath asset storage path
+   * @param storageClassId metadata storage class id
+   * @see <a href="https://aws.amazon.com/s3/storage-classes/">The S3 storage class docs</a>
+   */
+  public String modifyAssetStorageClass(StoragePath storagePath, String storageClassId) throws AssetStoreException {
+    try {
+      StorageClass storageClass = StorageClass.fromValue(storageClassId);
+      AwsAssetMapping map = database.findMapping(storagePath);
+      return modifyObjectStorageClass(map.getObjectKey(), storageClass).toString();
+    } catch (AwsAssetDatabaseException | IllegalArgumentException e) {
+      throw new AssetStoreException(e);
+    }
+  }
+
+  private StorageClass modifyObjectStorageClass(String objectName, StorageClass storageClass)
+          throws AssetStoreException {
+    try {
+      StorageClass objectStorageClass = StorageClass.fromValue(getObjectStorageClass(objectName));
+
+      if (storageClass != objectStorageClass) {
+        /* objects can only be retrieved from Glacier not moved */
+        if (objectStorageClass == StorageClass.Glacier || objectStorageClass == StorageClass.DeepArchive) {
+          boolean isRestoring = isRestoring(objectName);
+          boolean isRestored = null != s3.getObjectMetadata(bucketName, objectName).getRestoreExpirationTime();
+          if (!isRestoring && !isRestored) {
+            logger.warn("S3 Object {} can not be moved from storage class {} to {} without restoring the object first",
+                objectStorageClass, storageClass);
+            return objectStorageClass;
+          }
+        }
+
+        /* Only put suitable objects in Glacier */
+        if (storageClass == StorageClass.Glacier || objectStorageClass == StorageClass.DeepArchive) {
+          GetObjectTaggingRequest gotr = new GetObjectTaggingRequest(bucketName, objectName);
+          GetObjectTaggingResult objectTaggingRequest = s3.getObjectTagging(gotr);
+          if (!objectTaggingRequest.getTagSet().contains(freezable)) {
+            logger.info("S3 object {} is not suitable for storage class {}", objectName, storageClass);
+            return objectStorageClass;
+          }
+        }
+
+        CopyObjectRequest copyRequest = new CopyObjectRequest(bucketName, objectName, bucketName, objectName)
+                                            .withStorageClass(storageClass);
+        s3.copyObject(copyRequest);
+        logger.info("S3 object {} moved to storage class {}", objectName, storageClass);
+      } else {
+        logger.info("S3 object {} already in storage class {}", objectName, storageClass);
+      }
+
+      return storageClass;
+    } catch (SdkClientException e) {
+      throw new AssetStoreException(e);
+    }
+  }
+
+  /**
    *
    */
   @Override
-  protected InputStream getObject(AwsAssetMapping map) throws AssetStoreException {
+  protected InputStream getObject(AwsAssetMapping map) {
+    String storageClassId = getObjectStorageClass(map.getObjectKey());
+
+    if (StorageClass.Glacier.name().equals(storageClassId) || StorageClass.DeepArchive.name().equals(storageClassId)) {
+      // restore object and wait until available if necessary
+      restoreGlacierObject(map.getObjectKey(), restorePeriod, true);
+    }
+
     try {
       // Do not use S3 object stream anymore because the S3 object needs to be closed to release
       // the http connection so create the stream using the object url (signed).
@@ -303,12 +452,109 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     }
   }
 
+  public String getAssetRestoreStatusString(StoragePath storagePath) {
+    try {
+      AwsAssetMapping map = database.findMapping(storagePath);
+
+      Date expirationTime = s3.getObjectMetadata(bucketName, map.getObjectKey()).getRestoreExpirationTime();
+      if (expirationTime != null) {
+        return format("RESTORED, expires in %s", expirationTime.toString());
+      }
+
+      Boolean prevOngoingRestore = s3.getObjectMetadata(bucketName, map.getObjectKey()).getOngoingRestore();
+      if (prevOngoingRestore != null && prevOngoingRestore) {
+        return "RESTORING";
+      }
+
+      return "NONE";
+    } catch (AwsAssetDatabaseException | IllegalArgumentException e) {
+      throw new AssetStoreException(e);
+    }
+  }
+
+  /*
+   * Restore a frozen asset from deep archive
+   * @param storagePath asset storage path
+   * @param assetRestorePeriod number of days to restore assest for
+   * @see https://aws.amazon.com/s3/storage-classes/
+   */
+  public void initiateRestoreAsset(StoragePath storagePath, Integer assetRestorePeriod) throws AssetStoreException {
+    try {
+      AwsAssetMapping map = database.findMapping(storagePath);
+      restoreGlacierObject(map.getObjectKey(), assetRestorePeriod, false);
+    } catch (AwsAssetDatabaseException | IllegalArgumentException e) {
+      throw new AssetStoreException(e);
+    }
+  }
+
+  private boolean isRestoring(String objectName) {
+    Boolean prevOngoingRestore = s3.getObjectMetadata(bucketName, objectName).getOngoingRestore();
+    //FIXME: prevOngoingRestore is null when the object isn't being restored for some reason
+    // The javadocs for getOngoingRestore don't say anything about retuning null, and it doesn't make a ton of sense
+    // so I'm guessing this is a bug in the library itself that's not present in the version Manchester is using
+    if (prevOngoingRestore != null && prevOngoingRestore) {
+      logger.info("Object {} is already being restored", objectName);
+      return true;
+    }
+    logger.info("Object {} is not currently being restored", objectName);
+    return false;
+  }
+
+  private void restoreGlacierObject(String objectName, Integer objectRestorePeriod, Boolean wait) {
+    boolean newRestore = false;
+    if (isRestoring(objectName)) {
+      if (!wait) {
+        return;
+      }
+      logger.info("Waiting for object {}", objectName);
+    } else {
+      RestoreObjectRequest requestRestore = new RestoreObjectRequest(bucketName, objectName, objectRestorePeriod);
+      s3.restoreObjectV2(requestRestore);
+      newRestore = true;
+    }
+
+    // if the object had already been restored the restore request will just
+    // increase the expiration time
+    if (s3.getObjectMetadata(bucketName, objectName).getRestoreExpirationTime() == null) {
+      logger.info("Restoring object {} from Glacier class storage", objectName);
+
+      // Just initiate restore?
+      if (!wait) {
+        return;
+      }
+
+      // Check the restoration status of the object.
+      // Wait min restore time and then poll ofter that
+      try {
+        if (newRestore) {
+          Thread.sleep(RESTORE_MIN_WAIT);
+        }
+
+        while (s3.getObjectMetadata(bucketName, objectName).getOngoingRestore()) {
+          Thread.sleep(RESTORE_POLL);
+        }
+
+        logger.info("Object {} has been restored from Glacier class storage, for {} days", objectName,
+                                                                                           objectRestorePeriod);
+      } catch (InterruptedException e) {
+        logger.error("Object {} has not yet been restored from Glacier class storage", objectName);
+      }
+    } else {
+      logger.info("Object {} has already been restored, further extended by {} days", objectName, objectRestorePeriod);
+    }
+  }
+
+
   /**
   *
   */
   @Override
   protected void deleteObject(AwsAssetMapping map) {
     s3.deleteObject(bucketName, map.getObjectKey());
+  }
+
+  public Integer getRestorePeriod() {
+    return restorePeriod;
   }
 
   // For running tests

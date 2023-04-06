@@ -270,7 +270,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     } else {
       // Check if the media package found in the search index is live. We have to check because we may get a
       // notification for past events if the admin ui index is rebuilt
-      if (!isLive(mp)) {
+      if (!mp.isLive()) {
         logger.info("Media package {} is in search index but not live so not updating it.", mpId);
         return false;
       }
@@ -285,7 +285,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       logger.debug("Live media package {} not found in search index", mpId);
       return false;
     } else {
-      if (!isLive(mp)) {
+      if (!mp.isLive()) {
         logger.info("Media package {} is not live. Not retracting.", mpId);
         return false;
       }
@@ -297,7 +297,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   public boolean updateLiveEventAcl(String mpId, AccessControlList acl) throws LiveScheduleException {
     MediaPackage previousMp = getMediaPackageFromSearch(mpId);
     if (previousMp != null) {
-      if (!isLive(previousMp)) {
+      if (!previousMp.isLive()) {
         logger.info("Media package {} is not live. Not updating acl.", mpId);
         return false;
       }
@@ -614,19 +614,6 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     }
     matcher.appendTail(sb);
     return sb.toString();
-  }
-
-  private boolean isLive(MediaPackage mp) {
-    Track[] tracks = mp.getTracks();
-    if (tracks != null) {
-      for (Track track : tracks) {
-        if (track.isLive()) {
-          return true;
-        }
-      }
-    }
-
-    return false;
   }
 
   private JobBarrier.Result waitForStatus(Job... jobs) throws IllegalStateException, IllegalArgumentException {

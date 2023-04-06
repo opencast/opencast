@@ -29,7 +29,7 @@ import packagePom from '../pom.xml';
 
 import EpisodeConversor from './js/EpisodeConversor.js';
 
-const dictionaries = require.context('./i18n/dict/', true, /\.json$/);
+const dictionaries = require.context('./i18n/', true, /\.json$/);
 const languages = {};
 function addDictionaries(player) {
   dictionaries.keys().forEach(k => {
@@ -48,6 +48,18 @@ function addDictionaries(player) {
   });
 }
 
+function myWebsiteCheckConsentFunction(type) {
+  const cookie_consent_level = utils.getCookie('cookie_consent_level');
+  var consent_level = {};
+  try {
+    consent_level = JSON.parse(cookie_consent_level);
+  }
+  catch(e) {
+    paella.log.debug('Error parsing "cookie_consent_level" cookie');
+  }
+  return consent_level[type] || false;
+}
+
 const initParams = {
   customPluginContext: [
     require.context('./plugins', true, /\.js/),
@@ -56,6 +68,9 @@ const initParams = {
     getZoomPluginContext(),
     getUserTrackingPluginContext()
   ],
+  getCookieConsentFunction: (type) => {
+    return myWebsiteCheckConsentFunction(type);
+  },
   configResourcesUrl: '/ui/config/paella7/',
   configUrl: '/ui/config/paella7/config.json',
 
@@ -95,6 +110,22 @@ const initParams = {
       }
     };
 
+    // check cookie consent (if enabled)
+    const cookieConsent = config?.opencast?.cookieConsent?.enable ?? true;
+    const cookieConsentConfig = config?.opencast?.cookieConsent?.config ?? {
+      'notice_banner_type':'headline',
+      'consent_type':'express',
+      'palette':'dark',
+      'language':'en',
+      'page_load_consent_levels':['strictly-necessary'],
+      'notice_banner_reject_button_hide':false,
+      'preferences_center_close_button_hide':false,
+      'page_refresh_confirmation_buttons':false,
+      'website_name': 'Paella - opencast player'
+    };
+    if (cookieConsent == true) {
+      cookieconsent.run(cookieConsentConfig);
+    }
     // Load episode
     const data = await loadEpisode();
     if (data === null) {
@@ -112,6 +143,11 @@ const initParams = {
         throw Error('The video does not exist or the user can\'t see it');
       }
     }
+
+    // Add event title to browser tab
+    const videoTitle = data?.metadata?.title ?? 'Unknown video title';
+    const seriesTitle = data?.metadata?.seriestitle ?? 'No series';
+    document.title = `${videoTitle} - ${seriesTitle} | Opencast`;
 
     // Load stats
     const stats = await loadStats();

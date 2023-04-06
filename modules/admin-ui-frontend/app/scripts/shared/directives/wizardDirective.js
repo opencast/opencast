@@ -269,17 +269,31 @@ angular.module('adminNg.directives')
 
       HotkeysService.activateHotkey(scope, 'add_media.next_tab', (event) => {
         if (!scope.wizard.isLast()) {
+          // Trigger submit function on form elements, thereby updating the requiredMetadata array of the form.
+          // This allows the hotkey to trigger the "next" step while the form element is still in focus, if all
+          // requirements are met.
+          // It would  be preferable to just trigger 'blur'/'change' on the element, but since the execution of their
+          // callbacks is asynchronous, there is no guarantee that the callbacks will have run before the check for
+          // the "next" step is run.
+          var targetElement = angular.element(event.target);
+          if (targetElement.parents('form').length > 0) {
+            var targetScope = targetElement.scope();
+            targetScope.submit();
+          }
+
           scope.wizard.toTab(event, 'next');
         } else {
           scope.submit();
         }
         event.preventDefault();
-      });
+      },
+      ['INPUT', 'TEXTAREA', 'SELECT']);
 
       HotkeysService.activateHotkey(scope, 'add_media.previous_tab', (event) => {
         scope.wizard.toTab(event, 'previous');
         event.preventDefault();
-      });
+      },
+      ['INPUT', 'TEXTAREA', 'SELECT']);
     }
   };
 }]);

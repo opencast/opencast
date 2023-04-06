@@ -531,4 +531,11 @@ public interface MediaPackage extends Cloneable {
    */
   Object clone();
 
+  /**
+   * Whether the media package contains live tracks.
+   *
+   * @return if mp is live
+   */
+  boolean isLive();
+
 }

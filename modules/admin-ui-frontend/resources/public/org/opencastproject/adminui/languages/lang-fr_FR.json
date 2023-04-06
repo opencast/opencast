@@ -894,11 +894,23 @@
                   "ADDITIONAL_ACTIONS": "Actions supplémentaires",
                   "ACTION": "Actions",
                   "NEW": "Ajouter",
-                  "DETAILS": "Détails"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the event",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the event becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the event"
+                  }
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",
                   "EMPTY": "Aucun rôle trouvé"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "COMMENTS": {
@@ -1116,11 +1128,22 @@
                   "ADDITIONAL_ACTIONS": "Actions supplémentaires",
                   "ACTION": "Actions",
                   "NEW": "Nouvelle politique",
-                  "DETAILS": "Détails"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",
                   "EMPTY": "Aucun rôle trouvé"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "THEME": {
@@ -1194,17 +1217,29 @@
                   "ADDITIONAL_ACTIONS": "Actions supplémentaires",
                   "ACTION": "Actions",
                   "NEW": "Add row",
-                  "DETAILS": "Détails",
-                  "REPLACE_EVENT_ACLS": "Enregistrer et mettre à jour les autorisations d'événement",
+                  "DETAILS": "Non-user roles",
+                  "REPLACE_EVENT_ACLS": "Mettre à jour les permissions de l'événement",
                   "REPLACE_EVENT_ACLS_HINT": "Assurez-vous que tous les événements de cette série ont ces permissions en vigueur",
                   "SAVE_SERIES_ACLS": "Enregistrer",
                   "SAVE_SERIES_ACLS_HINT": "Appliquer les autorisations uniquement aux séries",
                   "LOAD_MORE_LIMIT": "politiques affichées.",
-                  "LOAD_MORE_LINK": "Afficher plus"
+                  "LOAD_MORE_LINK": "Afficher plus",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",
                   "EMPTY": "Aucun rôle trouvé"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "METADATA": {
@@ -1443,12 +1478,23 @@
                   "ADDITIONAL_ACTIONS": "Actions supplémentaires",
                   "ACTION": "Actions",
                   "NEW": "Nouvelle ligne",
-                  "DETAILS": "Détails",
-                  "DESCRIPTION": "S'il vous plaît, choisir un ensemble préconfiguré de règles ou ajouter des règles personnalisées ci-dessous"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "S'il vous plaît, choisir un ensemble préconfiguré de règles ou ajouter des règles personnalisées ci-dessous",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the access policy",
+                  "HELP": {
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                  }
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",
                   "EMPTY": "Aucun rôle trouvé"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          },
@@ -1481,12 +1527,24 @@
                   "ADDITIONAL_ACTIONS": "Actions supplémentaires",
                   "ACTION": "Actions",
                   "NEW": "Nouvelle ligne",
-                  "DETAILS": "Détails",
-                  "DESCRIPTION": "S'il vous plaît, choisir un ensemble préconfiguré de règles ou ajouter des règles personnalisées ci-dessous"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "S'il vous plaît, choisir un ensemble préconfiguré de règles ou ajouter des règles personnalisées ci-dessous",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the access policy",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                  }
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",
                   "EMPTY": "Aucun rôle trouvé"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          }

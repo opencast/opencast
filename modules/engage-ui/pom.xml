@@ -59,7 +59,7 @@
               </execution>
 
               <execution>
-                <id>esline</id>
+                <id>eslint</id>
                 <goals>
                   <goal>exec</goal>
                 </goals>

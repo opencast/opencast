@@ -82,6 +82,7 @@
     <sec:intercept-url pattern="/admin-ng/event/*" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/groups/groups.json" method="GET" access="ROLE_ADMIN, ROLE_UI_GROUPS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/groups/*" method="GET" access="ROLE_ADMIN, ROLE_UI_GROUPS_EDIT" />
+    <sec:intercept-url pattern="/admin-ng/index/rebuild/states.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERVICES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/job/jobs.json" method="GET" access="ROLE_ADMIN, ROLE_UI_JOBS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/series/series.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/series/new/metadata" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_METADATA_VIEW" />
@@ -103,7 +104,7 @@
     <sec:intercept-url pattern="/admin-ng/tools/*/thumbnail.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_EDITOR_VIEW" />
     <sec:intercept-url pattern="/admin-ng/tools/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_EDITOR_VIEW" />
     <sec:intercept-url pattern="/admin-ng/users/users.json" method="GET" access="ROLE_ADMIN, ROLE_UI_USERS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/users/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_USERS_EDIT" />
+    <sec:intercept-url pattern="/admin-ng/users/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_USERS_EDIT, ROLE_UI_EVENTS_DETAILS_ACL_USER_ROLES_VIEW, ROLE_UI_SERIES_DETAILS_ACL_USER_ROLES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/user-settings/signature" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/admin-ng/resources/events/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/resources/jobs/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_JOBS_VIEW" />
