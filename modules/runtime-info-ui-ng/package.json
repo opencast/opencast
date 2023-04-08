@@ -1,21 +1,15 @@
 {
-  "name": "opencast-runtime-info-ui",
+  "name": "opencast-runtime-info-ui-ng",
   "private": true,
   "scripts": {
     "eslint": "eslint --config ../../docs/checkstyle/eslintrc.js src/main/resources/ --resolve-plugins-relative-to .",
     "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'src/main/resources/**/*.html'"
   },
   "dependencies": {
-    "angular": "^1.8.3",
-    "angular-route": "^1.8.3",
     "jquery": "^3.6.4"
   },
   "devDependencies": {
-<<<<<<< HEAD
-    "eslint": "^8.39.0",
-=======
     "eslint": "^8.38.0",
->>>>>>> e5fb72f858 (Auto-update npm packages)
     "eslint-plugin-header": "^3.1.1",
     "html-linter": "^1.1.1"
   }
