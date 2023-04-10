@@ -149,6 +149,17 @@
       "HOTKEY_CHEAT_SHEET": "鍵盤快捷鍵",
       "ADOPTER_REGISTRATION": "使用者註冊"
    },
+   "REBUILD": {
+      "TITLE": "Index Rebuild",
+      "WARNING": "Attention!",
+      "HEADER": "Index rebuild in progress!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
+   },
    "NOTIFICATIONS": {
       "ACL_ADDED": "存取權限已新增",
       "ACL_NOT_SAVED": "存取權限無法儲存",

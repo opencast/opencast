@@ -149,6 +149,17 @@
       "HOTKEY_CHEAT_SHEET": "快捷键",
       "ADOPTER_REGISTRATION": "使用者登记"
    },
+   "REBUILD": {
+      "TITLE": "Index Rebuild",
+      "WARNING": "Attention!",
+      "HEADER": "Index rebuild in progress!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
+   },
    "NOTIFICATIONS": {
       "ACL_ADDED": "已创建访问权限",
       "ACL_NOT_SAVED": "无法保存访问权限",
