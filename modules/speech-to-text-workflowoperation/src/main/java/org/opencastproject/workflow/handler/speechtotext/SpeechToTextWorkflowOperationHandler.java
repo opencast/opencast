@@ -70,7 +70,8 @@ import java.util.UUID;
         "workflow.operation=speechtotext"
     }
 )
-public class SpeechToTextWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
+public class
+    SpeechToTextWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(SpeechToTextWorkflowOperationHandler.class);
 
@@ -85,6 +86,9 @@ public class SpeechToTextWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /** Language placeholder */
   private static final String PLACEHOLDER_LANG = "#{lang}";
+
+  /** Translation mode */
+  private static final String TRANSLATE_MODE = "translate";
 
   private enum AppendSubtitleAs {
     attachment, track
@@ -142,8 +146,11 @@ public class SpeechToTextWorkflowOperationHandler extends AbstractWorkflowOperat
     // How to save the subtitle file? (as attachment, as track...)
     AppendSubtitleAs appendSubtitleAs = howToAppendTheSubtitles(mediaPackage, workflowInstance);
 
+    // Translate to english
+    Boolean translate = getTranslationMode(mediaPackage, workflowInstance);
+
     for (Track track : tracks) {
-      createSubtitle(track, languageCode, mediaPackage, tagsAndFlavors, appendSubtitleAs);
+      createSubtitle(track, languageCode, mediaPackage, tagsAndFlavors, appendSubtitleAs, translate);
     }
 
     logger.info("Text-to-Speech workflow operation for media package {} completed", mediaPackage);
@@ -158,10 +165,11 @@ public class SpeechToTextWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param parentMediaPackage The media package where the track is located.
    * @param tagsAndFlavors Tags and flavors instance (to get target flavor information)
    * @param appendSubtitleAs Tells how the subtitles file has to be appended.
+   * @param translate Enable translation to english.
    * @throws WorkflowOperationException Get thrown if an error occurs.
    */
   private void createSubtitle(Track track, String languageCode, MediaPackage parentMediaPackage,
-          ConfiguredTagsAndFlavors tagsAndFlavors, AppendSubtitleAs appendSubtitleAs)
+          ConfiguredTagsAndFlavors tagsAndFlavors, AppendSubtitleAs appendSubtitleAs, Boolean translate)
           throws WorkflowOperationException {
 
     // Start the transcription job, create subtitles file
@@ -169,7 +177,7 @@ public class SpeechToTextWorkflowOperationHandler extends AbstractWorkflowOperat
     Job job;
     logger.info("Generating subtitle for '{}'...", trackURI);
     try {
-      job = speechToTextService.transcribe(trackURI, languageCode);
+      job = speechToTextService.transcribe(trackURI, languageCode, translate);
     } catch (SpeechToTextServiceException e) {
       throw new WorkflowOperationException(
               String.format("Generating subtitles for '%s' in media package '%s' failed",
@@ -183,7 +191,10 @@ public class SpeechToTextWorkflowOperationHandler extends AbstractWorkflowOperat
 
     // subtitles file is generated now, put it into the media package
     try {
-      URI output = new URI(job.getPayload());
+      String[] jobOutput = job.getPayload().split(",");
+      URI output = new URI(jobOutput[0]);
+      String outputLanguage = jobOutput[1];
+
       String mediaPackageIdentifier = UUID.randomUUID().toString();
 
       MediaPackageElement subtitleMediaPackageElement;
@@ -206,6 +217,7 @@ public class SpeechToTextWorkflowOperationHandler extends AbstractWorkflowOperat
       subtitleMediaPackageElement.setFlavor(targetFlavor);
 
       List<String> targetTags = tagsAndFlavors.getTargetTags();
+      targetTags.add("lang:" + outputLanguage);
 
       // this is used to set some values automatically, like the correct mimetype
       Job inspection = mediaInspectionService.enrich(subtitleMediaPackageElement, true);
@@ -262,6 +274,35 @@ public class SpeechToTextWorkflowOperationHandler extends AbstractWorkflowOperat
   }
 
   /**
+   * Get if the subtitle needs to be translated into english
+   *
+   * @param mediaPackage Contains mediapackage information
+   * @param workflowInstance Contains the workflow configuration
+   * @return Boolean to enable english translation
+   */
+  private Boolean getTranslationMode(MediaPackage mediaPackage, WorkflowInstance workflowInstance)
+          throws WorkflowOperationException {
+    WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
+    String stringTranslateMode = StringUtils.trimToEmpty(operation.getConfiguration(TRANSLATE_MODE)).toLowerCase();
+    Boolean translateMode;
+
+    if (stringTranslateMode.isEmpty()) {
+      translateMode = false;
+    } else {
+      try {
+        translateMode = Boolean.parseBoolean(stringTranslateMode);
+      } catch (NumberFormatException e) {
+        throw new WorkflowOperationException(String.format(
+            "Speech-to-Text job for media package '%s' failed, Because invalid \"translate\" value ('%s')."
+                + "Valid values types: \"true\", \"1\", \"yes\", \"false\", \"0\", or \"no\".", mediaPackage,
+                stringTranslateMode));
+      }
+    }
+    return translateMode;
+  }
+
+
+  /**
    * Searches some places to get the right language of the media package / track.
    *
    * @param mediaPackage The media package from which the subtitles are generated.
@@ -283,11 +324,6 @@ public class SpeechToTextWorkflowOperationHandler extends AbstractWorkflowOperat
     if (language.isEmpty()) {
       // If there is still no language, we look in the media package itself
       language = StringUtils.trimToEmpty(mediaPackage.getLanguage());
-    }
-
-    if (language.isEmpty()) {
-      // default value when nothing worked
-      language = StringUtils.defaultIfBlank(operation.getConfiguration(LANGUAGE_FALLBACK), "eng");
     }
 
     return language;

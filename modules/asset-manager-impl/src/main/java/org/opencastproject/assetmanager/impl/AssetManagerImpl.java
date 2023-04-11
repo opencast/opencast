@@ -165,7 +165,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerImpl.class);
 
-  private static final int PAGE_SIZE = 100;
+  private static final int PAGE_SIZE = 1000;
 
   enum AdminRole {
     GLOBAL, ORGANIZATION, NONE
@@ -956,7 +956,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       int current = 0;
       logIndexRebuildBegin(logger, index.getIndexName(), total, "snapshot(s)");
       do {
-        r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).page(offset, PAGE_SIZE).run());
+        r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).orderBy(q.mediapackageId().desc())
+          .page(offset, PAGE_SIZE).run());
         offset += PAGE_SIZE;
         int n = 16;
         var updatedEventRange = new ArrayList<Event>();
@@ -978,7 +979,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                 updatedEventData = getEventUpdateFunction(snapshot, orgId, snapshotSystemUser).apply(updatedEventData);
                 updatedEventRange.add(updatedEventData.get());
 
-                if (updatedEventRange.size() >= n || current >= byOrg.get(orgId).size()) {
+                if (updatedEventRange.size() >= n || current >= total) {
                   index.bulkEventUpdate(updatedEventRange);
                   logIndexRebuildProgress(logger, index.getIndexName(), total, current);
                   updatedEventRange.clear();
@@ -996,7 +997,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
             securityService.setUser(defaultSystemUser);
           }
         }
-      } while (offset + r.getSize() < total);
+      } while (offset < total);
     } finally {
       securityService.setOrganization(originalOrg);
       securityService.setUser(originalUser);

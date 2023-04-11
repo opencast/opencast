@@ -149,6 +149,17 @@
       "HOTKEY_CHEAT_SHEET": "Atajos de Teclado",
       "ADOPTER_REGISTRATION": "Registro de Adopters"
    },
+   "REBUILD": {
+      "TITLE": "Reconstrucción del índice",
+      "WARNING": "¡Atención!",
+      "HEADER": "¡Reconstrucción del índice en curso!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
+   },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Se ha creado la política de acceso",
       "ACL_NOT_SAVED": "No se ha podido guardar la política de acceso",
@@ -896,7 +907,7 @@
                   "NEW": "Nueva política",
                   "NEW_USER": "New user",
                   "DETAILS": "Non-user roles",
-                  "USER": "User",
+                  "USER": "Usuario",
                   "USERS": "Users who are authorized for the event",
                   "NONEXISTENT_USER": "Nonexistent user",
                   "HELP": {
@@ -1130,7 +1141,7 @@
                   "NEW": "Nueva política",
                   "NEW_USER": "New user",
                   "DETAILS": "Non-user roles",
-                  "USER": "User",
+                  "USER": "Usuario",
                   "USERS": "Users who are authorized for the series",
                   "HELP": {
                      "READ": "By setting read rights, the series becomes visible for the selected user",
@@ -1225,7 +1236,7 @@
                   "LOAD_MORE_LIMIT": "políticas mostradas.",
                   "LOAD_MORE_LINK": "Cargar más",
                   "NEW_USER": "New user",
-                  "USER": "User",
+                  "USER": "Usuario",
                   "USERS": "Users who are authorized for the series",
                   "NONEXISTENT_USER": "Nonexistent user",
                   "HELP": {
@@ -1481,7 +1492,7 @@
                   "DETAILS": "Non-user roles",
                   "DESCRIPTION": "Por favor, elija un conjunto de políticas preconfigurado o añada políticas personalizadas",
                   "NEW_USER": "New user",
-                  "USER": "User",
+                  "USER": "Usuario",
                   "USERS": "Users who are authorized for the access policy",
                   "HELP": {
                      "READ": "By setting read rights, the access policy becomes visible for the selected user",
@@ -1530,7 +1541,7 @@
                   "DETAILS": "Non-user roles",
                   "DESCRIPTION": "Por favor, elija un conjunto de políticas preconfigurado o añada políticas personalizadas",
                   "NEW_USER": "New user",
-                  "USER": "User",
+                  "USER": "Usuario",
                   "USERS": "Users who are authorized for the access policy",
                   "NONEXISTENT_USER": "Nonexistent user",
                   "HELP": {

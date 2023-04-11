@@ -24,9 +24,10 @@
 angular.module('adminNg.controllers')
 .controller('ApplicationCtrl', ['$scope', '$rootScope', '$location', '$window', 'AuthService', 'Notifications',
   'ResourceModal', 'VersionResource', 'TermsOfUseResource', 'HotkeysService', '$interval', 'RestServiceMonitor',
-  'AdopterRegistrationResource',
+  'AdopterRegistrationResource', 'IndexRebuildStates',
   function ($scope, $rootScope, $location, $window, AuthService, Notifications, ResourceModal,
-    VersionResource, TermsOfUseResource, HotkeysService, $interval, RestServiceMonitor, AdopterRegistrationResource){
+    VersionResource, TermsOfUseResource, HotkeysService, $interval, RestServiceMonitor,
+    AdopterRegistrationResource, IndexRebuildStates){
 
     $scope.adopter = new AdopterRegistrationResource.get();
 
@@ -45,6 +46,8 @@ angular.module('adminNg.controllers')
     $scope.mediaModuleUrl = undefined;
     RestServiceMonitor.run();
     $scope.services = RestServiceMonitor.getServiceStatus();
+    IndexRebuildStates.run();
+    $scope.rebuildServices = IndexRebuildStates.getRebuildStatus();
     $scope.studioReturnUrl = encodeURIComponent($location.absUrl());
     $scope.$on('$locationChangeSuccess', function($event, newUrl) {
       $scope.studioReturnUrl = encodeURIComponent(newUrl);
@@ -75,10 +78,12 @@ angular.module('adminNg.controllers')
       }
     }).catch(angular.noop);
 
-    //Running RestService on loop - updating $scope.service
+    //Running RestService on loop - updating $scope.service and $scope.rebuildService
     $interval(function(){
       RestServiceMonitor.run();
       $scope.service = RestServiceMonitor.getServiceStatus();
+      IndexRebuildStates.run();
+      $scope.rebuildService = IndexRebuildStates.getRebuildStatus();
     }, 60000);
 
     $scope.toServices = function(event) {

@@ -149,6 +149,17 @@
       "HOTKEY_CHEAT_SHEET": "Sneltoetsen",
       "ADOPTER_REGISTRATION": "Adopter registratie"
    },
+   "REBUILD": {
+      "TITLE": "Index Rebuild",
+      "WARNING": "Attention!",
+      "HEADER": "Index rebuild in progress!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
+   },
    "NOTIFICATIONS": {
       "ACL_ADDED": "De toegangspolicy werd aangemaakt",
       "ACL_NOT_SAVED": "De toegangspolicy kon niet bewaard worden",

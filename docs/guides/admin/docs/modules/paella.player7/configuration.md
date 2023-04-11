@@ -51,3 +51,18 @@ paella `config.json` file is configured to use it.
 
 To Learn more about paella cookie consent you can read paella 
 [cookie consent documentation](https://paellaplayer.upv.es/#/doc/cookie_consent.md).
+
+You can enable/disable the cookie consent banner in `config.json` file:
+
+```json
+{
+    ...
+    "opencast": {
+        "cookieConsent": {
+            "enable": true
+        },
+        ...
+    }
+    ...
+}
+```

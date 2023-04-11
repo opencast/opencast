@@ -21,6 +21,7 @@
 
 package org.opencastproject.speechtotext.impl.endpoint;
 
+import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.job.api.JaxbJob;
@@ -94,10 +95,12 @@ public class SpeechToTextServiceRestEndpoint extends AbstractJobProducerEndpoint
   @Path("speechtotext")
   @RestQuery(name = "speechtotext", description = "Generates subtitles for media files with audio.",
       restParameters = {
-      @RestParameter(name = "mediaFilePath", isRequired = true, type = STRING,
+          @RestParameter(name = "mediaFilePath", isRequired = true, type = STRING,
               description = "Location of to the media file."),
-      @RestParameter(name = "language", isRequired = true, type = STRING,
-              description = "Language of the media file.") },
+          @RestParameter(name = "language", isRequired = false, type = STRING,
+              description = "Language of the media file."),
+          @RestParameter(name = "translate", isRequired = false, type = BOOLEAN,
+              description = "Enable translation to english") },
       responses = {
           @RestResponse(description = "Subtitles created successfully", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Invalid data", responseCode = HttpServletResponse.SC_BAD_REQUEST),
@@ -107,14 +110,15 @@ public class SpeechToTextServiceRestEndpoint extends AbstractJobProducerEndpoint
   )
   public Response speechToText(
           @FormParam("mediaFilePath") String mediaFilePath,
-          @FormParam("language") String language) {
+          @FormParam("language") String language,
+          @FormParam("translate") Boolean translate) {
     try {
       logger.debug("Starting to generate subtitles.");
-      Job job = speechToTextService.transcribe(new URI(mediaFilePath), language);
+      Job job = speechToTextService.transcribe(new URI(mediaFilePath), language, translate);
       return Response.ok(new JaxbJob(job)).build();
     } catch (JsonSyntaxException | URISyntaxException | NullPointerException e) {
-      logger.debug("Invalid data passed to REST endpoint:\nmediaFilePath: {}\nlanguage: {})",
-              mediaFilePath, language);
+      logger.debug("Invalid data passed to REST endpoint:\nmediaFilePath: {}\nlanguage: {}\ntranslate: {})",
+              mediaFilePath, language, translate);
       return Response.status(Response.Status.BAD_REQUEST).build();
     } catch (SpeechToTextServiceException e) {
       logger.error("Error generating subtitles from file {}", mediaFilePath, e);

@@ -37,7 +37,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /** Vosk implementation of the Speech-to-text engine interface. */
 @Component(
@@ -62,6 +64,15 @@ public class VoskEngine implements SpeechToTextEngine {
   /** Currently used path of the vosk installation. */
   private String voskExecutable = VOSK_EXECUTABLE_DEFAULT_PATH;
 
+  /** Config key to set default language */
+  private static final String VOSK_DEFAULT_LANGUAGE_KEY = "vosk.default.language";
+
+  /** Default Language */
+  public static final String VOSK_DEFAULT_LANGUAGE = "eng";
+
+  /** Currently used default language for Vosk */
+  private  String voskLanguage = VOSK_DEFAULT_LANGUAGE;
+
 
   @Override
   public String getEngineName() {
@@ -74,18 +85,28 @@ public class VoskEngine implements SpeechToTextEngine {
     logger.debug("Activated/Modified Vosk engine service class");
     voskExecutable = StringUtils.defaultIfBlank(
             (String) cc.getProperties().get(VOSK_EXECUTABLE_PATH_CONFIG_KEY), VOSK_EXECUTABLE_DEFAULT_PATH);
+    voskLanguage = StringUtils.defaultIfBlank(
+        (String)  cc.getProperties().get(VOSK_DEFAULT_LANGUAGE_KEY), VOSK_DEFAULT_LANGUAGE);
     logger.debug("Set vosk path to {}", voskExecutable);
+    logger.debug("Set default vosk language to {}", voskLanguage);
     logger.debug("Finished activating/updating speech-to-text service");
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.speechtotext.api.SpeechToTextEngine#generateSubtitlesFile(File, File, String)
+   * @see org.opencastproject.speechtotext.api.SpeechToTextEngine#generateSubtitlesFile(File, File, String, Boolean)
    */
   @Override
-  public File generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language)
+  public Map<String, Object> generateSubtitlesFile(File mediaFile, File preparedOutputFile,
+      String language, Boolean translate)
           throws SpeechToTextEngineException {
+
+    if (language.isBlank()) {
+      logger.debug("Language field empty, using {} as default language", voskLanguage);
+      language = voskLanguage;
+    }
+
 
     final List<String> command = Arrays.asList(
             voskExecutable,
@@ -120,8 +141,11 @@ public class VoskEngine implements SpeechToTextEngine {
     } finally {
       IoSupport.closeQuietly(process);
     }
+    Map<String,Object> returnValues = new HashMap<>();
+    returnValues.put("subFile",preparedOutputFile);
+    returnValues.put("language",language);
 
-    return preparedOutputFile; // now containing subtitles data
+    return returnValues; // List containing the output File and language parameter
   }
 
 }

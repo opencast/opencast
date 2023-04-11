@@ -26,6 +26,23 @@
         </a>
       </div>
       <nav class="header-nav nav-dd-container" id="nav-dd-container">
+        <div ng-if="rebuildServices.showRebuildStates" title="{{ 'REBUILD.TITLE' | translate}}"
+              class="nav-dd rebuild-dd" id="rebuild-dd" old-admin-ng-dropdown="">
+          <span class="nav-rb-warning">{{ 'REBUILD.WARNING' | translate }}</span>
+          <span class="nav-rb-header">{{ 'REBUILD.HEADER' | translate }}</span>
+          <ul class="dropdown-ul">
+            <li ng-repeat="(key, value) in rebuildServices.service"><!-- rebuildService directive -->
+              <a service-name="{{ value.service }}">
+                <span ng-if="value.pending" class="ng-multi-value ng-multi-value-gray">{{ value.status }}</span>
+                <span ng-if="value.running" class="ng-multi-value ng-multi-value-orange">{{ value.status }}</span>
+                <span ng-if="value.ok" class="ng-multi-value ng-multi-value-green">{{ value.status }}</span>
+                <span ng-if="value.error" class="ng-multi-value ng-multi-value-red">{{ value.status }}</span>
+                <span>{{ value.service }}</span>
+              </a>
+            </li><!-- directive end -->
+          </ul>
+        </div>
+
         <div class="nav-dd lang-dd" id="lang-dd" old-admin-ng-dropdown="">
           <div class="lang" ng-class="currentLanguageCode" title="{{ 'LANGUAGE' | translate}}">
             <img ng-attr-src="img/lang/{{ currentLanguageCode }}.svg"
@@ -196,6 +213,7 @@
     <script src="scripts/shared/services/hotkeysService.js"></script>
     <script src="scripts/shared/services/restServiceMonitor.js"></script>
     <script src="scripts/shared/services/metadataSaveService.js"></script>
+    <script src="scripts/shared/services/indexRebuild.js"></script>
     <script src="scripts/shared/resources/resources.js"></script>
     <script src="scripts/shared/resources/identityResource.js"></script>
     <script src="scripts/shared/resources/versionResource.js"></script>
