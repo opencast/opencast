@@ -14,7 +14,7 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.21.3",
     "@babel/core": "^7.21.3",
-    "@babel/preset-env": "^7.20.2",
+    "@babel/preset-env": "^7.21.4",
     "babel-loader": "^9.1.2",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.3",
@@ -27,13 +27,13 @@
     "source-map-loader": "^4.0.1",
     "style-loader": "^3.3.2",
     "svg-inline-loader": "^0.8.2",
-    "webpack": "^5.76.3",
+    "webpack": "^5.77.0",
     "webpack-cli": "^5.0.1",
-    "webpack-dev-server": "^4.13.1",
+    "webpack-dev-server": "^4.13.2",
     "xml-loader": "^1.2.1"
   },
   "dependencies": {
-    "paella-basic-plugins": "^1.23.0",
+    "paella-basic-plugins": "^1.26.0",
     "paella-core": "^1.25.0",
     "paella-slide-plugins": "^1.8.0",
     "paella-user-tracking": "^1.8.0",

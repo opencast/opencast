@@ -43,6 +43,6 @@ public interface SpeechToTextService {
    * @return SpeechToText service job.
    * @throws SpeechToTextServiceException If something went wrong during the subtitles generation.
    */
-  Job transcribe(URI mediaFile, String language) throws SpeechToTextServiceException;
+  Job transcribe(URI mediaFile, String language, Boolean translate) throws SpeechToTextServiceException;
 
 }

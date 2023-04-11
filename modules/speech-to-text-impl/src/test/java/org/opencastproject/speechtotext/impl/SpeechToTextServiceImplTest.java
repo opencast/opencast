@@ -149,7 +149,7 @@ public class SpeechToTextServiceImplTest {
   @Test
   public void testVoskSpeechToText() throws Exception {
     URI videoUri = getClass().getResource("/speech_to_text_test.mp4").toURI();
-    Job job = speechToTextService.transcribe(videoUri, "eng");
+    Job job = speechToTextService.transcribe(videoUri, "eng", false);
     File output = new File(new URI(job.getPayload()));
     String textFromSpeech = Files.lines(Paths.get(output.getPath()), StandardCharsets.UTF_8)
             .collect(Collectors.joining("\n"));
