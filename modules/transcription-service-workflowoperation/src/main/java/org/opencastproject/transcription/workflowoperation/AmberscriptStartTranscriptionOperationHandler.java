@@ -50,8 +50,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 @Component(
     immediate = true,
@@ -66,27 +64,12 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
   private static final Logger logger = LoggerFactory.getLogger(AmberscriptStartTranscriptionOperationHandler.class);
 
   /** Workflow configuration option keys */
-  static final String SOURCE_FLAVOR = "source-flavor";
-  static final String SOURCE_TAG = "source-tag";
   static final String LANGUAGE = "language";
   static final String JOBTYPE = "jobtype";
   static final String SKIP_IF_FLAVOR_EXISTS = "skip-if-flavor-exists";
 
   /** The transcription service */
   private TranscriptionService service = null;
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(SOURCE_FLAVOR, "The \"flavor\" of the track to use as audio input");
-    CONFIG_OPTIONS.put(SOURCE_TAG, "The \"tag\" of the track to use as audio input");
-    CONFIG_OPTIONS.put(LANGUAGE, "The \"language\" the transcription service will use");
-    CONFIG_OPTIONS.put(JOBTYPE, "The \"jobtype\" the transcription service will use");
-    CONFIG_OPTIONS.put(SKIP_IF_FLAVOR_EXISTS,
-        "If this \"flavor\" is already in the media package, skip this operation");
-  }
 
   @Override
   @Activate
