@@ -336,7 +336,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
 
   @Override
   public Job startTranscription(String mpId, Track track) throws TranscriptionServiceException {
-    return startTranscription(mpId, track, getLanguage(), getAmberscriptJobType());
+    throw new UnsupportedOperationException("Not supported.");
   }
 
   @Override
