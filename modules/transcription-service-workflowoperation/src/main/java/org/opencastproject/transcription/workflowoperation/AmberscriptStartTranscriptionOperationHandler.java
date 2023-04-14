@@ -102,7 +102,7 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
     List<String> sourceTagOption = tagsAndFlavors.getSrcTags();
     List<MediaPackageElementFlavor> sourceFlavorOption = tagsAndFlavors.getSrcFlavors();
     String language = StringUtils.trimToEmpty(operation.getConfiguration(LANGUAGE));
-    String jobtype = StringUtils.trimToEmpty(operation.getConfiguration(JOBTYPE));
+    String jobType = StringUtils.trimToEmpty(operation.getConfiguration(JOBTYPE));
 
     AbstractMediaPackageElementSelector<Track> elementSelector = new TrackSelector();
 
@@ -122,7 +122,7 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
     Job job = null;
     for (Track track : elements) {
       try {
-        job = service.startTranscription(mediaPackage.getIdentifier().toString(), track, language, jobtype);
+        job = service.startTranscription(mediaPackage.getIdentifier().toString(), track, language, jobType);
         // Only one job per media package
         break;
       } catch (TranscriptionServiceException e) {

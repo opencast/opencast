@@ -160,27 +160,29 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
 
   // service configuration keys
   private static final String ENABLED_CONFIG = "enabled";
-  private static final String LANGUAGE = "language";
-  private static final String AMBERSCRIPTJOBTYPE = "jobtype";
   private static final String CLIENT_KEY = "client.key";
+  private static final String LANGUAGE = "language";
+  private static final String LANGUAGE_FROM_DUBLINCORE = "language.from.dublincore";
+  private static final String LANGUAGE_CODE_MAP = "language.code.map";
+  private static final String AMBERSCRIPTJOBTYPE = "jobtype";
   private static final String WORKFLOW_CONFIG = "workflow";
   private static final String DISPATCH_WORKFLOW_INTERVAL_CONFIG = "workflow.dispatch.interval";
   private static final String MAX_PROCESSING_TIME_CONFIG = "max.overdue.time";
   private static final String CLEANUP_RESULTS_DAYS_CONFIG = "cleanup.results.days";
   private static final String SPEAKER_METADATA_FIELD = "speaker.metadata.field";
-  private static final String LANGUAGE_FROM_DUBLINCORE = "language.from.dublincore";
-  private static final String LANGUAGE_CODE_MAP = "language.code.map";
 
   // service configuration default values
   private boolean enabled = false;
-  private String language = "en";
-  private String amberscriptJobType = "direct";
   private String clientKey;
+  private String language = "en";
+  /** determines if the transcription language should be taken from the dublincore */
+  private boolean languageFromDublinCore;
+  private String amberscriptJobType = "direct";
   private String workflowDefinitionId = "amberscript-attach-transcripts";
   private long workflowDispatchIntervalSeconds = 60;
   private long maxProcessingSeconds = 8 * 24 * 60 * 60; // maximum runtime for jobType perfect is 8 days
   private int cleanupResultDays = 7;
-  private final int defaultNumberOfSpeakers = 1;
+  private int numberOfSpeakers = 1;
   private SpeakerMetadataField speakerMetadataField = SpeakerMetadataField.creator;
 
   /**
@@ -188,9 +190,6 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
    * corresponding amberscript language code
    */
   private AmberscriptLangUtil amberscriptLangUtil;
-
-  /** determines if the transcription language should be taken from the dublincore */
-  private boolean languageFromDublinCore;
 
   private String systemAccount;
 
@@ -223,17 +222,46 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     Option<String> languageOpt = OsgiUtil.getOptCfg(cc.getProperties(), LANGUAGE);
     if (languageOpt.isSome()) {
       language = languageOpt.get();
-      logger.info("Default Language is set to '{}'.", language);
+      logger.info("Default language is set to '{}'.", language);
     } else {
       logger.info("Default language '{}' will be used.", language);
     }
 
+    Option<String> languageFromDublinCoreOpt = OsgiUtil.getOptCfg(cc.getProperties(), LANGUAGE_FROM_DUBLINCORE);
+    if (languageFromDublinCoreOpt.isSome()) {
+      try {
+        languageFromDublinCore = Boolean.parseBoolean(languageFromDublinCoreOpt.get());
+      } catch (Exception e) {
+        logger.warn("Configuration value for '{}' is invalid, defaulting to false.", LANGUAGE_FROM_DUBLINCORE);
+      }
+    }
+    logger.info("Configuration value for '{}' is set to '{}'.", LANGUAGE_FROM_DUBLINCORE, languageFromDublinCore);
+
+    amberscriptLangUtil = AmberscriptLangUtil.getInstance();
+    int customMapEntriesCount = 0;
+    Option<String> langCodeMapOpt = OsgiUtil.getOptCfg(cc.getProperties(), LANGUAGE_CODE_MAP);
+    if (langCodeMapOpt.isSome()) {
+      try {
+        String langCodeMapStr = langCodeMapOpt.get();
+        if (langCodeMapStr != null) {
+          for (String mapping : langCodeMapStr.split(",")) {
+            String[] mapEntries = mapping.split(":");
+            amberscriptLangUtil.addCustomMapping(mapEntries[0], mapEntries[1]);
+            customMapEntriesCount += 1;
+          }
+        }
+      } catch (Exception e) {
+        logger.warn("Configuration '{}' is invalid. Using just default mapping.", LANGUAGE_CODE_MAP);
+      }
+    }
+    logger.info("Language code map was set. Added '{}' additional entries.", customMapEntriesCount);
+
     Option<String> amberscriptJobTypeOpt = OsgiUtil.getOptCfg(cc.getProperties(), AMBERSCRIPTJOBTYPE);
     if (amberscriptJobTypeOpt.isSome()) {
       amberscriptJobType = amberscriptJobTypeOpt.get();
-      logger.info("Default AmberScript JobType is set to '{}'.", amberscriptJobType);
+      logger.info("Default Amberscript job type is set to '{}'.", amberscriptJobType);
     } else {
-      logger.info("Default AmberScript JobType '{}' will be used.", amberscriptJobType);
+      logger.info("Default Amberscript job type '{}' will be used.", amberscriptJobType);
     }
 
     Option<String> wfOpt = OsgiUtil.getOptCfg(cc.getProperties(), WORKFLOW_CONFIG);
@@ -264,56 +292,26 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     }
     logger.info("Maximum processing time for transcription job is {} seconds.", maxProcessingSeconds);
 
-    Option<String> cleaupOpt = OsgiUtil.getOptCfg(cc.getProperties(), CLEANUP_RESULTS_DAYS_CONFIG);
-    if (cleaupOpt.isSome()) {
+    Option<String> cleanupOpt = OsgiUtil.getOptCfg(cc.getProperties(), CLEANUP_RESULTS_DAYS_CONFIG);
+    if (cleanupOpt.isSome()) {
       try {
-        cleanupResultDays = Integer.parseInt(cleaupOpt.get());
+        cleanupResultDays = Integer.parseInt(cleanupOpt.get());
       } catch (NumberFormatException e) {
         logger.warn("Configured '{}' is invalid. Using default.", CLEANUP_RESULTS_DAYS_CONFIG);
       }
     }
     logger.info("Cleanup result files after {} days.", cleanupResultDays);
 
-    Option<String> numberOfSpeakersOpt = OsgiUtil.getOptCfg(cc.getProperties(), SPEAKER_METADATA_FIELD);
-    if (numberOfSpeakersOpt.isSome()) {
+    Option<String> speakerMetadataFieldOpt = OsgiUtil.getOptCfg(cc.getProperties(), SPEAKER_METADATA_FIELD);
+    if (speakerMetadataFieldOpt.isSome()) {
       try {
-        speakerMetadataField = SpeakerMetadataField.valueOf(numberOfSpeakersOpt.get());
+        speakerMetadataField = SpeakerMetadataField.valueOf(speakerMetadataFieldOpt.get());
       } catch (IllegalArgumentException e) {
         logger.warn("Value '{}' is invalid for configuration '{}'. Using default: '{}'.",
-            numberOfSpeakersOpt.get(), SPEAKER_METADATA_FIELD, speakerMetadataField);
+            speakerMetadataFieldOpt.get(), SPEAKER_METADATA_FIELD, speakerMetadataField);
       }
     }
     logger.info("Default metadata field for calculating the amount of speakers is set to '{}'.", speakerMetadataField);
-
-
-    Option<String> languageFromDublinCoreOpt = OsgiUtil.getOptCfg(cc.getProperties(), LANGUAGE_FROM_DUBLINCORE);
-    if (languageFromDublinCoreOpt.isSome()) {
-      try {
-        languageFromDublinCore = Boolean.parseBoolean(languageFromDublinCoreOpt.get());
-      } catch (Exception e) {
-        logger.warn("Configuration value for '{}' is invalid, defaulting to false.", LANGUAGE_FROM_DUBLINCORE);
-      }
-    }
-    logger.info("Configuration value for '{}' is set to '{}'.", LANGUAGE_FROM_DUBLINCORE, languageFromDublinCore);
-
-    amberscriptLangUtil = AmberscriptLangUtil.getInstance();
-    int customMapEntriesCount = 0;
-    Option<String> langCodeMapOpt = OsgiUtil.getOptCfg(cc.getProperties(), LANGUAGE_CODE_MAP);
-    if (langCodeMapOpt.isSome()) {
-      try {
-        String langCodeMapStr = langCodeMapOpt.get();
-        if (langCodeMapStr != null) {
-          for (String mapping : langCodeMapStr.split(",")) {
-            String[] mapEntries = mapping.split(":");
-            amberscriptLangUtil.addCustomMapping(mapEntries[0], mapEntries[1]);
-            customMapEntriesCount += 1;
-          }
-        }
-      } catch (Exception e) {
-        logger.warn("Configuration '{}' is invalid. Using just default mapping.", LANGUAGE_CODE_MAP);
-      }
-    }
-    logger.info("Language code map was set. Added '{}' additional entries.", customMapEntriesCount);
 
     systemAccount = OsgiUtil.getContextProperty(cc, OpencastConstants.DIGEST_USER_PROPERTY);
 
@@ -381,7 +379,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
       jobType = getAmberscriptJobType();
     }
 
-    int numberOfSpeakers = defaultNumberOfSpeakers;
+    int numberOfSpeakers = getNumberOfSpeakers();
     Set<String> speakers = new HashSet<>();
     for (Catalog catalog : track.getMediaPackage().getCatalogs(MediaPackageElements.EPISODE)) {
       try (InputStream in = workspace.read(catalog.getURI())) {
@@ -458,17 +456,21 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
   }
 
   @Override
-  public String getLanguage() {
-    return language;
-  }
-
-  @Override
   public Map<String, Object> getReturnValues(String mpId, String jobId) throws TranscriptionServiceException {
     throw new TranscriptionServiceException("Method not implemented");
   }
 
+  @Override
+  public String getLanguage() {
+    return language;
+  }
+
   public String getAmberscriptJobType() {
     return amberscriptJobType;
+  }
+
+  public int getNumberOfSpeakers() {
+    return numberOfSpeakers;
   }
 
   // Called by workflow
@@ -484,9 +486,9 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
         String mpId = arguments.get(0);
         Track track = (Track) MediaPackageElementParser.getFromXml(arguments.get(1));
         String languageCode = arguments.get(2);
-        String jobtype = arguments.get(3);
+        String jobType = arguments.get(3);
         String numberOfSpeakers = arguments.get(4);
-        createRecognitionsJob(mpId, track, languageCode, jobtype, numberOfSpeakers);
+        createRecognitionsJob(mpId, track, languageCode, jobType, numberOfSpeakers);
         break;
       default:
         throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
@@ -494,16 +496,19 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     return result;
   }
 
-  void createRecognitionsJob(String mpId, Track track, String languageCode, String jobtype, String numberOfSpeakers)
+  void createRecognitionsJob(String mpId, Track track, String languageCode, String jobType, String numberOfSpeakers)
           throws TranscriptionServiceException {
     // Timeout 3 hours (needs to include the time for the remote service to
     // fetch the media URL before sending final response)
     CloseableHttpClient httpClient = makeHttpClient(3 * 3600 * 1000);
     CloseableHttpResponse response = null;
 
-    String submitUrl = BASE_URL + "/jobs/upload-media?transcriptionType=transcription&jobType="
-            + jobtype + "&language=" + languageCode + "&apiKey=" + clientKey
-            + "&numberOfSpeakers=" + numberOfSpeakers;
+    String submitUrl = BASE_URL + "/jobs/upload-media"
+            + "?apiKey=" + clientKey
+            + "&language=" + languageCode
+            + "&jobType=" + jobType
+            + "&numberOfSpeakers=" + numberOfSpeakers
+            + "&transcriptionType=transcription";
 
     try {
       FileBody fileBody = new FileBody(workspace.get(track.getURI()), ContentType.DEFAULT_BINARY);
