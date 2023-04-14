@@ -169,7 +169,13 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
   private static final String DISPATCH_WORKFLOW_INTERVAL_CONFIG = "workflow.dispatch.interval";
   private static final String MAX_PROCESSING_TIME_CONFIG = "max.overdue.time";
   private static final String CLEANUP_RESULTS_DAYS_CONFIG = "cleanup.results.days";
+  private static final String SPEAKER = "speaker";
+  private static final String SPEAKER_FROM_DUBLINCORE = "speaker.from.dublincore";
   private static final String SPEAKER_METADATA_FIELD = "speaker.metadata.field";
+  private static final String TRANSCRIPTIONTYPE = "transcriptiontype";
+  private static final String GLOSSARY = "glossary";
+  private static final String TRANSCRIPTIONSTYLE = "cleanread";
+  private static final String TARGETLANGUAGE = "targetlanguage";
 
   // service configuration default values
   private boolean enabled = false;
@@ -183,7 +189,12 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
   private long maxProcessingSeconds = 8 * 24 * 60 * 60; // maximum runtime for jobType perfect is 8 days
   private int cleanupResultDays = 7;
   private int numberOfSpeakers = 1;
+  private boolean speakerFromDublinCore = true;
   private SpeakerMetadataField speakerMetadataField = SpeakerMetadataField.creator;
+  private String transcriptionType = "transcription";
+  private String glossary = "";
+  private String transcriptionStyle = "cleanread";
+  private String targetLanguage = "";
 
   /**
    * Contains mappings from several possible ways of writing a language name/code to the
@@ -302,6 +313,26 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     }
     logger.info("Cleanup result files after {} days.", cleanupResultDays);
 
+    Option<String> speakerOpt = OsgiUtil.getOptCfg(cc.getProperties(), SPEAKER);
+    if (speakerOpt.isSome()) {
+      try {
+        numberOfSpeakers = Integer.parseInt(speakerOpt.get());
+      } catch (NumberFormatException e) {
+        logger.warn("Configured '{}' is invalid. Using default.", SPEAKER);
+      }
+    }
+    logger.info("Default number of speakers is set to '{}'.", numberOfSpeakers);
+
+    Option<String> speakerFromDublinCoreOpt = OsgiUtil.getOptCfg(cc.getProperties(), SPEAKER_FROM_DUBLINCORE);
+    if (speakerFromDublinCoreOpt.isSome()) {
+      try {
+        speakerFromDublinCore = Boolean.parseBoolean(speakerFromDublinCoreOpt.get());
+      } catch (Exception e) {
+        logger.warn("Configuration value for '{}' is invalid, defaulting to true.", SPEAKER_FROM_DUBLINCORE);
+      }
+    }
+    logger.info("Configuration value for '{}' is set to '{}'.", SPEAKER_FROM_DUBLINCORE, speakerFromDublinCore);
+
     Option<String> speakerMetadataFieldOpt = OsgiUtil.getOptCfg(cc.getProperties(), SPEAKER_METADATA_FIELD);
     if (speakerMetadataFieldOpt.isSome()) {
       try {
@@ -312,6 +343,38 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
       }
     }
     logger.info("Default metadata field for calculating the amount of speakers is set to '{}'.", speakerMetadataField);
+
+    Option<String> transcriptionTypeOpt = OsgiUtil.getOptCfg(cc.getProperties(), TRANSCRIPTIONTYPE);
+    if (transcriptionTypeOpt.isSome()) {
+      transcriptionType = transcriptionTypeOpt.get();
+      logger.info("Default transcription type is set to '{}'.", transcriptionType);
+    } else {
+      logger.info("Default transcription type '{}' will be used.", transcriptionType);
+    }
+
+    Option<String> glossaryOpt = OsgiUtil.getOptCfg(cc.getProperties(), GLOSSARY);
+    if (glossaryOpt.isSome()) {
+      glossary = glossaryOpt.get();
+      logger.info("Default glossary is set to '{}'.", glossary);
+    } else {
+      logger.info("No glossary will be used by default");
+    }
+
+    Option<String> transcriptionStyleOpt = OsgiUtil.getOptCfg(cc.getProperties(), TRANSCRIPTIONSTYLE);
+    if (transcriptionStyleOpt.isSome()) {
+      transcriptionStyle = transcriptionStyleOpt.get();
+      logger.info("Default transcription style is set to '{}'.", transcriptionStyle);
+    } else {
+      logger.info("Default transcription style '{}' will be used.", transcriptionStyle);
+    }
+
+    Option<String> targetLanguageOpt = OsgiUtil.getOptCfg(cc.getProperties(), TARGETLANGUAGE);
+    if (targetLanguageOpt.isSome()) {
+      targetLanguage = targetLanguageOpt.get();
+      logger.info("Default target language is set to '{}'.", targetLanguage);
+    } else {
+      logger.info("Transcriptions won't be translated");
+    }
 
     systemAccount = OsgiUtil.getContextProperty(cc, OpencastConstants.DIGEST_USER_PROPERTY);
 
@@ -379,38 +442,77 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
       jobType = getAmberscriptJobType();
     }
 
-    int numberOfSpeakers = getNumberOfSpeakers();
-    Set<String> speakers = new HashSet<>();
-    for (Catalog catalog : track.getMediaPackage().getCatalogs(MediaPackageElements.EPISODE)) {
-      try (InputStream in = workspace.read(catalog.getURI())) {
-        DublinCoreCatalog dublinCatalog = DublinCores.read(in);
-        if (speakerMetadataField.equals(SpeakerMetadataField.creator)
-            || speakerMetadataField.equals(SpeakerMetadataField.both)) {
-          dublinCatalog.get(DublinCore.PROPERTY_CREATOR).stream()
-              .map(DublinCoreValue::getValue).forEach(speakers::add);
-        }
-        if (speakerMetadataField.equals(SpeakerMetadataField.contributor)
-            || speakerMetadataField.equals(SpeakerMetadataField.both)) {
-          dublinCatalog.get(DublinCore.PROPERTY_CONTRIBUTOR).stream()
-              .map(DublinCoreValue::getValue).forEach(speakers::add);
-        }
+    int numberOfSpeakers = 0;
+    if (speakerFromDublinCore) {
+      Set<String> speakers = new HashSet<>();
+      for (Catalog catalog : track.getMediaPackage().getCatalogs(MediaPackageElements.EPISODE)) {
+        try (InputStream in = workspace.read(catalog.getURI())) {
+          DublinCoreCatalog dublinCatalog = DublinCores.read(in);
+          if (speakerMetadataField.equals(SpeakerMetadataField.creator)
+                  || speakerMetadataField.equals(SpeakerMetadataField.both)) {
+            dublinCatalog.get(DublinCore.PROPERTY_CREATOR).stream()
+                    .map(DublinCoreValue::getValue).forEach(speakers::add);
+          }
+          if (speakerMetadataField.equals(SpeakerMetadataField.contributor)
+                  || speakerMetadataField.equals(SpeakerMetadataField.both)) {
+            dublinCatalog.get(DublinCore.PROPERTY_CONTRIBUTOR).stream()
+                    .map(DublinCoreValue::getValue).forEach(speakers::add);
+          }
 
-      } catch (IOException | NotFoundException e) {
-        logger.error("Unable to load dublin core catalog for event '{}'",
-            track.getMediaPackage().getIdentifier(), e);
+        } catch (IOException | NotFoundException e) {
+          logger.error("Unable to load dublin core catalog for event '{}'",
+                  track.getMediaPackage().getIdentifier(), e);
+        }
+      }
+
+      if (speakers.size() >= 1) {
+        numberOfSpeakers = speakers.size();
       }
     }
 
-    if (speakers.size() > 1) {
-      numberOfSpeakers = speakers.size();
+    if (numberOfSpeakers == 0) {
+      if (args.length > 2 && StringUtils.isNotBlank(args[2])) {
+        numberOfSpeakers = Integer.parseInt(args[2]);
+      } else {
+        numberOfSpeakers = getNumberOfSpeakers();
+      }
     }
 
-    logger.info("New transcription job for mpId '{}' language '{}' JobType '{}' Speakers '{}'.",
-        mpId, language, jobType, numberOfSpeakers);
+    String transcriptionType;
+    if (args.length > 3 && StringUtils.isNotBlank(args[3])) {
+      transcriptionType = args[3];
+    } else {
+      transcriptionType = getTranscriptionType();
+    }
+
+    String glossary;
+    if (args.length > 4 && args[4] != null) {
+      glossary = args[4];
+    } else {
+      glossary = getGlossary();
+    }
+
+    String transcriptionStyle;
+    if (args.length > 5 && StringUtils.isNotBlank(args[5])) {
+      transcriptionStyle = args[5];
+    } else {
+      transcriptionStyle = getTranscriptionStyle();
+    }
+
+    String targetLanguage;
+    if (args.length > 6 && args[6] != null) {
+      targetLanguage = args[6];
+    } else {
+      targetLanguage = getTargetLanguage();
+    }
+
+    logger.info("New transcription job for mpId '{}' language '{}' job type '{}' speakers '{}' transcription type '{}'"
+            + "glossary '{}'.", mpId, language, jobType, numberOfSpeakers, transcriptionType, glossary);
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.StartTranscription.name(), Arrays.asList(
-          mpId, MediaPackageElementParser.getAsXml(track), language, jobType, Integer.toString(numberOfSpeakers)));
+          mpId, MediaPackageElementParser.getAsXml(track), language, jobType, Integer.toString(numberOfSpeakers),
+          transcriptionType, glossary, transcriptionStyle, targetLanguage));
     } catch (ServiceRegistryException e) {
       throw new TranscriptionServiceException("Unable to create a job", e);
     } catch (MediaPackageException e) {
@@ -473,6 +575,22 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     return numberOfSpeakers;
   }
 
+  public String getTranscriptionType() {
+    return transcriptionType;
+  }
+
+  public String getGlossary() {
+    return glossary;
+  }
+
+  public String getTranscriptionStyle() {
+    return transcriptionStyle;
+  }
+
+  public String getTargetLanguage() {
+    return targetLanguage;
+  }
+
   // Called by workflow
   @Override
   protected String process(Job job) throws Exception {
@@ -488,7 +606,12 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
         String languageCode = arguments.get(2);
         String jobType = arguments.get(3);
         String numberOfSpeakers = arguments.get(4);
-        createRecognitionsJob(mpId, track, languageCode, jobType, numberOfSpeakers);
+        String transcriptionType = arguments.get(5);
+        String glossary = arguments.get(6);
+        String transcriptionStyle = arguments.get(7);
+        String targetLanguage = arguments.get(8);
+        createRecognitionsJob(mpId, track, languageCode, jobType, numberOfSpeakers, transcriptionType, glossary,
+                transcriptionStyle, targetLanguage);
         break;
       default:
         throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
@@ -496,7 +619,8 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     return result;
   }
 
-  void createRecognitionsJob(String mpId, Track track, String languageCode, String jobType, String numberOfSpeakers)
+  void createRecognitionsJob(String mpId, Track track, String languageCode, String jobType, String numberOfSpeakers,
+          String transcriptionType, String glossary, String transcriptionStyle, String targetLanguage)
           throws TranscriptionServiceException {
     // Timeout 3 hours (needs to include the time for the remote service to
     // fetch the media URL before sending final response)
@@ -508,7 +632,14 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
             + "&language=" + languageCode
             + "&jobType=" + jobType
             + "&numberOfSpeakers=" + numberOfSpeakers
-            + "&transcriptionType=transcription";
+            + "&transcriptionType=" + transcriptionType
+            + "&transcriptionStyle=" + transcriptionStyle;
+    if (StringUtils.isNotBlank(glossary)) {
+      submitUrl += "&glossary=" + glossary;
+    }
+    if (StringUtils.isNotBlank(targetLanguage)) {
+      submitUrl += "&targetLanguage=" + targetLanguage;
+    }
 
     try {
       FileBody fileBody = new FileBody(workspace.get(track.getURI()), ContentType.DEFAULT_BINARY);
