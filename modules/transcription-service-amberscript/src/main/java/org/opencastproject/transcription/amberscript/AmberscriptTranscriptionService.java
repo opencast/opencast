@@ -341,6 +341,11 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
 
   @Override
   public Job startTranscription(String mpId, Track track, String... args) throws TranscriptionServiceException {
+    if (!enabled) {
+      throw new TranscriptionServiceException("AmberScript Transcription Service disabled."
+              + " If you want to enable it, please update the service configuration.");
+    }
+
     String language = null;
 
     if (languageFromDublinCore) {
@@ -400,11 +405,6 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
 
     if (speakers.size() > 1) {
       numberOfSpeakers = speakers.size();
-    }
-
-    if (!enabled) {
-      throw new TranscriptionServiceException("AmberScript Transcription Service disabled."
-              + " If you want to enable it, please update the service configuration.");
     }
 
     logger.info("New transcription job for mpId '{}' language '{}' JobType '{}' Speakers '{}'.",
