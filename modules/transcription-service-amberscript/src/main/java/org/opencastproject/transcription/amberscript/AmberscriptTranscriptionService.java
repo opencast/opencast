@@ -328,7 +328,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
   }
 
   @Deactivate
-  public void deactivate(ComponentContext cc) {
+  public void deactivate() {
     if (scheduledExecutor != null) {
       scheduledExecutor.shutdown();
     }
@@ -393,8 +393,8 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
         }
 
       } catch (IOException | NotFoundException e) {
-        logger.error(String.format("Unable to load dublin core catalog for event '%s'",
-            track.getMediaPackage().getIdentifier()), e);
+        logger.error("Unable to load dublin core catalog for event '{}'",
+            track.getMediaPackage().getIdentifier(), e);
       }
     }
 
@@ -495,10 +495,10 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
   }
 
   void createRecognitionsJob(String mpId, Track track, String languageCode, String jobtype, String numberOfSpeakers)
-          throws TranscriptionServiceException, IOException {
+          throws TranscriptionServiceException {
     // Timeout 3 hours (needs to include the time for the remote service to
     // fetch the media URL before sending final response)
-    CloseableHttpClient httpClient = makeHttpClient(CONNECTION_TIMEOUT, 3 * 3600 * 1000, CONNECTION_TIMEOUT);
+    CloseableHttpClient httpClient = makeHttpClient(3 * 3600 * 1000);
     CloseableHttpResponse response = null;
 
     String submitUrl = BASE_URL + "/jobs/upload-media?transcriptionType=transcription&jobType="
@@ -539,7 +539,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
         default:
           String error = (String) result.get("error");
           String message = (String) result.get("message");
-          String msg = String.format("Unable to submit job: API returned {} - {}: {}", code, error, message);
+          String msg = String.format("Unable to submit job: API returned %s - %s: %s", code, error, message);
           logger.warn(msg);
           throw new TranscriptionServiceException(msg);
       }
@@ -612,12 +612,8 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
           throw new TranscriptionServiceException(
                   String.format("Captions job '%s' failed: Return Code %d", jobId, code), code);
       }
-    } catch (TranscriptionDatabaseException e) {
-      logger.warn("Error while checking status: ", e.toString());
-    } catch (IOException e) {
-      logger.warn("Error while checking status: ", e.toString());
-    } catch (ParseException e) {
-      logger.warn("Error while checking status: ", e.toString());
+    } catch (TranscriptionDatabaseException | IOException | ParseException e) {
+      logger.warn("Error while checking status: {}", e.toString());
     } finally {
       try {
         httpClient.close();
@@ -743,21 +739,19 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
    * @return closable http client
    */
   protected CloseableHttpClient makeHttpClient() {
-    return makeHttpClient(CONNECTION_TIMEOUT, SOCKET_TIMEOUT, CONNECTION_TIMEOUT);
+    return makeHttpClient(SOCKET_TIMEOUT);
   }
 
   /**
    * Creates a closable http client.
    *
-   * @param conectionTimeout http connection timeout value in milliseconds
    * @param socketTimeout http socket timeout value in milliseconds
-   * @param connectionRequestTimeout http connection request timeout value in milliseconds
-   * @return
    */
-  protected CloseableHttpClient makeHttpClient(int conectionTimeout, int socketTimeout, int connectionRequestTimeout) {
-    RequestConfig reqConfig = RequestConfig.custom().setConnectTimeout(conectionTimeout)
+  protected CloseableHttpClient makeHttpClient(int socketTimeout) {
+    RequestConfig reqConfig = RequestConfig.custom()
+        .setConnectTimeout(AmberscriptTranscriptionService.CONNECTION_TIMEOUT)
         .setSocketTimeout(socketTimeout)
-        .setConnectionRequestTimeout(connectionRequestTimeout)
+        .setConnectionRequestTimeout(AmberscriptTranscriptionService.CONNECTION_TIMEOUT)
         .build();
     CloseableHttpClient httpClient = HttpClientBuilder.create()
         .useSystemProperties()
@@ -767,7 +761,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
   }
 
   // Called when a transcription job has been submitted
-  protected void deleteStorageFile(String filename) throws IOException {
+  protected void deleteStorageFile(String filename) {
     try {
       logger.debug("Removing {} from collection {}.", filename, SUBMISSION_COLLECTION);
       wfr.deleteFromCollection(SUBMISSION_COLLECTION, filename, false);
@@ -948,10 +942,10 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
             // Update state in the database
             database.updateJobControl(jobId, TranscriptionJobControl.Status.Closed.name());
             logger.info("Attach transcription workflow {} scheduled for mp {}, transcription service job {}",
-                    new String[]{wfId, mpId, jobId});
+                    wfId, mpId, jobId);
           } catch (Exception e) {
             logger.warn("Attach transcription workflow could NOT be scheduled for mp {}, amberscript job {}, {}: {}",
-                    new String[]{mpId, jobId, e.getClass().getName(), e.getMessage()});
+                    mpId, jobId, e.getClass().getName(), e.getMessage());
           }
         }
       } catch (TranscriptionDatabaseException e) {
