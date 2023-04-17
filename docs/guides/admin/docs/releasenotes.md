@@ -8,7 +8,7 @@ The fifth maintenance release of Opencast 13.
 
 - Whisper language detection and tagging ([#4770](https://github.com/opencast/opencast/pull/4770))
   Important Note:
-  - If you use whisper, update to the latest version !
+    - If you use whisper, update to the latest version !
 - Paella 7: Allow to disable the cookie consent banner ([#4782](https://github.com/opencast/opencast/pull/4782))
 - Add paging to asset manager index rebuild ([#4783](https://github.com/opencast/opencast/pull/4783))
 - Fixed pagination when reindexing asset manager ([#4843](https://github.com/opencast/opencast/pull/4843))
