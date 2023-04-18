@@ -46,9 +46,25 @@ The Opencast AWS S3 Archive service configuration can be found in the
 Using S3 Archiving
 ------------------
 
-Moving assets to S3 is done via a workflow operation handler added as part of a workflow.  This can be part of your
-main workflow that runs on all of your recordings, or a small manually activated workflow accessed on-demand from the
-tasks menu.  The workflow operation handler definition looks like this
+S3 archiving is done on a Snapshot level, that is a mediapackage ID + version.  Because of the way that the Asset
+Manager handles snapshots, all newly created snapshots are *always* local.  Creating a snapshot of a mediapackage with
+non local data will download *all* related snapshots for that mediapackage which can incur significant costs.  S3
+archiving is meant to be a cost reduction, and storage expansion tool, rather than then primary storage for your
+asset manager.  Therefore, most adopters do not want to immediately (ie, at the end of your default workflow) offload
+your recordings to S3!  Instead, we suggest using the TimedMediaArchiver
+(org.opencastproject.assetmanager.impl.TimedMediaArchiver.cfg) to offload your recordings after sufficient time that
+further modification of the recording is unlikely.
+
+If you do need to create an additional workflow, a substantially better approach than restoring snapshots involves
+using the [ingest-download](../workflowoperationhandlers/ingestdownload-woh.md) workflow operation handler to download
+the relevant file(s) to the local workspace.  This dramatically speeds up snapshotting, and allows the operations which
+require local files to work properly without having to restore everything, and then re-archive to S3.
+
+Manual S3 Archiving
+-------------------
+
+Manually moving assets to and from S3 is done via a workflow operation handler added as part of a workflow.
+The workflow operation handler definition looks like this
 ```
     <operation
       id="move-storage"
@@ -72,14 +88,6 @@ changing the `target-storage` configuration value from `aws-s3` to `local-filesy
     </operation>
 ```
 
-
-
-Migrating to S3 Archiving with Pre-Existing Data
----------------------------------------------------
-
-Archiving to S3 is a non-destructive operation in that it is safe to move archive files back and forth between local
-storage and S3.  To offload your local archive, select the workflow(s) and follow the manual offload steps described in
-the user documentation.
 
 S3 Storage Tiers
 ================
