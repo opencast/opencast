@@ -68,3 +68,10 @@ Paella Player also can detect the tag `lang:{code}` to show the language in the 
     </configurations>
 </operation>
 ```
+
+Language code
+-------------------------
+
+The accepted language code are the two letter codes defined in ISO 639-1. A reference list can be found here:
+
+[List of ISO 639-1 codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)

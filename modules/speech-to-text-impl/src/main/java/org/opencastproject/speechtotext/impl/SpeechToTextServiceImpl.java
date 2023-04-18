@@ -140,8 +140,13 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
     List<String> arguments = job.getArguments();
     String language = arguments.get(1);
     URI mediaFile = new URI(arguments.get(0));
-    Boolean translate = Boolean.parseBoolean(arguments.get(2));
-
+    Boolean translate = false;
+    try {
+      translate = Boolean.parseBoolean(arguments.get(2));
+    } catch (NumberFormatException e) {
+      throw new SpeechToTextServiceException("The translate parameter must be a boolean. Declared value: \""
+              + arguments.get(2) + "\"");
+    }
 
     URI subtitleFilesURI;
     File subtitlesFile = null;
