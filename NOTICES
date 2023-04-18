@@ -205,6 +205,11 @@ modules/distribution-service-aws-s3
   https://github.com/aws/aws-sdk-java
   Licensed under Apache 2 (https://github.com/aws/aws-sdk-java/blob/master/LICENSE.txt)
 
+modules/engage-paella-player-7/public/cookie-consent/4.1.0/cookie-consent.js
+  TermsFeed Cookie Consent
+  Version 4.1.0
+  https://termsfeed.com/cookie-consent/
+  
 modules/engage-theodul-core/src/main/resources/ui/js/lib/backbone.js
   Backbone v1.2.3 (http://backbonejs.org)
   Copyright 2010-2016 Jeremy Ashkenas, DocumentCloud
