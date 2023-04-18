@@ -2159,43 +2159,45 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         statsMap.put(s.getId(), new JaxbServiceStatistics(s));
       }
 
-      Query query = em.createNamedQuery("ServiceRegistration.statistics");
-      query.setParameter("minDateCreated", startDate, TemporalType.TIMESTAMP);
-      query.setParameter("maxDateCreated", endDate, TemporalType.TIMESTAMP);
+      if (collectJobstats) {
+        Query query = em.createNamedQuery("ServiceRegistration.statistics");
+        query.setParameter("minDateCreated", startDate, TemporalType.TIMESTAMP);
+        query.setParameter("maxDateCreated", endDate, TemporalType.TIMESTAMP);
 
-      List queryResults = query.getResultList();
-      for (Object result : queryResults) {
-        Object[] oa = (Object[]) result;
-        Number serviceRegistrationId = ((Number) oa[0]);
-        if (serviceRegistrationId == null || serviceRegistrationId.longValue() == 0)
-          continue;
-        Status status = Status.values()[((Number) oa[1]).intValue()];
-        Number count = (Number) oa[2];
-        Number meanQueueTime = (Number) oa[3];
-        Number meanRunTime = (Number) oa[4];
+        List queryResults = query.getResultList();
+        for (Object result : queryResults) {
+          Object[] oa = (Object[]) result;
+          Number serviceRegistrationId = ((Number) oa[0]);
+          if (serviceRegistrationId == null || serviceRegistrationId.longValue() == 0)
+            continue;
+          Status status = Status.values()[((Number) oa[1]).intValue()];
+          Number count = (Number) oa[2];
+          Number meanQueueTime = (Number) oa[3];
+          Number meanRunTime = (Number) oa[4];
 
-        // The statistics query returns a cartesian product, so we need to iterate over them to build up the objects
-        JaxbServiceStatistics stats = statsMap.get(serviceRegistrationId.longValue());
-        if (stats == null)
-          continue;
+          // The statistics query returns a cartesian product, so we need to iterate over them to build up the objects
+          JaxbServiceStatistics stats = statsMap.get(serviceRegistrationId.longValue());
+          if (stats == null)
+            continue;
 
-        // the status will be null if there are no jobs at all associated with this service registration
-        if (status != null) {
-          switch (status) {
-            case RUNNING:
-              stats.setRunningJobs(count.intValue());
-              break;
-            case QUEUED:
-            case DISPATCHING:
-              stats.setQueuedJobs(count.intValue());
-              break;
-            case FINISHED:
-              stats.setMeanRunTime(meanRunTime.longValue());
-              stats.setMeanQueueTime(meanQueueTime.longValue());
-              stats.setFinishedJobs(count.intValue());
-              break;
-            default:
-              break;
+          // the status will be null if there are no jobs at all associated with this service registration
+          if (status != null) {
+            switch (status) {
+              case RUNNING:
+                stats.setRunningJobs(count.intValue());
+                break;
+              case QUEUED:
+              case DISPATCHING:
+                stats.setQueuedJobs(count.intValue());
+                break;
+              case FINISHED:
+                stats.setMeanRunTime(meanRunTime.longValue());
+                stats.setMeanQueueTime(meanQueueTime.longValue());
+                stats.setFinishedJobs(count.intValue());
+                break;
+              default:
+                break;
+            }
           }
         }
       }
