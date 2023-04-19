@@ -232,12 +232,20 @@ for offset in range(0, workflow_count, 100):
         workflow_operations = []
         workflow_operation_config = []
         workflow_config = []
+        description_limited = get_node_value(root, 'description', WORKFLOW_NS)
+        if description_limited is None:
+          description_limited = None
+        else:
+          description_limited = description_limited.lstrip().rstrip()
+          description_limited = description_limited.replace('\n','').replace('    ', ' ')
+          if (len(description_limited) > 255):
+            description_limited = description_limited[0:252] + "..."
         workflow = [
             workflow_id,
             get_node_value(root, 'creator-id', SECURITY_NS),
             date_completed,
             date_created,
-            get_node_value(root, 'description', WORKFLOW_NS),
+            description_limited,
             get_node_value(root, 'organization-id', SECURITY_NS),
             parse_workflow_state(get_attrib_from_node(root, "state")),
             get_node_value(root, 'template', WORKFLOW_NS),
