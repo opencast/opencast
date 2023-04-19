@@ -1,10 +1,25 @@
 # Opencast 13: Release Notes
 
 
+Opencast 13.5
+-------------
+
+The fifth maintenance release of Opencast 13.
+
+- Whisper language detection and tagging ([#4770](https://github.com/opencast/opencast/pull/4770))
+  Important Note:
+    - If you use whisper, update to the latest version !
+- Paella 7: Allow to disable the cookie consent banner ([#4782](https://github.com/opencast/opencast/pull/4782))
+- Add paging to asset manager index rebuild ([#4783](https://github.com/opencast/opencast/pull/4783))
+- Fixed pagination when reindexing asset manager ([#4843](https://github.com/opencast/opencast/pull/4843))
+
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
 Opencast 13.4
 -------------
 
-The third maintenance release of Opencast 13.
+The fourth maintenance release of Opencast 13.
 
 -  Fix default values for the Admin UI ACL editor. Previously the roles set for new events might not correspond to the
    rest of Opencast's defaults. ([#4799](https://github.com/opencast/opencast/pull/4799))
