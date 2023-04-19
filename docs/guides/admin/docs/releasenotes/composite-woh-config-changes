@@ -1,0 +1,11 @@
+Instead of the `#{compositeCommand}` variable which was build by the composite workflow operation handler and could not
+be configured, the composite operation now supports multiple different variables for constructing the ffmpeg command to
+create the composite, most of which can be configured in the encoding profile. This is relevant e.g. for GPU encoding.
+
+If you use custom encoding profiles for composite or use the existing profiles in a different way than the standard
+workflows do, you might need to make some changes. Specifically, the `#{compositeCommand}` variable is no longer
+supported in the ffmpeg command, and the `mp4-preview` profile now only supports dual-streams and no watermark,
+while the `composite` profile retains its full functionality, but offers more configuration options than before.
+
+For more details see the updated documentation for the
+[composite operation](../workflowoperationhandlers/composite-woh.md).
