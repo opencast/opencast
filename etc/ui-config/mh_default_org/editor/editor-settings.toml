@@ -70,16 +70,23 @@
 # Default: "captions"
 #mainFlavor = "captions"
 
-## A list of languages for which subtitles can be created
-#
-# Example:
 [subtitles.languages]
-# "captions/source+de" = "Deutsch"
-# "captions/source+en" = "English"
+## A list of languages for which subtitles can be created
+"captions/source+de" = "Deutsch"
+"captions/source+en" = "English"
+"captions/source+es" = "Español"
 
+[subtitles.icons]
+# A list of icons to be displayed for languages defined above.
+# Values are strings but should preferably be Unicode icons.
+# These are optional and you can also choose to have no icons.
+"captions/source+de" = "🇩🇪"
+"captions/source+en" = "🇺🇸"
+"captions/source+es" = "🇪🇸"
+
+[subtitles.defaultVideoFlavor]
 # Specify the default video in the subtitle video player by flavor
 # If not specified, the editor will decide on a default by itself
-#[subtitles.defaultVideoFlavor]
 # "type" = "presentation"
 # "subtype" = "preview"
 
@@ -92,7 +99,7 @@
 # If the thumbnail editor appears in the main menu
 # Type: boolean
 # Default: false
-# show = false
+#show = false
 
 # Whether to use "simple" or "professional" mode.
 # Professional mode allows users to edit all thumbnails that fit the subflavor
@@ -105,4 +112,6 @@
 # when there is only a single thumbnail to worry about and you want hide
 # potential fallbacks from the user. If a primary thumbnail cannot be
 # determined, this falls back to professional mode.
-simpleMode = false
+# Type: boolean
+# Default: false
+#simpleMode = false
