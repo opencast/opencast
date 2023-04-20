@@ -10,6 +10,8 @@ Opencast can take advantage of [Open AI's Whisper Project]() to generate automat
 Advantages
 ----------
 - Transcription on more than 80 languages
+- Translation to English
+- Automatic language detection
 - Fast processing (When using a GPU)
 - Run locally, no data sent to third parties.
 
@@ -37,9 +39,4 @@ the Whisper machines (Whose nodes have higher job load set).
     - Avoid workflows failures over not enough memory with parallel transcriptions.
     - Performance bottleneck with too many parallel transcriptions.
 
-#### Not yet implemented
 
-This is a list of features that are not implemented, they will be added in the near future.
-
-- Translation to English
-- Automatic language recognition and tagging
