@@ -56,8 +56,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.function.Function;
 
 /**
@@ -79,16 +77,6 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
   private static final String PLUS = "+";
   private static final String MINUS = "-";
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put("source-flavor", "The \"flavor\" of the track to use as a video source input");
-    CONFIG_OPTIONS.put("target-flavor", "The flavor to apply to the encoded file");
-    CONFIG_OPTIONS.put("target-tags", "The tags to apply to the encoded file");
-  }
-
   /** The local workspace */
   private Workspace workspace = null;
 
@@ -108,10 +96,6 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);
-  }
-
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**

@@ -27,8 +27,6 @@ import org.opencastproject.adopter.statistic.dto.GeneralData;
 import org.opencastproject.adopter.statistic.dto.Host;
 import org.opencastproject.adopter.statistic.dto.StatisticData;
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -289,8 +287,6 @@ public class ScheduledDataCollector extends TimerTask {
     });
     statisticData.setJobCount(serviceRegistry.count(null, null));
 
-    AQueryBuilder q = assetManager.createQuery();
-
     statisticData.setSeriesCount(seriesService.getSeriesCount());
     statisticData.setUserCount(userAndRoleProvider.countAllUsers());
 
@@ -308,8 +304,7 @@ public class ScheduledDataCollector extends TimerTask {
 
     for (Organization org : orgs) {
       SecurityUtil.runAs(securityService, org, systemAdminUser, () -> {
-        AResult result = q.select(q.snapshot()).where(q.version().isLatest()).run();
-        statisticData.setEventCount(statisticData.getEventCount() + result.getSize());
+        statisticData.setEventCount(statisticData.getEventCount() + assetManager.countEvents(org.getId()));
 
         //Calculate the number of attached CAs for this org, add it to the total
         long current = statisticData.getCACount();
