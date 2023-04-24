@@ -102,6 +102,7 @@ public class TestTasksEndpoint extends TasksEndpoint {
     wfD2.setId("full-html5");
     wfD2.setDescription("Test description");
     wfD2.setConfigurationPanel("<h2>Test</h2>");
+    wfD2.setConfigurationPanelJson("[{ \"fieldset\": [ { \"type\": \"checkbox\", \"name\": \"straightToPublishing\", \"label\": \"Straight to publishing\", \"value\": true } ] }]");
     wfD2.addTag("archive");
 
     WorkflowDefinitionImpl wfD3 = new WorkflowDefinitionImpl();

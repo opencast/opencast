@@ -16,11 +16,6 @@ updates:
     interval: monthly
   open-pull-requests-limit: 10
 - package-ecosystem: npm
-  directory: "/modules/runtime-info-ui-ng"
-  schedule:
-    interval: monthly
-  open-pull-requests-limit: 10
-- package-ecosystem: npm
   directory: "/modules/runtime-info-ui"
   schedule:
     interval: monthly

@@ -52,8 +52,9 @@
     <spring-security.version>3.1.7.RELEASE</spring-security.version>
   </properties>
   <modules>
-    <module>modules/admin-ui-frontend</module>
     <module>modules/admin-ui</module>
+    <module>modules/admin-ui-frontend</module>
+    <module>modules/admin-ui-interface</module>
     <module>modules/adopter-registration-api</module>
     <module>modules/adopter-registration-impl</module>
     <module>modules/analyze-mediapackage-workflowoperation</module>
@@ -174,7 +175,6 @@
     <module>modules/redirect</module>
     <module>modules/rename-files-workflowoperation</module>
     <module>modules/rest-test-environment</module>
-    <module>modules/runtime-info-ui-ng</module>
     <module>modules/runtime-info-ui</module>
     <module>modules/runtime-info</module>
     <module>modules/scheduler-api</module>
