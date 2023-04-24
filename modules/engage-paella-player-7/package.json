@@ -27,7 +27,7 @@
     "source-map-loader": "^4.0.1",
     "style-loader": "^3.3.2",
     "svg-inline-loader": "^0.8.2",
-    "webpack": "^5.77.0",
+    "webpack": "^5.78.0",
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.13.2",
     "xml-loader": "^1.2.1"
@@ -37,6 +37,6 @@
     "paella-core": "^1.25.0",
     "paella-slide-plugins": "^1.8.0",
     "paella-user-tracking": "^1.8.0",
-    "paella-zoom-plugin": "^1.2.1"
+    "paella-zoom-plugin": "^1.27.0"
   }
 }

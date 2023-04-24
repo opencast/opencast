@@ -4,6 +4,29 @@ Changelog
 Opencast 13
 -----------
 
+### Opencast 13.5
+
+*Released on April 19th, 2023*
+
+- [[#4866](https://github.com/opencast/opencast/pull/4866)] -
+  Add Opencast 13.5 release notes
+- [[#4843](https://github.com/opencast/opencast/pull/4843)] -
+  Fixed pagination when reindexing asset manager
+- [[#4824](https://github.com/opencast/opencast/pull/4824)] -
+  Bump @babel/preset-env from 7.20.2 to 7.21.4 in /modules/engage-paella-player-7
+- [[#4823](https://github.com/opencast/opencast/pull/4823)] -
+  Batch Dependabot Updates for Paella 7
+- [[#4813](https://github.com/opencast/opencast/pull/4813)] -
+  Bump html-validate from 7.13.3 to 7.14.0 in /modules/engage-paella-player-7
+- [[#4782](https://github.com/opencast/opencast/pull/4782)] -
+  Paella 7: Allow to disable the cookie consent banner
+- [[#4772](https://github.com/opencast/opencast/pull/4772)] -
+  Batch Dependabot Updates for Paella 7
+- [[#4770](https://github.com/opencast/opencast/pull/4770)] -
+  Whisper language detection and tagging
+- [[#4738](https://github.com/opencast/opencast/pull/4738)] -
+  Enable Whisper English Translation
+
 ### Opencast 13.4
 
 *Released on March 21th, 2023*
