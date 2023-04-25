@@ -1,5 +1,10 @@
-Paella Player
-=============
+Paella Player 6
+===============
+
+<div class=warn>
+This documentation is about the old Paella Player.
+For the new default player, take a look at the Paella Player 7 documentation section.
+</div>
 
 The Paella `(pronounced 'paeja')` [Player](https://paellaplayer.upv.es) is an Open Source
 JavaScript video player capable of playing an unlimited number of audio & video streams 
@@ -11,8 +16,6 @@ Paella has been specially designed for lecture recordings. It works with all HTM
 
 Have a look to the paella [features list](https://paellaplayer.upv.es/features/)
 or see them live on paella [demos page](https://paellaplayer.upv.es/demos/)
-
-Paella is Opencast's default player.
 
 
 Configuration

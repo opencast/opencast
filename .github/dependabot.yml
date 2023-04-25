@@ -29,7 +29,6 @@ updates:
   directory: "/modules/engage-paella-player-7"
   schedule:
     interval: monthly
-  target-branch: "r/13.x"
   open-pull-requests-limit: 10
 - package-ecosystem: npm
   directory: "/modules/admin-ui-frontend"
