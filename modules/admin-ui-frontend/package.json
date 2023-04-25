@@ -38,7 +38,7 @@
     "jit-grunt": "^0.10.0",
     "jshint-stylish": "^2.2.1",
     "karma": "^6.4.2",
-    "karma-chrome-launcher": "^3.1.1",
+    "karma-chrome-launcher": "^3.2.0",
     "karma-coverage": "^2.2.0",
     "karma-detect-browsers": "^2.0",
     "karma-firefox-launcher": "^2.1.2",
