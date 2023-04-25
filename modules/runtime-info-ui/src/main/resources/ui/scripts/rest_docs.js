@@ -19,36 +19,40 @@
  *
  */
 
-/* global $ */
-
 function search() {
-  var value = $('input').val();
-  $('li').each(function() {
-    $(this).toggle($(this).text().toLowerCase().indexOf(value.toLowerCase()) >= 0);
-  });
+  const value = document.getElementById('search').value.toLowerCase();
+  for (const li of document.getElementsByTagName('li')) {
+    li.style.display = li.innerText.toLowerCase().indexOf(value) >= 0 ? 'block' : 'none';
+  }
 }
 
-$(document).ready(function($) {
-  $('input').change(search);
-  $('input').keyup(search);
+async function init() {
+  const input = document.getElementById('search');
+  input.addEventListener('keyup', search);
+  input.addEventListener('change', search);
 
-  $.getJSON('/info/components.json', function(data) {
-    var docs = $('#docs'),
-        tpl = $('#template').html();
-    $.each(data, function(section) {
-      if ('rest' == section) {
-        data.rest.sort((a,b) => a.path > b.path ? 1 : -1);
-        $.each(data.rest, function(i) {
-          let path = data.rest[i].path,
-              service = $(tpl);
-          $('a', service).attr('href', '/docs.html?path=' + path);
-          $('.path', service).text(path);
-          $('.desc', service).text(data.rest[i].description);
-          docs.append(service);
-        });
-        return;
-      }
-    });
-    search();
-  });
-});
+  const docs = document.getElementById('docs');
+
+  const response = await fetch('/info/components.json');
+  const rest = (await response.json()).rest;
+  rest.sort((a,b) => a.path > b.path ? 1 : -1);
+
+  for (const endpoint of rest) {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = '/docs.html?path=' + endpoint.path;
+    li.appendChild(a);
+    const path = document.createElement('span');
+    path.classList = ['path'];
+    path.innerText = endpoint.path;
+    a.appendChild(path);
+    const desc = document.createElement('span');
+    desc.classList = ['desc'];
+    desc.innerText = endpoint.description;
+    a.appendChild(desc);
+    docs.appendChild(li);
+  }
+  search();
+}
+
+addEventListener('DOMContentLoaded', () => init());
