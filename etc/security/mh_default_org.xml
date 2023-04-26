@@ -34,6 +34,7 @@
 
     <!-- Allow anonymous access to resources from runtime info ui -->
     <sec:intercept-url pattern="/img/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/js/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/scripts/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/styles/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/docs.*" access="ROLE_ANONYMOUS" />
