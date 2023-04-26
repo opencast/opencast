@@ -49,10 +49,10 @@ Using S3 Archiving
 S3 archiving is done on a Snapshot level, that is a mediapackage ID + version.  Because of the way that the Asset
 Manager handles snapshots, all newly created snapshots are *always* local.  Creating a snapshot of a mediapackage with
 non local data will download *all* related snapshots for that mediapackage which can incur significant costs.  S3
-archiving is meant to be a cost reduction, and storage expansion tool, rather than then primary storage for your
-asset manager.  Therefore, most adopters do not want to immediately (ie, at the end of your default workflow) offload
-your recordings to S3!  Instead, we suggest using the TimedMediaArchiver
-(org.opencastproject.assetmanager.impl.TimedMediaArchiver.cfg) to offload your recordings after sufficient time that
+archiving is meant to be a cost reduction, and storage expansion tool, rather than hot storage where lots of reads and
+writes will occur.  Therefore, most adopters do not want to immediately (ie, at the end of your default workflow)
+offload your recordings to S3!  Instead, we suggest using the `TimedMediaArchiver` as configured in
+`/etc/org.opencastproject.assetmanager.impl.TimedMediaArchiver.cfg` to offload your recordings after sufficient time that
 further modification of the recording is unlikely.
 
 If you do need to create an additional workflow, a substantially better approach than restoring snapshots involves
