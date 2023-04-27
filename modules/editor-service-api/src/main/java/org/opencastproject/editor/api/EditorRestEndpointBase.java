@@ -44,6 +44,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -93,13 +94,23 @@ public abstract class EditorRestEndpointBase {
 
   @POST
   @Path("{mediaPackageId}/lock")
-  @Consumes(MediaType.APPLICATION_JSON)
   @RestQuery(name = "lockMediapackage",
-          description = "Creates and updates the lock for a mediapackage in the editor",
-          returnDescription = "",
+          description = "Creates and updates the lock for a mediapackage in the editor. "
+          + "Requests will create/refreshen a lock at /editor/{mediapackageId}/lock{uuid} "
+          + "(see Location header in response) that will expire after the configured period. "
+          + "Subsequent calls must have the same uuid, which will then freshen the lock.",
+          returnDescription = "The lock is returned in the Location header.",
           pathParameters = {
             @RestParameter(name = "mediaPackageId", description = "The id of the media package", isRequired = true,
                     type = RestParameter.Type.STRING)
+          },
+          restParameters = {
+            @RestParameter(name = "user", isRequired = true,
+                description = "The user requesting to lock this mediapackage",
+                type = RestParameter.Type.STRING, defaultValue = "admin"),
+            @RestParameter(name = "uuid", isRequired = true,
+                description = "The unique identitier of the lock",
+                type = RestParameter.Type.STRING)
           },
           responses = {
             @RestResponse(description = "Lock obtained", responseCode = SC_CREATED),
@@ -107,10 +118,10 @@ public abstract class EditorRestEndpointBase {
             @RestResponse(description = "Mediapackage not found", responseCode = SC_NOT_FOUND)
           })
   public Response lockMediapackage(@PathParam("mediaPackageId") final String mediaPackageId,
+         @FormParam("user") final String user, @FormParam("uuid") final String uuid,
          @Context HttpServletRequest request) {
     try {
-      String details = readInputStream(request);
-      LockData lockData = LockData.parse(details);
+      LockData lockData = new LockData(uuid, user);
       editorService.lockMediaPackage(mediaPackageId, lockData);
       return RestUtil.R.created(new URI(request.getRequestURI() + "/" + lockData.getUUID()));
     } catch (EditorServiceException e) {

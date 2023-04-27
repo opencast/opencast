@@ -39,8 +39,8 @@ public class EditorLock {
       new CacheLoader<String, LockData>() {
         // NB, this is not used but the abstract class needs a concrete implementaton
         @Override
-        public LockData load(String json) throws Exception {
-          return LockData.parse(json);
+        public LockData load(String mediapackageId) throws Exception {
+          return lockedPackages.getIfPresent(mediapackageId);
         }
       });
   }

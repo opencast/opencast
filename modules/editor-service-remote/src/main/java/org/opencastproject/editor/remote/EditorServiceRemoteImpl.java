@@ -32,10 +32,12 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -43,7 +45,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component(
     property = {
@@ -88,7 +95,10 @@ public class EditorServiceRemoteImpl extends RemoteBase implements EditorService
 
   @Override
   public void lockMediaPackage(String mediaPackageId, LockData lockData) throws EditorServiceException {
-    doPostForMediaPackage(mediaPackageId, LOCK_SUFFIX, lockData.toJSONString());
+    Map<String, String> params = new HashMap<>();
+    params.put("uuid", lockData.getUUID());
+    params.put("user", lockData.getUser());
+    doPostFormForMediaPackage(mediaPackageId, LOCK_SUFFIX, params);
   }
 
   @Override
@@ -163,6 +173,33 @@ public class EditorServiceRemoteImpl extends RemoteBase implements EditorService
       if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
         evaluateResponseCode(response);
       }
+    } finally {
+      closeConnection(response);
+    }
+  }
+
+  protected void doPostFormForMediaPackage(final String mediaPackageId, final String urlSuffix,
+          final Map<String, String> params)
+          throws EditorServiceException {
+    logger.debug("Editor Remote POST Request for mediaPackage : '{}' to url: '{}'", mediaPackageId, urlSuffix);
+    HttpPost post = new HttpPost(mediaPackageId + urlSuffix);
+    HttpResponse response = null;
+    try {
+      List<BasicNameValuePair> formParams = new ArrayList<>();
+      for (String field : params.keySet()) {
+        formParams.add(new BasicNameValuePair(field, params.get(field)));
+      }
+      post.setEntity(new UrlEncodedFormEntity(formParams, "UTF-8"));
+      response = getResponse(post, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND, HttpStatus.SC_BAD_REQUEST,
+              HttpStatus.SC_CONFLICT);
+      if (response == null || response.getStatusLine() == null) {
+        throw new EditorServiceException("No response for setEditData", ErrorStatus.UNKNOWN);
+      }
+      if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+        evaluateResponseCode(response);
+      }
+    } catch (UnsupportedEncodingException e) {
+      throw new EditorServiceException(e.getMessage(), ErrorStatus.UNKNOWN);
     } finally {
       closeConnection(response);
     }
