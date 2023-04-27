@@ -46,7 +46,7 @@ Operation Example
 
 The operation will create workflow instance variables like this:
 
-```properties
+```
 dublincore_episode_exists=true
 dublincore_episode_type=Catalog
 presentation_source_exists=true
