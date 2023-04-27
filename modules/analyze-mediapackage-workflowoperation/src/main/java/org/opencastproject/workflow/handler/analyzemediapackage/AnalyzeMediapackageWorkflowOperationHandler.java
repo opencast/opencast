@@ -86,7 +86,7 @@ public class AnalyzeMediapackageWorkflowOperationHandler extends AbstractWorkflo
       if (MediaPackageElement.Type.Publication == mpe.getElementType()) {
         continue;
       }
-      String flavorPrefix = mpe.getType() + "_" + mpe.getSubtype();
+      String flavorPrefix = mpe.getFlavor().getType() + "_" + mpe.getFlavor().getSubtype();
       properties.put(flavorPrefix + "_exists", "true");
       properties.put(flavorPrefix + "_type", mpe.getElementType().toString());
     }
