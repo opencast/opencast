@@ -378,14 +378,14 @@ public class EditorServiceImpl implements EditorService {
       lockTimeout = Integer.parseUnsignedInt(
            Objects.toString(properties.get(OPT_LOCK_TIMEOUT)));
     } catch (NumberFormatException e) {
-      logger.warn("Configuration {} contains invalid value", OPT_LOCK_TIMEOUT);
+      logger.info("Configuration {} contains invalid value, defaulting to {}", OPT_LOCK_TIMEOUT, lockTimeout);
     }
 
     try {
       lockRefresh = Integer.parseUnsignedInt(
             Objects.toString(properties.get(OPT_LOCK_REFRESH)));
     } catch (NumberFormatException e) {
-      logger.warn("Configuration {} contains invalid value", OPT_LOCK_REFRESH);
+      logger.info("Configuration {} contains invalid value, defaulting to {}", OPT_LOCK_REFRESH, lockRefresh);
     }
 
     editorLock = new EditorLock(lockTimeout);

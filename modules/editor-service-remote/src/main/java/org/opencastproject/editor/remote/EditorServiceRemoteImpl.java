@@ -104,7 +104,7 @@ public class EditorServiceRemoteImpl extends RemoteBase implements EditorService
     try {
       response = getResponse(delete, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND, HttpStatus.SC_CONFLICT);
       if (response == null || response.getStatusLine() == null) {
-        throw new EditorServiceException("Editor Remote call failed to repsond", ErrorStatus.UNKNOWN);
+        throw new EditorServiceException("Editor Remote call failed to respond", ErrorStatus.UNKNOWN);
       }
       if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
         evaluateResponseCode(response);
