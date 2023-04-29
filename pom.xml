@@ -42,10 +42,14 @@
     <jettison.version>1.5.4</jettison.version>
     <joda-time.version>2.12.5</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
-    <karaf.version>4.2.16</karaf.version>
+    <karaf.version>4.4.3</karaf.version>
     <node.version>v16.13.0</node.version>
-    <osgi.compendium.version>6.0.0</osgi.compendium.version>
-    <osgi.core.version>6.0.0</osgi.core.version>
+    <osgi.core.version>8.0.0</osgi.core.version>
+    <org.osgi.service.component.version>1.5.0</org.osgi.service.component.version>
+    <org.osgi.service.component.annotations.version>1.5.0</org.osgi.service.component.annotations.version>
+    <org.osgi.service.cm.version>1.6.0</org.osgi.service.cm.version>
+    <org.osgi.service.log.version>1.5.0</org.osgi.service.log.version>
+    <org.osgi.service.http.version>1.2.1</org.osgi.service.http.version>
     <querydsl.version>3.7.4</querydsl.version>
     <rest-assured.version>4.4.0</rest-assured.version>
     <spring.version>3.1.4.RELEASE</spring.version>
@@ -868,8 +872,32 @@
       </dependency>
       <dependency>
         <groupId>org.osgi</groupId>
-        <artifactId>osgi.cmpn</artifactId>
-        <version>${osgi.compendium.version}</version>
+        <artifactId>org.osgi.service.cm</artifactId>
+        <version>${org.osgi.service.cm.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.log</artifactId>
+        <version>${org.osgi.service.log.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.component</artifactId>
+        <version>${org.osgi.service.component.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.http</artifactId>
+        <version>${org.osgi.service.http.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.component.annotations</artifactId>
+        <version>${org.osgi.service.component.annotations.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -1125,12 +1153,12 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.33</version>
+        <version>1.7.36</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
-        <version>1.7.33</version>
+        <version>1.7.36</version>
       </dependency>
       <!-- apache commons syncing -->
       <dependency>
@@ -1337,6 +1365,11 @@
             <artifactId>stax-api</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.ops4j.pax.web</groupId>
+        <artifactId>pax-web-extender-whiteboard</artifactId>
+        <version>8.0.15</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -52,7 +52,7 @@ import javax.servlet.http.HttpServletResponse;
         "service.description=Current Job Filter",
         "httpContext.id=opencast.httpcontext",
         "httpContext.shared=true",
-        "service.ranking=4",
+        "service.ranking:Integer=4",
         "urlPatterns=*"
     }
 )

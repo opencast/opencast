@@ -55,7 +55,7 @@ import javax.servlet.http.HttpServletResponse;
         "service.description=Organization Filter",
         "httpContext.id=opencast.httpcontext",
         "httpContext.shared=true",
-        "service.ranking=2",
+        "service.ranking:Integer=2",
         "urlPatterns=*"
     }
 )

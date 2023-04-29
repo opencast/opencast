@@ -60,7 +60,7 @@ import javax.servlet.http.HttpServletResponse;
         "service.description=Url Signing Filter",
         "httpContext.id=opencast.httpcontext",
         "httpContext.shared=true",
-        "service.ranking=9",
+        "service.ranking:Integer=9",
         "urlPatterns=*"
     }
 )

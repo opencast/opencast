@@ -60,7 +60,11 @@
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>osgi.cmpn</artifactId>
+      <artifactId>org.osgi.service.component</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.component.annotations</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -92,7 +96,7 @@
         </exclusion>
         <exclusion>
           <groupId>org.apache.felix</groupId>
-          <artifactId>osgi.cmpn</artifactId>
+          <artifactId>org.osgi.service.component.annotations</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

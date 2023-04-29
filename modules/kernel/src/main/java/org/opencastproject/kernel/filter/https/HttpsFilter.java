@@ -45,7 +45,7 @@ import javax.servlet.http.HttpServletRequest;
         "service.description=Https Filter",
         "httpContext.id=opencast.httpcontext",
         "httpContext.shared=true",
-        "service.ranking=2",
+        "service.ranking:Integer=2",
         "urlPatterns=*"
     }
 )

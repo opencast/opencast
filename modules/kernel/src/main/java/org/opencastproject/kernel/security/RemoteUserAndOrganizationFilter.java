@@ -74,7 +74,7 @@ import javax.servlet.http.HttpServletResponse;
         "service.description=Remote User and Organization Filter",
         "httpContext.id=opencast.httpcontext",
         "httpContext.shared=true",
-        "service.ranking=5",
+        "service.ranking:Integer=5",
         "urlPatterns=*"
     }
 )

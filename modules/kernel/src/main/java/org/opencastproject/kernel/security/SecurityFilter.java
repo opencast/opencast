@@ -51,7 +51,7 @@ import javax.servlet.http.HttpServletResponse;
         "service.description=Security Filter",
         "httpContext.id=opencast.httpcontext",
         "httpContext.shared=true",
-        "service.ranking=3",
+        "service.ranking:Integer=3",
         "urlPatterns=*"
     }
 )

@@ -55,7 +55,7 @@ import javax.servlet.http.HttpServletResponseWrapper;
         "service.description=JSONP Filter",
         "httpContext.id=opencast.httpcontext",
         "httpContext.shared=true",
-        "service.ranking=10",
+        "service.ranking:Integer=10",
         "urlPatterns=*"
     }
 )

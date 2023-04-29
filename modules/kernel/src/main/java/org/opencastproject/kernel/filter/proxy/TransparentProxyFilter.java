@@ -47,7 +47,7 @@ import javax.servlet.http.HttpServletRequest;
         "service.description=Transparent Proxy Filter",
         "httpContext.id=opencast.httpcontext",
         "httpContext.shared=true",
-        "service.ranking=9",
+        "service.ranking:Integer=9",
         "urlPatterns=*"
     }
 )

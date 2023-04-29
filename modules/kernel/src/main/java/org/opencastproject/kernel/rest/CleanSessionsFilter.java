@@ -52,7 +52,7 @@ import javax.servlet.http.HttpSession;
         "service.description=Clean Digest Sessions and Set Max Inactive Interval Filter",
         "httpContext.id=opencast.httpcontext",
         "httpContext.shared=true",
-        "service.ranking=1",
+        "service.ranking:Integer=1",
         "urlPatterns=*"
     }
 )
