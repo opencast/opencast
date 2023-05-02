@@ -122,14 +122,13 @@
               <feature>opencast-security-cas</feature>
               <feature>opencast-security-jwt</feature>
               <feature>opencast-plugin-legacy-annotation</feature>
-              <feature>opencast-plugin-transcription-amberscript</feature>
-              <feature>opencast-plugin-transcription-google-speech</feature>
-              <feature>opencast-plugin-transcription-ibm-watson</feature>
+              <feature>opencast-plugin-transcription-services</feature>
               <feature>opencast-plugin-userdirectory-brightspace</feature>
               <feature>opencast-plugin-userdirectory-canvas</feature>
               <feature>opencast-plugin-userdirectory-moodle</feature>
               <feature>opencast-plugin-userdirectory-sakai</feature>
               <feature>opencast-plugin-userdirectory-studip</feature>
+              <feature>opencast-plugin-userdirectory-brightspace</feature>
               <feature>opencast-plugin-usertracking</feature>
             </installedFeatures>
           </configuration>
