@@ -258,6 +258,7 @@ angular.module('adminNg.services')
           });
 
           me.ud.policies = [];
+          me.ud.policiesUser = [];
           // After loading an ACL template add the user's role to the top of the ACL list if it isn't included
           if (angular.isDefined(AuthService.getUserRole())
             && !angular.isDefined(newPolicies[AuthService.getUserRole()])) {
@@ -269,7 +270,6 @@ angular.module('adminNg.services')
             }
           });
 
-          me.ud.policiesUser = [];
           angular.forEach(newPolicies, function (policy) {
             if (policy.role.startsWith(me.roleUserPrefix)) {
               var id = policy.role.split(me.roleUserPrefix).pop().toLowerCase();
