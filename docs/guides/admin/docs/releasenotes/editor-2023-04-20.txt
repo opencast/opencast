@@ -1,0 +1,5 @@
+Major Update of the Editor
+--------------------------
+
+Opencast 13.? contains a new version of the editor which comes with many additional features and bug fixes.
+For more details, [take a look at the release notes](https://github.com/opencast/opencast-editor/releases/tag/2023-04-20).
