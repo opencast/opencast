@@ -122,6 +122,8 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   public static final String AWS_S3_MAX_RETRIES = "org.opencastproject.assetmanager.aws.s3.max.retries";
   public static final String AWS_GLACIER_RESTORE_DAYS = "org.opencastproject.assetmanager.aws.s3.glacier.restore.days";
 
+  public static final String AWS_OVERRIDE_RESTORE_MIN_WAIT = "org.opencastproject.assetmanager.aws.s3.glacier.min.wait";
+  public static final String AWS_OVERRIDE_RESTORE_POLL = "org.opencastproject.assetmanager.aws.s3.glacier.poll";
   public static final Integer AWS_S3_GLACIER_RESTORE_DAYS_DEFAULT = 2;
 
   // defaults
@@ -144,6 +146,9 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
 
   /** The Glacier storage class, restore period **/
   private Integer restorePeriod;
+
+  private Integer glacierRestoreInitialWait = RESTORE_MIN_WAIT;
+  private Integer glacierRestorePollTime = RESTORE_POLL;
 
   protected boolean bucketCreated = false;
 
@@ -205,6 +210,11 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       // Glacier storage class restore period
       restorePeriod = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_GLACIER_RESTORE_DAYS)
           .getOrElse(AWS_S3_GLACIER_RESTORE_DAYS_DEFAULT);
+
+      glacierRestoreInitialWait = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_OVERRIDE_RESTORE_MIN_WAIT)
+          .getOrElse(RESTORE_MIN_WAIT);
+      glacierRestorePollTime = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_OVERRIDE_RESTORE_POLL)
+          .getOrElse(RESTORE_POLL);
 
       // Explicit credentials are optional.
       AWSCredentialsProvider provider = null;
