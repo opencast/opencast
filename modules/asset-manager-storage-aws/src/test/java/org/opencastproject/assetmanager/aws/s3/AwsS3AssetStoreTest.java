@@ -24,6 +24,8 @@ package org.opencastproject.assetmanager.aws.s3;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
+import org.opencastproject.assetmanager.api.Availability;
+import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
 import org.opencastproject.assetmanager.api.storage.Source;
@@ -31,6 +33,7 @@ import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabaseImpl;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetMapping;
 import org.opencastproject.assetmanager.impl.VersionImpl;
+import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -54,6 +57,7 @@ import com.amazonaws.services.s3.transfer.Upload;
 import com.entwinemedia.fn.data.Opt;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.After;
@@ -68,6 +72,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Date;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 
 public class AwsS3AssetStoreTest {
@@ -102,6 +108,8 @@ public class AwsS3AssetStoreTest {
 
   private AwsS3AssetStore store;
 
+  private Database amDb;
+
   @Before
   public void setUp() throws Exception {
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
@@ -135,12 +143,29 @@ public class AwsS3AssetStoreTest {
     EasyMock.expect(workspace.get(uri)).andReturn(sampleFile).anyTimes();
     EasyMock.replay(workspace);
 
+    amDb = EasyMock.createStrictMock(Database.class);
+    amDb.setAvailability(EasyMock.anyObject(), EasyMock.anyObject(), EasyMock.anyObject());
+    EasyMock.expectLastCall().anyTimes();
+
+    Dictionary<String, Object> props = new Hashtable<>();
+    //Override the default Glacier timings so that it's sanely testable
+    props.put(AwsS3AssetStore.AWS_S3_ENABLED, "true");
+    props.put(AssetStore.STORE_TYPE_PROPERTY, "s3");
+    props.put(AwsS3AssetStore.AWS_S3_BUCKET_CONFIG, BUCKET_NAME);
+    props.put(AwsS3AssetStore.AWS_S3_REGION_CONFIG, "fake");
+    props.put(AwsS3AssetStore.AWS_OVERRIDE_RESTORE_MIN_WAIT, 2);
+    props.put(AwsS3AssetStore.AWS_OVERRIDE_RESTORE_POLL, 2);
+    ComponentContext ccmock = EasyMock.createNiceMock(ComponentContext.class);
+    EasyMock.expect(ccmock.getProperties()).andReturn(props).anyTimes();
+    EasyMock.replay(ccmock);
+
     store = new AwsS3AssetStore();
-    store.setBucketName(BUCKET_NAME);
+    store.activate(ccmock);
     store.setS3(s3Client);
     store.setS3TransferManager(s3Transfer);
     store.setWorkspace(workspace);
     store.setDatabase(database);
+    store.setAssetManagerDatabase(amDb);
   }
 
   @After
@@ -326,20 +351,22 @@ public class AwsS3AssetStoreTest {
   public void testStorageClasses() throws Exception {
     GetObjectTaggingResult gotr = EasyMock.createStrictMock(GetObjectTaggingResult.class);
     List<Tag> tags = List.of(new Tag("Freezable", "true"));
-    EasyMock.expect(gotr.getTagSet()).andReturn(tags).once();
+    EasyMock.expect(gotr.getTagSet()).andReturn(tags).times(2);
     ObjectMetadata metadata = EasyMock.createStrictMock(ObjectMetadata.class);
     EasyMock.expect(metadata.getVersionId()).andReturn(AWS_VERSION_1).anyTimes();
 
     EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Standard.toString()).times(4);
     EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Glacier.toString()).once();
+    //EasyMock.expect(amDb)
     EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Standard.toString()).once();
     EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Glacier.toString()).once();
     EasyMock.expect(metadata.getOngoingRestore()).andReturn(false);
     EasyMock.expect(metadata.getRestoreExpirationTime()).andReturn(new Date()).once();
     EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Standard.toString()).once();
     EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.DeepArchive.toString()).once();
+    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Standard.toString()).once();
     EasyMock.expect(s3Client.getObjectTagging(EasyMock.anyObject(GetObjectTaggingRequest.class)))
-        .andReturn(gotr).once();
+        .andReturn(gotr).times(2);
     //FIXME: Mock appropriate results, not that they're checked.
     EasyMock.expect(s3Client.copyObject(EasyMock.anyObject(CopyObjectRequest.class))).andReturn(null).anyTimes();
     EasyMock.replay(gotr, metadata);
@@ -441,7 +468,7 @@ public class AwsS3AssetStoreTest {
     Assert.assertEquals(ASSET_ID2, mapping2.getMediaPackageElementId());
 
     // Check if both have the same AWS object key
-    Assert.assertTrue(mapping.getObjectKey().equals(mapping2.getObjectKey()));
+    Assert.assertEquals(mapping.getObjectKey(), mapping2.getObjectKey());
   }
 
   @Test
@@ -457,7 +484,7 @@ public class AwsS3AssetStoreTest {
   }
 
   @Test
-  public void testGet() throws Exception {
+  public void testS3Get() throws Exception {
     Upload upload = EasyMock.createStrictMock(Upload.class);
     upload.waitForCompletion();
     EasyMock.expectLastCall().once();
@@ -652,7 +679,7 @@ public class AwsS3AssetStoreTest {
     Assert.assertEquals(ASSET_ID2, mapping2.getMediaPackageElementId());
 
     // Check if both have the same AWS object key
-    Assert.assertTrue(mapping.getObjectKey().equals(mapping2.getObjectKey()));
+    Assert.assertEquals(mapping.getObjectKey(), mapping2.getObjectKey());
 
     // Delete version 1 only, no call to s3Client.deleteObject is expected: the
     // object should not be deleted from s3 because it's linked to by ASSET_ID2
@@ -666,49 +693,129 @@ public class AwsS3AssetStoreTest {
     Assert.assertNotNull(mapping2);
   }
 
-  @Test @Ignore
+  @Test
   public void testAssetRestore() throws Exception {
-    //FIXME: Partially implemented, but the poll time is a constant...
     GetObjectTaggingResult gotr = EasyMock.createStrictMock(GetObjectTaggingResult.class);
     List<Tag> tags = List.of(new Tag("Freezable", "true"));
     EasyMock.expect(gotr.getTagSet()).andReturn(tags).once();
+
     ObjectMetadata metadata = EasyMock.createStrictMock(ObjectMetadata.class);
     EasyMock.expect(metadata.getVersionId()).andReturn(AWS_VERSION_1).anyTimes();
+    //Initial move to Glacier, and then verifications
     EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Standard.toString()).times(1);
+    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Glacier.toString()).times(1);
+    EasyMock.expect(metadata.getRestoreExpirationTime()).andReturn(null).times(1);
+    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Glacier.toString()).times(1);
+    //Initiate the restore
     EasyMock.expect(metadata.getOngoingRestore()).andReturn(false).once();
-    EasyMock.expect(metadata.getRestoreExpirationTime()).andReturn(null).once();
+    EasyMock.expect(metadata.getRestoreExpirationTime()).andReturn(null).times(1);
+    //Mid restore
+    EasyMock.expect(metadata.getRestoreExpirationTime()).andReturn(null).times(1);
     EasyMock.expect(metadata.getOngoingRestore()).andReturn(true).once();
+    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Glacier.toString()).times(1);
+    EasyMock.expect(metadata.getRestoreExpirationTime()).andReturn(null).times(1);
+    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Glacier.toString()).times(1);
+    //Restore is now finished
+    //This restore expires tomorrow, always.
+    EasyMock.expect(metadata.getRestoreExpirationTime()).andReturn(DateUtils.addDays(new Date(), 1)).times(1);
+    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Glacier.toString()).times(1);
+    EasyMock.expect(metadata.getRestoreExpirationTime()).andReturn(DateUtils.addDays(new Date(), 1)).times(1);
+    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Glacier.toString()).times(1);
+    //Testing what happens *after* the restore has expired
+    EasyMock.expect(metadata.getRestoreExpirationTime()).andReturn(null).times(1);
+    EasyMock.expect(metadata.getOngoingRestore()).andReturn(false).times(1);
+    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Glacier.toString()).times(1);
+    EasyMock.expect(metadata.getRestoreExpirationTime()).andReturn(null).times(1);
+    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Glacier.toString()).times(1);
+    //Now we try to restore to S3 standard, which fails
+    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Glacier.toString()).times(1);
+    EasyMock.expect(metadata.getOngoingRestore()).andReturn(false).times(1);
+    EasyMock.expect(metadata.getRestoreExpirationTime()).andReturn(null).times(1);
+    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Glacier.toString()).times(1);
+    EasyMock.expect(metadata.getRestoreExpirationTime()).andReturn(null).times(1);
+    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Glacier.toString()).times(1);
+    //Initiating restore, again.
+    EasyMock.expect(metadata.getOngoingRestore()).andReturn(false).times(1);
+    EasyMock.expect(metadata.getRestoreExpirationTime()).andReturn(DateUtils.addDays(new Date(), 1024)).times(1);
+    //Restore is done, move things permanently out of Glacier and into S3
+    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Glacier.toString()).times(1);
+    EasyMock.expect(metadata.getOngoingRestore()).andReturn(false).times(1);
+    EasyMock.expect(metadata.getRestoreExpirationTime()).andReturn(DateUtils.addDays(new Date(), 1024)).times(1);
+    EasyMock.expect(metadata.getRestoreExpirationTime()).andReturn(null).times(1);
+    EasyMock.expect(metadata.getOngoingRestore()).andReturn(false).times(1);
+    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Standard.toString()).times(1);
+    EasyMock.expect(metadata.getStorageClass()).andReturn(StorageClass.Standard.toString()).times(1);
+
+
+
+    EasyMock.resetToStrict(amDb);
+    //Move to Glacier
+    amDb.setAvailability(EasyMock.eq(VersionImpl.mk(1L)), EasyMock.eq(MP_ID), EasyMock.eq(Availability.OFFLINE));
+    EasyMock.expectLastCall().once();
+    //Move out of Glacier, fail
+    amDb.setAvailability(EasyMock.eq(VersionImpl.mk(1L)), EasyMock.eq(MP_ID), EasyMock.eq(Availability.OFFLINE));
+    //Move out of Glacier, succeed
+    amDb.setAvailability(EasyMock.eq(VersionImpl.mk(1L)), EasyMock.eq(MP_ID), EasyMock.eq(Availability.ONLINE));
+    EasyMock.expectLastCall().once();
 
     EasyMock.expect(s3Client.getObjectTagging(EasyMock.anyObject(GetObjectTaggingRequest.class)))
-        .andReturn(gotr).once();
+       .andReturn(gotr).once();
     //FIXME: Mock appropriate results, not that they're checked.
-    EasyMock.expect(s3Client.copyObject(EasyMock.anyObject(CopyObjectRequest.class))).andReturn(null).anyTimes();
+    EasyMock.expect(s3Client.copyObject(EasyMock.anyObject(CopyObjectRequest.class))).andReturn(null).once();
     //FIXME: Mock appropriate results, not that they're checked.
     EasyMock.expect(s3Client.restoreObjectV2(EasyMock.anyObject(RestoreObjectRequest.class))).andReturn(null).once();
     EasyMock.replay(gotr, metadata);
 
     setupUpload(OBJECT_KEY_1, metadata);
-    EasyMock.replay(s3Client, s3Transfer);
+    EasyMock.replay(s3Client, s3Transfer, amDb);
 
     StoragePath path = new StoragePath(ORG_ID, MP_ID, new VersionImpl(1L), ASSET_ID);
     Source source = Source.mk(uri);
     store.put(path, source);
 
     store.modifyAssetStorageClass(path, StorageClass.Glacier.toString());
+    //NB: We're not checking amDB since it's a Mock.
+    // We verify that the DB is being told that the asset(s) are offline with EM.expect lines above
+    Assert.assertEquals(Availability.OFFLINE, store.getAvailability(path));
+    Assert.assertEquals(StorageClass.Glacier.toString(), store.getAssetStorageClass(path));
 
     //Picked by random dice roll, guaranteed to be random
     store.initiateRestoreAsset(path, 4);
-    //RestoreObjectRequest requestRestore = new RestoreObjectRequest(bucketName, objectName, objectRestorePeriod);
-    //s3.restoreObjectV2(requestRestore);
-    //s3.getObjectMetadata(bucketName, objectName).getRestoreExpirationTime() -> null
 
     //Mid restore
-    //String status = store.getAssetRestoreStatusString(path);
-    //Restore is now finished
-    //status = store.getAssetRestoreStatusString(path);
+    Assert.assertEquals("RESTORING", store.getAssetRestoreStatusString(path));
+    Assert.assertEquals(Availability.OFFLINE, store.getAvailability(path));
+    Assert.assertEquals(StorageClass.Glacier.toString(), store.getAssetStorageClass(path));
 
-    EasyMock.verify(s3Client, metadata);
-    Assert.fail("Not done");
+    //Restore is now finished
+    Assert.assertTrue(store.getAssetRestoreStatusString(path).contains("RESTORED, expires in"));
+    //NB: ONLINE, but in glacier -> thawed to S3 *temporarily*
+    Assert.assertEquals(Availability.ONLINE, store.getAvailability(path));
+    Assert.assertEquals(StorageClass.Glacier.toString(), store.getAssetStorageClass(path));
+
+    //Restore has now expired
+    Assert.assertEquals("NONE", store.getAssetRestoreStatusString(path));
+    Assert.assertEquals(Availability.OFFLINE, store.getAvailability(path));
+    Assert.assertEquals(StorageClass.Glacier.toString(), store.getAssetStorageClass(path));
+
+    //Permanently move things back to S3, which should fail
+    Assert.assertEquals(StorageClass.Glacier.toString(),
+            store.modifyAssetStorageClass(path, StorageClass.Standard.toString()));
+    Assert.assertEquals(Availability.OFFLINE, store.getAvailability(path));
+    Assert.assertEquals(StorageClass.Glacier.toString(), store.getAssetStorageClass(path));
+
+    //Since we're moving to s3, we don't really care about the restore period here
+    store.initiateRestoreAsset(path, 1024);
+    //We've mid and post restore earlier, so we're going to assume that everything worked
+
+    //Object is now restored in S3, so move it out of Glacier permanently
+    store.modifyAssetStorageClass(path, StorageClass.Standard.toString());
+    //NB: This is in S3, so no restore is possible
+    Assert.assertEquals("NONE", store.getAssetRestoreStatusString(path));
+    Assert.assertEquals(Availability.ONLINE, store.getAvailability(path));
+    Assert.assertEquals(StorageClass.Standard.toString(), store.getAssetStorageClass(path));
+
+    EasyMock.verify(s3Client, metadata, amDb);
   }
 
   @Test @Ignore
