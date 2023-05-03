@@ -337,8 +337,9 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       for (final AssetDtos.Medium asset : getDatabase().getAsset(RuntimeTypes.convert(version), mpId, mpElementId)) {
         for (final String storageId : getSnapshotStorageLocation(version, mpId)) {
           for (final AssetStore store : getAssetStore(storageId)) {
+            StoragePath storagePath = StoragePath.mk(asset.getOrganizationId(), mpId, version, mpElementId);
             for (final InputStream assetStream
-                    : store.get(StoragePath.mk(asset.getOrganizationId(), mpId, version, mpElementId))) {
+                    : store.get(storagePath)) {
 
               Checksum checksum = null;
               try {
@@ -347,6 +348,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                 logger.warn("Invalid checksum for asset {} of media package {}", mpElementId, mpId, e);
               }
 
+              Integer readyEstimate = 0;
+              if (getLocalAssetStore() != store) {
+                readyEstimate = ((RemoteAssetStore) store).getReadyEstimate(storagePath);
+              }
               final Asset a = new AssetImpl(
                       AssetId.mk(version, mpId, mpElementId),
                       assetStream,
@@ -354,6 +359,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                       asset.getAssetDto().getSize(),
                       asset.getStorageId(),
                       asset.getAvailability(),
+                      readyEstimate,
                       checksum);
               return Opt.some(a);
             }
