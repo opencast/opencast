@@ -83,6 +83,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.LinkedHashMap;
@@ -591,13 +592,20 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       // Wait min restore time and then poll ofter that
       try {
         if (newRestore) {
-          Thread.sleep(RESTORE_MIN_WAIT);
+          Calendar until = Calendar.getInstance();
+          until.add(Calendar.SECOND, RESTORE_MIN_WAIT);
+          pollTimes.put(objectName, until.getTime());
+          Thread.sleep(glacierRestoreInitialWait);
         }
 
         while (s3.getObjectMetadata(bucketName, objectName).getOngoingRestore()) {
-          Thread.sleep(RESTORE_POLL);
+          Calendar until = Calendar.getInstance();
+          until.add(Calendar.SECOND, RESTORE_MIN_WAIT);
+          pollTimes.put(objectName, until.getTime());
+          Thread.sleep(glacierRestorePollTime);
         }
 
+        pollTimes.remove(objectName);
         logger.info("Object {} has been restored from Glacier class storage, for {} days", objectName,
                                                                                            objectRestorePeriod);
       } catch (InterruptedException e) {
