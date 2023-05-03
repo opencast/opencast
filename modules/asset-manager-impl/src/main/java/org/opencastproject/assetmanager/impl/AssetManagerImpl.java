@@ -177,7 +177,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private static final String MANIFEST_DEFAULT_NAME = "manifest";
 
-  private CopyOnWriteArrayList<AssetManagerUpdateHandler> handlers = new CopyOnWriteArrayList<>();
+  private final CopyOnWriteArrayList<AssetManagerUpdateHandler> handlers = new CopyOnWriteArrayList<>();
 
   private SecurityService securityService;
   private AuthorizationService authorizationService;
@@ -511,8 +511,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    *
    * @param snapshot
    *         The newest snapshot of the event to update
-   * @param index
-   *         The Elasticsearch index to update
    */
   private void updateEventInIndex(Snapshot snapshot) {
     final MediaPackage mp = snapshot.getMediaPackage();
@@ -585,8 +583,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    *
    * @param eventId
    *         The id of the event to remove
-   * @param index
-   *         The Elasticsearch index to update
    */
   private void removeArchivedVersionFromIndex(String eventId) {
     final String orgId = securityService.getOrganization().getId();
