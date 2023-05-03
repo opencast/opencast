@@ -82,12 +82,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component(
     property = {
-    "service.description=Amazon S3 based asset store",
-    "store.type=aws-s3"
+      "service.description=Amazon S3 based asset store",
+      "store.type=aws-s3"
     },
     immediate = true,
     service = { RemoteAssetStore.class, AwsS3AssetStore.class }
@@ -99,7 +101,12 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
 
   private static final Tag freezable = new Tag("Freezable", "true");
   private static final Integer RESTORE_MIN_WAIT = 1080000; // 3h
-  private static final Integer RESTORE_POLL = 900000; // 15m
+  private static final Integer RESTORE_POLL = 900000; //
+
+  private static final List<String> COLD_STORAGE =
+      new ArrayList<>(List.of(StorageClass.DeepArchive.toString(),StorageClass.Glacier.toString()));
+
+  private static Map<String, Date> pollTimes = new LinkedHashMap<>();
 
 
   // Service configuration
@@ -371,7 +378,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   /**
    * Change the storage class of the object if possible
    * @param storagePath asset storage path
-   * @param storageClassId metadata storage class id
+   * @param storageClassId the desired storage class id
    * @see <a href="https://aws.amazon.com/s3/storage-classes/">The S3 storage class docs</a>
    */
   public String modifyAssetStorageClass(StoragePath storagePath, String storageClassId) throws AssetStoreException {
@@ -384,42 +391,42 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     }
   }
 
-  private StorageClass modifyObjectStorageClass(String objectName, StorageClass storageClass)
+  private StorageClass modifyObjectStorageClass(String objectName, StorageClass targetStorageClass)
           throws AssetStoreException {
     try {
-      StorageClass objectStorageClass = StorageClass.fromValue(getObjectStorageClass(objectName));
+      StorageClass currentStorageClass = StorageClass.fromValue(getObjectStorageClass(objectName));
 
-      if (storageClass != objectStorageClass) {
+      if (targetStorageClass != currentStorageClass) {
         /* objects can only be retrieved from Glacier not moved */
-        if (objectStorageClass == StorageClass.Glacier || objectStorageClass == StorageClass.DeepArchive) {
+        if (COLD_STORAGE.contains(currentStorageClass.toString())) {
           boolean isRestoring = isRestoring(objectName);
           boolean isRestored = null != s3.getObjectMetadata(bucketName, objectName).getRestoreExpirationTime();
           if (!isRestoring && !isRestored) {
             logger.warn("S3 Object {} can not be moved from storage class {} to {} without restoring the object first",
-                objectStorageClass, storageClass);
-            return objectStorageClass;
+                objectName, currentStorageClass, targetStorageClass);
+            return currentStorageClass;
           }
         }
 
         /* Only put suitable objects in Glacier */
-        if (storageClass == StorageClass.Glacier || objectStorageClass == StorageClass.DeepArchive) {
+        if (COLD_STORAGE.contains(targetStorageClass.toString())) {
           GetObjectTaggingRequest gotr = new GetObjectTaggingRequest(bucketName, objectName);
           GetObjectTaggingResult objectTaggingRequest = s3.getObjectTagging(gotr);
           if (!objectTaggingRequest.getTagSet().contains(freezable)) {
-            logger.info("S3 object {} is not suitable for storage class {}", objectName, storageClass);
-            return objectStorageClass;
+            logger.info("S3 object {} is not suitable for storage class {}", objectName, targetStorageClass);
+            return currentStorageClass;
           }
         }
 
         CopyObjectRequest copyRequest = new CopyObjectRequest(bucketName, objectName, bucketName, objectName)
-                                            .withStorageClass(storageClass);
+                                            .withStorageClass(targetStorageClass);
         s3.copyObject(copyRequest);
-        logger.info("S3 object {} moved to storage class {}", objectName, storageClass);
+        logger.info("S3 object {} moved to storage class {}", objectName, targetStorageClass);
       } else {
-        logger.info("S3 object {} already in storage class {}", objectName, storageClass);
+        logger.info("S3 object {} already in storage class {}", objectName, targetStorageClass);
       }
 
-      return storageClass;
+      return targetStorageClass;
     } catch (SdkClientException e) {
       throw new AssetStoreException(e);
     }
@@ -432,7 +439,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   protected InputStream getObject(AwsAssetMapping map) {
     String storageClassId = getObjectStorageClass(map.getObjectKey());
 
-    if (StorageClass.Glacier.name().equals(storageClassId) || StorageClass.DeepArchive.name().equals(storageClassId)) {
+    if (COLD_STORAGE.contains(storageClassId)) {
       // restore object and wait until available if necessary
       restoreGlacierObject(map.getObjectKey(), restorePeriod, true);
     }
@@ -565,9 +572,4 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   void setS3TransferManager(TransferManager s3TransferManager) {
     this.s3TransferManager = s3TransferManager;
   }
-
-  void setBucketName(String bucketName) {
-    this.bucketName = bucketName;
-  }
-
 }
