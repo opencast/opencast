@@ -23,6 +23,7 @@ package org.opencastproject.assetmanager.aws.s3;
 
 import static java.lang.String.format;
 
+import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
@@ -385,6 +386,16 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     }
   }
 
+  public Availability getAvailability(StoragePath path) throws AssetStoreException {
+    String storageClassId = getAssetStorageClass(path);
+    String objectName = getAssetObjectKey(path);
+    //Something in cold storage, but restored (ie, thawed to S3 temporarily) is ONLINE
+    if (COLD_STORAGE.contains(storageClassId) && !isRestored(objectName)) {
+      return Availability.OFFLINE;
+    }
+    return Availability.ONLINE;
+  }
+
   /**
    * Change the storage class of the object if possible
    * @param storagePath asset storage path
@@ -410,7 +421,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
         /* objects can only be retrieved from Glacier not moved */
         if (COLD_STORAGE.contains(currentStorageClass.toString())) {
           boolean isRestoring = isRestoring(objectName);
-          boolean isRestored = null != s3.getObjectMetadata(bucketName, objectName).getRestoreExpirationTime();
+          boolean isRestored = isRestored(objectName);
           if (!isRestoring && !isRestored) {
             logger.warn("S3 Object {} can not be moved from storage class {} to {} without restoring the object first",
                 objectName, currentStorageClass, targetStorageClass);
@@ -446,12 +457,19 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
    *
    */
   @Override
-  protected InputStream getObject(AwsAssetMapping map) {
+  protected InputStream getObject(StoragePath path, AwsAssetMapping map) {
     String storageClassId = getObjectStorageClass(map.getObjectKey());
 
     if (COLD_STORAGE.contains(storageClassId)) {
       // restore object and wait until available if necessary
-      restoreGlacierObject(map.getObjectKey(), restorePeriod, true);
+      restoreGlacierObject(map.getObjectKey(), restorePeriod, false);
+
+      // Flag that the stream is not yet ready
+      if (!isRestored(map.getObjectKey())) {
+        logger.debug("Object {} is still restoring from Glacier class storage", map.getObjectKey());
+        return RemoteAssetStore.streamNotReady;
+      }
+
     }
 
     try {
@@ -517,6 +535,16 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     return false;
   }
 
+  private boolean isRestored(String objectName) {
+    return null != s3.getObjectMetadata(bucketName, objectName).getRestoreExpirationTime();
+  }
+
+  public Integer getReadyEstimate(StoragePath path) throws AssetStoreException {
+    String objectName = getAssetObjectKey(path);
+    Date now = new Date();
+    return (int) (pollTimes.get(objectName).getTime() - now.getTime());
+  }
+
   private void restoreGlacierObject(String objectName, Integer objectRestorePeriod, Boolean wait) {
     boolean newRestore = false;
     if (isRestoring(objectName)) {
@@ -532,7 +560,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
 
     // if the object had already been restored the restore request will just
     // increase the expiration time
-    if (s3.getObjectMetadata(bucketName, objectName).getRestoreExpirationTime() == null) {
+    if (!isRestored(objectName)) {
       logger.info("Restoring object {} from Glacier class storage", objectName);
 
       // Just initiate restore?

@@ -207,7 +207,7 @@ public abstract class AwsAbstractArchive implements AssetStore {
       }
 
       logger.debug("Getting archive object from AWS {}: {}", getStoreType(), map.getObjectKey());
-      return Opt.some(getObject(map));
+      return Opt.some(getObject(path, map));
 
     } catch (AssetStoreException e) {
       throw e;
@@ -216,7 +216,7 @@ public abstract class AwsAbstractArchive implements AssetStore {
     }
   }
 
-  protected abstract InputStream getObject(AwsAssetMapping map) throws AssetStoreException;
+  protected abstract InputStream getObject(StoragePath path, AwsAssetMapping map) throws AssetStoreException;
 
   /** @see AssetStore#delete(DeletionSelector) */
   public boolean delete(DeletionSelector sel) throws AssetStoreException {
