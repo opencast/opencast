@@ -33,6 +33,8 @@ import org.opencastproject.assetmanager.aws.AwsUploadOperationResult;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabase;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabaseException;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetMapping;
+import org.opencastproject.assetmanager.impl.RuntimeTypes;
+import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.OsgiUtil;
@@ -165,6 +167,12 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   @Reference
   public void setDatabase(AwsAssetDatabase db) {
     super.setDatabase(db);
+  }
+
+  @Override
+  @Reference
+  public void setAssetManagerDatabase(Database db) {
+    super.setAssetManagerDatabase(db);
   }
 
   /**
@@ -406,7 +414,18 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     try {
       StorageClass storageClass = StorageClass.fromValue(storageClassId);
       AwsAssetMapping map = database.findMapping(storagePath);
-      return modifyObjectStorageClass(map.getObjectKey(), storageClass).toString();
+      String newStorageClass =  modifyObjectStorageClass(map.getObjectKey(), storageClass).toString();
+      //We have no way to query the availability from the DB directly, so we blindly update the avail
+      if (COLD_STORAGE.contains(newStorageClass)) {
+        amDatabase.setAvailability(RuntimeTypes.convert(storagePath.getVersion()),
+                                   storagePath.getMediaPackageId(),
+                                   Availability.OFFLINE);
+      } else {
+        amDatabase.setAvailability(RuntimeTypes.convert(storagePath.getVersion()),
+                storagePath.getMediaPackageId(),
+                Availability.ONLINE);
+      }
+      return newStorageClass;
     } catch (AwsAssetDatabaseException | IllegalArgumentException e) {
       throw new AssetStoreException(e);
     }
