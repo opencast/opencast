@@ -160,7 +160,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
       public Object load(String id) {
         String[] key = id.split(DELIMITER);
         logger.trace("Loading user '{}':'{}' from reference database", key[0], key[1]);
-        User user = loadUser(key[0], key[1]);
+        User user = loadUserFromDB(key[0], key[1]);
         return user == null ? nullToken : user;
       }
     });
@@ -250,12 +250,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
   @Override
   public User loadUser(String userName) {
     String orgId = securityService.getOrganization().getId();
-    Object user = cache.getUnchecked(userName.concat(DELIMITER).concat(orgId));
-    if (user == nullToken) {
-      return null;
-    } else {
-      return (User) user;
-    }
+    return loadUserFromCache(userName, orgId);
   }
 
   /**
@@ -267,10 +262,28 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    *          the organization id
    * @return the loaded user or <code>null</code> if not found
    */
-  private User loadUser(String userName, String organization) {
+  private User loadUserFromDB(String userName, String organization) {
     return db.exec(findUserReferenceQuery(userName, organization))
         .map(ref -> ref.toUser(PROVIDER_NAME))
         .orElse(null);
+  }
+
+  /**
+   * Loads a user from cache
+   *
+   * @param userName
+   *          the user name
+   * @param organization
+   *          the organization id
+   * @return the loaded user or <code>null</code> if not found
+   */
+  private User loadUserFromCache(String userName, String organization) {
+    Object user = cache.getUnchecked(userName.concat(DELIMITER).concat(organization));
+    if (user == nullToken) {
+      return null;
+    } else {
+      return (User) user;
+    }
   }
 
   @Override
