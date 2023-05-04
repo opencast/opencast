@@ -52,7 +52,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -315,7 +314,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
       JpaOrganization organization = UserDirectoryPersistenceUtil.saveOrganizationQuery(
           (JpaOrganization) user.getOrganization()).apply(em);
       JpaUserReference userReference = new JpaUserReference(user.getUsername(), user.getName(), user.getEmail(),
-          mechanism, new Date(), organization, roles);
+          mechanism, user.getLastLogin(), organization, roles);
 
       // Then save the user reference
       Optional<JpaUserReference> foundUserRef = findUserReferenceQuery(user.getUsername(),
@@ -341,7 +340,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
       }
       foundUserRef.get().setName(user.getName());
       foundUserRef.get().setEmail(user.getEmail());
-      foundUserRef.get().setLastLogin(new Date());
+      foundUserRef.get().setLastLogin(user.getLastLogin());
       foundUserRef.get().setRoles(UserDirectoryPersistenceUtil.saveRolesQuery(user.getRoles()).apply(em));
       em.merge(foundUserRef.get());
       cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), user.toUser(PROVIDER_NAME));
