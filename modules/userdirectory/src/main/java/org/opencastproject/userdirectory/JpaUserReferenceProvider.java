@@ -336,8 +336,10 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
         throw new IllegalStateException("User '" + user.getUsername() + "' already exists");
       }
       em.persist(userReference);
-      cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), user.toUser(PROVIDER_NAME));
     });
+    // There is still a race when this method is executed multiple times. However, the user reference is unlikely to be
+    // different.
+    cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), user.toUser(PROVIDER_NAME));
     updateGroupMembership(user);
   }
 
@@ -356,8 +358,10 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
       foundUserRef.get().setLastLogin(user.getLastLogin());
       foundUserRef.get().setRoles(UserDirectoryPersistenceUtil.saveRolesQuery(user.getRoles()).apply(em));
       em.merge(foundUserRef.get());
-      cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), user.toUser(PROVIDER_NAME));
     });
+    // There is still a race when this method is executed multiple times. However, the user reference is unlikely to be
+    // different.
+    cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), user.toUser(PROVIDER_NAME));
     updateGroupMembership(user);
   }
 
