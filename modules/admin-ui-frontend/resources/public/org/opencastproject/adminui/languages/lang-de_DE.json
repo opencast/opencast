@@ -149,6 +149,17 @@
       "HOTKEY_CHEAT_SHEET": "Tastenkürzel",
       "ADOPTER_REGISTRATION": "Adopter Registrierung"
    },
+   "REBUILD": {
+      "TITLE": "Index Rebuild",
+      "WARNING": "Attention!",
+      "HEADER": "Index rebuild in progress!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
+   },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Die Zugriffsrichtlinie wurde erstellt",
       "ACL_NOT_SAVED": "Die Zugriffsrichtlinie konnte nicht gespeichert werden",

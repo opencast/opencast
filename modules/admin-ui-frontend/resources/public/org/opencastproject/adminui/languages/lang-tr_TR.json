@@ -149,6 +149,17 @@
       "HOTKEY_CHEAT_SHEET": "Klavye Kısayolları",
       "ADOPTER_REGISTRATION": "Adopter Kayıt"
    },
+   "REBUILD": {
+      "TITLE": "Index Rebuild",
+      "WARNING": "Attention!",
+      "HEADER": "Index rebuild in progress!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
+   },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Erişim ilkesi oluşturuldu",
       "ACL_NOT_SAVED": "Erişim ilkesi kaydedilemedi",

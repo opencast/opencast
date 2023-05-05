@@ -149,6 +149,17 @@
       "HOTKEY_CHEAT_SHEET": "Raccourcis clavier",
       "ADOPTER_REGISTRATION": "Incription utilisateur"
    },
+   "REBUILD": {
+      "TITLE": "Index Rebuild",
+      "WARNING": "Attention!",
+      "HEADER": "Index rebuild in progress!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
+   },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Les droits d'accès ont été créés",
       "ACL_NOT_SAVED": "Les droits d'accès n'ont pas pu être enregistrés",

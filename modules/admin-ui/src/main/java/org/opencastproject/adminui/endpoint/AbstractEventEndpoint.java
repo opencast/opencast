@@ -2281,7 +2281,8 @@ public abstract class AbstractEventEndpoint {
                   f("title", v(nul(wflDef.getTitle()).getOr(""))),
                   f("description", v(nul(wflDef.getDescription()).getOr(""))),
                   f("displayOrder", v(wflDef.getDisplayOrder())),
-                  f("configuration_panel", v(nul(wflDef.getConfigurationPanel()).getOr("")))));
+                  f("configuration_panel", v(nul(wflDef.getConfigurationPanel()).getOr(""))),
+                  f("configuration_panel_json", v(nul(wflDef.getConfigurationPanelJson()).getOr("")))));
         }
       }
     } catch (WorkflowDatabaseException e) {

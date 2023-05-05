@@ -28,5 +28,5 @@ files:
     translation: '/modules/lti/src/i18n/%locale%.json'
 
   -
-    source: '/modules/engage-paella-player/src/i18n/dict/en-US.json'
-    translation: '/modules/engage-paella-player/src/i18n/dict/%locale%.json'
+    source: '/modules/engage-paella-player-7/src/i18n/en-US.json'
+    translation: '/modules/engage-paella-player-7/src/i18n/%locale%.json'

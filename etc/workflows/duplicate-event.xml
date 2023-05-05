@@ -85,6 +85,53 @@
       </script>
     ]]>
   </configuration_panel>
+  <configuration_panel_json>
+    [
+      {
+        "description": "Title of Duplicate:",
+        "fieldset": [
+          {
+            "name": "mpTitle",
+            "type": "text",
+            "value": " "
+          }
+        ]
+      },
+      {
+        "description": "Series Id:",
+        "fieldset": [
+            {
+            "name": "seriesId",
+            "type": "text",
+            "value": " "
+          }
+        ]
+      },
+      {
+        "description": "Insert the number of duplicated events",
+        "fieldset": [
+          {
+            "name": "numberOfEvents",
+            "type": "number",
+            "label": "Number of Events",
+            "min": "1",
+            "max": "25",
+            "value": "1"
+          }
+        ]
+      },
+      {
+        "fieldset": [
+          {
+            "name": "noCopySuffix",
+            "type": "checkbox",
+            "label": "Do not use copy suffix",
+            "value": false
+          }
+        ]
+      }
+    ]
+  </configuration_panel_json>
   <state-mappings>
     <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.DUPLICATING</state-mapping>
     <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.DUPLICATING</state-mapping>

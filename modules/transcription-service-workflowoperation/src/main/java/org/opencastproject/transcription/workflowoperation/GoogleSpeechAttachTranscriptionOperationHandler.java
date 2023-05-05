@@ -47,8 +47,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 @Component(
     immediate = true,
@@ -69,8 +67,6 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
    * Workflow configuration option keys
    */
   static final String TRANSCRIPTION_JOB_ID = "transcription-job-id";
-  static final String TARGET_FLAVOR = "target-flavor";
-  static final String TARGET_TAGS = "target-tags";
   static final String TARGET_CAPTION_FORMAT = "target-caption-format";
   static final String TRANSCRIPTION_LINE_SIZE = "line-size";
   static final String DEFAULT_LINE_SIZE = "100";
@@ -81,20 +77,6 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
   private TranscriptionService service = null;
   private Workspace workspace;
   private CaptionService captionService;
-
-  /**
-   * The configuration options for this handler
-   */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(TRANSCRIPTION_JOB_ID, "The job id that identifies the file to be attached");
-    CONFIG_OPTIONS.put(TARGET_FLAVOR, "The target \"flavor\" of the transcription file");
-    CONFIG_OPTIONS.put(TARGET_TAGS, "The target \"tag\" of the transcription file");
-    CONFIG_OPTIONS.put(TARGET_CAPTION_FORMAT, "The target caption format of the transcription file (vtt, dfxp, etc)");
-    CONFIG_OPTIONS.put(TRANSCRIPTION_LINE_SIZE, "Line size of transcription text to display on video");
-  }
 
   @Override
   protected void activate(ComponentContext cc) {

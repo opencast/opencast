@@ -152,7 +152,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${basedir}/target/classes/ui/admin-ng/scripts/</outputDirectory>
+              <outputDirectory>${basedir}/target/classes/ui/scripts/</outputDirectory>
               <resources>
                 <resource>
                   <directory>node_modules/</directory>
@@ -178,25 +178,6 @@
                   <directory>node_modules/</directory>
                   <includes>
                     <include>jquery/dist/jquery.min.js</include>
-                  </includes>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-rest-docs</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/classes/ui/</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>../runtime-info-ui-ng/src/main/resources/ui/</directory>
-                  <includes>
-                    <include>**/*</include>
                   </includes>
                   <filtering>false</filtering>
                 </resource>

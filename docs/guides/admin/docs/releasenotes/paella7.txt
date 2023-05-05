@@ -1,0 +1,6 @@
+New Default Player
+------------------
+
+- Paella 7 is the new default
+- Paella 6 is still available and can be configured
+- Theodul is no longer available

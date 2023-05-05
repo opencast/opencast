@@ -1,0 +1,14 @@
+- With OC14 comes an optional, new admin ui that seeks to become the stand in future versions
+
+New Admin UI / Admin UI Picard / Admin Interface
+------------------------
+Opencast 14 brings with it a new version of the admin ui. The new Admin UI continues with the same look and
+feel, but uses new technologies under the hood. It strives to be robust and easy to develop for, while having all the
+same functionality users expect from the old UI.
+
+For now, the new admin ui has not quite reached those goals yet. Therefore, it is not enabled by default and marked
+as beta. If you wish to try it out, you can easily do so by going to `https://your-opencast/admin-ui/index.html`
+(don't worry if it looks like nothing has changed, the look is *really* similar :)). If you find any issues,
+please report them at https://github.com/opencast/opencast-admin-interface/issues.
+
+For notes on how to set the new admin ui as your default, check [Admin UI](../modules/admin-ui.md).
