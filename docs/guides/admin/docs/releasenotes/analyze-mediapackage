@@ -1,0 +1,4 @@
+Changed behaviour of analyze-mediapackage
+-----------------------------------------
+
+Behaviour of analyze-mediapackage has been changed with this fix. The buggy behaviour was replacing every character that doesn't match a-b or 0-9 with underscore character. This fix only adds underscore to the already existing flavor only to remove "/" character, just like analyze-tracks does.
