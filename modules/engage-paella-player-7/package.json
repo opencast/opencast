@@ -28,7 +28,7 @@
     "style-loader": "^3.3.2",
     "svg-inline-loader": "^0.8.2",
     "webpack": "^5.78.0",
-    "webpack-cli": "^5.0.1",
+    "webpack-cli": "^5.0.2",
     "webpack-dev-server": "^4.13.2",
     "xml-loader": "^1.2.1"
   },
