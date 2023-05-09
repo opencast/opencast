@@ -43,8 +43,7 @@
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>osgi.cmpn</artifactId>
-      <scope>compile</scope>
+      <artifactId>org.osgi.service.component.annotations</artifactId>
     </dependency>
   </dependencies>
 

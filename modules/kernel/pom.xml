@@ -134,11 +134,27 @@
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
+      <artifactId>osgi.core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>osgi.cmpn</artifactId>
+      <artifactId>org.osgi.service.component</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.component.annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.cm</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.http</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.http.whiteboard</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.felix</groupId>
@@ -146,11 +162,11 @@
       <exclusions>
         <exclusion>
           <groupId>org.apache.felix</groupId>
-          <artifactId>org.osgi.core</artifactId>
+          <artifactId>osgi.core</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.apache.felix</groupId>
-          <artifactId>osgi.cmpn</artifactId>
+          <artifactId>org.osgi.service.component.annotations</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
