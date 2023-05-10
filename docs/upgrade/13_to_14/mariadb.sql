@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS IX_oc_job_statistics ON oc_job;
