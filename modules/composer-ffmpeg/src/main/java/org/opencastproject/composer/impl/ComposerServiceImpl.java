@@ -790,12 +790,70 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         }
       }
 
-      // Creating video filter command
-      final String compositeCommand = buildCompositeCommand(compositeTrackSize, lowerLaidOutElement,
-              upperLaidOutElement, upperVideoFile, watermarkOption, watermarkFile, backgroundColor, audioSourceName);
-
+      // set properties for encoding profile
       Map<String, String> properties = new HashMap<>();
-      properties.put(CMD_SUFFIX + ".compositeCommand", compositeCommand);
+
+      // always
+      final Layout lowerLayout = lowerLaidOutElement.getLayout();
+      final String lowerPosition = lowerLayout.getOffset().getX() + ":" + lowerLayout.getOffset().getY();
+      final String scaleLower = lowerLayout.getDimension().getWidth() + ":"
+              + lowerLayout.getDimension().getHeight();
+      final String padLower = compositeTrackSize.getWidth() + ":" + compositeTrackSize.getHeight() + ":"
+              + lowerPosition + ":" + backgroundColor;
+      properties.put("scaleLower", scaleLower);
+      properties.put("padLower", padLower);
+
+      // if dual stream
+      if (upperVideoFile.isSome() && upperLaidOutElement.isSome()) {
+        final Layout upperLayout = upperLaidOutElement.get().getLayout();
+        final String upperPosition = upperLayout.getOffset().getX() + ":" + upperLayout.getOffset().getY();
+        final String scaleUpper = upperLayout.getDimension().getWidth() + ":"
+                + upperLayout.getDimension().getHeight();
+
+        properties.put("scaleUpper", scaleUpper);
+        properties.put("upperPosition", upperPosition);
+        properties.put("upperFile", upperVideoFile.get().getAbsolutePath());
+
+        // audio mapping
+        boolean lowerAudio = lowerLaidOutElement.getElement().hasAudio();
+        boolean upperAudio = upperLaidOutElement.get().getElement().hasAudio();
+
+        if (lowerAudio && upperAudio && (ComposerService.BOTH.equalsIgnoreCase(audioSourceName)
+                || StringUtils.isBlank(audioSourceName))) {
+          properties.put(CMD_SUFFIX + ".audioMapping", ";[0:a][1:a]amix=inputs=2[aout] -map [out] -map [aout]");
+        } else if (lowerAudio && !ComposerService.UPPER.equalsIgnoreCase(audioSourceName)) {
+          properties.put(CMD_SUFFIX + ".audioMapping", " -map [out] -map 0:a");
+        } else if (upperAudio && !ComposerService.LOWER.equalsIgnoreCase(audioSourceName)) {
+          properties.put(CMD_SUFFIX + ".audioMapping", " -map [out] -map 1:a");
+        } else {
+          properties.put(CMD_SUFFIX + ".audioMapping", " -map [out]");
+        }
+      }
+
+      // if watermark
+      if (watermarkOption.isSome()) {
+        final LaidOutElement<Attachment> watermarkLayout = watermarkOption.get();
+        String watermarkPosition =
+                watermarkLayout.getLayout().getOffset().getX() + ":" + watermarkLayout.getLayout().getOffset().getY();
+        properties.put("watermarkPosition", watermarkPosition);
+        properties.put("watermarkFile", watermarkFile.getAbsoluteFile().toString());
+      }
+
+      // set conditional variables defined in encoding profile
+      for (String key: profile.getExtensions().keySet()) {
+        if (key.startsWith(CMD_SUFFIX + ".if-single-stream")
+                && (upperLaidOutElement.isNone() || upperVideoFile.isNone())) {
+          properties.put(key, profile.getExtension(key));
+        } else if (key.startsWith(CMD_SUFFIX + ".if-dual-stream")
+                && upperVideoFile.isSome() && upperLaidOutElement.isSome()) {
+          properties.put(key, profile.getExtension(key));
+        } else if (key.startsWith(CMD_SUFFIX + ".if-watermark") && watermarkOption.isSome()) {
+          properties.put(key, profile.getExtension(key));
+        } else if (key.startsWith(CMD_SUFFIX + ".if-no-watermark") && watermarkOption.isNone()) {
+          properties.put(key, profile.getExtension(key));
+        }
+      }
+
       List<File> output;
       try {
         Map<String, File> source = new HashMap<>();
@@ -1680,88 +1738,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     params.put("collection", collectionId);
     params.put("url", url.toString());
     return params;
-  }
-
-  /**
-   * Example composite command below. Use with `-filter_complex` option of ffmpeg if upper video is available otherwise
-   * use -filver:v option for a single video.
-   *
-   * Dual video sample: The ffmpeg command needs two source files set with the `-i` option. The first media file is the
-   * `lower`, the second the `upper` one. Example filter: -filter_complex
-   * [0:v]scale=909:682,pad=1280:720:367:4:0x444345FF[lower];[1:v]scale=358:151[upper];[lower][upper]overlay=4:4[out]
-   *
-   * Single video sample: The ffmpeg command needs one source files set with the `-i` option. Example filter: filter:v
-   * [in]scale=909:682,pad=1280:720:367:4:0x444345FF[out]
-   *
-   * @return commandline part with -filter_complex and -map options
-   */
-  private static String buildCompositeCommand(Dimension compositeTrackSize, LaidOutElement<Track> lowerLaidOutElement,
-          Option<LaidOutElement<Track>> upperLaidOutElement, Option<File> upperFile,
-          Option<LaidOutElement<Attachment>> watermarkOption, File watermarkFile, String backgroundColor, String audioSourceName) {
-    final StringBuilder cmd = new StringBuilder();
-    final String videoId = watermarkOption.isNone() ? "[out]" : "[video]";
-    if (upperLaidOutElement.isNone()) {
-      // There is only one video track and possibly one watermark.
-      final Layout videoLayout = lowerLaidOutElement.getLayout();
-      final String videoPosition = videoLayout.getOffset().getX() + ":" + videoLayout.getOffset().getY();
-      final String scaleVideo = videoLayout.getDimension().getWidth() + ":" + videoLayout.getDimension().getHeight();
-      final String padLower = compositeTrackSize.getWidth() + ":" + compositeTrackSize.getHeight() + ":"
-              + videoPosition + ":" + backgroundColor;
-      cmd.append("-filter:v [in]scale=").append(scaleVideo).append(",pad=").append(padLower).append(videoId);
-    } else if (upperFile.isSome() && upperLaidOutElement.isSome()) {
-      // There are two video tracks to handle.
-      final Layout lowerLayout = lowerLaidOutElement.getLayout();
-      final Layout upperLayout = upperLaidOutElement.get().getLayout();
-
-      final String upperPosition = upperLayout.getOffset().getX() + ":" + upperLayout.getOffset().getY();
-      final String lowerPosition = lowerLayout.getOffset().getX() + ":" + lowerLayout.getOffset().getY();
-
-      final String scaleUpper = upperLayout.getDimension().getWidth() + ":" + upperLayout.getDimension().getHeight();
-      final String scaleLower = lowerLayout.getDimension().getWidth() + ":" + lowerLayout.getDimension().getHeight();
-
-      final String padLower = compositeTrackSize.getWidth() + ":" + compositeTrackSize.getHeight() + ":"
-              + lowerPosition + ":" + backgroundColor;
-
-      // Add input file for the upper track
-      cmd.append("-i ").append(upperFile.get().getAbsolutePath()).append(" ");
-      // Add filter complex mode
-      cmd.append("-filter_complex").
-      // lower video
-              append(" [0:v]scale=").append(scaleLower).append(",pad=").append(padLower).append("[lower]")
-              // upper video
-              .append(";[1:v]scale=").append(scaleUpper).append("[upper]")
-              // mix
-              .append(";[lower][upper]overlay=").append(upperPosition).append(videoId);
-    }
-
-    for (final LaidOutElement<Attachment> watermarkLayout : watermarkOption) {
-      String watermarkPosition = watermarkLayout.getLayout().getOffset().getX() + ":"
-              + watermarkLayout.getLayout().getOffset().getY();
-      cmd.append(";").append("movie=").append(watermarkFile.getAbsoluteFile()).append("[watermark];").append(videoId)
-              .append("[watermark]overlay=").append(watermarkPosition).append("[out]");
-    }
-
-    if (upperLaidOutElement.isSome()) {
-      // handle audio
-      boolean lowerAudio = lowerLaidOutElement.getElement().hasAudio();
-      boolean upperAudio = upperLaidOutElement.get().getElement().hasAudio();
-      // if audio source name is "both" or unspecified, use audio of both videos, otherwise pick one
-      if (StringUtils.isNotBlank(audioSourceName) && ! ComposerService.BOTH.equalsIgnoreCase(audioSourceName)) {
-        lowerAudio = lowerAudio & ComposerService.LOWER.equalsIgnoreCase(audioSourceName);
-        upperAudio = upperAudio & ComposerService.UPPER.equalsIgnoreCase(audioSourceName);
-      }
-      if (lowerAudio && upperAudio) {
-        cmd.append(";[0:a][1:a]amix=inputs=2[aout] -map [out] -map [aout]");
-      } else if (lowerAudio) {
-        cmd.append(" -map [out] -map 0:a");
-      } else if (upperAudio) {
-        cmd.append(" -map [out] -map 1:a");
-      } else {
-        cmd.append(" -map [out]");
-      }
-    }
-
-    return cmd.toString();
   }
 
   private String buildConcatCommand(boolean onlyAudio, Dimension dimension, float outputFrameRate, List<File> files, List<Track> tracks) {
