@@ -18,21 +18,39 @@
  * the License.
  *
  */
-import { test, expect } from '@playwright/test';
-import { getState, playVideo } from './utils';
-import { getPlayerState } from './utils';
+import { expect, test } from '@playwright/test';
+import { playVideo } from './utils';
 
 
-test.describe("Player URL query parameters", () => {
+test.describe('Player URL query parameters', () => {
+
+  test('Without query aditional query parameters', async ({ page }) => {
+    await page.goto('/paella7/ui/watch.html?id=ID-dual-stream-demo');
+    await playVideo(page);
+    await page.waitForTimeout(500);
+
+    const currentTime = await page.evaluate('__paella_instances__[0].videoContainer.currentTime()');
+    const captionsVisible = await page.evaluate('__paella_instances__[0].captionsCanvas.isVisible');
+    await expect(currentTime).toBeCloseTo(0, 0);
+    await expect(captionsVisible).toBeFalsy();
+  });
 
   test('Check time param in URL and seek: ?time=1m2s', async ({ page }) => {
-    await page.goto('/paella7/ui/watch.html?id=ID-dual-stream-demo&time=20s');    
+    await page.goto('/paella7/ui/watch.html?id=ID-dual-stream-demo&time=20s');
     await playVideo(page);
-
     await page.waitForTimeout(500);
-    const currentTime = await page.evaluate(`__paella_instances__[0].videoContainer.currentTime()`);
+
+    const currentTime = await page.evaluate('__paella_instances__[0].videoContainer.currentTime()');
     await expect(currentTime).toBeCloseTo(20, 0);
   });
 
-  // TODO: Check captions param in URL: ?captions=<lang>
+  test('Check captions param in URL: ?captions=<lang>', async ({ page }) => {
+    await page.goto('/paella7/ui/watch.html?id=ID-dual-stream-demo&captions=en');
+    await playVideo(page);
+    await page.waitForTimeout(500);
+
+    const captionsVisible = await page.evaluate('__paella_instances__[0].captionsCanvas.isVisible');
+    await expect(captionsVisible).toBeTruthy();
+  });
+
 });

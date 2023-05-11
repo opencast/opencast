@@ -23,7 +23,7 @@ import { expect } from '@playwright/test';
 const player = '__paella_instances__[0]';
 
 
-export const getPlayerState = async page => page.evaluate(`${player}.PlayerState`);
+export const getPlayerState = async page => await page.evaluate(`${player}.PlayerState`);
 
 export const waitState = async (page, state) => {
   await page.evaluate(`${player}.waitState(${state})`);

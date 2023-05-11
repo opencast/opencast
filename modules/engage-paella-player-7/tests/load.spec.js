@@ -28,6 +28,6 @@ test('Has the correct title', async ({ page }) => {
 });
 
 test('Video is loaded', async ({ page }) => {
-  await page.goto('/paella7/ui/watch.html?id=ID-dual-stream-demo');    
+  await page.goto('/paella7/ui/watch.html?id=ID-dual-stream-demo');
   await playVideo(page);
 });
