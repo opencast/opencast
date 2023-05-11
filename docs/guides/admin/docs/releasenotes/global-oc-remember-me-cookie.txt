@@ -1,0 +1,5 @@
+Global 'oc-remember-me' cookie
+--------------------------
+
+It's now possible, to use the same 'oc-remember-me' cookie for all nodes.
+So, if you log into the admin node for example, you don't have to log in again, when switching to the presentation node.

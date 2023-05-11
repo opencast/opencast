@@ -44,10 +44,19 @@ public final class SystemTokenRememberMeUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(SystemTokenRememberMeUtils.class);
 
+  /** This is the default cookie key, that is configured in Opencast **/
+  private static final String defaultCookieKey = "opencast";
+
   private SystemTokenRememberMeUtils() {
   }
 
   public static String augmentKey(String key) {
+
+    if (!defaultCookieKey.equals(key)) {
+      logger.debug("The default cookie key 'opencast' is not in use. The given key won't be augmented.");
+      return key;
+    }
+
     // Start with a user key if provided
     StringBuilder keyBuilder = new StringBuilder(Objects.toString(key, ""));
 
