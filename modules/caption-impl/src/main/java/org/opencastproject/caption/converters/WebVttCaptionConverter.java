@@ -153,11 +153,9 @@ public class WebVttCaptionConverter implements CaptionConverter {
     if (EnumUtils.isValidEnumIgnoreCase(MediaPackageElement.Type.class, mediaPackageElementType)) {
       return EnumUtils.getEnumIgnoreCase(MediaPackageElement.Type.class, mediaPackageElementType);
     }
-    // Conversion didn't work. Print an error and throw an exception
-    String additionalErrorInfo = String.format("Please check the config file '%s'.", this.getClass().getName());
-    String errorMessage = String.format("Couldn't convert configuration '%s'='%s' into enum. " + additionalErrorInfo,
+    // Conversion didn't work, throw an exception
+    String errorMessage = String.format("Couldn't convert configuration '%s'='%s' into enum.",
         MEDIAPACKAGE_ELEMENT_TYPE_CONFIG_KEY, mediaPackageElementType);
-    logger.error(errorMessage);
     throw new IllegalArgumentException(errorMessage);
   }
 
