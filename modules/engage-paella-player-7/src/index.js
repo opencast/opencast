@@ -18,17 +18,18 @@
  * the License.
  *
  */
-import { utils } from 'paella-core';
 import { applyDefaultTheme } from './default-theme.js';
 import { PaellaOpencast } from './js/PaellaOpencast.js';
 
-window.onload = () => {
+window.onload = async () => {
   let paella = new PaellaOpencast('player-container');
 
-  paella.loadManifest()
-  .then(()=>{ return applyDefaultTheme(paella);})
-  .then(()=>{ return utils.loadStyle('/ui/config/paella7/custom_theme.css');})
-  .then(() => paella.log.info('Paella player load done'))
-  .catch(e => paella.log.error(e));
-
+  try {
+    await applyDefaultTheme(paella);
+    await paella.loadManifest();
+    paella.log.info('Paella player load done');
+  }
+  catch(error){
+    paella.log.error(error);
+  }
 };

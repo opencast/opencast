@@ -38,6 +38,7 @@ import VolumeHighIcon from './icons/volume-base-icon.svg';
 import VolumeMidIcon from './icons/volume-mid-icon.svg';
 import VolumeLowIcon from './icons/volume-low-icon.svg';
 import VolumeMuteIcon from './icons/volume-mute-icon.svg';
+import { getUrlFromOpencastConfig } from './js/PaellaOpencast';
 
 
 export async function applyDefaultTheme(paella) {
@@ -78,4 +79,7 @@ export async function applyDefaultTheme(paella) {
   //// slide navigation
   await paella.addCustomPluginIcon('es.upv.paella.nextSlideNavigatorButton','arrowRightIcon', NextIcon);
   await paella.addCustomPluginIcon('es.upv.paella.prevSlideNavigatorButton','arrowLeftIcon', PrevIcon);
+
+  //// Load custom theme
+  await paella.skin.loadSkin(getUrlFromOpencastConfig('custom_theme/theme.json'));
 }
