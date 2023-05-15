@@ -47,7 +47,7 @@
     <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/${jackson.version}</bundle>
-    <bundle>mvn:org.yaml/snakeyaml/1.33</bundle>
+    <bundle>mvn:org.yaml/snakeyaml/2.0</bundle>
     <bundle>mvn:com.google.guava/guava/${guava.version}</bundle>
     <bundle>mvn:com.google.guava/failureaccess/${failureaccess.version}</bundle>
     <bundle>mvn:com.google.code.gson/gson/${gson.version}</bundle>
