@@ -26,7 +26,12 @@ import org.opencastproject.caption.api.CaptionConverterException;
 import org.opencastproject.caption.util.TimeUtil;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
+import org.opencastproject.util.OsgiUtil;
+import org.opencastproject.util.data.Option;
 
+import org.apache.commons.lang3.EnumUtils;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +57,18 @@ public class WebVttCaptionConverter implements CaptionConverter {
   private static final Logger logger = LoggerFactory.getLogger(WebVttCaptionConverter.class);
 
   private static final String EXTENSION = "vtt";
+
+  /** This configuration key defines the mediapackage element type of the captions file (Attachment, Track) */
+  static final String MEDIAPACKAGE_ELEMENT_TYPE_CONFIG_KEY = "mediapackage-element-type";
+  static final Type DEFAULT_MEDIAPACKAGE_ELEMENT_TYPE = Type.Attachment;
+  private static Type mediapackageElementType = DEFAULT_MEDIAPACKAGE_ELEMENT_TYPE;
+
+
+  @Activate
+  public void activate(ComponentContext cc) {
+    mediapackageElementType = getConfiguredMediapackageElementType(cc);
+    logger.info("Mediapackage element type is set to '{}'.", mediapackageElementType);
+  }
 
   /**
    * {@inheritDoc} Language parameter is ignored.
@@ -107,7 +124,39 @@ public class WebVttCaptionConverter implements CaptionConverter {
 
   @Override
   public Type getElementType() {
-    return MediaPackageElement.Type.Attachment;
+    return mediapackageElementType;
+  }
+
+  /**
+   * Converts the configured property 'mediapackage-element-type' into the corresponding enum 'MediapackageElement.Type'
+   *
+   * @param cc ComponentContext
+   * @return the configured mediapackage element type
+   */
+  private MediaPackageElement.Type getConfiguredMediapackageElementType(ComponentContext cc) {
+    Option<String> mediapackageElementTypeOption = OsgiUtil.getOptCfg(
+        cc.getProperties(), MEDIAPACKAGE_ELEMENT_TYPE_CONFIG_KEY);
+    if (mediapackageElementTypeOption.isNone()) {
+      return DEFAULT_MEDIAPACKAGE_ELEMENT_TYPE; // returning default if config isn't set
+    }
+    return convertStringToEnum(mediapackageElementTypeOption.get());
+  }
+
+  /**
+   * Helps to convert a configured mediaPackageElementType.
+   * Converts from a string to the corresponding enum.
+   *
+   * @param mediaPackageElementType The string that will be converted to the enum.
+   * @return The resulting enum after the conversion.
+   */
+  private Type convertStringToEnum(String mediaPackageElementType) {
+    if (EnumUtils.isValidEnumIgnoreCase(MediaPackageElement.Type.class, mediaPackageElementType)) {
+      return EnumUtils.getEnumIgnoreCase(MediaPackageElement.Type.class, mediaPackageElementType);
+    }
+    // Conversion didn't work, throw an exception
+    String errorMessage = String.format("Couldn't convert configuration '%s'='%s' into enum.",
+        MEDIAPACKAGE_ELEMENT_TYPE_CONFIG_KEY, mediaPackageElementType);
+    throw new IllegalArgumentException(errorMessage);
   }
 
 }
