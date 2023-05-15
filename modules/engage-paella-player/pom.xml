@@ -89,7 +89,10 @@
                   <goal>install-node-and-npm</goal>
                 </goals>
                 <configuration>
-                  <nodeVersion>${node.version}</nodeVersion>
+                  <!-- Still building this with the old version of node -->
+                  <!-- This is going soon anyway. -->
+                  <!-- No need to work on an update -->
+                  <nodeVersion>v16.13.0</nodeVersion>
                 </configuration>
               </execution>
 
