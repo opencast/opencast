@@ -1,6 +1,21 @@
 # Opencast 13: Release Notes
 
 
+Opencast 13.6
+-------------
+
+The sixth maintenance release of Opencast 13.
+
+- Remove dead CONFIG_OPTIONS from WOHs ([#4864](https://github.com/opencast/opencast/pull/4864))
+- TermsFeed Cookie Consent NOTICE ([#4870](https://github.com/opencast/opencast/pull/4870))
+- Editor Release 2023-04-20 ([#4879](https://github.com/opencast/opencast/pull/4879))
+- Mitigate not loading ACLs ([#4923](https://github.com/opencast/opencast/pull/4923))
+- Ensure all plugin jars are present in tarballs. ([#4925](https://github.com/opencast/opencast/pull/4925))
+
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
+
 Opencast 13.5
 -------------
 
@@ -15,6 +30,7 @@ The fifth maintenance release of Opencast 13.
 
 
 See [changelog](changelog.md) for a comprehensive list of changes.
+
 
 Opencast 13.4
 -------------
