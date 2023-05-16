@@ -146,6 +146,7 @@ public class AnalyzeTracksWorkflowOperationHandlerTest {
     String[][] props = {
             {"presenter_source_media", "true"},
             {"presenter_source_audio", "false"},
+            {"presenter_source_subtitle", "false"},
             {"presenter_source_aspect", "16/9"},
             {"presenter_source_resolution_y", "720"},
             {"presenter_source_resolution_x", "1280"},
