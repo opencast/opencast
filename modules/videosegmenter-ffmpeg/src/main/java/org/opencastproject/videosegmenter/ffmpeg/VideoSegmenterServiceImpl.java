@@ -52,6 +52,8 @@ import org.opencastproject.videosegmenter.api.VideoSegmenterException;
 import org.opencastproject.videosegmenter.api.VideoSegmenterService;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -275,7 +277,9 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
         stabilityThreshold = Integer.parseInt(threshold);
         logger.info("Stability threshold set to {} consecutive frames", stabilityThreshold);
       } catch (Exception e) {
-        logger.warn("Found illegal value '{}' for videosegmenter's stability threshold", threshold);
+        throw new ConfigurationException(OPT_STABILITY_THRESHOLD,
+                String.format("Found illegal value '%s'", threshold)
+        );
       }
     }
 
@@ -286,7 +290,9 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
         changesThreshold = Float.parseFloat(threshold);
         logger.info("Changes threshold set to {}", changesThreshold);
       } catch (Exception e) {
-        logger.warn("Found illegal value '{}' for videosegmenter's changes threshold", threshold);
+        throw new ConfigurationException(OPT_CHANGES_THRESHOLD,
+                String.format("Found illegal value '%s'", threshold)
+        );
       }
     }
 
@@ -297,7 +303,9 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
         prefNumber = Integer.parseInt(number);
         logger.info("Preferred number of segments set to {}", prefNumber);
       } catch (Exception e) {
-        logger.warn("Found illegal value '{}' for videosegmenter's preferred number of segments", number);
+        throw new ConfigurationException(OPT_PREF_NUMBER,
+                String.format("Found illegal value '%s'", number)
+        );
       }
     }
 
@@ -308,7 +316,9 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
         maxCycles = Integer.parseInt(number);
         logger.info("Maximum number of cycles set to {}", maxCycles);
       } catch (Exception e) {
-        logger.warn("Found illegal value '{}' for videosegmenter's maximum number of cycles", number);
+        throw new ConfigurationException(OPT_MAX_CYCLES,
+                String.format("Found illegal value '%s'", number)
+        );
       }
     }
 
@@ -319,7 +329,9 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
         absoluteMax = Integer.parseInt(number);
         logger.info("Absolute maximum number of segments set to {}", absoluteMax);
       } catch (Exception e) {
-        logger.warn("Found illegal value '{}' for videosegmenter's absolute maximum number of segments", number);
+        throw new ConfigurationException(OPT_ABSOLUTE_MAX,
+                String.format("Found illegal value '%s'", number)
+        );
       }
     }
 
@@ -330,7 +342,9 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
         absoluteMin = Integer.parseInt(number);
         logger.info("Absolute minimum number of segments set to {}", absoluteMin);
       } catch (Exception e) {
-        logger.warn("Found illegal value '{}' for videosegmenter's absolute minimum number of segments", number);
+        throw new ConfigurationException(OPT_ABSOLUTE_MIN,
+                String.format("Found illegal value '%s'", number)
+        );
       }
     }
 
@@ -338,22 +352,24 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
     if (properties.get(OPT_DURATION_DEPENDENT) != null) {
       String value = (String) properties.get(OPT_DURATION_DEPENDENT);
       try {
-        durationDependent = Boolean.parseBoolean(value);
+        durationDependent = BooleanUtils.toBooleanObject(StringUtils.trimToNull(value));
         logger.info("Dependency on video duration is set to {}", durationDependent);
       } catch (Exception e) {
-        logger.warn("Found illegal value '{}' for videosegmenter's dependency on video duration", value);
+        throw new ConfigurationException(OPT_DURATION_DEPENDENT,
+                String.format("Found illegal value '%s'", value)
+        );
       }
     }
 
     if (properties.get(OPT_USE_CHAPTER_IF_AVAILABLE) != null) {
       String value = (String) properties.get(OPT_USE_CHAPTER_IF_AVAILABLE);
       try {
-        useChapterIfAvailable = Boolean.parseBoolean(value);
+        useChapterIfAvailable = BooleanUtils.toBooleanObject(StringUtils.trimToNull(value));
         logger.info("Use Chapters if available is set to {}", useChapterIfAvailable);
       } catch (Exception e) {
-        logger.warn("Found illegal value '{}' for videosegmenter's option: {}",
-                value,
-                OPT_USE_CHAPTER_IF_AVAILABLE);
+        throw new ConfigurationException(OPT_USE_CHAPTER_IF_AVAILABLE,
+                String.format("Found illegal value '%s'", value)
+        );
       }
     }
 
@@ -370,9 +386,9 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
 
         useChapterMimeTypes = mts;
       } catch (Exception e) {
-        logger.warn("Found illegal value '{}' for videosegmenter's option: {}",
-                value,
-                OPT_USE_CHAPTER_MIME_TYPES);
+        throw new ConfigurationException(OPT_USE_CHAPTER_MIME_TYPES,
+                String.format("Found illegal value '%s'", value)
+        );
       }
     } else {
       useChapterMimeTypes = DEFAULT_USE_CHAPTER_MIME_TYPES;
@@ -491,7 +507,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
         "-"
     };
 
-    logger.info("Detecting chapters using command: {}", (Object) command);
+    logger.debug("Detecting chapters using command: {}", (Object) command);
 
     ProcessBuilder pbuilder = new ProcessBuilder(command);
     Process process = pbuilder.start();
