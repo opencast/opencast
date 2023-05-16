@@ -24,6 +24,7 @@ import org.opencastproject.inspection.ffmpeg.api.AudioStreamMetadata;
 import org.opencastproject.inspection.ffmpeg.api.MediaAnalyzer;
 import org.opencastproject.inspection.ffmpeg.api.MediaAnalyzerException;
 import org.opencastproject.inspection.ffmpeg.api.MediaContainerMetadata;
+import org.opencastproject.inspection.ffmpeg.api.SubtitleStreamMetadata;
 import org.opencastproject.inspection.ffmpeg.api.VideoStreamMetadata;
 import org.opencastproject.util.IoSupport;
 
@@ -323,6 +324,20 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
 
           /* Add video stream metadata to overall metadata */
           metadata.getVideoStreamMetadata().add(vMetadata);
+
+          /* Handle subtitle streams ----------------------------- */
+
+        } else if ("subtitle".equals(codecType)) {
+          /* Extract subtitle stream metadata */
+          SubtitleStreamMetadata sMetadata = new SubtitleStreamMetadata();
+
+          /* Codec */
+          obj = stream.get("codec_long_name");
+          if (obj != null) {
+            sMetadata.setFormat((String) obj);
+          }
+
+          metadata.getSubtitleStreamMetadata().add(sMetadata);
         }
       }
 

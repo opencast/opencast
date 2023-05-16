@@ -29,6 +29,7 @@ import org.opencastproject.inspection.ffmpeg.api.AudioStreamMetadata;
 import org.opencastproject.inspection.ffmpeg.api.MediaAnalyzer;
 import org.opencastproject.inspection.ffmpeg.api.MediaAnalyzerException;
 import org.opencastproject.inspection.ffmpeg.api.MediaContainerMetadata;
+import org.opencastproject.inspection.ffmpeg.api.SubtitleStreamMetadata;
 import org.opencastproject.inspection.ffmpeg.api.VideoStreamMetadata;
 import org.opencastproject.mediapackage.AdaptivePlaylist;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -39,6 +40,7 @@ import org.opencastproject.mediapackage.Stream;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.UnsupportedElementException;
 import org.opencastproject.mediapackage.track.AudioStreamImpl;
+import org.opencastproject.mediapackage.track.SubtitleStreamImpl;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.VideoStreamImpl;
 import org.opencastproject.util.Checksum;
@@ -151,6 +153,13 @@ public class MediaInspector {
           addVideoStreamMetadata(track, metadata);
         } catch (Exception e) {
           throw new MediaInspectionException("Unable to extract video metadata from " + file, e);
+        }
+
+        // Subtitle metadata
+        try {
+          addSubtitleStreamMetadata(track, metadata);
+        } catch (Exception e) {
+          throw new MediaInspectionException("Unable to extract subtitle metadata from " + file, e);
         }
 
         // File size
@@ -291,6 +300,13 @@ public class MediaInspector {
           throw new MediaInspectionException("Unable to extract video metadata from " + file, e);
         }
 
+        // Subtitle metadata
+        try {
+          addSubtitleStreamMetadata(track, metadata);
+        } catch (Exception e) {
+          throw new MediaInspectionException("Unable to extract subtitle metadata from " + file, e);
+        }
+
         logger.info("Successfully inspected track {}", track);
         return track;
       }
@@ -380,12 +396,21 @@ public class MediaInspector {
       try {
         // Add mimeType - important for some browsers, eg: safari
         MimeType mimeType = MimeTypes.fromString(file.getName());
-        // TODO: DO we need this
-        // The mimetype library doesn't know about audio/video metadata, so the type might be wrong.
-        if ("audio".equals(mimeType.getType()) && metadata.hasVideoStreamMetadata()) {
-          mimeType = MimeTypes.parseMimeType("video/" + mimeType.getSubtype());
-        } else if ("video".equals(mimeType.getType()) && !metadata.hasVideoStreamMetadata()) {
-          mimeType = MimeTypes.parseMimeType("audio/" + mimeType.getSubtype());
+        // The mimetype library doesn't know about stream metadata, so the type might be wrong.
+        // TODO: these mime types might be incorrect
+        // application/ is a special case for HLS manifest files
+        if (metadata.hasVideoStreamMetadata()) {
+          if (!"video".equals(mimeType.getType()) && !"application".equals(mimeType.getType())) {
+            mimeType = MimeTypes.parseMimeType("video/" + mimeType.getSubtype());
+          }
+        } else if (metadata.hasAudioStreamMetadata()) {
+          if (!"audio".equals(mimeType.getType()) && !"application".equals(mimeType.getType())) {
+            mimeType = MimeTypes.parseMimeType("audio/" + mimeType.getSubtype());
+          }
+        } else if (metadata.hasSubtitleStreamMetadata()) {
+          if (!"text".equals(mimeType.getType()) && !"application".equals(mimeType.getType())) {
+            mimeType = MimeTypes.parseMimeType("text/" + mimeType.getSubtype());
+          }
         }
         metadata.setMimeType(mimeType);
       } catch (UnknownFileTypeException e) {
@@ -466,6 +491,34 @@ public class MediaInspector {
         audio.setSamplingRate(a.getSamplingRate());
         // TODO: retain the original audio metadata
         track.addStream(audio);
+      }
+    }
+    return track;
+  }
+
+
+  /**
+   * Adds the subtitle related metadata to the track.
+   *
+   * @param track
+   *          the track
+   * @param metadata
+   *          the container metadata
+   * @throws Exception
+   *           Media analysis is fragile, and may throw any kind of runtime exceptions due to inconsistencies in the
+   *           media's metadata
+   */
+  private Track addSubtitleStreamMetadata(TrackImpl track, MediaContainerMetadata metadata) throws Exception {
+    List<SubtitleStreamMetadata> subtitleList = metadata.getSubtitleStreamMetadata();
+    if (subtitleList != null && !subtitleList.isEmpty()) {
+      for (int i = 0; i < subtitleList.size(); i++) {
+        SubtitleStreamImpl subtitle = new SubtitleStreamImpl("subtitle-" + (i + 1));
+        SubtitleStreamMetadata s = subtitleList.get(i);
+        subtitle.setFormat(s.getFormat());
+        subtitle.setFormatVersion(s.getFormatVersion());
+        subtitle.setFrameCount(s.getFrames());
+        // TODO: retain the original subtitle metadata
+        track.addStream(subtitle);
       }
     }
     return track;

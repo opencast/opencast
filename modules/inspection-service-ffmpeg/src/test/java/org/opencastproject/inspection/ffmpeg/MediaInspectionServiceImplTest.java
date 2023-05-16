@@ -148,31 +148,6 @@ public class MediaInspectionServiceImplTest {
       assertNotSame(newTrack.getMimeType(), mt);
       assertTrue(newTrack.getDuration() > 0);
     }
-
-    for (MediaInspector mi : init(trackUri)) {
-      Track track = mi.inspectTrack(trackUri, Options.NO_OPTION);
-      // make changes to metadata
-      Checksum cs = track.getChecksum();
-      track.setChecksum(null);
-      MimeType mt = mimeType("video", "flash");
-      track.setMimeType(mt);
-      // test the enrich scenario
-      Track newTrack = (Track) mi.enrich(track, false, Options.NO_OPTION);
-
-      VideoStream[] videoStreams = TrackSupport.byType(newTrack.getStreams(), VideoStream.class);
-      assertTrue(videoStreams[0].getFrameCount() > 0);
-      AudioStream[] audioStreams = TrackSupport.byType(newTrack.getStreams(), AudioStream.class);
-      assertTrue(audioStreams[0].getFrameCount() > 0);
-      assertEquals(newTrack.getChecksum(), cs);
-      assertEquals(newTrack.getMimeType(), mt);
-      assertNotNull(newTrack.getDuration());
-      assertTrue(newTrack.getDuration() > 0);
-      // test the override scenario
-      newTrack = (Track) mi.enrich(track, true, Options.NO_OPTION);
-      assertEquals(newTrack.getChecksum(), cs);
-      assertNotSame(newTrack.getMimeType(), mt);
-      assertTrue(newTrack.getDuration() > 0);
-    }
   }
 
   @Test
