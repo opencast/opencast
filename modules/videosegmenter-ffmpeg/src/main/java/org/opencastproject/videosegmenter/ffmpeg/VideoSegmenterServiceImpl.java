@@ -111,7 +111,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
   private class Chapter {
     protected double start;
     protected double end;
-    protected String title;
+    protected Optional<String> title;
   };
 
   /** Path to the executable */
@@ -538,17 +538,20 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
     double timebase = defaultTimebase;
     long start = -1;
     long end = -1;
-    StringBuilder title = new StringBuilder();
+    Optional<StringBuilder> title = Optional.empty();
 
     String line = reader.readLine();
     int lineNumber = 1;
-    while (null != line) {
+    if (line == null) {
+      return chapters;
+    }
+    while (true) {
       // begin parsing
       if (state == 0 && ";FFMETADATA1".equals(line)) {
         state++;
       }
       // ignore comments, empty lines
-      else if (line.startsWith(";") || line.startsWith("#") || line.isEmpty()) { }
+      else if (line != null && (line.startsWith(";") || line.startsWith("#") || line.isEmpty())) { }
       // search for chapter begin
       else if (state == 1 && "[CHAPTER]".equals(line)) {
         state++;
@@ -634,12 +637,15 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
       // Being processing of title
       else if (state == 5) {
         if (!line.startsWith("title=")) {
-          throw new ParseException("Failed to parse FFMETADATA: CHAPTER title field missing", lineNumber);
+          state = 7;
+          continue;
         }
 
         String fakeLine = Arrays.stream(line.split("="))
                 .skip(1)
                 .collect(Collectors.joining());
+
+        title = Optional.of(new StringBuilder());
 
         // Process title further in next state
         line = fakeLine;
@@ -652,7 +658,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
         boolean isEscaped = false;
         for (int codePoint : codePoints) {
           if (isEscaped) {
-            title.appendCodePoint(codePoint);
+            title.get().appendCodePoint(codePoint);
 
             isEscaped = false;
           }
@@ -669,30 +675,53 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
                         + " CHAPTER title field '=' ';' '#' '\\' '\\n' have to be escaped", lineNumber);
             }
             else {
-              title.appendCodePoint(codePoint);
+              title.get().appendCodePoint(codePoint);
             }
           }
         }
 
         if (!isEscaped) {
-          state = 1;
-
-          Chapter chapter = new Chapter();
-          chapter.title = title.toString();
-          chapter.start = timebase * start;
-          chapter.end = timebase * end;
-
-          chapters.add(chapter);
-
-          timebase = defaultTimebase;
-          start = -1;
-          end = -1;
-          title = new StringBuilder();
+          state++;
         }
+      }
+      else if (state == 7) {
+        state = 1;
+
+        Chapter chapter = new Chapter();
+        chapter.title = title.map((t) -> t.toString());
+        chapter.start = timebase * start;
+        chapter.end = timebase * end;
+
+        chapters.add(chapter);
+
+        timebase = defaultTimebase;
+        start = -1;
+        end = -1;
+        title = Optional.empty();
+
+        if (line == null) {
+          break;
+        }
+        continue;
       }
 
       line = reader.readLine();
       lineNumber++;
+
+      if (line == null) {
+        if (state <= 1) {
+          // Haven't found a chapter yet or searching for next chapter,
+          // just finish and return current chapter list
+          break;
+        }
+        // state 5 and 7 can finish up a chapter, continue processing state 7 a last time
+        else if (state == 5 || state == 7) {
+          state = 7;
+        }
+        else {
+          throw new ParseException("Failed to parse FFMETADATA: Unexpected end of file", lineNumber);
+        }
+      }
     }
 
     return chapters;
