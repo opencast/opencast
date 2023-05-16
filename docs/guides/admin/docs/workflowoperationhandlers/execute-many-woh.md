@@ -32,6 +32,7 @@ in [Execute Service: Parameter Substitution](../modules/execute.md#parameter-sub
 |source-tag        |rss, trim, -engage    |Run the command for any MediaPackage elements with one of these (comma- separated) tags. If any of them starts with '-', MediaPackage elements containing this tag will be excluded. Elements must also match the source-flavor condition, if present|No|
 |source-audio      |true                  |If present, require the element either to have an audio stream (true) or no audio stream (false), in addition to any source-flavor or source-tag conditions.|No|
 |source-video      |true                  |If present, require the element either to have a video stream (true) or no video stream (false), in addition to any source-flavor or source-tag conditions. |No|
+|source-subtitle   |true                  |If present, require the element either to have a subtitle stream (true) or no subtitle stream (false), in addition to any source-flavor or source-tag conditions. |No|
 |output-filename   |outfile.mp4           |Specifies the name of the file created by the command (if any), without path information. Used as the last part of the #{out} parameter|No|
 |expected-type     |Track                 |Specifies the type of MediaPackage element produced by the command: Manifest, Timeline, Track, Catalog, Attachment, Publication, Other|Required if output- filename is present|
 |target-flavor     |presentation/processed|Specifies the flavor of the resulting Mediapackage element created by the command |Required if output- filename is present|
