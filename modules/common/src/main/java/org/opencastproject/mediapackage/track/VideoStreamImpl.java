@@ -105,7 +105,7 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
     try {
       String strBitrate = (String) xpath.evaluate("bitrate/text()", node, XPathConstants.STRING);
       if (StringUtils.isNotEmpty(strBitrate))
-        vs.bitRate = new Float(strBitrate.trim());
+        vs.bitRate = Float.valueOf(strBitrate.trim());
     } catch (NumberFormatException e) {
       throw new IllegalStateException("Bit rate was malformatted: " + e.getMessage());
     }
@@ -114,7 +114,7 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
     try {
       String strFrameRate = (String) xpath.evaluate("framerate/text()", node, XPathConstants.STRING);
       if (StringUtils.isNotEmpty(strFrameRate))
-        vs.frameRate = new Float(strFrameRate.trim());
+        vs.frameRate = Float.valueOf(strFrameRate.trim());
     } catch (NumberFormatException e) {
       throw new IllegalStateException("Frame rate was malformatted: " + e.getMessage());
     }
@@ -199,7 +199,7 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
       String[] s = resolution.trim().split("x");
       if (s.length != 2)
         throw new IllegalStateException("video size must be of the form <hsize>x<vsize>, found " + resolution);
-      return new Integer(s[0].trim());
+      return Integer.valueOf(s[0].trim());
     } catch (NumberFormatException e) {
       throw new IllegalStateException("Resolution was malformatted: " + e.getMessage());
     }
@@ -211,7 +211,7 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
       String[] s = resolution.trim().split("x");
       if (s.length != 2)
         throw new IllegalStateException("video size must be of the form <hsize>x<vsize>, found " + resolution);
-      return new Integer(s[1].trim());
+      return Integer.valueOf(s[1].trim());
     } catch (NumberFormatException e) {
       throw new IllegalStateException("Resolution was malformatted: " + e.getMessage());
     }
