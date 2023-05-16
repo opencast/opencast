@@ -710,6 +710,25 @@ Opencast 13
 Opencast 12
 -----------
 
+### Opencast 12.11
+
+*Released on May 16th, 2023*
+
+- [[#4929](https://github.com/opencast/opencast/pull/4929)] -
+  Fix template losing user role when creating an event in the admin ui
+- [[#4877](https://github.com/opencast/opencast/pull/4877)] -
+  Engage UI docs
+- [[#4874](https://github.com/opencast/opencast/pull/4874)] -
+  Upload Allinone as Actions Workflow Artifact
+- [[#4872](https://github.com/opencast/opencast/pull/4872)] -
+  Fixing adopter statistics data gathering
+- [[#4863](https://github.com/opencast/opencast/pull/4863)] -
+  Fixed long WF description 11_to_12 DB upgrade script bug for Maria and PSQL
+- [[#4862](https://github.com/opencast/opencast/pull/4862)] -
+  Serviceregistry activatation optimization
+- [[#4848](https://github.com/opencast/opencast/pull/4848)] -
+  Service statistics DB query optimazation
+
 ### Opencast 12.10
 
 *Released on March 27th, 2023*
