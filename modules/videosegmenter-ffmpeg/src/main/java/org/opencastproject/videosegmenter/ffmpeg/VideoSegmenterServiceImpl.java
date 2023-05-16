@@ -52,8 +52,6 @@ import org.opencastproject.videosegmenter.api.VideoSegmenterException;
 import org.opencastproject.videosegmenter.api.VideoSegmenterService;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -75,6 +73,7 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -441,13 +440,13 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
             track.getDuration() / 1000);
 
       Mpeg7Catalog mpeg7;
-      Opt<List<Chapter>> chapter = Opt.none();
+      Optional<List<Chapter>> chapter = Optional.empty();
       if (useChapterIfAvailable
           && (useChapterMimeTypes.isEmpty()
             || useChapterMimeTypes.stream().anyMatch(comp -> track.getMimeType().eq(comp)))) {
-        chapter = Opt.nul(extractChapter(mediaFile));
+        chapter = Optional.ofNullable(extractChapter(mediaFile));
       }
-      if (chapter.isSome() && !chapter.get().isEmpty()) {
+      if (chapter.isPresent() && !chapter.get().isEmpty()) {
         mpeg7 = segmentFromChapter(chapter.get(), track);
       } else {
         mpeg7 = segmentAndOptimize(track, mediaFile, mediaUrl);
