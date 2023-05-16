@@ -83,51 +83,7 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
   @Override
   public Node toManifest(Document document, MediaPackageSerializer serializer) {
     Element node = document.createElement("audio");
-    // Stream ID
-    node.setAttribute("id", getIdentifier());
-
-    // Frame count
-    if (frameCount != null) {
-      Element frameCountNode = document.createElement("framecount");
-      frameCountNode.appendChild(document.createTextNode(Long.toString(frameCount)));
-      node.appendChild(frameCountNode);
-    }
-
-    // Device
-    Element deviceNode = document.createElement("device");
-    boolean hasAttr = false;
-    if (device.type != null) {
-      deviceNode.setAttribute("type", device.type);
-      hasAttr = true;
-    }
-    if (device.version != null) {
-      deviceNode.setAttribute("version", device.version);
-      hasAttr = true;
-    }
-    if (device.vendor != null) {
-      deviceNode.setAttribute("vendor", device.vendor);
-      hasAttr = true;
-    }
-    if (hasAttr)
-      node.appendChild(deviceNode);
-
-    // Encoder
-    Element encoderNode = document.createElement("encoder");
-    hasAttr = false;
-    if (encoder.type != null) {
-      encoderNode.setAttribute("type", encoder.type);
-      hasAttr = true;
-    }
-    if (encoder.version != null) {
-      encoderNode.setAttribute("version", encoder.version);
-      hasAttr = true;
-    }
-    if (encoder.vendor != null) {
-      encoderNode.setAttribute("vendor", encoder.vendor);
-      hasAttr = true;
-    }
-    if (hasAttr)
-      node.appendChild(encoderNode);
+    addCommonManifestElements(node, document, serializer);
 
     // Channels
     if (channels != null) {
@@ -189,18 +145,11 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
           XPathException {
     // Create stream
     String sid = (String) xpath.evaluate("@id", node, XPathConstants.STRING);
-    if (StringUtils.isEmpty(sid))
+    if (StringUtils.isEmpty(sid)) {
       sid = streamIdHint;
-    AudioStreamImpl as = new AudioStreamImpl(sid);
-
-    // Frame count
-    try {
-      String frameCount = (String) xpath.evaluate("framecount/text()", node, XPathConstants.STRING);
-      if (!StringUtils.isBlank(frameCount))
-        as.frameCount = new Long(frameCount.trim());
-    } catch (NumberFormatException e) {
-      throw new IllegalStateException("Frame count was malformatted: " + e.getMessage());
     }
+    AudioStreamImpl as = new AudioStreamImpl(sid);
+    partialFromManifest(as, node, xpath);
 
     // bit depth
     try {
@@ -264,28 +213,6 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
     } catch (NumberFormatException e) {
       throw new IllegalStateException("RMS Pk dB was malformatted: " + e.getMessage());
     }
-
-    // device
-    String captureDevice = (String) xpath.evaluate("device/@type", node, XPathConstants.STRING);
-    if (!StringUtils.isBlank(captureDevice))
-      as.device.type = captureDevice;
-    String captureDeviceVersion = (String) xpath.evaluate("device/@version", node, XPathConstants.STRING);
-    if (!StringUtils.isBlank(captureDeviceVersion))
-      as.device.version = captureDeviceVersion;
-    String captureDeviceVendor = (String) xpath.evaluate("device/@vendor", node, XPathConstants.STRING);
-    if (!StringUtils.isBlank(captureDeviceVendor))
-      as.device.vendor = captureDeviceVendor;
-
-    // encoder
-    String format = (String) xpath.evaluate("encoder/@type", node, XPathConstants.STRING);
-    if (!StringUtils.isBlank(format))
-      as.encoder.type = format;
-    String formatVersion = (String) xpath.evaluate("encoder/@version", node, XPathConstants.STRING);
-    if (!StringUtils.isBlank(formatVersion))
-      as.encoder.version = formatVersion;
-    String encoderLibraryVendor = (String) xpath.evaluate("encoder/@vendor", node, XPathConstants.STRING);
-    if (!StringUtils.isBlank(encoderLibraryVendor))
-      as.encoder.vendor = encoderLibraryVendor;
 
     return as;
   }

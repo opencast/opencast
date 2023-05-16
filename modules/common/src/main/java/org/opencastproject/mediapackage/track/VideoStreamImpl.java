@@ -95,18 +95,11 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
           XPathException {
     // Create stream
     String sid = (String) xpath.evaluate("@id", node, XPathConstants.STRING);
-    if (StringUtils.isEmpty(sid))
+    if (StringUtils.isEmpty(sid)) {
       sid = streamIdHint;
-    VideoStreamImpl vs = new VideoStreamImpl(sid);
-
-    // Frame count
-    try {
-      String frameCount = (String) xpath.evaluate("framecount/text()", node, XPathConstants.STRING);
-      if (!StringUtils.isBlank(frameCount))
-        vs.frameCount = new Long(frameCount.trim());
-    } catch (NumberFormatException e) {
-      throw new IllegalStateException("Frame count was malformatted: " + e.getMessage());
     }
+    VideoStreamImpl vs = new VideoStreamImpl(sid);
+    partialFromManifest(vs, node, xpath);
 
     // bit rate
     try {
@@ -146,49 +139,6 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
         vs.scanType = new Scan();
       vs.scanType.order = ScanOrder.fromString(scanOrder);
     }
-    // device
-    String deviceType = (String) xpath.evaluate("device/@type", node, XPathConstants.STRING);
-    if (StringUtils.isNotEmpty(deviceType)) {
-      if (vs.device == null)
-        vs.device = new Device();
-      vs.device.type = deviceType;
-    }
-
-    String deviceVersion = (String) xpath.evaluate("device/@version", node, XPathConstants.STRING);
-    if (StringUtils.isNotEmpty(deviceVersion)) {
-      if (vs.device == null)
-        vs.device = new Device();
-      vs.device.version = deviceVersion;
-    }
-
-    String deviceVendor = (String) xpath.evaluate("device/@vendor", node, XPathConstants.STRING);
-    if (StringUtils.isNotEmpty(deviceVendor)) {
-      if (vs.device == null)
-        vs.device = new Device();
-      vs.device.vendor = deviceVendor;
-    }
-
-    // encoder
-    String encoderType = (String) xpath.evaluate("encoder/@type", node, XPathConstants.STRING);
-    if (StringUtils.isNotEmpty(encoderType)) {
-      if (vs.encoder == null)
-        vs.encoder = new Encoder();
-      vs.encoder.type = encoderType;
-    }
-
-    String encoderVersion = (String) xpath.evaluate("encoder/@version", node, XPathConstants.STRING);
-    if (StringUtils.isNotEmpty(encoderVersion)) {
-      if (vs.encoder == null)
-        vs.encoder = new Encoder();
-      vs.encoder.version = encoderVersion;
-    }
-
-    String encoderVendor = (String) xpath.evaluate("encoder/@vendor", node, XPathConstants.STRING);
-    if (StringUtils.isNotEmpty(encoderVendor)) {
-      if (vs.encoder == null)
-        vs.encoder = new Encoder();
-      vs.encoder.vendor = encoderVendor;
-    }
 
     return vs;
   }
@@ -200,51 +150,7 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
   @Override
   public Node toManifest(Document document, MediaPackageSerializer serializer) {
     Element node = document.createElement("video");
-    // Stream ID
-    node.setAttribute("id", getIdentifier());
-
-    // Frame count
-    if (frameCount != null) {
-      Element frameCountNode = document.createElement("framecount");
-      frameCountNode.appendChild(document.createTextNode(Long.toString(frameCount)));
-      node.appendChild(frameCountNode);
-    }
-
-    // device
-    Element deviceNode = document.createElement("device");
-    boolean hasAttr = false;
-    if (device.type != null) {
-      deviceNode.setAttribute("type", device.type);
-      hasAttr = true;
-    }
-    if (device.version != null) {
-      deviceNode.setAttribute("version", device.version);
-      hasAttr = true;
-    }
-    if (device.vendor != null) {
-      deviceNode.setAttribute("vendor", device.vendor);
-      hasAttr = true;
-    }
-    if (hasAttr)
-      node.appendChild(deviceNode);
-
-    // encoder
-    Element encoderNode = document.createElement("encoder");
-    hasAttr = false;
-    if (encoder.type != null) {
-      encoderNode.setAttribute("type", encoder.type);
-      hasAttr = true;
-    }
-    if (encoder.version != null) {
-      encoderNode.setAttribute("version", encoder.version);
-      hasAttr = true;
-    }
-    if (encoder.vendor != null) {
-      encoderNode.setAttribute("vendor", encoder.vendor);
-      hasAttr = true;
-    }
-    if (hasAttr)
-      node.appendChild(encoderNode);
+    addCommonManifestElements(node, document, serializer);
 
     // Resolution
     Element resolutionNode = document.createElement("resolution");

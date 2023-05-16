@@ -28,6 +28,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageSerializer;
 import org.opencastproject.mediapackage.Stream;
+import org.opencastproject.mediapackage.SubtitleStream;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.util.Checksum;
@@ -75,6 +76,9 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
 
   @XmlElement(name = "video")
   protected List<VideoStream> video = new ArrayList<>();
+
+  @XmlElement(name = "subtitle")
+  protected List<SubtitleStream> subtitle = new ArrayList<>();
 
   @XmlAttribute(name = "transport")
   protected StreamingProtocol transport = null;
@@ -157,9 +161,10 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
 
   @Override
   public Stream[] getStreams() {
-    List<Stream> streams = new ArrayList<>(audio.size() + video.size());
+    List<Stream> streams = new ArrayList<>(audio.size() + video.size() + subtitle.size());
     streams.addAll(audio);
     streams.addAll(video);
+    streams.addAll(subtitle);
     return streams.toArray(new Stream[0]);
   }
 
@@ -171,6 +176,8 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
       audio.add((AudioStreamImpl) stream);
     } else if (stream instanceof VideoStreamImpl) {
       video.add((VideoStreamImpl) stream);
+    } else if (stream instanceof SubtitleStreamImpl) {
+      subtitle.add((SubtitleStreamImpl) stream);
     } else {
       throw new IllegalArgumentException("stream must be either audio or video");
     }
@@ -196,6 +203,16 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
     return video != null && video.size() > 0;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.mediapackage.Track#hasSubtitle()
+   */
+  @Override
+  public boolean hasSubtitle() {
+    return subtitle != null && subtitle.size() > 0;
+  }
+
   public List<AudioStream> getAudio() {
     return audio;
   }
@@ -210,6 +227,14 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
 
   public void setVideo(List<VideoStream> video) {
     this.video = video;
+  }
+
+  public List<SubtitleStream> getSubtitle() {
+    return subtitle;
+  }
+
+  public void setSubtitle(List<SubtitleStream> subtitle) {
+    this.subtitle = subtitle;
   }
 
   public void setLive(boolean isLive) {
@@ -273,10 +298,11 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
       node.appendChild(nameNode);
     }
 
-
     for (Stream s : audio)
       node.appendChild(s.toManifest(document, serializer));
     for (Stream s : video)
+      node.appendChild(s.toManifest(document, serializer));
+    for (Stream s : subtitle)
       node.appendChild(s.toManifest(document, serializer));
     return node;
   }
