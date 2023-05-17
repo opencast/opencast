@@ -346,8 +346,13 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
 
     Option<String> transcriptionTypeOpt = OsgiUtil.getOptCfg(cc.getProperties(), TRANSCRIPTIONTYPE);
     if (transcriptionTypeOpt.isSome()) {
-      transcriptionType = transcriptionTypeOpt.get();
-      logger.info("Default transcription type is set to '{}'.", transcriptionType);
+      if (List.of("transcription", "captions", "translatedSubtitles").contains(transcriptionType)) {
+        transcriptionType = transcriptionTypeOpt.get();
+        logger.info("Default transcription type is set to '{}'.", transcriptionType);
+      } else {
+        logger.warn("Value '{}' is invalid for configuration '{}'. Using default: '{}'.",
+            transcriptionTypeOpt.get(), TRANSCRIPTIONTYPE, transcriptionType);
+      }
     } else {
       logger.info("Default transcription type '{}' will be used.", transcriptionType);
     }
@@ -362,8 +367,13 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
 
     Option<String> transcriptionStyleOpt = OsgiUtil.getOptCfg(cc.getProperties(), TRANSCRIPTIONSTYLE);
     if (transcriptionStyleOpt.isSome()) {
-      transcriptionStyle = transcriptionStyleOpt.get();
-      logger.info("Default transcription style is set to '{}'.", transcriptionStyle);
+      if (List.of("cleanread", "verbatim").contains(transcriptionStyle)) {
+        transcriptionStyle = transcriptionStyleOpt.get();
+        logger.info("Default transcription style is set to '{}'.", transcriptionStyle);
+      } else {
+        logger.warn("Value '{}' is invalid for configuration '{}'. Using default: '{}'.",
+            transcriptionStyleOpt.get(), TRANSCRIPTIONSTYLE, transcriptionStyle);
+      }
     } else {
       logger.info("Default transcription style '{}' will be used.", transcriptionStyle);
     }
