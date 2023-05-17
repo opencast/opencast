@@ -58,7 +58,7 @@ export default class EpisodesFromSeriesPlugin extends PopUpButtonPlugin {
   }
 
   async load() {
-    this.icon = ListIcon;
+    this.icon = this.player.getCustomPluginIcon(this.name, 'buttonIcon') || ListIcon;
   }
 
   async getContent() {

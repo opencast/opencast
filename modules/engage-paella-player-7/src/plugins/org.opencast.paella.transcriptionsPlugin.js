@@ -97,6 +97,6 @@ export default class TranscriptionsPlugin extends PopUpButtonPlugin {
   }
 
   async load() {
-    this.icon = TranscriptionsIcon;
+    this.icon = this.player.getCustomPluginIcon(this.name, 'buttonIcon') || TranscriptionsIcon;
   }
 }
