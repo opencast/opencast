@@ -41,7 +41,7 @@ import VolumeMuteIcon from './icons/volume-mute-icon.svg';
 import { getUrlFromOpencastConfig } from './js/PaellaOpencast';
 
 
-export async function applyDefaultTheme(paella) {
+async function applyDefaultTheme(paella) {
   await utils.loadStyle('style.css');
 
   //// Customized icons
@@ -79,7 +79,24 @@ export async function applyDefaultTheme(paella) {
   //// slide navigation
   await paella.addCustomPluginIcon('es.upv.paella.nextSlideNavigatorButton','arrowRightIcon', NextIcon);
   await paella.addCustomPluginIcon('es.upv.paella.prevSlideNavigatorButton','arrowLeftIcon', PrevIcon);
+}
+
+
+export async function applyOpencastTheme(paella) {
+  await applyDefaultTheme(paella);
 
   //// Load custom theme
-  await paella.skin.loadSkin(getUrlFromOpencastConfig('custom_theme/theme.json'));
+  const config = await fetch(getUrlFromOpencastConfig('config.json'));
+  const configJson = await config.json();
+
+  const u = new URL(window.location.href);
+  const ocTheme = u.searchParams.get('oc.theme')
+    ?? configJson?.opencast?.theme
+    ?? 'default_theme'  ;
+  try {
+    await paella.skin.loadSkin(getUrlFromOpencastConfig(`${ocTheme}/theme.json`));
+  }
+  catch (err) {
+    paella.log.info(`Error applying opencast theme '${ocTheme}'. Using default theme!`);
+  }
 }

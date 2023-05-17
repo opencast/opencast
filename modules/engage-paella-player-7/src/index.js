@@ -18,14 +18,14 @@
  * the License.
  *
  */
-import { applyDefaultTheme } from './default-theme.js';
+import { applyOpencastTheme } from './default-theme.js';
 import { PaellaOpencast } from './js/PaellaOpencast.js';
 
 window.onload = async () => {
   let paella = new PaellaOpencast('player-container');
 
   try {
-    await applyDefaultTheme(paella);
+    await applyOpencastTheme(paella);
     await paella.loadManifest();
     paella.log.info('Paella player load done');
   }

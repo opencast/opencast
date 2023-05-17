@@ -66,8 +66,20 @@ The skin definition file is divided into three sections:
 
 For more information, see the paella 7 [skin documentation](https://paellaplayer.upv.es/#/doc/skin_api.md).
 
+You can create a new folder for you theme in `.../etc/ui-config/<tenant>/paella7/` with a file called `theme.json` and configure the theme you want to use in `config.json` file:
 
-You can find the skin JSON file in `.../etc/ui-config/<tenant>/paella7/custom_theme/theme.json`.
+```json
+{
+    ...
+    "opencast": {
+        "theme": "default_teme"
+        ...
+    }
+    ...
+}
+```
+
+Default theme: `.../etc/ui-config/<tenant>/paella7/default_theme/theme.json`.
 
 Select the Opencast Player
 ------------------------------
