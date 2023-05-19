@@ -37,6 +37,7 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-asset-manager-impl</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>

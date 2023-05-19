@@ -222,6 +222,11 @@
       <artifactId>easymock</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -230,6 +235,9 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <extensions>true</extensions>
         <configuration>
+          <ignoredNonTestScopedDependencies>
+            <ignoredNonTestScopedDependency>org.opencastproject:opencast-elasticsearch-impl</ignoredNonTestScopedDependency>
+          </ignoredNonTestScopedDependencies>
           <ignoredUnusedDeclaredDependencies>
             <!-- provide a logger for tests -->
             <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>

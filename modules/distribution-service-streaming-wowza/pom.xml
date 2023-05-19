@@ -94,6 +94,7 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient-osgi</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -102,6 +103,7 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore-osgi</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
@@ -110,6 +112,9 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <configuration>
+          <ignoredNonTestScopedDependencies>
+            <ignoredNonTestScopedDependency>javax.servlet:javax.servlet-api</ignoredNonTestScopedDependency>
+          </ignoredNonTestScopedDependencies>
           <ignoredUnusedDeclaredDependencies>
             <!-- provide a logger for tests -->
             <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
