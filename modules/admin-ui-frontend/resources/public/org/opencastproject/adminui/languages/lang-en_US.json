@@ -1485,7 +1485,7 @@
              "DESCRIPTION" : "Please choose a pre-configured set of policies or add custom policies below",
              "NEW_USER": "New user",
              "USER": "User",
-             "USERS": "Users who are authorized for the access policy",
+             "USERS": "Users who are authorized by this access policy",
              "HELP": {
                "READ": "By setting read rights, the access policy becomes visible for the selected user",
                "WRITE": "By setting write rights, the selected user can edit the access policy"
@@ -1534,7 +1534,7 @@
              "DESCRIPTION" : "Please choose a pre-configured set of policies or add custom policies below",
              "NEW_USER": "New user",
              "USER": "User",
-             "USERS": "Users who are authorized for the access policy",
+             "USERS": "Users who are authorized by this access policy",
              "NONEXISTENT_USER": "Nonexistent user",
              "HELP": {
                "READ": "By setting read rights, the access policy becomes visible for the selected user",
