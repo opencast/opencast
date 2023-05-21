@@ -513,7 +513,7 @@
                     <tr>
                       <td>
                         <div class="obj-container padded">
-                          <select
+                          <select chosen
                                   data-width="'200px'"
                                   tabindex="1"
                                   focushere
@@ -522,9 +522,7 @@
                                   ng-options="id as name for (id, name) in wizard.step.acls"
                                   placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                   no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
-                                  >
-                                  <option value=""></option>
-                          </select>
+                                  ></select>
                         </div>
                       </td>
                     </tr>
