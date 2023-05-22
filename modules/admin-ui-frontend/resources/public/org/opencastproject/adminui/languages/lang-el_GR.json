@@ -28,7 +28,7 @@
    "YES": "Ναί",
    "COPY": "Αντιγραφή στο πρόχειρο",
    "MONITOR": {
-      "REGISTRATION": "Out of date"
+      "REGISTRATION": "Απαρχαιωμένη έκδοση"
    },
    "LTI": {
       "ERROR_LOADING_METADATA": "Σφάλμα στην φόρτωση των μεταδεδομένων της εκδήλωσης. Παρακαλώ προσπαθείστε αργότερα.",
@@ -905,14 +905,14 @@
                   "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
                   "ACTION": "Ενέργειες",
                   "NEW": "Νέα πολιτική",
-                  "NEW_USER": "New user",
-                  "DETAILS": "Non-user roles",
+                  "NEW_USER": "Νέος χρήστης",
+                  "DETAILS": "Ρόλοι μη χρηστών",
                   "USER": "User",
-                  "USERS": "Users who are authorized for the event",
-                  "NONEXISTENT_USER": "Nonexistent user",
+                  "USERS": "Χρήστες που είναι εξουσιοδοτημένοι για την εκδήλωση",
+                  "NONEXISTENT_USER": "Μη υπάρχων χρήστης",
                   "HELP": {
-                     "READ": "By setting read rights, the event becomes visible for the selected user",
-                     "WRITE": "By setting write rights, the selected user can edit the event"
+                     "READ": "Θέτοντας δικαιώματα ανάγνωσης, η εκδήλωση γίνεται ορατή για τον επιλεγμένο χρήστη",
+                     "WRITE": "Ρυθμίζοντας δικαιώματα εγγραφής, ο επιλεγμένος χρήστης μπορεί να επεξεργαστεί την εκδήλωση"
                   }
                },
                "ROLES": {
@@ -920,8 +920,8 @@
                   "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
                },
                "USERS": {
-                  "LABEL": "Select a user",
-                  "EMPTY": "No user found"
+                  "LABEL": "Επιλέξτε χρήστη ",
+                  "EMPTY": "Δεν βρέθηκαν χρήστες"
                }
             },
             "COMMENTS": {
@@ -1139,13 +1139,13 @@
                   "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
                   "ACTION": "Ενέργειες",
                   "NEW": "Νέα πολιτική",
-                  "NEW_USER": "New user",
-                  "DETAILS": "Non-user roles",
+                  "NEW_USER": "Νέος χρήστης",
+                  "DETAILS": "Ρόλοι μη χρηστών",
                   "USER": "User",
-                  "USERS": "Users who are authorized for the series",
+                  "USERS": "Χρήστες που είναι εξουσιοδοτημένοι για τη σειρά",
                   "HELP": {
-                     "READ": "By setting read rights, the series becomes visible for the selected user",
-                     "WRITE": "By setting write rights, the selected user can edit the series"
+                     "READ": "Με τον ορισμό δικαιωμάτων ανάγνωσης, η σειρά γίνεται ορατή για τον επιλεγμένο χρήστη",
+                     "WRITE": "Με τη ρύθμιση δικαιωμάτων εγγραφής, ο επιλεγμένος χρήστης μπορεί να επεξεργαστεί τη σειρά"
                   }
                },
                "ROLES": {
@@ -1153,8 +1153,8 @@
                   "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
                },
                "USERS": {
-                  "LABEL": "Select a user",
-                  "EMPTY": "No user found"
+                  "LABEL": "Επιλέξτε χρήστη ",
+                  "EMPTY": "Δεν βρέθηκαν χρήστες"
                }
             },
             "THEME": {
@@ -1228,20 +1228,20 @@
                   "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
                   "ACTION": "Ενέργειες",
                   "NEW": "Νέα πολιτική",
-                  "DETAILS": "Non-user roles",
+                  "DETAILS": "Ρόλοι μη χρηστών",
                   "REPLACE_EVENT_ACLS": "Ενημέρωση δικαιωμάτων εκδήλωσης",
                   "REPLACE_EVENT_ACLS_HINT": "Επιβεβαίωση ότι όλες οι εκδηλώσεις σε αυτή την σειρά έχουν τα ίδια δικαιώματα σε ισχύ",
                   "SAVE_SERIES_ACLS": "Αποθήκευση",
                   "SAVE_SERIES_ACLS_HINT": "Εφαρμογή δικαιωμάτων μόνο στη σειρά",
                   "LOAD_MORE_LIMIT": "Εμφάνιση πολιτικών.",
                   "LOAD_MORE_LINK": "Φόρτωση περισσοτέρων",
-                  "NEW_USER": "New user",
+                  "NEW_USER": "Νέος χρήστης",
                   "USER": "User",
-                  "USERS": "Users who are authorized for the series",
-                  "NONEXISTENT_USER": "Nonexistent user",
+                  "USERS": "Χρήστες που είναι εξουσιοδοτημένοι για τη σειρά",
+                  "NONEXISTENT_USER": "Μη υπάρχων χρήστης",
                   "HELP": {
-                     "READ": "By setting read rights, the series becomes visible for the selected user",
-                     "WRITE": "By setting write rights, the selected user can edit the series"
+                     "READ": "Με τον ορισμό δικαιωμάτων ανάγνωσης, η σειρά γίνεται ορατή για τον επιλεγμένο χρήστη",
+                     "WRITE": "Με τη ρύθμιση δικαιωμάτων εγγραφής, ο επιλεγμένος χρήστης μπορεί να επεξεργαστεί τη σειρά"
                   }
                },
                "ROLES": {
@@ -1249,8 +1249,8 @@
                   "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
                },
                "USERS": {
-                  "LABEL": "Select a user",
-                  "EMPTY": "No user found"
+                  "LABEL": "Επιλέξτε χρήστη ",
+                  "EMPTY": "Δεν βρέθηκαν χρήστες"
                }
             },
             "METADATA": {
@@ -1489,14 +1489,14 @@
                   "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
                   "ACTION": "Ενέργειες",
                   "NEW": "Νέα πολιτική",
-                  "DETAILS": "Non-user roles",
+                  "DETAILS": "Ρόλοι μη χρηστών",
                   "DESCRIPTION": "Παρακαλώ επιλέξτε ένα σύνολο προ-διαμορφωμένων πολιτικών ή να προσθέσετε τις ακόλουθες προσαρμοσμένες πολιτικές",
-                  "NEW_USER": "New user",
+                  "NEW_USER": "Νέος χρήστης",
                   "USER": "User",
-                  "USERS": "Users who are authorized for the access policy",
+                  "USERS": "Χρήστες που είναι εξουσιοδοτημένοι για την πολιτική πρόσβασης",
                   "HELP": {
-                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
-                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                     "READ": "Με τον ορισμό δικαιωμάτων ανάγνωσης, η πολιτική πρόσβασης γίνεται ορατή για τον επιλεγμένο χρήστη",
+                     "WRITE": "Με τη ρύθμιση δικαιωμάτων εγγραφής, ο επιλεγμένος χρήστης μπορεί να επεξεργαστεί την πολιτική πρόσβασης"
                   }
                },
                "ROLES": {
@@ -1504,8 +1504,8 @@
                   "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
                },
                "USERS": {
-                  "LABEL": "Select a user",
-                  "EMPTY": "No user found"
+                  "LABEL": "Επιλέξτε χρήστη ",
+                  "EMPTY": "Δεν βρέθηκαν χρήστες"
                }
             }
          },
@@ -1538,15 +1538,15 @@
                   "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
                   "ACTION": "Ενέργειες",
                   "NEW": "Νέα πολιτική",
-                  "DETAILS": "Non-user roles",
+                  "DETAILS": "Ρόλοι μη χρηστών",
                   "DESCRIPTION": "Παρακαλώ επιλέξτε ένα σύνολο προ-διαμορφωμένων πολιτικών ή να προσθέσετε τις ακόλουθες προσαρμοσμένες πολιτικές",
-                  "NEW_USER": "New user",
+                  "NEW_USER": "Νέος χρήστης",
                   "USER": "User",
-                  "USERS": "Users who are authorized for the access policy",
-                  "NONEXISTENT_USER": "Nonexistent user",
+                  "USERS": "Χρήστες που είναι εξουσιοδοτημένοι για την πολιτική πρόσβασης",
+                  "NONEXISTENT_USER": "Μη υπάρχων χρήστης",
                   "HELP": {
-                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
-                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                     "READ": "Με τον ορισμό δικαιωμάτων ανάγνωσης, η πολιτική πρόσβασης γίνεται ορατή για τον επιλεγμένο χρήστη",
+                     "WRITE": "Με τη ρύθμιση δικαιωμάτων εγγραφής, ο επιλεγμένος χρήστης μπορεί να επεξεργαστεί την πολιτική πρόσβασης"
                   }
                },
                "ROLES": {
@@ -1554,8 +1554,8 @@
                   "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
                },
                "USERS": {
-                  "LABEL": "Select a user",
-                  "EMPTY": "No user found"
+                  "LABEL": "Επιλέξτε χρήστη ",
+                  "EMPTY": "Δεν βρέθηκαν χρήστες"
                }
             }
          }
