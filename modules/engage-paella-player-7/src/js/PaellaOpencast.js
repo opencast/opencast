@@ -179,6 +179,7 @@ const initParams = {
     for (const lang in dictionary) {
       player.addDictionary(lang, dictionary[lang]);
     }
+    player.setLanguage(navigator.language.substring(0, 2));
   }
 };
 
