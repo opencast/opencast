@@ -41,7 +41,7 @@ public interface SpeechToTextEngine {
    * @param preparedOutputFile The prepared output file where the subtitle's data should be saved.
    * @param language           The language of the audio track.
    * @param translate          If the subtitles should be translated into english
-   * @return The generated subtitles file.
+   * @return HashMap which contains the language code and the subtitles file path.
    * @throws SpeechToTextEngineException Thrown when an error occurs at the process.
    */
   Map<String, Object> generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language,

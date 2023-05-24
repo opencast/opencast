@@ -71,6 +71,14 @@ Required for animate service (optional):
 
     synfig
 
+Required for text to speech (optional):
+
+    Vosk
+
+OR 
+    
+    Whisper >= 20230314
+
 ### Dependency Download
 
 Pre-built versions of most dependencies that are not in the repositories can be downloaded from the respective project
