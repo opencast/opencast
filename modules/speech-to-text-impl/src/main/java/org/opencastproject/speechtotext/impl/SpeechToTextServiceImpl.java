@@ -36,6 +36,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -140,9 +141,10 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
     List<String> arguments = job.getArguments();
     String language = arguments.get(1);
     URI mediaFile = new URI(arguments.get(0));
-    Boolean translate = Boolean.parseBoolean(arguments.get(2));
-
-
+    Boolean translate = BooleanUtils.toBooleanObject(arguments.get(2));
+    if (translate == null) {
+      translate = false;
+    }
     URI subtitleFilesURI;
     File subtitlesFile = null;
     String vttFileName = String.format("%s%d_%s.%s", TMP_PREFIX,

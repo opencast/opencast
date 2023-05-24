@@ -30,7 +30,7 @@
   "username": "Benutzername",
   "password": "Passwort",
   "remember_me": "Angemeldet bleiben.",
-  "sthWentWrong": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+  "sthWentWrong": "Etwas ist schief gelaufen. Bitte erneut versuchen.",
   "loading": "Wird geladen…",
   "no_data": "Keine Daten verfügbar.",
   "login_success": "Anmeldung erfolgreich.",
