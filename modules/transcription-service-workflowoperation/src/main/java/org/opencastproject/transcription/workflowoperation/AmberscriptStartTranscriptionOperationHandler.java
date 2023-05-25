@@ -66,6 +66,11 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
   /** Workflow configuration option keys */
   static final String LANGUAGE = "language";
   static final String JOBTYPE = "jobtype";
+  static final String SPEAKER = "speaker";
+  static final String TRANSCRIPTIONTYPE = "transcriptiontype";
+  static final String GLOSSARY = "glossary";
+  static final String TRANSCRIPTIONSTYLE = "transcriptionstyle";
+  static final String TARGETLANGUAGE = "targetlanguage";
   static final String SKIP_IF_FLAVOR_EXISTS = "skip-if-flavor-exists";
 
   /** The transcription service */
@@ -102,7 +107,16 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
     List<String> sourceTagOption = tagsAndFlavors.getSrcTags();
     List<MediaPackageElementFlavor> sourceFlavorOption = tagsAndFlavors.getSrcFlavors();
     String language = StringUtils.trimToEmpty(operation.getConfiguration(LANGUAGE));
-    String jobtype = StringUtils.trimToEmpty(operation.getConfiguration(JOBTYPE));
+    String jobType = StringUtils.trimToEmpty(operation.getConfiguration(JOBTYPE));
+    String speaker = StringUtils.trimToEmpty(operation.getConfiguration(SPEAKER));
+    String transcriptionType = StringUtils.trimToEmpty(operation.getConfiguration(TRANSCRIPTIONTYPE));
+    // Note that specifying `""` is different from not specifying a glossary at all!
+    // The former will override the default with not using a glossary for this operation,
+    // while the latter will fall back to said default. Hence, no `trimToEmpty` here.
+    String glossary = StringUtils.trim(operation.getConfiguration(GLOSSARY));
+    String transcriptionStyle = StringUtils.trimToEmpty(operation.getConfiguration(TRANSCRIPTIONSTYLE));
+    // See glossary comment above
+    String targetLanguage = StringUtils.trim(operation.getConfiguration(TARGETLANGUAGE));
 
     AbstractMediaPackageElementSelector<Track> elementSelector = new TrackSelector();
 
@@ -122,7 +136,8 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
     Job job = null;
     for (Track track : elements) {
       try {
-        job = service.startTranscription(mediaPackage.getIdentifier().toString(), track, language, jobtype);
+        job = service.startTranscription(mediaPackage.getIdentifier().toString(), track, language, jobType, speaker,
+            transcriptionType, glossary, transcriptionStyle, targetLanguage);
         // Only one job per media package
         break;
       } catch (TranscriptionServiceException e) {

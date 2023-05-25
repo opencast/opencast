@@ -95,7 +95,7 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
     List<String> targetTagOption = tagsAndFlavors.getTargetTags();
     String captionFormatOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_CAPTION_FORMAT));
 
-    MediaPackageElementFlavor flavor = null;
+    MediaPackageElementFlavor flavor;
     if (!targetFlavorOption.isEmpty()) {
       flavor = targetFlavorOption.get(0);
     } else {
@@ -112,7 +112,7 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
       MediaPackageElement transcription
           = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId);
 
-      MediaPackageElement convertedTranscription = null;
+      MediaPackageElement convertedTranscription;
       if (captionFormatOption != null) {
         Job job = captionService.convert(transcription, "subrip", captionFormatOption, service.getLanguage());
         if (!waitForStatus(job).isSuccess()) {
