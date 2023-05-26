@@ -357,6 +357,8 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.replay(workflowService);
     env.setWorkflowService(workflowService);
 
+
+
     SeriesEndpoint seriesEndpoint = EasyMock.createNiceMock(SeriesEndpoint.class);
     EasyMock.expect(seriesEndpoint.getOnlySeriesWithWriteAccessEventsFilter()).andReturn(false).anyTimes();
     EasyMock.expect(seriesEndpoint.getUserSeriesByAccess(EasyMock.anyBoolean())).andReturn(new HashMap<>()).anyTimes();
@@ -421,6 +423,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser(EasyMock.anyString())).andReturn(userWithPermissions).anyTimes();
     EasyMock.replay(userDirectoryService);
+    env.setUserDirectoryService(userDirectoryService);
 
     JobEndpoint endpoint = new JobEndpoint();
     endpoint.setServiceRegistry(serviceRegistry);
@@ -762,5 +765,10 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   @Override
   public Boolean getOnlyEventsWithWriteAccessEventsTab() {
     return false;
+  }
+
+  @Override
+  public UserDirectoryService getUserDirectoryService() {
+    return env.getUserDirectoryService();
   }
 }

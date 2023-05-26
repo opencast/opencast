@@ -124,6 +124,7 @@ import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.util.SecurityUtil;
@@ -273,6 +274,8 @@ public abstract class AbstractEventEndpoint {
   public abstract Boolean getOnlySeriesWithWriteAccessEventModal();
 
   public abstract Boolean getOnlyEventsWithWriteAccessEventsTab();
+
+  public abstract UserDirectoryService getUserDirectoryService();
 
   /** Default server URL */
   protected String serverUrl = "http://localhost:8080";
@@ -1813,7 +1816,11 @@ public abstract class AbstractEventEndpoint {
         for (WorkflowInstance instance : workflowInstances) {
           long instanceId = instance.getId();
           Date created = instance.getDateCreated();
-          String creatorName = instance.getCreatorName();
+          String userId = instance.getCreatorName();
+
+          User user = getUserDirectoryService().loadUser(userId);
+          String creatorName = user.getName() + "<" + user.getEmail() + ">";
+
           jsonList.add(obj(f("id", v(instanceId)), f("title", v(instance.getTitle(), Jsons.BLANK)),
                   f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + instance.getState().toString())),
                   f("submitted", v(created != null ? DateTimeSupport.toUTC(created.getTime()) : "", Jsons.BLANK)),

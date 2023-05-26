@@ -41,6 +41,7 @@ import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.test.rest.NotFoundExceptionMapper;
 import org.opencastproject.test.rest.RestServiceTestEnv;
@@ -698,6 +699,7 @@ public class AbstractEventEndpointTest {
     private CaptureAgentStateService captureAgentStateService;
     private ElasticsearchIndex index;
     private UrlSigningService urlSigningService;
+    private UserDirectoryService userDirectoryService;
 
     public WorkflowService getWorkflowService() {
       return workflowService;
@@ -809,6 +811,14 @@ public class AbstractEventEndpointTest {
 
     public UrlSigningService getUrlSigningService() {
       return urlSigningService;
+    }
+
+    public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+      this.userDirectoryService = userDirectoryService;
+    }
+
+    public UserDirectoryService getUserDirectoryService() {
+      return userDirectoryService;
     }
 
   }
