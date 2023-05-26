@@ -1,6 +1,20 @@
 # Opencast 13: Release Notes
 
 
+Opencast 13.6
+-------------
+
+The sixth maintenance release of Opencast 13.
+
+- Extend configuration options of Amberscript integration ([#4868](https://github.com/opencast/opencast/pull/4868))
+- Mitigate not loading ACLs on first start ([#4923](https://github.com/opencast/opencast/pull/4923))
+- Remove empty options in ACL template select ([#4961](https://github.com/opencast/opencast/pull/4961))
+- Editor Release 2023-04-20 ([#4879](https://github.com/opencast/opencast/pull/4879))
+- Fix missing JARs in released distributions ([#4925](https://github.com/opencast/opencast/pull/4925))
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
+
 Opencast 13.5
 -------------
 
@@ -13,16 +27,16 @@ The fifth maintenance release of Opencast 13.
 - Add paging to asset manager index rebuild ([#4783](https://github.com/opencast/opencast/pull/4783))
 - Fixed pagination when reindexing asset manager ([#4843](https://github.com/opencast/opencast/pull/4843))
 
-
 See [changelog](changelog.md) for a comprehensive list of changes.
+
 
 Opencast 13.4
 -------------
 
 The fourth maintenance release of Opencast 13.
 
--  Fix default values for the Admin UI ACL editor. Previously the roles set for new events might not correspond to the
-   rest of Opencast's defaults. ([#4799](https://github.com/opencast/opencast/pull/4799))
+- Fix default values for the Admin UI ACL editor. Previously the roles set for new events might not correspond to the
+  rest of Opencast's defaults. ([#4799](https://github.com/opencast/opencast/pull/4799))
 
 See [changelog](changelog.md) for a comprehensive list of changes.
 
@@ -32,12 +46,12 @@ Opencast 13.3
 
 The third maintenance release of Opencast 13.
 
--  Add paging to asset manager index rebuild ([#4783](https://github.com/opencast/opencast/pull/4783))
--  Fix reindex of multi-tanant systems ([#4740](https://github.com/opencast/opencast/pull/4740))
--  Fix exception when retrieving comments where the author is missing ([#4739](https://github.com/opencast/opencast/pull/4739))
--  Paella 7 matomo plugin ([#4722](https://github.com/opencast/opencast/pull/4722))
--  Dependabot-batcher update ([#4707](https://github.com/opencast/opencast/pull/4707))
--  Fix typo and adds recomendations to whisper doc ([#4683](https://github.com/opencast/opencast/pull/4683))
+- Add paging to asset manager index rebuild ([#4783](https://github.com/opencast/opencast/pull/4783))
+- Fix reindex of multi-tanant systems ([#4740](https://github.com/opencast/opencast/pull/4740))
+- Fix exception when retrieving comments where the author is missing ([#4739](https://github.com/opencast/opencast/pull/4739))
+- Paella 7 matomo plugin ([#4722](https://github.com/opencast/opencast/pull/4722))
+- Dependabot-batcher update ([#4707](https://github.com/opencast/opencast/pull/4707))
+- Fix typo and adds recomendations to whisper doc ([#4683](https://github.com/opencast/opencast/pull/4683))
 
 See [changelog](changelog.md) for a comprehensive list of changes.
 
@@ -47,10 +61,10 @@ Opencast 13.2
 
 The second maintenance release of Opencast 13.
 
--  Fix calendar.json endpoint ([#4619](https://github.com/opencast/opencast/pull/4619))
--  Add missing expected response code ([#4628](https://github.com/opencast/opencast/pull/4628))
--  Add webvtt-to-cutmarks to list of workflow operations ([#4654](https://github.com/opencast/opencast/pull/4654))
--  Fix multiple bugs in the adopters registration resulting in incorrect counts ([#4616](https://github.com/opencast/opencast/pull/4616))
+- Fix calendar.json endpoint ([#4619](https://github.com/opencast/opencast/pull/4619))
+- Add missing expected response code ([#4628](https://github.com/opencast/opencast/pull/4628))
+- Add webvtt-to-cutmarks to list of workflow operations ([#4654](https://github.com/opencast/opencast/pull/4654))
+- Fix multiple bugs in the adopters registration resulting in incorrect counts ([#4616](https://github.com/opencast/opencast/pull/4616))
 
 See [changelog](changelog.md) for a comprehensive list of changes.
 
