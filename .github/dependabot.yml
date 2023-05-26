@@ -16,11 +16,6 @@ updates:
     interval: monthly
   open-pull-requests-limit: 10
 - package-ecosystem: npm
-  directory: "/modules/runtime-info-ui-ng"
-  schedule:
-    interval: monthly
-  open-pull-requests-limit: 10
-- package-ecosystem: npm
   directory: "/modules/runtime-info-ui"
   schedule:
     interval: monthly
@@ -34,7 +29,6 @@ updates:
   directory: "/modules/engage-paella-player-7"
   schedule:
     interval: monthly
-  target-branch: "r/13.x"
   open-pull-requests-limit: 10
 - package-ecosystem: npm
   directory: "/modules/admin-ui-frontend"

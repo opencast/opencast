@@ -11,6 +11,7 @@ Documentation for modules included in Opencast.
 * [LTI Module](ltimodule.md)
 * [Media Module](mediamodule.configuration.md)
 * [Metrics (OpenMetrics, Prometheus)](metrics.md)
+* [New Admin UI](admin-ui.md)
 * [Search Indexes](searchindex/index.md)
     * [Solr](searchindex/solr.md)
 * [Stream Security](stream-security.md)

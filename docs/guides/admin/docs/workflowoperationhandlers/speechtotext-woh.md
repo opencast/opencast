@@ -14,15 +14,15 @@ engines available, [Whisper](../modules/transcription.modules/whisper.md) and
 Parameter Table
 ---------------
 
-| configuration keys | required | description                                                                                                                                        |
-|--------------------|----------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| source-flavor      | yes      | The source media package to use.                                                                                                                   |
-| target-flavor      | yes      | Flavor of the produced subtitle file.                                                                                                              |
-| target-element     | no       | Define where to append the subtitles file. Possibilities are: as a 'track' or as an 'attachment'. The default is "track".                          |
-| language-code      | no       | The language of the video or audio source (default is "eng"). Vosk only: It has to match the name of the language model directory. See 'vosk-cli'. |
-| language-fallback  | yes*     | The fallback value if the dublin core/media package language field is not present.                                                                 |
-| target-tags        | no       | Tags for the subtitle file.**                                                                                                                      |
-| translate          | no       | Transcription is translated into English (Whisper Only)                                                                                            |
+| configuration keys | required | Example           | description                                                                                                                                        |
+|--------------------|----------|-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| source-flavor      | yes      | source/presenter  | The source media package to use                                                                                                                    |
+| target-flavor      | yes      | archive           | Flavor of the produced subtitle file.                                                                                                              |
+| target-element     | no       | track             | Define where to append the subtitles file. Possibilities are: as a 'track' or as an 'attachment'. The default is "track".                          |
+| language-code      | no       | de                | The language of the video or audio source (default is "eng"). Vosk only: It has to match the name of the language model directory. See 'vosk-cli'. |
+| language-fallback  | yes*     | en                | The fallback value if the dublin core/media package language field is not present.                                                                 |
+| target-tags        | no       | delivery/captions | Tags for the subtitle file** (Whisper only: If no `language-code`,the tag `lang:{code}` will be auto generated)                                    |
+| translate          | no       | true              | Transcription is translated into English, valid values `true` or `false` (Whisper Only)                                                            |
 
 
 *Vosk Only, default value can be modified on Vosk config file.
@@ -63,3 +63,10 @@ Operation Examples
     </configurations>
 </operation>
 ```
+
+Language code
+-------------------------
+
+The accepted language code are the two letter codes defined in ISO 639-1. A reference list can be found here:
+
+[List of ISO 639-1 codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)

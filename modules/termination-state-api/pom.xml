@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>14-SNAPSHOT</version>
+    <version>15-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -31,11 +31,17 @@
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
+      <artifactId>osgi.core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>osgi.cmpn</artifactId>
+      <artifactId>org.osgi.service.component</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.cm</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -60,8 +66,9 @@
         <extensions>true</extensions>
         <configuration>
           <ignoredUnusedDeclaredDependencies>
-            <ignoredUnusedDeclaredDependency>org.osgi:org.osgi.core</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.osgi:osgi.cmpn</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.osgi:osgi.core</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.osgi:org.osgi.service.component</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.osgi:org.osgi.service.cm</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>

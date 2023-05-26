@@ -28,7 +28,8 @@ export default class CookieConsentButtonPlugin extends ButtonPlugin {
     if (!(await super.isEnabled())) {
       return false;
     }
-    if (!window.cookieconsent) {
+
+    if (!this?.player?.config?.opencast?.cookieConsent?.enable) {
       this.player.log.warn('"Cookie Consent by TermsFeed" library not loaded. \
       You need to load in your web to use this plugin.');
       return false;

@@ -6,6 +6,7 @@
   <tags />
   <description/>
   <configuration_panel />
+  <configuration_panel_json/>
   <displayOrder>10</displayOrder>
 
   <operations>

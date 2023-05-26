@@ -34,6 +34,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.apache.commons.io.FilenameUtils;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -131,9 +132,10 @@ public class ResumableWorkflowOperationHandlerBase extends AbstractWorkflowOpera
     String path = FilenameUtils.getPathNoEndSeparator(resourcePath);
     String welcomeFile = FilenameUtils.getName(resourcePath);
     staticResource = new StaticResource(getClass().getClassLoader(), path, alias, welcomeFile);
-    Dictionary<String, String> props = new Hashtable<String, String>();
-    props.put("httpContext.id", RestConstants.HTTP_CONTEXT_ID);
-    props.put("alias", alias);
+    Dictionary<String, String> props = new Hashtable<>();
+    props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT, "(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=" + RestConstants.HTTP_CONTEXT_ID + ")");
+    props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, alias);
+    props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, alias + "/*");
     staticResourceRegistration = componentContext.getBundleContext().registerService(Servlet.class.getName(),
             staticResource, props);
     return staticResource.getDefaultUrl();

@@ -32,10 +32,13 @@ import static org.junit.Assert.fail;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.api.EncodingProfile.MediaType;
 
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
 import java.io.File;
 import java.net.URL;
@@ -74,10 +77,16 @@ public class EncodingProfileTest {
    */
   @Test
   public void testInstall() throws Exception {
+    ServiceRegistration service = EasyMock.createNiceMock(ServiceRegistration.class);
+    BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+    EasyMock.expect(bc.registerService(EasyMock.anyString(), EasyMock.anyObject(), EasyMock.anyObject())).andReturn(service).anyTimes();
+    EasyMock.replay(service, bc);
+
     URL url = EncodingProfileTest.class.getResource("/encodingtestprofiles.properties");
     File file = new File(url.toURI());
 
     EncodingProfileScanner mgr = new EncodingProfileScanner();
+    mgr.activate(bc);
     mgr.install(file);
     int profileCount = mgr.getProfiles().size();
     assertTrue(profileCount > 0);

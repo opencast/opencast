@@ -31,7 +31,7 @@
       "REGISTRATION": "Out of date"
    },
    "LTI": {
-      "ERROR_LOADING_METADATA": "Erro ó cargar os metadatos do evento. Por favor, inténteo de novo máis tarde.",
+      "ERROR_LOADING_METADATA": "Error loading event metadata. Por favor, inténteo de novo máis tarde.",
       "SERIES_TITLE": "Ver Serie",
       "UPLOAD_TITLE": "Importar evento",
       "LOADING": "Cargando…",
@@ -63,7 +63,7 @@
       "GENERIC_ERROR": "Erro: {{message}}",
       "DELETION_SUCCESS": "Evento borrado correctamente",
       "DELETION_SUCCESS_DESCRIPTION": "O evento eliminarase da lista en breve...",
-      "EVENT_LOCKED": "O evento está a ser procesado. Por favor, espere para facer máis cambios…",
+      "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
       "DELETION_FAILURE": "Fallo ao borrar o evento",
       "DELETION_FAILURE_DESCRIPTION": "Por favor, inténteo de novo máis tarde…",
       "RESULT_HEADING": "Resultados {{{range.begin}}}-{{{range.end}}} de {{{total}}}",
@@ -104,7 +104,7 @@
          "SUBHEADING": "Seleccione os datos que se amosarán por defecto na vista da táboa {{ tableName }}",
          "AVAILABLE_COLUMNS": "Columnas dispoñibles",
          "SELECTED_COLUMNS": "Columnas seleccionadas",
-         "FOOTER_TEXT": "A orde e a selección gardaranse automaticamente. Pulse \"{{resetTranslation}}\" para restaurar a vista por defecto."
+         "FOOTER_TEXT": "The order and selection will be saved automatically. Press \"{{resetTranslation}}\" to restore the default view."
       }
    },
    "CONFIRMATIONS": {
@@ -130,7 +130,7 @@
          }
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "Estas series non conteñen eventos. Eliminar as series non eliminará os eventos.",
+         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
          "EVENT_WILL_BE_GONE": "De continuar, o evento eliminarase de xeito permanente.",
          "UNSAVED_CHANGES": "You have unsaved changes. If you continue, those changes will be discarded. Are you sure that you want to continue?"
       },
@@ -178,7 +178,7 @@
       "GROUP_NOT_SAVED": "Non se puido gardar o grupo",
       "GROUP_DELETED": "Grupo borrado",
       "GROUP_NOT_DELETED": "Non se puido borrar o grupo",
-      "ACCESS_DENIED": "Acceso denegado. Non está autorizado a ver esta páxina",
+      "ACCESS_DENIED": "Access denied. You're not allowed to view this page",
       "SERIES_ADDED": "Serie creada",
       "SERIES_NOT_SAVED": "Non se puido gardar a serie",
       "EVENTS_CREATED": "Evento creado",
@@ -212,8 +212,8 @@
       "LOCATION_DELETED": "Ubicación borrada",
       "LOCATION_NOT_DELETED": "Non se puido borrar a ubicación",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Non se puido borrar a ubicación porque non se dispón do permiso para facelo.",
-      "CONFLICT_DETECTED": "Conflito de programación: o novo evento coincide con outro existente. Por favor, cambie a sala, as datas ou as horas.",
-      "CONFLICT_BULK_DETECTED": "Conflito de programación: o cambio dos eventos xera conflitos. Por favor mude a localización, datas ou horarios.",
+      "CONFLICT_DETECTED": "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
+      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "Erro de programación: O evento xa rematou.",
       "CONFLICT_END_BEFORE_START": "Erro de programación: O final ten que ser máis tarde que o comezo.",
       "CONFLICT_IN_THE_PAST": "Non se puido actualizar a programación: non se pode programar un evento no pasado.",
@@ -247,8 +247,8 @@
       "THUMBNAIL_CHANGE_FAILED": "Non se puido cambiar a miniatura.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Non se seleccionaron pistas de vídeo para procesar",
       "VIDEO_TOO_MANY_AUDIOS": "Non se pode ter máis dunha pista de audio por cada pista de vídeo",
-      "SERVER_UNRESPONSIVE": "Ui! Parece que o servidor non responde. Por favor, inténteo de novo máis tarde.",
-      "SERVICE_UNAVAILABLE": "Ui! Parece que o servidor non responde. Por favor, inténteo de novo máis tarde.",
+      "SERVER_UNRESPONSIVE": "Oops! The server seems to be unresponsive. Por favor, inténteo de novo máis tarde.",
+      "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Por favor, inténteo de novo máis tarde.",
       "ACTIVE_TRANSACTION": "No se pode modificar este evento mentres exista un fluxo de traballo ou unha transacción activos.",
       "BULK_METADATA_UPDATE": {
          "UNEXPECTED_ERROR": "An unexpected error occurred while updating. Some events might have been updated.",
@@ -282,19 +282,19 @@
          "EVENTS": {
             "CAPTION": "Borrar",
             "DELETE_EVENTS": "Borrar Eventos",
-            "UNAUTHORIZED": "Non está autorizado a borrar os eventos seleccionados. Por favor, desmárqueos para continuar."
+            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Ó borrar un evento, borraranse tamén todos os seus metadatos e os arquivos de audio e vídeo e serán irrecuperables.",
       "DELETE_EVENTS_WARNING_LINE2": "",
-      "DELETE_SERIES_WARNING_LINE1": "Ó borrar unha serie, todos os seus metadatos serán irrecuperables. Os eventos da serie non se borrarán.",
+      "DELETE_SERIES_WARNING_LINE1": "Once deleted, all series metadata will be unrecoverable. Events in the series will not be deleted.",
       "DELETE_SERIES_WARNING_LINE2": "",
       "SCHEDULE_TASK": {
          "CAPTION": "Iniciar Tarefa",
          "GENERAL": {
             "CAPTION": "Xeral",
             "SUMMARY": "({{ count }} eventos seleccionados)",
-            "CANNOTSTART": "O(s) evento(s) destacado(s) non se poden procesar neste momento. Desmárqueo(s) ou volva intentalo máis tarde."
+            "CANNOTSTART": "Highlighted event(s) cannot be processed at the moment. Deselect it/them or try again later."
          },
          "TASKS": {
             "CAPTION": "Tarefas",
@@ -317,7 +317,7 @@
             "NOCHANGES": "¡Non se detectaron cambios nos eventos!",
             "CONFLICT_FIRST_EVENT": "Evento modificado",
             "CONFLICT_SECOND_EVENT": "Evento en conflicto",
-            "CANNOTEDITSCHEDULE": "Non ten permiso para modificar a programación dos eventos indicados. Pode continuar, pero non poderá modificar a programación de ningún evento."
+            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
          },
          "METADATA": {
             "EDIT": "Modificar Metadatos"
@@ -333,7 +333,7 @@
             "CAPTION": "Modificar",
             "EVENT": "evento",
             "EVENTS": "eventos",
-            "HEADER": "Esta páxina permite modificar eventos programados por días da semana. Os campos xa están cumprimentados se todos os eventos programados teñen o mesmo valor para ese campo específico. En caso contrario, os campos aparecen en branco. Deixar os campos en branco significa que os valores respectivos non deben cambiarse.",
+            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
             "METADATA": "Metadatos",
             "SCHEDULING": "{{ weekday }}{{ noEvents }}{{ eventOrEvents }}"
          }
@@ -352,7 +352,7 @@
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Modificar e/ou seleccionar os metadatos que se queiran actualizar. Non se poden seleccionar os campos que non cambien o valor dun ou máis eventos, ou os que conteñan valores non válidos (por exemplo, os campos obrigatorios non poden estar baleiros). Os campos resaltados conteñen distintos valores para os eventos seleccionados.",
+            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
             "TABLE": {
                "CAPTION": "Metadatos dos eventos seleccionados",
                "FIELDS": "Metadatos",
@@ -1160,7 +1160,7 @@
             "THEME": {
                "CAPTION": "Estilo",
                "DESCRIPTION": {
-                  "TEXT": "Opcionalmente pode usar estilos para marcar os seus vídeos. Os estilos poden definir cortinillas e avances de vídeo, marcas de auga e diapositivas de títulos, incluindo os metadatos."
+                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
                },
                "TITLE": "Estilo",
                "LABEL": "Por favor seleccione un estilo",
@@ -1688,7 +1688,7 @@
                "BOTTOM_RIGHT": "Esquina inferior dereita",
                "UPLOAD": "Subir",
                "POSITION": "Posición e vista previa da marca de auga",
-               "FILEUPLOAD_DESCRIPTION": "O arquivo debería ter unha canle alfa (fondo transparente). Os tipos de arquivo compatibles son: .PNG, .GIF, .SVG, .WEBP",
+               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: .PNG, .GIF, .SVG, .WEBP",
                "UPLOAD_LABEL": "Subir imaxe",
                "UPLOAD_BUTTON": "Subir"
             },
@@ -1777,7 +1777,7 @@
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "Advertencia: algúns dos seus cambios non foron gardados. Se abandona o editor de vídeo, estes cambios perderanse. De verdade queres continuar?",
+      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
       "TIMELINE": "Liña de tempo",
       "ZOOMLEVEL": "Nivel de zoom",
       "PREVIEW_MODE": "Modo de vista previa",
@@ -1825,7 +1825,7 @@
          "END": "Fin"
       },
       "THUMBNAIL": {
-         "DESCRIPTION": "Xenérase automaticamente unha miniatura por defecto, que se emprega para representar visualmente o evento. Se se desexa usar unha miniatura diferente, pode extraerse unha do vídeo na posición actual ou subir unha imaxe.",
+         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
@@ -1852,7 +1852,7 @@
          },
          "PREVIEW": {
             "NOT_AVAILABLE": "Non hai vista previa dispoñible",
-            "OUTDATED": "A vista previa está obsoleta porque cambiaron os segmentos. Actualizarase unha vez que se garden os cambios."
+            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
          },
          "CURRENT": {
             "DEFAULT": "Estase a usar a miniatura por defecto.",
@@ -1861,7 +1861,7 @@
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "Pódense desmarcar pistas para que non sigan sendo procesadas. Teña en conta que é necesario (re-)publicar o evento para que os cambios se apliquen.",
+         "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
          "NOTIFICATION": {
             "NO_VIDEO_TRACK_SELECTED": "Debe seleccionarse polo menos unha pista de vídeo",
             "NO_AUDIO_TRACK_SELECTED": "Debe seleccionarse polo menos unha pista de audio"
@@ -1875,8 +1875,8 @@
             "NO_PREVIEW_AVAILABLE": "Non se atopou unha imaxe de vista previa",
             "NO_TRACK_SELECTED": "Non se seleccionou unha pista de vídeo",
             "TOOLTIPS": {
-               "HIDE": "Esta pista de vídeo está activada. Facer clic para desactivar",
-               "UNHIDE": "Esta pista de vídeo está desactivada. Facer clic para activar."
+               "HIDE": "This video track is currently enabled. Click to disable",
+               "UNHIDE": "This video track is currently disabled. Click to enable."
             }
          },
          "AUDIO": {
@@ -1885,8 +1885,8 @@
             "NO_PREVIEW_AVAILABLE": "Non se atopou unha imaxe de vista previa",
             "NO_TRACK_SELECTED": "Non se seleccionou unha pista de audio",
             "TOOLTIPS": {
-               "HIDE": "Esta pista de audio está activada. Facer clic para desactivar",
-               "UNHIDE": "Esta pista de audio está desactivada. Facer clic para activar"
+               "HIDE": "This audio track is currently enabled. Click to disable",
+               "UNHIDE": "This audio track is currently disabled. Click to enable"
             }
          }
       },
@@ -2165,7 +2165,7 @@
    "HOTKEYS": {
       "CHEAT_SHEET": {
          "TITLE": "Atallos de teclado",
-         "HINT": "Esta páxina contén a lista dos atallos de teclado dispoñibles actualmente. Teña en conta que estes poden cambiar dependendo da páxina que se estea a visitar."
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
       },
       "KEYS": {
          "CTRL": "Ctrl",
@@ -2254,7 +2254,7 @@
       }
    },
    "STATISTICS": {
-      "NOT_AVAILABLE": "Neste momento non se poden amosar as estatísticas. Por favor, inténteo de novo máis tarde.",
+      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Por favor, inténteo de novo máis tarde.",
       "UNSUPPORTED_TYPE": "Sentímolo. Opencast non pode representar este tipo de datos estatísticos.",
       "FROM": "Dende",
       "TO": "Ata",
@@ -2270,7 +2270,7 @@
          "PUBLISHEDHOURS": "Horas de Vídeo Publicadas"
       },
       "DESCRIPTION": {
-         "RANDOM": "Esta gráfica amosa datos aleatorios como exemplo. Para que deixe de mostrarse, elimine da carpeta etc/providers o ficheiro JSON coa definición correspondente a este provedor",
+         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
          "VIEWS_SUM": "Aquí amósase o número total de visualizacións por unidade de tempo.",
          "VIEWS_AVG": "Aquí amósase o número total de visualizacións diarias por unidade de tempo.",
          "PUBLISHEDHOURS": "This displays the published hours of video"

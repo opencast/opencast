@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
-  <version>14-SNAPSHOT</version>
+  <version>15-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>opencast</name>
   <description>Opencast is a media capture, processing, management and distribution system</description>
@@ -25,7 +25,7 @@
     <commons-io.version>2.8.0</commons-io.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
     <commons-text.version>1.10.0</commons-text.version>
-    <cxf.version>3.4.6</cxf.version>
+    <cxf.version>3.5.5</cxf.version>
     <eclipselink.version>2.7.8</eclipselink.version>
     <failureaccess.version>1.0.1</failureaccess.version>
     <freemarker.version>2.3.31</freemarker.version>
@@ -34,7 +34,7 @@
     <guava.version>30.1.1-jre</guava.version>
     <httpcomponents-httpclient.version>4.5.13</httpcomponents-httpclient.version>
     <httpcomponents-httpcore.version>4.4.16</httpcomponents-httpcore.version>
-    <jackson.version>2.14.2</jackson.version>
+    <jackson.version>2.15.0</jackson.version>
     <jakarta.mail.version>1.6.7</jakarta.mail.version>
     <java.release>11</java.release>
     <javadoc-plugin.version>3.3.1</javadoc-plugin.version>
@@ -42,18 +42,27 @@
     <jettison.version>1.5.4</jettison.version>
     <joda-time.version>2.12.5</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
-    <karaf.version>4.2.16</karaf.version>
+    <karaf.version>4.4.3</karaf.version>
     <node.version>v16.13.0</node.version>
-    <osgi.compendium.version>6.0.0</osgi.compendium.version>
-    <osgi.core.version>6.0.0</osgi.core.version>
+    <osgi.core.version>8.0.0</osgi.core.version>
+    <osgi.annotation.version>8.1.0</osgi.annotation.version>
+    <org.osgi.service.component.version>1.5.0</org.osgi.service.component.version>
+    <org.osgi.service.component.annotations.version>1.5.0</org.osgi.service.component.annotations.version>
+    <org.osgi.service.cm.version>1.6.0</org.osgi.service.cm.version>
+    <org.osgi.service.log.version>1.5.0</org.osgi.service.log.version>
+    <org.osgi.service.http.version>1.2.1</org.osgi.service.http.version>
+    <org.osgi.service.http.whiteboard.version>1.1.1</org.osgi.service.http.whiteboard.version>
+    <org.osgi.service.jaxrs.version>1.0.1</org.osgi.service.jaxrs.version>
+    <pax.web.version>8.0.15</pax.web.version>
     <querydsl.version>3.7.4</querydsl.version>
     <rest-assured.version>4.4.0</rest-assured.version>
     <spring.version>3.1.4.RELEASE</spring.version>
     <spring-security.version>3.1.7.RELEASE</spring-security.version>
   </properties>
   <modules>
-    <module>modules/admin-ui-frontend</module>
     <module>modules/admin-ui</module>
+    <module>modules/admin-ui-frontend</module>
+    <module>modules/admin-ui-interface</module>
     <module>modules/adopter-registration-api</module>
     <module>modules/adopter-registration-impl</module>
     <module>modules/analyze-mediapackage-workflowoperation</module>
@@ -174,7 +183,6 @@
     <module>modules/redirect</module>
     <module>modules/rename-files-workflowoperation</module>
     <module>modules/rest-test-environment</module>
-    <module>modules/runtime-info-ui-ng</module>
     <module>modules/runtime-info-ui</module>
     <module>modules/runtime-info</module>
     <module>modules/scheduler-api</module>
@@ -508,7 +516,7 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-scr-plugin</artifactId>
-          <version>1.26.2</version>
+          <version>1.26.4</version>
           <executions>
             <execution>
               <id>generate-scr-scrdescriptor</id>
@@ -612,7 +620,7 @@
         <plugin>
           <groupId>com.googlecode.maven-download-plugin</groupId>
           <artifactId>download-maven-plugin</artifactId>
-          <version>1.6.6</version>
+          <version>1.6.8</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -672,7 +680,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
-          <version>1.6.0</version>
+          <version>3.1.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -862,15 +870,55 @@
       <!-- OSGi -->
       <dependency>
         <groupId>org.osgi</groupId>
-        <artifactId>org.osgi.core</artifactId>
+        <artifactId>osgi.core</artifactId>
         <version>${osgi.core.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.osgi</groupId>
-        <artifactId>osgi.cmpn</artifactId>
-        <version>${osgi.compendium.version}</version>
+        <artifactId>org.osgi.service.cm</artifactId>
+        <version>${org.osgi.service.cm.version}</version>
         <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.log</artifactId>
+        <version>${org.osgi.service.log.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.component</artifactId>
+        <version>${org.osgi.service.component.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.http</artifactId>
+        <version>${org.osgi.service.http.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.http.whiteboard</artifactId>
+        <version>${org.osgi.service.http.whiteboard.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.component.annotations</artifactId>
+        <version>${org.osgi.service.component.annotations.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.jaxrs</artifactId>
+        <version>${org.osgi.service.jaxrs.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>osgi.annotation</artifactId>
+        <version>${osgi.annotation.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.felix</groupId>
@@ -1066,7 +1114,7 @@
       <dependency>
         <groupId>org.owasp.esapi</groupId>
         <artifactId>esapi</artifactId>
-        <version>2.3.0.0</version>
+        <version>2.5.2.0</version>
       </dependency>
       <dependency>
         <groupId>org.opensaml</groupId>
@@ -1125,12 +1173,12 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.33</version>
+        <version>1.7.36</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
-        <version>1.7.33</version>
+        <version>1.7.36</version>
       </dependency>
       <!-- apache commons syncing -->
       <dependency>
@@ -1337,6 +1385,17 @@
             <artifactId>stax-api</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.ops4j.pax.web</groupId>
+        <artifactId>pax-web-api</artifactId>
+        <version>${pax.web.version}</version>
+        <scope>compile</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.ops4j.pax.web</groupId>
+        <artifactId>pax-web-extender-whiteboard</artifactId>
+        <version>${pax.web.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -1840,7 +1899,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>3.4.2</version>
+        <version>3.4.3</version>
         <configuration>
           <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
         </configuration>

@@ -1,10 +1,6 @@
 Stand-Alone Video Editor
 ========================
 
-<div class=warn>
-The editor is still <b>beta</b>.
-</div>
-
 Opencast's stand-alone video editor provides a tool for users to cut videos without full access to the admin interface.
 It strives to be simple and easy to use while providing enough features for most common use-cases.
 

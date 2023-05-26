@@ -135,6 +135,9 @@ public class WhisperEngine implements SpeechToTextEngine {
     logger.info("Executing Whisper's transcription command: {}", command);
 
     Process process = null;
+
+    String mediaFileNameWithoutExtension;
+
     try {
       ProcessBuilder processBuilder = new ProcessBuilder(command);
       processBuilder.redirectErrorStream(true);
@@ -156,10 +159,9 @@ public class WhisperEngine implements SpeechToTextEngine {
 
       // Renaming output whisper filename to the expected output filename
       String mediaFileName = mediaFile.getName();
-      String mediaFileNameWithoutExtension = mediaFileName.lastIndexOf('.') != -1
+      mediaFileNameWithoutExtension = mediaFileName.lastIndexOf('.') != -1
           ? mediaFileName.substring(0, mediaFileName.lastIndexOf('.')) : mediaFileName;
-      File whisperVTT = new File((preparedOutputFile.getParent() + "/" + mediaFileNameWithoutExtension + ".vtt"));
-      whisperVTT.renameTo(preparedOutputFile);
+      preparedOutputFile = new File((preparedOutputFile.getParent() + "/" + mediaFileNameWithoutExtension + ".vtt"));
 
       if (!preparedOutputFile.isFile()) {
         throw new SpeechToTextEngineException("Whisper produced no output");
@@ -176,7 +178,8 @@ public class WhisperEngine implements SpeechToTextEngine {
     if (language.isBlank()) {
       JSONParser jsonParser = new JSONParser();
       try {
-        FileReader reader = new FileReader((preparedOutputFile.getParent() + "/" + mediaFile.getName() + ".json"));
+        FileReader reader = new FileReader((preparedOutputFile.getParent() + "/"
+            + mediaFileNameWithoutExtension + ".json"));
         Object obj = jsonParser.parse(reader);
         JSONObject jsonObject = (JSONObject) obj;
         language = (String) jsonObject.get("language");

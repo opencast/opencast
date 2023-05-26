@@ -31,7 +31,7 @@
       "REGISTRATION": "Out of date"
    },
    "LTI": {
-      "ERROR_LOADING_METADATA": "Sohbet yüklenirken hata oluştu. Lütfen daha sonra tekrar deneyin.",
+      "ERROR_LOADING_METADATA": "Error loading event metadata. Lütfen daha sonra tekrar deneyin.",
       "SERIES_TITLE": "Seriyi Göster",
       "UPLOAD_TITLE": "Etkinlik yükle",
       "LOADING": "Yükleniyor…",
@@ -63,7 +63,7 @@
       "GENERIC_ERROR": "Hata iletisi:",
       "DELETION_SUCCESS": "Başarı ile silindi",
       "DELETION_SUCCESS_DESCRIPTION": "Etkinlik birkaç dakika içinde listeden kaldırılacak…",
-      "EVENT_LOCKED": "Bu dosya şu anda kullanılıyor. Lütfen değişiklik yapmadan bekleyin.",
+      "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
       "DELETION_FAILURE": "Etkinlik silme işlemi başarısız oldu",
       "DELETION_FAILURE_DESCRIPTION": "Lütfen daha sonra tekrar deneyin.",
       "RESULT_HEADING": "Results {{{range.begin}}}-{{{range.end}}} of {{{total}}}",
@@ -104,7 +104,7 @@
          "SUBHEADING": "{{ tableName }} görüntülemede göstermek istediğiniz varsayılan veriyi seçiniz",
          "AVAILABLE_COLUMNS": "Kullanılabilir Sütunlar",
          "SELECTED_COLUMNS": "Seçili sütunlar",
-         "FOOTER_TEXT": "Sıralama ve seçim otomatik olarak kaydedilecek. Varsayılan görünümü yüklemek için \"{{resetTranslation}}\" düğmesine tıklayın."
+         "FOOTER_TEXT": "The order and selection will be saved automatically. Press \"{{resetTranslation}}\" to restore the default view."
       }
    },
    "CONFIRMATIONS": {
@@ -130,7 +130,7 @@
          }
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "Bu seri etkinlikler içeriyor. Serinin silinmesi, etkinlikleri silmez.",
+         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
          "EVENT_WILL_BE_GONE": "Devam ederseniz, bu etkinlik geri alınamaz bir şekilde gider.",
          "UNSAVED_CHANGES": "You have unsaved changes. If you continue, those changes will be discarded. Are you sure that you want to continue?"
       },
@@ -178,7 +178,7 @@
       "GROUP_NOT_SAVED": "Grup kaydedilemedi",
       "GROUP_DELETED": "Grup silindi",
       "GROUP_NOT_DELETED": "Grup silinemedi",
-      "ACCESS_DENIED": "Erişim engellendi. Bu sayfayı görme yetkiniz bulunmamakta",
+      "ACCESS_DENIED": "Access denied. You're not allowed to view this page",
       "SERIES_ADDED": "Dizi oluşturuldu",
       "SERIES_NOT_SAVED": "Dizi kaydedilemedi",
       "EVENTS_CREATED": "Etkinlik oluşturuldu",
@@ -212,8 +212,8 @@
       "LOCATION_DELETED": "Konum silindi",
       "LOCATION_NOT_DELETED": "Konum silinemedi",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Lokasyon silinemedi çünkü bunu yapma izniniz yok.",
-      "CONFLICT_DETECTED": "Zamanlama sorunu: yeni etkinlik eski etkinlikle çakışmakta. Lütfen konumu, tarihi ve zamanı değiştirin.",
-      "CONFLICT_BULK_DETECTED": "Zamanlamada Çatışma: etkinliklerin değiştirilmesi çatışmalara neden olur. Lütfen yer, tarih veya saatleri değiştirin.",
+      "CONFLICT_DETECTED": "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
+      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "Zamanlama hatası: Etkinlik zaten bitmiş durumda.",
       "CONFLICT_END_BEFORE_START": "Zamanlama hatası: Bitiş zamanlaması başlangıçtan daha sonra olmalı.",
       "CONFLICT_IN_THE_PAST": "Zamanlama planı güncelleştirilemedi: Bir etkinliği geçmişe planlayamazsınız.",
@@ -247,11 +247,11 @@
       "THUMBNAIL_CHANGE_FAILED": "Küçük resim değiştirilemedi.",
       "VIDEO_SOURCE_TRACKS_INVALID": "İşlenecek video kaydı seçmediniz",
       "VIDEO_TOO_MANY_AUDIOS": "Tek bir video akışında birden fazla ses akışına sahip olamazsınız",
-      "SERVER_UNRESPONSIVE": "Hop! Sunucu yanıt vermiyor. Lütfen daha sonra tekrar deneyin.",
-      "SERVICE_UNAVAILABLE": "Hop! Sunucu yanıt vermiyor. Lütfen daha sonra tekrar deneyin.",
+      "SERVER_UNRESPONSIVE": "Oops! The server seems to be unresponsive. Lütfen daha sonra tekrar deneyin.",
+      "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Lütfen daha sonra tekrar deneyin.",
       "ACTIVE_TRANSACTION": "Bu etkinlik iş akışında aktif bir işem olduğu sürece düzenlenemez.",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "Güncelleme sırasında beklenmeyen bir hata oluştu. Bazı videolar güncellenmiş olabilir. ",
+         "UNEXPECTED_ERROR": "An unexpected error occurred while updating. Some events might have been updated.",
          "ALL_EVENTS_UPDATED": "Tüm etkinlikler başarıyla güncellendi.",
          "NO_EVENTS_UPDATED": "Tüm güncellemeler başarısız oldu.",
          "SOME_EVENTS_NOT_UPDATED": "Bazı etkinlikler güncellenemedi."
@@ -282,19 +282,19 @@
          "EVENTS": {
             "CAPTION": "Sil",
             "DELETE_EVENTS": "Olayları Sil",
-            "UNAUTHORIZED": "Vurgulanan etkinlikleri silme yetkiniz yok. Lütfen devam etmek için bu seçimleri kaldırın."
+            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Silindikten sonra, tüm etkinlik metaverisi, ses ve video dosyaları silinecek ve kurarılamaz olacaklar.",
       "DELETE_EVENTS_WARNING_LINE2": "",
-      "DELETE_SERIES_WARNING_LINE1": "Silindikten sonra, tüm metaveri serileri kurtarılamaz olacak. Serilerdeki etkinlikler silinmeyecek.",
+      "DELETE_SERIES_WARNING_LINE1": "Once deleted, all series metadata will be unrecoverable. Events in the series will not be deleted.",
       "DELETE_SERIES_WARNING_LINE2": "",
       "SCHEDULE_TASK": {
          "CAPTION": "Başlangıç Görevi",
          "GENERAL": {
             "CAPTION": "Genel",
             "SUMMARY": "({{ count }} etkinlik seçildi)",
-            "CANNOTSTART": "Altı çizlen etkinlik(ler) şu anda işlenemiyor. Seçimi kaldırın veya tekrar deneyin."
+            "CANNOTSTART": "Highlighted event(s) cannot be processed at the moment. Deselect it/them or try again later."
          },
          "TASKS": {
             "CAPTION": "Görevler",
@@ -317,7 +317,7 @@
             "NOCHANGES": "Saptanan olaylarda değişiklik bulunmadı!",
             "CONFLICT_FIRST_EVENT": "Değiştirilen etkinlik",
             "CONFLICT_SECOND_EVENT": "Çatışmada bulunan etkenlik",
-            "CANNOTEDITSCHEDULE": "Vurgulanan etkinlikler için zamanlama bilgilerini düzenleme izniniz yoktur. Devam edebilirsiniz, ancak hiçbir etkinliğin zamanlama bilgilerini düzenleyemezsiniz."
+            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
          },
          "METADATA": {
             "EDIT": "Meta verileri düzenle"
@@ -333,7 +333,7 @@
             "CAPTION": "Düzenle",
             "EVENT": "etkinlik",
             "EVENTS": "etkinlikler",
-            "HEADER": "Bu sayfa, hafta içi gruplara göre düzenlenmiş etkinlikleri düzenlemenizi sağlar. Tüm zamanlanmış olayların belirli bir alan için aynı değere sahip olması durumunda giriş alanları önceden doldurulur. Aksi takdirde, giriş alanları boş bırakılır. Giriş alanlarını boş bırakmak, ilgili değerlerin değiştirilmemesi gerektiği anlamına gelir.",
+            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
             "METADATA": "Üstveri",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -459,7 +459,7 @@
             "LAST_NAME": "Last name",
             "STREET": "Street",
             "NUMBER": "Number",
-            "ADDITIONAL_ADDRESS_INFO": "Adres bilgilerini ekleyin",
+            "ADDITIONAL_ADDRESS_INFO": "Add. address information",
             "MAIL": "Email",
             "CONTACT_ME": "Güncellemeler ve güvenlik güncellemeleri için bana ulaşın ",
             "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
@@ -1160,7 +1160,7 @@
             "THEME": {
                "CAPTION": "Şablon",
                "DESCRIPTION": {
-                  "TEXT": "Videolarınızı markalamak için temaları isteğe bağlı olarak kullanabilirsiniz. Temalar, tampon ve fragman videolarını, filigranları ve meta verileri içeren başlık slaytlarını tanımlayabilir."
+                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
                },
                "TITLE": "Şablon",
                "LABEL": "Şablon yok",
@@ -1688,7 +1688,7 @@
                "BOTTOM_RIGHT": "Sağ alt",
                "UPLOAD": "Karşıya Yükle",
                "POSITION": "Filigran pozisyonu ve önizleme",
-               "FILEUPLOAD_DESCRIPTION": "Dosya'nın bir alfa kanalı olmalı (şeffaf arkaplan). Kabul edilen dosya türleri: .PNG, .GIF, .SVG, .WEBP",
+               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: .PNG, .GIF, .SVG, .WEBP",
                "UPLOAD_LABEL": "Görüntü yükle",
                "UPLOAD_BUTTON": "Karşıya Yükle"
             },
@@ -1777,7 +1777,7 @@
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "Uyarı: Bazı değişiklikler kaydedilmedi. Video editörü bırakırsanız, bu değişiklikler kaybolur. Gerçekten devam etmek istiyor musunuz?",
+      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
       "TIMELINE": "Zaman tüneli",
       "ZOOMLEVEL": "Yakınlaştırma Düzeyi",
       "PREVIEW_MODE": "Önizleme modu",
@@ -1875,8 +1875,8 @@
             "NO_PREVIEW_AVAILABLE": "Önizleme görseli bulunamadı",
             "NO_TRACK_SELECTED": "Hiçbir video kaydı seçilmedi",
             "TOOLTIPS": {
-               "HIDE": "Bu video kaydı şu anda etkin. Devre dışı bırakmak için tıklayın",
-               "UNHIDE": "Bu video kaydı şu anda devre dışı. Etkinleştirmek için tıklayın."
+               "HIDE": "This video track is currently enabled. Click to disable",
+               "UNHIDE": "This video track is currently disabled. Click to enable."
             }
          },
          "AUDIO": {
@@ -1885,8 +1885,8 @@
             "NO_PREVIEW_AVAILABLE": "Önizleme görseli bulunamadı",
             "NO_TRACK_SELECTED": "Hiçbir ses kaydı seçilmedi",
             "TOOLTIPS": {
-               "HIDE": "Bu ses kaydı şu anda etkin. Devre dışı bırakmak için tıklayın",
-               "UNHIDE": "Bu ses kaydı şu anda devre dışı. Etkinleştirmek için tıklayın"
+               "HIDE": "This audio track is currently enabled. Click to disable",
+               "UNHIDE": "This audio track is currently disabled. Click to enable"
             }
          }
       },
@@ -2254,7 +2254,7 @@
       }
    },
    "STATISTICS": {
-      "NOT_AVAILABLE": "İstatistiklere şu anda erişilemiyor. Lütfen daha sonra tekrar deneyin.",
+      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Lütfen daha sonra tekrar deneyin.",
       "UNSUPPORTED_TYPE": "Üzgünüz, Opencast bu tür istatistiksel veriyi oluşturamıyor.",
       "FROM": "den",
       "TO": "Kime",
@@ -2270,7 +2270,7 @@
          "PUBLISHEDHOURS": "Published Hours of Video"
       },
       "DESCRIPTION": {
-         "RANDOM": "Bu rastgele veriler sadece deneme ve tanıtım amaçlıdır. Bu grafiğin istatistik sağlayıcısının json tanımını 'etc/providers' klasörün içinden silerek bu grafiği devre dışı bırakabilirsiniz.",
+         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
          "VIEWS_SUM": "Zaman birimi başına toplam görüntülenme sayısını görüntüler.",
          "VIEWS_AVG": "Zaman birimi başına ortalama günlük görüntü sayısını görüntüler.",
          "PUBLISHEDHOURS": "This displays the published hours of video"

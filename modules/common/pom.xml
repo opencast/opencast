@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>14-SNAPSHOT</version>
+    <version>15-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -74,11 +74,19 @@
     <!-- OSGi -->
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
+      <artifactId>osgi.core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>osgi.cmpn</artifactId>
+      <artifactId>org.osgi.service.component</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.component.annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.cm</artifactId>
     </dependency>
     <!-- Persistence -->
     <dependency>
@@ -185,6 +193,11 @@
       <artifactId>org.apache.servicemix.specs.jaxp-api-1.4</artifactId>
       <version>2.4.0</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.http.whiteboard</artifactId>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
   <build>

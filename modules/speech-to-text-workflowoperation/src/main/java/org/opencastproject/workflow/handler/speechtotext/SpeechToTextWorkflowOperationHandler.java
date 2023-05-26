@@ -289,13 +289,17 @@ public class
     if (stringTranslateMode.isEmpty()) {
       translateMode = false;
     } else {
-      try {
-        translateMode = Boolean.parseBoolean(stringTranslateMode);
-      } catch (NumberFormatException e) {
-        throw new WorkflowOperationException(String.format(
+      if ("true".equals(stringTranslateMode) || "1".equals(stringTranslateMode)
+          || "yes".equals(stringTranslateMode)) {
+        translateMode = true;
+      } else if ("false".equals(stringTranslateMode) || "0".equals(stringTranslateMode)
+              || "no".equals(stringTranslateMode)) {
+        translateMode = false;
+      } else {
+        throw new IllegalArgumentException(String.format(
             "Speech-to-Text job for media package '%s' failed, Because invalid \"translate\" value ('%s')."
                 + "Valid values types: \"true\", \"1\", \"yes\", \"false\", \"0\", or \"no\".", mediaPackage,
-                stringTranslateMode));
+            stringTranslateMode));
       }
     }
     return translateMode;
