@@ -66,8 +66,6 @@ public class MicrosoftAzureStartTranscriptionOperationHandler extends AbstractWo
   private static final Logger logger = LoggerFactory.getLogger(MicrosoftAzureStartTranscriptionOperationHandler.class);
 
   /** Workflow configuration option keys */
-  static final String SOURCE_FLAVOR = "source-flavor";
-  static final String SOURCE_TAG = "source-tag";
   static final String OPT_LANGUAGE_CODE = "language-code";
   static final String OPT_SKIP_IF_FLAVOR_EXISTS = "skip-if-flavor-exists";
   static final String OPT_AUTO_DETECT_LANGUAGE = "auto-detect-language";

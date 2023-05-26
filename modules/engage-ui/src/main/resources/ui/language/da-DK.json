@@ -30,7 +30,7 @@
   "username": "Brugernavn",
   "password": "Adgangskode",
   "remember_me": "Husk mig.",
-  "sthWentWrong": "Noget gik galt. Forsøg igen.",
+  "sthWentWrong": "Something went wrong. Please try again.",
   "loading": "Indlæser ...",
   "no_data": "Ingen data tilgængelig.",
   "login_success": "Logget ind.",

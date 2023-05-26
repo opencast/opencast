@@ -27,8 +27,6 @@ import org.opencastproject.adopter.statistic.dto.GeneralData;
 import org.opencastproject.adopter.statistic.dto.Host;
 import org.opencastproject.adopter.statistic.dto.StatisticData;
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -289,12 +287,6 @@ public class ScheduledDataCollector extends TimerTask {
     });
     statisticData.setJobCount(serviceRegistry.count(null, null));
 
-    AQueryBuilder q = assetManager.createQuery();
-    SecurityUtil.runAs(this.securityService, this.defaultOrganization, this.systemAdminUser, () -> {
-      AResult result = q.select(q.snapshot()).where(q.version().isLatest()).run();
-      statisticData.setEventCount(result.getSize());
-    });
-
     statisticData.setSeriesCount(seriesService.getSeriesCount());
     statisticData.setUserCount(userAndRoleProvider.countAllUsers());
 
@@ -312,6 +304,8 @@ public class ScheduledDataCollector extends TimerTask {
 
     for (Organization org : orgs) {
       SecurityUtil.runAs(securityService, org, systemAdminUser, () -> {
+        statisticData.setEventCount(statisticData.getEventCount() + assetManager.countEvents(org.getId()));
+
         //Calculate the number of attached CAs for this org, add it to the total
         long current = statisticData.getCACount();
         int orgCAs = caStateService.getKnownAgents().size();
@@ -333,7 +327,7 @@ public class ScheduledDataCollector extends TimerTask {
                                        .map(MediaPackage::getDuration)
                                        .mapToLong(Long::valueOf)
                                        .sum() / 1000L;
-          } while (false); //offset + SEARCH_ITERATION_SIZE <= total);
+          } while (offset + SEARCH_ITERATION_SIZE <= total);
         } catch (UnauthorizedException e) {
           //This should never happen, but...
           logger.warn("Unable to calculate total minutes, unauthorized");

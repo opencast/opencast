@@ -301,6 +301,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     wfD2.setDescription("Test description");
     wfD2.setDisplayOrder(100);
     wfD2.setConfigurationPanel("<h2>Test</h2>");
+    wfD2.setConfigurationPanelJson("[{ \"fieldset\": [ { \"type\": \"checkbox\", \"name\": \"straightToPublishing\", \"label\": \"Straight to publishing\", \"value\": true } ] }]");
 
     MediaPackage mp1 = loadMpFromResource("jobs_mediapackage1");
     // the id is set dynamic - lets force an id so we can get a consistent json respons

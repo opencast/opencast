@@ -66,9 +66,11 @@ The following table contains the workflow operations that are available in an ou
 | ingest-download                      | Download files from external URL for ingest                                               | [Documentation](ingestdownload-woh.md)                       |
 | inspect                              | Inspect the media (check if it is valid)                                                  | [Documentation](inspect-woh.md)                              |
 | log                                  | Log workflow status                                                                       | [Documentation](log-woh.md)                                  |
+| mattermost-notify                    | Send messages to Mattermost                                                               | [Documentation](mattermost-notify-woh.md)                    |
 | metadata-to-acl                      | Add read/write access based on metadata                                                   | [Documentation](metadata-to-acl.md)                          |
 | microsoft-azure-attach-transcription | Attaches automated transcripts to mediapackage                                            | [Documentation](microsoft-azure-attach-transcription-woh.md) |
 | microsoft-azure-start-transcription  | Starts automated transcription provided by Microsoft Azure                                | [Documentation](microsoft-azure-start-transcription-woh.md)  |
+| move-storage                         | Move files between asset manager storage systems                                          | [Documentation](move-storage-woh.md)                         |
 | multiencode                          | Encode to multiple profiles in one operation                                              | [Documentation](multiencode-woh.md)                          |
 | normalize-audio                      | Normalize first audio stream                                                              | [Documentation](normalizeaudio-woh.md)                       |
 | partial-import                       | Import partial tracks and process according to a SMIL document                            | [Documentation](partial-import-woh.md)                       |
@@ -94,6 +96,7 @@ The following table contains the workflow operations that are available in an ou
 | retract-oaipmh                       | Retracts media from a OAI-PMH repository                                                  | [Documentation](retract-oaipmh-woh.md)                       |
 | retract-partial                      | Retract a subset of the mediapackage from a publication                                   | [Documentation](retract-partial-woh.md)                      |
 | retract-youtube                      | Retracts media from YouTube                                                               | [Documentation](retract-youtube-woh.md)                      |
+| sanitize-adaptive                    | Fix references to media files in a playlist                                               | [Documentation](sanitize-adaptive-woh.md)                    |
 | segment-video                        | Extracting segments from presentation                                                     | [Documentation](segmentvideo-woh.md)                         |
 | segmentpreviews                      | Extract segment images from a video using FFmpeg                                          | [Documentation](segmentpreviews-woh.md)                      |
 | select-streams                       | Select streams for further processing                                                     | [Documentation](select-streams-woh.md)                       |
@@ -102,7 +105,7 @@ The following table contains the workflow operations that are available in an ou
 | series                               | Apply series to the mediapackage                                                          | [Documentation](series-woh.md)                               |
 | silence                              | Silence detection on audio of the mediapackage                                            | [Documentation](silence-woh.md)                              |
 | snapshot                             | Archive the current state of the mediapackage                                             | [Documentation](snapshot-woh.md)                             |
-| speech-to-text                       | Create subtitles for video and audio sources                                              | [Documentation](speech-to-text-woh.md)                       |
+| speechtotext                         | Create subtitles for video and audio sources                                              | [Documentation](speechtotext-woh.md)                       |
 | start-watson-transcription           | Starts automated transcription provided by IBM Watson                                     | [Documentation](start-watson-transcription-woh.md)           |
 | start-workflow                       | Start a new workflow for given media package ID                                           | [Documentation](start-workflow-woh.md)                       |
 | statistics-writer                    | Log statistical data about the video                                                      | [Documentation](statistics-writer.md)                        |
@@ -112,7 +115,9 @@ The following table contains the workflow operations that are available in an ou
 | theme                                | Make settings of themes available to processing                                           | [Documentation](theme-woh.md)                                |
 | timelinepreviews                     | Create a preview image stream from a given video track                                    | [Documentation](timelinepreviews-woh.md)                     |
 | transfer-metadata                    | Transfer metadata fields between catalogs                                                 | [Documentation](transfer-metadata-woh.md)                    |
+| video-grid                           | Put parallel video streams on a single video canvas                                       | [Documentation](video-grid-woh.md)                           |
 | waveform                             | Create a waveform image of the audio of the mediapackage                                  | [Documentation](waveform-woh.md)                             |
+| webvtt-to-cutmarks                   | Create cutting suggestions from subtitles                                                 | [Documentation](webvtt-to-cutmarks.md)                       |
 | zip                                  | Create zipped archive of the current state of the mediapackage                            | [Documentation](zip-woh.md)                                  |
 
 ## State Mappings

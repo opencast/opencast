@@ -2160,7 +2160,8 @@ public abstract class AbstractEventEndpoint {
     } catch (Exception e) {
       logger.error("Unable to parse access policy", e);
     }
-    Option<ManagedAcl> currentAcl = AccessInformationUtil.matchAcls(acls, activeAcl);
+    Option<ManagedAcl> currentAcl = AccessInformationUtil.matchAclsLenient(acls, activeAcl,
+            getAdminUIConfiguration().getMatchManagedAclRolePrefixes());
 
     JSONObject episodeAccessJson = new JSONObject();
     episodeAccessJson.put("current_acl", currentAcl.isSome() ? currentAcl.get().getId() : 0L);
@@ -2280,7 +2281,8 @@ public abstract class AbstractEventEndpoint {
                   f("title", v(nul(wflDef.getTitle()).getOr(""))),
                   f("description", v(nul(wflDef.getDescription()).getOr(""))),
                   f("displayOrder", v(wflDef.getDisplayOrder())),
-                  f("configuration_panel", v(nul(wflDef.getConfigurationPanel()).getOr("")))));
+                  f("configuration_panel", v(nul(wflDef.getConfigurationPanel()).getOr(""))),
+                  f("configuration_panel_json", v(nul(wflDef.getConfigurationPanelJson()).getOr("")))));
         }
       }
     } catch (WorkflowDatabaseException e) {

@@ -28,7 +28,7 @@
    "YES": "Sì",
    "COPY": "Copy to clipboard",
    "MONITOR": {
-      "REGISTRATION": "Opencast has sent a registration update in more than a week"
+      "REGISTRATION": "Out of date"
    },
    "LTI": {
       "ERROR_LOADING_METADATA": "Error loading event metadata. Please try again later.",
@@ -104,7 +104,7 @@
          "SUBHEADING": "Seleziona i dati predefiniti per la visualizzazione {{ tableName }}",
          "AVAILABLE_COLUMNS": "Colonne disponibili",
          "SELECTED_COLUMNS": "Colonne selezionate",
-         "FOOTER_TEXT": "L'ordinamento e la selezione verranno salvati automaticamente. Premere \"{{resetTranslation}}\" per ripristinare la visualizzazione predefinita."
+         "FOOTER_TEXT": "The order and selection will be saved automatically. Press \"{{resetTranslation}}\" to restore the default view."
       }
    },
    "CONFIRMATIONS": {
@@ -130,7 +130,7 @@
          }
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "Questa serie contiene eventi. L'eliminazione della serie non cancellerà gli eventi.",
+         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
          "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone.",
          "UNSAVED_CHANGES": "You have unsaved changes. If you continue, those changes will be discarded. Are you sure that you want to continue?"
       },
@@ -148,6 +148,17 @@
       "REST_DOC": "Documentazione REST API",
       "HOTKEY_CHEAT_SHEET": "Tasti Rapidi",
       "ADOPTER_REGISTRATION": "Adopter Registration"
+   },
+   "REBUILD": {
+      "TITLE": "Index Rebuild",
+      "WARNING": "Attention!",
+      "HEADER": "Index rebuild in progress!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "È stato creato il criterio di accesso",
@@ -167,7 +178,7 @@
       "GROUP_NOT_SAVED": "Il gruppo non può essere salvato",
       "GROUP_DELETED": "Il gruppo è stato cancellato",
       "GROUP_NOT_DELETED": "Il gruppo non può essere cancellato",
-      "ACCESS_DENIED": "Accesso negato. Non sei autorizzato a visualizzare questa pagina",
+      "ACCESS_DENIED": "Access denied. You're not allowed to view this page",
       "SERIES_ADDED": "La serie è stata creata",
       "SERIES_NOT_SAVED": "La serie non può essere salvata",
       "EVENTS_CREATED": "L'evento è stato creato",
@@ -201,8 +212,8 @@
       "LOCATION_DELETED": "La posizione è stata eliminata",
       "LOCATION_NOT_DELETED": "La posizione non potrebbe essere eliminata",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "La posizione non può essere eliminata, perché non possiedi i permessi per questa operazione.",
-      "CONFLICT_DETECTED": "Conflitto di programmazione: questo nuovo evento si sovrappone ad un evento esistente. Si prega di cambiare il luogo, le date o gli orari.",
-      "CONFLICT_BULK_DETECTED": "Conflitto di programmazione: modificare gli eventi è causa di conflitti. Cambia la posizione, le date o i tempi.",
+      "CONFLICT_DETECTED": "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
+      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "Errore di programmazione: L'evento è già terminato.",
       "CONFLICT_END_BEFORE_START": "Errore di programmazione: La fine del programma deve essere seguente all'inizio.",
       "CONFLICT_IN_THE_PAST": "La programmazione non può essere aggiornata: non puoi programmare un evento nel passato.",
@@ -236,8 +247,8 @@
       "THUMBNAIL_CHANGE_FAILED": "Fallimento nel cambiare la thumbnail.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Non hai selezionato alcuna traccia video da processare",
       "VIDEO_TOO_MANY_AUDIOS": "Non puoi avere più di un flusso audio su un singolo stream video",
-      "SERVER_UNRESPONSIVE": "Oops! Il server sembra non rispondere. Si prega di riprovare più tardi.",
-      "SERVICE_UNAVAILABLE": "Oops! Il server sembra non rispondere. Si prega di riprovare più tardi.",
+      "SERVER_UNRESPONSIVE": "Oops! The server seems to be unresponsive. Please try again later.",
+      "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Please try again later.",
       "ACTIVE_TRANSACTION": "Questo evento non può essere modificato mentre c'è un flusso di lavoro attivo o una transazione.",
       "BULK_METADATA_UPDATE": {
          "UNEXPECTED_ERROR": "An unexpected error occurred while updating. Some events might have been updated.",
@@ -271,19 +282,19 @@
          "EVENTS": {
             "CAPTION": "Elimina",
             "DELETE_EVENTS": "Elimina eventi",
-            "UNAUTHORIZED": "Non sei autorizzato a cancellare gli eventi evidenziati. Si prega di deselezionarli per continuare."
+            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Una volta eliminati, tutti i metadati degli eventi, file audio e video verranno eliminati in modo irreversibile.",
       "DELETE_EVENTS_WARNING_LINE2": "",
-      "DELETE_SERIES_WARNING_LINE1": "Una volta eliminati, tutti i metadati delle serie saranno irrecuperabili. Gli eventi delle serie non verranno eliminati.",
+      "DELETE_SERIES_WARNING_LINE1": "Once deleted, all series metadata will be unrecoverable. Events in the series will not be deleted.",
       "DELETE_SERIES_WARNING_LINE2": "",
       "SCHEDULE_TASK": {
          "CAPTION": "Avviare attività",
          "GENERAL": {
             "CAPTION": "Generale",
             "SUMMARY": "({{ count }} eventi selezionati)",
-            "CANNOTSTART": "Impossibile elaborare gli eventi evidenziati al momento. Deselezionare o riprovare più tardi."
+            "CANNOTSTART": "Highlighted event(s) cannot be processed at the moment. Deselect it/them or try again later."
          },
          "TASKS": {
             "CAPTION": "Attività",
@@ -306,7 +317,7 @@
             "NOCHANGES": "Nessuna modifica agli eventi rilevata!",
             "CONFLICT_FIRST_EVENT": "Evento modificato",
             "CONFLICT_SECOND_EVENT": "Evento in conflitto",
-            "CANNOTEDITSCHEDULE": "Per gli eventi evidenziati, non hai il permesso di modificare le informazioni di programmazione. È possibile continuare, ma non sarà possibile modificare le informazioni di programmazione di qualsiasi evento."
+            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
          },
          "METADATA": {
             "EDIT": "Modifica metadati"
@@ -322,7 +333,7 @@
             "CAPTION": "Modifica",
             "EVENT": "evento",
             "EVENTS": "eventi",
-            "HEADER": "Questa pagina consente di modificare gli eventi programmati raggruppandoli per giorni feriali. I campi in entrata sono pre-compilati nel caso in cui tutti gli eventi pianificati abbiano lo stesso valore per un campo specifico. Altrimenti, i campi di input sono lasciati vuoti. Lasciando i campi di input vuoto significa che i rispettivi valori non devono essere modificati.",
+            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
             "METADATA": "Metadati",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -894,11 +905,23 @@
                   "ADDITIONAL_ACTIONS": "Azioni aggiuntive",
                   "ACTION": "Azioni",
                   "NEW": "Nuova politica",
-                  "DETAILS": "Dettagli"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the event",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the event becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the event"
+                  }
                },
                "ROLES": {
                   "LABEL": "Seleziona un ruolo",
                   "EMPTY": "Nessun ruolo trovato"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "COMMENTS": {
@@ -1116,17 +1139,28 @@
                   "ADDITIONAL_ACTIONS": "Azioni aggiuntive",
                   "ACTION": "Azioni",
                   "NEW": "Nuova politica",
-                  "DETAILS": "Dettagli"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "Seleziona un ruolo",
                   "EMPTY": "Nessun ruolo trovato"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "THEME": {
                "CAPTION": "Tema",
                "DESCRIPTION": {
-                  "TEXT": "È possibile utilizzare i temi per marchiare i tuoi video. I temi possono definire video bumper e trailer, watermark e titoli diapositive che includono metadati."
+                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
                },
                "TITLE": "Tema",
                "LABEL": "No theme",
@@ -1194,17 +1228,29 @@
                   "ADDITIONAL_ACTIONS": "Azioni aggiuntive",
                   "ACTION": "Azioni",
                   "NEW": "Nuova politica",
-                  "DETAILS": "Dettagli",
-                  "REPLACE_EVENT_ACLS": "Save & update event permissions",
+                  "DETAILS": "Non-user roles",
+                  "REPLACE_EVENT_ACLS": "Aggiorna permessi evento",
                   "REPLACE_EVENT_ACLS_HINT": "Assicurarsi che tutti gli eventi di questa serie abbiano questi permessi in vigore",
                   "SAVE_SERIES_ACLS": "Save",
                   "SAVE_SERIES_ACLS_HINT": "Apply permissions only to series",
                   "LOAD_MORE_LIMIT": "policies shown.",
-                  "LOAD_MORE_LINK": "Load more"
+                  "LOAD_MORE_LINK": "Load more",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "Seleziona un ruolo",
                   "EMPTY": "Nessun ruolo trovato"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "METADATA": {
@@ -1443,12 +1489,23 @@
                   "ADDITIONAL_ACTIONS": "Azioni aggiuntive",
                   "ACTION": "Azioni",
                   "NEW": "Nuova politica",
-                  "DETAILS": "Dettagli",
-                  "DESCRIPTION": "Scegli un insieme di politiche pre-configurate o aggiungi politiche personalizzate qui sotto"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "Scegli un insieme di politiche pre-configurate o aggiungi politiche personalizzate qui sotto",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the access policy",
+                  "HELP": {
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                  }
                },
                "ROLES": {
                   "LABEL": "Seleziona un ruolo",
                   "EMPTY": "Nessun ruolo trovato"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          },
@@ -1481,12 +1538,24 @@
                   "ADDITIONAL_ACTIONS": "Azioni aggiuntive",
                   "ACTION": "Azioni",
                   "NEW": "Nuova politica",
-                  "DETAILS": "Dettagli",
-                  "DESCRIPTION": "Scegli un insieme di politiche pre-configurate o aggiungi politiche personalizzate qui sotto"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "Scegli un insieme di politiche pre-configurate o aggiungi politiche personalizzate qui sotto",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the access policy",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                  }
                },
                "ROLES": {
                   "LABEL": "Seleziona un ruolo",
                   "EMPTY": "Nessun ruolo trovato"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          }
@@ -1619,7 +1688,7 @@
                "BOTTOM_RIGHT": "In basso a destra",
                "UPLOAD": "Carica",
                "POSITION": "Posizione watermark e anteprima",
-               "FILEUPLOAD_DESCRIPTION": "Il file dovrebbe avere un canale alfa (sfondo trasparente). I tipi di file accettati sono: .PNG, .GIF, .SVG, .WEBP",
+               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: .PNG, .GIF, .SVG, .WEBP",
                "UPLOAD_LABEL": "Carica immagine",
                "UPLOAD_BUTTON": "Carica"
             },
@@ -1708,7 +1777,7 @@
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "Attenzione: alcune delle modifiche non sono state salvate. Se lasci l'editor video, queste modifiche andranno perse. Vuoi davvero continuare?",
+      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
       "TIMELINE": "Timeline",
       "ZOOMLEVEL": "Livello di zoom",
       "PREVIEW_MODE": "Modalità anteprima",
@@ -1756,7 +1825,7 @@
          "END": "Fine"
       },
       "THUMBNAIL": {
-         "DESCRIPTION": "Una miniatura predefinita utilizzata per rappresentare visivamente l'evento è generata automaticamente. Se vuoi utilizzare una miniatura diversa, è possibile estrarre una miniatura dal video nella posizione di riproduzione corrente o caricare un'immagine.",
+         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
@@ -1783,7 +1852,7 @@
          },
          "PREVIEW": {
             "NOT_AVAILABLE": "Anteprima non disponibile",
-            "OUTDATED": "L'anteprima è obsoleta dal momento che i segmenti sono stati modificati. Sarà aggiornata non appena si salvano le modifiche."
+            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
          },
          "CURRENT": {
             "DEFAULT": "Stai attualmente utilizzando la thumbnail predefinita.",
@@ -1792,7 +1861,7 @@
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "Puoi deselezionare le tracce per escluderle dall'ulteriore elaborazione. Si prega di notare che è necessario (ri-)pubblicare l'evento per applicare effettivamente le modifiche.",
+         "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
          "NOTIFICATION": {
             "NO_VIDEO_TRACK_SELECTED": "Devi selezionare almeno una traccia video",
             "NO_AUDIO_TRACK_SELECTED": "Devi selezionare almeno una traccia audio"
@@ -1806,8 +1875,8 @@
             "NO_PREVIEW_AVAILABLE": "Nessuna immagine di anteprima trovata",
             "NO_TRACK_SELECTED": "Nessuna traccia video selezionata",
             "TOOLTIPS": {
-               "HIDE": "Questa traccia video è attualmente abilitata. Clicca per disabilitare",
-               "UNHIDE": "Questa traccia audio è attualmente disabilitata. Clicca per abilitare."
+               "HIDE": "This video track is currently enabled. Click to disable",
+               "UNHIDE": "This video track is currently disabled. Click to enable."
             }
          },
          "AUDIO": {
@@ -1816,8 +1885,8 @@
             "NO_PREVIEW_AVAILABLE": "Nessuna immagine di anteprima trovata",
             "NO_TRACK_SELECTED": "Nessuna traccia audio selezionata",
             "TOOLTIPS": {
-               "HIDE": "Questa traccia audio è attualmente abilitata. Clicca per disabilitare",
-               "UNHIDE": "Questa traccia audio è attualmente disabilitata. Clicca per abilitare"
+               "HIDE": "This audio track is currently enabled. Click to disable",
+               "UNHIDE": "This audio track is currently disabled. Click to enable"
             }
          }
       },
@@ -2096,7 +2165,7 @@
    "HOTKEYS": {
       "CHEAT_SHEET": {
          "TITLE": "Scorciatoie da tastiera",
-         "HINT": "Questa pagina elenca le scorciatoie della tastiera attualmente disponibili. Nota che queste potrebbero cambiare a seconda della pagina che stai visitando."
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
       },
       "KEYS": {
          "CTRL": "Ctrl",

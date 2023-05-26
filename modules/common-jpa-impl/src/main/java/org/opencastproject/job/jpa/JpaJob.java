@@ -78,8 +78,7 @@ import javax.persistence.Version;
     @Index(name = "IX_oc_job_date_created", columnList = ("date_created")),
     @Index(name = "IX_oc_job_date_completed", columnList = ("date_completed")),
     @Index(name = "IX_oc_job_dispatchable", columnList = ("dispatchable")),
-    @Index(name = "IX_oc_job_operation", columnList = ("operation")),
-    @Index(name = "IX_oc_job_statistics", columnList = ("processor_service, status, queue_time, run_time")) })
+    @Index(name = "IX_oc_job_operation", columnList = ("operation")) })
 @NamedQueries({
     @NamedQuery(name = "Job", query = "SELECT j FROM Job j "
         + "where j.status = :status and j.creatorServiceRegistration.serviceType = :serviceType "
@@ -225,6 +224,15 @@ public class JpaJob {
   @ManyToOne
   @JoinColumn(name = "processor_service")
   private ServiceRegistrationJpaImpl processorServiceRegistration;
+
+  /**
+   * This readonly field provides the raw value of processor_service database table column
+   * and is defined for performance reason.
+   * Do not use this field in Java!
+   * It should only be used by JPQL named queries.
+   */
+  @Column(name = "processor_service",  updatable = false, insertable = false)
+  private Long processorServiceRegistrationFK;
 
   @JoinColumn(name = "parent", referencedColumnName = "id", nullable = true)
   private JpaJob parentJob = null;

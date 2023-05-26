@@ -169,5 +169,40 @@
             "required":false
          }
       ]
+   },
+   {
+      "flavor": "dublincore/extended",
+      "title" : "EVENTS.EVENTS.DETAILS.CATALOG.EXTENDED",
+      "fields": [
+         {
+            "id": "os",
+            "label": "EVENTS.EVENTS.DETAILS.METADATA.OS",
+            "value": "",
+            "type": "text",
+            "readOnly": false
+         },
+         {
+            "readOnly": true,
+            "id":"rightsHolder",
+            "label":"EVENTS.EVENTS.DETAILS.METADATA.RIGHTS",
+            "type":"text",
+            "value":"everyone",
+            "required":false
+         },
+         {
+            "id": "visibility",
+            "label": "EVENTS.EVENTS.DETAILS.METADATA.VISIBILITY",
+            "value": "false",
+            "type": "boolean",
+            "readOnly": false
+         },
+         {
+            "id": "public",
+            "label": "EVENTS.EVENTS.DETAILS.METADATA.PUBLIC",
+            "value": "true",
+            "type": "boolean",
+            "readOnly": true
+         }
+      ]
    }
 ]

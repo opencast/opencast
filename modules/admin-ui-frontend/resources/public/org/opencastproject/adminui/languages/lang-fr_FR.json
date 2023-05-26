@@ -28,10 +28,10 @@
    "YES": "Oui",
    "COPY": "Copier dans le presse-papiers",
    "MONITOR": {
-      "REGISTRATION": "Opencast a envoyé une mise à jour d'inscription dans plus d'une semaine"
+      "REGISTRATION": "Out of date"
    },
    "LTI": {
-      "ERROR_LOADING_METADATA": "Erreur lors du chargement des métadonnées de l'événement. Veuillez réessayer plus tard.",
+      "ERROR_LOADING_METADATA": "Error loading event metadata. Veuillez réessayer plus tard.",
       "SERIES_TITLE": "Voir les séries",
       "UPLOAD_TITLE": "Envoyer un événement",
       "LOADING": "Chargement…",
@@ -63,7 +63,7 @@
       "GENERIC_ERROR": "Erreur: {{message}}",
       "DELETION_SUCCESS": "Événement supprimé avec succès",
       "DELETION_SUCCESS_DESCRIPTION": "L'événement sera supprimé de la liste dans quelques instants…",
-      "EVENT_LOCKED": "L'événement est en cours de traitement. Veuillez patienter jusqu'à ce que d'autres modifications soient apportées…",
+      "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
       "DELETION_FAILURE": "La suppression de l'événement a échoué",
       "DELETION_FAILURE_DESCRIPTION": "Veuillez réessayer plus tard…",
       "RESULT_HEADING": "Résultats {{range.begin}}-{{range.end}} sur {{total}}",
@@ -104,7 +104,7 @@
          "SUBHEADING": "Sélectionner les données à afficher par défaut dans la table {{ tableName }}",
          "AVAILABLE_COLUMNS": "Colonnes disponibles",
          "SELECTED_COLUMNS": "Colonnes choisies",
-         "FOOTER_TEXT": "L'ordre et la sélection seront enregistrés automatiquement. Appuyez sur «{{resetTranslation}} » pour restaurer l'affichage par défaut."
+         "FOOTER_TEXT": "The order and selection will be saved automatically. Press \"{{resetTranslation}}\" to restore the default view."
       }
    },
    "CONFIRMATIONS": {
@@ -130,9 +130,9 @@
          }
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "Cette série contient des événements. Suppression de la série ne supprimera pas les événements.",
+         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
          "EVENT_WILL_BE_GONE": "Si vous continuez, l'événement disparaîtra irrévocablement.",
-         "UNSAVED_CHANGES": "Vous avez des modifications non enregistrées. Si vous continuez, ces modifications seront annulées. Êtes-vous sûr de vouloir continuer ?"
+         "UNSAVED_CHANGES": "You have unsaved changes. If you continue, those changes will be discarded. Are you sure that you want to continue?"
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Cette série ne peut être supprimée car elle contient toujours des événements."
@@ -148,6 +148,17 @@
       "REST_DOC": "Documentation des API REST",
       "HOTKEY_CHEAT_SHEET": "Raccourcis clavier",
       "ADOPTER_REGISTRATION": "Incription utilisateur"
+   },
+   "REBUILD": {
+      "TITLE": "Index Rebuild",
+      "WARNING": "Attention!",
+      "HEADER": "Index rebuild in progress!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Les droits d'accès ont été créés",
@@ -167,7 +178,7 @@
       "GROUP_NOT_SAVED": "Le groupe n'a pas pu être enregistré",
       "GROUP_DELETED": "Le groupe a été supprimé",
       "GROUP_NOT_DELETED": "Le groupe n'a pas pu être supprimé",
-      "ACCESS_DENIED": "Accès refusé. Vous n'êtes pas autorisé à afficher cette page",
+      "ACCESS_DENIED": "Access denied. You're not allowed to view this page",
       "SERIES_ADDED": "La série a été créée",
       "SERIES_NOT_SAVED": "La série n'a pas pu être enregistrée",
       "EVENTS_CREATED": "L'événement a été créé",
@@ -201,8 +212,8 @@
       "LOCATION_DELETED": "L’emplacement a été supprimé",
       "LOCATION_NOT_DELETED": "L’emplacement n’a pas pu être supprimé",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Vous n’avez pas la permission de supprimer cet emplacement.",
-      "CONFLICT_DETECTED": "Conflit de programmation: le nouvel événement entre en conflit avec un événement existant. Veuillez changer l'emplacement ou les dates.",
-      "CONFLICT_BULK_DETECTED": "Conflit dans la planification: la modification des événements entraîne des conflits. S'il vous plaît changer l'emplacement, les dates ou les heures.",
+      "CONFLICT_DETECTED": "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
+      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "Erreur de programmation : l’événement est déjà terminée.",
       "CONFLICT_END_BEFORE_START": "Erreur de programmation : la fin de l’événement programmé doit être postérieure au début.",
       "CONFLICT_IN_THE_PAST": "Le planning n'a pu être mis à jour : vous ne pouvez pas planifier un événement dans le passé.",
@@ -236,29 +247,29 @@
       "THUMBNAIL_CHANGE_FAILED": "Impossible de changer la vignette.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Vous n’avez sélectionné aucune vidéo pour traiter",
       "VIDEO_TOO_MANY_AUDIOS": "Vous ne pouvez pas avoir plus d'un flux audio sur un seul flux vidéo",
-      "SERVER_UNRESPONSIVE": "Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement.",
-      "SERVICE_UNAVAILABLE": "Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement.",
+      "SERVER_UNRESPONSIVE": "Oops! The server seems to be unresponsive. Veuillez réessayer plus tard.",
+      "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Veuillez réessayer plus tard.",
       "ACTIVE_TRANSACTION": "Cet événement ne peut pas être modifié, pendant qu’il y a un flux de travail actif ou une transaction.",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "Une erreur inattendue s'est produite lors de la mise à jour. Certains événements peuvent avoir été mis à jour.",
+         "UNEXPECTED_ERROR": "An unexpected error occurred while updating. Some events might have been updated.",
          "ALL_EVENTS_UPDATED": "Tous les événements ont été mis à jour avec succès.",
          "NO_EVENTS_UPDATED": "Toutes les mises à jour ont échoué.",
          "SOME_EVENTS_NOT_UPDATED": "Certains événements n'ont pas pu être mis à jour."
       },
       "ADOPTER_PROFILE_UPDATED": "Les informations de profil ont été mises à jour avec succès.",
-      "ADOPTER_PROFILE_NOT_UPDATED": "Oups ! Impossible de mettre à jour les informations de profil. Veuillez réessayer !",
+      "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
       "ADOPTER_PROFILE_DELETED": "Les informations de profil ont bien été supprimées.",
-      "ADOPTER_PROFILE_NOT_DELETED": "Oups ! Impossible de supprimer les informations de profil. Veuillez réessayer !",
+      "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!",
       "TOBIRA_OVERRIDE_NAME": "Le titre de la page sélectionnée sera remplacé par le titre de la série.",
       "TOBIRA_NO_PATH_SEGMENT": "La page a besoin d'un segment de chemin.",
       "TOBIRA_NOT_MOUNTED": "La série n'a pas pu être montée en Tobira.",
-      "TOBIRA_PATH_SEGMENT_INVALID": "Le segment de chemin n'est pas valide. Un segment de chemin valide est d'au moins 2 caractères, ne contient aucun espace ou caractère de contrôle, aucun des caractères '<>\"[\\]^`{|}#%/? ', et ne commence pas par un des caractères '-+~@_! &;:. =*'()'.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
       "TOBIRA_PATH_SEGMENT_UNIQUE": "Le segment de chemin d'une page doit être unique parmi toutes ses pages frères.",
-      "TOBIRA_PAGE_NOT_FOUND": "La page vers laquelle vous avez essayé de naviguer n'existe pas ou n'existe plus. Essayez peut-être de commencer à partir du début.",
-      "TOBIRA_SERVER_ERROR": " Erreur lors de la conversation avec Tobira. Contactez votre administrateur système et/ou réessayez plus tard.",
+      "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
+      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and/or try again later.",
       "TOBIRA_COPIED_DIRECT_LINK": "Le lien a été copié dans votre presse-papiers.",
       "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Impossible de copier dans le presse-papiers.",
-      "TOBIRA_NOT_FOUND": "Tobira ne connaît pas encore cette série. Réessayez dans quelques minutes ou contactez votre administrateur système."
+      "TOBIRA_NOT_FOUND": "Tobira doesn't know about this series (yet). Try again in a few minutes or contact your system administrator."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
@@ -271,19 +282,19 @@
          "EVENTS": {
             "CAPTION": "Supprimer",
             "DELETE_EVENTS": "Supprimer les Evénements",
-            "UNAUTHORIZED": "Vous n'êtes pas autorisé à supprimer les événements sélectionnés . Veuillez les désélectionner pour continuer."
+            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Une fois supprimés, toutes les métadonnées, les fichiers audio et vidéo seront supprimés et rendus irrécupérable.",
       "DELETE_EVENTS_WARNING_LINE2": "",
-      "DELETE_SERIES_WARNING_LINE1": "Une fois supprimées, toutes les métadonnées seront rendues irrécupérables.",
+      "DELETE_SERIES_WARNING_LINE1": "Once deleted, all series metadata will be unrecoverable. Events in the series will not be deleted.",
       "DELETE_SERIES_WARNING_LINE2": "",
       "SCHEDULE_TASK": {
          "CAPTION": "Démarrer tâche",
          "GENERAL": {
             "CAPTION": "Général",
             "SUMMARY": "({{ count }} événements sélectionnés)",
-            "CANNOTSTART": "Les événements en surbrillance ne peuvent être traités à l'heure actuelle. Désélectionnez-les ou réessayez plus tard."
+            "CANNOTSTART": "Highlighted event(s) cannot be processed at the moment. Deselect it/them or try again later."
          },
          "TASKS": {
             "CAPTION": "Tâche",
@@ -306,7 +317,7 @@
             "NOCHANGES": "Aucun changement aux événements détectés !",
             "CONFLICT_FIRST_EVENT": "Événement modifié",
             "CONFLICT_SECOND_EVENT": "Événement en conflit",
-            "CANNOTEDITSCHEDULE": "Pour les événements sélectionnés, vous n’avez pas l’autorisation de modifier les planning . Vous pouvez continuer, mais vous ne pourrez pas modifier les informations des événements programmés."
+            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
          },
          "METADATA": {
             "EDIT": "Éditer les métadonnées"
@@ -322,7 +333,7 @@
             "CAPTION": "Éditer",
             "EVENT": "événement",
             "EVENTS": "événements",
-            "HEADER": "Cette page vous permet de modifier les événements planifiés regroupés par semaine. Les champs d'entrée sont pré-remplis au cas où tous les événements planifiés ont la même valeur pour un champ spécifique. Sinon, les champs d'entrée sont laissés vides. Laisser les champs d'entrée vide signifie que les valeurs respectives ne devraient pas être modifiées.",
+            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
             "METADATA": "Métadonnées",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -341,7 +352,7 @@
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Modifier et/ou sélectionner les champs de métadonnées que vous souhaitez mettre à jour. Un champ ne peut pas être sélectionné si cela ne donne pas une valeur modifiée pour au moins un événement, ou si le champ n'est pas valide (e. . Les champs obligatoires ne peuvent pas être vide). Les champs de métadonnées en surbrillance ont des valeurs divergentes pour les événements sélectionnés.",
+            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
             "TABLE": {
                "CAPTION": "Métadonnées des événements sélectionnés",
                "FIELDS": "Métadonnées",
@@ -431,7 +442,7 @@
          },
          "INFORMATION_STATE": {
             "HEADER": "Merci d'avoir utilisé Opencast!",
-            "INFORMATION_PARAGRAPH_1": "Nos développeurs travaillent constamment pour vous offrir la meilleure expérience possible. Pour cela, nous avons besoin de savoir qui utilise Opencast et comment il est utilisé. Vous pouvez nous aider avec une inscription rapide.",
+            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
             "INFORMATION_PARAGRAPH_2": "Nous apprécions vivement tout commentaire, car même certaines des données que nous recueillons sur l'utilisation d'Opencast nous aideront à créer de meilleurs logiciels. ont de meilleures chances d'obtenir un financement supplémentaire et attirent plus d'entreprises pour fournir des services autour d'Opencast."
          },
          "FORM_STATE": {
@@ -448,7 +459,7 @@
             "LAST_NAME": "Nom",
             "STREET": "Rue",
             "NUMBER": "Numéro",
-            "ADDITIONAL_ADDRESS_INFO": "Ajouter des informations d'adresse",
+            "ADDITIONAL_ADDRESS_INFO": "Add. address information",
             "MAIL": "Email",
             "CONTACT_ME": "Contactez-moi pour les mises à jour et les problèmes de sécurité",
             "WHICH_DATA_TO_SHARE": "Quelles données voulez-vous partager ?",
@@ -473,7 +484,7 @@
             "TEXT": "Une erreur est survenue lors du traitement de la requête."
          },
          "DELETE_SUBMIT_STATE": {
-            "TEXT": "Êtes-vous sûr de vouloir supprimer vos données d'inscription ? En confirmant cela supprimera également vos données d'enregistrement du serveur de projet Opencast avec le prochain intervalle de mise à jour."
+            "TEXT": "Êtes-vous sûr de vouloir supprimer vos données d'inscription ? Confirming this will also remove your registration data from the Opencast project server with the next update interval."
          }
       }
    },
@@ -894,11 +905,23 @@
                   "ADDITIONAL_ACTIONS": "Actions supplémentaires",
                   "ACTION": "Actions",
                   "NEW": "Ajouter",
-                  "DETAILS": "Détails"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the event",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the event becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the event"
+                  }
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",
                   "EMPTY": "Aucun rôle trouvé"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "COMMENTS": {
@@ -1116,17 +1139,28 @@
                   "ADDITIONAL_ACTIONS": "Actions supplémentaires",
                   "ACTION": "Actions",
                   "NEW": "Nouvelle politique",
-                  "DETAILS": "Détails"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",
                   "EMPTY": "Aucun rôle trouvé"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "THEME": {
                "CAPTION": "Thème",
                "DESCRIPTION": {
-                  "TEXT": "Vous pouvez éventuellement utiliser des thèmes pour marquer vos vidéos. Les thèmes peuvent définir des vidéos introductions et des bandes-annonces, des filigranes et des diapositives, y compris des métadonnées."
+                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
                },
                "TITLE": "Thème",
                "LABEL": "Aucun thème",
@@ -1134,7 +1168,7 @@
             },
             "TOBIRA": {
                "CAPTION": "Tobira",
-               "DESCRIPTION": "Ici vous pouvez sélectionner où vous voulez que la série s'affiche dans le portail vidéo Tobira. Vous ne pouvez sélectionner qu'un seul emplacement ici, et il doit être vide (marqué en gras). Vous pouvez créer de nouvelles pages ici, mais notez qu'elles ne sont persistantes que si elles sont sur le chemin de la page sélectionnée.",
+               "DESCRIPTION": "Here you can select where you want the series to show up in the Tobira video portal. You can only select one location here, and it needs to be empty (marked in bold). You can create new pages here, but note that they are only persisted if they are on the path to the selected page.",
                "SELECT_PAGE": "Sélectionner la page cible",
                "PAGE_TITLE": "Titre de la sous-page",
                "PATH_SEGMENT": "Segment de chemin",
@@ -1143,7 +1177,7 @@
                "CANCEL": "Annuler",
                "HOMEPAGE": "Accueil",
                "SELECTED_PAGE": "Les séries seront montées sous le chemin suivant",
-               "NO_PAGE_SELECTED": "Aucune page sélectionnée. Les séries ne seront pas montées dans Tobira.",
+               "NO_PAGE_SELECTED": "No page selected. Series will not be mounted in Tobira.",
                "PATH": "Chemin d'accès"
             },
             "SUMMARY": {
@@ -1194,17 +1228,29 @@
                   "ADDITIONAL_ACTIONS": "Actions supplémentaires",
                   "ACTION": "Actions",
                   "NEW": "Add row",
-                  "DETAILS": "Détails",
-                  "REPLACE_EVENT_ACLS": "Enregistrer et mettre à jour les autorisations d'événement",
+                  "DETAILS": "Non-user roles",
+                  "REPLACE_EVENT_ACLS": "Mettre à jour les permissions de l'événement",
                   "REPLACE_EVENT_ACLS_HINT": "Assurez-vous que tous les événements de cette série ont ces permissions en vigueur",
                   "SAVE_SERIES_ACLS": "Enregistrer",
                   "SAVE_SERIES_ACLS_HINT": "Appliquer les autorisations uniquement aux séries",
                   "LOAD_MORE_LIMIT": "politiques affichées.",
-                  "LOAD_MORE_LINK": "Afficher plus"
+                  "LOAD_MORE_LINK": "Afficher plus",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",
                   "EMPTY": "Aucun rôle trouvé"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "METADATA": {
@@ -1443,12 +1489,23 @@
                   "ADDITIONAL_ACTIONS": "Actions supplémentaires",
                   "ACTION": "Actions",
                   "NEW": "Nouvelle ligne",
-                  "DETAILS": "Détails",
-                  "DESCRIPTION": "S'il vous plaît, choisir un ensemble préconfiguré de règles ou ajouter des règles personnalisées ci-dessous"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "S'il vous plaît, choisir un ensemble préconfiguré de règles ou ajouter des règles personnalisées ci-dessous",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the access policy",
+                  "HELP": {
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                  }
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",
                   "EMPTY": "Aucun rôle trouvé"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          },
@@ -1481,12 +1538,24 @@
                   "ADDITIONAL_ACTIONS": "Actions supplémentaires",
                   "ACTION": "Actions",
                   "NEW": "Nouvelle ligne",
-                  "DETAILS": "Détails",
-                  "DESCRIPTION": "S'il vous plaît, choisir un ensemble préconfiguré de règles ou ajouter des règles personnalisées ci-dessous"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "S'il vous plaît, choisir un ensemble préconfiguré de règles ou ajouter des règles personnalisées ci-dessous",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the access policy",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                  }
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",
                   "EMPTY": "Aucun rôle trouvé"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          }
@@ -1619,7 +1688,7 @@
                "BOTTOM_RIGHT": "En Bas à Droite",
                "UPLOAD": "Envoi",
                "POSITION": "Position du filigrane et aperçu",
-               "FILEUPLOAD_DESCRIPTION": "Fichier doit avoir un canal alpha (fond transparent). Les types de fichiers acceptés sont:.PNG.GIF.SVG.WEBP",
+               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: .PNG, .GIF, .SVG, .WEBP",
                "UPLOAD_LABEL": "Envoyer une image",
                "UPLOAD_BUTTON": "Envoi"
             },
@@ -1708,7 +1777,7 @@
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "Attention: Certaines de vos modifications n'ont pas été sauvegardées. Si vous quittez l'éditeur de vidéo, ces modifications seront perdues. Voulez-vous vraiment continuer?",
+      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
       "TIMELINE": "Chronologie",
       "ZOOMLEVEL": "Niveau de zoom",
       "PREVIEW_MODE": "Mode aperçu",
@@ -1756,7 +1825,7 @@
          "END": "Fin"
       },
       "THUMBNAIL": {
-         "DESCRIPTION": "Une vignette par défaut est générée automatiquement et utilisée pour représenter visuellement l'événement. Si vous souhaitez utiliser une vignette différente, vous pouvez extraire une vignette de la vidéo à la position de lecture actuelle ou télécharger une image.",
+         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
@@ -1783,7 +1852,7 @@
          },
          "PREVIEW": {
             "NOT_AVAILABLE": "Aucun aperçu disponible",
-            "OUTDATED": "L'aperçu est obsolète car les segments ont été modifiés. Il sera mis à jour dès que vous enregistrez vos modifications."
+            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
          },
          "CURRENT": {
             "DEFAULT": "Vous utilisez actuellement la vignette par défaut.",
@@ -1792,7 +1861,7 @@
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "Vous pouvez désélectionner des pistes pour les exclure des traitement ultérieurs. Noter que vous devez (re) publier l'événement pour appliquer les modifications.",
+         "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
          "NOTIFICATION": {
             "NO_VIDEO_TRACK_SELECTED": "Vous devez activer au moins une piste vidéo",
             "NO_AUDIO_TRACK_SELECTED": "Vous devez activer au moins une piste audio"
@@ -1806,8 +1875,8 @@
             "NO_PREVIEW_AVAILABLE": "Aucune image d'aperçu trouvée",
             "NO_TRACK_SELECTED": "Aucune piste vidéo sélectionnée",
             "TOOLTIPS": {
-               "HIDE": "Cette piste vidéo est actuellement activée. Cliquez pour désactiver",
-               "UNHIDE": "Cette piste vidéo est actuellement désactivée. Cliquez pour activer."
+               "HIDE": "This video track is currently enabled. Click to disable",
+               "UNHIDE": "This video track is currently disabled. Click to enable."
             }
          },
          "AUDIO": {
@@ -1816,8 +1885,8 @@
             "NO_PREVIEW_AVAILABLE": "Aucune image d'aperçu trouvée",
             "NO_TRACK_SELECTED": "Aucune piste audio sélectionnée",
             "TOOLTIPS": {
-               "HIDE": "Cette piste audio est actuellement activée. Cliquez pour désactiver",
-               "UNHIDE": "Cette piste audio est actuellement désactivée. Cliquez pour activer"
+               "HIDE": "This audio track is currently enabled. Click to disable",
+               "UNHIDE": "This audio track is currently disabled. Click to enable"
             }
          }
       },
@@ -2096,7 +2165,7 @@
    "HOTKEYS": {
       "CHEAT_SHEET": {
          "TITLE": "Raccourcis clavier",
-         "HINT": "Cette page répertorie les raccourcis clavier actuellement disponibles. Notez que ceux-ci peuvent changer en fonction de la page visitée."
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
       },
       "KEYS": {
          "CTRL": "Ctrl",
@@ -2185,7 +2254,7 @@
       }
    },
    "STATISTICS": {
-      "NOT_AVAILABLE": "Les statistiques ne peuvent pas être affichées pour le moment. Veuillez réessayer plus tard.",
+      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Veuillez réessayer plus tard.",
       "UNSUPPORTED_TYPE": "Désolé, Opencast ne peut pas afficher ce type de données statistiques.",
       "FROM": "Début",
       "TO": "A",
@@ -2201,7 +2270,7 @@
          "PUBLISHEDHOURS": "Heures de vidéo publiées"
       },
       "DESCRIPTION": {
-         "RANDOM": "Ceci affiche des données aléatoires comme exemple. Vous pouvez désactiver ce graphique en supprimant le fichier json du fournisseur de statistiques correspondant dans etc/providers",
+         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
          "VIEWS_SUM": "Ceci affiche le nombre total de vues en fonction du temps.",
          "VIEWS_AVG": "Ceci affiche la moyenne de vues quotidiennes en fonction du temps.",
          "PUBLISHEDHOURS": "Ceci affiche les heures publiées de la vidéo"

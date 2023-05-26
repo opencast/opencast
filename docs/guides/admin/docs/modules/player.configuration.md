@@ -11,4 +11,4 @@ Select the Opencast Player
 
 To change the default player for a tenant, set the following key in `.../etc/org.opencastproject.organization-<tenant>.cfg`.
 
-    prop.player=/paella/ui/watch.html?id=#{id}
+    prop.player=/paella7/ui/watch.html?id=#{id}

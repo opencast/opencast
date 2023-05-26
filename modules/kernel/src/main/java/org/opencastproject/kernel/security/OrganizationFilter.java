@@ -29,6 +29,11 @@ import org.opencastproject.util.NotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ServiceScope;
+import org.osgi.service.component.propertytypes.ServiceRanking;
+import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContextSelect;
+import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardFilterName;
+import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardFilterPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,16 +54,16 @@ import javax.servlet.http.HttpServletResponse;
  * Inspects request URLs and sets the organization for the request.
  */
 @Component(
-    immediate = true,
     service = Filter.class,
+    scope = ServiceScope.PROTOTYPE,
     property = {
         "service.description=Organization Filter",
-        "httpContext.id=opencast.httpcontext",
-        "httpContext.shared=true",
-        "service.ranking=2",
-        "urlPatterns=*"
     }
 )
+@ServiceRanking(980)
+@HttpWhiteboardFilterName("OrganizationFilter")
+@HttpWhiteboardFilterPattern("/*")
+@HttpWhiteboardContextSelect("(osgi.http.whiteboard.context.name=opencast)")
 public class OrganizationFilter implements Filter {
 
   private static final String X_FORWARDED_FOR = "X-Forwarded-For";

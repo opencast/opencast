@@ -31,7 +31,10 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.http.HttpContext;
+import org.osgi.service.http.context.ServletContextHelper;
+import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,15 +51,14 @@ import javax.servlet.http.HttpServletResponse;
  * registrations should use the {@link HttpContext} that is registered with the OSGi service registry.
  */
 @Component(
-    immediate = true,
-    service = HttpContext.class,
+    service = ServletContextHelper.class,
+    scope = ServiceScope.BUNDLE,
     property = {
         "service.description=Opencast HttpContent",
-        "httpContext.id=opencast.httpcontext",
-        "httpContext.shared=true"
     }
 )
-public class SharedHttpContext implements HttpContext {
+@HttpWhiteboardContext(path = "/", name = "opencast")
+public class SharedHttpContext extends ServletContextHelper {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(SharedHttpContext.class);
 

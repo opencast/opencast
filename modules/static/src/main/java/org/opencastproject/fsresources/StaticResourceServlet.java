@@ -34,6 +34,9 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContextSelect;
+import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardServletName;
+import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardServletPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,13 +66,12 @@ import javax.servlet.http.HttpServletResponse;
 @Component(
     property = {
         "service.description=Opencast Download Resources",
-        "alias=/static",
-        "httpContext.id=opencast.httpcontext",
-        "httpContext.shared=true"
     },
-    immediate = true,
     service = Servlet.class
 )
+@HttpWhiteboardServletName(StaticResourceServlet.SERVLET_PATH)
+@HttpWhiteboardServletPattern(StaticResourceServlet.SERVLET_PATH + "/*")
+@HttpWhiteboardContextSelect("(osgi.http.whiteboard.context.name=opencast)")
 public class StaticResourceServlet extends HttpServlet {
 
   /** The serialization UID */
@@ -86,6 +88,8 @@ public class StaticResourceServlet extends HttpServlet {
   static {
     FULL_RANGE = new ArrayList<>();
   }
+
+  public static final String SERVLET_PATH = "/static";
 
   /** The filesystem directory to serve files fro */
   private String distributionDirectory;

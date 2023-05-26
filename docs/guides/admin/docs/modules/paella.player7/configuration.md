@@ -1,6 +1,8 @@
 Paella Player 7
 ===============
 
+Paella 7 is Opencast's default player.
+
 The Paella `(pronounced 'paeja')` [Player](https://paellaplayer.upv.es) is an Open Source
 JavaScript video player capable of playing an unlimited number of audio & video streams 
 synchronously, Live Streaming, Zoom, Captions, contributed user plugins and a lot more. 
@@ -22,7 +24,7 @@ Configuration
 -------------
 
 The configurations for the player are done for each tenant. So the configuration keys are located in
-`.../etc/ui-config/<tenant>/paella7/config.yml`
+`.../etc/ui-config/<tenant>/paella7/config.json`
 
 The default tenant for opencast is `mh_default_org`
 
@@ -39,3 +41,30 @@ To activate the player set for each tenant the property `prop.player` in the fil
 
     prop.player=/paella7/ui/watch.html?id=#{id}
 
+
+Cookie consent
+--------------
+Paella uses cookies to store some user parameters (layout configuration, volume, etc...).
+And, if enabled, the paella user tracking plugin can use cookie to track the user.
+
+To comply with GDPR, ePrivacy Directive, or any other privacy laws, the opencast player uses 
+the [Terms Feed Privacy Consent](https://www.termsfeed.com/privacy-consent/) banner and the 
+paella `config.json` file is configured to use it. 
+
+To Learn more about paella cookie consent you can read paella 
+[cookie consent documentation](https://paellaplayer.upv.es/#/doc/cookie_consent.md).
+
+You can enable/disable the cookie consent banner in `config.json` file:
+
+```json
+{
+    ...
+    "opencast": {
+        "cookieConsent": {
+            "enable": true
+        },
+        ...
+    }
+    ...
+}
+```

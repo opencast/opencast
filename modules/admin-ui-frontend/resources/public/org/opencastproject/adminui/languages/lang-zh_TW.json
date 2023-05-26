@@ -28,10 +28,10 @@
    "YES": "是",
    "COPY": "複製到剪貼簿",
    "MONITOR": {
-      "REGISTRATION": "Opencast has sent a registration update in more than a week"
+      "REGISTRATION": "Out of date"
    },
    "LTI": {
-      "ERROR_LOADING_METADATA": "載入事件後設資料時發生錯誤。請稍後再試。",
+      "ERROR_LOADING_METADATA": "Error loading event metadata. 請稍後重試。",
       "SERIES_TITLE": "瀏覽系列",
       "UPLOAD_TITLE": "上傳事件",
       "LOADING": "載入中...",
@@ -63,7 +63,7 @@
       "GENERIC_ERROR": "錯誤訊息: {{message}}",
       "DELETION_SUCCESS": "事件刪除成功",
       "DELETION_SUCCESS_DESCRIPTION": "稍後該事件將從列表中刪除…",
-      "EVENT_LOCKED": "該事件目前正在進行中。 請稍等以便進行下一步的更改...",
+      "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
       "DELETION_FAILURE": "事件刪除失敗",
       "DELETION_FAILURE_DESCRIPTION": "請稍後重試。",
       "RESULT_HEADING": "結果 {{range.begin}}-{{range.end}} 於 {{total}}",
@@ -104,7 +104,7 @@
          "SUBHEADING": "選擇您希望顯示在 {{ tableName }} 的設定值",
          "AVAILABLE_COLUMNS": "可用的列",
          "SELECTED_COLUMNS": "選擇列",
-         "FOOTER_TEXT": "順序和選擇將被自動保存。按下\"{{resetTranslation}}\"回到原設定值。"
+         "FOOTER_TEXT": "The order and selection will be saved automatically. Press \"{{resetTranslation}}\" to restore the default view."
       }
    },
    "CONFIRMATIONS": {
@@ -130,9 +130,9 @@
          }
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "這個系列中包含事件。 刪除系列不會刪除事件。",
+         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
          "EVENT_WILL_BE_GONE": "如果您繼續，該事件將永久消失無法恢復。",
-         "UNSAVED_CHANGES": "您有未儲存的更改。 如果您繼續，這些更改將被丟棄。 您確定要繼續嗎？"
+         "UNSAVED_CHANGES": "You have unsaved changes. If you continue, those changes will be discarded. Are you sure that you want to continue?"
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "此系列無法刪除，因為它仍然包含事件。"
@@ -148,6 +148,17 @@
       "REST_DOC": "REST API 文檔",
       "HOTKEY_CHEAT_SHEET": "鍵盤快捷鍵",
       "ADOPTER_REGISTRATION": "使用者註冊"
+   },
+   "REBUILD": {
+      "TITLE": "Index Rebuild",
+      "WARNING": "Attention!",
+      "HEADER": "Index rebuild in progress!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "存取權限已新增",
@@ -167,7 +178,7 @@
       "GROUP_NOT_SAVED": "該群組無法儲存",
       "GROUP_DELETED": "該群組已刪除",
       "GROUP_NOT_DELETED": "該群組無法刪除",
-      "ACCESS_DENIED": "拒絕進入。您無權查看此頁",
+      "ACCESS_DENIED": "Access denied. You're not allowed to view this page",
       "SERIES_ADDED": "該系列已新增",
       "SERIES_NOT_SAVED": "該系列無法儲存",
       "EVENTS_CREATED": "事件已創建",
@@ -201,8 +212,8 @@
       "LOCATION_DELETED": "位置已被刪除",
       "LOCATION_NOT_DELETED": "無法刪除位置",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "無法刪除該位置，因為您沒有足夠的權限。",
-      "CONFLICT_DETECTED": "預約程序有衝突 ︰ 新的事件與現有的事件重疊。請更改位置、 日期或時間。",
-      "CONFLICT_BULK_DETECTED": "排程衝突：改變事件會導致衝突。 請更改地點、日期或時間。",
+      "CONFLICT_DETECTED": "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
+      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "排程有誤，此一事件已經結束。",
       "CONFLICT_END_BEFORE_START": "排程有誤: 排程結束的時間，必須晚於開始時間。",
       "CONFLICT_IN_THE_PAST": "無法更新排程：您不能將事件安排在過去。",
@@ -236,19 +247,19 @@
       "THUMBNAIL_CHANGE_FAILED": "更改縮圖失敗。",
       "VIDEO_SOURCE_TRACKS_INVALID": "您尚未選擇要處理的影片軌道",
       "VIDEO_TOO_MANY_AUDIOS": "一個影片串流上不能有多個聲音串流",
-      "SERVER_UNRESPONSIVE": "伺服器沒有回應，請稍後再試。",
-      "SERVICE_UNAVAILABLE": "哎呀! 伺服器似乎沒有反應。請稍後再試。",
+      "SERVER_UNRESPONSIVE": "Oops! The server seems to be unresponsive. 請稍後重試。",
+      "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. 請稍後重試。",
       "ACTIVE_TRANSACTION": "現有事件正在程序轉換中，無法編輯。",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "更新時出現意外錯誤。 某些事件可能已更新。",
+         "UNEXPECTED_ERROR": "An unexpected error occurred while updating. Some events might have been updated.",
          "ALL_EVENTS_UPDATED": "已成功更新所有事件",
          "NO_EVENTS_UPDATED": "所有更新都失敗",
          "SOME_EVENTS_NOT_UPDATED": "部份事件無法被更新。"
       },
       "ADOPTER_PROFILE_UPDATED": "成功更新概要資訊。",
-      "ADOPTER_PROFILE_NOT_UPDATED": "無法更新概要資訊，請稍後再試一次!",
+      "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
       "ADOPTER_PROFILE_DELETED": "概要資訊已被成功移除",
-      "ADOPTER_PROFILE_NOT_DELETED": "哎呀！ 無法刪除概要資訊。 請再試一次！",
+      "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!",
       "TOBIRA_OVERRIDE_NAME": "The title of the selected page will be overridden with the title of the series.",
       "TOBIRA_NO_PATH_SEGMENT": "Page needs a path segment.",
       "TOBIRA_NOT_MOUNTED": "Series could not be mounted in Tobira.",
@@ -271,19 +282,19 @@
          "EVENTS": {
             "CAPTION": "刪除",
             "DELETE_EVENTS": "删除事件",
-            "UNAUTHORIZED": "您無權刪除已被強調顯示的事件。 請取消選擇它們以繼續。"
+            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "一旦刪除, 所有的事件中繼資料, 音訊和視頻檔將被刪除和不可恢復。",
       "DELETE_EVENTS_WARNING_LINE2": "",
-      "DELETE_SERIES_WARNING_LINE1": "一旦刪除, 所有系列中繼資料將不可恢復。不會刪除系列中的事件。",
+      "DELETE_SERIES_WARNING_LINE1": "Once deleted, all series metadata will be unrecoverable. Events in the series will not be deleted.",
       "DELETE_SERIES_WARNING_LINE2": "",
       "SCHEDULE_TASK": {
          "CAPTION": "啟動任務",
          "GENERAL": {
             "CAPTION": "一般",
             "SUMMARY": "({{ count }} 個選定的事件)",
-            "CANNOTSTART": "標示的事件無法在此刻進行處理, 你可以取消選擇或稍後再試。"
+            "CANNOTSTART": "Highlighted event(s) cannot be processed at the moment. Deselect it/them or try again later."
          },
          "TASKS": {
             "CAPTION": "任務",
@@ -306,7 +317,7 @@
             "NOCHANGES": "檢測到的事件沒有變化！",
             "CONFLICT_FIRST_EVENT": "已更改事件",
             "CONFLICT_SECOND_EVENT": "衝突事件",
-            "CANNOTEDITSCHEDULE": "對於已被強調顯示的事件，您無權編輯時程安排資訊。 您可以繼續，但您根本無法編輯任何事件的時程安排資訊。"
+            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
          },
          "METADATA": {
             "EDIT": "編輯後設資料"
@@ -322,7 +333,7 @@
             "CAPTION": "編輯",
             "EVENT": "事件",
             "EVENTS": "事件",
-            "HEADER": "此頁面允許您編輯按平日分組的預定事件。 輸入欄位是預先填寫的，以防所有已排程的事件對於特定欄位具有相同的值。 否則，輸入欄位將留空。 將輸入欄位留空意味著不應更改相對應的欄位值。",
+            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
             "METADATA": "後設資料",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})\n"
          }
@@ -341,7 +352,7 @@
             }
          },
          "EDIT": {
-            "DESCRIPTION": "編輯和/或選擇要更新的後設資料欄位。 如果這不會導致至少一個事件的值發生更改，或者該欄位是無效（例如，必填欄位不能為空）則無法選擇該欄位。 已被強調顯示的後設資料欄位對於所選事件具有許多不同的值。",
+            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
             "TABLE": {
                "CAPTION": "選定事件的後設資料",
                "FIELDS": "後設資料",
@@ -431,7 +442,7 @@
          },
          "INFORMATION_STATE": {
             "HEADER": "謝謝您使用 Opencast!",
-            "INFORMATION_PARAGRAPH_1": "我們的開發人員一直在努力為您提供最佳的用戶體驗。 為此，我們需要更多地了解誰在使用 Opencast 以及如何使用它。 您可以快速註冊來幫助我們。",
+            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
             "INFORMATION_PARAGRAPH_2": "我們非常感謝任何反饋，因為即使是我們收集的有關 Opencast 使用情況的一些資訊也將幫助我們創建更好的軟體，有更好的機會獲得額外資金並吸引更多公司採用 Opencast 提供服務。"
          },
          "FORM_STATE": {
@@ -448,7 +459,7 @@
             "LAST_NAME": "姓氏",
             "STREET": "街",
             "NUMBER": "號碼",
-            "ADDITIONAL_ADDRESS_INFO": "添加。 地址資訊",
+            "ADDITIONAL_ADDRESS_INFO": "Add. address information",
             "MAIL": "郵件信箱",
             "CONTACT_ME": "聯繫我獲取更新和安全相關問題",
             "WHICH_DATA_TO_SHARE": "您要分享哪些資料？",
@@ -473,7 +484,7 @@
             "TEXT": "處理您的請求時出錯。"
          },
          "DELETE_SUBMIT_STATE": {
-            "TEXT": "Are you sure you want to delete your registration data? Confirming this will also remove your registration data from the Opencast project server with the next update interval."
+            "TEXT": "你確定想要刪除您的註冊資料？ Confirming this will also remove your registration data from the Opencast project server with the next update interval."
          }
       }
    },
@@ -894,11 +905,23 @@
                   "ADDITIONAL_ACTIONS": "更多選項",
                   "ACTION": "操作",
                   "NEW": "新政策",
-                  "DETAILS": "詳細信息"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the event",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the event becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the event"
+                  }
                },
                "ROLES": {
                   "LABEL": "選擇一個角色",
                   "EMPTY": "找不到角色"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "COMMENTS": {
@@ -1116,17 +1139,28 @@
                   "ADDITIONAL_ACTIONS": "更多選項",
                   "ACTION": "操作",
                   "NEW": "新政策",
-                  "DETAILS": "詳細信息"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "選擇一個角色",
                   "EMPTY": "找不到角色"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "THEME": {
                "CAPTION": "主題",
                "DESCRIPTION": {
-                  "TEXT": "您可以選擇使用主題來標示視頻。主題可以定義前後段視頻、浮水印和標題幻燈片 (包括中繼資料)。"
+                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
                },
                "TITLE": "主題",
                "LABEL": "無主題",
@@ -1194,17 +1228,29 @@
                   "ADDITIONAL_ACTIONS": "更多選項",
                   "ACTION": "操作",
                   "NEW": "新政策",
-                  "DETAILS": "詳細信息",
-                  "REPLACE_EVENT_ACLS": "Save & update event permissions",
+                  "DETAILS": "Non-user roles",
+                  "REPLACE_EVENT_ACLS": "更新事件權限",
                   "REPLACE_EVENT_ACLS_HINT": "確保本系列的所有事件都具有這些權限",
                   "SAVE_SERIES_ACLS": "Save",
                   "SAVE_SERIES_ACLS_HINT": "Apply permissions only to series",
                   "LOAD_MORE_LIMIT": "顯示的政策。",
-                  "LOAD_MORE_LINK": "載入更多"
+                  "LOAD_MORE_LINK": "載入更多",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "選擇一個角色",
                   "EMPTY": "找不到角色"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "METADATA": {
@@ -1443,12 +1489,23 @@
                   "ADDITIONAL_ACTIONS": "更多選項",
                   "ACTION": "操作",
                   "NEW": "新政策",
-                  "DETAILS": "詳細信息",
-                  "DESCRIPTION": "請選擇一組預配置的策略或添加自訂策略"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "請選擇一組預配置的策略或添加自訂策略",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the access policy",
+                  "HELP": {
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                  }
                },
                "ROLES": {
                   "LABEL": "選擇一個角色",
                   "EMPTY": "找不到角色"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          },
@@ -1481,12 +1538,24 @@
                   "ADDITIONAL_ACTIONS": "更多選項",
                   "ACTION": "操作",
                   "NEW": "新政策",
-                  "DETAILS": "詳細信息",
-                  "DESCRIPTION": "請選擇一組預配置的策略或添加自訂策略"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "請選擇一組預配置的策略或添加自訂策略",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the access policy",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                  }
                },
                "ROLES": {
                   "LABEL": "選擇一個角色",
                   "EMPTY": "找不到角色"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          }
@@ -1619,7 +1688,7 @@
                "BOTTOM_RIGHT": "右下",
                "UPLOAD": "上載",
                "POSITION": "浮水印位置和預覽",
-               "FILEUPLOAD_DESCRIPTION": "文件應該有一個alpha通道（透明背景）可接受的文件類型有：.PNG,.GIF,.SVG,.WEBP",
+               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: .PNG, .GIF, .SVG, .WEBP",
                "UPLOAD_LABEL": "上傳圖片",
                "UPLOAD_BUTTON": "上載"
             },
@@ -1708,7 +1777,7 @@
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "警告：您的某些更改未儲存。 如果您離開影片編輯器，這些更改將會遺失。 你真的要繼續嗎？",
+      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
       "TIMELINE": "時間軸",
       "ZOOMLEVEL": "縮放級別",
       "PREVIEW_MODE": "預覽模式",
@@ -1756,7 +1825,7 @@
          "END": "結束"
       },
       "THUMBNAIL": {
-         "DESCRIPTION": "用於呈現事件的預設縮圖是自動生成的。 如果您想使用不同的縮圖，您可以從目前播放位置的影片中截取縮圖或上傳縮圖圖像。",
+         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
@@ -1783,7 +1852,7 @@
          },
          "PREVIEW": {
             "NOT_AVAILABLE": "無法預覽",
-            "OUTDATED": "由於影片片段已更改，因此此預覽已過時。 儲存更改後它將立即更新。"
+            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
          },
          "CURRENT": {
             "DEFAULT": "您目前正在使用預設縮圖。",
@@ -1792,7 +1861,7 @@
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "您可以取消選擇軌道以將它們排除在進一步處理之外。 請注意，您需要（重新）發布事件才能實際套用更改。",
+         "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
          "NOTIFICATION": {
             "NO_VIDEO_TRACK_SELECTED": "您必須至少啟用一個影片軌道",
             "NO_AUDIO_TRACK_SELECTED": "您必須至少啟用一個聲音軌道"
@@ -1806,8 +1875,8 @@
             "NO_PREVIEW_AVAILABLE": "找不到可預覽的圖像",
             "NO_TRACK_SELECTED": "尚未選取影片軌道",
             "TOOLTIPS": {
-               "HIDE": "此影片軌道目前已啟用。 請點擊後停用",
-               "UNHIDE": "此影片軌道目前已停用用。 請點擊後啟"
+               "HIDE": "This video track is currently enabled. Click to disable",
+               "UNHIDE": "This video track is currently disabled. Click to enable."
             }
          },
          "AUDIO": {
@@ -1816,8 +1885,8 @@
             "NO_PREVIEW_AVAILABLE": "找不到可預覽的圖像",
             "NO_TRACK_SELECTED": "尚未選取聲音軌道",
             "TOOLTIPS": {
-               "HIDE": "此聲音軌道目前已啟用。 請點擊後停用",
-               "UNHIDE": "此聲音軌道目前已停用。 請點擊後啟用"
+               "HIDE": "This audio track is currently enabled. Click to disable",
+               "UNHIDE": "This audio track is currently disabled. Click to enable"
             }
          }
       },
@@ -2096,7 +2165,7 @@
    "HOTKEYS": {
       "CHEAT_SHEET": {
          "TITLE": "鍵盤快捷鍵",
-         "HINT": "此頁面列出了當前可用的鍵盤快捷鍵。 請注意，這些可能會根據您當前訪問的頁面而改變。"
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
       },
       "KEYS": {
          "CTRL": "Ctrl",
@@ -2185,7 +2254,7 @@
       }
    },
    "STATISTICS": {
-      "NOT_AVAILABLE": "暫時無法顯示統計數據。 請稍後再試。",
+      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. 請稍後重試。",
       "UNSUPPORTED_TYPE": "抱歉，Opencast 無法呈現此類統計數據。",
       "FROM": "從",
       "TO": "至",
@@ -2201,7 +2270,7 @@
          "PUBLISHEDHOURS": "已發行的影片時數"
       },
       "DESCRIPTION": {
-         "RANDOM": "這顯示隨機數據作為展示。 您可以通過從 etc/providers 中刪除相對應的統計提供者的 json 定義值來停用此圖表",
+         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
          "VIEWS_SUM": "這將顯示每個時間單位的總觀看次數。",
          "VIEWS_AVG": "這顯示了每個時間單位的平均觀看次數。",
          "PUBLISHEDHOURS": "這將顯示已發布的影片時數"

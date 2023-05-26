@@ -8,5 +8,6 @@ module.exports = {
     },
     "globals": {
         "require": true,
+        "cookieconsent": true
     }
 };

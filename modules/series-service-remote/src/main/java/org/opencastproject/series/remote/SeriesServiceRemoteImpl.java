@@ -645,7 +645,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
     HttpPut put = new HttpPut("/" + seriesID + "/elements/" + type);
     put.setEntity(new ByteArrayEntity(data, ContentType.DEFAULT_BINARY));
 
-    HttpResponse response = getResponse(put, SC_NO_CONTENT, SC_INTERNAL_SERVER_ERROR);
+    HttpResponse response = getResponse(put, SC_CREATED, SC_NO_CONTENT, SC_INTERNAL_SERVER_ERROR);
     try {
       if (response == null) {
         throw new SeriesException(format("Error while updating element of type '%s' in series '%s'", type, seriesID));

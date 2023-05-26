@@ -28,10 +28,10 @@
    "YES": "是",
    "COPY": "复制到剪贴板",
    "MONITOR": {
-      "REGISTRATION": "Opencast 已在一周多时间内发送注册更新"
+      "REGISTRATION": "Out of date"
    },
    "LTI": {
-      "ERROR_LOADING_METADATA": "加载事件元数据时出错。请稍后再试。",
+      "ERROR_LOADING_METADATA": "Error loading event metadata. 请稍后再试。",
       "SERIES_TITLE": "查看系列",
       "UPLOAD_TITLE": "上传事件",
       "LOADING": "加载中...",
@@ -63,7 +63,7 @@
       "GENERIC_ERROR": "错误: {{message}}",
       "DELETION_SUCCESS": "事件删除成功",
       "DELETION_SUCCESS_DESCRIPTION": "事件将很快从列表中移除…",
-      "EVENT_LOCKED": "事件正在处理中。请等待以进行进一步更改…",
+      "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
       "DELETION_FAILURE": "事件删除失败",
       "DELETION_FAILURE_DESCRIPTION": "请稍后再试…",
       "RESULT_HEADING": "结果： 第{{range.begin}}-{{range.end}}项，共{{total}}项",
@@ -104,7 +104,7 @@
          "SUBHEADING": "选择择您希望在 {{ tableName }} 显示的默认值",
          "AVAILABLE_COLUMNS": "可用的列",
          "SELECTED_COLUMNS": "选定的列",
-         "FOOTER_TEXT": "设定的选项及其顺序会自动保存。您可以点击 \"{{resetTranslation}}\" 恢复到默认视图。"
+         "FOOTER_TEXT": "The order and selection will be saved automatically. Press \"{{resetTranslation}}\" to restore the default view."
       }
    },
    "CONFIRMATIONS": {
@@ -130,9 +130,9 @@
          }
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "此系列包含事件。删除此系列将不会删除其中的事件。",
+         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
          "EVENT_WILL_BE_GONE": "如果您继续，该事件将彻底丢失。",
-         "UNSAVED_CHANGES": "您有未保存的更改。如果您继续，这些更改将被丢弃。您确定要继续吗？"
+         "UNSAVED_CHANGES": "You have unsaved changes. If you continue, those changes will be discarded. Are you sure that you want to continue?"
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "此系列无法删除，因为它仍然包含事件。"
@@ -148,6 +148,17 @@
       "REST_DOC": "REST API 文档",
       "HOTKEY_CHEAT_SHEET": "快捷键",
       "ADOPTER_REGISTRATION": "使用者登记"
+   },
+   "REBUILD": {
+      "TITLE": "Index Rebuild",
+      "WARNING": "Attention!",
+      "HEADER": "Index rebuild in progress!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "已创建访问权限",
@@ -167,7 +178,7 @@
       "GROUP_NOT_SAVED": "无法保存该群组",
       "GROUP_DELETED": "该群组已删除",
       "GROUP_NOT_DELETED": "无法删除该群组",
-      "ACCESS_DENIED": "拒绝访问。您无权查看此页",
+      "ACCESS_DENIED": "Access denied. You're not allowed to view this page",
       "SERIES_ADDED": "该系列已新增",
       "SERIES_NOT_SAVED": "无法保存此系列",
       "EVENTS_CREATED": "事件已创建",
@@ -201,8 +212,8 @@
       "LOCATION_DELETED": "已删除位置",
       "LOCATION_NOT_DELETED": "无法删除位置",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "您无权删除该位置。",
-      "CONFLICT_DETECTED": "计划冲突：新事件与已存在的事件有重叠。请修改位置或时间。",
-      "CONFLICT_BULK_DETECTED": "计划冲突：修改此时间会导致冲突。请修改位置或时间。",
+      "CONFLICT_DETECTED": "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
+      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "计划冲突：此事件已结束。",
       "CONFLICT_END_BEFORE_START": "计划错误：结束时间应晚于开始时间。",
       "CONFLICT_IN_THE_PAST": "计划无法更新: 无法预约过去的事件。",
@@ -236,29 +247,29 @@
       "THUMBNAIL_CHANGE_FAILED": "更改缩略图失败。",
       "VIDEO_SOURCE_TRACKS_INVALID": "您未选择要处理的视频轨道",
       "VIDEO_TOO_MANY_AUDIOS": "您不能在一个视频流上放置多个音频流",
-      "SERVER_UNRESPONSIVE": "服务器没有响应，请稍后再试。",
-      "SERVICE_UNAVAILABLE": "服务器没有响应，请稍后再试。",
+      "SERVER_UNRESPONSIVE": "Oops! The server seems to be unresponsive. 请稍后再试。",
+      "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. 请稍后再试。",
       "ACTIVE_TRANSACTION": "当前事件处于某个工作流的处理过程中，因此无法编辑。",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "更新时发生意外错误。一些事件可能已更新。",
+         "UNEXPECTED_ERROR": "An unexpected error occurred while updating. Some events might have been updated.",
          "ALL_EVENTS_UPDATED": "已成功更新所有事件",
          "NO_EVENTS_UPDATED": "所有更新失败。",
          "SOME_EVENTS_NOT_UPDATED": "部分事件无法被更新。"
       },
       "ADOPTER_PROFILE_UPDATED": "资料已更新",
-      "ADOPTER_PROFILE_NOT_UPDATED": "哎呀！无法更新资料信息。请重试！",
+      "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
       "ADOPTER_PROFILE_DELETED": "成功删除资料信息",
-      "ADOPTER_PROFILE_NOT_DELETED": "哎呀！无法删除资料信息。请重试！",
+      "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!",
       "TOBIRA_OVERRIDE_NAME": "所选页面的标题将被系列的标题覆盖。",
       "TOBIRA_NO_PATH_SEGMENT": "页面需要路径部分。",
       "TOBIRA_NOT_MOUNTED": "无法将系列挂载到 tobira。",
-      "TOBIRA_PATH_SEGMENT_INVALID": "路径段无效。 一个有效的路径段长度至少为2个字符，不包含任何空白或控制字符，不能包含 '<>\"[\\]^`{|}#%/? '，不能以字符 '-+~@_!$&;:.,=*'()'。",
+      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
       "TOBIRA_PATH_SEGMENT_UNIQUE": "一个页面的路径部分必须在所有同级页面中保持唯一。",
-      "TOBIRA_PAGE_NOT_FOUND": "您试图访问的页面不存在。您可以尝试从头开始访问。",
-      "TOBIRA_SERVER_ERROR": " 连接到 Tobira 时出错。请联系系统管理员或稍后重试。",
+      "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
+      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and/or try again later.",
       "TOBIRA_COPIED_DIRECT_LINK": "链接已复制到剪贴板。",
       "TOBIRA_FAILED_COPYING_DIRECT_LINK": "无法复制链接到剪贴板。",
-      "TOBIRA_NOT_FOUND": "Tobira 目前不知道这个系列。请几分钟后再试或联系系统管理员。"
+      "TOBIRA_NOT_FOUND": "Tobira doesn't know about this series (yet). Try again in a few minutes or contact your system administrator."
    },
    "BULK_ACTIONS": {
       "CAPTION": "操作",
@@ -271,19 +282,19 @@
          "EVENTS": {
             "CAPTION": "删除",
             "DELETE_EVENTS": "刪除事件",
-            "UNAUTHORIZED": "您无权删除突出显示的事件。请取消选择以继续。"
+            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "一经删除，所有事件的元数据、视音频文件将被删除，无法恢复。",
       "DELETE_EVENTS_WARNING_LINE2": "",
-      "DELETE_SERIES_WARNING_LINE1": "一旦删除，所有系列元数据将无法恢复。系列中的事件将不会被删除。",
+      "DELETE_SERIES_WARNING_LINE1": "Once deleted, all series metadata will be unrecoverable. Events in the series will not be deleted.",
       "DELETE_SERIES_WARNING_LINE2": "",
       "SCHEDULE_TASK": {
          "CAPTION": "启动任务",
          "GENERAL": {
             "CAPTION": "概述",
             "SUMMARY": "(已选定 {{ count }} 个事件)",
-            "CANNOTSTART": "目前无法处理突出显示的事件 。请取消选择或稍后再试。"
+            "CANNOTSTART": "Highlighted event(s) cannot be processed at the moment. Deselect it/them or try again later."
          },
          "TASKS": {
             "CAPTION": "任务",
@@ -306,7 +317,7 @@
             "NOCHANGES": "未检测到事件更改！",
             "CONFLICT_FIRST_EVENT": "更改的事件",
             "CONFLICT_SECOND_EVENT": "冲突的事件",
-            "CANNOTEDITSCHEDULE": "对于突出显示的事件，您没有权限编辑计划信息。您可以继续，但是您无法编辑任何事件的计划信息。"
+            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
          },
          "METADATA": {
             "EDIT": "编辑元数据"
@@ -322,7 +333,7 @@
             "CAPTION": "编辑",
             "EVENT": "事件",
             "EVENTS": "事件",
-            "HEADER": "此页面允许您按工作日编辑计划事件。如果所有计划事件具有相同的字段值，输入字段将被预填。否则，输入字段留空值。输入字段留空意味着相应的值不应被改变。",
+            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
             "METADATA": "元数据",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -341,7 +352,7 @@
             }
          },
          "EDIT": {
-            "DESCRIPTION": "编辑或选择您想更新的元数据字段。如果修改字段不会更新任何事件或字段无效（例如：字段不能为空），那么此字段就不能被选择。高亮的元数据字段表示对于选定的事件有不同的值。",
+            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
             "TABLE": {
                "CAPTION": "选定事件的元数据",
                "FIELDS": "元数据",
@@ -431,7 +442,7 @@
          },
          "INFORMATION_STATE": {
             "HEADER": "感谢您使用Opencast！",
-            "INFORMATION_PARAGRAPH_1": "我们的开发者一直努力为您提供最好的用户体验。因此，我们需要更多地了解谁使用Opencast以及如何使用。您可以通过快速注册来帮助我们。",
+            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
             "INFORMATION_PARAGRAPH_2": "我们非常感谢任何反馈，因为即使是关于Opencast使用情况的一部分数据也将有助于我们创造更好的软件，获得更多的资助，吸引更多公司为Opencast提供周边服务。"
          },
          "FORM_STATE": {
@@ -448,7 +459,7 @@
             "LAST_NAME": "姓",
             "STREET": "街道",
             "NUMBER": "号码",
-            "ADDITIONAL_ADDRESS_INFO": "增加地址信息",
+            "ADDITIONAL_ADDRESS_INFO": "Add. address information",
             "MAIL": "电子邮件",
             "CONTACT_ME": "有更新或安全问题时联系我",
             "WHICH_DATA_TO_SHARE": "您愿意分享哪些信息？",
@@ -473,7 +484,7 @@
             "TEXT": "处理您的请求时出错。"
          },
          "DELETE_SUBMIT_STATE": {
-            "TEXT": "您确定要删除您的注册信息吗？ 如果确认，将在下次Opencast服务器更新时，移除您的注册信息。"
+            "TEXT": "您确认要删除注册信息吗？ Confirming this will also remove your registration data from the Opencast project server with the next update interval."
          }
       }
    },
@@ -894,11 +905,23 @@
                   "ADDITIONAL_ACTIONS": "其他操作",
                   "ACTION": "操作",
                   "NEW": "新建策略",
-                  "DETAILS": "详情"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the event",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the event becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the event"
+                  }
                },
                "ROLES": {
                   "LABEL": "选择角色",
                   "EMPTY": "找不到角色"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "COMMENTS": {
@@ -1116,17 +1139,28 @@
                   "ADDITIONAL_ACTIONS": "其他操作",
                   "ACTION": "操作",
                   "NEW": "新建策略",
-                  "DETAILS": "详情"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "选择角色",
                   "EMPTY": "找不到角色"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "THEME": {
                "CAPTION": "主题",
                "DESCRIPTION": {
-                  "TEXT": "您可以通过主题在视频中打上标记。主题可以包括片头、片尾、水印和包含元数据的幻灯片。"
+                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
                },
                "TITLE": "主题",
                "LABEL": "请选择主题",
@@ -1134,7 +1168,7 @@
             },
             "TOBIRA": {
                "CAPTION": "Tobira",
-               "DESCRIPTION": "您可以在此选择您想要在 Tobira 视频门户中显示系列的位置。 您只能在这里选择一个位置，它必须是空的(用粗体标记)。 您可以在这里创建新的页面，但是请注意，它们只是在选定页面的路径上才会持续存在。",
+               "DESCRIPTION": "Here you can select where you want the series to show up in the Tobira video portal. You can only select one location here, and it needs to be empty (marked in bold). You can create new pages here, but note that they are only persisted if they are on the path to the selected page.",
                "SELECT_PAGE": "选择目标页面",
                "PAGE_TITLE": "子页面标题",
                "PATH_SEGMENT": "路径段",
@@ -1143,7 +1177,7 @@
                "CANCEL": "取消",
                "HOMEPAGE": "首页",
                "SELECTED_PAGE": "系列将在以下路径中挂载",
-               "NO_PAGE_SELECTED": "没有选择页面。系列将不会在 Tobira 挂载。",
+               "NO_PAGE_SELECTED": "No page selected. Series will not be mounted in Tobira.",
                "PATH": "路径"
             },
             "SUMMARY": {
@@ -1194,17 +1228,29 @@
                   "ADDITIONAL_ACTIONS": "其他操作",
                   "ACTION": "操作",
                   "NEW": "新建策略",
-                  "DETAILS": "详情",
-                  "REPLACE_EVENT_ACLS": "保存并更新事件权限",
+                  "DETAILS": "Non-user roles",
+                  "REPLACE_EVENT_ACLS": "更新事件权限",
                   "REPLACE_EVENT_ACLS_HINT": "确保此系列中的所有事件都具有这些权限",
                   "SAVE_SERIES_ACLS": "保存",
                   "SAVE_SERIES_ACLS_HINT": "仅将权限应用于系列",
                   "LOAD_MORE_LIMIT": "显示策略.",
-                  "LOAD_MORE_LINK": "载入更多"
+                  "LOAD_MORE_LINK": "载入更多",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "选择角色",
                   "EMPTY": "找不到角色"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "METADATA": {
@@ -1443,12 +1489,23 @@
                   "ADDITIONAL_ACTIONS": "其他操作",
                   "ACTION": "操作",
                   "NEW": "新建策略",
-                  "DETAILS": "详情",
-                  "DESCRIPTION": "请选择一套预先配置的策略或在下方添加自定义策略"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "请选择一套预先配置的策略或在下方添加自定义策略",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the access policy",
+                  "HELP": {
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                  }
                },
                "ROLES": {
                   "LABEL": "选择角色",
                   "EMPTY": "找不到角色"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          },
@@ -1481,12 +1538,24 @@
                   "ADDITIONAL_ACTIONS": "其他操作",
                   "ACTION": "操作",
                   "NEW": "新建策略",
-                  "DETAILS": "详情",
-                  "DESCRIPTION": "请选择一套预先配置的策略或在下方添加自定义策略"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "请选择一套预先配置的策略或在下方添加自定义策略",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the access policy",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                  }
                },
                "ROLES": {
                   "LABEL": "选择角色",
                   "EMPTY": "找不到角色"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          }
@@ -1619,7 +1688,7 @@
                "BOTTOM_RIGHT": "右下",
                "UPLOAD": "上传",
                "POSITION": "水印位置和预览",
-               "FILEUPLOAD_DESCRIPTION": "文件应该有一个 alpha 通道 (透明背景)。可接受的文件类型是：.PNG, .GIF, .SVG, .WEBP",
+               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: .PNG, .GIF, .SVG, .WEBP",
                "UPLOAD_LABEL": "上传图片",
                "UPLOAD_BUTTON": "上传"
             },
@@ -1708,7 +1777,7 @@
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "警告：您的一些更改没有保存。如果您离开视频编辑器，这些更改将会丢失。您确实想要继续吗？",
+      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
       "TIMELINE": "时间线",
       "ZOOMLEVEL": "缩放级别",
       "PREVIEW_MODE": "预览模式",
@@ -1756,7 +1825,7 @@
          "END": "结束"
       },
       "THUMBNAIL": {
-         "DESCRIPTION": "已自动生成用于表示此事件的默认缩略图。如果您想使用其他缩略图，您可以从视频的当前播放位置提取或上传图片。",
+         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
@@ -1783,7 +1852,7 @@
          },
          "PREVIEW": {
             "NOT_AVAILABLE": "无可用预览",
-            "OUTDATED": "因分段更改已导致预览过时。一旦您保存更改，它将尽快更新。"
+            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
          },
          "CURRENT": {
             "DEFAULT": "您当前正在使用默认缩略图。",
@@ -1792,7 +1861,7 @@
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "您可以取消选择轨道，将其排除在进一步处理之外。请注意您需要重新发布事件才能使更改生效。",
+         "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
          "NOTIFICATION": {
             "NO_VIDEO_TRACK_SELECTED": "您必须启用至少一个视频轨道",
             "NO_AUDIO_TRACK_SELECTED": "您必须启用至少一个音频轨道"
@@ -1806,8 +1875,8 @@
             "NO_PREVIEW_AVAILABLE": "未找到预览图像",
             "NO_TRACK_SELECTED": "没有选择视频轨道",
             "TOOLTIPS": {
-               "HIDE": "此视频轨道当前已启用。点击以禁用",
-               "UNHIDE": "此视频轨道目前已禁用。点击以启用。"
+               "HIDE": "This video track is currently enabled. Click to disable",
+               "UNHIDE": "This video track is currently disabled. Click to enable."
             }
          },
          "AUDIO": {
@@ -1816,8 +1885,8 @@
             "NO_PREVIEW_AVAILABLE": "未找到预览图像",
             "NO_TRACK_SELECTED": "没有选择音频轨道",
             "TOOLTIPS": {
-               "HIDE": "此音频轨道当前已启用。点击以禁用",
-               "UNHIDE": "此音频轨道当前已禁用。点击以启用"
+               "HIDE": "This audio track is currently enabled. Click to disable",
+               "UNHIDE": "This audio track is currently disabled. Click to enable"
             }
          }
       },
@@ -2096,7 +2165,7 @@
    "HOTKEYS": {
       "CHEAT_SHEET": {
          "TITLE": "快捷键",
-         "HINT": "该页面显示当前页面可用的快捷键。注意：不同页面可能显示的不一样。"
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
       },
       "KEYS": {
          "CTRL": "Ctrl",
@@ -2185,7 +2254,7 @@
       }
    },
    "STATISTICS": {
-      "NOT_AVAILABLE": "统计数据目前无法显示。请稍后再试。",
+      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. 请稍后再试。",
       "UNSUPPORTED_TYPE": "对不起，Opencast无法显示此类型的统计数据。",
       "FROM": "从",
       "TO": "到",
@@ -2201,7 +2270,7 @@
          "PUBLISHEDHOURS": "已发布视频的小时数"
       },
       "DESCRIPTION": {
-         "RANDOM": "显示随机数据作为展示。您可以通过删除 etc/providers 中相应的统计定义json 来禁用此图表。",
+         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
          "VIEWS_SUM": "显示单位时间内的查看数。",
          "VIEWS_AVG": "显示单位时间内的平均每天查看数。",
          "PUBLISHEDHOURS": "显示已发布的视频小时数"

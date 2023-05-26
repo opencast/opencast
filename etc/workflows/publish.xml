@@ -12,6 +12,7 @@
     Process media files and publish them.
   </description>
   <configuration_panel/>
+  <configuration_panel_json/>
   <state-mappings>
     <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.PUBLISHING</state-mapping>
     <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.PUBLISHING</state-mapping>

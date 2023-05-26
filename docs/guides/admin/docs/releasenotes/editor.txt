@@ -1,0 +1,11 @@
+New Default Editor
+------------------
+
+The default editor of Opencast has changed.
+If you want to continue using the internal editor of the old admin interface,
+you need to specifically configure this in `etc/org.opencastproject.organization-mh_default_org.cfg`
+by configuring `prop.admin.editor.url`.
+
+Note that the old admin interface is deprecated and will be removed in one of the next major releases.
+Even if you use the old editor for now, please make sure to test the new one
+and report potential problems.

@@ -47,7 +47,7 @@ First you have to install the necessary repositories so that your package manage
     repository. If you need the new release prior to its promotion to stable you can use the testing repository.
     Note that the testing repository is an additional repository and still requires the stable repository to be active.
 
-        echo "deb https://pkg.opencast.org/debian {{ opencast_major_version()}}.x stable testing" | sudo tee /etc/apt/sources.list.d/opencast.list
+        echo "deb https://pkg.opencast.org/debian {{ opencast_major_version() }}.x stable testing" | sudo tee /etc/apt/sources.list.d/opencast.list
 
 * Add the repository key to your apt keyring:
 
@@ -84,6 +84,12 @@ file at `/etc/elasticsearch/jvm.options.d/log4shell.options` with the content:
 
 This applies a mitigation for the security issue.  Once applied, you should restart Elasticsearch.
 
+Finally, make sure to start and enable the service:
+
+```sh
+systemctl start elasticsearch
+systemctl enable elasticsearch
+```
 
 
 Install Opencast
@@ -99,18 +105,26 @@ This will install the default distribution of Opencast and all its dependencies,
 that while the repository provides a packaged version of FFmpeg, your distribution may have a version which is
 pre-installed or otherwise takes precedence.  This version may work, however Opencast only formally supports the
 version(s) in the repository.  To install the Opencast version of ffmpeg add `ffmpeg-dist` to the end of the command above.
+For more options, see the [advanced installation section below](#advanced-installation).
 
-At this point Opencast is installed and will work locally, but it is not completely configured.  Because additional configuration
-is required, Opencast is not configured to start automatically. Please follow the
-[Basic Configuration guide](../configuration/basic.md).  Once you are ready, enable Opencast and Elasticsearch to start on boot with:
 
-        systemctl enable elasticsearch.service
-        systemctl enable opencast.service
+Configuration
+-------------
 
-then start them with:
+Make sure to set your hostname, login information and other configuration details by following the
 
-        systemctl start elasticsearch.service
-        systemctl start opencast.service
+- [Basic Configuration guide](../configuration/basic.md)
+
+
+Start Opencast
+--------------
+
+Finally, start and enable Opencast by running:
+
+```sh
+systemctl start opencast.service
+systemctl enable opencast.service
+```
 
 
 Advanced Installation

@@ -19,6 +19,10 @@
         "Peter Planner"
       ],
       "technical_start": "2018-08-31T12:00:00Z",
+      "series":{
+        "id":"edf05757-34b1-42b8-8821-e3302b663972",
+        "title":"Mock Series"
+      },
       "location": "F300.1",
       "managedAcl": "",
       "workflow_state": "",

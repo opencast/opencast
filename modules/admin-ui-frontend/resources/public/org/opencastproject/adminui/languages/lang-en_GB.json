@@ -28,7 +28,7 @@
    "YES": "Yes",
    "COPY": "Copy to clipboard",
    "MONITOR": {
-      "REGISTRATION": "Opencast has sent a registration update in more than a week"
+      "REGISTRATION": "Out of date"
    },
    "LTI": {
       "ERROR_LOADING_METADATA": "Error loading event metadata. Please try again later.",
@@ -149,6 +149,17 @@
       "HOTKEY_CHEAT_SHEET": "Keyboard shortcuts",
       "ADOPTER_REGISTRATION": "Adopter Registration"
    },
+   "REBUILD": {
+      "TITLE": "Index Rebuild",
+      "WARNING": "Attention!",
+      "HEADER": "Index rebuild in progress!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
+   },
    "NOTIFICATIONS": {
       "ACL_ADDED": "The access policy has been created",
       "ACL_NOT_SAVED": "The access policy could not be saved",
@@ -167,7 +178,7 @@
       "GROUP_NOT_SAVED": "The group could not be saved",
       "GROUP_DELETED": "The group has been deleted",
       "GROUP_NOT_DELETED": "The group could not be deleted",
-      "ACCESS_DENIED": "Access denied. You are not allowed to view this page",
+      "ACCESS_DENIED": "Access denied. You're not allowed to view this page",
       "SERIES_ADDED": "The series has been created",
       "SERIES_NOT_SAVED": "The series could not be saved",
       "EVENTS_CREATED": "The event has been created",
@@ -431,7 +442,7 @@
          },
          "INFORMATION_STATE": {
             "HEADER": "Thank you for using Opencast!",
-            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you with the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
+            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
             "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding, and attract more companies to provide services around Opencast."
          },
          "FORM_STATE": {
@@ -894,11 +905,23 @@
                   "ADDITIONAL_ACTIONS": "Additional Actions",
                   "ACTION": "Actions",
                   "NEW": "New policy",
-                  "DETAILS": "Details"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the event",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the event becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the event"
+                  }
                },
                "ROLES": {
                   "LABEL": "Select a role",
                   "EMPTY": "No role found"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "COMMENTS": {
@@ -1116,11 +1139,22 @@
                   "ADDITIONAL_ACTIONS": "Additional Actions",
                   "ACTION": "Actions",
                   "NEW": "New policy",
-                  "DETAILS": "Details"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "Select a role",
                   "EMPTY": "No role found"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "THEME": {
@@ -1194,17 +1228,29 @@
                   "ADDITIONAL_ACTIONS": "Additional Actions",
                   "ACTION": "Actions",
                   "NEW": "New policy",
-                  "DETAILS": "Details",
-                  "REPLACE_EVENT_ACLS": "Save & update event permissions",
+                  "DETAILS": "Non-user roles",
+                  "REPLACE_EVENT_ACLS": "Update event permissions",
                   "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect",
                   "SAVE_SERIES_ACLS": "Save",
                   "SAVE_SERIES_ACLS_HINT": "Apply permissions only to series",
                   "LOAD_MORE_LIMIT": "policies shown.",
-                  "LOAD_MORE_LINK": "Load more"
+                  "LOAD_MORE_LINK": "Load more",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "Select a role",
                   "EMPTY": "No role found"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "METADATA": {
@@ -1443,12 +1489,23 @@
                   "ADDITIONAL_ACTIONS": "Additional Actions",
                   "ACTION": "Actions",
                   "NEW": "New policy",
-                  "DETAILS": "Details",
-                  "DESCRIPTION": "Please choose a pre-configured set of policies or add custom policies below"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "Please choose a pre-configured set of policies or add custom policies below",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the access policy",
+                  "HELP": {
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                  }
                },
                "ROLES": {
                   "LABEL": "Select a role",
                   "EMPTY": "No role found"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          },
@@ -1481,12 +1538,24 @@
                   "ADDITIONAL_ACTIONS": "Additional Actions",
                   "ACTION": "Actions",
                   "NEW": "New policy",
-                  "DETAILS": "Details",
-                  "DESCRIPTION": "Please choose a pre-configured set of policies or add custom policies below"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "Please choose a pre-configured set of policies or add custom policies below",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the access policy",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                  }
                },
                "ROLES": {
                   "LABEL": "Select a role",
                   "EMPTY": "No role found"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          }
@@ -1619,7 +1688,7 @@
                "BOTTOM_RIGHT": "Bottom right",
                "UPLOAD": "Upload",
                "POSITION": "Watermark position and preview",
-               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: . PNG, . GIF, . SVG, . WEBP",
+               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: .PNG, .GIF, .SVG, .WEBP",
                "UPLOAD_LABEL": "Upload image",
                "UPLOAD_BUTTON": "Upload"
             },

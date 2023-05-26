@@ -285,6 +285,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
   }
+
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("mediaPackage/{id}/hasActiveWorkflows")
