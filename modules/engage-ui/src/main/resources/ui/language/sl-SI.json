@@ -30,7 +30,7 @@
   "username": "Uporabniško ime",
   "password": "Geslo",
   "remember_me": "Zapomni si me.",
-  "sthWentWrong": "Something went wrong. Please try again.",
+  "sthWentWrong": "Nekaj je šlo narobe. Poskusite znova.",
   "loading": "Nalaganje ...",
   "no_data": "Ni razpoložljivih podatkov.",
   "login_success": "Prijava uspešna.",

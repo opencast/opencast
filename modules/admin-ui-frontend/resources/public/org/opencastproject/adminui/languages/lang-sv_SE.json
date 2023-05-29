@@ -104,7 +104,7 @@
          "SUBHEADING": "Välj data som du vill ha visad i vyn {{ tableName }}",
          "AVAILABLE_COLUMNS": "Tillgängliga kolumner",
          "SELECTED_COLUMNS": "Valda kolumner",
-         "FOOTER_TEXT": "The order and selection will be saved automatically. Press \"{{resetTranslation}}\" to restore the default view."
+         "FOOTER_TEXT": "Ordningen och urvalet kommer att sparas automatiskt. Tryck på \"{{resetTranslation}}\" för att återställa standardvyn."
       }
    },
    "CONFIRMATIONS": {
@@ -130,7 +130,7 @@
          }
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
+         "SERIES_HAS_EVENTS": "Den här serien innehåller events. Raderingen av serien ska inte ta bort events.",
          "EVENT_WILL_BE_GONE": "Om du fortsätta, eventet ska gå förlorad.",
          "UNSAVED_CHANGES": "You have unsaved changes. If you continue, those changes will be discarded. Are you sure that you want to continue?"
       },
@@ -178,7 +178,7 @@
       "GROUP_NOT_SAVED": "Gruppen kunde inte sparas",
       "GROUP_DELETED": "Gruppen har tagits bort",
       "GROUP_NOT_DELETED": "Gruppen kunde inte raderas",
-      "ACCESS_DENIED": "Access denied. You're not allowed to view this page",
+      "ACCESS_DENIED": "Åtkomst nekad. Du har inte tillåtelse att visa denna sida",
       "SERIES_ADDED": "Serien har skapats",
       "SERIES_NOT_SAVED": "Serien kunde inte sparas",
       "EVENTS_CREATED": "Händelsen har skapats",
@@ -212,8 +212,8 @@
       "LOCATION_DELETED": "Platsen har raderats",
       "LOCATION_NOT_DELETED": "Platsen kunde inte raderas",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Platsen kunde inte tas bort eftersom att du inte har rättigheterna för att göra det.",
-      "CONFLICT_DETECTED": "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
-      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
+      "CONFLICT_DETECTED": "Konflikt vid schemaläggning: Denna nya händelse överlappar med en annan. Ändra rum, datum eller tider.",
+      "CONFLICT_BULK_DETECTED": "Planeringskonflikt: Förändring av eventet resulterar i konflikter. Ändra på plats eller tidspunkt.",
       "CONFLICT_ALREADY_ENDED": "Fel vid schemaläggning: Händelsen har redan avslutats.",
       "CONFLICT_END_BEFORE_START": "Fel vid schemaläggning: Slutet måste vara senare än början.",
       "CONFLICT_IN_THE_PAST": "Tidsplanen kunde inte updateras: Du kan inte planera en event som ligger i det förflutna.",
@@ -247,8 +247,8 @@
       "THUMBNAIL_CHANGE_FAILED": "Misslyckades med att byta miniatyr.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Du har inte valt att bearbeta några videospår",
       "VIDEO_TOO_MANY_AUDIOS": "Du kan inte ha mer än en ljudström i samma videoström",
-      "SERVER_UNRESPONSIVE": "Oops! The server seems to be unresponsive. Please try again later.",
-      "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Please try again later.",
+      "SERVER_UNRESPONSIVE": "Oops! Servern svarar inte. Försök igen senare.",
+      "SERVICE_UNAVAILABLE": "Oops! Servern svarar inte. Försök igen senare.",
       "ACTIVE_TRANSACTION": "Den aktuella händelsen kan för närvarande inte redigeras för att den deltar i en aktiv transaktion.",
       "BULK_METADATA_UPDATE": {
          "UNEXPECTED_ERROR": "An unexpected error occurred while updating. Some events might have been updated.",
@@ -282,19 +282,19 @@
          "EVENTS": {
             "CAPTION": "Ta bort",
             "DELETE_EVENTS": "Radera händelser",
-            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue."
+            "UNAUTHORIZED": "Du har inte behörighet att radera markerade events. Avmarkera dem för att kunna fortsätta."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Efter raderingen kan inga metadata av händelsen och inga ljud- och videofiler återställas.",
       "DELETE_EVENTS_WARNING_LINE2": "",
-      "DELETE_SERIES_WARNING_LINE1": "Once deleted, all series metadata will be unrecoverable. Events in the series will not be deleted.",
+      "DELETE_SERIES_WARNING_LINE1": "Efter raderingen kan inga metadata av serien återställas. Händelserna i serien tas inte bort.",
       "DELETE_SERIES_WARNING_LINE2": "",
       "SCHEDULE_TASK": {
          "CAPTION": "Starta uppgift",
          "GENERAL": {
             "CAPTION": "Allmänt",
             "SUMMARY": "({{ count }} händelser valda)",
-            "CANNOTSTART": "Highlighted event(s) cannot be processed at the moment. Deselect it/them or try again later."
+            "CANNOTSTART": "Framhävda händelse(r) kan inte bearbetas just nu. Avmarkera den/dem eller försök igen senare."
          },
          "TASKS": {
             "CAPTION": "Uppgifter",
@@ -1688,7 +1688,7 @@
                "BOTTOM_RIGHT": "Nederst till höger",
                "UPLOAD": "Ladda upp",
                "POSITION": "Vattenstämpelsposition och förhandsgranskning",
-               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: .PNG, .GIF, .SVG, .WEBP",
+               "FILEUPLOAD_DESCRIPTION": "Filen skulle ha en alfakanal (genomskinlig bakgrund). Acceptabla filtyper är: .PNG, .GIF, .SVG, .WEBP",
                "UPLOAD_LABEL": "Ladda upp bild",
                "UPLOAD_BUTTON": "Ladda upp"
             },
@@ -1777,7 +1777,7 @@
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
+      "WARNING_UNSAVED": "Varning: Några av dina ändringar sparades inte. Om du lämnar videoeditoren kommer dessa förändringar att gå bort. Vill du verkligen fortsätta?",
       "TIMELINE": "Tidslinje",
       "ZOOMLEVEL": "Zoomnivå",
       "PREVIEW_MODE": "Förhandsgranskningsläge",
@@ -1825,7 +1825,7 @@
          "END": "Slut"
       },
       "THUMBNAIL": {
-         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
+         "DESCRIPTION": "En standardminiatur som används som en visuell repräsentation av event genereras automatiskt. Om du vil hellre använda en annan miniatur så kan du extrahera en miniatur ur videon på den aktuella avspelningsposition eller ladda upp ett bild.",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
@@ -1852,7 +1852,7 @@
          },
          "PREVIEW": {
             "NOT_AVAILABLE": "Ingen förhandsgranskning tillgänglig",
-            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
+            "OUTDATED": "Miniaturen är inte aktuellt för att segment blev förändrade. Den ska aktualiseras efter du har sparat dina förändringar."
          },
          "CURRENT": {
             "DEFAULT": "Du använder just nu standardminiaturen.",
@@ -1861,7 +1861,7 @@
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
+         "DESCRIPTION": "Du kan välja av spår för att inte processera vidare dem. Obs: Du måste (re-)publicera eventet för att använda förändelser.",
          "NOTIFICATION": {
             "NO_VIDEO_TRACK_SELECTED": "Du måste välja minst ett video spår",
             "NO_AUDIO_TRACK_SELECTED": "Du måste välja minst ett audio spår"
@@ -1875,8 +1875,8 @@
             "NO_PREVIEW_AVAILABLE": "Det finns inget preview-bild tillgänglig",
             "NO_TRACK_SELECTED": "Inget videospår utvald",
             "TOOLTIPS": {
-               "HIDE": "This video track is currently enabled. Click to disable",
-               "UNHIDE": "This video track is currently disabled. Click to enable."
+               "HIDE": "Det här videospåret är utvald. Klicka för att avvälja",
+               "UNHIDE": "Det här videospåret är inte utvald. Klicka för att välja."
             }
          },
          "AUDIO": {
@@ -1885,8 +1885,8 @@
             "NO_PREVIEW_AVAILABLE": "Det finns inget preview-bild tillgängliga",
             "NO_TRACK_SELECTED": "Inget audiospår utvald",
             "TOOLTIPS": {
-               "HIDE": "This audio track is currently enabled. Click to disable",
-               "UNHIDE": "This audio track is currently disabled. Click to enable"
+               "HIDE": "Det här audiospåret är utvald. Klicka för att avvälja",
+               "UNHIDE": "Det här audiospåret är inte utvald. Klicka för att välja"
             }
          }
       },
@@ -2165,7 +2165,7 @@
    "HOTKEYS": {
       "CHEAT_SHEET": {
          "TITLE": "Tangentbordsgenvägar",
-         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+         "HINT": "Den här sidan visar alla tastaturgenvägar. Obs: De kan vara olika beroende av på vilken sida du är aktuellt."
       },
       "KEYS": {
          "CTRL": "Ctrl",
@@ -2254,7 +2254,7 @@
       }
    },
    "STATISTICS": {
-      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
+      "NOT_AVAILABLE": "Statistiken kan inte visas just nu. Försök igen senare.",
       "UNSUPPORTED_TYPE": "Förlåt, Opencast kan inte visa den här typen av statistik.",
       "FROM": "Från",
       "TO": "Till",
@@ -2270,7 +2270,7 @@
          "PUBLISHEDHOURS": "Publicerad antal timmar"
       },
       "DESCRIPTION": {
-         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
+         "RANDOM": "Det här visar random uppgifter som ett exempel. Du kan deaktivera detta igenom att du ta bort JSON definitionen av statistic provider ifrån pärmen etc/providers.",
          "VIEWS_SUM": "Det här visar totala antalet visningar per tidsenhet.",
          "VIEWS_AVG": "Det här visar det genomsnittliga antalet visningar per tidsenhet.",
          "PUBLISHEDHOURS": "Det här visar antalet publicerade timmar av video"

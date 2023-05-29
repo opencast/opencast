@@ -178,7 +178,7 @@
       "GROUP_NOT_SAVED": "The group could not be saved",
       "GROUP_DELETED": "The group has been deleted",
       "GROUP_NOT_DELETED": "The group could not be deleted",
-      "ACCESS_DENIED": "Access denied. You're not allowed to view this page",
+      "ACCESS_DENIED": "Access denied. You are not allowed to view this page",
       "SERIES_ADDED": "The series has been created",
       "SERIES_NOT_SAVED": "The series could not be saved",
       "EVENTS_CREATED": "The event has been created",
@@ -442,7 +442,7 @@
          },
          "INFORMATION_STATE": {
             "HEADER": "Thank you for using Opencast!",
-            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
+            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you with the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
             "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding, and attract more companies to provide services around Opencast."
          },
          "FORM_STATE": {
@@ -1688,7 +1688,7 @@
                "BOTTOM_RIGHT": "Bottom right",
                "UPLOAD": "Upload",
                "POSITION": "Watermark position and preview",
-               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: .PNG, .GIF, .SVG, .WEBP",
+               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: . PNG, . GIF, . SVG, . WEBP",
                "UPLOAD_LABEL": "Upload image",
                "UPLOAD_BUTTON": "Upload"
             },
