@@ -130,9 +130,9 @@
          }
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "Diese Serie enthält Events. Deleting the series will not delete the events.",
+         "SERIES_HAS_EVENTS": "Diese Serie enthält Events. Das Löschen der Serie löscht die Ereignisse nicht.",
          "EVENT_WILL_BE_GONE": "Wenn Sie fortfahren, wird das Video unwiderruflich gelöscht.",
-         "UNSAVED_CHANGES": "You have unsaved changes. If you continue, those changes will be discarded. Are you sure that you want to continue?"
+         "UNSAVED_CHANGES": "Es gibt ungespeicherte Änderungen. Wenn Sie fortfahren, werden diese Änderungen verworfen. Sind Sie sicher, dass Sie fortfahren möchten?"
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Diese Serie enthält Videos und kann daher nicht gelöscht werden."
@@ -178,7 +178,7 @@
       "GROUP_NOT_SAVED": "Die Gruppe konnte nicht gespeichert werden",
       "GROUP_DELETED": "Die Gruppe wurde gelöscht",
       "GROUP_NOT_DELETED": "Die Gruppe konnte nicht gelöscht werden",
-      "ACCESS_DENIED": "Access denied. Sie sind nicht berechtigt, diese Seite zu sehen.",
+      "ACCESS_DENIED": "Zugriff verweigert. Sie sind nicht berechtigt, diese Seite zu sehen.",
       "SERIES_ADDED": "Die Serie wurde angelegt",
       "SERIES_NOT_SAVED": "Die Serie konnte nicht gespeichert werden",
       "EVENTS_CREATED": "Das Video wurde angelegt",
@@ -212,8 +212,8 @@
       "LOCATION_DELETED": "Der Standort wurde gelöscht",
       "LOCATION_NOT_DELETED": "Der Standort konnte nicht entfernt werden",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Der Standort konnte nicht entfernt werden, weil Sie nicht dazu berechtigt sind.",
-      "CONFLICT_DETECTED": "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
-      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
+      "CONFLICT_DETECTED": "Planungskonflikt: Das neue Ereignis wird von einem bestehenden Ereignis überlappt. Bitte ändern Sie Ort, Datum oder Uhrzeit.",
+      "CONFLICT_BULK_DETECTED": "Planungskonflikt: Das Ändern der Ereignisse führt zu Konflikten. Bitte ändern Sie Ort, Datum oder Uhrzeit.",
       "CONFLICT_ALREADY_ENDED": "Planungs-Fehler: Das Video endete bereits.",
       "CONFLICT_END_BEFORE_START": "Planungs-Fehler: Der Endzeitpunkt des Ereignisses muss nach dem Anfangszeitpunkt liegen.",
       "CONFLICT_IN_THE_PAST": "Die Planung konnte nicht aktualisiert werden: Sie können ein Video nicht in der Vergangenheit planen.",
@@ -247,29 +247,29 @@
       "THUMBNAIL_CHANGE_FAILED": "Das Vorschaubild konnte nicht aktualisiert werden.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Keine Videospuren selektiert",
       "VIDEO_TOO_MANY_AUDIOS": "Mehrere Audiospuren können nicht mit einer Videospur verarbeitet werden",
-      "SERVER_UNRESPONSIVE": "Hoppla! The server seems to be unresponsive. Bitte versuche es später erneut.",
-      "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Bitte versuche es später erneut.",
+      "SERVER_UNRESPONSIVE": "Hoppla! Der Server scheint nicht zu reagieren. Bitte versuche es später erneut.",
+      "SERVICE_UNAVAILABLE": "Tut uns leid! Der Server scheint nicht zu reagieren. Bitte versuche es später erneut.",
       "ACTIVE_TRANSACTION": "Dieses Video kann nicht bearbeitet werden, während ein Workflow oder eine Transaktion auf diesem aktiv sind.",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "An unexpected error occurred while updating. Some events might have been updated.",
+         "UNEXPECTED_ERROR": "Beim Aktualisieren ist ein unerwarteter Fehler aufgetreten. Einige Ereignisse könnten aktualisiert worden sein.",
          "ALL_EVENTS_UPDATED": "Alle Videos wurden erfolgreich aktualisiert.",
          "NO_EVENTS_UPDATED": "Alle Aktualisierungen schlugen fehl.",
          "SOME_EVENTS_NOT_UPDATED": "Einige Videos konnten nicht aktualisiert werden."
       },
       "ADOPTER_PROFILE_UPDATED": "Profil-Informationen erfolgreich aktualisiert.",
-      "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
+      "ADOPTER_PROFILE_NOT_UPDATED": "Tut uns leid! Profilinformationen konnten nicht aktualisiert werden. Bitte erneut versuchen.",
       "ADOPTER_PROFILE_DELETED": "Profil-Informationen erfolgreich gelöscht.",
-      "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!",
+      "ADOPTER_PROFILE_NOT_DELETED": "Tut uns leid! Profilinformationen konnten nicht gelöscht werden. Bitte erneut versuchen.",
       "TOBIRA_OVERRIDE_NAME": "Der Titel der ausgewählten Seite wird mit dem Titel der Serie überschrieben.",
       "TOBIRA_NO_PATH_SEGMENT": "Die Seite benötigt ein Pfadsegment.",
       "TOBIRA_NOT_MOUNTED": "Die Serie konnte nicht in Tobira eingehängt werden.",
-      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "Pfadsegment ist ungültig. Ein gültiges Pfadsegment ist mindestens 2 Zeichen lang und enthält keine Leer- oder Kontrollzeichen, keines der Zeichen '<>\"[\\]^`{|}#%/? ', und beginnt nicht mit einem der Zeichen '-+~@_! &;:. =*'()'.",
       "TOBIRA_PATH_SEGMENT_UNIQUE": "Das Pfadsegment einer Seite muss in der gleichen Ebene eindeutig sein.",
-      "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
-      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and/or try again later.",
+      "TOBIRA_PAGE_NOT_FOUND": "Die Seite, die Sie aufgerufen haben, existiert nicht oder nicht mehr. Vielleicht versuchen Sie es noch einmal von vorn.",
+      "TOBIRA_SERVER_ERROR": " Fehler bei der Kommunikation mit Tobira. Kontaktieren Sie Ihren Systemadministrator oder versuchen Sie es später erneut.",
       "TOBIRA_COPIED_DIRECT_LINK": "Der Link wurde in Ihre Zwischenablage kopiert.",
       "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Fehler beim Kopieren in die Zwischenablage",
-      "TOBIRA_NOT_FOUND": "Tobira doesn't know about this series (yet). Try again in a few minutes or contact your system administrator."
+      "TOBIRA_NOT_FOUND": "Tobira ist diese Serie (noch) nicht bekannt. Versuchen Sie es in wenigen Minuten noch einmal oder kontaktieren Sie Ihren Systemadministrator."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Aktionen",
@@ -282,19 +282,19 @@
          "EVENTS": {
             "CAPTION": "Löschen",
             "DELETE_EVENTS": "Videos löschen",
-            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue."
+            "UNAUTHORIZED": "Sie sind nicht berechtigt, die markierten Ereignisse zu löschen. Bitte heben Sie die Auswahl auf, um fortzufahren."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Sobald alle Metadaten gelöscht sind, werden die Audio- und Video-Dateien gelöscht und können nicht wiederhergestellt werden.",
       "DELETE_EVENTS_WARNING_LINE2": "",
-      "DELETE_SERIES_WARNING_LINE1": "Once deleted, all series metadata will be unrecoverable. Events in the series will not be deleted.",
+      "DELETE_SERIES_WARNING_LINE1": "Nach dem Löschen sind alle Serien-Metadaten unwiederbringlich verloren. Ereignisse in der Serie werden nicht gelöscht.",
       "DELETE_SERIES_WARNING_LINE2": "",
       "SCHEDULE_TASK": {
          "CAPTION": "Aufgabe starten",
          "GENERAL": {
             "CAPTION": "Allgemein",
             "SUMMARY": "({{ count }} Videos ausgewählt)",
-            "CANNOTSTART": "Highlighted event(s) cannot be processed at the moment. Deselect it/them or try again later."
+            "CANNOTSTART": "Hervorgehobene Ereignisse(n) können momentan nicht verarbeitet werden. Deselect it/them or try again later."
          },
          "TASKS": {
             "CAPTION": "Aufgaben",
@@ -317,7 +317,7 @@
             "NOCHANGES": "Keine Änderungen der Videos!",
             "CONFLICT_FIRST_EVENT": "Geändertes Video",
             "CONFLICT_SECOND_EVENT": "Kollidierendes Video",
-            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
+            "CANNOTEDITSCHEDULE": "Für die hervorgehobenen Ereignisse haben Sie nicht die Berechtigung, Zeitpläne zu bearbeiten. Sie können fortfahren, aber Sie können Planung keines der Ereignisse bearbeiten."
          },
          "METADATA": {
             "EDIT": "Metadaten bearbeiten"
@@ -333,7 +333,7 @@
             "CAPTION": "Bearbeiten",
             "EVENT": "Video",
             "EVENTS": "Videos",
-            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
+            "HEADER": "Auf dieser Seite können Sie geplante Ereignisse nach Wochentagen gruppiert bearbeiten. Die Eingabefelder werden vorausgefüllt, falls alle geplanten Ereignisse den gleichen Wert für ein bestimmtes Feld haben. Andernfalls bleiben die Eingabefelder leer. Leere Eingabefelder bedeuten, dass die entsprechenden Werte nicht geändert werden sollen.",
             "METADATA": "Metadaten",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -352,7 +352,7 @@
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "DESCRIPTION": "Bearbeiten und/oder wählen Sie die Metadatenfelder aus, die Sie aktualisieren möchten. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
             "TABLE": {
                "CAPTION": "Metadaten gewählter Videos",
                "FIELDS": "Metadaten",
