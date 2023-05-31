@@ -76,7 +76,7 @@ public final class RecursiveDirectoryCleaner implements FileVisitor<Path> {
   @Override
   public FileVisitResult visitFileFailed(Path path, IOException e) throws IOException {
     if (!(e instanceof NoSuchFileException)) {
-      logger.warn("Visiting file {} failed with exception {}", path, e);
+      logger.warn("Visiting file {} failed", path, e);
     }
     return FileVisitResult.CONTINUE;
   }
@@ -98,6 +98,17 @@ public final class RecursiveDirectoryCleaner implements FileVisitor<Path> {
     if (!Files.exists(startingDir)) {
       logger.warn("Directory {} to cleanup is not existing", startingDir);
       return false;
+    }
+
+    if (Files.isSymbolicLink(startingDir)) {
+      logger.warn("Directory {} is a symlink. Trying to resolve it.", startingDir);
+      try {
+        startingDir = Path.of(startingDir.toFile().getCanonicalPath());
+      } catch (IOException ioException) {
+        logger.error("Couldn't resolve symlink {}", startingDir, ioException);
+        return false;
+      }
+      logger.warn("New cleanup directory after symlink was resolved: {}", startingDir);
     }
 
     if (!Files.isDirectory(startingDir)) {
