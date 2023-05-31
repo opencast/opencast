@@ -1816,15 +1816,18 @@ public abstract class AbstractEventEndpoint {
         for (WorkflowInstance instance : workflowInstances) {
           long instanceId = instance.getId();
           Date created = instance.getDateCreated();
-          String userId = instance.getCreatorName();
+          String submitter = instance.getCreatorName();
 
-          User user = getUserDirectoryService().loadUser(userId);
-          String creatorName = user.getName() + "<" + user.getEmail() + ">";
+          User user = getUserDirectoryService().loadUser(submitter);
+          String submitterName = user.getName();
+          String submitterEmail = user.getEmail();
 
           jsonList.add(obj(f("id", v(instanceId)), f("title", v(instance.getTitle(), Jsons.BLANK)),
                   f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + instance.getState().toString())),
                   f("submitted", v(created != null ? DateTimeSupport.toUTC(created.getTime()) : "", Jsons.BLANK)),
-                  f("submitter", v(creatorName, Jsons.BLANK))));
+                  f("submitter", v(submitter, Jsons.BLANK)),
+                  f("submitterName", v(submitterName, Jsons.BLANK)),
+                  f("submitterEmail", v(submitterEmail, Jsons.BLANK))));
         }
         JObject json = obj(f("results", arr(jsonList)), f("count", v(workflowInstances.size())));
         return okJson(json);

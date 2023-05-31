@@ -6,21 +6,27 @@
             "title": "Full",
             "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
             "submitted": "2014-06-05T15:00:00Z",
-            "submitter": "WithPermissions<with@permissions.com>"
+            "submitter": "WithPermissions",
+            "submitterName": "WithPermissions",
+            "submitterEmail": "with@permissions.com"
         },
         {
             "id": 2,
             "title": "Full",
             "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
             "submitted": "2014-06-05T15:00:00Z",
-            "submitter": "WithPermissions<with@permissions.com>"
+            "submitter": "",
+            "submitterName": "WithPermissions",
+            "submitterEmail": "with@permissions.com"
         },
         {
             "id": 3,
             "title": "Full",
             "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
             "submitted": "2014-06-05T15:00:00Z",
-            "submitter": "WithPermissions<with@permissions.com>"
+            "submitter": "",
+            "submitterName": "WithPermissions",
+            "submitterEmail": "with@permissions.com"
         }
     ]
 }
