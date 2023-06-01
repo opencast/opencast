@@ -46,7 +46,7 @@
     <node.version>v16.13.0</node.version>
     <osgi.core.version>8.0.0</osgi.core.version>
     <osgi.annotation.version>8.1.0</osgi.annotation.version>
-    <org.osgi.service.component.version>1.5.0</org.osgi.service.component.version>
+    <org.osgi.service.component.version>1.5.1</org.osgi.service.component.version>
     <org.osgi.service.component.annotations.version>1.5.0</org.osgi.service.component.annotations.version>
     <org.osgi.service.cm.version>1.6.0</org.osgi.service.cm.version>
     <org.osgi.service.log.version>1.5.0</org.osgi.service.log.version>
