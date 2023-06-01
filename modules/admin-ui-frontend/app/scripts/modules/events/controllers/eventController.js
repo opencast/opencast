@@ -169,6 +169,55 @@ angular.module('adminNg.controllers')
             me.loadingWorkflow = false;
           }
         },
+        addUsersToPolicies = function (newPolicies) {
+          var newPoliciesWithUsers = [];
+          angular.forEach(newPolicies, function (policy) {
+            if (policy.role.startsWith($scope.roleUserPrefix)) {
+              var id = policy.role.split($scope.roleUserPrefix).pop();
+              // FIXMe: If roles are sanitized, WE CANNOT derive the user from their user role,
+              //  because the user roles are converted to uppercase, while usernames are case sensitive.
+              //  This is a terrible workaround, because usernames are usually all lowercase anyway.
+              if ($scope.aclCreateDefaults['sanitize']) {
+                id = id.toLowerCase();
+              }
+
+              var exists = false;
+              var userArray = [];
+              if ($scope.users.rows) {
+                userArray = $scope.users.rows;
+              } else {
+                userArray = $scope.users;
+              }
+              var startIndex  = 0,
+              stopIndex   = userArray.length - 1,
+              middle      = Math.floor((stopIndex + startIndex)/2);
+
+
+              while(userArray[middle].username != id && startIndex < stopIndex){
+
+                  //adjust search area
+                  if (id < userArray[middle].username){
+                      stopIndex = middle - 1;
+                  } else if (id > userArray[middle].username){
+                      startIndex = middle + 1;
+                  }
+
+                  //recalculate middle
+                  middle = Math.floor((stopIndex + startIndex)/2);
+              }
+
+              //make sure it's the right value
+              if(userArray[middle].username === id) {
+                policy.user = userArray[middle];
+              } else {
+                policy.userDoesNotExist = id;
+              }
+
+              newPoliciesWithUsers.push(policy);
+            }
+          });
+          $scope.policiesUser = $scope.policiesUser.concat(newPoliciesWithUsers)
+        },
         changePolicies = function (access, loading) {
           var newPolicies = {};
           if (!Array.isArray(access)) {
@@ -208,25 +257,14 @@ angular.module('adminNg.controllers')
           });
 
           $scope.policiesUser = [];
-          angular.forEach(newPolicies, function (policy) {
-            if (policy.role.startsWith($scope.roleUserPrefix)) {
-              var id = policy.role.split($scope.roleUserPrefix).pop();
-              // FIXMe: If roles are sanitized, WE CANNOT derive the user from their user role,
-              //  because the user roles are converted to uppercase, while usernames are case sensitive.
-              //  This is a terrible workaround, because usernames are usually all lowercase anyway.
-              if ($scope.aclCreateDefaults['sanitize']) {
-                id = id.toLowerCase();
-              }
+          if($scope.users.$promise) {
+            $scope.users.$promise.then(function () {
+              addUsersToPolicies(newPolicies);
+            });
+          } else {
+            addUsersToPolicies(newPolicies);
+          }
 
-              UserResource.get({ username: id }).$promise.then(function (data) {
-                policy.user = data;
-              }).catch(function() {
-                policy.userDoesNotExist = id;
-              });
-
-              $scope.policiesUser.push(policy);
-            }
-          });
         },
         checkForActiveTransactions = function () {
           EventTransactionResource.hasActiveTransaction({id: $scope.resourceId }, function (data) {
@@ -496,7 +534,7 @@ angular.module('adminNg.controllers')
 
           $scope.comments = CommentResource.query({ resource: 'event', resourceId: id, type: 'comments' });
 
-          $scope.users = UsersResource.query({limit: 2147483647});
+          $scope.users = UsersResource.query({limit: 2147483647, sort: 'username:ASC'});
           $scope.users.$promise.then(function () {
             $scope.aclCreateDefaults.$promise.then(function () {
               var newUsers = [];
