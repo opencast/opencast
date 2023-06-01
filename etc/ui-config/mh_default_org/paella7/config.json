@@ -2,8 +2,8 @@
     "defaultLayout": "presenter-presentation-dynamic",
 
     "defaultLanguage": "en",
-    "defaultVideoPreview": "config/default_preview_landscape.jpg",
-    "defaultVideoPreviewPortrait": "config/default_preview_portrait.jpg",
+    "defaultVideoPreview": "/ui/config/paella7/default_preview_landscape.jpg",
+    "defaultVideoPreviewPortrait": "/ui/config/paella7/default_preview_portrait.jpg",
 
     "logLevel": "INFO",
 
