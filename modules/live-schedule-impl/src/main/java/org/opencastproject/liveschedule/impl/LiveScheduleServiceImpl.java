@@ -655,6 +655,9 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       if (mp.getAttachments(MediaPackageElements.XACML_POLICY_EPISODE).length > 0) {
         elementIds.add(mp.getAttachments(MediaPackageElements.XACML_POLICY_EPISODE)[0].getIdentifier());
       }
+      if (mp.getAttachments(MediaPackageElements.XACML_POLICY_SERIES).length > 0) {
+        elementIds.add(mp.getAttachments(MediaPackageElements.XACML_POLICY_SERIES)[0].getIdentifier());
+      }
 
       // Distribute element(s)
       Job distributionJob = downloadDistributionService.distribute(CHANNEL_ID, mp, elementIds, false);
