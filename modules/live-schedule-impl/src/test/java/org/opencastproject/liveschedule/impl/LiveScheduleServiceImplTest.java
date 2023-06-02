@@ -83,7 +83,6 @@ import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -150,8 +149,6 @@ public class LiveScheduleServiceImplTest {
     EasyMock.expect(downloadDistributionService.getDistributionType())
             .andReturn(LiveScheduleServiceImpl.DEFAULT_LIVE_DISTRIBUTION_SERVICE).anyTimes();
     workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.put(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString(),
-            EasyMock.anyObject(InputStream.class))).andReturn(new URI("http://someUrl"));
     dublinCoreService = EasyMock.createNiceMock(DublinCoreCatalogService.class);
     assetManager = EasyMock.createNiceMock(AssetManager.class);
     authService = new AuthorizationServiceMock();
@@ -386,7 +383,7 @@ public class LiveScheduleServiceImplTest {
     Assert.assertEquals("http://10.10.10.50/static/mh_default_org/engage-live/security_policy_episode.xml",
             att.getURI().toString());
     Assert.assertEquals("security/xacml+episode", att.getFlavor().toString());
-    EasyMock.verify(downloadDistributionService, workspace);
+    EasyMock.verify(downloadDistributionService);
   }
 
   @Test

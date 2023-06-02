@@ -645,21 +645,12 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       MediaPackage mp = (MediaPackage) snapshot.getMediaPackage().clone();
 
       Set<String> elementIds = new HashSet<>();
-      // Then, add series catalog if needed
-      if (StringUtils.isNotEmpty(mp.getSeries())) {
-        DublinCoreCatalog catalog = seriesService.getSeries(mp.getSeries());
-        // Create temporary catalog and save to workspace
-        mp.add(catalog);
-        URI uri = workspace.put(mp.getIdentifier().toString(), catalog.getIdentifier(), "series.xml",
-                dublinCoreService.serialize(catalog));
-        catalog.setURI(uri);
-        catalog.setChecksum(null);
-        catalog.setFlavor(MediaPackageElements.SERIES);
-        elementIds.add(catalog.getIdentifier());
-      }
 
       if (mp.getCatalogs(MediaPackageElements.EPISODE).length > 0) {
         elementIds.add(mp.getCatalogs(MediaPackageElements.EPISODE)[0].getIdentifier());
+      }
+      if (mp.getCatalogs(MediaPackageElements.SERIES).length > 0) {
+        elementIds.add(mp.getCatalogs(MediaPackageElements.SERIES)[0].getIdentifier());
       }
       if (mp.getAttachments(MediaPackageElements.XACML_POLICY_EPISODE).length > 0) {
         elementIds.add(mp.getAttachments(MediaPackageElements.XACML_POLICY_EPISODE)[0].getIdentifier());
