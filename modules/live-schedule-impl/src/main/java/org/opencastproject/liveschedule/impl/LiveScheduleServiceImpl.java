@@ -107,6 +107,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -367,8 +368,13 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       return false;
     }
 
-    // generate new live tracks
+    // create temp mp for comparison
     MediaPackage tmpMp = (MediaPackage) snapshot.getMediaPackage().clone();
+    // remove all elements that would not be published
+    Collection<MediaPackageElement> elements = publishElementSelector.select(tmpMp, false);
+    Arrays.stream(tmpMp.getElements()).filter(Predicate.not(elements::contains)).collect(Collectors.toList())
+            .forEach(tmpMp::remove);
+    // generate new live tracks
     setDurationForMediaPackage(tmpMp, episodeDC); // duration is used by live tracks
     Map<String, Track> liveTracks = addLiveTracksToMediaPackage(tmpMp, episodeDC);
 
