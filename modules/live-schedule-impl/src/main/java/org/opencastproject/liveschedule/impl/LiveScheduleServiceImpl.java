@@ -645,7 +645,6 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       MediaPackage mp = (MediaPackage) snapshot.getMediaPackage().clone();
 
       Set<String> elementIds = new HashSet<>();
-
       if (mp.getCatalogs(MediaPackageElements.EPISODE).length > 0) {
         elementIds.add(mp.getCatalogs(MediaPackageElements.EPISODE)[0].getIdentifier());
       }
@@ -666,18 +665,22 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
                 "Element(s) for live media package " + mp.getIdentifier() + " could not be distributed");
       }
 
-      for (String id : elementIds) {
-        MediaPackageElement e = mp.getElementById(id);
-        // Cleanup workspace/wfr
+      // remove all elements from mp
+      for (MediaPackageElement e: mp.getElements()) {
         mp.remove(e);
-        workspace.delete(e.getURI());
       }
 
-      // Add distributed element(s) to mp
+      // Re-add distributed elements
       List<MediaPackageElement> distributedElements = (List<MediaPackageElement>) MediaPackageElementParser
               .getArrayFromXml(distributionJob.getPayload());
-      for (MediaPackageElement mpe : distributedElements) {
-        mp.add(mpe);
+      for (MediaPackageElement distributedElement : distributedElements) {
+        mp.add(distributedElement);
+      }
+
+      // Clean up
+      for (String id : elementIds) {
+        MediaPackageElement e = mp.getElementById(id);
+        workspace.delete(e.getURI());
       }
 
       return mp;
