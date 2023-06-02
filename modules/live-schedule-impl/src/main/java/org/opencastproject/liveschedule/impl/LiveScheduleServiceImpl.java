@@ -44,6 +44,7 @@ import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.VideoStreamImpl;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
@@ -90,6 +91,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -105,6 +107,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Component(
     immediate = true,
@@ -151,6 +154,10 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   public static final String LIVE_DISTRIBUTION_SERVICE = "live.distributionService";
   public static final String LIVE_PUBLISH_STREAMING = "live.publishStreaming";
 
+  private static final MediaPackageElementFlavor[] publishFlavors = { MediaPackageElements.EPISODE,
+      MediaPackageElements.SERIES, MediaPackageElements.XACML_POLICY_EPISODE,
+      MediaPackageElements.XACML_POLICY_SERIES }; // make configurable later
+
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(LiveScheduleServiceImpl.class);
 
@@ -181,6 +188,8 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   private SecurityService securityService;
 
   private long jobPollingInterval = JobBarrier.DEFAULT_POLLING_INTERVAL;
+
+  private SimpleElementSelector publishElementSelector;
 
   /**
    * OSGi callback on component activation.
@@ -248,6 +257,11 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     }
     publishedStreamingFormats = Arrays.asList(Optional.ofNullable(StringUtils.split(
             (String)properties.get(LIVE_PUBLISH_STREAMING), ",")).orElse(new String[0]));
+
+    publishElementSelector = new SimpleElementSelector();
+    for (MediaPackageElementFlavor flavor : publishFlavors) {
+      publishElementSelector.addFlavor(flavor);
+    }
 
     logger.info(
         "Configured live stream name: {}, mime type: {}, resolution: {}, target flavors: {}, distribution service: {}",
@@ -644,28 +658,18 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     try {
       MediaPackage mp = (MediaPackage) snapshot.getMediaPackage().clone();
 
-      Set<String> elementIds = new HashSet<>();
-      if (mp.getCatalogs(MediaPackageElements.EPISODE).length > 0) {
-        elementIds.add(mp.getCatalogs(MediaPackageElements.EPISODE)[0].getIdentifier());
-      }
-      if (mp.getCatalogs(MediaPackageElements.SERIES).length > 0) {
-        elementIds.add(mp.getCatalogs(MediaPackageElements.SERIES)[0].getIdentifier());
-      }
-      if (mp.getAttachments(MediaPackageElements.XACML_POLICY_EPISODE).length > 0) {
-        elementIds.add(mp.getAttachments(MediaPackageElements.XACML_POLICY_EPISODE)[0].getIdentifier());
-      }
-      if (mp.getAttachments(MediaPackageElements.XACML_POLICY_SERIES).length > 0) {
-        elementIds.add(mp.getAttachments(MediaPackageElements.XACML_POLICY_SERIES)[0].getIdentifier());
-      }
+      // Select elements
+      Collection<MediaPackageElement> elements = publishElementSelector.select(mp, false);
+      Set<String> elementIds = elements.stream().map(MediaPackageElement::getIdentifier).collect(Collectors.toSet());
 
-      // Distribute element(s)
+      // Distribute elements
       Job distributionJob = downloadDistributionService.distribute(CHANNEL_ID, mp, elementIds, false);
       if (!waitForStatus(distributionJob).isSuccess()) {
         throw new LiveScheduleException(
                 "Element(s) for live media package " + mp.getIdentifier() + " could not be distributed");
       }
 
-      // remove all elements from mp
+      // Remove all elements from mp
       for (MediaPackageElement e: mp.getElements()) {
         mp.remove(e);
       }
