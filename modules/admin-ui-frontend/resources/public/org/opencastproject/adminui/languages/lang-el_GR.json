@@ -1261,7 +1261,7 @@
                "HOMEPAGE": "Αρχική σελίδα",
                "DIRECT_LINK": "Άμεσος σύνδεσμος με τη σειρά",
                "COPY_DIRECT_LINK": "Αντιγραφή στο πρόχειρο",
-               "NOT_MOUNTED": "Αυτή η σειρά δεν περιλαμβάνεται στην δομή  της σελίδας  και μπορεί να είναι προσβάσιμη μόνο χρησιμοποιώντας τον παραπάνω σύνδεσμο.",
+               "NOT_MOUNTED": "This series is currently not included in the page structure, and can only be reached using the direct link above.",
                "PAGES": "Σελίδες στο Tobira που περιέχουν αυτή τη σειρά"
             },
             "EVENTS": {
@@ -1482,10 +1482,10 @@
                   "DESCRIPTION": "Παρακαλώ επιλέξτε ένα σύνολο προ-διαμορφωμένων πολιτικών ή να προσθέσετε τις ακόλουθες προσαρμοσμένες πολιτικές",
                   "NEW_USER": "Νέος χρήστης",
                   "USER": "Χρήστης",
-                  "USERS": "Χρήστες που είναι εξουσιοδοτημένοι για την πολιτική πρόσβασης",
+                  "USERS": "Users who are authorized by this access policy",
                   "HELP": {
-                     "READ": "Με τον ορισμό δικαιωμάτων ανάγνωσης, η πολιτική πρόσβασης γίνεται ορατή για τον επιλεγμένο χρήστη",
-                     "WRITE": "Με τη ρύθμιση δικαιωμάτων εγγραφής, ο επιλεγμένος χρήστης μπορεί να επεξεργαστεί την πολιτική πρόσβασης"
+                     "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
+                     "WRITE": "By setting write permissions, the entity to which this access policy is assigned can be modified by the selected user."
                   }
                },
                "ROLES": {
@@ -1531,11 +1531,11 @@
                   "DESCRIPTION": "Παρακαλώ επιλέξτε ένα σύνολο προ-διαμορφωμένων πολιτικών ή να προσθέσετε τις ακόλουθες προσαρμοσμένες πολιτικές",
                   "NEW_USER": "Νέος χρήστης",
                   "USER": "Χρήστης",
-                  "USERS": "Χρήστες που είναι εξουσιοδοτημένοι για την πολιτική πρόσβασης",
+                  "USERS": "Users who are authorized by this access policy",
                   "NONEXISTENT_USER": "Μη υπάρχων χρήστης",
                   "HELP": {
-                     "READ": "Με τον ορισμό δικαιωμάτων ανάγνωσης, η πολιτική πρόσβασης γίνεται ορατή για τον επιλεγμένο χρήστη",
-                     "WRITE": "Με τη ρύθμιση δικαιωμάτων εγγραφής, ο επιλεγμένος χρήστης μπορεί να επεξεργαστεί την πολιτική πρόσβασης"
+                     "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
+                     "WRITE": "By setting write permissions, the entity to which this access policy is assigned can be modified by the selected user."
                   }
                },
                "ROLES": {

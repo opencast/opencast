@@ -1261,7 +1261,7 @@
                "HOMEPAGE": "(Homepage)",
                "DIRECT_LINK": "Direct link to series",
                "COPY_DIRECT_LINK": "Copy to clipboard",
-               "NOT_MOUNTED": "This series is currently not included the page structure, and can only be reached using the direct link above.",
+               "NOT_MOUNTED": "This series is currently not included in the page structure, and can only be reached using the direct link above.",
                "PAGES": "Pages in Tobira that contain this series"
             },
             "EVENTS": {
@@ -1482,10 +1482,10 @@
                   "DESCRIPTION": "Kies een vooraf geconfigureerde verzameling beleidsregels of voeg een aangepast beleid hieronder toe",
                   "NEW_USER": "New user",
                   "USER": "Gebruiker",
-                  "USERS": "Users who are authorized for the access policy",
+                  "USERS": "Users who are authorized by this access policy",
                   "HELP": {
-                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
-                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                     "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
+                     "WRITE": "By setting write permissions, the entity to which this access policy is assigned can be modified by the selected user."
                   }
                },
                "ROLES": {
@@ -1531,11 +1531,11 @@
                   "DESCRIPTION": "Kies een vooraf geconfigureerde verzameling beleidsregels of voeg een aangepast beleid hieronder toe",
                   "NEW_USER": "New user",
                   "USER": "Gebruiker",
-                  "USERS": "Users who are authorized for the access policy",
+                  "USERS": "Users who are authorized by this access policy",
                   "NONEXISTENT_USER": "Nonexistent user",
                   "HELP": {
-                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
-                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                     "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
+                     "WRITE": "By setting write permissions, the entity to which this access policy is assigned can be modified by the selected user."
                   }
                },
                "ROLES": {
