@@ -13,6 +13,37 @@ Opencast 14
 Opencast 13
 -----------
 
+### Opencast 13.6
+
+*Released on Mai 26th, 2023*
+
+- [[#4961](https://github.com/opencast/opencast/pull/4961)] -
+  Remove empty options in ACL template select (#4910)
+- [[#4925](https://github.com/opencast/opencast/pull/4925)] -
+  Ensure all plugin jars are present in tarballs.
+- [[#4923](https://github.com/opencast/opencast/pull/4923)] -
+  Mitigate not loading ACLs
+- [[#4920](https://github.com/opencast/opencast/pull/4920)] -
+  Batch Dependabot Updates for Paella 7
+- [[#4890](https://github.com/opencast/opencast/pull/4890)] -
+  Bump eslint from 8.37.0 to 8.39.0 in /modules/engage-paella-player-7
+- [[#4885](https://github.com/opencast/opencast/pull/4885)] -
+  Bump html-validate from 7.14.0 to 7.15.1 in /modules/engage-paella-player-7
+- [[#4879](https://github.com/opencast/opencast/pull/4879)] -
+  Editor Release 2023-04-20
+- [[#4870](https://github.com/opencast/opencast/pull/4870)] -
+  TermsFeed Cookie Consent NOTICE
+- [[#4869](https://github.com/opencast/opencast/pull/4869)] -
+  [Whisper] Fixes automatic language detection
+- [[#4868](https://github.com/opencast/opencast/pull/4868)] -
+  Extend configuration options of Amberscript integration
+- [[#4864](https://github.com/opencast/opencast/pull/4864)] -
+  Remove dead `CONFIG_OPTIONS` from WOHs
+- [[#4853](https://github.com/opencast/opencast/pull/4853)] -
+  Bump webpack from 5.77.0 to 5.78.0 in /modules/engage-paella-player-7
+- [[#4851](https://github.com/opencast/opencast/pull/4851)] -
+  Bump paella-zoom-plugin from 1.2.1 to 1.27.0 in /modules/engage-paella-player-7
+
 ### Opencast 13.5
 
 *Released on April 19th, 2023*
