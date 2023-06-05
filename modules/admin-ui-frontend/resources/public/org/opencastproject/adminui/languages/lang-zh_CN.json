@@ -1261,7 +1261,7 @@
                "HOMEPAGE": "(首页)",
                "DIRECT_LINK": "直接链接到系列",
                "COPY_DIRECT_LINK": "复制到剪贴板",
-               "NOT_MOUNTED": "该系列目前不在页面结构中，只能使用上面的直接链接。",
+               "NOT_MOUNTED": "This series is currently not included in the page structure, and can only be reached using the direct link above.",
                "PAGES": "Tobira 中包含此系列的页面"
             },
             "EVENTS": {
@@ -1482,10 +1482,10 @@
                   "DESCRIPTION": "请选择一套预先配置的策略或在下方添加自定义策略",
                   "NEW_USER": "New user",
                   "USER": "用户",
-                  "USERS": "Users who are authorized for the access policy",
+                  "USERS": "Users who are authorized by this access policy",
                   "HELP": {
-                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
-                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                     "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
+                     "WRITE": "By setting write permissions, the entity to which this access policy is assigned can be modified by the selected user."
                   }
                },
                "ROLES": {
@@ -1531,11 +1531,11 @@
                   "DESCRIPTION": "请选择一套预先配置的策略或在下方添加自定义策略",
                   "NEW_USER": "New user",
                   "USER": "用户",
-                  "USERS": "Users who are authorized for the access policy",
+                  "USERS": "Users who are authorized by this access policy",
                   "NONEXISTENT_USER": "Nonexistent user",
                   "HELP": {
-                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
-                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                     "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
+                     "WRITE": "By setting write permissions, the entity to which this access policy is assigned can be modified by the selected user."
                   }
                },
                "ROLES": {
