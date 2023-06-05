@@ -1,7 +1,8 @@
-# Studip UserDirectoryProvider configuration
+# Stud.IP UserDirectoryProvider configuration
 
-# This is an an optional service which is not enabled by default. To enable it,
-# edit etc/org.apache.karaf.features.cfg and add opencast-studip to the featuresBoot option.
+# This is an optional plugin not enabled by default.
+# Enable this plugin in:
+#   org.opencastproject.plugin.impl.PluginManagerImpl.cfg
 
 # The organization for this provider
 org.opencastproject.userdirectory.studip.org=mh_default_org
