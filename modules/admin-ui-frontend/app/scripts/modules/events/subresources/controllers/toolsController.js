@@ -156,25 +156,22 @@ angular.module('adminNg.controllers')
     };
 
     $scope.anyTrackSelected = function (type) {
-      var selected = false;
-      var present = false;
       if ($scope.video.source_tracks === undefined) {
         return false;
       }
+      var present = false;
       for(var i = 0; i < $scope.video.source_tracks.length; i++) {
         var t = $scope.video.source_tracks[i][type];
         if (t.present === true) {
           present = true;
-        }
-        if (t.present === true && t.hidden === false) {
-          selected = true;
+          // track selected?
+          if (t.hidden === false) {
+            return true;
+          }
         }
       }
       // If we don't have any tracks at all, selecting none is valid
-      if (present === false) {
-        return true;
-      }
-      return selected;
+      return !present;
     };
 
     $scope.trackClicked = function(index, type) {
