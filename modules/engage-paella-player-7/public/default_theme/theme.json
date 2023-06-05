@@ -1,0 +1,65 @@
+{
+    "styleSheets": [
+        "theme.css"
+    ],
+    "configOverrides": {
+        "accessibility": {
+            "clickWithSpacebar": false
+        },
+        "progressIndicator": {
+            "inlineMode": false,
+            "showTotal": true,
+            "parentContainer": "buttonArea",
+            "side": "left",
+            "visible": false,
+            "showHandler": true,
+            "hideHandlerOnMouseOut": true,
+            "showRemainingProgress": true
+        },
+        "videoContainer": {
+            "overPlaybackBar": false,
+            "dynamicLayout": {
+                "landscapeVerticalAlignment": "align-center",
+                "portraitHorizontalAlignment": "align-center"
+            }
+        },
+        "plugins": {
+            "es.upv.paella.slideMapProgressBarPlugin": {
+                "markColor": {
+                    "mouseOut": "#0A0A0A",
+                    "mouseHover": "#9CA3AF"
+                },
+                "markWidth": 3,
+                "drawBackground": false
+            }
+        }
+    },
+    "icons": [
+        { "plugin": "es.upv.paella.fullscreenButton", "identifier": "fullscreenIcon", "icon": "./icons/fullscreen-icon.svg" },
+        { "plu,gin": "es.upv.paella.fullscreenButton", "identifier": "windowedIcon", "icon": "./icons/fullscreen-exit.svg" },
+
+        { "plugin": "es.upv.paella.volumeButtonPlugin","identifier": "volumeHighIcon", "icon": "./icons/volume-high.svg"},
+        { "plugin": "es.upv.paella.volumeButtonPlugin","identifier": "volumeMidIcon", "icon": "./icons/volume-mid.svg"},
+        { "plugin": "es.upv.paella.volumeButtonPlugin","identifier": "volumeLowIcon", "icon": "./icons/volume-low.svg"},
+        { "plugin": "es.upv.paella.volumeButtonPlugin","identifier": "volumeMuteIcon", "icon": "./icons/volume-mute.svg"},
+
+        { "plugin": "es.upv.paella.dualVideoDynamic", "identifier": "iconMaximize", "icon": "./icons/maximize.svg" },
+        { "plugin": "es.upv.paella.dualVideoDynamic", "identifier": "iconMimimize", "icon": "./icons/minimize.svg" },
+        { "plugin": "es.upv.paella.dualVideoDynamic", "identifier": "iconClose", "icon": "./icons/close.svg" },
+
+        { "plugin": "es.upv.paella.playPauseButton", "identifier": "play", "icon": "./icons/play.svg" },
+
+        { "plugin": "es.upv.paella.layoutSelector","identifier": "layoutIcon", "icon": "./icons/view-mode.svg"},
+
+        { "plugin": "es.upv.paella.backwardButtonPlugin","identifier": "backwardIcon", "icon": "./icons/backward.svg"},
+        { "plugin": "es.upv.paella.forwardButtonPlugin","identifier": "forwardIcon", "icon": "./icons/forward.svg"},
+
+        { "plugin": "es.upv.paella.captionsSelectorPlugin","identifier": "captionsIcon", "icon": "./icons/captions-icon.svg"},
+
+        { "plugin": "es.upv.paella.frameControlButtonPlugin","identifier": "photoIcon", "icon": "./icons/slides-icon.svg"},
+
+        { "plugin": "es.upv.paella.nextSlideNavigatorButton","identifier": "arrowRightIcon", "icon": "./icons/slide-next-icon.svg"},
+        { "plugin": "es.upv.paella.prevSlideNavigatorButton","identifier": "arrowLeftIcon", "icon": "./icons/slide-prev-icon.svg"}
+
+    ]
+}
