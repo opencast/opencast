@@ -1869,8 +1869,10 @@
      "TRACKS": {
        "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
        "NOTIFICATION": {
-         "NO_VIDEO_TRACK_SELECTED": "You must enable at least one video track",
-         "NO_AUDIO_TRACK_SELECTED": "You must enable at least one audio track"
+         "NO_VIDEO_TRACK_SELECTED_WARNING": "You should probably enable at least one video track",
+         "NO_AUDIO_TRACK_SELECTED_WARNING": "You should probably enable at least one audio track",
+         "TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING": "You probably shouldn't enable more audio than video tracks",
+         "NO_TRACK_SELECTED_ERROR": "You must enable at least one track"
        },
        "TRACK": {
          "HEADER": "Track"

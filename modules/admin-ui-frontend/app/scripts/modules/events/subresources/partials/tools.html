@@ -302,13 +302,20 @@
           <div ng-if="area === 'tracks'" class="editor-tracks">
             <div class="area-body">
               <div data-admin-ng-notification="" data-type="error"
-                                                 show="!anyTrackSelected('video')" message="VIDEO_TOOL.TRACKS.NOTIFICATION.NO_VIDEO_TRACK_SELECTED">
+                   show="!anyTrackSelected('video') && !anyTrackSelected('audio')"
+                   message="VIDEO_TOOL.TRACKS.NOTIFICATION.NO_TRACK_SELECTED_ERROR">
               </div>
-              <div data-admin-ng-notification="" data-type="error"
-                                                 show="!anyTrackSelected('audio')" message="VIDEO_TOOL.TRACKS.NOTIFICATION.NO_AUDIO_TRACK_SELECTED">
+              <div data-admin-ng-notification="" data-type="warning"
+                   show="anyTrackSelected('audio') && anyTrackPresent('video') && !anyTrackSelected('video')"
+                   message="VIDEO_TOOL.TRACKS.NOTIFICATION.NO_VIDEO_TRACK_SELECTED_WARNING">
               </div>
-              <div data-admin-ng-notification="" data-type="error"
-                                                 show="tooManyAudios() && anyTrackSelected('video')" message="NOTIFICATIONS.VIDEO_TOO_MANY_AUDIOS">
+              <div data-admin-ng-notification="" data-type="warning"
+                   show="anyTrackSelected('video') && anyTrackPresent('audio') && !anyTrackSelected('audio')"
+                   message="VIDEO_TOOL.TRACKS.NOTIFICATION.NO_AUDIO_TRACK_SELECTED_WARNING">
+              </div>
+              <div data-admin-ng-notification="" data-type="warning"
+                   show="tooManyAudios()"
+                   message="VIDEO_TOOL.TRACKS.NOTIFICATION.TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING">
               </div>
               <div class="full-col">
                 <div class="obj tbl-details">
@@ -403,7 +410,7 @@
               </select>
 
               <a ng-click="submit([commonMetadataCatalog], commonMetadataCatalog)"
-                 ng-class="{disabled: activeTransaction || activeSubmission || sanityCheckFlags()}"
+                 ng-class="{disabled: activeTransaction || activeSubmission || !isValid()}"
                  class="save-and-close-button"
                  translate="{{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' }}">
                 <!-- Save and Continue -->
