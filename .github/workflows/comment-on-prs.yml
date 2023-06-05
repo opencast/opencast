@@ -9,7 +9,9 @@ on:
 
 jobs:
   comment:
-    if: github.event.workflow_run.conclusion == 'success'
+    if: > 
+      github.event.workflow_run.conclusion == 'success'
+      && github.repository == 'opencast/opencast'
     runs-on: ubuntu-latest
     steps:
       - name: Get Artifact and Pull request info
