@@ -24,7 +24,15 @@ jobs:
           PREVIOUS_JOB_ID=$(jq -r '.id' <<< "$WORKFLOW_RUN_EVENT_OBJ")
           echo "Previous Job ID: $PREVIOUS_JOB_ID"
           echo "PREVIOUS_JOB_ID=$PREVIOUS_JOB_ID" >> "$GITHUB_ENV"
-          
+
+          PREVIOUS_TYPE=$(gh api "/repos/$OWNER/$REPO/actions/runs/$PREVIOUS_JOB_ID" \
+            --jq ".event")
+          echo "Previous event was a $PREVIOUS_TYPE"
+          echo "PREVIOUS_TYPE=$PREVIOUS_TYPE" >> "$GITHUB_ENV"
+          if [[ "pull_request" != "$PREVIOUS_TYPE" ]]; then
+            exit 0
+          fi
+
           SUITE_ID=$(jq -r '.check_suite_id' <<< "$WORKFLOW_RUN_EVENT_OBJ")
           echo "Previous Suite ID: $SUITE_ID"
           echo "SUITE_ID=$SUITE_ID" >> "$GITHUB_ENV"
@@ -52,12 +60,14 @@ jobs:
       - name: Find Comment
         uses: peter-evans/find-comment@v2
         id: find-comment
+        if: env.PR_NUMBER != 'null' && env.PREVIOUS_TYPE == 'pull_request'
         with:
           issue-number: ${{ env.PR_NUMBER }}
           comment-author: 'github-actions[bot]'
           body-includes: 'You can find a link to the downloadable artifacts below'
 
       - name: Update Comment
+        if: env.PR_NUMBER != 'null' && env.PREVIOUS_TYPE == 'pull_request'
         env:
           JOB_PATH: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ env.PREVIOUS_JOB_ID }}"
           ARTIFACT_URL: "${{ github.server_url }}/${{ github.repository }}/suites/${{ env.SUITE_ID }}/artifacts/${{ env.ARTIFACT_ID }}"
