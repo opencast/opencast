@@ -31,7 +31,7 @@
       "REGISTRATION": "Out of date"
    },
    "LTI": {
-      "ERROR_LOADING_METADATA": "Error al cargar los metadatos del evento. Por favor, inténtelo más tarde.",
+      "ERROR_LOADING_METADATA": "Error al cargar los metadatos del evento. Inténtalo de nuevo más tarde.",
       "SERIES_TITLE": "Ver series",
       "UPLOAD_TITLE": "Subir un evento",
       "LOADING": "Cargando…",
@@ -63,7 +63,7 @@
       "GENERIC_ERROR": "Error: {{message}}",
       "DELETION_SUCCESS": "El evento ha sido eliminado exitosamente",
       "DELETION_SUCCESS_DESCRIPTION": "El evento se eliminará de la lista en unos momentos…",
-      "EVENT_LOCKED": "Actualmente se está trabajando en ello. Por favor, espere hasta hacer más cambios…",
+      "EVENT_LOCKED": "El evento está activo. Por favor espere hasta que haga más cambios…",
       "DELETION_FAILURE": "Error al eliminar el evento",
       "DELETION_FAILURE_DESCRIPTION": "Por favor, inténtelo más tarde...",
       "RESULT_HEADING": "Resultados {{range.begin}}-{{range.end}} de {{total}}",
@@ -104,7 +104,7 @@
          "SUBHEADING": "Seleccione los datos que se mostrarán por defecto en la vista de la tabla {{ tableName }}",
          "AVAILABLE_COLUMNS": "Columnas disponibles",
          "SELECTED_COLUMNS": "Columnas seleccionadas",
-         "FOOTER_TEXT": "El orden y la selección se guardarán automáticamente. Pulsa \"{{resetTranslation}}\" para restaurar la vista predeterminada."
+         "FOOTER_TEXT": "El orden y la selección se guardarán automáticamente. Pulse \"{{resetTranslation}}\" para restaurar la vista por defecto."
       }
    },
    "CONFIRMATIONS": {
@@ -130,9 +130,9 @@
          }
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "Esta serie contiene eventos. Eliminar la serie no eliminará los eventos.",
+         "SERIES_HAS_EVENTS": "Esta serie contiene eventos. Eliminar la serie no eliminará los acontecimientos.",
          "EVENT_WILL_BE_GONE": "Si continúa, el evento se eliminará permanentemente.",
-         "UNSAVED_CHANGES": "Tiene cambios sin guardar. Si continúa, estos cambios serán descartados. ¿Está seguro de que desea continuar?"
+         "UNSAVED_CHANGES": "Tiene cambios sin guardar. Si continúa, esos cambios serán descartados. ¿Está seguro que desea continuar?"
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Esta serie no se puede eliminar ya que todavía contiene eventos."
@@ -178,7 +178,7 @@
       "GROUP_NOT_SAVED": "No se ha podido guardar el grupo",
       "GROUP_DELETED": "El grupo ha sido eliminado",
       "GROUP_NOT_DELETED": "No se ha podido eliminar el grupo",
-      "ACCESS_DENIED": "Acceso denegado. No tienes permiso para ver esta página",
+      "ACCESS_DENIED": "Acceso denegado. No está autorizado a ver esta página",
       "SERIES_ADDED": "Se ha creado la serie",
       "SERIES_NOT_SAVED": "No se ha podido guardar la serie",
       "EVENTS_CREATED": "Se ha creado el evento",
@@ -212,8 +212,8 @@
       "LOCATION_DELETED": "Se ha borrado la ubicación",
       "LOCATION_NOT_DELETED": "No se ha podido borrar la ubicación",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "No se ha podido borrar la ubicación porque no se dispone del permiso para ello.",
-      "CONFLICT_DETECTED": "Conflicto de programación: este nuevo evento se solapa con un evento existente. Por favor, cambie la ubicación, fechas o horas.",
-      "CONFLICT_BULK_DETECTED": "Programar conflictos: cambiar los acontecimientos da lugar a conflictos. Por favor, cambie la ubicación, fechas o horas.",
+      "CONFLICT_DETECTED": "Conflicto de programación: el nuevo evento se solapa con otro existente. Por favor, cambie la sala, las fechas o las horas.",
+      "CONFLICT_BULK_DETECTED": "Conflicto de programación: los cambios propuestos causan un conflicto. Por favor, cambia la ubicación, las fechas o horas.",
       "CONFLICT_ALREADY_ENDED": "Error de programación: El evento ya ha terminado.",
       "CONFLICT_END_BEFORE_START": "Error de programación: El final tiene que ser más tarde que el comienzo.",
       "CONFLICT_IN_THE_PAST": "El programa no podría ser actualizado: no se puede programar un evento que en el pasado.",
@@ -247,29 +247,29 @@
       "THUMBNAIL_CHANGE_FAILED": "No se pudo cambiar la miniatura.",
       "VIDEO_SOURCE_TRACKS_INVALID": "No ha seleccionado pistas de vídeo para procesar",
       "VIDEO_TOO_MANY_AUDIOS": "No se puede tener más de una pista de audio en una única pista de vídeo",
-      "SERVER_UNRESPONSIVE": "¡Vaya! El servidor parece no responder. Por favor, inténtelo más tarde.",
-      "SERVICE_UNAVAILABLE": "¡Vaya! El servidor parece no responder. Por favor, inténtelo más tarde.",
+      "SERVER_UNRESPONSIVE": "¡Uy! Parece que el servidor no responde. Por favor, inténtelo de nuevo más tarde.",
+      "SERVICE_UNAVAILABLE": "¡Uy! Parece que el servidor no responde. Por favor, inténtelo de nuevo más tarde.",
       "ACTIVE_TRANSACTION": "Este evento no puede editarse mientras exista un flujo de trabajo o una transacción activos.",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "Se ha producido un error inesperado al actualizar el evento. Algunos eventos pueden haber sido actualizados.",
+         "UNEXPECTED_ERROR": "Se ha producido un error inesperado durante la actualización. Algunos eventos pueden haber sido actualizados.",
          "ALL_EVENTS_UPDATED": "Todos los eventos se han actualizado correctamente",
          "NO_EVENTS_UPDATED": "Todas las actualizaciones fallaron.",
          "SOME_EVENTS_NOT_UPDATED": "Algunos eventos no pudieron ser actualizados."
       },
       "ADOPTER_PROFILE_UPDATED": "El perfil se actualizó correctamente",
-      "ADOPTER_PROFILE_NOT_UPDATED": "¡Vaya! No se pudo actualizar la información del perfil. Por favor inténtalo de nuevo!",
+      "ADOPTER_PROFILE_NOT_UPDATED": "¡Ups! No se pudo actualizar la información del perfil. ¡Inténtalo de nuevo!",
       "ADOPTER_PROFILE_DELETED": "Información del perfil eliminada correctamente.",
-      "ADOPTER_PROFILE_NOT_DELETED": "¡Vaya! No se pudo actualizar la información del perfil. Por favor inténtalo de nuevo!",
+      "ADOPTER_PROFILE_NOT_DELETED": "¡Ups! No se pudo eliminar la información del perfil. ¡Inténtalo de nuevo!",
       "TOBIRA_OVERRIDE_NAME": "El título de la página seleccionada se sobrescribirá con el título de la serie.",
       "TOBIRA_NO_PATH_SEGMENT": "La página necesita un segmento de ruta.",
       "TOBIRA_NOT_MOUNTED": "No se pudo montar la serie en Tobira.",
-      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "El segmento de ruta no es válido. Un segmento de ruta válido tiene al menos 2 caracteres, no contiene ningún espacio en blanco o caracteres de control, ninguno de los caracteres '<>\"[\\]^`{|}#%/? ', y no empieza con ninguno de los caracteres '-+~@_! &;:. =*'()'.",
       "TOBIRA_PATH_SEGMENT_UNIQUE": "El segmento de ruta de una página debe ser única entre todas sus páginas hermanas.",
-      "TOBIRA_PAGE_NOT_FOUND": "La página a la que intentó navegar no existe o ya no existe. ¿Quiere empezar desde el principio?",
-      "TOBIRA_SERVER_ERROR": " Error al hablar con Tobira. Contacte con el administrador de su sistema y/o vuelva a intentarlo más tarde.",
+      "TOBIRA_PAGE_NOT_FOUND": "La página a la que intentó navegar no existe o ya no existe. Intente comenzar desde el principio.",
+      "TOBIRA_SERVER_ERROR": " Error al comunicarse con Tobira. Contacte a su administrador del sistema y/o vuelva a intentarlo más tarde.",
       "TOBIRA_COPIED_DIRECT_LINK": "Enlace copiado al portapapeles.",
       "TOBIRA_FAILED_COPYING_DIRECT_LINK": "No se pudo copiar el enlace al portapapeles.",
-      "TOBIRA_NOT_FOUND": "Tobira no conoce esta serie (aún). Inténtelo de nuevo en unos minutos o póngase en contacto con el administrador del sistema."
+      "TOBIRA_NOT_FOUND": "Tobira no conoce esta serie (todavía). Inténtalo de nuevo en unos minutos o, contacte con el administrador del sistema."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Acciones",
@@ -282,19 +282,19 @@
          "EVENTS": {
             "CAPTION": "Eliminar",
             "DELETE_EVENTS": "Eliminar Eventos",
-            "UNAUTHORIZED": "No está autorizado a eliminar los eventos resaltados. Deseleccionar para continuar."
+            "UNAUTHORIZED": "No está autorizado a borrar los eventos seleccionados. Por favor, desmárquelos para continuar."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Al eliminar un evento, todos sus metadatos y sus archivos de audio y vídeo se eliminarán y serán irrecuperables.",
       "DELETE_EVENTS_WARNING_LINE2": "",
-      "DELETE_SERIES_WARNING_LINE1": "Una vez eliminados, todos los metadatos de la serie serán irrecuperables. Todos los eventos en la serie serán eliminados.",
+      "DELETE_SERIES_WARNING_LINE1": "Al eliminar una serie, todos sus metadatos serán irrecuperables. Los eventos de la serie no se borrarán.",
       "DELETE_SERIES_WARNING_LINE2": "",
       "SCHEDULE_TASK": {
          "CAPTION": "Comenzar Tarea",
          "GENERAL": {
             "CAPTION": "General",
             "SUMMARY": "({{ count }} eventos seleccionados)",
-            "CANNOTSTART": "Los eventos destacados no pueden ser procesados en este momento. Deselect it/them or try again later."
+            "CANNOTSTART": "El/Los evento(s) indicados no pueden procesarse en este momento. Desmárquelo(s) o inténtelo de nuevo más tarde."
          },
          "TASKS": {
             "CAPTION": "Tareas",
@@ -317,7 +317,7 @@
             "NOCHANGES": "No se han detectado cambios en los eventos.",
             "CONFLICT_FIRST_EVENT": "Evento modificado",
             "CONFLICT_SECOND_EVENT": "Evento en conflicto",
-            "CANNOTEDITSCHEDULE": "Para los eventos resaltados, no tiene permiso para editar la información de programación. Puede continuar, pero no podrá editar la información de programación de ningún evento."
+            "CANNOTEDITSCHEDULE": "No tiene permiso para modificar la programación de los eventos indicados. Puede continuar, pero no podrá modificar la programación de ningún evento."
          },
          "METADATA": {
             "EDIT": "Editar metadatos"
@@ -333,7 +333,7 @@
             "CAPTION": "Modificar",
             "EVENT": "evento",
             "EVENTS": "eventos",
-            "HEADER": "Esta página le permite editar eventos programados agrupados por días de semana. Los campos de entrada son pre-llenados en caso de que todos los eventos programados tengan el mismo valor para un campo específico. De lo contrario, los campos de entrada se dejan en blanco. Dejar en blanco los campos de entrada significa que los valores respectivos no deben ser cambiados.",
+            "HEADER": "Esta página le permite editar eventos programados agrupados por días de semana. Los campos de entrada están ya preconfigurados en caso de que todos los eventos tengan el mismo valor para un campo en específico. De otra forma, los campos de entrada quedan en blanco. Dejar los campos de entrada en blanco significa que los valores respectivos para cada evento no debieran ser cambiados.",
             "METADATA": "Metadatos",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -352,7 +352,7 @@
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Editar y/o seleccionar los campos de metadatos que desea actualizar. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "DESCRIPTION": "Editar y/o seleccionar los campos de metadatos que desea actualizar. No se puede seleccionar un campo si esto no resulta en un valor cambiado para al menos un evento, o si el campo no es válido (p.e. los campos obligatorios no pueden estar vacíos). Los campos de metadatos destacados tienen valores divergentes para los eventos seleccionados.",
             "TABLE": {
                "CAPTION": "Metadatos de los eventos seleccionados",
                "FIELDS": "Metadatos",
@@ -442,7 +442,7 @@
          },
          "INFORMATION_STATE": {
             "HEADER": "¡Gracias por usar Opencast!",
-            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. Puede ayudarnos con un registro rápido.",
+            "INFORMATION_PARAGRAPH_1": "Nuestros desarrolladores están trabajando constantemente para proporcionarle la mejor experiencia de usuario posible. Para eso, necesitamos saber más sobre quién utiliza Opencast y cómo se utiliza. Puedes ayudarnos con un registro rápido.",
             "INFORMATION_PARAGRAPH_2": "Agradecemos mucho cualquier comentario, ya que incluso algunos de los datos que recopilamos sobre el uso de Opencast nos ayudarán a crear mejor software, tener mejores posibilidades de financiación adicional y atraer más empresas para prestar servicios alrededor de Opencast."
          },
          "FORM_STATE": {
@@ -459,7 +459,7 @@
             "LAST_NAME": "Apellido(s)",
             "STREET": "Calle",
             "NUMBER": "Número",
-            "ADDITIONAL_ADDRESS_INFO": "Agregar Detalles de dirección",
+            "ADDITIONAL_ADDRESS_INFO": "Agregar información Adicional de la dirección ",
             "MAIL": "E-Mail",
             "CONTACT_ME": "Contactar conmigo para actualizaciones y problemas de seguridad",
             "WHICH_DATA_TO_SHARE": "¿Qué quieres compartir?",
@@ -484,7 +484,7 @@
             "TEXT": "Se produjo un error al procesar tu solicitud."
          },
          "DELETE_SUBMIT_STATE": {
-            "TEXT": "¿Está seguro de que desea eliminar sus datos de registro? Confirmando esto también eliminará sus datos de registro del servidor del proyecto Opencast con el siguiente intervalo de actualización."
+            "TEXT": "¿Está seguro que desea eliminar sus datos de registro? Confirmando esto también eliminará sus datos de registro del servidor del proyecto Opencast en el siguiente intervalo de actualización."
          }
       }
    },
@@ -1160,7 +1160,7 @@
             "THEME": {
                "CAPTION": "Estilo",
                "DESCRIPTION": {
-                  "TEXT": "Opcionalmente puedes usar temas para marcar tus videos. Los temas pueden definir vídeos bumper y trailer, marcas de agua y diapositivas de título, incluyendo metadatas."
+                  "TEXT": "Opcionalmente se pueden utilizar temas para personalizar los vídeos. Los temas pueden incluir videos de inicio y fin, marcas de agua y diapositivas de título que pueden obtenerse de los metadatos."
                },
                "TITLE": "Estilo",
                "LABEL": "Seleccione tema",
@@ -1168,7 +1168,7 @@
             },
             "TOBIRA": {
                "CAPTION": "Tobira",
-               "DESCRIPTION": "Aquí puede seleccionar dónde desea que la serie aparezca en el portal de vídeo de Tobira. You can only select one location here, and it needs to be empty (marked in bold). Puede crear nuevas páginas aquí, pero tenga en cuenta que sólo persisten si están en la ruta a la página seleccionada.",
+               "DESCRIPTION": "Aquí puede seleccionar dónde desea que la serie aparezca en el portal de vídeo de Tobira. Solo puede seleccionar una ubicación aquí, y debe estar vacía (marcada en negrita). Puede crear nuevas páginas aquí, pero tenga en cuenta que solo persisten si están en la ruta a la página seleccionada.",
                "SELECT_PAGE": "Seleccione una página de destino",
                "PAGE_TITLE": "Título de subpágina",
                "PATH_SEGMENT": "Segmento de ruta",
@@ -1177,7 +1177,7 @@
                "CANCEL": "Cancelar",
                "HOMEPAGE": "Página principal",
                "SELECTED_PAGE": "La serie será montada bajo la siguiente ruta",
-               "NO_PAGE_SELECTED": "Página no seleccionada. No se pudo montar la serie en Tobira.",
+               "NO_PAGE_SELECTED": "No hay página seleccionada. La serie no se publicará en Tobira.",
                "PATH": "Ruta"
             },
             "SUMMARY": {
@@ -1272,7 +1272,7 @@
                "HOMEPAGE": "(Página principal)",
                "DIRECT_LINK": "Enlace directo a la serie",
                "COPY_DIRECT_LINK": "Copiar en el portapapeles",
-               "NOT_MOUNTED": "Esta serie no está actualmente incluida en la estructura de la página, y solo se puede alcanzar utilizando el enlace directo de arriba.",
+               "NOT_MOUNTED": "This series is currently not included in the page structure, and can only be reached using the direct link above.",
                "PAGES": "Páginas en Tobira que contienen esta serie"
             },
             "EVENTS": {
@@ -1493,10 +1493,10 @@
                   "DESCRIPTION": "Por favor, elija un conjunto de políticas preconfigurado o añada políticas personalizadas",
                   "NEW_USER": "New user",
                   "USER": "Usuario",
-                  "USERS": "Users who are authorized for the access policy",
+                  "USERS": "Users who are authorized by this access policy",
                   "HELP": {
-                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
-                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                     "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
+                     "WRITE": "By setting write permissions, the entity to which this access policy is assigned can be modified by the selected user."
                   }
                },
                "ROLES": {
@@ -1542,11 +1542,11 @@
                   "DESCRIPTION": "Por favor, elija un conjunto de políticas preconfigurado o añada políticas personalizadas",
                   "NEW_USER": "New user",
                   "USER": "Usuario",
-                  "USERS": "Users who are authorized for the access policy",
+                  "USERS": "Users who are authorized by this access policy",
                   "NONEXISTENT_USER": "Nonexistent user",
                   "HELP": {
-                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
-                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                     "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
+                     "WRITE": "By setting write permissions, the entity to which this access policy is assigned can be modified by the selected user."
                   }
                },
                "ROLES": {
@@ -1688,7 +1688,7 @@
                "BOTTOM_RIGHT": "Esquina inferior derecha",
                "UPLOAD": "Subida",
                "POSITION": "Posición y vista previa de la marca de agua",
-               "FILEUPLOAD_DESCRIPTION": "El archivo debe tener un canal alfa (fondo transparente). Los tipos de archivo aceptables son: .PNG, .GIF, .SVG, .WEBP",
+               "FILEUPLOAD_DESCRIPTION": "El archivo debería tener un canal alfa (fondo transparente). Los tipos de archivo soportados son: .PNG, .GIF, .SVG, .WEBP",
                "UPLOAD_LABEL": "Subir imagen",
                "UPLOAD_BUTTON": "Subida"
             },
@@ -1777,7 +1777,7 @@
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "Advertencia: Algunos de sus cambios no fueron guardados. Si abandonas el editor de vídeo, estos cambios se perderán. ¿De verdad quieres continuar?",
+      "WARNING_UNSAVED": "ADVERTENCIA: Algunos de los cambios no se han guardado. Si deja el editor de vídeo, estos cambios se perderán ¿Desea continuar?",
       "TIMELINE": "Línea de tiempo",
       "ZOOMLEVEL": "Nivel de Zoom",
       "PREVIEW_MODE": "Modo vista previa",
@@ -1825,7 +1825,7 @@
          "END": "Fin"
       },
       "THUMBNAIL": {
-         "DESCRIPTION": "Una miniatura por defecto usada para representar visualmente el evento se genera automáticamente. En caso de que desee utilizar una miniatura diferente, puede extraer una miniatura del vídeo en la posición actual de reproducción o subir una imagen.",
+         "DESCRIPTION": "Se genera automáticamente una miniatura por defecto, que se usa para representar visualmente el evento. Si desea usar una miniatura diferente, puede extraerse una del vídeo en la posición actual o subir una imagen.",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
@@ -1852,7 +1852,7 @@
          },
          "PREVIEW": {
             "NOT_AVAILABLE": "No hay vista previa disponible",
-            "OUTDATED": "La vista previa está desactualizada desde que se cambiaron los segmentos. Se actualizará tan pronto como guarde sus cambios."
+            "OUTDATED": "La vista previa está desactualizada porque los segmentos han cambiado. Se actualizará al guardar los cambios."
          },
          "CURRENT": {
             "DEFAULT": "Se está usando la miniatura por defecto.",
@@ -1861,7 +1861,7 @@
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "Puede anular la selección de pistas para excluirlas del proceso posterior. Tenga en cuenta que necesita (re)publicar el evento para aplicar los cambios.",
+         "DESCRIPTION": "Se pueden deseleccionar pistas para que no sigan siendo procesadas. Tenga en cuenta que es necesario (re-)publicar el evento para que los cambios tengan efecto.",
          "NOTIFICATION": {
             "NO_VIDEO_TRACK_SELECTED": "Debe activar al menos una pista de vídeo",
             "NO_AUDIO_TRACK_SELECTED": "Debe activar al menos una pista de audio"
@@ -1875,8 +1875,8 @@
             "NO_PREVIEW_AVAILABLE": "No se han encontrado imágenes de vista previa",
             "NO_TRACK_SELECTED": "No se ha seleccionado una pista de vídeo",
             "TOOLTIPS": {
-               "HIDE": "This video track is currently enabled. Haga clic para desactivar",
-               "UNHIDE": "This video track is currently disabled. Marque para activar"
+               "HIDE": "Esta pista de vídeo está activada. Haga clic para desactivar",
+               "UNHIDE": "Esta pista de vídeo está desactivada. Haga clic para activar."
             }
          },
          "AUDIO": {
@@ -1885,8 +1885,8 @@
             "NO_PREVIEW_AVAILABLE": "No se han encontrado imágenes de vista previa",
             "NO_TRACK_SELECTED": "No se ha seleccionado una pista de audio",
             "TOOLTIPS": {
-               "HIDE": "This audio track is currently enabled. Haga clic para desactivar",
-               "UNHIDE": "This audio track is currently disabled. Haga clic para activar"
+               "HIDE": "Esta pista de audio está activada. Haga clic para desactivar",
+               "UNHIDE": "Esta pista de audio está desactivada. Haga clic para activar"
             }
          }
       },
@@ -2165,7 +2165,7 @@
    "HOTKEYS": {
       "CHEAT_SHEET": {
          "TITLE": "Atajos de teclado",
-         "HINT": "Esta página lista los atajos de teclado disponibles actualmente. Note that these might change depending on what page you are currently visiting."
+         "HINT": "Esta página enumera los atajos de teclado disponibles en este momento. Tenga en cuenta que éstos pueden cambiar dependiendo de qué página se esté visitando."
       },
       "KEYS": {
          "CTRL": "Ctrl",
@@ -2254,7 +2254,7 @@
       }
    },
    "STATISTICS": {
-      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Por favor, inténtelo más tarde.",
+      "NOT_AVAILABLE": "Las estadísticas no se pueden mostrar en este momento. Por favor, inténtalo de nuevo más tarde.",
       "UNSUPPORTED_TYPE": "Lo sentimos, Opencast no puede procesar este tipo de datos estadísticos.",
       "FROM": "Desde",
       "TO": "Hasta",
@@ -2270,7 +2270,7 @@
          "PUBLISHEDHOURS": "Horas de Vídeo Publicadas"
       },
       "DESCRIPTION": {
-         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
+         "RANDOM": "Esto muestra datos aleatorios como muestra. Puede desactivar este gráfico eliminando la definición json del proveedor de estadísticas correspondiente de etc/providers",
          "VIEWS_SUM": "Aquí se muestra el número total de vistas por unidad de tiempo.",
          "VIEWS_AVG": "Aquí se muestra el número medio de vistas diarias por unidad de tiempo.",
          "PUBLISHEDHOURS": "Esto muestra las horas de video publicadas"

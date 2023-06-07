@@ -30,7 +30,7 @@
   "username": "Gebruikersnaam",
   "password": "Wachtwoord",
   "remember_me": "Onthoud mij.",
-  "sthWentWrong": "Something went wrong. Please try again.",
+  "sthWentWrong": "Er is iets fout gegaan. Probeer het nogmaals.",
   "loading": "Laden ...",
   "no_data": "Geen data beschikbaar.",
   "login_success": "Login succesvol.",
