@@ -137,7 +137,7 @@ public class Sender {
       request = new HttpPost(url);
       request.addHeader("Content-Type", "application/json; utf-8");
       request.addHeader("Accept", "application/json");
-      ((HttpPost) request).setEntity(new StringEntity(json));
+      ((HttpPost) request).setEntity(new StringEntity(json, StandardCharsets.UTF_8));
     }
 
     HttpResponse resp = client.execute(request);
