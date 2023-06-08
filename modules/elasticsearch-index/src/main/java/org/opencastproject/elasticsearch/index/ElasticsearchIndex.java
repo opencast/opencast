@@ -839,4 +839,27 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
       throw new SearchIndexException("Error querying theme index", t);
     }
   }
+
+  /**
+   * Escapes all reserved Elasticsearch characters in a given string
+   * Useful for when a given query string does not know about Elasticsearch query syntax
+   * @param text String to escape reserved characters in
+   * @return the given string with escaped characters
+   */
+  public String escapeQuery(String text) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < text.length(); i++) {
+      char c = text.charAt(i);
+      // These characters are part of the query syntax and must be escaped
+      // CHECKSTYLE:OFF
+      if (c == '\\' || c == '+' || c == '-' || c == '!' || c == '(' || c == ')' || c == ':'
+              || c == '^' || c == '[' || c == ']' || c == '\"' || c == '{' || c == '}' || c == '~'
+              || c == '*' || c == '?' || c == '|' || c == '&' || c == '/') {
+        sb.append('\\');
+      }
+      // CHECKSTYLE:ON
+      sb.append(c);
+    }
+    return sb.toString();
+  }
 }
