@@ -40,11 +40,13 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
+import org.opencastproject.userdirectory.JpaUserReferenceProvider;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
@@ -112,7 +114,9 @@ public class ScheduledDataCollector extends TimerTask {
   private SearchService searchService;
 
   /** User and role provider */
-  protected JpaUserAndRoleProvider userAndRoleProvider;
+  protected UserProvider userRefProvider;
+
+  protected JpaUserAndRoleProvider userProvider;
 
   /** The security service */
   protected SecurityService securityService;
@@ -288,8 +292,6 @@ public class ScheduledDataCollector extends TimerTask {
     statisticData.setJobCount(serviceRegistry.count(null, null));
 
     statisticData.setSeriesCount(seriesService.getSeriesCount());
-    statisticData.setUserCount(userAndRoleProvider.countAllUsers());
-
     SearchQuery sq = new SearchQuery();
     sq.withId("");
     sq.withElementTags(new String[0]);
@@ -333,6 +335,10 @@ public class ScheduledDataCollector extends TimerTask {
           logger.warn("Unable to calculate total minutes, unauthorized");
         }
         statisticData.setTotalMinutes(current + orgDuration);
+
+        //Add the users for each org
+        long currentUsers = statisticData.getUserCount();
+        statisticData.setUserCount(currentUsers + userProvider.countUsers() + userRefProvider.countUsers());
       });
     }
     statisticData.setVersion(version);
@@ -378,10 +384,16 @@ public class ScheduledDataCollector extends TimerTask {
     this.searchService = searchService;
   }
 
-  /** OSGi setter for the user provider. */
+  /** OSGi setter for the userref provider. */
   @Reference
-  public void setUserAndRoleProvider(JpaUserAndRoleProvider userAndRoleProvider) {
-    this.userAndRoleProvider = userAndRoleProvider;
+  public void setUserRefProvider(JpaUserReferenceProvider userRefProvider) {
+    this.userRefProvider = userRefProvider;
+  }
+
+  /* OSGi setter for the user provider. */
+  @Reference
+  public void setUserAndRoleProvider(JpaUserAndRoleProvider userProvider) {
+    this.userProvider = userProvider;
   }
 
   /** OSGi callback for setting the security service. */

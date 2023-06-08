@@ -68,7 +68,7 @@ import javax.persistence.Query;
         "service.description=Provides a user reference directory"
     },
     immediate = true,
-    service = { UserProvider.class, RoleProvider.class, UserReferenceProvider.class }
+    service = { UserProvider.class, RoleProvider.class, UserReferenceProvider.class, JpaUserReferenceProvider.class }
 )
 public class JpaUserReferenceProvider implements UserReferenceProvider, UserProvider, RoleProvider {
 
