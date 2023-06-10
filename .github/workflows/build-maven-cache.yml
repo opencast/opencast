@@ -1,0 +1,76 @@
+name: Build Maven Cache
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 6'
+
+jobs:
+  build:
+    name: build maven cache
+    runs-on: ubuntu-latest
+    if: github.repository == 'opencast/opencast'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: setup java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: clone mvn.opencast.org
+        run: |
+          git clone --depth 1 https://github.com/opencast/mvn.opencast.org.git
+
+      - name: prepare additional maven repository
+        run: |
+          sed -i "s#https://mvn.opencast.org/#file://$(readlink -f mvn.opencast.org)#" pom.xml
+
+      - name: install dependencies
+        run: |
+          sudo apt update -q
+          sudo apt install -y -q \
+            bzip2 \
+            ffmpeg \
+            gzip \
+            s3cmd \
+            sox \
+            tar \
+            unzip
+
+      - name: prepare build
+        run: |
+          sed -i 's/build --skipTests=${skipTests}/build --skipTests=true/' modules/admin-ui-frontend/pom.xml
+
+      - name: build opencast
+        run: |
+          mvn clean install -Pdev \
+            --batch-mode \
+            -Dsurefire.rerunFailingTestsCount=2 \
+            -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+            -Dhttp.keepAlive=false \
+            -Dmaven.wagon.http.pool=false \
+            -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+
+      - name: build cache tarball
+        run: |
+          ln -s ~/.m2
+          tar cfvJh dot-m2.tar.xz .m2
+
+      - name: configure s3cmd
+        env:
+          S3_HOST: ${{ secrets.S3_HOST }}
+          S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+          S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+        run: |
+          echo "host_base = ${S3_HOST}" > "$HOME/.s3cfg"
+          echo "host_bucket = ${S3_HOST}" >> "$HOME/.s3cfg"
+          echo "bucket_location = us-east-1" >> "$HOME/.s3cfg"
+          echo "use_https = True" >> "$HOME/.s3cfg"
+          echo "access_key = ${S3_ACCESS_KEY}" >> "$HOME/.s3cfg"
+          echo "secret_key = ${S3_SECRET_KEY}" >> "$HOME/.s3cfg"
+          echo "signature_v2 = False" >> "$HOME/.s3cfg"
+
+      - name: upload assets
+        run: |
+          s3cmd put -P dot-m2.tar.xz s3://opencast-maven-cache/
