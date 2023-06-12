@@ -205,33 +205,11 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
   public List<WorkflowIndexData> getWorkflowIndexData(int limit, int offset) throws WorkflowDatabaseException {
     try {
       return db.exec(em -> {
-        List<WorkflowIndexData> results = em
+        return em
             .createNamedQuery("WorkflowIndexData.getAll", WorkflowIndexData.class)
             .setMaxResults(limit)
             .setFirstResult(offset)
             .getResultList();
-        //2023-02: Reports of workflows with missing org IDs in adopters upgrading to 13.x, fixing.
-        for (WorkflowIndexData entry : results) {
-          if (null == entry.getOrganizationId()) {
-            WorkflowInstance actualWorkflow = em.createNamedQuery("Workflow.workflowById", WorkflowInstance.class)
-                .setMaxResults(1)
-                .setParameter("workflowId", entry.getId())
-                //NB: This query filters by org, so we have to explicitly null out the org
-                .setParameter("organizationId", null)
-                .getSingleResult();
-            logger.warn("Detected workflow with missing org id.  Workflow ID {}", entry.getId());
-            logger.warn("If you see this message a lot please report it.");
-            actualWorkflow.setOrganizationId(securityService.getOrganization().getId());
-            try {
-              updateInDatabase(actualWorkflow);
-              logger.warn("Repaired workflow ID {}", entry.getId());
-            } catch (WorkflowDatabaseException wde) {
-              //If this errors out then we should probably die?  Chances are the DB connection is broken anyway.
-              throw new RuntimeException(wde);
-            }
-          }
-        }
-        return results;
       });
     } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
