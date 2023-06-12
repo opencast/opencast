@@ -23,6 +23,7 @@ package org.opencastproject.editor.api;
 import static java.util.Objects.requireNonNull;
 
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.security.api.User;
 import org.opencastproject.util.data.Tuple;
 
 import com.google.gson.Gson;
@@ -31,12 +32,17 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Provides access to the parsed editing information
  */
 public class EditingData {
   public static final String WORKFLOW_ACTIVE = "workflow_active";
+  public static final String LOCKING_ACTIVE = "locking_active";
+  public static final String LOCK_REFRESH = "lock_refresh";
+  public static final String LOCK_UUID = "lock_uuid";
+  public static final String LOCK_USER = "lock_user";
   private final List<SegmentData> segments;
   private final List<WorkflowData> workflows;
   private final List<TrackData> tracks;
@@ -46,13 +52,23 @@ public class EditingData {
   private final SeriesData series;
   @SerializedName(WORKFLOW_ACTIVE)
   private final Boolean workflowActive;
+  @SerializedName(LOCKING_ACTIVE)
+  private final Boolean lockingActive;
+  @SerializedName(LOCK_REFRESH)
+  private final Integer lockRefresh;
+  @SerializedName(LOCK_UUID)
+  private final String lockUUID;
+  @SerializedName(LOCK_USER)
+  private final String lockUser;
+
   private final List<String> waveformURIs;
   private final List<Subtitle> subtitles;
   private final Boolean local;
 
   public EditingData(List<SegmentData> segments, List<TrackData> tracks, List<WorkflowData> workflows, Long duration,
           String title, String recordingStartDate, String seriesId, String seriesName, Boolean workflowActive,
-          List<String> waveformURIs, List<Subtitle> subtitles, Boolean local) {
+          List<String> waveformURIs, List<Subtitle> subtitles, Boolean local, Boolean lockingActive,
+          Integer lockRefresh, User user) {
     this.segments = segments;
     this.tracks = tracks;
     this.workflows = workflows;
@@ -64,6 +80,10 @@ public class EditingData {
     this.waveformURIs = waveformURIs;
     this.subtitles = subtitles;
     this.local = local;
+    this.lockingActive = lockingActive;
+    this.lockRefresh = lockRefresh * 1000;
+    this.lockUUID = UUID.randomUUID().toString();
+    this.lockUser = user.getUsername();
   }
 
   public static EditingData parse(String json) {
