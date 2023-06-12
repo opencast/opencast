@@ -58,18 +58,11 @@ jobs:
           tar cfvJh dot-m2.tar.xz .m2
 
       - name: configure s3cmd
-        env:
-          S3_HOST: ${{ secrets.S3_HOST }}
-          S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
-          S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
-        run: |
-          echo "host_base = ${S3_HOST}" > "$HOME/.s3cfg"
-          echo "host_bucket = ${S3_HOST}" >> "$HOME/.s3cfg"
-          echo "bucket_location = us-east-1" >> "$HOME/.s3cfg"
-          echo "use_https = True" >> "$HOME/.s3cfg"
-          echo "access_key = ${S3_ACCESS_KEY}" >> "$HOME/.s3cfg"
-          echo "secret_key = ${S3_SECRET_KEY}" >> "$HOME/.s3cfg"
-          echo "signature_v2 = False" >> "$HOME/.s3cfg"
+        uses: lkiesow/configure-s3cmd@v1
+        with:
+          host: ${{ secrets.S3_HOST }}
+          access_key: ${{ secrets.S3_ACCESS_KEY }}
+          secret_key: ${{ secrets.S3_SECRET_KEY }}
 
       - name: upload assets
         run: |
