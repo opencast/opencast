@@ -33,6 +33,7 @@ import org.opencastproject.editor.api.EditingData;
 import org.opencastproject.editor.api.EditorService;
 import org.opencastproject.editor.api.EditorServiceException;
 import org.opencastproject.editor.api.ErrorStatus;
+import org.opencastproject.editor.api.LockData;
 import org.opencastproject.editor.api.SegmentData;
 import org.opencastproject.editor.api.TrackData;
 import org.opencastproject.editor.api.TrackSubData;
@@ -147,6 +148,7 @@ public class EditorServiceImpl implements EditorService {
   /** Tag that marks workflow for being used from the editor tool */
   private static final String EDITOR_WORKFLOW_TAG = "editor";
 
+  private static EditorLock editorLock;
 
   private long expireSeconds = UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
 
@@ -188,6 +190,8 @@ public class EditorServiceImpl implements EditorService {
   private static final String DEFAULT_THUMBNAIL_SUBTYPE = "player+preview";
   private static final String DEFAULT_THUMBNAIL_WF_PROPERTY = "thumbnail_edited";
   private static final List<MediaPackageElementFlavor> DEFAULT_THUMBNAIL_PRIORITY_FLAVOR = new ArrayList<>();
+  private static final int DEFAULT_LOCK_TIMEOUT_SECONDS = 300; // ( 5 mins )
+  private static final int DEFAULT_LOCK_REFRESH_SECONDS = 60;  // ( 1 min )
 
   public static final String OPT_PREVIEW_SUBTYPE = "preview.subtype";
   public static final String OPT_PREVIEW_TAG = "preview.tag";
@@ -201,6 +205,13 @@ public class EditorServiceImpl implements EditorService {
   public static final String OPT_THUMBNAIL_WF_PROPERTY = "thumbnail.workflow.property";
   public static final String OPT_THUMBNAIL_PRIORITY_FLAVOR = "thumbnail.priority.flavor";
   public static final String OPT_LOCAL_PUBLICATION = "publication.local";
+  public static final String OPT_LOCK_ENABLED = "lock.enable";
+  public static final String OPT_LOCK_TIMEOUT = "lock.release.after.seconds";
+  public static final String OPT_LOCK_REFRESH = "lock.refresh.after.seconds";
+
+  private Boolean lockingActive;
+  private int lockRefresh = DEFAULT_LOCK_REFRESH_SECONDS;
+  private int lockTimeout = DEFAULT_LOCK_TIMEOUT_SECONDS;
 
   private final Set<String> smilCatalogTagSet = new HashSet<>();
 
@@ -323,6 +334,7 @@ public class EditorServiceImpl implements EditorService {
 
     // Preview Video subtype
     previewVideoSubtype =  Objects.toString(properties.get(OPT_PREVIEW_VIDEO_SUBTYPE), DEFAULT_PREVIEW_VIDEO_SUBTYPE);
+
     logger.debug("Preview video subtype set to '{}'", previewVideoSubtype);
 
     // Flavor for captions
@@ -359,6 +371,25 @@ public class EditorServiceImpl implements EditorService {
       }
     }
     logger.debug("Thumbnail track priority set to '{}'", thumbnailSourcePrimary);
+
+    lockingActive = Boolean.parseBoolean(StringUtils.trimToEmpty((String) properties.get(OPT_LOCK_ENABLED)));
+
+    try {
+      lockTimeout = Integer.parseUnsignedInt(
+           Objects.toString(properties.get(OPT_LOCK_TIMEOUT)));
+    } catch (NumberFormatException e) {
+      logger.info("Configuration {} contains invalid value, defaulting to {}", OPT_LOCK_TIMEOUT, lockTimeout);
+    }
+
+    try {
+      lockRefresh = Integer.parseUnsignedInt(
+            Objects.toString(properties.get(OPT_LOCK_REFRESH)));
+    } catch (NumberFormatException e) {
+      logger.info("Configuration {} contains invalid value, defaulting to {}", OPT_LOCK_REFRESH, lockRefresh);
+    }
+
+    editorLock = new EditorLock(lockTimeout);
+
   }
 
   /**
@@ -875,6 +906,24 @@ public class EditorServiceImpl implements EditorService {
   }
 
   @Override
+  public void lockMediaPackage(final String mediaPackageId, LockData lockRequest) throws EditorServiceException {
+    // Does mediaPackage exist
+    getEvent(mediaPackageId);
+
+    // Try to get lock, throws Exception if not owner
+    editorLock.lock(mediaPackageId, lockRequest);
+  }
+
+  @Override
+  public void unlockMediaPackage(final String mediaPackageId, LockData lockRequest) throws EditorServiceException {
+    // Does mediaPackage exist
+    getEvent(mediaPackageId);
+
+    // Try to release lock, throws Exception if not owner
+    editorLock.unlock(mediaPackageId, lockRequest);
+  }
+
+  @Override
   public EditingData getEditData(final String mediaPackageId) throws EditorServiceException, UnauthorizedException {
 
     Event event = getEvent(mediaPackageId);
@@ -980,8 +1029,11 @@ public class EditorServiceImpl implements EditorService {
             .map(Attachment::getURI).map(this::signIfNecessary)
             .collect(Collectors.toList());
 
+    User user = securityService.getUser();
+
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
-            event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList, subtitles, localPublication);
+            event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList, subtitles, localPublication,
+            lockingActive, lockRefresh, user);
   }
 
 
