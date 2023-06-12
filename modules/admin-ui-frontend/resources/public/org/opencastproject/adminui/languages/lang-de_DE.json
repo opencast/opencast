@@ -459,7 +459,7 @@
             "LAST_NAME": "Nachname",
             "STREET": "Straße",
             "NUMBER": "Hausnummer",
-            "ADDITIONAL_ADDRESS_INFO": "Add. address information",
+            "ADDITIONAL_ADDRESS_INFO": "Hinzufügen address information",
             "MAIL": "E-Mail-Adresse",
             "CONTACT_ME": "Kontaktiere mich für Aktualisierungen und Sicherheitsupdates",
             "WHICH_DATA_TO_SHARE": "Welche Daten möchtest du teilen?",
@@ -1177,7 +1177,7 @@
                "CANCEL": "Abbrechen",
                "HOMEPAGE": "Startseite",
                "SELECTED_PAGE": "Serie wird in folgendem Pfad eingebunden",
-               "NO_PAGE_SELECTED": "No page selected. Series will not be mounted in Tobira.",
+               "NO_PAGE_SELECTED": "Keine Seite ausgewählt. Die Serie wird nicht in Tobira eingehängt.",
                "PATH": "Pfad"
             },
             "SUMMARY": {
@@ -1272,7 +1272,7 @@
                "HOMEPAGE": "(Startseite)",
                "DIRECT_LINK": "Direkter Link zur Serie",
                "COPY_DIRECT_LINK": "In die Zwischenablage kopieren",
-               "NOT_MOUNTED": "This series is currently not included the page structure, and can only be reached using the direct link above.",
+               "NOT_MOUNTED": "Diese Serie ist derzeit nicht in der Seitenstruktur enthalten und kann nur über den oben genannten direkten Link erreicht werden.",
                "PAGES": "Seiten in Tobira, die diese Serie einbinden"
             },
             "EVENTS": {
@@ -1493,10 +1493,10 @@
                   "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu",
                   "NEW_USER": "Neuer Nutzer",
                   "USER": "User",
-                  "USERS": "Users who are authorized for the access policy",
+                  "USERS": "Nutzer, die durch diese Zugriffsrichtlinie autorisiert sind",
                   "HELP": {
-                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
-                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                     "READ": "Durch das Setzen von Leseberechtigungen wird das Medium, dem diese Zugriffsrichtlinie zugewiesen wird, für den ausgewählten Benutzer sichtbar.",
+                     "WRITE": "Durch das Setzen von Schreibberechtigungen kann das Medium, dem diese Zugriffsrichtlinie zugewiesen wird, vom ausgewählten Benutzer geändert werden."
                   }
                },
                "ROLES": {
@@ -1542,11 +1542,11 @@
                   "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu",
                   "NEW_USER": "Neuer Nutzer",
                   "USER": "User",
-                  "USERS": "Users who are authorized for the access policy",
+                  "USERS": "Nutzer, die durch diese Zugriffsrichtlinie autorisiert sind",
                   "NONEXISTENT_USER": "Nicht existierender Nutzer",
                   "HELP": {
-                     "READ": "By setting read rights, the access policy becomes visible for the selected user",
-                     "WRITE": "By setting write rights, the selected user can edit the access policy"
+                     "READ": "Durch das Setzen von Leseberechtigungen wird das Medium, dem diese Zugriffsrichtlinie zugewiesen wird, für den ausgewählten Benutzer sichtbar.",
+                     "WRITE": "Durch das Setzen von Schreibberechtigungen kann das Medium, dem diese Zugriffsrichtlinie zugewiesen wird, vom ausgewählten Benutzer geändert werden."
                   }
                },
                "ROLES": {
@@ -1688,7 +1688,7 @@
                "BOTTOM_RIGHT": "Unten rechts",
                "UPLOAD": "Hochladen",
                "POSITION": "Wasserzeichen-Position & -Vorschau",
-               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: .PNG, .GIF, .SVG, .WEBP",
+               "FILEUPLOAD_DESCRIPTION": "Die Datei sollte einen Alphakanal haben (transparenter Hintergrund). Zulässige Dateitypen sind .PNG, .GIF, .SVG, .WEBP",
                "UPLOAD_LABEL": "Bild hochladen",
                "UPLOAD_BUTTON": "Hochladen"
             },
@@ -1777,7 +1777,7 @@
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
+      "WARNING_UNSAVED": "Warnung: Einige Ihrer Änderungen wurden nicht gespeichert. Wenn Sie den Video-Editor verlassen, gehen diese Änderungen verloren. Do you really want to continue?",
       "TIMELINE": "Zeitleiste",
       "ZOOMLEVEL": "Zoomlevel",
       "PREVIEW_MODE": "Vorschau Modus",
