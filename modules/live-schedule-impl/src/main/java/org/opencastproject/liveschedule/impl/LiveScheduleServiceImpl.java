@@ -44,6 +44,8 @@ import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.VideoStream;
+import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.VideoStreamImpl;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
@@ -74,6 +76,8 @@ import com.entwinemedia.fn.data.Opt;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Equator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIUtils;
 import org.osgi.framework.BundleContext;
@@ -90,11 +94,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -103,8 +107,10 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Component(
     immediate = true,
@@ -151,6 +157,10 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   public static final String LIVE_DISTRIBUTION_SERVICE = "live.distributionService";
   public static final String LIVE_PUBLISH_STREAMING = "live.publishStreaming";
 
+  private static final MediaPackageElementFlavor[] publishFlavors = { MediaPackageElements.EPISODE,
+      MediaPackageElements.SERIES, MediaPackageElements.XACML_POLICY_EPISODE,
+      MediaPackageElements.XACML_POLICY_SERIES }; // make configurable later
+
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(LiveScheduleServiceImpl.class);
 
@@ -181,6 +191,8 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   private SecurityService securityService;
 
   private long jobPollingInterval = JobBarrier.DEFAULT_POLLING_INTERVAL;
+
+  private SimpleElementSelector publishElementSelector;
 
   /**
    * OSGi callback on component activation.
@@ -248,6 +260,11 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     }
     publishedStreamingFormats = Arrays.asList(Optional.ofNullable(StringUtils.split(
             (String)properties.get(LIVE_PUBLISH_STREAMING), ",")).orElse(new String[0]));
+
+    publishElementSelector = new SimpleElementSelector();
+    for (MediaPackageElementFlavor flavor : publishFlavors) {
+      publishElementSelector.addFlavor(flavor);
+    }
 
     logger.info(
         "Configured live stream name: {}, mime type: {}, resolution: {}, target flavors: {}, distribution service: {}",
@@ -351,8 +368,13 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       return false;
     }
 
-    // generate new live tracks
+    // create temp mp for comparison
     MediaPackage tmpMp = (MediaPackage) snapshot.getMediaPackage().clone();
+    // remove all elements that would not be published
+    Collection<MediaPackageElement> elements = publishElementSelector.select(tmpMp, false);
+    Arrays.stream(tmpMp.getElements()).filter(Predicate.not(elements::contains)).collect(Collectors.toList())
+            .forEach(tmpMp::remove);
+    // generate new live tracks
     setDurationForMediaPackage(tmpMp, episodeDC); // duration is used by live tracks
     Map<String, Track> liveTracks = addLiveTracksToMediaPackage(tmpMp, episodeDC);
 
@@ -644,46 +666,33 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     try {
       MediaPackage mp = (MediaPackage) snapshot.getMediaPackage().clone();
 
-      Set<String> elementIds = new HashSet<>();
-      // Then, add series catalog if needed
-      if (StringUtils.isNotEmpty(mp.getSeries())) {
-        DublinCoreCatalog catalog = seriesService.getSeries(mp.getSeries());
-        // Create temporary catalog and save to workspace
-        mp.add(catalog);
-        URI uri = workspace.put(mp.getIdentifier().toString(), catalog.getIdentifier(), "series.xml",
-                dublinCoreService.serialize(catalog));
-        catalog.setURI(uri);
-        catalog.setChecksum(null);
-        catalog.setFlavor(MediaPackageElements.SERIES);
-        elementIds.add(catalog.getIdentifier());
-      }
+      // Select elements
+      Collection<MediaPackageElement> elements = publishElementSelector.select(mp, false);
+      Set<String> elementIds = elements.stream().map(MediaPackageElement::getIdentifier).collect(Collectors.toSet());
 
-      if (mp.getCatalogs(MediaPackageElements.EPISODE).length > 0) {
-        elementIds.add(mp.getCatalogs(MediaPackageElements.EPISODE)[0].getIdentifier());
-      }
-      if (mp.getAttachments(MediaPackageElements.XACML_POLICY_EPISODE).length > 0) {
-        elementIds.add(mp.getAttachments(MediaPackageElements.XACML_POLICY_EPISODE)[0].getIdentifier());
-      }
-
-      // Distribute element(s)
+      // Distribute elements
       Job distributionJob = downloadDistributionService.distribute(CHANNEL_ID, mp, elementIds, false);
       if (!waitForStatus(distributionJob).isSuccess()) {
         throw new LiveScheduleException(
                 "Element(s) for live media package " + mp.getIdentifier() + " could not be distributed");
       }
 
-      for (String id : elementIds) {
-        MediaPackageElement e = mp.getElementById(id);
-        // Cleanup workspace/wfr
+      // Remove all elements from mp
+      for (MediaPackageElement e: mp.getElements()) {
         mp.remove(e);
-        workspace.delete(e.getURI());
       }
 
-      // Add distributed element(s) to mp
+      // Re-add distributed elements
       List<MediaPackageElement> distributedElements = (List<MediaPackageElement>) MediaPackageElementParser
               .getArrayFromXml(distributionJob.getPayload());
-      for (MediaPackageElement mpe : distributedElements) {
-        mp.add(mpe);
+      for (MediaPackageElement distributedElement : distributedElements) {
+        mp.add(distributedElement);
+      }
+
+      // Clean up
+      for (String id : elementIds) {
+        MediaPackageElement e = mp.getElementById(id);
+        workspace.delete(e.getURI());
       }
 
       return mp;
@@ -781,46 +790,56 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     }
   }
 
-  private boolean isSameArray(String[] previous, String[] current) {
-    Set<String> previousSet = new HashSet<String>(Arrays.asList(previous));
-    Set<String> currentSet = new HashSet<String>(Arrays.asList(current));
-    return previousSet.equals(currentSet);
-  }
+  boolean isSameMediaPackage(MediaPackage previous, MediaPackage current) {
 
-  private boolean isSameTrackArray(Track[] previous, Track[] current) {
-    Set<Track> previousTracks = new HashSet<Track>(Arrays.asList(previous));
-    Set<Track> currentTracks = new HashSet<Track>(Arrays.asList(current));
-    if (previousTracks.size() != currentTracks.size()) {
-      return false;
-    }
-    for (Track tp : previousTracks) {
-      Iterator<Track> it = currentTracks.iterator();
-      while (it.hasNext()) {
-        Track tc = it.next();
-        if (tp.getURI().equals(tc.getURI()) && tp.getDuration().equals(tc.getDuration())) {
-          currentTracks.remove(tc);
-          break;
-        }
+    Equator<Track> liveTrackEquator = new Equator<>() {
+      @Override
+      public boolean equate(Track track1, Track track2) {
+        // we can safely assume that each live track has exactly one video stream since we generated that ourselves
+        VideoStream videostream1 = (VideoStream) track1.getStreams()[0];
+        VideoStream videostream2 = (VideoStream) track2.getStreams()[0];
+
+        return Objects.equals(track1.getURI(), track2.getURI())
+                && Objects.equals(track1.getFlavor(), track2.getFlavor())
+                && Objects.equals(track1.getMimeType(), track2.getMimeType())
+                && Objects.equals(track1.getDuration(), track2.getDuration())
+                && Objects.equals(videostream1.getFrameWidth(), videostream2.getFrameWidth())
+                && Objects.equals(videostream1.getFrameHeight(), videostream2.getFrameHeight());
       }
-    }
-    if (currentTracks.size() > 0) {
+
+      @Override
+      public int hash(Track track) {
+        VideoStream videostream = (VideoStream) track.getStreams()[0];
+        return Objects.hash(track.getURI(), track.getFlavor(), track.getMimeType(), track.getDuration(),
+                videostream.getFrameWidth(), videostream.getFrameHeight());
+      }
+    };
+
+    Equator<MediaPackageElement> catalogAndAttachmentEquator = new Equator<>() {
+      @Override
+      public boolean equate(MediaPackageElement mpe1, MediaPackageElement mpe2) {
+        return Objects.equals(mpe1.getIdentifier(), mpe2.getIdentifier())
+                && Objects.equals(mpe1.getElementType(), mpe2.getElementType())
+                && Objects.equals(mpe1.getChecksum(), mpe2.getChecksum())
+                && Objects.equals(mpe1.getFlavor(), mpe2.getFlavor());
+      }
+
+      @Override
+      public int hash(MediaPackageElement mpe) {
+        return Objects.hash(mpe.getIdentifier(), mpe.getElementType(), mpe.getChecksum(), mpe.getFlavor());
+      }
+    };
+
+    if (!CollectionUtils.isEqualCollection(Arrays.asList(previous.getTracks()), Arrays.asList(current.getTracks()),
+            liveTrackEquator)) {
       return false;
+    } else if (!CollectionUtils.isEqualCollection(Arrays.asList(previous.getCatalogs()),
+            Arrays.asList(current.getCatalogs()), catalogAndAttachmentEquator)) {
+      return false;
+    } else {
+      return CollectionUtils.isEqualCollection(Arrays.asList(previous.getAttachments()),
+              Arrays.asList(current.getAttachments()), catalogAndAttachmentEquator);
     }
-
-    return true;
-  }
-
-  boolean isSameMediaPackage(MediaPackage previous, MediaPackage current) throws LiveScheduleException {
-    return Objects.equals(previous.getTitle(), current.getTitle())
-            && Objects.equals(previous.getLanguage(), current.getLanguage())
-            && Objects.equals(previous.getSeries(), current.getSeries())
-            && Objects.equals(previous.getSeriesTitle(), current.getSeriesTitle())
-            && Objects.equals(previous.getDuration(), current.getDuration())
-            && Objects.equals(previous.getDate(), current.getDate())
-            && isSameArray(previous.getCreators(), current.getCreators())
-            && isSameArray(previous.getContributors(), current.getContributors())
-            && isSameArray(previous.getSubjects(), current.getSubjects())
-            && isSameTrackArray(previous.getTracks(), current.getTracks());
   }
 
   void retractPreviousElements(MediaPackage previousMp, MediaPackage newMp) throws LiveScheduleException {
