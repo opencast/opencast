@@ -52,7 +52,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -161,7 +160,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
       public Object load(String id) {
         String[] key = id.split(DELIMITER);
         logger.trace("Loading user '{}':'{}' from reference database", key[0], key[1]);
-        User user = loadUser(key[0], key[1]);
+        User user = loadUserFromDB(key[0], key[1]);
         return user == null ? nullToken : user;
       }
     });
@@ -251,12 +250,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
   @Override
   public User loadUser(String userName) {
     String orgId = securityService.getOrganization().getId();
-    Object user = cache.getUnchecked(userName.concat(DELIMITER).concat(orgId));
-    if (user == nullToken) {
-      return null;
-    } else {
-      return (User) user;
-    }
+    return loadUserFromCache(userName, orgId);
   }
 
   /**
@@ -268,10 +262,28 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    *          the organization id
    * @return the loaded user or <code>null</code> if not found
    */
-  private User loadUser(String userName, String organization) {
+  private User loadUserFromDB(String userName, String organization) {
     return db.exec(findUserReferenceQuery(userName, organization))
         .map(ref -> ref.toUser(PROVIDER_NAME))
         .orElse(null);
+  }
+
+  /**
+   * Loads a user from cache
+   *
+   * @param userName
+   *          the user name
+   * @param organization
+   *          the organization id
+   * @return the loaded user or <code>null</code> if not found
+   */
+  private User loadUserFromCache(String userName, String organization) {
+    Object user = cache.getUnchecked(userName.concat(DELIMITER).concat(organization));
+    if (user == nullToken) {
+      return null;
+    } else {
+      return (User) user;
+    }
   }
 
   @Override
@@ -315,7 +327,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
       JpaOrganization organization = UserDirectoryPersistenceUtil.saveOrganizationQuery(
           (JpaOrganization) user.getOrganization()).apply(em);
       JpaUserReference userReference = new JpaUserReference(user.getUsername(), user.getName(), user.getEmail(),
-          mechanism, new Date(), organization, roles);
+          mechanism, user.getLastLogin(), organization, roles);
 
       // Then save the user reference
       Optional<JpaUserReference> foundUserRef = findUserReferenceQuery(user.getUsername(),
@@ -324,8 +336,10 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
         throw new IllegalStateException("User '" + user.getUsername() + "' already exists");
       }
       em.persist(userReference);
-      cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), user.toUser(PROVIDER_NAME));
     });
+    // There is still a race when this method is executed multiple times. However, the user reference is unlikely to be
+    // different.
+    cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), user.toUser(PROVIDER_NAME));
     updateGroupMembership(user);
   }
 
@@ -341,11 +355,13 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
       }
       foundUserRef.get().setName(user.getName());
       foundUserRef.get().setEmail(user.getEmail());
-      foundUserRef.get().setLastLogin(new Date());
+      foundUserRef.get().setLastLogin(user.getLastLogin());
       foundUserRef.get().setRoles(UserDirectoryPersistenceUtil.saveRolesQuery(user.getRoles()).apply(em));
       em.merge(foundUserRef.get());
-      cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), user.toUser(PROVIDER_NAME));
     });
+    // There is still a race when this method is executed multiple times. However, the user reference is unlikely to be
+    // different.
+    cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), user.toUser(PROVIDER_NAME));
     updateGroupMembership(user);
   }
 
