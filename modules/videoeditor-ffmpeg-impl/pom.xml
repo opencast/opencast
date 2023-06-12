@@ -69,6 +69,7 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-inspection-service-ffmpeg</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>

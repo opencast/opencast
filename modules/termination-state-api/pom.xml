@@ -24,6 +24,7 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-serviceregistry</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>jakarta.ws.rs</groupId>
