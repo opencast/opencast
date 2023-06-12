@@ -2200,14 +2200,20 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
               String orgid = indexData.getOrganizationId();
               if (null == orgid) {
-                //NB: This version of getWorkflow takes the org id, which in this case is null
-                // Using the normal version filters by org, and since this workflow has a NULL org it can't be found
-                WorkflowInstance instance = persistence.getWorkflow(indexData.getId(), orgid);
                 //We're assuming here that mediapackages don't change orgs
                 orgid = assetManager.getSnapshotsById(indexData.getMediaPackageId())
                     .getSnapshots().head2().getOrganizationId();
-                instance.setOrganizationId(orgid);
-                persistence.updateInDatabase(instance);
+                //We try-catch here since it's possible for the WF to exist in the *index* but not in the *DB*
+                // It probably shouldn't be, but that won't keep it from happening anyway.
+                try {
+                  //NB: This version of getWorkflow takes the org id, which in this case is null
+                  // Using the normal version filters by org, and since this workflow has a NULL org it can't be found
+                  WorkflowInstance instance = persistence.getWorkflow(indexData.getId(), null);
+                  instance.setOrganizationId(orgid);
+                  persistence.updateInDatabase(instance);
+                } catch (NotFoundException e) {
+                  logger.warn("Workflow {} not found in the database, but present in the index", indexData.getId());
+                }
               }
               var updatedWorkflowData = index.getEvent(indexData.getMediaPackageId(), orgid, securityService.getUser());
               updatedWorkflowData = getStateUpdateFunction(indexData).apply(updatedWorkflowData);
