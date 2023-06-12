@@ -20,21 +20,24 @@
  */
 import { expect } from '@playwright/test';
 
-const player = '__paella_instances__[0]';
+export const playerInstanceStr = '__paella_instances__[0]';
 
 
-export const getPlayerState = async page => await page.evaluate(`${player}.PlayerState`);
+export const getPlayerState = async page => await page.evaluate(`${playerInstanceStr}.PlayerState`);
 
 export const waitState = async (page, state) => {
-  await page.evaluate(`${player}.waitState(${state})`);
+  await page.evaluate(`${playerInstanceStr}.waitState(${state})`);
 };
 
-export const getState = async (page) => await page.evaluate(`${player}.state`);
+export const getState = async (page) => await page.evaluate(`${playerInstanceStr}.state`);
 
-export const playVideo = async (page) => {
+export const clickToStartVideo = async (page) => {
   const PlayerState = await getPlayerState(page);
   await waitState(page, PlayerState.MANIFEST);
   await page.click('#playerContainerClickArea');
   await waitState(page, PlayerState.LOADED);
   await expect(await getState(page)).toBe(PlayerState.LOADED);
 };
+
+export const playVideo = async (page) => await page.evaluate(`${playerInstanceStr}.play()`);
+export const pauseVideo = async (page) => await page.evaluate(`${playerInstanceStr}.pause()`);

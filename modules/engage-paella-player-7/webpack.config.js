@@ -23,6 +23,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 
 
+
 module.exports = function (env) {
   const ocServer = env.server || 'http://localhost:8080';
   const proxyOpts = {
@@ -36,7 +37,7 @@ module.exports = function (env) {
     output: {
       path: path.join(__dirname,'target/paella-build'),
       filename: 'paella-player.js',
-      publicPath: '/paella7/ui'
+      publicPath: env.PUBLIC_PATH ?? '/paella7/ui'
     },
     devtool: 'source-map',
     devServer: {
@@ -48,7 +49,7 @@ module.exports = function (env) {
       },
       static: {
         directory: path.join(__dirname, '../../etc/ui-config/mh_default_org/paella7'),
-        publicPath: '/ui/config/paella7'
+        publicPath: env.OPENCAST_CONFIG_URL ?? '/ui/config/paella7'
       },
       proxy: {
         '/search/**': proxyOpts,
@@ -105,6 +106,15 @@ module.exports = function (env) {
     },
 
     plugins: [
+      new webpack.ProvidePlugin({
+        h: ['preact', 'h'],
+        Fragment: ['preact', 'Fragment'],
+      }),
+      new webpack.DefinePlugin({
+        OPENCAST_SERVER_URL: JSON.stringify(env.OPENCAST_SERVER_URL),
+        OPENCAST_CONFIG_URL: JSON.stringify(env.OPENCAST_CONFIG_URL),
+        OPENCAST_PAELLA_URL: JSON.stringify(env.PUBLIC_PATH)
+      }),
       new webpack.SourceMapDevToolPlugin({
         filename: '[file].js.map[query]'
       }),

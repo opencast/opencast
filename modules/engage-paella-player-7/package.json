@@ -6,11 +6,12 @@
   "scripts": {
     "build": "webpack --mode production",
     "dev": "webpack serve --mode development --host=0.0.0.0",
-    "eslint": "eslint --config .eslintrc.js src --resolve-plugins-relative-to .",
+    "eslint": "eslint --config .eslintrc.js src tests --resolve-plugins-relative-to .",
     "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'src/**/*.html'",
     "html-validate": "html-validate 'public/*.html'",
     "check": "npm run eslint && npm run html-linter && npm run html-validate",
-    "testenv:dev": "webpack serve --mode development --host=0.0.0.0 --env server=https://develop.opencast.org"
+    "testenv:dev": "webpack serve --mode development --host=0.0.0.0 --env OPENCAST_SERVER_URL=https://develop.opencast.org --env OPENCAST_CONFIG_URL=/paella-opencast/config --env PUBLIC_PATH=/paella7/ui",
+    "test": "playwright test"
   },
   "devDependencies": {
     "@babel/core": "^7.21.3",
