@@ -2,7 +2,7 @@
     "styleSheets": [
         "theme.css"
     ],
-    "configOverrides": {
+    "configOverrides": {      
         "accessibility": {
             "clickWithSpacebar": false
         },
@@ -17,14 +17,14 @@
             "showRemainingProgress": true
         },
         "videoContainer": {
-            "overPlaybackBar": false,
+            "overPlaybackBar": false,    
             "dynamicLayout": {
-                "landscapeVerticalAlignment": "align-center",
+                "landscapeVerticalAlignment": "align-bottom",
                 "portraitHorizontalAlignment": "align-center"
             }
         },
         "plugins": {
-            "es.upv.paella.slideMapProgressBarPlugin": {
+            "es.upv.paella.slideMapProgressBarPlugin": {   
                 "markColor": {
                     "mouseOut": "#0A0A0A",
                     "mouseHover": "#9CA3AF"
@@ -46,7 +46,7 @@
         { "plugin": "es.upv.paella.dualVideoDynamic", "identifier": "iconMaximize", "icon": "./icons/maximize.svg" },
         { "plugin": "es.upv.paella.dualVideoDynamic", "identifier": "iconMimimize", "icon": "./icons/minimize.svg" },
         { "plugin": "es.upv.paella.dualVideoDynamic", "identifier": "iconClose", "icon": "./icons/close.svg" },
-
+        
         { "plugin": "es.upv.paella.playPauseButton", "identifier": "play", "icon": "./icons/play.svg" },
 
         { "plugin": "es.upv.paella.layoutSelector","identifier": "layoutIcon", "icon": "./icons/view-mode.svg"},

@@ -35,10 +35,6 @@
 
 
 
-
-
-
-
 .button-group .button-plugin-wrapper .button-description,
 .button-group-title,
 .menu-button-title,
@@ -47,23 +43,16 @@ button {
   font-weight: 600;
 }
 
-.player-container button:focus-visible {
-  outline-color: #f200f2;
-}
-
-.playback-bar {
-  -webkit-user-select: none;
-  user-select: none;
-}
 
 .progress-indicator-container {
-forced-color-adjust: none;
+  forced-color-adjust: none;
 }
 
 .playback-bar .button-plugins .button-plugin-container div.non-interactive {
   margin-top: -2px;
 }
 
+/* progress indicator style */
 .progress-indicator {
   height: 25px;
   width: calc(100% - 30px);
@@ -88,6 +77,7 @@ forced-color-adjust: none;
   height: 16px;
 }
 
+/* button area on videos */
 .video-canvas .button-area button {
   background-color: var(--highlight-bg-color-hover);
   width: 32px;
@@ -96,6 +86,7 @@ forced-color-adjust: none;
   padding: 4px;
 }
 
+/* buttons in playbar */
 .playback-bar .button-plugins .button-plugin-container button {
   border-radius: 7px;
 }
@@ -113,18 +104,47 @@ forced-color-adjust: none;
   margin-right: 5px;
 }
 
-.playback-bar .button-plugins .button-plugin-container button[name="es.upv.paella.backwardButtonPlugin"] div{
+
+/* align text in es.upv.paella.backwardButtonPlugin and es.upv.paella.forwardButtonPlugin */
+.playback-bar .button-plugins .button-plugin-container button[name="es.upv.paella.backwardButtonPlugin"] div,
+.playback-bar .button-plugins .button-plugin-container button[name="es.upv.paella.forwardButtonPlugin"] div{
   margin-top: -10px;;
 }
 
-.playback-bar .button-plugins .button-plugin-container button[name="es.upv.paella.forwardButtonPlugin"] div{
-  margin-top: -10px;;
+
+.button-group .button-plugin-container button[name="es.upv.paella.qualitySelector"] {
+  padding: 0;
+}
+
+
+
+/* This should be in paella-core */
+:root {
+  --main-outline-color: #f200f2;
+}
+
+.playback-bar {
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .frame-control-plugin-container .image-list img {
   width: 160px;
 }
 
-.button-group .button-plugin-container button[name="es.upv.paella.qualitySelector"] {
-  padding: 0;
+/* outline styles for buttons */
+.player-container button,
+.video-container .video-canvas .button-area button,
+.button-group .button-plugin-container button {
+  outline-style: none;
 }
+
+.player-container button:focus-visible,
+.video-container .video-canvas .button-area button:focus-visible,
+.button-group .button-plugin-container button:focus-visible {
+  outline-color: var(--main-outline-color);
+  outline-style: solid;
+  opacity: 1;
+}
+
+
