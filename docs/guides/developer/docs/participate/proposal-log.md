@@ -185,7 +185,7 @@ be deprecated 4 (Four) next releases of Opencast.
 
 ```
 Example of deprecation policy:
-![deprecation-api-policy](img/api-depr-example.png)
+![deprecation-api-policy](../img/api-depr-example.png)
 
 ### Release Notes
 Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Tue, 26 Jan 2021
