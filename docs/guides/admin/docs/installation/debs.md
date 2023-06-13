@@ -91,7 +91,7 @@ Install Opencast
 
 For a basic installation (All-In-One) just run:
 
-    apt-get install opencast-{{ opencast_major_version() }}-allinone elasticsearch-oss
+    apt-get install opencast-{{ opencast_major_version() }}-allinone opensearch
 
 This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.  Note
 that while the repository provides a packaged version of FFmpeg, your distribution may have a version which is
