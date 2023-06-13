@@ -70,7 +70,7 @@ nav:
    - Firewall: 'configuration/firewall.md'
    - Asset Manager: 'configuration/asset-manager.md'
    - Elasticsearch: 'configuration/elasticsearch.md'
-   - Opensearch: 'configuration/opensearch.md'
+   - OpenSearch: 'configuration/opensearch.md'
    - Metadata: 'configuration/metadata.md'
    - Encoding: 'configuration/encoding.md'
    - Inbox: 'configuration/inbox.md'

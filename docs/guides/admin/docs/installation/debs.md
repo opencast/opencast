@@ -58,22 +58,22 @@ First you have to install the necessary repositories so that your package manage
         apt-get update
 
 
-Install Opensearch
+Install OpenSearch
 ------------------
 
-Starting with Opencast 14, Opensearch is now a dependency.  Our packages do not explicitly depend on Opensearch
-because it runs externally to Opencast.  By default we expect Opensearch to be running on the admin node, however
+Starting with Opencast 14, OpenSearch is now a dependency.  Our packages do not explicitly depend on OpenSearch
+because it runs externally to Opencast.  By default we expect OpenSearch to be running on the admin node, however
 you can configure the URL in Opencast's configuration files.
 
-In our repository we provide validated Opensearch packages copied from the upstream repository.  Installation can be
+In our repository we provide validated OpenSearch packages copied from the upstream repository.  Installation can be
 accomplished by running the following:
 
     apt-get install opensearch
 
-If you wish to use the upstream Opensearc repository directly be aware that Opencast only supported with Opensearch 1.x
-and will not work with Opensearch 2.x yet.  Future support for this is forthcoming.
+If you wish to use the upstream OpenSearch repository directly be aware that Opencast only supported with OpenSearch 1.x
+and will not work with OpenSearch 2.x yet.  Future support for this is forthcoming.
 
-The default Opensearch configuration should work for Opencast out of the box, although we encourage you to set your
+The default OpenSearch configuration should work for Opencast out of the box, although we encourage you to set your
 index up in a secure manner.
 
 After installing an configuring make sure to start and enable the service:
