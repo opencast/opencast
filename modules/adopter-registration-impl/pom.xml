@@ -82,6 +82,12 @@
       <groupId>org.osgi</groupId>
       <artifactId>osgi.cmpn</artifactId>
     </dependency>
+      <dependency>
+          <groupId>org.opencastproject</groupId>
+          <artifactId>opencast-tobira</artifactId>
+          <version>13-SNAPSHOT</version>
+          <scope>compile</scope>
+      </dependency>
   </dependencies>
   <build>
     <plugins>

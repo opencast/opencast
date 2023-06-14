@@ -44,7 +44,10 @@ import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.tobira.impl.TobiraEndpoint;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
+
+import com.google.gson.JsonObject;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
@@ -52,6 +55,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,6 +121,8 @@ public class ScheduledDataCollector extends TimerTask {
 
   /** The security service */
   protected SecurityService securityService;
+
+  protected TobiraEndpoint tobiraEndpoint;
 
 
   //================================================================================
@@ -224,8 +231,13 @@ public class ScheduledDataCollector extends TimerTask {
 
       if (adopter.allowsStatistics()) {
         try {
-          String statisticDataAsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
-          sender.sendStatistics(statisticDataAsJson);
+          StatisticData statisticData = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
+          sender.sendStatistics(statisticData.jsonify());
+          if (null != tobiraEndpoint) {
+            JsonObject tobiraJson = tobiraEndpoint.getStats();
+            tobiraJson.addProperty("statistic_key", statisticData.getStatisticKey());
+            sender.sendTobiraData(tobiraJson.getAsString());
+          }
           //Note: save the form (unmodified) (again!) to update the dates.  Old dates cause warnings to the user!
           adopterFormService.saveFormData(adopter);
         } catch (Exception e) {
@@ -240,7 +252,7 @@ public class ScheduledDataCollector extends TimerTask {
     String generalJson = collectGeneralData(adopter);
     String statsJson;
     if (adopter.allowsStatistics()) {
-      statsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
+      statsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey()).jsonify();
     } else {
       statsJson = "{}";
     }
@@ -269,7 +281,7 @@ public class ScheduledDataCollector extends TimerTask {
    * @return The statistic data as JSON string.
    * @throws Exception General exception that can occur while gathering data.
    */
-  private String collectStatisticData(String adopterKey, String statisticKey) throws Exception {
+  private StatisticData collectStatisticData(String adopterKey, String statisticKey) throws Exception {
     StatisticData statisticData = new StatisticData(statisticKey);
     statisticData.setAdopterKey(adopterKey);
     serviceRegistry.getHostRegistrations().forEach(host -> {
@@ -336,7 +348,7 @@ public class ScheduledDataCollector extends TimerTask {
       });
     }
     statisticData.setVersion(version);
-    return statisticData.jsonify();
+    return statisticData;
   }
 
 
@@ -396,4 +408,8 @@ public class ScheduledDataCollector extends TimerTask {
     this.organizationDirectoryService = orgDirServ;
   }
 
+  @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
+  public void setTobiraEndpoint(TobiraEndpoint endpoint) {
+    this.tobiraEndpoint = endpoint;
+  }
 }
