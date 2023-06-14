@@ -4,6 +4,25 @@ Changelog
 Opencast 13
 -----------
 
+### Opencast 13.7
+
+*Released on June 26th, 2023*
+
+- [[#5019](https://github.com/opencast/opencast/pull/5019)] -
+  Fix Distribution of Elements for Live Events
+- [[#4972](https://github.com/opencast/opencast/pull/4972)] -
+  Fix directory cleanup for symlinks
+- [[#4968](https://github.com/opencast/opencast/pull/4968)] -
+  Fix STT Vosk test
+- [[#4954](https://github.com/opencast/opencast/pull/4954)] -
+  Add Opencast 13.6 release notes
+- [[#4952](https://github.com/opencast/opencast/pull/4952)] -
+  Fix bug in paella 7 usertracking plugin
+- [[#4944](https://github.com/opencast/opencast/pull/4944)] -
+  Fix possible deadlock spanning DB transaction and caching lock with user references
+- [[#4927](https://github.com/opencast/opencast/pull/4927)] -
+  Fix Check for Whether Live Publication has Changed
+
 ### Opencast 13.6
 
 *Released on Mai 26th, 2023*

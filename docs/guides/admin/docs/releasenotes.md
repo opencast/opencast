@@ -1,6 +1,16 @@
 # Opencast 13: Release Notes
 
 
+Opencast 13.7
+-------------
+
+The seventh maintenance release of Opencast 13.
+
+- Various fixes including fixes for live events, Paella player 7, user references and workspace cleanup.
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
+
 Opencast 13.6
 -------------
 
