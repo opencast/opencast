@@ -1,6 +1,5 @@
 # Opencast 13: Release Notes
 
-
 Opencast 13.7
 -------------
 
