@@ -84,7 +84,8 @@
               *
             </Import-Package>
             <Export-Package>
-              org.opencastproject.tobira;version=${project.version}
+              org.opencastproject.tobira;version=${project.version},
+              org.opencastproject.tobira.impl;version=${project.version}
             </Export-Package>
           </instructions>
         </configuration>
