@@ -760,6 +760,22 @@ Opencast 13
 Opencast 12
 -----------
 
+### Opencast 12.12
+
+*Released on June 15th, 2023*
+
+
+- [[#5017](https://github.com/opencast/opencast/pull/5017)] -
+  Properly encode adopter registration data
+- [[#4964](https://github.com/opencast/opencast/pull/4964)] -
+  Fix User ACL Wording
+- [[#4963](https://github.com/opencast/opencast/pull/4963)] -
+  Fix Wording of Tobira Integration
+- [[#4697](https://github.com/opencast/opencast/pull/4697)] -
+  Remove duplicated `oc_workflow` columns
+- [[#4658](https://github.com/opencast/opencast/pull/4658)] -
+  Editor service mediapackage locking
+
 ### Opencast 12.11
 
 *Released on May 16th, 2023*
