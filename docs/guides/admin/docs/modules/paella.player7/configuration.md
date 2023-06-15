@@ -72,14 +72,17 @@ You can create a new folder for you theme in `.../etc/ui-config/<tenant>/paella7
 {
     ...
     "opencast": {
-        "theme": "default_teme"
+        "theme": "custom_theme"
         ...
     }
     ...
 }
 ```
 
-Default theme: `.../etc/ui-config/<tenant>/paella7/default_theme/theme.json`.
+And create your custom theme: `.../etc/ui-config/<tenant>/paella7/custom_theme/theme.json`.
+As an example there is a basic example here: `.../etc/ui-config/<tenant>/paella7/custom_theme_example`
+
+If no custom theme is found or there is an error loading the resources, the default opencast theme will be used.
 
 Select the Opencast Player
 ------------------------------
