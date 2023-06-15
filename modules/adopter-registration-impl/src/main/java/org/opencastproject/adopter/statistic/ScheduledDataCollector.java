@@ -234,8 +234,12 @@ public class ScheduledDataCollector extends TimerTask {
           sender.sendStatistics(statisticData.jsonify());
           if (null != tobiraEndpoint) {
             JsonObject tobiraJson = tobiraEndpoint.getStats();
-            tobiraJson.addProperty("statistic_key", statisticData.getStatisticKey());
-            sender.sendTobiraData(tobiraJson.getAsString());
+            // This is null in the case that Tobira hasn't sent any stats yet.
+            // This could be due to Tobira not existing, or because we've just rebooted.
+            if (null != tobiraJson) {
+              tobiraJson.addProperty("statistic_key", statisticData.getStatisticKey());
+              sender.sendTobiraData(tobiraJson.getAsString());
+            }
           }
           //Note: save the form (unmodified) (again!) to update the dates.  Old dates cause warnings to the user!
           adopterFormService.saveFormData(adopter);
