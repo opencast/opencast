@@ -18,18 +18,16 @@
  * the License.
  *
  */
-import { applyOpencastTheme } from './default-theme.js';
-import { PaellaOpencast } from './js/PaellaOpencast.js';
+import { test, expect } from '@playwright/test';
+import { clickToStartVideo } from './utils';
 
-window.onload = async () => {
-  let paella = new PaellaOpencast('player-container');
 
-  try {
-    await applyOpencastTheme(paella);
-    await paella.loadManifest();
-    paella.log.info('Paella player load done');
-  }
-  catch(error){
-    paella.log.error(error);
-  }
-};
+test('Has the correct title', async ({ page }) => {
+  await page.goto('/paella7/ui/watch.html?id=ID-dual-stream-demo');
+  await expect(page).toHaveTitle('Dual-Stream Demo - No series | Opencast');
+});
+
+test('Video is loaded', async ({ page }) => {
+  await page.goto('/paella7/ui/watch.html?id=ID-dual-stream-demo');
+  await clickToStartVideo(page);
+});

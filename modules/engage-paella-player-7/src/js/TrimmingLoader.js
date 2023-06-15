@@ -19,10 +19,12 @@
  *
  */
 
+import { getUrlFromOpencastServer } from './PaellaOpencast';
+
 export const loadTrimming = async (player,videoId) => {
+  const requestUrl = `/annotation/annotations.json?episode=${videoId}&type=paella%2Ftrimming&day=&limit=1&offset=0`;
   let trimmingData = { start: 0, end: 0, enabled: false };
-  const response = await fetch(`/annotation/annotations.json?episode=${videoId}` +
-    '&type=paella%2Ftrimming&day=&limit=1&offset=0');
+  const response = await fetch(getUrlFromOpencastServer(requestUrl));
   if (response.ok) {
     try {
       const data = await response.json();

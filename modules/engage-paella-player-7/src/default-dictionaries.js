@@ -18,18 +18,22 @@
  * the License.
  *
  */
-import { applyOpencastTheme } from './default-theme.js';
-import { PaellaOpencast } from './js/PaellaOpencast.js';
+const defaultDictionaries = {};
 
-window.onload = async () => {
-  let paella = new PaellaOpencast('player-container');
+const dictionaries = require.context('./i18n/', true, /\.json$/);
+dictionaries.keys().forEach(k => {
+  const reResult = /([a-z-]+[A-Z_]+)\.json/.exec(k);
+  const localization = reResult && reResult[1];
 
-  try {
-    await applyOpencastTheme(paella);
-    await paella.loadManifest();
-    paella.log.info('Paella player load done');
+  if (localization) {
+    const dict = dictionaries(k);
+    defaultDictionaries[localization] = dict;
+
+    const lang = localization.substr(0,2);
+    if (!(lang in defaultDictionaries)) {
+      defaultDictionaries[lang] = dict;
+    }
   }
-  catch(error){
-    paella.log.error(error);
-  }
-};
+});
+
+export default defaultDictionaries;
