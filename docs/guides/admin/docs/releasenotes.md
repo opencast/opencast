@@ -1,5 +1,13 @@
 # Opencast 12: Release Notes
 
+Opencast 12.12
+--------------
+
+The final maintenance release of Opencast 12.
+The release fixes a few minor bugs.
+
+For more details, please take a look at [the changelog](changelog.md).
+
 Opencast 12.11
 --------------
 
