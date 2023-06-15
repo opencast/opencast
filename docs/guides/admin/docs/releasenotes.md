@@ -1,17 +1,19 @@
 # Opencast 14: Release Notes
-
-
-Opencast 14.0
 -------------
 
 ### Features
+- [Paella Player 7 is the new default player](../releasenotes/paella7.txt)
+- [New default Editor](../releasenotes/editor.txt)
+- [Global OC remember me cookie](../releasenotes/global-oc-remember-me-cookie.txt)
 
 ### Improvements
+- [New Admin-UI](../releasenotes/new-admin-ui.txt)
 
 ### Behavior changes
-
-### API changes
-
+- [Changed behaviour of analyze-mediapackage](../releasenotes/composite-woh.md)
+- [Composite WOH config changes](../releasenotes/composite-woh-changes)
+- Theodul Player is no longer available
+- Paella Player 6 is still available and can be configured
 
 Release Schedule
 ----------------
