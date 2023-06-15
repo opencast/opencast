@@ -7,7 +7,7 @@
 - [Global OC remember me cookie](releasenotes/global-oc-remember-me-cookie.txt)
 
 ### Improvements
-- [New Admin-UI](../releasenotes/new-admin-ui.txt)
+- [New Admin-UI](releasenotes/new-admin-ui.txt)
 
 ### Behavior changes
 - [Changed behaviour of analyze-mediapackage](releasenotes/analyze-mediapackage)
