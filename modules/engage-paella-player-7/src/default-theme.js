@@ -18,18 +18,25 @@
  * the License.
  *
  */
-import { applyOpencastTheme } from './default-theme.js';
-import { PaellaOpencast } from './js/PaellaOpencast.js';
 
-window.onload = async () => {
-  let paella = new PaellaOpencast('player-container');
+import { getUrlFromOpencastConfig, getUrlFromOpencastPaella } from './js/PaellaOpencast';
 
+
+export async function applyOpencastTheme(paella) {
+  //// Load custom theme
+  const config = await fetch(getUrlFromOpencastConfig('config.json'));
+  const configJson = await config.json();
+
+  const u = new URL(window.location.href);
+  const ocTheme = u.searchParams.get('oc.theme')
+    ?? configJson?.opencast?.theme
+    ?? 'default_theme'  ;
   try {
-    await applyOpencastTheme(paella);
-    await paella.loadManifest();
-    paella.log.info('Paella player load done');
+    paella.log.info(`Applying opencast theme '${ocTheme}'.`);
+    await paella.skin.loadSkin(getUrlFromOpencastConfig(`${ocTheme}/theme.json`));
   }
-  catch(error){
-    paella.log.error(error);
+  catch (err) {
+    paella.log.info(`Error applying opencast theme '${ocTheme}'. Using default theme!`);
+    await paella.skin.loadSkin(getUrlFromOpencastPaella('default_theme/theme.json'));
   }
-};
+}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 19 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <style>
+        .time-text {
+            font: 10px sans-serif;
+            text-align: right;
+            font-weight: bolder;
+        }
+    </style>
+    <path d="M13.449,0.849C13.828,0.43 14.494,0.381 14.937,0.741L18.631,3.741C18.865,3.931 19,4.208 19,4.5C19,4.792 18.865,5.069 18.631,5.259L14.937,8.259C14.494,8.619 13.828,8.57 13.449,8.151C13.069,7.731 13.12,7.1 13.563,6.741L15.091,5.5L9.236,5.5C5.301,5.5 2.111,8.522 2.111,12.25C2.111,14.728 3.521,16.895 5.622,18.069C6.115,18.344 6.382,18.903 6.184,19.411C5.976,19.94 5.345,20.208 4.822,19.938C1.949,18.455 0,15.568 0,12.25C0,7.418 4.135,3.5 9.236,3.5L15.091,3.5L13.563,2.259C13.12,1.9 13.069,1.269 13.449,0.849Z" style="fill-rule:nonzero;"/>
+    <text class="time-text" x="5" y="19">30</text>
+</svg>

@@ -35,7 +35,8 @@ module.exports = function (env) {
     entry: './src/index.js',
     output: {
       path: path.join(__dirname,'target/paella-build'),
-      filename: 'paella-player.js'
+      filename: 'paella-player.js',
+      publicPath: '/paella7/ui'
     },
     devtool: 'source-map',
     devServer: {
@@ -50,30 +51,16 @@ module.exports = function (env) {
         publicPath: '/ui/config/paella7'
       },
       proxy: {
-        '/paella7/ui': {
-          target: 'http://localhost:7070',
-          pathRewrite: {
-            '/paella7/ui': ''
-          }
-        },
-        '/paella/ui': {
-          target: 'http://localhost:7070',
-          pathRewrite: {
-            '/paella/ui': ''
-          }
-        },
         '/search/**': proxyOpts,
         '/info/**': proxyOpts,
         '/series/**': proxyOpts,
         '/annotation/**': proxyOpts,
         '/engage/**': proxyOpts,
-        '/annotation/**': proxyOpts,
         '/play/**': proxyOpts,
         '/usertracking/**': proxyOpts,
         '/editor/**': proxyOpts,
         '/editor-ui/**': proxyOpts
       }
-
     },
 
     module: {

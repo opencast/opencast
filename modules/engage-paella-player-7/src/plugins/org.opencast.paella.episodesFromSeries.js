@@ -29,6 +29,7 @@ import { getVideoPreview } from '../js/EpisodeConversor';
 import ListIcon from '../icons/list.svg';
 
 import '../css/EpisodesFromSeries.css';
+import { getUrlFromOpencastServer } from '../js/PaellaOpencast';
 
 export default class EpisodesFromSeriesPlugin extends PopUpButtonPlugin {
 
@@ -43,7 +44,7 @@ export default class EpisodesFromSeriesPlugin extends PopUpButtonPlugin {
           return false;
         }
         const limit = this.config.maxCount || 5;
-        const response = await fetch(`/search/episode.json?sid=${ series }&limit=${limit}`);
+        const response = await fetch(getUrlFromOpencastServer(`/search/episode.json?sid=${ series }&limit=${limit}`));
         if (response.ok) {
           this._episodesData = await response.json();
           return (this._episodesData['search-results'].total > 1);
@@ -57,7 +58,7 @@ export default class EpisodesFromSeriesPlugin extends PopUpButtonPlugin {
   }
 
   async load() {
-    this.icon = ListIcon;
+    this.icon = this.player.getCustomPluginIcon(this.name, 'buttonIcon') || ListIcon;
   }
 
   async getContent() {
