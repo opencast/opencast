@@ -47,6 +47,8 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.tobira.impl.TobiraEndpoint;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import org.osgi.framework.BundleContext;
@@ -237,8 +239,10 @@ public class ScheduledDataCollector extends TimerTask {
             // This is null in the case that Tobira hasn't sent any stats yet.
             // This could be due to Tobira not existing, or because we've just rebooted.
             if (null != tobiraJson) {
-              tobiraJson.addProperty("statistic_key", statisticData.getStatisticKey());
-              sender.sendTobiraData(tobiraJson.getAsString());
+              JsonObject blob = new Gson().fromJson("{}", JsonElement.class).getAsJsonObject();
+              blob.addProperty("statistic_key", statisticData.getStatisticKey());
+              blob.add("data", tobiraJson);
+              sender.sendTobiraData(blob.toString());
             }
           }
           //Note: save the form (unmodified) (again!) to update the dates.  Old dates cause warnings to the user!
