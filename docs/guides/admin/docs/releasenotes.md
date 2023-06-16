@@ -30,7 +30,7 @@ Opencast 14.0
 - Allow use of extended metadata in send-email WOH [[#4376](https://github.com/opencast/opencast/pull/4376)]
 - Add basic auth support ingest download [[#4180](https://github.com/opencast/opencast/pull/4180)]
 - Common persistence util classes that also implement transaction retries [[#3903](https://github.com/opencast/opencast/pull/3903)]
- 
+
 ### Behavior changes
 - Remove Theodul [[#4315](https://github.com/opencast/opencast/pull/4315)]
 - Make Composite Ffmpeg Command Configurable [[#4878](https://github.com/opencast/opencast/pull/4878)]
