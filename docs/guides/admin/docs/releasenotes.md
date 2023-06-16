@@ -10,7 +10,7 @@ Opencast 14.0
 - New Default Editor [[#4876](https://github.com/opencast/opencast/pull/4876)]
 
 ### Improvements
-- Truncate Bundle Info. This patch [[#4946](https://github.com/opencast/opencast/pull/4946)] adds a cleanup routine for bundle information from nodes  which no longer exist to the migration scripts
+- Truncate Bundle Info [[#4946](https://github.com/opencast/opencast/pull/4946)]
 - Drop orphan statistics database index [[#4945](https://github.com/opencast/opencast/pull/4945)]
 - Update Paella 7 default theme [[#4943](https://github.com/opencast/opencast/pull/4943)]
 - Karaf upgrade 4.4.3 [[#4930](https://github.com/opencast/opencast/pull/4930)]
