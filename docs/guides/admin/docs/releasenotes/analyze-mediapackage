@@ -1,4 +1,0 @@
-Changed behaviour of analyze-mediapackage
------------------------------------------
-
-The behaviour of the `analyze-mediapackage` workflow operation has been changed. Instead of replacing every character that doesn't match `a-z` or `0-9` with an underscore character, the operation now only replaces the `/` separating flavor and subflavor. This makes it behave identical to the `analyze-tracks` operation.
