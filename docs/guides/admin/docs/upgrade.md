@@ -17,7 +17,11 @@ Configuration changes
 
 ### Analyze-mediapackage workflow operation changes
 
-The behaviour of the `analyze-mediapackage` workflow operation has been changed. Instead of replacing every character that doesn't match `a-z` or `0-9` with an underscore character, the operation now only replaces the `/` separating flavor and subflavor. This makes it behave identical to the `analyze-tracks` operation. If you make use of `analyze-mediapackage` workflow operation in your custom workflows, please adopt this changes.
+The behaviour of the `analyze-mediapackage` workflow operation has been changed.
+Instead of replacing every character that doesn't match `a-z` or `0-9` with an underscore character,
+the operation now only replaces the `/` separating flavor and subflavor. This makes it behave identical to the
+`analyze-tracks` operation. If you make use of `analyze-mediapackage` workflow operation in your custom workflows,
+please adopt this changes.
 
 For more details see the documentation for the
 [analyze-mediapackage operation](workflowoperationhandlers/analyze-mediapackage-woh.md).
@@ -50,23 +54,28 @@ and report potential problems.
 ### New default player
 
 Paella 7 is the new default player in Opencast.
-If you want to continue using the Paella 6 you need to specifically configure this in `etc/org.opencastproject.organization-mh_default_org.cfg` by configuring `prop.player`.
+If you want to continue using the Paella 6 you need to specifically configure this in
+`etc/org.opencastproject.organization-mh_default_org.cfg` by configuring `prop.player`.
 
 Note that the old player Paella 6 is deprecated and will be removed in one of the next major releases.
 Even if you use the old player for now, please make sure to test the new one and report potential problems.
 
 ### Theodul player removed
 
-The Theodul player was removed and can not be used any more. Please move to the new [Paella7 player](#new-default-player).
+The Theodul player was removed and can not be used any more.
+Please move to the new [Paella7 player](#new-default-player).
 
 ### Global oc-remember-me cookie
 
 It's now possible, to use the same `oc-remember-me` cookie for all nodes.
-So, if you log into the admin node for example, you don't have to log in again, when switching to the presentation node. You can enable it in the `etc/security/mh_default_org.xml` configuration (search for `rememberMeServices` bean and set the property named `key`). 
+So, if you log into the admin node for example, you don't have to log in again, when switching to the presentation
+node. You can enable it in the `etc/security/mh_default_org.xml` configuration (search for `rememberMeServices` bean
+and set the property named `key`).
 
 ### Login page moved
 
-The login web page is moved from `/admin-ng/login.html` to `/login.html`. You may want to adopt this change in yor reverse proxy configuration in some cases.
+The login web page is moved from `/admin-ng/login.html` to `/login.html`. You may want to adopt this change in yor
+reverse proxy configuration in some cases.
 
 Database Migration
 ------------------
