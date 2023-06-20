@@ -9,41 +9,41 @@ same functionality users expect from the old UI.
 For now, the new Admin UI has not quite reached those goals yet. Therefore, it is not enabled by default and marked
 as beta. If you wish to try it out, you can easily do so by going to `https://your-opencast/admin-ui/index.html`
 (don't worry if it looks like nothing has changed, the look is *really* similar :)). If you find any issues,
-please report them at https://github.com/opencast/opencast-admin-interface/issues.
+please report them at [GitHub project issue board](https://github.com/opencast/opencast-admin-interface/issues).
 
 For notes on how to set the new Admin UI as your default, check [Admin UI](modules/admin-ui.md).
 
 ## Opencast 14.0
 
 ### Features
-- Add new admin UI as beta [[#4695](https://github.com/opencast/opencast/pull/4695)]
-- Global 'oc-remember-me' cookie [[#4951](https://github.com/opencast/opencast/pull/4951)]
+- The new Admin UI (beta) is now shipped with Opencast [[#4695](https://github.com/opencast/opencast/pull/4695)]
+- Global `oc-remember-me` cookie can be configured [[#4951](https://github.com/opencast/opencast/pull/4951)]
+- Status of the index rebuild will be shown as an indicator in the Admin UI [[#4206](https://github.com/opencast/opencast/pull/4206)]
 
 ### Improvements
-- Truncate Bundle Info [[#4946](https://github.com/opencast/opencast/pull/4946)]
-- Drop orphan statistics database index [[#4945](https://github.com/opencast/opencast/pull/4945)]
-- Karaf upgrade 4.4.3 [[#4930](https://github.com/opencast/opencast/pull/4930)]
-- Fix rest docs forms [[#4928](https://github.com/opencast/opencast/pull/4928)]
-- Update deprecated ACL code [[#4924](https://github.com/opencast/opencast/pull/4924)]
-- Fix REST docs login problem [[#4921](https://github.com/opencast/opencast/pull/4921)]
-- Run auto-update on main repo only [[#4881](https://github.com/opencast/opencast/pull/4881)]
-- Include Amberscript-Transcription Documentation in Module Overview [[#4745](https://github.com/opencast/opencast/pull/4745)]
-- Fix documentation syntax error [[#4609](https://github.com/opencast/opencast/pull/4609)]
-- Document feature pull request targetting rules [[#4595](https://github.com/opencast/opencast/pull/4595)]
-- image preview added [[#4556](https://github.com/opencast/opencast/pull/4556)]
-- Fix parent POM version of redirect module in develop [[#4530](https://github.com/opencast/opencast/pull/4530)]
-- Remove Twitter and Facebook links [[#4520](https://github.com/opencast/opencast/pull/4520)]
-- Make debug output in the JWT filters simpler and more idiomatic [[#4511](https://github.com/opencast/opencast/pull/4511)]
-- Update board list in documentation [[#4488](https://github.com/opencast/opencast/pull/4488)]
-- Update Issue Template [[#4423](https://github.com/opencast/opencast/pull/4423)]
-- Changed rebuild order and added rebuild indicator [[#4206](https://github.com/opencast/opencast/pull/4206)]
+- OSGI bundle info database table will be truncated by the database migration script [[#4946](https://github.com/opencast/opencast/pull/4946)]
+- Orphan statistics database index will be dropped by database migration script [[#4945](https://github.com/opencast/opencast/pull/4945)]
+- Updated Karaf to version 4.4.3 [[#4930](https://github.com/opencast/opencast/pull/4930)]
+- Fixed rest docs forms [[#4928](https://github.com/opencast/opencast/pull/4928)]
+- Updateed deprecated ACL code [[#4924](https://github.com/opencast/opencast/pull/4924)]
+- Fixed REST docs login problem [[#4921](https://github.com/opencast/opencast/pull/4921)]
+- Github actions will run auto-update on main repo only [[#4881](https://github.com/opencast/opencast/pull/4881)]
+- Includeed Amberscript-Transcription documentation in module overview [[#4745](https://github.com/opencast/opencast/pull/4745)]
+- Fixed documentation syntax error [[#4609](https://github.com/opencast/opencast/pull/4609)]
+- Documented feature pull request targetting rules [[#4595](https://github.com/opencast/opencast/pull/4595)]
+- Image preview added in the asset details view in the Admin UI [[#4556](https://github.com/opencast/opencast/pull/4556)]
+- Fixed parent POM version of redirect module [[#4530](https://github.com/opencast/opencast/pull/4530)]
+- Removed Twitter and Facebook links from the readme [[#4520](https://github.com/opencast/opencast/pull/4520)]
+- Simplified debug output in the JWT filters and made it more idiomatic [[#4511](https://github.com/opencast/opencast/pull/4511)]
+- Updated board list in documentation [[#4488](https://github.com/opencast/opencast/pull/4488)]
+- Updated Issue template [[#4423](https://github.com/opencast/opencast/pull/4423)]
 
 ### Behavior changes
-- Update Paella 7 default theme [[#4943](https://github.com/opencast/opencast/pull/4943)]
-- Paella 7 is the new default [[#4875](https://github.com/opencast/opencast/pull/4875)]
-- Remove Theodul [[#4315](https://github.com/opencast/opencast/pull/4315)]
-- New Default Editor [[#4876](https://github.com/opencast/opencast/pull/4876)]
-- Make Composite Ffmpeg Command Configurable [[#4878](https://github.com/opencast/opencast/pull/4878)]
+- Improved Paella 7 default theme [[#4943](https://github.com/opencast/opencast/pull/4943)]
+- Made Paella 7 the new default player in Opencast [[#4875](https://github.com/opencast/opencast/pull/4875)]
+- Removed Theodul player (plugin) [[#4315](https://github.com/opencast/opencast/pull/4315)]
+- Made standolone Editor default videoeditor in Opencast [[#4876](https://github.com/opencast/opencast/pull/4876)]
+- Made Composite Ffmpeg command configurable to support GPU encoding [[#4878](https://github.com/opencast/opencast/pull/4878)]
 
 
 Release Schedule

@@ -5,12 +5,12 @@ This guide describes how to upgrade Opencast 13.x to 14.x.
 In case you need information about how to upgrade older versions of Opencast,
 please refer to [older release notes](https://docs.opencast.org).
 
+1. Read the [release notes](releasenotes.md) (especially the section of behaviour changes)
 1. Stop your current Opencast instance
-2. Replace Opencast with the new version
-3. Read the [release notes](releasenotes.md) (especially the section of behaviour changes)
-4. Review the [configuration changes](#configuration-changes) and adjust your configuration accordingly
-5. [Migrate the database](#database-migration)
-6. Start Opencast
+1. Replace Opencast with the new version
+1. Review the [configuration changes](#configuration-changes) and adjust your configuration accordingly
+1. [Migrate the database](#database-migration)
+1. Start Opencast
 
 Configuration changes
 ---------------------
@@ -18,6 +18,9 @@ Configuration changes
 ### Analyze-mediapackage workflow operation changes
 
 The behaviour of the `analyze-mediapackage` workflow operation has been changed. Instead of replacing every character that doesn't match `a-z` or `0-9` with an underscore character, the operation now only replaces the `/` separating flavor and subflavor. This makes it behave identical to the `analyze-tracks` operation. If you make use of `analyze-mediapackage` workflow operation in your custom workflows, please adopt this changes.
+
+For more details see the documentation for the
+[analyze-mediapackage operation](workflowoperationhandlers/analyze-mediapackage-woh.md).
 
 ### Composite workflow operation changes
 
@@ -50,8 +53,7 @@ Paella 7 is the new default player in Opencast.
 If you want to continue using the Paella 6 you need to specifically configure this in `etc/org.opencastproject.organization-mh_default_org.cfg` by configuring `prop.player`.
 
 Note that the old player Paella 6 is deprecated and will be removed in one of the next major releases.
-Even if you use the old player for now, please make sure to test the new one
-and report potential problems.
+Even if you use the old player for now, please make sure to test the new one and report potential problems.
 
 ### Theodul player removed
 

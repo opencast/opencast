@@ -341,10 +341,6 @@ Opencast 14
   Remove Theodul
 - [[#4206](https://github.com/opencast/opencast/pull/4206)] -
   Changed rebuild order and added rebuild indicator
-- [[#4180](https://github.com/opencast/opencast/pull/4180)] -
-  Add basic auth support ingest download
-- [[#3903](https://github.com/opencast/opencast/pull/3903)] -
-  Common persistence util classes that also implement transaction retries
 
 
 Opencast 13
