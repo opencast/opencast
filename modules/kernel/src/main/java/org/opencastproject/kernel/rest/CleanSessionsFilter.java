@@ -94,7 +94,7 @@ public class CleanSessionsFilter implements Filter {
 
     // Cast the request and response to HTTP versions
     HttpServletRequest request = (HttpServletRequest) req;
-    if (request != null && request.getSession() != null) {
+    if (request != null && request.getSession(false) != null) {
       if (request.getSession().getMaxInactiveInterval() == NO_MAX_INACTIVE_INTERVAL_SET) {
         // There is no maxInactiveInterval set so we need to set one.
         logger.trace("Setting maxInactiveInterval to " + RestConstants.MAX_INACTIVE_INTERVAL + " on request @" + request.getRequestURL());
