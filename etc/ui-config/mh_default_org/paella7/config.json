@@ -522,7 +522,9 @@
         "es.upv.paella.vttManifestCaptionsPlugin": {
             "enabled": true
         },
-
+        "es.upv.paella.dfxpManifestCaptionsPlugin": {
+            "enabled": true
+        },
         "es.upv.paella.hlsCaptionsPlugin": {
             "enabled": true
         },
