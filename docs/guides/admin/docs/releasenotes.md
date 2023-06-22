@@ -49,7 +49,8 @@ For notes on how to set the new Admin UI as your default, check [Admin UI](modul
 - Made standolone Editor default videoeditor in Opencast [[#4876](https://github.com/opencast/opencast/pull/4876)]
 - Made Composite Ffmpeg command configurable to support GPU encoding [[#4878](https://github.com/opencast/opencast/pull/4878)]
 
-# Release Schedule
+Release Schedule
+----------------
 
 | Date          | Phase                      |
 |---------------|----------------------------|
@@ -58,7 +59,8 @@ For notes on how to set the new Admin UI as your default, check [Admin UI](modul
 | May 30, 2023  | Public QA phase            |
 | June 22, 2023 | Release of Opencast 14.0   |
 
-# Release Managers
+Release Managers
+----------------
 
 - Waldemar Smirnow (ELAN e.V.)
 - Stefanos Georgopoulos (FAU Erlangen Nürnberg)
