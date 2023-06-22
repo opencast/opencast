@@ -111,7 +111,7 @@ function getSourceData(track, config) {
 }
 
 function getMetadata(episode) {
-  const { duration, title, language, series, seriestitle, subjects, license } = episode.mediapackage;
+  const { duration, title, language, series, seriestitle, subjects, license, type } = episode.mediapackage;
   const startDate = new Date(episode.dcCreated);
   const presenters = episode?.mediapackage?.creators?.creator
     ? (Array.isArray(episode?.mediapackage?.creators?.creator)
@@ -138,7 +138,9 @@ function getMetadata(episode) {
     startDate,
     duration: duration / 1000,
     location: episode?.dcSpatial,
-    UID: episode?.id
+    UID: episode?.id,
+    type,
+    opencast: {episode}
   };
 
   return result;
