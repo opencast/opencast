@@ -9,6 +9,14 @@ Opencast 14
 
 *Released on June 22th, 2023*
 
+- [[#5051](https://github.com/opencast/opencast/pull/5051)] -
+  Paella7 backwards support for old captions/dfxp flavored xml files
+- [[#5050](https://github.com/opencast/opencast/pull/5050)] -
+  Fixes Session IllegalStateException
+- [[#5049](https://github.com/opencast/opencast/pull/5049)] -
+  Paella 7: Enable dfxp captions support
+- [[#5048](https://github.com/opencast/opencast/pull/5048)] -
+  Paella 7: Add missing metadata
 - [[#4946](https://github.com/opencast/opencast/pull/4946)] -
   Truncate Bundle Info
 - [[#4945](https://github.com/opencast/opencast/pull/4945)] -

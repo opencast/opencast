@@ -21,6 +21,10 @@ For notes on how to set the new Admin UI as your default, check [Admin UI](modul
 - Status of the index rebuild will be shown as an indicator in the Admin UI [[#4206](https://github.com/opencast/opencast/pull/4206)]
 
 ### Improvements
+- Fixed session IllegalStateException [[#5050](https://github.com/opencast/opencast/pull/5050)]
+- Backwards support for old captions/dfxp flavored xml files in Paella 7 [[#5051](https://github.com/opencast/opencast/pull/5051)]
+- Enabled dfxp captions support for Paella 7 [[#5049](https://github.com/opencast/opencast/pull/5049)]
+- Added missing metadata in Paella 7 [[#5048](https://github.com/opencast/opencast/pull/5048)]
 - OSGI bundle info database table will be truncated by the database migration script [[#4946](https://github.com/opencast/opencast/pull/4946)]
 - Orphan statistics database index will be dropped by database migration script [[#4945](https://github.com/opencast/opencast/pull/4945)]
 - Updated Karaf to version 4.4.3 [[#4930](https://github.com/opencast/opencast/pull/4930)]
@@ -45,9 +49,7 @@ For notes on how to set the new Admin UI as your default, check [Admin UI](modul
 - Made standolone Editor default videoeditor in Opencast [[#4876](https://github.com/opencast/opencast/pull/4876)]
 - Made Composite Ffmpeg command configurable to support GPU encoding [[#4878](https://github.com/opencast/opencast/pull/4878)]
 
-
-Release Schedule
-----------------
+# Release Schedule
 
 | Date          | Phase                      |
 |---------------|----------------------------|
@@ -56,8 +58,7 @@ Release Schedule
 | May 30, 2023  | Public QA phase            |
 | June 22, 2023 | Release of Opencast 14.0   |
 
-Release Managers
-----------------
+# Release Managers
 
 - Waldemar Smirnow (ELAN e.V.)
 - Stefanos Georgopoulos (FAU Erlangen Nürnberg)
