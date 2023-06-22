@@ -306,6 +306,7 @@ function readCaptions(potentialNewCaptions, captions) {
 
       if (captions_match) {
         let captions_lang = captions_match[3];
+        const captions_subtype = captions_match[1];
 
         if (!captions_lang && potentialCaption.tags && potentialCaption.tags.tag) {
           if (!(potentialCaption.tags.tag instanceof Array)) {
@@ -319,6 +320,10 @@ function readCaptions(potentialNewCaptions, captions) {
         }
 
         let captions_format = potentialCaption.url.split('.').pop();
+        // Backwards support for 'captions/dfxp' flavored xml files
+        if (captions_subtype === 'dfxp' && captions_format === 'xml') {
+          captions_format = captions_subtype;
+        }
 
         captions.push({
           id: potentialCaption.id,
