@@ -5,7 +5,7 @@ Parameter      | Example    | Description
 ---------------|------------|------------
 **id**         | `SOME-ID`  | Video Id to play
 **time**       | `10m20s`   | Seeks initially automatically to a specified time
-**trimming**   | `1m2s:10m` | Apply a soft trimming to the video
+**trimming**   | `1m2s;10m` | Apply a soft trimming to the video
 
 
 id
@@ -37,6 +37,8 @@ The result is that the user will only be able to view the specified video chunk.
 
 Possible values
 * `<start time>;<end time>`
+
+The separator between `<start time>` and `<end time>` must be a semicolon `;`
 
 Time in `XhYmZs` format:
 * Hours (with value `X`), minutes (with value `Y`) and seconds (with value `Z`)
