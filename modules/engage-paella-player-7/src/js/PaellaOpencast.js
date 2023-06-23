@@ -221,30 +221,61 @@ export class PaellaOpencast extends Paella {
 
     bindEvent(paella, Events.PLAYER_LOADED, async () => {
       // Enable trimming
+      // Retrieve video duration in case a default trim end time is needed
+      const videoDuration = paella.videoManifest?.metadata?.duration;
+      // Retrieve trimming data from a data delegate
       let trimmingData = await loadTrimming(paella, paella.videoId);
-      // Check for trimming param in URL: ?trimming=1m2s;2m
+      // Retrieve trimming data in URL param: ?trimming=1m2s;2m
       const trimming = utils.getHashParameter('trimming') || utils.getUrlParameter('trimming');
-      if (trimming) {
-        const trimmingSplit = trimming.split(';');
-        if (trimmingSplit.length == 2) {
-          const startTrimming = trimmingData.start + humanTimeToSeconds(trimmingSplit[0]);
-          const endTrimming = Math.min(trimmingData.start + humanTimeToSeconds(trimmingSplit[1]), trimmingData.end);
+      // Retrieve trimming data in URL start-end params in seconds: ?start=12&end=345
+      // Allow the 'end' param to overrule the end in trimming data,
+      // Allow a 'start' or an 'end' URL parameter to be passed alone
+      const startTrimVal = utils.getHashParameter('start') || utils.getUrlParameter('start');
+      const endTrimVal = utils.getHashParameter('end') || utils.getUrlParameter('end');
 
-          if (startTrimming < endTrimming && endTrimming > 0 && startTrimming >= 0) {
-            trimmingData = {
-              start: startTrimming,
-              end: endTrimming,
-              enabled: true
-            };
+      if (trimming || startTrimVal || endTrimVal) {
+        let startTrimming = 0;  // default start time
+        let endTrimming = videoDuration; // raw video duration;
+        if (trimming) {
+          const trimmingSplit = trimming.split(';');
+          if (trimmingSplit.length == 2) {
+            startTrimming = trimmingData.start + humanTimeToSeconds(trimmingSplit[0]);
+            endTrimming = (trimmingData.end == 0)
+              ? trimmingData.start + humanTimeToSeconds(trimmingSplit[1])
+              : Math.min(trimmingData.start + humanTimeToSeconds(trimmingSplit[1]), trimmingData.end);
+          }
+        } else {
+          if (startTrimVal) {
+            startTrimming = trimmingData.start + Math.floor(startTrimVal);
+          }
+          if (endTrimVal) {
+            endTrimming = Math.min(trimmingData.start + Math.floor(endTrimVal), videoDuration);
           }
         }
+        if (startTrimming < endTrimming && endTrimming > 0 && startTrimming >= 0) {
+          trimmingData = {
+            start: startTrimming,
+            end: endTrimming,
+            enabled: true
+          };
+        }
+        paella.log.debug(`Setting trim to ${JSON.stringify(trimmingData)}`);
+        await setTrimming(paella, trimmingData);
       }
-      await setTrimming(paella, trimmingData);
 
       // Check time param in URL and seek:  ?time=1m2s
       const timeString = utils.getHashParameter('time') || utils.getUrlParameter('time');
-      if (timeString) {
-        const totalTime = humanTimeToSeconds(timeString);
+      // Check t param, which is seek time in seconds, to be passed as a query or hash: #t=12002
+      const timeStringInSecs = utils.getHashParameter('t') || utils.getUrlParameter('t');
+
+      if (timeString || timeStringInSecs) {
+        let totalTime = 0;
+        if (timeString) {
+          totalTime = humanTimeToSeconds(timeString);
+        } else {
+          totalTime = Math.floor(timeStringInSecs);
+        }
+        paella.log.debug(`Setting initial seek to '${totalTime}' seconds`);
         await paella.videoContainer.setCurrentTime(totalTime);
       }
 
