@@ -1,6 +1,6 @@
 Paella Player 7 - URL Parameters
 ==============================
-
+The player support different URL parameters to modify the behaviour or the target event.
 Parameter      | Example    | Description
 ---------------|------------|------------
 **id**         | `SOME-ID`  | Video Id to play
