@@ -53,6 +53,10 @@ Time in `XhYmZs` format:
 
 Default value: `-`
 
+Security Parameters
+--------------------
+
+If Stream Security is enabled, there will be additional parameters. For further information, kindly refer to the [stream security section](Link-to-stream-security).
 
 logLevel
 --------
