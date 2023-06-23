@@ -6,6 +6,7 @@ Parameter      | Example    | Description
 **id**         | `SOME-ID`  | Video Id to play
 **time**       | `10m20s`   | Seeks initially automatically to a specified time
 **trimming**   | `1m2s;10m` | Apply a soft trimming to the video
+**logLevel**   | `DEBUG`    | Configure the logging system to show only the log messages at or above a certain level
 
 
 id
@@ -51,6 +52,20 @@ Time in `XhYmZs` format:
     * `Zs`
 
 Default value: `-`
+
+
+logLevel
+--------
+The log level parameter allows developers to configure the logging system to show only the log messages at or above a certain level.
+
+Possible values
+* `ERROR`
+* `WARN`
+* `INFO`
+* `DEBUG`
+* `VERBOSE`
+
+Default value: defined in `config.json` file
 
 
 Example
