@@ -36,8 +36,8 @@
     "xml-loader": "^1.2.1"
   },
   "dependencies": {
-    "paella-basic-plugins": "^1.31.2",
-    "paella-core": "^1.37.2",
+    "paella-basic-plugins": "^1.38.0",
+    "paella-core": "^1.39.2",
     "paella-slide-plugins": "^1.8.0",
     "paella-user-tracking": "^1.8.0",
     "paella-zoom-plugin": "^1.27.0"

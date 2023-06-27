@@ -136,6 +136,7 @@ nav:
         - es.upv.paella.opencast.userTrackingSaverPlugIn: 'modules/paella.player/plugins/es.upv.paella.opencast.userTrackingSaverPlugIn.md'
    - Paella player 7:
       - Configuration: 'modules/paella.player7/configuration.md'
+      - URL Parameters: 'modules/paella.player7/url.parameter.md'
    - Search Index:
       - Overview: 'modules/searchindex/index.md'
       - Solr: 'modules/searchindex/solr.md'
