@@ -52,6 +52,11 @@ jobs:
             -Dmaven.wagon.http.pool=false \
             -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
 
+      - name: remove opencast assets
+        run: |
+          rm -rf ~/.m2/repository/org/opencastproject/{base,assemblies}/
+          rm -rf ~/.m2/repository/org/opencastproject/opencast-*
+
       - name: build cache tarball
         run: |
           ln -s ~/.m2
