@@ -16,6 +16,12 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'opencast/opencast'
     steps:
+      - name: Install s3cmd
+        run: |
+          set -eu
+          sudo apt update -q
+          sudo apt install -y -q s3cmd
+
       - name: Download FFmpeg
         run: |
           wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-${{ matrix.arch }}-static.tar.xz
