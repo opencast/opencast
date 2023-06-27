@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Download FFmpeg
         run: |
-          https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-${{ matrix.arch }}-static.tar.xz
+          wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-${{ matrix.arch }}-static.tar.xz
 
       - name: Unpack FFmpeg
         run: |
