@@ -44,6 +44,7 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -60,6 +61,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
@@ -91,9 +93,11 @@ public class XACMLAuthorizationService implements AuthorizationService {
   private MediaPackageSerializer serializer;
 
   private static final String CONFIG_MERGE_MODE = "merge.mode";
+  private static final String CONFIG_EPISODE_ID_ROLE = "episode.id.role.access";
 
   /** Definition of how merging of series and episode ACLs work */
   private static MergeMode mergeMode = MergeMode.OVERRIDE;
+  private static boolean episodeIdRole = false;
 
   enum MergeMode {
     OVERRIDE, ROLES, ACTIONS
@@ -107,6 +111,8 @@ public class XACMLAuthorizationService implements AuthorizationService {
     if (properties == null) {
       mergeMode = MergeMode.OVERRIDE;
       logger.debug("Merge mode set to {}", mergeMode);
+      episodeIdRole = false;
+      logger.debug("Using episode ID roles is deactivated");
       return;
     }
     final String mode = StringUtils.defaultIfBlank((String) properties.get(CONFIG_MERGE_MODE),
@@ -118,6 +124,9 @@ public class XACMLAuthorizationService implements AuthorizationService {
       mergeMode = MergeMode.OVERRIDE;
     }
     logger.debug("Merge mode set to {}", mergeMode);
+
+    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(properties.get(CONFIG_EPISODE_ID_ROLE), "false"));
+    logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
   }
 
   @Reference(
@@ -308,8 +317,16 @@ public class XACMLAuthorizationService implements AuthorizationService {
   @Override
   public boolean hasPermission(final MediaPackage mp, final String action) {
     AccessControlList acl = getActiveAcl(mp).getA();
-    boolean allowed = false;
     final User user = securityService.getUser();
+    var allowed = true;
+
+    // Check special ROLE_<ID>_<ACTION> permissions
+    if (episodeIdRole) {
+      var episodeRole = "ROLE_EPISODE_" + mp.getIdentifier() + "_" + action.toUpperCase();
+      allowed = user.getRoles().stream().map(Role::getName).anyMatch(r -> r.equals(episodeRole));
+    }
+
+    // Check ACL
     for (AccessControlEntry entry: acl.getEntries()) {
       // ignore entries for other actions
       if (!entry.getAction().equals(action)) {
