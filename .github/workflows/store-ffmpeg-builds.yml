@@ -43,6 +43,6 @@ jobs:
           access_key: ${{ secrets.S3_ACCESS_KEY }}
           secret_key: ${{ secrets.S3_SECRET_KEY }}
 
-      - name: Upload RPMs
+      - name: Upload tarball
         run: |
           s3cmd put -P *.tar.xz s3://opencast-ffmpeg-static/
