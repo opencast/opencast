@@ -21,6 +21,9 @@ or see them live on paella [demos page](https://paellaplayer.upv.es/demos/)
 Configuration
 -------------
 
+The Paelly player version 6 is no longer enabled by default.
+To use the player, enable the plugin in `etc/org.opencastproject.plugin.impl.PluginManagerImpl.cfg`.
+
 The configurations for the paella player are done for each tenant. The paella configuration files are located in
 `etc/ui-config/<tenant_id>/paella/config.json`.
 
