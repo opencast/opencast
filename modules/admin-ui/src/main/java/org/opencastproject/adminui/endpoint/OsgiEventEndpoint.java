@@ -32,6 +32,7 @@ import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
 import org.opencastproject.util.doc.rest.RestService;
@@ -83,6 +84,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
   private UrlSigningService urlSigningService;
   private WorkflowService workflowService;
   private AdminUIConfiguration adminUIConfiguration;
+  private UserDirectoryService userDirectoryService;
 
   private long expireSeconds = UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
   private Boolean signWithClientIP = UrlSigningServiceOsgiUtil.DEFAULT_SIGN_WITH_CLIENT_IP;
@@ -244,6 +246,17 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
   @Reference
   public void setUrlSigningService(UrlSigningService urlSigningService) {
     this.urlSigningService = urlSigningService;
+  }
+
+  @Override
+  public UserDirectoryService getUserDirectoryService() {
+    return userDirectoryService;
+  }
+
+  /** Sets the user directory service */
+  @Reference
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    this.userDirectoryService = userDirectoryService;
   }
 
   @Activate

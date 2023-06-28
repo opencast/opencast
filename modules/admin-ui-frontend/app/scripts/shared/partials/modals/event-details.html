@@ -422,7 +422,7 @@
                     <tr ng-repeat="item in workflows.entries|orderBy:'submitted':true track by $index">
                       <td>{{ item.id }}</td>
                       <td>{{ item.title }}</td>
-                      <td>{{ item.submitter }}</td>
+                      <td>{{ item.submitterName + '&lt;' + item.submitterEmail + '&gt;' + ' (' + item.submitter + ')'}}</td>
                       <td>{{ item.submitted | localizeDate : 'dateTime' : 'medium' }}</td>
                       <td>{{ item.status | translate }}</td>
                       <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')">
