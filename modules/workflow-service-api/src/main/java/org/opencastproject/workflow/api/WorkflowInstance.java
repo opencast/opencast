@@ -76,47 +76,47 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 @Entity(name = "WorkflowInstance")
 @Access(AccessType.FIELD)
 @Table(name = "oc_workflow", indexes = {
-        @Index(name = "IX_oc_workflow_mediapackage_id", columnList = ("mediapackage_id")),
-        @Index(name = "IX_oc_workflow_series_id", columnList = ("series_id")), })
+    @Index(name = "IX_oc_workflow_mediapackage_id", columnList = ("mediapackage_id")),
+    @Index(name = "IX_oc_workflow_series_id", columnList = ("series_id")), })
 @NamedQueries({
-        @NamedQuery(
-                name = "Workflow.findAll",
-                query = "select w from WorkflowInstance w where w.organizationId=:organizationId order by w.dateCreated"
-        ),
-        @NamedQuery(
-                name = "Workflow.countLatest",
-                query = "SELECT COUNT(DISTINCT w.mediaPackageId) FROM WorkflowInstance w"
-        ),
-        @NamedQuery(
-                name = "Workflow.findAllOrganizationIndependent",
-                query = "select w from WorkflowInstance w"
-        ),
-        @NamedQuery(
-                name = "Workflow.workflowById",
-                query = "SELECT w FROM WorkflowInstance as w where w.workflowId=:workflowId and w.organizationId=:organizationId"
-        ),
-        @NamedQuery(
-                name = "Workflow.getCount",
-                query = "select COUNT(w) from WorkflowInstance w where w.organizationId=:organizationId "
-                        + "and (:state is null or w.state = :state) "
-        ),
-        @NamedQuery(
-                name = "Workflow.toCleanup",
-                query = "SELECT w FROM WorkflowInstance w where w.state = :state "
-                + "and w.dateCreated < :dateCreated and w.organizationId = :organizationId"
-        ),
+    @NamedQuery(
+        name = "Workflow.findAll",
+        query = "select w from WorkflowInstance w where w.organizationId=:organizationId order by w.dateCreated"
+    ),
+    @NamedQuery(
+        name = "Workflow.countLatest",
+        query = "SELECT COUNT(DISTINCT w.mediaPackageId) FROM WorkflowInstance w"
+    ),
+    @NamedQuery(
+        name = "Workflow.findAllOrganizationIndependent",
+        query = "select w from WorkflowInstance w"
+    ),
+    @NamedQuery(
+        name = "Workflow.workflowById",
+        query = "SELECT w FROM WorkflowInstance as w where w.workflowId=:workflowId and w.organizationId=:organizationId"
+    ),
+    @NamedQuery(
+        name = "Workflow.getCount",
+        query = "select COUNT(w) from WorkflowInstance w where w.organizationId=:organizationId "
+              + "and (:state is null or w.state = :state) "
+    ),
+    @NamedQuery(
+        name = "Workflow.toCleanup",
+        query = "SELECT w FROM WorkflowInstance w where w.state = :state "
+              + "and w.dateCreated < :dateCreated and w.organizationId = :organizationId"
+    ),
 
-        // For media packages
-        @NamedQuery(name = "Workflow.byMediaPackage", query = "SELECT w FROM WorkflowInstance w where "
-                + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId order by w.dateCreated"),
-        @NamedQuery(name = "Workflow.countActiveByMediaPackage", query = "SELECT COUNT(w) FROM WorkflowInstance w where "
-                + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId and "
-                + "(w.state = :stateInstantiated or w.state = :statePaused or w.state = :stateRunning "
-                + "or w.state = :stateFailing)"),
-        @NamedQuery(name = "Workflow.byMediaPackageAndActive", query = "SELECT w FROM WorkflowInstance w where "
-                + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId and "
-                + "(w.state = :stateInstantiated or w.state = :statePaused or w.state = :stateRunning "
-                + "or w.state = :stateFailing) order by w.dateCreated"),
+    // For media packages
+    @NamedQuery(name = "Workflow.byMediaPackage", query = "SELECT w FROM WorkflowInstance w where "
+            + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId order by w.dateCreated"),
+    @NamedQuery(name = "Workflow.countActiveByMediaPackage", query = "SELECT COUNT(w) FROM WorkflowInstance w where "
+            + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId and "
+            + "(w.state = :stateInstantiated or w.state = :statePaused or w.state = :stateRunning "
+            + "or w.state = :stateFailing)"),
+    @NamedQuery(name = "Workflow.byMediaPackageAndActive", query = "SELECT w FROM WorkflowInstance w where "
+            + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId and "
+            + "(w.state = :stateInstantiated or w.state = :statePaused or w.state = :stateRunning "
+            + "or w.state = :stateFailing) order by w.dateCreated"),
 })
 public class WorkflowInstance {
 
@@ -175,7 +175,7 @@ public class WorkflowInstance {
           name = "oc_workflow_configuration",
           joinColumns = @JoinColumn(name = "workflow_id"),
           indexes = {
-                @Index(name = "IX_oc_workflow_configuration_workflow_id", columnList = ("workflow_id")),
+              @Index(name = "IX_oc_workflow_configuration_workflow_id", columnList = ("workflow_id")),
           }
   )
   @MapKeyColumn(name = "configuration_key")

@@ -54,9 +54,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * Object wrapper for a theme.
  */
 @XmlType(name = "theme", namespace = IndexObject.INDEX_XML_NAMESPACE, propOrder = { "identifier", "creationDate",
-        "isDefault", "description", "name", "creator", "organization", "bumperActive", "bumperFile", "trailerActive",
-        "trailerFile", "titleSlideActive", "titleSlideMetadata", "titleSlideBackground", "licenseSlideActive",
-        "licenseSlideDescription", "licenseSlideBackground", "watermarkActive", "watermarkFile", "watermarkPosition" })
+    "isDefault", "description", "name", "creator", "organization", "bumperActive", "bumperFile", "trailerActive",
+    "trailerFile", "titleSlideActive", "titleSlideMetadata", "titleSlideBackground", "licenseSlideActive",
+    "licenseSlideDescription", "licenseSlideBackground", "watermarkActive", "watermarkFile", "watermarkPosition" })
 @XmlRootElement(name = "theme", namespace = IndexObject.INDEX_XML_NAMESPACE)
 @XmlAccessorType(XmlAccessType.NONE)
 public class IndexTheme implements IndexObject {

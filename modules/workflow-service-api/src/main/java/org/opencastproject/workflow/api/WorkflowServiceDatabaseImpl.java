@@ -47,11 +47,11 @@ import javax.persistence.NoResultException;
  * Implements {@link WorkflowServiceDatabase}. Defines permanent storage for workflow.
  */
 @Component(
-        property = {
-                "service.description=Workflow Service Database"
-        },
-        immediate = true,
-        service = { WorkflowServiceDatabase.class }
+    property = {
+        "service.description=Workflow Service Database"
+    },
+    immediate = true,
+    service = { WorkflowServiceDatabase.class }
 )
 public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
   /** Logging utilities */
