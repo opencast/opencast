@@ -77,44 +77,49 @@ public class IngestDownloadServiceEndpoint extends AbstractJobProducerEndpoint {
   @POST
   @Path("ingestdownload")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "ingestdownload",description = "Downloads mediapackage elements to workspace",
-          restParameters = { @RestParameter(description = "mediapackage as xml", isRequired = true, name = "mediapackage",
-                  type = RestParameter.Type.TEXT),
+  @RestQuery(name = "ingestdownload", description = "Downloads mediapackage elements to workspace",
+      restParameters = { @RestParameter(description = "mediapackage as xml", isRequired = true, name = "mediapackage",
+          type = RestParameter.Type.TEXT),
           @RestParameter(description = "sourceFlavors as String seperated by , (presenter/source,presentation/source) ", isRequired = false, name = "sourceFlavors",
-          type = RestParameter.Type.STRING),
+              type = RestParameter.Type.STRING),
           @RestParameter(description = "sourceTags as String seperated by , (archive,download)", isRequired = false, name = "sourceTags",
-          type = RestParameter.Type.STRING),
+              type = RestParameter.Type.STRING),
           @RestParameter(description = "delete from external workingfile repository: Boolean true / false", isRequired = false, name = "deleteExternal",
-          type = RestParameter.Type.STRING),
+              type = RestParameter.Type.STRING),
           @RestParameter(description = "select both tags and flavors: Boolean true / false", isRequired = false, name = "tagsAndFlavor",
-          type = RestParameter.Type.STRING),
-          },
-      responses =  {@RestResponse(description = "Mediapackage as xml", responseCode = HttpServletResponse.SC_OK)},
-          returnDescription = "Mediapackage as xml with element urls in workspace.")
+              type = RestParameter.Type.STRING),
+      },
+      responses = { @RestResponse(description = "Mediapackage as xml", responseCode = HttpServletResponse.SC_OK) },
+      returnDescription = "Mediapackage as xml with element urls in workspace.")
   public Response ingestdownload(@FormParam("mediapackage") String mediapackageString,
-          @FormParam("sourceFlavors") String sourceFlavors,
-          @FormParam("sourceTags") String sourceTags,
-          @FormParam("deleteExternal") String deleteExternal,
-          @FormParam("tagsAndFlavor") String tagsAndFlavor) throws Exception {
+      @FormParam("sourceFlavors") String sourceFlavors,
+      @FormParam("sourceTags") String sourceTags,
+      @FormParam("deleteExternal") String deleteExternal,
+      @FormParam("tagsAndFlavor") String tagsAndFlavor) throws Exception {
     logger.info("starting ingest-download Service");
     MediaPackage mediapackage = MediaPackageParser.getFromXml(mediapackageString);
     boolean boolTagsAndFlavor = false;
     boolean boolDeleteExternal = false;
     //set Defaults
-    if (sourceFlavors.isEmpty()) { sourceFlavors = "*/*"; }
-    if (!tagsAndFlavor.isEmpty()) { boolTagsAndFlavor = Boolean.parseBoolean(tagsAndFlavor); }
-    if (!deleteExternal.isEmpty()) { boolDeleteExternal = Boolean.parseBoolean(deleteExternal); }
+    if (sourceFlavors.isEmpty()) {
+      sourceFlavors = "*/*";
+    }
+    if (!tagsAndFlavor.isEmpty()) {
+      boolTagsAndFlavor = Boolean.parseBoolean(tagsAndFlavor);
+    }
+    if (!deleteExternal.isEmpty()) {
+      boolDeleteExternal = Boolean.parseBoolean(deleteExternal);
+    }
 
     try {
-      final Job retJob = service.ingestDownload(mediapackage ,sourceFlavors,sourceTags,boolDeleteExternal,
-              boolTagsAndFlavor);
+      final Job retJob = service.ingestDownload(mediapackage, sourceFlavors, sourceTags, boolDeleteExternal,
+                                                boolTagsAndFlavor);
       return Response.ok().entity(new JaxbJob(retJob)).build();
     } catch (ServiceRegistryException e) {
       logger.warn("Unable to start IngestDownload: ", e);
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
-
 
   @Reference
   public void setIngestDownloadService(IngestDownloadService service) {
@@ -123,10 +128,11 @@ public class IngestDownloadServiceEndpoint extends AbstractJobProducerEndpoint {
 
   @Override
   public JobProducer getService() {
-    if (service instanceof JobProducer)
+    if (service instanceof JobProducer) {
       return (JobProducer) service;
-    else
+    } else {
       return null;
+    }
   }
 
   /**

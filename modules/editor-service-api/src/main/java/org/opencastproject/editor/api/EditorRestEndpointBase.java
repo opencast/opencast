@@ -70,10 +70,11 @@ public abstract class EditorRestEndpointBase {
   @Path("{mediaPackageId}/edit.json")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "getEditorData",
-          description = "Returns all the information required to get the editor tool started",
-          returnDescription = "JSON object",
-          pathParameters = { @RestParameter(name = "mediaPackageId", description = "The id of the media package",
-                  isRequired = true, type = RestParameter.Type.STRING) }, responses = {
+      description = "Returns all the information required to get the editor tool started",
+      returnDescription = "JSON object",
+      pathParameters = { @RestParameter(name = "mediaPackageId", description = "The id of the media package",
+          isRequired = true, type = RestParameter.Type.STRING) },
+      responses = {
           @RestResponse(description = "Media package found", responseCode = SC_OK),
           @RestResponse(description = "Media package not found", responseCode = SC_NOT_FOUND) })
   public Response getEditorData(@PathParam("mediaPackageId") final String mediaPackageId) {
@@ -95,31 +96,31 @@ public abstract class EditorRestEndpointBase {
   @POST
   @Path("{mediaPackageId}/lock")
   @RestQuery(name = "lockMediapackage",
-          description = "Creates and updates the lock for a mediapackage in the editor. "
+      description = "Creates and updates the lock for a mediapackage in the editor. "
           + "Requests will create/refreshen a lock at /editor/{mediapackageId}/lock{uuid} "
           + "(see Location header in response) that will expire after the configured period. "
           + "Subsequent calls must have the same uuid, which will then freshen the lock.",
-          returnDescription = "The lock is returned in the Location header.",
-          pathParameters = {
-            @RestParameter(name = "mediaPackageId", description = "The id of the media package", isRequired = true,
-                    type = RestParameter.Type.STRING)
-          },
-          restParameters = {
-            @RestParameter(name = "user", isRequired = true,
-                description = "The user requesting to lock this mediapackage",
-                type = RestParameter.Type.STRING, defaultValue = "admin"),
-            @RestParameter(name = "uuid", isRequired = true,
-                description = "The unique identitier of the lock",
-                type = RestParameter.Type.STRING)
-          },
-          responses = {
-            @RestResponse(description = "Lock obtained", responseCode = SC_CREATED),
-            @RestResponse(description = "Lock not obtained", responseCode = SC_CONFLICT),
-            @RestResponse(description = "Mediapackage not found", responseCode = SC_NOT_FOUND)
-          })
+      returnDescription = "The lock is returned in the Location header.",
+      pathParameters = {
+          @RestParameter(name = "mediaPackageId", description = "The id of the media package", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "user", isRequired = true,
+              description = "The user requesting to lock this mediapackage",
+              type = RestParameter.Type.STRING, defaultValue = "admin"),
+          @RestParameter(name = "uuid", isRequired = true,
+              description = "The unique identitier of the lock",
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Lock obtained", responseCode = SC_CREATED),
+          @RestResponse(description = "Lock not obtained", responseCode = SC_CONFLICT),
+          @RestResponse(description = "Mediapackage not found", responseCode = SC_NOT_FOUND)
+      })
   public Response lockMediapackage(@PathParam("mediaPackageId") final String mediaPackageId,
-         @FormParam("user") final String user, @FormParam("uuid") final String uuid,
-         @Context HttpServletRequest request) {
+      @FormParam("user") final String user, @FormParam("uuid") final String uuid,
+      @Context HttpServletRequest request) {
     try {
       LockData lockData = new LockData(uuid, user);
       editorService.lockMediaPackage(mediaPackageId, lockData);
@@ -127,7 +128,7 @@ public abstract class EditorRestEndpointBase {
     } catch (EditorServiceException e) {
       return checkErrorState(mediaPackageId, e);
     } catch (Exception e) {
-      logger.debug("Unable to create lock {}",  e);
+      logger.debug("Unable to create lock {}", e);
       return RestUtil.R.badRequest();
     }
   }
@@ -135,22 +136,22 @@ public abstract class EditorRestEndpointBase {
   @DELETE
   @Path("{mediaPackageId}/lock/{uuid}")
   @RestQuery(name = "unlockMediapackage",
-          description = "Releases the lock for a mediapackage in the editor",
-          returnDescription = "",
-          pathParameters = {
-            @RestParameter(name = "mediaPackageId", description = "The id of the media package", isRequired = true,
-                    type = RestParameter.Type.STRING),
-            @RestParameter(name = "uuid", description = "Identifier of editor session", isRequired = true,
-                    type = RestParameter.Type.STRING)
-          },
-          responses = {
-            @RestResponse(description = "Lock deleted", responseCode = SC_OK),
-            @RestResponse(description = "Lock not obtained", responseCode = SC_CONFLICT),
-            @RestResponse(description = "Lock not found", responseCode = SC_NOT_FOUND)
-          })
+      description = "Releases the lock for a mediapackage in the editor",
+      returnDescription = "",
+      pathParameters = {
+          @RestParameter(name = "mediaPackageId", description = "The id of the media package", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "uuid", description = "Identifier of editor session", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Lock deleted", responseCode = SC_OK),
+          @RestResponse(description = "Lock not obtained", responseCode = SC_CONFLICT),
+          @RestResponse(description = "Lock not found", responseCode = SC_NOT_FOUND)
+      })
 
   public Response unlockMediapackage(@PathParam("mediaPackageId") final String mediaPackageId,
-          @PathParam("uuid") final String uuid)  {
+      @PathParam("uuid") final String uuid) {
     try {
       editorService.unlockMediaPackage(mediaPackageId, new LockData(uuid, ""));
       return RestUtil.R.ok();
@@ -163,17 +164,17 @@ public abstract class EditorRestEndpointBase {
   @Path("{mediaPackageId}/edit.json")
   @Consumes(MediaType.APPLICATION_JSON)
   @RestQuery(name = "editVideo", description = "Takes editing information from the client side and processes it",
-          returnDescription = "",
-          pathParameters = {
+      returnDescription = "",
+      pathParameters = {
           @RestParameter(name = "mediaPackageId", description = "The id of the media package", isRequired = true,
-                  type = RestParameter.Type.STRING) },
-          responses = {
+              type = RestParameter.Type.STRING) },
+      responses = {
           @RestResponse(description = "Editing information saved and processed", responseCode = SC_OK),
           @RestResponse(description = "Media package not found", responseCode = SC_NOT_FOUND),
           @RestResponse(description = "The editing information cannot be parsed",
-                  responseCode = HttpServletResponse.SC_BAD_REQUEST) })
+              responseCode = HttpServletResponse.SC_BAD_REQUEST) })
   public Response editVideo(@PathParam("mediaPackageId") final String mediaPackageId,
-          @Context HttpServletRequest request) {
+      @Context HttpServletRequest request) {
     String details = null;
     try {
       details = readInputStream(request);
@@ -193,14 +194,14 @@ public abstract class EditorRestEndpointBase {
   @POST
   @Path("{mediaPackageId}/metadata.json")
   @RestQuery(name = "updateMetadata", description = "Update the passed metadata for the event with the given Id",
-          pathParameters = {
+      pathParameters = {
           @RestParameter(name = "mediaPackageId", description = "The event id", isRequired = true,
               type = RestParameter.Type.STRING) },
-          responses = {
+      responses = {
           @RestResponse(description = "The metadata have been updated.", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Could not parse metadata.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "No event with this identifier was found.",
-                  responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "No content is returned.")
+              responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "No content is returned.")
   public Response updateEventMetadata(
       @PathParam("mediaPackageId") String eventId,
       @Context HttpServletRequest request) {
@@ -247,16 +248,16 @@ public abstract class EditorRestEndpointBase {
   @Path("{mediaPackageId}/metadata.json")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "getMetadata",
-          description = "Returns all the data related to the metadata tab in the event details modal as JSON",
-          returnDescription = "All the data related to the event metadata tab as JSON",
-          pathParameters = {
+      description = "Returns all the data related to the metadata tab in the event details modal as JSON",
+      returnDescription = "All the data related to the event metadata tab as JSON",
+      pathParameters = {
           @RestParameter(name = "mediaPackageId", description = "The event id", isRequired = true,
-                  type = RestParameter.Type.STRING) },
-          responses = {
+              type = RestParameter.Type.STRING) },
+      responses = {
           @RestResponse(description = "Returns all the data related to the event metadata tab as JSON",
-                  responseCode = HttpServletResponse.SC_OK),
+              responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "No event with this identifier was found.",
-                  responseCode = HttpServletResponse.SC_NOT_FOUND) })
+              responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventMetadata(@PathParam("mediaPackageId") String eventId) {
     try {
       String response = editorService.getMetadata(eventId);

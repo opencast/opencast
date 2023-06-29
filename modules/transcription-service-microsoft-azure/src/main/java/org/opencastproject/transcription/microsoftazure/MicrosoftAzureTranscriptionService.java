@@ -114,12 +114,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Component(
-        immediate = true,
-        service = { TranscriptionService.class, MicrosoftAzureTranscriptionService.class },
-        property = {
-                "service.description=Microsoft Azure Transcription Service",
-                "provider=microsoft.azure"
-        }
+    immediate = true,
+    service = { TranscriptionService.class, MicrosoftAzureTranscriptionService.class },
+    property = {
+        "service.description=Microsoft Azure Transcription Service",
+        "provider=microsoft.azure"
+    }
 )
 public class MicrosoftAzureTranscriptionService extends AbstractJobProducer implements TranscriptionService {
 
@@ -311,9 +311,9 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     if (autoDetectLanguagesOpt.isSome()) {
       defaultAutoDetectLanguages = new ArrayList<>(Arrays.asList(autoDetectLanguagesOpt.get().split(",")));
       if (defaultIsAutoDetectLanguage
-              && (defaultAutoDetectLanguages.size() == 0 || defaultAutoDetectLanguages.size() > 4)) {
+          && (defaultAutoDetectLanguages.size() == 0 || defaultAutoDetectLanguages.size() > 4)) {
         throw new ConfigurationException("When using automatic language detection, the list of languages must contain"
-                + "at least one language and at most four languages");
+                                             + "at least one language and at most four languages");
       }
       logger.info("Languages for auto detection: {}", defaultAutoDetectLanguages);
     } else {
@@ -333,7 +333,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
         splitTextLineSize = Integer.parseInt(splitTextLineSizeOpt.get());
       } catch (NumberFormatException e) {
         throw new ConfigurationException("Invalid configuration for split text line size. Please check your"
-                + "configuration");
+                                             + "configuration");
       }
     }
 
@@ -355,7 +355,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       } catch (NumberFormatException e) {
         // Use default
         logger.warn("Invalid configuration for Workflow dispatch interval. Default used instead: {}",
-                workflowDispatchInterval);
+                    workflowDispatchInterval);
       }
     }
     logger.info("Workflow dispatch interval is {} seconds", workflowDispatchInterval);
@@ -367,7 +367,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       } catch (NumberFormatException e) {
         // Use default
         logger.warn("Invalid configuration for {} : {}. Default used instead: {}",
-                new Object[]{COMPLETION_CHECK_BUFFER_CONFIG, bufferOpt.get(), completionCheckBuffer});
+                    new Object[] { COMPLETION_CHECK_BUFFER_CONFIG, bufferOpt.get(), completionCheckBuffer });
       }
     }
     logger.info("Completion check buffer is {} seconds", completionCheckBuffer);
@@ -379,7 +379,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       } catch (NumberFormatException e) {
         // Use default
         logger.warn("Invalid configuration for maximum processing time. Default used instead: {}",
-                maxProcessingSeconds);
+                    maxProcessingSeconds);
       }
     }
     logger.info("Maximum time a job is checked after it should have ended is {} seconds", maxProcessingSeconds);
@@ -422,7 +422,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
 
     // Schedule the workflow dispatching, starting in 2 minutes
     scheduledExecutor.scheduleWithFixedDelay(new WorkflowDispatcher(), 120, workflowDispatchInterval,
-            TimeUnit.SECONDS);
+                                             TimeUnit.SECONDS);
 
     // Schedule the cleanup of old results jobs from the collection in the wfr once a day
     scheduledExecutor.scheduleWithFixedDelay(new ResultsFileCleanup(), 1, 1, TimeUnit.DAYS);
@@ -451,12 +451,12 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   public Job startTranscription(String mpId, Track track, String... args) throws TranscriptionServiceException {
     if (!enabled) {
       throw new TranscriptionServiceException(
-              "This service is disabled. If you want to enable it, please update the service configuration.");
+          "This service is disabled. If you want to enable it, please update the service configuration.");
     }
 
     if (args.length != 3) {
       throw new IllegalArgumentException("Must provide three arguments: language, autoDetect, autoDetectLanguages. Any"
-              + "of these arguments may be an empty string.");
+                                             + "of these arguments may be an empty string.");
     }
 
     String language = args[0];
@@ -465,8 +465,9 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.StartTranscription.name(),
-              Arrays.asList(mpId, MediaPackageElementParser.getAsXml(track), language, autoDetect,
-                      autoDetectLanguages));
+                                       Arrays.asList(mpId, MediaPackageElementParser.getAsXml(track), language,
+                                                     autoDetect,
+                                                     autoDetectLanguages));
     } catch (ServiceRegistryException e) {
       throw new TranscriptionServiceException("Unable to create a job", e);
     } catch (MediaPackageException e) {
@@ -477,11 +478,11 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   @Override
   public Job startTranscription(String mpId, Track track) throws TranscriptionServiceException {
     return startTranscription(
-            mpId,
-            track,
-            defaultLanguage,
-            Boolean.toString(defaultIsAutoDetectLanguage),
-            String.join(", ", defaultAutoDetectLanguages));
+        mpId,
+        track,
+        defaultLanguage,
+        Boolean.toString(defaultIsAutoDetectLanguage),
+        String.join(", ", defaultAutoDetectLanguages));
   }
 
   @Override
@@ -498,11 +499,11 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       database.updateJobControl(jobId, TranscriptionJobControl.Status.Error.name());
       TranscriptionJobControl jobControl = database.findByJob(jobId);
       logger.warn("Error received for media package {}, job id {}",
-              jobControl.getMediaPackageId(), jobId);
+                  jobControl.getMediaPackageId(), jobId);
       // Send notification email
       sendEmail(TRANSCRIPTION_ERROR,
-              String.format("There was a transcription error for for media package %s, job id %s.",
-                      jobControl.getMediaPackageId(), jobId));
+                String.format("There was a transcription error for for media package %s, job id %s.",
+                              jobControl.getMediaPackageId(), jobId));
     } catch (TranscriptionDatabaseException e) {
       logger.warn("Transcription error. State in db could not be updated to error for mpId {}, jobId {}", mpId, jobId);
       throw new TranscriptionServiceException("Could not update transcription job control db", e);
@@ -534,7 +535,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
    * Setup speech recognition
    */
   void runTranscriptionJob(String mpId, Track track, String jobId, String languageCode, String isAutoDetectString,
-          String isAutoDetectLanguagesString)
+      String isAutoDetectLanguagesString)
           throws TranscriptionServiceException {
     boolean isAutoDetectLanguage;
     List<String> autoDetectLanguages;
@@ -551,9 +552,9 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     } else {
       autoDetectLanguages = new ArrayList<>(Arrays.asList(isAutoDetectLanguagesString.split(",")));
       if (defaultIsAutoDetectLanguage
-              && (defaultAutoDetectLanguages.size() == 0 || defaultAutoDetectLanguages.size() > 4)) {
+          && (defaultAutoDetectLanguages.size() == 0 || defaultAutoDetectLanguages.size() > 4)) {
         throw new TranscriptionServiceException("When using automatic language detection, the list of languages must"
-                + " contain at least one language and at most four languages");
+                                                    + " contain at least one language and at most four languages");
       }
     }
 
@@ -564,7 +565,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
 
       if (isAutoDetectLanguage) {
         AutoDetectSourceLanguageConfig autoDetectSourceLanguageConfig = AutoDetectSourceLanguageConfig
-                .fromLanguages(autoDetectLanguages);
+            .fromLanguages(autoDetectLanguages);
         speechRecognizer = new SpeechRecognizer(speechConfig, autoDetectSourceLanguageConfig, audioConfig);
       } else {
         speechRecognizer = new SpeechRecognizer(speechConfig, audioConfig);
@@ -587,7 +588,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
    * Track speech recognizing progress through event listeners
    */
   void recognizeContinuous(SpeechRecognizer speechRecognizer, String jobId, String mpId, Track track,
-          boolean isAutoDetectLanguage)
+      boolean isAutoDetectLanguage)
           throws ExecutionException, InterruptedException {
     // This lets us modify local variables from inside a lambda.
     final int[] sequenceNumber = new int[] { 0 };
@@ -597,7 +598,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       logger.info("Transcription job {} for media package {} started.", jobId, mpId);
       try {
         database.storeJobControl(mpId, track.getIdentifier(), jobId, TranscriptionJobControl.Status.InProgress.name(),
-            track.getDuration() == null ? 0 : track.getDuration().longValue(), null, PROVIDER);
+                                 track.getDuration() == null ? 0 : track.getDuration().longValue(), null, PROVIDER);
         createTranscriptFile(jobId);
       } catch (TranscriptionDatabaseException ex) {
         errorCallback("Could not store job: " + ex, speechRecognizer, jobId, mpId);
@@ -617,7 +618,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
         for (String text : texts) {
           try {
             writeTranscriptToFile(text, jobId);
-          }  catch (NotFoundException ex) {
+          } catch (NotFoundException ex) {
             errorCallback("Transcription file not found: " + ex, speechRecognizer, jobId, mpId);
           } catch (IOException ex) {
             errorCallback("Unable to write to transcription file: " + ex, speechRecognizer, jobId, mpId);
@@ -631,17 +632,16 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
               && StringUtils.isNotBlank(autoDetectSourceLanguageResult.getLanguage())) {
             try {
               workspace.putInCollection(TRANSCRIPT_COLLECTION, getTranscriptLanguageFileName(jobId),
-                  new ByteArrayInputStream(autoDetectSourceLanguageResult.getLanguage()
-                      .getBytes(StandardCharsets.UTF_8)));
+                                        new ByteArrayInputStream(autoDetectSourceLanguageResult.getLanguage()
+                                                                     .getBytes(StandardCharsets.UTF_8)));
               languageDetected[0] = true;
             } catch (IOException ex) {
               errorCallback("Unable to write to transcription language file: " + ex, speechRecognizer,
-                  jobId, mpId);
+                            jobId, mpId);
             }
           }
         }
-      }
-      else if (ResultReason.NoMatch == e.getResult().getReason()) {
+      } else if (ResultReason.NoMatch == e.getResult().getReason()) {
         logger.debug("NOMATCH: Speech could not be recognized by transcription job {}.", jobId);
       }
     });
@@ -653,15 +653,13 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
         // This is expected
         logger.debug("End of stream reached for transcription job {}", jobId);
         return;
-      }
-      else if (CancellationReason.CancelledByUser == e.getReason()) {
+      } else if (CancellationReason.CancelledByUser == e.getReason()) {
         errorMessage = "User canceled request.";
-      }
-      else if (CancellationReason.Error == e.getReason()) {
+      } else if (CancellationReason.Error == e.getReason()) {
         errorMessage = String.format("Encountered error.%sError code: %s%sError details: %s",
-                System.lineSeparator(), e.getErrorCode().name(), System.lineSeparator(), e.getErrorDetails());
-      }
-      else {
+                                     System.lineSeparator(), e.getErrorCode().name(), System.lineSeparator(),
+                                     e.getErrorDetails());
+      } else {
         errorMessage = String.format("Request was cancelled for an unrecognized reason: %d.", e.getReason());
       }
 
@@ -698,7 +696,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     }
     logger.trace("Create transcript for transcription job {}", jobId);
     return workspace.putInCollection(TRANSCRIPT_COLLECTION, getTranscriptFileName(jobId),
-        new ByteArrayInputStream(transcript.getBytes(StandardCharsets.UTF_8)));
+                                     new ByteArrayInputStream(transcript.getBytes(StandardCharsets.UTF_8)));
   }
 
   /**
@@ -713,7 +711,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     URI collectionURI = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, getTranscriptFileName(jobId));
     File transcriptFile = workspace.get(collectionURI);
     logger.trace("Write transcript to {}: {}", transcriptFile.getAbsolutePath(), text);
-    try (FileWriter transcriptWriter = new FileWriter(transcriptFile, StandardCharsets.UTF_8,true)) {
+    try (FileWriter transcriptWriter = new FileWriter(transcriptFile, StandardCharsets.UTF_8, true)) {
       transcriptWriter.write(text);
     }
   }
@@ -754,7 +752,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     if (splitText) {
       lines = splitText(result.getText());
       Map<String, List<BigInteger>> offsetsAndDurations = splitTextTimes(lines, result.getOffset(),
-              result.getDuration());
+                                                                         result.getDuration());
       offsets = offsetsAndDurations.get("offsets");
       durations = offsetsAndDurations.get("durations");
     } else {
@@ -771,7 +769,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
         caption.append(String.format("%d%s", sequenceNumber + i, System.lineSeparator()));
       }
       caption.append(String.format("%s%s", timestampFromSpeechRecognitionResult(offsets.get(i), durations.get(i)),
-              System.lineSeparator()));
+                                   System.lineSeparator()));
       caption.append(String.format("%s%s%s", lines.get(i), System.lineSeparator(), System.lineSeparator()));
 
       formattedLines.add(caption.toString());
@@ -814,8 +812,8 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     List<BigInteger> durations = new ArrayList<>();
     BigInteger percentage = BigInteger.ZERO;
     int lengthOfAllLines = lines.stream()
-            .mapToInt(l -> l.length())
-            .sum();
+        .mapToInt(l -> l.length())
+        .sum();
 
     for (int i = 0; i < lines.size(); i++) {
       BigInteger previousDurations = durations.stream().reduce(BigInteger.ZERO, BigInteger::add);
@@ -823,13 +821,13 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
 
       // Divide total duration fairly between lines, based on char count
       percentage = BigDecimal.valueOf((double) lines.get(i).length() / lengthOfAllLines)
-              .multiply(new BigDecimal(duration))
-              .toBigInteger();
+          .multiply(new BigDecimal(duration))
+          .toBigInteger();
 
       durations.add(percentage);
     }
 
-    Map<String,List<BigInteger>> map = new HashMap();
+    Map<String, List<BigInteger>> map = new HashMap();
     map.put("offsets", offsets);
     map.put("durations", durations);
     return map;
@@ -839,14 +837,13 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     final BigInteger ticksPerMillisecond = BigInteger.valueOf(10000);
     final Date startTime = new Date(offset.divide(ticksPerMillisecond).longValue());
     final Date endTime = new Date((offset
-            .add(duration)).divide(ticksPerMillisecond).longValue());
+        .add(duration)).divide(ticksPerMillisecond).longValue());
 
     String format = "";
     if (useSubRipTextCaptionFormat) {
       // SRT format requires ',' as decimal separator rather than '.'.
       format = "HH:mm:ss,SSS";
-    }
-    else {
+    } else {
       format = "HH:mm:ss.SSS";
     }
     SimpleDateFormat formatter = new SimpleDateFormat(format);
@@ -883,7 +880,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       URI uri = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, getTranscriptFileName(jobId));
       MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
       return builder.elementFromURI(uri, Attachment.TYPE, new MediaPackageElementFlavor("captions",
-              "microsoft-azure"));
+                                                                                        "microsoft-azure"));
     } catch (TranscriptionDatabaseException e) {
       throw new TranscriptionServiceException("Job id not informed and could not find transcription", e);
     }
@@ -926,14 +923,14 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     String jobId = null;
     for (TranscriptionJobControl jc : database.findByMediaPackage(mpId)) {
       if (TranscriptionJobControl.Status.Closed.name().equals(jc.getStatus())
-              || TranscriptionJobControl.Status.TranscriptionComplete.name().equals(jc.getStatus())) {
+          || TranscriptionJobControl.Status.TranscriptionComplete.name().equals(jc.getStatus())) {
         jobId = jc.getTranscriptionJobId();
       }
     }
 
     if (jobId == null) {
       throw new TranscriptionServiceException(
-              "No completed or closed transcription job found in database for media package " + mpId);
+          "No completed or closed transcription job found in database for media package " + mpId);
     }
 
     return jobId;
@@ -1051,7 +1048,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
         }
 
         List<TranscriptionJobControl> jobs = database.findByStatus(
-                TranscriptionJobControl.Status.TranscriptionComplete.name());
+            TranscriptionJobControl.Status.TranscriptionComplete.name());
         for (TranscriptionJobControl j : jobs) {
 
           // Don't process jobs for other services
@@ -1069,17 +1066,17 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
             String wfId = startWorkflow(mpId, workflowDefinitionId, jobId, params);
             if (wfId == null) {
               logger.warn("Attach transcription workflow could NOT be scheduled for mp {}, microsoft azure job {}",
-                      mpId, jobId);
+                          mpId, jobId);
               continue;
             }
             // Update state in the database
             database.updateJobControl(jobId, TranscriptionJobControl.Status.Closed.name());
             logger.info("Attach transcription workflow {} scheduled for mp {}, microsoft azure job {}",
-                    wfId, mpId, jobId);
+                        wfId, mpId, jobId);
           } catch (Exception e) {
             logger.warn("Attach transcription workflow could NOT be scheduled for mp {},"
                             + "microsoft azure job {}, {}: {}",
-                    mpId, jobId, e.getClass().getName(), e.getMessage());
+                        mpId, jobId, e.getClass().getName(), e.getMessage());
           }
         }
       } catch (TranscriptionDatabaseException e) {
@@ -1100,8 +1097,8 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       if (!hasTranscriptionRequestExpired(jobId)) {
         // Media package not archived but still within completion time? Skip until next time.
         logger.warn("Media package {} has not been archived yet or has been deleted. Will keep trying for {} "
-                + "more minutes before cancelling transcription job {}."
-                    ,mpId, getRemainingTranscriptionExpireTimeInMin(jobId), jobId);
+                        + "more minutes before cancelling transcription job {}."
+            , mpId, getRemainingTranscriptionExpireTimeInMin(jobId), jobId);
       } else {
         // Close transcription job and email admin
         cancelTranscription(jobId, " Microsoft Azure Transcription job canceled, archived media package not found");
@@ -1135,7 +1132,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       Set<String> mpIds = new HashSet<String>();
       mpIds.add(mpId);
       List<WorkflowInstance> wfList = workflows
-              .applyWorkflowToLatestVersion(mpIds, ConfiguredWorkflow.workflow(wfDef, params)).toList();
+          .applyWorkflowToLatestVersion(mpIds, ConfiguredWorkflow.workflow(wfDef, params)).toList();
       return wfList.size() > 0 ? Long.toString(wfList.get(0).getId()) : null;
     } catch (NotFoundException | WorkflowDatabaseException e) {
       logger.warn("Could not get workflow definition: {}", wfDefId);
@@ -1148,7 +1145,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     try {
       // set a time limit based on video duration and maximum processing time
       if (database.findByJob(jobId).getDateCreated().getTime() + database.findByJob(jobId).getTrackDuration()
-              + (completionCheckBuffer + maxProcessingSeconds) * 1000 < System.currentTimeMillis()) {
+          + (completionCheckBuffer + maxProcessingSeconds) * 1000 < System.currentTimeMillis()) {
         return true;
       }
     } catch (Exception e) {
@@ -1162,9 +1159,9 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   private long getRemainingTranscriptionExpireTimeInMin(String jobId) {
     try {
       long expiredTime = (database.findByJob(jobId).getDateCreated().getTime()
-              + database.findByJob(jobId).getTrackDuration()
-              + (completionCheckBuffer + maxProcessingSeconds) * 1000)
-              - (System.currentTimeMillis());
+          + database.findByJob(jobId).getTrackDuration()
+          + (completionCheckBuffer + maxProcessingSeconds) * 1000)
+          - (System.currentTimeMillis());
       // Transcription has expired
       if (expiredTime < 0) {
         expiredTime = 0;

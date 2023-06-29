@@ -230,7 +230,6 @@ public class SeriesRestService {
     this.securityService = securityService;
   }
 
-
   /**
    * Activates REST service.
    *
@@ -1017,7 +1016,7 @@ public class SeriesRestService {
       }
   )
   public Response getSeriesProperty(@PathParam("seriesId") String seriesId,
-          @PathParam("propertyName") String propertyName) throws UnauthorizedException, NotFoundException {
+      @PathParam("propertyName") String propertyName) throws UnauthorizedException, NotFoundException {
     if (StringUtils.isBlank(seriesId)) {
       logger.warn("Series id parameter is blank '{}'.", seriesId);
       return Response.status(BAD_REQUEST).build();
@@ -1226,7 +1225,7 @@ public class SeriesRestService {
       Opt<byte[]> data = seriesService.getSeriesElementData(seriesId, elementType);
       if (data.isSome()) {
         return Response.ok().entity(new ByteArrayInputStream(data.get()))
-                .type(SERIES_ELEMENT_CONTENT_TYPE_PREFIX + elementType).build();
+            .type(SERIES_ELEMENT_CONTENT_TYPE_PREFIX + elementType).build();
       } else {
         return R.notFound();
       }
@@ -1239,31 +1238,31 @@ public class SeriesRestService {
   @PUT
   @Path("{seriesId}/extendedMetadata/{type}")
   @RestQuery(
-          name = "updateExtendedMetadata",
-          description = "Updates extended metadata of a series",
-          returnDescription = "An empty response",
-          pathParameters = {
-                  @RestParameter(name = "seriesId", description = "The series identifier", type = STRING,
-                          isRequired = true),
-                  @RestParameter(name = "type", description = "The type of the catalog flavor", type = STRING,
-                          isRequired = true)
-          },
-          restParameters = {
-                  @RestParameter(name = "dc", description = "The catalog with extended metadata.", type = TEXT,
-                          isRequired = true, defaultValue = SAMPLE_DUBLIN_CORE
-                  )
-          },
-          responses = {
-                  @RestResponse(responseCode = SC_NO_CONTENT, description = "Extended metadata updated"),
-                  @RestResponse(responseCode = SC_CREATED, description = "Extended metadata created"),
-                  @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR,
-                          description = "Error while processing the request")
-          }
+      name = "updateExtendedMetadata",
+      description = "Updates extended metadata of a series",
+      returnDescription = "An empty response",
+      pathParameters = {
+          @RestParameter(name = "seriesId", description = "The series identifier", type = STRING,
+              isRequired = true),
+          @RestParameter(name = "type", description = "The type of the catalog flavor", type = STRING,
+              isRequired = true)
+      },
+      restParameters = {
+          @RestParameter(name = "dc", description = "The catalog with extended metadata.", type = TEXT,
+              isRequired = true, defaultValue = SAMPLE_DUBLIN_CORE
+          )
+      },
+      responses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "Extended metadata updated"),
+          @RestResponse(responseCode = SC_CREATED, description = "Extended metadata created"),
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR,
+              description = "Error while processing the request")
+      }
   )
   public Response putSeriesExtendedMetadata(
-          @PathParam("seriesId") String seriesId,
-          @PathParam("type") String type,
-          @FormParam("dc") String dcString
+      @PathParam("seriesId") String seriesId,
+      @PathParam("type") String type,
+      @FormParam("dc") String dcString
   ) {
     try {
       DublinCoreCatalog dc = dcService.load(new ByteArrayInputStream(dcString.getBytes(StandardCharsets.UTF_8)));
@@ -1285,7 +1284,6 @@ public class SeriesRestService {
       return R.serverError();
     }
   }
-
 
   @PUT
   @Path("{seriesId}/elements/{elementType}")

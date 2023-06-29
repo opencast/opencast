@@ -40,7 +40,7 @@ import javax.persistence.EntityManagerFactory;
 
 @Component(
     property = {
-    "service.description=Aws S3 File Archive Persistence"
+        "service.description=Aws S3 File Archive Persistence"
     },
     immediate = false,
     service = { AwsAssetDatabase.class }

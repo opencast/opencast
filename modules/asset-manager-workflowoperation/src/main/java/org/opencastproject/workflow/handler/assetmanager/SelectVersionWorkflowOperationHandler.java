@@ -60,7 +60,7 @@ import java.util.List;
  * used by the current workflow.
  */
 @Component(immediate = true, service = WorkflowOperationHandler.class, property = {
-        "service.description=Selects a mp version from the archive", "workflow.operation=select-version" })
+    "service.description=Selects a mp version from the archive", "workflow.operation=select-version" })
 public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(SelectVersionWorkflowOperationHandler.class);
@@ -89,8 +89,8 @@ public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOpera
     String sourceFlavorsOpt = StringUtils.trimToNull(currentOperation.getConfiguration(OPT_SOURCE_FLAVORS));
     if (version != null && (noTagsOpt != null || sourceFlavorsOpt != null)) {
       throw new WorkflowOperationException(
-              String.format("Configuration error: '%s' cannot be used with '%s' and '%s'.",
-              OPT_VERSION, OPT_NO_TAGS, OPT_SOURCE_FLAVORS));
+          String.format("Configuration error: '%s' cannot be used with '%s' and '%s'.",
+                        OPT_VERSION, OPT_NO_TAGS, OPT_SOURCE_FLAVORS));
     }
 
     // Specific version informed? If yes, use it.
@@ -101,7 +101,7 @@ public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOpera
         resultMp = findVersion(mp.getIdentifier().toString(), version);
         if (resultMp == null) {
           throw new WorkflowOperationException(
-                  String.format("Could not find version %d of mp %s in the archive", mp.getIdentifier(), version));
+              String.format("Could not find version %d of mp %s in the archive", mp.getIdentifier(), version));
         }
       } catch (NumberFormatException e) {
         throw new WorkflowOperationException("Invalid version passed: " + version);
@@ -109,7 +109,7 @@ public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOpera
     } else {
       if (noTagsOpt == null || sourceFlavorsOpt == null) {
         throw new WorkflowOperationException(String.format("Configuration error: both '%s' and '%s' must be passed.",
-                OPT_NO_TAGS, OPT_SOURCE_FLAVORS));
+                                                           OPT_NO_TAGS, OPT_SOURCE_FLAVORS));
       }
       Collection<String> noTags = Arrays.asList(noTagsOpt.split(","));
 
@@ -121,8 +121,8 @@ public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOpera
       resultMp = findVersionWithNoTags(mp.getIdentifier().toString(), elementSelector, noTags);
       if (resultMp == null) {
         throw new WorkflowOperationException(String.format(
-                "Could not find in the archive a version of mp %s that does not have the tags %s in element flavors %s",
-                mp.getIdentifier(), noTagsOpt, sourceFlavorsOpt));
+            "Could not find in the archive a version of mp %s that does not have the tags %s in element flavors %s",
+            mp.getIdentifier(), noTagsOpt, sourceFlavorsOpt));
       }
     }
     return createResult(resultMp, WorkflowOperationResult.Action.CONTINUE);
@@ -133,12 +133,12 @@ public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOpera
     AQueryBuilder q = assetManager.createQuery();
 
     AResult r = q.select(q.snapshot())
-            .where(q.mediaPackageId(mpId).and(q.version().eq(assetManager.toVersion(version).get()))).run();
+        .where(q.mediaPackageId(mpId).and(q.version().eq(assetManager.toVersion(version).get()))).run();
 
     if (r.getSize() == 0) {
       // Version not found
       throw new WorkflowOperationException(
-              String.format("Media package %s, version %s not found in the archive.", mpId, version));
+          String.format("Media package %s, version %s not found in the archive.", mpId, version));
     }
 
     for (ARecord rec : r.getRecords()) {
@@ -154,7 +154,7 @@ public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOpera
   }
 
   private MediaPackage findVersionWithNoTags(String mpId, SimpleElementSelector elementSelector,
-          Collection<String> tags) throws WorkflowOperationException {
+      Collection<String> tags) throws WorkflowOperationException {
     // Get all the snapshots from the asset manager
     AQueryBuilder q = assetManager.createQuery();
 
@@ -164,7 +164,8 @@ public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOpera
       throw new WorkflowOperationException("Media package not found in the archive: " + mpId);
     }
 
-    nextVersion: for (ARecord rec : r.getRecords()) {
+    nextVersion:
+    for (ARecord rec : r.getRecords()) {
       Opt<Snapshot> optSnap = rec.getSnapshot();
       if (optSnap.isNone()) {
         continue;

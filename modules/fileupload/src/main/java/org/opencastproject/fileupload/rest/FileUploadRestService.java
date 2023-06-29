@@ -178,11 +178,11 @@ public class FileUploadRestService {
       returnDescription = "The ID of the newly created upload job"
   )
   public Response getNewJob(
-          @FormParam(REQUESTFIELD_FILENAME) String filename,
-          @FormParam(REQUESTFIELD_FILESIZE) long filesize,
-          @FormParam(REQUESTFIELD_CHUNKSIZE) int chunksize,
-          @FormParam(REQUESTFIELD_MEDIAPACKAGE) String mediapackage,
-          @FormParam(REQUESTFIELD_FLAVOR) String flav) {
+      @FormParam(REQUESTFIELD_FILENAME) String filename,
+      @FormParam(REQUESTFIELD_FILESIZE) long filesize,
+      @FormParam(REQUESTFIELD_CHUNKSIZE) int chunksize,
+      @FormParam(REQUESTFIELD_MEDIAPACKAGE) String mediapackage,
+      @FormParam(REQUESTFIELD_FLAVOR) String flav) {
     try {
       if (StringUtils.isBlank(filename)) {
         filename = "john.doe";
@@ -215,7 +215,7 @@ public class FileUploadRestService {
   }
 
   @GET
-  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+  @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
   @Path("job/{jobID}.{format:xml|json}")
   @RestQuery(
       name = "job",
@@ -247,7 +247,7 @@ public class FileUploadRestService {
       returnDescription = "The XML representation of the requested upload job."
   )
   public Response getJob(@PathParam("jobID") String id,
-          @PathParam("format") String format) {
+      @PathParam("format") String format) {
     try {
       if (uploadService.hasJob(id)) {
         // Return the results using the requested format
@@ -366,14 +366,14 @@ public class FileUploadRestService {
           ),
       },
       responses = {
-        @RestResponse(
-            description = "the job and file have been found.",
-            responseCode = HttpServletResponse.SC_OK
-        ),
-        @RestResponse(
-            description = "the job or file were not found.",
-            responseCode = HttpServletResponse.SC_NOT_FOUND
-        ),
+          @RestResponse(
+              description = "the job and file have been found.",
+              responseCode = HttpServletResponse.SC_OK
+          ),
+          @RestResponse(
+              description = "the job or file were not found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND
+          ),
       },
       returnDescription = "The payload of the upload job"
   )

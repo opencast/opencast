@@ -103,7 +103,6 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
 
   private static final Gson gson = new Gson();
 
-
   /**
    * OSGi activation callback
    *
@@ -138,12 +137,12 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/publishToStreaming")
   @RestQuery(name = "publishToStreaming", description = "Checks whether publish to streaming is configured for the "
-                  + "current organization",
-          returnDescription = "Returns whether publish to streaming is configured for the current organization as a "
-                            + "boolean.",
-          responses = {
-                  @RestResponse(responseCode = SC_OK, description = "Whether publish to streaming is configured for "
-                                                                  + "the current organization.")})
+      + "current organization",
+      returnDescription = "Returns whether publish to streaming is configured for the current organization as a "
+          + "boolean.",
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "Whether publish to streaming is configured for "
+              + "the current organization.") })
   public Response publishToStreaming() {
     return Response.ok(Boolean.toString(service.publishToStreaming())).build();
   }
@@ -193,7 +192,8 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
   ) {
     Job job;
     try {
-      Set<String> setElementIds = gson.fromJson(elementIds, new TypeToken<Set<String>>() { }.getType());
+      Set<String> setElementIds = gson.fromJson(elementIds, new TypeToken<Set<String>>() {
+      }.getType());
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
       job = service.distribute(channelId, mediapackage, setElementIds);
       if (job == null) {
@@ -255,7 +255,8 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
   ) {
     List<MediaPackageElement> result;
     try {
-      Set<String> setElementIds = gson.fromJson(elementIds, new TypeToken<Set<String>>() { }.getType());
+      Set<String> setElementIds = gson.fromJson(elementIds, new TypeToken<Set<String>>() {
+      }.getType());
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
       result = service.distributeSync(channelId, mediapackage, setElementIds);
       if (result == null || result.isEmpty()) {
@@ -317,7 +318,8 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
   ) {
     Job job;
     try {
-      Set<String> setElementIds = gson.fromJson(elementIds, new TypeToken<Set<String>>() { }.getType());
+      Set<String> setElementIds = gson.fromJson(elementIds, new TypeToken<Set<String>>() {
+      }.getType());
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
       job = service.retract(channelId, mediapackage, setElementIds);
       if (job == null) {
@@ -330,7 +332,7 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
       return status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
       logger.warn("Unable to retract media package '{}' from streaming channel: {}",
-          new Object[] { mediaPackageXml, e });
+                  new Object[] { mediaPackageXml, e });
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
   }
@@ -374,11 +376,12 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
       }
   )
   public Response retractSync(@FormParam("mediapackage") String mediaPackageXml,
-                          @FormParam("channelId") String channelId,
-                          @FormParam("elementIds") String elementIds) {
+      @FormParam("channelId") String channelId,
+      @FormParam("elementIds") String elementIds) {
     List<MediaPackageElement> result;
     try {
-      Set<String> setElementIds = gson.fromJson(elementIds, new TypeToken<Set<String>>() { }.getType());
+      Set<String> setElementIds = gson.fromJson(elementIds, new TypeToken<Set<String>>() {
+      }.getType());
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
       result = service.retractSync(channelId, mediapackage, setElementIds);
       if (result == null || result.isEmpty()) {
@@ -391,7 +394,7 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
       return status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
       logger.warn("Unable to retract mediapackage '{}' from streaming channel: {}",
-          new Object[] { mediaPackageXml, e });
+                  new Object[] { mediaPackageXml, e });
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
   }

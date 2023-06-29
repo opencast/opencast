@@ -109,7 +109,7 @@ import javax.ws.rs.core.UriBuilder;
  */
 @Component(
     property = {
-    "service.description=Workspace"
+        "service.description=Workspace"
     },
     immediate = true,
     service = { Workspace.class }
@@ -274,7 +274,7 @@ public final class WorkspaceImpl implements Workspace {
         garbageCollectionPeriodInSeconds = Integer.parseInt(period);
       } catch (NumberFormatException e) {
         logger.warn("Invalid configuration for workspace garbage collection period ({}={})",
-                WORKSPACE_CLEANUP_PERIOD_KEY, period);
+                    WORKSPACE_CLEANUP_PERIOD_KEY, period);
         garbageCollectionPeriodInSeconds = -1;
       }
     }
@@ -287,7 +287,7 @@ public final class WorkspaceImpl implements Workspace {
         maxAgeInSeconds = Integer.parseInt(age);
       } catch (NumberFormatException e) {
         logger.warn("Invalid configuration for workspace garbage collection max age ({}={})",
-                WORKSPACE_CLEANUP_MAX_AGE_KEY, age);
+                    WORKSPACE_CLEANUP_MAX_AGE_KEY, age);
         maxAgeInSeconds = -1;
       }
     }
@@ -360,12 +360,12 @@ public final class WorkspaceImpl implements Workspace {
 
     if (uniqueFilename) {
       inWs = new File(FilenameUtils.removeExtension(inWs.getAbsolutePath()) + '-' + UUID.randomUUID() + '.'
-              + FilenameUtils.getExtension(inWs.getName()));
+                          + FilenameUtils.getExtension(inWs.getName()));
       logger.debug("Created unique filename: {}", inWs);
     }
 
     if (pathMappable != null && StringUtils.isNotBlank(pathMappable.getPathPrefix())
-            && StringUtils.isNotBlank(pathMappable.getUrlPrefix())) {
+        && StringUtils.isNotBlank(pathMappable.getUrlPrefix())) {
       if (uri.toString().startsWith(pathMappable.getUrlPrefix())) {
         final String localPath = uri.toString().substring(pathMappable.getUrlPrefix().length());
         final File wfrCopy = workingFileRepositoryFile(localPath);
@@ -384,7 +384,7 @@ public final class WorkspaceImpl implements Workspace {
           return new File(inWs.getAbsolutePath());
         } else {
           logger.warn("The working file repository and workspace paths don't match. Looking up {} at {} failed",
-                  uri.toString(), wfrCopy.getAbsolutePath());
+                      uri.toString(), wfrCopy.getAbsolutePath());
         }
       }
     }
@@ -681,7 +681,7 @@ public final class WorkspaceImpl implements Workspace {
       // there ourselves
       wfr.put(mediaPackageID, mediaPackageElementID, fileName, in);
       File workingFileRepoDirectory = workingFileRepositoryFile(WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX,
-              mediaPackageID, mediaPackageElementID);
+                                                                mediaPackageID, mediaPackageElementID);
       File workingFileRepoCopy = new File(workingFileRepoDirectory, safeFileName);
       FileSupport.link(workingFileRepoCopy, workspaceFile, true);
     } else {
@@ -718,7 +718,7 @@ public final class WorkspaceImpl implements Workspace {
         wfr.putInCollection(collectionId, fileName, tee);
         FileUtils.forceMkdir(tempFile.getParentFile());
         File workingFileRepoDirectory = workingFileRepositoryFile(WorkingFileRepository.COLLECTION_PATH_PREFIX,
-                collectionId);
+                                                                  collectionId);
         File workingFileRepoCopy = new File(workingFileRepoDirectory, safeFileName);
         FileSupport.link(workingFileRepoCopy, tempFile, true);
       } else {
@@ -917,16 +917,16 @@ public final class WorkspaceImpl implements Workspace {
   private void waitForResource(final URI uri, final int expectedStatus, final String errorMsg) throws IOException {
     if (waitForResourceFlag) {
       HttpUtil.waitForResource(trustedHttpClient, uri, expectedStatus, TIMEOUT, INTERVAL)
-              .fold(Misc.<Exception, Void> chuck(), new Effect.X<Integer>() {
-                @Override
-                public void xrun(Integer status) throws Exception {
-                  if (ne(status, expectedStatus)) {
-                    final String msg = format(errorMsg, uri.toString());
-                    logger.warn(msg);
-                    throw new IOException(msg);
-                  }
-                }
-              });
+          .fold(Misc.<Exception, Void>chuck(), new Effect.X<Integer>() {
+            @Override
+            public void xrun(Integer status) throws Exception {
+              if (ne(status, expectedStatus)) {
+                final String msg = format(errorMsg, uri.toString());
+                logger.warn(msg);
+                throw new IOException(msg);
+              }
+            }
+          });
     }
   }
 
@@ -943,7 +943,7 @@ public final class WorkspaceImpl implements Workspace {
     // currently being processed. The warn value is 2 days:
     if (maxAgeInSeconds < 60 * 60 * 24 * 2) {
       logger.warn("The max age for the workspace cleaner is dangerously low. Please consider increasing the value to "
-              + "avoid deleting data in use by running workflows.");
+                      + "avoid deleting data in use by running workflows.");
     }
 
     // Clean workspace root directly
@@ -963,8 +963,7 @@ public final class WorkspaceImpl implements Workspace {
     if (filesOnly) {
       logger.debug("Clean workspace media package directory {} (files only)", mediaPackageDir);
       FileSupport.delete(mediaPackageDir, FileSupport.DELETE_FILES);
-    }
-    else {
+    } else {
       logger.debug("Clean workspace media package directory {}", mediaPackageDir);
       FileUtils.deleteDirectory(mediaPackageDir);
     }

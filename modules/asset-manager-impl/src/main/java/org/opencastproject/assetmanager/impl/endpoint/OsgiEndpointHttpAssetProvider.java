@@ -58,8 +58,8 @@ import java.net.URI;
  */
 @Component(
     property = {
-    "service.description=HttpAssetProvider for the AssetManager",
-    "assetmanager.service.path=/assets"
+        "service.description=HttpAssetProvider for the AssetManager",
+        "assetmanager.service.path=/assets"
     },
     immediate = true,
     service = { HttpAssetProvider.class }
@@ -97,9 +97,11 @@ public class OsgiEndpointHttpAssetProvider implements HttpAssetProvider {
     return orgServerUrl.trim();
   }
 
-  @Override public Snapshot prepareForDelivery(final Snapshot snapshot) {
+  @Override
+  public Snapshot prepareForDelivery(final Snapshot snapshot) {
     return AssetManagerImpl.rewriteUris(snapshot, new Fn<MediaPackageElement, URI>() {
-      @Override public URI apply(MediaPackageElement mpe) {
+      @Override
+      public URI apply(MediaPackageElement mpe) {
         return createUriFor(mpe, snapshot);
       }
     });

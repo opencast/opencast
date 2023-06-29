@@ -74,31 +74,31 @@ public class WaveformServiceEndpoint extends AbstractJobProducerEndpoint {
 
   @POST
   @Path("/create")
-  @Produces({MediaType.APPLICATION_XML})
+  @Produces({ MediaType.APPLICATION_XML })
   @RestQuery(name = "create", description = "Create a waveform image from the given track",
-          returnDescription = "Media package attachment for the generated waveform.",
-          restParameters = {
-            @RestParameter(name = "track", type = RestParameter.Type.TEXT,
-                    description = "Track with at least one audio channel.", isRequired = true),
-            @RestParameter(name = "pixelsPerMinute", type = RestParameter.Type.INTEGER,
-                    description = "Width of waveform image in pixels per minute.", isRequired = true),
-            @RestParameter(name = "minWidth", type = RestParameter.Type.INTEGER,
-                    description = "Minimum width of waveform image.", isRequired = true),
-            @RestParameter(name = "maxWidth", type = RestParameter.Type.INTEGER,
-                    description = "Maximum width of waveform image.", isRequired = true),
-            @RestParameter(name = "height", type = RestParameter.Type.INTEGER,
-                    description = "Height of waveform image.", isRequired = true),
-            @RestParameter(name = "color", type = RestParameter.Type.STRING, defaultValue = "black",
-                    description = "Color of waveform image.", isRequired = true)
-          },
-          responses = {
-            @RestResponse(description = "Waveform generation job successfully created.",
-                    responseCode = HttpServletResponse.SC_OK),
-            @RestResponse(description = "The given track can't be parsed.",
-                    responseCode = HttpServletResponse.SC_BAD_REQUEST),
-            @RestResponse(description = "Internal server error.",
-                    responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-  })
+      returnDescription = "Media package attachment for the generated waveform.",
+      restParameters = {
+          @RestParameter(name = "track", type = RestParameter.Type.TEXT,
+              description = "Track with at least one audio channel.", isRequired = true),
+          @RestParameter(name = "pixelsPerMinute", type = RestParameter.Type.INTEGER,
+              description = "Width of waveform image in pixels per minute.", isRequired = true),
+          @RestParameter(name = "minWidth", type = RestParameter.Type.INTEGER,
+              description = "Minimum width of waveform image.", isRequired = true),
+          @RestParameter(name = "maxWidth", type = RestParameter.Type.INTEGER,
+              description = "Maximum width of waveform image.", isRequired = true),
+          @RestParameter(name = "height", type = RestParameter.Type.INTEGER,
+              description = "Height of waveform image.", isRequired = true),
+          @RestParameter(name = "color", type = RestParameter.Type.STRING, defaultValue = "black",
+              description = "Color of waveform image.", isRequired = true)
+      },
+      responses = {
+          @RestResponse(description = "Waveform generation job successfully created.",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "The given track can't be parsed.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "Internal server error.",
+              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+      })
   public Response createWaveformImage(@FormParam("track") String track,
       @FormParam("pixelsPerMinute") int pixelsPerMinute, @FormParam("minWidth") int minWidth,
       @FormParam("maxWidth") int maxWidth, @FormParam("height") int height, @FormParam("color") String color) {

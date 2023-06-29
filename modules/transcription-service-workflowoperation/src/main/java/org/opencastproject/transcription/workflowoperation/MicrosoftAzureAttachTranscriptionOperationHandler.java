@@ -50,12 +50,12 @@ import java.util.List;
 import java.util.Map;
 
 @Component(
-        immediate = true,
-        service = WorkflowOperationHandler.class,
-        property = {
-                "service.description=Microsoft Azure Attach Transcription Workflow Operation Handler",
-                "workflow.operation=microsoft-azure-attach-transcription"
-        }
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Microsoft Azure Attach Transcription Workflow Operation Handler",
+        "workflow.operation=microsoft-azure-attach-transcription"
+    }
 )
 public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractWorkflowOperationHandler {
 
@@ -96,7 +96,7 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
 
     // Check which tags/flavors have been configured
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(
-            workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
+        workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
     List<String> targetTags = tagsAndFlavors.getTargetTags();
     // Target flavor is mandatory
     MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
@@ -105,7 +105,7 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
     try {
       // Get transcription file from the service
       MediaPackageElement transcription = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(),
-              jobId);
+                                                                            jobId);
 
       // Get return values from the service
       try {
@@ -120,13 +120,14 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
       // Set the target flavor
       if (language != null) {
         targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavor.toString()
-                .replace(REPLACE_THIS_WITH_LANGUAGE, language));
+                                                                 .replace(REPLACE_THIS_WITH_LANGUAGE, language));
       } else if (autoDetectedLanguage != null) {
         targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavor.toString()
-                .replace(REPLACE_THIS_WITH_LANGUAGE, autoDetectedLanguage));
+                                                                 .replace(REPLACE_THIS_WITH_LANGUAGE,
+                                                                          autoDetectedLanguage));
       } else {
         targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavor.toString()
-                .replace(REPLACE_THIS_WITH_LANGUAGE, ""));
+                                                                 .replace(REPLACE_THIS_WITH_LANGUAGE, ""));
       }
       transcription.setFlavor(targetFlavor);
 
@@ -141,7 +142,7 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
       String uri = transcription.getURI().toString();
       String ext = uri.substring(uri.lastIndexOf("."));
       transcription.setURI(workspace.moveTo(transcription.getURI(), mediaPackage.getIdentifier().toString(),
-              transcription.getIdentifier(), "captions" + ext));
+                                            transcription.getIdentifier(), "captions" + ext));
     } catch (Exception e) {
       throw new WorkflowOperationException(e);
     }

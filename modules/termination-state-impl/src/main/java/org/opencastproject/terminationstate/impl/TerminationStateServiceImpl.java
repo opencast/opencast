@@ -72,7 +72,6 @@ public final class TerminationStateServiceImpl extends AbstractJobTerminationSta
 
   private int jobPollingPeriod = DEFAULT_JOB_POLLING_PERIOD;
 
-
   @Activate
   protected void activate(ComponentContext componentContext) {
     try {
@@ -87,7 +86,6 @@ public final class TerminationStateServiceImpl extends AbstractJobTerminationSta
       logger.error("Cannot create quartz scheduler", e.getMessage());
     }
   }
-
 
   protected void configure(Dictionary config) throws ConfigurationException {
     this.jobPollingPeriod = OsgiUtil.getOptCfgAsInt(config, CONFIG_JOB_POLLING_PERIOD)

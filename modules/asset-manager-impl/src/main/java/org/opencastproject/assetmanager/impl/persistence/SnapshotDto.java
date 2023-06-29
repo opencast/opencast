@@ -67,16 +67,16 @@ import javax.persistence.UniqueConstraint;
     @Index(name = "IX_oc_assets_snapshot_organization_id", columnList = ("organization_id")),
     @Index(name = "IX_oc_assets_snapshot_owner", columnList = ("owner")),
     @Index(name = "IX_oc_assets_snapshot_series", columnList = ("series_id, version"))
-    }, uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"mediapackage_id", "version"}) })
+}, uniqueConstraints = {
+    @UniqueConstraint(columnNames = { "mediapackage_id", "version" }) })
 @NamedQueries({
-        @NamedQuery(name = "Snapshot.countOrgEvents", query = "select count(distinct s.mediaPackageId) from Snapshot s "
-                + "where s.organizationId = :organizationId"),
-        @NamedQuery(name = "Snapshot.countEvents", query = "select count(distinct s.mediaPackageId) from Snapshot s"),
-        @NamedQuery(name = "Snapshot.countByMediaPackage", query = "select count(s) from Snapshot s "
-                + "where s.mediaPackageId = :mediaPackageId"),
-        @NamedQuery(name = "Snapshot.countByMediaPackageAndOrg", query = "select count(s) from Snapshot s "
-                + "where s.mediaPackageId = :mediaPackageId and s.organizationId = :organizationId")})
+    @NamedQuery(name = "Snapshot.countOrgEvents", query = "select count(distinct s.mediaPackageId) from Snapshot s "
+        + "where s.organizationId = :organizationId"),
+    @NamedQuery(name = "Snapshot.countEvents", query = "select count(distinct s.mediaPackageId) from Snapshot s"),
+    @NamedQuery(name = "Snapshot.countByMediaPackage", query = "select count(s) from Snapshot s "
+        + "where s.mediaPackageId = :mediaPackageId"),
+    @NamedQuery(name = "Snapshot.countByMediaPackageAndOrg", query = "select count(s) from Snapshot s "
+        + "where s.mediaPackageId = :mediaPackageId and s.organizationId = :organizationId") })
 // Maintain own generator to support database migrations from Archive to AssetManager
 // The generator's initial value has to be set after the data migration.
 // Otherwise duplicate key errors will most likely happen.
@@ -123,13 +123,13 @@ public class SnapshotDto {
   private Set<AssetDto> assets;
 
   public static SnapshotDto mk(
-          MediaPackage mediaPackage,
-          VersionImpl version,
-          String organization,
-          Date archivalDate,
-          Availability availability,
-          String storageId,
-          String owner) {
+      MediaPackage mediaPackage,
+      VersionImpl version,
+      String organization,
+      Date archivalDate,
+      Availability availability,
+      String storageId,
+      String owner) {
     try {
       final SnapshotDto dto = new SnapshotDto();
       dto.mediaPackageId = mediaPackage.getIdentifier().toString();
@@ -150,12 +150,12 @@ public class SnapshotDto {
   public static SnapshotDto mk(Snapshot snapshot) {
     try {
       return mk(snapshot.getMediaPackage(),
-              VersionImpl.mk(Long.parseLong(snapshot.getVersion().toString())),
-              snapshot.getOrganizationId(),
-              snapshot.getArchivalDate(),
-              snapshot.getAvailability(),
-              snapshot.getStorageId(),
-              snapshot.getOwner());
+                VersionImpl.mk(Long.parseLong(snapshot.getVersion().toString())),
+                snapshot.getOrganizationId(),
+                snapshot.getArchivalDate(),
+                snapshot.getAvailability(),
+                snapshot.getStorageId(),
+                snapshot.getOwner());
     } catch (Exception e) {
       return chuck(e);
     }
@@ -196,21 +196,21 @@ public class SnapshotDto {
   public Snapshot toSnapshot() {
     MediaPackage mediaPackage = Conversions.toMediaPackage(mediaPackageXml);
     // ensure elements are tagged `archive`
-    for (MediaPackageElement element: mediaPackage.getElements()) {
+    for (MediaPackageElement element : mediaPackage.getElements()) {
       if (!Arrays.asList(element.getTags()).contains("archive")) {
         logger.debug("Adding additional tag `archive` to element {} retrieved from asset manager", element);
         element.addTag("archive");
       }
     }
     return new SnapshotImpl(
-            id,
-            Conversions.toVersion(version),
-            organizationId,
-            archivalDate,
-            Availability.valueOf(availability),
-            storageId,
-            owner,
-            mediaPackage);
+        id,
+        Conversions.toVersion(version),
+        organizationId,
+        archivalDate,
+        Availability.valueOf(availability),
+        storageId,
+        owner,
+        mediaPackage);
   }
 
   /**

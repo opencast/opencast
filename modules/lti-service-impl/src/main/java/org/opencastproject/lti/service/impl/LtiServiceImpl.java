@@ -216,7 +216,7 @@ public class LtiServiceImpl implements LtiService {
         if (workflow.getState().equals(SUCCEEDED)) {
           final String publishWorkflowName = "publish";
           logger.info("workflow '{}' succeeded for media package '{}', starting workflow '{}'", workflow.getTemplate(),
-                  workflow.getMediaPackage().getIdentifier(), publishWorkflowName);
+                      workflow.getMediaPackage().getIdentifier(), publishWorkflowName);
           final WorkflowDefinition wfd;
           try {
             wfd = workflowService.getWorkflowDefinitionById(publishWorkflowName);
@@ -224,16 +224,16 @@ public class LtiServiceImpl implements LtiService {
             final ConfiguredWorkflow newWorkflow = workflow(wfd);
             final String targetMpId = workflow.getConfiguration(NEW_MP_ID_KEY);
             final List<WorkflowInstance> workflowInstances = workflows
-                    .applyWorkflowToLatestVersion(Collections.singleton(targetMpId), newWorkflow).toList();
+                .applyWorkflowToLatestVersion(Collections.singleton(targetMpId), newWorkflow).toList();
             if (workflowInstances.isEmpty()) {
               throw new RuntimeException(
-                      String.format("couldn't start workflow '%s' for event %s", publishWorkflowName, targetMpId));
+                  String.format("couldn't start workflow '%s' for event %s", publishWorkflowName, targetMpId));
             }
           } catch (WorkflowDatabaseException e) {
             logger.error(String.format("couldn't instantiate workflow '%s'", publishWorkflowName), e);
           } catch (NotFoundException e) {
             logger.error(String.format("couldn't find media package while starting workflow workflow '%s'",
-                    publishWorkflowName), e);
+                                       publishWorkflowName), e);
           }
         }
       }
@@ -250,7 +250,7 @@ public class LtiServiceImpl implements LtiService {
   public List<LtiJob> listJobs(String seriesId) {
     final User user = securityService.getUser();
     final EventSearchQuery query = new EventSearchQuery(securityService.getOrganization().getId(), user)
-            .withSeriesId(StringUtils.trimToNull(seriesId));
+        .withSeriesId(StringUtils.trimToNull(seriesId));
     if (!listAllJobsInSeries) {
       query.withCreator(user.getName());
     }
@@ -258,10 +258,10 @@ public class LtiServiceImpl implements LtiService {
       SearchResult<Event> results = this.searchIndex.getByQuery(query);
       ZonedDateTime startOfDay = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS);
       return Arrays.stream(results.getItems())
-              .map(SearchResultItem::getSource)
-              .filter(e -> ZonedDateTime.parse(e.getCreated()).compareTo(startOfDay) > 0)
-              .map(e -> new LtiJob(e.getTitle(), e.getDisplayableStatus(workflowService.getWorkflowStateMappings())))
-              .collect(Collectors.toList());
+          .map(SearchResultItem::getSource)
+          .filter(e -> ZonedDateTime.parse(e.getCreated()).compareTo(startOfDay) > 0)
+          .map(e -> new LtiJob(e.getTitle(), e.getDisplayableStatus(workflowService.getWorkflowStateMappings())))
+          .collect(Collectors.toList());
     } catch (SearchIndexException e) {
       throw new RuntimeException("search index exception", e);
     }
@@ -269,13 +269,13 @@ public class LtiServiceImpl implements LtiService {
 
   @Override
   public void upsertEvent(
-          final LtiFileUpload file,
-          final String captions,
-          final String captionFormat,
-          final String captionLanguage,
-          final String eventId,
-          final String seriesId,
-          final String metadataJson) throws UnauthorizedException, NotFoundException {
+      final LtiFileUpload file,
+      final String captions,
+      final String captionFormat,
+      final String captionLanguage,
+      final String eventId,
+      final String seriesId,
+      final String metadataJson) throws UnauthorizedException, NotFoundException {
     if (eventId != null) {
       updateEvent(eventId, metadataJson);
       return;
@@ -296,7 +296,7 @@ public class LtiServiceImpl implements LtiService {
         final MediaPackageElementBuilder elementBuilder =
             MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
         final MediaPackageElement captionsMediaPackage = elementBuilder
-                .newElement(MediaPackageElement.Type.Attachment, captionsFlavor);
+            .newElement(MediaPackageElement.Type.Attachment, captionsFlavor);
         if ("dfxp".equals(captionFormat)) {
           captionsMediaPackage.setMimeType(mimeType("application", "xml"));
         } else {
@@ -305,11 +305,11 @@ public class LtiServiceImpl implements LtiService {
         captionsMediaPackage.addTag("lang:" + captionLanguage);
         mediaPackage.add(captionsMediaPackage);
         final URI captionsUri = workspace
-                .put(
-                        mediaPackage.getIdentifier().toString(),
-                        captionsMediaPackage.getIdentifier(),
-                        "captions." + captionFormat,
-                        new ByteArrayInputStream(captions.getBytes(StandardCharsets.UTF_8)));
+            .put(
+                mediaPackage.getIdentifier().toString(),
+                captionsMediaPackage.getIdentifier(),
+                "captions." + captionFormat,
+                new ByteArrayInputStream(captions.getBytes(StandardCharsets.UTF_8)));
         captionsMediaPackage.setURI(captionsUri);
       }
 
@@ -334,17 +334,17 @@ public class LtiServiceImpl implements LtiService {
 
       if (accessControlList == null || accessControlList.getEntries().isEmpty()) {
         accessControlList = new AccessControlList(
-          new AccessControlEntry("ROLE_ADMIN", "write", true),
-          new AccessControlEntry("ROLE_ADMIN", "read", true),
-          new AccessControlEntry("ROLE_USER", "read", true));
+            new AccessControlEntry("ROLE_ADMIN", "write", true),
+            new AccessControlEntry("ROLE_ADMIN", "read", true),
+            new AccessControlEntry("ROLE_USER", "read", true));
       }
 
       this.authorizationService.setAcl(mediaPackage, AclScope.Episode, accessControlList);
       mediaPackage = ingestService.addTrack(
-            file.getStream(),
-            file.getSourceName(),
-            MediaPackageElements.PRESENTER_SOURCE,
-            mediaPackage
+          file.getStream(),
+          file.getSourceName(),
+          MediaPackageElements.PRESENTER_SOURCE,
+          mediaPackage
       );
 
       final Map<String, String> configuration = gson.fromJson(workflowConfiguration, Map.class);
@@ -373,7 +373,7 @@ public class LtiServiceImpl implements LtiService {
       final ConfiguredWorkflow workflow
           = workflow(wfd, createCopyWorkflowConfig(seriesId, UUID.randomUUID().toString()));
       final List<WorkflowInstance> workflowInstances = workflows
-              .applyWorkflowToLatestVersion(Collections.singleton(eventId), workflow).toList();
+          .applyWorkflowToLatestVersion(Collections.singleton(eventId), workflow).toList();
       if (workflowInstances.isEmpty()) {
         throw new RuntimeException(String.format("Couldn't start workflow '%s' for event %s", workflowId, eventId));
       }
@@ -474,7 +474,7 @@ public class LtiServiceImpl implements LtiService {
   public String getNewEventMetadata() {
     final MetadataList metadataList = this.indexService.getMetadataListWithAllEventCatalogUIAdapters();
     final DublinCoreMetadataCollection collection = metadataList
-            .getMetadataByAdapter(this.indexService.getCommonEventCatalogUIAdapter());
+        .getMetadataByAdapter(this.indexService.getCommonEventCatalogUIAdapter());
     if (collection != null) {
       if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_CREATED.getLocalName())) {
         collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName()));
@@ -539,7 +539,7 @@ public class LtiServiceImpl implements LtiService {
         throw new RuntimeException("Event '" + id + "' not found");
       }
       final IndexService.EventRemovalResult eventRemovalResult = indexService.removeEvent(event.get(),
-              retractWorkflowId);
+                                                                                          retractWorkflowId);
       if (eventRemovalResult == IndexService.EventRemovalResult.GENERAL_FAILURE) {
         throw new RuntimeException("Error deleting event: " + eventRemovalResult);
       }

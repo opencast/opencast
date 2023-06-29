@@ -45,19 +45,18 @@ import javax.persistence.TemporalType;
 @Access(AccessType.FIELD)
 @Table(name = "oc_adopter_registration")
 @NamedQueries({
-        @NamedQuery(name = "Form.findAll", query = "SELECT f FROM Form f"),
-        @NamedQuery(name = "Form.deleteAll", query = "DELETE FROM Form f")
+    @NamedQuery(name = "Form.findAll", query = "SELECT f FROM Form f"),
+    @NamedQuery(name = "Form.deleteAll", query = "DELETE FROM Form f")
 })
 public class Form implements IForm {
 
   public enum TERMSOFUSEVERSION {
     PRE_2022, APRIL_2022
-  };
+  }
 
   public static final TERMSOFUSEVERSION getLatestTermsOfUse() {
     return TERMSOFUSEVERSION.APRIL_2022;
   }
-
 
   //================================================================================
   // Properties
@@ -134,7 +133,6 @@ public class Form implements IForm {
   @Column(name = "delete_me")
   private boolean deleteMe = false;
 
-
   //================================================================================
   // Constructor and Methods
   //================================================================================
@@ -145,8 +143,8 @@ public class Form implements IForm {
   }
 
   public Form(String organisationName, String departmentName, String firstName, String lastName, String email,
-          String country, String postalCode, String city, String street, String streetNo, boolean contactMe,
-          boolean allowsStatistics, boolean allowsErrorReports, boolean agreedToPolicy, boolean registered) {
+      String country, String postalCode, String city, String street, String streetNo, boolean contactMe,
+      boolean allowsStatistics, boolean allowsErrorReports, boolean agreedToPolicy, boolean registered) {
     this.organisationName = organisationName;
     this.departmentName = departmentName;
     this.firstName = firstName;
@@ -210,7 +208,6 @@ public class Form implements IForm {
   public String toString() {
     return adopterKey;
   }
-
 
   //================================================================================
   // Getter and Setter

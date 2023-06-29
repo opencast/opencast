@@ -38,8 +38,8 @@ import java.nio.file.Paths;
 
 @Component(
     property = {
-    "service.description=File system based asset store",
-    "store.type=local-filesystem"
+        "service.description=File system based asset store",
+        "store.type=local-filesystem"
     },
     immediate = true,
     service = { AssetStore.class }
@@ -66,7 +66,8 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
   /** The workspace */
   private Workspace workspace;
 
-  @Override protected Workspace getWorkspace() {
+  @Override
+  protected Workspace getWorkspace() {
     return workspace;
   }
 
