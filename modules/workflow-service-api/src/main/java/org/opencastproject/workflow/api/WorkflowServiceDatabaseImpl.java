@@ -285,6 +285,29 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
   /**
    * {@inheritDoc}
    *
+   * @see WorkflowServiceDatabase#userHasActiveWorkflows(String mediaPackageId)
+   */
+  public boolean userHasActiveWorkflows(String userId) throws WorkflowDatabaseException {
+    try {
+      long count = db.exec(namedQuery.find(
+              "Workflow.countActiveByUser",
+              Long.class,
+              Pair.of("organizationId", securityService.getOrganization().getId()),
+              Pair.of("userId", userId),
+              Pair.of("stateInstantiated", WorkflowInstance.WorkflowState.INSTANTIATED),
+              Pair.of("stateRunning", WorkflowInstance.WorkflowState.RUNNING),
+              Pair.of("statePaused", WorkflowInstance.WorkflowState.PAUSED),
+              Pair.of("stateFailing", WorkflowInstance.WorkflowState.FAILING)
+      ));
+      return count > 0;
+    } catch (Exception e) {
+      throw new WorkflowDatabaseException(e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see WorkflowServiceDatabase#updateInDatabase(WorkflowInstance instance)
    */
   public void updateInDatabase(WorkflowInstance instance) throws WorkflowDatabaseException {

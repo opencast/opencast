@@ -326,6 +326,16 @@ public interface WorkflowService {
   boolean mediaPackageHasActiveWorkflows(String mediaPackageId) throws WorkflowDatabaseException;
 
   /**
+   * Checks if there is at least one workflow currently running started by the given user
+   *
+   * @param userId
+   *          the identifier of the user
+   * @return Whether there is a workflow active started by the user
+   * @throws WorkflowDatabaseException
+   */
+  boolean userHasActiveWorkflows(String userId) throws WorkflowDatabaseException;
+
+  /**
    * Returns all workflows associated with the given mediapackage
    * Current user needs permission to the mediapackage
    *

@@ -117,6 +117,12 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
                 + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId and "
                 + "(w.state = :stateInstantiated or w.state = :statePaused or w.state = :stateRunning "
                 + "or w.state = :stateFailing) order by w.dateCreated"),
+
+        // For users
+        @NamedQuery(name = "Workflow.countActiveByUser", query = "SELECT COUNT(w) FROM WorkflowInstance w where "
+                + "w.creatorName = :userId and w.organizationId = :organizationId and "
+                + "(w.state = :stateInstantiated or w.state = :statePaused or w.state = :stateRunning "
+                + "or w.state = :stateFailing)"),
 })
 public class WorkflowInstance {
 

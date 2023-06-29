@@ -1360,6 +1360,16 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workflow.api.WorkflowService#userHasActiveWorkflows(String)
+   */
+  @Override
+  public boolean userHasActiveWorkflows(String userId) throws WorkflowDatabaseException {
+    return persistence.userHasActiveWorkflows(userId);
+  }
+
+  /**
    * Callback for workflow operations that were throwing an exception. This implementation assumes that the operation
    * worker has already adjusted the current operation's state appropriately.
    *
