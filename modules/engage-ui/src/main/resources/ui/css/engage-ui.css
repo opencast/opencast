@@ -19,6 +19,9 @@
 
 .thumbnail {
     padding-bottom: 5px;
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
 }
 
 /* title */
@@ -167,10 +170,10 @@ strong {
 }
 
 .tile img {
-    width: 50%;
     float: left;
     margin-right: 2%;
-    max-height: 163px; 
+    max-height: 90px;
+    max-width: 160px;
 }
 
 .headline {
@@ -183,16 +186,19 @@ strong {
 @media (min-width: 768px) {
     .tile img {
 	max-height: 77px;
+	max-width: 137px;
     }
 }
 @media (min-width: 992px) {
     .tile img {
 	max-height: 65px;
+	max-width: 115px;
     }
 }
 @media (min-width: 1200px) {
     .tile img {
 	max-height: 84px;
+	max-width: 150px;
     }
 }
 
