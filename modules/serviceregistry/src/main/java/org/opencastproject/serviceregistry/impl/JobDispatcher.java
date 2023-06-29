@@ -216,7 +216,7 @@ public class JobDispatcher {
         logger.warn("Dispatch interval {} ms too low, adjusting to {}", dispatchInterval, MIN_DISPATCH_INTERVAL);
         dispatchInterval = MIN_DISPATCH_INTERVAL;
       } else {
-        logger.info("Dispatch interval set to {} ms", dispatchInterval);
+        logger.info("Dispatch interval set to {} seconds", dispatchInterval);
       }
     }
 
