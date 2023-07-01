@@ -58,7 +58,7 @@
     <querydsl.version>3.7.4</querydsl.version>
     <rest-assured.version>4.4.0</rest-assured.version>
     <spring.version>3.1.4.RELEASE</spring.version>
-    <spring-security.version>3.1.7.RELEASE</spring-security.version>
+    <spring-security.version>6.1.1</spring-security.version>
   </properties>
   <modules>
     <module>modules/admin-ui</module>
