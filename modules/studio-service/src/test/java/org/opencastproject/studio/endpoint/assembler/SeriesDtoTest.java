@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -28,13 +28,13 @@ import java.util.UUID;
 
 import junit.framework.TestCase;
 
-public class SeriesAssemblerTest extends TestCase {
+public class SeriesDtoTest extends TestCase {
 
   public void testToDto() {
     Series series = new Series(UUID.randomUUID().toString(), "mh_default_org");
     series.setTitle("Series Test 1");
 
-    SeriesDto dto = SeriesAssembler.toDto(series);
+    SeriesDto dto = SeriesDto.create(series);
 
     assertEquals(dto.getId(), series.getIdentifier());
     assertEquals(dto.getTitle(), series.getTitle());

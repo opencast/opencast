@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -21,15 +21,21 @@
 
 package org.opencastproject.studio.endpoint.dto;
 
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+
 public class SeriesDto {
 
-  private String id;
+  private final String id;
 
-  private String title;
+  private final String title;
 
   public SeriesDto(String id, String title) {
     this.id = id;
     this.title = title;
+  }
+
+  public static SeriesDto create(Series series) {
+    return new SeriesDto(series.getIdentifier(), series.getTitle());
   }
 
   public String getId() {

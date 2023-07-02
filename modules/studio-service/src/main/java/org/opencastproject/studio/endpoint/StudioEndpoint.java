@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -21,7 +21,6 @@
 
 package org.opencastproject.studio.endpoint;
 
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
@@ -30,7 +29,7 @@ import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.studio.endpoint.assembler.SeriesAssembler;
+import org.opencastproject.studio.endpoint.dto.SeriesDto;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -57,17 +56,29 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@RestService(name = "seriesservice", title = "Series Service",
-    abstractText = "This service creates, edits and retrieves and helps managing series.", notes = {
-    "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-    "If the service is down or not working it will return a status 503, this means the the "
-        + "underlying service is not working and is either restarting or has failed",
-    "A status code 500 means a general failure has occurred which is not recoverable and was "
-        + "not anticipated. In other words, there is a bug! You should file an error report "
-        + "with your server logs from the time when the error occurred: "
-        + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
-@Component(immediate = true, service = StudioEndpoint.class, property = { "service.description=Studio REST Endpoint",
-    "opencast.service.type=org.opencastproject.studio", "opencast.service.path=/studio-api" })
+@RestService(
+    name = "studioservice",
+    title = "Studio REST Endpoint",
+    abstractText = "The Internal studio API is not stable!",
+    notes = {
+        "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
+        "If the service is down or not working it will return a status 503, this means the the "
+            + "underlying service is not working and is either restarting or has failed",
+        "A status code 500 means a general failure has occurred which is not recoverable and was "
+            + "not anticipated. In other words, there is a bug! You should file an error report "
+            + "with your server logs from the time when the error occurred: "
+            + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
+    }
+)
+@Component(
+    immediate = true,
+    service = StudioEndpoint.class,
+    property = {
+        "service.description=Studio REST Endpoint",
+        "opencast.service.type=org.opencastproject.studio",
+        "opencast.service.path=/studio-api"
+    }
+)
 public class StudioEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(StudioEndpoint.class);
@@ -84,17 +95,26 @@ public class StudioEndpoint {
   @GET
   @Path("/series.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getSeries", description = "Returns series where the current user has write permissions.",
+  @RestQuery(
+      name = "getSeries",
+      description = "Returns all series for which the current user has write permissions.",
       returnDescription = "A list of JSON series objects",
       restParameters = {
-         @RestParameter(name = "filter", isRequired = false,
-          description = "Usage <Filter Name>:<Value to Filter With>. Filters can combine using a comma \",\"."
-            + " Available Filters: title, textFilter.", type = STRING),
+          @RestParameter(
+              name = "filter",
+              isRequired = false,
+              description = "Usage <Filter Name>:<Value to Filter With>. Filters can combine using a comma \",\"."
+                  + " Available Filters: title, textFilter.",
+              type = STRING
+          ),
       },
       responses = {
-      @RestResponse(description = "Returns a list of series.",
-          responseCode = HttpServletResponse.SC_OK)
-  })
+          @RestResponse(
+              description = "Returns a list of series.",
+              responseCode = HttpServletResponse.SC_OK
+          )
+      }
+  )
   public Response getSeries(@QueryParam("filter") String filter) {
     SeriesSearchQuery query = new SeriesSearchQuery(securityService.getOrganization().getId(),
         securityService.getUser());
@@ -103,10 +123,12 @@ public class StudioEndpoint {
 
     if (filter != null && !filter.isBlank()) {
       for (String f : filter.split(",")) {
-        String[] filterTuple = f.split(":",2);
+        String[] filterTuple = f.split(":", 2);
         if (filterTuple.length < 2) {
-          logger.info("Filter {} not valid: {}", filterTuple[0], filter);
-          continue;
+          throw new WebApplicationException(Response
+              .status(Response.Status.BAD_REQUEST)
+              .entity(String.format("Filter %s is not valid: %s", filterTuple[0], filter))
+              .build());
         }
         String name = filterTuple[0];
         String value = filterTuple[1];
@@ -116,18 +138,20 @@ public class StudioEndpoint {
         } else if ("textFilter".equals(name)) {
           query.withText("*" + value + "*");
         } else {
-          logger.warn("Unknown filter criteria {}", name);
-          return Response.status(SC_BAD_REQUEST).build();
+          throw new WebApplicationException(Response
+              .status(Response.Status.BAD_REQUEST)
+              .entity(String.format("Unknown filter criteria %s", name))
+              .build());
         }
       }
     }
 
     try {
-      return Response.ok(gson.toJson(Arrays.stream(elasticsearchIndex.getByQuery(query).getItems())
+      var items = Arrays.stream(elasticsearchIndex.getByQuery(query).getItems())
               .map(SearchResultItem::getSource)
-              .map(SeriesAssembler::toDto)
-              .collect(Collectors.toList())
-          )).build();
+              .map(SeriesDto::create)
+              .collect(Collectors.toList());
+      return Response.ok(gson.toJson(items)).build();
     } catch (SearchIndexException e) {
       throw new WebApplicationException(e);
     }
