@@ -94,7 +94,7 @@ This will be picked up by Nginx if it is used as reverse proxy and treated as an
 Thus, for this to work, there needs to be a matching internal location configuration like this:
 
 ```
-location /protected {
+location /protected/ {
   internal;
   alias /srv/opencast/downloads/;
 }
