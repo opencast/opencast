@@ -28,8 +28,8 @@ import org.opencastproject.assetmanager.impl.query.DeleteQueryContribution.Where
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
-import com.mysema.query.jpa.JPASubQuery;
-import com.mysema.query.types.expr.BooleanExpression;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.sql.SQLExpressions;
 
 /**
  * A place to share common predicate constructor methods for properties.

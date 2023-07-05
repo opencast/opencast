@@ -24,7 +24,7 @@ import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.Stream.empty;
 
 import com.entwinemedia.fn.Stream;
-import com.mysema.query.types.EntityPath;
+import com.querydsl.core.types.EntityPath;
 
 /**
  * Shortcuts to Querydsl entity paths.

@@ -38,13 +38,13 @@ import org.opencastproject.util.data.Function;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.SetB;
-import com.mysema.query.Tuple;
-import com.mysema.query.jpa.JPASubQuery;
-import com.mysema.query.jpa.impl.JPADeleteClause;
-import com.mysema.query.jpa.impl.JPAQueryFactory;
-import com.mysema.query.support.Expressions;
-import com.mysema.query.types.EntityPath;
-import com.mysema.query.types.expr.BooleanExpression;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.EntityPath;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPADeleteClause;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.sql.SQLExpressions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

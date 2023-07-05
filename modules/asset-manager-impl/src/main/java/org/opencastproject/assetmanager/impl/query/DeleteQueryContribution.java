@@ -26,8 +26,8 @@ import org.opencastproject.assetmanager.impl.persistence.QSnapshotDto;
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
-import com.mysema.query.types.EntityPath;
-import com.mysema.query.types.expr.BooleanExpression;
+import com.querydsl.core.types.EntityPath;
+import com.querydsl.core.types.dsl.BooleanExpression;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;

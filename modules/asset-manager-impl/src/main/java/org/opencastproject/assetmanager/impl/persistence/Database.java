@@ -35,14 +35,14 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.util.data.Function;
 
 import com.entwinemedia.fn.data.Opt;
-import com.mysema.query.Tuple;
-import com.mysema.query.jpa.EclipseLinkTemplates;
-import com.mysema.query.jpa.JPQLTemplates;
-import com.mysema.query.jpa.impl.JPADeleteClause;
-import com.mysema.query.jpa.impl.JPAQuery;
-import com.mysema.query.jpa.impl.JPAQueryFactory;
-import com.mysema.query.jpa.impl.JPAUpdateClause;
-import com.mysema.query.types.expr.BooleanExpression;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.EclipseLinkTemplates;
+import com.querydsl.jpa.JPQLTemplates;
+import com.querydsl.jpa.impl.JPADeleteClause;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.jpa.impl.JPAUpdateClause;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
