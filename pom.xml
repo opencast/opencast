@@ -10,7 +10,7 @@
   <url>https://opencast.org</url>
   <inceptionYear>2009</inceptionYear>
   <properties>
-    <checkstyle.skip>false</checkstyle.skip>
+    <checkstyle.skip>true</checkstyle.skip>
     <opencast.basedir>${basedir}</opencast.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

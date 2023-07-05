@@ -53,7 +53,7 @@ public class VersionFieldImpl extends AbstractSnapshotField<Version, Long> imple
    */
   private Predicate mkFirstLatestPredicate(boolean isLatest) {
     return mkPredicate(Q_SNAPSHOT.version.eq(
-            new JPASubQuery().from(Q_SNAPSHOT_ALIAS)
+            SQLExpressions.select(Q_SNAPSHOT_ALIAS)
                     .where(Q_SNAPSHOT_ALIAS.mediaPackageId.eq(Q_SNAPSHOT.mediaPackageId))
                     .unique(isLatest ? Q_SNAPSHOT_ALIAS.version.max() : Q_SNAPSHOT_ALIAS.version.min())));
   }

@@ -188,7 +188,22 @@
     <!-- contains javax.inject.Provider -->
     <dependency>
       <groupId>com.querydsl</groupId>
+      <artifactId>querydsl-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.querydsl</groupId>
       <artifactId>querydsl-apt</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.querydsl</groupId>
+      <artifactId>querydsl-jpa</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.querydsl</groupId>
+      <artifactId>querydsl-sql-spatial</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -208,7 +223,6 @@
             <ignoredUnusedDeclaredDependency>org.mnode.ical4j:ical4j</ignoredUnusedDeclaredDependency>
             <!-- commons-codec -->
             <ignoredUnusedDeclaredDependency>commons-codec:commons-codec</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>com.mysema.querydsl:querydsl-apt</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-list-providers-service</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>

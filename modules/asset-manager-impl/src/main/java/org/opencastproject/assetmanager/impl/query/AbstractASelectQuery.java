@@ -200,7 +200,7 @@ public abstract class AbstractASelectQuery implements ASelectQuery, SelectQueryC
     {
       // run query
       am.getDatabase().logQuery(q);
-      final List<Tuple> result = q.list(JpaFns.toExpressionArray(fetch));
+      final List<Tuple> result = q.select(JpaFns.toExpressionArray(fetch)).fetch();
       logger.debug("Pure query ms " + (System.nanoTime() - startTime) / 1000000);
       // map result based on the fact whether properties have been fetched or not
       if (!toFetchProperties) {

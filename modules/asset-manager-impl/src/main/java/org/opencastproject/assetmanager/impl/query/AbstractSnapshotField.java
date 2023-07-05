@@ -142,7 +142,7 @@ public abstract class AbstractSnapshotField<A, B extends Comparable> implements 
             if (from instanceof QSnapshotDto) {
               return where;
             } else if (from instanceof QPropertyDto) {
-              return new JPASubQuery().from(Q_SNAPSHOT)
+              return SQLExpressions.select(Q_SNAPSHOT)
                   .where(Q_SNAPSHOT.mediaPackageId.eq(Q_PROPERTY.mediaPackageId).and(where))
                   .exists();
             } else {
@@ -157,17 +157,17 @@ public abstract class AbstractSnapshotField<A, B extends Comparable> implements 
   /**
    * Create a predicate for comparisons with a constant value.
    */
-  private Predicate mkComparison(final Operator<? super Boolean> op, A right) {
-    return mkPredicate(BooleanOperation.create(op, path, ConstantImpl.create(extract(right))));
+  private Predicate mkComparison(final Operator op, A right) {
+    return mkPredicate(Expressions.booleanOperation(op, path, ConstantImpl.create(extract(right))));
   }
 
   /**
    * Create a predicate for comparisons with a property field.
    */
-  private Predicate mkComparison(final Operator<? super Boolean> op, final PropertyField<A> right) {
+  private Predicate mkComparison(final Operator op, final PropertyField<A> right) {
     return mkPredicate(PropertyPredicates.mkWhereSelect(right.name(), new Fn<QPropertyDto, Opt<BooleanExpression>>() {
       @Override public Opt<BooleanExpression> apply(QPropertyDto qPropertyDto) {
-        return Opt.some(BooleanOperation.create(op, path, RuntimeTypes.convert(right).getPath(qPropertyDto)));
+        return Opt.some(Expressions.booleanOperation(op, path, RuntimeTypes.convert(right).getPath(qPropertyDto)));
       }
     }));
   }
