@@ -26,7 +26,7 @@ import org.opencastproject.assetmanager.api.query.VersionField;
 import org.opencastproject.assetmanager.impl.RuntimeTypes;
 import org.opencastproject.assetmanager.impl.persistence.QSnapshotDto;
 
-import com.mysema.query.jpa.JPASubQuery;
+import com.querydsl.sql.SQLExpressions;
 
 public class VersionFieldImpl extends AbstractSnapshotField<Version, Long> implements VersionField {
   private static final QSnapshotDto Q_SNAPSHOT_ALIAS = new QSnapshotDto("s");

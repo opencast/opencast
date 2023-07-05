@@ -33,15 +33,13 @@ import org.opencastproject.assetmanager.impl.persistence.QSnapshotDto;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
-import com.mysema.query.jpa.JPASubQuery;
-import com.mysema.query.jpa.impl.JPAQueryFactory;
-import com.mysema.query.types.ConstantImpl;
-import com.mysema.query.types.EntityPath;
-import com.mysema.query.types.Operator;
-import com.mysema.query.types.Ops;
-import com.mysema.query.types.expr.BooleanExpression;
-import com.mysema.query.types.expr.BooleanOperation;
-import com.mysema.query.types.expr.ComparableExpressionBase;
+import com.querydsl.core.types.ConstantImpl;
+import com.querydsl.core.types.Operator;
+import com.querydsl.core.types.Ops;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.sql.SQLExpressions;
 
 /**
  * Generic implementation to query {@link org.opencastproject.assetmanager.impl.persistence.SnapshotDto} fields.

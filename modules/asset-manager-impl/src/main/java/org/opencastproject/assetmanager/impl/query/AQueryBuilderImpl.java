@@ -46,9 +46,9 @@ import org.opencastproject.util.RequireUtil;
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
-import com.mysema.query.jpa.impl.JPAQueryFactory;
-import com.mysema.query.support.Expressions;
-import com.mysema.query.types.expr.BooleanExpression;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import java.util.Date;
 
@@ -63,7 +63,7 @@ public final class AQueryBuilderImpl implements AQueryBuilder, EntityPaths {
     this.am = am;
   }
 
-  /** Convert a {@link Target} into a Querydsl {@link com.mysema.query.types.Expression}. */
+  /** Convert a {@link Target} into a Querydsl {@link com.querydsl.core.types.Expression}. */
   private static Fn<Target, SelectQueryContribution> contributeSelect(final JPAQueryFactory f) {
     return new Fn<Target, SelectQueryContribution>() {
       @Override public SelectQueryContribution apply(Target t) {

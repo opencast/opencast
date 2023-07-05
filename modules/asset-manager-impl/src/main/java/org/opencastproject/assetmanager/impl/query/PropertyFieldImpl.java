@@ -41,14 +41,14 @@ import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.ProductBuilder;
 import com.entwinemedia.fn.Products;
 import com.entwinemedia.fn.data.Opt;
-import com.mysema.query.jpa.JPASubQuery;
-import com.mysema.query.jpa.impl.JPAQueryFactory;
-import com.mysema.query.types.ConstantImpl;
-import com.mysema.query.types.Operator;
-import com.mysema.query.types.Ops;
-import com.mysema.query.types.Path;
-import com.mysema.query.types.expr.BooleanExpression;
-import com.mysema.query.types.expr.BooleanOperation;
+import com.querydsl.core.types.ConstantImpl;
+import com.querydsl.core.types.Operator;
+import com.querydsl.core.types.Ops;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.sql.SQLExpressions;
 
 import java.util.Date;
 

@@ -30,10 +30,10 @@ import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBTestEnv;
 import org.opencastproject.util.data.Function;
 
-import com.mysema.query.jpa.impl.JPADeleteClause;
-import com.mysema.query.jpa.impl.JPAQuery;
-import com.mysema.query.types.EntityPath;
-import com.mysema.query.types.Predicate;
+import com.com.querydsl.jpa.JPADeleteClause;
+import com.com.querydsl.jpa.JPAQuery;
+import com.querydsl.core.types.EntityPath;
+import com.querydsl.core.types.Predicate;
 
 import javax.persistence.EntityManager;
 

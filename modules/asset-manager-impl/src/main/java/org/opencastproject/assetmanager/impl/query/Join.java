@@ -21,8 +21,8 @@
 package org.opencastproject.assetmanager.impl.query;
 
 import com.entwinemedia.fn.Fn;
-import com.mysema.query.types.EntityPath;
-import com.mysema.query.types.expr.BooleanExpression;
+import com.querydsl.core.types.EntityPath;
+import com.querydsl.core.types.dsl.BooleanExpression;
 
 final class Join {
   // CHECKSTYLE:OFF

@@ -20,7 +20,7 @@
  */
 package org.opencastproject.assetmanager.impl.query;
 
-import com.mysema.query.types.expr.ComparableExpressionBase;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
 
 /**
  * Implementation of {@link AbstractSnapshotField} where business and database type are equal.

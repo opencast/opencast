@@ -26,7 +26,7 @@ import org.opencastproject.assetmanager.impl.persistence.EntityPaths;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.DefaultOrganization;
 
-import com.mysema.query.jpa.JPASubQuery;
+import com.querydsl.core.jpa.JPASubQuery;
 
 import org.junit.Test;
 

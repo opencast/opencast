@@ -55,7 +55,7 @@
     <org.osgi.service.http.whiteboard.version>1.1.1</org.osgi.service.http.whiteboard.version>
     <org.osgi.service.jaxrs.version>1.0.1</org.osgi.service.jaxrs.version>
     <pax.web.version>8.0.15</pax.web.version>
-    <querydsl.version>3.7.4</querydsl.version>
+    <querydsl.version>4.0.0</querydsl.version>
     <rest-assured.version>4.4.0</rest-assured.version>
     <spring.version>3.1.4.RELEASE</spring.version>
     <spring-security.version>3.1.7.RELEASE</spring-security.version>
@@ -1220,18 +1220,23 @@
       </dependency>
       <!-- Querydsl -->
       <dependency>
-        <groupId>com.mysema.querydsl</groupId>
+        <groupId>com.querydsl</groupId>
         <artifactId>querydsl-apt</artifactId>
         <version>${querydsl.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
-        <groupId>com.mysema.querydsl</groupId>
+        <groupId>com.querydsl</groupId>
         <artifactId>querydsl-jpa</artifactId>
         <version>${querydsl.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.mysema.querydsl</groupId>
+        <groupId>com.querydsl</groupId>
+        <artifactId>querydsl-sql-spatial</artifactId>
+        <version>${querydsl.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.querydsl</groupId>
         <artifactId>querydsl-core</artifactId>
         <version>${querydsl.version}</version>
       </dependency>

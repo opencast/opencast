@@ -20,7 +20,7 @@
  */
 package org.opencastproject.assetmanager.impl.query;
 
-import com.mysema.query.jpa.impl.JPAQueryFactory;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 /**
  * Implementations of this interface may contribute to a JPA query.
