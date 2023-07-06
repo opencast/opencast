@@ -114,7 +114,7 @@ public class TobiraEndpoint {
   private SeriesService seriesService;
   private Workspace workspace;
 
-  private JsonObject stats = null;
+  private JsonObject stats = new JsonObject();
 
   @Activate
   public void activate(BundleContext bundleContext) {
@@ -227,10 +227,10 @@ public class TobiraEndpoint {
       name = "stats",
       description = "Accepts a json blob of statistical data about Tobira.",
       restParameters = {},
-      bodyParameter = @RestParameter(description = "The job blob",
-                                     isRequired = true,
-                                     name = "BODY",
-                                     type = Type.STRING),
+      bodyParameter = @RestParameter(description = "The Tobira data blob",
+            isRequired = true,
+            name = "BODY",
+            type = Type.STRING),
       responses = {
           @RestResponse(description = "Stats parsed", responseCode = HttpServletResponse.SC_ACCEPTED)
       },
