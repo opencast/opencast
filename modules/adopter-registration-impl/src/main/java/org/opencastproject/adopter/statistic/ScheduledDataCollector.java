@@ -48,8 +48,6 @@ import org.opencastproject.tobira.impl.TobiraEndpoint;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
@@ -93,6 +91,8 @@ public class ScheduledDataCollector extends TimerTask {
 
   /* How many records to get from the search index at once */
   private static final int SEARCH_ITERATION_SIZE = 100;
+
+  private static final Gson gson = new Gson();
 
   //================================================================================
   // OSGi properties
@@ -236,14 +236,12 @@ public class ScheduledDataCollector extends TimerTask {
           StatisticData statisticData = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
           sender.sendStatistics(statisticData.jsonify());
           if (null != tobiraEndpoint) {
-            JsonObject tobiraJson = tobiraEndpoint.getStats();
+            String tobiraJson = tobiraEndpoint.getStats().toString();
             // This is null in the case that Tobira hasn't sent any stats yet.
             // This could be due to Tobira not existing, or because we've just rebooted.
             if (null != tobiraJson) {
-              JsonObject blob = new Gson().fromJson("{}", JsonElement.class).getAsJsonObject();
-              blob.addProperty("statistic_key", statisticData.getStatisticKey());
-              blob.add("data", tobiraJson);
-              sender.sendTobiraData(blob.toString());
+              sender.sendTobiraData(
+                  "{ \"statistic_key\": \"" + statisticData.getStatisticKey() + "\", \"data\": " + tobiraJson + " }");
             }
           }
           //Note: save the form (unmodified) (again!) to update the dates.  Old dates cause warnings to the user!
@@ -264,8 +262,10 @@ public class ScheduledDataCollector extends TimerTask {
     } else {
       statsJson = "{}";
     }
+    String tobiraJson = gson.toJson(tobiraEndpoint.getStats());
+
     //It's not stupid if it works!
-    return "{ \"general\":" + generalJson + ", \"statistics\":" + statsJson + "}";
+    return "{ \"general\":" + generalJson + ", \"statistics\":" + statsJson + ", \"tobira\":" + tobiraJson + "}";
   }
 
 
