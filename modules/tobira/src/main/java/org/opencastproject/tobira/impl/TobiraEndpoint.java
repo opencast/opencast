@@ -48,6 +48,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
@@ -107,6 +109,8 @@ public class TobiraEndpoint {
   private static final int VERSION_MAJOR = 1;
   private static final int VERSION_MINOR = 2;
   private static final String VERSION = VERSION_MAJOR + "." + VERSION_MINOR;
+
+  private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
   private static final Gson gson = new Gson();
 
@@ -239,7 +243,8 @@ public class TobiraEndpoint {
   public Response acceptStats(@Context HttpServletRequest request) {
     try (InputStream is = request.getInputStream()) {
       String json = IOUtils.toString(is, request.getCharacterEncoding());
-      stats = new Gson().fromJson(json, JsonElement.class).getAsJsonObject();
+      stats = gson.fromJson(json, JsonElement.class).getAsJsonObject();
+      stats.addProperty("updated", sdf.format(Calendar.getInstance().getTime()));
     } catch (IOException e) {
       logger.error("Error parsing Tobira stats blob", e);
       return Response.status(BAD_REQUEST).build();
