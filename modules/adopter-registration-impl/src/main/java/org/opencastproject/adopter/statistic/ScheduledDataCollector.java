@@ -58,6 +58,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -415,8 +416,15 @@ public class ScheduledDataCollector extends TimerTask {
     this.organizationDirectoryService = orgDirServ;
   }
 
-  @Reference(cardinality = ReferenceCardinality.OPTIONAL)
+  @Reference(
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "unsetTobiraEndpoint")
   public void setTobiraEndpoint(TobiraEndpoint endpoint) {
     this.tobiraEndpoint = endpoint;
+  }
+
+  public void unsetTobiraEndpoint(TobiraEndpoint endpoint) {
+    this.tobiraEndpoint = null;
   }
 }
