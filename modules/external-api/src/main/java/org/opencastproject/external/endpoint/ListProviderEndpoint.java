@@ -27,7 +27,6 @@ import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.list.impl.ListProviderNotFoundException;
 import org.opencastproject.list.impl.ResourceListQueryImpl;
-import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
@@ -48,7 +47,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 @Path("/")
@@ -113,25 +111,17 @@ public class ListProviderEndpoint {
           name = "getlanguages",
           description = "Returns a list of configured languages",
           returnDescription = "",
-          restParameters = {
-            @RestParameter(description = "The maximum number of items to return per page", isRequired = false, name = "limit", type = RestParameter.Type.INTEGER),
-            @RestParameter(description = "The offset", isRequired = false, name = "offset", type = RestParameter.Type.INTEGER),
-          },
           responses = {
                   @RestResponse(description = "The list is returned.", responseCode = HttpServletResponse.SC_OK),
           }
   )
   public Response getLanguages(
-          @QueryParam("limit") final int limit,
-          @QueryParam("offset") final int offset,
           @HeaderParam("Accept") String acceptHeader
   ) throws Exception {
 
     final String source = "LANGUAGES";
 
     ResourceListQueryImpl query = new ResourceListQueryImpl();
-    query.setLimit(limit);
-    query.setOffset(offset);
 
     return getList(source, query);
   }
@@ -142,25 +132,17 @@ public class ListProviderEndpoint {
           name = "getlicenses",
           description = "Returns a list of configured licenses",
           returnDescription = "",
-          restParameters = {
-                  @RestParameter(description = "The maximum number of items to return per page", isRequired = false, name = "limit", type = RestParameter.Type.INTEGER),
-                  @RestParameter(description = "The offset", isRequired = false, name = "offset", type = RestParameter.Type.INTEGER),
-          },
           responses = {
                   @RestResponse(description = "The list is returned.", responseCode = HttpServletResponse.SC_OK),
           }
   )
   public Response getLicenses(
-          @QueryParam("limit") final int limit,
-          @QueryParam("offset") final int offset,
           @HeaderParam("Accept") String acceptHeader
   ) throws Exception {
 
     final String source = "LICENSES";
 
     ResourceListQueryImpl query = new ResourceListQueryImpl();
-    query.setLimit(limit);
-    query.setOffset(offset);
 
     return getList(source, query);
   }
