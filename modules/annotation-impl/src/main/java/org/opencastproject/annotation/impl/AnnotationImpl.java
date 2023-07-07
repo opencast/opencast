@@ -205,7 +205,7 @@ public class AnnotationImpl implements Annotation {
   private Boolean privateAnnotation = false;
 
   @Lob
-  @Column(name = "value", length = 65535)
+  @Column(name = "\"value\"", length = 65535)
   @XmlElement(name = "value")
   private String value;
 
