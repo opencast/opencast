@@ -45,7 +45,6 @@ import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.identifier.IdImpl;
-import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
@@ -66,6 +65,8 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.Checksum;
+import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
@@ -83,7 +84,6 @@ import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -150,8 +150,6 @@ public class LiveScheduleServiceImplTest {
     EasyMock.expect(downloadDistributionService.getDistributionType())
             .andReturn(LiveScheduleServiceImpl.DEFAULT_LIVE_DISTRIBUTION_SERVICE).anyTimes();
     workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.put(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString(),
-            EasyMock.anyObject(InputStream.class))).andReturn(new URI("http://someUrl"));
     dublinCoreService = EasyMock.createNiceMock(DublinCoreCatalogService.class);
     assetManager = EasyMock.createNiceMock(AssetManager.class);
     authService = new AuthorizationServiceMock();
@@ -386,7 +384,7 @@ public class LiveScheduleServiceImplTest {
     Assert.assertEquals("http://10.10.10.50/static/mh_default_org/engage-live/security_policy_episode.xml",
             att.getURI().toString());
     Assert.assertEquals("security/xacml+episode", att.getFlavor().toString());
-    EasyMock.verify(downloadDistributionService, workspace);
+    EasyMock.verify(downloadDistributionService);
   }
 
   @Test
@@ -524,63 +522,36 @@ public class LiveScheduleServiceImplTest {
     mp2.setDuration(DURATION);
     service.addLiveTracksToMediaPackage(mp2, episodeDC);
 
-    // Change title
-    String previous = mp2.getTitle();
-    mp2.setTitle("Changed");
-    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
-    mp2.setTitle(previous);
-    // Change language
-    previous = mp2.getLanguage();
-    mp2.setLanguage("Changed");
-    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
-    mp2.setLanguage(previous);
-    // Change series
-    previous = mp2.getSeries();
-    mp2.setSeries("Changed");
-    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
-    mp2.setSeries(previous);
-    // Change series title
-    previous = mp2.getSeriesTitle();
-    mp2.setSeriesTitle("Changed");
-    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
-    mp2.setSeriesTitle(previous);
-    // Change date
-    Date dt = mp2.getDate();
-    mp2.setDate(new Date());
-    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
-    mp2.setDate(dt);
-    // Change creators
-    mp2.addCreator("New object");
-    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
-    mp2.removeCreator("New object");
-    // Change contributors
-    mp2.addContributor("New object");
-    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
-    mp2.removeContributor("New object");
-    // Change subjects
-    mp2.addSubject("New object");
-    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
-    mp2.removeSubject("New object");
     // Change track uri
     Track track = mp2.getTracks()[0];
     URI previousURI = track.getURI();
     track.setURI(new URI("http://new.url.com"));
     Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
     track.setURI(previousURI);
-    // Change duration
-    long duration = mp2.getDuration();
-    for (Track t : mp2.getTracks()) {
-      ((TrackImpl) t).setDuration(1L);
-    }
-    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
-    for (Track t : mp2.getTracks()) {
-      ((TrackImpl) t).setDuration(duration);
-    }
+    Assert.assertTrue(service.isSameMediaPackage(mp1, mp2));
+
     // Change number of tracks
     track = (Track) mp2.getTracks()[0].clone();
     mp2.remove(track);
     Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
     mp2.add(track);
+    Assert.assertTrue(service.isSameMediaPackage(mp1, mp2));
+
+    // Change catalog checksum
+    Catalog catalog = mp2.getCatalogs()[0];
+    Checksum previousChecksum = catalog.getChecksum();
+    catalog.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, "123456abcd"));
+    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
+    catalog.setChecksum(previousChecksum);
+    Assert.assertTrue(service.isSameMediaPackage(mp1, mp2));
+
+    // Change attachment flavor
+    Attachment attachment = mp2.getAttachments()[0];
+    MediaPackageElementFlavor previousFlavor = attachment.getFlavor();
+    attachment.setFlavor(MediaPackageElementFlavor.parseFlavor("test/test"));
+    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
+    attachment.setFlavor(previousFlavor);
+    Assert.assertTrue(service.isSameMediaPackage(mp1, mp2));
   }
 
   @Test

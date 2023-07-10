@@ -19,11 +19,12 @@
  *
  */
 import { ButtonPlugin } from 'paella-core';
+import { getUrlFromOpencastServer } from './PaellaOpencast';
 
 export default class OpencastAuthButtonPlugin extends ButtonPlugin {
   async _getUserInfo() {
     try {
-      const response = await fetch('/info/me.json');
+      const response = await fetch(getUrlFromOpencastServer('/info/me.json'));
       if (response.ok) {
         return await response.json();
       }
@@ -36,7 +37,7 @@ export default class OpencastAuthButtonPlugin extends ButtonPlugin {
 
   async _getEpisodeACL() {
     try {
-      const response = await fetch(`/search/episode.json?id=${this.player.videoId}`);
+      const response = await fetch(getUrlFromOpencastServer(`/search/episode.json?id=${this.player.videoId}`));
       if (response.ok) {
         const episode = await response.json();
         return episode['search-results']?.result?.acl;
@@ -54,7 +55,7 @@ export default class OpencastAuthButtonPlugin extends ButtonPlugin {
       if (!series) {
         return null;
       }
-      const response = await fetch(`/series/${series}/acl.json`);
+      const response = await fetch(getUrlFromOpencastServer(`/series/${series}/acl.json`));
       if (response.ok) {
         return await response.json();
       }

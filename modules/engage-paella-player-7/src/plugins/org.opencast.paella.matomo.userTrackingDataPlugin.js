@@ -19,6 +19,7 @@
  *
  */
 import { MatomoUserTrackingDataPlugin } from 'paella-user-tracking';
+import { getUrlFromOpencastServer } from '../js/PaellaOpencast';
 
 export default class OpencastMatomoUserTrackingDataPlugin extends MatomoUserTrackingDataPlugin {
 
@@ -27,7 +28,7 @@ export default class OpencastMatomoUserTrackingDataPlugin extends MatomoUserTrac
       if (this.config.logUserId) {
 
         if (this.opencast_username === undefined) {
-          const data = await fetch('/info/me.json');
+          const data = await fetch(getUrlFromOpencastServer('/info/me.json'));
           const me = await data.json();
           if ((me?.roles?.length == 1) && (me.roles[0] == me.org.anonymousRole)) {
             this.opencast_username = null;

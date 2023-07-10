@@ -30,7 +30,7 @@ import TagIcon from '../icons/tag.svg';
 
 export default class OpencastPaellaVersionPlugin extends PopUpButtonPlugin {
   async load() {
-    this.icon = TagIcon;
+    this.icon = this.player.getCustomPluginIcon(this.name, 'buttonIcon') || TagIcon;
   }
 
   async getContent() {

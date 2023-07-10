@@ -55,7 +55,7 @@ export default class CookieConsentButtonPlugin extends ButtonPlugin {
   }
 
   async load() {
-    this.icon = this.player.getCustomPluginIcon(this.name, 'cookieIcon') || defaultCookieIcon;
+    this.icon = this.player.getCustomPluginIcon(this.name, 'buttonIcon') || defaultCookieIcon;
   }
 
   async action() {

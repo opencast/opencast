@@ -59,6 +59,10 @@
       <artifactId>jetty-servlet</artifactId>
       <version>9.4.20.v20190813</version>
     </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

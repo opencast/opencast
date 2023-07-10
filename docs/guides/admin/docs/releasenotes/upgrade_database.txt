@@ -1,5 +1,0 @@
-Database Migration
-------------------
-
-You can find database upgrade scripts in `docs/upgrade/13_to_14/`. These scripts are suitable for both, MariaDB and
-PostgreSQL. Changes include DB schema optimizations as well as fixes for the new workflow tables.

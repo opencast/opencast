@@ -37,6 +37,7 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-inspection-workflowoperation</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -77,6 +78,7 @@
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

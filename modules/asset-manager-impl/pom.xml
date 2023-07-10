@@ -98,6 +98,7 @@
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -128,6 +129,10 @@
     <dependency>
       <groupId>com.mysema.querydsl</groupId>
       <artifactId>querydsl-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
     </dependency>
     <!--
       - JPA
@@ -179,7 +184,7 @@
     <dependency>
       <groupId>org.mutabilitydetector</groupId>
       <artifactId>MutabilityDetector</artifactId>
-      <version>0.10.2</version>
+      <version>0.10.6</version>
       <scope>test</scope>
     </dependency>
     <dependency>

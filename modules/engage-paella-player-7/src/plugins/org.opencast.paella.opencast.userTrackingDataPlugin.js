@@ -19,12 +19,16 @@
  *
  */
 import { DataPlugin, Events } from 'paella-core';
+import { getUrlFromOpencastServer } from '../js/PaellaOpencast';
 
 export default class OpencastUserTrackingDataPlugin extends DataPlugin {
 
   async isEnabled() {
     try {
-      const response = await fetch('/usertracking/detailenabled');
+      if (!(await super.isEnabled())) {
+        return false;
+      }
+      const response = await fetch(getUrlFromOpencastServer('/usertracking/detailenabled'));
       const data = await response.text();
       const enabled = /true/i.test(data);
       return enabled;
@@ -73,7 +77,7 @@ export default class OpencastUserTrackingDataPlugin extends DataPlugin {
 
     const params = (new URLSearchParams(opencastLog)).toString();
     const requestUrl = `/usertracking/?_method=PUT&${ params }`;
-    const result = await fetch(requestUrl);
+    const result = await fetch(getUrlFromOpencastServer(requestUrl));
     if (!result.ok) {
       this.player.log.error('Error in user data log');
     }

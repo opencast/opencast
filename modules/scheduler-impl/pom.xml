@@ -59,6 +59,7 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-authorization-xacml</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -102,6 +103,7 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient-osgi</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>

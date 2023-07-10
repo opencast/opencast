@@ -31,11 +31,12 @@
       <artifactId>slf4j-log4j12</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- Testing -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
+      <scope>test</scope>
     </dependency>
-    <!-- Testing -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

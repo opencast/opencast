@@ -22,10 +22,12 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient-osgi</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore-osgi</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jaxb</groupId>

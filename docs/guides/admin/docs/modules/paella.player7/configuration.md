@@ -28,10 +28,61 @@ The configurations for the player are done for each tenant. So the configuration
 
 The default tenant for opencast is `mh_default_org`
 
-Change the default colors
--------------------------
+Customize the player
+--------------------
 
-To customize the theme modify the `.../etc/ui-config/<tenant>/paella7/custom_theme.css` file.
+Paella player can be customized using skin packages.
+
+Skin packages contain at least one skin configuration file, and additionally other files that are specified in the skin definition. The skin definition file is a `json` file with the following structure:
+
+```json
+{
+    "styleSheets": [
+        "style.css"
+    ],
+    "configOverrides": {
+        "progressIndicator": {
+            "inlineMode": true
+        },
+        "videoContainer": {
+            "overPlaybackBar": true
+        }
+    },
+    "icons": [
+        {
+            "plugin": "es.upv.paella.playPauseButton",
+            "identifier": "play",
+            "icon": "play-icon.svg"
+        }
+    ]
+}
+```
+
+The skin definition file is divided into three sections:
+
+- `styleSheets`: an array containing the list of style sheet files to be included when the skin is loaded. The file paths included here are relative to the skin definition file.
+- `configOverrides`: is a json with the same properties as the main configuration file. It should be noted that in this section it is possible to include any configuration option, and not only those related to the user interface. For example: it is possible to define plugins configuration. The elements defined in this section overwrite any attribute that also exists in the main configuration file. It is important to note that configuration attributes of type array overwrite the entire array defined in the configuration, i.e. they are not added to the main array, but replaced.
+- `icons`: is an array with the list of custom icons, in the form of objects with attributes `plugin`, `identifier` and `icon`. The file paths included here are relative to the skin definition file.
+
+For more information, see the paella 7 [skin documentation](https://paellaplayer.upv.es/#/doc/skin_api.md).
+
+You can create a new folder for you theme in `.../etc/ui-config/<tenant>/paella7/` with a file called `theme.json` and configure the theme you want to use in `config.json` file:
+
+```json
+{
+    ...
+    "opencast": {
+        "theme": "custom_theme"
+        ...
+    }
+    ...
+}
+```
+
+And create your custom theme: `.../etc/ui-config/<tenant>/paella7/custom_theme/theme.json`.
+As an example there is a basic example here: `.../etc/ui-config/<tenant>/paella7/custom_theme_example`
+
+If no custom theme is found or there is an error loading the resources, the default opencast theme will be used.
 
 Select the Opencast Player
 ------------------------------
