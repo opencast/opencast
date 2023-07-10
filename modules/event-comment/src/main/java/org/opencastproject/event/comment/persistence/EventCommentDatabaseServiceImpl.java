@@ -431,7 +431,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
 
                       if (updatedEventRange.size() >= n || i >= eventsWithComments.get(orgId).size()) {
                         index.bulkEventUpdate(updatedEventRange);
-                        logIndexRebuildProgress(logger, index.getIndexName(), total, current[0]);
+                        logIndexRebuildProgress(logger, index.getIndexName(), total, current[0], n);
                         updatedEventRange.clear();
                       }
                     } catch (Throwable t) {
