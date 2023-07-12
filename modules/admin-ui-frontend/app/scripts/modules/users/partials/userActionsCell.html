@@ -10,6 +10,6 @@
    data-object="row"
    class="remove"
    title="{{ 'USERS.USERS.TABLE.TOOLTIP.DELETE' | translate }}"
-   ng-if="row.manageable"
+   ng-if="row.manageable || ( row.provider != 'opencast' && row.provider != 'system' )"
    with-role="ROLE_UI_USERS_DELETE">
 </a>
