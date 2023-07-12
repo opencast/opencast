@@ -2205,7 +2205,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
               if (updatedWorkflowRange.size() >= n || current >= total) {
                 index.bulkEventUpdate(updatedWorkflowRange);
-                logIndexRebuildProgress(logger.getSlf4jLogger(), index.getIndexName(), total, current);
+                logIndexRebuildProgress(logger.getSlf4jLogger(), index.getIndexName(), total, current, n);
                 updatedWorkflowRange.clear();
               }
 
