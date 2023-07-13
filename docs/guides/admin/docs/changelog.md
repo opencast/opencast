@@ -5,6 +5,20 @@ Changelog
 Opencast 14
 -----------
 
+### Opencast 14.1
+
+*Released on July 13th, 2023*
+
+- [[#5109](https://github.com/opencast/opencast/pull/5109)] -
+  Paella Player 7 URL parameters documentation fixed
+- [[#5065](https://github.com/opencast/opencast/pull/5065)] -
+  Update Opencast 14 RPM Docs
+- [[#5053](https://github.com/opencast/opencast/pull/5053)] -
+  Paella7 fix trimming url params
+- [[#5037](https://github.com/opencast/opencast/pull/5037)] -
+  Switch to Opensearch by default
+
+
 ### Opencast 14.0
 
 *Released on June 22th, 2023*
