@@ -48,6 +48,7 @@ import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
+import org.opencastproject.userdirectory.JpaUserReferenceProvider;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SmartIterator;
 import org.opencastproject.util.UrlSupport;
@@ -124,6 +125,9 @@ public class UsersEndpoint {
 
   /** The internal role and user provider */
   private JpaUserAndRoleProvider jpaUserAndRoleProvider;
+
+  /** The internal user reference provider */
+  private JpaUserReferenceProvider jpaUserReferenceProvider;
 
   /** The security service */
   private SecurityService securityService;
@@ -420,6 +424,8 @@ public class UsersEndpoint {
           @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.") })
   public Response deleteUser(@PathParam("username") String username) throws NotFoundException {
     Organization organization = securityService.getOrganization();
+    boolean userReferenceNotFound = false;
+    boolean userNotFound = false;
 
     try {
       if (workflowService.userHasActiveWorkflows(username)) {
@@ -431,9 +437,22 @@ public class UsersEndpoint {
       return Response.status(SC_INTERNAL_SERVER_ERROR).build();
     }
 
-
     try {
-      jpaUserAndRoleProvider.deleteUser(username, organization.getId());
+      try {
+        jpaUserAndRoleProvider.deleteUser(username, organization.getId());
+      } catch (NotFoundException e) {
+        userReferenceNotFound = true;
+      }
+      try {
+        jpaUserAndRoleProvider.deleteUser(username, organization.getId());
+      } catch (NotFoundException e) {
+        userNotFound = true;
+      }
+
+      if (userNotFound && userReferenceNotFound) {
+        throw new NotFoundException();
+      }
+
       userDirectoryService.invalidate(username);
     } catch (NotFoundException e) {
       logger.debug("User {} not found.", username);
