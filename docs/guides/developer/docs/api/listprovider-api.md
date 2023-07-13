@@ -4,45 +4,44 @@
 
 The ListProvider API is available since API version 1.10.0.
 
-### GET /api/listproviders/languages
+### GET /api/listproviders/providers.json
 
-Returns a list of languages as configured in the listproviders.
+Returns a list of listproviders.
 
 __Response__
 
-`200 (OK)`: The languages are returned as key value pairs in a JSON object.
+`200 (OK)`: The listproviders are returned as a list.
 
 Field     | Type                       | Description
 :---------|:---------------------------|:-----------
-`key `    | [`string`](types.md#basic) | Three letter ISO language codes
-`value`   | [`string`](types.md#basic) | The translation string used in the Opencast Admin UI
+`value`   | [`string`](types.md#basic) | The string used to identify a provider, e.g. "LANGUAGES"
 
 
 __Example__
 
 ```
 {
-  "dan": "LANGUAGES.DANISH",
-  "nor": "LANGUAGES.NORWEGIAN",
-  "tur": "LANGUAGES.TURKISH",
+  "LICENSES",
+  "LANGUAGES",
+  "SERIES",
 }
 ```
 
-### GET /api/listproviders/licenses
+### GET /api/listproviders/{source}.json
 
-Returns a list of licenses as configured in the listproviders.
+Provides key-value list from the given listprovider.
 
 __Response__
 
-`200 (OK)`: The licenses are returned as key value pairs in a JSON object.
+`200 (OK)`: The key-value list are returned as a JSON object.
 
 Field     | Type                       | Description
 :---------|:---------------------------|:-----------
-`key `    | [`string`](types.md#basic) | Three license codes
-`value`   | [`object`](types.md#basic) | An object containing information for display in the Opencast Admin UI
+`key `    | [`string`](types.md#basic) | Source key
+`value`   | [`object`](types.md#basic) | Source value
 
 
-__Example__
+__Example for "LICENSES"__
 
 ```
 {

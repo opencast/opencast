@@ -30,7 +30,9 @@ import org.opencastproject.list.api.ResourceListQuery;
 import org.easymock.EasyMock;
 import org.junit.Ignore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.Path;
@@ -40,6 +42,11 @@ import javax.ws.rs.Path;
 public class TestListProviderEndpoint extends ListProviderEndpoint {
 
   public TestListProviderEndpoint() throws Exception {
+    List<String> providers = new ArrayList<>();
+    providers.add("LANGUAGES");
+    providers.add("LICENSES");
+    providers.add("YES");
+
     Map<String, String> languages = new HashMap<>();
     languages.put("ara", "LANGUAGES.ARABIC");
     languages.put("dan", "LANGUAGES.DANISH");
@@ -51,6 +58,7 @@ public class TestListProviderEndpoint extends ListProviderEndpoint {
     licenses.put("CC-BY-NC-ND", "{\"label\":\"EVENTS.LICENSE.CCBYNCND\", \"order\":7, \"selectable\": true}");
 
     ListProvidersService service = createNiceMock(ListProvidersService.class);
+    expect(service.getAvailableProviders()).andReturn(providers);
     expect(service.getList(EasyMock.matches("LANGUAGES"), EasyMock.anyObject(ResourceListQuery.class),
             EasyMock.anyBoolean())).andReturn(languages);
     expect(service.getList(EasyMock.matches("LICENSES"), EasyMock.anyObject(ResourceListQuery.class),

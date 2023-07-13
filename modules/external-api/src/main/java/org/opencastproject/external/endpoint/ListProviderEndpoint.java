@@ -24,15 +24,17 @@ import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
-import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.list.impl.ListProviderNotFoundException;
 import org.opencastproject.list.impl.ResourceListQueryImpl;
+import org.opencastproject.list.query.StringListFilter;
+import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import com.google.gson.Gson;
 
+import org.json.simple.JSONArray;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -44,9 +46,13 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/")
@@ -86,8 +92,33 @@ public class ListProviderEndpoint {
     logger.info("Activating External API - List Providers Endpoint");
   }
 
+  @GET
+  @Path("providers.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "availableProviders", description = "Provides the list of the available list providers", responses = { @RestResponse(description = "Returns the availables list providers.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  public Response getAvailablesProviders(@Context HttpHeaders headers) {
+    JSONArray list = new JSONArray();
 
-  private Response getList(String source, ResourceListQuery query) {
+    list.add(listProvidersService.getAvailableProviders());
+
+    return Response.ok(list.toString()).build();
+  }
+
+  @GET
+  @Path("{source}.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "list", description = "Provides key-value list from the given source", pathParameters = { @RestParameter(name = "source", description = "The source for the key-value list", isRequired = true, type = RestParameter.Type.STRING) }, restParameters = {
+          @RestParameter(description = "The maximum number of items to return per page", isRequired = false, name = "limit", type = RestParameter.Type.INTEGER),
+          @RestParameter(description = "The offset", isRequired = false, name = "offset", type = RestParameter.Type.INTEGER),
+          @RestParameter(description = "Filters", isRequired = false, name = "filter", type = RestParameter.Type.STRING) }, responses = { @RestResponse(description = "Returns the key-value list for the given source.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  public Response getList(@PathParam("source") final String source, @QueryParam("limit") final int limit,
+          @QueryParam("filter") final String filter, @QueryParam("offset") final int offset,
+          @Context HttpHeaders headers) {
+
+    ResourceListQueryImpl query = new ResourceListQueryImpl();
+    query.setLimit(limit);
+    query.setOffset(offset);
+    addRequestFiltersToQuery(filter, query);
     Map<String, String> autocompleteList;
     try {
       autocompleteList = listProvidersService.getList(source, query, false);
@@ -99,52 +130,32 @@ public class ListProviderEndpoint {
       return ApiResponses.serverError("");
     }
 
-
     Gson gson = new Gson();
     String jsonList = gson.toJson(autocompleteList);
     return Response.ok(jsonList).build();
   }
 
-  @GET
-  @Path("languages")
-  @RestQuery(
-          name = "getlanguages",
-          description = "Returns a list of configured languages",
-          returnDescription = "",
-          responses = {
-                  @RestResponse(description = "The list is returned.", responseCode = HttpServletResponse.SC_OK),
-          }
-  )
-  public Response getLanguages(
-          @HeaderParam("Accept") String acceptHeader
-  ) throws Exception {
-
-    final String source = "LANGUAGES";
-
-    ResourceListQueryImpl query = new ResourceListQueryImpl();
-
-    return getList(source, query);
+  /**
+   * Add the string based filters to the given list query.
+   *
+   * @param filterString
+   *          The string based filters
+   * @param query
+   *          The query to update with the filters
+   */
+  private void addRequestFiltersToQuery(final String filterString, ResourceListQueryImpl query) {
+    if (filterString != null) {
+      String[] filters = filterString.split(",");
+      for (String filter : filters) {
+        String[] splitFilter = filter.split(":", 2);
+        if (splitFilter != null && splitFilter.length == 2) {
+          String key = splitFilter[0].trim();
+          String value = splitFilter[1].trim();
+          query.addFilter(new StringListFilter(key, value));
+        }
+      }
+    }
   }
 
-  @GET
-  @Path("licenses")
-  @RestQuery(
-          name = "getlicenses",
-          description = "Returns a list of configured licenses",
-          returnDescription = "",
-          responses = {
-                  @RestResponse(description = "The list is returned.", responseCode = HttpServletResponse.SC_OK),
-          }
-  )
-  public Response getLicenses(
-          @HeaderParam("Accept") String acceptHeader
-  ) throws Exception {
-
-    final String source = "LICENSES";
-
-    ResourceListQueryImpl query = new ResourceListQueryImpl();
-
-    return getList(source, query);
-  }
 }
 
