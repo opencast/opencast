@@ -2,7 +2,8 @@
 
 ## Opencast 14.1
 
-Opencast 14.1 is a minor release, containing documentation improvements and Paella Player 7 trimming URL parameter fix. For more details, make sure to check out the [documentation](modules/paella.player7/url.parameter.md).
+Opencast 14.1 is a minor release, containing documentation improvements and Paella Player 7 trimming URL parameter fix.
+For more details, make sure to check out the [documentation](modules/paella.player7/url.parameter.md).
 
 See [changelog](changelog.md#opencast-14.1) for a comprehensive list of changes.
 
