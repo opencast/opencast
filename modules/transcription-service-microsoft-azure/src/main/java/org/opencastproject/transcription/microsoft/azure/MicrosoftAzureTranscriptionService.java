@@ -764,6 +764,8 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
             logger.warn(e.getMessage(), e);
           } catch (NotFoundException e) {
             logger.warn("Unable to load organization.", e);
+          } catch (IllegalStateException e) {
+            logger.debug(e.getMessage());
           }
         }
         // cleanup all old jobs
