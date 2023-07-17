@@ -18,6 +18,8 @@
  * the License.
  *
  */
+import { translate } from 'paella-core';
+
 /* eslint no-console: "warn" */
 const g_contentTypes = {
   'presentation/delivery': 'presentation',
@@ -320,7 +322,7 @@ function readCaptions(potentialNewCaptions, captions) {
               captions_lang = tag.substring('lang:'.length);
             }
             if (tag.startsWith('generator-type:') && tag.substring('generator-type:'.length) === 'auto') {
-              captions_generated = ' (automatically generated)';
+              captions_generated = ' (' + translate('automatically generated') + ')';
             }
             if (tag.startsWith('type:') && tag.substring('type:'.length) === 'closed-caption') {
               captions_closed = '[CC] ';
@@ -334,10 +336,10 @@ function readCaptions(potentialNewCaptions, captions) {
           captions_format = captions_subtype;
         }
 
-        let captions_description = undefined;
+        let captions_description = translate('Undefined caption');
         if (captions_lang) {
           let languageNames = new Intl.DisplayNames([window.navigator.language], {type: 'language'});
-          let captions_language_name = languageNames.of(captions_lang) || 'unknown language';
+          let captions_language_name = languageNames.of(captions_lang) || translate('Unknown language');
           captions_description = captions_closed + captions_language_name + captions_generated;
         }
 

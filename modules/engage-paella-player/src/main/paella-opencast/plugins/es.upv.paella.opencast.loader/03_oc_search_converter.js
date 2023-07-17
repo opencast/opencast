@@ -404,7 +404,7 @@ class OpencastToPaellaConverter {
                 captions_lang = tag.substring('lang:'.length);
               }
               if (tag.startsWith('generator-type:') && tag.substring('generator-type:'.length) === 'auto') {
-                captions_generated = ' (automatically generated)';
+                captions_generated = ' (' + paella.utils.dictionary.translate('CAPTIONS_auto_generated') + ')';
               }
               if (tag.startsWith('type:') && tag.substring('type:'.length) === 'closed-caption') {
                 captions_closed = '[CC] ';
@@ -414,10 +414,11 @@ class OpencastToPaellaConverter {
 
           let captions_format = potentialCaption.url.split('.').pop();
 
-          let captions_description = undefined;
+          let captions_description = paella.utils.dictionary.translate('CAPTIONS_undefined');
           if (captions_lang) {
             let languageNames = new Intl.DisplayNames([window.navigator.language], {type: 'language'});
-            let captions_language_name = languageNames.of(captions_lang) || 'unknown language';
+            let captions_language_name = languageNames.of(captions_lang) ||
+              paella.utils.dictionary.translate('CAPTIONS_unknown_language');
             captions_description = captions_closed + captions_language_name + captions_generated;
           }
 
