@@ -44,7 +44,7 @@ Three source types are enabled by default for use in the Admin UI.
         "type":"track",\
         "flavorType": "captions",\
         "flavorSubType": "source",\
-        "tags": "generator:false",\
+        "tags": "generator:unknown",\
         "displayOrder":3,\
         "accept": ".vtt"}
 
@@ -106,7 +106,7 @@ publish, and archive uploaded assets on existing events.
         "flavorType": "presentation","flavorSubType": "source", "multiple":false, "displayOrder":2,
         "accept": ".avi,.flv,.m4v,.mkv,.mov,.mp4,.mpeg,.mpg,.ogv,.webm,.wmv,.flac,.m4a,.mp3,.ogg,.wav,.wma,.f4v"}
     EVENTS.EVENTS.NEW.SOURCE.UPLOAD.SUBTITLES={"id": "track_subtitles", "type":"track",
-        "flavorType": "captions", "flavorSubType": "source", "tags": "generator:false", "displayOrder":3,
+        "flavorType": "captions", "flavorSubType": "source", "tags": "generator:unknown", "displayOrder":3,
         "accept": ".vtt"}
     # The MULTIPLE_PARTS example shows how to enable choosing multiple source files for a single flavor. In this case, a fictional "multipart/part+source".
     # EVENTS.EVENTS.NEW.SOURCE.UPLOAD.MULTIPLE_PARTS={"id": "track_parts","type":"track", "flavorType": "multipart",
