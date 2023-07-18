@@ -46,6 +46,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -90,12 +91,11 @@ import javax.ws.rs.core.MediaType;
     notes = {}
 )
 @Component(
-    immediate = true,
     service = RuntimeInfo.class,
     property = {
         "service.description=Runtime Information REST Endpoint",
         "opencast.service.type=org.opencastproject.info",
-        "opencast.service.path=/info"
+        "opencast.service.path=/info",
     }
 )
 public class RuntimeInfo {
@@ -159,6 +159,7 @@ public class RuntimeInfo {
     return bundleContext.getAllServiceReferences(Servlet.class.getName(), "(&(alias=*)(classpath=*))");
   }
 
+  @Activate
   public void activate(ComponentContext cc) throws MalformedURLException {
     logger.debug("start()");
     this.bundleContext = cc.getBundleContext();

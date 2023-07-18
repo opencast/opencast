@@ -46,17 +46,88 @@ The Opencast AWS S3 Archive service configuration can be found in the
 Using S3 Archiving
 ------------------
 
-There are two major methods to access S3 archiving features: manually, and via a workflow.  Amazon S3 archiving is not
-part of the default workflows and manual S3 offload is disabled by default.  To enable manual S3 offload you must edit
-the `offload.xml` workflow configuration file and change `var s3Enabled = false;` to `var s3Enabled = true;`.  To
-manually offload a media package follow the directions in the user documentation.
+S3 archiving is done on a Snapshot level, that is a mediapackage ID + version.  Because of the way that the Asset
+Manager handles snapshots, all newly created snapshots are *always* local.  Creating a snapshot of a mediapackage with
+non local data will download *all* related snapshots for that mediapackage which can incur significant costs.  S3
+archiving is meant to be a cost reduction, and storage expansion tool, rather than hot storage where lots of reads and
+writes will occur.  Therefore, most adopters do not want to immediately (ie, at the end of your default workflow)
+offload your recordings to S3!  Instead, we suggest using the `TimedMediaArchiver` as configured in
+`/etc/org.opencastproject.assetmanager.impl.TimedMediaArchiver.cfg` to offload your recordings after sufficient time that
+further modification of the recording is unlikely.
 
-To automatically offload a media package to S3 you must add the `move-storage` workflow operation to your workflow.
-The operation documentation can be found [here](../workflowoperationhandlers/move-storage-woh.md).
+If you do need to create an additional workflow, a substantially better approach than restoring snapshots involves
+using the [ingest-download](../workflowoperationhandlers/ingestdownload-woh.md) workflow operation handler to download
+the relevant file(s) to the local workspace.  This dramatically speeds up snapshotting, and allows the operations which
+require local files to work properly without having to restore everything, and then re-archive to S3.
 
-Migrating to S3 Archiving with Pre-Existing Data
----------------------------------------------------
+Manual S3 Archiving
+-------------------
 
-Archiving to S3 is a non-destructive operation in that it is safe to move archive files back and forth between local
-storage and S3.  To offload your local archive, select the workflow(s) and follow the manual offload steps described in
-the user documentation.
+Manually moving assets to and from S3 is done via a workflow operation handler added as part of a workflow.
+The workflow operation handler definition looks like this
+```
+    <operation
+      id="move-storage"
+      description="Offloading to AWS S3">
+      <configurations>
+        <configuration key="target-storage">aws-s3</configuration>
+      </configurations>
+    </operation>
+```
+
+Assets in S3 continue to be accessible to Opencast, however there may be cases where you wish to restore your content
+back to your local storage.  This can be accomplished using the same workflow operation definition as above, and
+changing the `target-storage` configuration value from `aws-s3` to `local-filesystem` like so
+```
+    <operation
+      id="move-storage"
+      description="Restoring from AWS S3">
+      <configurations>
+        <configuration key="target-storage">local-filesystem</configuration>
+      </configurations>
+    </operation>
+```
+
+
+S3 Storage Tiers
+================
+
+S3 supports [storage tiering](https://aws.amazon.com/s3/storage-classes/), which can offer significant cost savings in
+return for substantially increased access times.  Opencast does not directly expose this functionality in the UI, but
+support is present in the back end.  Both manual, and Lifecycle based storage tiering are supported, as are all tiers.
+Attempting to retrieve an asset will trigger a restore to the standard S3 tier, if appropriate, and then return the
+file contents.  For more on cold storage, see below.
+
+
+S3 Glacier Flexible Retrieval and Deep Archive
+----------------------------------------------
+
+The Glacier FR and Deep Archive (known as Cold Storage going forward) storage classes are supported, however they have
+a significant drawback at this point: Opencast does not understand that these files are not immediately accessible.
+Attempts to process a workflow containing assets will trigger a restore of the file, but then likely fail the workflow
+after some time.  This because some Opencast configurations use HTTP(S) downloading to transfer the files between
+processing nodes, and those transfers *will* time out when access times for the media files are measured in hours.
+Note that these failures will not harm your Opencast system, but they will cost you money because of the potentially
+wasted restores.
+
+A better approach is to use the REST endpoints at `/assets/aws/s3`, eg `http://stable.opencast.org/assets/aws/s3`.
+Specifically, you probably want to use `PUT glacier/{mediaPackageId}/assets`, which enables temporary restoration of
+files from the Cold Storage tiers to standard S3.  AWS will automatically remove the temporary copy after the specified
+duration, and that should be long enough for your workflow to complete.
+
+
+Permanently Restoring Content
+-----------------------------
+
+Rarely you will need your content restored to S3 on a more permanent basis.  In this case you need to temporarily
+restore as above, and the once the restore is complete use the `POST {mediaPackageId}/assets` endpoint to permanently
+move the asset.  Note that the permanently restored asset may still be re-Glaciered by any active AWS Object Lifecycle
+rules.
+
+
+Manually Changing Content Storage Tiers
+---------------------------------------
+
+While AWS Lifecycle rules are a much more scalable solution, there may be times when you wish to manually alter an
+asset's storage tier.  In the same way that you can permanently restore an asset, you can also manually move assets
+betwen storage classes using the `POST {mediaPackageId}/assets`.

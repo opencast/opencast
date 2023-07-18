@@ -15,11 +15,11 @@ if grep -rn ' $' modules assemblies pom.xml --include=pom.xml; then
 fi
 
 echo Checking configuration files for tabs or trailing spaces…
-if grep -rn $'\t' etc; then
+if grep -rnI $'\t' etc; then
   echo "Tabs found in config files!"
   ret=1
 fi
-if grep -rn ' $' etc; then
+if grep -rnI ' $' etc; then
   echo "Trailing spaces found in config files!"
   ret=1
 fi
@@ -37,5 +37,13 @@ if ! diff -q maven-dependency-plugin.list docs/checkstyle/maven-dependency-plugi
   cat maven-dependency-plugin.list
   ret=1
 fi
+
+echo "Checking that all plugins are listed for inclusion in the assembly pom"
+for plugin in $(sed -n 's/^.*<feature.*"\(opencast-plugin-[^"]*\)".*$/\1/p' assemblies/karaf-features/src/main/feature/feature.xml); do
+    if ! grep -q "$plugin" assemblies/pom.xml; then
+      echo "ERROR: Plugin $plugin not listed in assemblies/karaf-features/src/main/feature/feature.xml"
+      ret=1
+    fi
+done
 
 exit $ret

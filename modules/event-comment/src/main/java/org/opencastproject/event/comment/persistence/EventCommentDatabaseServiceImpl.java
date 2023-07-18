@@ -185,7 +185,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       if (event.isEmpty()) {
         throw new NotFoundException("Event comment with ID " + commentId + " does not exist");
       }
-      return event.get().toComment(userDirectoryService);
+      return event.get().toComment(userDirectoryService, organizationDirectoryService);
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -252,7 +252,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     try {
       final EventCommentDto commentDto = EventCommentDto.from(comment);
       final EventComment updatedComment = db.execTx(namedQuery.persistOrUpdate(commentDto))
-          .toComment(userDirectoryService);
+          .toComment(userDirectoryService, organizationDirectoryService);
       updateIndices(updatedComment.getEventId());
       return updatedComment;
     } catch (Exception e) {
@@ -285,7 +285,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
               Pair.of("eventId", eventId),
               Pair.of("org", securityService.getOrganization().getId())
           )).stream()
-          .map(c -> c.toComment(userDirectoryService))
+          .map(c -> c.toComment(userDirectoryService, organizationDirectoryService))
           .sorted((c1, c2) -> {
             boolean v1 = c1.isResolvedStatus();
             boolean v2 = c2.isResolvedStatus();

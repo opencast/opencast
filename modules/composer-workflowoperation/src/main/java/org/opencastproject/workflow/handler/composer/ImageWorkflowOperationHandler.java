@@ -31,7 +31,6 @@ import static com.entwinemedia.fn.parser.Parsers.opt;
 import static com.entwinemedia.fn.parser.Parsers.space;
 import static com.entwinemedia.fn.parser.Parsers.symbol;
 import static com.entwinemedia.fn.parser.Parsers.token;
-import static com.entwinemedia.fn.parser.Parsers.yield;
 import static java.lang.String.format;
 import static org.opencastproject.util.EqualsUtil.eq;
 
@@ -543,13 +542,13 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     static final Parser<Double> number = token(Parsers.dbl);
     static final Parser<MediaPosition> seconds = number.bind(new Fn<Double, Parser<MediaPosition>>() {
       @Override public Parser<MediaPosition> apply(Double p) {
-        return yield(new MediaPosition(PositionType.Seconds, p));
+        return Parsers.yield(new MediaPosition(PositionType.Seconds, p));
       }
     });
     static final Parser<MediaPosition> percentage =
             number.bind(Parsers.<Double, String>ignore(symbol("%"))).bind(new Fn<Double, Parser<MediaPosition>>() {
               @Override public Parser<MediaPosition> apply(Double p) {
-                return yield(new MediaPosition(PositionType.Percentage, p));
+                return Parsers.yield(new MediaPosition(PositionType.Percentage, p));
               }
             });
     static final Parser<Character> comma = token(character(','));
@@ -565,7 +564,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
                 return many(opt(comma).bind(Parsers.ignorePrevious(position)))
                         .bind(new Fn<List<MediaPosition>, Parser<List<MediaPosition>>>() {
                           @Override public Parser<List<MediaPosition>> apply(List<MediaPosition> rest) {
-                            return yield($(first).append(rest).toList());
+                            return Parsers.yield($(first).append(rest).toList());
                           }
                         });
               }

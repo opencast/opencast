@@ -1459,6 +1459,11 @@ public final class MediaPackageImpl implements MediaPackage {
     this.title = title;
   }
 
+  @Override
+  public boolean isLive() {
+    return Arrays.stream(getTracks()).anyMatch(Track::isLive);
+  }
+
   /**
    * Returns the media package element that matches the given reference.
    *
@@ -1565,5 +1570,4 @@ public final class MediaPackageImpl implements MediaPackage {
     }
     return attachments;
   }
-
 }

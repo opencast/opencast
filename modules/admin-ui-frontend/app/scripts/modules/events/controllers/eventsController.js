@@ -47,7 +47,7 @@ angular.module('adminNg.controllers')
     AuthService.getUser().$promise.then(function (user) {
       $scope.editorUrl = user.org.properties['admin.editor.url'];
       if (!$scope.editorUrl) {
-        $scope.editorUrl = '#!/events/events/$id/tools/editor';
+        $scope.editorUrl = '/editor-ui/index.html?id=$id';
       }
     }).catch(angular.noop);
 

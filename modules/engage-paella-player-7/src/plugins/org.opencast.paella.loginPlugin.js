@@ -24,7 +24,7 @@ import AccountIcon from '../icons/account.svg';
 
 export default class LoginPlugin extends OpencastAuthButtonPlugin {
   async load() {
-    this.icon = AccountIcon;
+    this.icon = this.player.getCustomPluginIcon(this.name, 'buttonIcon') || AccountIcon;
   }
 
   async isEnabled() {

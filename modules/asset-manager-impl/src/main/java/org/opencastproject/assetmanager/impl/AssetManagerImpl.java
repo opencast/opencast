@@ -165,6 +165,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerImpl.class);
 
+  private static final int PAGE_SIZE = 1000;
+
   enum AdminRole {
     GLOBAL, ORGANIZATION, NONE
   }
@@ -939,58 +941,66 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   @Override
   public void repopulate() throws IndexRebuildException {
-    final Organization org = securityService.getOrganization();
-    final User user = (org != null ? securityService.getUser() : null);
+    final Organization originalOrg = securityService.getOrganization();
+    final User originalUser = (originalOrg != null ? securityService.getUser() : null);
     try {
       final Organization defaultOrg = new DefaultOrganization();
-      final User systemUser = SecurityUtil.createSystemUser(systemUserName, defaultOrg);
+      final User defaultSystemUser = SecurityUtil.createSystemUser(systemUserName, defaultOrg);
       securityService.setOrganization(defaultOrg);
-      securityService.setUser(systemUser);
+      securityService.setUser(defaultSystemUser);
 
+      int offset = 0;
+      int total = (int) countEvents(null);
       final AQueryBuilder q = createQuery();
-      final RichAResult r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).run());
-      final int total = r.countSnapshots();
-      logIndexRebuildBegin(logger, index.getIndexName(), total, "snapshot(s)");
+      RichAResult r;
       int current = 0;
-      int n = 16;
-      var updatedEventRange = new ArrayList<Event>();
+      logIndexRebuildBegin(logger, index.getIndexName(), total, "snapshot(s)");
+      do {
+        r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).orderBy(q.mediapackageId().desc())
+          .page(offset, PAGE_SIZE).run());
+        offset += PAGE_SIZE;
+        int n = 16;
+        var updatedEventRange = new ArrayList<Event>();
 
-      final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
-      for (String orgId : byOrg.keySet()) {
-        final Organization snapshotOrg;
-        try {
-          snapshotOrg = orgDir.getOrganization(orgId);
-          securityService.setOrganization(snapshotOrg);
-          securityService.setUser(SecurityUtil.createSystemUser(systemUserName, snapshotOrg));
-          for (Snapshot snapshot : byOrg.get(orgId)) {
-            try {
-              current++;
+        final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
+        for (String orgId : byOrg.keySet()) {
+          final Organization snapshotOrg;
+          try {
+            snapshotOrg = orgDir.getOrganization(orgId);
+            User snapshotSystemUser = SecurityUtil.createSystemUser(systemUserName, snapshotOrg);
+            securityService.setOrganization(snapshotOrg);
+            securityService.setUser(snapshotSystemUser);
+            for (Snapshot snapshot : byOrg.get(orgId)) {
+              try {
+                current++;
 
-              var updatedEventData = index.getEvent(snapshot.getMediaPackage().getIdentifier().toString(), orgId, user);
-              updatedEventData = getEventUpdateFunction(snapshot, orgId, user).apply(updatedEventData);
-              updatedEventRange.add(updatedEventData.get());
+                var updatedEventData = index.getEvent(snapshot.getMediaPackage().getIdentifier().toString(), orgId,
+                    snapshotSystemUser);
+                updatedEventData = getEventUpdateFunction(snapshot, orgId, snapshotSystemUser).apply(updatedEventData);
+                updatedEventRange.add(updatedEventData.get());
 
-              if (updatedEventRange.size() >= n || current >= byOrg.get(orgId).size()) {
-                index.bulkEventUpdate(updatedEventRange);
-                logIndexRebuildProgress(logger, index.getIndexName(), total, current);
-                updatedEventRange.clear();
+                if (updatedEventRange.size() >= n || current >= total) {
+                  index.bulkEventUpdate(updatedEventRange);
+                  logIndexRebuildProgress(logger, index.getIndexName(), total, current);
+                  updatedEventRange.clear();
+                }
+              } catch (Throwable t) {
+                logSkippingElement(logger, "event", snapshot.getMediaPackage().getIdentifier().toString(),
+                        snapshotOrg, t);
               }
-            } catch (Throwable t) {
-              logSkippingElement(logger, "event", snapshot.getMediaPackage().getIdentifier().toString(),
-                      snapshotOrg, t);
             }
+          } catch (Throwable t) {
+            logIndexRebuildError(logger, index.getIndexName(), t, originalOrg);
+            throw new IndexRebuildException(index.getIndexName(), getService(), originalOrg, t);
+          } finally {
+            securityService.setOrganization(defaultOrg);
+            securityService.setUser(defaultSystemUser);
           }
-        } catch (Throwable t) {
-          logIndexRebuildError(logger, index.getIndexName(), t, org);
-          throw new IndexRebuildException(index.getIndexName(), getService(), org, t);
-        } finally {
-          securityService.setOrganization(defaultOrg);
-          securityService.setUser(systemUser);
         }
-      }
+      } while (offset < total);
     } finally {
-      securityService.setOrganization(org);
-      securityService.setUser(user);
+      securityService.setOrganization(originalOrg);
+      securityService.setUser(originalUser);
     }
   }
 

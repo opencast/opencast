@@ -77,14 +77,14 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /** Config for Tag Parsing operation */
   protected enum Configuration { none, one, many };
 
-  private static final String TARGET_FLAVORS = "target-flavors";
-  private static final String TARGET_FLAVOR = "target-flavor";
-  private static final String TARGET_TAGS = "target-tags";
-  private static final String TARGET_TAG = "target-tag";
-  private static final String SOURCE_FLAVORS = "source-flavors";
-  private static final String SOURCE_FLAVOR = "source-flavor";
-  private static final String SOURCE_TAG = "source-tag";
-  private static final String SOURCE_TAGS = "source-tags";
+  public static final String TARGET_FLAVORS = "target-flavors";
+  public static final String TARGET_FLAVOR = "target-flavor";
+  public static final String TARGET_TAGS = "target-tags";
+  public static final String TARGET_TAG = "target-tag";
+  public static final String SOURCE_FLAVORS = "source-flavors";
+  public static final String SOURCE_FLAVOR = "source-flavor";
+  public static final String SOURCE_TAG = "source-tag";
+  public static final String SOURCE_TAGS = "source-tags";
 
   /**
    * Activates this component with its properties once all of the collaborating services have been set

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>14-SNAPSHOT</version>
+    <version>15-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -17,7 +17,7 @@
   <dependencies>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>osgi.cmpn</artifactId>
+      <artifactId>org.osgi.service.component.annotations</artifactId>
     </dependency>
     <dependency>
       <groupId>com.entwinemedia.common</groupId>

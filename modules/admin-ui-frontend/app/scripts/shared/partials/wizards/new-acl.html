@@ -57,7 +57,7 @@
                                          data-width="'200px'"
                                          tabindex="1"
                                          focushere
-                                         ng-change="wizard.step.changeBaseAcl()"
+                                         ng-change="wizard.step.changeBaseAcl(wizard.step.ud.id)"
                                          ng-model="wizard.step.ud.id"
                                          ng-options="id as name for (id, name) in wizard.step.acls"
                                          placeholder-text-single="'{{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
@@ -71,7 +71,68 @@
               </div>
             </div>
 
-            <div class="obj-container">
+            <div class="obj-container" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_USER_ROLES_VIEW')">
+              <div class="obj tbl-list">
+                <header translate="USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.USERS">
+                  <!-- Details -->
+                </header>
+                <div class="obj-container">
+                  <table class="main-tbl">
+                    <thead>
+                      <tr>
+                        <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.USER">
+                          <!-- Role -->
+                        </th>
+                        <th class="fit">
+                          <!-- Read -->
+                          {{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.READ' | translate }}
+                          <span title="{{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.HELP.READ' | translate}}"
+                                class="fa fa-question-circle">
+                          </span>
+                        </th>
+                        <th class="fit">
+                          <!--Write-->
+                          {{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.WRITE' | translate }}
+                          <span title="{{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.HELP.WRITE' | translate}}"
+                                class="fa fa-question-circle">
+                          </span>
+                        </th>
+                        <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS" class="fit" ng-if="wizard.step.hasActions">
+                          <!--Additional Actions-->
+                        </th>
+                        <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ACTION" class="fit">
+                          <!--Action-->
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="policy in wizard.step.ud.policiesUser">
+                        <td>
+                          <select chosen pre-select-from="users"
+                                         call-on-search="wizard.step.getMatchingUsers"
+                                         data-width="'360px'"
+                                         ng-model="policy.role"
+                                         ng-options="user.userRole as wizard.step.userToStringForDetails(user) for user in wizard.step.users"
+                                         placeholder-text-single="'{{ 'USERS.ACLS.NEW.ACCESS.ROLES.LABEL' | translate }}'"
+                                         no-results-text="'{{ 'USERS.ACLS.NEW.ACCESS.ROLES.EMPTY' | translate }}'"
+                                         ></select>
+                        </td>
+                        <td class="fit text-center"><input type="checkbox"  ng-model="policy.read" ng-disabled="wizard.step.aclCreateDefaults['read_readonly']"/></td>
+                        <td class="fit text-center"><input type="checkbox"  ng-model="policy.write" ng-disabled="wizard.step.aclCreateDefaults['write_readonly']"/></td>
+                        <td class="fit editable" ng-if="wizard.step.hasActions"><div admin-ng-editable-multi-select mixed="false" params="policy.actions" collection="wizard.step.actions"> </div></td>
+                        <td class="fit"><a ng-click="wizard.step.deletePolicy(wizard.step.ud.policiesUser, policy)"  class="remove"></a>
+                        </td>
+                      </tr>
+                      <tr ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')">
+                        <td colspan="5"><a ng-click="wizard.step.addPolicy(wizard.step.ud.policiesUser)">+ {{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.NEW_USER' | translate }}</a></td>
+                        <tr>
+                        </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="obj-container" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_NONUSER_ROLES_VIEW')">
               <div class="obj tbl-list">
                 <header translate="USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.DETAILS">
                   <!-- Details -->
@@ -104,19 +165,19 @@
                                          call-on-search="wizard.step.getMatchingRoles"
                                          data-width="'360px'"
                                          ng-model="policy.role"
-                                         ng-options="role as role for role in wizard.step.roles"
+                                         ng-options="role as role for role in wizard.step.roles | filter: wizard.step.filterUserRoles"
                                          placeholder-text-single="'{{ 'USERS.ACLS.NEW.ACCESS.ROLES.LABEL' | translate }}'"
                                          no-results-text="'{{ 'USERS.ACLS.NEW.ACCESS.ROLES.EMPTY' | translate }}'"
                                          ></select>
                         </td>
-                        <td class="fit text-center"><input type="checkbox"  ng-model="policy.read"/></td>
-                        <td class="fit text-center"><input type="checkbox"  ng-model="policy.write"/></td>
+                        <td class="fit text-center"><input type="checkbox"  ng-model="policy.read" ng-disabled="wizard.step.aclCreateDefaults['read_readonly']"/></td>
+                        <td class="fit text-center"><input type="checkbox"  ng-model="policy.write" ng-disabled="wizard.step.aclCreateDefaults['write_readonly']"/></td>
                         <td class="fit editable" ng-if="wizard.step.hasActions"><div admin-ng-editable-multi-select mixed="false" params="policy.actions" collection="wizard.step.actions"> </div></td>
-                        <td class="fit"><a ng-click="wizard.step.deletePolicy(policy)" class="remove"></a>
+                        <td class="fit"><a ng-click="wizard.step.deletePolicy(wizard.step.ud.policies, policy)" class="remove"></a>
                         </td>
                       </tr>
                       <tr ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')">
-                        <td colspan="5"><a ng-click="wizard.step.addPolicy()">+ {{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
+                        <td colspan="5"><a ng-click="wizard.step.addPolicy(wizard.step.ud.policies)">+ {{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
                         <tr>
                         </tr>
                     </tbody>
@@ -167,7 +228,7 @@
               </th>
             </tr>
           </thead>
-          <tr ng-repeat="policy in wizard.getStateControllerByName('access').ud.policies">
+          <tr ng-repeat="policy in wizard.getStateControllerByName('access').getAllPolicies()">
             <td>{{ policy.role }}</td>
             <td class="fit"><input type="checkbox" disabled ng-model="policy.read"/></td>
             <td class="fit"><input type="checkbox" disabled ng-model="policy.write"/></td>

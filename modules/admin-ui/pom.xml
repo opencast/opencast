@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>14-SNAPSHOT</version>
+    <version>15-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -19,11 +19,19 @@
     <!-- osgi support -->
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
+      <artifactId>osgi.core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>osgi.cmpn</artifactId>
+      <artifactId>org.osgi.service.component</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.component.annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.cm</artifactId>
     </dependency>
     <!-- opencast -->
     <dependency>
@@ -47,6 +55,7 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-message-broker-api</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -158,6 +167,7 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-kernel</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -267,6 +277,7 @@
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.commons-httpclient</artifactId>
+      <scope>test</scope>
     </dependency>
     <!-- Testing -->
     <dependency>
@@ -352,6 +363,10 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <extensions>true</extensions>
         <configuration>
+          <ignoredNonTestScopedDependencies>
+            <ignoredNonTestScopedDependency>org.opencastproject:opencast-elasticsearch-impl</ignoredNonTestScopedDependency>
+            <ignoredNonTestScopedDependency>joda-time:joda-time</ignoredNonTestScopedDependency>
+          </ignoredNonTestScopedDependencies>
           <ignoredUnusedDeclaredDependencies>
             <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore-osgi</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.mnode.ical4j:ical4j</ignoredUnusedDeclaredDependency>

@@ -448,7 +448,7 @@ public final class WorkspaceImpl implements Workspace {
 
   /** {@link #copyOrLink(java.io.File, java.io.File)} as an effect. <code>src -> dst -> ()</code> */
   private Effect<File> copyOrLink(final File src) {
-    return new Effect.X<File>() {
+    return new Effect.X<>() {
       @Override
       protected void xrun(File dst) throws IOException {
         copyOrLink(src, dst);

@@ -36,6 +36,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -50,6 +51,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 
 /** Creates a subtitles file for a video. */
 @Component(
@@ -60,7 +62,7 @@ import java.util.List;
     property = {
         "service.description=Speech to Text Service",
         "service.pid=org.opencastproject.speechtotext.impl.SpeechToTextServiceImpl"
-})
+    })
 public class SpeechToTextServiceImpl extends AbstractJobProducer implements SpeechToTextService {
 
   private static final Logger logger = LoggerFactory.getLogger(SpeechToTextServiceImpl.class);
@@ -139,7 +141,10 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
     List<String> arguments = job.getArguments();
     String language = arguments.get(1);
     URI mediaFile = new URI(arguments.get(0));
-
+    Boolean translate = BooleanUtils.toBooleanObject(arguments.get(2));
+    if (translate == null) {
+      translate = false;
+    }
     URI subtitleFilesURI;
     File subtitlesFile = null;
     String vttFileName = String.format("%s%d_%s.%s", TMP_PREFIX,
@@ -151,9 +156,11 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
               workspace.rootDirectory(), COLLECTION, vttFileName));
       subtitlesFile.deleteOnExit();
       FileUtils.forceMkdirParent(subtitlesFile);
+      Map<String,Object> subOutput = speechToTextEngine.generateSubtitlesFile(
+              workspace.get(mediaFile), subtitlesFile, language, translate);
 
-      subtitlesFile = speechToTextEngine.generateSubtitlesFile(
-              workspace.get(mediaFile), subtitlesFile, language);
+      subtitlesFile = (File) subOutput.get("subFile");
+      language = (String) subOutput.get("language");
 
       // we need to call the "putInCollection" method to get
       // a URI, that can be used in the following processes
@@ -168,20 +175,20 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
         FileUtils.deleteQuietly(subtitlesFile);
       }
     }
-    return subtitleFilesURI.toString();
+    return subtitleFilesURI.toString() + "," + language;
   }
 
 
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.speechtotext.api.SpeechToTextService#transcribe(URI, String)
+   * @see org.opencastproject.speechtotext.api.SpeechToTextService#transcribe(URI, String, Boolean)
    */
   @Override
-  public Job transcribe(URI mediaFile, String language) throws SpeechToTextServiceException {
+  public Job transcribe(URI mediaFile, String language, Boolean translate) throws SpeechToTextServiceException {
     try {
       logger.debug("Creating speechToText service job");
-      List<String> jobArguments = Arrays.asList(mediaFile.toString(), language);
+      List<String> jobArguments = Arrays.asList(mediaFile.toString(), language, translate.toString());
       return serviceRegistry.createJob(JOB_TYPE, OPERATION, jobArguments, jobLoad);
     } catch (ServiceRegistryException e) {
       throw new SpeechToTextServiceException(e);

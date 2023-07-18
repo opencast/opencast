@@ -24,6 +24,10 @@ package org.opencastproject.kernel.rest;
 import org.opencastproject.rest.RestConstants;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.propertytypes.ServiceRanking;
+import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContextSelect;
+import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardFilterName;
+import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardFilterPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,16 +50,15 @@ import javax.servlet.http.HttpSession;
  * http://opencast.jira.com/browse/MH-8205 for more details and discussion.
  */
 @Component(
-    immediate = true,
     service = Filter.class,
     property = {
         "service.description=Clean Digest Sessions and Set Max Inactive Interval Filter",
-        "httpContext.id=opencast.httpcontext",
-        "httpContext.shared=true",
-        "service.ranking=1",
-        "urlPatterns=*"
     }
 )
+@ServiceRanking(1000)
+@HttpWhiteboardFilterName("CleanSessionsFilter")
+@HttpWhiteboardFilterPattern("/*")
+@HttpWhiteboardContextSelect("(osgi.http.whiteboard.context.name=opencast)")
 public class CleanSessionsFilter implements Filter {
   private static final int NO_MAX_INACTIVE_INTERVAL_SET = -1;
   /** The logger */
@@ -91,7 +94,7 @@ public class CleanSessionsFilter implements Filter {
 
     // Cast the request and response to HTTP versions
     HttpServletRequest request = (HttpServletRequest) req;
-    if (request != null && request.getSession() != null) {
+    if (request != null && request.getSession(false) != null) {
       if (request.getSession().getMaxInactiveInterval() == NO_MAX_INACTIVE_INTERVAL_SET) {
         // There is no maxInactiveInterval set so we need to set one.
         logger.trace("Setting maxInactiveInterval to " + RestConstants.MAX_INACTIVE_INTERVAL + " on request @" + request.getRequestURL());
