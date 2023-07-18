@@ -56,6 +56,7 @@
         <configuration key="source-flavors">captions/prepared</configuration>
         <configuration key="target-flavor">captions/work</configuration>
         <configuration key="target-tags">-archive</configuration>
+        <configuration key="copy">true</configuration>
       </configurations>
     </operation>
 
