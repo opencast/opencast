@@ -318,11 +318,13 @@ public class XACMLAuthorizationService implements AuthorizationService {
   public boolean hasPermission(final MediaPackage mp, final String action) {
     AccessControlList acl = getActiveAcl(mp).getA();
     final User user = securityService.getUser();
-    var allowed = true;
+    var allowed = false;
 
-    // Check special ROLE_<ID>_<ACTION> permissions
+    // Check special ROLE_EPISODE_<ID>_<ACTION> permissions
+    logger.error("episodeIdRole set to: {}", episodeIdRole);
     if (episodeIdRole) {
       var episodeRole = "ROLE_EPISODE_" + mp.getIdentifier() + "_" + action.toUpperCase();
+      logger.error("Checking for role: {}", episodeRole);
       allowed = user.getRoles().stream().map(Role::getName).anyMatch(r -> r.equals(episodeRole));
     }
 

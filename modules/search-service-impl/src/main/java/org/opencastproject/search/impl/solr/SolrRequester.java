@@ -83,6 +83,9 @@ public class SolrRequester {
 
   private static final int NONADMIN_QUERY_LIMIT = 2000;
 
+  private static final String ACL_ID_PREFIX_EPISODE = "ROLE_EPISODE_";
+  private static final String[] ACL_ID_SUFFIX = {"_READ", "_WRITE"};
+
   /**
    * Logging facility
    */
@@ -626,13 +629,22 @@ public class SolrRequester {
    */
   private SolrQuery getForAction(SearchQuery q, String action, boolean applyPermissions) throws SolrServerException {
     StringBuilder sb = new StringBuilder();
+    logger.error("Called getForAction");
 
     if (StringUtils.isNotBlank(q.getQuery())) {
       sb.append(q.getQuery());
     }
 
+    User user = securityService.getUser();
     String solrIdRequest = StringUtils.trimToNull(q.getId());
     if (solrIdRequest != null) {
+
+      // If user has ROLE_EPISODE_<ID>_READ/WRITE, no further permission checks are necessary
+      for (var suffix: ACL_ID_SUFFIX) {
+        if (user.hasRole(ACL_ID_PREFIX_EPISODE + solrIdRequest + suffix)) {
+          applyPermissions = false;
+        }
+      }
       String cleanSolrIdRequest = SolrUtils.clean(solrIdRequest);
       if (sb.length() > 0) {
         sb.append(" AND ");
@@ -734,8 +746,8 @@ public class SolrRequester {
       if (sb.length() > 0) {
         sb.append(" AND ");
       }
-      sb.append(Schema.OC_DELETED + ":"
-              + SolrUtils.serializeDateRange(option(q.getDeletedDate()), Option.none()));
+      sb.append(Schema.OC_DELETED).append(":")
+          .append(SolrUtils.serializeDateRange(option(q.getDeletedDate()), Option.none()));
     }
 
     if (q.getUpdatedSince() != null) {
@@ -751,7 +763,6 @@ public class SolrRequester {
       sb.append("*:*");
     }
 
-    User user = securityService.getUser();
     if (applyPermissions) {
       sb.append(" AND ").append(Schema.OC_ORGANIZATION).append(":")
               .append(SolrUtils.clean(securityService.getOrganization().getId()));
@@ -760,13 +771,34 @@ public class SolrRequester {
       if (roles.size() > 0) {
         sb.append(" AND (");
         StringBuilder roleList = new StringBuilder();
+        var ids = new ArrayList<String>(roles.size());
         for (Role role : roles) {
-          if (roleList.length() > 0) {
-            roleList.append(" OR ");
-          }
-          roleList.append(Schema.OC_ACL_PREFIX).append(action).append(":").append(SolrUtils.clean(role.getName()));
-          if (role.getName().equalsIgnoreCase(securityService.getOrganization().getAnonymousRole())) {
-            userHasAnonymousRole = true;
+          var roleName = role.getName();
+
+          // Check ROLE_EPISODE_<ID>_<ACTION>
+          if (roleName.startsWith(ACL_ID_PREFIX_EPISODE)) {
+            for (var suffix: ACL_ID_SUFFIX) {
+              if (roleName.endsWith(suffix)) {
+                var id = roleName.substring(ACL_ID_PREFIX_EPISODE.length(), roleName.length() - suffix.length());
+                if (!ids.contains(id)) {
+                  if (roleList.length() > 0) {
+                    roleList.append(" OR ");
+                  }
+                  roleList.append(Schema.ID).append(":").append(id);
+                  ids.add(id);
+                }
+                break;
+              }
+            }
+          } else {
+            // Check non-id user roles
+            if (roleList.length() > 0) {
+              roleList.append(" OR ");
+            }
+            roleList.append(Schema.OC_ACL_PREFIX).append(action).append(":").append(SolrUtils.clean(role.getName()));
+            if (role.getName().equalsIgnoreCase(securityService.getOrganization().getAnonymousRole())) {
+              userHasAnonymousRole = true;
+            }
           }
         }
         if (!userHasAnonymousRole) {
@@ -777,8 +809,7 @@ public class SolrRequester {
                   .append(SolrUtils.clean(securityService.getOrganization().getAnonymousRole()));
         }
 
-        sb.append(roleList.toString());
-        sb.append(")");
+        sb.append(roleList).append(")");
       }
     }
 
