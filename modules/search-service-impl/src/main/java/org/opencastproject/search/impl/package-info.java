@@ -1,4 +1,4 @@
-/**
+/*
  * Search service implementation classes
  */
 @javax.xml.bind.annotation.XmlSchema(elementFormDefault = XmlNsForm.QUALIFIED)

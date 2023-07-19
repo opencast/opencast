@@ -1,4 +1,4 @@
-/**
+/*
  * Service implementation classes
  */
 @XmlSchema(elementFormDefault = XmlNsForm.QUALIFIED, attributeFormDefault = XmlNsForm.UNQUALIFIED, namespace = "http://serviceregistry.opencastproject.org")

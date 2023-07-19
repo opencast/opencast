@@ -1,4 +1,4 @@
-/**
+/*
  * Search service.
  */
 @XmlSchema(elementFormDefault = XmlNsForm.QUALIFIED, attributeFormDefault = XmlNsForm.UNQUALIFIED, namespace = "http://search.opencastproject.org", xmlns = { @XmlNs(prefix = "mp", namespaceURI = "http://mediapackage.opencastproject.org") })

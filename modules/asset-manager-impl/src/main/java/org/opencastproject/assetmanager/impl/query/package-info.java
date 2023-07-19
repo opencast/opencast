@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009, 2010 The Regents of the University of California
  * Licensed under the Educational Community License, Version 2.0
  * (the "License"); you may not use this file except in compliance

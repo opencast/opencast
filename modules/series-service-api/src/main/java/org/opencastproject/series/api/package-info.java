@@ -1,4 +1,4 @@
-/**
+/*
  * Series service.
  * TODO
  *

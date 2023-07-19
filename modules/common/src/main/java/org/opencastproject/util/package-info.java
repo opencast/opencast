@@ -1,4 +1,4 @@
-/**
+/*
  * Utility classes for dealing with media packages, collections, URLs, files, and streams.
  */
 @XmlSchema(elementFormDefault = XmlNsForm.QUALIFIED, attributeFormDefault = XmlNsForm.UNQUALIFIED)
