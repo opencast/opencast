@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  */
 
-/*
+/**
  * Implementations are required to be immutable.
  */
 package org.opencastproject.assetmanager.api.query;
