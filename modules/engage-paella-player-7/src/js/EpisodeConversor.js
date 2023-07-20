@@ -18,12 +18,6 @@
  * the License.
  *
  */
-/* eslint no-console: "warn" */
-const g_contentTypes = {
-  'presentation/delivery': 'presentation',
-  'presenter/delivery': 'presenter'
-};
-
 const g_streamTypes = [
   {
     enabled: true,
@@ -95,8 +89,8 @@ function getStreamType(track) {
 
 function getSourceData(track, config) {
   let data = null;
-  const contentTypes = config.contentTypes || g_contentTypes;
-  const type = contentTypes[track.type];
+  // Get substring of type before slash
+  const type = track.type.split('/')[0];
   if (type) {
     const streamType = getStreamType(track, config);
     if (streamType) {
@@ -244,6 +238,13 @@ export function getVideoPreview(mediapackage, config) {
       return videoPreview !== null;
     });
   });
+  // Get first preview if no predefined was found
+  if (videoPreview === null) {
+    const firstPreviewAttachment = attachment.find(att => {
+      return att.type.split('/').pop() === 'player+preview';
+    });
+    videoPreview = firstPreviewAttachment?.url ?? null;
+  }
 
   return videoPreview;
 }
@@ -259,10 +260,6 @@ function processAttachments(episode, manifest, config) {
   }
 
   const previewAttachment = config.previewAttachment || 'presentation/segment+preview';
-  const videoPreviewAttachments = config.videoPreviewAttachments || [
-    'presenter/player+preview',
-    'presentation/player+preview'
-  ];
   attachment.forEach(att => {
     const timeRE = /time=T(\d+):(\d+):(\d+)/.exec(att.ref);
     if (att.type === previewAttachment && timeRE) {
@@ -279,12 +276,7 @@ function processAttachments(episode, manifest, config) {
       });
     }
     else {
-      videoPreviewAttachments.some(validAttachment => {
-        if (validAttachment === att.type) {
-          videoPreview = att.url;
-        }
-        return videoPreview !== null;
-      });
+      videoPreview = getVideoPreview(episode.mediapackage, config);
     }
   });
 
