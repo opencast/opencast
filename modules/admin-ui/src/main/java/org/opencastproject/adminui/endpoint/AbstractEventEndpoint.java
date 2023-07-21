@@ -224,6 +224,8 @@ public abstract class AbstractEventEndpoint {
   public static final String SCHEDULING_START_KEY = "start";
   public static final String SCHEDULING_END_KEY = "end";
   private static final String SCHEDULING_AGENT_CONFIGURATION_KEY = "agentConfiguration";
+  public static final String SCHEDULING_PREVIOUS_AGENTID = "previousAgentId";
+  public static final String SCHEDULING_PREVIOUS_PREVIOUSENTRIES = "previousEntries";
 
   private static final String WORKFLOW_ACTION_STOP = "STOP";
 
@@ -664,7 +666,22 @@ public abstract class AbstractEventEndpoint {
     if (schedulingJson.has(SCHEDULING_AGENT_ID_KEY)) {
       agentId = Opt.some(schedulingJson.getString(SCHEDULING_AGENT_ID_KEY));
       logger.trace("Updating agent id of event '{}' from '{}' to '{}'",
-        event.getIdentifier(), technicalMetadata.getAgentId(), agentId);
+              event.getIdentifier(), technicalMetadata.getAgentId(), agentId);
+    }
+
+    Opt<String> previousAgentId = Opt.none();
+    if (schedulingJson.has(SCHEDULING_PREVIOUS_AGENTID)) {
+      previousAgentId = Opt.some(schedulingJson.getString(SCHEDULING_PREVIOUS_AGENTID));
+    }
+
+    Opt<String> previousAgentInputs = Opt.none();
+    Opt<String> agentInputs = Opt.none();
+    if (agentId.isSome() && previousAgentId.isSome()) {
+      Agent previousAgent = getCaptureAgentStateService().getAgent(previousAgentId.get());
+      Agent agent = getCaptureAgentStateService().getAgent(agentId.get());
+
+      previousAgentInputs = Opt.some(previousAgent.getCapabilities().getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES));
+      agentInputs = Opt.some(agent.getCapabilities().getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES));
     }
 
     // Check if we are allowed to re-schedule on this agent
@@ -694,6 +711,27 @@ public abstract class AbstractEventEndpoint {
       agentConfiguration = Opt.some(JSONUtils.toMap(schedulingJson.getJSONObject(SCHEDULING_AGENT_CONFIGURATION_KEY)));
       logger.trace("Updating agent configuration of event '{}' id from '{}' to '{}'",
         event.getIdentifier(), technicalMetadata.getCaptureAgentConfiguration(), agentConfiguration);
+    }
+
+    Opt<Map<String, String>> previousAgentInputMethods = Opt.none();
+    if (schedulingJson.has(SCHEDULING_PREVIOUS_PREVIOUSENTRIES)) {
+      previousAgentInputMethods = Opt.some(
+              JSONUtils.toMap(schedulingJson.getJSONObject(SCHEDULING_PREVIOUS_PREVIOUSENTRIES)));
+    }
+
+    // If we had previously selected an agent, and both the old and new agent have the same set of input channels,
+    // copy which input channels are active to the new agent
+    if (previousAgentInputs.isSome() && previousAgentInputs.isSome() && agentInputs.isSome()) {
+      Map<String, String> map = previousAgentInputMethods.get();
+      String mapAsString = map.keySet().stream()
+              .collect(Collectors.joining(","));
+      String previousInputs = mapAsString;
+
+      if (previousAgentInputs.equals(agentInputs)) {
+        final Map<String, String> configMap = new HashMap<>(agentConfiguration.get());
+        configMap.put(CaptureParameters.CAPTURE_DEVICE_NAMES, previousInputs);
+        agentConfiguration = Opt.some(configMap);
+      }
     }
 
     if ((start.isSome() || end.isSome())

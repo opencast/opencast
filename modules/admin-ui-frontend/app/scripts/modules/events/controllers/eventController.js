@@ -626,7 +626,7 @@ angular.module('adminNg.controllers')
       });
     };
 
-    $scope.saveScheduling = function () {
+    $scope.saveScheduling = function (newObj, oldObj) {
       if (me.readyToPollConflicts()) {
         if (!me.checkValidity()) {
           return;
@@ -649,7 +649,9 @@ angular.module('adminNg.controllers')
 
           EventSchedulingResource.save({
             id: $scope.resourceId,
-            entries: $scope.source
+            entries: $scope.source,
+            previousId: oldObj.id,
+            previousEntries: oldObj.inputMethods
           }, function () {
             fetchChildResources($scope.resourceId);
           });
