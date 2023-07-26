@@ -1,5 +1,26 @@
 # Opencast 13: Release Notes
 
+
+Opencast 13.8
+-------------
+
+The eighth maintenance release of Opencast 13.
+
+- Increase index rebuild logging frequency for batches ([#5105](https://github.com/opencast/opencast/pull/5105))
+- Add endpoint to get languages & licenses ([#5102](https://github.com/opencast/opencast/pull/5102))
+- Log dispatch interval in seconds, not milliseconds ([#5064](https://github.com/opencast/opencast/pull/5064))
+- Allow engage ui and ltitools to handle non-16/9 thumbnails ([#5063](https://github.com/opencast/opencast/pull/5063))
+- Allow deletion of reference users from the Admin UI ([#5058](https://github.com/opencast/opencast/pull/5058))
+- Dont copy media files to new scheduled event ([#5055](https://github.com/opencast/opencast/pull/5055))
+- Fix tainted canvas in editor thumbnail extractor ([#5052](https://github.com/opencast/opencast/pull/5052))
+- Enable Tobira adopter stats tracking ([#5040](https://github.com/opencast/opencast/pull/5040))
+- Count user references ([#5032](https://github.com/opencast/opencast/pull/5032))
+- Show user information in event workflow details ([#4970](https://github.com/opencast/opencast/pull/4970))
+- Automate PR comments with built tarball links ([#4969](https://github.com/opencast/opencast/pull/4969))
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
+
 Opencast 13.7
 -------------
 
