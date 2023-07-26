@@ -4,6 +4,35 @@ Changelog
 Opencast 13
 -----------
 
+### Opencast 13.8
+
+*Released on July 26th, 2023*
+
+- [[#5123](https://github.com/opencast/opencast/pull/5123)] -
+  Add Opencast 13.8 release notes
+- [[#5105](https://github.com/opencast/opencast/pull/5105)] -
+  Increase index rebuild logging frequency for batches
+- [[#5102](https://github.com/opencast/opencast/pull/5102)] -
+  Add endpoint to get languages & licenses
+- [[#5064](https://github.com/opencast/opencast/pull/5064)] -
+  Log dispatch interval in seconds, not milliseconds
+- [[#5063](https://github.com/opencast/opencast/pull/5063)] -
+  Allow engage ui and ltitools to handle non-16/9 thumbnails
+- [[#5058](https://github.com/opencast/opencast/pull/5058)] -
+  Allow deletion of reference users from the Admin UI
+- [[#5055](https://github.com/opencast/opencast/pull/5055)] -
+  Dont copy media files to new scheduled event
+- [[#5052](https://github.com/opencast/opencast/pull/5052)] -
+  Fix tainted canvas in editor thumbnail extractor
+- [[#5040](https://github.com/opencast/opencast/pull/5040)] -
+  Enable Tobira adopter stats tracking
+- [[#5032](https://github.com/opencast/opencast/pull/5032)] -
+  Count user references
+- [[#4970](https://github.com/opencast/opencast/pull/4970)] -
+  Show user information in event workflow details
+- [[#4969](https://github.com/opencast/opencast/pull/4969)] -
+  Automate PR comments with built tarball links
+
 ### Opencast 13.7
 
 *Released on June 26th, 2023*
