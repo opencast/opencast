@@ -318,7 +318,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
 
             if (updatedThemeRange.size() >= n || current >= themes.size()) {
               index.bulkThemeUpdate(updatedThemeRange);
-              logIndexRebuildProgress(logger, index.getIndexName(), total, current);
+              logIndexRebuildProgress(logger, index.getIndexName(), total, current, n);
               updatedThemeRange.clear();
             }
           }

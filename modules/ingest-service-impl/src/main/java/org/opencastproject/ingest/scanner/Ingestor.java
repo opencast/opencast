@@ -30,6 +30,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -258,6 +259,12 @@ public class Ingestor implements Runnable {
                       var referenceId = mediaPackage.getIdentifier().toString();
                       mediaPackage = (MediaPackage) mediaPackage.clone();
                       mediaPackage.setIdentifier(IdImpl.fromUUID());
+
+                      // Drop copied media files. We don't want them in the new event
+                      for (Track track : mediaPackage.getTracks()) {
+                        logger.info("Remove track: " + track);
+                        mediaPackage.remove(track);
+                      }
 
                       // Update dublincore title and set reference to originally scheduled event
                       try {

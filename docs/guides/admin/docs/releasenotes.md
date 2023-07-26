@@ -1,5 +1,14 @@
 # Opencast 14: Release Notes
 
+## Opencast 14.1
+
+Opencast 14.1 is a minor release, containing documentation improvements and Paella Player 7 trimming URL parameter fix.
+For more details, make sure to check out the [documentation](modules/paella.player7/url.parameter.md).
+
+See [changelog](changelog.md#opencast-14.1) for a comprehensive list of changes.
+
+## Opencast 14.0
+
 ### New Admin UI
 
 Opencast 14 brings with it a new version of the Admin UI. The new Admin UI continues with the same look and
@@ -12,8 +21,6 @@ as beta. If you wish to try it out, you can easily do so by going to `https://yo
 please report them at [GitHub project issue board](https://github.com/opencast/opencast-admin-interface/issues).
 
 For notes on how to set the new Admin UI as your default, check [Admin UI](modules/admin-ui.md).
-
-## Opencast 14.0
 
 ### Features
 - The new Admin UI (beta) is now shipped with Opencast [[#4695](https://github.com/opencast/opencast/pull/4695)]
@@ -46,7 +53,7 @@ For notes on how to set the new Admin UI as your default, check [Admin UI](modul
 - Improved Paella 7 default theme [[#4943](https://github.com/opencast/opencast/pull/4943)]
 - Made Paella 7 the new default player in Opencast [[#4875](https://github.com/opencast/opencast/pull/4875)]
 - Removed Theodul player (plugin) [[#4315](https://github.com/opencast/opencast/pull/4315)]
-- Made standolone Editor default videoeditor in Opencast [[#4876](https://github.com/opencast/opencast/pull/4876)]
+- Made standalone Editor default videoeditor in Opencast [[#4876](https://github.com/opencast/opencast/pull/4876)]
 - Made Composite Ffmpeg command configurable to support GPU encoding [[#4878](https://github.com/opencast/opencast/pull/4878)]
 
 Release Schedule
