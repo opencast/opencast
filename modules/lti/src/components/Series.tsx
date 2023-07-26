@@ -59,8 +59,8 @@ const SeriesEpisode: React.StatelessComponent<EpisodeProps> = ({ episode, delete
     return <div
         className="list-group-item list-group-item-action d-flex justify-content-start align-items-center episode-item"
         onClick={(_) => { window.location.href = "/play/" + episode.id; }}>
-        <div>
-            <img alt="Preview" className="img-fluid" src={image} />
+        <div className="thumbnail-container">
+            <img alt="Preview" className="img-fluid thumbnail-image" src={image} />
         </div>
         <div className="ms-3">
             <h4>{episode.dcTitle}</h4>
