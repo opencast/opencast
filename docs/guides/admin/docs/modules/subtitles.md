@@ -28,9 +28,11 @@ should work without them being present, falling back to generic displays, or not
 
 The following is a list of tags that Opencast components may recognize:
 - `lang:<language>`
-	- `<language>` represents a language code of the form TODO: WHICH LANGUAGE CODE?
+	- `<language>` represents a language code of the form `en` or `en-US`.
+	    - Based on the [IETF BCP 47 language tag specification](https://www.rfc-editor.org/info/rfc5646).
+	    - Can either be a two letter language code, or a two letter language code followed by a hyphen and a two letter
+	      region tag. Other subtags may not be supported by all Opencast services.
 	- Specifies the languages most prominently used in the subtitle.
-	- TODO: WHAT ABOUT SUBTITLES WITHOUT A MAJOR LANGUAGE
 	- Even though all tags are optional, it is recommended to set this tag if possible, as it can help the most with
 	  user experience (For example, the Paella Player uses `lang` in its subtitle selection).  
 	  
