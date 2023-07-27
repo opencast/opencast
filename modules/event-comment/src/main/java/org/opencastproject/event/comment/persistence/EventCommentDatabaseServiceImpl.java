@@ -410,7 +410,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       logIndexRebuildBegin(logger, index.getIndexName(), total, "events with comment");
       final int[] current = new int[1];
       current[0] = 0;
-      int n = 16;
+      int n = 20;
       var updatedEventRange = new ArrayList<Event>();
 
       final Map<String, List<String>> eventsWithComments = getEventsWithComments();
