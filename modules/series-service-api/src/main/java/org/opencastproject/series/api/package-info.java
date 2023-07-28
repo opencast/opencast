@@ -19,7 +19,7 @@
  *
  */
 
- /*
+/**
  * Series service.
  * TODO
  *

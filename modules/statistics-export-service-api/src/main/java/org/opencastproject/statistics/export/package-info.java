@@ -19,5 +19,5 @@
  *
  */
 
- package org.opencastproject.statistics.export;
+package org.opencastproject.statistics.export;
 

@@ -19,7 +19,7 @@
  *
  */
 
- @XmlSchema(elementFormDefault = XmlNsForm.QUALIFIED,
+@XmlSchema(elementFormDefault = XmlNsForm.QUALIFIED,
            attributeFormDefault = XmlNsForm.UNQUALIFIED,
            namespace = "http://mediapackage.opencastproject.org")
 package org.opencastproject.mediapackage;

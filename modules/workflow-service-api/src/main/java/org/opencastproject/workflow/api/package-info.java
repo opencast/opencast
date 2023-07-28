@@ -19,7 +19,7 @@
  *
  */
 
- /*
+/**
  * Workflow service.
  */
 @XmlSchema(elementFormDefault = XmlNsForm.QUALIFIED, attributeFormDefault = XmlNsForm.UNQUALIFIED, namespace = "http://workflow.opencastproject.org", xmlns = {

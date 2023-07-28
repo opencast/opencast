@@ -19,7 +19,7 @@
  *
  */
 
-/*
+/**
  * User Tracking service implementation classes
  */
 @XmlSchema(elementFormDefault = XmlNsForm.QUALIFIED, attributeFormDefault = XmlNsForm.UNQUALIFIED, namespace = "http://usertracking.opencastproject.org")

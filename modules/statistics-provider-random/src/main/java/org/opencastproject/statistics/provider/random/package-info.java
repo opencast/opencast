@@ -19,5 +19,5 @@
  *
  */
 
- package org.opencastproject.statistics.provider.random;
+package org.opencastproject.statistics.provider.random;
 
