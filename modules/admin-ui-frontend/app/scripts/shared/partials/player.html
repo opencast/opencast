@@ -1,6 +1,6 @@
 <div class="video-player">
   <div>
-    <video id="player">
+    <video id="player" crossorigin="anonymous">
       <source ng-repeat="preview in video.previews" ng-src="{{ preview.uri | trusted }}" type="video/mp4" />
       Your browser does not support HTML5 video.
     </video>

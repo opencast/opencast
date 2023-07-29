@@ -40,11 +40,16 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.tobira.impl.TobiraEndpoint;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
+import org.opencastproject.userdirectory.JpaUserReferenceProvider;
+
+import com.google.gson.Gson;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
@@ -52,6 +57,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,6 +94,8 @@ public class ScheduledDataCollector extends TimerTask {
   /* How many records to get from the search index at once */
   private static final int SEARCH_ITERATION_SIZE = 100;
 
+  private static final Gson gson = new Gson();
+
   //================================================================================
   // OSGi properties
   //================================================================================
@@ -112,10 +121,14 @@ public class ScheduledDataCollector extends TimerTask {
   private SearchService searchService;
 
   /** User and role provider */
-  protected JpaUserAndRoleProvider userAndRoleProvider;
+  protected UserProvider userRefProvider;
+
+  protected JpaUserAndRoleProvider userProvider;
 
   /** The security service */
   protected SecurityService securityService;
+
+  protected TobiraEndpoint tobiraEndpoint;
 
 
   //================================================================================
@@ -224,8 +237,17 @@ public class ScheduledDataCollector extends TimerTask {
 
       if (adopter.allowsStatistics()) {
         try {
-          String statisticDataAsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
-          sender.sendStatistics(statisticDataAsJson);
+          StatisticData statisticData = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
+          sender.sendStatistics(statisticData.jsonify());
+          if (null != tobiraEndpoint) {
+            String tobiraJson = tobiraEndpoint.getStats().toString();
+            // This is null in the case that Tobira hasn't sent any stats yet.
+            // This could be due to Tobira not existing, or because we've just rebooted.
+            if (null != tobiraJson) {
+              sender.sendTobiraData(
+                  "{ \"statistic_key\": \"" + statisticData.getStatisticKey() + "\", \"data\": " + tobiraJson + " }");
+            }
+          }
           //Note: save the form (unmodified) (again!) to update the dates.  Old dates cause warnings to the user!
           adopterFormService.saveFormData(adopter);
         } catch (Exception e) {
@@ -240,12 +262,14 @@ public class ScheduledDataCollector extends TimerTask {
     String generalJson = collectGeneralData(adopter);
     String statsJson;
     if (adopter.allowsStatistics()) {
-      statsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
+      statsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey()).jsonify();
     } else {
       statsJson = "{}";
     }
+    String tobiraJson = gson.toJson(tobiraEndpoint.getStats());
+
     //It's not stupid if it works!
-    return "{ \"general\":" + generalJson + ", \"statistics\":" + statsJson + "}";
+    return "{ \"general\":" + generalJson + ", \"statistics\":" + statsJson + ", \"tobira\":" + tobiraJson + "}";
   }
 
 
@@ -269,7 +293,7 @@ public class ScheduledDataCollector extends TimerTask {
    * @return The statistic data as JSON string.
    * @throws Exception General exception that can occur while gathering data.
    */
-  private String collectStatisticData(String adopterKey, String statisticKey) throws Exception {
+  private StatisticData collectStatisticData(String adopterKey, String statisticKey) throws Exception {
     StatisticData statisticData = new StatisticData(statisticKey);
     statisticData.setAdopterKey(adopterKey);
     serviceRegistry.getHostRegistrations().forEach(host -> {
@@ -288,8 +312,6 @@ public class ScheduledDataCollector extends TimerTask {
     statisticData.setJobCount(serviceRegistry.count(null, null));
 
     statisticData.setSeriesCount(seriesService.getSeriesCount());
-    statisticData.setUserCount(userAndRoleProvider.countAllUsers());
-
     SearchQuery sq = new SearchQuery();
     sq.withId("");
     sq.withElementTags(new String[0]);
@@ -333,10 +355,14 @@ public class ScheduledDataCollector extends TimerTask {
           logger.warn("Unable to calculate total minutes, unauthorized");
         }
         statisticData.setTotalMinutes(current + orgDuration);
+
+        //Add the users for each org
+        long currentUsers = statisticData.getUserCount();
+        statisticData.setUserCount(currentUsers + userProvider.countUsers() + userRefProvider.countUsers());
       });
     }
     statisticData.setVersion(version);
-    return statisticData.jsonify();
+    return statisticData;
   }
 
 
@@ -378,10 +404,16 @@ public class ScheduledDataCollector extends TimerTask {
     this.searchService = searchService;
   }
 
-  /** OSGi setter for the user provider. */
+  /** OSGi setter for the userref provider. */
   @Reference
-  public void setUserAndRoleProvider(JpaUserAndRoleProvider userAndRoleProvider) {
-    this.userAndRoleProvider = userAndRoleProvider;
+  public void setUserRefProvider(JpaUserReferenceProvider userRefProvider) {
+    this.userRefProvider = userRefProvider;
+  }
+
+  /* OSGi setter for the user provider. */
+  @Reference
+  public void setUserAndRoleProvider(JpaUserAndRoleProvider userProvider) {
+    this.userProvider = userProvider;
   }
 
   /** OSGi callback for setting the security service. */
@@ -396,4 +428,15 @@ public class ScheduledDataCollector extends TimerTask {
     this.organizationDirectoryService = orgDirServ;
   }
 
+  @Reference(
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "unsetTobiraEndpoint")
+  public void setTobiraEndpoint(TobiraEndpoint endpoint) {
+    this.tobiraEndpoint = endpoint;
+  }
+
+  public void unsetTobiraEndpoint(TobiraEndpoint endpoint) {
+    this.tobiraEndpoint = null;
+  }
 }

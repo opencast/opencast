@@ -981,7 +981,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
                 if (updatedEventRange.size() >= n || current >= total) {
                   index.bulkEventUpdate(updatedEventRange);
-                  logIndexRebuildProgress(logger, index.getIndexName(), total, current);
+                  logIndexRebuildProgress(logger, index.getIndexName(), total, current, n);
                   updatedEventRange.clear();
                 }
               } catch (Throwable t) {
