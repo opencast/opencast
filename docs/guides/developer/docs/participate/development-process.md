@@ -98,10 +98,11 @@ Only a committer can perform a merge, so if a reviewed pull request has not yet 
 feel free to contact one.
 
 There are a couple of rules that committers must follow when merging pull requests. These are:
+
 * A pull request requires at least one approving review before merging.
     * More reviews are always welcome.
 * A pull request must be approved at the weekly technical meeting before merging (visit https://docs.opencast.org/ for
-the time and place of the technical meeting).
+  the time and place of the technical meeting).
 * Reviewing or merging your own pull requests is strongly discouraged, but technically allowed.
     * It is advised to be pragmatic and only do so if necessary.
 
