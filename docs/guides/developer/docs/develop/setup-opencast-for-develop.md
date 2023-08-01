@@ -6,8 +6,8 @@ This is meant for developers.
 For the installation of a production cluster, take a look at the admin guides.
 
 
-TL;DR
------
+## TL;DR
+
 
 ```sh
 $ git clone https://github.com/opencast/opencast.git
@@ -26,8 +26,8 @@ Default credentials are:
 
 Where `*` is the version number of the distribution.
 
-Clone Opencast
---------------
+## Clone Opencast
+
 
 You can get the Opencast source code by cloning the Git repository.
 
@@ -38,8 +38,8 @@ $ git clone https://github.com/opencast/opencast.git
 ```
 
 
-Install Dependencies
---------------------
+## Install Dependencies
+
 
 Please make sure to install the following dependencies.
 
@@ -105,6 +105,31 @@ Option | Description
 `-DtrimStackTrace=false` | Do not trim stack traces in the logs
 `-DskipTests=true` | Skip tests
 `-T 1.0C` | Use multiple threads for building (Experimental)
+
+### Build Single Modules
+
+When working on a single Opencast module, it can be extremely helpful to watch the newly built version and include
+it automatically in the Opencast OSGi infrastructure. This can be done through the
+[bundle:watch](https://karaf.apache.org/manual/latest/commands/bundle-watch.html) command in Karaf. The workflow would
+be as follows:
+
+* Start Opencast and use `la -u` in the Karaf console to list all installed bundles/modules. Note down the IDs of the
+  bundles you want to watch.
+* Use `bundle:watch IDs` to watch the desired modules, e.g. `bundle:watch 190 199`
+* Make your changes and rebuild the module (e.g. execute `mvn clean install` in the module folder).
+* Watch how Karaf automatically redeploys the changed jars from your local Maven repository. You can verify that
+  everything went smoothly by checking the log with `log:tail`.
+
+To see this technique in action, you can watch the following short video:
+
+* [Opencast development: Watch and reload modules](https://asciinema.org/a/348132)
+
+The updated bundles are only available in the currently running Karaf instance. To create a Opencast version that has
+this changes permanently, you have to run `mvn clean install` in the the assemblies directory again. Your current
+instance will be deleted by the new assembly!
+
+In several cases the `bundle:watch` can bring Karaf in an unstable condition, as dependencies between bundles will not
+correctly be restored, after the new bundle has been deployed.
 
 
 ### Examples
