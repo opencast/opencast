@@ -10,6 +10,8 @@
     <replaceregexp file="target/assembly/bin/karaf" match=" init$" replace=" [ -z &quot;${TERM##*256color}&quot; ] &amp;&amp; export TERM=xterm-color&#x0A;    init" byline="true"/>
     <!-- Make sure bundle cache gets cleared by default -->
     <replaceregexp file="target/assembly/etc/system.properties" match="^karaf.clean.cache .*=.*$" replace="karaf.clean.cache = true" byline="true"/>
+    <!-- Disable feature auto refresh (it's broken rn, see #5151) -->
+    <replaceregexp file="target/assembly/etc/org.apache.karaf.features.cfg" match="^autoRefresh=\s*.*$" replace="autoRefresh=false" byline="true"/>
     <!-- Additional config lines to system.properties -->
     <concat destfile="target/assembly/etc/system.properties" append="true">
       <filelist dir="../resources" files="system.properties.append"/>
