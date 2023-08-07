@@ -305,7 +305,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
           int total = themes.size();
           logIndexRebuildBegin(logger, index.getIndexName(), total, "themes", organization);
           int current = 0;
-          int n = 16;
+          int n = 20;
           List<IndexTheme> updatedThemeRange = new ArrayList<>();
 
           for (Theme theme : themes) {
