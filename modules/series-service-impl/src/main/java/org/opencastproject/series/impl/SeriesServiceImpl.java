@@ -515,7 +515,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       final int total = databaseSeries.size();
       logIndexRebuildBegin(logger, index.getIndexName(), total, "series");
       int current = 0;
-      int n = 16;
+      int n = 20;
       var updatedSeriesRange = new ArrayList<Series>();
 
       for (SeriesEntity series: databaseSeries) {

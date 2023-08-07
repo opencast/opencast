@@ -2173,7 +2173,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       if (total > 0) {
         logIndexRebuildBegin(logger.getSlf4jLogger(), index.getIndexName(), total, "workflows");
         int current = 0;
-        int n = 16;
+        int n = 20;
         List<WorkflowIndexData> workflowIndexData;
 
         int limit = 1000;
