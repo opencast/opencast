@@ -1146,8 +1146,8 @@
       <dependency>
         <groupId>org.easymock</groupId>
         <artifactId>easymock</artifactId>
-        <scope>test</scope>
         <version>5.1.0</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.easymock</groupId>
@@ -1174,8 +1174,9 @@
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
+        <artifactId>slf4j-reload4j</artifactId>
         <version>1.7.36</version>
+        <scope>test</scope>
       </dependency>
       <!-- apache commons syncing -->
       <dependency>
