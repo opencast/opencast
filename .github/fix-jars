@@ -1,0 +1,33 @@
+#!/bin/sh
+
+set -eu
+
+cd build
+for tarball in opencast*.tar.gz
+do
+  tar xf "${tarball}"
+  distname="$(echo "${tarball}" | sed 's/-[0-9].*//')"
+
+  cd "${distname}/system/org/opencastproject/"
+
+  find . -name '*jar' | while read i
+  do
+    if ! zip --test "$i" &> /dev/null
+    then
+      echo "$i is broken -> Fixing"
+      tmpdir="$(mktemp --directory)"
+      jarpath="$(readlink -f "$i")"
+      cd "${tmpdir}"
+      unzip "${jarpath}"
+      zip -r --compression-method store fix.zip *
+      mv -v fix.zip "${jarpath}"
+      cd -
+      rm -rf "${tmpdir}"
+    fi
+  done
+
+  cd ../../../../
+  rm "${tarball}"
+  tar cfz "${tarball}" "${distname}"
+  rm -r "${distname}"
+done

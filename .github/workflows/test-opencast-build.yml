@@ -86,11 +86,21 @@ jobs:
             -Dmaven.wagon.http.pool=false \
             -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
 
+      - name: fix jar files
+        if: matrix.java == 11
+        run: |
+            .github/fix-jars
+
       - name: prepare allinone distribution
         if: matrix.java == 11
         working-directory: build
         run: |
           tar xf opencast-dist-allinone*.tar.gz
+
+      - name: verify jar file integrity
+        if: matrix.java == 11
+        run: |
+          .github/test-jars
 
       - name: prepare runtime dependencies
         if: matrix.java == 11
