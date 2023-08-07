@@ -574,8 +574,6 @@
               <Bundle-DocURL>https://opencast.org/</Bundle-DocURL>
               <Bundle-Vendor>The Opencast Project</Bundle-Vendor>
               <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-              <!-- Can be removed after upgrading to OSGi R7 or later. -->
-              <_noimportjava>true</_noimportjava>
             </instructions>
           </configuration>
         </plugin>
