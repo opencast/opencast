@@ -34,11 +34,6 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
-import org.apache.commons.io.IOUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -46,21 +41,13 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 /**
@@ -110,15 +97,9 @@ public class TobiraEndpoint {
   private static final int VERSION_MINOR = 2;
   private static final String VERSION = VERSION_MAJOR + "." + VERSION_MINOR;
 
-  private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-  private static final Gson gson = new Gson();
-
   private SearchService searchService;
   private SeriesService seriesService;
   private Workspace workspace;
-
-  private JsonObject stats = new JsonObject();
 
   @Activate
   public void activate(BundleContext bundleContext) {
@@ -222,37 +203,5 @@ public class TobiraEndpoint {
   private static Response badRequest(String msg) {
     logger.warn("Bad request to tobira/harvest: {}", msg);
     return Response.status(BAD_REQUEST).entity(msg).build();
-  }
-
-  @POST
-  @Path("/stats")
-  @Consumes(APPLICATION_JSON)
-  @RestQuery(
-      name = "stats",
-      description = "Accepts a json blob of statistical data about Tobira.",
-      restParameters = {},
-      bodyParameter = @RestParameter(description = "The Tobira data blob",
-            isRequired = true,
-            name = "BODY",
-            type = Type.STRING),
-      responses = {
-          @RestResponse(description = "Stats parsed", responseCode = HttpServletResponse.SC_ACCEPTED)
-      },
-      returnDescription = "No data returned, just a 204 on success"
-  )
-  public Response acceptStats(@Context HttpServletRequest request) {
-    try (InputStream is = request.getInputStream()) {
-      String json = IOUtils.toString(is, request.getCharacterEncoding());
-      stats = gson.fromJson(json, JsonElement.class).getAsJsonObject();
-      stats.addProperty("updated", sdf.format(Calendar.getInstance().getTime()));
-    } catch (IOException e) {
-      logger.error("Error parsing Tobira stats blob", e);
-      return Response.status(BAD_REQUEST).build();
-    }
-    return Response.noContent().build();
-  }
-
-  public JsonObject getStats() {
-    return stats;
   }
 }
