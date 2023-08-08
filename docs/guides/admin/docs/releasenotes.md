@@ -1,5 +1,13 @@
 # Opencast 12: Release Notes
 
+Opencast 12.13
+--------------
+
+The off-schedule release of Opencast 12.
+The release fixes corrupt zip headers in the distributed jar files.
+
+For more details, please take a look at [the changelog](changelog.md).
+
 Opencast 12.12
 --------------
 

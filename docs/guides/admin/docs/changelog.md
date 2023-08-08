@@ -4,6 +4,15 @@ Changelog
 Opencast 12
 -----------
 
+### Opencast 12.13
+
+*Released on August 8th, 2023*
+
+- [[#5158](https://github.com/opencast/opencast/pull/5158)] -
+  Update maven-bundle-plugin to latest version to fix invalid
+  zip headers in jar files distributed by Opencast; otherwise
+  Opencast would not start up with OpenJDK 11.0.20.
+
 ### Opencast 12.12
 
 *Released on June 15th, 2023*
