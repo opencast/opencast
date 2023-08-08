@@ -7,13 +7,13 @@ Common Developer Pitfalls
 Every development environment has its quirks, so here are a few which have been collected by the community:
 
 ### General
-* Build Opencast, then open your IDE.  Opencast generates a number of classes as part of its build process (eg:
-  QSnapshotDto), which will not be found by your IDE and thus cause build errors.  It is possible to get your IDE
+* Build Opencast, then open your IDE.  Opencast generates a number of classes as part of its build process (e.g.,
+  `QSnapshotDto`), which will not be found by your IDE and thus cause build errors.  It is possible to get your IDE
   to run the appropriate Maven lifecycle event, but that can be hit-and-miss in terms of functionality.
 * If your IDE stubbornly refuses to acknowledge that a class exists, even when you're sure it's there, try closing your
-  IDE, then running `git clean -fdx`, then building.  This will ensure everything in your clone is up to date.  Also
+  IDE, then running `git clean -fdx`, then building.  This will ensure everything in your clone is up-to-date.  Also
   ensure you find your project workspace to make sure your IDE isn't keeping a cache of things.
-* Check if you have selected the correct java version in your IDE. Opencast requires Java 11, but your IDE might have
+* Check if you have selected the correct java version in your IDE. Opencast requires Java 11 or 17, but your IDE might have
   selected a different version.
 * Absolute worst case, remove your Maven cache (typically ~/.m2), and possibly your Node cache (typically ~/.npm) and
   repeat the above steps.  This is completely starting from scratch.
@@ -73,7 +73,7 @@ Specific development environments tips
 --------------------------------------
 
 
-### Ubuntu
+### Ubuntu (Using JDK 11)
 
 #### Update System
 
@@ -97,18 +97,18 @@ $ sudo apt-get install -y nodejs
 
 #### Install and start Elasticsearch with Docker
 
-You can use `docker-compose` to easily run Elasticsearch:
+You can use `docker compose` to easily run Elasticsearch:
 
 ```sh
 $ cd docs/scripts/devel-dependency-containers
-$ docker-compose up -d
+$ docker compose up -d
 ```
 
 To shut the services down again, run:
 
 ```sh
 $ cd docs/scripts/devel-dependency-containers
-$ docker-compose down
+$ docker compose down
 ```
 
 
@@ -119,25 +119,6 @@ Choose the Java Version 11 by entering:
 ```sh
 $ update-alternatives --config java
 ```
-
-
-### Fedora
-
-
-#### Update System
-
-```sh
-$ dnf update -y
-```
-
-#### Install Dependencies
-
-```sh
-$ dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm -y
-$ dnf group install 'Development Tools'
-$ dnf install -y ffmpeg maven tesseract hunspell sox synfig unzip gcc-c++ tar bzip2 nodejs
-```
-
 
 ### macOS
 
