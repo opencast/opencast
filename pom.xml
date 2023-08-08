@@ -566,7 +566,7 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
-          <version>5.1.2</version>
+          <version>5.1.9</version>
           <inherited>true</inherited>
           <configuration>
             <instructions>
@@ -574,6 +574,8 @@
               <Bundle-DocURL>https://opencast.org/</Bundle-DocURL>
               <Bundle-Vendor>The Opencast Project</Bundle-Vendor>
               <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+              <!-- Can be removed after upgrading to OSGi R7 or later. -->
+              <_noimportjava>true</_noimportjava>
             </instructions>
           </configuration>
         </plugin>
