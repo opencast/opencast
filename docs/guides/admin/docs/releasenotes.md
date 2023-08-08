@@ -1,5 +1,17 @@
 # Opencast 12: Release Notes
 
+Opencast 12.13
+--------------
+
+The off-schedule release of Opencast 12.
+The release fixes corrupt zip headers in the distributed jar files.
+This was causing Opencast to fail at startup in combination with a recent OpenJDK security update.
+
+The alternative to updating to this release is to run Java with `-Djdk.util.zip.disableZip64ExtraFieldValidation=true`.
+Setting this will disable the new security check.
+
+For more details, please take a look at [the changelog](changelog.md).
+
 Opencast 12.12
 --------------
 
