@@ -6,8 +6,16 @@ Opencast 13.9
 
 The ninth maintenance release of Opencast 13.
 
+The release fixes corrupt zip headers in the distributed jar files.
+This was causing Opencast to fail at startup in combination with a recent OpenJDK security update.
+
+The alternative to updating to this release is to run Java with `-Djdk.util.zip.disableZip64ExtraFieldValidation=true`.
+Setting this will disable the new security check.
+
+Additionally, the following changes are part of this release.
+
 - Only show Asset Upload for options of correct type ([#5117](https://github.com/opencast/opencast/pull/5117))
-- Fix index rebuild ([#5115](https://github.com/opencast/opencast/pull/5115))
+- Index rebuild fixes ([#5115](https://github.com/opencast/opencast/pull/5115))
 - Mark tag operation as skipped if nothing happened ([#5108](https://github.com/opencast/opencast/pull/5108))
 
 See [changelog](changelog.md) for a comprehensive list of changes.

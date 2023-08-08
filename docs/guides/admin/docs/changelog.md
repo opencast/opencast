@@ -4,6 +4,27 @@ Changelog
 Opencast 13
 -----------
 
+### Opencast 13.9
+
+*Released on August 8th, 2023*
+
+- [[#5158](https://github.com/opencast/opencast/pull/5158)] -
+  Update maven-bundle-plugin to latest version to fix invalid
+  zip headers in jar files distributed by Opencast; otherwise
+  Opencast would not start up with OpenJDK 11.0.20.
+- [[#5161](https://github.com/opencast/opencast/pull/5161)] -
+  Revert "Enable Tobira adopter stats tracking"
+- [[#5153](https://github.com/opencast/opencast/pull/5153)] -
+  Disable auto refresh on feature installation
+- [[#5123](https://github.com/opencast/opencast/pull/5123)] -
+  Add Opencast 13.8 release notes
+- [[#5117](https://github.com/opencast/opencast/pull/5117)] -
+  Only show Asset Upload for options of correct type
+- [[#5115](https://github.com/opencast/opencast/pull/5115)] -
+  Fix index rebuild
+- [[#5108](https://github.com/opencast/opencast/pull/5108)] -
+  Mark tag operation as skipped if nothing happened
+
 ### Opencast 13.8
 
 *Released on July 26th, 2023*
