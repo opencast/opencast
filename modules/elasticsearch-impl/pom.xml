@@ -190,6 +190,7 @@
               !javax.activation.*,
               !javax.annotation,
               !jdk.net,
+              !java.nio.file.spi.*,
               !org.elasticsearch.geometry.*,
               !org.elasticsearch.secure_sm.*,
               !org.jctools.queues.*,
