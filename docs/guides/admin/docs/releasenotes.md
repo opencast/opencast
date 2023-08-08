@@ -1,6 +1,18 @@
 # Opencast 13: Release Notes
 
 
+Opencast 13.9
+-------------
+
+The ninth maintenance release of Opencast 13.
+
+- Only show Asset Upload for options of correct type ([#5117](https://github.com/opencast/opencast/pull/5117))
+- Fix index rebuild ([#5115](https://github.com/opencast/opencast/pull/5115))
+- Mark tag operation as skipped if nothing happened ([#5108](https://github.com/opencast/opencast/pull/5108))
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
+
 Opencast 13.8
 -------------
 
