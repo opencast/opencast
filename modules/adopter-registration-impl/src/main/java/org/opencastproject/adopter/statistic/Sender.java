@@ -54,8 +54,6 @@ public class Sender {
   private static final String GENERAL_DATA_URL_SUFFIX = "api/1.0/adopter";
   private static final String STATISTIC_URL_SUFFIX = "api/1.0/statistic";
 
-  private static final String TOBIRA_URL_SUFFIX = "api/1.0/tobira";
-
   //================================================================================
   // Constructor
   //================================================================================
@@ -100,15 +98,6 @@ public class Sender {
    */
   public void sendStatistics(String json) throws IOException {
     send(json, STATISTIC_URL_SUFFIX);
-  }
-
-  /**
-   * Executes the 'send' method with the proper REST URL suffix.
-   * @param json The data which shall be sent.
-   * @throws IOException General exception that can occur while sending the data.
-   */
-  public void sendTobiraData(String json) throws IOException {
-    send(json, TOBIRA_URL_SUFFIX);
   }
 
   /**

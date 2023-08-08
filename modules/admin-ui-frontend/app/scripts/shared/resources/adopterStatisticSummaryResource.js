@@ -32,7 +32,6 @@ angular.module('adminNg.resources')
           var shortenedServices = data['statistics']['hosts'][host]['services'].substring(0, 50) + '[...]';
           data['statistics']['hosts'][host]['services'] = shortenedServices;
         }*/
-        data['statistics']['tobira'] = data['tobira'];
         return {'general': data['general'], 'statistics': data['statistics']};
       }
     }
