@@ -39,14 +39,12 @@ export default class MultiVideoDynamicLayout extends VideoLayout {
     return [streamData];
   }
 
-  // eslint-disable-next-line no-unused-vars
-  getValidContentIds(streamData) {
+  getValidContentIds() {
     // Ignore content of streamData
     return this.validContentIds;
   }
 
-  // eslint-disable-next-line no-unused-vars
-  getLayoutStructure(streamData, contentId) {
+  getLayoutStructure(streamData) {
     if (!this._currentVideos) {
       const size = 100 / streamData.length;
       this._currentVideos = streamData.map(d => {
