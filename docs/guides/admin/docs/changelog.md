@@ -5,6 +5,18 @@ Changelog
 Opencast 14
 -----------
 
+### Opencast 14.2
+
+*Released on August 9th, 2023*
+
+- [[#5159](https://github.com/opencast/opencast/pull/5159)] -
+  Remove obsolete maven-bundle-plugin config
+- [[#5124](https://github.com/opencast/opencast/pull/5124)] -
+  Fix changed pax web config keys
+- [[#5114](https://github.com/opencast/opencast/pull/5114)] -
+  Upgrade Crowdin Integration
+
+
 ### Opencast 14.1
 
 *Released on July 13th, 2023*

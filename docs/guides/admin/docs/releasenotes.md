@@ -1,5 +1,19 @@
 # Opencast 14: Release Notes
 
+## Opencast 14.2
+
+Opencast 14.2 is a minor release. The release fixes elasticsearch package imports. This was causing Opencast to fail at startup in combination with a recent OpenJDK security update.
+
+The alternative to updating to this release is to run Java with `-Djdk.util.zip.disableZip64ExtraFieldValidation=true`.
+Setting this will disable the new security check.
+
+Additionally, the following changes are part of this release.
+
+- Fix changed pax web config keys ([#5124](https://github.com/opencast/opencast/pull/5124))
+- Upgrade Crowdin Integration ([#5114](https://github.com/opencast/opencast/pull/5114))
+
+See [changelog](changelog.md#opencast-14.2) for a comprehensive list of changes.
+
 ## Opencast 14.1
 
 Opencast 14.1 is a minor release, containing documentation improvements and Paella Player 7 trimming URL parameter fix.
