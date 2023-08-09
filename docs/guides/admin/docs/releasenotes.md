@@ -2,7 +2,8 @@
 
 ## Opencast 14.2
 
-Opencast 14.2 is a minor release. The release fixes elasticsearch package imports. This was causing Opencast to fail at startup in combination with a recent OpenJDK security update.
+Opencast 14.2 is a minor release. The release fixes corrupt zip headers in the distributed jar files and elasticsearch
+package imports. This was causing Opencast to fail at startup in combination with a recent OpenJDK security update.
 
 The alternative to updating to this release is to run Java with `-Djdk.util.zip.disableZip64ExtraFieldValidation=true`.
 Setting this will disable the new security check.
