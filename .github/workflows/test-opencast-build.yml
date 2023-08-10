@@ -94,6 +94,11 @@ jobs:
         run: |
           tar xf opencast-dist-allinone*.tar.gz
 
+      - name: verify jar file integrity
+        if: matrix.java == 11
+        run: |
+          .github/test-jars
+
       - name: prepare runtime dependencies
         if: matrix.java == 11
         working-directory: docs/scripts/devel-dependency-containers
