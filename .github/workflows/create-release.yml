@@ -38,10 +38,6 @@ jobs:
             -DskipTests \
             -Dcheckstyle.skip=true
 
-      - name: fix jar files
-        run: |
-            .github/fix-jars
-
       - name: Get the version
         id: get_version
         run: |

@@ -2,7 +2,7 @@
 
 set -eu
 
-find build/opencast-*/system/org/opencastproject -name '*.jar' | while read jarfile
+find build/opencast-*/system/org/opencastproject -name '*.jar' | while read -r jarfile
 do
   zip --test "${jarfile}"
 done
