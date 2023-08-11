@@ -1,4 +1,5 @@
-project_identifier: opencast-community
+project_id: 285795
+api_token_env: CROWDIN_TOKEN
 base_path: .
 preserve_hierarchy: true
 
@@ -6,14 +7,6 @@ files:
   -
     source: '/modules/admin-ui-frontend/resources/public/org/opencastproject/adminui/languages/lang-en_US.json'
     translation: '/modules/admin-ui-frontend/resources/public/org/opencastproject/adminui/languages/lang-%locale_with_underscore%.json'
-
-  -
-    source: '/modules/engage-theodul-core/src/main/resources/ui/language/en-US.json'
-    translation: '/modules/engage-theodul-core/src/main/resources/ui/language/%locale%.json'
-
-  -
-    source: '/modules/**/src/main/resources/static/language/en-US.json'
-    translation: '/%original_path%/%locale%.json'
 
   -
     source: '/modules/engage-ui/src/main/resources/ui/language/en-US.json'

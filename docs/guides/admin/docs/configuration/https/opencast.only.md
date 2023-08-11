@@ -26,11 +26,11 @@ org.osgi.service.http.port.secure=8443
 #     -keypass password -storepass password -keystore keystore.jks
 org.ops4j.pax.web.ssl.keystore=<path_to_keystore>
 
-# Password used for keystore integrity check.
-org.ops4j.pax.web.ssl.password=<the_keystore_password>
-
 # Password used for keystore.
-org.ops4j.pax.web.ssl.keypassword=<the_key_password>
+org.ops4j.pax.web.ssl.keystore.password=<the_keystore_password>
+
+#  Password for private key entry inside server keystore.
+org.ops4j.pax.web.ssl.key.password=<the_key_password>
 ```
 
 

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -2173,7 +2173,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       if (total > 0) {
         logIndexRebuildBegin(logger.getSlf4jLogger(), index.getIndexName(), total, "workflows");
         int current = 0;
-        int n = 16;
+        int n = 20;
         List<WorkflowIndexData> workflowIndexData;
 
         int limit = 1000;
@@ -2207,7 +2207,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
                 if (updatedWorkflowRange.size() >= n || current >= total) {
                   index.bulkEventUpdate(updatedWorkflowRange);
-                  logIndexRebuildProgress(logger.getSlf4jLogger(), index.getIndexName(), total, current);
+                  logIndexRebuildProgress(logger.getSlf4jLogger(), index.getIndexName(), total, current, n);
                   updatedWorkflowRange.clear();
                 }
               }

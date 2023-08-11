@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -216,7 +216,7 @@ public class JobDispatcher {
         logger.warn("Dispatch interval {} ms too low, adjusting to {}", dispatchInterval, MIN_DISPATCH_INTERVAL);
         dispatchInterval = MIN_DISPATCH_INTERVAL;
       } else {
-        logger.info("Dispatch interval set to {} ms", dispatchInterval);
+        logger.info("Dispatch interval set to {} seconds", dispatchInterval);
       }
     }
 

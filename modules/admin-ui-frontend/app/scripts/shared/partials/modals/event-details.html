@@ -171,7 +171,7 @@
                   <th class="medium">
                     <a translate="EVENTS.EVENTS.NEW.UPLOAD_ASSET.ADD"
                        class="details-link"
-                       ng-show="(uploadAssetOptions && !transactions.read_only)"
+                       ng-show="((uploadAssetOptions | filter: {showAs: 'uploadAsset'}).length > 0 && !transactions.read_only)"
                        ng-click="openSubTab('newAssetUpload', 'EventAssetAttachmentsResource', 'newassetupload', false, true)"
                        with-role="ROLE_UI_EVENTS_DETAILS_ASSETS_EDIT">
                     </a>

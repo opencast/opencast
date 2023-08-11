@@ -104,6 +104,7 @@ nav:
       - Base API: 'architecture/api/base-api.md'
       - Agents API: 'architecture/api/agents-api.md'
       - Events API: 'architecture/api/events-api.md'
+      - ListProvider API: 'architecture/api/listprovider-api.md'
       - Series API: 'architecture/api/series-api.md'
       - Statistics API: 'architecture/api/statistics-api.md'
       - Groups API: 'architecture/api/groups-api.md'
