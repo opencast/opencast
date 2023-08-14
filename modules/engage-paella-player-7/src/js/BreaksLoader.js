@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,10 +19,12 @@
  *
  */
 
+import { getUrlFromOpencastServer } from './PaellaOpencast';
+
 export const loadBreaks = async (player, videoId) => {
+  const requestUrl = `/annotation/annotations.json?episode=${videoId}&type=paella%2Fbreaks&day=&limit=1&offset=0`;
   const breaks = [];
-  const response = await fetch(`/annotation/annotations.json?episode=${videoId}` +
-    '&type=paella%2Fbreaks&day=&limit=1&offset=0');
+  const response = await fetch(getUrlFromOpencastServer(requestUrl));
   if (response.ok) {
     try {
       const data = await response.json();

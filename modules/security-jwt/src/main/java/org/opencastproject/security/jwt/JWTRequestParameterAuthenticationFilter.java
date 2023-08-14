@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -44,9 +44,6 @@ public class JWTRequestParameterAuthenticationFilter extends AbstractPreAuthenti
   /** If set to true, throws an exception when the configured parameter is not provided. */
   private boolean exceptionIfParameterMissing = true;
 
-  /** If set to true, all request headers will be logged. */
-  private boolean debug = false;
-
   @Override
   public void afterPropertiesSet() {
     super.afterPropertiesSet();
@@ -56,9 +53,7 @@ public class JWTRequestParameterAuthenticationFilter extends AbstractPreAuthenti
 
   @Override
   protected Object getPreAuthenticatedPrincipal(HttpServletRequest request) {
-    if (debug) {
-      Util.debug(logger, request);
-    }
+    Util.debug(logger, request);
 
     String token = request.getParameter(parameterName);
     if (token == null && exceptionIfParameterMissing) {
@@ -100,15 +95,6 @@ public class JWTRequestParameterAuthenticationFilter extends AbstractPreAuthenti
    */
   public void setExceptionIfParameterMissing(boolean exceptionIfParameterMissing) {
     this.exceptionIfParameterMissing = exceptionIfParameterMissing;
-  }
-
-  /**
-   * Setter for the debug switch.
-   *
-   * @param debug Value for the debug switch.
-   */
-  public void setDebug(boolean debug) {
-    this.debug = debug;
   }
 
 }

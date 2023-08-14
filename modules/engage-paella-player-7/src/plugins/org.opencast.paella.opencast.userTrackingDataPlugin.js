@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,6 +19,7 @@
  *
  */
 import { DataPlugin, Events } from 'paella-core';
+import { getUrlFromOpencastServer } from '../js/PaellaOpencast';
 
 export default class OpencastUserTrackingDataPlugin extends DataPlugin {
 
@@ -27,7 +28,7 @@ export default class OpencastUserTrackingDataPlugin extends DataPlugin {
       if (!(await super.isEnabled())) {
         return false;
       }
-      const response = await fetch('/usertracking/detailenabled');
+      const response = await fetch(getUrlFromOpencastServer('/usertracking/detailenabled'));
       const data = await response.text();
       const enabled = /true/i.test(data);
       return enabled;
@@ -76,7 +77,7 @@ export default class OpencastUserTrackingDataPlugin extends DataPlugin {
 
     const params = (new URLSearchParams(opencastLog)).toString();
     const requestUrl = `/usertracking/?_method=PUT&${ params }`;
-    const result = await fetch(requestUrl);
+    const result = await fetch(getUrlFromOpencastServer(requestUrl));
     if (!result.ok) {
       this.player.log.error('Error in user data log');
     }

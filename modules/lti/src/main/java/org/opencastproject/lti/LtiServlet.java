@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -24,6 +24,9 @@ package org.opencastproject.lti;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContextSelect;
+import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardServletName;
+import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardServletPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,15 +54,14 @@ import javax.ws.rs.core.UriBuilder;
  * produce JSON containing the LTI parameters passed during LTI launch.
  */
 @Component(
-    immediate = true,
     service = Servlet.class,
     property = {
         "service.description=LTI Servlet",
-        "alias=/lti",
-        "httpContext.id=opencast.httpcontext",
-        "httpContext.shared=true"
     }
 )
+@HttpWhiteboardServletName("/lti")
+@HttpWhiteboardServletPattern("/lti/*")
+@HttpWhiteboardContextSelect("(osgi.http.whiteboard.context.name=opencast)")
 public class LtiServlet extends HttpServlet {
 
   private static final String LTI_CUSTOM_PREFIX = "custom_";

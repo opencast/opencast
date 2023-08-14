@@ -149,6 +149,17 @@
       "HOTKEY_CHEAT_SHEET": "Tastenkürzel",
       "ADOPTER_REGISTRATION": "Adopter Registrierung"
    },
+   "REBUILD": {
+      "TITLE": "Index Rebuild",
+      "WARNING": "Attention!",
+      "HEADER": "Index rebuild in progress!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
+   },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Die Zugriffsrichtlinie wurde erstellt",
       "ACL_NOT_SAVED": "Die Zugriffsrichtlinie konnte nicht gespeichert werden",
@@ -896,7 +907,7 @@
                   "NEW": "Neue Richtlinie",
                   "NEW_USER": "Neuer Nutzer",
                   "DETAILS": "Nicht-Benutzer-Rollen",
-                  "USER": "Benutzer",
+                  "USER": "User",
                   "USERS": "Benutzer, die für das Event autorisiert sind",
                   "NONEXISTENT_USER": "Nicht existierender Nutzer",
                   "HELP": {
@@ -1130,7 +1141,7 @@
                   "NEW": "Neue Richtlinie",
                   "NEW_USER": "Neuer Nutzer",
                   "DETAILS": "Nicht-Nutzer-Rollen",
-                  "USER": "Benutzer",
+                  "USER": "User",
                   "USERS": "Nutzer, die für das Event autorisiert sind",
                   "HELP": {
                      "READ": "Durch das Setzen von Leserechte wird die Serie für den ausgewählten Nutzer sichtbar",
@@ -1225,7 +1236,7 @@
                   "LOAD_MORE_LIMIT": "angezeigte Richtlinien.",
                   "LOAD_MORE_LINK": "Mehr laden",
                   "NEW_USER": "Neuer Nutzer",
-                  "USER": "Benutzer",
+                  "USER": "User",
                   "USERS": "Nutzer, die für das Event autorisiert sind",
                   "NONEXISTENT_USER": "Nicht existierender Nutzer",
                   "HELP": {
@@ -1481,7 +1492,7 @@
                   "DETAILS": "Nicht-Nutzer-Rollen",
                   "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu",
                   "NEW_USER": "Neuer Nutzer",
-                  "USER": "Benutzer",
+                  "USER": "User",
                   "USERS": "Nutzer, die durch diese Zugriffsrichtlinie autorisiert sind",
                   "HELP": {
                      "READ": "Durch das Setzen von Leseberechtigungen wird das Medium, dem diese Zugriffsrichtlinie zugewiesen wird, für den ausgewählten Benutzer sichtbar.",
@@ -1530,7 +1541,7 @@
                   "DETAILS": "Nicht-Nutzer-Rollen",
                   "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu",
                   "NEW_USER": "Neuer Nutzer",
-                  "USER": "Benutzer",
+                  "USER": "User",
                   "USERS": "Nutzer, die durch diese Zugriffsrichtlinie autorisiert sind",
                   "NONEXISTENT_USER": "Nicht existierender Nutzer",
                   "HELP": {

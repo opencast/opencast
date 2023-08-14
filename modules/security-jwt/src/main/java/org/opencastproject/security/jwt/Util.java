@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -39,6 +39,10 @@ public final class Util {
    * @param request The request.
    */
   protected static void debug(Log logger, HttpServletRequest request) {
+    if (!logger.isDebugEnabled()) {
+      return;
+    }
+
     Enumeration<String> he = request.getHeaderNames();
     while (he.hasMoreElements()) {
       String headerName = he.nextElement();

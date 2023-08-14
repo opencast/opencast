@@ -47,7 +47,7 @@ First you have to install the necessary repositories so that your package manage
     repository. If you need the new release prior to its promotion to stable you can use the testing repository.
     Note that the testing repository is an additional repository and still requires the stable repository to be active.
 
-        echo "deb https://pkg.opencast.org/debian {{ opencast_major_version()}}.x stable testing" | sudo tee /etc/apt/sources.list.d/opencast.list
+        echo "deb https://pkg.opencast.org/debian {{ opencast_major_version() }}.x stable testing" | sudo tee /etc/apt/sources.list.d/opencast.list
 
 * Add the repository key to your apt keyring:
 
@@ -58,37 +58,29 @@ First you have to install the necessary repositories so that your package manage
         apt-get update
 
 
-Install Elasticsearch
----------------------
+Install OpenSearch
+------------------
 
-Starting with Opencast 9, Elasticsearch is now a dependency.  Our packages do not explicitly depend on Elasticsearch
-because it runs externally to Opencast.  By default we expect Elasticsearch to be running on the admin node, however
+Starting with Opencast 14, OpenSearch is now a dependency.  Our packages do not explicitly depend on OpenSearch
+because it runs externally to Opencast.  By default we expect OpenSearch to be running on the admin node, however
 you can configure the URL in Opencast's configuration files.
 
-In our repository we provide validated Elasticsearch packages copied from the upstream repository.  Installation can be
+In our repository we provide validated OpenSearch packages copied from the upstream repository.  Installation can be
 accomplished by running the following:
 
-    apt-get install elasticsearch-oss
+    apt-get install opensearch
 
-If you wish to use the upstream Elasticsearch repository directly be aware that Opencast only formally supports Elasticsearch
-versions with the same major and minor version values.  That is, if our 9.x repository has Elasticsearch 7.9.2 then
-Opencast only formally supports Elasticsearch versions starting with 7.9.
+If you wish to use the upstream OpenSearch repository directly be aware that Opencast only supported with OpenSearch 1.x
+and will not work with OpenSearch 2.x yet.  Future support for this is forthcoming.
 
-The default Elasticsearch configuration should work for Opencast out of the box, however there is one change you should make.
-[Log4Shell](https://nvd.nist.gov/vuln/detail/CVE-2021-44228) affects Elasticsearch, and you should mitigate this by adding a
-file at `/etc/elasticsearch/jvm.options.d/log4shell.options` with the content:
+The default OpenSearch configuration should work for Opencast out of the box, although we encourage you to set your
+index up in a secure manner.
 
-```
--Dlog4j2.formatMsgNoLookups=true
-```
-
-This applies a mitigation for the security issue.  Once applied, you should restart Elasticsearch.
-
-Finally, make sure to start and enable the service:
+After installing an configuring make sure to start and enable the service:
 
 ```sh
-systemctl start elasticsearch
-systemctl enable elasticsearch
+systemctl restart opensearch
+systemctl enable opensearch
 ```
 
 
@@ -99,7 +91,7 @@ Install Opencast
 
 For a basic installation (All-In-One) just run:
 
-    apt-get install opencast-{{ opencast_major_version() }}-allinone elasticsearch-oss
+    apt-get install opencast-{{ opencast_major_version() }}-allinone opensearch
 
 This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.  Note
 that while the repository provides a packaged version of FFmpeg, your distribution may have a version which is

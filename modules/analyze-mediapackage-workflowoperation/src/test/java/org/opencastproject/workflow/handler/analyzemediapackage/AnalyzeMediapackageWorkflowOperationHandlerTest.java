@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -85,10 +85,10 @@ public class AnalyzeMediapackageWorkflowOperationHandlerTest {
     Assert.assertTrue("Workflowproperty 'dublincore_episode_type' must be set to 'Catalog'.",
         StringUtils.equals("Catalog", wfProperties.get("dublincore_episode_type")));
 
-    Assert.assertTrue("Workflowproperty 'security_episode_xacml_exists' must be set to 'true'.",
-        StringUtils.equals("true", wfProperties.get("security_episode_xacml_exists")));
-    Assert.assertTrue("Workflowproperty 'security_episode_xacml_type' must be set to 'Attachment'.",
-        StringUtils.equals("Attachment", wfProperties.get("security_episode_xacml_type")));
+    Assert.assertTrue("Workflowproperty 'security_episode+xacml_exists' must be set to 'true'.",
+        StringUtils.equals("true", wfProperties.get("security_episode+xacml_exists")));
+    Assert.assertTrue("Workflowproperty 'security_episode+xacml_type' must be set to 'Attachment'.",
+        StringUtils.equals("Attachment", wfProperties.get("security_episode+xacml_type")));
 
     Assert.assertTrue("Workflowproperty 'presenter_source_exists' must be set to 'true'.",
         StringUtils.equals("true", wfProperties.get("presenter_source_exists")));
@@ -124,8 +124,8 @@ public class AnalyzeMediapackageWorkflowOperationHandlerTest {
 
     Assert.assertFalse("Workflowproperty 'dublincore_episode_exists' must not exists.",
         wfProperties.containsKey("dublincore_episode_exists"));
-    Assert.assertFalse("Workflowproperty 'security_episode_xacml_exists' must not exists.",
-        wfProperties.containsKey("security_episode_xacml_exists"));
+    Assert.assertFalse("Workflowproperty 'security_episode+xacml_exists' must not exists.",
+        wfProperties.containsKey("security_episode+xacml_exists"));
     Assert.assertFalse("Workflowproperty 'foo_bar_exists' must not exists.",
         wfProperties.containsKey("foo_bar_exists"));
   }

@@ -6,10 +6,10 @@ plugins:
   - search:
   - mermaid2:
       arguments:
-        theme: neutral
+        theme: 'neutral'
 
 # Default theme used is windmill
-theme: windmill
+theme: 'windmill'
 
 # The directory that contain the source .md files
 docs_dir: 'docs'
@@ -27,86 +27,91 @@ extra_javascript:
 
 # The logo in the header
 extra:
-  logo: 'opencast-white.svg'
+  logo: 'img/opencast-white.svg'
 
 # This needs to be listed in order to populate the left navigation and the TOC
 # Items will appear in this order
 nav:
 - Home: 'index.md'
-- Development Process:
-   - Installation: 'installation/source-linux.md'
-   - Development: 'development-process.md'
-   - Release Manager: 'release-manager.md'
-   - QA Coordinator: 'qa-coordinator.md'
-   - Security Issues: 'security.md'
-   - Code Style: 'code-style.md'
-   - Documentation: 'documentation.md'
-- Decision Making:
-   - Overview: 'decision-making/index.md'
-   - Lazy Consensus: 'decision-making/lazy-consensus.md'
-   - Consensus Building: 'decision-making/consensus-building.md'
-   - Voting: 'decision-making/voting.md'
-- Development Environment:
-   - Overview: 'development-environment.md'
-   - With Docker: 'development-environment-docker.md'
-- Committers: 'committer.md'
+- Participate:
+   - Development process: 'participate/development-process.md'
+   - Committers: 'participate/committer.md'
+   - Release manager: 'participate/release-manager.md'
+   - QA coordinator: 'participate/qa-coordinator.md'
+   - Translators: 'participate/translators.md'
+   - Submit issues/PRs: 
+      - Overview: 'participate/submit-issues-prs.md'
+      - Security issues: participate/security.md
+   - Decision making:
+      - Overview: 'participate/decision-making/index.md'
+      - Lazy consensus: 'participate/decision-making/lazy-consensus.md'
+      - Consensus building: 'participate/decision-making/consensus-building.md'
+      - Voting: 'participate/decision-making/voting.md'
+   - Governance: 'participate/governance.md'
+   - Services infrastructure:
+      - Overview: 'participate/infrastructure/index.md'
+      - Maven repository: 'participate/infrastructure/maven-repository.md'
+      - Packaging: 'participate/infrastructure/packaging.md'
+   - Proposal log: 'participate/proposal-log.md'
+- Develop:
+   - Setup dev environment:
+      - General: 'develop/setup-opencast-for-develop.md'
+      - With Docker: 'develop/development-environment-docker.md'
+   - Tips for developing: 'develop/development-environment.md'
+   - Dev ops:
+      - Local cluster for testing: 'develop/devops/local-cluster.md'
+      - Explore H2 database: 'develop/devops/explore-h2-database.md'
+   - Code style: 'develop/code-style.md'
+   - Debugging: 'develop/debugging.md'
+   - Frontend development:
+      - Overview: 'develop/admin-ui/development.md'
+      - Style:
+         - Alerts indicators: 'develop/admin-ui/style/alerts-indicators.md'
+         - Buttons: 'develop/admin-ui/style/buttons.md'
+         - Color-palette: 'develop/admin-ui/style/color-palette.md'
+         - dropdowns: 'develop/admin-ui/style/dropdowns.md'
+         - Forms: 'develop/admin-ui/style/forms.md'
+         - Icons: 'develop/admin-ui/style/icons.md'
+         - Index: 'develop/admin-ui/style/index.md'
+         - Modals: 'develop/admin-ui/style/modals.md'
+         - Navigation: 'develop/admin-ui/style/navigation.md'
+         - References: 'develop/admin-ui/style/references.md'
+         - Spacing: 'develop/admin-ui/style/spacing.md'
+         - Typeface: 'develop/admin-ui/style/typeface.md'
+         - View Structure: 'develop/admin-ui/style/view-structure.md'
+   - Documentation: 'develop/documentation.md'
+   - Localization: 'develop/localization.md'
+- Opencast architecture:
+   - Overview: 'architecture/overview.md'
+   - Filesystem: 'architecture/filesystem.md'
+   - Asset manager: 'architecture/asset-manager.md'
+   - Scheduler: 'architecture/scheduler.md'
+   - Statistics: 'architecture/statistics.md'
+   - Job dispatch: 'architecture/job-dispatch.md'
+   - Admin-UI: 'architecture/admin-ui.md'
+   - Paella player 7: 'architecture/paella-player-7/index.md'
+   - Capture agent:
+      - Introduction: 'architecture/capture-agent/capture-agent.md'
+      - Input: 'architecture/capture-agent/capture-agent-input.md'
+      - Test Cases for Capture Agents: 'architecture/capture-agent/testcases.md'
+   - Stream security: 'architecture/stream-security.md'
+   - OAI-PMH: 'architecture/oaipmh.md'
+   - External API:
+      - Introduction: 'architecture/api/index.md'
+      - Usage: 'architecture/api/usage.md'
+      - Authentication: 'architecture/api/authentication.md'
+      - Authorization: 'architecture/api/authorization.md'
+      - Base API: 'architecture/api/base-api.md'
+      - Agents API: 'architecture/api/agents-api.md'
+      - Events API: 'architecture/api/events-api.md'
+      - ListProvider API: 'architecture/api/listprovider-api.md'
+      - Series API: 'architecture/api/series-api.md'
+      - Statistics API: 'architecture/api/statistics-api.md'
+      - Groups API: 'architecture/api/groups-api.md'
+      - Security API: 'architecture/api/security-api.md'
+      - Workflow API: 'architecture/api/workflow-api.md'
+      - Data Types: 'architecture/api/types.md'
+      - Glossary: 'architecture/api/glossary.md'
 - Licenses and Legal Matters: 'license.md'
-- Governance: 'governance.md'
-- Localization: 'localization.md'
-- Packaging: 'packaging.md'
-- Proposal Log: 'proposal-log.md'
-- Asset Manager: 'asset-manager.md'
-- Scheduler: 'scheduler.md'
-- Statistics: 'statistics.md'
-- Modules:
-   - Overview: 'modules/index.md'
-   - Administrative user Interface:
-      - Development: 'modules/admin-ui/development.md'
-      - Style Guide:
-        - Overview: 'modules/admin-ui/style/index.md'
-        - Color Palette: 'modules/admin-ui/style/color-palette.md'
-        - Typeface: 'modules/admin-ui/style/typeface.md'
-        - View Structure: 'modules/admin-ui/style/view-structure.md'
-        - Logo: 'modules/admin-ui/style/spacing.md'
-        - Navigation: 'modules/admin-ui/style/navigation.md'
-        - Modals: 'modules/admin-ui/style/modals.md'
-        - Forms: 'modules/admin-ui/style/forms.md'
-        - Icons: 'modules/admin-ui/style/icons.md'
-        - Buttons: 'modules/admin-ui/style/buttons.md'
-        - Dropdowns: 'modules/admin-ui/style/dropdowns.md'
-        - Alerts and Indicators: 'modules/admin-ui/style/alerts-indicators.md'
-        - References: 'modules/admin-ui/style/references.md'
-   - Capture Agent:
-     - Capture Agent: 'modules/capture-agent/capture-agent.md'
-     - Input Selection: modules/capture-agent/capture-agent-input.md
-     - Test Cases: 'modules/capture-agent/testcases.md'
-   - Player:
-      - Architecture: 'modules/player/architecture.md'
-      - Core Reference: 'modules/player/core.reference.md'
-      - Events: 'modules/player/events.md'
-      - Storage: 'modules/player/storage.md'
-      - Plugin Development: 'modules/player/plugin.development.md'
-      - Testing: 'modules/player/testing.md'
-   - Paella Player 7: 'modules/paella-player-7/index.md'
-   - Stream Security: 'modules/stream-security.md'
-   - OAI-PMH: 'modules/oaipmh.md'
-- Infrastructure:
-   - Overview: 'infrastructure/index.md'
-   - Maven Repository: 'infrastructure/maven-repository.md'
-- External API:
-   - Introduction: 'api/index.md'
-   - Usage: 'api/usage.md'
-   - Authentication: 'api/authentication.md'
-   - Authorization: 'api/authorization.md'
-   - Base API: 'api/base-api.md'
-   - Agents API: 'api/agents-api.md'
-   - Events API: 'api/events-api.md'
-   - Series API: 'api/series-api.md'
-   - Statistics API: 'api/statistics-api.md'
-   - Groups API: 'api/groups-api.md'
-   - Security API: 'api/security-api.md'
-   - Workflow API: 'api/workflow-api.md'
-   - Data Types: 'api/types.md'
-   - Glossary: 'api/glossary.md'
-- Configure a Local Cluster for Testing: local-cluster.md
-- Explore H2 Database: explore-h2-database.md
+- Glossary: 'glossary.md'
+

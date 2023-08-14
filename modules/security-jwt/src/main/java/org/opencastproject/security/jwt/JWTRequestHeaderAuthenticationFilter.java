@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -37,9 +37,6 @@ public class JWTRequestHeaderAuthenticationFilter extends RequestHeaderAuthentic
   /** Login handler. */
   private JWTLoginHandler loginHandler = null;
 
-  /** If set to true, all request headers will be logged. */
-  private boolean debug = false;
-
   @Override
   public void afterPropertiesSet() {
     super.afterPropertiesSet();
@@ -48,9 +45,7 @@ public class JWTRequestHeaderAuthenticationFilter extends RequestHeaderAuthentic
 
   @Override
   protected Object getPreAuthenticatedPrincipal(HttpServletRequest request) {
-    if (debug) {
-      Util.debug(logger, request);
-    }
+    Util.debug(logger, request);
 
     String username = null;
 
@@ -84,15 +79,6 @@ public class JWTRequestHeaderAuthenticationFilter extends RequestHeaderAuthentic
    */
   public void setLoginHandler(JWTLoginHandler loginHandler) {
     this.loginHandler = loginHandler;
-  }
-
-  /**
-   * Setter for the debug switch.
-   *
-   * @param debug Value for the debug switch.
-   */
-  public void setDebug(boolean debug) {
-    this.debug = debug;
   }
 
 }

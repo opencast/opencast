@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -955,12 +955,12 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       RichAResult r;
       int current = 0;
       logIndexRebuildBegin(logger, index.getIndexName(), total, "snapshot(s)");
+      var updatedEventRange = new ArrayList<Event>();
       do {
         r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).orderBy(q.mediapackageId().desc())
           .page(offset, PAGE_SIZE).run());
         offset += PAGE_SIZE;
-        int n = 16;
-        var updatedEventRange = new ArrayList<Event>();
+        int n = 20;
 
         final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
         for (String orgId : byOrg.keySet()) {
@@ -981,7 +981,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
                 if (updatedEventRange.size() >= n || current >= total) {
                   index.bulkEventUpdate(updatedEventRange);
-                  logIndexRebuildProgress(logger, index.getIndexName(), total, current);
+                  logIndexRebuildProgress(logger, index.getIndexName(), total, current, n);
                   updatedEventRange.clear();
                 }
               } catch (Throwable t) {

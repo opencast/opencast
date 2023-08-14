@@ -149,6 +149,17 @@
       "HOTKEY_CHEAT_SHEET": "Atajos de Teclado",
       "ADOPTER_REGISTRATION": "Registro de Adopters"
    },
+   "REBUILD": {
+      "TITLE": "Reconstrucción del índice",
+      "WARNING": "¡Atención!",
+      "HEADER": "¡Reconstrucción del índice en curso!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
+   },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Se ha creado la política de acceso",
       "ACL_NOT_SAVED": "No se ha podido guardar la política de acceso",

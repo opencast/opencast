@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -64,7 +65,11 @@ public class IndexRebuildService implements BundleActivator {
    * Attention: The order is relevant for the index rebuild and should not be changed!
    */
   public enum Service {
-    Themes, Series, Scheduler, Workflow, AssetManager, Comments
+    Themes, Series, Scheduler, AssetManager, Comments, Workflow
+  }
+
+  public enum State {
+    PENDING, RUNNING, OK, ERROR
   }
 
   private static final Logger logger = LoggerFactory.getLogger(IndexRebuildService.class);
@@ -89,6 +94,9 @@ public class IndexRebuildService implements BundleActivator {
         addIndexProducer((IndexProducer) bundleContext.getService(serviceReference), bundleContext);
       }
     }
+
+    // Set rebuild service repopulation states to default values
+    setAllRebuildStates(IndexRebuildService.State.OK);
 
     // listen to changes in availability
     bundleContext.addServiceListener(new IndexProducerListener(bundleContext),
@@ -124,6 +132,7 @@ public class IndexRebuildService implements BundleActivator {
           throws IOException, IndexRebuildException {
     index.clear();
     logger.info("{} Index cleared, starting complete rebuild.", index.getIndexName());
+    setAllRebuildStates(IndexRebuildService.State.PENDING);
     for (IndexRebuildService.Service service: IndexRebuildService.Service.values()) {
       rebuildIndex(index, service);
     }
@@ -146,6 +155,7 @@ public class IndexRebuildService implements BundleActivator {
           throws IllegalArgumentException, IndexRebuildException {
     IndexRebuildService.Service service = IndexRebuildService.Service.valueOf(serviceName);
     logger.info("Starting partial rebuild of the {} index from service '{}'.", index.getIndexName(), service);
+    setRebuildState(service, IndexRebuildService.State.PENDING);
     rebuildIndex(index, service);
   }
 
@@ -167,6 +177,7 @@ public class IndexRebuildService implements BundleActivator {
           throws IllegalArgumentException, IndexRebuildException {
     IndexRebuildService.Service startingService = IndexRebuildService.Service.valueOf(serviceName);
     logger.info("Resuming rebuild of {} index with service '{}'.", index.getIndexName(), startingService);
+    setSubsetOfRebuildStates(startingService, IndexRebuildService.State.PENDING);
     Service[] services = IndexRebuildService.Service.values();
     for (int i = startingService.ordinal(); i < services.length; i++) {
       rebuildIndex(index, services[i]);
@@ -193,7 +204,13 @@ public class IndexRebuildService implements BundleActivator {
 
     IndexProducer indexProducer = indexProducers.get(service);
     logger.info("Starting to rebuild the {} index from service '{}'", index.getIndexName(), service);
-    indexProducer.repopulate();
+    setRebuildState(service, IndexRebuildService.State.RUNNING);
+    try {
+      indexProducer.repopulate();
+      setRebuildState(service, IndexRebuildService.State.OK);
+    } catch (IndexRebuildException e) {
+      setRebuildState(service, IndexRebuildService.State.ERROR);
+    }
     logger.info("Finished to rebuild the {} index from service '{}'", index.getIndexName(), service);
   }
 
@@ -291,5 +308,66 @@ public class IndexRebuildService implements BundleActivator {
         removeIndexProducer((IndexProducer) bundleContext.getService(serviceReference));
       }
     }
+  }
+
+  private final Map<Service, State> rebuildStates = new HashMap<>();
+
+  /**
+   * @return All rebuild service repopulation states.
+   */
+  public Map<String, String> getRebuildStates() {
+    Map <String, String> statesAsString = new HashMap<>();
+    for (Map.Entry<IndexRebuildService.Service,IndexRebuildService.State> entry : rebuildStates.entrySet()) {
+      statesAsString.put(entry.getKey().toString(), entry.getValue().toString());
+    }
+    return statesAsString;
+  }
+
+  /**
+   * @param service
+   *           the rebuild service
+   * @return the repopulation state of a single rebuild service.
+   */
+  public String getRebuildState(IndexRebuildService.Service service) {
+    return rebuildStates.get(service).toString();
+  }
+
+  /**
+   * Set all rebuild States.
+   *
+   * @param state
+   *           the state to be set
+   */
+  private void setAllRebuildStates(IndexRebuildService.State state) {
+    for (IndexRebuildService.Service service: IndexRebuildService.Service.values()) {
+      setRebuildState(service, state);
+    }
+  }
+
+  /**
+   * Set a subset of rebuild States following the rebuild order.
+   *
+   * @param startingservice
+   *           the service to start from
+   * @param state
+   *           the state to be set
+   */
+  private void setSubsetOfRebuildStates(IndexRebuildService.Service startingService, IndexRebuildService.State state) {
+    Service[] services = IndexRebuildService.Service.values();
+    for (int i = startingService.ordinal(); i < services.length; i++) {
+      rebuildStates.put(services[i], state);
+    }
+  }
+
+  /**
+   * Set a single rebuild State.
+   *
+   * @param service
+   *           the service to be set
+   * @param state
+   *           the state to be set
+   */
+  private void setRebuildState(IndexRebuildService.Service service, IndexRebuildService.State state) {
+    rebuildStates.put(service, state);
   }
 }

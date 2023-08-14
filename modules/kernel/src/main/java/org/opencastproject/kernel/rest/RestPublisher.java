@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -22,7 +22,6 @@
 package org.opencastproject.kernel.rest;
 
 import org.opencastproject.rest.RestConstants;
-import org.opencastproject.rest.SharedHttpContext;
 import org.opencastproject.rest.StaticResource;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.OpencastConstants;
@@ -41,8 +40,6 @@ import org.apache.cxf.jaxrs.JAXRSBindingFactory;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.ext.ResourceComparator;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
-import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
-import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
@@ -66,6 +63,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.http.HttpService;
+import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
 import org.osgi.util.tracker.BundleTracker;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
@@ -84,10 +82,10 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.Servlet;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -116,6 +114,7 @@ public class RestPublisher implements RestConstants {
   /** The rest publisher looks for any non-servlet with the 'opencast.service.path' property */
   public static final String JAX_RS_SERVICE_FILTER = "(&(!(objectClass=javax.servlet.Servlet))(" + SERVICE_PATH_PROPERTY
           + "=*))";
+  //public static final String JAX_RS_SERVICE_FILTER = "(&(!(objectClass=javax.servlet.Servlet))(opencast.jaxrs.resource=true))";
 
   /** A map that sets default xml namespaces in {@link XMLStreamWriter}s */
   protected static final ConcurrentHashMap<String, String> NAMESPACE_MAP;
@@ -152,11 +151,11 @@ public class RestPublisher implements RestConstants {
 
   private ServiceRegistration<Bus> busServiceRegistration;
 
-  /** The map of JAX-RS resource providers */
-  private Map<ServiceReference<?>, ResourceProvider> resourceProviders = new ConcurrentHashMap<>();
+  /** The List of JAX-RS resources */
+  private final List<Object> serviceBeans = new CopyOnWriteArrayList<>();
 
   /** A token to store in the miss cache */
-  private Object nullToken = new Object();
+  private final Object nullToken = new Object();
 
   private final CacheLoader<Class<?>, Object> servicePathLoader = new CacheLoader<Class<?>, Object>() {
     @Override
@@ -295,8 +294,9 @@ public class RestPublisher implements RestConstants {
     String serviceType = (String) ref.getProperty(SERVICE_TYPE_PROPERTY);
     String servicePath = (String) ref.getProperty(SERVICE_PATH_PROPERTY);
     boolean servicePublishFlag = ref.getProperty(SERVICE_PUBLISH_PROPERTY) == null
-            || Boolean.parseBoolean((String) ref.getProperty(SERVICE_PUBLISH_PROPERTY));
-    boolean jobProducer = Boolean.parseBoolean((String) ref.getProperty(SERVICE_JOBPRODUCER_PROPERTY));
+            || Boolean.parseBoolean(ref.getProperty(SERVICE_PUBLISH_PROPERTY).toString());
+    boolean jobProducer = ref.getProperty(SERVICE_JOBPRODUCER_PROPERTY) != null
+            && Boolean.parseBoolean(ref.getProperty(SERVICE_JOBPRODUCER_PROPERTY).toString());
 
     ServiceRegistration<?> reg = servletRegistrationMap.get(servicePath);
     if (reg != null) {
@@ -308,14 +308,15 @@ public class RestPublisher implements RestConstants {
     cxf.setBus(bus);
     try {
       Dictionary<String, Object> props = new Hashtable<>();
-      props.put(SharedHttpContext.ALIAS, servicePath);
-      props.put(SharedHttpContext.SERVLET_NAME, service.toString());
-      props.put(SharedHttpContext.CONTEXT_ID, RestConstants.HTTP_CONTEXT_ID);
-      props.put(SharedHttpContext.SHARED, "true");
+
       props.put(SERVICE_TYPE_PROPERTY, serviceType);
       props.put(SERVICE_PATH_PROPERTY, servicePath);
       props.put(SERVICE_PUBLISH_PROPERTY, servicePublishFlag);
       props.put(SERVICE_JOBPRODUCER_PROPERTY, jobProducer);
+      props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT, "(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=" + RestConstants.HTTP_CONTEXT_ID + ")");
+      props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, servicePath);
+      props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, servicePath + "/*");
+
       reg = componentContext.getBundleContext().registerService(Servlet.class.getName(), cxf, props);
     } catch (Exception e) {
       logger.info("Problem registering REST endpoint {} : {}", servicePath, e.getMessage());
@@ -323,28 +324,7 @@ public class RestPublisher implements RestConstants {
     }
     servletRegistrationMap.put(servicePath, reg);
 
-    // Wait for the servlet to be initialized as long as one minute. Since the servlet is published via the whiteboard,
-    // this may happen asynchronously. However, after 30 seconds we expect the HTTP service and the whiteboard
-    // implementation to be loaded and active.
-    int count = 0;
-    while (!cxf.isInitialized() && count < 300) {
-      logger.debug("Waiting for the servlet at '{}' to be initialized", servicePath);
-      try {
-        Thread.sleep(100);
-        count++;
-      } catch (InterruptedException e) {
-        logger.warn("Interrupt while waiting for RestServlet initialization");
-        break;
-      }
-    }
-
-    // Was initialization successful
-    if (!cxf.isInitialized()) {
-      logger.error("Whiteboard implementation failed to pick up REST endpoint declaration {}", serviceType);
-      return;
-    }
-
-    resourceProviders.put(ref, new SingletonResourceProvider(service));
+    serviceBeans.add(service);
 
     rewire();
 
@@ -359,12 +339,12 @@ public class RestPublisher implements RestConstants {
    *
    * @param alias
    *          The URL space to reclaim
-   * @param reference
+   * @param service
    *          The service reference
    */
-  protected void destroyEndpoint(String alias, ServiceReference<?> reference) {
+  protected void destroyEndpoint(String alias, Object service) {
     ServiceRegistration<?> reg = servletRegistrationMap.remove(alias);
-    resourceProviders.remove(reference);
+    serviceBeans.remove(service);
     if (reg != null) {
       reg.unregister();
     }
@@ -374,8 +354,8 @@ public class RestPublisher implements RestConstants {
 
   private synchronized void rewire() {
 
-    if (resourceProviders.isEmpty()) {
-      logger.debug("No resource classes skip JAX-RS server recreation");
+    if (serviceBeans.isEmpty()) {
+      logger.info("No resource classes skip JAX-RS server recreation");
       return;
     }
 
@@ -385,7 +365,6 @@ public class RestPublisher implements RestConstants {
     sf.setProviders(providers);
 
     // Set the service class
-    sf.setResourceProviders(new ArrayList<>(resourceProviders.values()));
     sf.setResourceComparator(new OsgiCxfEndpointComparator());
 
     sf.setAddress("/");
@@ -402,6 +381,7 @@ public class RestPublisher implements RestConstants {
       server.destroy();
     }
 
+    sf.setServiceBeans(serviceBeans);
     server = sf.create();
   }
 
@@ -456,7 +436,7 @@ public class RestPublisher implements RestConstants {
     @Override
     public void removedService(ServiceReference<Object> reference, Object service) {
       String servicePath = (String) reference.getProperty(SERVICE_PATH_PROPERTY);
-      destroyEndpoint(servicePath, reference);
+      destroyEndpoint(servicePath, service);
       super.removedService(reference, service);
     }
 
@@ -532,17 +512,22 @@ public class RestPublisher implements RestConstants {
 
       if (classpath != null && alias != null) {
         Dictionary<String, String> props = new Hashtable<>();
-        props.put(SharedHttpContext.ALIAS, alias);
-        props.put(SharedHttpContext.CONTEXT_ID, RestConstants.HTTP_CONTEXT_ID);
-        props.put(SharedHttpContext.SHARED, "true");
+
+        props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT, "(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=" + RestConstants.HTTP_CONTEXT_ID + ")");
+        props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, alias);
+        if ("/".equals(alias)) {
+          props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, alias);
+        } else {
+          props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, alias + "/*");
+        }
         StaticResource servlet = new StaticResource(new StaticResourceClassLoader(bundle), classpath, alias,
                 welcomeFile, spaRedirect);
 
         // We use the newly added bundle's context to register this service, so when that bundle shuts down, it brings
         // down this servlet with it
-        logger.debug("Registering servlet with alias {}", alias);
+        logger.info("Registering servlet with alias {}", alias + "/*");
 
-        ServiceRegistration serviceRegistration = componentContext.getBundleContext()
+        ServiceRegistration<?> serviceRegistration = componentContext.getBundleContext()
                 .registerService(Servlet.class.getName(), servlet, props);
         servlets.put(bundle, serviceRegistration);
       }
@@ -573,29 +558,11 @@ public class RestPublisher implements RestConstants {
     /** Serialization UID */
     private static final long serialVersionUID = -8963338160276371426L;
 
-    /** Whether this servlet has been initialized by the http service */
-    private boolean initialized = false;
-
-    /**
-     * Whether the http service has initialized this servlet.
-     *
-     * @return the initialization state
-     */
-    public boolean isInitialized() {
-      return initialized;
-    }
-
     /**
      * Default constructor needed by Jetty
      */
     public RestServlet() {
 
-    }
-
-    @Override
-    public void init(ServletConfig servletConfig) throws ServletException {
-      super.init(servletConfig);
-      initialized = true;
     }
 
     @Override

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -410,7 +410,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       logIndexRebuildBegin(logger, index.getIndexName(), total, "events with comment");
       final int[] current = new int[1];
       current[0] = 0;
-      int n = 16;
+      int n = 20;
       var updatedEventRange = new ArrayList<Event>();
 
       final Map<String, List<String>> eventsWithComments = getEventsWithComments();
@@ -431,7 +431,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
 
                       if (updatedEventRange.size() >= n || i >= eventsWithComments.get(orgId).size()) {
                         index.bulkEventUpdate(updatedEventRange);
-                        logIndexRebuildProgress(logger, index.getIndexName(), total, current[0]);
+                        logIndexRebuildProgress(logger, index.getIndexName(), total, current[0], n);
                         updatedEventRange.clear();
                       }
                     } catch (Throwable t) {

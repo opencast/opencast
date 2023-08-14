@@ -12,8 +12,9 @@ on:
 jobs:
   update-npm-libs:
     runs-on: ubuntu-latest
+    if: github.repository == 'opencast/opencast'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: prepare git
         run: |
@@ -52,41 +53,6 @@ jobs:
           npm run eslint
           npm run html-linter
           git add package.json package-lock.json
-
-      - name: update runtime-info-ui-ng test libraries
-        working-directory: modules/runtime-info-ui-ng
-        run: |
-          set -eu
-          npm install --save --dev eslint@latest eslint-plugin-header@latest html-linter@latest
-          npm audit fix || true
-          npm run eslint
-          npm run html-linter
-          git add package.json package-lock.json
-
-      - name: update all engage-theodul-* libraries (they only have tests)
-        working-directory: modules/
-        run: |
-          set -ue
-          for module in $(ls -1 engage-theodul-*/package.json | sed 's_/package.json__')
-          do
-            cd "${module}"
-            rm package-lock.json
-            npm update --dev
-            npm audit fix
-            git add package.json package-lock.json
-            cd -
-          done
-
-      - name: make sure tests still work
-        working-directory: modules
-        run: |
-          set -ue
-          for module in $(ls -1 engage-theodul-*/package.json | sed 's_/package.json__')
-          do
-            cd "${module}"
-            npm run eslint
-            cd -
-          done
 
       #NB: The || true after the commit ensures that the pipeline doesn't fail
       # (and send emails) if there are no updates available

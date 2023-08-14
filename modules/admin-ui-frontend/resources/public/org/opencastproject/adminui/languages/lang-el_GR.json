@@ -149,6 +149,17 @@
       "HOTKEY_CHEAT_SHEET": "Συντομεύσεις πληκτρολογίου",
       "ADOPTER_REGISTRATION": "Εγγραφή adopter"
    },
+   "REBUILD": {
+      "TITLE": "Αναδόμηση Ευρετηρίου",
+      "WARNING": "Προσοχή!",
+      "HEADER": "Αναδημιουργία ευρετηρίου σε εξέλιξη!",
+      "THEME_SERVICE": "Υπηρεσία Θέματος",
+      "SERIES_SERVICE": "Υπηρεσία Σειράς",
+      "SCHEDULER_SERVICE": "Υπηρεσία Χρονοδιαγράμματος",
+      "ASSETMANAGER_SERVICE": "Υπηρεσία Διαχειριστή Αντικειμένων",
+      "COMMENTS_SERVICE": "Υπηρεσία Σχολίων",
+      "WORKFLOW_SERVICE": "Υπηρεσία Ροής Εργασίας"
+   },
    "NOTIFICATIONS": {
       "ACL_ADDED": "H πολιτική πρόσβασης έχει δημιουργηθεί",
       "ACL_NOT_SAVED": "Δεν ήταν δυνατή η αποθήκευση της πολιτικής πρόσβασης",

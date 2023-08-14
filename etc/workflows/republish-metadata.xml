@@ -11,6 +11,7 @@
   </description>
   <displayOrder>900</displayOrder>
   <configuration_panel/>
+  <configuration_panel_json/>
   <state-mappings>
     <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.REPUBLISHING_METADATA</state-mapping>
     <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.REPUBLISHING_METADATA</state-mapping>

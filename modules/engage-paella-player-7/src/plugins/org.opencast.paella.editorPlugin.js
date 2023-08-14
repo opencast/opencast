@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -24,7 +24,7 @@ import LeadPencilIcon from '../icons/lead-pencil.svg';
 
 export default class EditorPlugin extends OpencastAuthButtonPlugin {
   async load() {
-    this.icon = LeadPencilIcon;
+    this.icon = this.player.getCustomPluginIcon(this.name, 'buttonIcon') || LeadPencilIcon;
   }
 
   async isEnabled() {

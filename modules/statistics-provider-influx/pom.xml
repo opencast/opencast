@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>13-SNAPSHOT</version>
+    <version>15-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -37,7 +37,15 @@
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>osgi.cmpn</artifactId>
+      <artifactId>org.osgi.service.component</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.component.annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.cm</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -53,11 +61,11 @@
       <exclusions>
         <exclusion>
           <groupId>org.apache.felix</groupId>
-          <artifactId>org.osgi.core</artifactId>
+          <artifactId>osgi.core</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.apache.felix</groupId>
-          <artifactId>osgi.cmpn</artifactId>
+          <artifactId>org.osgi.service.cm</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

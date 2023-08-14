@@ -149,6 +149,17 @@
       "HOTKEY_CHEAT_SHEET": "Keyboard shortcuts",
       "ADOPTER_REGISTRATION": "Adopter Registration"
    },
+   "REBUILD": {
+      "TITLE": "Index Rebuild",
+      "WARNING": "Attention!",
+      "HEADER": "Index rebuild in progress!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
+   },
    "NOTIFICATIONS": {
       "ACL_ADDED": "The access policy has been created",
       "ACL_NOT_SAVED": "The access policy could not be saved",

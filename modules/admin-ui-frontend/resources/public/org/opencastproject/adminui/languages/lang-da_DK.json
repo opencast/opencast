@@ -149,6 +149,17 @@
       "HOTKEY_CHEAT_SHEET": "Tastaturgenveje",
       "ADOPTER_REGISTRATION": "Adopter Registration"
    },
+   "REBUILD": {
+      "TITLE": "Index Rebuild",
+      "WARNING": "Attention!",
+      "HEADER": "Index rebuild in progress!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
+   },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Adgangspolitikken er blevet oprettet",
       "ACL_NOT_SAVED": "Adgangspolitikken kunne ikke gemmes",
@@ -896,7 +907,7 @@
                   "NEW": "Nye politik",
                   "NEW_USER": "New user",
                   "DETAILS": "Non-user roles",
-                  "USER": "Bruger",
+                  "USER": "User",
                   "USERS": "Users who are authorized for the event",
                   "NONEXISTENT_USER": "Nonexistent user",
                   "HELP": {
@@ -1130,7 +1141,7 @@
                   "NEW": "Ny politik",
                   "NEW_USER": "New user",
                   "DETAILS": "Non-user roles",
-                  "USER": "Bruger",
+                  "USER": "User",
                   "USERS": "Users who are authorized for the series",
                   "HELP": {
                      "READ": "By setting read rights, the series becomes visible for the selected user",
@@ -1225,7 +1236,7 @@
                   "LOAD_MORE_LIMIT": "policies shown.",
                   "LOAD_MORE_LINK": "Load more",
                   "NEW_USER": "New user",
-                  "USER": "Bruger",
+                  "USER": "User",
                   "USERS": "Users who are authorized for the series",
                   "NONEXISTENT_USER": "Nonexistent user",
                   "HELP": {
@@ -1481,7 +1492,7 @@
                   "DETAILS": "Non-user roles",
                   "DESCRIPTION": "Vælg et præopsat sæt af politikker eller tilføj tilpassede politikker nedenfor",
                   "NEW_USER": "New user",
-                  "USER": "Bruger",
+                  "USER": "User",
                   "USERS": "Users who are authorized by this access policy",
                   "HELP": {
                      "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
@@ -1530,7 +1541,7 @@
                   "DETAILS": "Non-user roles",
                   "DESCRIPTION": "Vælg et præopsat sæt af politikker eller tilføj tilpassede politikker nedenfor",
                   "NEW_USER": "New user",
-                  "USER": "Bruger",
+                  "USER": "User",
                   "USERS": "Users who are authorized by this access policy",
                   "NONEXISTENT_USER": "Nonexistent user",
                   "HELP": {
