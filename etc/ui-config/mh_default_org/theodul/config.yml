@@ -1,0 +1,182 @@
+################################################################################
+# Theodul Player Configuration File
+################################################################################
+
+
+################################################################################
+# Video Control Configuration
+#
+# Control which and how videos are loaded and how they are displayed
+################################################################################
+
+# The default flavor of the master video (the video on the "left side" in the video display)
+mastervideotype: presenter/delivery
+
+# Play only videos that are tagged with one of these tags
+# default: don't filter for tags at all
+allowedTags:
+  - engage-download
+  - engage-streaming
+
+# Play only videos that use these video/streaming formats.
+# The browser's format setting will be engaged only after this filter has been applied.
+# Default: don't filter video/streaming formats
+# Allowed values: hls, dash, rtmp, mp4, webm, audio
+#allowedFormats:
+#  - hls
+#  - dash
+#  - mp4
+
+
+################################################################################
+# User Interface Settings
+################################################################################
+
+# Path to the logo that is displayed in the Opencast player
+# Value: <a complete url with scheme and port>
+#
+logo: /engage/theodul/ui/img/opencast.svg
+
+# Choose where the controls will be rendered
+# Allowed values: top, bottom
+positioncontrols: bottom
+
+# Choose which layout should be applied by default if no previous selection is stored in the browsers local storage
+# Allowed values: left, right, beside, off
+# Default: off
+layout: off
+
+# Choose which flavor (without subflavor) should be focused in the layout if none is stored in the local storage.
+# The focused flavor will only be used if `layout` is not set to "off".
+focusedflavor: presentation
+
+# Hide the browser context menu on video elements
+# Allowed values: true, false
+# Default: false
+hide_video_context_menu: false
+
+# Link back to the Media Module
+# Allowed values: true, false
+# Default: false
+link_mediamodule: true
+
+# Link back to Media Module from the embed player
+# Allowed values: true, false
+# Default: false
+show_embed_links: true
+
+# Shows/Hides the download tab under the theodul player.
+# In order to show up, the user also needs a role that matches the
+# regex in the following configuration 'allowed_roles_for_video_download'
+# Allowed values: true, false
+# Default: true
+allow_video_download: true
+
+# Configures the roles that are allowed to see the download plugin.
+# Note that this does not restrict access to the media files itself.
+# Allowed values: regular expressions (if any role of the user matches this regex, the download tab will be shown)
+# Default: ROLE_USER
+allowed_roles_for_video_download: ROLE_USER
+
+# Shortcut definitions for the html5 player
+# - modifier keys
+#   - shift
+#   - ctrl
+#   - alt
+#   - option
+#   - meta
+#   - command
+#   - mod -- combines Mac 'command' and Windows/Linux 'ctrl'
+# - special keys
+#   - backspace
+#   - tab
+#   - enter
+#   - return
+#   - capslock
+#   - esc
+#   - escape
+#   - space
+#   - pageup
+#   - pagedown
+#   - end
+#   - home
+#   - left
+#   - up
+#   - right
+#   - down
+#   - ins
+#   - del
+#   - plus
+# - any other key
+#   - should be referenceable by name like a, /, $, *, or =
+# - for more information have a look at the player docs
+shortcuts:
+  controls:
+    playPause: space
+    seekRight: right
+    seekLeft: left
+    jumpToBegin: backspace
+    prevChapter: pagedown
+    nextChapter: pageup
+  playbackrate:
+    increase: t
+    decrease: T
+  volume:
+    up: '9'
+    down: '8'
+    muteToggle: m
+  fullscreen:
+    enable: mod+enter
+    cancel: escape
+  layout:
+    focusNext: '>'
+    focusPrev: '<'
+    movePip: p
+    togglePiP: o
+  zoom:
+    moveLeft: a
+    moveRight: d
+    moveUp: w
+    moveDown: s
+    in: plus
+    out: '-'
+
+
+################################################################################
+# Matomo (User Tracking) Configuration
+#
+# These settings allow a tracking of user interaction with Matomo (https://matomo.org/) in the Opencast Player
+# The plugin will be activated only if a Matomo server.
+################################################################################
+matomo:
+
+  # The Matomo server from which the Piwik JS library will be loaded and to which the data will be reported
+  #server: http://localhost/matomo
+
+  # The Matomo site ID has to be numeric value. If not set this will be 1.
+  #site_id:1
+
+  # The heartbeat setting to track how long a user stayed on the player page. Set to 0 or comment this line to
+  # disable the heartbeat
+  #heartbeat:30
+
+  # Notification that matomo is tracking the user, set to false to disable notifications
+  # Default: true
+  #notification:true
+
+  # These settings let you track several player events. Add the events that you want to track to the list.
+  # Events that can be tracked:
+
+  #track_events:
+  # - play          #play has been pressed (will also be called if after seeking).
+  # - pause         #pause has been pressend (will also be called if before seeking).
+  # - seek          #user jumps to a different time. Time in seconds will be stored
+  # - ended         #video has reached the end
+  # - playbackrate  #user changes the playback speed (values 0.75 to 3.00)
+  # - volume        #Volume change by the user value 0.0 to 1.0
+  # - quality       #manual change of video quality (quality tag is stored)
+  # - fullscreen    #user presses fullscreen button
+  # - focus         #user selects one video to be enlarged (flavor of selected video is stored)
+  # - layout_reset  #user switches back to default layout
+  # - zoom          #user changes the zoom of the video
+

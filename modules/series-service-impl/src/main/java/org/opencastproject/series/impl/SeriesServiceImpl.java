@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -515,7 +515,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       final int total = databaseSeries.size();
       logIndexRebuildBegin(logger, index.getIndexName(), total, "series");
       int current = 0;
-      int n = 20;
+      int n = 16;
       var updatedSeriesRange = new ArrayList<Series>();
 
       for (SeriesEntity series: databaseSeries) {
@@ -579,7 +579,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
         if (updatedSeriesRange.size() >= n || current >= databaseSeries.size()) {
           // do the actual index update
           index.bulkSeriesUpdate(updatedSeriesRange);
-          logIndexRebuildProgress(logger, index.getIndexName(), total, current, n);
+          logIndexRebuildProgress(logger, index.getIndexName(), total, current);
           updatedSeriesRange.clear();
         }
       }

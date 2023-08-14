@@ -9,9 +9,11 @@ on:
 jobs:
   update-translations:
     if: github.repository_owner == 'opencast'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
+    env:
+      CROWDIN_API_KEY: ${{ secrets.CROWDIN_API_KEY }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
 
     - name: prepare git
       run: |
@@ -20,8 +22,9 @@ jobs:
 
     - name: prepare crowdin client
       run: |
-        wget --quiet https://artifacts.crowdin.com/repo/deb/crowdin3.deb
+        wget --quiet https://artifacts.crowdin.com/repo/deb/crowdin.deb
         sudo dpkg -i crowdin.deb
+        echo "api_key: ${CROWDIN_API_KEY}" > ~/.crowdin.yaml
 
     - name: prepare github ssh key
       env:
@@ -37,13 +40,11 @@ jobs:
         git clone "git@github.com:opencast/opencast.git" ~/oc
 
     - name: upload translation source
-      env:
-        CROWDIN_TOKEN: ${{ secret.CROWDIN_TOKEN }}
       run: |
         set -o errexit
         update() {
           git checkout "$1"
-          crowdin download --config .crowdin.yaml -b "$2"
+          crowdin --config .crowdin.yaml download -b "$2"
           git clean -f
           if git commit -a -m "Automatically update translation keys ($1)"; then
             git push origin "$1"
@@ -51,7 +52,7 @@ jobs:
           git clean -fdx
         }
 
-        if [ -z "${CROWDIN_TOKEN}" ]; then
+        if [ -z "${CROWDIN_API_KEY}" ]; then
           echo Skipping update without secret
         else
           cd ~/oc

@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -24,10 +24,9 @@
 angular.module('adminNg.controllers')
 .controller('ApplicationCtrl', ['$scope', '$rootScope', '$location', '$window', 'AuthService', 'Notifications',
   'ResourceModal', 'VersionResource', 'TermsOfUseResource', 'HotkeysService', '$interval', 'RestServiceMonitor',
-  'AdopterRegistrationResource', 'IndexRebuildStates',
+  'AdopterRegistrationResource',
   function ($scope, $rootScope, $location, $window, AuthService, Notifications, ResourceModal,
-    VersionResource, TermsOfUseResource, HotkeysService, $interval, RestServiceMonitor,
-    AdopterRegistrationResource, IndexRebuildStates){
+    VersionResource, TermsOfUseResource, HotkeysService, $interval, RestServiceMonitor, AdopterRegistrationResource){
 
     $scope.adopter = new AdopterRegistrationResource.get();
 
@@ -46,8 +45,6 @@ angular.module('adminNg.controllers')
     $scope.mediaModuleUrl = undefined;
     RestServiceMonitor.run();
     $scope.services = RestServiceMonitor.getServiceStatus();
-    IndexRebuildStates.run();
-    $scope.rebuildServices = IndexRebuildStates.getRebuildStatus();
     $scope.studioReturnUrl = encodeURIComponent($location.absUrl());
     $scope.$on('$locationChangeSuccess', function($event, newUrl) {
       $scope.studioReturnUrl = encodeURIComponent(newUrl);
@@ -78,12 +75,10 @@ angular.module('adminNg.controllers')
       }
     }).catch(angular.noop);
 
-    //Running RestService on loop - updating $scope.service and $scope.rebuildService
+    //Running RestService on loop - updating $scope.service
     $interval(function(){
       RestServiceMonitor.run();
       $scope.service = RestServiceMonitor.getServiceStatus();
-      IndexRebuildStates.run();
-      $scope.rebuildService = IndexRebuildStates.getRebuildStatus();
     }, 60000);
 
     $scope.toServices = function(event) {

@@ -1,0 +1,8 @@
+{
+    "value_locale": "tr",
+    "error_mediaPackageInformationNotLoaded": "Bu hataya 2 şey sebep olabilir:",
+    "error_mediaPackageInformationNotLoaded_reason1": "Medya artık mevcut değil",
+    "error_mediaPackageInformationNotLoaded_reason2": "Medya korumalı ve hesabınıza giriş yapmalısınız",
+    "error_noMediaInformationAvailable": "Medya bilgisi bulunmamakta.",
+    "error_endpointNotAvailable": "Arama hizmeti şu anda kullanılamıyor."
+}

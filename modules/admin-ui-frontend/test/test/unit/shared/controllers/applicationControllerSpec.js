@@ -49,7 +49,6 @@ describe('Application controller', function () {
         $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $httpBackend.whenGET('/admin-ng/adopter/latestToU').respond('test');
         $httpBackend.whenGET('shared/partials/modals/registration-modal.html').respond('');
-        $httpBackend.whenGET('/index/rebuild/states.json').respond('{}');
 
         $scope = $rootScope.$new();
 

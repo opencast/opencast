@@ -1,0 +1,29 @@
+<!-- theodul video videojs plugin mobile mode -->
+<% if((typeof type !== "undefined") && (type == "audio")) { %>
+	<div class="audio_wrapper">
+		<% if(typeof sources !== "undefined") { %>
+			<div class="audioDisplay">
+				<audio id="audioDisplay">
+				  <% _.each(sources, function(src) { %>
+				    <% if((src.src != "") && (src.type != "")) { %>
+				      <source src="<%= src.src %>" type="<%= src.type %>" />
+				    <% } %>
+				  <% }); %>
+				  <p class="lang_error_AudioElementNotSupported">Error: Your browser does not support the audio element.</p>
+				</audio>
+			</div>
+		<% } %>
+	</div>
+<% } else { %>
+	<div class="videojs_wrapper clearfix">
+		<% if(typeof ids !== "undefined") { var i = 1; %>
+			<% _.each(ids, function(id) { %>
+				<div id="videoDisplay<%= i %>" class="videoDisplay videoDefaultLayout <% if(i==1) { %>active<% } %>" data-videodisplay="<%= id %>" style="left: <%= (i-1)*100 %>%;">
+					<div id="videoDisplay<%= i %>_wrapper" class="videoFrame">
+						<video id="<%= id %>" class="video-js vjs-playback-rate vjs-default-skin container" data-setup="{}"></video>
+					</div>
+				</div>
+			<% i++;}); %>
+		<% } %>
+	</div>
+<% } %>

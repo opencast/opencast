@@ -10,6 +10,3 @@ javax.xml.transform.TransformerFactory=org.apache.xalan.processor.TransformerFac
 
 # Decode files with UTF-8
 felix.fileinstall.configEncoding=UTF-8
-
-# Disable default cxf servlet
-org.apache.cxf.osgi.http.transport.disable = true

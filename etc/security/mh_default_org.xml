@@ -19,7 +19,7 @@
   <sec:http pattern="/favicon.ico" security="none" />
 
   <sec:http create-session="ifRequired" servlet-api-provision="true" realm="Opencast"
-            entry-point-ref="opencastEntryPoint">
+    entry-point-ref="opencastEntryPoint">
 
     <sec:access-denied-handler error-page="/403.html"/>
 
@@ -29,14 +29,12 @@
 
     <!-- Allow anonymous access to the login form -->
     <sec:intercept-url pattern="/" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/login.html" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/admin-ng/login.html" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/sysinfo/bundles/version" method="GET" access="ROLE_ANONYMOUS" />
 
     <!-- Allow anonymous access to resources from runtime info ui -->
     <sec:intercept-url pattern="/img/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/js/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/scripts/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/styles/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/docs.*" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/rest_docs.*" access="ROLE_ANONYMOUS" />
 
@@ -83,7 +81,6 @@
     <sec:intercept-url pattern="/admin-ng/event/*" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/groups/groups.json" method="GET" access="ROLE_ADMIN, ROLE_UI_GROUPS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/groups/*" method="GET" access="ROLE_ADMIN, ROLE_UI_GROUPS_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/index/rebuild/states.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERVICES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/job/jobs.json" method="GET" access="ROLE_ADMIN, ROLE_UI_JOBS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/series/series.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/series/new/metadata" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_METADATA_VIEW" />
@@ -268,10 +265,6 @@
     <sec:intercept-url pattern="/admin-ng/shared/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/admin-ng/styles/**" access="ROLE_ANONYMOUS" />
 
-    <sec:intercept-url pattern="/admin-ui/static/media/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/admin-ui/static/js/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/admin-ui/static/css/**" access="ROLE_ANONYMOUS" />
-
     <!-- Enable anonymous access to the /info/** resource -->
     <sec:intercept-url pattern="/info/**" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/i18n/languages.json" method="GET" access="ROLE_ANONYMOUS" />
@@ -354,9 +347,9 @@
     <sec:intercept-url pattern="/redirect/**" access="ROLE_ANONYMOUS" />
 
     <!-- Everything else is for the admin users -->
-    <sec:intercept-url pattern="/admin-ui" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/admin-ui/" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/admin-ui/index.html" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
+    <sec:intercept-url pattern="/admin-ng" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
+    <sec:intercept-url pattern="/admin-ng/" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
+    <sec:intercept-url pattern="/admin-ng/index.html" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/index.html" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/index.js" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/**" access="ROLE_ADMIN" />
@@ -370,7 +363,7 @@
 
     <!-- Enable and configure the failure URL for form-based logins -->
     <!-- CAS Auth: Comment this if using CAS authentication -->
-    <sec:form-login authentication-failure-url="/login.html?error" authentication-success-handler-ref="authSuccessHandler" />
+    <sec:form-login authentication-failure-url="/admin-ng/login.html?error" authentication-success-handler-ref="authSuccessHandler" />
 
     <!-- (Pre-)Authentication filter chain(s) -->
     <sec:custom-filter position="BASIC_AUTH_FILTER" ref="authenticationFilters" />
@@ -421,10 +414,8 @@
     <!-- All following settings are optional -->
     <property name="tokenValiditySeconds" value="1209600"/>
     <property name="cookieName" value="oc-remember-me"/>
-    <!-- The following key will be augmented by system properties if left at the default value.
-         Thus, leaving this untouched is okay. This key must be equal to the key passed to
-         rememberMeAuthenticationProvider (s. below). To generate cookies which are valid for the whole cluster,
-         set this manually. The key won't be augmented/randomized if you use something different than 'opencast'. -->
+    <!-- The following key will be augmented by system properties. Thus, leaving this untouched is okay -->
+    <!-- This key must be equal to the key passed to rememberMeAuthenticationProvider (s. below) -->
     <property name="key" value="opencast"/>
   </bean>
 
@@ -509,7 +500,7 @@
 
   <!-- Redirects unauthenticated requests to the login form -->
   <bean id="userEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
-    <property name="loginFormUrl" value="/login.html" />
+    <property name="loginFormUrl" value="/admin-ng/login.html" />
   </bean>
 
   <!-- Redirect unauthenticated requests to custom login url with configurable redirect query parameter
@@ -534,8 +525,8 @@
     <property name="securityService" ref="securityService" />
     <property name="welcomePages">
       <map>
-        <entry key="ROLE_ADMIN" value="/admin-ui/index.html" />
-        <entry key="ROLE_ADMIN_UI" value="/admin-ui/index.html" />
+        <entry key="ROLE_ADMIN" value="/admin-ng/index.html" />
+        <entry key="ROLE_ADMIN_UI" value="/admin-ng/index.html" />
         <entry key="*" value="/engage/ui/index.html" /> <!-- Any role not listed explicitly will redirect here -->
       </map>
     </property>
@@ -729,6 +720,7 @@
     <property name="authenticationManager" ref="authenticationManager" />
     <property name="loginHandler" ref="jwtLoginHandler" />
     <property name="exceptionIfHeaderMissing" value="false" />
+    <property name="debug" value="false" />
   </bean>-->
 
   <!-- General JWT request parameter extraction filter
@@ -737,6 +729,7 @@
     <property name="authenticationManager" ref="authenticationManager" />
     <property name="loginHandler" ref="jwtLoginHandler" />
     <property name="exceptionIfParameterMissing" value="false" />
+    <property name="debug" value="false" />
   </bean>-->
 
   <!-- JWT login handler

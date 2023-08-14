@@ -15,11 +15,11 @@ if grep -rn ' $' modules assemblies pom.xml --include=pom.xml; then
 fi
 
 echo Checking configuration files for tabs or trailing spaces…
-if grep -rnI $'\t' etc; then
+if grep -rn $'\t' etc; then
   echo "Tabs found in config files!"
   ret=1
 fi
-if grep -rnI ' $' etc; then
+if grep -rn ' $' etc; then
   echo "Trailing spaces found in config files!"
   ret=1
 fi

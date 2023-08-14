@@ -46,11 +46,11 @@ Operation Example
 
 The operation will create workflow instance variables like this:
 
-```
+```properties
 dublincore_episode_exists=true
 dublincore_episode_type=Catalog
 presentation_source_exists=true
 presentation_source_type=Track
-security_xacml+episode_exists=true
-security_xacml+episode_type=Attachment
+security_xacml_episode_exists=true
+security_xacml_episode_type=Attachment
 ```

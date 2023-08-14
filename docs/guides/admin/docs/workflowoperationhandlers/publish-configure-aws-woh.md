@@ -55,7 +55,7 @@ execution of the workflow operation.
 |Variable           |Description                               |Example                               |
 |-------------------|------------------------------------------|--------------------------------------|
 |`${event_id}`      |The event (media package) identifier      |`18633e04-1a3f-4bbb-a72a-99c15deba1b9`|
-|`${player_path}`   |The player path for the event             |`/paella/ui/watch.html?id=`    |
+|`${player_path}`   |The player path for the event             |`/engage/theodul/ui/core.html?id=`    |
 |`${publication_id}`|The id of this publication.               |`54f6c12d-8e68-4ec8-badf-cd045b33d01e`|
 |`${series_id}`     |The id of the series if available         |`36f3c5d8-ad4d-4dab-beb1-1400ffab4a69`|
 

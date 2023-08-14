@@ -149,17 +149,6 @@
       "HOTKEY_CHEAT_SHEET": "快捷键",
       "ADOPTER_REGISTRATION": "使用者登记"
    },
-   "REBUILD": {
-      "TITLE": "Index Rebuild",
-      "WARNING": "Attention!",
-      "HEADER": "Index rebuild in progress!",
-      "THEME_SERVICE": "Theme Service",
-      "SERIES_SERVICE": "Series Service",
-      "SCHEDULER_SERVICE": "Scheduler Service",
-      "ASSETMANAGER_SERVICE": "AssetManager Service",
-      "COMMENTS_SERVICE": "Comments Service",
-      "WORKFLOW_SERVICE": "Workflow Service"
-   },
    "NOTIFICATIONS": {
       "ACL_ADDED": "已创建访问权限",
       "ACL_NOT_SAVED": "无法保存访问权限",
@@ -907,7 +896,7 @@
                   "NEW": "新建策略",
                   "NEW_USER": "New user",
                   "DETAILS": "Non-user roles",
-                  "USER": "User",
+                  "USER": "用户",
                   "USERS": "Users who are authorized for the event",
                   "NONEXISTENT_USER": "Nonexistent user",
                   "HELP": {
@@ -1141,7 +1130,7 @@
                   "NEW": "新建策略",
                   "NEW_USER": "New user",
                   "DETAILS": "Non-user roles",
-                  "USER": "User",
+                  "USER": "用户",
                   "USERS": "Users who are authorized for the series",
                   "HELP": {
                      "READ": "By setting read rights, the series becomes visible for the selected user",
@@ -1236,7 +1225,7 @@
                   "LOAD_MORE_LIMIT": "显示策略.",
                   "LOAD_MORE_LINK": "载入更多",
                   "NEW_USER": "New user",
-                  "USER": "User",
+                  "USER": "用户",
                   "USERS": "Users who are authorized for the series",
                   "NONEXISTENT_USER": "Nonexistent user",
                   "HELP": {
@@ -1492,7 +1481,7 @@
                   "DETAILS": "Non-user roles",
                   "DESCRIPTION": "请选择一套预先配置的策略或在下方添加自定义策略",
                   "NEW_USER": "New user",
-                  "USER": "User",
+                  "USER": "用户",
                   "USERS": "Users who are authorized by this access policy",
                   "HELP": {
                      "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
@@ -1541,7 +1530,7 @@
                   "DETAILS": "Non-user roles",
                   "DESCRIPTION": "请选择一套预先配置的策略或在下方添加自定义策略",
                   "NEW_USER": "New user",
-                  "USER": "User",
+                  "USER": "用户",
                   "USERS": "Users who are authorized by this access policy",
                   "NONEXISTENT_USER": "Nonexistent user",
                   "HELP": {

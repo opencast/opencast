@@ -1,0 +1,8 @@
+{
+    "value_locale": "pl",
+    "error_mediaPackageInformationNotLoaded": "Istnieją dwie możliwe przyczyny tego błędu:",
+    "error_mediaPackageInformationNotLoaded_reason1": "Nagranie już nie jest dostępne",
+    "error_mediaPackageInformationNotLoaded_reason2": "Tylko zalogowani użytkownicy mają dostęp do tego nagrania",
+    "error_noMediaInformationAvailable": "Brak informacji o mediach.",
+    "error_endpointNotAvailable": "Usługa wyszukiwania jest obecnie niedostępna."
+}

@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -24,25 +24,23 @@ package org.opencastproject.security.urlsigning.filter;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.verifier.UrlSigningVerifier;
 import org.opencastproject.urlsigning.common.ResourceRequest;
+import org.opencastproject.util.OsgiUtil;
+import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
-import org.osgi.service.component.propertytypes.ServiceRanking;
-import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContextSelect;
-import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardFilterName;
-import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardFilterPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,16 +54,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Component(
-    scope = ServiceScope.PROTOTYPE,
+    immediate = true,
+    service = { Filter.class,ManagedService.class },
     property = {
         "service.description=Url Signing Filter",
+        "httpContext.id=opencast.httpcontext",
+        "httpContext.shared=true",
+        "service.ranking=9",
+        "urlPatterns=*"
     }
 )
-@ServiceRanking(7)
-@HttpWhiteboardFilterName("UrlSigningFilter")
-@HttpWhiteboardFilterPattern("/*")
-@HttpWhiteboardContextSelect("(osgi.http.whiteboard.context.name=opencast)")
-public class UrlSigningFilter implements Filter {
+public class UrlSigningFilter implements Filter, ManagedService {
   /** The prefix in the configuration file to define the regex that will match a url path. */
   public static final String URL_REGEX_PREFIX = "url.regex";
   /** The property in the configuration file to enable or disable this filter. */
@@ -207,14 +206,13 @@ public class UrlSigningFilter implements Filter {
     return this.getClass().getSimpleName();
   }
 
-  @Activate
-  @Modified
-  public void updated(Map<String, Object> properties) {
+  @Override
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     logger.info("Updating UrlSigningFilter");
 
-    String enableFilterConfig = (String) properties.get(ENABLE_FILTER_CONFIG_KEY);
-    if (enableFilterConfig != null) {
-      enabled = Boolean.parseBoolean(enableFilterConfig);
+    Option<String> enableFilterConfig = OsgiUtil.getOptCfg(properties, ENABLE_FILTER_CONFIG_KEY);
+    if (enableFilterConfig.isSome()) {
+      enabled = Boolean.parseBoolean(enableFilterConfig.get());
       if (enabled) {
         logger.info("The UrlSigningFilter is configured to be enabled.");
       } else {
@@ -228,9 +226,9 @@ public class UrlSigningFilter implements Filter {
           ENABLE_FILTER_CONFIG_KEY);
     }
 
-    String strictFilterConfig = (String) properties.get(STRICT_FILTER_CONFIG_KEY);
-    if (strictFilterConfig != null) {
-      strict = Boolean.parseBoolean(strictFilterConfig);
+    Option<String> strictFilterConfig = OsgiUtil.getOptCfg(properties, STRICT_FILTER_CONFIG_KEY);
+    if (strictFilterConfig.isSome()) {
+      strict = Boolean.parseBoolean(strictFilterConfig.get());
       if (strict) {
         logger.info("The UrlSigningFilter is configured to use strict checking of resource URLs.");
       } else {
@@ -252,7 +250,9 @@ public class UrlSigningFilter implements Filter {
       return;
     }
 
-    for (String propertyKey : properties.keySet()) {
+    Enumeration<String> propertyKeys = properties.keys();
+    while (propertyKeys.hasMoreElements()) {
+      String propertyKey = propertyKeys.nextElement();
       if (!propertyKey.startsWith(URL_REGEX_PREFIX)) {
         continue;
       }
@@ -261,8 +261,10 @@ public class UrlSigningFilter implements Filter {
       logger.debug("Looking for configuration of {} and found '{}'", propertyKey, urlRegularExpression);
       // Has the url signing provider been fully configured
       if (urlRegularExpression == null) {
-        logger.debug("Unable to configure url regular expression with id '{}' because it is missing. "
-            + "Stopping to look for new keys.", propertyKey);
+        logger.debug(
+            "Unable to configure url regular expression with id '{}' because it is missing. "
+                + "Stopping to look for new keys.",
+            propertyKey);
         break;
       }
 

@@ -1,0 +1,18 @@
+{
+    "error": "Errore",
+    "error_unknown": "Si è verificato un errore. Ricarica la pagina.",
+    "reloadPage": "Ricarica la pagina",
+    "loginInformation": "Accedi con il tuo account Opencast",
+    "login": "Accedi",
+    "enterUsernamePassword": "Si prega di inserire nome utente e password:",
+    "username": "Nome Utente",
+    "password": "Password",
+    "rememberMe": "Ricordami",
+    "cancel": "Annulla",
+    "loginSuccessful": "Accesso riuscito. Se la pagina non si ricarica automaticamente, si prega di ricaricare la pagina.",
+    "logoutSuccessful": "Disconessione riuscita. Se la pagina non si ricarica automaticamente, si prega di ricaricare la pagina.",
+    "loginFailed": "Impossibile accedere.",
+    "description": "Descrizione",
+    "slideText": "Testo slide",
+    "shortcuts": "Scorciatoie"
+}

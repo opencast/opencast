@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -31,10 +31,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.http.HttpContext;
-import org.osgi.service.http.context.ServletContextHelper;
-import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,14 +48,15 @@ import javax.servlet.http.HttpServletResponse;
  * registrations should use the {@link HttpContext} that is registered with the OSGi service registry.
  */
 @Component(
-    service = ServletContextHelper.class,
-    scope = ServiceScope.BUNDLE,
+    immediate = true,
+    service = HttpContext.class,
     property = {
         "service.description=Opencast HttpContent",
+        "httpContext.id=opencast.httpcontext",
+        "httpContext.shared=true"
     }
 )
-@HttpWhiteboardContext(path = "/", name = "opencast")
-public class SharedHttpContext extends ServletContextHelper {
+public class SharedHttpContext implements HttpContext {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(SharedHttpContext.class);
 

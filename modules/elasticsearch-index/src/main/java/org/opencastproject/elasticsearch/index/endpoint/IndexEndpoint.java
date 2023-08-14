@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -31,25 +31,19 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
@@ -133,7 +127,7 @@ public class IndexEndpoint {
       description = "Repopulates the Index from an specific service",
       returnDescription = "OK if repopulation has started", pathParameters = {
       @RestParameter(name = "service", isRequired = true, description = "The service to recreate index from. "
-        + "The available services are: Themes, Series, Scheduler, AssetManager, Comments and Workflow. "
+        + "The available services are: Themes, Series, Scheduler, Workflow, AssetManager and Comments. "
         + "The service order (see above) is very important! Make sure, you do not run index rebuild for more than one "
         + "service at a time!",
         type = RestParameter.Type.STRING) }, responses = {
@@ -180,7 +174,7 @@ public class IndexEndpoint {
           returnDescription = "OK if repopulation has started", pathParameters = {
           @RestParameter(name = "service", isRequired = true, description = "The service to start recreating the index "
                   + "from. "
-                  + "The available services are: Themes, Series, Scheduler, AssetManager, Comments and Workflow. "
+                  + "The available services are: Themes, Series, Scheduler, Workflow, AssetManager and Comments. "
                   + "All services that come after the specified service in the order above will also run.",
                   type = RestParameter.Type.STRING) }, responses = {
           @RestResponse(description = "OK if repopulation has started", responseCode = HttpServletResponse.SC_OK) })
@@ -196,31 +190,5 @@ public class IndexEndpoint {
       }
     }));
     return R.ok();
-  }
-
-  @GET
-  @Path("rebuild/states.json")
-  @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getrebuildstates", description = "Returns the index rebuild service"
-          + "repopulation states", returnDescription = "The repopulation states of the index rebuild services",
-          responses = {
-          @RestResponse(description = "Returns the repopulation states of the index rebuild services",
-          responseCode = HttpServletResponse.SC_OK),
-    })
-  public Response getRebuildStates() {
-    Map<String, String> states = indexRebuildService.getRebuildStates();
-    JSONArray statesAsJson = new JSONArray();
-    for (Map.Entry<String, String> entry : states.entrySet()) {
-      JSONObject data = new JSONObject();
-      data.put("type", entry.getKey());
-      data.put("state", entry.getValue());
-      data.put("executionOrder", IndexRebuildService.Service.valueOf(entry.getKey()).ordinal());
-      statesAsJson.add(data);
-    }
-    JSONObject service = new JSONObject();
-    service.put("service", statesAsJson);
-    JSONObject services = new JSONObject();
-    services.put("services", service);
-    return Response.ok(services.toJSONString()).build();
   }
 }

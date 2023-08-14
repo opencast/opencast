@@ -1,0 +1,13 @@
+{
+    "value_locale": "אנגלית",
+    "value_dateFormatFull": "MMMM DD YYYY, h:mm:ss a",
+    "title": "כותרת",
+    "noTitle": "אין כותרת",
+    "creator": "יוצר",
+    "presenter": "תורמ(ים)",
+    "views": "צפיות",
+    "series": "סדרות",
+    "recordingDate": "תאריך הקלטה",
+    "description": "תיאור",
+    "noDescriptionAvailable": "אין תיאור זמין."
+}

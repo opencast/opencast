@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -22,11 +22,6 @@
 package org.opencastproject.kernel.filter.https;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ServiceScope;
-import org.osgi.service.component.propertytypes.ServiceRanking;
-import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContextSelect;
-import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardFilterName;
-import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardFilterPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,16 +39,16 @@ import javax.servlet.http.HttpServletRequest;
  * This filter is wrapping <code>HttpServletRequest</code>s in such a way that they feature the https scheme.
  */
 @Component(
+    immediate = true,
     service = Filter.class,
-    scope = ServiceScope.PROTOTYPE,
     property = {
         "service.description=Https Filter",
+        "httpContext.id=opencast.httpcontext",
+        "httpContext.shared=true",
+        "service.ranking=2",
+        "urlPatterns=*"
     }
 )
-@ServiceRanking(990)
-@HttpWhiteboardFilterName("HttpsFilter")
-@HttpWhiteboardFilterPattern("/*")
-@HttpWhiteboardContextSelect("(osgi.http.whiteboard.context.name=opencast)")
 public class HttpsFilter implements Filter {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(HttpsFilter.class);

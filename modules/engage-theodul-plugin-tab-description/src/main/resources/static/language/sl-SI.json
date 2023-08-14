@@ -1,0 +1,13 @@
+{
+    "value_locale": "sl",
+    "value_dateFormatFull": "MMMM Do LLLL, h:mm:ss a",
+    "title": "Naslov",
+    "noTitle": "Ni naslova",
+    "creator": "Avtor",
+    "presenter": "Sodelavec",
+    "views": "Ogledi",
+    "series": "Serije",
+    "recordingDate": "Datum posnetka",
+    "description": "Opis",
+    "noDescriptionAvailable": "Opis ni na voljo."
+}

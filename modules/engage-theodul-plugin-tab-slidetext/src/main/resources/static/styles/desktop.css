@@ -1,0 +1,34 @@
+#engage_slidetext_tab_content {
+    width: 100%;
+    padding-top: 15px;
+    padding-right: 20px;
+}
+
+.media {
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: -10px;
+}
+
+.mediaColor {
+    color: #000000;
+    background-color: #F1F1F1;
+    border-color: #969696;
+    cursor: pointer;
+}
+
+.mediaColor-hover {
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+    cursor: pointer;
+}
+
+.media-time {
+    color: rgba(98, 98, 98, 1);
+}
+
+.media-heading {
+    font-size: 1.2em;
+    font-style: italic;
+}

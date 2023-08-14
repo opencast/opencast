@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -24,6 +24,7 @@ package org.opencastproject.util;
 import static org.opencastproject.util.data.Option.option;
 
 import org.opencastproject.rest.RestConstants;
+import org.opencastproject.rest.SharedHttpContext;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Strings;
 
@@ -32,7 +33,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -160,9 +160,9 @@ public final class OsgiUtil {
 
   public static ServiceRegistration<?> registerServlet(BundleContext bundleContext, Object service, String alias) {
     Dictionary<String, String> resourceProps = new Hashtable<>();
-    resourceProps.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT, "(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=" + RestConstants.HTTP_CONTEXT_ID + ")");
-    resourceProps.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, alias);
-    resourceProps.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, alias + "/*");
+    resourceProps.put(SharedHttpContext.CONTEXT_ID, RestConstants.HTTP_CONTEXT_ID);
+    resourceProps.put(SharedHttpContext.SHARED, "true");
+    resourceProps.put(SharedHttpContext.ALIAS, alias);
     return bundleContext.registerService(Servlet.class.getName(), service, resourceProps);
   }
 

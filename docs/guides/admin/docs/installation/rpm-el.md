@@ -1,16 +1,14 @@
 Install from Repository (Red Hat Enterprise Linux, CentOS Stream, …
 ===================================================================
 
-This guide is based on an RPM software repository available for Red Hat based Linux distributions provided
-by [Osnabrück University](https://uni-osnabrueck.de).
+This guide is based on an RPM software repository available for Red Hat based Linux distributions provided by [Osnabrück
+University](https://uni-osnabrueck.de) and [ELAN e.V.](https://elan-ev.de).
 This repository provides preconfigured Opencast installations and all necessary 3rd-party-tools.
+
 
 > In addition to this guide, we have also recorded [a full installation done in 30 minutes](https://vt.uos.de/71hfc)
 > if you like to see how this works before you try it yourself.
 
-<div class=warn>
-  <b>Opencast {{ opencast_major_version() }}</b> is not yet available.
-</div>
 
 Currently Supported
 -------------------
@@ -30,7 +28,8 @@ Activate Repository
 First you have to install the necessary repositories:
 
 ```sh
-dnf install -y "https://pkg.opencast.org/rpms/release/el/$(rpm -E %rhel)/oc-{{ opencast_major_version() }}/noarch/opencast-repository-{{ opencast_major_version() }}-1.el$(rpm -E %rhel).noarch.rpm"
+dnf install -y \
+  "https://pkg.opencast.org/rpms/release/el/$(rpm -E %rhel)/oc-{{ opencast_major_version() }}/noarch/opencast-repository-{{ opencast_major_version() }}-1.el$(rpm -E %rhel).noarch.rpm"
 ```
 
 It might take some time after the release of a new Opencast version before the RPMs are moved to the stable repository.

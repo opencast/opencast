@@ -1,0 +1,16 @@
+{
+    "value_locale": "sl",
+    "error_AudioCodecNotSupported": "Napaka: ta brskalnik ne podpira zvočnega kodeka",
+    "error_AudioElementNotSupported": "Napaka: vaš brskalnik ne podpira zvočnega elementa.",
+    "video": "Videoposnetek",
+    "video_short": "Vid.",
+    "openInPlayer": "Odpri v predvajalniku",
+    "givenTime": "Dana ura",
+    "hasToBeSmallerThanDuration": "mora biti manjše kot trajanje",
+    "msg_waitToSetTime": "Z nastavitvijo časa predvajanja počakajte, dokler ni video naložen.",
+    "msg_startPlayingToSetTime": "Pred nastavljanjem časa predvajanja začnite predvajati video.",
+    "msg_waitToSeek": "Iskanje ni mogoče, dokler ni video naložen.",
+    "msg_startPlayingToSeek": "Iskanje ni mogoče, dokler vsaj enkrat ne kliknete gumba »Predvajaj«.",
+    "chromeBuffer": "Preverjevalnik medpomnilnika je onemogočen zaradi omejitev Chroma. Morda boste pri predvajanju videa naleteli na težave.",
+    "scroll_overlay_text": "Use shift + scroll to zoom."
+}

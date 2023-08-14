@@ -4,23 +4,23 @@
   "private": true,
   "homepage": "/ltitools",
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.4.0",
-    "@fortawesome/free-solid-svg-icons": "^6.4.0",
+    "@fortawesome/fontawesome-svg-core": "^6.2.0",
+    "@fortawesome/free-solid-svg-icons": "^6.2.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "axios": "^0.27.2",
-    "bootstrap": "^5.3.0",
-    "i18next": "^23.4.2",
-    "i18next-browser-languagedetector": "^7.1.0",
-    "iframe-resizer": "^4.3.6",
+    "bootstrap": "^5.2.2",
+    "i18next": "^22.0.4",
+    "i18next-browser-languagedetector": "^7.0.0",
+    "iframe-resizer": "^4.3.2",
     "query-string": "^7.1.1",
     "react": "^18.1.0",
-    "react-bootstrap": "^2.8.0",
+    "react-bootstrap": "^2.5.0",
     "react-dom": "^18.1.0",
-    "react-i18next": "^12.3.1",
+    "react-i18next": "^12.0.0",
     "react-js-pagination": "^3.0.2",
     "react-scripts": "^5.0.1",
-    "react-select": "^5.7.4",
-    "typescript": "4.9.5"
+    "react-select": "^5.5.9",
+    "typescript": "4.8.4"
   },
   "overrides": {
     "autoprefixer": "10.4.5"
@@ -64,11 +64,11 @@
     ]
   },
   "devDependencies": {
-    "@types/jest": "29.5.2",
-    "@types/node": "20.4.8",
+    "@types/jest": "29.2.1",
+    "@types/node": "18.11.8",
     "@types/react": "17.0.39",
-    "@types/react-dom": "18.2.7",
-    "@types/react-helmet": "^6.1.6",
+    "@types/react-dom": "18.0.8",
+    "@types/react-helmet": "^6.1.5",
     "@types/react-js-pagination": "^3.0.4"
   }
 }

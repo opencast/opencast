@@ -1,0 +1,87 @@
+<!-- theodul controls plugin mobile mode -->
+<% if((typeof hasmultiplevideos !== "undefined")
+	&& (typeof plugin_path !== "undefined")
+	&& (typeof str_playPauseVideo !== "undefined")
+	&& (typeof str_playVideo !== "undefined")
+	&& (typeof str_pauseVideo !== "undefined")
+	&& (typeof str_volumeSlider !== "undefined")
+	&& (typeof str_showVolumeBar !== "undefined")
+	&& (typeof str_video !== "undefined")
+	&& (typeof str_of !== "undefined")
+	&& (typeof str_swipeHint !== "undefined")
+	&& (typeof str_fullscreen !== "undefined")) { %>
+
+<% if(hasmultiplevideos) { %>
+<div id="swipe_hint">
+    <span class="glyphicon glyphicon-chevron-left left" aria-hidden="true"></span>
+    <span><%= str_swipeHint %></span>
+    <span class="glyphicon glyphicon-chevron-right right" aria-hidden="true"></span>
+</div>
+<% } %>
+
+<div id="big_play_button">
+    <span class="glyphicon glyphicon-play-circle" aria-hidden="true" aria-label="<%= str_playVideo %>" title="<%= str_playVideo %>"></span>
+</div>
+
+<div id="navigation_wrapper">
+
+    <div id="navigation_control">
+        <div id="playpause_controls" class="controlbutton" role="button" aria-label="<%= str_playPauseVideo %>">
+            <span id="play_button" class="playpause_btn glyphicon glyphicon-play" aria-hidden="true" aria-label="<%= str_playVideo %>" title="<%= str_playVideo %>"></span>
+            <span id="pause_button" class="playpause_btn glyphicon glyphicon-pause" style="display: none;" aria-hidden="true" aria-label="<%= str_pauseVideo %>" title="<%= str_pauseVideo %>"></span>
+        </div>
+    </div>
+
+    <div id="slider" role="progressbar"></div>
+
+    <div id="navigation_time">
+        <% if(typeof startTime !== "undefined") { %>
+        <p id="navigation_time_current" role="timer"><%= startTime %></p>
+        <p id="navigation_time_duration" aria-label="<%= str_totalVideoLength %> <%= duration %>"><%= duration %></p>
+        <% } else { %>
+        <p id="navigation_time_current" role="timer">00:00:00</p>
+        <% } %>
+    </div>
+
+    <% if(hasmultiplevideos) { %>
+    <div id="current_video">
+        <%= str_video %><br>
+        <span id="current_video_id">1</span>
+        <em><%= str_of %></em>
+        <span><%= numberofvideos %></span>
+    </div>
+    <% } %>
+    
+    <div class="btn-group">
+        <div id="volume" class="btn btn-default">
+            <button class="volume_icon" id="volumeIcon">
+                <span class="glyphicon glyphicon-volume-up" aria-hidden="true" aria-label="<%= str_showVolumeBar %>" title="<%= str_showVolumeBar %>"></span>
+            </button>
+            <div id="volumeSlider" role="slider" aria-label="<%= str_volumeSlider %>"></div>
+        </div>
+
+        <% if((typeof hasqualities !== "undefined") && hasqualities
+        && (typeof str_qualityButton !== "undefined")
+        && (typeof str_quality !== "undefined")
+        && (typeof qualities !== "undefined") 
+        && (typeof translatedqualities !== "undefined")) { %>
+        <div class="btn-group dropup">
+            <button id="dropdownMenuQuality" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_qualityButton %>">
+              <span class="glyphicon glyphicon-cog"></span>
+              <span id="qualityIndicator"><%= str_quality %></span>
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu pull-right" role="menu">
+              <li class="disabled" role="presentation"><a id="qualityDescription" role="menuitem" tabindex="-1" href="#"><b><%= str_quality %></b></a></li>
+              <li class="divider"></li>
+              <% for (var i = 0; i < qualities.length; i++) { %>
+              <li role="presentation"><a id="quality<%= qualities[i] %>" role="menuitem" tabindex="-1" href="#"><b><%= translatedqualities[qualities[i]] %></b></a></li>
+              <% } %>
+            </ul>
+        </div>
+        <% } %>
+  </div>
+
+</div> <!-- end #navigation_wrapper -->
+
+<% } %>

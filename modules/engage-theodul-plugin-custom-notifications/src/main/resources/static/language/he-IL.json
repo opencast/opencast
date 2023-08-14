@@ -1,0 +1,13 @@
+{
+    "value_locale": "אנגלית",
+    "value_dateFormatFull": "MMMM DD YYYY, h:mm:ss a",
+    "error_videoLoading": "הוידאו בטעינה. נא המתן מספר רגעים.",
+    "error_audioLoading": "השמע בטעינה. נא המתן מספר רגעים.",
+    "msg_videoLoadedSuccessfully": "הוידאו נטען בהצלחה.",
+    "msg_audioLoadedSuccessfully": "השמע נטען בהצלחה.",
+    "msg_videoBuffering": "הווידאו נאגר כעת. נא המתן מספר רגעים.",
+    "msg_videoBufferedSuccessfullyAndAutoplaying": "הוידאו נטען בהצלחה וכעת מתנגן אוטומטית.",
+    "msg_videoBufferedSuccessfully": "הוידאו נטען בהצלחה.",
+    "error": "שגיאה",
+    "error_AudioCodecNotSupported": "שגיאה: קודק אודיו אינו נתמך על ידי דפדפן זה"
+}

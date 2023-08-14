@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -285,7 +285,6 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
   }
-
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("mediaPackage/{id}/hasActiveWorkflows")

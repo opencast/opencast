@@ -1,0 +1,8 @@
+{
+    "value_locale": "en",
+    "error_mediaPackageInformationNotLoaded": "Der er to mulige årsager til denne fejl:",
+    "error_mediaPackageInformationNotLoaded_reason1": "Medie er ikke længere tilgængeligt",
+    "error_mediaPackageInformationNotLoaded_reason2": "Mediet er beskyttet, og du skal logge ind",
+    "error_noMediaInformationAvailable": "Ingen tilgængelige medieoplysninger.",
+    "error_endpointNotAvailable": "Søgetjenesten er pt. utilgængelig."
+}

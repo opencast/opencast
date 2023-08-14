@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -22,7 +22,6 @@ package org.opencastproject.external.common;
 
 public final class ApiMediaType {
 
-  public static final String VERSION_1_10_0 = "application/v1.10.0+json";
   public static final String VERSION_1_9_0 = "application/v1.9.0+json";
   public static final String VERSION_1_8_0 = "application/v1.8.0+json";
   public static final String VERSION_1_7_0 = "application/v1.7.0+json";
@@ -51,10 +50,8 @@ public final class ApiMediaType {
   public static ApiMediaType parse(String acceptHeader) throws ApiMediaTypeException {
     /* MH-12802: The External API does not support content negotiation */
     ApiMediaType mediaType;
-    if (acceptHeader == null || acceptHeader.contains(VERSION_1_10_0) || acceptHeader.contains(JSON)
+    if (acceptHeader == null || acceptHeader.contains(VERSION_1_9_0) || acceptHeader.contains(JSON)
     || acceptHeader.contains(APPLICATION_ANY) || acceptHeader.contains(ANY)) {
-      mediaType = new ApiMediaType(ApiVersion.VERSION_1_10_0, ApiFormat.JSON, VERSION_1_10_0);
-    } else if (acceptHeader.contains(VERSION_1_9_0)) {
       mediaType = new ApiMediaType(ApiVersion.VERSION_1_9_0, ApiFormat.JSON, VERSION_1_9_0);
     } else if (acceptHeader.contains(VERSION_1_8_0)) {
       mediaType = new ApiMediaType(ApiVersion.VERSION_1_8_0, ApiFormat.JSON, VERSION_1_8_0);

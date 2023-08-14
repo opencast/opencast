@@ -6,7 +6,6 @@
   <tags/>
   <description/>
   <configuration_panel/>
-  <configuration_panel_json/>
   <state-mappings>
     <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.UPDATING_PREVIEWS</state-mapping>
     <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.UPDATING_PREVIEWS</state-mapping>

@@ -70,7 +70,7 @@ nav:
    - Firewall: 'configuration/firewall.md'
    - Asset Manager: 'configuration/asset-manager.md'
    - Elasticsearch: 'configuration/elasticsearch.md'
-   - OpenSearch: 'configuration/opensearch.md'
+   - Opensearch: 'configuration/opensearch.md'
    - Metadata: 'configuration/metadata.md'
    - Encoding: 'configuration/encoding.md'
    - Inbox: 'configuration/inbox.md'
@@ -118,9 +118,10 @@ nav:
    - LTI Module: 'modules/ltimodule.md'
    - Media Module: 'modules/mediamodule.configuration.md'
    - Metrics (OpenMetrics, Prometheus): modules/metrics.md
-   - New Admin UI: 'modules/admin-ui.md'
    - Player:
       - Configuration: 'modules/player.configuration.md'
+      - URL Parameters: 'modules/player.url.parameter.md'
+      - Matomo Tracking: 'modules/player.matomo.tracking.md'
    - Paella player:
       - Configuration: 'modules/paella.player/configuration.md'
       - URL Parameters: 'modules/paella.player/url.parameter.md'
@@ -136,7 +137,6 @@ nav:
         - es.upv.paella.opencast.userTrackingSaverPlugIn: 'modules/paella.player/plugins/es.upv.paella.opencast.userTrackingSaverPlugIn.md'
    - Paella player 7:
       - Configuration: 'modules/paella.player7/configuration.md'
-      - URL Parameters: 'modules/paella.player7/url.parameter.md'
    - Search Index:
       - Overview: 'modules/searchindex/index.md'
       - Solr: 'modules/searchindex/solr.md'

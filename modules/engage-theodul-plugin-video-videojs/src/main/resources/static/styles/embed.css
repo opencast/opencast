@@ -1,0 +1,227 @@
+/*theodul video videojs plugin, embed mode styles*/
+
+.vjs-openInPlayer {
+    float: right !important;
+}
+
+.vjs-openInPlayer:before {
+    content: "\2771";
+}
+
+.vjs-switchPlayer {
+    float: right !important;
+}
+
+.vjs-switchPlayer-value {
+    font-size: 1.5em;
+    line-height: 2;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.btn-video {
+    text-transform: none !important;
+}
+
+#canvas {
+  position: absolute;
+}
+
+.videojs_wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    margin: 0 auto;
+    cursor: pointer;
+}
+#canvas {
+  position: absolute;
+}
+
+.videojs_wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    margin: 0 auto;
+    cursor: pointer;
+}
+
+.videoDisplay {
+    margin: 1px;
+    overflow: hidden;
+}
+
+#engage_video {
+    overflow: hidden;
+}
+
+.videoDefaultLayout {
+    float: left;
+    width: 49.5%;
+}
+
+.audioDisplayError {
+    display: none;
+}
+
+.videoFrame {
+    width: 100%;
+    height: 100%;
+}
+
+.videoFocusedPiP {
+    width: 100%;
+    float: left;
+    z-index: 10;
+    padding-top: 0px;
+}
+.videoUnfocusedPiP {
+    width: 19.5%;
+    position: absolute;
+    margin-left: 12%;
+    margin-top: 10%;
+    box-shadow: 3px 3px 3px black;
+    opacity: 0.7;
+    z-index: 20;
+}
+
+.videoFocused {
+    width: 80%;
+    float: left;
+    position: absolute;
+    padding-top: 0px;
+}
+
+.videoUnfocused {
+    width: 19.5%;
+    float: right;
+    margin-left: 70%;
+   }
+
+.video-js {
+    background-color: #FFF !important;
+}
+.clearfix:before,
+.clearfix:after {
+    content: " ";
+    display: table;
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+.video-js.auto-height {
+    height: 0 !important;
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box;
+    box-sizing: content-box;
+    max-width: 100%;
+    width: auto !important;
+}
+
+#indicator {
+    position: absolute;
+    background-color: black;
+    opacity: 0.4;
+    width: 10%;
+    height: 10%;
+    left: 88%;
+    top: 88%;
+    border: 1px solid white;
+}
+
+.videoDisplay {
+    margin: 1px;
+    overflow: hidden;
+}
+
+#engage_video {
+    overflow: hidden;
+}
+
+.videoDefaultLayout {
+    float: left;
+    width: 49.5%;
+}
+
+.audioDisplayError {
+    display: none;
+}
+
+.videoFrame {
+    width: 100%;
+    height: 100%;
+}
+
+.videoFocusedPiP {
+    width: 100%;
+    float: left;
+    z-index: 10;
+    padding-top: 0px;
+}
+.videoUnfocusedPiP {
+    width: 19.5%;
+    position: absolute;
+    margin-left: 12%;
+    margin-top: 10%;
+    box-shadow: 3px 3px 3px black;
+    opacity: 0.7;
+    z-index: 20;
+}
+
+.videoFocused {
+    width: 80%;
+    float: left;
+    position: absolute;
+    padding-top: 0px;
+}
+
+.videoUnfocused {
+    width: 19.5%;
+    float: right;
+    margin-left: 70%;
+   }
+
+.video-js {
+    background-color: #FFF !important;
+}
+.clearfix:before,
+.clearfix:after {
+    content: " ";
+    display: table;
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+.video-js.auto-height {
+    height: 0 !important;
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box;
+    box-sizing: content-box;
+    max-width: 100%;
+    width: auto !important;
+}
+
+.vjs-fullscreen-control {
+    visibility: visible;
+}
+
+#indicator {
+    position: absolute;
+    background-color: black;
+    opacity: 0.4;
+    width: 10%;
+    height: 10%;
+    left: 88%;
+    top: 88%;
+    border: 1px solid white;
+}
+

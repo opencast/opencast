@@ -62,10 +62,10 @@ Details about the configuration can be found at:
 - [Database Configuration](database.md)
 
 
-Step 4: Setting up OpenSearch
+Step 4: Setting up Elasticsearch
 --------------------------------
 
-Opencast requires OpenSearch. Instructions for installing OpenSearch can be found in the
+Opencast requires Elasticsearch. Instructions for installing Elasticsearch can be found in the
 [installation documentation](../installation/index.md).
 
 

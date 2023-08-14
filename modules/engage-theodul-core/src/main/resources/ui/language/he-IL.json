@@ -1,0 +1,18 @@
+{
+    "error": "שגיאה",
+    "error_unknown": "אירעה שגיאה. אנא רענן את הדף.",
+    "reloadPage": "רענן דף",
+    "loginInformation": "היכנס למערכת באמצעות חשבון Opencast",
+    "login": "התחבר",
+    "enterUsernamePassword": "אנא הכנס את שם המשתמש והסיסמה שלך:",
+    "username": "שם משתמש",
+    "password": "סיסמה",
+    "rememberMe": "זכור אותי",
+    "cancel": "בטל",
+    "loginSuccessful": "התחבר בהצלחה. נא לטעון מחדש את העמוד, אם הדף לא התרענן אוטומטית.",
+    "logoutSuccessful": "התנתק בהצלחה. נא לטעון מחדש את העמוד, אם הדף לא התרענן אוטומטית.",
+    "loginFailed": "לא הצליח להיכנס.",
+    "description": "תאור",
+    "slideText": "שקופית טקסט",
+    "shortcuts": "קיצורי דרך"
+}

@@ -1,0 +1,43 @@
+<% if((typeof str_type !== "undefined")
+&& (typeof str_mimetype !== "undefined")
+&& (typeof str_resolution !== "undefined")
+&& (typeof str_download !== "undefined")) { %>
+<div id="engage_tab_downloadableVideos_content">
+  <table class="table table-bordered table-hover">
+    <thead>
+    <tr>
+      <th><%= str_type %></th>
+      <th><%= str_mimetype %></th>
+      <th><%= str_resolution %></th>
+      <th><%= str_download %></th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <% if(typeof tracks !== "undefined"
+    && tracks.length !== "undefined") { %>
+    <% _.each(tracks, function(item) { %>
+    <tr>
+      <td><%= item.type %></td>
+      <td><%= item.mimetype%></td>
+
+      <% if(typeof item.video !== "undefined") { %>
+      <td><%= item.video.resolution %></td>
+      <% } else { %>
+      <td></td>
+      <% } %>
+      <td>
+
+        <a class="btn btn-default" href="<%= item.url %>" role="button" download="<%= item.id %>">
+          <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+        </a>
+
+      </td>
+    </tr>
+    <% }); %>
+    <% } %>
+    </tbody>
+
+  </table>
+</div>
+<% } %>

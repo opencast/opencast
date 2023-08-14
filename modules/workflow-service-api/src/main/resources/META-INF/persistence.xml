@@ -15,6 +15,8 @@
       <property name="eclipselink.ddl-generation" value="create-tables" />
       <property name="eclipselink.logging.logger" value="JavaLogger" />
       <property name="eclipselink.logging.level.sql" value="FINE" />
+      <property name="eclipselink.create-ddl-jdbc-file-name" value="create-workflow-service-api.jdbc"/>
+      <property name="eclipselink.drop-ddl-jdbc-file-name" value="drop-workflow-service-api.jdbc"/>
     </properties>
   </persistence-unit>
 </persistence>

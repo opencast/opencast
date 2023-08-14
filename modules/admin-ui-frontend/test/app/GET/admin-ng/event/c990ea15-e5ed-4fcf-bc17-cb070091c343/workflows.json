@@ -10,7 +10,7 @@
       "series": "",
       "id": 2110,
       "title": "Mock Event Published",
-      "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
+      "status": "SUCCEEDED"
     }
   ]
 }

@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -28,8 +28,7 @@ export default class CookieConsentButtonPlugin extends ButtonPlugin {
     if (!(await super.isEnabled())) {
       return false;
     }
-
-    if (!this?.player?.config?.opencast?.cookieConsent?.enable) {
+    if (!window.cookieconsent) {
       this.player.log.warn('"Cookie Consent by TermsFeed" library not loaded. \
       You need to load in your web to use this plugin.');
       return false;
@@ -55,7 +54,7 @@ export default class CookieConsentButtonPlugin extends ButtonPlugin {
   }
 
   async load() {
-    this.icon = this.player.getCustomPluginIcon(this.name, 'buttonIcon') || defaultCookieIcon;
+    this.icon = this.player.getCustomPluginIcon(this.name, 'cookieIcon') || defaultCookieIcon;
   }
 
   async action() {

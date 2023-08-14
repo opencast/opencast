@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -72,17 +72,6 @@
         }
     }
 
-    // Index rebuild indicator
-    .nav-rb-warning {
-        color: red;
-        font-weight: bold;
-        padding: 0 7px;
-    }
-
-    .nav-rb-header {
-        font-weight: bold;
-    }
-
     .dropdown-ul {
         position: absolute;
         z-index: $max-z + 10;
@@ -133,15 +122,6 @@
     .fa {
         color: #fff;
         font-size: 20px;
-    }
-
-    // Rebuild Dropdown
-    // ----------------------------------------
-
-    .rebuild-dd .dropdown-ul {
-        width: 240px;
-        top: $header-dropdown-top-position;
-        right: 5px;
     }
 
     // Language Dropdown

@@ -1,0 +1,234 @@
+/*********************************************************
+ * Add theodul controls plugin (mobile mode) scss here.
+ * This file is compiled with compass,
+ * see http://compass-style.org/
+ *********************************************************/
+
+
+@import "compass/css3/images";
+@import "compass/css3/text-shadow";
+@import "compass/css3/flexbox";
+@import "compass/css3/transition";
+@import "compass/css3/transform";
+@import "compass/css3/border-radius";
+@import "compass/css3/box-shadow";
+
+#engage_controls {
+  #swipe_hint {
+    position: absolute;
+    z-index: 9;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 9px;
+    font-style: italic;
+    text-align: center;
+    background: rgba(#fff, 0.8);
+    border-bottom: 1px solid #555;
+  }
+  &.first #swipe_hint .left {
+    display: none;
+  }
+  &.last #swipe_hint .right {
+    display: none;
+  }
+
+  #big_play_button {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 50%;
+    font-size: 100px;
+    font-size: 19vmin;
+    line-height: 1;
+    color: #333;
+    cursor: pointer;
+    @include transform(translate(-50%,-50%));
+
+    background: rgba(#fff, 0.7);
+    padding: 10px;
+    @include border-radius(10px);
+    @include box-shadow(1px 1px 9px rgba(20, 20, 20, 0.4));
+
+    &:focus, &:hover {
+      color: #111;
+      @include box-shadow(1px 1px 9px rgba(20, 20, 20, 0.6), inset 1px 1px 3px rgba(20, 20, 20, 0.6));
+    }
+
+    span {
+      display: block;
+    }
+  }
+
+  #navigation_wrapper {
+    position: absolute;
+    z-index: 10;
+    bottom: 0;
+    left: 0;
+
+    width: 100%;
+    padding: 5px 5px 2px;
+    background: rgba(#fff, 0.8);
+    border-top: 1px solid #555;
+
+    @include display-flex;
+    @include align-items(center);
+    
+    > .btn-group {
+      @include flex(0 0 auto);
+    }
+
+    .btn-default {
+      background-color: rgba(#fff, 0.5);
+      &:hover {
+        background-color: rgba(#e6e6e6, 0.5);
+      }
+    }
+
+    .ui-slider-handle {
+      position: absolute;
+      z-index: 2;
+      width: 25px !important;
+      height: 25px !important;
+      cursor: pointer !important;
+      background: url('../images/handle.png') no-repeat 50% 50% !important;
+      font-weight: bold;
+      color: #1C94C4;
+      outline: none;
+      border: none !important;
+      top: -10px !important;
+      margin-left: -12px;
+    }
+
+    #navigation_control {
+      @include flex(0 0 auto);
+      font-size: 27px;
+      cursor: pointer;
+    }
+
+    #navigation_time {
+      @include flex(0 0 auto);
+      margin-right: 12px;
+      font-size: 12px;
+      #navigation_time_current {
+        color: #666;
+      }
+      p {
+        margin: 0;
+        line-height: 1.2;
+      }
+    }
+
+    #current_video {
+      @include flex(0 0 auto);
+      font-size: 12px;
+      line-height: 1.2;
+      margin-right: 12px;
+      color: #666;
+      span {
+        color: #333;
+      } 
+    }
+
+    #slider {
+      @include flex(1 0 30px);
+
+      margin: 0 17px;
+      border-width: 1px;
+      border-style: solid;
+      border-color: #333 #333 #777 #333;
+      border-radius: 25px;
+      height: 7px;
+      background-color: #8e8d8d;
+      background: url('../images/bg-track.png') repeat top left;
+      box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, .5), 0 1px 0 0px rgba(250, 250, 250, .5);
+    }
+
+    #volume {
+      position: relative;
+
+      width: 47px;
+      height: 34px;
+      @include transition(width 0.5s);
+      overflow: hidden;
+
+      #volumeIcon {
+        cursor: pointer;
+        width: 47px;
+        font-size: 24px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background: none;
+        border: none;
+        outline: none;
+        span {
+          display: block;
+          &:before {
+            display: block;
+            margin: 0 auto;
+            overflow: hidden;
+            width: 24px;
+            @include transition(width 0.2s);
+          }
+          &.muted:before {
+            width: 14px;
+          }
+          &.low:before {
+            width: 18px;
+          }
+        }
+      }
+
+      #volumeSlider {
+        position: absolute;
+        top: 14px;
+        left: 48px;
+        border-width: 1px;
+        border-style: solid;
+        border-color: #333 #777 #333 #333;
+        border-radius: 25px;
+        width: 75px;
+        height: 7px;
+        background-color: #8e8d8d;
+        background: url('../images/bg-track.png') repeat top left;
+        box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, .5), 0 1px 0 0px rgba(250, 250, 250, .5);
+      }
+      
+      .ui-slider-handle {
+        opacity: 0;
+        @include transition(opacity 0.4s);
+      }
+
+      &.active {
+        width: 143px;
+        .ui-slider-handle {
+          opacity: 1;
+        }
+      }
+    }
+
+    .ui-slider-range {
+      background: #ffffff; /* Old browsers */
+      background: -moz-linear-gradient(top, #ffffff 0%, #eaeaea 100%);
+      /* FF3.6+ */
+      background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffffff),
+           color-stop(100%, #eaeaea)); /* Chrome,Safari4+ */
+      background: -webkit-linear-gradient(top, #ffffff 0%, #eaeaea 100%);
+      /* Chrome10+,Safari5.1+ */
+      background: -o-linear-gradient(top, #ffffff 0%, #eaeaea 100%);
+      /* Opera 11.10+ */
+      background: -ms-linear-gradient(top, #ffffff 0%, #eaeaea 100%);
+      /* IE10+ */
+      background: linear-gradient(top, #ffffff 0%, #eaeaea 100%); /* W3C */
+      filter: progid:DXImageTransform.Microsoft.gradient(  startColorstr='#ffffff',
+                 endColorstr='#eaeaea', GradientType=0); /* IE6-9 */
+      position: absolute;
+      border: 0;
+      top: 0;
+      height: 100%;
+      border-radius: 25px;
+    }
+  }
+}

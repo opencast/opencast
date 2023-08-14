@@ -1,0 +1,8 @@
+{
+    "value_locale": "אנגלית",
+    "error_mediaPackageInformationNotLoaded": "קיימות שתי סיבות אפשריות לשגיאה זו:",
+    "error_mediaPackageInformationNotLoaded_reason1": "המדיה אינה זמינה יותר",
+    "error_mediaPackageInformationNotLoaded_reason2": "המדיה מוגנת ואתה צריך להיכנס למערכת",
+    "error_noMediaInformationAvailable": "פרטי מדיה אינם זמינים.",
+    "error_endpointNotAvailable": "שירות החיפוש אינו זמין כעת."
+}

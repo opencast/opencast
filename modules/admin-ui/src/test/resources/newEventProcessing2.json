@@ -8,8 +8,7 @@
         "tags": ["quick_actions","test"],
       "description": "Test description",
       "displayOrder": 100,
-      "configuration_panel": "<h2>Test</h2>",
-      "configuration_panel_json": "[{ \"fieldset\": [ { \"type\": \"checkbox\", \"name\": \"straightToPublishing\", \"label\": \"Straight to publishing\", \"value\": true } ] }]"
+      "configuration_panel": "<h2>Test</h2>"
     }
   ]
 }

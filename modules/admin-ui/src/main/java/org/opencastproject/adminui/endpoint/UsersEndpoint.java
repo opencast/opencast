@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -48,7 +48,6 @@ import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
-import org.opencastproject.userdirectory.JpaUserReferenceProvider;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SmartIterator;
 import org.opencastproject.util.UrlSupport;
@@ -124,9 +123,6 @@ public class UsersEndpoint {
   /** The internal role and user provider */
   private JpaUserAndRoleProvider jpaUserAndRoleProvider;
 
-  /** The internal user reference provider */
-  private JpaUserReferenceProvider jpaUserReferenceProvider;
-
   /** The security service */
   private SecurityService securityService;
 
@@ -164,15 +160,6 @@ public class UsersEndpoint {
   @Reference
   public void setJpaUserAndRoleProvider(JpaUserAndRoleProvider jpaUserAndRoleProvider) {
     this.jpaUserAndRoleProvider = jpaUserAndRoleProvider;
-  }
-
-  /**
-   * @param jpaUserReferenceProvider
-   *          the user provider to set
-   */
-  @Reference
-  public void setJpaUserReferenceProvider(JpaUserReferenceProvider jpaUserReferenceProvider) {
-    this.jpaUserReferenceProvider = jpaUserReferenceProvider;
   }
 
   /** OSGi callback. */
@@ -419,25 +406,9 @@ public class UsersEndpoint {
           @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.") })
   public Response deleteUser(@PathParam("username") String username) throws NotFoundException {
     Organization organization = securityService.getOrganization();
-    boolean userReferenceNotFound = false;
-    boolean userNotFound = false;
 
     try {
-      try {
-        jpaUserReferenceProvider.deleteUser(username, organization.getId());
-      } catch (NotFoundException e) {
-        userReferenceNotFound = true;
-      }
-      try {
-        jpaUserAndRoleProvider.deleteUser(username, organization.getId());
-      } catch (NotFoundException e) {
-        userNotFound = true;
-      }
-
-      if (userNotFound && userReferenceNotFound) {
-        throw new NotFoundException();
-      }
-
+      jpaUserAndRoleProvider.deleteUser(username, organization.getId());
       userDirectoryService.invalidate(username);
     } catch (NotFoundException e) {
       logger.debug("User {} not found.", username);

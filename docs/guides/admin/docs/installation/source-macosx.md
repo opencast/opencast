@@ -59,7 +59,7 @@ Required:
 
 Required (not necessarily on the same machine):
 
-    OpenSearch 1.x
+    Elasticsearch 7.9.x
 
 Required for text extraction:
 
@@ -94,12 +94,11 @@ Homebrew is a package manager for OS X. For installation instruction see [their 
     brew install sox
     brew install synfig
 
-#### OpenSearch on macOS
+#### Elasticsearch on macOS
 
-If you want to install OpenSearch in the same machine run OpenSearch as a Docker container
+If you want to install Elasticsearch in the same machine run Elasticsearch as a Docker container
 
-    docker run -d --name opensearch -p 9200:9200 -p 9300:9300 -e 'discovery.type=single-node' opensearchproject/opensearch:1
-
+    docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300 -e 'discovery.type=single-node' elasticsearch:7.9.3
 #### Using pre-built binaries
 
 Pre-built versions of most dependencies can be downloaded from the respective project website:

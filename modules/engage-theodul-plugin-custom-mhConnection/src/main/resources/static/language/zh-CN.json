@@ -1,0 +1,8 @@
+{
+    "value_locale": "zh",
+    "error_mediaPackageInformationNotLoaded": "此错误有两个可能的原因：",
+    "error_mediaPackageInformationNotLoaded_reason1": "该媒体文件已不再可用",
+    "error_mediaPackageInformationNotLoaded_reason2": "媒体受到保护, 您需要登录后才能访问",
+    "error_noMediaInformationAvailable": "无可用的媒体信息。",
+    "error_endpointNotAvailable": "搜索服务目前不可用。"
+}

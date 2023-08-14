@@ -13,7 +13,6 @@
     <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.RETRACTING</state-mapping>
   </state-mappings>
   <configuration_panel/>
-  <configuration_panel_json/>
   <operations>
 
     <operation

@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -30,7 +30,7 @@ import TagIcon from '../icons/tag.svg';
 
 export default class OpencastPaellaVersionPlugin extends PopUpButtonPlugin {
   async load() {
-    this.icon = this.player.getCustomPluginIcon(this.name, 'buttonIcon') || TagIcon;
+    this.icon = TagIcon;
   }
 
   async getContent() {

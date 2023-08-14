@@ -1,0 +1,22 @@
+/* theodul description plugin, mobile mode styles */
+#engage_basic_description_title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#engage_basic_description_info {
+    font-size: 16px;
+    font-weight: normal;
+}
+
+#engage_basic_description_title {
+    margin-bottom: 2px;
+}
+
+.engage_basic_description_wrap {
+    float: left;
+}
+
+#engage_description {
+	padding: 0 9px;
+}

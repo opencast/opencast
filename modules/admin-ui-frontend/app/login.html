@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en" ng-app="adminNg">
+  <head>
+    <meta charset="UTF-8">
+    <title>Opencast</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="shortcut icon" href="img/favicon.ico">
+  </head>
+
+  <body class="login-body" ng-controller="LoginCtrl" ng-cloak>
+    <section class="login-container">
+      <div class="login-form">
+        <div class="form-container">
+          <form action="j_spring_security_check" method="post">
+            <div class="row">
+              <p>
+              <span translate="LOGIN.WELCOME"><!-- Welcome --></span><br />
+              </p>
+            </div>
+
+            <div ng-show="isError" class="error-container" translate="LOGIN.ERROR">
+              <!-- Incorrect username and / or password -->
+            </div>
+
+            <div class="row">
+              <input ng-class="{error: isError}"
+                     name="j_username"
+                     type="text"
+                     id="email"
+                     placeholder="{{ 'LOGIN.USERNAME' | translate }}"
+                     class="login-input"
+                     autofocus="autofocus"
+                     autocomplete="username"
+                     autocapitalize="none"
+                     spellcheck="false">
+            </div>
+            <div class="row">
+              <input ng-class="{error: isError}"
+                     name="j_password"
+                     type="password"
+                     id="password"
+                     placeholder="{{ 'LOGIN.PASSWORD' | translate }}"
+                     class="login-input">
+            </div>
+
+            <div class="row remember-me">
+              <input type="checkbox" id="remember" name="_spring_security_remember_me" checked />
+              <label for="remember" translate="LOGIN.REMEMBER"><!-- Remember --></label>
+            </div>
+            <div class="row">
+              <button class="submit" translate="LOGIN.LOGIN"><!-- Login --></button>
+            </div>
+          </form>
+        </div>
+
+        <nav class="login-nav nav-dd-container" id="nav-dd-container">
+          <div class="nav-dd lang-dd" id="lang-dd" old-admin-ng-dropdown>
+            <img class=lang-flag
+                 ng-attr-src="img/lang/{{ currentLanguageCode }}.svg"
+                 ng-attr-alt="{{ currentLanguageCode }}" />
+            <span>{{ currentLanguageName }}</span>
+            <ul class="dropdown-ul">
+              <li>
+                <a href="#"
+                   ng-repeat="language in availableLanguages | orderBy:'displayLanguage'"
+                   ng-click="changeLanguage(language.code)">
+                  <img class=lang-flag
+                       ng-attr-src="img/lang/{{ language.code }}.svg"
+                       ng-attr-alt="{{ language.code }}" />
+                  {{ language.displayLanguage }}
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </section>
+
+    <!-- build:js(./) scripts/bower.js -->
+    <!-- bower:js -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/jquery-ui/jquery-ui.js"></script>
+    <script src="bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.js"></script>
+    <script src="bower_components/angular-messages/angular-messages.js"></script>
+    <script src="bower_components/angular-translate/angular-translate.js"></script>
+    <script src="bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js"></script>
+    <script src="bower_components/angular-local-storage/dist/angular-local-storage.js"></script>
+    <script src="bower_components/angular-wizard/dist/angular-wizard.js"></script>
+    <script src="bower_components/angular-hotkeys/build/hotkeys.js"></script>
+    <script src="bower_components/angular-ui-sortable/sortable.js"></script>
+    <script src="bower_components/ng-file-upload/angular-file-upload.js"></script>
+    <script src="bower_components/chart.js/dist/Chart.js"></script>
+    <script src="bower_components/angular-chart.js/dist/angular-chart.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+
+    <!-- build:js(app) scripts/vendor.js -->
+    <script src="scripts/lib/chosen.js"></script>
+    <!-- endbuild -->
+
+    <!-- build:js(app) scripts/scripts.js -->
+    <script src="scripts/app.js"></script>
+    <script src="scripts/shared/controllers/controllers.js"></script>
+    <script src="scripts/shared/controllers/navigationController.js"></script>
+    <script src="scripts/shared/services/services.js"></script>
+    <script src="scripts/shared/filters/filters.js"></script>
+    <script src="scripts/shared/directives/directives.js"></script>
+    <script src="scripts/shared/services/languageService.js"></script>
+    <script src="scripts/modules/login/controllers/loginController.js"></script>
+    <script src="scripts/shared/services/jsHelperService.js"></script>
+    <script src="scripts/shared/resources/resources.js"></script>
+    <script src="scripts/shared/resources/identityResource.js"></script>
+    <script src="scripts/shared/resources/versionResource.js"></script>
+    <script src="scripts/shared/directives/oldDropdownDirective.js"></script>
+    <!-- endbuild -->
+  </body>
+</html>

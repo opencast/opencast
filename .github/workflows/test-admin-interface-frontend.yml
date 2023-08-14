@@ -19,7 +19,7 @@ jobs:
           - firefox
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
 
     - name: use node.js
       uses: actions/setup-node@v1

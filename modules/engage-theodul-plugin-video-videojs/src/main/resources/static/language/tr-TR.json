@@ -1,0 +1,16 @@
+{
+    "value_locale": "ing",
+    "error_AudioCodecNotSupported": "Hata: Ses codec bileşeni bu tarayıcı tarafından desteklenmiyor",
+    "error_AudioElementNotSupported": "Hata: Tarayıcınız ses ögesini desteklemiyor.",
+    "video": "Video",
+    "video_short": "Vid.",
+    "openInPlayer": "Oynatıcıda aç",
+    "givenTime": "Verilen süre",
+    "hasToBeSmallerThanDuration": "süreden daha kısa olmak zorunda",
+    "msg_waitToSetTime": "Oynatma hızını ayarlamak için lütfen video yüklenene kadar bekleyin.",
+    "msg_startPlayingToSetTime": "Lütfen video oynatma süresini ayarlamadan önce oynatın.",
+    "msg_waitToSeek": "Video yüklenene kadar inceleme mümkün değil.",
+    "msg_startPlayingToSeek": "İnceleme, Oynat düğmesine en az bir kez basana dek kullanılamaz.",
+    "chromeBuffer": "Ara bellek denetleyicisi, Chrome sınırlamaları sebebiyle devre dışı bırakıldı. Video oynatmakla ilgili sorunlar yaşayabilirsiniz.",
+    "scroll_overlay_text": "Use shift + scroll to zoom."
+}

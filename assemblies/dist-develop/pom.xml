@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.opencastproject.assemblies</groupId>
     <artifactId>opencast-assemblies</artifactId>
-    <version>15-SNAPSHOT</version>
+    <version>13-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
@@ -104,7 +104,6 @@
             <feature>service</feature>
             <feature>system</feature>
             <feature>config</feature>
-            <feature>pax-web-karaf</feature>
             <!-- Opencast external features -->
             <feature>jpa</feature>
             <feature>http</feature>

@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -37,7 +37,6 @@ import org.osgi.service.cm.ConfigurationException;
 
 import java.io.IOException;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
@@ -50,14 +49,14 @@ import javax.servlet.http.HttpServletResponse;
 
 public class UrlSigningFilterTest {
   private static final String BASE_URL = "http://test.com";
-  private HashMap<String, Object> matchAllProperties;
+  private Dictionary<String, String> matchAllProperties;
   private String keyId = "TheKeyID";
   private String key = "TheFullKey";
   private String clientIp = "10.0.0.1";
 
   @Before
   public void setUp() {
-    matchAllProperties = new HashMap<>();
+    matchAllProperties = new Hashtable<>();
     matchAllProperties.put(UrlSigningFilter.URL_REGEX_PREFIX + ".foo", ".*");
   }
 
@@ -110,7 +109,7 @@ public class UrlSigningFilterTest {
     Properties properties = new Properties();
     properties.load(IOUtils.toInputStream(IOUtils.toString(getClass().getResource("/UrlSigningFilter.properties"))));
     UrlSigningFilter filter = new UrlSigningFilter();
-    filter.updated(new HashMap<>(properties.entrySet().stream()
+    filter.updated(new Hashtable<>(properties.entrySet().stream()
             .collect(Collectors.toMap(
                     (Map.Entry<Object, Object> entry) -> (String) entry.getKey(),
                     Map.Entry::getValue))));

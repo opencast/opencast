@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -66,7 +66,7 @@ public class PlayerRedirect {
 
   private static final Logger logger = LoggerFactory.getLogger(PlayerRedirect.class);
 
-  private static final String PLAYER_DEFAULT = "/paella7/ui/watch.html?id=#{id}";
+  private static final String PLAYER_DEFAULT = "/paella/ui/watch.html?id=#{id}";
 
   private SecurityService securityService;
 

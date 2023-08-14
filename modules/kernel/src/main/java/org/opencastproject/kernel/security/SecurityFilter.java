@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -26,10 +26,6 @@ import org.opencastproject.security.api.SecurityService;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.propertytypes.ServiceRanking;
-import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContextSelect;
-import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardFilterName;
-import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardFilterPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,15 +45,16 @@ import javax.servlet.http.HttpServletResponse;
  * A servlet filter that delegates to the appropriate spring filter chain
  */
 @Component(
-    service = { Filter.class, SecurityFilter.class },
+    immediate = true,
+    service = { Filter.class,SecurityFilter.class },
     property = {
         "service.description=Security Filter",
+        "httpContext.id=opencast.httpcontext",
+        "httpContext.shared=true",
+        "service.ranking=3",
+        "urlPatterns=*"
     }
 )
-@ServiceRanking(970)
-@HttpWhiteboardFilterName("SecurityFilter")
-@HttpWhiteboardFilterPattern("/*")
-@HttpWhiteboardContextSelect("(osgi.http.whiteboard.context.name=opencast)")
 public final class SecurityFilter implements Filter {
 
   /** The logger */

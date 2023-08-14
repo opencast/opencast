@@ -53,7 +53,7 @@ Required:
 
 Required (not necessarily on the same machine):
 
-    OpenSearch 1.x
+    Elasticsearch 7.9.x
 
 Required for text extraction (recommended):
 
@@ -86,7 +86,7 @@ website:
 
 * [Get FFmpeg](http://ffmpeg.org/download.html)
 * [Get Apache Maven](https://maven.apache.org/download.cgi)
-* [Get OpenSearch](https://opensearch.org)
+* [Get Elasticsearch](https://elastic.co)
 
 Building Opencast
 -----------------

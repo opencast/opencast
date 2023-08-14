@@ -1,0 +1,13 @@
+{
+    "value_locale": "it",
+    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "title": "Titolo",
+    "noTitle": "Nessun titolo",
+    "creator": "Creatore",
+    "presenter": "Collaboratore",
+    "views": "Visualizzazioni",
+    "series": "Serie",
+    "recordingDate": "Data di registrazione",
+    "description": "Descrizione",
+    "noDescriptionAvailable": "Nessuna descrizione disponibile."
+}

@@ -157,6 +157,7 @@ All this can be configured in the "Options" section of the Wowza application:
 
 ## Players and Formats
 
+* **Theodul**: HLS, DASH (over HTTP and HTTPS)
 * **Paella** : HLS, DASH (over HTTP and HTTPS)
 
 

@@ -1,0 +1,13 @@
+{
+    "value_locale": "sl",
+    "value_dateFormatFull": "MMMM Do LLLL, h:mm:ss a",
+    "error_videoLoading": "Video se nalaga. Počakajte trenutek.",
+    "error_audioLoading": "Zvok se nalaga. Počakajte trenutek.",
+    "msg_videoLoadedSuccessfully": "Video je bil uspešno naložen.",
+    "msg_audioLoadedSuccessfully": "Zvok je bil uspešno naložen.",
+    "msg_videoBuffering": "Video se trenutno medpomni. Počakajte trenutek.",
+    "msg_videoBufferedSuccessfullyAndAutoplaying": "Video je bil uspešno medpomnjen in se zdaj samodejno predvaja.",
+    "msg_videoBufferedSuccessfully": "Video je bil uspešno medpomnjen.",
+    "error": "Napaka",
+    "error_AudioCodecNotSupported": "Napaka: ta brskalnik ne podpira zvočnega kodeka"
+}

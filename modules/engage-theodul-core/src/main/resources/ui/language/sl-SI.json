@@ -1,0 +1,18 @@
+{
+    "error": "Napaka",
+    "error_unknown": "Prišlo je do napake. Znova naložite stran.",
+    "reloadPage": "Znova naloži stran",
+    "loginInformation": "Prijavite se z uporabniškim računom za Opencast",
+    "login": "Prijava",
+    "enterUsernamePassword": "Vnesite uporabniško ime in geslo:",
+    "username": "Uporabniško ime",
+    "password": "Geslo",
+    "rememberMe": "Zapomni si me",
+    "cancel": "Prekliči",
+    "loginSuccessful": "Uspešna prijava. Če se stran ne naloži znova samodejno, jo znova naložite.",
+    "logoutSuccessful": "Uspešna odjava. Če se stran ne naloži znova samodejno, jo znova naložite.",
+    "loginFailed": "Prijava ni uspela.",
+    "description": "Opis",
+    "slideText": "Besedilo diapozitiva",
+    "shortcuts": "Bližnjice"
+}

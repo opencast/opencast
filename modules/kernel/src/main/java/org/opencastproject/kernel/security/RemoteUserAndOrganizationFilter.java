@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -48,11 +48,6 @@ import com.entwinemedia.fn.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
-import org.osgi.service.component.propertytypes.ServiceRanking;
-import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContextSelect;
-import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardFilterName;
-import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardFilterPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,16 +68,16 @@ import javax.servlet.http.HttpServletResponse;
  * Security filter used to set the organization and user in remote implementations.
  */
 @Component(
+    immediate = true,
     service = Filter.class,
-    scope = ServiceScope.PROTOTYPE,
     property = {
         "service.description=Remote User and Organization Filter",
+        "httpContext.id=opencast.httpcontext",
+        "httpContext.shared=true",
+        "service.ranking=5",
+        "urlPatterns=*"
     }
 )
-@ServiceRanking(8)
-@HttpWhiteboardFilterName("RemoteUserAndOrganizationFilter")
-@HttpWhiteboardFilterPattern("/*")
-@HttpWhiteboardContextSelect("(osgi.http.whiteboard.context.name=opencast)")
 public class RemoteUserAndOrganizationFilter implements Filter {
 
   /** The logger */

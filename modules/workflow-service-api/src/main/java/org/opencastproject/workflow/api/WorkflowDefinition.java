@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -78,14 +78,9 @@ public interface WorkflowDefinition extends Comparable<WorkflowDefinition> {
   void setDescription(String description);
 
   /**
-   * A XML String describing the configuration parameter/panel for this WorkflowDefinition.
+   * An XML String describing the configuration parameter/panel for this WorkflowDefinition.
    */
   String getConfigurationPanel();
-
-  /**
-   * A JSON String describing the configuration parameter/panel for this WorkflowDefinition.
-   */
-  String getConfigurationPanelJson();
 
   /**
    * An integer describing the display order for this workflow definition. The display order is supposed to define the

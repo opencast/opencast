@@ -149,17 +149,6 @@
       "HOTKEY_CHEAT_SHEET": "Skróty Klawiaturowe",
       "ADOPTER_REGISTRATION": "Rejestracja adoptera"
    },
-   "REBUILD": {
-      "TITLE": "Index Rebuild",
-      "WARNING": "Attention!",
-      "HEADER": "Index rebuild in progress!",
-      "THEME_SERVICE": "Theme Service",
-      "SERIES_SERVICE": "Series Service",
-      "SCHEDULER_SERVICE": "Scheduler Service",
-      "ASSETMANAGER_SERVICE": "AssetManager Service",
-      "COMMENTS_SERVICE": "Comments Service",
-      "WORKFLOW_SERVICE": "Workflow Service"
-   },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Zasady dostępu zostały utworzone",
       "ACL_NOT_SAVED": "Zasady dostępu nie mogły zostać zapisane",
@@ -907,7 +896,7 @@
                   "NEW": "Nowe zasada",
                   "NEW_USER": "New user",
                   "DETAILS": "Non-user roles",
-                  "USER": "User",
+                  "USER": "Użytkownik",
                   "USERS": "Users who are authorized for the event",
                   "NONEXISTENT_USER": "Nonexistent user",
                   "HELP": {
@@ -1141,7 +1130,7 @@
                   "NEW": "Nowe zasada",
                   "NEW_USER": "New user",
                   "DETAILS": "Non-user roles",
-                  "USER": "User",
+                  "USER": "Użytkownik",
                   "USERS": "Users who are authorized for the series",
                   "HELP": {
                      "READ": "By setting read rights, the series becomes visible for the selected user",
@@ -1236,7 +1225,7 @@
                   "LOAD_MORE_LIMIT": "zaprezentowane zasady.",
                   "LOAD_MORE_LINK": "Załaduj więcej",
                   "NEW_USER": "New user",
-                  "USER": "User",
+                  "USER": "Użytkownik",
                   "USERS": "Users who are authorized for the series",
                   "NONEXISTENT_USER": "Nonexistent user",
                   "HELP": {
@@ -1492,7 +1481,7 @@
                   "DETAILS": "Non-user roles",
                   "DESCRIPTION": "Proszę wybrać zestaw wstępnie skonfigurowanych zasad lub dodać niestandardowe zasady poniżej",
                   "NEW_USER": "New user",
-                  "USER": "User",
+                  "USER": "Użytkownik",
                   "USERS": "Users who are authorized by this access policy",
                   "HELP": {
                      "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
@@ -1541,7 +1530,7 @@
                   "DETAILS": "Non-user roles",
                   "DESCRIPTION": "Proszę wybrać zestaw wstępnie skonfigurowanych zasad lub dodać niestandardowe zasady poniżej",
                   "NEW_USER": "New user",
-                  "USER": "User",
+                  "USER": "Użytkownik",
                   "USERS": "Users who are authorized by this access policy",
                   "NONEXISTENT_USER": "Nonexistent user",
                   "HELP": {

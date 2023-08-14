@@ -31,25 +31,25 @@ Parameter Table
 Tags and flavors can be used in combination.
 
 
-| configuration keys       | value type (EBNF)                               | example                                                                                                     | description                                                                                                                                                                                                 | default value |
-|--------------------------|-------------------------------------------------|-------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
-| source-audio-name        | "lower", "upper" or "both"                      | upper                                                                                                       | The "name" of track to use as a source audio.                                                                                                                                                               | both          |
-| source-tags-upper        | String , { "," , String }                       | comp,rss                                                                                                    | The "tag" of the upper track to use as a source input.                                                                                                                                                      | EMPTY         |
-| source-flavor-upper      | MediaPackageElementFlavor                       | presenter/trimmed                                                                                           | The "flavor" of the upper track to use as a source input.                                                                                                                                                   | EMPTY         |
-| source-tags-lower        | String , { "," , String }                       | comp,rss                                                                                                    | The "tag" of the lower track to use as a source input.                                                                                                                                                      | EMPTY         |
-| source-flavor-lower      | MediaPackageElementFlavor                       | presenter/trimmed                                                                                           | The "flavor" of the lower track to use as a source input.                                                                                                                                                   | EMPTY         |
-| source-tags-watermark    | String , { "," , String }                       | branding                                                                                                    | The "tag" of the attachment image to use as a source input.                                                                                                                                                 | EMPTY         |
-| source-flavor-watermark  | MediaPackageElementFlavor                       | image/work                                                                                                  | The "flavor" of the attachment image to use as a source input.                                                                                                                                              | EMPTY         |
-| source-url-watermark     | URL                                             | file:///Users/me/logo.jpg                                                                                   | The "URL" of the fallback image to use as a source input.                                                                                                                                                   | EMPTY         |
-| target-tags              | String , { "," , String }                       | composite,rss,atom,archive                                                                                  | The tags to apply to the compound video track.                                                                                                                                                              | EMPTY         |
-| \* **target-flavor**     | MediaPackageElementFlavor                       | composite/delivery                                                                                          | The flavor to apply to the compound video track.                                                                                                                                                            | EMPTY         |
-| \* **encoding-profile**  | String                                          | composite                                                                                                   | The encoding profile to use.                                                                                                                                                                                | EMPTY         |
-| \* **output-resolution** | width , "x" , height &#124; lower &#124; higher | 1920x1080                                                                                                   | The resulting resolution of the compound video e.g. 1920x1080.                                                                                                                                              | EMPTY         |
-| output-background        | String                                          | red                                                                                                         | The resulting background color of the compound video http://www.ffmpeg.org/ffmpeg-utils.html#Color.                                                                                                         | black         |
-| layout                   | name                                            | Json , ";" , Json , [ ";" , Json ]                                                                          | The layout name to use or a semi-colon separated JSON layout definition (lower video, upper video, optional watermark). If a layout name is given than the corresponding layout-{name} key must be defined. | EMPTY         |
-| layout-single            | name                                            | Json , ";" , Json , [ ";" , Json ]                                                                          | Layout to be used in case of one input video track (see *layout*)                                                                                                                                           | EMPTY         |
-| layout-dual              | name                                            | Json , ";" , Json , [ ";" , Json ]                                                                          | Layout to be used in case of two input video tracks (see *layout*). Defaults to value of *layout* if not set.                                                                                               | EMPTY         |
-| layout-{name}            | Json , ";" , Json , [ ";" , Json ]              | Define semi-colon separated JSON layouts (lower video, upper video, optional watermark) to provide by name. | EMPTY                                                                                                                                                                                                       |               |
+|configuration keys|value type (EBNF)|example|description|default value|
+|------------------|-----------------|-------|-----------|-------------|
+|source-audio-name|"lower", "upper" or "both" |upper|The "name" of track to use as a source audio.|both|
+|source-tags-upper|String , { "," , String }    |comp,rss|The "tag" of the upper track to use as a source input.|EMPTY|
+|source-flavor-upper|MediaPackageElementFlavor    |presenter/trimmed|The "flavor" of the upper track to use as a source input.|EMPTY|
+|source-tags-lower|String , { "," , String }    |comp,rss|The "tag" of the lower track to use as a source input.|EMPTY|
+|source-flavor-lower|MediaPackageElementFlavor    |presenter/trimmed|The "flavor" of the lower track to use as a source input.|EMPTY|
+|source-tags-watermark|String , { "," , String }    |branding|The "tag" of the attachment image to use as a source input.|EMPTY|
+|source-flavor-watermark|MediaPackageElementFlavor    |image/work|The "flavor" of the attachment image to use as a source input.|EMPTY|
+|source-url-watermark|URL    |file:///Users/me/logo.jpg|The "URL" of the fallback image to use as a source input.|EMPTY|
+|target-tags|String , { "," , String }    |composite,rss,atom,archive|The tags to apply to the compound video track.|EMPTY|
+|\* **target-flavor**|MediaPackageElementFlavor|    composite/delivery    |The flavor to apply to the compound video track.|EMPTY|
+|\* **encoding-profile**|String|    composite    |The encoding profile to use.|EMPTY|
+|\* **output-resolution**|width , "x" , height &#124; lower &#124; higher|1920x1080|The resulting resolution of the compound video e.g. 1920x1080.|EMPTY|
+|output-background|String    |red|The resulting background color of the compound video http://www.ffmpeg.org/ffmpeg-utils.html#Color.|black|
+|layout|name | Json , ";" , Json , [ ";" , Json ]|The layout name to use or a semi-colon separated JSON layout definition (lower video, upper video, optional watermark). If a layout name is given than the corresponding layout-{name} key must be defined.|EMPTY|
+|layout-single|name | Json , ";" , Json , [ ";" , Json ]|Layout to be used in case of one input video track (see *layout*)|EMPTY|
+|layout-dual|name | Json , ";" , Json , [ ";" , Json ]|Layout to be used in case of two input video tracks (see *layout*). Defaults to value of *layout* if not set.|EMPTY|
+|layout-{name}|Json , ";" , Json , [ ";" , Json ]         |Define semi-colon separated JSON layouts (lower video, upper video, optional watermark) to provide by name.|EMPTY|
 
 
 \* **mandatory**
@@ -179,59 +179,4 @@ Operation Example
     </configuration>
   </configurations>
 </operation>
-```
-
-
-Encoding Profile Variables
---------------------------
-
-Since the composite operation supports diverse forms of input (single video with watermark, composite with or without
-watermark) that require different ffmpeg filters, the operation handler can make use of certain conditional variables in
-its encoding profile, similarly to the [encode operation](encode-woh.md).
-
-These variables are defined as `ffmpeg.command.<variable name>` and can then be used in the `ffmpeg.command` property.
-Defining these variables is optional; if it is known that the encoding profile will only be used with specific input,
-instead of defining conditional variables, the filters can simply be included in the main command.
-
-The following variables are currently supported:
-
-| Variable           | Description                                                             |
-|--------------------|-------------------------------------------------------------------------|
-| `if-single-stream` | The value is set if there is no upper video.                            |
-| `if-dual-stream`   | The value is set if there is both an upper and a lower video.           |
-| `if-watermark`     | The value is set if a watermark is configured and the watermark exists. |
-| `if-no-watermark`  | The value is set if no watermark is configured / no watermark exists.   |
-
-Additionally, there are variables that can be used in the ffmpeg command, but not configured, since they are defined by
-the operation handler:
-
-| Variable            | Description                                                                                                                                        |
-|---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| `audioMapping`      | The audio mapping for dual-stream.                                                                                                                 |
-| `scaleLower`        | The dimensions for the lower video.                                                                                                                |
-| `padLower`          | The padding for the lower video; contains the size of the new composite video as well as the position of the lower video and the background color. |
-| `scaleUpper`        | The dimensions for the upper video.                                                                                                                |
-| `upperFile`         | The path to the upper video file.                                                                                                                  |
-| `upperPosition`     | The offset for the upper video.                                                                                                                    |
-| `watermarkFile`     | The path to the watermark file.                                                                                                                    |
-| `watermarkPosition` | The position of the watermark.                                                                                                                     |
-
-This example encoding profile uses all of those variables:
-
-```properties
-profile.composite.http.name = composite
-profile.composite.http.input = visual
-profile.composite.http.output = visual
-profile.composite.http.suffix = -compound.mkv
-profile.composite.http.ffmpeg.command.if-single-stream = -filter:v [in]scale=#{scaleLower},pad=#{padLower}
-profile.composite.http.ffmpeg.command.if-dual-stream = -i #{upperFile} -filter_complex \
-  [0:v]scale=#{scaleLower},pad=#{padLower}[lower];[1:v]scale=#{scaleUpper}[upper];[lower][upper]overlay=#{upperPosition}
-profile.composite.http.ffmpeg.command.if-watermark = \
-  [video];movie=#{watermarkFile}[watermark];[video][watermark]overlay=#{watermarkPosition}[out]
-profile.composite.http.ffmpeg.command.if-no-watermark = [out]
-profile.composite.http.ffmpeg.command = -i #{in.video.path} \
-  #{if-single-stream}#{if-dual-stream}#{if-watermark}#{if-no-watermark}#{audioMapping} \
-  -c:v libx264 -crf 10 -preset fast \
-  -c:a flac \
-  #{out.dir}/#{out.name}#{out.suffix}
 ```

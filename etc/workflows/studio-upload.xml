@@ -19,18 +19,6 @@
       </div>
     ]]>
   </configuration_panel>
-  <configuration_panel_json>
-    [{
-      "fieldset": [
-        {
-          "type": "checkbox",
-          "name": "straightToPublishing",
-          "label": "Straight to publishing",
-          "value": true
-        }
-      ]
-    }]
-  </configuration_panel_json>
 
   <operations>
 

@@ -75,6 +75,8 @@ sections found in `etc/security/mh_default_org.xml`. Some of the options are con
   <property name="loginHandler" ref="jwtLoginHandler" />
   <!-- Throws an exception if a request is missing the configured header (default: true) -->
   <property name="exceptionIfHeaderMissing" value="false" />
+  <!-- Logs the header contents for debug purposes (default: false) -->
+  <property name="debug" value="false" />
 </bean>
 
 <!-- General JWT request parameter extraction filter -->
@@ -85,6 +87,8 @@ sections found in `etc/security/mh_default_org.xml`. Some of the options are con
   <property name="loginHandler" ref="jwtLoginHandler" />
   <!-- Throws an exception if a request is missing the configured parameter (default: true) -->
   <property name="exceptionIfParameterMissing" value="false" />
+  <!-- Logs the header contents for debug purposes (default: false) -->
+  <property name="debug" value="false" />
 </bean>
 ```
 * Configure the `jwtLoginHandler`. For the JWT validation, either configure the `secret` property for JWTs signed with

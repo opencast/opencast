@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -44,19 +44,10 @@ public final class SystemTokenRememberMeUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(SystemTokenRememberMeUtils.class);
 
-  /** This is the default cookie key, that is configured in Opencast **/
-  private static final String DEFAULT_COOKIE_KEY = "opencast";
-
   private SystemTokenRememberMeUtils() {
   }
 
   public static String augmentKey(String key) {
-
-    if (!DEFAULT_COOKIE_KEY.equals(key)) {
-      logger.debug("The default cookie key '{}' is not in use. The given key won't be augmented.", DEFAULT_COOKIE_KEY);
-      return key;
-    }
-
     // Start with a user key if provided
     StringBuilder keyBuilder = new StringBuilder(Objects.toString(key, ""));
 

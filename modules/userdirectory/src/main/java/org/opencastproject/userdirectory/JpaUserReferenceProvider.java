@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -29,7 +29,6 @@ import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
@@ -37,9 +36,6 @@ import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUserReference;
 import org.opencastproject.userdirectory.api.AAIRoleProvider;
 import org.opencastproject.userdirectory.api.UserReferenceProvider;
-import org.opencastproject.userdirectory.utils.UserDirectoryUtils;
-import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.function.ThrowingConsumer;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -76,7 +72,7 @@ import javax.persistence.TypedQuery;
         "service.description=Provides a user reference directory"
     },
     immediate = true,
-    service = { UserProvider.class, RoleProvider.class, UserReferenceProvider.class, JpaUserReferenceProvider.class }
+    service = { UserProvider.class, RoleProvider.class, UserReferenceProvider.class }
 )
 public class JpaUserReferenceProvider implements UserReferenceProvider, UserProvider, RoleProvider {
 
@@ -506,44 +502,6 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
   public void invalidate(String userName) {
     String orgId = securityService.getOrganization().getId();
     cache.invalidate(userName.concat(DELIMITER).concat(orgId));
-  }
-
-  /**
-   * Delete the given user
-   *
-   * @param username
-   *          the name of the user to delete
-   * @param orgId
-   *          the organization id
-   * @throws NotFoundException
-   *          if the requested user is not exist
-   * @throws org.opencastproject.security.api.UnauthorizedException
-   *          if you havn't permissions to delete an admin user (only admins may do that)
-   * @throws Exception
-   */
-  public void deleteUser(String username, String orgId) throws NotFoundException, UnauthorizedException, Exception {
-    User user = loadUser(username);
-    if (user != null && !UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, user.getRoles())) {
-      throw new UnauthorizedException("The user is not allowed to delete an admin user");
-    }
-
-    // Remove the user's group membership
-    groupRoleProvider.removeMemberFromAllGroups(username, orgId);
-
-    // Remove the user
-    db.execTxChecked(deleteUserQuery(username, orgId));
-
-    cache.invalidate(username + DELIMITER + orgId);
-  }
-
-  private ThrowingConsumer<EntityManager, NotFoundException> deleteUserQuery(String username, String orgId) {
-    return em -> {
-      Optional<JpaUserReference> user = findUserReferenceQuery(username, orgId).apply(em);
-      if (user.isEmpty()) {
-        throw new NotFoundException("User with name " + username + " does not exist");
-      }
-      em.remove(em.merge(user.get()));
-    };
   }
 
   public void setRoleProvider(RoleProvider roleProvider) {

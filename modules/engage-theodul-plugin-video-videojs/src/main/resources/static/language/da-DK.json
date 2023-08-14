@@ -1,0 +1,16 @@
+{
+    "value_locale": "en",
+    "error_AudioCodecNotSupported": "Fejl: Lyd-codec'et understøttes ikke af denne browser",
+    "error_AudioElementNotSupported": "Fejl: Din browser understøtter ikke lydelementet.",
+    "video": "Video",
+    "video_short": "Vid.",
+    "openInPlayer": "Åbn i afspiller",
+    "givenTime": "Det givne tidsrum",
+    "hasToBeSmallerThanDuration": "skal være kortere end varigheden",
+    "msg_waitToSetTime": "Vent med at indstille en afspilningstid indtil videoen er indlæst.",
+    "msg_startPlayingToSetTime": "Start med at afspille videoen før du indstiller en afspilningstid.",
+    "msg_waitToSeek": "Søgning er ikke mulig før videoen er indlæst.",
+    "msg_startPlayingToSeek": "Søgning er ikke mulig før Afspil-knappen er klikket mindst én gang.",
+    "chromeBuffer": "Buffer-tjekkeren er blevet deaktiveret grundet Chrome-begrænsninger. Det er muligt, at du oplever problemer med videoafspilningen.",
+    "scroll_overlay_text": "Use shift + scroll to zoom."
+}

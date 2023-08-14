@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -28,11 +28,6 @@ import org.opencastproject.util.NotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
-import org.osgi.service.component.propertytypes.ServiceRanking;
-import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContextSelect;
-import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardFilterName;
-import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardFilterPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,16 +46,16 @@ import javax.servlet.http.HttpServletResponse;
  * Inspects request current job header and sets the current job for the request.
  */
 @Component(
+    immediate = true,
     service = Filter.class,
-    scope = ServiceScope.PROTOTYPE,
     property = {
         "service.description=Current Job Filter",
+        "httpContext.id=opencast.httpcontext",
+        "httpContext.shared=true",
+        "service.ranking=4",
+        "urlPatterns=*"
     }
 )
-@ServiceRanking(9)
-@HttpWhiteboardFilterName("CurrentJobFilter")
-@HttpWhiteboardFilterPattern("/*")
-@HttpWhiteboardContextSelect("(osgi.http.whiteboard.context.name=opencast)")
 public class CurrentJobFilter implements Filter {
 
   public static final String CURRENT_JOB_HEADER = "X-Opencast-Matterhorn-Current-Job-Id";
@@ -128,9 +123,9 @@ public class CurrentJobFilter implements Filter {
         serviceRegistry.setCurrentJob(currentJob);
       }
     } catch (NotFoundException e) {
-      logger.debug("Unable to set non-existing current job {}", currentJobId, e);
+      logger.debug("Unable to set non-existing current job {}: {}", currentJobId, e);
     } catch (Exception e) {
-      logger.error("Unable to set the current job {}", currentJobId, e);
+      logger.error("Unable to set the current job {}: {}", currentJobId, e);
       httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
               "Was not able to set the current job id {} to the service registry" + currentJobId);
     }

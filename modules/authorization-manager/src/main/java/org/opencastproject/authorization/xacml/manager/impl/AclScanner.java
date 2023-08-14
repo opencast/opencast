@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -34,6 +34,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -258,10 +259,18 @@ public class AclScanner implements ArtifactInstaller {
    * @throws FileNotFoundException
    * @throws JAXBException
    */
-  private AccessControlList parseToAcl(File artifact) throws IOException, XACMLParsingException {
-    try (FileInputStream in = new FileInputStream(artifact)) {
-      return XACMLUtils.parseXacml(in);
+  private AccessControlList parseToAcl(File artifact) throws FileNotFoundException, XACMLParsingException {
+    FileInputStream in = null;
+    AccessControlList acl = null;
+
+    try {
+      in = new FileInputStream(artifact);
+      acl = XACMLUtils.parseXacml(in);
+    } finally {
+      IOUtils.closeQuietly(in);
     }
+
+    return acl;
   }
 
   private AclService getAclService(Organization organization) {

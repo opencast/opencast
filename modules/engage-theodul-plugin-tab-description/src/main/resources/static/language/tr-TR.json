@@ -1,0 +1,13 @@
+{
+    "value_locale": "ing",
+    "value_dateFormatFull": "AAAA g YYYY, s:dd:ss a",
+    "title": "Başlık",
+    "noTitle": "Başlık Yok",
+    "creator": "Yapımcı",
+    "presenter": "Katkıda Bulunan",
+    "views": "Görüntüleyenler",
+    "series": "Diziler",
+    "recordingDate": "Kayıt tarihi",
+    "description": "Açıklama",
+    "noDescriptionAvailable": "Açıklama bulunmuyor."
+}

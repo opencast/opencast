@@ -1,0 +1,8 @@
+{
+    "value_locale": "sl",
+    "error_mediaPackageInformationNotLoaded": "Za to napako sta dva možna vzroka:",
+    "error_mediaPackageInformationNotLoaded_reason1": "Predstavnost ni več na voljo",
+    "error_mediaPackageInformationNotLoaded_reason2": "Predstavnost je zaščitena in se morate prijaviti",
+    "error_noMediaInformationAvailable": "Podatki o predstavnosti niso na voljo.",
+    "error_endpointNotAvailable": "Storitev iskanja trenutno ni na voljo."
+}

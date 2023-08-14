@@ -3,14 +3,12 @@
         "id": "full",
         "title": "Full",
         "description": "",
-        "configuration_panel": "",
-        "configuration_panel_json": ""
+        "configuration_panel": ""
     },
     {
         "id": "full-html5",
         "title": "Full HTML5",
         "description": "Test description",
-        "configuration_panel": "<h2>Test</h2>",
-        "configuration_panel_json": "[{ \"fieldset\": [ { \"type\": \"checkbox\", \"name\": \"straightToPublishing\", \"label\": \"Straight to publishing\", \"value\": true } ] }]"
+        "configuration_panel": "<h2>Test</h2>"
     }
 ]

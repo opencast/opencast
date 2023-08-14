@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -305,7 +305,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
           int total = themes.size();
           logIndexRebuildBegin(logger, index.getIndexName(), total, "themes", organization);
           int current = 0;
-          int n = 20;
+          int n = 16;
           List<IndexTheme> updatedThemeRange = new ArrayList<>();
 
           for (Theme theme : themes) {
@@ -318,7 +318,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
 
             if (updatedThemeRange.size() >= n || current >= themes.size()) {
               index.bulkThemeUpdate(updatedThemeRange);
-              logIndexRebuildProgress(logger, index.getIndexName(), total, current, n);
+              logIndexRebuildProgress(logger, index.getIndexName(), total, current);
               updatedThemeRange.clear();
             }
           }

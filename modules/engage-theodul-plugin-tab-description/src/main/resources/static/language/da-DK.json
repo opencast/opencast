@@ -1,0 +1,13 @@
+{
+    "value_locale": "en",
+    "value_dateFormatFull": "Dd MMMM ÅÅÅÅ, t:mm:ss",
+    "title": "Titel",
+    "noTitle": "Ingen titel",
+    "creator": "Kreatør",
+    "presenter": "Bidragsyder",
+    "views": "Visninger",
+    "series": "Serier",
+    "recordingDate": "Optagelsesdato",
+    "description": "Beskriveslse",
+    "noDescriptionAvailable": "Ingen beskrivelse tilgængelig."
+}

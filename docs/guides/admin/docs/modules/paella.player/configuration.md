@@ -1,10 +1,5 @@
-Paella Player 6
-===============
-
-<div class=warn>
-This documentation is about the old Paella Player.
-For the new default player, take a look at the Paella Player 7 documentation section.
-</div>
+Paella Player
+=============
 
 The Paella `(pronounced 'paeja')` [Player](https://paellaplayer.upv.es) is an Open Source
 JavaScript video player capable of playing an unlimited number of audio & video streams 
@@ -17,12 +12,11 @@ Paella has been specially designed for lecture recordings. It works with all HTM
 Have a look to the paella [features list](https://paellaplayer.upv.es/features/)
 or see them live on paella [demos page](https://paellaplayer.upv.es/demos/)
 
+Paella is Opencast's default player.
+
 
 Configuration
 -------------
-
-The Paelly player version 6 is no longer enabled by default.
-To use the player, enable the plugin in `etc/org.opencastproject.plugin.impl.PluginManagerImpl.cfg`.
 
 The configurations for the paella player are done for each tenant. The paella configuration files are located in
 `etc/ui-config/<tenant_id>/paella/config.json`.

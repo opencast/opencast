@@ -1,84 +1,134 @@
-Upgrading Opencast from 13.x to 14.x
+Upgrading Opencast from 12.x to 13.x
 ====================================
 
-This guide describes how to upgrade Opencast 13.x to 14.x.
+This guide describes how to upgrade Opencast 12.x to 13.x.
 In case you need information about how to upgrade older versions of Opencast,
 please refer to [older release notes](https://docs.opencast.org).
 
-1. Read the [release notes](releasenotes.md) (especially the section of behaviour changes)
 1. Stop your current Opencast instance
-1. Replace Opencast with the new version
-1. Review the [configuration changes](#configuration-changes) and adjust your configuration accordingly
-1. [Migrate the database](#database-migration)
-1. Start Opencast
+2. Replace Opencast with the new version
+3. Read the [release notes](releasenotes.md) (especially the section of behaviour changes)
+4. [Review the configuration changes and adjust your configuration accordingly](#configuration-changes)
+5. [Migrate the database](#database-migration)
+6. Start Opencast
+7. [Rebuild the Elasticsearch indexes](#rebuild-the-elasticsearch-indexes)
 
-Configuration changes
+Configuration Changes
 ---------------------
 
-### Analyze-mediapackage workflow operation changes
+`etc/org.apache.felix.fileinstall-workflows.cfg`:
 
-The behaviour of the `analyze-mediapackage` workflow operation has been changed.
-Instead of replacing every character that doesn't match `a-z` or `0-9` with an underscore character,
-the operation now only replaces the `/` separating flavor and subflavor. This makes it behave identical to the
-`analyze-tracks` operation. If you make use of `analyze-mediapackage` workflow operation in your custom workflows,
-please adopt this changes.
+- The inclusion filter was adapted for YAML.
 
-For more details see the documentation for the
-[analyze-mediapackage operation](workflowoperationhandlers/analyze-mediapackage-woh.md).
+`etc/org.opencastproject.db.DBSessionFactoryImpl.cfg`:
 
-### Composite workflow operation changes
+- New configuration file allowing to adopt retry behavior for DB transactions.
 
-Instead of the `#{compositeCommand}` variable which was build by the composite workflow operation handler and could not
-be configured, the composite operation now supports multiple different variables for constructing the ffmpeg command to
-create the composite, most of which can be configured in the encoding profile. This is relevant e.g. for GPU encoding.
+`etc/org.opencastproject.ingest.impl.IngestServiceImpl.cfg`:
 
-If you use custom encoding profiles for composite or use the existing profiles in a different way than the standard
-workflows do, you might need to make some changes. Specifically, the `#{compositeCommand}` variable is no longer
-supported in the ffmpeg command, and the `mp4-preview` profile now only supports dual-streams and no watermark,
-while the `composite` profile retains its full functionality, but offers more configuration options than before.
+- New configuration options for allowing ingests from HTTP sources protected by basic auth.
 
-For more details see the updated documentation for the
-[composite operation](workflowoperationhandlers/composite-woh.md).
+`etc/org.opencastproject.liveschedule.impl.LiveScheduleServiceImpl.cfg`:
 
-### New default editor
+- Default streaming resolution was changed to 16:9.
 
-The default editor of Opencast has changed.
-If you want to continue using the internal editor of the old admin interface,
-you need to specifically configure this in `etc/org.opencastproject.organization-mh_default_org.cfg`
-by configuring `prop.admin.editor.url`.
+`etc/org.opencastproject.organization-mh_default_org.cfg`:
 
-Note that the old admin interface is deprecated and will be removed in one of the next major releases.
-Even if you use the old editor for now, please make sure to test the new one
-and report potential problems.
+- New configuration option to redirect Theodul requests to the configured default player.
+- New configuration options for Admin UI keyboard shortcut.
 
-### New default player
+`etc/org.opencastproject.plugin.impl.PluginManagerImpl.cfg`:
 
-Paella 7 is the new default player in Opencast.
-If you want to continue using the Paella 6 you need to specifically configure this in
-`etc/org.opencastproject.organization-mh_default_org.cfg` by configuring `prop.player`.
+- New configuration file for Opencast plugins. LMS role provider (Brightspace, Canvas, Moodle and Sakai), transcription
+  services, the legacy annotation service and the Theodul player are now plugins and off by default. Note that the
+  Theodul player will be fully removed in Opencast 14. You may also refer to the [Plugin
+  Management](modules/plugin-management.md) documentation.
 
-Note that the old player Paella 6 is deprecated and will be removed in one of the next major releases.
-Even if you use the old player for now, please make sure to test the new one and report potential problems.
+`etc/org.opencastproject.serviceregistry.impl.JobDispatcher.cfg`:
 
-### Theodul player removed
+- New configuration file resulting out of an internal service registry refactoring. The `dispatch.interval` option,
+  previously configured in `etc/org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg`, was moved to this
+  file.
 
-The Theodul player was removed and can not be used any more.
-Please move to the new [Paella7 player](#new-default-player).
+`etc/org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg`:
 
-### Global oc-remember-me cookie
+- The `dispatch.interval` option was moved to `etc/org.opencastproject.serviceregistry.impl.JobDispatcher.cfg`.
+- New configuration options for encoding specialized workers.
 
-It's now possible, to use the same `oc-remember-me` cookie for all nodes.
-So, if you log into the admin node for example, you don't have to log in again, when switching to the presentation
-node. You can enable it in the `etc/security/mh_default_org.xml` configuration (search for `rememberMeServices` bean
-and set the property named `key`).
+`etc/org.opencastproject.speechtotext.impl.SpeechToTextServiceImpl.cfg`:
 
-### Login page moved
+- New configuration option for switching between Vosk and Whisper for creating automated subtitles. The default remains
+  Vosk.
 
-The login web page is moved from `/admin-ng/login.html` to `/login.html`. You may want to adopt this change in yor
-reverse proxy configuration in some cases.
+`etc/org.opencastproject.speechtotext.impl.engine.WhisperEngine.cfg`:
+
+- New configuration file for configuring Whisper.
+
+`etc/org.opencastproject.transcription.amberscript.AmberscriptTranscriptionService.cfg`:
+
+- The default documented workflow incorrectly included `.xml` in the name.
+
+`etc/org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common.cfg` and
+`etc/org.opencastproject.ui.metadata.CatalogUIAdapterFactory-series-common.cfg`:
+
+- The organization was changed to the wildcard `*` as each tenant can now have a custom common metadata catalog.
+
+`etc/org.opencastproject.userdirectory.ldap.cfg.template`:
+
+- New configuration options for mapping LDAP attributes to user details.
+
+`etc/org.opencastproject.videoeditor.impl.VideoEditorServiceImpl.cfg`:
+
+- Default values for the fade between cuts as well as the used FFmpeg command were changed.
+
+`etc/email/errorDetails`:
+
+- The included metadata was changed to the new syntax.
+
+`etc/listproviders/event.upload.asset.options.properties`:
+
+- `.f4v` was added as allowed file type.
+
+`etc/security/mh_default_org.xml`:
+
+- New role mappings for paths have been added.
+- Basic auth entrypoint has been added to allow HTTP clients to force Opencast to use basic auth. Analogously to digest
+  auth, the `X-Requested-Auth: Basic` must be included in the request.
+- LDAP configuration has been adapted.
+
+Workflow changes:
+
+- The `failing` workflow operation is replaced by `assert`. Refer to the [Assert Workflow
+  Operation](workflowoperationhandlers/assert-woh.md) documentation for more details.
+- The `send-email` workflow operation no longer has the configuration option `use-html`. Instead you may now
+  additionally use the `body-html` or `body-html-template-file` options for passing an HTML template. If you configure
+  a text and HTML template, a multipart email including both will be created.
+- The `send-email` workflow operation deprecates the `${catalogs['SUBTYPE']['FIELD']}` syntax in favor of
+  `${catalogs['FLAVOR']['FIELD']}` for including catalog values into templates. The old syntax may be removed from
+  future Opencast versions. Refer to the [Send Email Workflow Operation](workflowoperationhandlers/send-email-woh.md)
+  documentation for more details.
+- `etc/workflows/partial-error.xml`, `etc/workflows/partial-publish.xml`, `etc/workflows/publish.xml` and
+  `etc/workflows/schedule-and-upload.xml` have been adapted to publish captions.
 
 Database Migration
 ------------------
 
-You will find database upgrade scripts in `docs/upgrade/13_to_14/`. These scripts are suitable for both, MariaDB and
+You can find database upgrade scripts in `docs/upgrade/12_to_13/`. These scripts are suitable for both, MariaDB and
 PostgreSQL. Changes include DB schema optimizations as well as fixes for the new workflow tables.
+
+Rebuild the Elasticsearch Indexes
+----------------------------------
+
+The 13.0 release contains multiple changes to the Elasticsearch indexes an requires a rebuild.
+
+Start your new Opencast and make an HTTP POST request to `/index/rebuild`.
+
+Example (using cURL):
+
+    curl -i -u <admin_user>:<password> -s -X POST https://example.opencast.org/index/rebuild
+
+You can also just open the REST documentation, which can be found under the “Help” section in the admin interface (the
+“?” symbol at the top right corner). Then go to the “Index Endpoint” section and use the testing form on
+`/rebuild` to issue a POST request.
+
+In both cases you should get a 200 HTTP status.
