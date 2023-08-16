@@ -138,7 +138,10 @@ public class
               String.format("No tracks with source flavor '%s' found for transcription", sourceFlavor));
     }
 
-    logger.info("Found {} track(s) with source flavor '{}'.", tracks.length, sourceFlavor);
+    if (tracks.length > 1) {
+      logger.warn("Found {} track(s) with source flavor '{}'.", tracks.length, sourceFlavor);
+      logger.warn("Only 1 subtitle will be generated for the flavor");
+    }
 
     // Get the information in which language the audio track should be
     String languageCode = getMediaPackageLanguage(mediaPackage, workflowInstance);
