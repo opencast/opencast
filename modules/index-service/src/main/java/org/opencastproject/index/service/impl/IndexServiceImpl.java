@@ -38,6 +38,9 @@ import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.distribution.api.DistributionException;
+import org.opencastproject.distribution.api.DownloadDistributionService;
+import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
@@ -75,7 +78,10 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.Publication;
+import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -92,6 +98,7 @@ import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
+import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AclScope;
@@ -108,6 +115,7 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlNamespaceBinding;
 import org.opencastproject.util.XmlNamespaceContext;
@@ -157,6 +165,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -224,6 +233,9 @@ public class IndexServiceImpl implements IndexService {
   private WorkflowService workflowService;
   private Workspace workspace;
   private ElasticsearchIndex elasticsearchIndex;
+  private DownloadDistributionService downloadDistributionService = null;
+  private StreamingDistributionService streamingDistributionService = null;
+  private SearchService searchService = null;
 
   /** The single thread executor service */
   private ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -428,6 +440,21 @@ public class IndexServiceImpl implements IndexService {
   @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
+  }
+
+  @Reference(target = "(distribution.channel=streaming)")
+  protected void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
+    this.streamingDistributionService = streamingDistributionService;
+  }
+
+  @Reference(target = "(distribution.channel=download)")
+  protected void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
+    this.downloadDistributionService = downloadDistributionService;
+  }
+
+  @Reference
+  protected void setSearchService(SearchService searchService) {
+    this.searchService = searchService;
   }
 
   /**
@@ -1347,6 +1374,7 @@ public class IndexServiceImpl implements IndexService {
         break;
       case ARCHIVE:
         assetManager.takeSnapshot(mediaPackage);
+        updatePublication(mediaPackage);
         break;
       case SCHEDULE:
         try {
@@ -1361,6 +1389,88 @@ public class IndexServiceImpl implements IndexService {
         logger.error("Unknown event source!");
     }
     return metadataList;
+  }
+
+  /**
+   * Updates the publications of a mediapackage with new metadata and access rights.
+   * @param mediaPackage
+   */
+  private void updatePublication(MediaPackage mediaPackage) {
+    for (Publication publication : mediaPackage.getPublications()) {
+      String channelId = publication.getChannel();
+      String publicationId = publication.getIdentifier();
+      URI publicationURI = publication.getURI();
+      MimeType publicationMimeType = publication.getMimeType();
+
+      if (channelId == null || publicationURI == null || publicationMimeType == null || publicationId == null) {
+        // No publication, do nothing
+        continue;
+      }
+
+      // Get metadata and acls
+      SimpleElementSelector elementSelector = new SimpleElementSelector();
+      // This does not necessarily work for extended metadata, which can have completely different flavors.
+//      elementSelector.addFlavor("dublincore/*");
+      // Relies on ACLs having this particular flavor
+      elementSelector.addFlavor("security/*");
+      Collection<MediaPackageElement> elements = elementSelector.select(mediaPackage, false);
+
+      Set<String> elementIds = new HashSet<String>();
+      for (MediaPackageElement elem : elements) {
+        elementIds.add(elem.getIdentifier());
+      }
+
+      // To make sure we hit all extended metadata catalogs, let's just get all catalogs
+      for (Catalog catalog : mediaPackage.getCatalogs()) {
+        elementIds.add(catalog.getIdentifier());
+      }
+
+      if (elementIds.size() < 1) {
+        // Nothing to republish, do nothing
+        continue;
+      }
+
+      // Remove publication from mediapackage
+      for (Publication publicationElement : mediaPackage.getPublications()) {
+        if (channelId.equals(publicationElement.getChannel())) {
+          mediaPackage.remove(publicationElement);
+        }
+      }
+
+      List<MediaPackageElement> downloadElements = new ArrayList<>();
+      List<MediaPackageElement> streamingElements = new ArrayList<>();
+      try {
+        downloadElements = downloadDistributionService.distributeSync(channelId, mediaPackage, elementIds, false);
+        if (streamingDistributionService != null && streamingDistributionService.publishToStreaming()) {
+          streamingElements = streamingDistributionService.distributeSync(channelId, mediaPackage, elementIds);
+        }
+      } catch (DistributionException e) {
+        throw new RuntimeException(e);
+      }
+      logger.debug("Distribute of mediapackage {} to channel {} completed", mediaPackage, channelId);
+
+      // Re-add publication
+      Publication newPublication = PublicationImpl.publication(publicationId, channelId, publicationURI, publicationMimeType);
+
+      // Add published elements
+      for (MediaPackageElement element : downloadElements) {
+        element.setIdentifier(null);
+        PublicationImpl.addElementToPublication(newPublication, element);
+      }
+      for (MediaPackageElement element : streamingElements) {
+        element.setIdentifier(null);
+        PublicationImpl.addElementToPublication(newPublication, element);
+      }
+
+      mediaPackage.add(newPublication);
+    }
+
+    // Also search service
+    try {
+      searchService.addSynchronously(mediaPackage);
+    } catch (UnauthorizedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
@@ -1411,6 +1521,7 @@ public class IndexServiceImpl implements IndexService {
           throw new IndexServiceException("Unable to update  acl", e);
         }
         assetManager.takeSnapshot(mediaPackage);
+        updatePublication(mediaPackage);
         return acl;
       case SCHEDULE:
         try {
