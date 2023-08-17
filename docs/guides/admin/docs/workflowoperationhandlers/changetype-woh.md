@@ -23,6 +23,7 @@ Parameter Table
 
 Notes:
 
+- Valid target types are: Track, Catalog, Attachment
 - *source-flavor* and *source-tags* may be used both together to select media package elements based on both flavors and
   tags If *source-flavor* is not specified, all media package elements matching *source-tags* will be selected
 - In case that neither *source-flavor* nor *source-tags* are specified, the operation will be skipped
