@@ -1,4 +1,4 @@
-Clone Workflow Operation
+Change Type Workflow Operation
 ========================
 
 ID: `changetype`
@@ -12,12 +12,12 @@ The change type workflow operation can be used to change the type of media packa
 Parameter Table
 ---------------
 
-|Configuration Key         |Description                                       |Example           |
-|--------------------------|--------------------------------------------------|------------------|
-|source-flavors            |The source flavor(s) to clone                     |presenter/source  |
-|source-tags               |Comma-separated list of source-tags               |archive           |
-|target-flavor\*           |The target flavor                                 |presenter/target  |
-|target-type\*             |The target type                                   |track             |
+|Configuration Key         | Description                         |Example           |
+|--------------------------|-------------------------------------|------------------|
+|source-flavors            | The source flavor(s) to select from |presenter/source  |
+|source-tags               | Comma-separated list of source-tags |archive           |
+|target-flavor\*           | The target flavor                   |presenter/target  |
+|target-type\*             | The target type                     |track             |
 
 \* mandatory configuration key
 
