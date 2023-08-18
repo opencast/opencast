@@ -185,6 +185,8 @@ public class
 
     // Translate to english
     Boolean translate = getTranslationMode(mediaPackage, workflowInstance);
+
+    // Subtitles creation
     if (sourceTagList.isEmpty() && (tracks.length > 1)) {
       logger.info("Multiple tracks found but no source tags specified");
       logger.info("Using the first track in the flavor list");
