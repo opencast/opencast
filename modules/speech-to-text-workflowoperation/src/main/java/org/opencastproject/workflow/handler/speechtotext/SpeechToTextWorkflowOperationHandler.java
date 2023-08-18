@@ -29,6 +29,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
+import org.opencastproject.mediapackage.elementbuilder.TrackBuilderPlugin;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.metadata.api.MediaPackageMetadata;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
@@ -56,7 +57,10 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -125,23 +129,53 @@ public class
           throws WorkflowOperationException {
 
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
+    WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     logger.info("Start speech-to-text workflow operation for media package {}", mediaPackage);
+
 
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
             Configuration.none, Configuration.one,
             Configuration.many, Configuration.one);
-    MediaPackageElementFlavor sourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
+    List<MediaPackageElementFlavor> sourceFlavor = tagsAndFlavors.getSrcFlavors();
+    List<String> sourceTagList = tagsAndFlavors.getSrcTags();
 
-    Track[] tracks = mediaPackage.getTracks(sourceFlavor);
-    if (tracks.length == 0) {
+
+    MediaPackageElementFlavor matchingFlavor = null;
+    if (!sourceFlavor.isEmpty()) {
+      matchingFlavor = sourceFlavor.get(0);
+    }
+
+    // Select the tracks based on source flavors and tags
+    Set<MediaPackageElement> inputSet = new HashSet<>();
+    for (MediaPackageElement element : mediaPackage.getElementsByTags(sourceTagList)) {
+      MediaPackageElementFlavor elementFlavor = element.getFlavor();
+      if (sourceFlavor == null || (elementFlavor != null && elementFlavor.matches(matchingFlavor))) {
+        inputSet.add(element);
+      }
+    }
+
+    if (inputSet.size() == 0) {
       throw new WorkflowOperationException(
-              String.format("No tracks with source flavor '%s' found for transcription", sourceFlavor));
+              String.format("No elements with source flavor(s) {} and tag(s)"
+                  + " {} found for transcription", sourceFlavor, sourceTagList));
     }
 
-    if (tracks.length > 1) {
-      logger.warn("Found {} track(s) with source flavor '{}'.", tracks.length, sourceFlavor);
-      logger.warn("Only 1 subtitle will be generated for the flavor");
+    // Convert MediaPackageElements to Tracks
+    TrackBuilderPlugin trackBuilder = new TrackBuilderPlugin();
+    List<Track> tracksList = new ArrayList<>();
+
+    for (MediaPackageElement element : inputSet) {
+      try {
+        URI elementUri = element.getURI();
+        Track trackElement = (Track)  trackBuilder.elementFromURI(elementUri);
+        tracksList.add(trackElement);
+      } catch (ClassCastException e) {
+        logger.error("Element {} is not a track", element);
+      }
     }
+
+    Track[] tracks = tracksList.toArray(new Track[tracksList.size()]);
+
 
     // Get the information in which language the audio track should be
     String languageCode = getMediaPackageLanguage(mediaPackage, workflowInstance);
@@ -151,11 +185,15 @@ public class
 
     // Translate to english
     Boolean translate = getTranslationMode(mediaPackage, workflowInstance);
-
-    for (Track track : tracks) {
-      createSubtitle(track, languageCode, mediaPackage, tagsAndFlavors, appendSubtitleAs, translate);
+    if (sourceTagList.isEmpty() && (tracks.length > 1)) {
+      logger.info("Multiple tracks found but no source tags specified");
+      logger.info("Using the first track in the flavor list");
+      createSubtitle(tracks[0], languageCode, mediaPackage, tagsAndFlavors, appendSubtitleAs, translate);
+    } else {
+      for (Track track : tracks) {
+        createSubtitle(track, languageCode, mediaPackage, tagsAndFlavors, appendSubtitleAs, translate);
+      }
     }
-
     logger.info("Text-to-Speech workflow operation for media package {} completed", mediaPackage);
     return createResult(mediaPackage, WorkflowOperationResult.Action.CONTINUE);
   }

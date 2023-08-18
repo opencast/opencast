@@ -10,6 +10,8 @@ The speech to text operation can be used to generate subtitles for Videos or Aud
 engines available, [Whisper](../modules/transcription.modules/whisper.md) and 
 [Vosk](../modules/transcription.modules/vosk.md). The subtitles file format ist WebVTT.
 
+This operation is designed to only work with one source file per flavor. If you want to use multiple source files in one
+flavor, you need to set the same tag to each element.
 
 Parameter Table
 ---------------
@@ -17,6 +19,7 @@ Parameter Table
 | configuration keys | required | Example           | description                                                                                                                                        |
 |--------------------|----------|-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
 | source-flavor      | yes      | source/presenter  | The source media package to use                                                                                                                    |
+| source-tags        | no       | 1080p             | The tags that the source track uses                                                                                                                   |
 | target-flavor      | yes      | archive           | Flavor of the produced subtitle file. The subflavor supports the language-code placeholder `#{lang}`                                               |
 | target-element     | no       | attachment        | Define where to append the subtitles file. Possibilities are: as a 'track' or as an 'attachment'. The default is "attachment".                     |
 | language-code      | no       | de                | The language of the video or audio source (default is "eng"). Vosk only: It has to match the name of the language model directory. See 'vosk-cli'. |
