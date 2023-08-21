@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -1921,48 +1921,50 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         statsMap.put(s.getId(), new JaxbServiceStatistics(s))
       );
 
-      // Build stats map
-      namedQuery.findAll(
-          "ServiceRegistration.statistics",
-          Object[].class,
-          Pair.of("minDateCreated", startDate),
-          Pair.of("maxDateCreated", endDate)
-      ).apply(em).forEach(row -> {
-        Number serviceRegistrationId = (Number) row[0];
-        if (serviceRegistrationId == null || serviceRegistrationId.longValue() == 0) {
-          return;
-        }
-        Status status = Status.values()[((Number) row[1]).intValue()];
-        Number count = (Number) row[2];
-        Number meanQueueTime = (Number) row[3];
-        Number meanRunTime = (Number) row[4];
-
-        // The statistics query returns a cartesian product, so we need to iterate over them to build up the objects
-        JaxbServiceStatistics stats = statsMap.get(serviceRegistrationId.longValue());
-        if (stats == null) {
-          return;
-        }
-
-        // the status will be null if there are no jobs at all associated with this service registration
-        if (status != null) {
-          switch (status) {
-            case RUNNING:
-              stats.setRunningJobs(count.intValue());
-              break;
-            case QUEUED:
-            case DISPATCHING:
-              stats.setQueuedJobs(count.intValue());
-              break;
-            case FINISHED:
-              stats.setMeanRunTime(meanRunTime.longValue());
-              stats.setMeanQueueTime(meanQueueTime.longValue());
-              stats.setFinishedJobs(count.intValue());
-              break;
-            default:
-              break;
+      if (collectJobstats) {
+        // Build stats map
+        namedQuery.findAll(
+            "ServiceRegistration.statistics",
+            Object[].class,
+            Pair.of("minDateCreated", startDate),
+            Pair.of("maxDateCreated", endDate)
+        ).apply(em).forEach(row -> {
+          Number serviceRegistrationId = (Number) row[0];
+          if (serviceRegistrationId == null || serviceRegistrationId.longValue() == 0) {
+            return;
           }
-        }
-      });
+          Status status = Status.values()[((Number) row[1]).intValue()];
+          Number count = (Number) row[2];
+          Number meanQueueTime = (Number) row[3];
+          Number meanRunTime = (Number) row[4];
+
+          // The statistics query returns a cartesian product, so we need to iterate over them to build up the objects
+          JaxbServiceStatistics stats = statsMap.get(serviceRegistrationId.longValue());
+          if (stats == null) {
+            return;
+          }
+
+          // the status will be null if there are no jobs at all associated with this service registration
+          if (status != null) {
+            switch (status) {
+              case RUNNING:
+                stats.setRunningJobs(count.intValue());
+                break;
+              case QUEUED:
+              case DISPATCHING:
+                stats.setQueuedJobs(count.intValue());
+                break;
+              case FINISHED:
+                stats.setMeanRunTime(meanRunTime.longValue());
+                stats.setMeanQueueTime(meanQueueTime.longValue());
+                stats.setFinishedJobs(count.intValue());
+                break;
+              default:
+                break;
+            }
+          }
+        });
+      }
 
       List<ServiceStatistics> stats = new ArrayList<>(statsMap.values());
       stats.sort((o1, o2) -> {

@@ -41,6 +41,10 @@ describe('New Event Controller', function () {
                 .respond(JSON.stringify(getJSONFixture('admin-ng/capture-agents/agents.json')));
             $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond('{}');
             $httpBackend.whenGET('/admin-ng/resources/ACL.ACTIONS.json').respond('{}');
+            $httpBackend.whenGET('/admin-ng/resources/ACL.DEFAULTS.json').respond('{}');
+            $httpBackend.whenGET('/admin-ng/users/users.json?limit=2147483647').respond(JSON.stringify(getJSONFixture('admin-ng/users/users.json')));
+            $httpBackend.whenGET('/admin-ng/users/admin.json')
+            .respond(JSON.stringify(getJSONFixture('admin-ng/users/admin.json')));
             $httpBackend.whenGET('/admin-ng/acl/roles.json').respond('[]');
             $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
             $httpBackend.whenGET('/workflow/definitions.json').respond('{}');

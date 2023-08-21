@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -1027,7 +1027,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   public List<MediaPackage> search(Opt<String> captureAgentId, Opt<Date> startsFrom, Opt<Date> startsTo,
           Opt<Date> endFrom, Opt<Date> endTo) throws SchedulerException {
     try {
-      return persistence.search(captureAgentId, startsFrom, startsTo, endFrom, endTo, Opt.none()).parallelStream()
+      return persistence.search(captureAgentId, startsFrom, startsTo, endFrom, endTo, Opt.none()).stream()
           .map(ExtendedEventDto::getMediaPackageId)
           .map(this::getEventMediaPackage).collect(Collectors.toList());
     } catch (Exception e) {
@@ -1722,7 +1722,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       }
       logIndexRebuildBegin(logger, index.getIndexName(), total, "scheduled events");
       final int[] current = {0};
-      int n = 16;
+      int n = 20;
       var updatedEventRange = new ArrayList<Event>();
 
       for (Organization organization: orgDirectoryService.getOrganizations()) {
@@ -1748,7 +1748,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
                       if (updatedEventRange.size() >= n || current[0] >= events.size()) {
                         index.bulkEventUpdate(updatedEventRange);
-                        logIndexRebuildProgress(logger, index.getIndexName(), total, current[0]);
+                        logIndexRebuildProgress(logger, index.getIndexName(), total, current[0], n);
                         updatedEventRange.clear();
                       }
                     } catch (SearchIndexException e) {

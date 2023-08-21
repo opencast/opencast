@@ -53,7 +53,7 @@ Required:
 
 Required (not necessarily on the same machine):
 
-    Elasticsearch 7.9.x
+    OpenSearch 1.x
 
 Required for text extraction (recommended):
 
@@ -71,6 +71,14 @@ Required for animate service (optional):
 
     synfig
 
+Required for text to speech (optional):
+
+    Vosk
+
+OR 
+    
+    Whisper >= 20230314
+
 ### Dependency Download
 
 Pre-built versions of most dependencies that are not in the repositories can be downloaded from the respective project
@@ -78,7 +86,7 @@ website:
 
 * [Get FFmpeg](http://ffmpeg.org/download.html)
 * [Get Apache Maven](https://maven.apache.org/download.cgi)
-* [Get Elasticsearch](https://elastic.co)
+* [Get OpenSearch](https://opensearch.org)
 
 Building Opencast
 -----------------

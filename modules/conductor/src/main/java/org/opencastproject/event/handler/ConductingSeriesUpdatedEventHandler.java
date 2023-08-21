@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -29,6 +29,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +52,7 @@ public class ConductingSeriesUpdatedEventHandler implements SeriesUpdateHandler 
   private static final Logger logger = LoggerFactory.getLogger(ConductingSeriesUpdatedEventHandler.class);
 
   private AssetManagerUpdatedEventHandler assetManagerUpdatedEventHandler;
-  private SeriesUpdatedEventHandler seriesUpdatedEventHandler;
+  private SearchUpdatedEventHandler searchUpdatedEventHandler;
 
 
   @Activate
@@ -70,7 +72,9 @@ public class ConductingSeriesUpdatedEventHandler implements SeriesUpdateHandler 
     } else if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())
                  || SeriesItem.Type.UpdateAcl.equals(seriesItem.getType())
                  || SeriesItem.Type.Delete.equals(seriesItem.getType())) {
-      seriesUpdatedEventHandler.handleEvent(seriesItem);
+      if (searchUpdatedEventHandler != null) {
+        searchUpdatedEventHandler.handleEvent(seriesItem);
+      }
       assetManagerUpdatedEventHandler.handleEvent(seriesItem);
     }
   }
@@ -82,8 +86,16 @@ public class ConductingSeriesUpdatedEventHandler implements SeriesUpdateHandler 
   }
 
   /** OSGi DI callback. */
-  @Reference
-  public void setSeriesUpdatedEventHandler(SeriesUpdatedEventHandler h) {
-    this.seriesUpdatedEventHandler = h;
+  @Reference (
+      policy = ReferencePolicy.DYNAMIC,
+      cardinality = ReferenceCardinality.OPTIONAL,
+      unbind = "unsetSearchUpdatedEventHandler"
+  )
+  public void setSearchUpdatedEventHandler(SearchUpdatedEventHandler h) {
+    this.searchUpdatedEventHandler = h;
+  }
+
+  public void unsetSearchUpdatedEventHandler(SearchUpdatedEventHandler h) {
+    this.searchUpdatedEventHandler = null;
   }
 }

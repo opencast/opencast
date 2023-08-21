@@ -12,7 +12,7 @@ General rules are:
 - Users communicate with Opencast via HTTP(S)
 - Capture agents communicate with Opencast via HTTP(S)
 - Opencast nodes communicate among each other via HTTP(S)
-- Often Elasticsearch runs on the admin node since this node communicates with these services exclusively
+- Often OpenSearch runs on the admin node since this node communicates with these services exclusively
 - All servers should get access to the storage infrastructure
 - All Opencast nodes need database access
 
@@ -30,7 +30,7 @@ graph LR
   oc1 -->|e.g. 3306| db(Database)
   oc2 -->|e.g. 3306| db
   oc3 -->|e.g. 3306| db
-  oc1 -->|9200| es(Elasticsearch)
+  oc1 -->|9200| os(OpenSearch)
   oc1 --> storage(Storage)
   oc2 --> storage
   oc3 --> storage
@@ -65,5 +65,5 @@ If you want a more complex, stricter set of rules:
 
 1. Allow external HTTP and HTTPS communication to admin, presentation and possibly ingest
 2. Allow all Opencast nodes to access the database
-3. Allow the admin node to access Elasticsearch
+3. Allow the admin node to access OpenSearch
 4. Allow all nodes access to the storage infrastructure

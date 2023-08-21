@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -86,7 +86,7 @@ public class AnalyzeMediapackageWorkflowOperationHandler extends AbstractWorkflo
       if (MediaPackageElement.Type.Publication == mpe.getElementType()) {
         continue;
       }
-      String flavorPrefix = mpe.getFlavor().toString().replaceAll("[^a-z0-9]", "_").toLowerCase();
+      String flavorPrefix = mpe.getFlavor().getType() + "_" + mpe.getFlavor().getSubtype();
       properties.put(flavorPrefix + "_exists", "true");
       properties.put(flavorPrefix + "_type", mpe.getElementType().toString());
     }

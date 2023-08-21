@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -143,7 +143,7 @@ public class WorkflowInstance {
   @Column(name = "creator_id")
   private String creatorName;
 
-  @Column(name = "organization_id")
+  @Column(name = "organization_id")  //NB: This column definition needs to match WorkflowIndexData!
   private String organizationId;
 
   @Column(name = "date_created")
@@ -183,7 +183,7 @@ public class WorkflowInstance {
   @Column(name = "configuration_value")
   protected Map<String, String> configurations;
 
-  @Column(name = "mediapackage_id", length = 128)
+  @Column(name = "mediapackage_id", length = 128) //NB: This column definition needs to match WorkflowIndexData!
   protected String mediaPackageId;
 
   @Column(name = "series_id", length = 128)

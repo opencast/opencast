@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -530,5 +530,12 @@ public interface MediaPackage extends Cloneable {
    * @return the cloned media package
    */
   Object clone();
+
+  /**
+   * Whether the media package contains live tracks.
+   *
+   * @return if mp is live
+   */
+  boolean isLive();
 
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -27,8 +27,6 @@ import org.opencastproject.adopter.statistic.dto.GeneralData;
 import org.opencastproject.adopter.statistic.dto.Host;
 import org.opencastproject.adopter.statistic.dto.StatisticData;
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -42,11 +40,13 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
+import org.opencastproject.userdirectory.JpaUserReferenceProvider;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
@@ -114,7 +114,9 @@ public class ScheduledDataCollector extends TimerTask {
   private SearchService searchService;
 
   /** User and role provider */
-  protected JpaUserAndRoleProvider userAndRoleProvider;
+  protected UserProvider userRefProvider;
+
+  protected JpaUserAndRoleProvider userProvider;
 
   /** The security service */
   protected SecurityService securityService;
@@ -289,15 +291,7 @@ public class ScheduledDataCollector extends TimerTask {
     });
     statisticData.setJobCount(serviceRegistry.count(null, null));
 
-    AQueryBuilder q = assetManager.createQuery();
-    SecurityUtil.runAs(this.securityService, this.defaultOrganization, this.systemAdminUser, () -> {
-      AResult result = q.select(q.snapshot()).where(q.version().isLatest()).run();
-      statisticData.setEventCount(result.getSize());
-    });
-
     statisticData.setSeriesCount(seriesService.getSeriesCount());
-    statisticData.setUserCount(userAndRoleProvider.countAllUsers());
-
     SearchQuery sq = new SearchQuery();
     sq.withId("");
     sq.withElementTags(new String[0]);
@@ -312,6 +306,8 @@ public class ScheduledDataCollector extends TimerTask {
 
     for (Organization org : orgs) {
       SecurityUtil.runAs(securityService, org, systemAdminUser, () -> {
+        statisticData.setEventCount(statisticData.getEventCount() + assetManager.countEvents(org.getId()));
+
         //Calculate the number of attached CAs for this org, add it to the total
         long current = statisticData.getCACount();
         int orgCAs = caStateService.getKnownAgents().size();
@@ -333,12 +329,16 @@ public class ScheduledDataCollector extends TimerTask {
                                        .map(MediaPackage::getDuration)
                                        .mapToLong(Long::valueOf)
                                        .sum() / 1000L;
-          } while (false); //offset + SEARCH_ITERATION_SIZE <= total);
+          } while (offset + SEARCH_ITERATION_SIZE <= total);
         } catch (UnauthorizedException e) {
           //This should never happen, but...
           logger.warn("Unable to calculate total minutes, unauthorized");
         }
         statisticData.setTotalMinutes(current + orgDuration);
+
+        //Add the users for each org
+        long currentUsers = statisticData.getUserCount();
+        statisticData.setUserCount(currentUsers + userProvider.countUsers() + userRefProvider.countUsers());
       });
     }
     statisticData.setVersion(version);
@@ -384,10 +384,16 @@ public class ScheduledDataCollector extends TimerTask {
     this.searchService = searchService;
   }
 
-  /** OSGi setter for the user provider. */
+  /** OSGi setter for the userref provider. */
   @Reference
-  public void setUserAndRoleProvider(JpaUserAndRoleProvider userAndRoleProvider) {
-    this.userAndRoleProvider = userAndRoleProvider;
+  public void setUserRefProvider(JpaUserReferenceProvider userRefProvider) {
+    this.userRefProvider = userRefProvider;
+  }
+
+  /* OSGi setter for the user provider. */
+  @Reference
+  public void setUserAndRoleProvider(JpaUserAndRoleProvider userProvider) {
+    this.userProvider = userProvider;
   }
 
   /** OSGi callback for setting the security service. */

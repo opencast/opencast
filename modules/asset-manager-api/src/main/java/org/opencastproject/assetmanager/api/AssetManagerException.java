@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -20,6 +20,9 @@
  */
 package org.opencastproject.assetmanager.api;
 
+import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.util.NotFoundException;
+
 /**
  * A common exception indicating various issues.
  */
@@ -38,4 +41,16 @@ public class AssetManagerException extends RuntimeException {
   public AssetManagerException(Throwable cause) {
     super(cause);
   }
+
+  /** Returns true if the exception is caused by a {@link org.opencastproject.security.api.UnauthorizedException}. */
+  // todo is an authorization failure really unrecoverable?
+  public boolean isCauseNotAuthorized() {
+    return getCause() instanceof UnauthorizedException;
+  }
+
+  /** Returns true if the exception is caused by a {@link org.opencastproject.util.NotFoundException}. */
+  public boolean isCauseNotFound() {
+    return getCause() instanceof NotFoundException;
+  }
+
 }

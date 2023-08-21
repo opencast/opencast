@@ -1,4 +1,4 @@
-# Dependabot Batcher v1.0.1
+# Dependabot Batcher v1.0.3
 
 name: 'Dependabot Batcher for Paella 7'
 
@@ -26,9 +26,9 @@ jobs:
     steps:
   # Batches Dependabot PRs into one by merging them into a combined branch, then raising a new PR
       - name: 'Dependabot Batcher'
-        uses: Legal-and-General/dependabot-batcher@v1.0.1
+        uses: Legal-and-General/dependabot-batcher@v1.0.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }} #required
-          baseBranchName: 'r/12.x' #optional
+          baseBranchName: 'r/13.x' #optional
           batchBranchName: 'paella7-batcher-updates'
           batchPullTitle: 'Batch Dependabot Updates for Paella 7'

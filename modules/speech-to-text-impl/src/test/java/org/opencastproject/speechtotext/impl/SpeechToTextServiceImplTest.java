@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -149,8 +149,9 @@ public class SpeechToTextServiceImplTest {
   @Test
   public void testVoskSpeechToText() throws Exception {
     URI videoUri = getClass().getResource("/speech_to_text_test.mp4").toURI();
-    Job job = speechToTextService.transcribe(videoUri, "eng");
-    File output = new File(new URI(job.getPayload()));
+    Job job = speechToTextService.transcribe(videoUri, "eng", false);
+    File output = new File(new URI(job.getPayload().split(",")[0]));
+    Assert.assertEquals("eng", job.getPayload().split(",")[1]);
     String textFromSpeech = Files.lines(Paths.get(output.getPath()), StandardCharsets.UTF_8)
             .collect(Collectors.joining("\n"));
     Assert.assertTrue(output.isFile());

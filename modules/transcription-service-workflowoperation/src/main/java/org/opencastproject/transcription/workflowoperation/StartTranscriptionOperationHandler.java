@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -65,8 +65,6 @@ public class StartTranscriptionOperationHandler extends AbstractWorkflowOperatio
   private static final Logger logger = LoggerFactory.getLogger(StartTranscriptionOperationHandler.class);
 
   /** Workflow configuration option keys */
-  static final String SOURCE_FLAVOR = "source-flavor";
-  static final String SOURCE_TAG = "source-tag";
   static final String SKIP_IF_FLAVOR_EXISTS = "skip-if-flavor-exists";
 
   /** The transcription service */

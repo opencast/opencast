@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -29,6 +29,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,8 +80,16 @@ public class ConductingEpisodeUpdatedEventHandler implements AssetManagerUpdateH
   /**
    * OSGi DI callback.
    */
-  @Reference
+  @Reference (
+      policy = ReferencePolicy.DYNAMIC,
+      cardinality = ReferenceCardinality.OPTIONAL,
+      unbind = "unsetOaiPmhUpdatedEventHandler"
+  )
   public void setOaiPmhUpdatedEventHandler(OaiPmhUpdatedEventHandler h) {
     this.oaiPmhUpdatedEventHandler = h;
+  }
+
+  public void unsetOaiPmhUpdatedEventHandler(OaiPmhUpdatedEventHandler h) {
+    this.oaiPmhUpdatedEventHandler = null;
   }
 }

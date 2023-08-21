@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -47,7 +47,7 @@ angular.module('adminNg.controllers')
     AuthService.getUser().$promise.then(function (user) {
       $scope.editorUrl = user.org.properties['admin.editor.url'];
       if (!$scope.editorUrl) {
-        $scope.editorUrl = '#!/events/events/$id/tools/editor';
+        $scope.editorUrl = '/editor-ui/index.html?id=$id';
       }
     }).catch(angular.noop);
 

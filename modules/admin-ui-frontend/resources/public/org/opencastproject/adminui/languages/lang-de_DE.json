@@ -28,7 +28,7 @@
    "YES": "Ja",
    "COPY": "In die Zwischenablage kopieren",
    "MONITOR": {
-      "REGISTRATION": "Opencast has sent a registration update in more than a week"
+      "REGISTRATION": "veraltet"
    },
    "LTI": {
       "ERROR_LOADING_METADATA": "Fehler beim Laden der Videometadaten. Bitte versuchen Sie es später noch einmal.",
@@ -149,6 +149,17 @@
       "HOTKEY_CHEAT_SHEET": "Tastenkürzel",
       "ADOPTER_REGISTRATION": "Adopter Registrierung"
    },
+   "REBUILD": {
+      "TITLE": "Index Rebuild",
+      "WARNING": "Attention!",
+      "HEADER": "Index rebuild in progress!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
+   },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Die Zugriffsrichtlinie wurde erstellt",
       "ACL_NOT_SAVED": "Die Zugriffsrichtlinie konnte nicht gespeichert werden",
@@ -249,16 +260,16 @@
       "ADOPTER_PROFILE_NOT_UPDATED": "Hoppla! Profil-Informationen konnten nicht aktualisiert werden. Bitte versuchen Sie es erneut!",
       "ADOPTER_PROFILE_DELETED": "Profil-Informationen erfolgreich gelöscht.",
       "ADOPTER_PROFILE_NOT_DELETED": "Hoppla! Profil-Informationen konnten nicht gelöscht werden. Bitte versuchen Sie es erneut!",
-      "TOBIRA_OVERRIDE_NAME": "The title of the selected page will be overridden with the title of the series.",
-      "TOBIRA_NO_PATH_SEGMENT": "Page needs a path segment.",
-      "TOBIRA_NOT_MOUNTED": "Series could not be mounted in Tobira.",
-      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
-      "TOBIRA_PATH_SEGMENT_UNIQUE": "The path segment of a page must be unqiue among all its sibling pages.",
-      "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
-      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and/or try again later.",
-      "TOBIRA_COPIED_DIRECT_LINK": "Copied link to clipboard.",
-      "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Couldn't copy link to clipboard.",
-      "TOBIRA_NOT_FOUND": "Tobira doesn't know about this series (yet). Try again in a few minutes or contact your system administrator."
+      "TOBIRA_OVERRIDE_NAME": "Der Titel der ausgewählten Seite wird mit dem Titel der Serie überschrieben.",
+      "TOBIRA_NO_PATH_SEGMENT": "Die Seite benötigt ein Pfadsegment.",
+      "TOBIRA_NOT_MOUNTED": "Die Serie konnte nicht in Tobira eingehängt werden.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "Pfadsegment ist ungültig. Ein gültiges Pfadsegment ist mindestens 2 Zeichen lang, enthält keine Leerzeichen oder Kontrollzeichen, keines der Zeichen '<>\"[\\]^`{|}#%/? ', und startet nicht mit einem der Zeichen '-+~@_! &;:. =*'()'.",
+      "TOBIRA_PATH_SEGMENT_UNIQUE": "Das Pfadsegment einer Seite muss in der gleichen Ebene eindeutig sein.",
+      "TOBIRA_PAGE_NOT_FOUND": "Die Seite, auf die du navigieren wolltest, existiert nicht oder nicht mehr. Versuche es vielleicht von Anfang an.",
+      "TOBIRA_SERVER_ERROR": " Fehler bei der Kommunikation mit Tobira. Kontaktieren Sie Ihren Systemadministrator und/oder versuchen Sie es später erneut.",
+      "TOBIRA_COPIED_DIRECT_LINK": "Der Link wurde in Ihre Zwischenablage kopiert.",
+      "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Fehler beim Kopieren in die Zwischenablage",
+      "TOBIRA_NOT_FOUND": "Tobira kennt diese Serie (noch) nicht. Versuchen Sie es in ein paar Minuten noch einmal oder kontaktieren Sie Ihren Systemadministrator."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Aktionen",
@@ -425,9 +436,9 @@
             "HEADER": "Nutzungsbedingungen und Datenschutzerklärung"
          },
          "SUMMARY_STATE": {
-            "HEADER": "This is a JSON summary of exactly what would be sent to Opencast's servers",
-            "GENERAL_HEADER": "Adopter Information",
-            "STATS_HEADER": "Statistical Information"
+            "HEADER": "Dies ist eine JSON-Zusammenfassung dessen, was genau an Opencast's Server gesendet werden würde",
+            "GENERAL_HEADER": "Adopter-Informationen",
+            "STATS_HEADER": "Statistikinformationen"
          },
          "INFORMATION_STATE": {
             "HEADER": "Danke, dass Sie Opencast nutzen!",
@@ -894,11 +905,23 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "DETAILS": "Details"
+                  "NEW_USER": "Neuer Nutzer",
+                  "DETAILS": "Nicht-Benutzer-Rollen",
+                  "USER": "User",
+                  "USERS": "Benutzer, die für das Event autorisiert sind",
+                  "NONEXISTENT_USER": "Nicht existierender Nutzer",
+                  "HELP": {
+                     "READ": "Durch das Setzen von Leserechte wird das Ereignis für den ausgewählten Nutzer sichtbar",
+                     "WRITE": "Durch die Einstellung von Schreibrechten kann der ausgewählte Nutzer das Ereignis bearbeiten"
+                  }
                },
                "ROLES": {
                   "LABEL": "Rolle auswählen",
                   "EMPTY": "Keine Rolle gefunden"
+               },
+               "USERS": {
+                  "LABEL": "Nutzer wählen",
+                  "EMPTY": "Kein Nutzer gefunden"
                }
             },
             "COMMENTS": {
@@ -1116,11 +1139,22 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "DETAILS": "Details"
+                  "NEW_USER": "Neuer Nutzer",
+                  "DETAILS": "Nicht-Nutzer-Rollen",
+                  "USER": "User",
+                  "USERS": "Nutzer, die für das Event autorisiert sind",
+                  "HELP": {
+                     "READ": "Durch das Setzen von Leserechte wird die Serie für den ausgewählten Nutzer sichtbar",
+                     "WRITE": "Durch die Einstellung von Schreibrechten kann der ausgewählte Nutzer die Serie bearbeiten"
+                  }
                },
                "ROLES": {
                   "LABEL": "Rolle auswählen",
                   "EMPTY": "Keine Rolle gefunden"
+               },
+               "USERS": {
+                  "LABEL": "Nutzer wählen",
+                  "EMPTY": "Kein Nutzer gefunden"
                }
             },
             "THEME": {
@@ -1134,17 +1168,17 @@
             },
             "TOBIRA": {
                "CAPTION": "Tobira",
-               "DESCRIPTION": "Here you can select where you want the series to show up in the Tobira video portal. You can only select one location here, and it needs to be empty (marked in bold). You can create new pages here, but note that they are only persisted if they are on the path to the selected page.",
-               "SELECT_PAGE": "Select a target page",
-               "PAGE_TITLE": "Subpage title",
-               "PATH_SEGMENT": "Path segment",
-               "SUBPAGES": "Subpages",
-               "ADD_SUBPAGE": "Add subpage",
+               "DESCRIPTION": "Hier können Sie auswählen, wo die Serie im Videoportal Tobira erscheinen soll. Sie können nur einen Ort auswählen, und dieser darf noch nicht belegt sein (fett markiert). Sie können auch neue Seiten anlegen. Diese werden aber nur dann in Tobira erstellt, wenn sie auf dem Pfad zur ausgewählten Seite liegen.",
+               "SELECT_PAGE": "Zielseite auswählen",
+               "PAGE_TITLE": "Titel der Unterseite",
+               "PATH_SEGMENT": "Pfadsegment",
+               "SUBPAGES": "Unterseiten",
+               "ADD_SUBPAGE": "Unterseite hinzufügen",
                "CANCEL": "Abbrechen",
-               "HOMEPAGE": "Homepage",
-               "SELECTED_PAGE": "Series will be mounted under the following path",
-               "NO_PAGE_SELECTED": "No page selected. Series will not be mounted in Tobira.",
-               "PATH": "Path"
+               "HOMEPAGE": "Startseite",
+               "SELECTED_PAGE": "Serie wird in folgendem Pfad eingebunden",
+               "NO_PAGE_SELECTED": "Keine Seite ausgewählt. Serie wird nicht im Videoportal eingehängt.",
+               "PATH": "Pfad"
             },
             "SUMMARY": {
                "CAPTION": "Zusammenfassung"
@@ -1194,17 +1228,29 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "DETAILS": "Details",
-                  "REPLACE_EVENT_ACLS": "Save & update event permissions",
+                  "DETAILS": "Nicht-Nutzer-Rollen",
+                  "REPLACE_EVENT_ACLS": "Zugriffsrechte des Videos aktualisieren",
                   "REPLACE_EVENT_ACLS_HINT": "Sicherstellen, dass alle Videos dieser Serie genau diese Zugriffsrechte haben",
                   "SAVE_SERIES_ACLS": "Speichern",
-                  "SAVE_SERIES_ACLS_HINT": "Apply permissions only to series",
+                  "SAVE_SERIES_ACLS_HINT": "Berechtigungen nur für Serien anwenden",
                   "LOAD_MORE_LIMIT": "angezeigte Richtlinien.",
-                  "LOAD_MORE_LINK": "Mehr laden"
+                  "LOAD_MORE_LINK": "Mehr laden",
+                  "NEW_USER": "Neuer Nutzer",
+                  "USER": "User",
+                  "USERS": "Nutzer, die für das Event autorisiert sind",
+                  "NONEXISTENT_USER": "Nicht existierender Nutzer",
+                  "HELP": {
+                     "READ": "Durch das Setzen von Leserechte wird die Serie für den ausgewählten Nutzer sichtbar",
+                     "WRITE": "Durch die Einstellung von Schreibrechten kann der ausgewählte Nutzer die Serie bearbeiten"
+                  }
                },
                "ROLES": {
                   "LABEL": "Rolle auswählen",
                   "EMPTY": "Keine Rolle gefunden"
+               },
+               "USERS": {
+                  "LABEL": "Nutzer wählen",
+                  "EMPTY": "Kein Nutzer gefunden"
                }
             },
             "METADATA": {
@@ -1223,11 +1269,11 @@
                "DESCRIPTION": "Beschreibung"
             },
             "TOBIRA": {
-               "HOMEPAGE": "(Homepage)",
-               "DIRECT_LINK": "Direct link to series",
+               "HOMEPAGE": "(Startseite)",
+               "DIRECT_LINK": "Direkter Link zur Serie",
                "COPY_DIRECT_LINK": "In die Zwischenablage kopieren",
-               "NOT_MOUNTED": "This series is currently not included the page structure, and can only be reached using the direct link above.",
-               "PAGES": "Pages in Tobira that contain this series"
+               "NOT_MOUNTED": "Diese Serie ist derzeit nicht in der Seitenstruktur enthalten und kann nur über den oben genannten direkten Link erreicht werden.",
+               "PAGES": "Seiten in Tobira, die diese Serie einbinden"
             },
             "EVENTS": {
                "TITLE": "Titel",
@@ -1443,12 +1489,23 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "DETAILS": "Details",
-                  "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu"
+                  "DETAILS": "Nicht-Nutzer-Rollen",
+                  "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu",
+                  "NEW_USER": "Neuer Nutzer",
+                  "USER": "User",
+                  "USERS": "Nutzer, die durch diese Zugriffsrichtlinie autorisiert sind",
+                  "HELP": {
+                     "READ": "Durch das Setzen von Leseberechtigungen wird das Medium, dem diese Zugriffsrichtlinie zugewiesen wird, für den ausgewählten Benutzer sichtbar.",
+                     "WRITE": "Durch das Setzen von Schreibberechtigungen kann das Medium, dem diese Zugriffsrichtlinie zugewiesen wird, vom ausgewählten Benutzer geändert werden."
+                  }
                },
                "ROLES": {
                   "LABEL": "Rolle auswählen",
                   "EMPTY": "Keine Rolle gefunden"
+               },
+               "USERS": {
+                  "LABEL": "Nutzer wählen",
+                  "EMPTY": "Kein Nutzer gefunden"
                }
             }
          },
@@ -1481,12 +1538,24 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "DETAILS": "Details",
-                  "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu"
+                  "DETAILS": "Nicht-Nutzer-Rollen",
+                  "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu",
+                  "NEW_USER": "Neuer Nutzer",
+                  "USER": "User",
+                  "USERS": "Nutzer, die durch diese Zugriffsrichtlinie autorisiert sind",
+                  "NONEXISTENT_USER": "Nicht existierender Nutzer",
+                  "HELP": {
+                     "READ": "Durch das Setzen von Leseberechtigungen wird das Medium, dem diese Zugriffsrichtlinie zugewiesen wird, für den ausgewählten Benutzer sichtbar.",
+                     "WRITE": "Durch das Setzen von Schreibberechtigungen kann das Medium, dem diese Zugriffsrichtlinie zugewiesen wird, vom ausgewählten Benutzer geändert werden."
+                  }
                },
                "ROLES": {
                   "LABEL": "Rolle auswählen",
                   "EMPTY": "Keine Rolle gefunden"
+               },
+               "USERS": {
+                  "LABEL": "Nutzer wählen",
+                  "EMPTY": "Kein Nutzer gefunden"
                }
             }
          }

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -48,8 +48,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 @Component(
     immediate = true,
@@ -65,25 +63,12 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
 
   /** Workflow configuration option keys */
   static final String TRANSCRIPTION_JOB_ID = "transcription-job-id";
-  static final String TARGET_FLAVOR = "target-flavor";
-  static final String TARGET_TAGS = "target-tags";
   static final String TARGET_CAPTION_FORMAT = "target-caption-format";
 
   private TranscriptionService service = null;
   private CaptionService captionService;
 
   private Workspace workspace;
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(TRANSCRIPTION_JOB_ID, "The job id that identifies the file to be attached");
-    CONFIG_OPTIONS.put(TARGET_FLAVOR, "The target \"flavor\" of the transcription file");
-    CONFIG_OPTIONS.put(TARGET_TAGS, "The target \"tags\" of the transcription file");
-    CONFIG_OPTIONS.put(TARGET_CAPTION_FORMAT, "The target caption format of the transcription file (dfxp, etc)");
-  }
 
   @Override
   @Activate
@@ -110,7 +95,7 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
     List<String> targetTagOption = tagsAndFlavors.getTargetTags();
     String captionFormatOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_CAPTION_FORMAT));
 
-    MediaPackageElementFlavor flavor = null;
+    MediaPackageElementFlavor flavor;
     if (!targetFlavorOption.isEmpty()) {
       flavor = targetFlavorOption.get(0);
     } else {
@@ -127,7 +112,7 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
       MediaPackageElement transcription
           = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId);
 
-      MediaPackageElement convertedTranscription = null;
+      MediaPackageElement convertedTranscription;
       if (captionFormatOption != null) {
         Job job = captionService.convert(transcription, "subrip", captionFormatOption, service.getLanguage());
         if (!waitForStatus(job).isSuccess()) {

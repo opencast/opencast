@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -70,8 +70,9 @@ import javax.persistence.UniqueConstraint;
     }, uniqueConstraints = {
     @UniqueConstraint(columnNames = {"mediapackage_id", "version"}) })
 @NamedQueries({
-        @NamedQuery(name = "Snapshot.countEvents", query = "select count(distinct s.mediaPackageId) from Snapshot s "
+        @NamedQuery(name = "Snapshot.countOrgEvents", query = "select count(distinct s.mediaPackageId) from Snapshot s "
                 + "where s.organizationId = :organizationId"),
+        @NamedQuery(name = "Snapshot.countEvents", query = "select count(distinct s.mediaPackageId) from Snapshot s"),
         @NamedQuery(name = "Snapshot.countByMediaPackage", query = "select count(s) from Snapshot s "
                 + "where s.mediaPackageId = :mediaPackageId"),
         @NamedQuery(name = "Snapshot.countByMediaPackageAndOrg", query = "select count(s) from Snapshot s "
@@ -258,8 +259,12 @@ public class SnapshotDto {
   public static Function<EntityManager, Long> countEventsQuery(final String organization) {
     return em -> {
       TypedQuery<Long> query;
-      query = em.createNamedQuery("Snapshot.countEvents", Long.class)
-          .setParameter("organizationId", organization);
+      if (null != organization) {
+        query = em.createNamedQuery("Snapshot.countOrgEvents", Long.class)
+            .setParameter("organizationId", organization);
+      } else {
+        query = em.createNamedQuery("Snapshot.countEvents", Long.class);
+      }
       logger.debug("Executing query {}", query);
       return query.getSingleResult();
     };

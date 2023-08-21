@@ -28,7 +28,7 @@
    "YES": "Oui",
    "COPY": "Copier dans le presse-papiers",
    "MONITOR": {
-      "REGISTRATION": "Opencast a envoyé une mise à jour d'inscription dans plus d'une semaine"
+      "REGISTRATION": "Out of date"
    },
    "LTI": {
       "ERROR_LOADING_METADATA": "Erreur lors du chargement des métadonnées de l'événement. Veuillez réessayer plus tard.",
@@ -148,6 +148,17 @@
       "REST_DOC": "Documentation des API REST",
       "HOTKEY_CHEAT_SHEET": "Raccourcis clavier",
       "ADOPTER_REGISTRATION": "Incription utilisateur"
+   },
+   "REBUILD": {
+      "TITLE": "Index Rebuild",
+      "WARNING": "Attention!",
+      "HEADER": "Index rebuild in progress!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Les droits d'accès ont été créés",
@@ -894,11 +905,23 @@
                   "ADDITIONAL_ACTIONS": "Actions supplémentaires",
                   "ACTION": "Actions",
                   "NEW": "Ajouter",
-                  "DETAILS": "Détails"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the event",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the event becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the event"
+                  }
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",
                   "EMPTY": "Aucun rôle trouvé"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "COMMENTS": {
@@ -1116,11 +1139,22 @@
                   "ADDITIONAL_ACTIONS": "Actions supplémentaires",
                   "ACTION": "Actions",
                   "NEW": "Nouvelle politique",
-                  "DETAILS": "Détails"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",
                   "EMPTY": "Aucun rôle trouvé"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "THEME": {
@@ -1194,17 +1228,29 @@
                   "ADDITIONAL_ACTIONS": "Actions supplémentaires",
                   "ACTION": "Actions",
                   "NEW": "Add row",
-                  "DETAILS": "Détails",
-                  "REPLACE_EVENT_ACLS": "Enregistrer et mettre à jour les autorisations d'événement",
+                  "DETAILS": "Non-user roles",
+                  "REPLACE_EVENT_ACLS": "Mettre à jour les permissions de l'événement",
                   "REPLACE_EVENT_ACLS_HINT": "Assurez-vous que tous les événements de cette série ont ces permissions en vigueur",
                   "SAVE_SERIES_ACLS": "Enregistrer",
                   "SAVE_SERIES_ACLS_HINT": "Appliquer les autorisations uniquement aux séries",
                   "LOAD_MORE_LIMIT": "politiques affichées.",
-                  "LOAD_MORE_LINK": "Afficher plus"
+                  "LOAD_MORE_LINK": "Afficher plus",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",
                   "EMPTY": "Aucun rôle trouvé"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "METADATA": {
@@ -1226,7 +1272,7 @@
                "HOMEPAGE": "(Accueil)",
                "DIRECT_LINK": "Lien direct vers la série",
                "COPY_DIRECT_LINK": "Copier dans le presse-papiers",
-               "NOT_MOUNTED": "Cette série n'est actuellement pas incluse dans la structure des pages, et ne peut être atteinte qu'en utilisant le lien direct ci-dessus.",
+               "NOT_MOUNTED": "This series is currently not included in the page structure, and can only be reached using the direct link above.",
                "PAGES": "Pages dans Tobira qui contiennent cette série"
             },
             "EVENTS": {
@@ -1443,12 +1489,23 @@
                   "ADDITIONAL_ACTIONS": "Actions supplémentaires",
                   "ACTION": "Actions",
                   "NEW": "Nouvelle ligne",
-                  "DETAILS": "Détails",
-                  "DESCRIPTION": "S'il vous plaît, choisir un ensemble préconfiguré de règles ou ajouter des règles personnalisées ci-dessous"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "S'il vous plaît, choisir un ensemble préconfiguré de règles ou ajouter des règles personnalisées ci-dessous",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized by this access policy",
+                  "HELP": {
+                     "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
+                     "WRITE": "By setting write permissions, the entity to which this access policy is assigned can be modified by the selected user."
+                  }
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",
                   "EMPTY": "Aucun rôle trouvé"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          },
@@ -1481,12 +1538,24 @@
                   "ADDITIONAL_ACTIONS": "Actions supplémentaires",
                   "ACTION": "Actions",
                   "NEW": "Nouvelle ligne",
-                  "DETAILS": "Détails",
-                  "DESCRIPTION": "S'il vous plaît, choisir un ensemble préconfiguré de règles ou ajouter des règles personnalisées ci-dessous"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "S'il vous plaît, choisir un ensemble préconfiguré de règles ou ajouter des règles personnalisées ci-dessous",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized by this access policy",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
+                     "WRITE": "By setting write permissions, the entity to which this access policy is assigned can be modified by the selected user."
+                  }
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",
                   "EMPTY": "Aucun rôle trouvé"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          }

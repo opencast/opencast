@@ -28,7 +28,7 @@
    "YES": "是",
    "COPY": "複製到剪貼簿",
    "MONITOR": {
-      "REGISTRATION": "Opencast has sent a registration update in more than a week"
+      "REGISTRATION": "Out of date"
    },
    "LTI": {
       "ERROR_LOADING_METADATA": "載入事件後設資料時發生錯誤。請稍後再試。",
@@ -148,6 +148,17 @@
       "REST_DOC": "REST API 文檔",
       "HOTKEY_CHEAT_SHEET": "鍵盤快捷鍵",
       "ADOPTER_REGISTRATION": "使用者註冊"
+   },
+   "REBUILD": {
+      "TITLE": "Index Rebuild",
+      "WARNING": "Attention!",
+      "HEADER": "Index rebuild in progress!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "存取權限已新增",
@@ -894,11 +905,23 @@
                   "ADDITIONAL_ACTIONS": "更多選項",
                   "ACTION": "操作",
                   "NEW": "新政策",
-                  "DETAILS": "詳細信息"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the event",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the event becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the event"
+                  }
                },
                "ROLES": {
                   "LABEL": "選擇一個角色",
                   "EMPTY": "找不到角色"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "COMMENTS": {
@@ -1116,11 +1139,22 @@
                   "ADDITIONAL_ACTIONS": "更多選項",
                   "ACTION": "操作",
                   "NEW": "新政策",
-                  "DETAILS": "詳細信息"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "選擇一個角色",
                   "EMPTY": "找不到角色"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "THEME": {
@@ -1194,17 +1228,29 @@
                   "ADDITIONAL_ACTIONS": "更多選項",
                   "ACTION": "操作",
                   "NEW": "新政策",
-                  "DETAILS": "詳細信息",
-                  "REPLACE_EVENT_ACLS": "Save & update event permissions",
+                  "DETAILS": "Non-user roles",
+                  "REPLACE_EVENT_ACLS": "更新事件權限",
                   "REPLACE_EVENT_ACLS_HINT": "確保本系列的所有事件都具有這些權限",
                   "SAVE_SERIES_ACLS": "Save",
                   "SAVE_SERIES_ACLS_HINT": "Apply permissions only to series",
                   "LOAD_MORE_LIMIT": "顯示的政策。",
-                  "LOAD_MORE_LINK": "載入更多"
+                  "LOAD_MORE_LINK": "載入更多",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "選擇一個角色",
                   "EMPTY": "找不到角色"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "METADATA": {
@@ -1226,7 +1272,7 @@
                "HOMEPAGE": "(Homepage)",
                "DIRECT_LINK": "Direct link to series",
                "COPY_DIRECT_LINK": "Copy to clipboard",
-               "NOT_MOUNTED": "This series is currently not included the page structure, and can only be reached using the direct link above.",
+               "NOT_MOUNTED": "This series is currently not included in the page structure, and can only be reached using the direct link above.",
                "PAGES": "Pages in Tobira that contain this series"
             },
             "EVENTS": {
@@ -1443,12 +1489,23 @@
                   "ADDITIONAL_ACTIONS": "更多選項",
                   "ACTION": "操作",
                   "NEW": "新政策",
-                  "DETAILS": "詳細信息",
-                  "DESCRIPTION": "請選擇一組預配置的策略或添加自訂策略"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "請選擇一組預配置的策略或添加自訂策略",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized by this access policy",
+                  "HELP": {
+                     "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
+                     "WRITE": "By setting write permissions, the entity to which this access policy is assigned can be modified by the selected user."
+                  }
                },
                "ROLES": {
                   "LABEL": "選擇一個角色",
                   "EMPTY": "找不到角色"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          },
@@ -1481,12 +1538,24 @@
                   "ADDITIONAL_ACTIONS": "更多選項",
                   "ACTION": "操作",
                   "NEW": "新政策",
-                  "DETAILS": "詳細信息",
-                  "DESCRIPTION": "請選擇一組預配置的策略或添加自訂策略"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "請選擇一組預配置的策略或添加自訂策略",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized by this access policy",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
+                     "WRITE": "By setting write permissions, the entity to which this access policy is assigned can be modified by the selected user."
+                  }
                },
                "ROLES": {
                   "LABEL": "選擇一個角色",
                   "EMPTY": "找不到角色"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          }

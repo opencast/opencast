@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -926,6 +926,7 @@ public class Event implements IndexObject {
       eventStatus = "EVENTS.EVENTS.STATUS.SCHEDULED";
     } else {
       /* This can be the case if all workflows of an event have been deleted */
+      /* It also happens to events with running workflows while rebuilding the index */
       eventStatus = "EVENTS.EVENTS.STATUS.PROCESSED";
     }
   }

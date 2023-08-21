@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -22,6 +22,7 @@
 package org.opencastproject.search.impl;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
@@ -473,7 +474,14 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   public boolean deleteSynchronously(final String mediaPackageId) throws SearchException {
     SearchResult result;
     try {
-      result = solrRequester.getForWrite(new SearchQuery().withId(mediaPackageId));
+      SearchQuery q = new SearchQuery().withId(mediaPackageId);
+      User user = securityService.getUser();
+      // allow ca users to retract live publications without putting them into the ACL
+      if (user.hasRole(GLOBAL_CAPTURE_AGENT_ROLE)) {
+        result = solrRequester.getForAdministrativeRead(q); // action doesn't matter here
+      } else {
+        result = solrRequester.getForWrite(q); // also checks admin rights which are always part of the ACL in search
+      }
       if (result.getItems().length == 0) {
         logger.warn("Can not delete mediapackage {}, which is not available for the current user to delete from the "
                     + "search index.", mediaPackageId);

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -96,6 +96,7 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowServiceDatabase;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateMapping;
+import org.opencastproject.workflow.api.WorkflowUtil;
 import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -2172,7 +2173,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       if (total > 0) {
         logIndexRebuildBegin(logger.getSlf4jLogger(), index.getIndexName(), total, "workflows");
         int current = 0;
-        int n = 16;
+        int n = 20;
         List<WorkflowIndexData> workflowIndexData;
 
         int limit = 1000;
@@ -2198,15 +2199,20 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
               }
               current++;
 
-              var updatedWorkflowData = index.getEvent(indexData.getMediaPackageId(), indexData.getOrganizationId(),
+              if (!WorkflowUtil.isActive(WorkflowInstance.WorkflowState.values()[indexData.getState()].toString())) {
+                var updatedWorkflowData = index.getEvent(indexData.getMediaPackageId(), indexData.getOrganizationId(),
                         securityService.getUser());
-              updatedWorkflowData = getStateUpdateFunction(indexData).apply(updatedWorkflowData);
-              updatedWorkflowRange.add(updatedWorkflowData.get());
+                updatedWorkflowData = getStateUpdateFunction(indexData).apply(updatedWorkflowData);
+                updatedWorkflowRange.add(updatedWorkflowData.get());
 
-              if (updatedWorkflowRange.size() >= n || current >= total) {
-                index.bulkEventUpdate(updatedWorkflowRange);
-                logIndexRebuildProgress(logger.getSlf4jLogger(), index.getIndexName(), total, current);
-                updatedWorkflowRange.clear();
+                if (updatedWorkflowRange.size() >= n || current >= total) {
+                  index.bulkEventUpdate(updatedWorkflowRange);
+                  logIndexRebuildProgress(logger.getSlf4jLogger(), index.getIndexName(), total, current, n);
+                  updatedWorkflowRange.clear();
+                }
+              }
+              else {
+                logger.info("Skipping. Workflow {} is currently active.", indexData.getId());
               }
 
               lastMediapackageId = currentMediapackageId;

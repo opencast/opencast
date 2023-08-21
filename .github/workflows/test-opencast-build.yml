@@ -26,11 +26,11 @@ jobs:
       matrix:
         java:
           - 11
-          - 13
+          - 17
     name: build (java ${{ matrix.java }})
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: cache local maven repository
         uses: actions/cache@v2
@@ -94,6 +94,11 @@ jobs:
         run: |
           tar xf opencast-dist-allinone*.tar.gz
 
+      - name: verify jar file integrity
+        if: matrix.java == 11
+        run: |
+          .github/test-jars
+
       - name: prepare runtime dependencies
         if: matrix.java == 11
         working-directory: docs/scripts/devel-dependency-containers
@@ -154,3 +159,12 @@ jobs:
           && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
         run: |
           s3cmd put -P *.commit opencast-dist-allinone*tar.gz s3://opencast-daily/
+
+      - name: upload tarball as workflow asset
+        if: >
+          matrix.java == 11
+          && github.repository == 'opencast/opencast'
+        uses: actions/upload-artifact@v3
+        with:
+          name: opencast-allinone
+          path: build/opencast-dist-allinone*.tar.gz

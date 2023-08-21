@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -43,6 +43,6 @@ public interface SpeechToTextService {
    * @return SpeechToText service job.
    * @throws SpeechToTextServiceException If something went wrong during the subtitles generation.
    */
-  Job transcribe(URI mediaFile, String language) throws SpeechToTextServiceException;
+  Job transcribe(URI mediaFile, String language, Boolean translate) throws SpeechToTextServiceException;
 
 }

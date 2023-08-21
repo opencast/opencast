@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -71,6 +71,7 @@ public class TestWorkflowDefinitionsEndpoint extends WorkflowDefinitionsEndpoint
     wd1.setDescription("Example workflow definition");
     wd1.setDisplayOrder(2);
     wd1.setConfigurationPanel("<h3>Config</h3>");
+    wd1.setConfigurationPanelJson("[{ \"fieldset\": [ { \"type\": \"checkbox\", \"name\": \"straightToPublishing\", \"label\": \"Straight to publishing\", \"value\": true } ] }]");
     wd1.addTag("archive");
     wd1.addTag("my-tag");
     wd1.getOperations().add(wod1);
@@ -81,6 +82,7 @@ public class TestWorkflowDefinitionsEndpoint extends WorkflowDefinitionsEndpoint
     wd2.setDescription("Example workflow definition");
     wd2.setDisplayOrder(0);
     wd2.setConfigurationPanel("<h3>Config2</h3>");
+    wd2.setConfigurationPanelJson("[{ \"fieldset\": [ { \"type\": \"checkbox\", \"name\": \"straightToPublishing\", \"label\": \"Straight to publishing\", \"value\": true } ] }]");
     wd2.getOperations().add(wod2);
 
     WorkflowService ws = createNiceMock(WorkflowService.class);

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -52,13 +52,13 @@ angular.module('adminNg.controllers')
 
       // assemble the access
       if ($scope.states[1].name === 'access') {
-        access = $scope.states[1].stateController.ud;
+        access = $scope.states[1].stateController;
       } else if ($scope.states[2].name === 'access') {
-        access = $scope.states[2].stateController.ud;
+        access = $scope.states[2].stateController;
       }
 
       ace = [];
-      angular.forEach(access.policies, function (policy) {
+      angular.forEach(access.getAllPolicies(), function (policy) {
         if (angular.isDefined(policy.role)) {
           if (policy.read) {
             ace.push({

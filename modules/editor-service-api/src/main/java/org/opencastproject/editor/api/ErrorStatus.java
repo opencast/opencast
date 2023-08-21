@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -22,5 +22,5 @@ package org.opencastproject.editor.api;
 
 public enum ErrorStatus {
   MEDIAPACKAGE_NOT_FOUND, WORKFLOW_ACTIVE, UNABLE_TO_CREATE_CATALOG, WORKFLOW_ERROR, WORKFLOW_NOT_FOUND,
-  NO_INTERNAL_PUBLICATION, METADATA_UPDATE_FAIL, NOT_AUTHORIZED, UNKNOWN;
+  NO_INTERNAL_PUBLICATION, METADATA_UPDATE_FAIL, NOT_AUTHORIZED, MEDIAPACKAGE_LOCKED, UNKNOWN
 }

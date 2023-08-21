@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
-  <version>14-SNAPSHOT</version>
+  <version>15-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>opencast</name>
   <description>Opencast is a media capture, processing, management and distribution system</description>
@@ -16,44 +16,54 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!-- library version specifications -->
-    <aws.version>1.11.469_1</aws.version>
+    <aws.version>1.12.269_1</aws.version>
     <commons-codec.version>1.15</commons-codec.version>
     <commons-collections.version>4.4</commons-collections.version>
-    <commons-compress.version>1.21</commons-compress.version>
+    <commons-compress.version>1.23.0</commons-compress.version>
     <commons-csv.version>1.9.0</commons-csv.version>
-    <commons-fileupload.version>1.4</commons-fileupload.version>
+    <commons-fileupload.version>1.5</commons-fileupload.version>
     <commons-io.version>2.8.0</commons-io.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
     <commons-text.version>1.10.0</commons-text.version>
-    <cxf.version>3.4.6</cxf.version>
-    <eclipselink.version>2.7.8</eclipselink.version>
+    <cxf.version>3.5.5</cxf.version>
+    <eclipselink.version>2.7.11</eclipselink.version>
+    <eclipselink.asm.version>9.5.0</eclipselink.asm.version>
     <failureaccess.version>1.0.1</failureaccess.version>
-    <freemarker.version>2.3.31</freemarker.version>
+    <freemarker.version>2.3.32</freemarker.version>
     <functional.version>1.4.2</functional.version>
-    <gson.version>2.8.9</gson.version>
+    <gson.version>2.10.1</gson.version>
     <guava.version>30.1.1-jre</guava.version>
     <httpcomponents-httpclient.version>4.5.13</httpcomponents-httpclient.version>
-    <httpcomponents-httpcore.version>4.4.15</httpcomponents-httpcore.version>
-    <jackson.version>2.14.1</jackson.version>
+    <httpcomponents-httpcore.version>4.4.16</httpcomponents-httpcore.version>
+    <jackson.version>2.15.2</jackson.version>
     <jakarta.mail.version>1.6.7</jakarta.mail.version>
     <java.release>11</java.release>
     <javadoc-plugin.version>3.3.1</javadoc-plugin.version>
     <jersey.version>2.29.1</jersey.version>
-    <jettison.version>1.5.2</jettison.version>
-    <joda-time.version>2.10.10</joda-time.version>
+    <jettison.version>1.5.4</jettison.version>
+    <joda-time.version>2.12.5</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
-    <karaf.version>4.2.16</karaf.version>
-    <node.version>v16.13.0</node.version>
-    <osgi.compendium.version>6.0.0</osgi.compendium.version>
-    <osgi.core.version>6.0.0</osgi.core.version>
+    <karaf.version>4.4.3</karaf.version>
+    <node.version>v18.16.0</node.version>
+    <osgi.core.version>8.0.0</osgi.core.version>
+    <osgi.annotation.version>8.1.0</osgi.annotation.version>
+    <org.osgi.service.component.version>1.5.1</org.osgi.service.component.version>
+    <org.osgi.service.component.annotations.version>1.5.0</org.osgi.service.component.annotations.version>
+    <org.osgi.service.cm.version>1.6.0</org.osgi.service.cm.version>
+    <org.osgi.service.log.version>1.5.0</org.osgi.service.log.version>
+    <org.osgi.service.http.version>1.2.1</org.osgi.service.http.version>
+    <org.osgi.service.http.whiteboard.version>1.1.1</org.osgi.service.http.whiteboard.version>
+    <org.osgi.service.jaxrs.version>1.0.1</org.osgi.service.jaxrs.version>
+    <pax.web.version>8.0.15</pax.web.version>
     <querydsl.version>3.7.4</querydsl.version>
     <rest-assured.version>4.4.0</rest-assured.version>
     <spring.version>3.1.4.RELEASE</spring.version>
     <spring-security.version>3.1.7.RELEASE</spring-security.version>
   </properties>
   <modules>
-    <module>modules/admin-ui-frontend</module>
     <module>modules/admin-ui</module>
+    <module>modules/admin-ui-frontend</module>
+    <module>modules/admin-ui-interface</module>
     <module>modules/adopter-registration-api</module>
     <module>modules/adopter-registration-impl</module>
     <module>modules/analyze-mediapackage-workflowoperation</module>
@@ -174,7 +184,6 @@
     <module>modules/redirect</module>
     <module>modules/rename-files-workflowoperation</module>
     <module>modules/rest-test-environment</module>
-    <module>modules/runtime-info-ui-ng</module>
     <module>modules/runtime-info-ui</module>
     <module>modules/runtime-info</module>
     <module>modules/scheduler-api</module>
@@ -312,7 +321,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.11.0</version>
         <configuration>
           <release>${java.release}</release>
           <encoding>UTF-8</encoding>
@@ -322,7 +331,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.0.0-M2</version>
+        <version>3.3.0</version>
         <executions>
           <execution>
             <id>enforce-maven</id>
@@ -367,7 +376,10 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <useFile>false</useFile>
-          <argLine>-Dfile.encoding=UTF-8</argLine>
+          <argLine>
+            -Dfile.encoding=UTF-8
+            --add-opens java.base/java.util=ALL-UNNAMED
+          </argLine>
           <!-- see https://jira.codehaus.org/browse/SUREFIRE-951 -->
           <systemPropertyVariables>
             <M2_REPO>${settings.localRepository}</M2_REPO>
@@ -430,7 +442,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.8</version>
+        <version>1.6.13</version>
         <extensions>true</extensions>
         <configuration>
           <serverId>ossrh</serverId>
@@ -508,7 +520,7 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-scr-plugin</artifactId>
-          <version>1.26.2</version>
+          <version>1.26.4</version>
           <executions>
             <execution>
               <id>generate-scr-scrdescriptor</id>
@@ -558,7 +570,7 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
-          <version>5.1.2</version>
+          <version>5.1.9</version>
           <inherited>true</inherited>
           <configuration>
             <instructions>
@@ -587,7 +599,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.10.0</version>
+          <version>3.12.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -597,7 +609,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-plugin-plugin</artifactId>
-          <version>3.6.0</version>
+          <version>3.9.0</version>
         </plugin>
         <plugin>
           <groupId>org.antlr</groupId>
@@ -607,17 +619,17 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>3.3.0</version>
+          <version>3.6.0</version>
         </plugin>
         <plugin>
           <groupId>com.googlecode.maven-download-plugin</groupId>
           <artifactId>download-maven-plugin</artifactId>
-          <version>1.6.6</version>
+          <version>1.6.8</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>3.2.0</version>
+          <version>3.3.1</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -667,17 +679,17 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-install-plugin</artifactId>
-          <version>2.5.2</version>
+          <version>3.1.1</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
-          <version>1.6.0</version>
+          <version>3.1.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.1.2</version>
+          <version>3.6.0</version>
           <executions>
             <execution>
               <id>analyze</id>
@@ -689,18 +701,6 @@
               </configuration>
             </execution>
           </executions>
-          <dependencies>
-            <dependency>
-              <groupId>org.ow2.asm</groupId>
-              <artifactId>asm</artifactId>
-              <version>9.3</version>
-            </dependency>
-            <dependency>
-              <groupId>org.apache.maven.shared</groupId>
-              <artifactId>maven-dependency-analyzer</artifactId>
-              <version>1.11.1</version>
-            </dependency>
-          </dependencies>
         </plugin>
         <plugin>
           <groupId>org.apache.karaf.tooling</groupId>
@@ -728,7 +728,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>2.2.1</version>
+            <version>3.2.1</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
@@ -756,7 +756,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.5</version>
+            <version>3.0.1</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -862,20 +862,60 @@
       <!-- OSGi -->
       <dependency>
         <groupId>org.osgi</groupId>
-        <artifactId>org.osgi.core</artifactId>
+        <artifactId>osgi.core</artifactId>
         <version>${osgi.core.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.osgi</groupId>
-        <artifactId>osgi.cmpn</artifactId>
-        <version>${osgi.compendium.version}</version>
+        <artifactId>org.osgi.service.cm</artifactId>
+        <version>${org.osgi.service.cm.version}</version>
         <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.log</artifactId>
+        <version>${org.osgi.service.log.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.component</artifactId>
+        <version>${org.osgi.service.component.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.http</artifactId>
+        <version>${org.osgi.service.http.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.http.whiteboard</artifactId>
+        <version>${org.osgi.service.http.whiteboard.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.component.annotations</artifactId>
+        <version>${org.osgi.service.component.annotations.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.jaxrs</artifactId>
+        <version>${org.osgi.service.jaxrs.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>osgi.annotation</artifactId>
+        <version>${osgi.annotation.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.felix</groupId>
         <artifactId>org.apache.felix.fileinstall</artifactId>
-        <version>3.6.4</version>
+        <version>3.7.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.felix</groupId>
@@ -909,6 +949,11 @@
         <groupId>jakarta.activation</groupId>
         <artifactId>jakarta.activation-api</artifactId>
         <version>1.2.1</version>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.annotation</groupId>
+        <artifactId>jakarta.annotation-api</artifactId>
+        <version>1.3.5</version>
       </dependency>
       <dependency>
         <groupId>com.sun.mail</groupId>
@@ -949,7 +994,7 @@
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>org.eclipse.persistence.asm</artifactId>
-        <version>${eclipselink.version}</version>
+        <version>${eclipselink.asm.version}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
@@ -1066,7 +1111,7 @@
       <dependency>
         <groupId>org.owasp.esapi</groupId>
         <artifactId>esapi</artifactId>
-        <version>2.3.0.0</version>
+        <version>2.5.2.0</version>
       </dependency>
       <dependency>
         <groupId>org.opensaml</groupId>
@@ -1101,8 +1146,8 @@
       <dependency>
         <groupId>org.easymock</groupId>
         <artifactId>easymock</artifactId>
+        <version>5.1.0</version>
         <scope>test</scope>
-        <version>4.3</version>
       </dependency>
       <dependency>
         <groupId>org.easymock</groupId>
@@ -1125,12 +1170,13 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.33</version>
+        <version>1.7.36</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
-        <version>1.7.33</version>
+        <artifactId>slf4j-reload4j</artifactId>
+        <version>1.7.36</version>
+        <scope>test</scope>
       </dependency>
       <!-- apache commons syncing -->
       <dependency>
@@ -1337,6 +1383,17 @@
             <artifactId>stax-api</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.ops4j.pax.web</groupId>
+        <artifactId>pax-web-api</artifactId>
+        <version>${pax.web.version}</version>
+        <scope>compile</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.ops4j.pax.web</groupId>
+        <artifactId>pax-web-extender-whiteboard</artifactId>
+        <version>${pax.web.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -1797,7 +1854,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.20</version>
+        <version>2.22.2</version>
         <configuration>
           <aggregate>true</aggregate>
         </configuration>
@@ -1840,7 +1897,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.8.1</version>
+        <version>3.4.3</version>
         <configuration>
           <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
         </configuration>

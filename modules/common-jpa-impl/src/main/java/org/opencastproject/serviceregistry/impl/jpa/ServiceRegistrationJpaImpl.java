@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -68,12 +68,12 @@ import javax.persistence.UniqueConstraint;
 @NamedQueries({
     @NamedQuery(
         name = "ServiceRegistration.statistics",
-        query = "SELECT job.processorServiceRegistration.id as serviceRegistration, job.status, "
+        query = "SELECT job.processorServiceRegistrationFK as serviceRegistration, job.status, "
             + "count(job.status) as numJobs, "
             + "avg(job.queueTime) as meanQueue, "
             + "avg(job.runTime) as meanRun FROM Job job "
             + "where job.dateCreated >= :minDateCreated and job.dateCreated <= :maxDateCreated "
-            + "group by job.processorServiceRegistration.id, job.status"
+            + "group by job.processorServiceRegistrationFK, job.status"
     ),
     @NamedQuery(
         name = "ServiceRegistration.hostloads",

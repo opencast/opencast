@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -27,7 +27,6 @@ import org.opencastproject.transcription.amberscript.AmberscriptTranscriptionSer
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
-import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -80,7 +79,7 @@ public class AmberscriptTranscriptionRestService extends AbstractJobProducerEndp
   protected WorkingFileRepository wfr;
 
   @Activate
-  public void activate(ComponentContext cc) {
+  public void activate() {
     logger.debug("activate()");
   }
 

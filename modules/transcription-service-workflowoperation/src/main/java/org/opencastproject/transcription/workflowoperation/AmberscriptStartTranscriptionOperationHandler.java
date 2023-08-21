@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -50,8 +50,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 @Component(
     immediate = true,
@@ -66,27 +64,17 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
   private static final Logger logger = LoggerFactory.getLogger(AmberscriptStartTranscriptionOperationHandler.class);
 
   /** Workflow configuration option keys */
-  static final String SOURCE_FLAVOR = "source-flavor";
-  static final String SOURCE_TAG = "source-tag";
   static final String LANGUAGE = "language";
   static final String JOBTYPE = "jobtype";
+  static final String SPEAKER = "speaker";
+  static final String TRANSCRIPTIONTYPE = "transcriptiontype";
+  static final String GLOSSARY = "glossary";
+  static final String TRANSCRIPTIONSTYLE = "transcriptionstyle";
+  static final String TARGETLANGUAGE = "targetlanguage";
   static final String SKIP_IF_FLAVOR_EXISTS = "skip-if-flavor-exists";
 
   /** The transcription service */
   private TranscriptionService service = null;
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(SOURCE_FLAVOR, "The \"flavor\" of the track to use as audio input");
-    CONFIG_OPTIONS.put(SOURCE_TAG, "The \"tag\" of the track to use as audio input");
-    CONFIG_OPTIONS.put(LANGUAGE, "The \"language\" the transcription service will use");
-    CONFIG_OPTIONS.put(JOBTYPE, "The \"jobtype\" the transcription service will use");
-    CONFIG_OPTIONS.put(SKIP_IF_FLAVOR_EXISTS,
-        "If this \"flavor\" is already in the media package, skip this operation");
-  }
 
   @Override
   @Activate
@@ -119,7 +107,16 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
     List<String> sourceTagOption = tagsAndFlavors.getSrcTags();
     List<MediaPackageElementFlavor> sourceFlavorOption = tagsAndFlavors.getSrcFlavors();
     String language = StringUtils.trimToEmpty(operation.getConfiguration(LANGUAGE));
-    String jobtype = StringUtils.trimToEmpty(operation.getConfiguration(JOBTYPE));
+    String jobType = StringUtils.trimToEmpty(operation.getConfiguration(JOBTYPE));
+    String speaker = StringUtils.trimToEmpty(operation.getConfiguration(SPEAKER));
+    String transcriptionType = StringUtils.trimToEmpty(operation.getConfiguration(TRANSCRIPTIONTYPE));
+    // Note that specifying `""` is different from not specifying a glossary at all!
+    // The former will override the default with not using a glossary for this operation,
+    // while the latter will fall back to said default. Hence, no `trimToEmpty` here.
+    String glossary = StringUtils.trim(operation.getConfiguration(GLOSSARY));
+    String transcriptionStyle = StringUtils.trimToEmpty(operation.getConfiguration(TRANSCRIPTIONSTYLE));
+    // See glossary comment above
+    String targetLanguage = StringUtils.trim(operation.getConfiguration(TARGETLANGUAGE));
 
     AbstractMediaPackageElementSelector<Track> elementSelector = new TrackSelector();
 
@@ -139,7 +136,8 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
     Job job = null;
     for (Track track : elements) {
       try {
-        job = service.startTranscription(mediaPackage.getIdentifier().toString(), track, language, jobtype);
+        job = service.startTranscription(mediaPackage.getIdentifier().toString(), track, language, jobType, speaker,
+            transcriptionType, glossary, transcriptionStyle, targetLanguage);
         // Only one job per media package
         break;
       } catch (TranscriptionServiceException e) {

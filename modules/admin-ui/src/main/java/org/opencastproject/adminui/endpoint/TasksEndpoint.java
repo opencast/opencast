@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -137,7 +137,8 @@ public class TasksEndpoint {
         if (wflDef.containsTag(tags)) {
           actions.add(obj(f("id", v(wflDef.getId())), f("title", v(nul(wflDef.getTitle()).getOr(""))),
                   f("description", v(nul(wflDef.getDescription()).getOr(""))),
-                  f("configuration_panel", v(nul(wflDef.getConfigurationPanel()).getOr("")))));
+                  f("configuration_panel", v(nul(wflDef.getConfigurationPanel()).getOr(""))),
+                  f("configuration_panel_json", v(nul(wflDef.getConfigurationPanelJson()).getOr("")))));
         }
       }
     } catch (WorkflowDatabaseException e) {

@@ -28,7 +28,7 @@
    "YES": "Tak",
    "COPY": "Kopiuj do schowka",
    "MONITOR": {
-      "REGISTRATION": "Opencast has sent a registration update in more than a week"
+      "REGISTRATION": "Out of date"
    },
    "LTI": {
       "ERROR_LOADING_METADATA": "Błąd ładowania metadanych wydarzenia. Spróbuj ponownie później.",
@@ -148,6 +148,17 @@
       "REST_DOC": "Dokumentacja interfejsu API REST",
       "HOTKEY_CHEAT_SHEET": "Skróty Klawiaturowe",
       "ADOPTER_REGISTRATION": "Rejestracja adoptera"
+   },
+   "REBUILD": {
+      "TITLE": "Index Rebuild",
+      "WARNING": "Attention!",
+      "HEADER": "Index rebuild in progress!",
+      "THEME_SERVICE": "Theme Service",
+      "SERIES_SERVICE": "Series Service",
+      "SCHEDULER_SERVICE": "Scheduler Service",
+      "ASSETMANAGER_SERVICE": "AssetManager Service",
+      "COMMENTS_SERVICE": "Comments Service",
+      "WORKFLOW_SERVICE": "Workflow Service"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Zasady dostępu zostały utworzone",
@@ -894,11 +905,23 @@
                   "ADDITIONAL_ACTIONS": "Dodatkowe Działania",
                   "ACTION": "Działania",
                   "NEW": "Nowe zasada",
-                  "DETAILS": "Szczegóły"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the event",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the event becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the event"
+                  }
                },
                "ROLES": {
                   "LABEL": "Wybierz rolę",
                   "EMPTY": "Nie znaleziono roli"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "COMMENTS": {
@@ -1116,11 +1139,22 @@
                   "ADDITIONAL_ACTIONS": "Dodatkowe Działania",
                   "ACTION": "Działania",
                   "NEW": "Nowe zasada",
-                  "DETAILS": "Szczegóły"
+                  "NEW_USER": "New user",
+                  "DETAILS": "Non-user roles",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "Wybierz rolę",
                   "EMPTY": "Nie znaleziono roli"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "THEME": {
@@ -1194,17 +1228,29 @@
                   "ADDITIONAL_ACTIONS": "Dodatkowe Działania",
                   "ACTION": "Działania",
                   "NEW": "Nowe zasada",
-                  "DETAILS": "Szczegóły",
-                  "REPLACE_EVENT_ACLS": "Save & update event permissions",
+                  "DETAILS": "Non-user roles",
+                  "REPLACE_EVENT_ACLS": "Update event permissions",
                   "REPLACE_EVENT_ACLS_HINT": "Upewnij się, że wszystkie zdarzenia tej serii mają te uprawnienia w mocy",
                   "SAVE_SERIES_ACLS": "Zapisz",
                   "SAVE_SERIES_ACLS_HINT": "Zastosuj uprawnienia tylko do serii",
                   "LOAD_MORE_LIMIT": "zaprezentowane zasady.",
-                  "LOAD_MORE_LINK": "Załaduj więcej"
+                  "LOAD_MORE_LINK": "Załaduj więcej",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized for the series",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read rights, the series becomes visible for the selected user",
+                     "WRITE": "By setting write rights, the selected user can edit the series"
+                  }
                },
                "ROLES": {
                   "LABEL": "Wybierz rolę",
                   "EMPTY": "Nie znaleziono roli"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             },
             "METADATA": {
@@ -1226,7 +1272,7 @@
                "HOMEPAGE": "(Strona główna)",
                "DIRECT_LINK": "Bezpośredni link do serii",
                "COPY_DIRECT_LINK": "Kopiuj do schowka",
-               "NOT_MOUNTED": "Ta seria nie jest obecnie dołączona do struktury strony i może być osiągnięta tylko za pomocą łącza bezpośredniego powyżej.",
+               "NOT_MOUNTED": "This series is currently not included in the page structure, and can only be reached using the direct link above.",
                "PAGES": "Strony w Tobirze zawierające tę serię"
             },
             "EVENTS": {
@@ -1443,12 +1489,23 @@
                   "ADDITIONAL_ACTIONS": "Dodatkowe Działania",
                   "ACTION": "Działania",
                   "NEW": "Nowe zasada",
-                  "DETAILS": "Szczegóły",
-                  "DESCRIPTION": "Proszę wybrać zestaw wstępnie skonfigurowanych zasad lub dodać niestandardowe zasady poniżej"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "Proszę wybrać zestaw wstępnie skonfigurowanych zasad lub dodać niestandardowe zasady poniżej",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized by this access policy",
+                  "HELP": {
+                     "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
+                     "WRITE": "By setting write permissions, the entity to which this access policy is assigned can be modified by the selected user."
+                  }
                },
                "ROLES": {
                   "LABEL": "Wybierz rolę",
                   "EMPTY": "Nie znaleziono roli"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          },
@@ -1481,12 +1538,24 @@
                   "ADDITIONAL_ACTIONS": "Dodatkowe Działania",
                   "ACTION": "Działania",
                   "NEW": "Nowe zasada",
-                  "DETAILS": "Szczegóły",
-                  "DESCRIPTION": "Proszę wybrać zestaw wstępnie skonfigurowanych zasad lub dodać niestandardowe zasady poniżej"
+                  "DETAILS": "Non-user roles",
+                  "DESCRIPTION": "Proszę wybrać zestaw wstępnie skonfigurowanych zasad lub dodać niestandardowe zasady poniżej",
+                  "NEW_USER": "New user",
+                  "USER": "User",
+                  "USERS": "Users who are authorized by this access policy",
+                  "NONEXISTENT_USER": "Nonexistent user",
+                  "HELP": {
+                     "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
+                     "WRITE": "By setting write permissions, the entity to which this access policy is assigned can be modified by the selected user."
+                  }
                },
                "ROLES": {
                   "LABEL": "Wybierz rolę",
                   "EMPTY": "Nie znaleziono roli"
+               },
+               "USERS": {
+                  "LABEL": "Select a user",
+                  "EMPTY": "No user found"
                }
             }
          }

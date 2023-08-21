@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -29,14 +29,14 @@ angular.module('adminNg.controllers')
   'EventPublicationsResource', 'EventSchedulingResource','NewEventProcessingResource', 'CaptureAgentsResource',
   'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService', 'UploadAssetOptions',
   'EventUploadAssetResource', 'Table', 'SchedulingHelperService', 'StatisticsReusable', 'Modal', '$translate',
-  'MetadataSaveService',
+  'MetadataSaveService', 'UserResource', 'UsersResource',
   function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource,
     EventAssetCatalogsResource, CommentResource, EventWorkflowsResource, EventWorkflowActionResource,
     EventWorkflowDetailsResource, ResourcesListResource, RolesResource, EventAccessResource,
     EventPublicationsResource, EventSchedulingResource, NewEventProcessingResource, CaptureAgentsResource,
     ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService, UploadAssetOptions,
     EventUploadAssetResource, Table, SchedulingHelperService, StatisticsReusable, Modal, $translate,
-    MetadataSaveService) {
+    MetadataSaveService, UserResource, UsersResource) {
 
     var metadataChangedFns = {},
         me = this,
@@ -46,15 +46,16 @@ angular.module('adminNg.controllers')
         idConfigElement = '#event-workflow-configuration',
         workflowConfigEl = angular.element(idConfigElement),
         baseWorkflow,
-        createPolicy = function (role) {
+        createPolicy = function (role, read, write, actionValues) {
           return {
             role  : role,
-            read  : false,
-            write : false,
+            read  : read !== undefined ? read : false,
+            write : write !== undefined ? write : false,
             actions : {
               name : 'event-acl-actions',
-              value : []
-            }
+              value : actionValues !== undefined ? actionValues : [],
+            },
+            user: undefined,
           };
         },
         findWorkflow = function (id) {
@@ -188,7 +189,7 @@ angular.module('adminNg.controllers')
 
           // add policy to allow ROLE_USER_* to read and write
           var userRole = Object.keys($scope.roles).filter(function(role){
-            return role.startsWith('ROLE_USER_') && role != 'ROLE_USER_ADMIN';
+            return role.startsWith($scope.roleUserPrefix) && role != 'ROLE_USER_ADMIN';
           });
           if (angular.isDefined(userRole) && userRole.length == 1){
             userRole = userRole[0];
@@ -201,7 +202,30 @@ angular.module('adminNg.controllers')
 
           $scope.policies = [];
           angular.forEach(newPolicies, function (policy) {
-            $scope.policies.push(policy);
+            if (!policy.role.startsWith($scope.roleUserPrefix)) {
+              $scope.policies.push(policy);
+            }
+          });
+
+          $scope.policiesUser = [];
+          angular.forEach(newPolicies, function (policy) {
+            if (policy.role.startsWith($scope.roleUserPrefix)) {
+              var id = policy.role.split($scope.roleUserPrefix).pop();
+              // FIXMe: If roles are sanitized, WE CANNOT derive the user from their user role,
+              //  because the user roles are converted to uppercase, while usernames are case sensitive.
+              //  This is a terrible workaround, because usernames are usually all lowercase anyway.
+              if ($scope.aclCreateDefaults['sanitize']) {
+                id = id.toLowerCase();
+              }
+
+              UserResource.get({ username: id }).$promise.then(function (data) {
+                policy.user = data;
+              }).catch(function() {
+                policy.userDoesNotExist = id;
+              });
+
+              $scope.policiesUser.push(policy);
+            }
           });
         },
         checkForActiveTransactions = function () {
@@ -372,6 +396,33 @@ angular.module('adminNg.controllers')
             });
           });
 
+          $scope.aclCreateDefaults = ResourcesListResource.get({ resource: 'ACL.DEFAULTS'}, function(data) {
+            angular.forEach(data, function (value, key) {
+              if (key.charAt(0) !== '$') {
+                $scope.aclCreateDefaults[key] = value;
+              }
+            });
+
+            $scope.aclCreateDefaults['read_enabled'] = $scope.aclCreateDefaults['read_enabled'] !== undefined
+              ? ($scope.aclCreateDefaults['read_enabled'].toLowerCase() === 'true') : true;
+            $scope.aclCreateDefaults['write_enabled'] = $scope.aclCreateDefaults['write_enabled'] !== undefined
+              ? ($scope.aclCreateDefaults['write_enabled'].toLowerCase() === 'true') : false;
+            $scope.aclCreateDefaults['read_readonly'] = $scope.aclCreateDefaults['read_readonly'] !== undefined
+              ? ($scope.aclCreateDefaults['read_readonly'].toLowerCase() === 'true') : true;
+            $scope.aclCreateDefaults['write_readonly'] = $scope.aclCreateDefaults['write_readonly'] !== undefined
+              ? ($scope.aclCreateDefaults['write_readonly'].toLowerCase() === 'true') : false;
+            $scope.aclCreateDefaults['default_actions'] = $scope.aclCreateDefaults['default_actions'] !== undefined
+              ? $scope.aclCreateDefaults['default_actions'].split(',') : [];
+            $scope.roleUserPrefix = $scope.aclCreateDefaults['role_user_prefix'] !== undefined
+              ? $scope.aclCreateDefaults['role_user_prefix']
+              : 'ROLE_USER_';
+            $scope.aclCreateDefaults['sanitize'] = $scope.aclCreateDefaults['sanitize'] !== undefined
+              ? ($scope.aclCreateDefaults['sanitize'].toLowerCase() === 'true') : true;
+            $scope.aclCreateDefaults['keep_on_template_switch_role_prefixes'] =
+              $scope.aclCreateDefaults['keep_on_template_switch_role_prefixes'] !== undefined
+                ? $scope.aclCreateDefaults['keep_on_template_switch_role_prefixes'].split(',') : [];
+          });
+
           $scope.assets = EventAssetsResource.get({ id: id });
 
           $scope.setWorkflowDefinitions = function (workflowDefinitions) {
@@ -420,9 +471,12 @@ angular.module('adminNg.controllers')
 
           $scope.access = EventAccessResource.get({ id: id }, function (data) {
             if (angular.isDefined(data.episode_access)) {
+              $scope.baseAclId = data.episode_access.current_acl.toString();
               var json = angular.fromJson(data.episode_access.acl);
-              changePolicies(json.acl.ace, true);
-              getCurrentPolicies();
+              $scope.aclCreateDefaults.$promise.then(function () { // needed for roleUserPrefix
+                changePolicies(json.acl.ace, true);
+                getCurrentPolicies();
+              });
             }
           });
 
@@ -441,6 +495,23 @@ angular.module('adminNg.controllers')
           });
 
           $scope.comments = CommentResource.query({ resource: 'event', resourceId: id, type: 'comments' });
+
+          $scope.users = UsersResource.query({limit: 2147483647});
+          $scope.users.$promise.then(function () {
+            $scope.aclCreateDefaults.$promise.then(function () {
+              var newUsers = [];
+              angular.forEach($scope.users.rows, function(user) {
+                if ($scope.aclCreateDefaults['sanitize']) {
+                  // FixMe: See the FixMe above pertaining to sanitize
+                  user.userRole = $scope.roleUserPrefix + user.username.replace(/\W/g, '_').toUpperCase();
+                } else {
+                  user.userRole = $scope.roleUserPrefix + user.username;
+                }
+                newUsers.push(user);
+              });
+              $scope.users = newUsers;
+            });
+          });
         },
         tzOffset = (new Date()).getTimezoneOffset() / -60;
 
@@ -448,6 +519,16 @@ angular.module('adminNg.controllers')
 
     $scope.getMatchingRoles = function (value) {
       RolesResource.queryNameOnly({query: value, target: 'ACL'}).$promise.then(function (data) {
+        angular.forEach(data, function(newRole) {
+          if ($scope.roles.indexOf(newRole) == -1) {
+            $scope.roles.unshift(newRole);
+          }
+        });
+      });
+    };
+
+    $scope.getMatchingUsers = function (value) {
+      UsersResource.query({query: value}).$promise.then(function (data) {
         angular.forEach(data, function(newRole) {
           if ($scope.roles.indexOf(newRole) == -1) {
             $scope.roles.unshift(newRole);
@@ -596,23 +677,89 @@ angular.module('adminNg.controllers')
          */
 
     $scope.policies = [];
+    $scope.policiesUser = [];
     $scope.baseAcl = {};
+    $scope.baseAclId = '';
 
-    $scope.changeBaseAcl = function () {
-      $scope.baseAcl = EventAccessResource.getManagedAcl({id: this.baseAclId}, function () {
-        changePolicies($scope.baseAcl.acl.ace);
+    $scope.not = function(func) {
+      return function (item) {
+        return !func(item);
+      };
+    };
+
+    $scope.userExists = function (policy) {
+      if (policy.userDoesNotExist === undefined) {
+        return true;
+      }
+      return false;
+    };
+
+    $scope.filterUserRoles = function (item) {
+      if (!item) {
+        return true;
+      }
+      return !item.includes($scope.roleUserPrefix);
+    };
+
+    $scope.userToStringForDetails = function (user) {
+      if (!user) {
+        return undefined;
+      }
+      var n = user.name ? user.name : user.username;
+      var e = user.email ? '<' + user.email + '>' : '';
+
+      return n + ' ' + e;
+    };
+
+    $scope.getAllPolicies = function () {
+      return [].concat($scope.policies, $scope.policiesUser);
+    };
+
+    $scope.changeBaseAcl = function (id) {
+      // Get the policies which should persist on template change
+      var allPolicies = $scope.getAllPolicies();
+      var remainingPolicies = allPolicies.filter(policy => (
+        $scope.aclCreateDefaults['keep_on_template_switch_role_prefixes'].some(
+          pattern => policy.role.startsWith(pattern)
+        )
+      ));
+
+      var remainingACEs = [];
+      angular.forEach(remainingPolicies, function (policy) {
+        if (policy.read) {
+          remainingACEs.push({role: policy.role, action: 'read', allow: true});
+        }
+        if (policy.write) {
+          remainingACEs.push({role: policy.role, action: 'write', allow: true});
+        }
+        for (const action of policy.actions.value) {
+          remainingACEs.push({role: policy.role, action: action, allow: true});
+        }
       });
-      this.baseAclId = '';
+
+      $scope.baseAcl = EventAccessResource.getManagedAcl({id: id}, function () {
+        var combine = $scope.baseAcl.acl.ace.concat(remainingACEs);
+        $scope.aclCreateDefaults.$promise.then(function () { // needed for roleUserPrefix
+          changePolicies(combine);
+        });
+      });
     };
 
-    $scope.addPolicy = function () {
-      $scope.policies.push(createPolicy());
+    // E.g. model === $scope.policies
+    $scope.addPolicy = function (model) {
+      model.push(createPolicy(
+        undefined,
+        $scope.aclCreateDefaults['read_enabled'],
+        $scope.aclCreateDefaults['write_enabled'],
+        $scope.aclCreateDefaults['default_actions']
+      ));
     };
 
-    $scope.deletePolicy = function (policyToDelete) {
+    // E.g. model === $scope.policies
+    $scope.deletePolicy = function (model, policyToDelete) {
       var index;
 
-      angular.forEach($scope.policies, function (policy, idx) {
+      angular.forEach(model, function (policy, idx) {
         if (policy.role === policyToDelete.role &&
                     policy.write === policyToDelete.write &&
                     policy.read === policyToDelete.read) {
@@ -621,7 +768,7 @@ angular.module('adminNg.controllers')
       });
 
       if (angular.isDefined(index)) {
-        $scope.policies.splice(index, 1);
+        model.splice(index, 1);
       }
     };
 
@@ -860,8 +1007,11 @@ angular.module('adminNg.controllers')
 
       $scope.access = EventAccessResource.get({ id: $scope.resourceId }, function (data) {
         if (angular.isDefined(data.episode_access)) {
+          $scope.baseAclId = data.episode_access.current_acl.toString();
           var json = angular.fromJson(data.episode_access.acl);
-          changePolicies(json.acl.ace, true);
+          $scope.aclCreateDefaults.$promise.then(function () { // needed for roleUserPrefix
+            changePolicies(json.acl.ace, true);
+          });
         }
       });
     };
@@ -871,7 +1021,7 @@ angular.module('adminNg.controllers')
           hasRights = false,
           rulesValid = false;
 
-      angular.forEach($scope.policies, function (policy) {
+      angular.forEach($scope.getAllPolicies(), function (policy) {
         rulesValid = false;
 
         if (policy.read && policy.write) {
@@ -942,42 +1092,54 @@ angular.module('adminNg.controllers')
     };
 
     let oldPolicies = {};
+    let oldPoliciesUser = {};
 
     function getCurrentPolicies () {
-
-      oldPolicies = $scope.policies.map(policy => {
-        let newObject = {};
-        Object.keys(policy).forEach(propertyKey => {
-          newObject[propertyKey] = policy[propertyKey];
-        });
-        return newObject;
-      });
-
-      return oldPolicies;
+      oldPolicies = JSON.parse(JSON.stringify($scope.policies));
+      oldPoliciesUser = JSON.parse(JSON.stringify($scope.policiesUser));
     }
 
     function unsavedAccessChanges () {
-      let hasChanges = false;
+      if (!policiesEqual(oldPolicies, $scope.policies)) {
+        return true;
+      }
+      if (!policiesEqual(oldPoliciesUser, $scope.policiesUser)) {
+        return true;
+      }
+      return false;
+    }
 
-      if (oldPolicies.length !== $scope.policies.length) {
-        hasChanges = true;
-        return hasChanges;
+    function policiesEqual(policies1, policies2) {
+      if (policies1.length !== policies2.length) {
+        return false;
       }
 
-      oldPolicies.forEach((oldPolicy, index) => {
-        const policy = $scope.policies[index];
+      let equal = true;
+      policies1.forEach((policy1, index) => {
+        const policy2 = policies2[index];
 
-        if(oldPolicy.role !== policy.role) {
-          hasChanges = true;
+        if (policy1.role !== policy2.role) {
+          equal = false;
         }
-        else if (oldPolicy.read !== policy.read) {
-          hasChanges = true;
+        else if (policy1.read !== policy2.read) {
+          equal = false;
         }
-        else if (oldPolicy.write !== policy.write) {
-          hasChanges = true;
+        else if (policy1.write !== policy2.write) {
+          equal = false;
         }
+
+        if (policy1.actions.value.length !== policy2.actions.value.length) {
+          equal = false;
+          return;
+        }
+        policy1.actions.value.forEach((action1, index) => {
+          const action2 = policy2.actions.value[index];
+          if (action1 !== action2) {
+            equal = false;
+          }
+        });
       });
-      return hasChanges;
+      return equal;
     }
 
     $scope.statisticsCsvFileName = function (statsTitle) {

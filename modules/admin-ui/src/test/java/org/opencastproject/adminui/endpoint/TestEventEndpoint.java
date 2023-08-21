@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -301,6 +301,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     wfD2.setDescription("Test description");
     wfD2.setDisplayOrder(100);
     wfD2.setConfigurationPanel("<h2>Test</h2>");
+    wfD2.setConfigurationPanelJson("[{ \"fieldset\": [ { \"type\": \"checkbox\", \"name\": \"straightToPublishing\", \"label\": \"Straight to publishing\", \"value\": true } ] }]");
 
     MediaPackage mp1 = loadMpFromResource("jobs_mediapackage1");
     // the id is set dynamic - lets force an id so we can get a consistent json respons
@@ -356,6 +357,8 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.expect(workflowService.listAvailableWorkflowDefinitions()).andReturn(Arrays.asList(wfD, wfD2));
     EasyMock.replay(workflowService);
     env.setWorkflowService(workflowService);
+
+
 
     SeriesEndpoint seriesEndpoint = EasyMock.createNiceMock(SeriesEndpoint.class);
     EasyMock.expect(seriesEndpoint.getOnlySeriesWithWriteAccessEventsFilter()).andReturn(false).anyTimes();
@@ -421,6 +424,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser(EasyMock.anyString())).andReturn(userWithPermissions).anyTimes();
     EasyMock.replay(userDirectoryService);
+    env.setUserDirectoryService(userDirectoryService);
 
     JobEndpoint endpoint = new JobEndpoint();
     endpoint.setServiceRegistry(serviceRegistry);
@@ -762,5 +766,10 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   @Override
   public Boolean getOnlyEventsWithWriteAccessEventsTab() {
     return false;
+  }
+
+  @Override
+  public UserDirectoryService getUserDirectoryService() {
+    return env.getUserDirectoryService();
   }
 }

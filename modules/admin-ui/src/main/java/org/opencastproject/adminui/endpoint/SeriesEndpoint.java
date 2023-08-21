@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -52,6 +52,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
+import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.tobira.TobiraException;
 import org.opencastproject.adminui.tobira.TobiraService;
 import org.opencastproject.adminui.util.QueryPreprocessor;
@@ -196,6 +197,7 @@ public class SeriesEndpoint {
   private IndexService indexService;
   private ListProvidersService listProvidersService;
   private ElasticsearchIndex searchIndex;
+  private AdminUIConfiguration adminUIConfiguration;
 
   /** Default server URL */
   private String serverUrl = "http://localhost:8080";
@@ -241,6 +243,12 @@ public class SeriesEndpoint {
   }
 
   private Map<String, TobiraService> tobiras = new HashMap<>();
+
+  /** OSGi DI. */
+  @Reference
+  public void setAdminUIConfiguration(AdminUIConfiguration adminUIConfiguration) {
+    this.adminUIConfiguration = adminUIConfiguration;
+  }
 
   @Activate
   protected void activate(ComponentContext cc, Map<String, Object> properties) {
@@ -319,7 +327,8 @@ public class SeriesEndpoint {
     JSONObject seriesAccessJson = new JSONObject();
     try {
       AccessControlList seriesAccessControl = seriesService.getSeriesAccessControl(seriesId);
-      Option<ManagedAcl> currentAcl = AccessInformationUtil.matchAcls(acls, seriesAccessControl);
+      Option<ManagedAcl> currentAcl = AccessInformationUtil.matchAclsLenient(acls, seriesAccessControl,
+              adminUIConfiguration.getMatchManagedAclRolePrefixes());
       seriesAccessJson.put("current_acl", currentAcl.isSome() ? currentAcl.get().getId() : 0);
       seriesAccessJson.put("privileges", AccessInformationUtil.serializePrivilegesByRole(seriesAccessControl));
       seriesAccessJson.put("acl", AccessControlParser.toJsonSilent(seriesAccessControl));

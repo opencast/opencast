@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -82,6 +82,9 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
   @XmlElement(name = "configuration_panel")
   private String configurationPanel;
 
+  @XmlElement(name = "configuration_panel_json")
+  private String configurationPanelJson;
+
   @XmlElement(name = "operation")
   @XmlElementWrapper(name = "operations")
   private List<WorkflowOperationDefinition> operations;
@@ -161,6 +164,25 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
    */
   public String getConfigurationPanel() {
     return this.configurationPanel;
+  }
+
+  /**
+   * Sets the configuration panel for this workflow.
+   *
+   * @param panelJson
+   *          the json for the configuration panel
+   */
+  public void setConfigurationPanelJson(String panelJson) {
+    this.configurationPanelJson = panelJson;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workflow.api.WorkflowDefinition#getConfigurationPanelJson()
+   */
+  public String getConfigurationPanelJson() {
+    return this.configurationPanelJson;
   }
 
   /**

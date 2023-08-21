@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,6 +19,8 @@
  *
  */
 package org.opencastproject.elasticsearch.index.objects.series;
+
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
 import org.opencastproject.elasticsearch.api.SearchTerms;
 import org.opencastproject.elasticsearch.impl.AbstractSearchQuery;
@@ -73,8 +75,10 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
     this.organization = organization;
     this.user = user;
     this.actions.add(Permissions.Action.READ.toString());
-    if (!user.getOrganization().getId().equals(organization)) {
-      throw new IllegalStateException("User's organization must match search organization");
+    if (!user.hasRole(GLOBAL_ADMIN_ROLE)) {
+      if (!user.getOrganization().getId().equals(organization)) {
+        throw new IllegalStateException("User's organization must match search organization");
+      }
     }
   }
 

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -185,7 +185,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       if (event.isEmpty()) {
         throw new NotFoundException("Event comment with ID " + commentId + " does not exist");
       }
-      return event.get().toComment(userDirectoryService);
+      return event.get().toComment(userDirectoryService, organizationDirectoryService);
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -252,7 +252,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     try {
       final EventCommentDto commentDto = EventCommentDto.from(comment);
       final EventComment updatedComment = db.execTx(namedQuery.persistOrUpdate(commentDto))
-          .toComment(userDirectoryService);
+          .toComment(userDirectoryService, organizationDirectoryService);
       updateIndices(updatedComment.getEventId());
       return updatedComment;
     } catch (Exception e) {
@@ -285,7 +285,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
               Pair.of("eventId", eventId),
               Pair.of("org", securityService.getOrganization().getId())
           )).stream()
-          .map(c -> c.toComment(userDirectoryService))
+          .map(c -> c.toComment(userDirectoryService, organizationDirectoryService))
           .sorted((c1, c2) -> {
             boolean v1 = c1.isResolvedStatus();
             boolean v2 = c2.isResolvedStatus();
@@ -410,7 +410,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       logIndexRebuildBegin(logger, index.getIndexName(), total, "events with comment");
       final int[] current = new int[1];
       current[0] = 0;
-      int n = 16;
+      int n = 20;
       var updatedEventRange = new ArrayList<Event>();
 
       final Map<String, List<String>> eventsWithComments = getEventsWithComments();
@@ -431,7 +431,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
 
                       if (updatedEventRange.size() >= n || i >= eventsWithComments.get(orgId).size()) {
                         index.bulkEventUpdate(updatedEventRange);
-                        logIndexRebuildProgress(logger, index.getIndexName(), total, current[0]);
+                        logIndexRebuildProgress(logger, index.getIndexName(), total, current[0], n);
                         updatedEventRange.clear();
                       }
                     } catch (Throwable t) {

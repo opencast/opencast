@@ -13,8 +13,6 @@
     <properties>
       <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
       <property name="eclipselink.logging.logger" value="JavaLogger"/>
-      <property name="eclipselink.create-ddl-jdbc-file-name" value="create-adopter-registration-impl.jdbc"/>
-      <property name="eclipselink.drop-ddl-jdbc-file-name" value="drop-adopter-registration-impl.jdbc"/>
     </properties>
   </persistence-unit>
 </persistence>

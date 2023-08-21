@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -27,10 +27,10 @@ angular.module('adminNg.controllers')
     $scope.states = NewAclStates.get();
 
     $scope.submit = function () {
-      var access = $scope.states[1].stateController.ud,
+      var access = $scope.states[1].stateController,
           ace = [];
 
-      angular.forEach(access.policies, function (policy) {
+      angular.forEach(access.getAllPolicies(), function (policy) {
         if (angular.isDefined(policy.role)) {
           if (policy.read) {
             ace.push({

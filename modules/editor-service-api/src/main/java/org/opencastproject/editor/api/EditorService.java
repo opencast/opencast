@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -38,7 +38,26 @@ public interface EditorService {
   /**
    * Provide information to edit video and audio data relevant to the given mediaPackageId
    */
-  EditingData getEditData(String mediaPackageId) throws EditorServiceException, UnauthorizedException;
+  EditingData getEditData(String mediaPackageId)
+          throws EditorServiceException, UnauthorizedException;
+
+  /**
+   * Create or refresh lock for the mediapackage
+   * @param mediaPackageId
+   * @param lockData identify the owner of the lock
+   * @return lock state
+   * @throws EditorServiceException if invalid mediapackge or locked by other
+   */
+  void  lockMediaPackage(String mediaPackageId, LockData lockData) throws EditorServiceException;
+
+  /**
+   * Remove lock for the mediapackage
+   * @param mediaPackageId
+   * @param lockData identify the owner of the lock
+   * @return lock state
+   * @throws EditorServiceException if invalid mediapackge or locked by other
+   */
+  void unlockMediaPackage(String mediaPackageId, LockData lockData) throws EditorServiceException;
 
   /**
    * Store information about edited data relevant to the given mediaPackageId

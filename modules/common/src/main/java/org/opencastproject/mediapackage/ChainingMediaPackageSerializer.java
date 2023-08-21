@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -49,7 +49,7 @@ import java.util.List;
     service = MediaPackageSerializer.class,
     property = {
         "service.pid=org.opencastproject.mediapackage.ChainingMediaPackageSerializer",
-        "service.ranking=1000"
+        "service.ranking:Integer=1000"
     }
 )
 public class ChainingMediaPackageSerializer implements MediaPackageSerializer {

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -52,7 +52,7 @@ angular.module('adminNg.services')
         });
       };
 
-      function activateHotkey(hotkeys, keyIdentifier, callback) {
+      function activateHotkey(hotkeys, keyIdentifier, callback, allowIn) {
         me.loading.then(function () {
           var key = me.keyBindings[keyIdentifier];
           if (key) {
@@ -63,18 +63,21 @@ angular.module('adminNg.services')
               // information, which we need in our custom cheat sheet template
               // to translate and group the keys.
               description: keyIdentifier,
-              callback: callback
+              callback: callback,
+              // array of strings, allows shortcut execution in these html elements
+              // Possible values: 'INPUT', 'TEXTAREA', 'SELECT'
+              allowIn: allowIn,
             });
           }
         });
       }
 
-      this.activateHotkey = function (scope, keyIdentifier, callback) {
-        activateHotkey(hotkeys.bindTo(scope), keyIdentifier, callback);
+      this.activateHotkey = function (scope, keyIdentifier, callback, allowIn) {
+        activateHotkey(hotkeys.bindTo(scope), keyIdentifier, callback, allowIn);
       };
 
-      this.activateUniversalHotkey = function (keyIdentifier, callback) {
-        activateHotkey(hotkeys, keyIdentifier, callback);
+      this.activateUniversalHotkey = function (keyIdentifier, callback, allowIn) {
+        activateHotkey(hotkeys, keyIdentifier, callback, allowIn);
       };
 
       this.loading = this.loadHotkeys();

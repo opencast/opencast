@@ -38,7 +38,7 @@
 # export JAVA_DEBUG_PORT   # Set debug port (defaults to 5005)
 
 
-export EXTRA_JAVA_OPTS="${EXTRA_JAVA_OPTS} -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1500000 -Dfile.encoding=UTF-8 -Dlog4j2.formatMsgNoLookups=true"
+export EXTRA_JAVA_OPTS="${EXTRA_JAVA_OPTS} -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1500000 -Dfile.encoding=UTF-8 -Dlog4j2.formatMsgNoLookups=true --add-opens java.base/java.util=ALL-UNNAMED"
 export JAVA_MAX_MEM="${JAVA_MAX_MEM:-1G}"
 export JAVA_PERM_MEM="${JAVA_PERM_MEM:-256M}"
 export KARAF_NOROOT=true

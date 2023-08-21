@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -33,6 +33,7 @@ import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabaseExceptio
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetMapping;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.util.ConfigurationException;
+import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
@@ -110,7 +111,7 @@ public abstract class AwsAbstractArchive implements AssetStore {
   public boolean copy(final StoragePath from, final StoragePath to) throws AssetStoreException {
     try {
       AwsAssetMapping map = database.findMapping(from);
-      if (map == null) {
+      if (!contains(from)) {
         logger.warn("Origin file mapping not found in database: {}", from);
         return false;
       }
@@ -176,7 +177,7 @@ public abstract class AwsAbstractArchive implements AssetStore {
     String objectVersion = null;
     try {
       // Upload file to AWS
-      AwsUploadOperationResult result = uploadObject(origin, objectName);
+      AwsUploadOperationResult result = uploadObject(origin, objectName, source.getMimeType());
       objectName = result.getObjectName();
       objectVersion = result.getObjectVersion();
     } catch (Exception e) {
@@ -193,7 +194,8 @@ public abstract class AwsAbstractArchive implements AssetStore {
     }
   }
 
-  protected abstract AwsUploadOperationResult uploadObject(File origin, String objectName) throws AssetStoreException;
+  protected abstract AwsUploadOperationResult uploadObject(File origin, String objectName, Opt<MimeType> mimeType)
+          throws AssetStoreException;
 
   /** @see AssetStore#get(StoragePath) */
   public Opt<InputStream> get(final StoragePath path) throws AssetStoreException {
