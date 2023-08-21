@@ -51,8 +51,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import javax.ws.rs.HEAD;
-
 @Component(
     immediate = true,
     service = WorkflowOperationHandler.class,
@@ -122,7 +120,7 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
     try {
       MediaPackageElement transcription
           = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId, type);
-      
+
       Job job = captionService.convert(transcription, "subrip", format, service.getLanguage());
       if (!waitForStatus(job).isSuccess()) {
         throw new WorkflowOperationException("Transcription format conversion job did not complete successfully.");
