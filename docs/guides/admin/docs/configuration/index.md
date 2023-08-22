@@ -111,7 +111,6 @@ A list of everything.
     - [Microsoft Azure](configuration/transcription.configuration/microsoftazuretranscripts.md)
     - [Vosk](configuration/transcription.configuration/vosk.md)
     - [Whisper](configuration/transcription.configuration/whisper.md)
-- [Trim Segments Configuration](trim-segments.md)
 - [User Statistics and Privacy Configuration](user-statistics.and.privacy.md)
 - [Video Editor Overview](videoeditor.overview.md)
     - [Architecture](videoeditor.architecture.md)

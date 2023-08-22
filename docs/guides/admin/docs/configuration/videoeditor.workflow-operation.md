@@ -26,3 +26,7 @@ by the video editor frontend.
 The FFmpeg properties for the edtior operation can be modified in
 `etc/org.opencastproject.videoeditor.impl.VideoEditorServiceImpl.cfg`. Usually there should be no reason to touch this
 file.
+
+To configure the trimming of the start/end of a video by the editor operation, check the bottom of
+`etc/org.opencastproject.organization-mh_default_org.cfg`.
+(TODO: Confirm if these values are actually still used by the editor?!)
