@@ -78,4 +78,4 @@ http://YOUR.SERVER/paella/ui/watch.html?id=SOME-ID&time=3m30s
 Security Parameters
 --------------------
 
-If Stream Security is enabled, there will be additional parameters. For further information, kindly refer to the [stream security section](../stream-security.md).
+If Stream Security is enabled, there will be additional parameters. For further information, kindly refer to the [stream security section](../stream-security/stream-security-overview.md).

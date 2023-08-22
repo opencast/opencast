@@ -126,7 +126,7 @@ Using this handler in custom workflows
 --------------------------------------
 
 If your workflow contains both `publish-engage` and `publish-engage-aws`, in that order, and without a
-[conditional](../configuration/workflow.md) you would have publication files stored both locally *and* in AWS.  This is
+[conditional](workflow.md) you would have publication files stored both locally *and* in AWS.  This is
 likely not what you want, so protect your workflow operations appropriately.  If you really do need these files stored
 in both places (for example, in cases where you need to make the files available immediately, and only push to AWS in
 some cases) then remember to add a [retract-engage](../workflowoperationhandlers/retract-engage-woh.md) in between the

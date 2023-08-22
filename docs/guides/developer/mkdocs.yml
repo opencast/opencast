@@ -94,7 +94,7 @@ nav:
       - Introduction: 'architecture/capture-agent/capture-agent.md'
       - Input: 'architecture/capture-agent/capture-agent-input.md'
       - Test Cases for Capture Agents: 'architecture/capture-agent/testcases.md'
-   - Stream security: 'architecture/stream-security.md'
+   - Stream security: 'architecture/stream-security-config.md'
    - OAI-PMH: 'architecture/oaipmh.md'
    - External API:
       - Introduction: 'architecture/api/index.md'

@@ -193,5 +193,5 @@ Further Information
 For further technical information like installation instructions, configuration guides, server plugins and the signing
 specification, please have a look at these documents:
 
-* [Stream Security Configuration & Testing](../configuration/stream-security.md)
+* [Stream Security Configuration & Testing](stream-security-config.md)
 * The Opencast Signing Protocol is defined in the subsection Stream Security in the modules section of the developer guide.
