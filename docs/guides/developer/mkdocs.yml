@@ -88,7 +88,7 @@ nav:
    - Scheduler: 'architecture/scheduler.md'
    - Statistics: 'architecture/statistics.md'
    - Job dispatch: 'architecture/job-dispatch.md'
-   - Admin-UI: 'architecture/admin-ui.md'
+   - Admin-UI: 'architecture/new-admin-ui.md'
    - Paella player 7: 'architecture/paella-player-7/index.md'
    - Capture agent:
       - Introduction: 'architecture/capture-agent/capture-agent.md'

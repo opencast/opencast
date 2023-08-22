@@ -68,13 +68,14 @@ nav:
       - Migrating old content to HTTPS: 'configuration/https/migration.md'
       - Self-Signed Certificates: 'configuration/https/self-signed-certificates.md'
    - Admin UI Configuration:
+        - Capture-Agent Access: configuration/admin-ui/capture-agent-access.md
         - Event Filters: 'configuration/admin-ui/event-filters.md'
-        - Manual Asset Upload: 'configuration/admin-ui/asset-upload.md'
         - Languages: 'configuration/admin-ui/languages.md'
+        - Manual Asset Upload: 'configuration/admin-ui/asset-upload.md'
+        - New Admin UI: 'configuration/admin-ui/new-admin-ui.md'
+        - Role-based Visibility: 'configuration/admin-ui/role-based-visibility.md'
         - Statistics: 'configuration/admin-ui/statistics.md'
         - Thumbnails: 'configuration/admin-ui/thumbnails.md'
-        - Role-based Visibility: 'configuration/admin-ui/role-based-visibility.md'
-        - Capture-Agent Access: configuration/admin-ui/capture-agent-access.md
    - Amazon Services:
         - Amazon S3 Archive Storage: 'configuration/awss3archive.md'
         - Amazon S3 Distribution: 'configuration/awss3distribution.md'
@@ -106,7 +107,6 @@ nav:
    - Metadata: 'configuration/metadata.md'
    - Metrics (OpenMetrics, Prometheus): configuration/metrics.md
    - Multi Tenancy: 'configuration/multi.tenancy.md'
-   - New Admin UI: 'configuration/admin-ui.md'
    - OAI-PMH: 'configuration/oaipmh.md'
    - Player:
         - Configuration: 'configuration/player.configuration.md'

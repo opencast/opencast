@@ -35,7 +35,7 @@ The Opencast Release Documentation is the official Opencast documentation for ea
     * [AWS S3 Distribution](configuration/awss3distribution.md)
     * [Media Module](configuration/mediamodule.configuration.md)
     * [Metrics (OpenMetrics, Prometheus)](configuration/metrics.md)
-    * [New Admin UI](configuration/admin-ui.md)
+    * [New Admin UI](configuration/admin-ui/new-admin-ui.md)
     * [Stream Security](configuration/stream-security/stream-security-overview.md)
     * [Stand-alone Video Editor](configuration/editor.md)
     * [Studio](configuration/studio.md)

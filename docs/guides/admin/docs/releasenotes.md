@@ -35,7 +35,7 @@ as beta. If you wish to try it out, you can easily do so by going to `https://yo
 (don't worry if it looks like nothing has changed, the look is *really* similar :)). If you find any issues,
 please report them at [GitHub project issue board](https://github.com/opencast/opencast-admin-interface/issues).
 
-For notes on how to set the new Admin UI as your default, check [Admin UI](configuration/admin-ui.md).
+For notes on how to set the new Admin UI as your default, check [Admin UI](configuration/admin-ui/new-admin-ui.md).
 
 ### Features
 - The new Admin UI (beta) is now shipped with Opencast [[#4695](https://github.com/opencast/opencast/pull/4695)]
