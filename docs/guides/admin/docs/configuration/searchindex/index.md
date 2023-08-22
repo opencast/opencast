@@ -15,7 +15,7 @@ which would not be possible otherwise.
 ---
 
 - Solr is mostly powering older services and replacing this index type is planned for the future. But for now it is
-  still the back-end for the search service (LTI and engage tools), the workflow service and the series service.
+  still the back-end for the search service (LTI and engage tools).
 
     [Solr Configuration Guide](solr.md)
 
