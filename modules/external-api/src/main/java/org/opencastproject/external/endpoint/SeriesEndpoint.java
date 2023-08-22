@@ -272,7 +272,7 @@ public class SeriesEndpoint {
           } else if ("Creator".equals(name)) {
             query.withCreator(value);
           } else if ("textFilter".equals(name)) {
-            query.withText("*" + value + "*");
+            query.withText("*" + elasticsearchIndex.escapeQuery(value) + "*");
           } else if ("language".equals(name)) {
             query.withLanguage(value);
           } else if ("license".equals(name)) {
@@ -1341,7 +1341,7 @@ public class SeriesEndpoint {
       q.withEdit(edit);
     }
     if (StringUtils.isNotEmpty(text)) {
-      q.withText(fuzzyMatch.booleanValue(), text);
+      q.withText(fuzzyMatch.booleanValue(), elasticsearchIndex.escapeQuery(text));
     }
     if (StringUtils.isNotEmpty(seriesId)) {
       q.withIdentifier(seriesId);
