@@ -132,7 +132,6 @@ nav:
         - Solr: 'configuration/searchindex/solr.md'
         - Elasticsearch: 'configuration/searchindex/elasticsearch.md'
    - Serving Static Files: 'configuration/serving-static-files.md'
-   - Stand-alone Video Editor: 'configuration/editor.md'
    - Stream Security:
         - Overview: 'configuration/stream-security/stream-security-overview.md'
         - Configuration: 'configuration/stream-security/stream-security-config.md'
@@ -152,8 +151,10 @@ nav:
    - Trim Segments: 'configuration/trim-segments.md'
    - User Statistics and Privacy Configuration: 'configuration/user-statistics.and.privacy.md'
    - Video Editor:
-        - Setup: 'configuration/videoeditor.setup.md'
+        - Overview: 'configuration/videoeditor.overview.md'
         - Architecture: 'configuration/videoeditor.architecture.md'
+        - Frontend: 'configuration/videoeditor.frontend.md'
+        - Workflow Operations: 'configuration/videoeditor.workflow-operation.md'
    - Video Segmentation: 'configuration/videosegmentation.md'
    - Waveform Service: 'configuration/waveform.md'
    - Workflow: 'configuration/workflow.md'
