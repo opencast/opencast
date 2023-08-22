@@ -20,7 +20,7 @@ Therefore only `admin`, `adminpresentation`, and `allinone` need to connect to O
 
 `username` and `password` are optional. If configured, requests to OpenSearch are secured by
 HTTP basic authentication (which is unsecure without TLS encryption). Refer to [the OpenSearch
-documentation](https://opensearch.org/docs/latest/security-plugin/configuration/index/)
+documentation](https://opensearch.org/docs/1.3/install-and-configure/install-opensearch/debian/)
 to properly secure OpenSearch.
 
 Additionally, the following settings can be configured in
