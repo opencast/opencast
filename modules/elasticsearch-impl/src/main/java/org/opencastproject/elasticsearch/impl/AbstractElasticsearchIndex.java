@@ -281,6 +281,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
         } else {
           logger.error("Could not update documents in index {}, not retrying.", getIndexName(),
                   e);
+          throw e;
         }
       }
     } while (indexResponse == null);
@@ -331,6 +332,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
         } else {
           logger.error("Could not update documents in index {}, not retrying.", getIndexName(),
                   e);
+          throw e;
         }
       }
     } while (bulkResponse == null);
@@ -374,6 +376,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
         } else {
           logger.error("Could not remove documents from index {}, not retrying.", getIndexName(),
                   e);
+          throw e;
         }
       }
     } while (deleteResponse == null);
@@ -668,6 +671,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
         } else {
           logger.error("Could not query documents from index {}, not retrying.", getIndexName(),
                   e);
+          throw e;
         }
       }
     } while (searchResponse == null);
