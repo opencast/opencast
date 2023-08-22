@@ -27,7 +27,8 @@ Not absolutely required, but should have thought about before going live.
 Security Configuration
 ----------------------
 
-Everything related to protecting your installation and data 
+Everything related to protecting your installation and data.
+
 - [Authentication, Authorizations, and User Management](security.md)
     - [CAS Security Configuration](security.cas.md)
     - [LDAP Authentication and Authorization (without CAS)](security.ldap.md)
@@ -41,7 +42,7 @@ Everything related to protecting your installation and data
     - [Stream Security](stream-security/stream-security-config.md)
 - [Serving Static Files](serving-static-files.md)
 - [Stream Security Overview](stream-security/stream-security-overview.md)
-  - [Configuration](stream-security/stream-security-config.md)
+    - [Configuration](stream-security/stream-security-config.md)
 
 All Configuration
 ---------------------
