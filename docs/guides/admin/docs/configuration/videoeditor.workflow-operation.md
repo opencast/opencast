@@ -5,7 +5,12 @@ A short list of editor related workflow operations. For more and information and
 documentation pages, or see their usage in the default workflows.
 
 ### Waveform Operation
-The [**Waveform** operation](../workflowoperationhandlers/waveform-woh.md) creates an image showing the temporal audio activity within the recording. T
+The [**Waveform** operation](../workflowoperationhandlers/waveform-woh.md) creates an image showing the temporal audio activity within the recording.
+
+#### Waveform Configuration
+
+The Waveform service configuration file `etc/org.opencastproject.waveform.ffmpeg.WaveformServiceImpl.cfg` provides
+advanced settings.
 
 ### Silence Operation
 

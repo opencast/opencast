@@ -155,7 +155,6 @@ nav:
         - Frontend: 'configuration/videoeditor.frontend.md'
         - Workflow Operations: 'configuration/videoeditor.workflow-operation.md'
    - Video Segmentation: 'configuration/videosegmentation.md'
-   - Waveform Service: 'configuration/waveform.md'
    - Workflow: 'configuration/workflow.md'
    - Wowza Streaming Distribution Service: 'configuration/streaming-wowza.md'
    - YouTube Publication: 'configuration/youtubepublication.md'

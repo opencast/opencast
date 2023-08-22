@@ -117,7 +117,6 @@ A list of everything.
     - [Frontend](videoeditor.frontend.md)
     - [Workflow Operations](videoeditor.workflow-operation.md)
 - [Video Segmentation](videosegmentation.md)
-- [Waveform Service](waveform.md)
 - [Workflow Configuration](workflow.md)
     - [Workflow Operation Handler](../workflowoperationhandlers/index.md)
 - [Wowza Streaming Distribution Service](streaming-wowza.md)
