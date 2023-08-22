@@ -91,7 +91,6 @@ nav:
         - Sakai User Provider: 'configuration/security.user.sakai.md'
         - Brightspace User Provider: 'configuration/security.user.brightspace.md'
         - Canvas User Provider: 'configuration/security.user.canvas.md'
-   - Elasticsearch: 'configuration/elasticsearch.md'
    - Encoding: 'configuration/encoding.md'
    - Execute Service: 'configuration/execute.md'
    - External API: 'configuration/external-api.md'
@@ -109,7 +108,6 @@ nav:
    - Multi Tenancy: 'configuration/multi.tenancy.md'
    - New Admin UI: 'configuration/admin-ui.md'
    - OAI-PMH: 'configuration/oaipmh.md'
-   - OpenSearch: 'configuration/opensearch.md'
    - Player:
         - Configuration: 'configuration/player.configuration.md'
    - Paella player:
@@ -132,7 +130,7 @@ nav:
    - Search Index:
         - Overview: 'configuration/searchindex/index.md'
         - Solr: 'configuration/searchindex/solr.md'
-        - Elasticsearch: 'configuration/elasticsearch.md'
+        - Elasticsearch: 'configuration/searchindex/elasticsearch.md'
    - Serving Static Files: 'configuration/serving-static-files.md'
    - Stand-alone Video Editor: 'configuration/editor.md'
    - Stream Security:

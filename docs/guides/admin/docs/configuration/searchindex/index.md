@@ -21,7 +21,6 @@ which would not be possible otherwise.
 
 - OpenSearch/Elasticsearch powers the external API as well as the administrative user interface of Opencast.  Pick one of the following
 
-    [OpenSearch Configuration Guide](../opensearch.md)
-    [Elasticsearch Configuration Guide](../elasticsearch.md)
+    [OpenSearch/Elasticsearch Configuration Guide](elasticsearch.md)
 
 ---
