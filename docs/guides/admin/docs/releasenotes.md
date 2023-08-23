@@ -1,6 +1,22 @@
 # Opencast 13: Release Notes
 
 
+Opencast 13.10
+-------------
+
+The tenth maintenance release of Opencast 13.
+
+The release fixes the endless loop on ElasticsearchStatusException.
+
+Additionally, the following changes are part of this release.
+
+- Revert "Enable Tobira adopter stats tracking" ([#5161](https://github.com/opencast/opencast/pull/5161))
+- Test for broken JAR (zip) files ([#5157](https://github.com/opencast/opencast/pull/5157))
+- Disable auto refresh on feature installation ([#5153](https://github.com/opencast/opencast/pull/5153))
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
+
 Opencast 13.9
 -------------
 
