@@ -7,8 +7,8 @@ Description
 -----------
 
 The speech to text operation can be used to generate subtitles for Videos or Audio files. Currently, there are two STT
-engines available, [Whisper](../modules/transcription.modules/whisper.md) and 
-[Vosk](../modules/transcription.modules/vosk.md). The subtitles file format ist WebVTT.
+engines available, [Whisper](../configuration/transcription.modules/whisper.md) and 
+[Vosk](../configuration/transcription.modules/vosk.md). The subtitles file format ist WebVTT.
 
 
 Parameter Table

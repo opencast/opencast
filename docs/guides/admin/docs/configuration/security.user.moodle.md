@@ -1,5 +1,5 @@
 > Using this requires you to turn on an Opencast plugin.
-> Take a look [at the plugin management documentation](../modules/plugin-management.md) to find out how you can do that.
+> Take a look [at the plugin management documentation](plugin-management.md) to find out how you can do that.
 
 ### What it does
 
@@ -14,7 +14,7 @@ IDs are opaque ID values such as `10765`. The `ROLE_GROUP_MOODLE` Opencast group
 role is granted to all users that also exist in Moodle.
 
 The mapping of Moodle courses and capabilities to Opencast roles is consistent
-with the course and role mapping used by the [LTI](../modules/ltimodule.md)
+with the course and role mapping used by the [LTI](ltimodule.md)
 endpoint. The Moodle User Provider can therefore be used with LTI or another
 method of authenticating users.
 

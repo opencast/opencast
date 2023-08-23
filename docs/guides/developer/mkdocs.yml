@@ -88,13 +88,13 @@ nav:
    - Scheduler: 'architecture/scheduler.md'
    - Statistics: 'architecture/statistics.md'
    - Job dispatch: 'architecture/job-dispatch.md'
-   - Admin-UI: 'architecture/admin-ui.md'
+   - Admin-UI: 'architecture/new-admin-ui.md'
    - Paella player 7: 'architecture/paella-player-7/index.md'
    - Capture agent:
       - Introduction: 'architecture/capture-agent/capture-agent.md'
       - Input: 'architecture/capture-agent/capture-agent-input.md'
       - Test Cases for Capture Agents: 'architecture/capture-agent/testcases.md'
-   - Stream security: 'architecture/stream-security.md'
+   - Stream security: 'architecture/stream-security-config.md'
    - OAI-PMH: 'architecture/oaipmh.md'
    - External API:
       - Introduction: 'architecture/api/index.md'

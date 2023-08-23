@@ -1,5 +1,5 @@
 > Using this requires you to turn on an Opencast plugin.
-> Take a look [at the plugin management documentation](../modules/plugin-management.md) to find out how you can do that.
+> Take a look [at the plugin management documentation](plugin-management.md) to find out how you can do that.
 
 ### What it does
 
@@ -10,7 +10,7 @@ of the Canvas site `CourseID` with the Canvas role `Student` will be granted the
 Opencast role `CourseID_Learner`.
 
 The mapping of Canvas sites and roles to Opencast roles is consistent with the site
-and role mapping used by the [LTI](../modules/ltimodule.md) endpoint. The Canvas
+and role mapping used by the [LTI](ltimodule.md) endpoint. The Canvas
 User Provider can therefore be used with LTI or another method of authenticating
 users.
 

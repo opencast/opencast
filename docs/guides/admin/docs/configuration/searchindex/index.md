@@ -15,13 +15,12 @@ which would not be possible otherwise.
 ---
 
 - Solr is mostly powering older services and replacing this index type is planned for the future. But for now it is
-  still the back-end for the search service (LTI and engage tools), the workflow service and the series service.
+  still the back-end for the search service (LTI and engage tools).
 
     [Solr Configuration Guide](solr.md)
 
 - OpenSearch/Elasticsearch powers the external API as well as the administrative user interface of Opencast.  Pick one of the following
 
-    [OpenSearch Configuration Guide](../../configuration/opensearch.md)
-    [Elasticsearch Configuration Guide](../../configuration/elasticsearch.md)
+    [OpenSearch/Elasticsearch Configuration Guide](elasticsearch.md)
 
 ---

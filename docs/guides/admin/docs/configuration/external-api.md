@@ -150,4 +150,4 @@ creates publication elements that do not just contain a single URL to the public
 but also contain URLs for each of the attachments and tracks that have been published.
 
 **Note:** Secure access to distribution artefacts requires stream security to be enabled,
-see [Stream Security Configuration](stream-security.md).
+see [Stream Security Configuration](stream-security/stream-security-config.md).

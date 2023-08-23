@@ -1,7 +1,8 @@
-Stand-Alone Video Editor
+Video Editor Frontend
 ========================
 
-Opencast's stand-alone video editor provides a tool for users to cut videos without full access to the admin interface.
+Opencast's video editor frontend (also referred to as "Stand-alone video editor" or just "The editor") provides a tool for
+users to cut videos without full access to the admin interface.
 It strives to be simple and easy to use while providing enough features for most common use-cases.
 
 
@@ -13,6 +14,14 @@ You can access the editor by providing an event identifier to the web interface 
 ```
 /editor-ui/index.html?id=<ID>
 ```
+
+Stand-alone capabilities
+--------------
+
+The editor frontend is also referred to as "stand-alone" since it can be deployed and run outside an Opencast installation.
+Should you wish to do so check its github repository: https://github.com/opencast/opencast-editor
+However, there is little benefit in doing so, as the editor frontend will not function without a connection to its
+backend in Opencast.
 
 
 Preview Tracks
@@ -43,7 +52,7 @@ If only a single workflow exists, the selection will be skipped.
 Replacing the Admin Interface Editor
 ------------------------------------
 
-It is possible to have the admin interface link to the stand-alone editor instead of the internal editor.
+It is possible to have the admin interface link to old internal editor instead of the stand-alone editor.
 For this, configure the `prop.admin.editor.url` in `etc/org.opencastproject.organization-mh_default_org.cfg`.
 
 
