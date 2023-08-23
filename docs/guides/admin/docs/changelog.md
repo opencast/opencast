@@ -4,6 +4,19 @@ Changelog
 Opencast 13
 -----------
 
+### Opencast 13.10
+
+*Released on August 23th, 2023*
+
+- [[#5162](https://github.com/opencast/opencast/pull/5162)] -
+  Add Opencast 13.9 release notes
+- [[#5157](https://github.com/opencast/opencast/pull/5157)] -
+  Test for broken JAR (zip) files
+- [[#5150](https://github.com/opencast/opencast/pull/5150)] -
+  Fix Endless Loop on Elasticsearch Exception
+- [[#5033](https://github.com/opencast/opencast/pull/5033)] -
+  Escape ES query string in external API endpoints
+
 ### Opencast 13.9
 
 *Released on August 8th, 2023*
