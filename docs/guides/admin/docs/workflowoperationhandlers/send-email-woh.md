@@ -78,6 +78,29 @@ Use `${workflow.FIELD}`
 
 Note that some of these values may not exist depending on the workflow.
 
+## Failed Operation Information
+
+|Field                    |How To Get It                                     |
+|-------------------------|--------------------------------------------------|
+|id                       |${failedOperation.getId}                          |
+|Template                 |${failedOperation.getTemplate}                    |
+|Configuration            |${failedOperation.getConfiguration}               |
+|Configuration keys       |${failedOperation.getConfigurationKeys}           |
+|Date started             |${failedOperation.getDateStarted}                 |
+|Date completed           |${failedOperation.getDateCompleted}               |
+|Execution handling workflow|${failedOperation.getExceptionHandlingWorkflow} |
+|Execution condition      |${failedOperation.getExecutionCondition}          |
+|Execution host           |${failedOperation.getExecutionHost}               |
+|Failed attempts          |${failedOperation.getFailedAttempts}              |
+|Max attempts             |${failedOperation.getMaxAttempts}                 |
+|Retry strategy           |${failedOperation.getRetryStrategy}               |
+|State                    |${failedOperation.getState}                       |
+|Time in queue            |${failedOperation.getTimeInQueue}                 |
+|Workflow instance        |${failedOperation.getWorkflowInstance}            |
+
+
+
+
 
 ### Workflow Configuration Properties
 
@@ -285,16 +308,16 @@ The contents of the <config_dir>/etc/email/errorDetails email template:
 Error Details
 
 <#if catalogs['dublincore/series']?has_content>
-Course: ${catalogs['dublincore/series']['subject']!'series subject missing'}-${catalogs['dublincore/series']['title']!'series title missing'}
+Course: ${catalogs['dublincore/series']['subject']!'series subject missing'} - ${catalogs['dublincore/series']['title']!'series title missing'}
 Instructor: ${catalogs['dublincore/series']['contributor']!'instructor missing'}
 </#if>
 Title: ${catalogs['dublincore/episode']['title']!'title missing'}
 Event Date: ${mediaPackage.date?datetime?iso_local}
 
 <#if failedOperation?has_content>
-  Workflow failed in operation: ${failedOperation.position}-${failedOperation.template}
-  Started: ${failedOperation.dateStarted?datetime?iso_local}
-  Ended: ${failedOperation.dateCompleted?datetime?iso_local}
+  Workflow failed in operation: ${failedOperation.getId}-${failedOperation.getTemplate}
+  Started: ${failedOperation.getDateStarted?datetime?iso_local}
+  Ended: ${failedOperation.getDateCompleted?datetime?iso_local}
   Execution Host: ${failedOperation.executionHost}
 </#if>
 
