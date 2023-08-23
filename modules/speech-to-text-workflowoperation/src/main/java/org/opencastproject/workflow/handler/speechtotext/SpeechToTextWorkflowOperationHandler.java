@@ -134,7 +134,7 @@ public class
 
 
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
-            Configuration.none, Configuration.one,
+            Configuration.many, Configuration.one,
             Configuration.many, Configuration.one);
     List<MediaPackageElementFlavor> sourceFlavor = tagsAndFlavors.getSrcFlavors();
     List<String> sourceTagList = tagsAndFlavors.getSrcTags();
