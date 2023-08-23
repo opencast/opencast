@@ -4,6 +4,19 @@ Changelog
 
 Opencast 14
 -----------
+### Opencast 14.3
+
+*Released on August 23rd, 2023*
+
+- [[#5167](https://github.com/opencast/opencast/pull/5167)] -
+  Fix admin interface permissions
+- [[#5166](https://github.com/opencast/opencast/pull/5166)] -
+  Fix Admin Interface Redirect
+- [[#5165](https://github.com/opencast/opencast/pull/5165)] -
+  Fix crowdin package name
+- [[#5163](https://github.com/opencast/opencast/pull/5163)] -
+  Add Opencast 14.2 release notes
+
 
 ### Opencast 14.2
 

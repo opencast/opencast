@@ -1,5 +1,17 @@
 # Opencast 14: Release Notes
 
+## Opencast 14.3
+
+The off-schedule release of Opencast 14. This release includes fixes from Opencast 13.10 release,
+see [release notes of Opencast 13.10](https://docs.opencast.org/r/13.x/admin/#releasenotes/#opencast-1310)
+
+Additionally, the following changes are part of this release.
+
+- Fix admin interface permissions ([#5167](https://github.com/opencast/opencast/pull/5167))
+- Fix Admin Interface Redirect ([#5166](https://github.com/opencast/opencast/pull/5166))
+
+See [changelog](changelog.md#opencast-143) for a comprehensive list of changes.
+
 ## Opencast 14.2
 
 Opencast 14.2 is a minor release. The release fixes corrupt zip headers in the distributed jar files and elasticsearch
@@ -13,14 +25,14 @@ Additionally, the following changes are part of this release.
 - Fix changed pax web config keys ([#5124](https://github.com/opencast/opencast/pull/5124))
 - Upgrade Crowdin Integration ([#5114](https://github.com/opencast/opencast/pull/5114))
 
-See [changelog](changelog.md#opencast-14.2) for a comprehensive list of changes.
+See [changelog](changelog.md#opencast-142) for a comprehensive list of changes.
 
 ## Opencast 14.1
 
 Opencast 14.1 is a minor release, containing documentation improvements and Paella Player 7 trimming URL parameter fix.
 For more details, make sure to check out the [documentation](modules/paella.player7/url.parameter.md).
 
-See [changelog](changelog.md#opencast-14.1) for a comprehensive list of changes.
+See [changelog](changelog.md#opencast-141) for a comprehensive list of changes.
 
 ## Opencast 14.0
 
