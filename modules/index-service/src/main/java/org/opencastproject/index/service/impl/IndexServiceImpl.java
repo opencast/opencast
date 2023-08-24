@@ -1374,7 +1374,7 @@ public class IndexServiceImpl implements IndexService {
         break;
       case ARCHIVE:
         assetManager.takeSnapshot(mediaPackage);
-        updatePublication(mediaPackage);
+        updatePublications(mediaPackage);
         break;
       case SCHEDULE:
         try {
@@ -1393,9 +1393,9 @@ public class IndexServiceImpl implements IndexService {
 
   /**
    * Updates the publications of a mediapackage with new metadata and access rights.
-   * @param mediaPackage
+   * @param mediaPackage the mediapackage to update publications of
    */
-  private void updatePublication(MediaPackage mediaPackage) {
+  private void updatePublications(MediaPackage mediaPackage) {
     for (Publication publication : mediaPackage.getPublications()) {
       String channelId = publication.getChannel();
       String publicationId = publication.getIdentifier();
@@ -1407,15 +1407,13 @@ public class IndexServiceImpl implements IndexService {
         continue;
       }
 
-      // Get metadata and acls
+      // Get metadata and ACLs
       SimpleElementSelector elementSelector = new SimpleElementSelector();
-      // This does not necessarily work for extended metadata, which can have completely different flavors.
-//      elementSelector.addFlavor("dublincore/*");
       // Relies on ACLs having this particular flavor
       elementSelector.addFlavor("security/*");
       Collection<MediaPackageElement> elements = elementSelector.select(mediaPackage, false);
 
-      Set<String> elementIds = new HashSet<String>();
+      Set<String> elementIds = new HashSet<>();
       for (MediaPackageElement elem : elements) {
         elementIds.add(elem.getIdentifier());
       }
@@ -1437,7 +1435,7 @@ public class IndexServiceImpl implements IndexService {
         }
       }
 
-      List<MediaPackageElement> downloadElements = new ArrayList<>();
+      List<MediaPackageElement> downloadElements;
       List<MediaPackageElement> streamingElements = new ArrayList<>();
       try {
         downloadElements = downloadDistributionService.distributeSync(channelId, mediaPackage, elementIds, false);
@@ -1521,7 +1519,7 @@ public class IndexServiceImpl implements IndexService {
           throw new IndexServiceException("Unable to update  acl", e);
         }
         assetManager.takeSnapshot(mediaPackage);
-        updatePublication(mediaPackage);
+        updatePublications(mediaPackage);
         return acl;
       case SCHEDULE:
         try {
