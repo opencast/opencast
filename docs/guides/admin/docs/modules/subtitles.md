@@ -4,7 +4,7 @@ Subtitles
 This document records guidelines and conventions on how subtitles should be handled in Opencast.
 
 <div class=warn>
-These guidelines are new to Opencast 14. Not all parts of Opencast may yet adhere to them! 
+These guidelines are new to Opencast 15. Not all parts of Opencast may yet adhere to them! 
 </div>
 
 Subtitles are expected to be in [WebVTT format](https://developer.mozilla.org/en-US/docs/Web/API/WebVTT_API). Subtitles
