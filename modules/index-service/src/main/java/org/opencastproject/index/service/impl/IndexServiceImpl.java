@@ -1373,8 +1373,8 @@ public class IndexServiceImpl implements IndexService {
         }
         break;
       case ARCHIVE:
-        assetManager.takeSnapshot(mediaPackage);
         updatePublications(mediaPackage);
+        assetManager.takeSnapshot(mediaPackage);
         break;
       case SCHEDULE:
         try {
@@ -1429,11 +1429,7 @@ public class IndexServiceImpl implements IndexService {
       }
 
       // Remove publication from mediapackage
-      for (Publication publicationElement : mediaPackage.getPublications()) {
-        if (channelId.equals(publicationElement.getChannel())) {
-          mediaPackage.remove(publicationElement);
-        }
-      }
+      mediaPackage.remove(publication);
 
       List<MediaPackageElement> downloadElements;
       List<MediaPackageElement> streamingElements = new ArrayList<>();
@@ -1518,8 +1514,8 @@ public class IndexServiceImpl implements IndexService {
         } catch (MediaPackageException e) {
           throw new IndexServiceException("Unable to update  acl", e);
         }
-        assetManager.takeSnapshot(mediaPackage);
         updatePublications(mediaPackage);
+        assetManager.takeSnapshot(mediaPackage);
         return acl;
       case SCHEDULE:
         try {
