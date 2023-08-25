@@ -1373,7 +1373,6 @@ public class IndexServiceImpl implements IndexService {
         }
         break;
       case ARCHIVE:
-        updatePublications(mediaPackage);
         assetManager.takeSnapshot(mediaPackage);
         break;
       case SCHEDULE:
@@ -1389,82 +1388,6 @@ public class IndexServiceImpl implements IndexService {
         logger.error("Unknown event source!");
     }
     return metadataList;
-  }
-
-  /**
-   * Updates the publications of a mediapackage with new metadata and access rights.
-   * @param mediaPackage the mediapackage to update publications of
-   */
-  private void updatePublications(MediaPackage mediaPackage) {
-    for (Publication publication : mediaPackage.getPublications()) {
-      String channelId = publication.getChannel();
-      String publicationId = publication.getIdentifier();
-      URI publicationURI = publication.getURI();
-      MimeType publicationMimeType = publication.getMimeType();
-
-      if (channelId == null || publicationURI == null || publicationMimeType == null || publicationId == null) {
-        // No publication, do nothing
-        continue;
-      }
-
-      // Get metadata and ACLs
-      SimpleElementSelector elementSelector = new SimpleElementSelector();
-      // Relies on ACLs having this particular flavor
-      elementSelector.addFlavor("security/*");
-      Collection<MediaPackageElement> elements = elementSelector.select(mediaPackage, false);
-
-      Set<String> elementIds = new HashSet<>();
-      for (MediaPackageElement elem : elements) {
-        elementIds.add(elem.getIdentifier());
-      }
-
-      // To make sure we hit all extended metadata catalogs, let's just get all catalogs
-      for (Catalog catalog : mediaPackage.getCatalogs()) {
-        elementIds.add(catalog.getIdentifier());
-      }
-
-      if (elementIds.size() < 1) {
-        // Nothing to republish, do nothing
-        continue;
-      }
-
-      // Remove publication from mediapackage
-      mediaPackage.remove(publication);
-
-      List<MediaPackageElement> downloadElements;
-      List<MediaPackageElement> streamingElements = new ArrayList<>();
-      try {
-        downloadElements = downloadDistributionService.distributeSync(channelId, mediaPackage, elementIds, false);
-        if (streamingDistributionService != null && streamingDistributionService.publishToStreaming()) {
-          streamingElements = streamingDistributionService.distributeSync(channelId, mediaPackage, elementIds);
-        }
-      } catch (DistributionException e) {
-        throw new RuntimeException(e);
-      }
-      logger.debug("Distribute of mediapackage {} to channel {} completed", mediaPackage, channelId);
-
-      // Re-add publication
-      Publication newPublication = PublicationImpl.publication(publicationId, channelId, publicationURI, publicationMimeType);
-
-      // Add published elements
-      for (MediaPackageElement element : downloadElements) {
-        element.setIdentifier(null);
-        PublicationImpl.addElementToPublication(newPublication, element);
-      }
-      for (MediaPackageElement element : streamingElements) {
-        element.setIdentifier(null);
-        PublicationImpl.addElementToPublication(newPublication, element);
-      }
-
-      mediaPackage.add(newPublication);
-    }
-
-    // Also search service
-    try {
-      searchService.addSynchronously(mediaPackage);
-    } catch (UnauthorizedException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   /**
@@ -1514,7 +1437,6 @@ public class IndexServiceImpl implements IndexService {
         } catch (MediaPackageException e) {
           throw new IndexServiceException("Unable to update  acl", e);
         }
-        updatePublications(mediaPackage);
         assetManager.takeSnapshot(mediaPackage);
         return acl;
       case SCHEDULE:

@@ -1533,8 +1533,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   public void fireEventHandlers(AssetManagerItem item) {
-    while (handlers.size() != 2) {
-      logger.warn("Expecting 2 handlers, but {} are registered.  Waiting 10s then retrying...", handlers.size());
+    while (handlers.size() != 3) {
+      logger.warn("Expecting 3 handlers, but {} are registered.  Waiting 10s then retrying...", handlers.size());
       try {
         Thread.sleep(10000L);
       } catch (InterruptedException e) { /* swallow this, nothing to do */ }

@@ -121,6 +121,7 @@ public abstract class AssetManagerTestBase {
     AssetManagerImpl am = makeAssetManagerWithoutHandlers();
     am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
     am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
+    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
     return am;
   }
 
