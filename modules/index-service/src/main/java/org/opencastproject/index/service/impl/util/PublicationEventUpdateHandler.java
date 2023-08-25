@@ -35,6 +35,7 @@ import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.MimeType;
 
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -57,11 +58,16 @@ import java.util.Set;
         },
         property = {
                 "service.description=Update event publication metadata and ACLs",
+                "opencast.service.type=org.opencastproject.index.service.impl.util.PublicationEventUpdateHandler"
         }
 )
 public class PublicationEventUpdateHandler implements AssetManagerUpdateHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(PublicationEventUpdateHandler.class);
+
+  private static final String CONFIGURATION_PUBLICATION_CHANNEL_IDS = "publication.channel.ids";
+
+  private Set<String> configurationPublicationChannelIds = new HashSet<>();
 
   private DownloadDistributionService downloadDistributionService = null;
   private StreamingDistributionService streamingDistributionService = null;
@@ -85,6 +91,16 @@ public class PublicationEventUpdateHandler implements AssetManagerUpdateHandler 
   @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating {}", PublicationEventUpdateHandler.class.getName());
+    Object pubChannelIdsValue = cc.getProperties().get(CONFIGURATION_PUBLICATION_CHANNEL_IDS);
+    configurationPublicationChannelIds.clear();
+    if (pubChannelIdsValue != null) {
+      for (String publicationChannel : StringUtils.split(pubChannelIdsValue.toString(), ',')) {
+        if (StringUtils.trimToNull(publicationChannel) != null) {
+          configurationPublicationChannelIds.add(StringUtils.trimToNull(publicationChannel));
+        }
+      }
+    }
+    logger.debug("Excluded user providers: {}", configurationPublicationChannelIds);
   }
 
   @Deactivate
@@ -104,6 +120,9 @@ public class PublicationEventUpdateHandler implements AssetManagerUpdateHandler 
 
   private void updatePublications(MediaPackage mediaPackage) {
     for (Publication publication : mediaPackage.getPublications()) {
+      if (!configurationPublicationChannelIds.contains(publication.getChannel())) {
+        continue;
+      }
       String channelId = publication.getChannel();
       String publicationId = publication.getIdentifier();
       URI publicationURI = publication.getURI();
