@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -119,7 +120,7 @@ public class PublicationEventUpdateHandler implements AssetManagerUpdateHandler 
   }
 
   private void updatePublications(MediaPackage mediaPackage) {
-    for (Publication publication : mediaPackage.getPublications()) {
+    for (Publication publication : new ArrayList<>(Arrays.asList(mediaPackage.getPublications()))) {
       if (!configurationPublicationChannelIds.contains(publication.getChannel())) {
         continue;
       }
