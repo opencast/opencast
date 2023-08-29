@@ -17,8 +17,8 @@ files:
     translation: '/modules/engage-paella-player/src/main/paella-opencast/plugins/**/localization/%locale%.json'
 
   -
-    source: '/modules/lti/src/i18n/en-US.json'
-    translation: '/modules/lti/src/i18n/%locale%.json'
+    source: '/modules/lti/src/i18n/lang-en_US.json'
+    translation: '/modules/lti/src/i18n/lang-%locale_with_underscore%.json'
 
   -
     source: '/modules/engage-paella-player-7/src/i18n/en-US.json'
