@@ -650,8 +650,8 @@ angular.module('adminNg.controllers')
           EventSchedulingResource.save({
             id: $scope.resourceId,
             entries: $scope.source,
-            previousId: oldObj.id,
-            previousEntries: oldObj.inputMethods
+            previousId: oldObj ? oldObj.id : undefined,
+            previousEntries: oldObj? oldObj.inputMethods : undefined
           }, function () {
             fetchChildResources($scope.resourceId);
           });
