@@ -1169,6 +1169,11 @@ public class IndexServiceImpl implements IndexService {
           String type = (String)((JSONObject) assetDataMap.get(asset)).get("type");
           String flavorType = (String)((JSONObject) assetDataMap.get(asset)).get("flavorType");
           String flavorSubType = (String)((JSONObject) assetDataMap.get(asset)).get("flavorSubType");
+          String tags = (String)((JSONObject) assetDataMap.get(asset)).get("tags");
+          String[] tagsArray = null;
+          if (tags != null) {
+            tagsArray = tags.split(",");
+          }
           // Use 'multiple' setting to allow multiple elements with same flavor or not.
           boolean overwriteExisting = !(Boolean) ((JSONObject) assetDataMap.get(asset)).getOrDefault("multiple", false);
           if (patternNumberedAsset.matcher(flavorSubType).matches() && (assetNumber != null)) {
@@ -1187,6 +1192,11 @@ public class IndexServiceImpl implements IndexService {
             // correct the flavor of the new attachment
             Attachment[] elArray = mp.getAttachments(new MediaPackageElementFlavor(assetOrig, "*"));
             elArray[0].setFlavor(newElemflavor);
+            if (tags != null && tagsArray.length > 0) {
+              for (String tag : tagsArray) {
+                elArray[0].addTag(tag);
+              }
+            }
             logger.info("Updated asset {} {}", type, newElemflavor);
           } else if (patternCatalog.matcher(type).matches()) {
             if (overwriteExisting) {
@@ -1202,6 +1212,11 @@ public class IndexServiceImpl implements IndexService {
               throw new IllegalArgumentException("More than one " + asset + " found, only one expected.");
             }
             catArray[0].setFlavor(newElemflavor);
+            if (tags != null && tagsArray.length > 0) {
+              for (String tag : tagsArray) {
+                catArray[0].addTag(tag);
+              }
+            }
             logger.info("Update asset {} {}", type, newElemflavor);
           } else if (patternTrack.matcher(type).matches()) {
             if (overwriteExisting) {
@@ -1217,6 +1232,11 @@ public class IndexServiceImpl implements IndexService {
               throw new IllegalArgumentException("More than one " + asset + " found, only one expected.");
             }
             trackArray[0].setFlavor(newElemflavor);
+            if (tags != null && tagsArray.length > 0) {
+              for (String tag : tagsArray) {
+                trackArray[0].addTag(tag);
+              }
+            }
             logger.info("Update asset {} {}", type, newElemflavor);
           } else {
             logger.warn("Unknown asset type {} {} for field {}", type, newElemflavor, asset);

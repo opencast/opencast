@@ -94,6 +94,7 @@ angular.module('adminNg.services').factory('NewEventUploadAsset',['ResourcesList
           item.filename =  fileNames.join(', ');
           item.type = self.ud.namemap[key].type;
           item.flavor = self.ud.namemap[key].flavorType + '/' + self.ud.namemap[key].flavorSubType;
+          item.tags = self.ud.namemap[key].tags;
           self.ud.assetlistforsummary.push(item);
         });
       };
