@@ -655,6 +655,20 @@ angular.module('adminNg.controllers')
           }, function () {
             fetchChildResources($scope.resourceId);
           });
+
+          // Getting the update may take several seconds on large installations
+          // Fill in input channel values if possible
+          if (oldObj && $scope.source.device.inputs && oldObj.inputs) {
+            var sourceInputs = $scope.source.device.inputs.map(function(input){
+              return input.id;
+            }).join(",");
+            var oldObjInputs = oldObj.inputs.map(function(input){
+              return input.id;
+            }).join(",");
+            if (sourceInputs === oldObjInputs) {
+              $scope.source.device.inputMethods = oldObj.inputMethods;
+            }
+          }
         }, me.conflictsDetected);
       }
     };
