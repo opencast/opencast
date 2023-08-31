@@ -651,7 +651,7 @@ angular.module('adminNg.controllers')
             id: $scope.resourceId,
             entries: $scope.source,
             previousId: oldObj ? oldObj.id : undefined,
-            previousEntries: oldObj? oldObj.inputMethods : undefined
+            previousEntries: oldObj ? oldObj.inputMethods : undefined
           }, function () {
             fetchChildResources($scope.resourceId);
           });
@@ -661,10 +661,10 @@ angular.module('adminNg.controllers')
           if (oldObj && $scope.source.device.inputs && oldObj.inputs) {
             var sourceInputs = $scope.source.device.inputs.map(function(input){
               return input.id;
-            }).join(",");
+            }).join(',');
             var oldObjInputs = oldObj.inputs.map(function(input){
               return input.id;
-            }).join(",");
+            }).join(',');
             if (sourceInputs === oldObjInputs) {
               $scope.source.device.inputMethods = oldObj.inputMethods;
             }
