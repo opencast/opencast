@@ -86,8 +86,8 @@ import java.util.List;
 
 @Component(
     property = {
-    "service.description=Amazon S3 based asset store",
-    "store.type=aws-s3"
+        "service.description=Amazon S3 based asset store",
+        "store.type=aws-s3"
     },
     immediate = true,
     service = { RemoteAssetStore.class, AwsS3AssetStore.class }
@@ -100,7 +100,6 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   private static final Tag freezable = new Tag("Freezable", "true");
   private static final Integer RESTORE_MIN_WAIT = 1080000; // 3h
   private static final Integer RESTORE_POLL = 900000; // 15m
-
 
   // Service configuration
   public static final String AWS_S3_ENABLED = "org.opencastproject.assetmanager.aws.s3.enabled";
@@ -211,35 +210,35 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
         provider = new DefaultAWSCredentialsProviderChain();
       } else {
         provider = new AWSStaticCredentialsProvider(
-                new BasicAWSCredentials(accessKeyIdOpt.get(), accessKeySecretOpt.get()));
+            new BasicAWSCredentials(accessKeyIdOpt.get(), accessKeySecretOpt.get()));
       }
 
       // S3 client configuration
       ClientConfiguration clientConfiguration = new ClientConfiguration();
 
       int maxConnections = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_S3_MAX_CONNECTIONS)
-              .getOrElse(DEFAULT_MAX_CONNECTIONS);
+          .getOrElse(DEFAULT_MAX_CONNECTIONS);
       logger.debug("Max Connections: {}", maxConnections);
       clientConfiguration.setMaxConnections(maxConnections);
 
       int connectionTimeout = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_S3_CONNECTION_TIMEOUT)
-              .getOrElse(DEFAULT_CONNECTION_TIMEOUT);
+          .getOrElse(DEFAULT_CONNECTION_TIMEOUT);
       logger.debug("Connection Output: {}", connectionTimeout);
       clientConfiguration.setConnectionTimeout(connectionTimeout);
 
       int maxRetries = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_S3_MAX_RETRIES)
-              .getOrElse(DEFAULT_MAX_RETRIES);
+          .getOrElse(DEFAULT_MAX_RETRIES);
       logger.debug("Max Retry: {}", maxRetries);
       clientConfiguration.setMaxErrorRetry(maxRetries);
 
       // Create AWS client.
       s3 = AmazonS3ClientBuilder.standard()
-              .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint
+          .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint
               , regionName))
-              .withClientConfiguration(clientConfiguration)
-              .withPathStyleAccessEnabled(pathStyle)
-              .withCredentials(provider)
-              .build();
+          .withClientConfiguration(clientConfiguration)
+          .withPathStyleAccessEnabled(pathStyle)
+          .withCredentials(provider)
+          .build();
 
       s3TransferManager = TransferManagerBuilder.standard().withS3Client(s3).build();
 
@@ -263,7 +262,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
           // Enable versioning
           BucketVersioningConfiguration configuration = new BucketVersioningConfiguration().withStatus("Enabled");
           SetBucketVersioningConfigurationRequest configRequest = new SetBucketVersioningConfigurationRequest(
-                  bucketName, configuration);
+              bucketName, configuration);
           s3.setBucketVersioningConfiguration(configRequest);
           logger.info("AWS S3 ARCHIVE bucket {} created and versioning enabled", bucketName);
         } catch (Exception e2) {
@@ -272,7 +271,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
         }
       } else {
         throw new IllegalStateException("ARCHIVE bucket " + bucketName + " exists, but we can't access it: "
-                + e.getMessage(), e);
+                                            + e.getMessage(), e);
       }
     }
     // Bucket already existed or was just created
@@ -301,7 +300,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       // Block and wait for the upload to finish
       upload.waitForCompletion();
       logger.info("Upload of {} to archive bucket {} completed in {} seconds",
-              new Object[] { objectName, bucketName, (System.currentTimeMillis() - start) / 1000 });
+                  new Object[] { objectName, bucketName, (System.currentTimeMillis() - start) / 1000 });
       ObjectMetadata objMetadata = s3.getObjectMetadata(bucketName, objectName);
       logger.trace("Got object metadata for: {}, version is {}", objectName, objMetadata.getVersionId());
 
@@ -396,7 +395,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
           boolean isRestored = null != s3.getObjectMetadata(bucketName, objectName).getRestoreExpirationTime();
           if (!isRestoring && !isRestored) {
             logger.warn("S3 Object {} can not be moved from storage class {} to {} without restoring the object first",
-                objectStorageClass, storageClass);
+                        objectStorageClass, storageClass);
             return objectStorageClass;
           }
         }
@@ -412,7 +411,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
         }
 
         CopyObjectRequest copyRequest = new CopyObjectRequest(bucketName, objectName, bucketName, objectName)
-                                            .withStorageClass(storageClass);
+            .withStorageClass(storageClass);
         s3.copyObject(copyRequest);
         logger.info("S3 object {} moved to storage class {}", objectName, storageClass);
       } else {
@@ -443,7 +442,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       String objectKey = map.getObjectKey();
       Date expiration = new Date(System.currentTimeMillis() + DOWNLOAD_URL_EXPIRATION_MS);
       GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucketName, objectKey)
-              .withMethod(HttpMethod.GET).withExpiration(expiration);
+          .withMethod(HttpMethod.GET).withExpiration(expiration);
       URL signedUrl = s3.generatePresignedUrl(generatePresignedUrlRequest);
       logger.debug("Returning pre-signed URL stream for '{}': {}", map, signedUrl);
       return signedUrl.openStream();
@@ -535,7 +534,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
         }
 
         logger.info("Object {} has been restored from Glacier class storage, for {} days", objectName,
-                                                                                           objectRestorePeriod);
+                    objectRestorePeriod);
       } catch (InterruptedException e) {
         logger.error("Object {} has not yet been restored from Glacier class storage", objectName);
       }
@@ -544,10 +543,9 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     }
   }
 
-
   /**
-  *
-  */
+   *
+   */
   @Override
   protected void deleteObject(AwsAssetMapping map) {
     s3.deleteObject(bucketName, map.getObjectKey());

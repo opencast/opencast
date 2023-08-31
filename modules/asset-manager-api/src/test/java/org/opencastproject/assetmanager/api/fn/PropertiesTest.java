@@ -53,40 +53,39 @@ public class PropertiesTest {
 
   @Test
   @Parameters({
-          "unknown.namespace | 0",
-          "org.opencastproject.approval | 3",
-          "org.opencastproject.comment | 2"})
+      "unknown.namespace | 0",
+      "org.opencastproject.approval | 3",
+      "org.opencastproject.comment | 2"})
   public void testByNamespace(String namespace, int expectedCount) throws Exception {
     assertEquals(expectedCount, filterCount(Properties.byNamespace(namespace)));
   }
 
   @Test
   @Parameters({
-          "unknown.name | 0",
-          "approved | 1",
-          "date | 1",
-          "comment | 2"})
+      "unknown.name | 0",
+      "approved | 1",
+      "date | 1",
+      "comment | 2"})
   public void testByPropertyName(String propertyName, int expectedCount) throws Exception {
     assertEquals(expectedCount, filterCount(Properties.byPropertyName(propertyName)));
   }
 
   @Test
   @Parameters({
-          "unknown.name | approved | 0",
-          "org.opencastproject.approval | approved | 1",
-          "org.opencastproject.approval | date | 1",
-          "org.opencastproject.approval | comment | 1"})
-
+      "unknown.name | approved | 0",
+      "org.opencastproject.approval | approved | 1",
+      "org.opencastproject.approval | date | 1",
+      "org.opencastproject.approval | comment | 1"})
   public void testByFqnName(String namespace, String propertyName, int expectedCount) throws Exception {
     assertEquals(expectedCount, filterCount(Properties.byFqnName(PropertyName.mk(namespace, propertyName))));
   }
 
   @Test
   @Parameters({
-          "mp-x | 0",
-          "mp-1 | 2",
-          "mp-2 | 1",
-          "mp-3 | 2"})
+      "mp-x | 0",
+      "mp-1 | 2",
+      "mp-2 | 1",
+      "mp-3 | 2"})
   public void testByMediaPackageId(String mpId, int expectedCount) throws Exception {
     assertEquals(expectedCount, filterCount(Properties.byMediaPackageId(mpId)));
   }

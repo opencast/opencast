@@ -117,8 +117,8 @@ public class LtiServiceRestEndpoint {
   )
   public Response listJobs(@QueryParam("seriesId") String seriesId) {
     return Response.status(Status.OK)
-            .entity(gson.toJson(service.listJobs(seriesId), new TypeToken<List<LtiJob>>() {
-            }.getType())).build();
+        .entity(gson.toJson(service.listJobs(seriesId), new TypeToken<List<LtiJob>>() {
+        }.getType())).build();
   }
 
   @POST
@@ -148,16 +148,16 @@ public class LtiServiceRestEndpoint {
               type = STRING
           ),
           @RestParameter(
-            name = "captionFormat",
-            description = "Caption file format",
-            isRequired = false,
-            type = STRING
+              name = "captionFormat",
+              description = "Caption file format",
+              isRequired = false,
+              type = STRING
           ),
           @RestParameter(
-            name = "captionLanguage",
-            description = "Caption language",
-            isRequired = false,
-            type = STRING
+              name = "captionLanguage",
+              description = "Caption language",
+              isRequired = false,
+              type = STRING
           ),
           @RestParameter(
               name = "isPartOf",
@@ -173,18 +173,18 @@ public class LtiServiceRestEndpoint {
           )
       },
       responses = {
-        @RestResponse(
-            description = "A new event is created or the event is updated",
-            responseCode = HttpServletResponse.SC_OK
-        ),
-        @RestResponse(
-            description = "No authorization to create or update events",
-            responseCode = HttpServletResponse.SC_UNAUTHORIZED
-        ),
-        @RestResponse(
-            description = "The event to be updated wasn't found",
-            responseCode = HttpServletResponse.SC_NOT_FOUND
-        )
+          @RestResponse(
+              description = "A new event is created or the event is updated",
+              responseCode = HttpServletResponse.SC_OK
+          ),
+          @RestResponse(
+              description = "No authorization to create or update events",
+              responseCode = HttpServletResponse.SC_UNAUTHORIZED
+          ),
+          @RestResponse(
+              description = "The event to be updated wasn't found",
+              responseCode = HttpServletResponse.SC_NOT_FOUND
+          )
       }
   )
   public Response createNewEvent(@HeaderParam("Accept") String acceptHeader, @Context HttpServletRequest request) {
@@ -217,13 +217,13 @@ public class LtiServiceRestEndpoint {
           final InputStream stream = item.openStream();
           final String streamName = item.getName();
           service.upsertEvent(
-                  new LtiFileUpload(stream, streamName),
-                  captions,
-                  captionFormat,
-                  captionLanguage,
-                  eventId,
-                  seriesId,
-                  metadataJson);
+              new LtiFileUpload(stream, streamName),
+              captions,
+              captionFormat,
+              captionLanguage,
+              eventId,
+              seriesId,
+              metadataJson);
           return Response.ok().build();
         }
       }
@@ -274,7 +274,7 @@ public class LtiServiceRestEndpoint {
       }
   )
   public Response copyEventToSeries(@PathParam("eventId") final String eventId,
-          @QueryParam("seriesId") final String seriesId) {
+      @QueryParam("seriesId") final String seriesId) {
     service.copyEventToSeries(eventId, seriesId);
     return Response.noContent().build();
   }

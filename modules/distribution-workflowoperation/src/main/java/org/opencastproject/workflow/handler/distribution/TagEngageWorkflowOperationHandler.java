@@ -61,12 +61,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component(
-        immediate = true,
-        service = WorkflowOperationHandler.class,
-        property = {
-                "service.description=Tag Engage Workflow Operation Handler",
-                "workflow.operation=tag-engage"
-        }
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Tag Engage Workflow Operation Handler",
+        "workflow.operation=tag-engage"
+    }
 )
 public class TagEngageWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
@@ -103,10 +103,10 @@ public class TagEngageWorkflowOperationHandler extends AbstractWorkflowOperation
 
     // parse config
     ConfiguredTagsAndFlavors config = getTagsAndFlavors(instance,
-            Configuration.many,  // source-tags
-            Configuration.many,  // source-flavors
-            Configuration.many,  // target-tags
-            Configuration.many); //target-flavors
+                                                        Configuration.many,  // source-tags
+                                                        Configuration.many,  // source-flavors
+                                                        Configuration.many,  // target-tags
+                                                        Configuration.many); //target-flavors
 
     Set<String> removeTags = new HashSet<>();
     Set<String> addTags = new HashSet<>();
@@ -134,17 +134,17 @@ public class TagEngageWorkflowOperationHandler extends AbstractWorkflowOperation
     SearchResult result = searchService.getByQuery(new SearchQuery().withId(mediaPackageId));
     if (result.size() == 0) {
       throw new WorkflowOperationException(
-              "Media package " + mediaPackageId + " can't be updated in Search because it " + "isn't published.");
+          "Media package " + mediaPackageId + " can't be updated in Search because it " + "isn't published.");
     } else if (result.size() > 1) {
       throw new WorkflowOperationException("Media package " + mediaPackageId + " can't be updated in Search because "
-              + "more than one media package with that id was found.");
+                                               + "more than one media package with that id was found.");
     }
     MediaPackage mediaPackageForSearch = result.getItems()[0].getMediaPackage();
 
     // update tags & flavors in published mp
     Collection<MediaPackageElement> searchElements = mpeSelector.select(mediaPackageForSearch, false);
     boolean changedMediaPackageForSearch = updateTagsAndFlavors(searchElements, config, removeTags, addTags,
-            overrideTags);
+                                                                overrideTags);
     if (!changedMediaPackageForSearch) {
       logger.info("No element changed, not publishing anything.");
       return createResult(currentMediaPackage, WorkflowOperationResult.Action.SKIP);
@@ -155,8 +155,8 @@ public class TagEngageWorkflowOperationHandler extends AbstractWorkflowOperation
     for (Publication publication : currentMediaPackage.getPublications()) {
       if (CHANNEL_ID.equals(publication.getChannel())) {
         List<MediaPackageElement> publicationElements =
-                Stream.of(publication.getAttachments(), publication.getCatalogs(), publication.getTracks())
-                        .flatMap(Stream::of).collect(Collectors.toList());
+            Stream.of(publication.getAttachments(), publication.getCatalogs(), publication.getTracks())
+                .flatMap(Stream::of).collect(Collectors.toList());
         Collection<MediaPackageElement> selectedElements = mpeSelector.select(publicationElements, false);
         changedPublication = updateTagsAndFlavors(selectedElements, config, removeTags, addTags, overrideTags);
       }
@@ -180,7 +180,7 @@ public class TagEngageWorkflowOperationHandler extends AbstractWorkflowOperation
   }
 
   private boolean updateTagsAndFlavors(Collection<MediaPackageElement> elements, ConfiguredTagsAndFlavors config,
-          Set<String> removeTags, Set<String> addTags, Set<String> overrideTags) {
+      Set<String> removeTags, Set<String> addTags, Set<String> overrideTags) {
 
     boolean changed = false;
     for (MediaPackageElement element : elements) {
@@ -199,7 +199,7 @@ public class TagEngageWorkflowOperationHandler extends AbstractWorkflowOperation
           newFlavorSubtype = currentFlavor.getSubtype();
         }
         MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor(
-                newFlavorType + MediaPackageElementFlavor.SEPARATOR + newFlavorSubtype);
+            newFlavorType + MediaPackageElementFlavor.SEPARATOR + newFlavorSubtype);
 
         if (!newFlavor.equals(currentFlavor)) {
           element.setFlavor(newFlavor);

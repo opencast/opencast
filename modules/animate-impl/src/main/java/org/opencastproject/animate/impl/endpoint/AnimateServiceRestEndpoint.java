@@ -119,11 +119,11 @@ public class AnimateServiceRestEndpoint extends AbstractJobProducerEndpoint {
   @Path("animate")
   @RestQuery(name = "animate", description = "Create animates video clip",
       restParameters = {
-      @RestParameter(name = "animation", isRequired = true, type = STRING,
+          @RestParameter(name = "animation", isRequired = true, type = STRING,
               description = "Location of to the animation"),
-      @RestParameter(name = "arguments", isRequired = true, type = STRING,
+          @RestParameter(name = "arguments", isRequired = true, type = STRING,
               description = "Synfig command line arguments as JSON array"),
-      @RestParameter(name = "metadata", isRequired = true, type = STRING,
+          @RestParameter(name = "metadata", isRequired = true, type = STRING,
               description = "Metadata for replacement as JSON object") },
       responses = {
           @RestResponse(description = "Animation created successfully", responseCode = HttpServletResponse.SC_OK),
@@ -133,9 +133,9 @@ public class AnimateServiceRestEndpoint extends AbstractJobProducerEndpoint {
       returnDescription = "Returns the path to the generated animation video"
   )
   public Response animate(
-          @FormParam("animation") String animation,
-          @FormParam("arguments") String argumentsString,
-          @FormParam("metadata") String metadataString) {
+      @FormParam("animation") String animation,
+      @FormParam("arguments") String argumentsString,
+      @FormParam("metadata") String metadataString) {
     Gson gson = new Gson();
     try {
       Map<String, String> metadata = gson.fromJson(metadataString, stringMapType);
@@ -145,7 +145,7 @@ public class AnimateServiceRestEndpoint extends AbstractJobProducerEndpoint {
       return Response.ok(new JaxbJob(job)).build();
     } catch (JsonSyntaxException | URISyntaxException | NullPointerException e) {
       logger.debug("Invalid data passed to REST endpoint:\nanimation: {}\nmetadata: {}\narguments: {})",
-              animation, metadataString, argumentsString);
+                   animation, metadataString, argumentsString);
       return Response.status(Response.Status.BAD_REQUEST).build();
     } catch (AnimateServiceException e) {
       logger.error("Error animating file {}", animation, e);

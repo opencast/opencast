@@ -53,12 +53,12 @@ import java.util.Collection;
 import java.util.List;
 
 @Component(
-        immediate = true,
-        service = WorkflowOperationHandler.class,
-        property = {
-                "service.description=Microsoft Azure Start Transcription Workflow Operation Handler",
-                "workflow.operation=microsoft-azure-start-transcription"
-        }
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Microsoft Azure Start Transcription Workflow Operation Handler",
+        "workflow.operation=microsoft-azure-start-transcription"
+    }
 )
 public class MicrosoftAzureStartTranscriptionOperationHandler extends AbstractWorkflowOperationHandler {
 
@@ -91,8 +91,8 @@ public class MicrosoftAzureStartTranscriptionOperationHandler extends AbstractWo
       MediaPackageElement[] mpes = mediaPackage.getElementsByFlavor(MediaPackageElementFlavor.parseFlavor(skipOption));
       if (mpes != null && mpes.length > 0) {
         logger.info(
-                "Start transcription operation will be skipped because flavor {} already exists in the media package",
-                skipOption);
+            "Start transcription operation will be skipped because flavor {} already exists in the media package",
+            skipOption);
         return createResult(Action.SKIP);
       }
     }
@@ -101,7 +101,7 @@ public class MicrosoftAzureStartTranscriptionOperationHandler extends AbstractWo
 
     // Check which tags have been configured
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(
-            workflowInstance, Configuration.many, Configuration.many, Configuration.none, Configuration.none);
+        workflowInstance, Configuration.many, Configuration.many, Configuration.none, Configuration.none);
     List<String> sourceTagOption = tagsAndFlavors.getSrcTags();
     List<MediaPackageElementFlavor> sourceFlavorOption = tagsAndFlavors.getSrcFlavors();
 
@@ -139,7 +139,7 @@ public class MicrosoftAzureStartTranscriptionOperationHandler extends AbstractWo
     for (Track track : elements) {
       try {
         job = service.startTranscription(mediaPackage.getIdentifier().toString(), track, langCode, autoDetectLanguage,
-                autoDetectLanguages);
+                                         autoDetectLanguages);
         // Only one job per media package
         break;
       } catch (TranscriptionServiceException e) {

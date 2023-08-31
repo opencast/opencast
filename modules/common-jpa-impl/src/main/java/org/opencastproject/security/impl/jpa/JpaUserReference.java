@@ -112,9 +112,12 @@ public class JpaUserReference {
   protected JpaOrganization organization;
 
   @ManyToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.LAZY)
-  @JoinTable(name = "oc_user_ref_role", joinColumns = {
-      @JoinColumn(name = "user_id") }, inverseJoinColumns = {
-      @JoinColumn(name = "role_id") })
+  @JoinTable(name = "oc_user_ref_role",
+      joinColumns = {
+          @JoinColumn(name = "user_id")
+      }, inverseJoinColumns = {
+          @JoinColumn(name = "role_id")
+      })
   protected Set<JpaRole> roles;
 
   public User toUser(final String providerName) {

@@ -51,14 +51,14 @@ import javax.persistence.UniqueConstraint;
 
 @Entity(name = "ManagedAcl")
 @Table(name = "oc_acl_managed_acl",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"name", "organization_id"}))
+    uniqueConstraints = @UniqueConstraint(columnNames = { "name", "organization_id" }))
 @NamedQueries({
-        @NamedQuery(name = "ManagedAcl.findByIdAndOrg",
-                    query = "SELECT e FROM ManagedAcl e WHERE e.id = :id AND e.organizationId = :organization"),
-        @NamedQuery(name = "ManagedAcl.findAllByOrg",
-                    query = "SELECT e FROM ManagedAcl e WHERE e.organizationId = :organization"),
-        @NamedQuery(name = "ManagedAcl.deleteByIdAndOrg",
-                    query = "DELETE FROM ManagedAcl e WHERE e.id = :id AND e.organizationId = :organization") })
+    @NamedQuery(name = "ManagedAcl.findByIdAndOrg",
+        query = "SELECT e FROM ManagedAcl e WHERE e.id = :id AND e.organizationId = :organization"),
+    @NamedQuery(name = "ManagedAcl.findAllByOrg",
+        query = "SELECT e FROM ManagedAcl e WHERE e.organizationId = :organization"),
+    @NamedQuery(name = "ManagedAcl.deleteByIdAndOrg",
+        query = "DELETE FROM ManagedAcl e WHERE e.id = :id AND e.organizationId = :organization") })
 /** JPA link of {@link ManagedAcl}. */
 public class ManagedAclEntity implements ManagedAcl {
   @Id

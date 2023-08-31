@@ -305,27 +305,27 @@ public abstract class AbstractAclServiceRestEndpoint {
   @POST
   @Path("/apply/episode/{episodeId}")
   @RestQuery(
-          name = "applyAclToEpisode",
-          description = "Immediate application of an ACL to an episode (Attention: This endpoint is deprecated and "
-                  + " will be removed in future versions!)",
-          returnDescription = "Status code",
-          pathParameters = {
-                  @RestParameter(name = "episodeId", isRequired = true, description = "The episode ID", type = STRING)
-          },
-          restParameters = {
-                  @RestParameter(
-                          name = "aclId",
-                          isRequired = false,
-                          description = "The ID of the ACL to apply. If missing the episode ACL will be "
-                                  + "deleted to fall back to the series ACL",
-                          type = INTEGER
-                  )
-          },
-          responses = {
-                  @RestResponse(responseCode = SC_OK, description = "The ACL has been successfully applied"),
-                  @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL or the episode has not been found"),
-                  @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Internal error")
-          }
+      name = "applyAclToEpisode",
+      description = "Immediate application of an ACL to an episode (Attention: This endpoint is deprecated and "
+          + " will be removed in future versions!)",
+      returnDescription = "Status code",
+      pathParameters = {
+          @RestParameter(name = "episodeId", isRequired = true, description = "The episode ID", type = STRING)
+      },
+      restParameters = {
+          @RestParameter(
+              name = "aclId",
+              isRequired = false,
+              description = "The ID of the ACL to apply. If missing the episode ACL will be "
+                  + "deleted to fall back to the series ACL",
+              type = INTEGER
+          )
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "The ACL has been successfully applied"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL or the episode has not been found"),
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Internal error")
+      }
   )
   public Response applyAclToEpisode(@PathParam("episodeId") String episodeId, @FormParam("aclId") Long aclId) {
     final AclService aclService = aclService();

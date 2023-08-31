@@ -67,12 +67,12 @@ import javax.xml.transform.stream.StreamResult;
  */
 @Path("/")
 @RestService(name = "caption", title = "Caption Service", abstractText = "This service enables conversion from one caption format to another.", notes = {
-        "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-        "If the service is down or not working it will return a status 503, this means the the underlying service is "
-                + "not working and is either restarting or has failed",
-        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+    "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
+    "If the service is down or not working it will return a status 503, this means the the underlying service is "
+        + "not working and is either restarting or has failed",
+    "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
+        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+        + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
 @Component(
     immediate = true,
     service = CaptionServiceRestEndpoint.class,
@@ -85,20 +85,25 @@ import javax.xml.transform.stream.StreamResult;
 )
 public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
 
-  /** The logger */
+  /**
+   * The logger
+   */
   private static final Logger logger = LoggerFactory.getLogger(CaptionServiceRestEndpoint.class);
 
-  /** The caption service */
+  /**
+   * The caption service
+   */
   protected CaptionService service;
 
-  /** The service registry */
+  /**
+   * The service registry
+   */
   protected ServiceRegistry serviceRegistry = null;
 
   /**
    * Callback from OSGi that is called when this service is activated.
    *
-   * @param cc
-   *          OSGi component context
+   * @param cc OSGi component context
    */
   @Activate
   public void activate(ComponentContext cc) {
@@ -108,8 +113,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
   /**
    * Sets the caption service
    *
-   * @param service
-   *          the caption service to set
+   * @param service the caption service to set
    */
   @Reference(
       cardinality = ReferenceCardinality.OPTIONAL,
@@ -123,8 +127,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
   /**
    * Removes the caption service
    *
-   * @param service
-   *          the caption service to remove
+   * @param service the caption service to remove
    */
   protected void unsetCaptionService(CaptionService service) {
     this.service = null;
@@ -133,8 +136,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
   /**
    * Callback from the OSGi declarative services to set the service registry.
    *
-   * @param serviceRegistry
-   *          the service registry
+   * @param serviceRegistry the service registry
    */
   @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
@@ -144,31 +146,31 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
   /**
    * Convert captions in catalog from one format to another.
    *
-   * @param inputType
-   *          input format
-   * @param outputType
-   *          output format
-   * @param catalogAsXml
-   *          catalog containing captions
-   * @param lang
-   *          caption language
+   * @param inputType    input format
+   * @param outputType   output format
+   * @param catalogAsXml catalog containing captions
+   * @param lang         caption language
    * @return a Response containing receipt of for conversion
    */
   @POST
   @Path("convert")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "convert", description = "Convert captions from one format to another.", restParameters = {
+  @RestQuery(name = "convert", description = "Convert captions from one format to another.",
+      restParameters = {
           @RestParameter(description = "Captions to be converted.", isRequired = true, name = "captions", type = RestParameter.Type.TEXT),
           @RestParameter(description = "Caption input format (for example: dfxp, subrip,...).", isRequired = false, defaultValue = "dfxp", name = "input", type = RestParameter.Type.STRING),
           @RestParameter(description = "Caption output format (for example: dfxp, subrip,...).", isRequired = false, defaultValue = "subrip", name = "output", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Caption language (for those formats that store such information).", isRequired = false, defaultValue = "en", name = "language", type = RestParameter.Type.STRING) }, responses = { @RestResponse(description = "OK, Conversion successfully completed.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The converted captions file")
+          @RestParameter(description = "Caption language (for those formats that store such information).", isRequired = false, defaultValue = "en", name = "language", type = RestParameter.Type.STRING) },
+      responses = {
+          @RestResponse(description = "OK, Conversion successfully completed.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The converted captions file")
   public Response convert(@FormParam("input") String inputType, @FormParam("output") String outputType,
-          @FormParam("captions") String catalogAsXml, @FormParam("language") String lang) {
+      @FormParam("captions") String catalogAsXml, @FormParam("language") String lang) {
     MediaPackageElement element;
     try {
       element = MediaPackageElementParser.getFromXml(catalogAsXml);
-      if (!Catalog.TYPE.equals(element.getElementType()))
+      if (!Catalog.TYPE.equals(element.getElementType())) {
         return Response.status(Response.Status.BAD_REQUEST).entity("Captions must be of type catalog.").build();
+      }
     } catch (Exception e) {
       logger.info("Unable to parse serialized captions");
       return Response.status(Response.Status.BAD_REQUEST).build();
@@ -191,18 +193,20 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
   /**
    * Parses captions in catalog for language information.
    *
-   * @param inputType
-   *          caption format
-   * @param catalogAsXml
-   *          catalog containing captions
+   * @param inputType    caption format
+   * @param catalogAsXml catalog containing captions
    * @return a Response containing XML with language information
    */
   @POST
   @Path("languages")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "languages", description = "Get information about languages in caption catalog (if such information is available).", restParameters = {
+  @RestQuery(name = "languages", description = "Get information about languages in caption catalog (if such information is available).",
+      restParameters = {
           @RestParameter(description = "Captions to be examined.", isRequired = true, name = "captions", type = RestParameter.Type.TEXT),
-          @RestParameter(description = "Caption input format (for example: dfxp, subrip,...).", isRequired = false, defaultValue = "dfxp", name = "input", type = RestParameter.Type.STRING) }, responses = { @RestResponse(description = "OK, information was extracted and retrieved", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "Returned information about languages present in captions.")
+          @RestParameter(description = "Caption input format (for example: dfxp, subrip,...).", isRequired = false, defaultValue = "dfxp", name = "input", type = RestParameter.Type.STRING) },
+      responses = {
+          @RestResponse(description = "OK, information was extracted and retrieved", responseCode = HttpServletResponse.SC_OK) },
+      returnDescription = "Returned information about languages present in captions.")
   public Response languages(@FormParam("input") String inputType, @FormParam("captions") String catalogAsXml) {
     try {
       MediaPackageElement element = MediaPackageElementParser.getFromXml(catalogAsXml);
@@ -244,10 +248,11 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
    */
   @Override
   public JobProducer getService() {
-    if (service instanceof JobProducer)
+    if (service instanceof JobProducer) {
       return (JobProducer) service;
-    else
+    } else {
       return null;
+    }
   }
 
   /**

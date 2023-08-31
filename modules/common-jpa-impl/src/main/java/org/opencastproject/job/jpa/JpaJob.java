@@ -241,8 +241,8 @@ public class JpaJob {
   @JoinColumn(name = "root", referencedColumnName = "id", nullable = true)
   private JpaJob rootJob = null;
 
-  @OneToMany(mappedBy = "parentJob", fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.REFRESH,
-          CascadeType.MERGE })
+  @OneToMany(mappedBy = "parentJob", fetch = FetchType.LAZY,
+             cascade = { CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE })
   private List<JpaJob> childJobs;
 
   @Transient

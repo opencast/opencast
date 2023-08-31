@@ -37,22 +37,22 @@ import javax.ws.rs.Path;
 
 @Path("/")
 @RestService(
-      name = "MicrosoftAzureTranscriptionRestService",
-      title = "Transcription Service REST Endpoint (uses Microsoft Azure services)",
-      abstractText = "Uses external service to generate transcriptions of recordings.",
-      notes = {
+    name = "MicrosoftAzureTranscriptionRestService",
+    title = "Transcription Service REST Endpoint (uses Microsoft Azure services)",
+    abstractText = "Uses external service to generate transcriptions of recordings.",
+    notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/transcripts)"
-      }
+    }
 )
 @Component(
-      immediate = true,
-      service = MicrosoftAzureTranscriptionRestService.class,
-      property = {
-              "service.description=Microsoft Azure Transcription REST Endpoint",
-              "opencast.service.type=org.opencastproject.transcription.microsoftazure",
-              "opencast.service.path=/transcripts/microsoftazure",
-              "opencast.service.jobproducer=true"
-      }
+    immediate = true,
+    service = MicrosoftAzureTranscriptionRestService.class,
+    property = {
+        "service.description=Microsoft Azure Transcription REST Endpoint",
+        "opencast.service.type=org.opencastproject.transcription.microsoftazure",
+        "opencast.service.path=/transcripts/microsoftazure",
+        "opencast.service.jobproducer=true"
+    }
 )
 public class MicrosoftAzureTranscriptionRestService extends AbstractJobProducerEndpoint {
 

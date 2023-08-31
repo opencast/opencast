@@ -66,8 +66,8 @@ import javax.xml.stream.XMLStreamWriter;
  * Object wrapper for a series.
  */
 @XmlType(name = "series", namespace = IndexObject.INDEX_XML_NAMESPACE, propOrder = { "identifier", "title",
-        "description", "subject", "organization", "language", "creator", "license", "extendedMetadata", "accessPolicy",
-        "managedAcl", "createdDateTime", "organizers", "contributors", "publishers", "rightsHolder", "theme" })
+    "description", "subject", "organization", "language", "creator", "license", "extendedMetadata", "accessPolicy",
+    "managedAcl", "createdDateTime", "organizers", "contributors", "publishers", "rightsHolder", "theme" })
 @XmlRootElement(name = "series", namespace = IndexObject.INDEX_XML_NAMESPACE)
 @XmlAccessorType(XmlAccessType.NONE)
 public class Series implements IndexObject {

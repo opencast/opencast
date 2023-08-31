@@ -67,11 +67,11 @@ import javax.persistence.RollbackException;
 import javax.servlet.http.HttpServletRequest;
 
 @Component(
-        property = {
-                "service.description=Lti User Login"
-        },
-        immediate = true,
-        service = { LtiLaunchAuthenticationHandler.class, OAuthAuthenticationHandler.class }
+    property = {
+        "service.description=Lti User Login"
+    },
+    immediate = true,
+    service = { LtiLaunchAuthenticationHandler.class, OAuthAuthenticationHandler.class }
 )
 
 /**
@@ -227,7 +227,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
     // User blacklist
     if (!BooleanUtils.toBoolean(StringUtils.trimToNull((String) properties.get(ALLOW_SYSTEM_ADMINISTRATOR_KEY)))) {
       String adminUsername = StringUtils.trimToNull((String)
-              properties.get(SecurityConstants.GLOBAL_ADMIN_USER_PROPERTY));
+                                                        properties.get(SecurityConstants.GLOBAL_ADMIN_USER_PROPERTY));
       if (adminUsername != null) {
         usernameBlacklist.add(adminUsername);
       }
@@ -247,11 +247,11 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
 
     String createJpaUserRefStr = (String) properties.get(CREATE_JPA_USER_REFERENCE_KEY);
     createJpaUserReference = BooleanUtils.toBooleanDefaultIfNull(
-            BooleanUtils.toBooleanObject(StringUtils.trimToNull(createJpaUserRefStr)),
-            true);
+        BooleanUtils.toBooleanObject(StringUtils.trimToNull(createJpaUserRefStr)),
+        true);
 
     ltiRolesForUserCreation = extractLtiRolesForUserCreation(
-            Objects.toString(properties.get(LTI_ROLES_TO_CREATE_JPA_USER_REFERENCES_FROM), "*"));
+        Objects.toString(properties.get(LTI_ROLES_TO_CREATE_JPA_USER_REFERENCES_FROM), "*"));
 
     customRoleName = StringUtils.trimToNull((String) properties.get(CUSTOM_ROLE_NAME));
     if (customRoleName != null) {
@@ -260,7 +260,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
     }
 
     // Allow configuring prefixes for certain consumer
-    for (String key: Collections.list(properties.keys())) {
+    for (String key : Collections.list(properties.keys())) {
       if (key.startsWith(ROLE_PREFIX_KEY)) {
         final String consumerKey = key.substring(ROLE_PREFIX_KEY.length());
         final String prefix = Objects.toString(properties.get(key), "");
@@ -275,13 +275,13 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
    * {@inheritDoc}
    *
    * @see org.springframework.security.oauth.provider.OAuthAuthenticationHandler#createAuthentication(
-   *      javax.servlet.http.HttpServletRequest,
+   *javax.servlet.http.HttpServletRequest,
    *      org.springframework.security.oauth.provider.ConsumerAuthentication,
    *      org.springframework.security.oauth.provider.token.OAuthAccessProviderToken)
    */
   @Override
   public Authentication createAuthentication(HttpServletRequest request, ConsumerAuthentication authentication,
-          OAuthAccessProviderToken authToken) {
+      OAuthAccessProviderToken authToken) {
     // The User ID must be provided by the LTI consumer
     String userIdFromConsumer = request.getParameter(LTI_USER_ID_PARAM);
 
@@ -401,7 +401,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
           if (jpaUserReference == null) {
             final String jpaContext = Objects.toString(request.getParameter(CONTEXT_ID), DEFAULT_CONTEXT);
             JpaUserReference userReference = new JpaUserReference(username, name, email, jpaContext, loginDate,
-                organization, jpaRoles);
+                                                                  organization, jpaRoles);
             userReferenceProvider.addUserReference(userReference, jpaContext);
           } else {
             jpaUserReference.setLastLogin(loginDate);
@@ -423,7 +423,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
     //Create/Update UserReference End
 
     Authentication ltiAuth = new PreAuthenticatedAuthenticationToken(userDetails, authentication.getCredentials(),
-            userAuthorities);
+                                                                     userAuthorities);
     SecurityContextHolder.getContext().setAuthentication(ltiAuth);
     return ltiAuth;
   }
@@ -482,7 +482,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
       return (JpaOrganization) org;
     } else {
       return new JpaOrganization(org.getId(), org.getName(), org.getServers(), org.getAdminRole(),
-              org.getAnonymousRole(), org.getProperties());
+                                 org.getAnonymousRole(), org.getProperties());
     }
   }
 
