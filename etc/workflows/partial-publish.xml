@@ -47,6 +47,19 @@
       </configurations>
     </operation>
 
+    <!-- Keep captions in the loop, as they are ignored by select-tracks -->
+
+    <operation
+        id="tag"
+        description="Tag captions for cutting">
+      <configurations>
+        <configuration key="source-flavors">captions/prepared</configuration>
+        <configuration key="target-flavor">captions/work</configuration>
+        <configuration key="target-tags">-archive</configuration>
+        <configuration key="copy">true</configuration>
+      </configurations>
+    </operation>
+
     <operation
       id="analyze-tracks"
       exception-handler-workflow="partial-error"
@@ -82,6 +95,18 @@
         <configuration key="target-smil-flavor">smil/tmp</configuration>
         <configuration key="target-flavor-subtype">trimmed</configuration>
         <configuration key="interactive">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Mark captions for publication -->
+
+    <operation
+        id="tag"
+        description="Mark captions for publication">
+      <configurations>
+        <configuration key="source-flavors">captions/trimmed</configuration>
+        <configuration key="target-flavor">captions/delivery</configuration>
+        <configuration key="target-tags">+engage-download</configuration>
       </configurations>
     </operation>
 
@@ -281,7 +306,7 @@
       exception-handler-workflow="partial-error"
       description="Publishing to Opencast Media Module">
       <configurations>
-        <configuration key="download-source-flavors">dublincore/*,security/*,captions/*</configuration>
+        <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
         <configuration key="download-source-tags">engage-download,atom,rss</configuration>
         <configuration key="streaming-source-tags">engage-streaming</configuration>
         <configuration key="check-availability">false</configuration>
