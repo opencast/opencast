@@ -674,14 +674,14 @@ public abstract class AbstractEventEndpoint {
       previousAgentId = Opt.some(schedulingJson.getString(SCHEDULING_PREVIOUS_AGENTID));
     }
 
-    Opt<String> previousAgentInputs = Opt.none();
-    Opt<String> agentInputs = Opt.none();
+    Optional<String> previousAgentInputs = Optional.empty();
+    Optional<String> agentInputs = Optional.empty();
     if (agentId.isSome() && previousAgentId.isSome()) {
       Agent previousAgent = getCaptureAgentStateService().getAgent(previousAgentId.get());
       Agent agent = getCaptureAgentStateService().getAgent(agentId.get());
 
-      previousAgentInputs = Opt.some(previousAgent.getCapabilities().getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES));
-      agentInputs = Opt.some(agent.getCapabilities().getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES));
+      previousAgentInputs = Optional.ofNullable(previousAgent.getCapabilities().getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES));
+      agentInputs = Optional.ofNullable(agent.getCapabilities().getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES));
     }
 
     // Check if we are allowed to re-schedule on this agent
@@ -721,7 +721,7 @@ public abstract class AbstractEventEndpoint {
 
     // If we had previously selected an agent, and both the old and new agent have the same set of input channels,
     // copy which input channels are active to the new agent
-    if (previousAgentInputs.isSome() && previousAgentInputs.isSome() && agentInputs.isSome()) {
+    if (previousAgentInputs.isPresent() && previousAgentInputs.isPresent() && agentInputs.isPresent()) {
       Map<String, String> map = previousAgentInputMethods.get();
       String mapAsString = map.keySet().stream()
               .collect(Collectors.joining(","));
