@@ -65,6 +65,6 @@
     "sass": "^1.66.1"
   },
   "optionalDependencies": {
-    "fsevents": "^2.3.2"
+    "fsevents": "^2.3.3"
   }
 }
