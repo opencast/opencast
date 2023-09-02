@@ -24,6 +24,7 @@ public class TranscriptionServiceException extends Exception {
   private static final long serialVersionUID = 4196196907868554450L;
 
   private int code;
+  private boolean cancel = false;
 
   public TranscriptionServiceException() {
     super();
@@ -42,7 +43,17 @@ public class TranscriptionServiceException extends Exception {
     this.code = code;
   }
 
+  public TranscriptionServiceException(String message, int code, boolean cancel) {
+    super(message);
+    this.code = code;
+    this.cancel = cancel;
+  }
+
   public int getCode() {
     return this.code;
+  }
+
+  public boolean isCancel() {
+    return cancel;
   }
 }
