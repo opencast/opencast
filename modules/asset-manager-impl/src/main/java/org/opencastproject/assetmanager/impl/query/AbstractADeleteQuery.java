@@ -90,7 +90,7 @@ public abstract class AbstractADeleteQuery implements ADeleteQuery, DeleteQueryC
     };
   }
 
-  public long run(DeleteSnapshotHandler deleteSnapshotHandler) {
+  public long run(DeleteEpisodeHandler deleteSnapshotHandler) {
     // run query and map the result to records
     final long startTime = System.nanoTime();
     // resolve AST
@@ -255,7 +255,7 @@ HAVING v = (SELECT count(*)
   }
 
   @Override public long run() {
-    return run(NOP_DELETE_SNAPSHOT_HANDLER);
+    return run(DELETE_EPISODE_HANDLER);
   }
 
   private static String formatQueryName(String name, String subQueryName) {
@@ -263,14 +263,14 @@ HAVING v = (SELECT count(*)
   }
 
   /**
-   * Call {@link #run(DeleteSnapshotHandler)} with a deletion handler to get notified about deletions.
+   * Call {@link #run(DeleteEpisodeHandler)} with a deletion handler to get notified about deletions.
    */
-  public interface DeleteSnapshotHandler {
+  public interface DeleteEpisodeHandler {
 
     void handleDeletedEpisode(String mpId);
   }
 
-  public static final DeleteSnapshotHandler NOP_DELETE_SNAPSHOT_HANDLER = new DeleteSnapshotHandler() {
+  public static final DeleteEpisodeHandler DELETE_EPISODE_HANDLER = new DeleteEpisodeHandler() {
 
     @Override public void handleDeletedEpisode(String mpId) {
     }
