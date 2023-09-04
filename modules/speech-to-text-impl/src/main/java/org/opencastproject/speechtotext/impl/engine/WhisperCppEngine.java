@@ -117,7 +117,7 @@ public class WhisperCppEngine implements SpeechToTextEngine {
         "--model", whispercppModel,
         "-ovtt",
         "-oj",
-        "-bs 5",
+        "-bs", "5",
         "--output-file", preparedOutputFile.getAbsolutePath().replaceFirst("[.][^.]+$", "")};
 
     List<String> command = new ArrayList<>(Arrays.asList(baseCommands));
@@ -133,12 +133,6 @@ public class WhisperCppEngine implements SpeechToTextEngine {
       command.add("--language");
       command.add(language);
     }
-
-    // TODO: Remove as this is used only for debugging
-    logger.info("Executing WhisperC++'s transcription command: {}", command);
-    logger.info("preparedOutputFile: {}", preparedOutputFile);
-    logger.info("mediaFile: {}", mediaFile.getAbsolutePath());
-    logger.info("preparedOutputFileNoExt: {}", preparedOutputFile.getAbsolutePath().replaceFirst("[.][^.]+$", ""));
 
     Process process = null;
 
