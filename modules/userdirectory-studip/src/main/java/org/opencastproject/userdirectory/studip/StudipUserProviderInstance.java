@@ -267,8 +267,9 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
 
       // Email address
       var email = Objects.toString(userJsonObj.get("email"), null);
+      var name = Objects.toString(userJsonObj.get("fullname"), null);
 
-      User user = new JaxbUser(userName, null, null, email, PROVIDER_NAME, jaxbOrganization, roles);
+      User user = new JaxbUser(userName, null, name, email, PROVIDER_NAME, jaxbOrganization, roles);
 
       cache.put(userName, user);
       logger.debug("Returning user {}", userName);
