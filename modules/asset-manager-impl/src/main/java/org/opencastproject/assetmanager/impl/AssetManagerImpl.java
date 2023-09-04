@@ -912,16 +912,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     return getDatabase().countEvents(organization);
   }
 
-  /**
-   * DeleteSnapshotHandler implementation
-   */
-
-  @Override
-  public void handleDeletedSnapshot(String mpId, VersionImpl version) {
-    logger.info("Firing event handlers for event {}, snapshot {}", mpId, version);
-    fireEventHandlers(AssetManagerItem.deleteSnapshot(mpId, version.value(), new Date()));
-  }
-
   @Override
   public void handleDeletedEpisode(String mpId) {
     logger.info("Firing event handlers for event {}", mpId);

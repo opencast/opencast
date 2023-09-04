@@ -25,7 +25,6 @@ import static org.junit.Assert.assertThat;
 
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.DeleteEpisode;
-import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.DeleteSnapshot;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.TakeSnapshot;
 import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 
@@ -60,7 +59,7 @@ public class AssetManagerMessagingTest extends AssetManagerTestBase {
 
   @Test
   public void test1() throws Exception {
-    runTest(1, 1, 1, 1, new Fx<String[]>() {
+    runTest(1, 1, 1, new Fx<String[]>() {
       @Override public void apply(String[] mp) {
         q.delete(OWNER, q.snapshot()).run();
       }
@@ -69,7 +68,7 @@ public class AssetManagerMessagingTest extends AssetManagerTestBase {
 
   @Test
   public void test2() throws Exception {
-    runTest(2, 1, 1, 1, new Fx<String[]>() {
+    runTest(2, 1, 1, new Fx<String[]>() {
       @Override public void apply(String[] mp) {
         q.delete(OWNER, q.snapshot()).where(q.mediaPackageId(mp[0])).run();
       }
@@ -78,7 +77,7 @@ public class AssetManagerMessagingTest extends AssetManagerTestBase {
 
   @Test
   public void test3() throws Exception {
-    runTest(3, 2, 2, 1, new Fx<String[]>() {
+    runTest(3, 2, 1, new Fx<String[]>() {
       @Override public void apply(String[] mp) {
         q.delete(OWNER, q.snapshot()).where(q.mediaPackageId(mp[0])).run();
       }
@@ -87,7 +86,7 @@ public class AssetManagerMessagingTest extends AssetManagerTestBase {
 
   @Test
   public void test4() throws Exception {
-    runTest(3, 2, 1, 0, new Fx<String[]>() {
+    runTest(3, 2, 0, new Fx<String[]>() {
       @Override public void apply(String[] mp) {
         q.delete(OWNER, q.snapshot()).where(q.mediaPackageId(mp[0]).and(q.version().isLatest())).run();
       }
@@ -96,7 +95,7 @@ public class AssetManagerMessagingTest extends AssetManagerTestBase {
 
   @Test
   public void test5() throws Exception {
-    runTest(3, 2, 2, 0, new Fx<String[]>() {
+    runTest(3, 2, 0, new Fx<String[]>() {
       @Override public void apply(String[] mp) {
         q.delete(OWNER, q.snapshot())
             .where((q.mediaPackageId(mp[0]).or(q.mediaPackageId(mp[1])).and(q.version().isLatest())))
@@ -107,7 +106,7 @@ public class AssetManagerMessagingTest extends AssetManagerTestBase {
 
   @Test
   public void test6() throws Exception {
-    runTest(3, 2, 3, 0, new Fx<String[]>() {
+    runTest(3, 2, 0, new Fx<String[]>() {
       @Override public void apply(String[] mp) {
         q.delete(OWNER, q.snapshot()).where(q.version().isLatest()).run();
       }
@@ -116,7 +115,7 @@ public class AssetManagerMessagingTest extends AssetManagerTestBase {
 
   @Test
   public void test7() throws Exception {
-    runTest(3, 2, 6, 3, new Fx<String[]>() {
+    runTest(3, 2, 3, new Fx<String[]>() {
       @Override public void apply(String[] mp) {
         q.delete(OWNER, q.snapshot()).where(p.agent.eq("agent")).run();
       }
@@ -125,7 +124,7 @@ public class AssetManagerMessagingTest extends AssetManagerTestBase {
 
   @Test
   public void test8() throws Exception {
-    runTest(2, 9, 18, 2, new Fx<String[]>() {
+    runTest(2, 9, 2, new Fx<String[]>() {
       @Override public void apply(String[] mp) {
         q.delete(OWNER, q.snapshot()).where(p.agent.eq("agent")).run();
       }
@@ -136,7 +135,6 @@ public class AssetManagerMessagingTest extends AssetManagerTestBase {
   private void runTest(
           int mpCount,
           int versionCount,
-          int deleteSnapshotMsgCount,
           int deleteEpisodeMsgCount,
           Fx<String[]> deleteQuery)
           throws Exception {
@@ -145,7 +143,6 @@ public class AssetManagerMessagingTest extends AssetManagerTestBase {
     // expect add messages
     expectObjectMessage(handler1, TakeSnapshot.class, mpCount * versionCount);
     // expect delete messages
-    expectObjectMessage(handler1, DeleteSnapshot.class, deleteSnapshotMsgCount);
     expectObjectMessage(handler1, DeleteEpisode.class, deleteEpisodeMsgCount);
     EasyMock.replay(handler1);
     //

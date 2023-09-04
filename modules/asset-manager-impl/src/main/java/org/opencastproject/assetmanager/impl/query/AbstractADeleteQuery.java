@@ -113,7 +113,6 @@ public abstract class AbstractADeleteQuery implements ADeleteQuery, DeleteQueryC
       for (AssetStore as : am.getRemoteAssetStores()) {
         as.delete(deletionSelector);
       }
-      deleteSnapshotHandler.handleDeletedSnapshot(mpId, version);
     }
     for (String mpId : deletion.deletedEpisodes) {
       deleteSnapshotHandler.handleDeletedEpisode(mpId);
@@ -267,14 +266,11 @@ HAVING v = (SELECT count(*)
    * Call {@link #run(DeleteSnapshotHandler)} with a deletion handler to get notified about deletions.
    */
   public interface DeleteSnapshotHandler {
-    void handleDeletedSnapshot(String mpId, VersionImpl version);
 
     void handleDeletedEpisode(String mpId);
   }
 
   public static final DeleteSnapshotHandler NOP_DELETE_SNAPSHOT_HANDLER = new DeleteSnapshotHandler() {
-    @Override public void handleDeletedSnapshot(String mpId, VersionImpl version) {
-    }
 
     @Override public void handleDeletedEpisode(String mpId) {
     }
