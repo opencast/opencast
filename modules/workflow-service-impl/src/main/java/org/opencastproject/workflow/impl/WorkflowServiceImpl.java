@@ -49,6 +49,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
+import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.metadata.api.MediaPackageMetadata;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.metadata.api.MetadataService;
@@ -879,16 +880,20 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   private void removeTempFiles(WorkflowInstance workflowInstance) {
-    logger.info("Removing temporary files for workflow {}", workflowInstance);
+    logger.info("Removing temporary files for workflow {}", workflowInstance.getId());
     MediaPackage mp = workflowInstance.getMediaPackage();
     if (null == mp) {
       logger.warn("Workflow instance {} does not have an media package set", workflowInstance.getId());
       return;
     }
     for (MediaPackageElement elem : mp.getElements()) {
+      // Publications should not link to temporary files and can be skipped
+      if (elem instanceof Publication) {
+        continue;
+      }
       if (null == elem.getURI()) {
-        logger.warn("Mediapackage element {} from the media package {} does not have an URI set",
-                elem.getIdentifier(), mp.getIdentifier().toString());
+        logger.warn("Media package element {} from the media package {} does not have an URI set",
+                elem.getIdentifier(), mp.getIdentifier());
         continue;
       }
       try {
