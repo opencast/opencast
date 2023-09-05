@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -25,6 +25,7 @@ import org.opencastproject.speechtotext.api.SpeechToTextEngine;
 import org.opencastproject.speechtotext.api.SpeechToTextEngineException;
 import org.opencastproject.util.IoSupport;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
@@ -112,6 +113,10 @@ public class WhisperCppEngine implements SpeechToTextEngine {
       File preparedOutputFile, String language, Boolean translate)
           throws SpeechToTextEngineException {
 
+    if (!FilenameUtils.isExtension(mediaFile.getPath(), "wav")) {
+      throw new SpeechToTextEngineException("WhisperC++ currently doesn't support any media extension other than wav");
+    }
+
     String[] baseCommands = { whispercppExecutable,
         mediaFile.getAbsolutePath(),
         "--model", whispercppModel,
@@ -122,17 +127,29 @@ public class WhisperCppEngine implements SpeechToTextEngine {
 
     List<String> command = new ArrayList<>(Arrays.asList(baseCommands));
 
-    if (translate) {
-      command.add("--translate");
-      logger.info("Translation enabled");
-      language = "en";
-    }
+    String subtitleLanguage;
 
-    if (!language.isBlank() && !translate) {
+    // set language of the source audio if known
+    if (!language.isBlank()) {
       logger.info("Using language {} from workflows", language);
       command.add("--language");
       command.add(language);
+    } else {
+      logger.debug("Auto-detecting language");
+      command.add("--language");
+      command.add("auto");
     }
+
+    if (translate) {
+      command.add("--translate");
+      logger.info("Translation enabled");
+      subtitleLanguage = "en";
+    } else {
+      subtitleLanguage = language;
+    }
+
+
+    logger.info("Executing WhisperC++'s transcription command: {}", command);
 
     Process process = null;
 
@@ -167,15 +184,16 @@ public class WhisperCppEngine implements SpeechToTextEngine {
     }
 
     // Detect language if not set
-    if (language.isBlank()) {
+    if (subtitleLanguage.isBlank()) {
       JSONParser jsonParser = new JSONParser();
       try {
         FileReader reader = new FileReader(preparedOutputFile.getAbsolutePath().replaceFirst("[.][^.]+$", "")
             + ".json");
         Object obj = jsonParser.parse(reader);
         JSONObject jsonObject = (JSONObject) obj;
-        language = (String) jsonObject.get("language");
-        logger.info("Language detected by WhisperC++: {}", language);
+        JSONObject result = (JSONObject) jsonObject.get("result");
+        subtitleLanguage = (String) result.get("language");
+        logger.info("Language detected by WhisperC++: {}", subtitleLanguage);
       } catch (Exception e) {
         logger.info("Error reading WhisperC++ JSON file for: {}", mediaFile);
         throw new SpeechToTextEngineException(e);
@@ -184,7 +202,7 @@ public class WhisperCppEngine implements SpeechToTextEngine {
 
     Map<String,Object> returnValues = new HashMap<>();
     returnValues.put("subFile",preparedOutputFile);
-    returnValues.put("language",language);
+    returnValues.put("language",subtitleLanguage);
 
     return returnValues; // Subtitles data
   }
