@@ -23,7 +23,6 @@ package org.opencastproject.index.service.impl.util;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.distribution.api.StreamingDistributionService;
-import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.Publication;
@@ -50,7 +49,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component(
         immediate = true,
@@ -67,8 +68,10 @@ public class PublicationEventUpdateHandler implements AssetManagerUpdateHandler 
   private static final Logger logger = LoggerFactory.getLogger(PublicationEventUpdateHandler.class);
 
   private static final String CONFIGURATION_PUBLICATION_CHANNEL_IDS = "publication.channel.ids";
+  private static final String CONFIGURATION_SOURCE_FLAVORS = "publication.flavors";
 
   private Set<String> configurationPublicationChannelIds = new HashSet<>();
+  private List<String> sourceFlavors = new ArrayList<>();
 
   private DownloadDistributionService downloadDistributionService = null;
   private StreamingDistributionService streamingDistributionService = null;
@@ -102,6 +105,11 @@ public class PublicationEventUpdateHandler implements AssetManagerUpdateHandler 
       }
     }
     logger.debug("Excluded user providers: {}", configurationPublicationChannelIds);
+
+    String sourceFlavorsString = StringUtils.trimToEmpty(Objects.toString(cc.getProperties().get(CONFIGURATION_SOURCE_FLAVORS)));
+    sourceFlavors = Arrays.stream(sourceFlavorsString.split(","))
+        .map(String::trim)
+        .collect(Collectors.toList());
   }
 
   @Deactivate
@@ -136,18 +144,14 @@ public class PublicationEventUpdateHandler implements AssetManagerUpdateHandler 
 
       // Get metadata and ACLs
       SimpleElementSelector elementSelector = new SimpleElementSelector();
-      // Relies on ACLs having this particular flavor
-      elementSelector.addFlavor("security/*");
+      for (String flavor : sourceFlavors) {
+        elementSelector.addFlavor(flavor);
+      }
       Collection<MediaPackageElement> elements = elementSelector.select(mediaPackage, false);
 
       Set<String> elementIds = new HashSet<>();
       for (MediaPackageElement elem : elements) {
         elementIds.add(elem.getIdentifier());
-      }
-
-      // To make sure we hit all extended metadata catalogs, let's just get all catalogs
-      for (Catalog catalog : mediaPackage.getCatalogs()) {
-        elementIds.add(catalog.getIdentifier());
       }
 
       if (elementIds.size() < 1) {
