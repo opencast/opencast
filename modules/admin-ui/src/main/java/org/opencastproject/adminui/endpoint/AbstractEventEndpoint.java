@@ -1819,8 +1819,12 @@ public abstract class AbstractEventEndpoint {
           String submitter = instance.getCreatorName();
 
           User user = getUserDirectoryService().loadUser(submitter);
-          String submitterName = user.getName();
-          String submitterEmail = user.getEmail();
+          String submitterName = null;
+          String submitterEmail = null;
+          if (user != null) {
+            submitterName = user.getName();
+            submitterEmail = user.getEmail();
+          }
 
           jsonList.add(obj(f("id", v(instanceId)), f("title", v(instance.getTitle(), Jsons.BLANK)),
                   f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + instance.getState().toString())),
