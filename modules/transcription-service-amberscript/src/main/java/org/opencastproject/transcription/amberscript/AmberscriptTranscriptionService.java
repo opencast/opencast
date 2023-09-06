@@ -132,6 +132,8 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
   private static final String STATUS_DONE = "DONE";
   private static final String STATUS_ERROR = "ERROR";
 
+  private static final String ERROR_NO_SPEECH = "No speech found";
+
   private static final String PROVIDER = "amberscript";
 
   private AssetManager assetManager;
@@ -736,9 +738,11 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
               logger.debug("Captions job '{}' has not finished yet.", jobId);
               return false;
             case STATUS_ERROR:
-              logger.warn("Captions job '{}' failed.", jobId);
+              var errorMsg = (String) result.get("errorMsg");
               throw new TranscriptionServiceException(
-                      String.format("Captions job '%s' failed: Return Code %d", jobId, code), code);
+                      String.format("Captions job '%s' failed: %s", jobId, errorMsg),
+                      code,
+                      ERROR_NO_SPEECH.equals(errorMsg));
             case STATUS_DONE:
               logger.info("Captions job '{}' has finished.", jobId);
               TranscriptionJobControl jc = database.findByJob(jobId);
