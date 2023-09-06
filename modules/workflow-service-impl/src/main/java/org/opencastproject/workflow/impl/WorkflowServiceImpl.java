@@ -1129,10 +1129,11 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       }
     }
 
-    User workflowCreator = userDirectoryService.loadUser(workflow.getCreatorName());
+    var creatorName = workflow.getCreatorName();
+    var workflowCreator = creatorName == null ? null : userDirectoryService.loadUser(creatorName);
     boolean authorized = currentUser.hasRole(GLOBAL_ADMIN_ROLE)
             || (currentUser.hasRole(currentOrgAdminRole) && currentOrgId.equals(workflowOrgId))
-            || (workflowCreator != null && currentUser.equals(workflowCreator))
+            || (currentUser.equals(workflowCreator))
             || (authorizationService.hasPermission(mediapackage, action) && currentOrgId.equals(workflowOrgId));
 
     if (!authorized) {
