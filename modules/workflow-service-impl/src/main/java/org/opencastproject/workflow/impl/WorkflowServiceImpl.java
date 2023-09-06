@@ -2212,7 +2212,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                   instance.setOrganizationId(orgid);
                   persistence.updateInDatabase(instance);
                 } catch (NotFoundException e) {
-                  logger.warn("Workflow {} not found in the database, but present in the index", indexData.getId());
+                  //Technically this should never happen, but getWorkflow throws it.
                 }
               }
               var updatedWorkflowData = index.getEvent(indexData.getMediaPackageId(), orgid, securityService.getUser());
