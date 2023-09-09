@@ -38,6 +38,7 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
@@ -134,6 +135,8 @@ public class ScheduledDataCollector extends TimerTask {
 
   protected TobiraRemoteRequester tobiraRemoteRequester;
 
+  protected TrustedHttpClient trustedHttpClient;
+
 
   //================================================================================
   // Properties
@@ -181,8 +184,6 @@ public class ScheduledDataCollector extends TimerTask {
     }
     this.sender = new Sender(Objects.toString(serverBaseUrl, DEFAULT_STATISTIC_SERVER_ADDRESS));
 
-    this.tobiraRemoteRequester = new TobiraRemoteRequester();
-
     // Send data now. Repeat every 24h.
     timer = new Timer();
     timer.schedule(this, 0, ONE_DAY_IN_MILLISECONDS);
@@ -200,6 +201,10 @@ public class ScheduledDataCollector extends TimerTask {
   @Override
   public void run() {
     logger.info("Executing adopter statistic scheduler task.");
+
+    this.tobiraRemoteRequester = new TobiraRemoteRequester();
+    this.tobiraRemoteRequester.setRemoteServiceManager(serviceRegistry);
+    this.tobiraRemoteRequester.setTrustedHttpClient(trustedHttpClient);
 
     Form adopter;
     try {
@@ -437,9 +442,15 @@ public class ScheduledDataCollector extends TimerTask {
     this.organizationDirectoryService = orgDirServ;
   }
 
+  @Reference
+  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
+    this.trustedHttpClient = trustedHttpClient;
+  }
+
   private class TobiraRemoteRequester extends RemoteBase {
+    private static final String SERVICE_TYPE = "org.opencastproject.tobira";
     TobiraRemoteRequester() {
-      super("org.opencastproject.tobira");
+      super(SERVICE_TYPE);
     }
 
     public JsonObject getStats() throws IOException {
