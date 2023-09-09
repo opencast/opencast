@@ -43,26 +43,30 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.tobira.impl.TobiraEndpoint;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
 import org.opencastproject.userdirectory.JpaUserReferenceProvider;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -128,7 +132,7 @@ public class ScheduledDataCollector extends TimerTask {
   /** The security service */
   protected SecurityService securityService;
 
-  protected TobiraEndpoint tobiraEndpoint;
+  protected TobiraRemoteRequester tobiraRemoteRequester;
 
 
   //================================================================================
@@ -176,6 +180,8 @@ public class ScheduledDataCollector extends TimerTask {
           + "We cannot take any responsibility for what is done with the data.");
     }
     this.sender = new Sender(Objects.toString(serverBaseUrl, DEFAULT_STATISTIC_SERVER_ADDRESS));
+
+    this.tobiraRemoteRequester = new TobiraRemoteRequester();
 
     // Send data now. Repeat every 24h.
     timer = new Timer();
@@ -239,14 +245,13 @@ public class ScheduledDataCollector extends TimerTask {
         try {
           StatisticData statisticData = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
           sender.sendStatistics(statisticData.jsonify());
-          if (null != tobiraEndpoint) {
-            String tobiraJson = tobiraEndpoint.getStats().toString();
-            // This is null in the case that Tobira hasn't sent any stats yet.
-            // This could be due to Tobira not existing, or because we've just rebooted.
-            if (null != tobiraJson) {
-              sender.sendTobiraData(
-                  "{ \"statistic_key\": \"" + statisticData.getStatisticKey() + "\", \"data\": " + tobiraJson + " }");
-            }
+          JsonObject tobiraJson = tobiraRemoteRequester.getStats();
+          // This is null in the case that Tobira hasn't sent any stats yet.
+          // This could be due to Tobira not existing, or because we've just rebooted.
+          if (null != tobiraJson) {
+            sender.sendTobiraData(
+                "{ \"statistic_key\": \"" + statisticData.getStatisticKey()
+                  + "\", \"data\": " + tobiraJson.toString() + " }");
           }
           //Note: save the form (unmodified) (again!) to update the dates.  Old dates cause warnings to the user!
           adopterFormService.saveFormData(adopter);
@@ -266,10 +271,14 @@ public class ScheduledDataCollector extends TimerTask {
     } else {
       statsJson = "{}";
     }
-    String tobiraJson = gson.toJson(tobiraEndpoint.getStats());
+    JsonObject tobiraJson = tobiraRemoteRequester.getStats();
 
-    //It's not stupid if it works!
-    return "{ \"general\":" + generalJson + ", \"statistics\":" + statsJson + ", \"tobira\":" + tobiraJson + "}";
+    if (null != tobiraJson) {
+      //It's not stupid if it works!
+      return "{ \"general\":" + generalJson + ", \"statistics\":" + statsJson + ", \"tobira\":" + tobiraJson + "}";
+    } else {
+      return "{ \"general\":" + generalJson + ", \"statistics\":" + statsJson + "}";
+    }
   }
 
 
@@ -428,15 +437,24 @@ public class ScheduledDataCollector extends TimerTask {
     this.organizationDirectoryService = orgDirServ;
   }
 
-  @Reference(
-      cardinality = ReferenceCardinality.OPTIONAL,
-      policy = ReferencePolicy.DYNAMIC,
-      unbind = "unsetTobiraEndpoint")
-  public void setTobiraEndpoint(TobiraEndpoint endpoint) {
-    this.tobiraEndpoint = endpoint;
-  }
+  private class TobiraRemoteRequester extends RemoteBase {
+    TobiraRemoteRequester() {
+      super("org.opencastproject.tobira");
+    }
 
-  public void unsetTobiraEndpoint(TobiraEndpoint endpoint) {
-    this.tobiraEndpoint = null;
+    public JsonObject getStats() throws IOException {
+      HttpGet get = new HttpGet("/tobira/stats");
+      HttpResponse response = getResponse(get);
+      try {
+        if (response != null) {
+          InputStream is = response.getEntity().getContent();
+          String json = IOUtils.toString(is, response.getEntity().getContentEncoding().toString());
+          return gson.fromJson(json, JsonElement.class).getAsJsonObject();
+        }
+      } finally {
+        closeConnection(response);
+      }
+      return null;
+    }
   }
 }
