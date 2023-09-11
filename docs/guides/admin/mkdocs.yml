@@ -43,6 +43,7 @@ nav:
    - Overview: 'installation/index.md'
    - Hardware Requirements: installation/server-requirements.md
    - Multiple Servers: 'installation/multiple-servers.md'
+   - Example Installation: 'installation/example-installation.md'
    - Installation from Source:
       - Linux: 'installation/source-linux.md'
       - MacOS X: 'installation/source-macosx.md'
@@ -257,3 +258,4 @@ nav:
    - Waveform: 'workflowoperationhandlers/waveform-woh.md'
    - WebVTT to CutMarks Operation: 'workflowoperationhandlers/webvtt-to-cutmarks.md'
    - Zip: 'workflowoperationhandlers/zip-woh.md'
+- Glossary: 'glossary.md'
