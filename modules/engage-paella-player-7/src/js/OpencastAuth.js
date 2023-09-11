@@ -18,11 +18,11 @@
  * the License.
  *
  */
-import { ButtonPlugin } from 'paella-core';
+
 import { getUrlFromOpencastServer } from './PaellaOpencast';
 
-export default class OpencastAuthButtonPlugin extends ButtonPlugin {
-  async _getUserInfo() {
+export default class OpencastAuth {
+  async getUserInfo() {
     try {
       const response = await fetch(getUrlFromOpencastServer('/info/me.json'));
       if (response.ok) {
@@ -35,7 +35,7 @@ export default class OpencastAuthButtonPlugin extends ButtonPlugin {
     }
   }
 
-  async _getEpisodeACL() {
+  async getEpisodeACL() {
     try {
       const response = await fetch(getUrlFromOpencastServer(`/search/episode.json?id=${this.player.videoId}`));
       if (response.ok) {
@@ -49,7 +49,7 @@ export default class OpencastAuthButtonPlugin extends ButtonPlugin {
     }
   }
 
-  async _getSeriesACL() {
+  async getSeriesACL() {
     try {
       const { series } = this.player.videoManifest.metadata;
       if (!series) {
@@ -66,11 +66,11 @@ export default class OpencastAuthButtonPlugin extends ButtonPlugin {
     }
   }
 
-  async _getACL() {
+  async getACL() {
     return await this._getEpisodeACL() || await this._getSeriesACL();
   }
 
-  async _canWrite() {
+  async canWrite() {
     try {
       const userInfo = await this._getUserInfo();
       const acl = await this._getACL();

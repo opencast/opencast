@@ -18,11 +18,10 @@
  * the License.
  *
  */
-import OpencastAuthButtonPlugin from '../js/OpencastAuthButtonPlugin.js';
-
+import { ButtonPlugin } from 'paella-core';
 import AccountIcon from '../icons/account.svg';
 
-export default class LoginPlugin extends OpencastAuthButtonPlugin {
+export default class LoginPlugin extends ButtonPlugin {
   async load() {
     this.icon = this.player.getCustomPluginIcon(this.name, 'buttonIcon') || AccountIcon;
   }
@@ -33,7 +32,7 @@ export default class LoginPlugin extends OpencastAuthButtonPlugin {
         return false;
       }
       else {
-        const userInfo = await this._getUserInfo();
+        const userInfo = await this.player.opencastAuth.getUserInfo();
         const isAnonymous = ((userInfo.roles.length == 1) && (userInfo.roles[0] == userInfo.org.anonymousRole));
         return isAnonymous;
       }

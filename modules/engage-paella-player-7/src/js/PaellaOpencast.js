@@ -34,7 +34,7 @@ import EpisodeConversor from './EpisodeConversor.js';
 import packagePom from '../../pom.xml';
 
 import dictionary from '../default-dictionaries.js';
-
+import OpencastAuth from './OpencastAuth.js';
 
 function getUrlFromBase(base, url) {
   const a = base.endsWith('/') ? base.slice(0, -1) : base;
@@ -197,6 +197,7 @@ export class PaellaOpencast extends Paella {
 
   constructor(containerElement) {
     super(containerElement, initParams);
+    this._opencastAuth = new OpencastAuth();
 
     const paella = this;
     function humanTimeToSeconds(humanTime) {
@@ -299,5 +300,9 @@ export class PaellaOpencast extends Paella {
         }
       }
     });
+  }
+
+  get opencastAuth() {
+    return this._opencastAuth;
   }
 }
