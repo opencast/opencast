@@ -109,23 +109,23 @@ nav:
    - Multi Tenancy: 'configuration/multi.tenancy.md'
    - OAI-PMH: 'configuration/oaipmh.md'
    - Player:
-        - Configuration: 'configuration/player.configuration.md'
-   - Paella player:
-        - Configuration: 'configuration/paella.player/configuration.md'
-        - URL Parameters: 'configuration/paella.player/url.parameter.md'
-        - Paella plugins:
-             - Overview: 'configuration/paella.player/plugins.md'
-             - es.upv.paella.opencast.descriptionPlugin: 'configuration/paella.player/plugins/es.upv.paella.opencast.descriptionPlugin.md'
-             - es.upv.paella.opencast.downloadsPlugin: 'configuration/paella.player/plugins/es.upv.paella.opencast.downloadsPlugin.md'
-             - es.upv.paella.opencast.episodesFromSeries: 'configuration/paella.player/plugins/es.upv.paella.opencast.episodesFromSeries.md'
-             - es.upv.paella.opencast.loader: 'configuration/paella.player/plugins/es.upv.paella.opencast.loader.md'
-             - es.upv.paella.opencast.logIn: 'configuration/paella.player/plugins/es.upv.paella.opencast.logIn.md'
-             - es.upv.paella.opencast.searchPlugin: 'configuration/paella.player/plugins/es.upv.paella.opencast.searchPlugin.md'
-             - es.upv.paella.opencast.transcriptionTabBarPlugin: 'configuration/paella.player/plugins/es.upv.paella.opencast.transcriptionTabBarPlugin.md'
-             - es.upv.paella.opencast.userTrackingSaverPlugIn: 'configuration/paella.player/plugins/es.upv.paella.opencast.userTrackingSaverPlugIn.md'
-   - Paella player 7:
-        - Configuration: 'configuration/paella.player7/configuration.md'
-        - URL Parameters: 'configuration/paella.player7/url.parameter.md'
+        - Overview: 'configuration/player/player.overview.md'
+        - Paella player 6:
+             - Configuration: 'configuration/player/paella.player6/configuration.md'
+             - URL Parameters: 'configuration/player/paella.player6/url.parameter.md'
+             - Paella plugins:
+                  - Overview: 'configuration/player/paella.player6/plugins.md'
+                  - es.upv.paella.opencast.descriptionPlugin: 'configuration/player/paella.player6/plugins/es.upv.paella.opencast.descriptionPlugin.md'
+                  - es.upv.paella.opencast.downloadsPlugin: 'configuration/player/paella.player6/plugins/es.upv.paella.opencast.downloadsPlugin.md'
+                  - es.upv.paella.opencast.episodesFromSeries: 'configuration/player/paella.player6/plugins/es.upv.paella.opencast.episodesFromSeries.md'
+                  - es.upv.paella.opencast.loader: 'configuration/player/paella.player6/plugins/es.upv.paella.opencast.loader.md'
+                  - es.upv.paella.opencast.logIn: 'configuration/player/paella.player6/plugins/es.upv.paella.opencast.logIn.md'
+                  - es.upv.paella.opencast.searchPlugin: 'configuration/player/paella.player6/plugins/es.upv.paella.opencast.searchPlugin.md'
+                  - es.upv.paella.opencast.transcriptionTabBarPlugin: 'configuration/player/paella.player6/plugins/es.upv.paella.opencast.transcriptionTabBarPlugin.md'
+                  - es.upv.paella.opencast.userTrackingSaverPlugIn: 'configuration/player/paella.player6/plugins/es.upv.paella.opencast.userTrackingSaverPlugIn.md'
+        - Paella player 7:
+             - Configuration: 'configuration/player/paella.player7/configuration.md'
+             - URL Parameters: 'configuration/player/paella.player7/url.parameter.md'
    - Plugin Management: configuration/plugin-management.md
    - Search Index:
         - Overview: 'configuration/searchindex/index.md'
