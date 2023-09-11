@@ -40,7 +40,9 @@ export default class DownloadsPlugin extends PopUpButtonPlugin {
     const { streams, metadata } = this.player.videoManifest;
 
     const hasWritePermission = this.config.allowWritePermission && await this.player.opencastAuth.canWrite();
-    const hasAllowedLicense = this.config.allowOnlyLicenses ? (this.config.allowOnlyLicenses.includes(metadata.license)) : true;
+    const hasAllowedLicense = this.config.allowOnlyLicenses
+      ? (this.config.allowOnlyLicenses.includes(metadata.license))
+      : true;
     const enabled = (await super.isEnabled()) && (hasWritePermission || hasAllowedLicense);
 
     if (enabled) {
@@ -67,7 +69,7 @@ export default class DownloadsPlugin extends PopUpButtonPlugin {
   }
 
   async load() {
-    this.icon = this.player.getCustomPluginIcon(this.name, "downloadIcon") || defaultDownloadIcon;
+    this.icon = this.player.getCustomPluginIcon(this.name, 'downloadIcon') || defaultDownloadIcon;
   }
 
   async getContent() {
