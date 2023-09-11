@@ -118,6 +118,7 @@ import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
+import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -756,14 +757,7 @@ public class IndexServiceImpl implements IndexService {
     JSONObject configJson = (JSONObject) processing.get("configuration");
 
     try {
-      // 1. Check if any active workflows are running for this mediapackage id
-      if (workflowService.mediaPackageHasActiveWorkflows(mpId)) {
-        throw new IllegalArgumentException("Unable to start new workflow '" + workflowDefId + "' on archived media package '" + mediaPackage + "', existing workflow is running");
-      }
-      // 2. Save the snapshot
-      assetManager.takeSnapshot(mediaPackage);
-
-      // 3. start the new workflow on the snapshot
+      // Start the new workflow on the snapshot
       // Workflow params are assumed to be String (not mixed with Number)
       Map<String, String> params = new HashMap<String, String>();
       if (configJson != null) {
@@ -772,18 +766,10 @@ public class IndexServiceImpl implements IndexService {
         }
       }
 
-      Set<String> mpIds = new HashSet<String>();
-      mpIds.add(mpId);
-
-      final Workflows workflows = new Workflows(assetManager, workflowService);
-      List<WorkflowInstance> wfList = workflows
-              .applyWorkflowToLatestVersion(mpIds,
-                      ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowDefId), params))
-              .toList();
-      wfId = wfList.size() > 0 ? Long.toString(wfList.get(0).getId()) : "Unknown";
-      logger.info("Asset update and publish workflow {} scheduled for mp {}",wfId, mpId);
-
-    } catch (AssetManagerException e) {
+      WorkflowInstance workflowInstance = workflowService.start(
+              workflowService.getWorkflowDefinitionById(workflowDefId), mediaPackage, params);
+      logger.info("Asset update and publish workflow {} scheduled for mp {}", workflowInstance.getId(), mpId);
+    } catch (AssetManagerException | WorkflowParsingException | UnauthorizedException e) {
       throw new IndexServiceException("Unable to start workflow " + workflowDefId + " on " + mpId);
     } catch (WorkflowDatabaseException e) {
       logger.warn("Unable to load workflow '{}' from workflow service:", wfId, e);
