@@ -135,6 +135,17 @@ public interface WorkflowServiceDatabase {
   boolean mediaPackageHasActiveWorkflows(String mediaPackageId) throws WorkflowDatabaseException;
 
   /**
+   * Returns true there are still workflows running that were created by the user with the given identifier.
+   *
+   * @param userId
+   *          the user identifier
+   * @return true, if a workflow is running; false otherwise
+   * @throws WorkflowDatabaseException
+   *           if there is a problem communicating with the underlying data store
+   */
+  boolean userHasActiveWorkflows(String userId) throws WorkflowDatabaseException;
+
+  /**
    * Updates a single workflow.
    *
    * @param instance

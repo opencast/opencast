@@ -31,6 +31,7 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.transcription.api.TranscriptionService;
+import org.opencastproject.transcription.api.TranscriptionServiceException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -133,9 +134,14 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
         convertedTranscription.addTag(tag);
       }
       mediaPackage.add(convertedTranscription);
-      logger.info("Added transcription to the mediapackage {}: {}",
-          mediaPackage.getIdentifier(), convertedTranscription.getURI());
+      logger.info("Added transcription to the media package {}: {}", mediaPackage, convertedTranscription.getURI());
 
+    } catch (TranscriptionServiceException e) {
+      if (e.isCancel()) {
+        logger.warn(e.getMessage());
+        return createResult(mediaPackage, Action.SKIP);
+      }
+      throw new WorkflowOperationException(e);
     } catch (Exception e) {
       throw new WorkflowOperationException(e);
     }
