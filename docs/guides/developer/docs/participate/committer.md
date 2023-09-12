@@ -81,9 +81,6 @@ The current list of committers in aplhabetical order:
 <li><a href=https://github.com/Arnei><img style="width: 40px; margin: 0"
  src=https://avatars.githubusercontent.com/u/14070005?u=6e73d565059359edfca6ec780d0263e9c2a01668&v=4
  /> Arnei</a></li>
-<li><a href=https://github.com/CGreweling><img style="width: 40px; margin: 0"
- src=https://avatars.githubusercontent.com/u/3499600?u=27138059f4750ec5ce6ea6f4e80d08443b75367a&v=4
- /> CGreweling</a></li>
 <li><a href=https://github.com/geichelberger><img style="width: 40px; margin: 0"
  src=https://avatars.githubusercontent.com/u/35195803?v=4
  /> geichelberger</a></li>
@@ -120,9 +117,6 @@ The current list of committers in aplhabetical order:
 <li><a href=https://github.com/smarquard><img style="width: 40px; margin: 0"
  src=https://avatars.githubusercontent.com/u/5888197?u=71bbc5d122a4175f8954502c280afc0a3c575e59&v=4
  /> smarquard</a></li>
-<li><a href=https://github.com/ts23><img style="width: 40px; margin: 0"
- src=https://avatars.githubusercontent.com/u/3940856?v=4
- /> ts23</a></li>
 <li><a href=https://github.com/turro><img style="width: 40px; margin: 0"
  src=https://avatars.githubusercontent.com/u/3541284?u=c9b1c8c7d2d674a3bc633c3f026a3b09e9131ae6&v=4
  /> turro</a></li>
