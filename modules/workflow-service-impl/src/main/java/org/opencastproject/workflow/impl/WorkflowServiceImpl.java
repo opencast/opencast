@@ -2189,6 +2189,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         int offset = 0;
         String currentMediapackageId;
         String lastMediapackageId = "";
+        var updatedWorkflowRange = new ArrayList<Event>();
         do {
           try {
             workflowIndexData = persistence.getWorkflowIndexData(limit, offset);
@@ -2199,7 +2200,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           if (workflowIndexData.size() > 0) {
             offset += limit;
             logger.debug("Got {} workflows for re-indexing", workflowIndexData.size());
-            var updatedWorkflowRange = new ArrayList<Event>();
 
             for (WorkflowIndexData indexData : workflowIndexData) {
               currentMediapackageId = indexData.getMediaPackageId();
