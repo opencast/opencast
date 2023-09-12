@@ -36,7 +36,7 @@ angular.module('adminNg.services')
           write : write !== undefined ? write : false,
           actions : {
             name : 'new-event-acl-actions',
-            value : actionValues !== undefined ? actionValues : [],
+            value : actionValues !== undefined ? actionValues.slice() : [],
           },
           user: undefined,
         };

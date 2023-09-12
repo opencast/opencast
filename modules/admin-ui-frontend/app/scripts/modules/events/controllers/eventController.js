@@ -53,7 +53,7 @@ angular.module('adminNg.controllers')
             write : write !== undefined ? write : false,
             actions : {
               name : 'event-acl-actions',
-              value : actionValues !== undefined ? actionValues : [],
+              value : actionValues !== undefined ? actionValues.slice() : [],
             },
             user: undefined,
           };
@@ -626,7 +626,7 @@ angular.module('adminNg.controllers')
       });
     };
 
-    $scope.saveScheduling = function () {
+    $scope.saveScheduling = function (newObj, oldObj) {
       if (me.readyToPollConflicts()) {
         if (!me.checkValidity()) {
           return;
@@ -649,10 +649,26 @@ angular.module('adminNg.controllers')
 
           EventSchedulingResource.save({
             id: $scope.resourceId,
-            entries: $scope.source
+            entries: $scope.source,
+            previousId: oldObj ? oldObj.id : undefined,
+            previousEntries: oldObj ? oldObj.inputMethods : undefined
           }, function () {
             fetchChildResources($scope.resourceId);
           });
+
+          // Getting the update may take several seconds on large installations
+          // Fill in input channel values if possible
+          if (oldObj && $scope.source.device.inputs && oldObj.inputs) {
+            var sourceInputs = $scope.source.device.inputs.map(function(input){
+              return input.id;
+            }).join(',');
+            var oldObjInputs = oldObj.inputs.map(function(input){
+              return input.id;
+            }).join(',');
+            if (sourceInputs === oldObjInputs) {
+              $scope.source.device.inputMethods = oldObj.inputMethods;
+            }
+          }
         }, me.conflictsDetected);
       }
     };

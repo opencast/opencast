@@ -221,6 +221,21 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     throw new WorkflowDatabaseException("Workflow instances can not be loaded from a remote workflow service");
   }
 
+  @Override
+  public boolean userHasActiveWorkflows(String userId) throws WorkflowDatabaseException {
+    HttpGet get = new HttpGet("/user/" + userId + "/hasActiveWorkflows");
+    HttpResponse response = getResponse(get);
+    try {
+      if (response != null)
+        return Boolean.parseBoolean(response.getEntity().getContent().toString());
+    } catch (Exception e) {
+      throw new WorkflowDatabaseException(e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new WorkflowDatabaseException("Workflow instances can not be loaded from a remote workflow service");
+  }
+
   /**
    * {@inheritDoc}
    *

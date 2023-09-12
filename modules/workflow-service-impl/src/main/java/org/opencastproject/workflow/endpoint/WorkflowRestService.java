@@ -349,6 +349,26 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   }
 
   @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("user/{id}/hasActiveWorkflows")
+  @RestQuery(name = "userhasactiveworkflows", description = "Returns if there are currently workflow(s) running that"
+          + "were started by the given user",
+          returnDescription = "Returns if there are currently workflow(s) running that were started by the given user "
+                  + "as a boolean.",
+          pathParameters = {
+                  @RestParameter(name = "id", isRequired = true, description = "The user identifier", type = STRING) },
+          responses = {
+                  @RestResponse(responseCode = SC_OK, description = "Whether there are active workflow for the user.")})
+  public Response userHasActiveWorkflows(@PathParam("id") String userId) {
+    try {
+      return Response.ok(Boolean.toString(service.userHasActiveWorkflows(userId))).build();
+
+    } catch (WorkflowDatabaseException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
   @Produces(MediaType.TEXT_XML)
   @Path("instance/{id}.xml")
   @RestQuery(name = "workflowasxml", description = "Get a specific workflow instance.", returnDescription = "An XML representation of a workflow instance", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, responses = {
