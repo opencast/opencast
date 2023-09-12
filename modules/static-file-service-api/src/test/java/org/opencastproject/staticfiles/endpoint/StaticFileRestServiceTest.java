@@ -26,7 +26,6 @@ import static org.easymock.EasyMock.eq;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
@@ -260,11 +259,7 @@ public class StaticFileRestServiceTest {
     Response response = staticFileRestService.deleteStaticFile(uuid);
     assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
 
-    try {
-      staticFileRestService.getStaticFile(uuid);
-      fail("NotFoundException must be passed on");
-    } catch (NotFoundException e) {
-      // expected
-    }
+    response = staticFileRestService.getStaticFile(uuid);
+    assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
   }
 }
