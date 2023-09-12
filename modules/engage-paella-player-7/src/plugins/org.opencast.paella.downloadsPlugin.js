@@ -24,16 +24,11 @@ import {
   PopUpButtonPlugin,
   translate
 } from 'paella-core';
-import PaellaOpencastPlugins from './PaellaOpencastPlugins';
 
 import '../css/DownloadsPlugin.css';
-
 import defaultDownloadIcon from '../icons/download.svg';
 
 export default class DownloadsPlugin extends PopUpButtonPlugin {
-  getPluginModuleInstance() {
-    return PaellaOpencastPlugins.Get();
-  }
 
   async isEnabled() {
     this._downloads = {};
