@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+  <id>partial-process-uploaded-captions</id>
+  <title>Process uploaded captions</title>
+  <tags/>
+  <description/>
+  <configuration_panel/>
+
+  <operations>
+
+    <!-- create or update captions/prepared -->
+
+    <operation
+      id="tag"
+      description="Remove old captions/prepared">
+      <configurations>
+        <configuration key="source-flavors">captions/prepared</configuration>
+        <configuration key="target-tags">-archive</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      if="${presenter_prepared_exists} OR ${presentation_prepared_exists}"
+      id="clone"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Create captions/prepared">
+      <configurations>
+        <configuration key="source-flavor">captions/source</configuration>
+        <configuration key="target-flavor">captions/prepared</configuration>
+      </configurations>
+    </operation>
+
+    <!-- cut captions -->
+
+    <operation
+      id="clone"
+      exception-handler-workflow="partial-error"
+      description="Create working copy of the cutting information">
+      <configurations>
+        <configuration key="source-flavor">smil/cutting</configuration>
+        <configuration key="target-flavor">smil/tmp</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="editor"
+      exception-handler-workflow="partial-error"
+      description="Cut the captions">
+      <configurations>
+        <configuration key="source-flavors">captions/source</configuration>
+        <configuration key="smil-flavors">smil/tmp</configuration>
+        <configuration key="target-smil-flavor">smil/tmp</configuration>
+        <configuration key="target-flavor-subtype">delivery</configuration>
+        <configuration key="interactive">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- tag results -->
+
+    <operation
+      id="tag"
+      description="Tag captions for delivery">
+      <configurations>
+        <configuration key="source-flavors">captions/delivery</configuration>
+	<configuration key="target-tags">-archive,+generator:unknown,+engage-download</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="tag"
+      description="Don't publish captions/source">
+      <configurations>
+        <configuration key="source-flavors">captions/source</configuration>
+        <configuration key="target-tags">+exclude-publish</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>
