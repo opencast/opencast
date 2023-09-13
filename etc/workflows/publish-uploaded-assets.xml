@@ -27,7 +27,7 @@
       id="tag"
       description="Tag newly uploaded assets for archival">
       <configurations>
-	<configuration key="source-flavors">*/*</configuration>
+        <configuration key="source-flavors">*/*</configuration>
         <configuration key="target-tags">+archive</configuration>
       </configurations>
     </operation>
@@ -59,7 +59,7 @@
       description="Update recording in Opencast Media Module">
       <configurations>
         <configuration key="download-source-flavors">${download-source-flavors},dublincore/*,security/*</configuration>
-	<configuration key="download-source-tags">engage-download,-exclude-publish</configuration>  <!-- exclude necessary bc of download_source_flavors -->
+        <configuration key="download-source-tags">engage-download,-exclude-publish</configuration>  <!-- exclude necessary bc of download_source_flavors -->
         <configuration key="streaming-source-tags">engage-streaming</configuration>
         <configuration key="strategy">merge</configuration>
         <configuration key="check-availability">false</configuration>

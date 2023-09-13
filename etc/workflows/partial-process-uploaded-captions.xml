@@ -63,7 +63,7 @@
       description="Tag captions for delivery">
       <configurations>
         <configuration key="source-flavors">captions/delivery</configuration>
-	<configuration key="target-tags">-archive,+generator:unknown,+engage-download</configuration>
+        <configuration key="target-tags">-archive,+generator:unknown,+engage-download</configuration>
       </configurations>
     </operation>
 
