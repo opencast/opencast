@@ -31,6 +31,7 @@ import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.ST
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.SUCCEEDED;
 
 import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.query.RichAResult;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
@@ -2208,8 +2209,29 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
               }
               current++;
 
-              var updatedWorkflowData = index.getEvent(indexData.getMediaPackageId(), indexData.getOrganizationId(),
-                        securityService.getUser());
+              String orgid = indexData.getOrganizationId();
+              if (null == orgid) {
+                String mpId = indexData.getMediaPackageId();
+                //We're assuming here that mediapackages don't change orgs
+                RichAResult results = assetManager.getSnapshotsById(mpId);
+                if (results.getSize() == 0) {
+                  logger.debug("Dropping {} from the index since it is missing from the database", mpId);
+                  continue;
+                }
+                orgid = results.getSnapshots().head2().getOrganizationId();
+                //We try-catch here since it's possible for the WF to exist in the *index* but not in the *DB*
+                // It probably shouldn't be, but that won't keep it from happening anyway.
+                try {
+                  //NB: This version of getWorkflow takes the org id, which in this case is null
+                  // Using the normal version filters by org, and since this workflow has a NULL org it can't be found
+                  WorkflowInstance instance = persistence.getWorkflow(indexData.getId(), null);
+                  instance.setOrganizationId(orgid);
+                  persistence.updateInDatabase(instance);
+                } catch (NotFoundException e) {
+                  //Technically this should never happen, but getWorkflow throws it.
+                }
+              }
+              var updatedWorkflowData = index.getEvent(indexData.getMediaPackageId(), orgid, securityService.getUser());
               updatedWorkflowData = getStateUpdateFunction(indexData).apply(updatedWorkflowData);
               updatedWorkflowRange.add(updatedWorkflowData.get());
 
