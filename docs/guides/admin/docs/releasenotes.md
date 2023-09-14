@@ -1,8 +1,25 @@
 # Opencast 13: Release Notes
 
 
+Opencast 13.11
+--------------
+
+The eleventh maintenance release of Opencast 13.
+
+- Fix static file service exception on non-existing file([#5230](https://github.com/opencast/opencast/pull/5230))
+- Fix Workflow Index Rebuild([#5226](https://github.com/opencast/opencast/pull/5226))
+- Fix NPE when workflow user no longer exists([#5191](https://github.com/opencast/opencast/pull/5191))
+- Fix wrong failedOperation characterers in send email docs WoH and improves Freemaker documentation ([#5177](https://github.com/opencast/opencast/pull/5177))
+- Skip deleting non existent file ([#5171](https://github.com/opencast/opencast/pull/5171))
+- Copy active inputs between CAs if they have the same set of inputs([#5169](https://github.com/opencast/opencast/pull/5169))
+- Fix editing custom actions in the ACL editor([#5164](https://github.com/opencast/opencast/pull/5164))
+
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
+
 Opencast 13.10
--------------
+--------------
 
 The tenth maintenance release of Opencast 13.
 
