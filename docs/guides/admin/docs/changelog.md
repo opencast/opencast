@@ -393,6 +393,35 @@ Opencast 14
 Opencast 13
 -----------
 
+### Opencast 13.11
+
+*Released on September 14th, 2023*
+
+- [[#5251](https://github.com/opencast/opencast/pull/5251)] -
+  Add Opencast 13.11 release notes
+- [[#5230](https://github.com/opencast/opencast/pull/5230)] -
+  Fix static file service exception on non-existing file
+- [[#5226](https://github.com/opencast/opencast/pull/5226)] -
+  Fix Workflow Index Rebuild
+- [[#5191](https://github.com/opencast/opencast/pull/5191)] -
+  Fix NPE when workflow user no longer exists
+- [[#5177](https://github.com/opencast/opencast/pull/5177)] -
+  Fix wrong failedOperation characterers in send email docs WoH and improves Freemaker documentation.
+- [[#5175](https://github.com/opencast/opencast/pull/5175)] -
+  Add Opencast 13.10 release notes
+- [[#5171](https://github.com/opencast/opencast/pull/5171)] -
+  Skip deleting non existent file
+- [[#5169](https://github.com/opencast/opencast/pull/5169)] -
+  Copy active inputs between CAs if they have the same set of inputs
+- [[#5164](https://github.com/opencast/opencast/pull/5164)] -
+  Fix editing custom actions in the ACL editor
+- [[#5101](https://github.com/opencast/opencast/pull/5101)] -
+  Add whisper-ctranslate2 flags to WhisperEngine.java
+- [[#5062](https://github.com/opencast/opencast/pull/5062)] -
+  Dont allow to delete user with active workflow in Admin UI
+- [[#4684](https://github.com/opencast/opencast/pull/4684)] -
+  Ensure workflows have an associated org after upgrade
+
 ### Opencast 13.10
 
 *Released on August 23th, 2023*
