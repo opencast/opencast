@@ -715,24 +715,7 @@ public class IndexServiceImpl implements IndexService {
   /**
    * Parses the processing information, including the workflowDefinitionId, from the metadataJson and starts the
    * workflow with the passed mediapackage.
-   *
-   * TODO NOTE: This checks for running workflows, then takes a snapshot prior to starting a new workflow. This causes a
-   * potential race condition:
-   *
-   * 1. An existing workflow is running, the add asset workflow cannot start.
-   *
-   * 2. The snapshot(4x) archive(3x) is saved and the new workflow is started.
-   *
-   * 3. Possible race condition: No running workflow, a snapshot is saved but the workflow cannot start because another
-   * workflow has started between the time of checking and starting running.
-   *
-   * 4. If race condition: the Admin UI shows error that the workflow could not start.
-   *
-   * 5. If race condition: The interim snapshot(4x) archive(3x) is updated(4x-3x) by the running workflow's snapshots
-   * and resolves the inconsistency, eventually.
-   *
    * Example of processing json:
-   *
    * ...., "processing": { "workflow": "full", "configuration": { "videoPreview": "false", "trimHold": "false",
    * "captionHold": "false", "archiveOp": "true", "publishEngage": "true", "publishHarvesting": "true" } }, ....
    *
