@@ -309,14 +309,13 @@ public class MicrosoftAzureSpeechServicesClient {
     boolean formatIsWebVtt;
     switch (StringUtils.lowerCase(format)) {
       case "vtt":
-      case "webvtt":
         formatIsWebVtt = true;
         break;
       case "srt":
         formatIsWebVtt = false;
         break;
       default:
-        throw new IllegalArgumentException("format should be srt, vtt or webvtt");
+        throw new IllegalArgumentException("format should be srt or vtt");
     }
     String content;
     if (formatIsWebVtt) {

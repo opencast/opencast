@@ -109,6 +109,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   private static final String DEFAULT_AZURE_CONTAINER_NAME = "opencast-transcriptions";
   private static final float DEFAULT_MIN_CONFIDENCE = 1.0f;
   private static final int DEFAULT_SPLIT_TEXT_LINE_LENGTH = 100;
+  private static final String DEFAULT_OUTPUT_FILE_FORMAT = "vtt";
   private static final String KEY_ENABLED = "enabled";
   private static final String KEY_LANGUAGE = "language";
   private static final String KEY_AUTO_DETECT_LANGUAGES = "auto.detect.languages";
@@ -121,6 +122,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   private static final String KEY_COGNITIVE_SERVICES_SUBSCRIPTION_KEY = "azure_cognitive_services_subscription_key";
   private static final String KEY_AZURE_SPEECH_RECOGNITION_MIN_CONFIDENCE = "azure_speech_recognition_min_confidence";
   private static final String KEY_SPLIT_TEXT_LINE_LENGTH = "split.text.line.length";
+  private static final String KEY_OUTPUT_FILE_FORMAT = "output.file.format";
 
 
   private AssetManager assetManager;
@@ -149,6 +151,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   private MicrosoftAzureSpeechServicesClient azureSpeechServicesClient;
   private Float azureSpeechRecognitionMinConfidence;
   private Integer splitTextLineLength;
+  private String outputFileFormat;
 
   private enum Operation {
     StartTranscription
@@ -180,7 +183,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     }
 
     if (!enabled) {
-      logger.info("Microsoft Azure Transcription service disabled."
+      logger.info("Microsoft Azure transcription service disabled."
           + " If you want to enable it, please update the service configuration.");
       return;
     }
@@ -246,7 +249,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     Option<String> languageOpt = OsgiUtil.getOptCfg(cc.getProperties(), KEY_LANGUAGE);
     if (languageOpt.isSome()) {
       language = languageOpt.get();
-      logger.info("Default Language is set to '{}'.", language);
+      logger.info("Default language is set to '{}'.", language);
     } else {
       language = DEFAULT_LANGUAGE;
       logger.info("Default language '{}' will be used.", language);
@@ -302,6 +305,25 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
           KEY_SPLIT_TEXT_LINE_LENGTH, DEFAULT_MIN_CONFIDENCE);
       splitTextLineLength = DEFAULT_SPLIT_TEXT_LINE_LENGTH;
     }
+
+    Option<String> outputFileFormatOpt = OsgiUtil.getOptCfg(cc.getProperties(), KEY_OUTPUT_FILE_FORMAT);
+    if (outputFileFormatOpt.isSome()) {
+      outputFileFormat = outputFileFormatOpt.get();
+      switch (outputFileFormat) {
+        case "srt":
+        case "vtt":
+          break;
+        default:
+          logger.debug("Azure output file format not valid, using default format {}.",
+              DEFAULT_OUTPUT_FILE_FORMAT);
+          outputFileFormat = DEFAULT_OUTPUT_FILE_FORMAT;
+          break;
+      }
+    } else {
+      logger.debug("Azure output file format not set, using default format {}.", DEFAULT_OUTPUT_FILE_FORMAT);
+      outputFileFormat = DEFAULT_OUTPUT_FILE_FORMAT;
+    }
+    logger.info("Transcription output format is set to '{}'.", outputFileFormat);
 
     //// create Azure storage client
     try {
@@ -407,13 +429,14 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     try {
       MicrosoftAzureSpeechTranscriptionJson transcriptionJson = getTranscriptionJson(mpId, transcription);
       transcriptionFileUri = MicrosoftAzureSpeechServicesClient.writeTranscriptionFile(transcriptionJson,
-          workspace, "webvtt", azureSpeechRecognitionMinConfidence, splitTextLineLength);
+          workspace, outputFileFormat, azureSpeechRecognitionMinConfidence, splitTextLineLength);
     } catch (IOException | MicrosoftAzureNotFoundException e) {
       throw new TranscriptionServiceException(String.format(
           "Unable to download transcription file for media package '%s'.", mpId), e);
     }
     return MediaPackageElementBuilderFactory.newInstance().newElementBuilder().elementFromURI(
-        transcriptionFileUri, MediaPackageElement.Type.Attachment, new MediaPackageElementFlavor("captions", "vtt"));
+        transcriptionFileUri, MediaPackageElement.Type.Attachment,
+        new MediaPackageElementFlavor("captions", outputFileFormat));
   }
 
   @Override
