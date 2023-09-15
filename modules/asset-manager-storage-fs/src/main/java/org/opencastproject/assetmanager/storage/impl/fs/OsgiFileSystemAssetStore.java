@@ -47,6 +47,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -158,7 +159,7 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
   }
 
   private List<String> getRootDirectories() {
-    return rootDirectories;
+    return Collections.unmodifiableList(rootDirectories);
   }
 
   protected void setupCache() {
