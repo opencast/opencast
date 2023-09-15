@@ -46,7 +46,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -93,7 +92,6 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
           throws WorkflowOperationException {
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
-    Map<String, String> workflowConfigurations = workflowInstance.getConfigurations();
 
     logger.debug("Attach transcription for media package '{}' started.", mediaPackage.getIdentifier());
 

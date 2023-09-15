@@ -39,17 +39,30 @@ public class MicrosoftAzureSpeechServicesClientTest {
   private static final Logger logger = LoggerFactory.getLogger(MicrosoftAzureSpeechServicesClientTest.class);
 
   private boolean enabled;
+  /**
+   * Provide the Microsoft Azure Speech services endpoint as value here or
+   * put the value into AZURE_SPEECH_SERVICES_ENDPOINT environment variable.
+   */
   private String azureSpeechServicesEndpoint;
+  /**
+   * Provide the Microsoft Azure Speech services subscription kex as value here or
+   * put the value into AZURE_SPEECH_SERVICES_SUBSCRIPTION_KEY environment variable.
+   */
   private String azureCognitiveServicesSubscriptionKey;
   private MicrosoftAzureSpeechServicesClient azureSpeechClient;
 
 
   @Before
-  public void setUp() throws Exception {
-    azureSpeechServicesEndpoint = "https://videountertitelung-cognitive-service.cognitiveservices.azure.com";
-    azureCognitiveServicesSubscriptionKey = "";
+  public void setUp() {
+    azureSpeechServicesEndpoint = System.getProperty("AZURE_SPEECH_SERVICES_ENDPOINT", "");
+    azureCognitiveServicesSubscriptionKey = System.getProperty("AZURE_SPEECH_SERVICES_SUBSCRIPTION_KEY", "");
     enabled = StringUtils.isNotBlank(azureSpeechServicesEndpoint)
         && StringUtils.isNotBlank(azureCognitiveServicesSubscriptionKey);
+    if (enabled) {
+      logger.debug("Run tests on Azure endpoint {}", azureSpeechServicesEndpoint);
+    } else {
+      logger.debug("Skip tests.");
+    }
     azureSpeechClient = new MicrosoftAzureSpeechServicesClient(azureSpeechServicesEndpoint,
         azureCognitiveServicesSubscriptionKey);
   }

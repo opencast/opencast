@@ -41,12 +41,12 @@ public class MicrosoftAzureStorageClientTest {
    * Provide the Microsoft Azure storage account name as value here or
    * put the value into AZURE_STORAGE_ACCOUNT_NAME environment variable.
    */
-  private String azureStorageAccountName = "mmssubtitlestorage";
+  private String azureStorageAccountName;
   /**
    * Provide the Microsoft Azure account access key as value here or
    * put the value into AZURE_ACCOUNT_ACCESS_KEY environment variable.
    */
-  private String azureAccountAccessKey = "";
+  private String azureAccountAccessKey;
   private boolean enabled;   // will be set in setUp according the values of
                              // azureStorageAccountName and azureAccountAccessKey
 
@@ -54,18 +54,8 @@ public class MicrosoftAzureStorageClientTest {
 
   @Before
   public void setUp() throws MicrosoftAzureStorageClientException {
-//    if (StringUtils.isBlank(azureAccountAccessKey)) {
-//      String envValue = System.getProperty("AZURE_STORAGE_ACCOUNT_NAME");
-//      if (StringUtils.isNotBlank(envValue)) {
-//        azureAccountAccessKey = envValue;
-//      }
-//    }
-//    if (StringUtils.isBlank(azureAccountAccessKey)) {
-//      String envValue = System.getProperty("AZURE_ACCOUNT_ACCESS_KEY");
-//      if (StringUtils.isNotBlank(envValue)) {
-//        azureAccountAccessKey = envValue;
-//      }
-//    }
+    azureStorageAccountName = System.getProperty("AZURE_STORAGE_ACCOUNT_NAME", "");
+    azureAccountAccessKey = System.getProperty("AZURE_ACCOUNT_ACCESS_KEY", "");
     enabled = StringUtils.isNotBlank(azureStorageAccountName)
         && StringUtils.isNotBlank(azureAccountAccessKey);
     if (!enabled) {

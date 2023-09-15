@@ -34,23 +34,12 @@ public class MicrosoftAzureAuthorizationTest {
 
   private static final Logger logger = LoggerFactory.getLogger(MicrosoftAzureAuthorizationTest.class);
 
-  /**
-   * Provide the Microsoft Azure storage account name as value here or
-   * put the value into AZURE_STORAGE_ACCOUNT_NAME environment variable.
-   */
-  private String azureStorageAccountName = "myocstorage";
-  /**
-   * Provide the Microsoft Azure account access key as value here or
-   * put the value into AZURE_ACCOUNT_ACCESS_KEY environment variable.
-   */
-  private String azureAccountAccessKey = "mySecureAccountKey";
-  private boolean enabled;   // will be set in setUp according the values of
-                             // azureStorageAccountName and azureAccountAccessKey
-
   private MicrosoftAzureAuthorization azureAuthorization;
 
   @Before
   public void setUp() throws MicrosoftAzureStorageClientException {
+    String azureStorageAccountName = "azurestorageaccount";
+    String azureAccountAccessKey = "mysecretaccesskey";
     azureAuthorization = new MicrosoftAzureAuthorization(azureStorageAccountName, azureAccountAccessKey);
   }
 
@@ -69,6 +58,6 @@ public class MicrosoftAzureAuthorizationTest {
     Assert.assertTrue(sasToken.contains("st=2023-01-15T11:00:00Z"));
     Assert.assertTrue(sasToken.contains("se=2023-01-16T11:00:00Z"));
     Assert.assertTrue(sasToken.contains("spr=https"));
-    Assert.assertTrue(sasToken.contains("sig=6HIa8hyO1k68DMRIRmdn8wjNP5rMCI7SmvdQh2cRvEA%3D"));
+    Assert.assertTrue(sasToken.contains("sig=1oAO19BF8zsHJ7xKO1AzVtgSacN8xgqM6dFBZoQMZUM%3D"));
   }
 }
