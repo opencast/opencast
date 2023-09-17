@@ -1,9 +1,35 @@
 Changelog
 =========
 
-
 Opencast 14
 -----------
+
+### Opencast 14.4
+
+*Released on September 14th, 2023*
+
+- [[#5241](https://github.com/opencast/opencast/pull/5241)] -
+  Fix incorrect Debian install documentation
+- [[#5239](https://github.com/opencast/opencast/pull/5239)] -
+  Skip publications when removing temporary files
+- [[#5237](https://github.com/opencast/opencast/pull/5237)] -
+  Prevent concurrent cleanups
+- [[#5236](https://github.com/opencast/opencast/pull/5236)] -
+  Fix NPE when removing a workflow without creator
+- [[#5232](https://github.com/opencast/opencast/pull/5232)] -
+  Logging of delete snapshot workflow operation
+- [[#5229](https://github.com/opencast/opencast/pull/5229)] -
+  Fixed Admin UI redirect after login
+- [[#5228](https://github.com/opencast/opencast/pull/5228)] -
+  Fix AmberScript transcription failing if video contains no speech
+- [[#5194](https://github.com/opencast/opencast/pull/5194)] -
+  Fix Crowdin Sources
+- [[#5178](https://github.com/opencast/opencast/pull/5178)] -
+  Incorrect crowdin paths
+- [[#5176](https://github.com/opencast/opencast/pull/5176)] -
+  Opencast 14.3 release notes
+
+
 ### Opencast 14.3
 
 *Released on August 23rd, 2023*
