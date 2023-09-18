@@ -38,7 +38,7 @@ jobs:
 
     - name: upload translation source
       env:
-        CROWDIN_TOKEN: ${{ secret.CROWDIN_TOKEN }}
+        CROWDIN_TOKEN: ${{ secrets.CROWDIN_TOKEN }}
       run: |
         set -o errexit
         update() {
