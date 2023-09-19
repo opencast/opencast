@@ -14,28 +14,29 @@ The email body, if not specified by body or body-template-file, will consist of 
 `<Recording Title> (<Mediapackage ID>)`.
 
 Freemarker templates can be used in the following fields to allow replacement with values obtained from the workflow or
-media package: to, cc, bcc, subject, and body. If body-template-file is specified, the operation will use a Freemarker template
-file located in `<config_dir>/etc/email` to generate the email body.
+media package: to, cc, bcc, subject, and body. If body-template-file is specified, the operation will use a Freemarker 
+template file located in `<config_dir>/etc/email` to generate the email body. A more in deep explanation of how to use 
+Freemarker variables can be found in the [Appendix](#appendix-freemarker-variable-usage-guide).
 
-User names can be provided in `to`, `cc`, or `bcc` in lieu of email addresses so that the user directory is searched
+Usernames can be provided in `to`, `cc`, or `bcc` in lieu of email addresses so that the user directory is searched
 and that user's email address is used (see Example 5).
 
 
 Parameter Table
 ---------------
 
-|configuration keys|description|default value|example|
-|------------------|-------|-----------|-------------|
-|body|Email body content.<br>Takes precedence over body-template-file.|`<Recording Title> (<Mediapackage ID>)`|Lecture 1 (4bf316fc-ea78-4903-b00e-9976b0912e4d)|
-|body-template-file|Name of file that will be used as a template for the content of the email body.|EMPTY|templateName|
-|body-html|Email body content send as HTML.<br>Takes precedence over body-html-template-file.|EMPTY|`<h1>${mediapackage.identifier}</h1>`|
-|body-html-template-file|Name of file that will be used as a template for the HTML content of the email body.|EMPTY|templateNameHTML|
-|subject|Email subject.|EMPTY|Operation has been completed|
-|to|The field `to` of the email<br>i.e. the comma separated list of email accounts the email will be sent to.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
-|cc|The field `cc` of the email<br>i.e. the comma separated list of email accounts that will receive a carbon copy of the email.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
-|bcc|The field `bcc` of the email<br>i.e. the comma separated list of email accounts that will receive a blind carbon copy of the email.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
-|address-separator|Separator to use for splitting a string into separate email addresses|`, <tab>`|`,`|
-|skip-invalid-address|If the operation should skip invalid addresses instead of failing|false|true/false|
+| configuration keys       | description                                                                                                                            | default value                           | example                                                          |
+|--------------------------|----------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------|------------------------------------------------------------------|
+| body                     | Email body content.<br>Takes precedence over body-template-file.                                                                       | `<Recording Title> (<Mediapackage ID>)` | Lecture 1 (4bf316fc-ea78-4903-b00e-9976b0912e4d)                 |
+| body-template-file       | Name of file that will be used as a template for the content of the email body.                                                        | EMPTY                                   | templateName                                                     |
+| body-html                | Email body content send as HTML.<br>Takes precedence over body-html-template-file.                                                     | EMPTY                                   | `<h1>${mediapackage.identifier}</h1>`                            |
+| body-html-template-file  | Name of file that will be used as a template for the HTML content of the email body.                                                   | EMPTY                                   | templateNameHTML                                                 |
+| subject                  | Email subject.                                                                                                                         | EMPTY                                   | Operation has been completed                                     |
+| to                       | The field `to` of the email<br>i.e. the comma separated list of email accounts the email will be sent to.                              | EMPTY                                   | email-account@email-domain.org,second-account@second-domain.org  |
+| cc                       | The field `cc` of the email<br>i.e. the comma separated list of email accounts that will receive a carbon copy of the email.           | EMPTY                                   | email-account@email-domain.org,second-account@second-domain.org  |
+| bcc                      | The field `bcc` of the email<br>i.e. the comma separated list of email accounts that will receive a blind carbon copy of the email.    | EMPTY                                   | email-account@email-domain.org,second-account@second-domain.org  |
+| address-separator        | Separator to use for splitting a string into separate email addresses                                                                  | `, <tab>`                               | `,`                                                              |
+| skip-invalid-address     | If the operation should skip invalid addresses instead of failing                                                                      | false                                   | true/false                                                       |
 
 **Some other email parameters can be customized in the SMTP Service configuration**
 
@@ -53,30 +54,44 @@ Use `${mediaPackage.FIELD}`
 
 #### Examples
 
-|Field                  |How To Get It|
-|-----------------------|-------------|
-|media package id       |${mediaPackage.identifier}|
-|recording title        |${mediaPackage.title}|
-|recording date and time|${mediaPackage.date?datetime?iso_utc} - See Freemarker manual for date manipulation <br>(extract date only, time only, format, etc)|
-|series title           |${mediaPackage.seriesTitle}|
-|series id              |${mediaPackage.series}|
+| Field                   | How To Get It                                                                                                                       |
+|-------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| media package id        | ${mediaPackage.identifier}                                                                                                          |
+| recording title         | ${mediaPackage.title}                                                                                                               |
+| recording date and time | ${mediaPackage.date?datetime?iso_utc} - See Freemarker manual for date manipulation <br>(extract date only, time only, format, etc) |
+| series title            | ${mediaPackage.seriesTitle}                                                                                                         |
+| series id               | ${mediaPackage.series}                                                                                                              |
 
 ### Workflow Information
 
 Use `${workflow.FIELD}`
 
-|Field                    |How To Get It             |
-|-------------------------|--------------------------|
-|workflow id              |${workflow.id}            |
-|workflow template id     |${workflow.template}      |
-|workflow state           |${workflow.state}         |
-|workflow title           |${workflow.title}         |
-|workflow description     |${workflow.description}   |
-|id of parent workflow    |${workflow.parentId}      |
-|name of workflow creator |${workflow.creatorName}   |
-|workflow organization    |${workflow.organizationId}|
+| Field                    | How To Get It              |
+|--------------------------|----------------------------|
+| workflow id              | ${workflow.id}             |
+| workflow template id     | ${workflow.template}       |
+| workflow state           | ${workflow.state}          |
+| workflow title           | ${workflow.title}          |
+| workflow description     | ${workflow.description}    |
+| id of parent workflow    | ${workflow.parentId}       |
+| name of workflow creator | ${workflow.creatorName}    |
+| workflow organization    | ${workflow.organizationId} |
 
 Note that some of these values may not exist depending on the workflow.
+
+## Failed Operation Information
+
+| Field                       | How To Get It                                                     |
+|-----------------------------|-------------------------------------------------------------------|
+| Operation id                | ${failedOperation.getId()}                                        |
+| Template                    | ${failedOperation.template}                                       |
+| Date started                | ${failedOperation.getDateStarted?string("yyyy-MM-dd HH:mm:ss")}   |
+| Date completed              | ${failedOperation.getDateCompleted?string("yyyy-MM-dd HH:mm:ss")} |
+| Execution handling workflow | ${failedOperation.getExceptionHandlingWorkflow()}                 |
+| Execution host              | ${failedOperation.executionHost}                                  |
+| Failed attempts             | ${failedOperation.failedAttempts}                                 |
+| Max attempts                | ${failedOperation.maxAttempts}                                    |
+
 
 
 ### Workflow Configuration Properties
@@ -106,16 +121,17 @@ In your email template:
 
 Use `${catalogs['FLAVOR']['FIELD']}`
 
-Deprecation notice: Opencast versions before 13 used `${catalogs['SUBFLAVOR']['FIELD']}` for `dublincore/SUBFLAVOR` catalogs. This syntax is still accepted but deprecation. Future versions might remove support.
+Deprecation notice: Opencast versions before 13 used `${catalogs['SUBFLAVOR']['FIELD']}` for `dublincore/SUBFLAVOR` 
+catalogs. This syntax is still accepted but deprecation. Future versions might remove support.
 
 #### Examples
 
-|Field          |How To Get It|
-|---------------|-------------|
-|episode creator|${catalogs['dublincore/episode']['creator']}|
-|episode title  |${catalogs['dublincore/episode']['title']}|
-|series creator |${catalogs['dublincore/series']['creator']}|
-|series title   |${catalogs['dublincore/series']['title']}|
+| Field           | How To Get It                                |
+|-----------------|----------------------------------------------|
+| episode creator | ${catalogs['dublincore/episode']['creator']} |
+| episode title   | ${catalogs['dublincore/episode']['title']}   |
+| series creator  | ${catalogs['dublincore/series']['creator']}  |
+| series title    | ${catalogs['dublincore/series']['title']}    |
 
 ### Organization properties
 
@@ -123,9 +139,9 @@ Use `${organization['PROPERTY']}`
 
 #### Examples
 
-|Property  |How To Get It|
-|----------|-------------|
-|Engage URL|${organization["org.opencastproject.engage.ui.url"]}|
+| Property   | How To Get It                                        |
+|------------|------------------------------------------------------|
+| Engage URL | ${organization["org.opencastproject.engage.ui.url"]} |
 
 Examples
 --------
@@ -144,7 +160,7 @@ Media package title in subject field, default email body.
     <configuration key="to">email-account@email-domain.org</configuration>
     <!-- This is going to be replaced with the media package title -->
     <configuration key="subject">${mediaPackage.title} has been published</configuration>
-    <!-- Neither body or body-template-file specified so default body <Recording Title> (<Mediapackage ID>)<br>is sent -->
+    <!-- Neither body nor body-template-file specified so default body <Recording Title> (<Mediapackage ID>)<br>is sent -->
   </configurations>
 </operation>
 ```
@@ -175,7 +191,7 @@ To and subject are inline templates; the email body uses a template file named s
 
 The contents of the `…/etc/email/sample` email template:
 
-```
+```freemarker
 Event Details
 <#if catalogs['dublincore/series']?has_content>
 Series Title: ${catalogs['dublincore/series']['title']}
@@ -236,7 +252,7 @@ Workflow Configuration Panel:
         /* components with keys that begin with 'org.opencastproject.workflow.config' will be passed
          * into the workflow. The component's nodeKey must match the components array key.
          *
-         * Example:'org.opencastproject.workflow.config.myProperty' will be availible at ${my.property}
+         * Example:'org.opencastproject.workflow.config.myProperty' will be available at ${my.property}
          */
         // After the other components (Hold, Archive, etc), add:
         components['org.opencastproject.workflow.config.emailAddress'] = new ocAdmin.Component(
@@ -281,20 +297,20 @@ In error handling workflow (email-error):
 
 The contents of the <config_dir>/etc/email/errorDetails email template:
 
-```
+```freemarker
 Error Details
 
 <#if catalogs['dublincore/series']?has_content>
-Course: ${catalogs['dublincore/series']['subject']!'series subject missing'}-${catalogs['dublincore/series']['title']!'series title missing'}
+Course: ${catalogs['dublincore/series']['subject']!'series subject missing'} - ${catalogs['dublincore/series']['title']!'series title missing'}
 Instructor: ${catalogs['dublincore/series']['contributor']!'instructor missing'}
 </#if>
 Title: ${catalogs['dublincore/episode']['title']!'title missing'}
 Event Date: ${mediaPackage.date?datetime?iso_local}
 
 <#if failedOperation?has_content>
-  Workflow failed in operation: ${failedOperation.position}-${failedOperation.template}
-  Started: ${failedOperation.dateStarted?datetime?iso_local}
-  Ended: ${failedOperation.dateCompleted?datetime?iso_local}
+  Workflow failed in operation: ${failedOperation.getId()}-${failedOperation.template}
+  Started: ${failedOperation.dateStarted?string("yyyy-MM-dd HH:mm:ss")}
+  Ended: ${failedOperation.dateCompleted?string("yyyy-MM-dd HH:mm:ss")}
   Execution Host: ${failedOperation.executionHost}
 </#if>
 
@@ -309,7 +325,7 @@ Logged incident of the error looks like this:
 
 ### Example 5
 
-The user name is stored in the episode dublin core `contributor` field. There's a user `jharvard` with email
+The username is stored in the episode dublin core `contributor` field. There's a user `jharvard` with email
 `jharvard@harvard.edu` defined in the system. The message will be sent to `jharvard@harvard.edu`:
 
 ```xml
@@ -345,7 +361,7 @@ The user name is stored in the episode dublin core `contributor` field. There's 
 
 ### Example 6
 
-Send an email to the user which started the workflow.
+Email the user which started the workflow.
 Requires the user account to have a valid email address.
 
 ```xml
@@ -359,3 +375,137 @@ Requires the user account to have a valid email address.
   </configurations>
 </operation>
 ```
+
+Appendix: Freemarker Variable Usage Guide
+---------------------------
+
+Freemarker is a powerful template engine that allows you to embed dynamic content in your templates. 
+One of the key features is its ability to handle variables. This guide will walk you through the basics of using 
+variables in Freemarker templates.
+
+### Declaring Variables
+
+In Freemarker, you don't explicitly declare variables. You usually pass them from your application code to the template. 
+However, you can also set local variables using the `<#assign>` directive:
+
+```freemarker
+<#assign myVariable = "Hello, World!">
+```
+
+### Accessing Variables
+
+To access a variable, you can simply enclose its name in `${}`:
+
+```freemarker
+${myVariable}
+```
+
+### Checking for Null or Empty Values
+
+Freemarker provides the `?has_content` built-in to check if a variable has content:
+
+```freemarker
+<#if myVariable?has_content>
+  ${myVariable}
+<#else>
+  Variable is empty or null.
+</#if>
+```
+
+### Default Values
+
+You can provide a default value for a variable using the `!` operator:
+
+```freemarker
+${myVariable!"Default Value"}
+```
+
+### Nested Fields
+
+To access nested fields, you can use the dot notation:
+
+```freemarker
+${user.name}
+```
+
+And you can chain checks to avoid null pointer exceptions:
+
+```freemarker
+<#if user?has_content && user.name?has_content>
+  ${user.name}
+<#else>
+  Name is not available.
+</#if>
+```
+
+### Formatting Dates
+
+Freemarker allows you to format date variables using the `?string` built-in:
+
+```freemarker
+${dateVariable?string("yyyy-MM-dd")}
+```
+
+You can also specify the type of date-like value using `?date`, `?time`, or `?datetime`:
+
+```freemarker
+${dateVariable?datetime}
+```
+
+### Lists and Maps
+
+You can iterate over lists and maps using the `<#list>` directive:
+
+```freemarker
+<#list myList as item>
+  ${item}
+</#list>
+```
+
+For maps:
+
+```freemarker
+<#list myMap?keys as key>
+  ${key}: ${myMap[key]}
+</#list>
+```
+
+### Arithmetic Operations
+
+Freemarker supports basic arithmetic operations:
+
+```freemarker
+${x + y}
+${x - y}
+${x * y}
+${x / y}
+```
+
+### Conditional Statements
+
+You can use `<#if>`, `<#elseif>`, and `<#else>` for conditional logic:
+
+```freemarker
+<#if x > y>
+  X is greater.
+<#elseif x == y>
+  X and Y are equal.
+<#else>
+  Y is greater.
+</#if>
+```
+
+### Functions and Macros
+
+You can define reusable pieces of code using `<#macro>`:
+
+```freemarker
+<#macro greet name>
+  Hello, ${name}!
+</#macro>
+
+<@greet name="John"/>
+```
+
+This guide provides a quick overview of how to use variables in Freemarker. For more advanced topics and complete 
+documentation, you can refer to the [official Freemarker documentation](https://freemarker.apache.org/docs/).

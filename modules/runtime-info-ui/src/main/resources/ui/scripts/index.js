@@ -40,12 +40,14 @@ $(document).ready(function () {
               url: '/rest_docs.html',
               type: 'HEAD',
               error: function () {
-                // Give up
+                window.location.replace(adminUIUrl);
               },
               success: function () {
                 window.location.replace('/rest_docs.html');
               }
             });
+          } else {
+            window.location.replace(adminUIUrl);
           }
         },
         success: function () {

@@ -46,6 +46,19 @@ public interface WorkflowServiceDatabase {
   WorkflowInstance getWorkflow(long workflowId) throws NotFoundException, WorkflowDatabaseException;
 
   /**
+   * Gets a single workflow by its identifier
+   *
+   * @param workflowId
+   *          the series identifier
+   * @return the {@link WorkflowInstance} for this workflow
+   * @throws NotFoundException
+   *           if there is no workflow with this identifier
+   * @throws WorkflowDatabaseException
+   *           if there is a problem communicating with the underlying data store
+   */
+  WorkflowInstance getWorkflow(long workflowId, String orgId) throws NotFoundException, WorkflowDatabaseException;
+
+  /**
    * Gets workflow instances for current organization.
    *
    * @param limit
@@ -133,6 +146,17 @@ public interface WorkflowServiceDatabase {
    *           if there is a problem communicating with the underlying data store
    */
   boolean mediaPackageHasActiveWorkflows(String mediaPackageId) throws WorkflowDatabaseException;
+
+  /**
+   * Returns true there are still workflows running that were created by the user with the given identifier.
+   *
+   * @param userId
+   *          the user identifier
+   * @return true, if a workflow is running; false otherwise
+   * @throws WorkflowDatabaseException
+   *           if there is a problem communicating with the underlying data store
+   */
+  boolean userHasActiveWorkflows(String userId) throws WorkflowDatabaseException;
 
   /**
    * Updates a single workflow.

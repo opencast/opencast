@@ -199,12 +199,12 @@ public class
 
       MediaPackageElement subtitleMediaPackageElement;
       switch (appendSubtitleAs) {
-        case track:
-          subtitleMediaPackageElement = new TrackImpl();
-          break;
         case attachment:
-        default:
           subtitleMediaPackageElement = new AttachmentImpl();
+          break;
+        case track:
+        default:
+          subtitleMediaPackageElement = new TrackImpl();
       }
 
       subtitleMediaPackageElement.setIdentifier(mediaPackageIdentifier);
@@ -214,10 +214,6 @@ public class
         subtitleMediaPackageElement.setURI(uri);
       }
       MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor().applyTo(track.getFlavor());
-      targetFlavor = new MediaPackageElementFlavor(
-          targetFlavor.getType(),
-          targetFlavor.getSubtype().replace(PLACEHOLDER_LANG, languageCode)
-      );
       subtitleMediaPackageElement.setFlavor(targetFlavor);
 
       List<String> targetTags = tagsAndFlavors.getTargetTags();

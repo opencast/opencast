@@ -1,8 +1,4 @@
 {
 	"Error loading video! No video tracks found": "載入影片時出錯！ 未找到影片軌道",
-	"Error loading video {0}": "載入影片 {0} 時出錯",
-	"CAPTIONS_undefined": "未知的語言",
-	"CAPTIONS_es": "西班牙語",
-	"CAPTIONS_en": "英語",
-	"CAPTIONS_de": "德語"
+	"Error loading video {0}": "載入影片 {0} 時出錯"
 }

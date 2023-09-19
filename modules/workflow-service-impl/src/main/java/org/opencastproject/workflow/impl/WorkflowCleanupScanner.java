@@ -51,6 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Component(
     immediate = true,
@@ -86,6 +87,9 @@ public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner implem
 
   /** Buffer of parentless jobs in days */
   protected static int bufferForParentlessJobs = -1;
+
+  // Lock to prevent concurrent cleanups
+  private static final ReentrantLock lock = new ReentrantLock();
 
   public WorkflowCleanupScanner() {
     try {
@@ -188,45 +192,54 @@ public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner implem
 
   @Override
   public void scan() {
-    if (bufferForFailedJobs > 0) {
-      try {
-        getWorkflowService().cleanupWorkflowInstances(bufferForFailedJobs, WorkflowInstance.WorkflowState.FAILED);
-      } catch (WorkflowDatabaseException e) {
-        logger.error("Unable to cleanup failed jobs:", e);
-      } catch (UnauthorizedException e) {
-        logger.error("Workflow cleanup job doesn't have right to delete jobs!");
-        throw new IllegalStateException(e);
-      }
+    if (lock.isLocked()) {
+      logger.info("Skipping workflow scan since a previous scan is still active");
+      return;
     }
-
-    if (bufferForSuccessfulJobs > 0) {
-      try {
-        getWorkflowService().cleanupWorkflowInstances(bufferForSuccessfulJobs, WorkflowInstance.WorkflowState.SUCCEEDED);
-      } catch (WorkflowDatabaseException e) {
-        logger.error("Unable to cleanup successful jobs:", e);
-      } catch (UnauthorizedException e) {
-        logger.error("Workflow cleanup job doesn't have right to delete jobs!");
-        throw new IllegalStateException(e);
+    try {
+      lock.lock();
+      if (bufferForFailedJobs > 0) {
+        try {
+          getWorkflowService().cleanupWorkflowInstances(bufferForFailedJobs, WorkflowInstance.WorkflowState.FAILED);
+        } catch (WorkflowDatabaseException e) {
+          logger.error("Unable to cleanup failed jobs:", e);
+        } catch (UnauthorizedException e) {
+          logger.error("Workflow cleanup job doesn't have right to delete jobs!");
+          throw new IllegalStateException(e);
+        }
       }
-    }
 
-    if (bufferForStoppedJobs > 0) {
-      try {
-        getWorkflowService().cleanupWorkflowInstances(bufferForStoppedJobs, WorkflowInstance.WorkflowState.STOPPED);
-      } catch (WorkflowDatabaseException e) {
-        logger.error("Unable to cleanup stopped jobs:", e);
-      } catch (UnauthorizedException e) {
-        logger.error("Workflow cleanup job doesn't have right to delete jobs!");
-        throw new IllegalStateException(e);
+      if (bufferForSuccessfulJobs > 0) {
+        try {
+          getWorkflowService().cleanupWorkflowInstances(bufferForSuccessfulJobs, WorkflowInstance.WorkflowState.SUCCEEDED);
+        } catch (WorkflowDatabaseException e) {
+          logger.error("Unable to cleanup successful jobs:", e);
+        } catch (UnauthorizedException e) {
+          logger.error("Workflow cleanup job doesn't have right to delete jobs!");
+          throw new IllegalStateException(e);
+        }
       }
-    }
 
-    if (bufferForParentlessJobs > 0) {
-      try {
-        getServiceRegistry().removeParentlessJobs(bufferForParentlessJobs);
-      } catch (ServiceRegistryException e) {
-        logger.error("There was an error while removing parentless jobs: {}", e.getMessage());
+      if (bufferForStoppedJobs > 0) {
+        try {
+          getWorkflowService().cleanupWorkflowInstances(bufferForStoppedJobs, WorkflowInstance.WorkflowState.STOPPED);
+        } catch (WorkflowDatabaseException e) {
+          logger.error("Unable to cleanup stopped jobs:", e);
+        } catch (UnauthorizedException e) {
+          logger.error("Workflow cleanup job doesn't have right to delete jobs!");
+          throw new IllegalStateException(e);
+        }
       }
+
+      if (bufferForParentlessJobs > 0) {
+        try {
+          getServiceRegistry().removeParentlessJobs(bufferForParentlessJobs);
+        } catch (ServiceRegistryException e) {
+          logger.error("There was an error while removing parentless jobs: {}", e.getMessage());
+        }
+      }
+    } finally {
+      lock.unlock();
     }
   }
 

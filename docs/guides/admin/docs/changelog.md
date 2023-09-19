@@ -1,9 +1,48 @@
 Changelog
 =========
 
-
 Opencast 14
 -----------
+
+### Opencast 14.4
+
+*Released on September 14th, 2023*
+
+- [[#5241](https://github.com/opencast/opencast/pull/5241)] -
+  Fix incorrect Debian install documentation
+- [[#5239](https://github.com/opencast/opencast/pull/5239)] -
+  Skip publications when removing temporary files
+- [[#5237](https://github.com/opencast/opencast/pull/5237)] -
+  Prevent concurrent cleanups
+- [[#5236](https://github.com/opencast/opencast/pull/5236)] -
+  Fix NPE when removing a workflow without creator
+- [[#5232](https://github.com/opencast/opencast/pull/5232)] -
+  Logging of delete snapshot workflow operation
+- [[#5229](https://github.com/opencast/opencast/pull/5229)] -
+  Fixed Admin UI redirect after login
+- [[#5228](https://github.com/opencast/opencast/pull/5228)] -
+  Fix AmberScript transcription failing if video contains no speech
+- [[#5194](https://github.com/opencast/opencast/pull/5194)] -
+  Fix Crowdin Sources
+- [[#5178](https://github.com/opencast/opencast/pull/5178)] -
+  Incorrect crowdin paths
+- [[#5176](https://github.com/opencast/opencast/pull/5176)] -
+  Opencast 14.3 release notes
+
+
+### Opencast 14.3
+
+*Released on August 23rd, 2023*
+
+- [[#5167](https://github.com/opencast/opencast/pull/5167)] -
+  Fix admin interface permissions
+- [[#5166](https://github.com/opencast/opencast/pull/5166)] -
+  Fix Admin Interface Redirect
+- [[#5165](https://github.com/opencast/opencast/pull/5165)] -
+  Fix crowdin package name
+- [[#5163](https://github.com/opencast/opencast/pull/5163)] -
+  Add Opencast 14.2 release notes
+
 
 ### Opencast 14.2
 
@@ -379,6 +418,48 @@ Opencast 14
 
 Opencast 13
 -----------
+
+### Opencast 13.11
+
+*Released on September 14th, 2023*
+
+- [[#5251](https://github.com/opencast/opencast/pull/5251)] -
+  Add Opencast 13.11 release notes
+- [[#5230](https://github.com/opencast/opencast/pull/5230)] -
+  Fix static file service exception on non-existing file
+- [[#5226](https://github.com/opencast/opencast/pull/5226)] -
+  Fix Workflow Index Rebuild
+- [[#5191](https://github.com/opencast/opencast/pull/5191)] -
+  Fix NPE when workflow user no longer exists
+- [[#5177](https://github.com/opencast/opencast/pull/5177)] -
+  Fix wrong failedOperation characterers in send email docs WoH and improves Freemaker documentation.
+- [[#5175](https://github.com/opencast/opencast/pull/5175)] -
+  Add Opencast 13.10 release notes
+- [[#5171](https://github.com/opencast/opencast/pull/5171)] -
+  Skip deleting non existent file
+- [[#5169](https://github.com/opencast/opencast/pull/5169)] -
+  Copy active inputs between CAs if they have the same set of inputs
+- [[#5164](https://github.com/opencast/opencast/pull/5164)] -
+  Fix editing custom actions in the ACL editor
+- [[#5101](https://github.com/opencast/opencast/pull/5101)] -
+  Add whisper-ctranslate2 flags to WhisperEngine.java
+- [[#5062](https://github.com/opencast/opencast/pull/5062)] -
+  Dont allow to delete user with active workflow in Admin UI
+- [[#4684](https://github.com/opencast/opencast/pull/4684)] -
+  Ensure workflows have an associated org after upgrade
+
+### Opencast 13.10
+
+*Released on August 23th, 2023*
+
+- [[#5162](https://github.com/opencast/opencast/pull/5162)] -
+  Add Opencast 13.9 release notes
+- [[#5157](https://github.com/opencast/opencast/pull/5157)] -
+  Test for broken JAR (zip) files
+- [[#5150](https://github.com/opencast/opencast/pull/5150)] -
+  Fix Endless Loop on Elasticsearch Exception
+- [[#5033](https://github.com/opencast/opencast/pull/5033)] -
+  Escape ES query string in external API endpoints
 
 ### Opencast 13.9
 

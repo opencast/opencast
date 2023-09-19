@@ -23,10 +23,12 @@ package org.opencastproject.transcription.workflowoperation;
 import org.opencastproject.caption.api.CaptionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.transcription.api.TranscriptionService;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -70,6 +72,7 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
   static final String TARGET_CAPTION_FORMAT = "target-caption-format";
   static final String TRANSCRIPTION_LINE_SIZE = "line-size";
   static final String DEFAULT_LINE_SIZE = "100";
+  static final String TARGET_TYPE = "target-element-type";
 
   /**
    * The transcription service
@@ -113,6 +116,23 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
 
     String captionFormatOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_CAPTION_FORMAT));
 
+    String typeUnparsed = StringUtils.trimToEmpty(operation.getConfiguration(TARGET_TYPE));
+    MediaPackageElement.Type type = null;
+    if (!typeUnparsed.isEmpty()) {
+      // Case insensitive matching between user input (workflow config key) and enum value
+      for (MediaPackageElement.Type t : MediaPackageElement.Type.values()) {
+        if (t.name().equalsIgnoreCase(typeUnparsed)) {
+          type = t;
+        }
+      }
+      if (type == null || (type != Track.TYPE && type != Attachment.TYPE)) {
+        throw new IllegalArgumentException(String.format("The given type '%s' for mediapackage %s was illegal. Please"
+                + "check the operations' configuration keys.", type, mediaPackage.getIdentifier()));
+      }
+    } else {
+      type = Track.TYPE;
+    }
+
     // Get line size if set
     String lineSize = StringUtils.trimToNull(operation.getConfiguration(TRANSCRIPTION_LINE_SIZE));
     if (StringUtils.isBlank(lineSize)) {
@@ -121,7 +141,8 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
 
     try {
       // Get transcription file from the service
-      MediaPackageElement original = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId);
+      MediaPackageElement original = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId,
+              type);
       MediaPackageElement transcription = original;
 
       // If caption format passed, convert to desired format
