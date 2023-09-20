@@ -25,9 +25,15 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.opencastproject.util.doc.rest.RestParameter.Type;
 
+import org.opencastproject.job.api.AbstractJobProducer;
+import org.opencastproject.job.api.Job;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -89,7 +95,9 @@ import javax.ws.rs.core.Response;
     immediate = true,
     service = TobiraEndpoint.class
 )
-public class TobiraEndpoint {
+public class TobiraEndpoint extends AbstractJobProducer {
+
+  public static final String JOB_TYPE = "org.opencastproject.tobira";
   private static final Logger logger = LoggerFactory.getLogger(TobiraEndpoint.class);
 
   // Versioning the Tobira API:
@@ -119,8 +127,22 @@ public class TobiraEndpoint {
   private SeriesService seriesService;
   private AuthorizationService authorizationService;
   private Workspace workspace;
+  private OrganizationDirectoryService organizationDirectoryService;
+  private UserDirectoryService userDirectoryService;
+  private ServiceRegistry serviceRegistry;
+
+  private SecurityService securityService;
 
   private JsonObject stats = new JsonObject();
+
+  /**
+   * Creates a new abstract job producer for jobs of the given type.
+   *
+   * @param jobType the job type
+   */
+  public TobiraEndpoint() {
+    super(JOB_TYPE);
+  }
 
   @Activate
   public void activate(BundleContext bundleContext) {
@@ -263,5 +285,48 @@ public class TobiraEndpoint {
 
   public JsonObject getStats() {
     return stats;
+  }
+
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = serviceRegistry;
+  }
+
+  @Override
+  protected ServiceRegistry getServiceRegistry() {
+    return serviceRegistry;
+  }
+
+  @Reference
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
+
+  @Override
+  protected SecurityService getSecurityService() {
+    return securityService;
+  }
+
+  @Reference
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    this.userDirectoryService = userDirectoryService;
+  }
+  @Override
+  protected UserDirectoryService getUserDirectoryService() {
+    return userDirectoryService;
+  }
+
+  @Reference
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    this.organizationDirectoryService = organizationDirectoryService;
+  }
+
+  @Override
+  protected OrganizationDirectoryService getOrganizationDirectoryService() {
+    return organizationDirectoryService;
+  }
+
+  @Override
+  protected String process(Job job) throws Exception {
+    throw new RuntimeException("This should never be called for TobiraEndpoint!");
   }
 }
