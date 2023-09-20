@@ -133,9 +133,9 @@ public class ScheduledDataCollector extends TimerTask {
   /** The security service */
   protected SecurityService securityService;
 
-  protected TobiraRemoteRequester tobiraRemoteRequester;
+  private TobiraRemoteRequester tobiraRemoteRequester;
 
-  protected TrustedHttpClient trustedHttpClient;
+  protected TrustedHttpClient httpClient;
 
 
   //================================================================================
@@ -204,7 +204,7 @@ public class ScheduledDataCollector extends TimerTask {
 
     this.tobiraRemoteRequester = new TobiraRemoteRequester();
     this.tobiraRemoteRequester.setRemoteServiceManager(serviceRegistry);
-    this.tobiraRemoteRequester.setTrustedHttpClient(trustedHttpClient);
+    this.tobiraRemoteRequester.setTrustedHttpClient(httpClient);
 
     Form adopter;
     try {
@@ -444,7 +444,7 @@ public class ScheduledDataCollector extends TimerTask {
 
   @Reference
   public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
-    this.trustedHttpClient = trustedHttpClient;
+    this.httpClient = trustedHttpClient;
   }
 
   private class TobiraRemoteRequester extends RemoteBase {
@@ -454,8 +454,8 @@ public class ScheduledDataCollector extends TimerTask {
     }
 
     public JsonObject getStats() throws IOException {
-      HttpGet get = new HttpGet("/tobira/stats");
-      HttpResponse response = getResponse(get);
+      HttpGet get = new HttpGet("/stats");
+      HttpResponse response = this.getResponse(get);
       try {
         if (response != null) {
           InputStream is = response.getEntity().getContent();
@@ -463,7 +463,7 @@ public class ScheduledDataCollector extends TimerTask {
           return gson.fromJson(json, JsonElement.class).getAsJsonObject();
         }
       } finally {
-        closeConnection(response);
+        this.closeConnection(response);
       }
       return null;
     }
