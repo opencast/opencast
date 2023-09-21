@@ -86,7 +86,7 @@ Where `*` is the version number of the distribution.
 
 #### Assembly profiles
 
-Besides the default `dist` Maven profile, you can define other profiles to create different builds.
+Besides the default `dist` Maven profile, you can specify other profiles to create different builds.
 Activate these profiles using:
 
 profile | description
