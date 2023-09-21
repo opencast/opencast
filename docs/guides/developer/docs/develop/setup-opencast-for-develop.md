@@ -124,9 +124,7 @@ To see this technique in action, you can watch the following short video:
 
 * [Opencast development: Watch and reload modules](https://asciinema.org/a/348132)
 
-The updated bundles are only available in the currently running Karaf instance. To create a Opencast version that has
-this changes permanently, you have to run `mvn clean install` in the the assemblies directory again. Your current
-instance will be deleted by the new assembly!
+The updated bundles are only available in the currently running Karaf instance. To create a Opencast version that contains your changes permanently, you have to run `mvn install` in the assemblies directory again. 
 
 In several cases the `bundle:watch` can put Karaf in an unstable condition, as dependencies between bundles will not
 correctly be restored after the new bundle has been deployed.
