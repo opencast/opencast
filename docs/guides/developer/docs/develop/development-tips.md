@@ -7,7 +7,7 @@ Common Developer Pitfalls
 Every development environment has its quirks, so here are a few which have been collected by the community:
 
 ### General
-* Build Opencast, then open your IDE.  Opencast generates a number of classes as part of its build process (e.g.,
+* Build Opencast, then open your IDE.  Opencast generates a number of classes as part of its build process (e.g.
   `QSnapshotDto`), which will not be found by your IDE and thus cause build errors.  It is possible to get your IDE
   to run the appropriate Maven lifecycle event, but that can be hit-and-miss in terms of functionality.
 * If your IDE stubbornly refuses to acknowledge that a class exists, even when you're sure it's there, try closing your
