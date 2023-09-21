@@ -190,6 +190,12 @@
       <groupId>org.mnode.ical4j</groupId>
       <artifactId>ical4j</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-message-broker-api</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -225,12 +231,6 @@
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-message-broker-api</artifactId>
-      <version>${project.version}</version>
-      <scope>compile</scope>
     </dependency>
   </dependencies>
   <build>
