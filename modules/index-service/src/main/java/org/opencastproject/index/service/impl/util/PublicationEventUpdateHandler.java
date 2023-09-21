@@ -104,7 +104,7 @@ public class PublicationEventUpdateHandler implements AssetManagerUpdateHandler 
         }
       }
     }
-    logger.debug("Excluded user providers: {}", configurationPublicationChannelIds);
+    logger.debug("Auto-republish channel ids: {}", configurationPublicationChannelIds);
 
     String sourceFlavorsString = StringUtils.trimToEmpty(Objects.toString(cc.getProperties().get(CONFIGURATION_SOURCE_FLAVORS)));
     sourceFlavors = Arrays.stream(sourceFlavorsString.split(","))
