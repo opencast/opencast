@@ -151,7 +151,7 @@ We don't advice to use this feature for production.
 For a quick build, you can use the following command to skip Opencast's tests.
 
     $ cd opencast
-    $ mvn clean install -Pdev -DskipTests=true
+    $ mvn clean install -Pdev -DskipTests
 
 To see the whole `stacktrace` of the installation you can use the following command to disable the trimming.
 
