@@ -128,7 +128,7 @@ public class PublicationEventUpdateHandler implements AssetManagerUpdateHandler 
   }
 
   private void updatePublications(MediaPackage mediaPackage) {
-    for (Publication publication : new ArrayList<>(Arrays.asList(mediaPackage.getPublications()))) {
+    for (Publication publication : mediaPackage.getPublications().clone()) {
       if (!configurationPublicationChannelIds.contains(publication.getChannel())) {
         continue;
       }
