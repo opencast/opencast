@@ -51,6 +51,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Component(
@@ -109,6 +110,7 @@ public class PublicationEventUpdateHandler implements AssetManagerUpdateHandler 
     String sourceFlavorsString = StringUtils.trimToEmpty(Objects.toString(cc.getProperties().get(CONFIGURATION_SOURCE_FLAVORS)));
     sourceFlavors = Arrays.stream(sourceFlavorsString.split(","))
         .map(String::trim)
+        .filter(Predicate.not(String::isEmpty))
         .collect(Collectors.toList());
   }
 
