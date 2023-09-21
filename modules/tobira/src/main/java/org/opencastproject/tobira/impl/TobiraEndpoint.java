@@ -283,8 +283,17 @@ public class TobiraEndpoint extends AbstractJobProducer {
     return Response.noContent().build();
   }
 
-  public JsonObject getStats() {
-    return stats;
+  @GET
+  @Path("/stats")
+  @Produces(APPLICATION_JSON)
+  @RestQuery(name = "stats",
+      description = "Returns the stats, if any, pushed from Tobira",
+      returnDescription = "The stats, or an empty object",
+      responses = {
+          @RestResponse(description = "The stats, or an empty object", responseCode = HttpServletResponse.SC_OK)
+      })
+  public Response getStats() {
+    return Response.ok(gson.toJson(stats)).build();
   }
 
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {

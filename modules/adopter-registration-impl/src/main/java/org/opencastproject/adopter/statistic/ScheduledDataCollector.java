@@ -67,7 +67,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -458,8 +457,7 @@ public class ScheduledDataCollector extends TimerTask {
       HttpResponse response = this.getResponse(get);
       try {
         if (response != null) {
-          InputStream is = response.getEntity().getContent();
-          String json = IOUtils.toString(is, response.getEntity().getContentEncoding().toString());
+          String json = IOUtils.toString(response.getEntity().getContent());
           return gson.fromJson(json, JsonElement.class).getAsJsonObject();
         }
       } finally {
