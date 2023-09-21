@@ -128,8 +128,8 @@ The updated bundles are only available in the currently running Karaf instance. 
 this changes permanently, you have to run `mvn clean install` in the the assemblies directory again. Your current
 instance will be deleted by the new assembly!
 
-In several cases the `bundle:watch` can bring Karaf in an unstable condition, as dependencies between bundles will not
-correctly be restored, after the new bundle has been deployed.
+In several cases the `bundle:watch` can put Karaf in an unstable condition, as dependencies between bundles will not
+correctly be restored after the new bundle has been deployed.
 
 
 ### Examples
