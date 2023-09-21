@@ -108,10 +108,7 @@ Option | Description
 
 ### Build Single Modules
 
-When working on a single Opencast module, it can be extremely helpful to watch the newly built version and include
-it automatically in the Opencast OSGi infrastructure. This can be done through the
-[bundle:watch](https://karaf.apache.org/manual/latest/commands/bundle-watch.html) command in Karaf. The workflow would
-be as follows:
+When working on a single Opencast module, it can be extremely helpful having the new built version automatically included in the Opencast OSGi infrastructure. This can be achieved by watching the module with the [bundle:watch](https://karaf.apache.org/manual/latest/commands/bundle-watch.html) command in Karaf. The procedure would be as follows:
 
 * Start Opencast and use `la -u` in the Karaf console to list all installed bundles/modules. Note down the IDs of the
   bundles you want to watch.
@@ -142,7 +139,7 @@ If you want to enable multiple threads, you can use the following command:
     $ ./build/opencast-dist-develop-*/start-opencast
 
 Multiple threads build have not been thoroughly tested and may cause runtime problems or unexpected behavior.
-We don't advice to use this feature for production.
+We don't advise using this feature for production.
 
 #### Useful Commands for Testing Purposes
 
@@ -194,7 +191,7 @@ Follow the next steps, if you want to import opencast correctly
 - Search for projects recursively
 - Uncheck all listed profiles
 - Check all projects to import
-- To select JDK 11, it should be somewhere around `/usr/lib/jvm/java-11-openjdk` depending on your current system
+- Select JDK 11, it should be somewhere around `/usr/lib/jvm/java-11-openjdk` depending on your current system
 
 Now Idea should import the projects, it could take some time, you can make it faster by following [this](#slow-intellij-idea-fix).
 
@@ -249,6 +246,7 @@ Apply your changes with
 ### Visual Studio Code Editor
 
 We use VS code for mainly:
+
 - Frontend development
 - Configure files
 - Markdown files
