@@ -98,7 +98,7 @@ You can only use one of these profiles at a time.
 
 #### Build options
 
-The options can be used to customize the build process. They can be used in combination with the assembly profiles.
+The following options can be used to customize the build process. They can be used in combination with the assembly profiles.
 
 Option | Description
 -------|------------
