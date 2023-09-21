@@ -129,7 +129,6 @@ public class
           throws WorkflowOperationException {
 
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
-    WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     logger.info("Start speech-to-text workflow operation for media package {}", mediaPackage);
 
 
@@ -149,15 +148,15 @@ public class
     Set<MediaPackageElement> inputSet = new HashSet<>();
     for (MediaPackageElement element : mediaPackage.getElementsByTags(sourceTagList)) {
       MediaPackageElementFlavor elementFlavor = element.getFlavor();
-      if (sourceFlavor == null || (elementFlavor != null && elementFlavor.matches(matchingFlavor))) {
+      if (sourceFlavor.isEmpty() || (elementFlavor != null && elementFlavor.matches(matchingFlavor))) {
         inputSet.add(element);
       }
     }
 
     if (inputSet.size() == 0) {
       throw new WorkflowOperationException(
-              String.format("No elements with source flavor(s) {} and tag(s)"
-                  + " {} found for transcription", sourceFlavor, sourceTagList));
+              String.format("No elements with source flavor(s) '%s' and tag(s)"
+                  + " '%s' found for transcription", sourceFlavor, sourceTagList));
     }
 
     // Convert MediaPackageElements to Tracks
@@ -170,7 +169,8 @@ public class
         Track trackElement = (Track)  trackBuilder.elementFromURI(elementUri);
         tracksList.add(trackElement);
       } catch (ClassCastException e) {
-        logger.error("Element {} is not a track", element);
+        throw new WorkflowOperationException(
+                String.format("Element '%s' is not a track", element));
       }
     }
 
@@ -188,8 +188,7 @@ public class
 
     // Subtitles creation
     if (sourceTagList.isEmpty() && (tracks.length > 1)) {
-      logger.info("Multiple tracks found but no source tags specified");
-      logger.info("Using the first track in the flavor list");
+      logger.info("Multiple tracks found but no source tags specified. Using the first track in the flavor list");
       createSubtitle(tracks[0], languageCode, mediaPackage, tagsAndFlavors, appendSubtitleAs, translate);
     } else {
       for (Track track : tracks) {
