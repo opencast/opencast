@@ -72,7 +72,7 @@ install them.
 ## Build Opencast
 
 
-You can build now opencast by changing your directory into your opencast location and by running:
+You can now build opencast by changing into your opencast directory and running:
 
     $ mvn clean install [Options]
 
