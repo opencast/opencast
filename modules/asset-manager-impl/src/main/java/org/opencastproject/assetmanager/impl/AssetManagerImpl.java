@@ -438,11 +438,11 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                 mkPropertyName(ace.getRole(), ace.getAction())), Value.mk(ace.isAllow())));
       }
 
+      updateEventInIndex(snapshot);
+
       logger.info("Trigger update handlers for snapshot {}, version {}",
           snapshot.getMediaPackage().getIdentifier(), snapshot.getVersion());
       fireEventHandlers(mkTakeSnapshotMessage(snapshot));
-
-      updateEventInIndex(snapshot);
 
       return snapshot;
     }
