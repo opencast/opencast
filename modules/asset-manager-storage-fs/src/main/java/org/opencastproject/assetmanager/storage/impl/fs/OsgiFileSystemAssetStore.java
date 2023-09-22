@@ -237,6 +237,12 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
     for (String directory: rootDirectories) {
       mkDirs(file(directory));
     }
+    // Check for write access
+    for (String directory : rootDirectories) {
+      File tmp = new File(directory + "/tobedeleted.tmp");
+      tmp.createNewFile();
+      tmp.delete();
+    }
 
     logger.info("Start asset manager files system store at {}", rootDirectories);
 
