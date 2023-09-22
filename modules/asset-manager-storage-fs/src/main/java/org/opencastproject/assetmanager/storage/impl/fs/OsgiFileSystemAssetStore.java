@@ -51,6 +51,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.naming.ConfigurationException;
+
 @Component(
     property = {
     "service.description=File system based asset store",
@@ -188,8 +190,7 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
    *          the component context
    */
   @Activate
-  public void activate(final ComponentContext cc)
-          throws IllegalStateException, IOException {
+  public void activate(final ComponentContext cc) throws IllegalStateException, IOException, ConfigurationException {
     storeType = (String) cc.getProperties().get(AssetStore.STORE_TYPE_PROPERTY);
     logger.info("{} is: {}", AssetStore.STORE_TYPE_PROPERTY, storeType);
 
@@ -220,6 +221,19 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
       }
       index++;
     }
+    // Check for bad configuration
+    for (int i = 0; i < rootDirectories.size(); i++) {
+      for (int j = 0; j < rootDirectories.size(); j++) {
+        if (i == j) {
+          continue;
+        }
+        if (isChild(rootDirectories.get(j), rootDirectories.get(i))) {
+          throw new ConfigurationException("Storage directory " + rootDirectories.get(j) + " is a subdirectory of " +
+              rootDirectories.get(i) + ". This is not allowed.");
+        }
+      }
+    }
+    // Create
     for (String directory: rootDirectories) {
       mkDirs(file(directory));
     }
@@ -229,6 +243,15 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
     // Setup rootDirectory cache
     // Remembers the root directory for a given mediapackage
     setupCache();
+  }
+
+  private static boolean isChild(String childText, String parentText) {
+    Path parent = Paths.get(parentText).toAbsolutePath();
+    Path child = Paths.get(childText).toAbsolutePath();
+    if (child.startsWith(parent)) {
+      return true;
+    }
+    return false;
   }
 
   // Depending on how these functions are used, it may not make sense to just sum over all root directories.
