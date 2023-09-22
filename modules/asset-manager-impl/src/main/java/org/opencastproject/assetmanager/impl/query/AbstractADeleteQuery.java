@@ -90,7 +90,7 @@ public abstract class AbstractADeleteQuery implements ADeleteQuery, DeleteQueryC
     };
   }
 
-  public long run(DeleteEpisodeHandler deleteSnapshotHandler) {
+  public long run(DeleteEpisodeHandler deleteEpisodeHandler) {
     // run query and map the result to records
     final long startTime = System.nanoTime();
     // resolve AST
@@ -115,7 +115,7 @@ public abstract class AbstractADeleteQuery implements ADeleteQuery, DeleteQueryC
       }
     }
     for (String mpId : deletion.deletedEpisodes) {
-      deleteSnapshotHandler.handleDeletedEpisode(mpId);
+      deleteEpisodeHandler.handleDeletedEpisode(mpId);
     }
     final long searchTime = (System.nanoTime() - startTime) / 1000000;
     logger.debug("Complete query ms " + searchTime);
