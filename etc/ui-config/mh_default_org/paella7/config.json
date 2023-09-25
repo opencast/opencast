@@ -59,12 +59,6 @@
         },
         "previewAttachment": "presentation/segment+preview",
         "mainAudioContent": "presenter",
-        "contentTypes": {
-            "presentation/delivery": "presentation",
-            "presenter/delivery": "presenter",
-            "presentation/preview": "presentation",
-            "presenter/preview": "presenter"
-        },
         "videoPreviewAttachment": [
             "presenter/player+preview",
             "presentation/player+preview"
@@ -224,6 +218,18 @@
                     ],
                     "icon": "present-mode-4.svg",
                     "title": "Presenter and presentation"
+                }
+            ],
+            "tabIndexStart": 40
+        },
+        "org.opencast.paella.multiVideoDynamicLayout": {
+            "enabled": true,
+            "validContent": [
+                {
+                    "id": "multi-video",
+                    "content": [],
+                    "icon": "present-mode-4.svg",
+                    "title": "Auto"
                 }
             ],
             "tabIndexStart": 40
