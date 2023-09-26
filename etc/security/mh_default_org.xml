@@ -304,6 +304,7 @@
     <sec:intercept-url pattern="/studio/manifest.json" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/studio/static/js/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/studio/**" access="ROLE_ADMIN, ROLE_STUDIO" />
+    <sec:intercept-url pattern="/studio-api/**" access="ROLE_ADMIN, ROLE_STUDIO" />
 
     <!-- Enable access to Opencast Editor -->
     <sec:intercept-url pattern="/editor/**" access="ROLE_ADMIN, ROLE_USER" />

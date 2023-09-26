@@ -234,6 +234,7 @@
     <module>modules/statistics-service-remote</module>
     <module>modules/statistics-writer-workflowoperation</module>
     <module>modules/studio</module>
+    <module>modules/studio-service</module>
     <module>modules/termination-state-api</module>
     <module>modules/termination-state-aws</module>
     <module>modules/termination-state-impl</module>
