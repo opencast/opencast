@@ -63,11 +63,9 @@ export default class OpencastAuth {
       if (response.ok) {
         return await response.json();
       }
-      console.log("end")
       return null;
     }
     catch(_e) {
-      console.log("err", _e)
       return null;
     }
   }
@@ -84,7 +82,7 @@ export default class OpencastAuth {
       if (!userInfo || !acl) {
         return false;
       }
-      
+
       let roles = userInfo.roles;
       if (!(roles instanceof Array)) { roles = [roles]; }
 
