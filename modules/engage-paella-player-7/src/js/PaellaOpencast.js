@@ -197,7 +197,7 @@ export class PaellaOpencast extends Paella {
 
   constructor(containerElement) {
     super(containerElement, initParams);
-    this._opencastAuth = new OpencastAuth();
+    this._opencastAuth = new OpencastAuth(this);
 
     const paella = this;
     function humanTimeToSeconds(humanTime) {

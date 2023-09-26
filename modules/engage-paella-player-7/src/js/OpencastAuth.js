@@ -22,6 +22,10 @@
 import { getUrlFromOpencastServer } from './PaellaOpencast';
 
 export default class OpencastAuth {
+  constructor(player) {
+    this.player = player;
+  }
+
   async getUserInfo() {
     try {
       const response = await fetch(getUrlFromOpencastServer('/info/me.json'));
@@ -59,31 +63,34 @@ export default class OpencastAuth {
       if (response.ok) {
         return await response.json();
       }
+      console.log("end")
       return null;
     }
     catch(_e) {
+      console.log("err", _e)
       return null;
     }
   }
 
   async getACL() {
-    return await this._getEpisodeACL() || await this._getSeriesACL();
+    return await this.getEpisodeACL() || await this.getSeriesACL();
   }
 
   async canWrite() {
     try {
-      const userInfo = await this._getUserInfo();
-      const acl = await this._getACL();
+      const userInfo = await this.getUserInfo();
+      let acl = await this.getACL();
+      acl = acl?.acl ? acl.acl : acl;
       if (!userInfo || !acl) {
         return false;
       }
-
+      
       let roles = userInfo.roles;
       if (!(roles instanceof Array)) { roles = [roles]; }
 
       let canWrite = false;
-      if (acl.acl && acl.acl.ace) {
-        let aces = acl.acl.ace;
+      if (acl?.ace) {
+        let aces = acl?.ace;
         if (!(aces instanceof Array)) { aces = [aces]; }
 
         canWrite = roles.some(function(currentRole) {
