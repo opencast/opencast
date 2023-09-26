@@ -20,7 +20,7 @@
  */
 
 import {CanvasButtonPosition, VideoLayout, utils} from 'paella-core';
-import defaultIconMaximize from "../icons/maximize.svg";
+import defaultIconMaximize from '../icons/maximize.svg';
 
 export default class MultiVideoDynamicLayout extends VideoLayout {
   get identifier() {
@@ -45,13 +45,13 @@ export default class MultiVideoDynamicLayout extends VideoLayout {
     return this.validContentIds;
   }
 
-  getVideoCanvasButtons(layoutStructure, content, video, videoCanvas) {
+  getVideoCanvasButtons(layoutStructure, content) {
     const buttons = [];
 
     if (this.player.videoContainer.validContentIds.indexOf('focus-video') !== -1) {
       // Maximize
       buttons.push({
-        icon: this.player.getCustomPluginIcon(this.name, "iconMaximize") || defaultIconMaximize,
+        icon: this.player.getCustomPluginIcon(this.name, 'iconMaximize') || defaultIconMaximize,
         position: CanvasButtonPosition.LEFT,
         title: this.player.translate('Maximize video'),
         ariaLabel: this.player.translate('Maximize video'),

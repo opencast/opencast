@@ -60,13 +60,13 @@ export default class FocusVideoStaticLayout extends VideoLayout {
     await this.player.videoContainer.setLayout('multi-video');
   }
 
-  getVideoCanvasButtons(layoutStructure, content, video, videoCanvas) {
+  getVideoCanvasButtons(layoutStructure, content) {
     const buttons = [];
 
     if (content !== this._focusedContent) {
       // Maximize
       buttons.push({
-        icon: this.player.getCustomPluginIcon(this.name, "iconMaximize") || defaultIconMaximize,
+        icon: this.player.getCustomPluginIcon(this.name, 'iconMaximize') || defaultIconMaximize,
         position: CanvasButtonPosition.LEFT,
         title: this.player.translate('Maximize video'),
         ariaLabel: this.player.translate('Maximize video'),
@@ -79,7 +79,7 @@ export default class FocusVideoStaticLayout extends VideoLayout {
       // Minimize
       if (this.player.videoContainer.validContentIds.indexOf('multi-video') !== -1) {
         buttons.push({
-          icon: this.player.getCustomPluginIcon(this.name, "iconMinimize") || defaultIconMinimize,
+          icon: this.player.getCustomPluginIcon(this.name, 'iconMinimize') || defaultIconMinimize,
           position: CanvasButtonPosition.LEFT,
           title: this.player.translate('Minimize video'),
           ariaLabel: this.player.translate('Minimize video'),
@@ -94,7 +94,7 @@ export default class FocusVideoStaticLayout extends VideoLayout {
     return buttons;
   }
 
-  getLayoutStructure(streamData, contendId, mainContent) {
+  getLayoutStructure(streamData) {
     // Check for focused content in cookie
     const cookieContent = utils.getCookie('focusContent');
     if (cookieContent !== '') {
@@ -107,7 +107,7 @@ export default class FocusVideoStaticLayout extends VideoLayout {
       this._focusedContent = streamData[0].content;
     }
 
-    const numRightVideos = streamData.length - 1
+    const numRightVideos = streamData.length - 1;
     const rightVideoHeight = Math.min(720 / numRightVideos, 180);
     const rightVideoMaxWidth = rightVideoHeight * 16 / 9;
 
@@ -121,81 +121,81 @@ export default class FocusVideoStaticLayout extends VideoLayout {
         // Focus video
         rect = [
           {
-            aspectRatio: "16/9",
+            aspectRatio: '16/9',
             width: focusVideoWidth,
             height: focusVideoWidth * 9 / 16,
             top: (720 - focusVideoWidth * 9 / 16) / 2,
             left: 0
           },
           {
-            aspectRatio: "16/10",
+            aspectRatio: '16/10',
             width: focusVideoWidth,
             height: focusVideoWidth * 10 / 16,
             top: (720 - focusVideoWidth * 10 / 16) / 2,
             left: 0
           },
           {
-            aspectRatio: "4/3",
+            aspectRatio: '4/3',
             width: focusVideoWidth,
             height: focusVideoWidth * 3 / 4,
             top: (720 - focusVideoWidth * 3 / 4) / 2,
             left: 0
           },
           {
-            aspectRatio: "5/3",
+            aspectRatio: '5/3',
             width: focusVideoWidth,
             height: focusVideoWidth * 3 / 5,
             top: (720 - focusVideoWidth * 3 / 5) / 2,
             left: 0
           },
           {
-            aspectRatio: "5/4",
+            aspectRatio: '5/4',
             width: focusVideoWidth,
             height: focusVideoWidth * 4 / 5,
             top: (720 - focusVideoWidth * 4 / 5) / 2,
             left: 0
           }
-        ]
+        ];
       } else {
         // Right minimized Video
         const rightVideoTop = (720 - rightVideoHeight * numRightVideos) / 2 + rightVideoHeight * rightVideoIndex;
         rect = [
           {
-            aspectRatio: "16/9",
+            aspectRatio: '16/9',
             width: rightVideoHeight * 16 / 9,
             height: rightVideoHeight,
             top: rightVideoTop,
             left: focusVideoWidth
           },
           {
-            aspectRatio: "16/10",
+            aspectRatio: '16/10',
             width: rightVideoHeight * 16 / 10,
             height: rightVideoHeight,
             top: rightVideoTop,
             left: focusVideoWidth + (rightVideoMaxWidth - rightVideoHeight * 16 / 10) / 2
           },
           {
-            aspectRatio: "4/3",
+            aspectRatio: '4/3',
             width: rightVideoHeight * 4 / 3,
             height: rightVideoHeight,
             top: rightVideoTop,
             left: focusVideoWidth + (rightVideoMaxWidth - rightVideoHeight * 4 / 3) / 2
           },
           {
-            aspectRatio: "5/3",
+            aspectRatio: '5/3',
             width: rightVideoHeight * 5 / 3,
             height: rightVideoHeight,
             top: rightVideoTop,
             left: focusVideoWidth + (rightVideoMaxWidth - rightVideoHeight * 5 / 3) / 2
           },
           {
-            aspectRatio: "5/4",
+            aspectRatio: '5/4',
             width: rightVideoHeight * 5 / 4,
             height: rightVideoHeight,
             top: rightVideoTop,
             left: focusVideoWidth + (rightVideoMaxWidth - rightVideoHeight * 5 / 4) / 2
           }
-        ]
+        ];
         rightVideoIndex++;
       }
 
@@ -208,7 +208,7 @@ export default class FocusVideoStaticLayout extends VideoLayout {
     });
 
     return {
-      name: {es: "One focused video"},
+      name: {es: 'One focused video'},
       hidden: false,
       videos: videos,
     };
