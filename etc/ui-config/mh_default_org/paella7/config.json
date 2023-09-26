@@ -234,6 +234,18 @@
             ],
             "tabIndexStart": 40
         },
+        "org.opencast.paella.focusVideoStaticLayout": {
+            "enabled": true,
+            "validContent": [
+                {
+                    "id": "focus-video",
+                    "content": [],
+                    "icon": "present-mode-4.svg",
+                    "title": "Focus"
+                }
+            ],
+            "tabIndexStart": 40
+        },
 
         "/* video formats plugins */": "*********************************************************",
         "es.upv.paella.hlsVideoFormat": {

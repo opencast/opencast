@@ -19,7 +19,8 @@
  *
  */
 
-import {VideoLayout} from 'paella-core';
+import {CanvasButtonPosition, VideoLayout, utils} from 'paella-core';
+import defaultIconMaximize from "../icons/maximize.svg";
 
 export default class MultiVideoDynamicLayout extends VideoLayout {
   get identifier() {
@@ -42,6 +43,27 @@ export default class MultiVideoDynamicLayout extends VideoLayout {
   getValidContentIds() {
     // Ignore content of streamData
     return this.validContentIds;
+  }
+
+  getVideoCanvasButtons(layoutStructure, content, video, videoCanvas) {
+    const buttons = [];
+
+    if (this.player.videoContainer.validContentIds.indexOf('focus-video') !== -1) {
+      // Maximize
+      buttons.push({
+        icon: this.player.getCustomPluginIcon(this.name, "iconMaximize") || defaultIconMaximize,
+        position: CanvasButtonPosition.LEFT,
+        title: this.player.translate('Maximize video'),
+        ariaLabel: this.player.translate('Maximize video'),
+        name: this.name + ':iconMaximize',
+        click: async () => {
+          utils.setCookie('focusContent', content);
+          await this.player.videoContainer.setLayout('focus-video');
+        }
+      });
+    }
+
+    return buttons;
   }
 
   getLayoutStructure(streamData) {
