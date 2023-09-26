@@ -31,6 +31,44 @@ import TranscriptionsIcon from '../icons/transcriptions.svg';
 
 export default class TranscriptionsPlugin extends PopUpButtonPlugin {
 
+  get popUpType() {
+    return 'no-modal';
+  }
+
+  get moveable() {
+    return true;
+  }
+
+  get resizeable() {
+    return true;
+  }
+
+  get closeActions() {
+    return {
+      clickOutside: false,
+      closeButton: true
+    };
+  }
+
+  get customPopUpClass() {
+    return 'transcription-plugin-popup';
+  }
+
+  get menuTitle() {
+    return 'Transcriptions';
+  }
+
+  async isEnabled() {
+    const enabled = await super.isEnabled();
+    this.transcriptions = this?.player?.videoManifest?.transcriptions?.filter(t => t?.text != '') || [];
+    return enabled && this.transcriptions.length > 0;
+  }
+
+  async load() {
+    this.icon = this.player.getCustomPluginIcon(this.name, 'buttonIcon') || TranscriptionsIcon;
+  }
+
+
   rebuildList(search = '') {
     const { videoContainer } = this.player;
     this._transcriptionsContainer.innerHTML = '';
@@ -57,10 +95,10 @@ export default class TranscriptionsPlugin extends PopUpButtonPlugin {
       const trimmingOffset = videoContainer.isTrimEnabled ? videoContainer.trimStart : 0;
       const instant = (t.time / 1000) - trimmingOffset;
       const transcriptionItem = createElementWithHtmlText(`
-                <li>
-                    <img id="${id}" src="${t.preview}" alt="${t.text}"/>
-                    <span><strong>${utils.secondsToTime(instant)}:</strong> ${t.text}</span>
-                </li>`,
+        <li>
+          <img id="${id}" src="${t.preview}" alt="${t.text}"/>
+          <span><strong>${utils.secondsToTime(instant)}:</strong> ${t.text}</span>
+        </li>`,
       this._transcriptionsContainer);
       transcriptionItem.addEventListener('click', async evt => {
         const trimmingOffset = videoContainer.isTrimEnabled ? videoContainer.trimStart : 0;
@@ -71,7 +109,6 @@ export default class TranscriptionsPlugin extends PopUpButtonPlugin {
   }
 
   async getContent() {
-
     const container = createElementWithHtmlText('<div class="transcriptions-container"></div>');
     const searchContainer = createElementWithHtmlText(`
         <input type="search" placeholder="${translate('Search')}"></input>`, container);
@@ -84,19 +121,5 @@ export default class TranscriptionsPlugin extends PopUpButtonPlugin {
     this._transcriptionsContainer = transcriptionsContainer;
     this.rebuildList();
     return container;
-  }
-
-  get popUpType() {
-    return 'no-modal';
-  }
-
-  async isEnabled() {
-    const enabled = await super.isEnabled();
-    this.transcriptions = this?.player?.videoManifest?.transcriptions?.filter(t => t?.text != '') || [];
-    return enabled && this.transcriptions.length > 0;
-  }
-
-  async load() {
-    this.icon = this.player.getCustomPluginIcon(this.name, 'buttonIcon') || TranscriptionsIcon;
   }
 }
