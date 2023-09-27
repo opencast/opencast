@@ -32,6 +32,14 @@
   /* --video-container-padding: 10px; */
 }
 
+/* dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --video-container-background-color: #000000;
+    --base-video-rect-background-color: #000000;
+  }
+}
+
 
 
 
