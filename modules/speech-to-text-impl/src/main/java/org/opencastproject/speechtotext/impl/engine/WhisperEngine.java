@@ -268,7 +268,7 @@ public class WhisperEngine implements SpeechToTextEngine {
   /**
    * Handles the transcription process output
    *
-   * @param message the message returned by the encoder
+   * @param message the message returned by the transcription process
    */
   private void handleTranscriptionOutput(String message) {
     message = message.trim();
