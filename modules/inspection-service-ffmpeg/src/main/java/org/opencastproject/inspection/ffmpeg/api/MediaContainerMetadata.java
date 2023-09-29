@@ -35,8 +35,9 @@ import java.util.List;
  */
 public class MediaContainerMetadata extends TemporalMetadata {
 
-  private List<VideoStreamMetadata> vMetadata = new ArrayList<VideoStreamMetadata>();
-  private List<AudioStreamMetadata> aMetadata = new ArrayList<AudioStreamMetadata>();
+  private List<VideoStreamMetadata> vMetadata = new ArrayList<>();
+  private List<AudioStreamMetadata> aMetadata = new ArrayList<>();
+  private List<SubtitleStreamMetadata> sMetadata = new ArrayList<>();
 
   private String fileName;
   private String fileExtension;
@@ -63,6 +64,15 @@ public class MediaContainerMetadata extends TemporalMetadata {
   }
 
   /**
+   * Returns metadata for all contained subtitle streams.
+   *
+   * @return the metadata or an empty list
+   */
+  public List<SubtitleStreamMetadata> getSubtitleStreamMetadata() {
+    return sMetadata;
+  }
+
+  /**
    * Checks if any video metadata is present.
    */
   public boolean hasVideoStreamMetadata() {
@@ -74,6 +84,13 @@ public class MediaContainerMetadata extends TemporalMetadata {
    */
   public boolean hasAudioStreamMetadata() {
     return aMetadata.size() > 0;
+  }
+
+  /**
+   * Checks if any subtitle metadata is present.
+   */
+  public boolean hasSubtitleStreamMetadata() {
+    return sMetadata.size() > 0;
   }
 
   // --------------------------------------------------------------------------------------------
@@ -113,7 +130,7 @@ public class MediaContainerMetadata extends TemporalMetadata {
 
   /**
    * Returns the mimeType of the file
-   * 
+   *
    * @return mimetype
    */
   public MimeType getMimeType() {
@@ -126,7 +143,7 @@ public class MediaContainerMetadata extends TemporalMetadata {
 
   /**
    * Looks for adaptive master file
-   * 
+   *
    * @return true if this is an adaptiveMaster file
    */
   public Boolean getAdaptiveMaster() {

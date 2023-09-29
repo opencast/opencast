@@ -22,6 +22,7 @@
 package org.opencastproject.mediapackage;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -135,14 +136,23 @@ public class MediaPackageJaxbSerializationTest {
     try {
       in = this.getClass().getResourceAsStream("/manifest.xml");
       MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().loadFromXml(in);
-      assertEquals(2, mp.getTracks().length);
-      assertTrue(mp.getTracks()[0].hasVideo());
-      assertTrue(!mp.getTracks()[0].hasAudio());
-      assertTrue(mp.getTracks()[1].hasAudio());
-      assertTrue(!mp.getTracks()[1].hasVideo());
+
+      assertEquals(3, mp.getTracks().length);
       assertEquals(3, mp.getCatalogs().length);
       assertEquals(2, mp.getAttachments().length);
       assertEquals(1, mp.getPublications().length);
+
+      assertTrue(mp.getTracks()[0].hasVideo());
+      assertFalse(mp.getTracks()[0].hasAudio());
+      assertFalse(mp.getTracks()[0].hasSubtitle());
+
+      assertTrue(mp.getTracks()[1].hasAudio());
+      assertFalse(mp.getTracks()[1].hasVideo());
+      assertFalse(mp.getTracks()[1].hasSubtitle());
+
+      assertFalse(mp.getTracks()[2].hasAudio());
+      assertFalse(mp.getTracks()[2].hasVideo());
+      assertTrue(mp.getTracks()[2].hasSubtitle());
     } finally {
       IOUtils.closeQuietly(in);
     }

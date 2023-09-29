@@ -100,6 +100,7 @@ import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.track.AudioStreamImpl;
+import org.opencastproject.mediapackage.track.SubtitleStreamImpl;
 import org.opencastproject.mediapackage.track.VideoStreamImpl;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
@@ -2752,6 +2753,7 @@ public abstract class AbstractEventEndpoint {
     fields.add(f("duration", v(track.getDuration(), BLANK)));
     fields.add(f("has_audio", v(track.hasAudio())));
     fields.add(f("has_video", v(track.hasVideo())));
+    fields.add(f("has_subtitle", v(track.hasSubtitle())));
     fields.add(f("streams", obj(streamsToJSON(track.getStreams()))));
     return obj(fields);
   }
@@ -2760,6 +2762,7 @@ public abstract class AbstractEventEndpoint {
     List<Field> fields = new ArrayList<>();
     List<JValue> audioList = new ArrayList<>();
     List<JValue> videoList = new ArrayList<>();
+    List<JValue> subtitleList = new ArrayList<>();
     for (org.opencastproject.mediapackage.Stream stream : streams) {
       // TODO There is a bug with the stream ids, see MH-10325
       if (stream instanceof AudioStreamImpl) {
@@ -2788,12 +2791,19 @@ public abstract class AbstractEventEndpoint {
         video.add(f("scantype", v(videoStream.getScanType(), BLANK)));
         video.add(f("scanorder", v(videoStream.getScanOrder(), BLANK)));
         videoList.add(obj(video));
+      } else if (stream instanceof SubtitleStreamImpl) {
+        List<Field> subtitle = new ArrayList<>();
+        SubtitleStreamImpl subtitleStream = (SubtitleStreamImpl) stream;
+        subtitle.add(f("id", v(subtitleStream.getIdentifier(), BLANK)));
+        subtitle.add(f("type", v(subtitleStream.getFormat(), BLANK)));
+        subtitleList.add(obj(subtitle));
       } else {
-        throw new IllegalArgumentException("Stream must be either audio or video");
+        throw new IllegalArgumentException("Stream must be either audio, video or subtitle");
       }
     }
     fields.add(f("audio", arr(audioList)));
     fields.add(f("video", arr(videoList)));
+    fields.add(f("subtitle", arr(subtitleList)));
     return fields;
   }
 

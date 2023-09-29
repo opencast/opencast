@@ -69,7 +69,7 @@ public class MediaPackageBuilderTest extends AbstractMediaPackageTest {
     MediaPackage mediaPackage = mediaPackageBuilder.loadFromXml(new FileInputStream(manifestFile));
 
     // Test presence of tracks
-    assertEquals(2, mediaPackage.getTracks().length);
+    assertEquals(3, mediaPackage.getTracks().length);
 
     // Test presence of catalogs
     assertEquals(3, mediaPackage.getCatalogs().length);
@@ -118,7 +118,7 @@ public class MediaPackageBuilderTest extends AbstractMediaPackageTest {
     assertEquals(1, mediaPackage.getCreators().length);
 
     // Test presence of tracks
-    assertEquals(2, mediaPackage.getTracks().length);
+    assertEquals(3, mediaPackage.getTracks().length);
 
     // Test presence of catalogs
     assertEquals(3, mediaPackage.getCatalogs().length);
