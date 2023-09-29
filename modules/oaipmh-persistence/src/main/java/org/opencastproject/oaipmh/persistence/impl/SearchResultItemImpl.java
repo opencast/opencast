@@ -62,6 +62,24 @@ public class SearchResultItemImpl implements SearchResultItem {
     }
   }
 
+  public SearchResultItemImpl(final String mediaPackageId, final String mediaPackageXml,
+      final String organization, final String repoId, final Date modificationDate,
+      final Boolean isDeleted, final MediaPackage mediaPackage,
+      final List<SearchResultElementItem> mediaPackageElements,
+      final List<String> setSpecs) {
+    this.mediaPackageId = mediaPackageId;
+    this.mediaPackageXml = mediaPackageXml;
+    this.organization = organization;
+    this.repoId = repoId;
+    this.modificationDate = modificationDate;
+    this.isDeleted = isDeleted;
+    this.mediaPackage = mediaPackage;
+    this.mediaPackageElements = new ArrayList<>();
+    this.mediaPackageElements.addAll(mediaPackageElements);
+    this.setSpecs = new ArrayList<>();
+    this.setSpecs.addAll(setSpecs);
+  }
+
   @Override
   public String getId() {
     return mediaPackageId;
