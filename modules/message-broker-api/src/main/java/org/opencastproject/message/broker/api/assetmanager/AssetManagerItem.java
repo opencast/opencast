@@ -72,7 +72,7 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
   public abstract Type getType();
 
   public abstract <A> A decompose(Fn<? super TakeSnapshot, ? extends A> takeSnapshot,
-          Fn<? super DeleteSnapshot, ? extends A> deleteSnapshot, Fn<? super DeleteEpisode, ? extends A> deleteEpisode);
+          Fn<? super DeleteEpisode, ? extends A> deleteEpisode);
 
   public final Date getDate() {
     return new Date(date);
@@ -109,7 +109,6 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
 
     @Override
     public <A> A decompose(Fn<? super TakeSnapshot, ? extends A> takeSnapshot,
-            Fn<? super DeleteSnapshot, ? extends A> deleteSnapshot,
             Fn<? super DeleteEpisode, ? extends A> deleteEpisode) {
       return takeSnapshot.apply(this);
     }
@@ -177,44 +176,6 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
    * ------------------------------------------------------------------------------------------------------------------
    */
 
-  /**
-   * An event for deleting a single version of a media package (aka snapshot).
-   */
-  public static final class DeleteSnapshot extends AssetManagerItem {
-    private static final long serialVersionUID = 4797196156230502250L;
-
-    private final long version;
-
-    private DeleteSnapshot(String mediaPackageId, long version, Date date) {
-      super(mediaPackageId, date);
-      this.version = version;
-    }
-
-    @Override
-    public <A> A decompose(Fn<? super TakeSnapshot, ? extends A> takeSnapshot,
-            Fn<? super DeleteSnapshot, ? extends A> deleteSnapshot,
-            Fn<? super DeleteEpisode, ? extends A> deleteEpisode) {
-      return deleteSnapshot.apply(this);
-    }
-
-    @Override
-    public Type getType() {
-      return Type.Delete;
-    }
-
-    public String getMediaPackageId() {
-      return getId();
-    }
-
-    public static final Fn<DeleteSnapshot, String> getMediaPackageId = new Fn<DeleteSnapshot, String>() {
-      @Override
-      public String apply(DeleteSnapshot a) {
-        return a.getMediaPackageId();
-      }
-    };
-
-  }
-
   /*
    * ------------------------------------------------------------------------------------------------------------------
    */
@@ -231,7 +192,6 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
 
     @Override
     public <A> A decompose(Fn<? super TakeSnapshot, ? extends A> takeSnapshot,
-            Fn<? super DeleteSnapshot, ? extends A> deleteSnapshot,
             Fn<? super DeleteEpisode, ? extends A> deleteEpisode) {
       return deleteEpisode.apply(this);
     }
@@ -286,19 +246,6 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
     }
     return new TakeSnapshot(mp.getIdentifier().toString(), MediaPackageParser.getAsXml(mp), dcXml,
             AccessControlParser.toJsonSilent(acl), version, date);
-  }
-
-  /**
-   * @param mediaPackageId
-   *          The unique id of the media package to delete.
-   * @param version
-   *          The episode's version.
-   * @param date
-   *          The modification date.
-   * @return Builds {@link AssetManagerItem} for deleting a snapshot from the asset manager.
-   */
-  public static AssetManagerItem deleteSnapshot(String mediaPackageId, long version, Date date) {
-    return new DeleteSnapshot(mediaPackageId, version, date);
   }
 
   /**
