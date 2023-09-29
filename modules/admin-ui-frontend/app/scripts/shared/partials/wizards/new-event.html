@@ -573,7 +573,7 @@
                                   data-width="'360px'"
                                   ng-model="policy.role"
                                   ng-options="user.userRole as wizard.step.userToStringForDetails(user) for user in wizard.step.users"
-                                  call-on-search="wizard.step.getMatchingUsers"
+                                  call-on-search="wizard.step.getMatchingRoles"
                                   placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.USERS.LABEL' | translate }}'"
                                   no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.USERS.EMPTY' | translate }}'">
                             <option value=""></option>
