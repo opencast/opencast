@@ -118,6 +118,7 @@ import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
+import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -714,24 +715,7 @@ public class IndexServiceImpl implements IndexService {
   /**
    * Parses the processing information, including the workflowDefinitionId, from the metadataJson and starts the
    * workflow with the passed mediapackage.
-   *
-   * TODO NOTE: This checks for running workflows, then takes a snapshot prior to starting a new workflow. This causes a
-   * potential race condition:
-   *
-   * 1. An existing workflow is running, the add asset workflow cannot start.
-   *
-   * 2. The snapshot(4x) archive(3x) is saved and the new workflow is started.
-   *
-   * 3. Possible race condition: No running workflow, a snapshot is saved but the workflow cannot start because another
-   * workflow has started between the time of checking and starting running.
-   *
-   * 4. If race condition: the Admin UI shows error that the workflow could not start.
-   *
-   * 5. If race condition: The interim snapshot(4x) archive(3x) is updated(4x-3x) by the running workflow's snapshots
-   * and resolves the inconsistency, eventually.
-   *
    * Example of processing json:
-   *
    * ...., "processing": { "workflow": "full", "configuration": { "videoPreview": "false", "trimHold": "false",
    * "captionHold": "false", "archiveOp": "true", "publishEngage": "true", "publishHarvesting": "true" } }, ....
    *
@@ -756,14 +740,7 @@ public class IndexServiceImpl implements IndexService {
     JSONObject configJson = (JSONObject) processing.get("configuration");
 
     try {
-      // 1. Check if any active workflows are running for this mediapackage id
-      if (workflowService.mediaPackageHasActiveWorkflows(mpId)) {
-        throw new IllegalArgumentException("Unable to start new workflow '" + workflowDefId + "' on archived media package '" + mediaPackage + "', existing workflow is running");
-      }
-      // 2. Save the snapshot
-      assetManager.takeSnapshot(mediaPackage);
-
-      // 3. start the new workflow on the snapshot
+      // Start the new workflow on the snapshot
       // Workflow params are assumed to be String (not mixed with Number)
       Map<String, String> params = new HashMap<String, String>();
       if (configJson != null) {
@@ -772,18 +749,10 @@ public class IndexServiceImpl implements IndexService {
         }
       }
 
-      Set<String> mpIds = new HashSet<String>();
-      mpIds.add(mpId);
-
-      final Workflows workflows = new Workflows(assetManager, workflowService);
-      List<WorkflowInstance> wfList = workflows
-              .applyWorkflowToLatestVersion(mpIds,
-                      ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowDefId), params))
-              .toList();
-      wfId = wfList.size() > 0 ? Long.toString(wfList.get(0).getId()) : "Unknown";
-      logger.info("Asset update and publish workflow {} scheduled for mp {}",wfId, mpId);
-
-    } catch (AssetManagerException e) {
+      WorkflowInstance workflowInstance = workflowService.start(
+              workflowService.getWorkflowDefinitionById(workflowDefId), mediaPackage, params);
+      logger.info("Asset update and publish workflow {} scheduled for mp {}", workflowInstance.getId(), mpId);
+    } catch (AssetManagerException | WorkflowParsingException | UnauthorizedException e) {
       throw new IndexServiceException("Unable to start workflow " + workflowDefId + " on " + mpId);
     } catch (WorkflowDatabaseException e) {
       logger.warn("Unable to load workflow '{}' from workflow service:", wfId, e);
