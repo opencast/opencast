@@ -29,7 +29,6 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.serviceregistry.api.NopService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.Log;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -43,6 +42,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -58,7 +59,7 @@ import java.util.stream.Collectors;
     }
 )
 public class IncidentCreatorWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
-  private static final Log log = Log.mk(IncidentCreatorWorkflowOperationHandler.class);
+  private static final Logger log = LoggerFactory.getLogger(IncidentCreatorWorkflowOperationHandler.class);
 
   private static final String OPT_CODE = "code";
   private static final String OPT_SEVERITY = "severity";

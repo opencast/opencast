@@ -21,18 +21,17 @@
 
 package org.opencastproject.kernel.scanner;
 
-import org.opencastproject.util.Log;
-
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.quartz.CronExpression;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 
 public abstract class AbstractBufferScanner extends AbstractScanner {
-  private static final Log logger = new Log(LoggerFactory.getLogger(AbstractBufferScanner.class));
+  private static final Logger logger = LoggerFactory.getLogger(AbstractBufferScanner.class);
 
   /** The key that will be used to find the amount of buffer time to search for scheduled recordings to remove before now. */
   protected static final String PARAM_KEY_BUFFER = "buffer";

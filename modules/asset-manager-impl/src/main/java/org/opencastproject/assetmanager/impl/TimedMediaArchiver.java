@@ -29,7 +29,6 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.Log;
 import org.opencastproject.util.NeedleEye;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowService;
@@ -47,6 +46,7 @@ import org.quartz.CronExpression;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Calendar;
@@ -62,7 +62,7 @@ import java.util.concurrent.TimeUnit;
     }
 )
 public class TimedMediaArchiver extends AbstractScanner implements ManagedService {
-  private static final Log logger = new Log(LoggerFactory.getLogger(TimedMediaArchiver.class));
+  private static final Logger logger = LoggerFactory.getLogger(TimedMediaArchiver.class);
 
   public static final String PARAM_KEY_STORE_ID = "store-id";
   public static final String PARAM_KEY_MAX_AGE = "max-age";
