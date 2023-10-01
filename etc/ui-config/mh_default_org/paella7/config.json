@@ -402,7 +402,7 @@
             "enabled": true,
             "parentContainer": "settingsGroup",
             "order": 40,
-            "description": "Audio transcriptions"
+            "description": "Transcriptions"
         },
         "es.upv.paella.downloadsPlugin": {
             "enabled": true,
