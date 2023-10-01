@@ -120,6 +120,13 @@ public final class DateTimeSupport {
   }
 
   /**
+   * Converts seconds to a human readable time string.
+   */
+  public static String humanReadableTime(long seconds) {
+    return String.format("%d:%02d:%02d", seconds / 3600, seconds / 60 % 60, seconds % 60);
+  }
+
+  /**
   * JAXB adapter that formats dates in UTC format YYYY-MM-DD'T'hh:mm:ss'Z' up to second,
   * e.g. 1970-01-01T00:00:00Z
   */

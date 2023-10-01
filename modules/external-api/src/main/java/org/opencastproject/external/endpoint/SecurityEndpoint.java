@@ -32,7 +32,7 @@ import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
-import org.opencastproject.util.Log;
+import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -118,11 +118,11 @@ public class SecurityEndpoint implements ManagedService {
     if (expiration.isSome()) {
       expireSeconds = expiration.get();
       log.info("The property {} has been configured to expire signed URLs in {}.",
-              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
+              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, DateTimeSupport.humanReadableTime(expireSeconds));
     } else {
       expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
       log.info("The property {} has not been configured, so the default is being used to expire signed URLs in {}.",
-              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
+              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, DateTimeSupport.humanReadableTime(expireSeconds));
     }
   }
 
