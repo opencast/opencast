@@ -409,7 +409,7 @@
             "parentContainer": "settingsGroup",
             "order": 50,
             "description": "Downloads",
-            
+
             "downloadFlavors": false,
             "downloadTags": false,
             "downloadMimeTypes": ["audio/m4a", "video/mp4"],
