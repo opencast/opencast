@@ -302,6 +302,13 @@ export class PaellaOpencast extends Paella {
     });
   }
 
+  async getEpisode({episodeId}) {
+    return fetch(getUrlFromOpencastServer(`/search/episode.json?id=${episodeId}`))
+    .then(response => response.json() )
+    .then(response => response['search-results']?.result)
+    .catch(() => null);
+  }
+
   get opencastAuth() {
     return this._opencastAuth;
   }

@@ -409,7 +409,12 @@
             "parentContainer": "settingsGroup",
             "order": 50,
             "description": "Downloads",
-            "allowOnlyLicenses": [
+            
+            "downloadFlavors": false,
+            "downloadTags": false,
+            "downloadMimeTypes": ["audio/m4a", "video/mp4"],
+
+            "enableOnlyLicenses": [
                 "CC-BY",
                 "CC-BY-SA",
                 "CC-BY-ND",
@@ -418,7 +423,7 @@
                 "CC-BY-NC-ND",
                 "CC0"
             ],
-            "allowWritePermission": true
+            "enableOnWritePermission": true
         },
         "es.upv.paella.keyboardShortcutsHelp": {
             "enabled": true,

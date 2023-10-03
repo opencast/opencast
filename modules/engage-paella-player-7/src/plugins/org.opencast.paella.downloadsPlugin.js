@@ -32,32 +32,16 @@ export default class DownloadsPlugin extends PopUpButtonPlugin {
 
   async isEnabled() {
     this._downloads = {};
-    const { streams, metadata } = this.player.videoManifest;
+    const { metadata } = this.player.videoManifest;
 
-    const hasWritePermission = this.config.allowWritePermission && await this.player.opencastAuth.canWrite();
-    const hasAllowedLicense = this.config.allowOnlyLicenses
-      ? (this.config.allowOnlyLicenses.includes(metadata.license))
+    const hasWritePermission = this.config.enableOnWritePermission && await this.player.opencastAuth.canWrite();
+    const hasAllowedLicense = this.config.enableOnlyLicenses
+      ? (this.config.enableOnlyLicenses.includes(metadata.license))
       : true;
     const enabled = (await super.isEnabled()) && (hasWritePermission || hasAllowedLicense);
 
     if (enabled) {
-      streams.forEach(s => {
-        let streamDownloads = [];
-        const { mp4 } = s.sources;
-        if (mp4) {
-          mp4.forEach(v => {
-            streamDownloads.push({
-              id: `${s.content}_${v.res?.w || 0}_${v.res?.h || 0}`,
-              src: v.src,
-              res: v.res || { w: 0, h: 0 },
-              mimetype: v.mimetype
-            });
-          });
-        }
-        if (streamDownloads.length > 0) {
-          this._downloads[s.content] = streamDownloads;
-        }
-      });
+      this._downloads = await this.getDownloadableContent();
     }
 
     return enabled && Object.keys(this._downloads).length > 0;
@@ -65,6 +49,72 @@ export default class DownloadsPlugin extends PopUpButtonPlugin {
 
   async load() {
     this.icon = this.player.getCustomPluginIcon(this.name, 'downloadIcon') || defaultDownloadIcon;
+  }
+
+  async getDownloadableContent() {
+    const episode = await this.player.getEpisode({episodeId: this.player.videoId});
+    const tracks = episode?.mediapackage?.media?.track ?? [];
+    // const attachments = episode?.mediapackage?.attachments?.attachment ?? [];
+    const downloadable = {};
+
+
+    tracks.filter(track => {
+      if (this.config.downloadFlavors) {
+        const downloadFlavors = this.config.downloadFlavors?.includes(track.type);
+        if (!downloadFlavors) {
+          return false;
+        }
+      }
+
+      if (this.config.downloadTags) {
+        const tags = track?.tags?.tag ?? [];
+        const downloadTags = this.config.downloadTags?.some(tag => {
+          return tags.includes(tag);
+        });
+        if (!downloadTags) {
+          return false;
+        }
+      }
+
+      if (this.config.downloadMimeTypes) {
+        const downloadMimeTypes = this.config.downloadMimeTypes?.includes(track.mimetype);
+        if (!downloadMimeTypes) {
+          return false;
+        }
+      }
+
+      return true;
+    }).forEach(track => {
+      const vmeta = track?.video?.resolution ?
+        {
+          res: `${track?.video?.resolution}@${track?.video?.framerate}`,
+          codec: track.video.encoder.type
+        }
+        : null;
+      const ameta = track?.audio?.bitrate ?
+        {
+          bitrate: track?.audio?.bitrate,
+          samplingrate: track?.audio?.samplingrate,
+          channels: track?.audio?.channels,
+          codec: track.audio.encoder.type
+        }
+        : null;
+      const e = {
+        type: track.type,
+        mimetype: track.mimetype,
+        url: track.url,
+        metadata: {
+          video: vmeta,
+          audio: ameta
+        }
+      };
+      if (!(e.type in downloadable)) {
+        downloadable[e.type] = [];
+      }
+      downloadable[e.type].push(e);
+    });
+
+    return downloadable;
   }
 
   async getContent() {
@@ -81,11 +131,14 @@ export default class DownloadsPlugin extends PopUpButtonPlugin {
       const list = createElementWithHtmlText('<ul></ul>', J);
       const streamDownloads = this._downloads[k];
       streamDownloads.forEach(d => {
-        const res = `${d.res.w}x${d.res.h}`;
+        const vmeta = d?.metadata?.video?.res;
+        const ameta = d?.metadata?.audio?.samplingrate ? `${d?.metadata?.audio?.samplingrate} Hz` : null;
+        const meta = vmeta ?? ameta ?? '';
+
         createElementWithHtmlText(`
                 <li>
                   <a href="${d.src}" target="_blank">
-                    <span class="mimetype">[${d.mimetype}]</span><span class="res">${res}</span>
+                    <span class="mimetype">[${d.mimetype}]</span><span class="res">${meta}</span>
                   </a>
                 </li>
             `, list);
