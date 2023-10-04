@@ -122,6 +122,11 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
       return createResult(srcPackage, Action.SKIP);
     }
 
+    if (to.length == 1 && cc.length + bcc.length == 0 && "admin@localhost".equals(to[0])) {
+      logger.info("Skipping invalid default admin email address `admin@localhost`.");
+      return createResult(srcPackage, Action.SKIP);
+    }
+
     String subject = applyTemplateIfNecessary(workflowInstance, operation, SUBJECT_PROPERTY);
 
     String bodyCfg = operation.getConfiguration(BODY_PROPERTY);
