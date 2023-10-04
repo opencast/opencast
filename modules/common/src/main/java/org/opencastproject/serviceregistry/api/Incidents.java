@@ -28,12 +28,13 @@ import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.job.api.Job;
-import org.opencastproject.util.Log;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Tuple;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,7 +46,7 @@ import java.util.Map;
 /** Create and record job incidents. Facade for {@link IncidentService}. */
 public final class Incidents {
 
-  private static final Log log = Log.mk(Incident.class);
+  private static final Logger log = LoggerFactory.getLogger(Incident.class);
 
   /**
    * System error codes
@@ -170,7 +171,7 @@ public final class Incidents {
   }
 
   private void logException(Throwable t) {
-    log.error(t, "Error recording job incident. Log exception and move on.");
+    log.error("Error recording job incident. Log exception and move on.", t);
   }
 
   public boolean alreadyRecordedFailureIncident(long jobId) {
