@@ -4,6 +4,29 @@
 
 
 ####
+# General Settings
+##
+
+# Allowed prefixes in callback urls to prevent malicious urls
+# If empty, no callback url is allowed
+# Type: string[]
+# Default: []
+#allowedCallbackPrefixes = []
+
+# Url to go back after finishing editing
+# If undefined, no return link will be shown on the end pages
+# Type: string | undefined
+# Default: undefined
+#callbackUrl =
+
+# Name of system to go back to
+# If undefined, a generic system name is used instead of a speficic name
+# Type: string | undefined
+# Default: undefined
+#callbackSystem =
+
+
+####
 # Metadata
 ##
 
