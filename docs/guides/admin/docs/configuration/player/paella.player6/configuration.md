@@ -14,8 +14,8 @@ It is easy to install and customize for your own needs.
 Paella has been specially designed for lecture recordings. It works with all HTML5 browsers
 (Chrome, Firefox, Safari and Edge) and within iOS and Android.
 
-Have a look to the paella [features list](https://paellaplayer.upv.es/features/)
-or see them live on paella [demos page](https://paellaplayer.upv.es/demos/)
+Have a look to the paella [features list](https://paellaplayer.upv.es/#/features)
+or see them live on paella [demos page](https://paellaplayer.upv.es/#/demos)
 
 
 Configuration
@@ -29,7 +29,7 @@ The configurations for the paella player are done for each tenant. The paella co
 
 For the default `mh_default_org` tenant file is located at `etc/ui-config/mh_default_org/paella/config.json`.
 
-For more information about the configuration format options, see the paella [documentation](https://paellaplayer.upv.es/docs/)
+For more information about the configuration format options, see the paella [documentation](https://paellaplayer.upv.es/#/doc/index.md)
 
 
 Tracks to be played
