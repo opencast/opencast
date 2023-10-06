@@ -465,12 +465,12 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     VideoClip nextclip;
     while (it.hasNext()) {     // Check for legal durations
       clip = it.next();
-      if (clip.getDurationInMilliseconds() > segmentsMinDuration) { // Keep segments at least 2 seconds long
+      if (clip.getDurationInMilliseconds() > segmentsMinDuration) { // Keep segments longer than segmentsMinDuration
         ll.add(clip);
       }
     }
     clip = ll.pop();        // initialize
-    while (!ll.isEmpty()) { // Check that 2 consecutive segments from same src are at least 2 secs apart
+    while (!ll.isEmpty()) { // Check that 2 consecutive segments from same src are at least segmentsMinCutDuration apart
       if (ll.peek() != null) {
         nextclip = ll.pop();  // check next consecutive segment
         // collapse two segments into one
