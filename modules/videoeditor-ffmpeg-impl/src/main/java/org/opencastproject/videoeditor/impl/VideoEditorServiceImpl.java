@@ -324,7 +324,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
 
       // If we are cutting video/audio, use ffmpeg
       if (videoclips.size() > 0) {
-        // remove very shortcuts that will look bad
+        // remove very short cuts that will look bad
         List<VideoClip> cleanclips = sortSegments(videoclips, segmentsMinDuration, segmentsMinCutDuration);
         String error = null;
         String outputResolution = "";    //TODO: fetch the largest output resolution from SMIL.head.layout.root-layout
