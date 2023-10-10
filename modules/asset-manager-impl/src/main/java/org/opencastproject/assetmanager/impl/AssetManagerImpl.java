@@ -1080,6 +1080,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                 .collect(Collectors.toList());
         return getDatabase().selectProperties(mediaPackageId, SECURITY_NAMESPACE).parallelStream()
                 .map(p -> p.getId().getName())
+                .filter(p -> p.endsWith(action))
                 .anyMatch(p -> roles.parallelStream().anyMatch(r -> r.equals(p)));
     }
   }
