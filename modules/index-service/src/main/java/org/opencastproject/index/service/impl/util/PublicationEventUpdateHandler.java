@@ -20,6 +20,8 @@
  */
 package org.opencastproject.index.service.impl.util;
 
+import static org.opencastproject.workflow.handler.distribution.EngagePublicationChannel.CHANNEL_ID;
+
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.distribution.api.StreamingDistributionService;
@@ -30,6 +32,9 @@ import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
+import org.opencastproject.search.api.SearchQuery;
+import org.opencastproject.search.api.SearchResult;
+import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.MimeType;
@@ -190,13 +195,34 @@ public class PublicationEventUpdateHandler implements AssetManagerUpdateHandler 
       }
 
       mediaPackage.add(newPublication);
-    }
 
-    // Also search service
-    try {
-      searchService.addSynchronously(mediaPackage);
-    } catch (UnauthorizedException e) {
-      throw new RuntimeException(e);
+      // Also search service
+      if (channelId.equals(CHANNEL_ID)) {
+        try {
+          SearchQuery q = new SearchQuery().withId(mediaPackage.getIdentifier().toString()).withLimit(-1);
+          SearchResult result = searchService.getForAdministrativeRead(q);
+
+          for (SearchResultItem item : result.getItems()) {
+            MediaPackage searchMp = item.getMediaPackage();
+
+            for (String elementId : elementIds) {
+              searchMp.removeElementById(elementId);
+            }
+
+            for (MediaPackageElement mpe : downloadElements) {
+              searchMp.add(mpe);
+            }
+
+            for (MediaPackageElement mpe : streamingElements) {
+              mediaPackage.add(mpe);
+            }
+
+            searchService.addSynchronously(mediaPackage);
+          }
+        } catch (UnauthorizedException e) {
+          throw new RuntimeException(e);
+        }
+      }
     }
   }
 
