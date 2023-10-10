@@ -13,8 +13,8 @@
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <opencast.studio.url>https://github.com/elan-ev/opencast-studio/releases/download/2023-09-14/oc-studio-2023-09-14-integrated.tar.gz</opencast.studio.url>
-    <opencast.studio.sha256>3b1a5ff7b1943866d73a7f19192faaf03151d1a1ff7338192e8040f04236c0d7</opencast.studio.sha256>
+    <opencast.studio.url>https://github.com/elan-ev/opencast-studio/releases/download/2023-10-10/oc-studio-2023-10-10-integrated.tar.gz</opencast.studio.url>
+    <opencast.studio.sha256>dde7648b5a3656e5c2eccdd32ddbdbb4273093b19438e79037667cec874a6de8</opencast.studio.sha256>
   </properties>
   <build>
     <plugins>
