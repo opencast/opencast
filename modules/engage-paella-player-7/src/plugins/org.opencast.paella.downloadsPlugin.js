@@ -137,7 +137,7 @@ export default class DownloadsPlugin extends PopUpButtonPlugin {
 
         createElementWithHtmlText(`
                 <li>
-                  <a href="${d.src}" target="_blank">
+                  <a href="${d.url}" target="_blank">
                     <span class="mimetype">[${d.mimetype}]</span><span class="res">${meta}</span>
                   </a>
                 </li>
