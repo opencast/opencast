@@ -228,8 +228,8 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
           continue;
         }
         if (isChild(rootDirectories.get(j), rootDirectories.get(i))) {
-          throw new ConfigurationException("Storage directory " + rootDirectories.get(j) + " is a subdirectory of " +
-              rootDirectories.get(i) + ". This is not allowed.");
+          throw new ConfigurationException("Storage directory " + rootDirectories.get(j) + " is a subdirectory of "
+              + rootDirectories.get(i) + ". This is not allowed.");
         }
       }
     }
