@@ -43,7 +43,7 @@
       "VIDEOFILE": "Video dosyası",
       "VIDEOFILE_DESCRIPTION": "Yüklenecek video dosyası",
       "CAPTION": "Altyazılar",
-      "CAPTION_DESCRIPTION": "Altyazı dosyası; VTT veya dxfp dosya formatı desteklenir ",
+      "CAPTION_DESCRIPTION": "Caption file in VTT format",
       "UPLOAD": "Yükle",
       "UPLOADING": "Yükleniyor",
       "EDIT": "Kaydet",
@@ -541,6 +541,10 @@
                      "SHORT": "Hediye Eden",
                      "DETAIL": "Bu dosya bir kişinin kitleye konuşmasının kaydını içermekte."
                   },
+                  "SUBTITLES": {
+                     "SHORT": "Subtitles",
+                     "DETAIL": "The text file contains the words spoken in the video(s) above."
+                  },
                   "AUDIO_ONLY": {
                      "SHORT": "Sadece ses",
                      "DETAIL": "Dosyada sadece ses var."
@@ -584,8 +588,7 @@
                "NO_OPTIONS": "Web sayfasının bu bölümüne varlık seçeneklerinin bir listesi verilmemiştir!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Sınıfta verilen ders kağatları hakkında notlar",
-                  "CAPTIONS_DFXP": "Altyazı DFXP",
-                  "CAPTIONS_WEBVTT": "Altyazı WebVTT",
+                  "SUBTITLES": "Subtitles",
                   "PREVIEW_IMAGE": "Resim önizleme",
                   "SMIL": "SMIL Katalog",
                   "TRACK_PARTS": "Kayıt parçası"
@@ -1863,8 +1866,10 @@
       "TRACKS": {
          "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "En az bir video kanalı etkinleştirmeniz gerekir",
-            "NO_AUDIO_TRACK_SELECTED": "En az bir ses parçası etkinleştirmeniz gerekir"
+            "NO_VIDEO_TRACK_SELECTED_WARNING": "You should probably enable at least one video track",
+            "NO_AUDIO_TRACK_SELECTED_WARNING": "You should probably enable at least one audio track",
+            "TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING": "You probably shouldn't enable more audio than video tracks",
+            "NO_TRACK_SELECTED_ERROR": "You must enable at least one track"
          },
          "TRACK": {
             "HEADER": "Parça"

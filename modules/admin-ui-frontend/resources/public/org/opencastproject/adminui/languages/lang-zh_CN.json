@@ -43,7 +43,7 @@
       "VIDEOFILE": "视频文件",
       "VIDEOFILE_DESCRIPTION": "要上传的视频",
       "CAPTION": "字幕",
-      "CAPTION_DESCRIPTION": "标题文件; 支持VTT 或 dfxp 格式",
+      "CAPTION_DESCRIPTION": "Caption file in VTT format",
       "UPLOAD": "上传",
       "UPLOADING": "上传中",
       "EDIT": "保存",
@@ -541,6 +541,10 @@
                      "SHORT": "演讲者",
                      "DETAIL": "该文件包含对演讲者的录制。"
                   },
+                  "SUBTITLES": {
+                     "SHORT": "Subtitles",
+                     "DETAIL": "The text file contains the words spoken in the video(s) above."
+                  },
                   "AUDIO_ONLY": {
                      "SHORT": "仅音频",
                      "DETAIL": "该文件仅包含音频。"
@@ -584,8 +588,7 @@
                "NO_OPTIONS": "此网页的这一节没有提供资源选项列表！",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "课堂讲义",
-                  "CAPTIONS_DFXP": "DFXP格式字幕",
-                  "CAPTIONS_WEBVTT": "WebVTT格式字幕",
+                  "SUBTITLES": "Subtitles",
                   "PREVIEW_IMAGE": "预览图片",
                   "SMIL": "Smil编目",
                   "TRACK_PARTS": "轨道部分"
@@ -1863,8 +1866,10 @@
       "TRACKS": {
          "DESCRIPTION": "您可以取消选择轨道，将其排除在进一步处理之外。请注意您需要重新发布事件才能使更改生效。",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "您必须启用至少一个视频轨道",
-            "NO_AUDIO_TRACK_SELECTED": "您必须启用至少一个音频轨道"
+            "NO_VIDEO_TRACK_SELECTED_WARNING": "You should probably enable at least one video track",
+            "NO_AUDIO_TRACK_SELECTED_WARNING": "You should probably enable at least one audio track",
+            "TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING": "You probably shouldn't enable more audio than video tracks",
+            "NO_TRACK_SELECTED_ERROR": "You must enable at least one track"
          },
          "TRACK": {
             "HEADER": "轨道"

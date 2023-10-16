@@ -1,4 +1,7 @@
 {
 	"Error loading video! No video tracks found": "Σφάλμα φόρτωσης βίντεο! Δεν βρέθηκε κομμάτι βίντεο",
-	"Error loading video {0}": "Σφάλμα κατά τη φόρτωση βίντεο {0}"
+	"Error loading video {0}": "Σφάλμα κατά τη φόρτωση βίντεο {0}",
+	"CAPTIONS_undefined": "Άγνωστη γλώσσα",
+	"CAPTIONS_unknown_language": "Unknown language",
+	"CAPTIONS_auto_generated": "automatically generated"
 }

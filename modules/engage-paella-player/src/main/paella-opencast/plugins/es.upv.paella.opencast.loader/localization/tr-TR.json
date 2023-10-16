@@ -1,4 +1,7 @@
 {
 	"Error loading video! No video tracks found": "Video yüklenirken hata oluştu! Hiçbir video parçası bulunamadı",
-	"Error loading video {0}": "Video yüklenirken hata oluştu {0}"
+	"Error loading video {0}": "Video yüklenirken hata oluştu {0}",
+	"CAPTIONS_undefined": "Bilinmeyen dil",
+	"CAPTIONS_unknown_language": "Unknown language",
+	"CAPTIONS_auto_generated": "automatically generated"
 }

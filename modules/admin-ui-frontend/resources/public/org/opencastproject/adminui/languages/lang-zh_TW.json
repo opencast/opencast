@@ -43,7 +43,7 @@
       "VIDEOFILE": "影片檔案",
       "VIDEOFILE_DESCRIPTION": "選擇要上傳的影片檔案",
       "CAPTION": "字幕",
-      "CAPTION_DESCRIPTION": "字幕檔案； 支援 VTT 或 dfxp 格式",
+      "CAPTION_DESCRIPTION": "Caption file in VTT format",
       "UPLOAD": "上傳",
       "UPLOADING": "上傳中",
       "EDIT": "儲存",
@@ -541,6 +541,10 @@
                      "SHORT": "演講者",
                      "DETAIL": "該文件包含演講者的演講紀錄影音檔。"
                   },
+                  "SUBTITLES": {
+                     "SHORT": "Subtitles",
+                     "DETAIL": "The text file contains the words spoken in the video(s) above."
+                  },
                   "AUDIO_ONLY": {
                      "SHORT": "只有音訊",
                      "DETAIL": "該文件只包含音訊檔。"
@@ -584,8 +588,7 @@
                "NO_OPTIONS": "網頁的此部分未提供資源選項列表！",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "類別講義備註",
-                  "CAPTIONS_DFXP": "字幕 DFXP",
-                  "CAPTIONS_WEBVTT": "字幕 WebVTT",
+                  "SUBTITLES": "Subtitles",
                   "PREVIEW_IMAGE": "預覽圖像",
                   "SMIL": "Smil 目錄",
                   "TRACK_PARTS": "軌道部件"
@@ -1863,8 +1866,10 @@
       "TRACKS": {
          "DESCRIPTION": "您可以取消選擇軌道以將它們排除在進一步處理之外。 請注意，您需要（重新）發布事件才能實際套用更改。",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "您必須至少啟用一個影片軌道",
-            "NO_AUDIO_TRACK_SELECTED": "您必須至少啟用一個聲音軌道"
+            "NO_VIDEO_TRACK_SELECTED_WARNING": "You should probably enable at least one video track",
+            "NO_AUDIO_TRACK_SELECTED_WARNING": "You should probably enable at least one audio track",
+            "TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING": "You probably shouldn't enable more audio than video tracks",
+            "NO_TRACK_SELECTED_ERROR": "You must enable at least one track"
          },
          "TRACK": {
             "HEADER": "軌道"

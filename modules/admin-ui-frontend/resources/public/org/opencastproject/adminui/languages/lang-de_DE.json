@@ -43,7 +43,7 @@
       "VIDEOFILE": "Videodatei",
       "VIDEOFILE_DESCRIPTION": "Videodatei zum Hochladen",
       "CAPTION": "Untertitel",
-      "CAPTION_DESCRIPTION": "Untertiteldatei; VTT- oder dxfp-Dateiformat wird unterstützt",
+      "CAPTION_DESCRIPTION": "Caption file in VTT format",
       "UPLOAD": "Hochladen",
       "UPLOADING": "Lädt hoch",
       "EDIT": "Speichern",
@@ -541,6 +541,10 @@
                      "SHORT": "Vortragender",
                      "DETAIL": "Die Datei enthält die Aufnahme einer zum Publikum sprechenden Person."
                   },
+                  "SUBTITLES": {
+                     "SHORT": "Subtitles",
+                     "DETAIL": "The text file contains the words spoken in the video(s) above."
+                  },
                   "AUDIO_ONLY": {
                      "SHORT": "Nur Audio",
                      "DETAIL": "Die Datei enthält nur Audio."
@@ -584,8 +588,7 @@
                "NO_OPTIONS": "Es wurden keine Optionen konfiguriert!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Unterrichtsnotizen",
-                  "CAPTIONS_DFXP": "Untertitel (DFXP)",
-                  "CAPTIONS_WEBVTT": "Untertitel (WebVTT)",
+                  "SUBTITLES": "Subtitles",
                   "PREVIEW_IMAGE": "Vorschaubild",
                   "SMIL": "SMIL-Katalog",
                   "TRACK_PARTS": "Spur-Teile"
@@ -1863,8 +1866,10 @@
       "TRACKS": {
          "DESCRIPTION": "Sie können Spuren von der Auswahl entfernen, damit diese nicht verarbeitet werden. Bitte beachten Sie, dass Sie die Videos erneut publizieren müssen, damit die Änderung aktiv werden.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "Bitte wählen Sie mindestens eine Videospur aus",
-            "NO_AUDIO_TRACK_SELECTED": "Bitte wählen Sie mindestens eine Audiospur aus"
+            "NO_VIDEO_TRACK_SELECTED_WARNING": "You should probably enable at least one video track",
+            "NO_AUDIO_TRACK_SELECTED_WARNING": "You should probably enable at least one audio track",
+            "TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING": "You probably shouldn't enable more audio than video tracks",
+            "NO_TRACK_SELECTED_ERROR": "You must enable at least one track"
          },
          "TRACK": {
             "HEADER": "Spur"
