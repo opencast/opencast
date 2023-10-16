@@ -21,7 +21,7 @@ You need to enabled the `org.opencast.paella.downloadsPlugin` plugin.
         "downloadTags": false,
         "downloadMimeTypes": ["audio/m4a", "video/mp4"],
 
-        "enableOnlyLicenses": [
+        "enableOnLicenses": [
             "CC-BY",
             "CC-BY-SA",
             "CC-BY-ND",
@@ -35,9 +35,11 @@ You need to enabled the `org.opencast.paella.downloadsPlugin` plugin.
 }
 ```
 
+The plugin is enabled when `enabled` is true and one of the two conditions (`enableOnLicenses` or `enableOnWritePermission`) is valid.
+
 Configuration parameters:
 
-- **enableOnlyLicenses**: The plugin is enabled if the `episode license` match any of the the licenses
+- **enableOnLicenses**: The plugin is enabled if the `episode license` match any of the the licenses
     
     Valid values: `false` / Array strings
 

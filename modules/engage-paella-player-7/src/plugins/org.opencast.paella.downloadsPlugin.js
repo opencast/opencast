@@ -35,8 +35,8 @@ export default class DownloadsPlugin extends PopUpButtonPlugin {
     const { metadata } = this.player.videoManifest;
 
     const hasWritePermission = this.config.enableOnWritePermission && await this.player.opencastAuth.canWrite();
-    const hasAllowedLicense = this.config.enableOnlyLicenses
-      ? (this.config.enableOnlyLicenses.includes(metadata.license))
+    const hasAllowedLicense = this.config.enableOnLicenses
+      ? (this.config.enableOnLicenses.includes(metadata.license))
       : true;
     const enabled = (await super.isEnabled()) && (hasWritePermission || hasAllowedLicense);
 

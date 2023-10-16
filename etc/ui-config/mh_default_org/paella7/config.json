@@ -414,7 +414,7 @@
             "downloadTags": false,
             "downloadMimeTypes": ["audio/m4a", "video/mp4"],
 
-            "enableOnlyLicenses": [
+            "enableOnLicenses": [
                 "CC-BY",
                 "CC-BY-SA",
                 "CC-BY-ND",
