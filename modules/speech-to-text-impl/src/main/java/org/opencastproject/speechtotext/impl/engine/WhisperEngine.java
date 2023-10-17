@@ -195,7 +195,6 @@ public class WhisperEngine implements SpeechToTextEngine {
     logger.info("Executing Whisper's transcription command: {}", transcriptionCommand);
 
     Process transcriptonProcess = null;
-    BufferedReader in = null;
     String mediaFileNameWithoutExtension;
 
     try {
@@ -203,25 +202,20 @@ public class WhisperEngine implements SpeechToTextEngine {
       processBuilder.redirectErrorStream(true);
       transcriptonProcess = processBuilder.start();
 
-      // tell listeners about output
-      in = new BufferedReader(new InputStreamReader(transcriptonProcess.getInputStream()));
-      String line;
-      while ((line = in.readLine()) != null) {
-        handleTranscriptionOutput(line);
-      }
-
-      // wait until the task is finished
-      int exitCode = transcriptonProcess.waitFor();
-      logger.debug("Whisper process finished with exit code {}",exitCode);
-
-      if (exitCode != 0) {
-        var error = "";
-        try (var errorStream = transcriptonProcess.getInputStream()) {
-          error = "\n Output:\n" + IOUtils.toString(errorStream, StandardCharsets.UTF_8);
+      try (BufferedReader in = new BufferedReader(new InputStreamReader(transcriptonProcess.getInputStream()))) {
+        String line;
+        while ((line = in.readLine()) != null) { // consume process output
+          handleTranscriptionOutput(line);
         }
-        throw new SpeechToTextEngineException(
-            String.format("Whisper exited abnormally with status %d (command: %s)%s",
-                exitCode, transcriptionCommand, error));
+
+        // wait until the task is finished
+        int exitCode = transcriptonProcess.waitFor();
+        logger.debug("Whisper process finished with exit code {}", exitCode);
+
+        if (exitCode != 0) {
+          throw new SpeechToTextEngineException(
+              String.format("Whisper exited abnormally with status %d (command: %s)", exitCode, transcriptionCommand));
+        }
       }
 
       // Renaming output whisper filename to the expected output filename
@@ -238,8 +232,12 @@ public class WhisperEngine implements SpeechToTextEngine {
       logger.debug("Transcription failed closing Whisper transcription process for: {}", mediaFile);
       throw new SpeechToTextEngineException(e);
     } finally {
-      IoSupport.closeQuietly(in);
-      IoSupport.closeQuietly(transcriptonProcess);
+      if (transcriptonProcess != null && transcriptonProcess.isAlive()) {
+        transcriptonProcess.destroy();
+        if (transcriptonProcess.isAlive()) {
+          transcriptonProcess.destroyForcibly();
+        }
+      }
     }
 
     // Detect language if not set
