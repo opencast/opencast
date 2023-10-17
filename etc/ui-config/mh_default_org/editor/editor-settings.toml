@@ -101,7 +101,7 @@
 [subtitles.languages]
 ## A list of languages for which new subtitles can be created
 # For each language, various tags can be specified
-# A list of officially recommended tags can be found at: TODO: link to opencast documentation for subtitle tags
+# A list of officially recommended tags can be found at https://docs.opencast.org/develop/admin/#modules/subtitles/#tags
 # At least the "lang" tag MUST be specified
 german = { lang = "de-DE" }
 english = { lang = "en-US", type = "closed-caption" }
