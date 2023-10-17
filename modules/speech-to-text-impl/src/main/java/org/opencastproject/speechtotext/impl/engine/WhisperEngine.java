@@ -23,11 +23,9 @@ package org.opencastproject.speechtotext.impl.engine;
 
 import org.opencastproject.speechtotext.api.SpeechToTextEngine;
 import org.opencastproject.speechtotext.api.SpeechToTextEngineException;
-import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -42,7 +40,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
