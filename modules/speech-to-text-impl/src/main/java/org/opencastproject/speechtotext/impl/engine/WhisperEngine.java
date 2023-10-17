@@ -232,7 +232,7 @@ public class WhisperEngine implements SpeechToTextEngine {
       logger.debug("Transcription failed closing Whisper transcription process for: {}", mediaFile);
       throw new SpeechToTextEngineException(e);
     } finally {
-      if (transcriptonProcess != null && transcriptonProcess.isAlive()) {
+      if (transcriptonProcess != null) {
         transcriptonProcess.destroy();
         if (transcriptonProcess.isAlive()) {
           transcriptonProcess.destroyForcibly();
