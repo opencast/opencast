@@ -4,7 +4,7 @@
 Opencast 13.12
 --------------
 
-The twelve maintenance release of Opencast 13.
+The twelfth maintenance release of Opencast 13.
 
 - Add feature that stores Paella Player 7 user preferences in the local storage of the browser
 - Update of Paella Player 7
