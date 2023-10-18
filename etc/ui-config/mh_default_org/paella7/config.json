@@ -504,14 +504,17 @@
             "enabled": true,
             "order": 1
         },
-        "es.upv.paella.cookieDataPlugin": {
+
+        "es.upv.paella.localStorageDataPlugin": {
             "enabled": true,
             "order": 0,
             "context": [
                 "default",
-                "trimming"
+                "trimming",
+                "preferences"
             ]
         },
+
         "org.opencast.paella.cookieconsent": {
             "enabled": true,
             "side": "right"
