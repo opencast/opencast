@@ -225,6 +225,7 @@ class Item {
 
   private static List<Jsons.Val> assembleTracks(SearchResultItem event, MediaPackage mp) {
     return Arrays.stream(mp.getTracks())
+        .filter(track -> track.hasAudio() || track.hasVideo())
         .map(track -> {
           var videoStreams = TrackSupport.byType(track.getStreams(), VideoStream.class);
           var resolution = Jsons.NULL;
