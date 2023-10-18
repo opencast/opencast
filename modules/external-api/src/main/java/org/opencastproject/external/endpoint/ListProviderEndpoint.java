@@ -22,6 +22,7 @@ package org.opencastproject.external.endpoint;
 
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
+import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.impl.ListProviderNotFoundException;
@@ -46,13 +47,11 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.QueryParam;;
 import javax.ws.rs.core.Response;
 
 @Path("/")
@@ -94,26 +93,28 @@ public class ListProviderEndpoint {
 
   @GET
   @Path("providers.json")
-  @Produces(MediaType.APPLICATION_JSON)
+  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_10_0 })
   @RestQuery(name = "availableProviders", description = "Provides the list of the available list providers", responses = { @RestResponse(description = "Returns the availables list providers.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
-  public Response getAvailablesProviders(@Context HttpHeaders headers) {
+  public Response getAvailablesProviders(@HeaderParam("Accept") String acceptHeader) {
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     JSONArray list = new JSONArray();
 
     list.add(listProvidersService.getAvailableProviders());
 
-    return Response.ok(list.toString()).build();
+    return ApiResponses.Json.ok(requestedVersion, list.toJSONString());
   }
 
   @GET
   @Path("{source}.json")
-  @Produces(MediaType.APPLICATION_JSON)
+  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_10_0 })
   @RestQuery(name = "list", description = "Provides key-value list from the given source", pathParameters = { @RestParameter(name = "source", description = "The source for the key-value list", isRequired = true, type = RestParameter.Type.STRING) }, restParameters = {
           @RestParameter(description = "The maximum number of items to return per page", isRequired = false, name = "limit", type = RestParameter.Type.INTEGER),
           @RestParameter(description = "The offset", isRequired = false, name = "offset", type = RestParameter.Type.INTEGER),
           @RestParameter(description = "Filters", isRequired = false, name = "filter", type = RestParameter.Type.STRING) }, responses = { @RestResponse(description = "Returns the key-value list for the given source.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response getList(@PathParam("source") final String source, @QueryParam("limit") final int limit,
           @QueryParam("filter") final String filter, @QueryParam("offset") final int offset,
-          @Context HttpHeaders headers) {
+          @HeaderParam("Accept") String acceptHeader) {
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
 
     ResourceListQueryImpl query = new ResourceListQueryImpl();
     query.setLimit(limit);
@@ -132,7 +133,7 @@ public class ListProviderEndpoint {
 
     Gson gson = new Gson();
     String jsonList = gson.toJson(autocompleteList);
-    return Response.ok(jsonList).build();
+    return ApiResponses.Json.ok(requestedVersion, jsonList);
   }
 
   /**
