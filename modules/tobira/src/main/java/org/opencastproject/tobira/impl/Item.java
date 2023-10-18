@@ -48,12 +48,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -164,7 +164,7 @@ class Item {
 
   /** Assembles the object containing all additional metadata. */
   private static Jsons.Obj dccToMetadata(List<DublinCoreCatalog> dccs) {
-    /** Metadata fields from dcterms that we already handle elsewhere. Therefore, we don't need to
+    /* Metadata fields from dcterms that we already handle elsewhere. Therefore, we don't need to
       * include them here again. */
     final var ignoredDcFields = Set.of(new String[] {
         "created", "creator", "title", "extent", "isPartOf", "description", "identifier",
@@ -253,10 +253,7 @@ class Item {
   }
 
   private static List<Jsons.Val> findCaptions(MediaPackage mp) {
-    // We deduplicate the captions by URL and language in case we somehow find
-    // one twice.
-    var captions = new HashMap<String, HashSet<String>>();
-    Arrays.stream(mp.getElements())
+    return Arrays.stream(mp.getElements())
         .filter(element -> {
           final var isVTT = element.getFlavor().toString().startsWith("captions/vtt")
                 || element.getMimeType().eq("text", "vtt");
@@ -265,41 +262,36 @@ class Item {
 
           return isVTT && isCorrectType;
         })
-        .forEach(track -> {
-          final var uri = track.getURI().toString();
-          captions.putIfAbsent(uri, new HashSet<String>());
+        .map(track -> {
+          final var tags = track.getTags();
+          final Function<String, Optional<String>> findTag = (String prefix) -> Arrays.stream(tags)
+                .map(tag -> tag.split(":", 2))
+                .filter(tagArray -> (tagArray.length == 2 && tagArray[0].equals(prefix)))
+                .map(tagArray -> tagArray[1])
+                .findFirst();
 
-          // Try to get language from flavor. Otherwise there is an empty list
-          // in the map.
-          final var subflavor = track.getFlavor().getSubtype();
-          if (subflavor.startsWith("vtt+")) {
-            final var suffix = subflavor.substring("vtt+".length());
-            if (suffix.length() > 0) {
-              captions.get(uri).add(suffix);
+          // Try to get a language for this subtitle track. We first check the proper tag.
+          var lang = findTag.apply("lang");
+          if (lang.isEmpty()) {
+            // But for compatibility, we also check in the flavor.
+            final var subflavor = track.getFlavor().getSubtype();
+            if (subflavor.startsWith("vtt+")) {
+              final var suffix = subflavor.substring("vtt+".length());
+              if (suffix.length() > 0) {
+                lang = Optional.of(suffix);
+              }
             }
           }
 
-        });
-
-    return captions.entrySet()
-        .stream()
-        .flatMap(e -> {
-          final var languages = e.getValue();
-          final var uri = e.getKey();
-
-          // If this caption URL had no language associated with it, we push a
-          // `null` language to emit this caption at all. Otherwise, all
-          // languages are output as a separate track.
-          if (languages.isEmpty()) {
-            languages.add(null);
-          }
-
-          return languages.stream().map(lang -> Jsons.obj(
-            Jsons.p("uri", uri),
-            Jsons.p("lang", lang)
-          ));
+          return Jsons.obj(
+            Jsons.p("uri", track.getURI().toString()),
+            Jsons.p("lang", lang.orElse(null)),
+            Jsons.p("generatorType", findTag.apply("generator-type").orElse(null)),
+            Jsons.p("generator", findTag.apply("generator").orElse(null)),
+            Jsons.p("type", findTag.apply("type").orElse(null))
+          );
         })
-      .collect(Collectors.toCollection(ArrayList::new));
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 
   private static String findThumbnail(MediaPackage mp) {
