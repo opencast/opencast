@@ -26,6 +26,7 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.metadata.dublincore.DublinCore;
@@ -122,6 +123,18 @@ class Item {
 
       final var captions = findCaptions(mp);
 
+      // Obtain duration from tracks, as that's usually more accurate (stores information from
+      // inspect operations). Fall back to `getDcExtent`.
+      final var duration = Arrays.stream(mp.getTracks())
+          .filter(track -> track.hasVideo() || track.hasAudio())
+          .map(Track::getDuration)
+          .filter(d -> d != null && d > 0)
+          .mapToLong(Long::longValue)
+          // Not entirely clear how to combine different track durations. Taking the max is not
+          // worse than any other thing that I can think of. And usually all durations are basically
+          // the same.
+          .max()
+          .orElse(Math.max(0, event.getDcExtent()));
 
       this.obj = Jsons.obj(
           Jsons.p("kind", "event"),
@@ -133,7 +146,7 @@ class Item {
           Jsons.p("startTime", period.map(p -> p.getStart().getTime()).orElse(null)),
           Jsons.p("endTime", period.map(p -> p.getEnd().getTime()).orElse(null)),
           Jsons.p("creators", Jsons.arr(new ArrayList<>(creators))),
-          Jsons.p("duration", Math.max(0, event.getDcExtent())),
+          Jsons.p("duration", duration),
           Jsons.p("thumbnail", findThumbnail(mp)),
           Jsons.p("timelinePreview", findTimelinePreview(mp)),
           Jsons.p("tracks", Jsons.arr(assembleTracks(event, mp))),
