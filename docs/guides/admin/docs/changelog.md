@@ -4,6 +4,19 @@ Changelog
 Opencast 13
 -----------
 
+### Opencast 13.12
+
+*Released on October 18th, 2023*
+
+- [[#5313](https://github.com/opencast/opencast/pull/5313)] -
+  Update events in archive in order on series change
+- [[#5260](https://github.com/opencast/opencast/pull/5260)] -
+  Update ES index before triggering event handlers from AssetManager
+- [[#5253](https://github.com/opencast/opencast/pull/5253)] -
+  Paella 7: Use the localstorage to store the user preferences and upgrades Paella core to 1.43
+- [[#5246](https://github.com/opencast/opencast/pull/5246)] -
+  Paella 7 plugins documentation
+
 ### Opencast 13.11
 
 *Released on September 14th, 2023*
