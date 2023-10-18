@@ -9,14 +9,6 @@ connections from and to Opencast.  To archieve that, you can either use an HTTP(
 - [Using Apache httpd to enable HTTPS](apache-httpd.md)
 - [Enable HTTPS directly in Opencast](opencast.only.md)
 
-
-Note that introducing HTTPS will not automatically migrate old content.
-It may still use the previously configured HTTP protocol.
-For a semi-automatic migration, please take a look at the following guide:
-
-- [Migrating old content to HTTPS](migration.md)
-
-
 General Recommendations
 -----------------------
 
