@@ -179,6 +179,8 @@ public class YouTubeV3PublicationServiceImpl
   public synchronized void activate(final ComponentContext cc) {
     super.activate(cc);
     properties.setBundleContext(cc.getBundleContext());
+
+    logger.debug("Activated Youtube Publication Service");
   }
 
   @Override

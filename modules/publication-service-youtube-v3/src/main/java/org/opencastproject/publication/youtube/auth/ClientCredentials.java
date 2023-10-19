@@ -99,7 +99,16 @@ public final class ClientCredentials {
     final JSONParser parser = new JSONParser();
     final FileReader reader = new FileReader(file);
     final JSONObject jsonObject = (JSONObject) parser.parse(reader);
+
+    if (!jsonObject.containsKey("installed")) {
+      throw new IOException("client_secret file does not contain \"installed\" as a top level key. Did you set the "
+          + "type for your 'OAuth 2.0-Client-ID' correctly?");
+    }
     final JSONObject array = (JSONObject) jsonObject.get("installed");
+
+    if (!array.containsKey("client_id")) {
+      throw new IOException("client_secret file does not contain \"client_id\".");
+    }
     return (String) array.get("client_id");
   }
 
