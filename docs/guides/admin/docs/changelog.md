@@ -4,6 +4,21 @@ Changelog
 Opencast 14
 -----------
 
+### Opencast 14.5
+
+*Released on October 19th, 2023*
+
+- [[#5259](https://github.com/opencast/opencast/pull/5259)] -
+  Improve asset manager event handler logging
+- [[#5254](https://github.com/opencast/opencast/pull/5254)] -
+  Update Opencast Studio to `2023-09-14`
+- [[#5252](https://github.com/opencast/opencast/pull/5252)] -
+  Paella 7: Fix vertically stretched thumbnails in transcriptions plugin
+- [[#5243](https://github.com/opencast/opencast/pull/5243)] -
+  Extend analyze-mp for tag variables
+- [[#5240](https://github.com/opencast/opencast/pull/5240)] -
+  Use context aware logger for workflow service
+
 ### Opencast 14.4
 
 *Released on September 14th, 2023*
