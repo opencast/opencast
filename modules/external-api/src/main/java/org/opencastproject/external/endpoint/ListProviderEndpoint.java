@@ -22,7 +22,6 @@ package org.opencastproject.external.endpoint;
 
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
-import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.impl.ListProviderNotFoundException;
