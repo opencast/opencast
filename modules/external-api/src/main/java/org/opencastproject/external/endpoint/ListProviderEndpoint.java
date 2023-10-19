@@ -96,12 +96,11 @@ public class ListProviderEndpoint {
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_10_0 })
   @RestQuery(name = "availableProviders", description = "Provides the list of the available list providers", responses = { @RestResponse(description = "Returns the availables list providers.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response getAvailablesProviders(@HeaderParam("Accept") String acceptHeader) {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     JSONArray list = new JSONArray();
 
     list.add(listProvidersService.getAvailableProviders());
 
-    return ApiResponses.Json.ok(requestedVersion, list.toJSONString());
+    return ApiResponses.Json.ok(acceptHeader, list.toJSONString());
   }
 
   @GET
@@ -114,7 +113,6 @@ public class ListProviderEndpoint {
   public Response getList(@PathParam("source") final String source, @QueryParam("limit") final int limit,
           @QueryParam("filter") final String filter, @QueryParam("offset") final int offset,
           @HeaderParam("Accept") String acceptHeader) {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
 
     ResourceListQueryImpl query = new ResourceListQueryImpl();
     query.setLimit(limit);
@@ -133,7 +131,7 @@ public class ListProviderEndpoint {
 
     Gson gson = new Gson();
     String jsonList = gson.toJson(autocompleteList);
-    return ApiResponses.Json.ok(requestedVersion, jsonList);
+    return ApiResponses.Json.ok(acceptHeader, jsonList);
   }
 
   /**
