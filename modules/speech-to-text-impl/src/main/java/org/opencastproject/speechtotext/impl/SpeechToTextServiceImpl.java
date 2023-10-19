@@ -175,7 +175,7 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
         FileUtils.deleteQuietly(subtitlesFile);
       }
     }
-    return subtitleFilesURI.toString() + "," + language;
+    return subtitleFilesURI.toString() + "," + language + "," + speechToTextEngine.getEngineName();
   }
 
 
