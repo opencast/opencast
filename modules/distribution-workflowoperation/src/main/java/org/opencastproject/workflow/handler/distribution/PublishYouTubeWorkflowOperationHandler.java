@@ -122,13 +122,12 @@ public class PublishYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
       // Look for elements matching the tag
       final Collection<MediaPackageElement> elements = elementSelector.select(mediaPackage, true);
       if (elements.size() > 1) {
-        logger.warn("More than one element has been found for publishing to youtube: {}", elements);
-        return createResult(mediaPackage, Action.SKIP);
+        throw new WorkflowOperationException("More than one element has been found for publishing to youtube: "
+            + elements);
       }
 
       if (elements.size() < 1) {
-        logger.info("No mediapackage element was found for publishing");
-        return createResult(mediaPackage, Action.CONTINUE);
+        throw new WorkflowOperationException("No mediapackage element was found for publishing");
       }
 
       Job youtubeJob;
@@ -149,8 +148,8 @@ public class PublishYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
 
       // If there is no payload, then the item has not been published.
       if (job.getPayload() == null) {
-        logger.warn("Publish to youtube failed, no payload from publication job: {}", job);
-        return createResult(mediaPackage, Action.CONTINUE);
+        throw new WorkflowOperationException("Publish to youtube failed, no payload from publication job: "
+            + job.getId());
       }
 
       Publication newElement = null;
@@ -161,10 +160,9 @@ public class PublishYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
       }
 
       if (newElement == null) {
-        logger.warn(
-            "Publication to youtube failed, unable to parse the payload '{}' from job '{}' to a mediapackage element",
-            job.getPayload(), job);
-        return createResult(mediaPackage, Action.CONTINUE);
+        throw new WorkflowOperationException(String.format(
+            "Publication to youtube failed, unable to parse the payload '%s' from job '%d' to a mediapackage element",
+            job.getPayload(), job.getId()));
       }
       mediaPackage.add(newElement);
 
