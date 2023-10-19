@@ -94,7 +94,7 @@ public class ListProviderEndpoint {
   @Path("providers.json")
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_10_0 })
   @RestQuery(name = "availableProviders", description = "Provides the list of the available list providers", responses = { @RestResponse(description = "Returns the availables list providers.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
-  public Response getAvailablesProviders(@HeaderParam("Accept") String acceptHeader) {
+  public Response getAvailableProviders(@HeaderParam("Accept") String acceptHeader) {
     JSONArray list = new JSONArray();
 
     list.add(listProvidersService.getAvailableProviders());
