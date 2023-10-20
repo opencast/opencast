@@ -163,35 +163,21 @@
     </operation>
 
 
-    <!-- Create a cover image with the default template -->
+    <!-- Create a cover image -->
 
     <operation
-      id="image"
-      exception-handler-workflow="partial-error"
-      description="Creating player preview image for presenter video">
+        id="image"
+        exception-handler-workflow="partial-error"
+        description="Creating player preview image for presenter video">
       <configurations>
         <configuration key="source-flavor">presenter/trimmed</configuration>
-        <configuration key="target-flavor">presenter/coverbackground</configuration>
+        <configuration key="target-flavor">presenter/player+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">player-preview.http</configuration>
         <configuration key="time">3</configuration>
       </configurations>
     </operation>
 
-    <operation
-      id="cover-image"
-      if="${presenter_work_media}"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="Create a cover image">
-      <configurations>
-        <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
-        <configuration key="width">1920</configuration>
-        <configuration key="height">1080</configuration>
-        <configuration key="posterimage-flavor">presenter/coverbackground</configuration>
-        <configuration key="target-flavor">presenter/player+preview</configuration>
-        <configuration key="target-tags">engage-download</configuration>
-     </configurations>
-    </operation>
 
     <!-- Generate timeline preview images -->
 
