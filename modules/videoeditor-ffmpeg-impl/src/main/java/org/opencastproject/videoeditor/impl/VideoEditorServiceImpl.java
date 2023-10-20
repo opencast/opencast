@@ -587,11 +587,6 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
         String.valueOf(DEFAULT_SEGMENTS_MIN_DURATION)));
     segmentsMinCutDuration = Integer.parseInt(this.properties.getProperty(SEGMENTS_MIN_CUT_DURATION_KEY,
         String.valueOf(DEFAULT_SEGMENTS_MIN_CUT_DURATION)));
-    //segmentsMinDuration = (int) LoadUtil.getConfiguredLoadValue(properties, SEGMENTS_MIN_DURATION_KEY,
-    //    Float.valueOf(DEFAULT_SEGMENTS_MIN_DURATION), serviceRegistry);
-    //segmentsMinCutDuration = (int) LoadUtil.getConfiguredLoadValue(properties, SEGMENTS_MIN_CUT_DURATION_KEY,
-    //    Float.valueOf(DEFAULT_SEGMENTS_MIN_CUT_DURATION), serviceRegistry);
-
   }
 
   @Reference
