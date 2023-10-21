@@ -30,6 +30,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.opencastproject.util.OsgiUtil;
+import org.opencastproject.util.data.Option;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -79,6 +81,18 @@ public class WhisperCppEngine implements SpeechToTextEngine {
   /** Currently used whispercpp model */
   private String whispercppModel = WHISPERCPP_MODEL_DEFAULT;
 
+  /** Config key for setting whispercpp beam size */
+  private static final String WHISPERCPP_BEAM_SIZE_CONFIG_KEY = "whispercpp.beam.size";
+
+  /** Currently used whispercpp beam size */
+  private Option<Integer> whispercppBeamSize;
+
+  /** Config key for setting whispercpp maximum segment length */
+  private static final String WHISPERCPP_MAX_LENGTH_CONFIG_KEY = "whispercpp.max.length";
+
+  /** Currently used whispercpp maximum segment length */
+  private Option<Integer> whispercppMaxLength;
+
 
   @Override
   public String getEngineName() {
@@ -96,6 +110,16 @@ public class WhisperCppEngine implements SpeechToTextEngine {
     whispercppModel = StringUtils.defaultIfBlank(
         (String) cc.getProperties().get(WHISPERCPP_MODEL_CONFIG_KEY), WHISPERCPP_MODEL_DEFAULT);
     logger.debug("WhisperC++ Language model set to {}", whispercppModel);
+
+    whispercppBeamSize = OsgiUtil.getOptCfgAsInt(cc.getProperties(), WHISPERCPP_BEAM_SIZE_CONFIG_KEY);
+    if (whispercppBeamSize.isSome()) {
+      logger.debug("WhisperC++ beam size set to {}", whispercppBeamSize);
+    }
+
+    whispercppMaxLength = OsgiUtil.getOptCfgAsInt(cc.getProperties(), WHISPERCPP_MAX_LENGTH_CONFIG_KEY);
+    if (whispercppMaxLength.isSome()) {
+      logger.debug("WhisperC++ maximum segment length set to {}", whispercppMaxLength);
+    }
 
     logger.debug("Finished activating/updating speech-to-text service");
   }
@@ -122,10 +146,19 @@ public class WhisperCppEngine implements SpeechToTextEngine {
         "--model", whispercppModel,
         "-ovtt",
         "-oj",
-        "-bs", "5",
         "--output-file", preparedOutputFile.getAbsolutePath().replaceFirst("[.][^.]+$", "")};
 
     List<String> command = new ArrayList<>(Arrays.asList(baseCommands));
+
+    if (whispercppBeamSize.isSome()) {
+      command.add("-bs");
+      command.add(Integer.toString(whispercppBeamSize.get()));
+    }
+
+    if (whispercppMaxLength.isSome()) {
+      command.add("-ml");
+      command.add(Integer.toString(whispercppMaxLength.get()));
+    }
 
     String subtitleLanguage;
 
