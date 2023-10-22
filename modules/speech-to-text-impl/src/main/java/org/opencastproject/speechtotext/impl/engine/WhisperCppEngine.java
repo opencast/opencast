@@ -24,14 +24,15 @@ package org.opencastproject.speechtotext.impl.engine;
 import org.opencastproject.speechtotext.api.SpeechToTextEngine;
 import org.opencastproject.speechtotext.api.SpeechToTextEngineException;
 import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.OsgiUtil;
+import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.functions.Strings;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.opencastproject.util.OsgiUtil;
-import org.opencastproject.util.data.Option;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -82,16 +83,82 @@ public class WhisperCppEngine implements SpeechToTextEngine {
   private String whispercppModel = WHISPERCPP_MODEL_DEFAULT;
 
   /** Config key for setting whispercpp beam size */
-  private static final String WHISPERCPP_BEAM_SIZE_CONFIG_KEY = "whispercpp.beam.size";
+  private static final String WHISPERCPP_BEAM_SIZE_CONFIG_KEY = "whispercpp.beam-size";
 
   /** Currently used whispercpp beam size */
   private Option<Integer> whispercppBeamSize;
 
   /** Config key for setting whispercpp maximum segment length */
-  private static final String WHISPERCPP_MAX_LENGTH_CONFIG_KEY = "whispercpp.max.length";
+  private static final String WHISPERCPP_MAX_LENGTH_CONFIG_KEY = "whispercpp.max-len";
 
   /** Currently used whispercpp maximum segment length */
   private Option<Integer> whispercppMaxLength;
+
+  /** Config key for setting whispercpp number of threads */
+  private static final String WHISPERCPP_THREADS_CONFIG_KEY = "whispercpp.threads";
+
+  /** Currently used whispercpp number of threads */
+  private Option<Integer> whispercppThreads;
+
+  /** Config key for setting whispercpp number of processors */
+  private static final String WHISPERCPP_PROCESSORS_CONFIG_KEY = "whispercpp.processors";
+
+  /** Currently used whispercpp number of processors */
+  private Option<Integer> whispercppProcessors;
+
+  /** Config key for setting whispercpp maximum context */
+  private static final String WHISPERCPP_MAX_CONTEXT_CONFIG_KEY = "whispercpp.max-context";
+
+  /** Currently used whispercpp maximum context */
+  private Option<Integer> whispercppMaxContext;
+
+  /** Config key for setting whispercpp split on word */
+  private static final String WHISPERCPP_SPLIT_ON_WORD_CONFIG_KEY = "whispercpp.split-on-word";
+
+  /** Currently used whispercpp split on word */
+  private Option<Boolean> whispercppSplitOnWord;
+
+  /** Config key for setting whispercpp number of best candidates to keep */
+  private static final String WHISPERCPP_BEST_OF_CONFIG_KEY = "whispercpp.best-of";
+
+  /** Currently used whispercpp number of best candidates to keep */
+  private Option<Integer> whispercppBestOf;
+
+  /** Config key for setting whispercpp word probability threshold */
+  private static final String WHISPERCPP_WORD_THRESHOLD_CONFIG_KEY = "whispercpp.word-thold";
+
+  /** Currently used whispercpp word probability threshold */
+  private Option<Double> whispercppWordThreshold;
+
+  /** Config key for setting whispercpp entropy threshold for decoder fail */
+  private static final String WHISPERCPP_ENTROPY_THRESHOLD_CONFIG_KEY = "whispercpp.entropy-thold";
+
+  /** Currently used whispercpp entropy threshold for decoder fail */
+  private Option<Double> whispercppEntropyThreshold;
+
+  /** Config key for setting whispercpp log probability threshold for decoder fail */
+  private static final String WHISPERCPP_LOG_PROB_THRESHOLD_CONFIG_KEY = "whispercpp.logprob-thold";
+
+  /** Currently used whispercpp log probability threshold for decoder fail */
+  private Option<Double> whispercppLogProbThreshold;
+
+  /** Config key for setting whispercpp diarization */
+  private static final String WHISPERCPP_DIARIZATION_CONFIG_KEY = "whispercpp.diarize";
+
+  /** Currently used whispercpp diarization */
+  private Option<Boolean> whispercppDiarization;
+
+  /** Config key for setting whispercpp tinydiarization */
+  private static final String WHISPERCPP_TINY_DIARIZATION_CONFIG_KEY = "whispercpp.tinydiarize";
+
+  /** Currently used whispercpp tinydiarization */
+  private Option<Boolean> whispercppTinyDiarization;
+
+  /** Config key for setting whispercpp no fallback */
+  private static final String WHISPERCPP_NO_FALLBACK_CONFIG_KEY = "whispercpp.no-fallback";
+
+  /** Currently used whispercpp no fallback */
+  private Option<Boolean> whispercppNoFallback;
 
 
   @Override
@@ -119,6 +186,64 @@ public class WhisperCppEngine implements SpeechToTextEngine {
     whispercppMaxLength = OsgiUtil.getOptCfgAsInt(cc.getProperties(), WHISPERCPP_MAX_LENGTH_CONFIG_KEY);
     if (whispercppMaxLength.isSome()) {
       logger.debug("WhisperC++ maximum segment length set to {}", whispercppMaxLength);
+    }
+
+    whispercppThreads = OsgiUtil.getOptCfgAsInt(cc.getProperties(), WHISPERCPP_THREADS_CONFIG_KEY);
+    if (whispercppThreads.isSome()) {
+      logger.debug("WhisperC++ number of threads set to {}", whispercppThreads);
+    }
+
+    whispercppProcessors = OsgiUtil.getOptCfgAsInt(cc.getProperties(), WHISPERCPP_PROCESSORS_CONFIG_KEY);
+    if (whispercppProcessors.isSome()) {
+      logger.debug("WhisperC++ number of processors set to {}", whispercppProcessors);
+    }
+
+    whispercppMaxContext = OsgiUtil.getOptCfgAsInt(cc.getProperties(), WHISPERCPP_MAX_CONTEXT_CONFIG_KEY);
+    if (whispercppMaxContext.isSome()) {
+      logger.debug("WhisperC++ max context set to {}", whispercppMaxContext);
+    }
+
+    whispercppSplitOnWord = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), WHISPERCPP_SPLIT_ON_WORD_CONFIG_KEY);
+    if (whispercppSplitOnWord.isSome()) {
+      logger.debug("WhisperC++ split on word set to {}", whispercppSplitOnWord);
+    }
+
+    whispercppBestOf = OsgiUtil.getOptCfgAsInt(cc.getProperties(), WHISPERCPP_BEST_OF_CONFIG_KEY);
+    if (whispercppBestOf.isSome()) {
+      logger.debug("WhisperC++ best of set to {}", whispercppBestOf);
+    }
+
+    whispercppWordThreshold = OsgiUtil.getOptCfg(cc.getProperties(), WHISPERCPP_WORD_THRESHOLD_CONFIG_KEY).bind(
+        Strings.toDouble);
+    if (whispercppWordThreshold.isSome()) {
+      logger.debug("WhisperC++ word threshold set to {}", whispercppWordThreshold);
+    }
+
+    whispercppEntropyThreshold = OsgiUtil.getOptCfg(cc.getProperties(), WHISPERCPP_ENTROPY_THRESHOLD_CONFIG_KEY).bind(
+        Strings.toDouble);
+    if (whispercppEntropyThreshold.isSome()) {
+      logger.debug("WhisperC++ entropy threshold set to {}", whispercppEntropyThreshold);
+    }
+
+    whispercppLogProbThreshold = OsgiUtil.getOptCfg(cc.getProperties(), WHISPERCPP_LOG_PROB_THRESHOLD_CONFIG_KEY).bind(
+        Strings.toDouble);
+    if (whispercppLogProbThreshold.isSome()) {
+      logger.debug("WhisperC++ log prob threshold set to {}", whispercppLogProbThreshold);
+    }
+
+    whispercppDiarization = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), WHISPERCPP_DIARIZATION_CONFIG_KEY);
+    if (whispercppDiarization.isSome()) {
+      logger.debug("WhisperC++ diarization set to {}", whispercppDiarization);
+    }
+
+    whispercppTinyDiarization = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), WHISPERCPP_TINY_DIARIZATION_CONFIG_KEY);
+    if (whispercppTinyDiarization.isSome()) {
+      logger.debug("WhisperC++ tiny diarization set to {}", whispercppTinyDiarization);
+    }
+
+    whispercppNoFallback = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), WHISPERCPP_NO_FALLBACK_CONFIG_KEY);
+    if (whispercppNoFallback.isSome()) {
+      logger.debug("WhisperC++ no fallback set to {}", whispercppNoFallback);
     }
 
     logger.debug("Finished activating/updating speech-to-text service");
@@ -154,10 +279,49 @@ public class WhisperCppEngine implements SpeechToTextEngine {
       command.add("-bs");
       command.add(Integer.toString(whispercppBeamSize.get()));
     }
-
     if (whispercppMaxLength.isSome()) {
       command.add("-ml");
       command.add(Integer.toString(whispercppMaxLength.get()));
+    }
+    if (whispercppThreads.isSome()) {
+      command.add("-t");
+      command.add(Integer.toString(whispercppThreads.get()));
+    }
+    if (whispercppProcessors.isSome()) {
+      command.add("-p");
+      command.add(Integer.toString(whispercppProcessors.get()));
+    }
+    if (whispercppMaxContext.isSome()) {
+      command.add("-mc");
+      command.add(Integer.toString(whispercppMaxContext.get()));
+    }
+    if (whispercppSplitOnWord.isSome() && whispercppSplitOnWord.get()) {
+      command.add("-sow");
+    }
+    if (whispercppBestOf.isSome()) {
+      command.add("-bo");
+      command.add(Integer.toString(whispercppBestOf.get()));
+    }
+    if (whispercppWordThreshold.isSome()) {
+      command.add("-wt");
+      command.add(String.format("%f", whispercppWordThreshold.get()));
+    }
+    if (whispercppEntropyThreshold.isSome()) {
+      command.add("-et");
+      command.add(String.format("%f", whispercppEntropyThreshold.get()));
+    }
+    if (whispercppLogProbThreshold.isSome()) {
+      command.add("-lpt");
+      command.add(String.format("%f", whispercppLogProbThreshold.get()));
+    }
+    if (whispercppDiarization.isSome() && whispercppDiarization.get()) {
+      command.add("-di");
+    }
+    if (whispercppTinyDiarization.isSome() && whispercppTinyDiarization.get()) {
+      command.add("-tdrz");
+    }
+    if (whispercppNoFallback.isSome() && whispercppNoFallback.get()) {
+      command.add("-nf");
     }
 
     String subtitleLanguage;
