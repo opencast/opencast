@@ -1964,7 +1964,7 @@
          "COMMENTS": {
             "LABEL": "Comentarios",
             "NONE": "Ninguno",
-            "OPEN": "Abrir",
+            "OPEN": "Sin resolver",
             "RESOLVED": "Resuelto"
          },
          "CONTRIBUTORS": {
