@@ -180,7 +180,7 @@ public class YouTubeV3PublicationServiceImpl
     super.activate(cc);
     properties.setBundleContext(cc.getBundleContext());
 
-    logger.debug("Activated Youtube Publication Service");
+    logger.debug("Activated YouTube Publication Service");
   }
 
   @Override
