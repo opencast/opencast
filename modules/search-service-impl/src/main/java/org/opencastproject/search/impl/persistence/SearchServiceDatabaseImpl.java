@@ -226,13 +226,13 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
     try {
       return searchEntities.stream()
             .map(entity -> {
-                try {
-                    MediaPackage mediaPackage = MediaPackageParser.getFromXml(entity.getMediaPackageXML());
-                    return Tuple.tuple(mediaPackage, entity.getOrganization().getId());
-                } catch (Exception e) {
-                    logger.error("Could not parse series entity: {}", e.getMessage());
-                    throw new RuntimeException(e);
-                }
+              try {
+                  MediaPackage mediaPackage = MediaPackageParser.getFromXml(entity.getMediaPackageXML());
+                  return Tuple.tuple(mediaPackage, entity.getOrganization().getId());
+              } catch (Exception e) {
+                  logger.error("Could not parse series entity: {}", e.getMessage());
+                  throw new RuntimeException(e);
+              }
             });
     } catch (Exception e) {
       logger.error("Could not parse series entity: {}", e.getMessage());

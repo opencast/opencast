@@ -662,7 +662,8 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
         // log progress
         if (current.get() % 100 == 0) {
-          logger.info("Indexing search {}/{} ({} percent done)", current.get(), total.get(), current.get() * 100 / total.get());
+          logger.info("Indexing search {}/{} ({} percent done)", current.get(), total.get(),
+              current.get() * 100 / total.get());
         }
       });
       if (errors.get() > 0) {

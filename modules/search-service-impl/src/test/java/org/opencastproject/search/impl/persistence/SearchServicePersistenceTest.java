@@ -117,8 +117,9 @@ public class SearchServicePersistenceTest {
         Assert.assertNull(searchDatabase.getDeletionDate(mediaPackageId));
         Assert.assertEquals(modificationDate, searchDatabase.getModificationDate(mediaPackageId));
         Assert.assertEquals(mediaPackage.getA(), searchDatabase.getMediaPackage(mediaPackageId));
-        Assert.assertEquals(securityService.getOrganization().getId(), mediaPackage.getB());
-        Assert.assertEquals(securityService.getOrganization().getId(), searchDatabase.getOrganizationId(mediaPackageId));
+        String orgId = securityService.getOrganization().getId();
+        Assert.assertEquals(orgId, mediaPackage.getB());
+        Assert.assertEquals(orgId, searchDatabase.getOrganizationId(mediaPackageId));
       } catch (Exception e) {
         e.printStackTrace();
       }
