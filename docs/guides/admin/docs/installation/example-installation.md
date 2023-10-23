@@ -39,7 +39,9 @@ Prerequisites
 ------------
 * For serving the Opencast data to the outside world you will need to provide valid TLS/SSL certificate for each of your nodes. This will be relevant when configuring nginx in the later steps.
 
-* In order to be able to install Opensearch and Opencast from the official Opencast repository you need to make sure that the repository is added and activated for your system. On each node:
+* Make sure that your firewall configuration allows network communication within the cluster and communication via HTTP(S) from the outside world
+
+* In order to be able to install OpenSearch and Opencast from the official Opencast repository you need to make sure that the repository is added and activated for your system. On each node:
 
   * Ensure https repositories are supported:
 
@@ -65,7 +67,7 @@ Prerequisites
 
 Database
 ------------
-Opencast needs a database in order to operate and store information about events, workflows, metadata etc. For this setup a MariaDB database will be created on the Admin node but you can also use a seperate dedicated VM.
+Opencast needs a database in order to operate and store information about events, workflows, metadata etc. For this setup a MariaDB database will be created on the Admin node but you can also use a seperate dedicated VM. For more general information and a collection of all options refer to the chapter [database setup.](../configuration/database.md)
 
 First install and start MariaDB:
 
@@ -116,7 +118,7 @@ You want to have one common user on all your systems, so that file permissions d
     sudo groupadd -g 1234 opencast
     sudo useradd -g 1234 -u 1234 opencast
 
-Now you need to mount the network storage on all three servers of the Opencast clusters. To do that you need to edit the /etc/fstab on each server and add the command to mount the network storage on startup:
+Now you need to mount the network storage on all three servers of the Opencast clusters. The directory used in this installation will be `/srv/opencast` To do that you need to edit the /etc/fstab on each server and add the command to mount the network storage on startup:
 
     storageserver.example.com:/srv/opencast /srv/opencast   nfs rw,hard,intr,rsize=32768,wsize=32768 0 0
 
@@ -151,7 +153,6 @@ The following configurations serves as an example for /etc/nginx/nginx.conf and 
 2. Replace the lines ```ssl_certificate_key /path/to/(admin|worker|presentation).example.com.key;``` and ```ssl_certificate /path/to/(admin|worker|presentation).example.com.crt;```
     with the correct path to the corresponding TLS certificate/key.
 
-With those changes in place, all there is left to do ist to start and
 ```
 # Defines user and group credentials used by worker processes. If group is
 # omitted, a group whose name equals that of user is used.
@@ -264,13 +265,88 @@ http {
   }
 }
 ```
+After finishing the nginx configuration, you can check if everything is valid with:
+
+    nginx -t
+
+If the configuration is valid, all there is left to do ist to start and enable the nginx service:
+
+```sh
+systemctl start nginx.service
+systemctl enable nginx.service
+```
+
+
 Opencast
 ------------
-After completing all the steps above you can now start installing the Opencast package. Start with
+After completing all the steps above you can now start installing the Opencast packages. You can list all Opencast packages with:
 
+    apt-cache search opencast
+
+You will find packages for the admin, worker and presentation. You only need to install the package corresponding to the role of your node.
+
+    sudo apt get opencast-{{ opencast_major_version() }}-admin
+    sudo apt get opencast-{{ opencast_major_version() }}-presentation
+    sudo apt get opencast-{{ opencast_major_version() }}-worker
 
 Essential configuration
 ------------
 
+Before Opencast can be started you need to prepare some configuration files. This needs to be done on each of your nodes.
+
+Start with the file located at `/etc/opencast/custom.properties` :
+
+Set the server URL to the public URL of each server (admin URL on admin, worker URL on worker, presentation URL on
+presentation, …).  This may either be this nodes IP address or preferable its domain name:
+
+    org.opencastproject.server.url=http://<URL>:8080
+
+Set a secure password for the admin account and the digest user:
+
+    org.opencastproject.security.admin.pass=CHANGE_ME
+
+    org.opencastproject.security.digest.pass=CHANGE_ME
+
+
+Set the location of the shared storage directory:
+
+    org.opencastproject.storage.dir=/srv/opencast
+
+Set the database URL and user credentials. Use the DB name and password you set up earlier when creating the DB:
+
+    org.opencastproject.db.jdbc.url=jdbc:mariadb://admin.example.com/opencast?useMysqlMetadata=true
+    org.opencastproject.db.jdbc.user=opencast
+    org.opencastproject.db.jdbc.pass=dbpassword
+
+Next up open the file `/etc/opencast/org.opencastproject.organization-mh_default_org.cfg`. Here you need to configure the URLs to the respective Opencast nodes.
+
+Set the link to the AdminUI which is part of the admin node:
+
+    prop.org.opencastproject.admin.ui.url=http://admin.example.com:8080
+
+Set the link to the engage ui which essentially means the presentation node:
+
+    prop.org.opencastproject.engage.ui.url=http://presentation.example.com:8080
+
+This should be enough to be able to successfully start Opencast and start testing its features.
+
+Start Opencast
+--------------
+
+Finally, start and enable Opencast by running:
+
+```sh
+systemctl start opencast.service
+systemctl enable opencast.service
+```
+
+You should be able to go to https://admin.example.com , login with your specified credentials and start uploading videos. If everything works as expected you can also start checking out the plethora of possibilities and configuration options that Opencast provides. In general it is advisable to only change one functonality at a time in order to test if the configuration was successfull. If the admin-ui does not show up or anything unexpected happens, refer to the next section.
+
 Troubleshooting
 ------------
+If there are any problems with starting up Opencast, accessing a video or any errors during processing of a video a good place to start your investigation are the most recent Opencast logs which are located by default in `/var/logs/opencast/opencast.log`. Open the file, find the first error message that appeared and check what it says.
+In most cases, if there are some faulty configurations, files missing or connection problems there will be a corresponding message which should lead you to the solution.
+
+If Opencast is running, but the AdminUI does not show up you should also check if nginx is started and the configuration file is valid.
+
+If you can not solve the problem on your own you can also always ask in the appropriate Opencast mailing lists or community chatrooms.
