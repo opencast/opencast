@@ -130,7 +130,7 @@
     "Duration": "Duración",
     "Location": "Ubicación",
     "Video description and data": "Datos y descripción de vídeo",
-    "Audio transcriptions": "Transcripciones de audio",
+    "Transcriptions": "Transcriptions",
     "Videos in series": "Vídeos de esta serie",
     "Videos in this series": "Vídeos de esta serie",
     "Available downloads": "Descargas disponibles:",
@@ -143,5 +143,8 @@
     "Video quality": "Calidad de vídeo",
     "Captions": "Subtítulos",
     "Opencast player version": "Versión del reproductor de Opencast",
-    "Opencast player": "Reproductor de vídeo de Opencast"
+    "Opencast player": "Reproductor de vídeo de Opencast",
+    "Undefined caption": "Unknown language",
+    "Unknown language": "Unknown language",
+    "automatically generated": "automatically generated"
 }

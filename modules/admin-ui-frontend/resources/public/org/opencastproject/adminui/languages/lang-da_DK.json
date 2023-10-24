@@ -43,7 +43,7 @@
       "VIDEOFILE": "Videofil",
       "VIDEOFILE_DESCRIPTION": "Videofil til upload",
       "CAPTION": "Captions",
-      "CAPTION_DESCRIPTION": "Caption file; VTT or dfxp format is supported",
+      "CAPTION_DESCRIPTION": "Caption file in VTT format",
       "UPLOAD": "Upload",
       "UPLOADING": "Uploading",
       "EDIT": "Save",
@@ -541,6 +541,10 @@
                      "SHORT": "Oplægsholder",
                      "DETAIL": "Filen indeholder en optagelse af en person, der taler til et publikum."
                   },
+                  "SUBTITLES": {
+                     "SHORT": "Subtitles",
+                     "DETAIL": "The text file contains the words spoken in the video(s) above."
+                  },
                   "AUDIO_ONLY": {
                      "SHORT": "Kun lyd",
                      "DETAIL": "Filen indeholder kun lyd."
@@ -584,8 +588,7 @@
                "NO_OPTIONS": "En liste over indstillinger for aktivet blev ikke leveret til denne del af websiden!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Klasse uddelingsnotater",
-                  "CAPTIONS_DFXP": "Undertekster DFXP",
-                  "CAPTIONS_WEBVTT": "Undertekster WebVTT",
+                  "SUBTITLES": "Subtitles",
                   "PREVIEW_IMAGE": "Billedeksempel",
                   "SMIL": "SMIL-katalog",
                   "TRACK_PARTS": "Spordele"
@@ -1863,8 +1866,10 @@
       "TRACKS": {
          "DESCRIPTION": "Du kan fravælge spor for at udelukke dem fra yderligere behandling. Bemærk, at du er nødt til at (gen-)udgive begivenheden for at effektuere ændringerne.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "Du skal aktivere minimum ét videospor",
-            "NO_AUDIO_TRACK_SELECTED": "Du skal aktivere minimum ét lydspor"
+            "NO_VIDEO_TRACK_SELECTED_WARNING": "You should probably enable at least one video track",
+            "NO_AUDIO_TRACK_SELECTED_WARNING": "You should probably enable at least one audio track",
+            "TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING": "You probably shouldn't enable more audio than video tracks",
+            "NO_TRACK_SELECTED_ERROR": "You must enable at least one track"
          },
          "TRACK": {
             "HEADER": "Spor"

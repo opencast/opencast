@@ -126,6 +126,17 @@ nav:
         - Paella player 7:
              - Configuration: 'configuration/player/paella.player7/configuration.md'
              - URL Parameters: 'configuration/player/paella.player7/url.parameter.md'
+             - Paella plugins:
+                 - Overview: 'configuration/player/paella.player7/plugins.md'
+                 - org.opencast.paella.cookieconsent: 'configuration/player/paella.player7/plugins/org.opencast.paella.cookieconsent.md'
+                 - org.opencast.paella.descriptionPlugin: 'configuration/player/paella.player7/plugins/org.opencast.paella.descriptionPlugin.md'
+                 - org.opencast.paella.editorPlugin: 'configuration/player/paella.player7/plugins/org.opencast.paella.editorPlugin.md'
+                 - org.opencast.paella.episodesFromSeries: 'configuration/player/paella.player7/plugins/org.opencast.paella.episodesFromSeries.md'
+                 - org.opencast.paella.loginPlugin: 'configuration/player/paella.player7/plugins/org.opencast.paella.loginPlugin.md'
+                 - org.opencast.paella.opencast.userTrackingDataPlugin: 'configuration/player/paella.player7/plugins/org.opencast.paella.opencast.userTrackingDataPlugin.md'
+                 - org.opencast.paella.matomo.userTrackingDataPlugin: 'configuration/player/paella.player7/plugins/org.opencast.paella.matomo.userTrackingDataPlugin.md'
+                 - org.opencast.paella.transcriptionsPlugin: 'configuration/player/paella.player7/plugins/org.opencast.paella.transcriptionsPlugin.md'
+                 - org.opencast.paella.versionButton.js: 'configuration/player/paella.player7/plugins/org.opencast.paella.versionButton.md'
    - Plugin Management: configuration/plugin-management.md
    - Search Index:
         - Overview: 'configuration/searchindex/index.md'
@@ -136,6 +147,7 @@ nav:
         - Overview: 'configuration/stream-security/stream-security-overview.md'
         - Configuration: 'configuration/stream-security/stream-security-config.md'
    - Studio: 'configuration/studio.md'
+   - Subtitles: 'configuration/subtitles.md'
    - Termination State:
         - Basic: 'configuration/terminationstate.md'
         - AWS AutoScaling: 'configuration/terminationstate.aws.autoscaling.md'
@@ -173,6 +185,7 @@ nav:
    - Asset Snapshot: 'workflowoperationhandlers/snapshot-woh.md'
    - Asset Delete: 'workflowoperationhandlers/asset-delete-woh.md'
    - Attach Watson Transcription: 'workflowoperationhandlers/attach-watson-transcription-woh.md'
+   - Change Type: 'workflowoperationhandlers/changetype-woh.md'
    - Cleanup: 'workflowoperationhandlers/cleanup-woh.md'
    - Comment: 'workflowoperationhandlers/comment-woh.md'
    - Composite: 'workflowoperationhandlers/composite-woh.md'

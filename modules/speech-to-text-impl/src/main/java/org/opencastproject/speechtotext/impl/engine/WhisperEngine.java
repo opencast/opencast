@@ -24,6 +24,8 @@ package org.opencastproject.speechtotext.impl.engine;
 import org.opencastproject.speechtotext.api.SpeechToTextEngine;
 import org.opencastproject.speechtotext.api.SpeechToTextEngineException;
 import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.OsgiUtil;
+import org.opencastproject.util.data.Option;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -78,6 +80,21 @@ public class WhisperEngine implements SpeechToTextEngine {
   /** Currently used whisper model */
   private String whisperModel = WHISPER_MODEL_DEFAULT;
 
+  /** Config key for quantization */
+  private static final String WHISPER_QUANTIZATION = "whisper.quantization";
+
+  /** Quantization for whisper-ctranslate2 */
+  private enum Quantizations {
+    auto, int8, int8_float16, int16, float16, float32
+  }
+  private Option<Quantizations> quantization = Option.none();
+
+  /** Config key for Voice Activity Detection */
+  private static final String WHISPER_VAD = "whisper.vad_enabled";
+
+  /** Enable Voice Activity Detection for whisper-ctranslate2 */
+  private Option<Boolean> isVADEnabled = Option.none();
+
 
   @Override
   public String getEngineName() {
@@ -95,6 +112,15 @@ public class WhisperEngine implements SpeechToTextEngine {
     whisperModel = StringUtils.defaultIfBlank(
         (String) cc.getProperties().get(WHISPER_MODEL_CONFIG_KEY), WHISPER_MODEL_DEFAULT);
     logger.debug("Whisper Language model set to {}", whisperModel);
+
+    String t = (String) cc.getProperties().get(WHISPER_QUANTIZATION);
+    if (!StringUtils.isBlank(t)) {
+      quantization = Option.some(Quantizations.valueOf(t));
+    }
+    logger.debug("Whisper quantization set to {}", quantization);
+
+    isVADEnabled = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), WHISPER_VAD);
+    logger.debug("Whisper Voice Activity Detection  set to {}", isVADEnabled);
 
     logger.debug("Finished activating/updating speech-to-text service");
   }
@@ -130,6 +156,18 @@ public class WhisperEngine implements SpeechToTextEngine {
       logger.debug("Using language {} from workflows", language);
       command.add("--language");
       command.add(language);
+    }
+
+    if (quantization.isSome()) {
+      logger.debug("Using quantization {}", quantization.get());
+      command.add("--compute_type");
+      command.add(quantization.get().toString());
+    }
+
+    if (isVADEnabled.isSome()) {
+      logger.debug("Setting VAD to {}", isVADEnabled.get());
+      command.add("--vad_filter");
+      command.add(isVADEnabled.get().toString());
     }
 
     logger.info("Executing Whisper's transcription command: {}", command);

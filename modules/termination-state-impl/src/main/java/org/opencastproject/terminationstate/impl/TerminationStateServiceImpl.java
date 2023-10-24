@@ -24,7 +24,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.terminationstate.api.AbstractJobTerminationStateService;
 import org.opencastproject.terminationstate.api.TerminationStateService;
-import org.opencastproject.util.Log;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 
@@ -43,6 +42,7 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerUtils;
 import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
@@ -58,7 +58,7 @@ import java.util.Dictionary;
     }
 )
 public final class TerminationStateServiceImpl extends AbstractJobTerminationStateService {
-  private static final Log logger = new Log(LoggerFactory.getLogger(TerminationStateServiceImpl.class));
+  private static final Logger logger = LoggerFactory.getLogger(TerminationStateServiceImpl.class);
 
   public static final String CONFIG_JOB_POLLING_PERIOD = "job.polling.period";
   private static final int DEFAULT_JOB_POLLING_PERIOD = 300; // secs

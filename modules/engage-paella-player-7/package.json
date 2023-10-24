@@ -14,32 +14,32 @@
     "test": "playwright test"
   },
   "devDependencies": {
-    "@babel/core": "^7.21.3",
-    "@babel/eslint-parser": "^7.21.3",
-    "@babel/preset-env": "^7.21.4",
-    "@playwright/test": "^1.36.2",
-    "babel-loader": "^9.1.2",
+    "@babel/core": "^7.23.0",
+    "@babel/eslint-parser": "^7.22.15",
+    "@babel/preset-env": "^7.22.14",
+    "@playwright/test": "^1.38.1",
+    "babel-loader": "^9.1.3",
     "copy-webpack-plugin": "^11.0.0",
-    "css-loader": "^6.7.3",
-    "eslint": "^8.42.0",
+    "css-loader": "^6.8.1",
+    "eslint": "^8.50.0",
     "eslint-plugin-header": "^3.1.1",
     "express": "^4.18.2",
     "html-linter": "^1.1.1",
-    "html-validate": "^8.1.0",
+    "html-validate": "^8.5.0",
     "http-proxy": "^1.18.1",
     "source-map-loader": "^4.0.1",
-    "style-loader": "^3.3.2",
+    "style-loader": "^3.3.3",
     "svg-inline-loader": "^0.8.2",
     "webpack": "^5.88.2",
-    "webpack-cli": "^5.1.1",
-    "webpack-dev-server": "^4.13.3",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1",
     "xml-loader": "^1.2.1"
   },
   "dependencies": {
-    "paella-basic-plugins": "^1.38.0",
-    "paella-core": "^1.39.2",
-    "paella-slide-plugins": "^1.8.0",
-    "paella-user-tracking": "^1.8.0",
-    "paella-zoom-plugin": "^1.27.0"
+    "paella-basic-plugins": "^1.44.0",
+    "paella-core": "^1.43.0",
+    "paella-slide-plugins": "^1.41.1",
+    "paella-user-tracking": "^1.42.0",
+    "paella-zoom-plugin": "^1.41.1"
   }
 }

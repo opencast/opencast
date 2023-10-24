@@ -263,7 +263,7 @@ public class PublishEngageWorkflowOperationHandlerTest {
 
     operation.setConfiguration(PublishEngageWorkflowOperationHandler.DOWNLOAD_SOURCE_TAGS, "engage");
     operation.setConfiguration(PublishEngageWorkflowOperationHandler.STRATEGY,
-            PublishEngageWorkflowOperationHandler.MERGE_STRATEGY);
+            PublishEngageWorkflowOperationHandler.PUBLISH_STRATEGY_MERGE);
     // Do not merge force any flavors
     operation.setConfiguration(PublishEngageWorkflowOperationHandler.MERGE_FORCE_FLAVORS, "dummy/dummy"); // flavors
     WorkflowOperationResult result = handler.start(workflowInstance, null);
@@ -321,7 +321,7 @@ public class PublishEngageWorkflowOperationHandlerTest {
 
     operation.setConfiguration(PublishEngageWorkflowOperationHandler.DOWNLOAD_SOURCE_TAGS, "engage");
     operation.setConfiguration(PublishEngageWorkflowOperationHandler.STRATEGY,
-            PublishEngageWorkflowOperationHandler.MERGE_STRATEGY);
+            PublishEngageWorkflowOperationHandler.PUBLISH_STRATEGY_MERGE);
     // Use default merge force flavors. Remove "engage" tag from episode catalog so
     // that it's deleted from published mp.
     MediaPackageElement mpe = workflowInstance.getMediaPackage().getElementById("d84b6672-ff84-4df5-9ada-f1cdc0f2d901");
@@ -367,7 +367,7 @@ public class PublishEngageWorkflowOperationHandlerTest {
 
     operation.setConfiguration(PublishEngageWorkflowOperationHandler.DOWNLOAD_SOURCE_TAGS, "engage");
     operation.setConfiguration(PublishEngageWorkflowOperationHandler.STRATEGY,
-            PublishEngageWorkflowOperationHandler.MERGE_STRATEGY);
+            PublishEngageWorkflowOperationHandler.PUBLISH_STRATEGY_MERGE);
 
     WorkflowOperationResult result = handler.start(workflowInstance, null);
 

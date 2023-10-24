@@ -23,8 +23,8 @@ package org.opencastproject.terminationstate.api;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.util.Log;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** AbstractJobTerminationStateService.
@@ -37,7 +37,7 @@ public abstract class AbstractJobTerminationStateService implements TerminationS
   private TerminationState state = TerminationState.NONE;
   private ServiceRegistry serviceRegistry;
 
-  private final Log logger = new Log(LoggerFactory.getLogger(AbstractJobTerminationStateService.class.getName()));
+  private final Logger logger = LoggerFactory.getLogger(AbstractJobTerminationStateService.class.getName());
 
   /**
    * {@inheritDoc}

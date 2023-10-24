@@ -43,7 +43,7 @@
       "VIDEOFILE": "Videobestand",
       "VIDEOFILE_DESCRIPTION": "Te uploaden videobestand",
       "CAPTION": "Ondertitels",
-      "CAPTION_DESCRIPTION": "Ondersteunde formaten voor ondertiteling: VTT of dfxp",
+      "CAPTION_DESCRIPTION": "Caption file in VTT format",
       "UPLOAD": "Upload",
       "UPLOADING": "Aan het uploaden",
       "EDIT": "Opslaan",
@@ -541,6 +541,10 @@
                      "SHORT": "Presentator",
                      "DETAIL": "Het bestand bevat een opname van een persoon die een publiek aanspreekt."
                   },
+                  "SUBTITLES": {
+                     "SHORT": "Subtitles",
+                     "DETAIL": "The text file contains the words spoken in the video(s) above."
+                  },
                   "AUDIO_ONLY": {
                      "SHORT": "Enkel audio",
                      "DETAIL": "Het bestand bevat enkel audio."
@@ -584,8 +588,7 @@
                "NO_OPTIONS": "Een lijst met asset opties werd niet verleend voor dit gedeelte van de webpagina!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Hand-out aantekeningen",
-                  "CAPTIONS_DFXP": "Ondertitels DFXP",
-                  "CAPTIONS_WEBVTT": "Ondertitels WebVTT",
+                  "SUBTITLES": "Subtitles",
                   "PREVIEW_IMAGE": "Afbeelding voor voorvertoning",
                   "SMIL": "Smil catalogus",
                   "TRACK_PARTS": "Bijhouden van onderdelen"
@@ -1863,8 +1866,10 @@
       "TRACKS": {
          "DESCRIPTION": "Je kan tracks deselecteren om deze uit te sluiten van verdere verwerking. Gelieve rekening te houden met het feit dat je het event opnieuw moet publiceren om de wijzigingen effectief toe te passen.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "Selecteer ten minste een video track",
-            "NO_AUDIO_TRACK_SELECTED": "Selecteer ten minste een audio track"
+            "NO_VIDEO_TRACK_SELECTED_WARNING": "You should probably enable at least one video track",
+            "NO_AUDIO_TRACK_SELECTED_WARNING": "You should probably enable at least one audio track",
+            "TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING": "You probably shouldn't enable more audio than video tracks",
+            "NO_TRACK_SELECTED_ERROR": "You must enable at least one track"
          },
          "TRACK": {
             "HEADER": "Spoor"

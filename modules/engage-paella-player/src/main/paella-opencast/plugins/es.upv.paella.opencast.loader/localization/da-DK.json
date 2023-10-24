@@ -2,7 +2,6 @@
 	"Error loading video! No video tracks found": "Videoindlæsningsfejl! Igen videospor fundet",
 	"Error loading video {0}": "Videoindlæsningsfejl {0}",
 	"CAPTIONS_undefined": "Ukendt sprog",
-	"CAPTIONS_es": "Spansk",
-	"CAPTIONS_en": "Engelsk",
-	"CAPTIONS_de": "Tysk"
+	"CAPTIONS_unknown_language": "Unknown language",
+	"CAPTIONS_auto_generated": "automatically generated"
 }

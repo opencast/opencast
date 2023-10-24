@@ -100,6 +100,7 @@ A list of everything.
 - [Stream Security Overview](stream-security/stream-security-overview.md)
     -  [Configuration](stream-security/stream-security-config.md)
 - [Studio](studio.md)
+- [Subtitles](subtitles.md)
 - Termination State:
     - [Basic](terminationstate.md)
       - [AWS AutoScaling](terminationstate.aws.autoscaling.md)

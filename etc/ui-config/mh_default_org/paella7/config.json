@@ -59,12 +59,6 @@
         },
         "previewAttachment": "presentation/segment+preview",
         "mainAudioContent": "presenter",
-        "contentTypes": {
-            "presentation/delivery": "presentation",
-            "presenter/delivery": "presenter",
-            "presentation/preview": "presentation",
-            "presenter/preview": "presenter"
-        },
         "videoPreviewAttachment": [
             "presenter/player+preview",
             "presentation/player+preview"
@@ -224,6 +218,18 @@
                     ],
                     "icon": "present-mode-4.svg",
                     "title": "Presenter and presentation"
+                }
+            ],
+            "tabIndexStart": 40
+        },
+        "org.opencast.paella.multiVideoDynamicLayout": {
+            "enabled": true,
+            "validContent": [
+                {
+                    "id": "multi-video",
+                    "content": [],
+                    "icon": "present-mode-4.svg",
+                    "title": "Auto"
                 }
             ],
             "tabIndexStart": 40
@@ -396,7 +402,7 @@
             "enabled": true,
             "parentContainer": "settingsGroup",
             "order": 40,
-            "description": "Audio transcriptions"
+            "description": "Transcriptions"
         },
         "es.upv.paella.downloadsPlugin": {
             "enabled": true,
@@ -504,14 +510,17 @@
             "enabled": true,
             "order": 1
         },
-        "es.upv.paella.cookieDataPlugin": {
+
+        "es.upv.paella.localStorageDataPlugin": {
             "enabled": true,
             "order": 0,
             "context": [
                 "default",
-                "trimming"
+                "trimming",
+                "preferences"
             ]
         },
+
         "org.opencast.paella.cookieconsent": {
             "enabled": true,
             "side": "right"

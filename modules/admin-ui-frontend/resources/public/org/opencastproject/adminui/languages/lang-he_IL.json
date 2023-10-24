@@ -43,7 +43,7 @@
       "VIDEOFILE": "Videofile",
       "VIDEOFILE_DESCRIPTION": "Video file for upload",
       "CAPTION": "Captions",
-      "CAPTION_DESCRIPTION": "Caption file; VTT or dfxp format is supported",
+      "CAPTION_DESCRIPTION": "Caption file in VTT format",
       "UPLOAD": "Upload",
       "UPLOADING": "Uploading",
       "EDIT": "Save",
@@ -541,6 +541,10 @@
                      "SHORT": "מציג",
                      "DETAIL": "הקובץ מכיל הקלטה של אדם הדובר בפני קהל."
                   },
+                  "SUBTITLES": {
+                     "SHORT": "Subtitles",
+                     "DETAIL": "The text file contains the words spoken in the video(s) above."
+                  },
                   "AUDIO_ONLY": {
                      "SHORT": "שמע בלבד",
                      "DETAIL": "הקובץ מכיל רק שמע."
@@ -584,8 +588,7 @@
                "NO_OPTIONS": "רשימה של אפשרויות נכסים לא סופק עבור המקטע הזה של הדף!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "הערות בכתב יד",
-                  "CAPTIONS_DFXP": "כתוביות DFXP",
-                  "CAPTIONS_WEBVTT": "כתוביות לכבדי שמיעה WebVTT",
+                  "SUBTITLES": "Subtitles",
                   "PREVIEW_IMAGE": "תמונת תצוגה מקדימה",
                   "SMIL": "קטלוג סימלונים",
                   "TRACK_PARTS": "עקוב אחר חלקים"
@@ -1863,8 +1866,10 @@
       "TRACKS": {
          "DESCRIPTION": "אתם יכולים לבטל בחירה של רצועות בשביל שלא יכללו בתהליך העיבוד בהמשך. סימו לב שעליכם לפרסם (מחדש) את האירוע בשביל להכיל את השינויים בפועל.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "עליך לאפשר לפחות סרטון וידיאו אחד",
-            "NO_AUDIO_TRACK_SELECTED": "עליך לאפשר לפחות רצועת שמע אחת"
+            "NO_VIDEO_TRACK_SELECTED_WARNING": "You should probably enable at least one video track",
+            "NO_AUDIO_TRACK_SELECTED_WARNING": "You should probably enable at least one audio track",
+            "TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING": "You probably shouldn't enable more audio than video tracks",
+            "NO_TRACK_SELECTED_ERROR": "You must enable at least one track"
          },
          "TRACK": {
             "HEADER": "רצועה"

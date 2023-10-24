@@ -161,7 +161,7 @@ import javax.persistence.EntityManagerFactory;
     service = { AssetManager.class, IndexProducer.class }
 )
 public class AssetManagerImpl extends AbstractIndexProducer implements AssetManager,
-        AbstractADeleteQuery.DeleteSnapshotHandler {
+    AbstractADeleteQuery.DeleteEpisodeHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerImpl.class);
 
@@ -438,11 +438,11 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                 mkPropertyName(ace.getRole(), ace.getAction())), Value.mk(ace.isAllow())));
       }
 
+      updateEventInIndex(snapshot);
+
       logger.info("Trigger update handlers for snapshot {}, version {}",
           snapshot.getMediaPackage().getIdentifier(), snapshot.getVersion());
       fireEventHandlers(mkTakeSnapshotMessage(snapshot));
-
-      updateEventInIndex(snapshot);
 
       return snapshot;
     }
@@ -912,19 +912,9 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     return getDatabase().countEvents(organization);
   }
 
-  /**
-   * DeleteSnapshotHandler implementation
-   */
-
-  @Override
-  public void handleDeletedSnapshot(String mpId, VersionImpl version) {
-    logger.info("Firing event handlers for event {}, snapshot {}", mpId, version);
-    fireEventHandlers(AssetManagerItem.deleteSnapshot(mpId, version.value(), new Date()));
-  }
-
   @Override
   public void handleDeletedEpisode(String mpId) {
-    logger.info("Firing event handlers for event {}", mpId);
+    logger.info("Firing event handlers for deleting event {}", mpId);
     fireEventHandlers(AssetManagerItem.deleteEpisode(mpId, new Date()));
 
     removeArchivedVersionFromIndex(mpId);
@@ -1546,7 +1536,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   /**
    * Call {@link
-   * org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery#run(AbstractADeleteQuery.DeleteSnapshotHandler)}
+   * org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery#run(AbstractADeleteQuery.DeleteEpisodeHandler)}
    * with a delete handler. Also make sure to propagate the behaviour to subsequent instances.
    */
   private final class ADeleteQueryWithMessaging extends ADeleteQueryDecorator {

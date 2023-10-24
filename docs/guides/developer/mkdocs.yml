@@ -57,7 +57,7 @@ nav:
    - Setup dev environment:
       - General: 'develop/setup-opencast-for-develop.md'
       - With Docker: 'develop/development-environment-docker.md'
-   - Tips for developing: 'develop/development-environment.md'
+   - Tips for developing: 'develop/development-tips.md'
    - Dev ops:
       - Local cluster for testing: 'develop/devops/local-cluster.md'
       - Explore H2 database: 'develop/devops/explore-h2-database.md'

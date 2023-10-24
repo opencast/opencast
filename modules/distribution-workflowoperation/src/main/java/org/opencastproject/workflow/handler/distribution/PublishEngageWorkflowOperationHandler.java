@@ -130,14 +130,19 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   static final String CHECK_AVAILABILITY = "check-availability";
   static final String STRATEGY = "strategy";
   static final String MERGE_FORCE_FLAVORS = "merge-force-flavors";
+  static final String ADD_FORCE_FLAVORS = "add-force-flavors";
 
   private static final String MERGE_FORCE_FLAVORS_DEFAULT = "dublincore/*,security/*";
+  private static final String ADD_FORCE_FLAVORS_DEFAULT = "";
 
   /** Path the REST endpoint which will re-direct users to the currently configured video player **/
   static final String PLAYER_PATH = "/play/";
 
-  /** Merge strategy **/
-  static final String MERGE_STRATEGY = "merge";
+  /** Name constant for the 'merge' strategy **/
+  static final String PUBLISH_STRATEGY_MERGE = "merge";
+
+  /** Name constant for the 'default' 'strategy **/
+  static final String PUBLISH_STRATEGY_DEFAULT = "default";
 
   /** The streaming distribution service */
   private StreamingDistributionService streamingDistributionService = null;
@@ -247,9 +252,13 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     String streamingTargetTags = StringUtils.trimToEmpty(op.getConfiguration(STREAMING_TARGET_TAGS));
     String streamingSourceFlavors = StringUtils.trimToEmpty(op.getConfiguration(STREAMING_SOURCE_FLAVORS));
     String streamingTargetSubflavor = StringUtils.trimToNull(op.getConfiguration(STREAMING_TARGET_SUBFLAVOR));
-    String republishStrategy = StringUtils.trimToEmpty(op.getConfiguration(STRATEGY));
+    String republishStrategy = StringUtils.trimToEmpty(
+            StringUtils.defaultString(op.getConfiguration(STRATEGY), PUBLISH_STRATEGY_DEFAULT));
     String mergeForceFlavorsStr = StringUtils.trimToEmpty(
             StringUtils.defaultString(op.getConfiguration(MERGE_FORCE_FLAVORS), MERGE_FORCE_FLAVORS_DEFAULT));
+    String addForceFlavorsStr = StringUtils.trimToEmpty(
+            StringUtils.defaultString(op.getConfiguration(ADD_FORCE_FLAVORS), ADD_FORCE_FLAVORS_DEFAULT));
+
 
     boolean checkAvailability = option(op.getConfiguration(CHECK_AVAILABILITY)).bind(trimToNone).map(toBool)
             .getOrElse(true);
@@ -257,7 +266,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     // First check if mp exists in the search index and strategy is merge
     // to avoid leaving distributed elements around.
     MediaPackage distributedMp = getDistributedMediapackage(mediaPackage.getIdentifier().toString());
-    if (MERGE_STRATEGY.equals(republishStrategy) && distributedMp == null) {
+    if (PUBLISH_STRATEGY_MERGE.equals(republishStrategy) && distributedMp == null) {
       logger.info("Skipping republish for {} since it is not currently published",
               mediaPackage.getIdentifier().toString());
       return createResult(mediaPackage, Action.SKIP);
@@ -280,6 +289,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     // Parse forced flavors
     List<MediaPackageElementFlavor> mergeForceFlavors = Arrays.stream(StringUtils.split(mergeForceFlavorsStr, ", "))
             .map(MediaPackageElementFlavor::parseFlavor).collect(Collectors.toList());
+    List<MediaPackageElementFlavor> addForceFlavors = Arrays.stream(StringUtils.split(addForceFlavorsStr, ", "))
+        .map(MediaPackageElementFlavor::parseFlavor).collect(Collectors.toList());
 
     // Parse the download target flavor
     MediaPackageElementFlavor downloadSubflavor = null;
@@ -336,12 +347,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       }
 
       removePublicationElement(mediaPackage);
-      switch (republishStrategy) {
-        case (MERGE_STRATEGY):
-          // nothing to do here. other publication strategies can be added to this list later on
-          break;
-        default:
-          retractFromEngage(distributedMp);
+      if (republishStrategy.equals(PUBLISH_STRATEGY_DEFAULT)) {
+        retractFromEngage(distributedMp);
       }
 
       List<Job> jobs = new ArrayList<Job>();
@@ -386,12 +393,9 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
         // MH-10216, check if only merging into existing mediapackage
         removePublicationElement(mediaPackage);
-        switch (republishStrategy) {
-          case (MERGE_STRATEGY):
-            mediaPackageForSearch = mergePackages(mediaPackageForSearch, distributedMp, mergeForceFlavors);
-            break;
-          default:
-          // nothing to do here
+        if (republishStrategy.equals(PUBLISH_STRATEGY_MERGE)) {
+          mediaPackageForSearch = mergePackages(mediaPackageForSearch, distributedMp, mergeForceFlavors,
+              addForceFlavors);
         }
 
         if (StringUtils.isBlank(mediaPackageForSearch.getTitle())) {
@@ -723,7 +727,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @return the merged mediapackage
    */
   protected MediaPackage mergePackages(MediaPackage updatedMp, MediaPackage publishedMp,
-          List<MediaPackageElementFlavor> forceFlavors) {
+          List<MediaPackageElementFlavor> mergeForceFlavors, List<MediaPackageElementFlavor> addForceFlavors) {
     if (publishedMp == null) {
       return updatedMp;
     }
@@ -731,8 +735,17 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     MediaPackage mergedMediaPackage = (MediaPackage) updatedMp.clone();
     for (MediaPackageElement element : publishedMp.elements()) {
       String type = element.getElementType().toString().toLowerCase();
-      if (updatedMp.getElementsByFlavor(element.getFlavor()).length == 0) {
-        if (forceFlavors.stream().anyMatch((f) -> element.getFlavor().matches(f))) {
+      boolean elementHasFlavorThatAlreadyExists = updatedMp.getElementsByFlavor(element.getFlavor()).length > 0;
+      boolean elementHasForceMergeFlavor = mergeForceFlavors.stream().anyMatch((f) -> element.getFlavor().matches(f));
+      boolean elementHasForceAddFlavor = addForceFlavors.stream().anyMatch((f) -> element.getFlavor().matches(f));
+
+      if (elementHasForceAddFlavor) {
+        logger.info("Adding {} '{}' into the updated mediapackage", type, element.getIdentifier());
+        mergedMediaPackage.add((MediaPackageElement) element.clone());
+        continue;
+      }
+      if (!elementHasFlavorThatAlreadyExists) {
+        if (elementHasForceMergeFlavor) {
           logger.info("Forcing removal of {} {} due to the absence of a new element with flavor {}",
                   type, element.getIdentifier(), element.getFlavor().toString());
           continue;

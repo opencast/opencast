@@ -112,6 +112,9 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
   /** Property defining whether the track is required to contain or not contain a video stream to be used an input */
   public static final String SOURCE_VIDEO_PROPERTY = "source-video";
 
+  /** Property defining whether the track is required to contain or not contain a subtitle stream to be used an input */
+  public static final String SOURCE_SUBTITLE_PROPERTY = "source-subtitle";
+
   /** Property containing the flavor that the resulting mediapackage elements will be assigned */
   public static final String TARGET_FLAVOR_PROPERTY = "target-flavor";
 
@@ -165,6 +168,7 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
     List<String> sourceTagList = tagsAndFlavors.getSrcTags();
     String sourceAudio = StringUtils.trimToNull(operation.getConfiguration(SOURCE_AUDIO_PROPERTY));
     String sourceVideo = StringUtils.trimToNull(operation.getConfiguration(SOURCE_VIDEO_PROPERTY));
+    String sourceSubtitle = StringUtils.trimToNull(operation.getConfiguration(SOURCE_SUBTITLE_PROPERTY));
     List<MediaPackageElementFlavor> targetFlavorList = tagsAndFlavors.getTargetFlavors();
     List<String> targetTags = tagsAndFlavors.getTargetTags();
     String outputFilename = StringUtils.trimToNull(operation.getConfiguration(OUTPUT_FILENAME_PROPERTY));
@@ -211,13 +215,18 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
           continue;
         }
 
+        if ((element instanceof Track) && (sourceSubtitle != null)
+            && (Boolean.parseBoolean(sourceSubtitle) != ((Track) element).hasSubtitle())) {
+          continue;
+        }
+
         inputSet.add(element);
       }
     }
 
     if (inputSet.size() == 0) {
-      logger.warn("Mediapackage {} has no suitable elements to execute the command {} based on tags {}, flavor {}, sourceAudio {}, sourceVideo {}",
-              mediaPackage, exec, sourceTagList, sourceFlavor, sourceAudio, sourceVideo);
+      logger.warn("Mediapackage {} has no suitable elements to execute the command {} based on tags {}, flavor {}, sourceAudio {}, sourceVideo {}, sourceSubtitle {}",
+              mediaPackage, exec, sourceTagList, sourceFlavor, sourceAudio, sourceVideo, sourceSubtitle);
       return createResult(mediaPackage, Action.CONTINUE);
     }
 

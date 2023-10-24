@@ -18,11 +18,7 @@
  * the License.
  *
  */
-/* eslint no-console: "warn" */
-const g_contentTypes = {
-  'presentation/delivery': 'presentation',
-  'presenter/delivery': 'presenter'
-};
+import { translate } from 'paella-core';
 
 const g_streamTypes = [
   {
@@ -95,8 +91,8 @@ function getStreamType(track) {
 
 function getSourceData(track, config) {
   let data = null;
-  const contentTypes = config.contentTypes || g_contentTypes;
-  const type = contentTypes[track.type];
+  // Get substring of type before slash
+  const type = track.type.split('/')[0];
   if (type) {
     const streamType = getStreamType(track, config);
     if (streamType) {
@@ -244,6 +240,13 @@ export function getVideoPreview(mediapackage, config) {
       return videoPreview !== null;
     });
   });
+  // Get first preview if no predefined was found
+  if (videoPreview === null) {
+    const firstPreviewAttachment = attachment.find(att => {
+      return att.type.split('/').pop() === 'player+preview';
+    });
+    videoPreview = firstPreviewAttachment?.url ?? null;
+  }
 
   return videoPreview;
 }
@@ -259,10 +262,6 @@ function processAttachments(episode, manifest, config) {
   }
 
   const previewAttachment = config.previewAttachment || 'presentation/segment+preview';
-  const videoPreviewAttachments = config.videoPreviewAttachments || [
-    'presenter/player+preview',
-    'presentation/player+preview'
-  ];
   attachment.forEach(att => {
     const timeRE = /time=T(\d+):(\d+):(\d+)/.exec(att.ref);
     if (att.type === previewAttachment && timeRE) {
@@ -279,12 +278,7 @@ function processAttachments(episode, manifest, config) {
       });
     }
     else {
-      videoPreviewAttachments.some(validAttachment => {
-        if (validAttachment === att.type) {
-          videoPreview = att.url;
-        }
-        return videoPreview !== null;
-      });
+      videoPreview = getVideoPreview(episode.mediapackage, config);
     }
   });
 
@@ -305,16 +299,25 @@ function readCaptions(potentialNewCaptions, captions) {
       let captions_match = captions_regex.exec(potentialCaption.type);
 
       if (captions_match) {
+        // Fallback for captions which use the old flavor style, e.g. "captions/vtt+en"
         let captions_lang = captions_match[3];
+        let captions_generated = '';
+        let captions_closed = '';
         const captions_subtype = captions_match[1];
 
-        if (!captions_lang && potentialCaption.tags && potentialCaption.tags.tag) {
+        if (potentialCaption.tags && potentialCaption.tags.tag) {
           if (!(potentialCaption.tags.tag instanceof Array)) {
             potentialCaption.tags.tag = [potentialCaption.tags.tag];
           }
           potentialCaption.tags.tag.forEach((tag)=>{
             if (tag.startsWith('lang:')){
               captions_lang = tag.substring('lang:'.length);
+            }
+            if (tag.startsWith('generator-type:') && tag.substring('generator-type:'.length) === 'auto') {
+              captions_generated = ' (' + translate('automatically generated') + ')';
+            }
+            if (tag.startsWith('type:') && tag.substring('type:'.length) === 'closed-caption') {
+              captions_closed = '[CC] ';
             }
           });
         }
@@ -325,10 +328,17 @@ function readCaptions(potentialNewCaptions, captions) {
           captions_format = captions_subtype;
         }
 
+        let captions_description = translate('Undefined caption');
+        if (captions_lang) {
+          let languageNames = new Intl.DisplayNames([window.navigator.language], {type: 'language'});
+          let captions_language_name = languageNames.of(captions_lang) || translate('Unknown language');
+          captions_description = captions_closed + captions_language_name + captions_generated;
+        }
+
         captions.push({
           id: potentialCaption.id,
           lang: captions_lang,
-          text: captions_lang || 'unknown language',
+          text: captions_description,
           url: potentialCaption.url,
           format: captions_format
         });
@@ -342,10 +352,8 @@ function getCaptions(episode) {
   var captions = [];
 
   var attachments = episode.mediapackage.attachments.attachment;
-  var catalogs = episode.mediapackage.metadata.catalog;
   var tracks = episode.mediapackage.media.track;
   if (!(attachments instanceof Array)) { attachments = attachments ? [attachments] : []; }
-  if (!(catalogs instanceof Array)) { catalogs = catalogs ? [catalogs] : []; }
   if (!(tracks instanceof Array)) { tracks = tracks ? [tracks] : []; }
 
   // Read the attachments
@@ -353,37 +361,6 @@ function getCaptions(episode) {
 
   // Read the tracks
   readCaptions(tracks, captions);
-
-  // Read the catalogs
-  catalogs.forEach((currentCatalog) => {
-    try {
-      // backwards compatibility:
-      // Catalogs flavored as 'captions/timedtext' are assumed to be dfxp
-      if (currentCatalog.type == 'captions/timedtext') {
-        let captions_lang;
-        if (currentCatalog.tags && currentCatalog.tags.tag) {
-          if (!(currentCatalog.tags.tag instanceof Array)) {
-            currentCatalog.tags.tag = [currentCatalog.tags.tag];
-          }
-          currentCatalog.tags.tag.forEach((tag)=>{
-            if (tag.startsWith('lang:')){
-              captions_lang = tag.substring('lang:'.length);
-            }
-          });
-        }
-
-        let captions_label = captions_lang || 'unknown language';
-        captions.push({
-          id: currentCatalog.id,
-          lang: captions_lang,
-          text: captions_label,
-          url: currentCatalog.url,
-          format: 'dfxp'
-        });
-      }
-    }
-    catch (err) {/**/}
-  });
 
   return captions;
 }

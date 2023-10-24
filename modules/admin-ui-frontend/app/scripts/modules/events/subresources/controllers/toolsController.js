@@ -155,26 +155,30 @@ angular.module('adminNg.controllers')
       $scope.area = area;
     };
 
-    $scope.anyTrackSelected = function (type) {
-      var selected = false;
-      var present = false;
+    $scope.anyTrackPresent = function (type) {
       if ($scope.video.source_tracks === undefined) {
         return false;
       }
       for(var i = 0; i < $scope.video.source_tracks.length; i++) {
         var t = $scope.video.source_tracks[i][type];
         if (t.present === true) {
-          present = true;
+          return true;
         }
+      }
+      return false;
+    };
+
+    $scope.anyTrackSelected = function (type) {
+      if ($scope.video.source_tracks === undefined) {
+        return false;
+      }
+      for(var i = 0; i < $scope.video.source_tracks.length; i++) {
+        var t = $scope.video.source_tracks[i][type];
         if (t.present === true && t.hidden === false) {
-          selected = true;
+          return true;
         }
       }
-      // If we don't have any tracks at all, selecting none is valid
-      if (present === false) {
-        return true;
-      }
-      return selected;
+      return false;
     };
 
     $scope.trackClicked = function(index, type) {
@@ -202,11 +206,11 @@ angular.module('adminNg.controllers')
           videoTrackCount++;
         }
       }
-      return audioTrackCount > videoTrackCount;
+      return audioTrackCount >= 2 && audioTrackCount > videoTrackCount;
     };
 
-    $scope.sanityCheckFlags = function() {
-      return (!$scope.anyTrackSelected('video') || $scope.tooManyAudios()) || !$scope.anyTrackSelected('audio');
+    $scope.isValid = function() {
+      return $scope.anyTrackSelected('video') || $scope.anyTrackSelected('audio');
     };
 
     // TODO Move the following to a VideoCtrl

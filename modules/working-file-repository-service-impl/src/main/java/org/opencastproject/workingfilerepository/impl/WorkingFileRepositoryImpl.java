@@ -28,7 +28,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.FileSupport;
-import org.opencastproject.util.Log;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UrlSupport;
@@ -78,7 +77,6 @@ import javax.management.ObjectInstance;
 public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMappable {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(WorkingFileRepositoryImpl.class);
-  private static final Log log = new Log(logger);
 
   /** The extension we use for the md5 hash calculated from the file contents */
   public static final String MD5_EXTENSION = ".md5";
@@ -266,7 +264,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
         FileUtils.forceDelete(parentDirectory.getParentFile());
       return true;
     } catch (NotFoundException e) {
-      log.info("Unable to delete non existing media package element {}@{}", mediaPackageElementID, mediaPackageID);
+      logger.info("Unable to delete non existing media package element {}@{}", mediaPackageElementID, mediaPackageID);
       return false;
     }
   }
@@ -432,9 +430,12 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     // Clean up any other files
     if (filesToDelete != null && filesToDelete.length > 0) {
       for (File fileToDelete : filesToDelete) {
-        if (!fileToDelete.equals(f) && !fileToDelete.equals(md5File)) {
+        if (!fileToDelete.equals(f) && !fileToDelete.equals(md5File)
+            // On shared filesystems like NFS the move operation may create temporary .nfsXXX files
+            // which will be removed by the NFS subsystem itself. We should skip these files.
+            && !StringUtils.startsWith(fileToDelete.getName(), ".nfs")) {
           logger.trace("delete {}", fileToDelete.getAbsolutePath());
-          if (!fileToDelete.delete()) {
+          if (!fileToDelete.delete() && fileToDelete.exists()) {
             throw new IllegalStateException("Unable to delete file: " + fileToDelete.getAbsolutePath());
           }
         }

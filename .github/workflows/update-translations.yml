@@ -21,7 +21,7 @@ jobs:
     - name: prepare crowdin client
       run: |
         wget --quiet https://artifacts.crowdin.com/repo/deb/crowdin3.deb
-        sudo dpkg -i crowdin.deb
+        sudo dpkg -i crowdin3.deb
 
     - name: prepare github ssh key
       env:
@@ -36,9 +36,9 @@ jobs:
       run: |
         git clone "git@github.com:opencast/opencast.git" ~/oc
 
-    - name: upload translation source
+    - name: update translations
       env:
-        CROWDIN_TOKEN: ${{ secret.CROWDIN_TOKEN }}
+        CROWDIN_TOKEN: ${{ secrets.CROWDIN_TOKEN }}
       run: |
         set -o errexit
         update() {
