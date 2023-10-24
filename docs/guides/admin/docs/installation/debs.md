@@ -81,7 +81,7 @@ After installing OpenSearch please make sure to follow their
 to ensure that your OpenSearch instance is set up correctly and securely.  Once that setup is complete, ensure that
 your Opencast install matches your configured OpenSearch settings.  Notably, Opencast's current default assumes
 non-secured http rather than https, without a username and password.  Read the
-[Opencast OpenSearch Documentation](../configuration/opensearch.md) to correctly configure Opencast's connection
+[Opencast OpenSearch Documentation](../configuration/searchindex/elasticsearch.md) to correctly configure Opencast's connection
 once Opencast has been installed below.
 
 After installing and configuring make sure to start and enable OpenSearch:

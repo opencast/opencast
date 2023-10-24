@@ -61,7 +61,7 @@ Subtitles can be up- and downloaded wherever other tracks can be up- and downloa
 ### Admin UI
 
 If you wish to configure subtitle upload in the Admin UI, check out
-[Asset Upload Options](../../configuration/admin-ui/asset-upload).
+[Asset Upload Options](admin-ui/asset-upload.md).
 
 
 ## Automatically generating subtitles in Opencast
@@ -70,12 +70,12 @@ Opencast allows for automatically generating subtites by adding certain operatio
 can be generated locally by open-source services, or externally by paid services.
 
 For local generation, take a look at the
-[Speech-To-Text Workflow Operation](../../workflowoperationhandlers/speech-to-text-woh). As of writing, it supports
+[Speech-To-Text Workflow Operation](../workflowoperationhandlers/speechtotext-woh.md). As of writing, it supports
 *vosk* and *whisper*.
 
 For external generation, various plugins are available:
 
-* [Amberscript](../transcription.modules/amberscripttranscripts)
-* [Google Speech](../transcription.modules/googlespeechtranscripts)
-* [IBM Watson](../transcription.modules/watsontranscripts)
-* [Microsoft Azure](../transcription.modules/microsoftazuretranscripts)
+* [Amberscript](./transcription.configuration/amberscripttranscripts.md)
+* [Google Speech](./transcription.configuration/googlespeechtranscripts.md)
+* [IBM Watson](./transcription.configuration/watsontranscripts.md)
+* [Microsoft Azure](./transcription.configuration/microsoftazuretranscripts.md)
