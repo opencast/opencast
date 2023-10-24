@@ -71,7 +71,7 @@ can be generated locally by open-source services, or externally by paid services
 
 For local generation, take a look at the
 [Speech-To-Text Workflow Operation](../workflowoperationhandlers/speechtotext-woh.md). As of writing, it supports
-*vosk* and *whisper*.
+*vosk*, *whisper* and *whispercpp*.
 
 For external generation, various plugins are available:
 

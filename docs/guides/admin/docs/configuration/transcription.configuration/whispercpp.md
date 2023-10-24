@@ -26,7 +26,7 @@ To enable WhisperC++ as for the `SpeechToText` WoH, follow these steps.
 [whisper.cpp](https://github.com/ggerganov/whisper.cpp) repository or build and use your own RPMs for RHEL-based
 distributions from [whispercpp-rpmbuild](https://github.com/elearning-univie/whispercpp-rpmbuild).
 2. Enable whispercpp engine and set job load in `org.opencastproject.speechtotext.impl.SpeechToTextServiceImpl.cfg`.
-3. Set the target model to use in `org.opencastproject.speechtotext.impl.engine.WhisperCppEngine`.
+3. Set the binary and target model path to use in `org.opencastproject.speechtotext.impl.engine.WhisperCppEngine`.
 4. WhisperC++ processes only PCM16 (wav) audio files. Therefore you probably have to add an `encode`-operation before
 running `speechtotext` in your workflow and an encoder profile:
 
@@ -36,26 +36,31 @@ running `speechtotext` in your workflow and an encoder profile:
     configurations:
       - source-flavor: "*/themed"
       - target-flavor: "*/audio+stt"
-      - encoding-profile: audio-whisper
+      - encoding-profile: audio-whispercpp
 
   - id: speechtotext
     description: "Generates subtitles with whispercpp"
     configurations:
       - source-flavor: "*/audio+stt"
-      - target-flavor: captions/vtt+auto-#{lang}
-      - target-element: attachment
-      - target-tags: archive,subtitle,engage-download
+      - target-flavor: "captions/delivery"
+      - target-element: track
+      - target-tags: >-
+          archive,
+          engage-download,
+          generator-type:auto,
+          generator:whispercpp,
+          type:subtitle
       # - translate: true
 ```
 
 ```
 # Audio-only encoding format used for whispercpp
-profile.audio-whisper.name = whispercpp wav
-profile.audio-whisper.input = audio
-profile.audio-whisper.output = audio
-profile.audio-whisper.suffix = -stt.wav
-profile.audio-whisper.ffmpeg.command = -i #{in.video.path} -vn -ar 16000 -ac 1 -c:a pcm_s16le #{out.dir}/#{out.name}#{out.suffix}
-profile.audio-whisper.jobload = 1.0
+profile.audio-whispercpp.name = whispercpp wav
+profile.audio-whispercpp.input = audio
+profile.audio-whispercpp.output = audio
+profile.audio-whispercpp.suffix = -stt.wav
+profile.audio-whispercpp.ffmpeg.command = -i #{in.video.path} -vn -ar 16000 -ac 1 -c:a pcm_s16le #{out.dir}/#{out.name}#{out.suffix}
+profile.audio-whispercpp.jobload = 1.0
 ```
 
 

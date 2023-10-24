@@ -31,7 +31,7 @@ Parameter Table
 Requirements
 ------------
 
-In order for it to work, you have to install the vosk-cli or whisper package
+In order for it to work, you have to install the vosk-cli, whisper or whispercpp package.
 
 
 Operation Examples
