@@ -91,9 +91,10 @@ public final class ClientCredentials {
    *
    * @param file
    *          file to parse
-   * @return matching value, or null if no match or there was a parse exception
+   * @return matching value. Throws an exception if there is no matching value.
    * @throws java.io.FileNotFoundException
    * @throws java.io.IOException
+   * @throws java.lang.IllegalArgumentException
    */
   private String getValueFromArray(final File file) throws IOException, ParseException, IllegalArgumentException {
     final JSONParser parser = new JSONParser();
