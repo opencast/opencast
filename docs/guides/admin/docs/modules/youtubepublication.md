@@ -83,7 +83,7 @@ With the JSON file created and saved previously, you have to proceed as describe
 
 ## Add YouTube publication to your Opencast workflows
 
-Opencast can now publish to YouTube. To make use of this, add the [Publish Youtube workflow operation](../workflowoperationhandlers/publish-youtube-woh.md)
+Opencast can now publish to YouTube. To make use of this, add the [Publish YouTube workflow operation](../workflowoperationhandlers/publish-youtube-woh.md)
 to your Opencast workflows. You can find more details on how to use the operation on its [own page]((../workflowoperationhandlers/publish-youtube-woh.md)).
 In general, it should be placed near your other `publish` operations.
 
