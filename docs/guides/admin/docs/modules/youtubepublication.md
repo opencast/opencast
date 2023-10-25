@@ -87,7 +87,7 @@ Opencast can now publish to YouTube. To make use of this, add the [Publish YouTu
 to your Opencast workflows. You can find more details on how to use the operation on its [own page]((../workflowoperationhandlers/publish-youtube-woh.md)).
 In general, it should be placed near your other `publish` operations.
 
-You may also want to add the [Retract Youtube workflow operation](../workflowoperationhandlers/retract-youtube-woh.md) 
+You may also want to add the [Retract YouTube workflow operation](../workflowoperationhandlers/retract-youtube-woh.md) 
 near your `retract` operations.
 
 
