@@ -25,6 +25,7 @@ pages and we don't always notice!
 - Select **OAuth consent screen**
 - Configure the API Consent Screen
     - For **User type** select `external`
+    - Add a test user (only necessary if your app is still in testing mode)
     - Fill in the rest of the required settings at discretion
 - Select **Credentials**
 - Select **Create Credentials**, specifically OAuth Client ID
