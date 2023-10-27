@@ -194,6 +194,7 @@ public class
       String[] jobOutput = job.getPayload().split(",");
       URI output = new URI(jobOutput[0]);
       String outputLanguage = jobOutput[1];
+      String engineType = jobOutput[2];
 
       String mediaPackageIdentifier = UUID.randomUUID().toString();
 
@@ -218,6 +219,8 @@ public class
 
       List<String> targetTags = tagsAndFlavors.getTargetTags();
       targetTags.add("lang:" + outputLanguage);
+      targetTags.add("generator-type:auto");
+      targetTags.add("generator:" + engineType.toLowerCase());
 
       // this is used to set some values automatically, like the correct mimetype
       Job inspection = mediaInspectionService.enrich(subtitleMediaPackageElement, true);
