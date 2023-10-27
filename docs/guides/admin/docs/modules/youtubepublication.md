@@ -24,11 +24,11 @@ pages and we don't always notice!
 - Navigate to the [**Google Credentials Console**][googleapiconsole]
 - Select **OAuth consent screen**
 - Configure the API Consent Screen
-  - For **User type** select `external` 
-  - Fill in the rest of the required settings at discretion
+    - For **User type** select `external`
+    - Fill in the rest of the required settings at discretion
 - Select **Credentials**
 - Select **Create Credentials**, specifically OAuth Client ID
-  - **Application type** must be set to `Desktop`
+    - **Application type** must be set to `Desktop`
 
 
 ### Save Client ID in JSON Format
