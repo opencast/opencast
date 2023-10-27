@@ -166,7 +166,7 @@ Opencast 14
 - [[#4206](https://github.com/opencast/opencast/pull/4206)] -
   Changed rebuild order and added rebuild indicator
 
-<details><summary>Bot Pull Requests</summary>
+<details><summary>Dependency updates</summary>
 
 <ul>
 <li>[<a href="https://github.com/opencast/opencast/pull/4942">4942</a>] -
@@ -585,7 +585,7 @@ Opencast 13
   Extend configuration options of Amberscript integration
 - [[#4864](https://github.com/opencast/opencast/pull/4864)] -
   Remove dead `CONFIG_OPTIONS` from WOHs
-<details><summary>Bot Pull Requests</summary>
+<details><summary>Dependency updates</summary>
 
 <ul>
 <li>[<a href="https://github.com/opencast/opencast/pull/4890">4890</a>] -
@@ -617,7 +617,7 @@ Opencast 13
   Whisper language detection and tagging
 - [[#4738](https://github.com/opencast/opencast/pull/4738)] -
   Enable Whisper English Translation
-<details><summary>Bot Pull Requests</summary>
+<details><summary>Dependency updates</summary>
 
 <ul>
 <li>[<a href="https://github.com/opencast/opencast/pull/4824">4824</a>] -
@@ -631,7 +631,7 @@ Opencast 13
 
 *Released on March 21th, 2023*
 
-<details><summary>Bot Pull Requests</summary>
+<details><summary>Dependency updates</summary>
 
 <ul>
 <li>[<a href="https://github.com/opencast/opencast/pull/4780">4780</a>] -
@@ -667,7 +667,7 @@ Opencast 13
   Fix typo and adds recomendations to whisper doc
 - [[#4515](https://github.com/opencast/opencast/pull/4515)] -
   Allow hotkeys in create dialogs in input elements
-<details><summary>Bot Pull Requests</summary>
+<details><summary>Dependency updates</summary>
 
 <ul>
 <li>[<a href="https://github.com/opencast/opencast/pull/4753">4753</a>] -
@@ -699,7 +699,7 @@ Opencast 13
   Fix calendar.json endpoint
 - [[#4607](https://github.com/opencast/opencast/pull/4607)] -
   Add Opencast 13.1 release notes
-<details><summary>Bot Pull Requests</summary>
+<details><summary>Dependency updates</summary>
 
 <ul>
 <li>[<a href="https://github.com/opencast/opencast/pull/4687">4687</a>] -
@@ -735,7 +735,7 @@ Opencast 13
   Add silient detection based on subtitles (webvtt-to-cutmarks woh)
 - [[#4478](https://github.com/opencast/opencast/pull/4478)] -
   Bug fix: publish engage woh with merge SKIP the operation if media package not in search index
-<details><summary>Bot Pull Requests</summary>
+<details><summary>Dependency updates</summary>
 
 <ul>
 <li>[<a href="https://github.com/opencast/opencast/pull/4608">4608</a>] -
@@ -909,7 +909,7 @@ Opencast 13
   Index Extended Metadata
 - [[#3218](https://github.com/opencast/opencast/pull/3218)] -
   Opencast Plugin Manager
-<details><summary>Bot Pull Requests</summary>
+<details><summary>Dependency updates</summary>
 
 <ul>
 <li>[<a href="https://github.com/opencast/opencast/pull/4510">4510</a>] -
@@ -1477,7 +1477,7 @@ Opencast 12
   Automate Release Process
 - [[#4350](https://github.com/opencast/opencast/pull/4350)] -
   Lower JWT error logging to debug level
-<details><summary>Bot Pull Requests</summary>
+<details><summary>Dependency updates</summary>
 
 <ul>
 <li>[<a href="https://github.com/opencast/opencast/pull/4373">4373</a>] -
@@ -1534,7 +1534,7 @@ Opencast 12
 - [[#4229](https://github.com/opencast/opencast/pull/4229)] -
   Make busy waiting explicit during InboxScannerService config update
 
-<details><summary>Bot Pull Requests</summary>
+<details><summary>Dependency updates</summary>
 
 <ul>
 <li>[<a href="https://github.com/opencast/opencast/pull/4337">4337</a>] -
@@ -1597,7 +1597,7 @@ Opencast 12
 - [[#4094](https://github.com/opencast/opencast/pull/4094)] -
   Replace DownloadDistributionService target filter with aws version
 
-<details><summary>Bot Pull Requests</summary>
+<details><summary>Dependency updates</summary>
 
 <ul>
 <li>[<a href="https://github.com/opencast/opencast/pull/4197">4197</a>] -
@@ -1650,7 +1650,7 @@ Opencast 12
 - [[#3995](https://github.com/opencast/opencast/pull/3995)] -
   Avoid GitHub Actions Scheduling Conflicts
 
-<details><summary>Bot Pull Requests</summary>
+<details><summary>Dependency updates</summary>
 
 <ul>
 <li>[<a href="https://github.com/opencast/opencast/pull/4059">4059</a>] -
@@ -1890,7 +1890,7 @@ Opencast 11
   Opencast 11.11 release notes
 - [[#4208](https://github.com/opencast/opencast/pull/4208)] -
   Fix composer incident codes and messages for process-smil and multiencode.
-<details><summary>Bot Pull Requests</summary>
+<details><summary>Dependency updates</summary>
 
 <ul>
 <li>[<a href="https://github.com/opencast/opencast/pull/4242">4242</a>] -
@@ -2396,7 +2396,7 @@ Opencast 11
   LTI Tool Updates
 - [[#1227](https://github.com/opencast/opencast/pull/1227)] -
   Delete option of series for the SearchService
-<details><summary>Bot Pull Requests</summary>
+<details><summary>Dependency updates</summary>
 
 <ul>
 <li>[<a href="https://github.com/opencast/opencast/pull/3180">3180</a>] -
@@ -3157,7 +3157,7 @@ Opencast 10
 - [[#2666](https://github.com/opencast/opencast/pull/2666)] -
   Fix checkstyle violations in 11 modules
 
-<details><summary>Bot Pull Requests</summary>
+<details><summary>Dependency updates</summary>
 
 <ul>
 <li>[<a href="https://github.com/opencast/opencast/pull/2894">2894</a>] -
@@ -3395,7 +3395,7 @@ Opencast 10
 - [[#1634](https://github.com/opencast/opencast/pull/1634)] -
   LDAP Group Mapping
 
-<details><summary>Bot Pull Requests</summary>
+<details><summary>Dependency updates</summary>
 
 <ul>
 <li>[<a href="https://github.com/opencast/opencast/pull/2611">2611</a>] -
@@ -4018,7 +4018,7 @@ Opencast 9
   Only persist users with specific LTI role
 - [[#1792](https://github.com/opencast/opencast/pull/1792)] -
   Standalone downloads Paella plugin
-<details><summary>Bot Pull Requests</summary>
+<details><summary>Dependency updates</summary>
 
 <ul>
 <li>[<a href="https://github.com/opencast/opencast/pull/2443">2443</a>] -
@@ -4613,7 +4613,7 @@ Opencast 9
   S3 S3 compatibility - Endpoint configuration for Amazon S3 alternatives added
 - [[#884](https://github.com/opencast/opencast/pull/884)] -
   Display global notifications as overlay
-<details><summary>Bot Pull Requests</summary>
+<details><summary>Dependency updates</summary>
 
 <ul>
 <li>[<a href="https://github.com/opencast/opencast/pull/1897">1897</a>] -
@@ -5831,7 +5831,7 @@ Opencast 7
   Some error operations referencing the wrong error-handler.
 - [[#1246](https://github.com/opencast/opencast/pull/1246)] -
   Remove default storage_id setting from asset Manager
-<details><summary>Bot Pull Requests</summary>
+<details><summary>Dependency updates</summary>
 
 <ul>
 <li>[<a href="https://github.com/opencast/opencast/pull/1315">1315</a>] -
