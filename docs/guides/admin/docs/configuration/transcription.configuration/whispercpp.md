@@ -46,10 +46,7 @@ running `speechtotext` in your workflow and an encoder profile:
       - target-element: track
       - target-tags: >-
           archive,
-          engage-download,
-          generator-type:auto,
-          generator:whispercpp,
-          type:subtitle
+          engage-download
       # - translate: true
 ```
 
