@@ -128,7 +128,7 @@ public class PublishYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
 
       if (elements.size() < 1) {
         logger.info("No mediapackage element was found for publishing");
-        return createResult(mediaPackage, Action.CONTINUE);
+        return createResult(mediaPackage, Action.SKIP);
       }
 
       Job youtubeJob;
