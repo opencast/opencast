@@ -91,15 +91,25 @@ public final class ClientCredentials {
    *
    * @param file
    *          file to parse
-   * @return matching value, or null if no match or there was a parse exception
+   * @return matching value. Throws an exception if there is no matching value.
    * @throws java.io.FileNotFoundException
    * @throws java.io.IOException
+   * @throws java.lang.IllegalArgumentException
    */
-  private String getValueFromArray(final File file) throws IOException, ParseException {
+  private String getValueFromArray(final File file) throws IOException, ParseException, IllegalArgumentException {
     final JSONParser parser = new JSONParser();
     final FileReader reader = new FileReader(file);
     final JSONObject jsonObject = (JSONObject) parser.parse(reader);
+
+    if (!jsonObject.containsKey("installed")) {
+      throw new IllegalArgumentException("client_secret file does not contain \"installed\" as a top level key. Did you"
+          + "set the type for your 'OAuth 2.0-Client-ID' correctly?");
+    }
     final JSONObject array = (JSONObject) jsonObject.get("installed");
+
+    if (!array.containsKey("client_id")) {
+      throw new IllegalArgumentException("client_secret file does not contain \"client_id\".");
+    }
     return (String) array.get("client_id");
   }
 
