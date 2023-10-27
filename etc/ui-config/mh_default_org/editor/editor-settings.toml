@@ -2,6 +2,34 @@
 # Opencast Stand-alone Video Editor
 ##
 
+# This file contains the editord default configuration and our recommendation for production use.
+# All values in here aer set to their defaults.
+
+# ⚠️  When deployed, this file is publicly accessibly!
+
+
+####
+# General Settings
+##
+
+# Allowed prefixes in callback urls to prevent malicious urls
+# If empty, no callback url is allowed
+# Type: string[]
+# Default: []
+#allowedCallbackPrefixes = []
+
+# Url to go back after finishing editing
+# If undefined, no return link will be shown on the end pages
+# Type: string | undefined
+# Default: undefined
+#callbackUrl =
+
+# Name of system to go back to
+# If undefined, a generic system name is used instead of a speficic name
+# Type: string | undefined
+# Default: undefined
+#callbackSystem =
+
 
 ####
 # Metadata
@@ -71,18 +99,21 @@
 #mainFlavor = "captions"
 
 [subtitles.languages]
-## A list of languages for which subtitles can be created
-"captions/source+de" = "Deutsch"
-"captions/source+en" = "English"
-"captions/source+es" = "Español"
+## A list of languages for which new subtitles can be created
+# For each language, various tags can be specified
+# A list of officially recommended tags can be found at https://docs.opencast.org/develop/admin/#modules/subtitles/#tags
+# At least the "lang" tag MUST be specified
+german = { lang = "de-DE" }
+english = { lang = "en-US", type = "closed-caption" }
+spanish = { lang = "es" }
 
 [subtitles.icons]
 # A list of icons to be displayed for languages defined above.
 # Values are strings but should preferably be Unicode icons.
 # These are optional and you can also choose to have no icons.
-"captions/source+de" = "🇩🇪"
-"captions/source+en" = "🇺🇸"
-"captions/source+es" = "🇪🇸"
+"de-DE" = "DE"
+"en-US" = "EN"
+"es" = "ES"
 
 [subtitles.defaultVideoFlavor]
 # Specify the default video in the subtitle video player by flavor
