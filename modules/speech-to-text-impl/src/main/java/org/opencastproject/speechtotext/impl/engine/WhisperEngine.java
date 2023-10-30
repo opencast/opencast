@@ -95,6 +95,11 @@ public class WhisperEngine implements SpeechToTextEngine {
   /** Enable Voice Activity Detection for whisper-ctranslate2 */
   private Option<Boolean> isVADEnabled = Option.none();
 
+  /** Config key for additional Whisper args */
+  private static final String WHISPER_ARGS_CONFIG_KEY = "whisper.args";
+
+  /** Currently used Whisper args */
+  private String[] whisperArgs = {};
 
   @Override
   public String getEngineName() {
@@ -121,6 +126,14 @@ public class WhisperEngine implements SpeechToTextEngine {
 
     isVADEnabled = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), WHISPER_VAD);
     logger.debug("Whisper Voice Activity Detection  set to {}", isVADEnabled);
+
+    String whisperArgsString = (String) cc.getProperties().get(WHISPER_ARGS_CONFIG_KEY);
+    if (!StringUtils.isBlank(whisperArgsString)) {
+      logger.debug("Additional args for Whisper configured: {}", whisperArgsString);
+      whisperArgs = whisperArgsString.trim().split("\\s+");
+    } else {
+      logger.debug("No additional args for Whisper configured.");
+    }
 
     logger.debug("Finished activating/updating speech-to-text service");
   }
@@ -169,6 +182,8 @@ public class WhisperEngine implements SpeechToTextEngine {
       command.add("--vad_filter");
       command.add(isVADEnabled.get().toString());
     }
+
+    command.addAll(Arrays.asList(whisperArgs));
 
     logger.info("Executing Whisper's transcription command: {}", command);
 

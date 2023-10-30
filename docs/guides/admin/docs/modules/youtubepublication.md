@@ -7,7 +7,7 @@ This page documents the configuration for Opencast module **publication-service-
 You need to meet these requirements to make a YouTube Publication:
 
 - Google Account
-- YouTube Channel to make the publication
+- YouTube Channel to publish to
 
 
 ## Google Developers Configuration
@@ -18,22 +18,29 @@ pages and we don't always notice!
 
 ### Create new Google Project
 
-- Login to Google account
+- Login to your Google account
 - Navigate to the [**Google Developers Console**][googledevconsole]
 - Click **Create Project** and follow the instructions
 - Navigate to the [**Google Credentials Console**][googleapiconsole]
 - Select **OAuth consent screen**
-- Configure the API Consent Screen, you will need to set the Product name
+- Configure the API Consent Screen
+    - For **User type** select `external`
+    - Add a test user (only necessary if your app is still in testing mode)
+    - Fill in the rest of the required settings at discretion
 - Select **Credentials**
 - Select **Create Credentials**, specifically OAuth Client ID
-- Select **Other** application type
+    - **Application type** must be set to `Desktop`
+
 
 ### Save Client ID in JSON Format
 
+- Select **Credentials**, you should see a new entry in the **OAuth 2.0 Client IDs** table
 - Download the client information in JSON format by clicking **Download JSON**
     - This currently looks like an arrow pointing downwards on the rightmost portion of the client id row
 - Save the JSON file to `${karaf.etc}/youtube-v3/client-secrets-youtube-v3.json` (Usually this is
-  `etc/youtube-v3/client-secrets-youtube-v3.json`)
+  `etc/youtube-v3/client-secrets-youtube-v3.json`). It should match the path configured for
+  `org.opencastproject.publication.youtube.clientSecretsV3` in
+  `org.opencastproject.publication.youtube.YouTubeV3PublicationServiceImpl.cfg`.
 
 ### Enable API
 
@@ -51,7 +58,7 @@ pages and we don't always notice!
 
 With the JSON file created and saved previously, you have to proceed as described:
 
-- Start Opencast server (Restart Opencast in case was running)
+- Start Opencast server (Restart Opencast in case it was running)
 
     **Note:** Until this service is fully configured, Opencast will not start completely. In case you
     want to abort the configuration, you only need to delete the JSON file and restart Opencast.
@@ -75,34 +82,16 @@ With the JSON file created and saved previously, you have to proceed as describe
 - Restart Opencast
 
 
-## Activate YouTube publication in Opencast
+## Add YouTube publication to your Opencast workflows
 
-Opencast can now publish to YouTube. The last step is to activate this feature. For this you have to create a new
-workflow or modify an existing one.
+Opencast can now publish to YouTube. To make use of this, add the [Publish YouTube workflow operation](../workflowoperationhandlers/publish-youtube-woh.md)
+to your Opencast workflows. You can find more details on how to use the operation on its [own page]((../workflowoperationhandlers/publish-youtube-woh.md)).
+In general, it should be placed near your other `publish` operations.
 
-- Open the workflows `etc/opencast/workflows/ng-schedule-and-upload.xml` and `etc/opencast/workflows/ng-publish.xml`
+You may also want to add the [Retract YouTube workflow operation](../workflowoperationhandlers/retract-youtube-woh.md) 
+near your `retract` operations.
 
-- In the file, modify the `<configuration_panel>` and enable the YouTube option, like this:
 
-        <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true"
-               disabled="disabled" />
-
-  becomes
-
-        <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true"/>
-
-- Open the workflows `etc/opencast/workflows/ng-retract.xml`
-
-- In the file, modify the `<configuration_panel>` and enable the YouTube option, like this:
-
-        <input id="retractFromYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
-
-  becomes
-
-        <input id="retractFromYouTube" type="checkbox" checked="checked" class="configField" value="true" />
-
-Opencast will detect the new workflow without restart, with that you can select the new workflow with the YouTube option
-enabled.
 
 [googledevconsole]: https://console.developers.google.com/project
 [googledoc]: https://developers.google.com/youtube/registering_an_application
