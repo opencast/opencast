@@ -1,0 +1,3 @@
+The default workflow for publishing videos will no longer render the video metadata on the preview Image.
+Instead, a simple cover image without any text will be created and displayed.
+You can revert this by simply adding the "coverimage" WOH back to the "partial-publish" workflow (look out for the target-flavor and tags).

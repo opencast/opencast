@@ -43,7 +43,7 @@
       "VIDEOFILE": "Videofile",
       "VIDEOFILE_DESCRIPTION": "Video file for upload",
       "CAPTION": "Subtítulos",
-      "CAPTION_DESCRIPTION": "Caption file; VTT or dfxp format is supported",
+      "CAPTION_DESCRIPTION": "Caption file in VTT format",
       "UPLOAD": "Cargar",
       "UPLOADING": "Cargando",
       "EDIT": "Gardar",
@@ -541,6 +541,10 @@
                      "SHORT": "Relator",
                      "DETAIL": "O arquivo contén a gravación dunha persoa dirixíndose a unha audiencia."
                   },
+                  "SUBTITLES": {
+                     "SHORT": "Subtitles",
+                     "DETAIL": "The text file contains the words spoken in the video(s) above."
+                  },
                   "AUDIO_ONLY": {
                      "SHORT": "Só audio",
                      "DETAIL": "O arquivo só contén audio."
@@ -584,8 +588,7 @@
                "NO_OPTIONS": "Non se proporcionou unha lista de recursos para esta sección da páxina web!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Apuntamentos de clase",
-                  "CAPTIONS_DFXP": "Subtítulos DFXP",
-                  "CAPTIONS_WEBVTT": "Subtítulos WebVTT",
+                  "SUBTITLES": "Subtitles",
                   "PREVIEW_IMAGE": "Imaxe de vista previa",
                   "SMIL": "Catálogo SMIL",
                   "TRACK_PARTS": "Partes dun vídeo"
@@ -1863,8 +1866,10 @@
       "TRACKS": {
          "DESCRIPTION": "Pódense desmarcar pistas para que non sigan sendo procesadas. Teña en conta que é necesario (re-)publicar o evento para que os cambios se apliquen.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "Debe seleccionarse polo menos unha pista de vídeo",
-            "NO_AUDIO_TRACK_SELECTED": "Debe seleccionarse polo menos unha pista de audio"
+            "NO_VIDEO_TRACK_SELECTED_WARNING": "You should probably enable at least one video track",
+            "NO_AUDIO_TRACK_SELECTED_WARNING": "You should probably enable at least one audio track",
+            "TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING": "You probably shouldn't enable more audio than video tracks",
+            "NO_TRACK_SELECTED_ERROR": "You must enable at least one track"
          },
          "TRACK": {
             "HEADER": "Pista"

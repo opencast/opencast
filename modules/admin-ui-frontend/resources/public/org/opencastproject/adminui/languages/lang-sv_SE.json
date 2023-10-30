@@ -43,7 +43,7 @@
       "VIDEOFILE": "Videofile",
       "VIDEOFILE_DESCRIPTION": "Video file for upload",
       "CAPTION": "Captions",
-      "CAPTION_DESCRIPTION": "Caption file; VTT or dfxp format is supported",
+      "CAPTION_DESCRIPTION": "Caption file in VTT format",
       "UPLOAD": "Upload",
       "UPLOADING": "Uploading",
       "EDIT": "Save",
@@ -541,6 +541,10 @@
                      "SHORT": "Presentatör",
                      "DETAIL": "Filen innehåller en inspelning av en person som talar till en publik."
                   },
+                  "SUBTITLES": {
+                     "SHORT": "Subtitles",
+                     "DETAIL": "The text file contains the words spoken in the video(s) above."
+                  },
                   "AUDIO_ONLY": {
                      "SHORT": "Endast ljud",
                      "DETAIL": "Filen innehåller endast ljud."
@@ -584,8 +588,7 @@
                "NO_OPTIONS": "En list av resursoptioner blev inte laddad up på den här sektionen av webbsidan!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Lektionsanteckningar/Handout",
-                  "CAPTIONS_DFXP": "Undertexter DFXP",
-                  "CAPTIONS_WEBVTT": "Undertexter WebVTT",
+                  "SUBTITLES": "Subtitles",
                   "PREVIEW_IMAGE": "Förhandsgranskningsbilden",
                   "SMIL": "SMIL-katalogen",
                   "TRACK_PARTS": "Delar av spår"
@@ -1863,8 +1866,10 @@
       "TRACKS": {
          "DESCRIPTION": "Du kan välja av spår för att inte processera vidare dem. Obs: Du måste (re-)publicera eventet för att använda förändelser.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "Du måste välja minst ett video spår",
-            "NO_AUDIO_TRACK_SELECTED": "Du måste välja minst ett audio spår"
+            "NO_VIDEO_TRACK_SELECTED_WARNING": "You should probably enable at least one video track",
+            "NO_AUDIO_TRACK_SELECTED_WARNING": "You should probably enable at least one audio track",
+            "TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING": "You probably shouldn't enable more audio than video tracks",
+            "NO_TRACK_SELECTED_ERROR": "You must enable at least one track"
          },
          "TRACK": {
             "HEADER": "Spår"

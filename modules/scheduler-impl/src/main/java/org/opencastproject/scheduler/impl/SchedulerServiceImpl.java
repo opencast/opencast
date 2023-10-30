@@ -31,7 +31,6 @@ import static org.opencastproject.scheduler.impl.SchedulerUtil.recordToMp;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.uiAdapterToFlavor;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.EqualsUtil.ne;
-import static org.opencastproject.util.Log.getHumanReadableTimeString;
 import static org.opencastproject.util.RequireUtil.notEmpty;
 import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.RequireUtil.requireTrue;
@@ -398,9 +397,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       if (cacheExpireDuration.isSome()) {
         lastModifiedCache = CacheBuilder.newBuilder().expireAfterWrite(cacheExpireDuration.get(), TimeUnit.SECONDS)
                 .build();
-        logger.info("Set last modified cache to {}", getHumanReadableTimeString(cacheExpireDuration.get()));
+        logger.info("Set last modified cache to {}", DateTimeSupport.humanReadableTime(cacheExpireDuration.get()));
       } else {
-        logger.info("Set last modified cache to default {}", getHumanReadableTimeString(DEFAULT_CACHE_EXPIRE));
+        logger.info("Set last modified cache to default {}", DateTimeSupport.humanReadableTime(DEFAULT_CACHE_EXPIRE));
       }
       final Option<Boolean> maintenance = OsgiUtil.getOptCfgAsBoolean(properties, CFG_KEY_MAINTENANCE);
       if (maintenance.getOrElse(false)) {

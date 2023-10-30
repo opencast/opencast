@@ -96,7 +96,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.systems.OpencastConstants;
-import org.opencastproject.util.Log;
+import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.RestUtil.R;
@@ -372,7 +372,7 @@ public class EventsEndpoint implements ManagedService {
     } catch (NumberFormatException e) {
       logger.error("Error parsing URL signing expiration configuration value", e);
     }
-    logger.debug("URLs signatures are configured to expire in {}.", Log.getHumanReadableTimeString(expireSeconds));
+    logger.debug("URLs signatures are configured to expire in {}.", DateTimeSupport.humanReadableTime(expireSeconds));
 
     // Read preview subtype configuration
     // Default to DEFAULT_PREVIEW_SUBTYPE

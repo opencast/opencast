@@ -43,7 +43,7 @@
       "VIDEOFILE": "Videofile",
       "VIDEOFILE_DESCRIPTION": "Video file for upload",
       "CAPTION": "Captions",
-      "CAPTION_DESCRIPTION": "Caption file; VTT or dfxp format is supported",
+      "CAPTION_DESCRIPTION": "Caption file in VTT format",
       "UPLOAD": "Upload",
       "UPLOADING": "Uploading",
       "EDIT": "Save",
@@ -541,6 +541,10 @@
                      "SHORT": "Predavatelj",
                      "DETAIL": "Datoteka vsebuje posnetek osebe, ki govori občinstvu."
                   },
+                  "SUBTITLES": {
+                     "SHORT": "Subtitles",
+                     "DETAIL": "The text file contains the words spoken in the video(s) above."
+                  },
                   "AUDIO_ONLY": {
                      "SHORT": "Samo zvok",
                      "DETAIL": "Datoteka vsebuje samo zvok."
@@ -584,8 +588,7 @@
                "NO_OPTIONS": "Seznam z možnostmi za datoteke ni na voljo za ta del spletne strani!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Beležke za razdelitev v razredu",
-                  "CAPTIONS_DFXP": "Pripisi DFXP",
-                  "CAPTIONS_WEBVTT": "Pripisi WebVTT",
+                  "SUBTITLES": "Subtitles",
                   "PREVIEW_IMAGE": "Predogled slike",
                   "SMIL": "Katalog smil",
                   "TRACK_PARTS": "Deli sledi"
@@ -1863,8 +1866,10 @@
       "TRACKS": {
          "DESCRIPTION": "Posnetkov, ki jih ne želite obdelati, lahko odznačite. Če želite uveljaviti spremembe, morate posnetek ponovno objaviti.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "Izbrati morate vsaj eno video datoteko",
-            "NO_AUDIO_TRACK_SELECTED": "Izbrati morate vsaj eno audio datoteko"
+            "NO_VIDEO_TRACK_SELECTED_WARNING": "You should probably enable at least one video track",
+            "NO_AUDIO_TRACK_SELECTED_WARNING": "You should probably enable at least one audio track",
+            "TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING": "You probably shouldn't enable more audio than video tracks",
+            "NO_TRACK_SELECTED_ERROR": "You must enable at least one track"
          },
          "TRACK": {
             "HEADER": "Datoteka"

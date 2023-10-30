@@ -43,7 +43,7 @@
       "VIDEOFILE": " Αρχείο Βίντεο",
       "VIDEOFILE_DESCRIPTION": "Επιλογή αρχείου βίντεο για μεταφόρτωση",
       "CAPTION": "Λεζάντες",
-      "CAPTION_DESCRIPTION": "Αρχείο υπότιτλων; Υποστηρίζεται τύπος αρχείου VTT ή dfxp",
+      "CAPTION_DESCRIPTION": "Caption file in VTT format",
       "UPLOAD": "Μεταφόρτωση",
       "UPLOADING": "Αποστολή...",
       "EDIT": "Αποθήκευση",
@@ -541,6 +541,10 @@
                      "SHORT": "Παρουσιαστής",
                      "DETAIL": "Το αρχείο περιέχει μια καταγραφή ενός προσώπου μιλώντας σε ένα ακροατήριο."
                   },
+                  "SUBTITLES": {
+                     "SHORT": "Subtitles",
+                     "DETAIL": "The text file contains the words spoken in the video(s) above."
+                  },
                   "AUDIO_ONLY": {
                      "SHORT": "Μόνο αρχείου ήχου",
                      "DETAIL": "Το αρχείο περιέχει μόνο ήχο."
@@ -584,8 +588,7 @@
                "NO_OPTIONS": "Δεν καθορίστηκε λίστα επιλογών αντικειμένων σε αυτό το τμήμα της ιστοσελίδας!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Ενημερωτικές σημειώσεις κλάσης",
-                  "CAPTIONS_DFXP": "Υπότιτλοι DFXP",
-                  "CAPTIONS_WEBVTT": "Υπότιτλοι WebVTT",
+                  "SUBTITLES": "Subtitles",
                   "PREVIEW_IMAGE": "Προεπισκόπηση εικόνας",
                   "SMIL": "Κατάλογος Smil",
                   "TRACK_PARTS": "Παρακολούθηση τμημάτων"
@@ -1863,8 +1866,10 @@
       "TRACKS": {
          "DESCRIPTION": "Μπορείτε να αποεπιλέξετε κομμάτια για να τα αποκλείσετε από περαιτέρω επεξεργασία. Παρακαλώ σημειώστε ότι πρέπει να (επαν-) δημοσιεύετε την εκδλήλωση για να εφαρμόσετε τις αλλαγές.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "Πρέπει να ενεργοποιήσετε τουλάχιστον ένα κομμάτι βίντεο",
-            "NO_AUDIO_TRACK_SELECTED": "Πρέπει να ενεργοποιήσετε τουλάχιστον ένα κομμάτι ήχου"
+            "NO_VIDEO_TRACK_SELECTED_WARNING": "You should probably enable at least one video track",
+            "NO_AUDIO_TRACK_SELECTED_WARNING": "You should probably enable at least one audio track",
+            "TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING": "You probably shouldn't enable more audio than video tracks",
+            "NO_TRACK_SELECTED_ERROR": "You must enable at least one track"
          },
          "TRACK": {
             "HEADER": "Κομμάτι"

@@ -43,7 +43,7 @@
       "VIDEOFILE": "Fichier Vidéo",
       "VIDEOFILE_DESCRIPTION": "Fichier vidéo à téléverser",
       "CAPTION": "Sous-titres",
-      "CAPTION_DESCRIPTION": "Sous-titres; Le format VTT ou dfxp est pris en charge",
+      "CAPTION_DESCRIPTION": "Caption file in VTT format",
       "UPLOAD": "Envoyer",
       "UPLOADING": "Envoi en cours",
       "EDIT": "Enregistrer",
@@ -541,6 +541,10 @@
                      "SHORT": "Présentateur",
                      "DETAIL": "Le fichier contient un enregistrement d'une personne s'adressant à un auditoire."
                   },
+                  "SUBTITLES": {
+                     "SHORT": "Subtitles",
+                     "DETAIL": "The text file contains the words spoken in the video(s) above."
+                  },
                   "AUDIO_ONLY": {
                      "SHORT": "Audio seulement",
                      "DETAIL": "Le fichier contient uniquement une piste audio."
@@ -584,8 +588,7 @@
                "NO_OPTIONS": "Une liste d'options d'atouts n'a pas été fournie à cette section de la page Web!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Notes",
-                  "CAPTIONS_DFXP": "Sous-titre DFXP",
-                  "CAPTIONS_WEBVTT": "Sous-titre WebVTT",
+                  "SUBTITLES": "Subtitles",
                   "PREVIEW_IMAGE": "Aperçu des images",
                   "SMIL": "Catalogue Smil",
                   "TRACK_PARTS": "Parties de la vidéo"
@@ -1863,8 +1866,10 @@
       "TRACKS": {
          "DESCRIPTION": "Vous pouvez désélectionner des pistes pour les exclure des traitement ultérieurs. Noter que vous devez (re) publier l'événement pour appliquer les modifications.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "Vous devez activer au moins une piste vidéo",
-            "NO_AUDIO_TRACK_SELECTED": "Vous devez activer au moins une piste audio"
+            "NO_VIDEO_TRACK_SELECTED_WARNING": "You should probably enable at least one video track",
+            "NO_AUDIO_TRACK_SELECTED_WARNING": "You should probably enable at least one audio track",
+            "TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING": "You probably shouldn't enable more audio than video tracks",
+            "NO_TRACK_SELECTED_ERROR": "You must enable at least one track"
          },
          "TRACK": {
             "HEADER": "Pistes"
