@@ -270,9 +270,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
       if (customRolesString == null) {
         continue;
       }
-      String[] customRoles = customRolesString.split(",");
-      Pattern customRolePattern = Pattern.compile(customRoleName);
-      customRolePatterns.put(customRolePattern, customRoles);
+      enrichLtiCustomRoles(customRoleName, customRolesString);
     }
 
     // Add support for legacy custom_role_name
@@ -280,9 +278,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
 
     if (customRoleName != null) {
       String customRolesString = StringUtils.trimToNull((String) properties.get(CUSTOM_ROLES));
-      String[] customRoles = customRolesString.split(",");
-      Pattern customRolePattern = Pattern.compile(customRoleName);
-      customRolePatterns.put(customRolePattern, customRoles);
+      enrichLtiCustomRoles(customRoleName, customRolesString);
     }
 
     // Allow configuring prefixes for certain consumer
@@ -498,6 +494,12 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
         userAuthorities.add(new SimpleGrantedAuthority(role));
       }
     }
+  }
+
+  private void enrichLtiCustomRoles(String roleName, String customRolesString) {
+    String[] customRoles = customRolesString.split(",");
+    Pattern customRolePattern = Pattern.compile(roleName);
+    customRolePatterns.put(customRolePattern, customRoles);
   }
 
   /**
