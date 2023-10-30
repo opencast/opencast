@@ -29,7 +29,7 @@ import org.opencastproject.util.data.Tuple;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
+import java.util.stream.Stream;
 
 /**
  * API that defines persistent storage of series.
@@ -44,7 +44,7 @@ public interface SearchServiceDatabase {
    * @throws SearchServiceDatabaseException
    *           if exception occurs
    */
-  Iterator<Tuple<MediaPackage, String>> getAllMediaPackages() throws SearchServiceDatabaseException;
+  Stream<Tuple<MediaPackage, String>> getAllMediaPackages() throws SearchServiceDatabaseException;
 
   /**
    * Returns the organization id of the selected media package

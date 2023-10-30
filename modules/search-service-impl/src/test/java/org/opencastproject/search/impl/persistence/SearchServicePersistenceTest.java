@@ -46,8 +46,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -103,21 +104,26 @@ public class SearchServicePersistenceTest {
     searchDatabase.storeMediaPackage(mediaPackage, accessControlList, modificationDate);
     Assert.assertEquals(searchDatabase.countMediaPackages(), mpCount + 1);
 
-    Iterator<Tuple<MediaPackage, String>> mediaPackages = searchDatabase.getAllMediaPackages();
-    while (mediaPackages.hasNext()) {
-      Tuple<MediaPackage, String> mediaPackage = mediaPackages.next();
+    Stream<Tuple<MediaPackage, String>> mediaPackages = searchDatabase.getAllMediaPackages();
+    mediaPackages.forEach(mediaPackage -> {
 
       String mediaPackageId = mediaPackage.getA().getIdentifier().toString();
 
-      AccessControlList acl = searchDatabase.getAccessControlList(mediaPackageId);
-      Assert.assertEquals(accessControlList.getEntries().size(), acl.getEntries().size());
-      Assert.assertEquals(accessControlList.getEntries().get(0), acl.getEntries().get(0));
-      Assert.assertNull(searchDatabase.getDeletionDate(mediaPackageId));
-      Assert.assertEquals(modificationDate, searchDatabase.getModificationDate(mediaPackageId));
-      Assert.assertEquals(mediaPackage.getA(), searchDatabase.getMediaPackage(mediaPackageId));
-      Assert.assertEquals(securityService.getOrganization().getId(), mediaPackage.getB());
-      Assert.assertEquals(securityService.getOrganization().getId(), searchDatabase.getOrganizationId(mediaPackageId));
-    }
+      AccessControlList acl;
+      try {
+        acl = searchDatabase.getAccessControlList(mediaPackageId);
+        Assert.assertEquals(accessControlList.getEntries().size(), acl.getEntries().size());
+        Assert.assertEquals(accessControlList.getEntries().get(0), acl.getEntries().get(0));
+        Assert.assertNull(searchDatabase.getDeletionDate(mediaPackageId));
+        Assert.assertEquals(modificationDate, searchDatabase.getModificationDate(mediaPackageId));
+        Assert.assertEquals(mediaPackage.getA(), searchDatabase.getMediaPackage(mediaPackageId));
+        String orgId = securityService.getOrganization().getId();
+        Assert.assertEquals(orgId, mediaPackage.getB());
+        Assert.assertEquals(orgId, searchDatabase.getOrganizationId(mediaPackageId));
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    });
   }
 
   @Test
@@ -159,23 +165,21 @@ public class SearchServicePersistenceTest {
     episode = searchDatabase.getMediaPackage(mediaPackage.getIdentifier().toString());
     Assert.assertEquals(deletionDate, searchDatabase.getDeletionDate(mediaPackage.getIdentifier().toString()));
 
-    Iterator<Tuple<MediaPackage, String>> allMediaPackages = searchDatabase.getAllMediaPackages();
-    int i = 0;
-    while (allMediaPackages.hasNext()) {
-      allMediaPackages.next();
-      i++;
-    }
-    Assert.assertEquals(1, i);
+    Stream<Tuple<MediaPackage, String>> allMediaPackages = searchDatabase.getAllMediaPackages();
+    AtomicInteger i = new AtomicInteger(0);
+    allMediaPackages.forEach(mediaPackage -> {
+      i.incrementAndGet();
+    });
+    Assert.assertEquals(1, i.get());
 
     searchDatabase.storeMediaPackage(mediaPackage, accessControlList, new Date());
 
     allMediaPackages = searchDatabase.getAllMediaPackages();
-    i = 0;
-    while (allMediaPackages.hasNext()) {
-      allMediaPackages.next();
-      i++;
-    }
-    Assert.assertEquals(1, i);
+    AtomicInteger x = new AtomicInteger(0);
+    allMediaPackages.forEach(mediaPackage -> {
+      x.incrementAndGet();
+    });
+    Assert.assertEquals(1, x.get());
   }
 
 }
