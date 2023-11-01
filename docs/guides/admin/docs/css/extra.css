@@ -167,6 +167,21 @@ details {
   margin-left: 10px;
 }
 
+details summary::after {
+  position: relative;
+  top: 1px;
+  font-family: 'Glyphicons Halflings';
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1;
+  padding-left: 1ex;
+  content: '\e114'; /* glyphicon-chevron-down*/
+}
+
+details[open] summary::after {
+  content: '\e113'; /* glyphicon-chevron-up*/
+}
+
 details summary {
   color: darkblue;
   cursor: pointer;
