@@ -333,6 +333,7 @@
     <sec:intercept-url pattern="/capture-admin/**" access="ROLE_ADMIN, ROLE_CAPTURE_AGENT" />
     <sec:intercept-url pattern="/recordings/**" method="GET" access="ROLE_ADMIN, ROLE_CAPTURE_AGENT" />
     <sec:intercept-url pattern="/ingest/**" access="ROLE_ADMIN, ROLE_CAPTURE_AGENT, ROLE_STUDIO" />
+    <sec:intercept-url pattern="/workflow/definitions.xml" method="GET" access="ROLE_ADMIN, ROLE_CAPTURE_AGENT" />
 
     <!-- Secure the user management URLs for admins only -->
     <sec:intercept-url pattern="/users/**" access="ROLE_ADMIN" />

@@ -109,7 +109,7 @@
                       <tr ng-repeat="policy in wizard.step.ud.policiesUser">
                         <td>
                           <select chosen pre-select-from="users"
-                                         call-on-search="wizard.step.getMatchingUsers"
+                                         call-on-search="wizard.step.getMatchingRoles"
                                          data-width="'360px'"
                                          ng-model="policy.role"
                                          ng-options="user.userRole as wizard.step.userToStringForDetails(user) for user in wizard.step.users"

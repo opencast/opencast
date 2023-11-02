@@ -1869,7 +1869,8 @@ public class EventsEndpoint implements ManagedService {
   @Path("{eventId}/scheduling")
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
               ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
-              ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0 })
+              ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0,
+              ApiMediaType.VERSION_1_10_0 })
   @RestQuery(name = "geteventscheduling", description = "Returns an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, responses = {
       @RestResponse(description = "The scheduling information for the specified event is returned.", responseCode = HttpServletResponse.SC_OK),
@@ -1899,7 +1900,8 @@ public class EventsEndpoint implements ManagedService {
   @Path("{eventId}/scheduling")
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
               ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
-              ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0 })
+              ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0,
+              ApiMediaType.VERSION_1_10_0 })
   @RestQuery(name = "updateeventscheduling", description = "Update an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = Type.STRING) }, restParameters = {
       @RestParameter(name = "scheduling", isRequired = true, description = "Scheduling Information", type = Type.STRING),
