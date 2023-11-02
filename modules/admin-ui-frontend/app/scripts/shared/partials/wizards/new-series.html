@@ -138,7 +138,7 @@
                                   data-width="'360px'"
                                   ng-model="policy.role"
                                   ng-options="user.userRole as wizard.step.userToStringForDetails(user) for user in wizard.step.users"
-                                  call-on-search="wizard.step.getMatchingUsers"
+                                  call-on-search="wizard.step.getMatchingRoles"
                                   data-placeholder=" "
                                   no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.USERS.EMPTY' | translate }}'"
                                   placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.ACCESS.USERS.LABEL' | translate }}'">
