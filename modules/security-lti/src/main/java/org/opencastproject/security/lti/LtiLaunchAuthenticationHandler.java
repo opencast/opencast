@@ -56,6 +56,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
-import java.util.HashMap;
 
 import javax.persistence.RollbackException;
 import javax.servlet.http.HttpServletRequest;
@@ -550,5 +550,4 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
     }
     return false;
   }
-
 }
