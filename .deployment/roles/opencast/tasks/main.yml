@@ -103,9 +103,9 @@
     - studio/settings.toml
     - editor/editor-settings.toml
 
-# - name: start and enable opencast service
-#   systemd:
-#     name: opencast.service
-#     state: restarted
-#     enabled: true
-#     daemon_reload: true
+- name: start and enable opencast service
+  systemd:
+    name: opencast.service
+    state: restarted
+    enabled: true
+    daemon_reload: true
