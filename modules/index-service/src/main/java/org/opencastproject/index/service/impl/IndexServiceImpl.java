@@ -745,7 +745,8 @@ public class IndexServiceImpl implements IndexService {
       Map<String, String> params = new HashMap<String, String>();
       if (configJson != null) {
         for (Object key: configJson.keySet()) {
-          params.put((String)key, (String) configJson.get(key));
+          var value = configJson.get(key);
+          params.put((String)key, String.valueOf(value));
         }
       }
 
