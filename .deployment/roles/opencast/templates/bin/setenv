@@ -39,7 +39,7 @@ export KARAF_DEBUG=true       # Enable debug mode
 
 
 export KARAF_DATA={{ opencast_fast_data_path }}
-export EXTRA_JAVA_OPTS="${EXTRA_JAVA_OPTS} -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1500000 -Dfile.encoding=UTF-8 -Dlog4j2.formatMsgNoLookups=true"
+export EXTRA_JAVA_OPTS="${EXTRA_JAVA_OPTS} -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1500000 -Dfile.encoding=UTF-8 -Dlog4j2.formatMsgNoLookups=true --add-opens java.base/java.util=ALL-UNNAMED"
 export JAVA_MAX_MEM="${JAVA_MAX_MEM:-3G}"
 export JAVA_PERM_MEM="${JAVA_PERM_MEM:-256M}"
 export KARAF_NOROOT=true

@@ -13,7 +13,7 @@
 
 - name: extract distribution
   unarchive:
-    src: 'https://radosgw.public.os.wwu.de/opencast-daily/opencast-dist-allinone-12-SNAPSHOT.tar.gz'
+    src: 'https://radosgw.public.os.wwu.de/opencast-daily/opencast-dist-allinone-15-SNAPSHOT.tar.gz'
     dest: /opt
     remote_src: true
     owner: root
@@ -75,8 +75,8 @@
   lineinfile:
     state: present
     path: /opt/opencast/etc/org.apache.karaf.features.cfg
-    insertafter: '    opencast-allinone/12.0.0.SNAPSHOT, \\'
-    line: '    opencast-security-jwt/12.0.0.SNAPSHOT, \'
+    insertafter: '    opencast-allinone/15.0.0.SNAPSHOT, \\'
+    line: '    opencast-security-jwt/15.0.0.SNAPSHOT, \'
 
 - name: configure opencast
   template:
@@ -91,7 +91,7 @@
     - etc/org.opencastproject.fsresources.StaticResourceServlet.cfg
     - etc/org.opencastproject.liveschedule.impl.LiveScheduleServiceImpl.cfg
     - etc/security/mh_default_org.xml
-    - etc/workflows/fast.xml
+    - etc/workflows/fast.yaml
     - etc/workflows/schedule-and-upload.xml
     - bin/setenv
 
@@ -102,9 +102,9 @@
   loop:
     - studio/settings.toml
 
-- name: start and enable opencast service
-  systemd:
-    name: opencast.service
-    state: restarted
-    enabled: true
-    daemon_reload: true
+# - name: start and enable opencast service
+#   systemd:
+#     name: opencast.service
+#     state: restarted
+#     enabled: true
+#     daemon_reload: true

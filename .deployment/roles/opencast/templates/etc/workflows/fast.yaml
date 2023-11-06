@@ -1,0 +1,150 @@
+---
+id: fast
+title: Fast Testing Workflow
+tags:
+  - upload
+  - schedule
+displayOrder: 100
+description: |-
+  A minimal workflow that transcodes media into distribution formats,
+  then publishes the resulting distribution files, along with their associated metadata.
+configuration_panel: |-
+  <div id="workflow-configuration">
+     <input id="straightToPublishing" name="straightToPublishing" type="checkbox" class="configField" value="true" checked=checked />
+     <label for="straightToPublishing">Straight to publishing</label>
+     <fieldset>
+       <legend>Publish live stream:</legend>
+       <ul>
+         <li>
+           <input id="publishLive" name="publishLive" type="checkbox" class="configField" value="true" />
+           <label for="publishLive">Add live event to Opencast Media Module</label>
+         </li>
+       </ul>
+     </fieldset>
+  </div>
+operations:
+  - id: defaults
+    description: "Applying default configuration values"
+    configurations:
+      - straightToPublishing: true
+      - publishLive: true
+
+  - id: series
+    fail-on-error: true
+    exception-handler-workflow: partial-error
+    description: "Applying access control entries from series"
+    configurations:
+      - apply-acl: true
+
+  - id: inspect
+    fail-on-error: true
+    exception-handler-workflow: "partial-error"
+    description: "Inspecting audio and video streams"
+    configurations:
+      - overwrite: false
+      - accept-no-media: false
+
+  - id: encode
+    fail-on-error: true
+    exception-handler-workflow: "partial-error"
+    description: "Encoding video"
+    configurations:
+      - source-flavor: "*/source"
+      - target-flavor: "*/preview"
+      - target-tags: "engage-download,engage-streaming,rss,atom"
+      - encoding-profile: "fast.http"
+
+  - id: tag
+    fail-on-error: true
+    exception-handler-workflow: "partial-error"
+    description: "Tag captions for publication"
+    configurations:
+      - source-flavor: "captions/source"
+      - target-flavor: "captions/preview"
+      - target-tags: "+engage-download"
+      - copy: true
+
+  - id: image
+    if: "${straightToPublishing}"
+    fail-on-error: true
+    exception-handler-workflow: "partial-error"
+    description: "Creating Engage search result thumbnails"
+    configurations:
+      - source-flavor: "*/source"
+      - target-flavor: "*/search+preview"
+      - target-tags: "engage-download"
+      - encoding-profile: "search-cover.http"
+      - time: 1
+
+  - id: image
+    if: "${straightToPublishing}"
+    fail-on-error: true
+    exception-handler-workflow: "partial-error"
+    description: "Creating Engage player preview image"
+    configurations:
+      - source-flavor: "*/source"
+      - target-flavor: "*/player+preview"
+      - target-tags: "engage-download"
+      - encoding-profile: "player-preview.http"
+      - time: 1
+
+  - id: segment-video
+    if: "${straightToPublishing}"
+    fail-on-error: false
+    exception-handler-workflow: "partial-error"
+    description: "Detecting slide transitions in presentation track"
+    configurations:
+      - source-flavor: "presentation/source"
+      - target-tags: "engage-download"
+
+  - id: segmentpreviews
+    if: "${straightToPublishing}"
+    fail-on-error: false
+    exception-handler-workflow: "partial-error"
+    description: "Creating presentation segments preview image"
+    configurations:
+      - source-flavor: "presentation/source"
+      - target-flavor: "presentation/segment+preview"
+      - reference-tags: "engage-download"
+      - target-tags: "engage-download"
+      - encoding-profile: "player-slides.http"
+
+  - id: publish-configure
+    exception-handler-workflow: "partial-error"
+    description: "Publish to preview publication channel"
+    configurations:
+      - download-source-flavors: "*/preview"
+      - channel-id: "internal"
+      - url-pattern: "${org_org_opencastproject_admin_ui_url!'http://localhost:8080'}/admin-ng/index.html#/events/events/${event_id}/tools/editor"
+      - check-availability: false
+
+  - id: publish-engage
+    if: "${straightToPublishing}"
+    max-attempts: 2
+    fail-on-error: true
+    exception-handler-workflow: "partial-error"
+    description: "Publishing to Engage"
+    configurations:
+      - download-source-flavors: "dublincore/*,security/*"
+      - download-source-tags: "engage-download"
+      - check-availability: false
+
+  - id: snapshot
+    fail-on-error: true
+    exception-handler-workflow: "partial-error"
+    description: "Archiving"
+    configurations:
+      - source-flavors: "*/source,dublincore/*,security/*"
+
+  - id: cleanup
+    fail-on-error: "false"
+    description: "Cleaning up"
+    configurations:
+      - delete-external: true
+      - preserve-flavors: "security/*"
+
+state-mappings:
+  - state: "running"
+    value: EVENTS.EVENTS.STATE_MAPPING.IMPORTING
+  - state: "failing"
+    value: EVENTS.EVENTS.STATE_MAPPING.IMPORTING
