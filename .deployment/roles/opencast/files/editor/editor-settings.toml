@@ -90,7 +90,7 @@
 # under "subtitles.languages"
 # Type: boolean
 # Default: false
-#show = false
+show = true
 
 # The main flavor of the subtitle tracks in Opencast
 # No other tracks should have the same main flavor as subtitle tracks
@@ -130,7 +130,7 @@ spanish = { lang = "es" }
 # If the thumbnail editor appears in the main menu
 # Type: boolean
 # Default: false
-#show = false
+show = true
 
 # Whether to use "simple" or "professional" mode.
 # Professional mode allows users to edit all thumbnails that fit the subflavor
