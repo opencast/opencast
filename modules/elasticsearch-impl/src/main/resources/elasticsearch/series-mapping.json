@@ -9,19 +9,61 @@
 
           "object": { "type" : "text", "index": false, "store" : true },
 
-          "title": { "type" : "keyword" },
+          "title": { "type" : "keyword",
+            "fields" : {
+              "sort": {
+                "type": "keyword",
+                "normalizer": "sort_normalizer"
+              }
+            }
+          },
 
           "series_json": { "type" : "keyword" },
 
-          "description": { "type" : "keyword" },
+          "description": { "type" : "keyword",
+            "fields" : {
+              "sort": {
+                "type": "keyword",
+                "normalizer": "sort_normalizer"
+              }
+            }
+          },
 
-          "subject": { "type" : "keyword" },
+          "subject": { "type" : "keyword",
+            "fields" : {
+              "sort": {
+                "type": "keyword",
+                "normalizer": "sort_normalizer"
+              }
+            }
+          },
 
-          "language": { "type" : "keyword" },
+          "language": { "type" : "keyword",
+            "fields" : {
+              "sort": {
+                "type": "keyword",
+                "normalizer": "sort_normalizer"
+              }
+            }
+          },
 
-          "creator": { "type" : "keyword" },
+          "creator": { "type" : "keyword",
+            "fields" : {
+              "sort": {
+                "type": "keyword",
+                "normalizer": "sort_normalizer"
+              }
+            }
+          },
 
-          "license": { "type" : "keyword" },
+          "license": { "type" : "keyword",
+            "fields" : {
+              "sort": {
+                "type": "keyword",
+                "normalizer": "sort_normalizer"
+              }
+            }
+          },
 
           "access_policy": { "type" : "text" },
 
@@ -29,13 +71,41 @@
 
           "createdDateTime": { "type" : "date", "format" : "yyyy-MM-dd'T'HH:mm:ss'Z'" },
 
-          "organizers": { "copy_to" : "organizer", "type" : "keyword" },
+          "organizers": { "copy_to" : "organizer", "type" : "keyword",
+            "fields" : {
+              "sort": {
+                "type": "keyword",
+                "normalizer": "sort_normalizer"
+              }
+            }
+          },
 
-          "contributors": { "copy_to" : "contributor", "type" : "keyword" },
+          "contributors": { "copy_to" : "contributor", "type" : "keyword",
+            "fields" : {
+              "sort": {
+                "type": "keyword",
+                "normalizer": "sort_normalizer"
+              }
+            }
+          },
 
-          "publisher": { "type" : "keyword" },
+          "publisher": { "type" : "keyword",
+            "fields" : {
+              "sort": {
+                "type": "keyword",
+                "normalizer": "sort_normalizer"
+              }
+            }
+          },
 
-          "rights_holder": { "type" : "keyword" },
+          "rights_holder": { "type" : "keyword",
+            "fields" : {
+              "sort": {
+                "type": "keyword",
+                "normalizer": "sort_normalizer"
+              }
+            }
+          },
 
           "theme": { "type" : "long" },
 
