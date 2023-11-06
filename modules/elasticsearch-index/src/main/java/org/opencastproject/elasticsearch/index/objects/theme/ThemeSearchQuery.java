@@ -530,7 +530,7 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery sortByCreator(Order order) {
-    withSortOrder(ThemeIndexSchema.CREATOR, order);
+    withNormalizerSortOrder(ThemeIndexSchema.CREATOR, order);
     return this;
   }
 
@@ -584,7 +584,7 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery sortByName(Order order) {
-    withSortOrder(ThemeIndexSchema.NAME, order);
+    withNormalizerSortOrder(ThemeIndexSchema.NAME, order);
     return this;
   }
 
@@ -605,7 +605,7 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery sortByDescription(Order order) {
-    withSortOrder(ThemeIndexSchema.DESCRIPTION, order);
+    withNormalizerSortOrder(ThemeIndexSchema.DESCRIPTION, order);
     return this;
   }
 

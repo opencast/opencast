@@ -13,11 +13,32 @@
 
         "default": { "type" : "boolean" },
 
-        "creator": { "type" : "keyword" },
+        "creator": { "type" : "keyword",
+            "fields" : {
+                "sort": {
+                    "type": "keyword",
+                    "normalizer": "sort_normalizer"
+                }
+            }
+        },
 
-        "name": { "type" : "keyword" },
+        "name": { "type" : "keyword",
+            "fields" : {
+                "sort": {
+                    "type": "keyword",
+                    "normalizer": "sort_normalizer"
+                }
+            }
+        },
 
-        "description": { "type" : "keyword" },
+        "description": { "type" : "keyword",
+            "fields" : {
+                "sort": {
+                    "type": "keyword",
+                    "normalizer": "sort_normalizer"
+                }
+            }
+        },
 
         "bumper_active": { "type" : "boolean" },
 

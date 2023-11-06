@@ -9,7 +9,15 @@
 
         "object": { "type" : "text", "index" : false, "store" : true },
 
-        "title": { "type" : "keyword" },
+        "title": {
+            "type" : "keyword",
+            "fields" : {
+                "sort": {
+                    "type": "keyword",
+                    "normalizer": "sort_normalizer"
+                }
+            }
+        },
 
         "start_date": { "type" : "keyword" },
 
@@ -23,7 +31,15 @@
 
         "contributor": { "type" : "keyword" },
 
-        "presenter": { "type" : "keyword" },
+        "presenter": {
+            "type" : "keyword",
+            "fields" : {
+                "sort": {
+                    "type": "keyword",
+                    "normalizer": "sort_normalizer"
+                }
+            }
+        },
 
         "technical_presenters": { "type" : "keyword" },
 
@@ -31,7 +47,14 @@
 
         "description": { "type" : "keyword" },
 
-        "location": { "type" : "keyword" },
+        "location": { "type" : "keyword",
+            "fields" : {
+                "sort": {
+                    "type": "keyword",
+                    "normalizer": "sort_normalizer"
+                }
+            }
+        },
 
         "agent_id": { "type" : "keyword" },
 
@@ -41,7 +64,14 @@
 
         "series_id": { "type" : "keyword" },
 
-        "series_name": { "type" : "keyword" },
+        "series_name": { "type" : "keyword",
+            "fields" : {
+                "sort": {
+                    "type": "keyword",
+                    "normalizer": "sort_normalizer"
+                }
+            }
+        },
 
         "source": { "type" : "keyword" },
 

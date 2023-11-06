@@ -1077,7 +1077,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery sortByTitle(Order order) {
-    withSortOrder(EventIndexSchema.TITLE, order);
+    withNormalizerSortOrder(EventIndexSchema.TITLE, order);
     return this;
   }
 
@@ -1098,7 +1098,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery sortByPresenter(Order order) {
-    withSortOrder(EventIndexSchema.PRESENTER, order);
+    withNormalizerSortOrder(EventIndexSchema.PRESENTER, order);
     return this;
   }
 
@@ -1119,7 +1119,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the updated query
    */
   public EventSearchQuery sortByLocation(Order order) {
-    withSortOrder(EventIndexSchema.LOCATION, order);
+    withNormalizerSortOrder(EventIndexSchema.LOCATION, order);
     return this;
   }
 
@@ -1140,7 +1140,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the updated query
    */
   public EventSearchQuery sortBySeriesName(Order order) {
-    withSortOrder(EventIndexSchema.SERIES_NAME, order);
+    withNormalizerSortOrder(EventIndexSchema.SERIES_NAME, order);
     return this;
   }
 
