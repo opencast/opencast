@@ -1,0 +1,148 @@
+####
+# Opencast Stand-alone Video Editor
+##
+
+# This file contains the editord default configuration and our recommendation for production use.
+# All values in here aer set to their defaults.
+
+# ⚠️  When deployed, this file is publicly accessibly!
+
+
+####
+# General Settings
+##
+
+# Allowed prefixes in callback urls to prevent malicious urls
+# If empty, no callback url is allowed
+# Type: string[]
+# Default: []
+#allowedCallbackPrefixes = []
+
+# Url to go back after finishing editing
+# If undefined, no return link will be shown on the end pages
+# Type: string | undefined
+# Default: undefined
+#callbackUrl =
+
+# Name of system to go back to
+# If undefined, a generic system name is used instead of a speficic name
+# Type: string | undefined
+# Default: undefined
+#callbackSystem =
+
+
+####
+# Metadata
+##
+
+[metadata]
+# If the metadata editor appears in the main menu
+# Type: boolean
+# Default: true
+#show = true
+
+## Metadata display configuration
+## Override various settings for how metadata catalogs and fields will be
+## displayed in the editor. Configuration happens for each catalog separately.
+##
+## Configuration options for fields:
+##
+##   show (boolean): Show or hide fields
+##   readonly (boolean): Mark fields as readonly
+##
+## Default behavior:
+##
+## - The default settings are based on Opencast's admin interface configuration
+## - If catalogs are not specified, all of its fields will be displayed
+## - If a catalog is specified but empty, it will not be displayed
+##
+## Example:
+##
+# # This is the default catalog
+# [metadata.configureFields."EVENTS.EVENTS.DETAILS.CATALOG.EPISODE"]
+# title = {show = true, readonly = false}
+# subject = {show = false}
+# description = {readonly = true}
+#
+# # This catalog is specified but empty, and as such will not be displayed
+# [metadata.configureFields."NameOfAnExtendedMetadataCatalog"]
+
+
+####
+# Track Selection
+##
+
+[trackSelection]
+
+# If the track selection appears in the main menu
+# Type: boolean
+# Default: true
+#show = true
+
+####
+# Subtitles
+##
+
+[subtitles]
+
+# If the subtitle editor appears in the main menu
+# Before you enable the subtitle editor, you should define some languages
+# under "subtitles.languages"
+# Type: boolean
+# Default: false
+#show = false
+
+# The main flavor of the subtitle tracks in Opencast
+# No other tracks should have the same main flavor as subtitle tracks
+# Type: string
+# Default: "captions"
+#mainFlavor = "captions"
+
+[subtitles.languages]
+## A list of languages for which new subtitles can be created
+# For each language, various tags can be specified
+# A list of officially recommended tags can be found at https://docs.opencast.org/develop/admin/#modules/subtitles/#tags
+# At least the "lang" tag MUST be specified
+german = { lang = "de-DE" }
+english = { lang = "en-US", type = "closed-caption" }
+spanish = { lang = "es" }
+
+[subtitles.icons]
+# A list of icons to be displayed for languages defined above.
+# Values are strings but should preferably be Unicode icons.
+# These are optional and you can also choose to have no icons.
+"de-DE" = "DE"
+"en-US" = "EN"
+"es" = "ES"
+
+[subtitles.defaultVideoFlavor]
+# Specify the default video in the subtitle video player by flavor
+# If not specified, the editor will decide on a default by itself
+# "type" = "presentation"
+# "subtype" = "preview"
+
+####
+# Thumbnail Selection
+##
+
+[thumbnail]
+
+# If the thumbnail editor appears in the main menu
+# Type: boolean
+# Default: false
+#show = false
+
+# Whether to use "simple" or "professional" mode.
+# Professional mode allows users to edit all thumbnails that fit the subflavor
+# specified in the Opencast configuration file
+# `etc/org.opencastproject.editor.EditorServiceImpl.cfg`. It is useful
+# when working with multiple thumbnails.
+# Simple mode only allows users to edit the "primary" thumbnail, as specified
+# in the Opencast configuration file
+# `etc/org.opencastproject.editor.EditorServiceImpl.cfg`. It is useful
+# when there is only a single thumbnail to worry about and you want hide
+# potential fallbacks from the user. If a primary thumbnail cannot be
+# determined, this falls back to professional mode.
+# Type: boolean
+# Default: false
+#simpleMode = false
