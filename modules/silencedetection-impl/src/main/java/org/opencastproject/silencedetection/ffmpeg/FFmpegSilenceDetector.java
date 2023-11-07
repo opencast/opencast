@@ -177,11 +177,7 @@ public class FFmpegSilenceDetector {
      */
 
     LinkedList<MediaSegment> segmentsTmp = new LinkedList<>();
-    if (segmentsStrings.size() == 0) {
-      /* No silence found -> Add one segment for the whole track */
-      logger.info("No silence found. Adding one large segment.");
-      segmentsTmp.add(new MediaSegment(0, track.getDuration()));
-    } else {
+    if (!segmentsStrings.isEmpty()) {
       long lastSilenceEnd = 0;
       long lastSilenceStart = 0;
       Pattern patternStart = Pattern.compile("silence_start\\:\\ \\d+\\.\\d+");
