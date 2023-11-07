@@ -69,7 +69,7 @@ a quick peek every one in a while and make sure that they work.  Things to think
 
 ### The  Release Schedule
 
-Releases should happen twice a year, usually within a time span of 9.5 months between the cut of the previous release
+Releases should happen twice a year, usually within a time span of 6 months between the cut of the previous release
 branch and the final release. The release managers should create a release schedule as soon as possible, announce it on
 list and publish it on the release notes page.
 
