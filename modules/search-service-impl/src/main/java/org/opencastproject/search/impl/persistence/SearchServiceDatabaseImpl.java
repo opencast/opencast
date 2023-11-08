@@ -57,11 +57,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -215,7 +214,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
    * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getAllMediaPackages()
    */
   @Override
-  public Iterator<Tuple<MediaPackage, String>> getAllMediaPackages() throws SearchServiceDatabaseException {
+  public Stream<Tuple<MediaPackage, String>> getAllMediaPackages() throws SearchServiceDatabaseException {
     List<SearchEntity> searchEntities;
     try {
       searchEntities = db.exec(namedQuery.findAll("Search.findAll", SearchEntity.class));
@@ -224,17 +223,21 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
       throw new SearchServiceDatabaseException(e);
     }
 
-    List<Tuple<MediaPackage, String>> mediaPackageList = new LinkedList<>();
     try {
-      for (SearchEntity entity : searchEntities) {
-        MediaPackage mediaPackage = MediaPackageParser.getFromXml(entity.getMediaPackageXML());
-        mediaPackageList.add(Tuple.tuple(mediaPackage, entity.getOrganization().getId()));
-      }
+      return searchEntities.stream()
+            .map(entity -> {
+              try {
+                MediaPackage mediaPackage = MediaPackageParser.getFromXml(entity.getMediaPackageXML());
+                return Tuple.tuple(mediaPackage, entity.getOrganization().getId());
+              } catch (Exception e) {
+                logger.error("Could not parse series entity: {}", e.getMessage());
+                throw new RuntimeException(e);
+              }
+            });
     } catch (Exception e) {
       logger.error("Could not parse series entity: {}", e.getMessage());
       throw new SearchServiceDatabaseException(e);
     }
-    return mediaPackageList.iterator();
   }
 
   /**
