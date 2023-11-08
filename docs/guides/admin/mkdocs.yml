@@ -142,6 +142,7 @@ nav:
         - Overview: 'modules/paella.player7/plugins.md'
         - org.opencast.paella.cookieconsent: 'modules/paella.player7/plugins/org.opencast.paella.cookieconsent.md'
         - org.opencast.paella.descriptionPlugin: 'modules/paella.player7/plugins/org.opencast.paella.descriptionPlugin.md'
+        - org.opencast.paella.downloadsPlugin: 'modules/paella.player7/plugins/org.opencast.paella.downloadsPlugin.md'
         - org.opencast.paella.editorPlugin: 'modules/paella.player7/plugins/org.opencast.paella.editorPlugin.md'
         - org.opencast.paella.episodesFromSeries: 'modules/paella.player7/plugins/org.opencast.paella.episodesFromSeries.md'
         - org.opencast.paella.loginPlugin: 'modules/paella.player7/plugins/org.opencast.paella.loginPlugin.md'

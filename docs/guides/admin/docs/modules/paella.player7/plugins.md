@@ -37,6 +37,7 @@ Plugin                                             | Description
 ---------------------------------------------------|:------------
 [org.opencast.paella.cookieconsent](plugins/org.opencast.paella.cookieconsent.md)                                     | Adds a cookie consent banner to comply with international privacy laws.
 [org.opencast.paella.descriptionPlugin](plugins/org.opencast.paella.descriptionPlugin.md)                             | Adds a panel with the video description information.
+[org.opencast.paella.downloadsPlugin](plugins/org.opencast.paella.downloadsPlugin.md)                                 | Adds a panel to download the videos.
 [org.opencast.paella.editorPlugin](plugins/org.opencast.paella.editorPlugin.md)                                       | Adds a button to be access to the episode editor.
 [org.opencast.paella.episodesFromSeries](plugins/org.opencast.paella.episodesFromSeries.md)                           | Show a list of videos in the same series.
 [org.opencast.paella.loginPlugin](plugins/org.opencast.paella.loginPlugin.md)                                         | Adds a button to be able to login.
