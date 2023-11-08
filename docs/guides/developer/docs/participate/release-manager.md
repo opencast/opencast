@@ -69,7 +69,7 @@ a quick peek every one in a while and make sure that they work.  Things to think
 
 ### The  Release Schedule
 
-Releases should happen twice a year, usually within a time span of 9.5 months between the cut of the previous release
+Releases should happen twice a year, usually within a time span of 6 months between the cut of the previous release
 branch and the final release. The release managers should create a release schedule as soon as possible, announce it on
 list and publish it on the release notes page.
 
@@ -150,7 +150,7 @@ cut.  Please check if pull requests point to the correct branch.
 
 For a guide on what you can still add to release branches, please refer to
 
-  https://docs.opencast.org/develop/developer/development-process/#acceptance-criteria-for-patches-in-different-versions
+  https://docs.opencast.org/develop/developer/#participate/development-process/#acceptance-criteria-for-patches-in-different-versions
 
 
 Remember the release schedule for this release:
@@ -199,7 +199,7 @@ languages meet the criteria to be included in Opencast
 [1] Opencast on Crowdin
     https://crowdin.com/project/opencast-community
 [2] Inclusion and exclusion of translations
-    https://docs.opencast.org/develop/developer/localization/#inclusion-and-exclusion-of-translations
+    https://docs.opencast.org/develop/developer/#develop/localization/#inclusion-and-exclusion-of-translations
 ```
 
 Example announcement for endangered languages:
@@ -225,7 +225,7 @@ Sincerely,
 Your Opencast <VERSION> Release Managers
 
 [1] Inclusion and Exclusion of Translations
-    https://docs.opencast.org/develop/developer/localization/#inclusion-and-exclusion-of-translations
+    https://docs.opencast.org/develop/developer/#develop/localization/#inclusion-and-exclusion-of-translations
 ```
 
 A specific translation week may be announced using an email
@@ -431,7 +431,7 @@ coordination of the community during the release phase. The
 role of release managers is described in more detail in the
 Opencast development documentation:
 
-  https://docs.opencast.org/develop/developer/release-manager/
+  https://docs.opencast.org/develop/developer/#participate/release-manager/
 
 In the past, it has proven good practice to have two people
 fill this job as co-release managers to help keep up the
