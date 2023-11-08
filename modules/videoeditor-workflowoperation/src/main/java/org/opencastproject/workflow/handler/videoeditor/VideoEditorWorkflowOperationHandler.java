@@ -571,6 +571,7 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
         editedTrack.setURI(editedTrackNewUri);
         for (Track track : sourceTracks) {
           if (track.getFlavor().getType().equals(editedTrackFlavor.getType())) {
+            editedTrack.setTags(track.getTags());
             mp.addDerived(editedTrack, track);
             mpAdded = true;
             break;
