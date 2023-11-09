@@ -111,6 +111,7 @@
             <!-- Opencast features -->
             <feature>opencast-allinone</feature>
             <feature>opencast-pluginmanager</feature>
+            <feature>opencast-security-jwt</feature>
           </bootFeatures>
         </configuration>
       </plugin>

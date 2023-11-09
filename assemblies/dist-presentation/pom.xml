@@ -110,6 +110,7 @@
             <!-- Opencast features -->
             <feature>opencast-presentation</feature>
             <feature>opencast-pluginmanager</feature>
+            <feature>opencast-security-jwt</feature>
           </bootFeatures>
         </configuration>
       </plugin>
