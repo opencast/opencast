@@ -81,6 +81,7 @@ angular.module('adminNg.controllers')
               UserResource.get({ username: id }).$promise.then(function (data) {
                 policy.user = data;
                 $scope.policiesUser.push(policy);
+                getCurrentPolicies();
                 // Did we get a user not present in Opencast (e.g. LDAP)? Add it to the list!
                 if ($scope.users.map(user => user.id).indexOf(id) == -1) {
                   if ($scope.aclCreateDefaults['sanitize']) {
@@ -94,6 +95,7 @@ angular.module('adminNg.controllers')
               }).catch(function() {
                 policy.userDoesNotExist = id;
                 $scope.policiesUser.push(policy);
+                getCurrentPolicies();
               });
             }
           });
