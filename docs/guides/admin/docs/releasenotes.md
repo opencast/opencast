@@ -1,6 +1,21 @@
 # Opencast 13: Release Notes
 
 
+Opencast 13.13
+--------------
+
+The thirteenth maintenance release of Opencast 13.
+
+- Add new role `ROLE_API_LISTPROVIDERS_VIEW` for access to listprovider API
+- Add option to pass additional arguments to Whisper
+- Add option to set minimum duration for cuts and segments
+- Fix bug when generating thumbnails in the editor
+- Fix to the admin UI
+- Fix issues with the YouTube publication
+
+See [changelog](changelog.md) for a comprehensive list of changes.
+
+
 Opencast 13.12
 --------------
 
@@ -8,7 +23,7 @@ The twelfth maintenance release of Opencast 13.
 
 - Add feature that stores Paella Player 7 user preferences in the local storage of the browser
 - Update of Paella Player 7
-- Fixes to the asset manager
+- Fix to the asset manager
 
 See [changelog](changelog.md) for a comprehensive list of changes.
 
