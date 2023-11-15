@@ -125,6 +125,12 @@ directly in the Opencast administrative user interface.
 |ROLE_API_WORKFLOW_INSTANCE_DELETE   |DELETE |/api/workflow/\*                                          |
 |ROLE_API_WORKFLOW_DEFINITION_VIEW   |GET    |/api/workflow-definitions<br>/api/workflow-definitions/\* |
 
+**Listprovider API**
+
+| ROLE                        |METHOD | URL                |
+|-----------------------------|-------|--------------------|
+| ROLE_API_LISTPROVIDERS_VIEW |GET    | /api/listproviders |
+
 **User- and Role-switching**
 
 The External API supports user- and role-switching, i.e. it is possible to perform requests on behalf of another

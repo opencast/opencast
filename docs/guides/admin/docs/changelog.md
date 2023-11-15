@@ -441,6 +441,39 @@ Opencast 13
 
 ### Opencast 13.12
 
+*Released on November 15th, 2023*
+
+- [[#5411](https://github.com/opencast/opencast/pull/5411)] -
+  Update lockfile version in the old admin UI
+- [[#5407](https://github.com/opencast/opencast/pull/5407)] -
+  Fix manually entering time in `datetimepicker`-s in Safari
+- [[#5406](https://github.com/opencast/opencast/pull/5406)] -
+  Fix access policy tab always showing unsaved changes
+- [[#5404](https://github.com/opencast/opencast/pull/5404)] -
+  Add role for listprovider external api
+- [[#5354](https://github.com/opencast/opencast/pull/5354)] -
+  Get thumbnail for editor frontend from archive
+- [[#5350](https://github.com/opencast/opencast/pull/5350)] -
+  YT-Publish WOH: Fail more aggressively
+- [[#5349](https://github.com/opencast/opencast/pull/5349)] -
+  Youtube-Publication: Throw explicit error if client_secret is malformed
+- [[#5348](https://github.com/opencast/opencast/pull/5348)] -
+  Update Youtube Publication documentation
+- [[#5344](https://github.com/opencast/opencast/pull/5344)] -
+  Fix external api listprovider header
+- [[#5342](https://github.com/opencast/opencast/pull/5342)] -
+  Add option to pass additional args to Whisper
+- [[#5338](https://github.com/opencast/opencast/pull/5338)] -
+  Fixes connection test on NCast Hydra with CA user
+- [[#5337](https://github.com/opencast/opencast/pull/5337)] -
+  Document Registration
+- [[#5317](https://github.com/opencast/opencast/pull/5317)] -
+  Add config-keys to set minimum rules for cuts and segments duration
+- [[#5269](https://github.com/opencast/opencast/pull/5269)] -
+  Fix custom roles pattern now working in access policy tab
+
+### Opencast 13.12
+
 *Released on October 18th, 2023*
 
 - [[#5313](https://github.com/opencast/opencast/pull/5313)] -
