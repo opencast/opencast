@@ -204,6 +204,8 @@
     <sec:intercept-url pattern="/api/info/*" method="GET" access="ROLE_ADMIN, ROLE_API" />
     <sec:intercept-url pattern="/api/info/me/*" method="GET" access="ROLE_ADMIN, ROLE_API" />
     <sec:intercept-url pattern="/api/info/organization/properties/engageuiurl" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_EMBEDDING_CODE_VIEW" />
+    <sec:intercept-url pattern="/api/listproviders" method="GET" access="ROLE_ADMIN, ROLE_API_LISTPROVIDERS_VIEW"/>
+    <sec:intercept-url pattern="/api/listproviders/*" method="GET" access="ROLE_ADMIN, ROLE_API_LISTPROVIDERS_VIEW"/>
     <sec:intercept-url pattern="/api/series" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_VIEW"/>
     <sec:intercept-url pattern="/api/series/*" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_VIEW"/>
     <sec:intercept-url pattern="/api/series/*/acl" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_ACL_VIEW"/>
