@@ -28,7 +28,7 @@ jobs:
 
       - name: Unpack FFmpeg
         run: |
-          tar xf ffmpeg-release-${{ matrix.arch }}-static.tar.xz
+          tar xvf ffmpeg-release-${{ matrix.arch }}-static.tar.xz
 
       - name: Repack FFmpeg
         run: |
