@@ -679,8 +679,8 @@ angular.module('adminNg.controllers')
       return { ace, hasRights, rulesValid, override };
     };
 
-    let oldPolicies = {};
-    let oldPoliciesUser = {};
+    let oldPolicies = [];
+    let oldPoliciesUser = [];
 
     function getCurrentPolicies () {
       oldPolicies = JSON.parse(JSON.stringify($scope.policies));
