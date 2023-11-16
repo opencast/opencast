@@ -4,6 +4,19 @@ Changelog
 Opencast 14
 -----------
 
+### Opencast 14.6
+
+*Released on November 16th, 2023*
+
+- [[#5365](https://github.com/opencast/opencast/pull/5365)] -
+  Stream media packages to avoid memory issues
+- [[#5361](https://github.com/opencast/opencast/pull/5361)] -
+  Avoid a potential nullpointer exception in thumbnail generation
+- [[#5345](https://github.com/opencast/opencast/pull/5345)] -
+  Fix/improve parts of the Tobira harvest API (subtitles & duration)
+- [[#5315](https://github.com/opencast/opencast/pull/5315)] -
+  Improve Performance of Permission Check in AssetManager
+
 ### Opencast 14.5
 
 *Released on October 19th, 2023*
