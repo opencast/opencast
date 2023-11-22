@@ -1121,8 +1121,8 @@ angular.module('adminNg.controllers')
       getCurrentPolicies();
     };
 
-    let oldPolicies = {};
-    let oldPoliciesUser = {};
+    let oldPolicies = [];
+    let oldPoliciesUser = [];
 
     function getCurrentPolicies () {
       oldPolicies = JSON.parse(JSON.stringify($scope.policies));
