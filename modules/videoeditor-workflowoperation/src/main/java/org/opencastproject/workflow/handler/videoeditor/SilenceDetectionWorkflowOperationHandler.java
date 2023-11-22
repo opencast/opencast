@@ -211,6 +211,12 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
           throw new WorkflowOperationException("Silence Detection failed");
         }
         Smil smil = smilService.fromXml(detectionJob.getPayload()).getSmil();
+
+        if (smil.getBody().getMediaElements().isEmpty()) {
+          logger.debug("No segments detected in track {}, skip attaching smil file.", sourceTrack.getIdentifier());
+          continue;
+        }
+
         InputStream is = null;
         try {
           is = IOUtils.toInputStream(smil.toXML(), "UTF-8");
