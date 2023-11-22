@@ -133,6 +133,7 @@ nav:
         - Solr: 'configuration/searchindex/solr.md'
         - Elasticsearch: 'configuration/searchindex/elasticsearch.md'
    - Serving Static Files: 'configuration/serving-static-files.md'
+   - Storage: 'configuration/storage.md'
    - Stream Security:
         - Overview: 'configuration/stream-security/stream-security-overview.md'
         - Configuration: 'configuration/stream-security/stream-security-config.md'

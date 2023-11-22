@@ -1,7 +1,7 @@
 Example Installation
 ===========================================================================
 
-The following instructions will focus on installing the most common Opencast setup meaning a distributed system across three nodes on Debian 12 VMs. If your setup differs, you can always refer to the linked sections for a more detailed instruction covering alternative options. The installation steps will be detailed so you can follow them step by step but for maintanance reasons of course it might make sense to automate some of the steps. This can be done for example with [ansible](ansible.md).
+The following instructions will focus on installing the most common Opencast setup meaning a distributed system across three nodes on Debian 12 VMs. If your setup differs, you can always refer to the linked sections for a more detailed instruction covering alternative options. For a RedHat based installation also refer to the [RPM](rpm-el.md) guide to compare and select the neccessary commands. The installation steps will be detailed so you can follow them step by step but for maintanance reasons it might make sense to automate some of the steps. This can be done for example with [ansible](ansible.md).
 
 
 Hardware
@@ -33,6 +33,8 @@ NFS share:
 - 5TB disk space
 
 This setup will be sufficient for a basic distributed Opencast installation which can be used in production.
+
+If you looking for more possible ways to setup an Opencast server/cluster, refer to the [overview](multiple-servers.md).
 
 
 Prerequisites
@@ -101,7 +103,7 @@ Then create a user `opencast` with a password and grant it all necessary rights:
 
 ```sql
 GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,ALTER,DROP,INDEX,TRIGGER,CREATE TEMPORARY TABLES,REFERENCES ON opencast.*
-  TO 'opencast'@'%' IDENTIFIED BY 'opencast_password';
+  TO 'opencast'@'%' IDENTIFIED BY 'dbpassword';
 ```
 
 Finally, leave the client and restart the database server to enable the new user(s):
@@ -126,6 +128,7 @@ After a reload the NFS share should be correctly mounted and ready to store the 
 
     sudo mount -a
 
+For more information about using NFS with Opencast refer to the [storage setup](../configuration/storage.md)
 
 OpenSearch
 ------------
