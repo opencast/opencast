@@ -116,7 +116,8 @@ module.exports = function (env) {
       }),
       new CopyWebpackPlugin({
         patterns: [
-          { from: 'public', to: '' }
+          { from: 'public', to: '' },
+          { from: './node_modules/paella-skins/skins/opencast', to: 'default_theme' }
         ]
       })
     ],
