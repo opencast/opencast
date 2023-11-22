@@ -75,7 +75,7 @@ import javax.ws.rs.core.Response.Status;
     immediate = true,
     service = YouTubePublicationRestService.class,
     property = {
-        "service.description=Youtube Publication REST Endpoint",
+        "service.description=YouTube Publication REST Endpoint",
         "opencast.service.type=org.opencastproject.publication.youtube",
         "opencast.service.path=/youtube",
         "opencast.service.jobproducer=true"

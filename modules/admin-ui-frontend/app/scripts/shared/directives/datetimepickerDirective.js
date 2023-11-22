@@ -29,6 +29,38 @@ angular.module('adminNg.directives')
     return lc;
   }
 
+  // When you edit the time in the input field directly,
+  // instead of using any of the picker's means,
+  // the `timepicker` addon syncs that change with it's internal state,
+  // to reflect it in its controls.
+  // As part of this, it also sets the selection in one of them.
+  // This is weird and probably a bug, but this library is also all but dead.
+  // Anyway, in Safari this does weird stuff to the focus,
+  // making it impossible to enter more than one keystroke most of the time.
+  //
+  // The workaround is similarly crazy:
+  // The input field that has is selection updated
+  // is actually never shown in our use of the time picker.
+  // By inspecting the code I found the place where it is updated,
+  // and I also checked that its state is not used for anything else.
+  // (It isn't.)
+  // So since this is JavaScript, we can just monkey-patch the appropriate function
+  // and get rid of the element before calling through to the original.
+  // In a very lucky turn of events, said function actually defensively checks
+  // whether or not the element is there, instead of horribly breaking
+  // like you would expect from most jQuery-heavy code. 👀😮‍💨
+  //
+  // If you are wondering whether one could remove the element earlier,
+  // like immediately after construction instead of every time the time value changes:
+  // You can't, because the internal DOM is rebuilt every time that happens.
+  //
+  // Of course this will break when the `timepicker` is ever updated
+  // which—see above—will obviously never happen. 🤷‍♀️
+  var baseTimepickerOnTimeChange = $.timepicker._onTimeChange;
+  $.timepicker.constructor.prototype._onTimeChange = function () {
+    delete this.$timeObj;
+    return baseTimepickerOnTimeChange.apply(this, arguments);
+  };
 
   return {
     // Enforce the angularJS default of restricting the directive to // attributes only

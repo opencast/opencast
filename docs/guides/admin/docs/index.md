@@ -21,6 +21,7 @@ The Opencast Release Documentation is the official Opencast documentation for ea
 * [Release Notes](releasenotes.md)
     * [Upgrade](upgrade.md)
     * [Changelog](changelog.md)
+* [Registration](registration.md)
 * [Installation Guides](installation/index.md)
 * [Configuration Guides](configuration/index.md)
     * [Basic Configuration](configuration/basic.md)

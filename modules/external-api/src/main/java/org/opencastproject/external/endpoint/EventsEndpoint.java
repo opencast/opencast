@@ -156,6 +156,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
@@ -359,19 +360,15 @@ public class EventsEndpoint implements ManagedService {
   public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     // Ensure properties is not null
     if (properties == null) {
-      properties = new Hashtable();
+      properties = new Hashtable<>();
       logger.debug("No configuration set");
     }
 
     // Read URL Signing Expiration duration
     // Default to DEFAULT_URL_SIGNING_EXPIRE_DURATION.toString()));
-    try {
-      expireSeconds = Long.parseLong(StringUtils.defaultString(
-              (String) properties.get(URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY),
-              DEFAULT_URL_SIGNING_EXPIRE_DURATION.toString()));
-    } catch (NumberFormatException e) {
-      logger.error("Error parsing URL signing expiration configuration value", e);
-    }
+    expireSeconds = Long.parseLong(Objects.toString(
+        properties.get(URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY),
+        DEFAULT_URL_SIGNING_EXPIRE_DURATION.toString()));
     logger.debug("URLs signatures are configured to expire in {}.", DateTimeSupport.humanReadableTime(expireSeconds));
 
     // Read preview subtype configuration
@@ -1869,7 +1866,8 @@ public class EventsEndpoint implements ManagedService {
   @Path("{eventId}/scheduling")
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
               ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
-              ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0 })
+              ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0,
+              ApiMediaType.VERSION_1_10_0 })
   @RestQuery(name = "geteventscheduling", description = "Returns an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, responses = {
       @RestResponse(description = "The scheduling information for the specified event is returned.", responseCode = HttpServletResponse.SC_OK),
@@ -1899,7 +1897,8 @@ public class EventsEndpoint implements ManagedService {
   @Path("{eventId}/scheduling")
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
               ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
-              ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0 })
+              ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0,
+              ApiMediaType.VERSION_1_10_0 })
   @RestQuery(name = "updateeventscheduling", description = "Update an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = Type.STRING) }, restParameters = {
       @RestParameter(name = "scheduling", isRequired = true, description = "Scheduling Information", type = Type.STRING),

@@ -1004,12 +1004,26 @@ public class EditorServiceImpl implements EditorService {
       final TrackSubData video = new TrackSubData(track.hasVideo(), videoPreview,
                         videoEnable);
 
-      final String thumbnailURI = Arrays.stream(internalPub.getAttachments())
-              .filter(attachment -> attachment.getFlavor().getType().equals(track.getFlavor().getType()))
-              .filter(attachment -> attachment.getFlavor().getSubtype().equals(getThumbnailSubtype()))
-              .map(MediaPackageElement::getURI).map(this::signIfNecessary)
-              .findAny()
-              .orElse(null);
+      // Get thumbnail from archive
+      // If a thumbnail got generated in the frontend, it will be saved to the archive. So if no workflow runs,
+      // the saved, thumbnail will not show up in the frontend if we get it from the internal publication
+      String thumbnailURI = Arrays.stream(mp.getAttachments())
+          .filter(attachment -> attachment.getFlavor().getType().equals(track.getFlavor().getType()))
+          .filter(attachment -> attachment.getFlavor().getSubtype().equals(getThumbnailSubtype()))
+          .map(MediaPackageElement::getURI).map(this::signIfNecessary)
+          .findAny()
+          .orElse(null);
+
+      // If thumbnail is not in archive, try getting it from the internal publication
+      // Because our default workflows don't save thumbnails in the archive but only publish them.
+      if (thumbnailURI == null) {
+        thumbnailURI = Arrays.stream(internalPub.getAttachments())
+            .filter(attachment -> attachment.getFlavor().getType().equals(track.getFlavor().getType()))
+            .filter(attachment -> attachment.getFlavor().getSubtype().equals(getThumbnailSubtype()))
+            .map(MediaPackageElement::getURI).map(this::signIfNecessary)
+            .findAny()
+            .orElse(null);
+      }
 
       final int priority = thumbnailSourcePrimary.indexOf(track.getFlavor());
 

@@ -69,13 +69,13 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Publishes media to a Youtube play list.
+ * Publishes media to a YouTube play list.
  */
 @Component(
     immediate = true,
     service = { ManagedService.class,YouTubePublicationService.class },
     property = {
-        "service.description=Publication Service (Youtube API Version 3)"
+        "service.description=Publication Service (YouTube API Version 3)"
     }
 )
 public class YouTubeV3PublicationServiceImpl
@@ -134,7 +134,7 @@ public class YouTubeV3PublicationServiceImpl
   /** The security service */
   private SecurityService securityService;
 
-  /** Youtube configuration instance */
+  /** YouTube configuration instance */
   private final YouTubeAPIVersion3Service youTubeService;
 
   private boolean enabled = false;
@@ -179,6 +179,8 @@ public class YouTubeV3PublicationServiceImpl
   public synchronized void activate(final ComponentContext cc) {
     super.activate(cc);
     properties.setBundleContext(cc.getBundleContext());
+
+    logger.debug("Activated YouTube Publication Service");
   }
 
   @Override
@@ -304,7 +306,7 @@ public class YouTubeV3PublicationServiceImpl
       return PublicationImpl.publication(
           UUID.randomUUID().toString(), CHANNEL_NAME, url.toURI(), MimeTypes.parseMimeType(MIME_TYPE));
     } catch (Exception e) {
-      logger.error("failed publishing to Youtube", e);
+      logger.error("failed publishing to YouTube", e);
       logger.warn("Error publishing {}, {}", element, e.getMessage());
       if (e instanceof PublicationException) {
         throw (PublicationException) e;

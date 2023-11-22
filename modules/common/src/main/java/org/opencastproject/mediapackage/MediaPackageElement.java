@@ -79,6 +79,14 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
   void setElementDescription(String description);
 
   /**
+   * Sets the given tags for the media package element, overwriting any that may have been set previously.
+   *
+   * @param tags
+   *          array of tags
+   */
+  void setTags(String [] tags);
+
+  /**
    * Tags the media package element with the given tag.
    *
    * @param tag

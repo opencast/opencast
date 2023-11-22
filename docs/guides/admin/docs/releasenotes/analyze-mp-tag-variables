@@ -1,2 +1,0 @@
-The analyze-mediapackage WOH was extended so it will also create variables regarding the existence of elements of a
-certain flavor _and tag_ (example: `captions_source_hastag_archive`). These new variables are not created by default.

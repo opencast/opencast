@@ -404,11 +404,26 @@
             "order": 40,
             "description": "Transcriptions"
         },
-        "es.upv.paella.downloadsPlugin": {
+        "org.opencast.paella.downloadsPlugin": {
             "enabled": true,
             "parentContainer": "settingsGroup",
             "order": 50,
-            "description": "Downloads"
+            "description": "Downloads",
+
+            "downloadFlavors": false,
+            "downloadTags": false,
+            "downloadMimeTypes": ["audio/m4a", "video/mp4"],
+
+            "enableOnLicenses": [
+                "CC-BY",
+                "CC-BY-SA",
+                "CC-BY-ND",
+                "CC-BY-NC",
+                "CC-BY-NC-SA",
+                "CC-BY-NC-ND",
+                "CC0"
+            ],
+            "enableOnWritePermission": true
         },
         "es.upv.paella.keyboardShortcutsHelp": {
             "enabled": true,

@@ -39,6 +39,7 @@ nav:
 - Release Notes: 'releasenotes.md'
 - Upgrade: 'upgrade.md'
 - Changelog: 'changelog.md'
+- Registration: 'registration.md'
 - Installation:
    - Overview: 'installation/index.md'
    - Hardware Requirements: installation/server-requirements.md
@@ -130,6 +131,7 @@ nav:
                  - Overview: 'configuration/player/paella.player7/plugins.md'
                  - org.opencast.paella.cookieconsent: 'configuration/player/paella.player7/plugins/org.opencast.paella.cookieconsent.md'
                  - org.opencast.paella.descriptionPlugin: 'configuration/player/paella.player7/plugins/org.opencast.paella.descriptionPlugin.md'
+                 - org.opencast.paella.downloadsPlugin: 'configuration/player/paella.player7/plugins/org.opencast.paella.downloadsPlugin.md'
                  - org.opencast.paella.editorPlugin: 'configuration/player/paella.player7/plugins/org.opencast.paella.editorPlugin.md'
                  - org.opencast.paella.episodesFromSeries: 'configuration/player/paella.player7/plugins/org.opencast.paella.episodesFromSeries.md'
                  - org.opencast.paella.loginPlugin: 'configuration/player/paella.player7/plugins/org.opencast.paella.loginPlugin.md'

@@ -1,18 +1,25 @@
 # Opencast 14: Release Notes
 
+## Opencast 14.6
+
+Opencast 14.6 is a minor release. This release includes bug fixes and improvements.
+
+See [changelog](changelog.md#opencast-146) for a comprehensive list of changes.
+
 ## Opencast 14.5
 
 Opencast 14.5 is a minor release. This release includes bug fixes and improvements.
 
-See [changelog](changelog.md#opencast-145) for a comprehensive list of changes.
+The analyze-mediapackage WOH was extended so it will also create variables regarding the existence of elements of a
+certain flavor _and tag_ (example: `captions_source_hastag_archive`). These new variables are not created by default.
 
+See [changelog](changelog.md#opencast-145) for a comprehensive list of changes.
 
 ## Opencast 14.4
 
 Opencast 14.4 is a minor release. This release includes bug fixes and improvements.
 
 See [changelog](changelog.md#opencast-144) for a comprehensive list of changes.
-
 
 ## Opencast 14.3
 
