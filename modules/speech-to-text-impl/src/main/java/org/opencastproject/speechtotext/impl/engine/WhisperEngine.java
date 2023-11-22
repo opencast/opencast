@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /** Whisper implementation of the Speech-to-text engine interface. */
@@ -101,6 +102,9 @@ public class WhisperEngine implements SpeechToTextEngine {
   /** Currently used Whisper args */
   private String[] whisperArgs = {};
 
+  /** Map to get ISO 639 language code for language name in English */
+  private Map<String, String> languageMap = new HashMap<>();
+
   @Override
   public String getEngineName() {
     return engineName;
@@ -134,6 +138,14 @@ public class WhisperEngine implements SpeechToTextEngine {
     } else {
       logger.debug("No additional args for Whisper configured.");
     }
+
+    String[] languageCodes = Locale.getISOLanguages();
+    for (String languageCode: languageCodes) {
+      Locale locale = new Locale(languageCode);
+      String languageName = locale.getDisplayLanguage(new Locale("en"));
+      languageMap.put(languageName, languageCode);
+    }
+    logger.debug("Filled language map.");
 
     logger.debug("Finished activating/updating speech-to-text service");
   }
@@ -236,6 +248,7 @@ public class WhisperEngine implements SpeechToTextEngine {
         Object obj = jsonParser.parse(reader);
         JSONObject jsonObject = (JSONObject) obj;
         language = (String) jsonObject.get("language");
+        language = languageMap.getOrDefault(language, language);
         logger.debug("Language detected by Whisper: {}", language);
       } catch (Exception e) {
         logger.debug("Error reading Whisper JSON file for: {}", mediaFile);
