@@ -1,6 +1,8 @@
 Elasticsearch Configuration
 ===========================
 
+*Note: This configuration works the exact same way for OpenSearch*
+
 Elasticsearch powers the external API as well as the administrative user interface of Opencast.
 
 Configuring External Nodes
@@ -46,5 +48,5 @@ default, no retry will be attempted.
 Version
 -------
 
-Please confer to the [Linux installation guide](../installation/source-linux.md#install-dependencies)
+Please confer to the [Linux installation guide](../../installation/source-linux.md#install-dependencies)
 for version information.

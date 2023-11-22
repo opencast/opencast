@@ -31,7 +31,7 @@ The configuration options for requiring authentication can be found in the servi
 
 For some external software, like the ILIAS plugin, it is required to set `authentication.required` to `false` as static files authorization is active by default.
 
-An alternative method to this is Opencast's [token based authorization system](stream-security.md) which allows (and
+An alternative method to this is Opencast's [token based authorization system](stream-security/stream-security-config.md) which allows (and
 requires) to defer all security checks to external systems.
 
 

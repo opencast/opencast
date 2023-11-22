@@ -3,7 +3,7 @@ Configuration of Stream Security
 
 To get an introduction to stream security before deploying, please read the overview at:
 
-* [Stream Security Overview](../modules/stream-security.md)
+* [Stream Security Overview](stream-security-overview.md)
 
 
 It is important to note that if stream security is enabled, all resources will be signed and protected, even ones that
@@ -335,6 +335,6 @@ Inspecting and modifying the policy is useful for advanced testing, such as:
 
 For an overview of Stream Security: <!-- _This info is already given at the very beginning of the page! -->
 
-* [Stream Security Overview](../modules/stream-security.md)
+* [Stream Security Overview](stream-security-overview.md)
 
 For further developer information, please have a look at the stream security section in the developer guide.

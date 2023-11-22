@@ -1,5 +1,5 @@
 > Using this requires you to turn on an Opencast plugin.
-> Take a look [at the plugin management documentation](../modules/plugin-management.md) to find out how you can do that.
+> Take a look [at the plugin management documentation](plugin-management.md) to find out how you can do that.
 
 ### What it does
 
@@ -11,7 +11,7 @@ Opencast role `mysiteid_Learner`. Note that by default, Sakai site IDs are opaqu
 GUID values such as `d02f250e-be2d-4b72-009a-161d66ed6df9`.
 
 The mapping of Sakai sites and roles to Opencast roles is consistent with the site
-and role mapping used by the [LTI](../modules/ltimodule.md) endpoint. The Sakai
+and role mapping used by the [LTI](ltimodule.md) endpoint. The Sakai
 User Provider can therefore be used with LTI or another method of authenticating
 users.
 

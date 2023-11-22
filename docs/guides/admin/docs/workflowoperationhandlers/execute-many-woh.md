@@ -13,14 +13,14 @@ or to add configuration properties to the running workflow.
 To run a command only once for the whole mediapackage, use the [Execute Once](execute-once-woh.md) operation.
 
 Commands run by this operation handler must first be included in the `commands.allowed` list in the
-[Execute Service](../modules/execute.md#service-configuration) configuration.
+[Execute Service](../configuration/execute.md#service-configuration) configuration.
 
 
 Parameter Table
 ---------------
 
 All parameters are empty by default if not specified. The special parameters `#in` and `#out` are described
-in [Execute Service: Parameter Substitution](../modules/execute.md#parameter-substitution)
+in [Execute Service: Parameter Substitution](../configuration/execute.md#parameter-substitution)
 
 |Configuration keys|Example               |Description        |Required?|
 |------------------|----------------------|-------------------|---------|

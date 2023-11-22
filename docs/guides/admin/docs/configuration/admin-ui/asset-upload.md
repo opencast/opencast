@@ -1,4 +1,4 @@
-Asset Upload Options
+Manual Asset Upload
 ====================
 
 Description

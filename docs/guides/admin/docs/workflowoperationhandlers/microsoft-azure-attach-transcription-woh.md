@@ -20,7 +20,7 @@ Parameter Table
 |auto-set-language-tag   |no       |If autodetection was used, set a tag with the autodetected language.               |false        |true|
 |target-element-type     |no       |Define where to append the subtitles file. Accepted values: 'track', 'attachment'. |track        |track                                        |
 
-*For conventionally used tags see the general page on [Subtitles](../../modules/subtitles).
+*For conventionally used tags see the general page on [Subtitles](../configuration/subtitles.md).
 
 Example
 -------

@@ -51,7 +51,7 @@ See [changelog](changelog.md#opencast-142) for a comprehensive list of changes.
 ## Opencast 14.1
 
 Opencast 14.1 is a minor release, containing documentation improvements and Paella Player 7 trimming URL parameter fix.
-For more details, make sure to check out the [documentation](modules/paella.player7/url.parameter.md).
+For more details, make sure to check out the [documentation](configuration/player/paella.player7/url.parameter.md).
 
 See [changelog](changelog.md#opencast-141) for a comprehensive list of changes.
 
@@ -68,7 +68,7 @@ as beta. If you wish to try it out, you can easily do so by going to `https://yo
 (don't worry if it looks like nothing has changed, the look is *really* similar :)). If you find any issues,
 please report them at [GitHub project issue board](https://github.com/opencast/opencast-admin-interface/issues).
 
-For notes on how to set the new Admin UI as your default, check [Admin UI](modules/admin-ui.md).
+For notes on how to set the new Admin UI as your default, check [Admin UI](configuration/admin-ui/new-admin-ui.md).
 
 ### Features
 - The new Admin UI (beta) is now shipped with Opencast [[#4695](https://github.com/opencast/opencast/pull/4695)]

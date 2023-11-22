@@ -6,8 +6,8 @@ ID: `editor`
 Description
 -----------
 
-The editor operation processes the edited files. This operation needs the videoeditor API and impl (or remote on
-distributed systems) to be installed.
+The editor operation cuts the source file(s) according to the given *SMIL* file(s). SMIL file(s) are usually generated
+by the video editor frontend.
 
 ## Parameter Table
 

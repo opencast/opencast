@@ -1,7 +1,7 @@
 Paella plugin: es.upv.paella.opencast.userTrackingSaverPlugIn
 =============================================================
 
-This plugin allows to use [Opencast Usertracking Service](../../../../configuration/user-statistics.and.privacy/)
+This plugin allows to use [Opencast Usertracking Service](../../../../configuration/user-statistics.and.privacy.md)
 to track usage data. 
 
 The configurations for this plugin are done for each tenant. So you need to modify the `plugins`
