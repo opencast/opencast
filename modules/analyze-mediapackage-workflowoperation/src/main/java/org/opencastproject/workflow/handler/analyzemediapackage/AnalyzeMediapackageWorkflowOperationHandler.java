@@ -25,6 +25,7 @@ import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
@@ -62,10 +63,17 @@ public class AnalyzeMediapackageWorkflowOperationHandler extends AbstractWorkflo
   private static final Logger logger = LoggerFactory.getLogger(AnalyzeMediapackageWorkflowOperationHandler.class);
 
   public static final String TAG_VARIABLES_PROPERTY = "set-tag-variables";
+  public static final String PUBLICATION_VARIABLES_PROPERTY = "set-publication-variables";
 
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
+
+    boolean setTagVariables = BooleanUtils.toBoolean(workflowInstance.getCurrentOperation()
+            .getConfiguration(TAG_VARIABLES_PROPERTY));
+    boolean setPublicationVariables = BooleanUtils.toBoolean(workflowInstance.getCurrentOperation()
+            .getConfiguration(PUBLICATION_VARIABLES_PROPERTY));
+
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.many,
         Configuration.many, Configuration.none, Configuration.none);
@@ -84,9 +92,6 @@ public class AnalyzeMediapackageWorkflowOperationHandler extends AbstractWorkflo
       elements = mpeSelector.select(mediaPackage, false);
     }
 
-    boolean setTagVariables = BooleanUtils.toBoolean(workflowInstance.getCurrentOperation()
-            .getConfiguration(TAG_VARIABLES_PROPERTY));
-
     Map<String, String> properties = new HashMap<>();
     for (MediaPackageElement mpe : elements) {
       if (MediaPackageElement.Type.Publication == mpe.getElementType()) {
@@ -102,6 +107,14 @@ public class AnalyzeMediapackageWorkflowOperationHandler extends AbstractWorkflo
         }
       }
     }
+
+    if (setPublicationVariables) {
+      for (Publication publication: mediaPackage.getPublications()) {
+        String channel = publication.getChannel().replaceAll("[^a-z0-9]", "_").toLowerCase();
+        properties.put("publication_" + channel + "_exists", "true");
+      }
+    }
+
     return createResult(mediaPackage, properties, WorkflowOperationResult.Action.CONTINUE, 0L);
   }
 
