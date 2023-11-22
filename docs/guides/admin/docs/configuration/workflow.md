@@ -329,7 +329,7 @@ As the formal description above explains, such boolean expressions may contain�
 - …strings, which must be surrounded by single-quotes. Escaping of single quotes is supported, just use two single
   quotes next to each other: `'foo''bar'`
 - …as well as references to the variables of the workflow instance that contain these data types. Variables
-  are enclosed in in `${}`, as shown below. A default value may be specified for a variable, after the name, 
+  are enclosed in `${}`, as shown below. A default value may be specified for a variable, after the name, 
   separated by a colon, as such: `${foo:1}`. The default value will be used in case the variable doesn’t exist. 
   If no default value is specified, `false` will be used. This, of course, only makes sense in boolean contexts. Be
   aware to specify a default value in relations such as `${foo} < ${bar}`.
@@ -370,6 +370,10 @@ Example:
       …
     </operation>
 
+Some workflow operation handlers can generate or import variables during a workflow's run, for example:
+- [analyze-tracks](../workflowoperationhandlers/analyze-tracks-woh.md)
+- [analyze-mediapackage](../workflowoperationhandlers/analyze-mediapackage-woh.md)
+- [import-wf-properties](../workflowoperationhandlers/import-wf-properties-woh.md)
 
 ## Thumbnail Support
 
