@@ -14,7 +14,7 @@
     </div>
     <div id="pageInfo">
       <span class="fileUpload btn pull-right">
-        <input type="file" id="addFile" />
+        <input type="file" id="addFile" name="upload" />
       </span>
     </div>
     <input type="checkbox" class="hiddenCheck modalToggler" id="notifyModalToggle" />
@@ -23,18 +23,17 @@
     <div id="notificationModal" class="modal">
       <label class="close" for="notifyModalToggle" title="Close"></label>
       <div class="modalBody">
-        <h2></h2>
         <div class="modalContent">
         </div>
       </div>
     </div>
-    <input type="checkbox" class="hiddenCheck" id="menuToggle" />
+    <input type="checkbox" class="hiddenCheck" id="menuToggle" name="menuCheckbox" />
     <label for="menuToggle"></label>
     <ul id="menu">
-      <input type="checkbox" class="hiddenCheck" id="progressive" />
+      <input type="checkbox" class="hiddenCheck" id="progressive" name="progressiveCheckbox" />
       <li>
         <section id="progressiveOptions">
-          <input type="checkbox" class="hiddenCheck" id="exfeatures" />
+          <input type="checkbox" class="hiddenCheck" id="exfeatures" name="featuresCheckbox" />
           <span class="menuHeader">Experimental features</span>
           <input type="checkbox" class="hiddenCheck" id="offlineToggle" />
           <span class="togglerContainer unsupported"><label for="offlineToggle" title="Allow this application to be usable even when no internet is available.
@@ -42,7 +41,7 @@ Protip: offline features can help minimise data usage when uploading to UCT serv
           <input type="checkbox" class="hiddenCheck" id="notificationsToggle" />
           <span class="togglerContainer unsupported"><label for="notificationsToggle" title="Receive notifications of when your videos are published">Receive notifications</label><label for="notificationsToggle" class="toggler"></label></span>
         </section>
-      </li><li><label for="progressive"><img src="/admin-ng/img/configuration.png" /></label</li><li></li><li></li>
+      </li><li><label for="progressive"><img src="/admin-ng/img/configuration.png" alt="configuration" /></label</li><li></li><li></li>
     </ul>
   </header>
   <main>
@@ -70,10 +69,10 @@ Protip: offline features can help minimise data usage when uploading to UCT serv
       <video preload="auto"></video>
       <div class="videoControls">
         <span>
-          <input type="range" value=0 min=0 max=100 step=5 />
+          <input type="range" value=0 min=0 max=100 step=5 name="range" />
         </span><span>
-          <input id="isPlaying" type="checkbox" class="hiddenCheck" />
-          <input id="isPaused" type="checkbox" class="hiddenCheck" />
+          <input id="isPlaying" type="checkbox" class="hiddenCheck" name="playing" />
+          <input id="isPaused" type="checkbox" class="hiddenCheck" name="paused" />
           <label for="isPlaying"></label>
         </span><span>
         </span>
@@ -99,7 +98,7 @@ Protip: offline features can help minimise data usage when uploading to UCT serv
             <img /-->
           </div>
           <div class="selection">
-            <button id="snip"></button>
+            <button id="snip" name="snip"></button>
           </div>
         </div>
         <div class="seektrack">
@@ -126,13 +125,13 @@ Protip: offline features can help minimise data usage when uploading to UCT serv
       <div class="component">
         <ul class="row halfWidth">
           <li>
-            <span class="width-1-6">Title</span><span class="width-5-6"><input name="title" /></span>
+            <span class="width-1-6" name="spanTitle">Title</span><span class="width-5-6"><input name="title" /></span>
           </li>
           <li>
-            <span class="width-1-6">Location</span><span class="width-5-6"><input name="location" /></span>
+            <span class="width-1-6" name="spanLocation">Location</span><span class="width-5-6"><input name="location" /></span>
           </li>
           <li>
-            <span class="width-1-6">Date</span><span class="width-5-6"><input name="date" type="date" /></span>
+            <span class="width-1-6" name="spanDate">Date</span><span class="width-5-6"><input name="date" type="date" /></span>
           </li>
         </ul>
       </div>

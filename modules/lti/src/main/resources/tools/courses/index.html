@@ -13,8 +13,8 @@
     <!-- scripts -->
   </head>
   <body>
-      <div class="lti-outer">
-    <div class="modal fade" id="manageNotificationModal" tabindex="-1" role="dialog" aria-labelledby="mModal">
+    <div class="lti-outer">
+    <div class="modal fade" id="manageNotificationModal" name="schedule" tabindex="-1" role="dialog" aria-labelledby="mModal">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -94,7 +94,7 @@
                       </div>
                     </div>
                   </ul>
-                  <div id="upcomingModal" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="upcomingModalLabel">
+                  <div id="upcomingModal" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="upcomingModalLabel" name="upcoming">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -104,7 +104,6 @@
                                     <h3 class="modal-title" id="downloadModalLabel">Upcoming Recordings</h3>
                                 </div>
                                 <div class="modal-body text-center" id="upcomingTbl">
-                                    <h5 id="records_count"><b></b></h5>
                                     <table class="table table-condensed table-sml table-bordered table-hover text-left" id="upcomingGrid">
                                         <thead>
                                             <tr>
@@ -133,9 +132,6 @@
                                 <h3 class="modal-title" id="downloadModalLabel">Download videos</h3>
                             </div>
                             <div class="modal-body text-center" id="downloadLinks">
-                                <h4 id="titleHolder"></h4>
-                                <h5 id="presenterHolder"></h5>
-                                <h5 id="dateHolder"></h5>
                                 <table class="table table-condensed table-sml table-bordered table-hover text-left" id="mediaTable">
                                     <thead>
                                         <tr>

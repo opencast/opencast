@@ -89,7 +89,7 @@
                 </div>
                 <div class="dropdown">
                   <button class="btn btn-default dropdown-toggle" type="button" id="dayDropdown" data-toggle="dropdown"
-                          aria-haspopup="true" aria-expanded="true" ></button>
+                          aria-haspopup="true" aria-expanded="true" name="dayDropdown" ></button>
                   <ul class="dropdown-menu dropdown-menu-right" aria-describedby="dayDropdown">
                       <li data-ref="Mon" role="presentation" class=""><a href="#">Monday<span class="badge"></span></a></li>
                       <li data-ref="Tue" role="presentation" class=""><a href="#">Tuesday<span class="badge"></span></a></li>
@@ -120,7 +120,7 @@
                           <span></span><span></span>
                         </span>
                         <span class="badge"></span>
-                        <input type="text" class="form-control" />
+                        <input type="text" class="form-control" name="dateInput" />
                       </a>
                     </li>
                 </ul>
@@ -155,26 +155,25 @@
     </div>
     </div>
 
-    <div class="modal fade" id="editModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="eModal">
+    <div class="modal fade" id="editModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="eModal" name="editModal">
       <div class="modal-dialog" role="document">
         <form class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="close">
               <span aria-hidden="true" title="Close Popup">&times;</span>
             </button>
-            <h4 class="modal-title" id="eModal"></h4>
           </div>
           <div class="modal-body">
           </div>
           <div class="modal-footer">
             <button type="reset" class="btn btn-default">Cancel</button>
-            <button class="btn btn-success"><span class="loader"><i class="fa fa-cog fa-spin"></i></span><span class="text"></span></button>
+            <button class="btn btn-success"><span class="loader" name="settings"><i class="fa fa-cog fa-spin"></i></span><span class="text"></span></button>
           </div>
         </form>
       </div>
     </div>
 
-    <div class="modal fade" id="editPublishedModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="epModal">
+    <div class="modal fade" id="editPublishedModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="epModal" name="editPublished">
       <div class="modal-dialog" role="document">
         <form class="modal-content">
           <div class="modal-header">
