@@ -167,26 +167,25 @@
           </div>
           <div class="modal-footer">
             <button type="reset" class="btn btn-default">Cancel</button>
-            <button class="btn btn-success"><span class="loader" name="settings"><i class="fa fa-cog fa-spin"></i></span><span class="text"></span></button>
+            <button class="btn btn-success" aria-label="settings"><span class="loader"><i class="fa fa-cog fa-spin"></i></span><span class="text"></span></button>
           </div>
         </form>
       </div>
     </div>
 
-    <div class="modal fade" id="editPublishedModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="epModal" name="editPublished">
+    <div class="modal fade" id="editPublishedModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="epModal" aria-label="editPublished">
       <div class="modal-dialog" role="document">
         <form class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="close">
               <span aria-hidden="true" title="Close Popup">&times;</span>
             </button>
-            <h4 class="modal-title" id="epModal"></h4>
           </div>
           <div class="modal-body">
           </div>
           <div class="modal-footer">
             <button type="reset" class="btn btn-default btn-red" id="editPublishedCancel">Cancel</button>
-            <button class="btn btn-success" id="editPublished"><span class="loader"><i class="fa fa-cog fa-spin"></i></span><span class="text"></span></button>
+            <button class="btn btn-success" id="editPublished" aria-label="publish"><span class="loader"><i class="fa fa-cog fa-spin"></i></span><span class="text"></span></button>
           </div>
         </form>
       </div>
@@ -199,7 +198,7 @@
             <button type="button" class="close" data-dismiss="modal" aria-label="close">
               <span aria-hidden="true" title="Close Popup">&times;</span>
             </button>
-            <h4 class="modal-title" id="rModal">Unpublish recording</h4>
+            <h4 class="modal-title" id="retactModalTitle">Unpublish recording</h4>
           </div>
           <div class="modal-body">
             <p>The following recording will be unpublished and made inaccessible to students</p>
@@ -211,7 +210,7 @@
           </div>
           <div class="modal-footer">
             <button type="reset" class="btn btn-default" name="cancel">Cancel</button>
-            <button class="btn btn-danger" name="delete"></button>
+            <button class="btn btn-danger" name="delete" aria-label="delete"></button>
           </div>
         </div>
       </div>
@@ -245,13 +244,13 @@
             <button type="button" class="close" data-dismiss="modal" aria-label="close">
               <span aria-hidden="true" title="Close Popup">&times;</span>
             </button>
-            <h4 class="modal-title" id="dModal">Delete event(s)</h4>
+            <h4 class="modal-title" id="delModalTitle">Delete event(s)</h4>
           </div>
           <div class="modal-body">
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default">Cancel</button>
-            <button type="button" class="btn btn-success"><span class="loader"><i class="fa fa-cog fa-spin"></i></span><span class="text"></span></button>
+            <button type="button" class="btn btn-success" aria-label="loading"><span class="loader"><i class="fa fa-cog fa-spin"></i></span><span class="text"></span></button>
           </div>
         </div>
       </div>
@@ -276,7 +275,7 @@
       </div>
     </div>
 
-    <form class="modal fade" id="ttNotificationModal" tabindex="-1" role="dialog" aria-labelledby="ttyModal">
+    <form class="modal fade" id="ttNotificationModal" tabindex="-1" role="dialog" aria-labelledby="ttyModal" aria-label="notification">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -330,12 +329,12 @@
             <input type="checkbox" id="scheduleMultiple" name="multipleSchedule" autocomplete="off" />
             <ul class="modal-page active infoList">
               <li>
-                <span>Title</span>
-                <span><input type="text" name="title" required autocomplete="off" /></span>
+                <label for="scheduleTitle">Title</label>
+                <span><input type="text" id="scheduleTitle" name="title" required autocomplete="off" /></span>
               </li>
               <li data-field="presenters">
-                <span>Presenters</span>
-                <span><textarea name="presenters" required></textarea></span>
+                <label for="presenters">Presenters</label>
+                <span><textarea id="presenters" name="presenters" required></textarea></span>
               </li>
               <li>
                 <span>Repeat Recordings?</span>
@@ -344,8 +343,8 @@
               <li>
                 <span>Date <span class="multiple">Range</span></span>
                 <span>
-                  <span class="valueContainer uneditableWhenChecking" id="choose_start" data-target="#sched_start"><input autocomplete="off" type="text" name="start_date" id="sched_start" required /><i class="glyphicon glyphicon-time fa fa-clock-o"></i><span class="selectedValue"></span><span class="single">Choose</span><span class="multiple">Start</span> <span>date</span></span>
-                  <span class="valueContainer multiple uneditableWhenChecking" id="choose_end" data-target="#sched_end"><input autocomplete="off" type="text" name="end_date" id="sched_end" /><i class="glyphicon glyphicon-time fa fa-clock-o"></i><span class="selectedValue"></span><span>End date<span class="selectedValue"></span></span></span>
+                  <span class="valueContainer uneditableWhenChecking" id="choose_start" data-target="#sched_start"><input autocomplete="off" type="text" name="start_date" id="sched_start" required aria-label="startDate" /><i class="glyphicon glyphicon-time fa fa-clock-o"></i><span class="selectedValue"></span><span class="single">Choose</span><span class="multiple">Start</span> <span>date</span></span>
+                  <span class="valueContainer multiple uneditableWhenChecking" id="choose_end" data-target="#sched_end"><input autocomplete="off" type="text" name="end_date" id="sched_end" aria-label="endDate" /><i class="glyphicon glyphicon-time fa fa-clock-o"></i><span class="selectedValue"></span><span>End date<span class="selectedValue"></span></span></span>
                   <span class="invalidChoice">Invalid date selected</span>
                 </span>
               </li>
@@ -386,7 +385,7 @@
               <li data-field="location" data-fieldtype="text">
                 <span>Venue</span>
                   <span class="dropdown">
-                    <input name="location" required autocomplete="off" class="setField" />
+                    <input name="location" required autocomplete="off" class="setField" aria-label="location" />
                     <i class="glyphicon fa fa-location-arrow" aria-hidden="true"></i>
                     <button class="btn btn-default dropdown-toggle uneditableWhenChecking" type="button" id="venueDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Choose venue</button>
                     <ul class="dropdown-menu" aria-labelledby="venueDropdown">
@@ -409,13 +408,13 @@
           </div>
           <div class="modal-footer">
             <button type="reset" class="btn btn-default">Cancel</button>
-            <button class="btn btn-success"><span class="loader"><i class="fa fa-cog fa-spin"></i></span><span class="text"></span></button>
+            <button class="btn btn-success" aria-label="loading"><span class="loader"><i class="fa fa-cog fa-spin"></i></span><span class="text"></span></button>
           </div>
         </form>
       </div>
     </div>
 
-    <div class="modal fade" id="ttScheduleModal" data-backdrop="static" role="dialog" aria-labelledby="ttModal">
+    <div class="modal fade" id="ttScheduleModal" data-backdrop="static" role="dialog" aria-labelledby="ttModal" aria-label="scheduleModal">
       <div class="modal-dialog" role="document">
         <form class="modal-content">
           <div class="modal-header">
@@ -437,13 +436,13 @@
           </div>
           <div class="modal-footer">
             <button type="reset" class="btn btn-default">Cancel</button>
-            <button class="btn btn-success"><span class="loader"><i class="fa fa-cog fa-spin"></i></span><span class="text"></span></button>
+            <button class="btn btn-success" aria-label="loading"><span class="loader"><i class="fa fa-cog fa-spin"></i></span><span class="text"></span></button>
           </div>
         </form>
       </div>
     </div>
 
-    <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uModal">
+    <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uModal" aria-label="uploadModal">
       <div class="modal-dialog" role="document">
         <form class="modal-content">
           <div class="modal-header">
@@ -455,22 +454,22 @@
           <div class="modal-body">
             <ul class="modal-page active infoList">
               <li>
-                <span>Title</span>
-                <span><input autocomplete="off" type="text" name="title" required /></span>
+                <label for="title">Title</label>
+                <span><input autocomplete="off" type="text" name="title" id="title" required /></span>
               </li>
               <li data-field="presenters">
-                <span>Presenters</span>
-                <span><textarea name="presenters" rows="2" required></textarea></span>
+                <label for="presenters1">Presenters</label>
+                <span><textarea id="presenters1" name="presenters" rows="2" required></textarea></span>
               </li>
               <li>
-                <span>Description</span>
-                <span><textarea name="description" placeholder="(Optional)" rows="2"></textarea></span>
+                <label for="description">Description</label>
+                <span><textarea id="description" name="description" placeholder="(Optional)" rows="2"></textarea></span>
               </li>
               <li>
                 <span>Date</span>
                 <span>
                   <input autocomplete="off" type="text" name="start_date" id="upload_start" required />
-                  <span class="valueContainer" class="choose_start" data-target="#upload_start"><i class="glyphicon glyphicon-time fa fa-clock-o"></i><span class="selectedValue"></span><span class="single">Choose</span><span class="multiple">Start</span> <span>date</span></span>
+                  <label class="valueContainer choose_start" data-target="#upload_start" for="upload_start"><i class="glyphicon glyphicon-time fa fa-clock-o"></i><span class="selectedValue"></span><span class="single">Choose</span><span class="multiple">Start</span> <span>date</span></label>
                 </span>
               </li>
               <hr/>
@@ -478,16 +477,16 @@
                 <span>Webcam video or audio file</span>
                 <input autocomplete="off" type="checkbox" id="populatedPresVid" class="filePopulated" />
                 <span class="fileContainer" data-mediatype="video" >
-                  <input autocomplete="off" type="file" name="presenter" data-mediatype="video" title="Choose a presenter/webcam video or audio file"/>
+                  <input autocomplete="off" type="file" name="presenter" data-mediatype="video" title="Choose a presenter/webcam video or audio file" aria-label="Choose a file"/>
                   <progress min="0" value=0 max="100"></progress>
                 </span>
                 <label for="populatedPresVid" class="removeFile"></label>
                   <span class="videoPreview">
-                    <img />
+                    <img alt="empty image tag" />
                   </span>
               </li>
               <li>
-                <span>Screenshare video</span>
+                <label for="populatedPresentationVid">Screenshare video</label>
                 <input autocomplete="off" type="checkbox" id="populatedPresentationVid" class="filePopulated" />
                 <span class="presentationContainer" data-mediatype="video" >
                    <input autocomplete="off" type="file" name="presentation" data-mediatype="video" title="Choose a presentation/screenshare video"/>
@@ -497,7 +496,7 @@
                 </span>
                 <label for="populatedPresentationVid" class="removeFile"></label>
                 <span class="presentationPreview">
-                    <img />
+                    <img alt="empty image tag" />
                 </span>
               </li>
               <li style="line-height:120%;margin-bottom:15px;font-size:0.8em;">
@@ -521,39 +520,37 @@
             </div>
             <div class="modal-footer">
               <button type="reset" class="btn btn-default">Cancel</button>
-              <button class="btn btn-success"><span class="loader"><i class="fa fa-cog fa-spin"></i></span><span class="text"></span></button>
+              <button class="btn btn-success" aria-label="loading"><span class="loader"><i class="fa fa-cog fa-spin"></i></span><span class="text"></span></button>
             </div>
           </form>
         </div>
       </div>
 
-      <div class="modal fade" id="bulkModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="bModal">
+      <div class="modal fade" id="bulkModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="bModal" aria-label="bulk upload">
         <div class="modal-dialog" role="document">
           <form class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="close">
                 <span aria-hidden="true" title="Close Popup">&times;</span>
               </button>
-              <h4 class="modal-title" id="bModal"></h4>
             </div>
             <div class="modal-body">
             </div>
             <div class="modal-footer">
               <button type="reset" class="btn btn-default">Cancel</button>
-              <button class="btn btn-success"><span class="loader"><i class="fa fa-cog fa-spin"></i></span><span class="text"></span></button>
+              <button class="btn btn-success" aria-label="loading"><span class="loader"><i class="fa fa-cog fa-spin"></i></span><span class="text"></span></button>
             </div>
           </form>
         </div>
       </div>
 
-      <div class="modal fade" id="editCaptionsModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="ecModal">
+      <div class="modal fade" id="editCaptionsModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="ecModal" aria-label="edit captions">
         <div class="modal-dialog" role="document">
           <form class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="close">
                 <span aria-hidden="true" title="Close Popup">&times;</span>
               </button>
-              <h4 class="modal-title" id="ecModal"></h4>
             </div>
             <div class="modal-body" id="ecModalBody">
               <div class="form-group green-border-focus">
@@ -595,14 +592,13 @@
               </form>
           </div>
       </div>
-      <div class="modal fade" id="removeCaptionsModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="rcModal">
+      <div class="modal fade" id="removeCaptionsModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="rcModal" aria-label="remove caption">
         <div class="modal-dialog" role="document">
             <form class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="close">
                         <span aria-hidden="true" title="Close Popup">&times;</span>
                     </button>
-                    <h4 class="modal-title" id="rcModalTitle"></h4>
                 </div>
                 <div class="modal-body" id="rcModalBody">
                     <p><span style="color:#e45253;padding-right:5px"><b>PLEASE NOTE:</b></span>

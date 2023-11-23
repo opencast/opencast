@@ -27,14 +27,14 @@
         </div>
       </div>
     </div>
-    <input type="checkbox" class="hiddenCheck" id="menuToggle" name="menuCheckbox" />
+    <input type="checkbox" class="hiddenCheck" id="menuToggle" name="menuToggle"/>
     <label for="menuToggle"></label>
     <ul id="menu">
       <input type="checkbox" class="hiddenCheck" id="progressive" name="progressiveCheckbox" />
       <li>
         <section id="progressiveOptions">
-          <input type="checkbox" class="hiddenCheck" id="exfeatures" name="featuresCheckbox" />
-          <span class="menuHeader">Experimental features</span>
+          <input type="checkbox" class="hiddenCheck" id="exfeatures" name="featuresCheckbox" label="featuresCheckbox" />
+          <label for="exfeatures" class="menuHeader">Experimental features</label>
           <input type="checkbox" class="hiddenCheck" id="offlineToggle" />
           <span class="togglerContainer unsupported"><label for="offlineToggle" title="Allow this application to be usable even when no internet is available.
 Protip: offline features can help minimise data usage when uploading to UCT servers">Offline mode</label><label for="offlineToggle" class="toggler"></label></span>
@@ -69,11 +69,13 @@ Protip: offline features can help minimise data usage when uploading to UCT serv
       <video preload="auto"></video>
       <div class="videoControls">
         <span>
-          <input type="range" value=0 min=0 max=100 step=5 name="range" />
+          <input type="range" value=0 min=0 max=100 step=5 name="range" id="range" />
+          <label for="range"></label>
         </span><span>
           <input id="isPlaying" type="checkbox" class="hiddenCheck" name="playing" />
-          <input id="isPaused" type="checkbox" class="hiddenCheck" name="paused" />
           <label for="isPlaying"></label>
+          <input id="isPaused" type="checkbox" class="hiddenCheck" name="paused" />
+          <label for="isPaused"></label>
         </span><span>
         </span>
       </div>
@@ -98,7 +100,7 @@ Protip: offline features can help minimise data usage when uploading to UCT serv
             <img /-->
           </div>
           <div class="selection">
-            <button id="snip" name="snip"></button>
+            <button id="snip" name="snip" aria-label="Click to Snip"></button>
           </div>
         </div>
         <div class="seektrack">
@@ -125,13 +127,13 @@ Protip: offline features can help minimise data usage when uploading to UCT serv
       <div class="component">
         <ul class="row halfWidth">
           <li>
-            <span class="width-1-6" name="spanTitle">Title</span><span class="width-5-6"><input name="title" /></span>
+            <label class="width-1-6" for="title">Title</label><span class="width-5-6"><input id="title" name="title" /></span>
           </li>
           <li>
-            <span class="width-1-6" name="spanLocation">Location</span><span class="width-5-6"><input name="location" /></span>
+            <label class="width-1-6" for="location">Location</label><span class="width-5-6"><input id="location" name="location" /></span>
           </li>
           <li>
-            <span class="width-1-6" name="spanDate">Date</span><span class="width-5-6"><input name="date" type="date" /></span>
+            <label class="width-1-6" for="date">Date</label><span class="width-5-6"><input id="date" name="date" type="date" /></span>
           </li>
         </ul>
       </div>
