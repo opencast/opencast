@@ -9,7 +9,7 @@ With Opencast 15 we want to put more emphasis on subtitles. You can find more de
 handled going forward in [Subtitles](./configuration/subtitles.md).
 
 This comes with a bit of migration. Namely, subtitles should not be stored as "attachments" or "catalogs" anymore, but as "media"
-(as they is called in the Admin UI) or "tracks" (as the are called internally). Therefore, all subtitle files currently
+(as they are called in the Admin UI) or "tracks" (as they are called internally). Therefore, all subtitle files currently
 stored as attachments or catalogs in your events should be moved to tracks. This can easily be accomplished with the "changetype"
 workflow operation handler new to Opencast 15. See example below. (Subtitles should then be republished)
 
