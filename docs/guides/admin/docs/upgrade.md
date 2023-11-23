@@ -17,10 +17,11 @@ Subtitle changes
 With Opencast 15 we want to put more emphasis on subtitles. You can find more details on how subtitles should be
 handled going forward in [Subtitles](./configuration/subtitles.md).
 
-This comes with a bit of migration. Namely, subtitles should not be stored as "attachments" or "catalogs" anymore, but as "media"
-(as they are called in the Admin UI) or "tracks" (as they are called internally). Therefore, all subtitle files currently
-stored as attachments or catalogs in your events should be moved to tracks. This can easily be accomplished with the "changetype"
-workflow operation handler new to Opencast 15. See example below. (Subtitles should then be republished)
+This comes with a bit of migration. Namely, subtitles should not be stored as "attachments" or "catalogs" anymore, but
+as "media"(as they are called in the Admin UI) or "tracks" (as they are called internally). Therefore, all subtitle
+files currently stored as attachments or catalogs in your events should be moved to tracks. This can easily be
+accomplished with the "changetype" workflow operation handler new to Opencast 15. See example below. (Subtitles should
+then be republished)
 
 Additionally, we recommend adding a language tag `lang:<language-code>` to your subtitle files. While tags for subtitles
 are optional, the flavor will not encode the given language for a subtitle anymore, so a language tag is useful for

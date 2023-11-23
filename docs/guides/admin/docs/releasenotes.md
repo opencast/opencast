@@ -8,10 +8,11 @@
 With Opencast 15 we want to put more emphasis on subtitles. You can find more details on how subtitles should be
 handled going forward in [Subtitles](./configuration/subtitles.md).
 
-This comes with a bit of migration. Namely, subtitles should not be stored as "attachments" or "catalogs" anymore, but as "media"
-(as they are called in the Admin UI) or "tracks" (as they are called internally). Therefore, all subtitle files currently
-stored as attachments or catalogs in your events should be moved to tracks. This can easily be accomplished with the "changetype"
-workflow operation handler new to Opencast 15. See example below. (Subtitles should then be republished)
+This comes with a bit of migration. Namely, subtitles should not be stored as "attachments" or "catalogs" anymore, but
+as "media" (as they are called in the Admin UI) or "tracks" (as they are called internally). Therefore, all subtitle
+files currently stored as attachments or catalogs in your events should be moved to tracks. This can easily be
+accomplished with the "changetype" workflow operation handler new to Opencast 15. See example below. (Subtitles should
+then be republished)
 
 Additionally, we recommend adding a language tag `lang:<language-code>` to your subtitle files. While tags for subtitles
 are optional, the flavor will not encode the given language for a subtitle anymore, so a language tag is useful for
@@ -126,10 +127,10 @@ WebVTT is the only one that will be guaranteed to work.
   [[#5023](https://github.com/opencast/opencast/pull/5023)]
 - The default workflow for publishing videos will no longer render the video metadata on the preview Image.
   Instead, a simple cover image without any text will be created and displayed.
-  You can revert this by simply adding the "coverimage" WOH back to the "partial-publish" workflow (look out for the 
+  You can revert this by simply adding the "coverimage" WOH back to the "partial-publish" workflow (look out for the
   target-flavor and tags).
   [[#5353](https://github.com/opencast/opencast/pull/5353)]
-- The speech-to-text workflow operation will automatically set the tags `generator` and `generator-type` and no longer 
+- The speech-to-text workflow operation will automatically set the tags `generator` and `generator-type` and no longer
   have to be configured in the workflow.
   [[#5352](https://github.com/opencast/opencast/pull/5352)]
 - Paella Player 6 has been turned into a plugin. If you are still using it, you will need to enable it.
