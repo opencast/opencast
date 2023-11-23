@@ -1,2 +1,0 @@
-Copy over tags from source tracks to trimmed tracks in the editor WOH. Was already the case when trimming was skipped.
-If you relied on the old behavior, you might need to amend your workflows.
