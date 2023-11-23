@@ -366,13 +366,13 @@
               <li class="toggleList">
                 <span>Repeat on</span>
                 <span class="hiddenChecks">
-                  <input type="checkbox" name="repeatdays[]" value="MO" id="hiddenMonday" autocomplete="off" />
-                  <input type="checkbox" name="repeatdays[]" value="TU" id="hiddenTuesday" autocomplete="off" />
-                  <input type="checkbox" name="repeatdays[]" value="WE" id="hiddenWednesday" autocomplete="off" />
-                  <input type="checkbox" name="repeatdays[]" value="TH" id="hiddenThursday" autocomplete="off" />
-                  <input type="checkbox" name="repeatdays[]" value="FR" id="hiddenFriday" autocomplete="off" />
-                  <input type="checkbox" name="repeatdays[]" value="SA" id="hiddenSaturday" autocomplete="off" />
-                  <input type="checkbox" name="repeatdays[]" value="SU" id="hiddenSunday" autocomplete="off" />
+                  <input type="checkbox" name="repeatdays[]" value="MO" id="hiddenMonday" autocomplete="off" aria-label="Monday" />
+                  <input type="checkbox" name="repeatdays[]" value="TU" id="hiddenTuesday" autocomplete="off" aria-label="Tuesay" />
+                  <input type="checkbox" name="repeatdays[]" value="WE" id="hiddenWednesday" autocomplete="off" aria-label="Wednesday" />
+                  <input type="checkbox" name="repeatdays[]" value="TH" id="hiddenThursday" autocomplete="off" aria-label="Thursday" />
+                  <input type="checkbox" name="repeatdays[]" value="FR" id="hiddenFriday" autocomplete="off" aria-label="Friday" />
+                  <input type="checkbox" name="repeatdays[]" value="SA" id="hiddenSaturday" autocomplete="off" aria-label="Saturday" />
+                  <input type="checkbox" name="repeatdays[]" value="SU" id="hiddenSunday" autocomplete="off" aria-label="Sunday" />
                   <label for="hiddenMonday" data-above="Mo" class="uneditableWhenChecking"><svg></svg></label>
                   <label for="hiddenTuesday" data-above="Tu" class="uneditableWhenChecking"><svg></svg></label>
                   <label for="hiddenWednesday" data-above="We" class="uneditableWhenChecking"><svg></svg></label>
@@ -474,7 +474,7 @@
               </li>
               <hr/>
               <li data-field="presenter">
-                <span>Webcam video or audio file</span>
+                <label for="populatedPresVid">Webcam video or audio file</label>
                 <input autocomplete="off" type="checkbox" id="populatedPresVid" class="filePopulated" />
                 <span class="fileContainer" data-mediatype="video" >
                   <input autocomplete="off" type="file" name="presenter" data-mediatype="video" title="Choose a presenter/webcam video or audio file" aria-label="Choose a file"/>
@@ -560,7 +560,7 @@
                   <b>PLEASE NOTE: </b> Your changes will only be published when you click the <b><i>SAVE</i></b> button.
                 </p><br/>
                <span id="editCaptionsError" class="errors" style="display:none;color:red;"><ol id="errorLi"></ol><br/></span>
-                <textarea id="vttText" name="text/vtt" rows="15" class="form-control rounded-0 newVtt"></textarea>
+                <textarea id="vttText" name="text/vtt" rows="15" class="form-control rounded-0 newVtt" aria-label="vvt text"></textarea>
               </div>
             </div>
             <div class="modal-footer">
