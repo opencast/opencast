@@ -41,14 +41,14 @@ import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.ProductBuilder;
 import com.entwinemedia.fn.Products;
 import com.entwinemedia.fn.data.Opt;
-import com.mysema.query.jpa.JPASubQuery;
-import com.mysema.query.jpa.impl.JPAQueryFactory;
-import com.mysema.query.types.ConstantImpl;
-import com.mysema.query.types.Operator;
-import com.mysema.query.types.Ops;
-import com.mysema.query.types.Path;
-import com.mysema.query.types.expr.BooleanExpression;
-import com.mysema.query.types.expr.BooleanOperation;
+import com.querydsl.core.types.ConstantImpl;
+import com.querydsl.core.types.Operator;
+import com.querydsl.core.types.Ops;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.sql.SQLExpressions;
 
 import java.util.Date;
 
@@ -148,8 +148,7 @@ public class PropertyFieldImpl<A> implements PropertyField<A>, EntityPaths {
 
           @Override public BooleanExpression fromProperty(QPropertyDto p) {
             return p.mediaPackageId.notIn(
-                    new JPASubQuery()
-                            .from(p)
+                    SQLExpressions.select(p)
                             .where(whereBase.fromProperty(p))
                             .distinct()
                             .list(p.mediaPackageId));
@@ -176,29 +175,30 @@ public class PropertyFieldImpl<A> implements PropertyField<A>, EntityPaths {
   /**
    * Create a predicate to compare this field's value with a constant value.
    */
-  private Fn<QPropertyDto, Opt<BooleanExpression>> mkValuePredicate(final Operator<? super Boolean> op, final A value) {
+  private Fn<QPropertyDto, Opt<BooleanExpression>> mkValuePredicate(final Operator op, final A value) {
     return new Fn<QPropertyDto, Opt<BooleanExpression>>() {
       @Override public Opt<BooleanExpression> apply(final QPropertyDto dto) {
         final BooleanExpression expr = mkValue.mk(value).decompose(
             new Fn<String, BooleanExpression>() {
               @Override public BooleanExpression apply(String a) {
-                return BooleanOperation.create(op, dto.stringValue, ConstantImpl.create(a));
+                return Expressions.booleanOperation(op, dto.stringValue, ConstantImpl.create(a));
               }
             }, new Fn<Date, BooleanExpression>() {
               @Override public BooleanExpression apply(Date a) {
-                return BooleanOperation.create(op, dto.dateValue, ConstantImpl.create(a));
+                return Expressions.booleanOperation(op, dto.dateValue, ConstantImpl.create(a));
               }
             }, new Fn<Long, BooleanExpression>() {
               @Override public BooleanExpression apply(Long a) {
-                return BooleanOperation.create(op, dto.longValue, ConstantImpl.create(a));
+                return Expressions.booleanOperation(op, dto.longValue, ConstantImpl.create(a));
               }
             }, new Fn<Boolean, BooleanExpression>() {
               @Override public BooleanExpression apply(Boolean a) {
-                return BooleanOperation.create(op, dto.boolValue, ConstantImpl.create(a));
+                return Expressions.booleanOperation(op, dto.boolValue, ConstantImpl.create(a));
               }
             }, new Fn<Version, BooleanExpression>() {
               @Override public BooleanExpression apply(Version a) {
-                return BooleanOperation.create(op, dto.longValue, ConstantImpl.create(RuntimeTypes.convert(a).value()));
+                return Expressions.booleanOperation(op, dto.longValue,
+                                                    ConstantImpl.create(RuntimeTypes.convert(a).value()));
               }
             });
         return Opt.some(expr);
@@ -225,7 +225,7 @@ public class PropertyFieldImpl<A> implements PropertyField<A>, EntityPaths {
 //      @Override public Opt<BooleanExpression> apply(final QPropertyDto dto) {
 //        final BooleanExpression expr = mkValue.match(new Fn<StringType, BooleanExpression>() {
 //          @Override public BooleanExpression apply(StringType stringType) {
-//            return BooleanOperation.create(op, dto.stringValue, PropertyPredicates.)
+//            return Expressions.booleanOperation(op, dto.stringValue, PropertyPredicates.)
 //          }
 //        }, new Fn<DateType, BooleanExpression>() {
 //          @Override public BooleanExpression apply(DateType dateType) {
@@ -251,7 +251,7 @@ public class PropertyFieldImpl<A> implements PropertyField<A>, EntityPaths {
   /**
    * Create a predicate that compares the property (of this field) with the given constant value.
    */
-  private Predicate mkPredicate(final Operator<? super Boolean> op, final A value) {
+  private Predicate mkPredicate(final Operator op, final A value) {
     return new AbstractPredicate() {
       @Override public DeleteQueryContribution contributeDelete(String owner) {
         return DeleteQueryContribution.mk().where(mkWhereDeleteBase(mkValuePredicate(op, value)));

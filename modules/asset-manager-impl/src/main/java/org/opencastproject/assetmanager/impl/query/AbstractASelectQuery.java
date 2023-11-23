@@ -44,13 +44,13 @@ import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.SetB;
 import com.entwinemedia.fn.fns.Booleans;
-import com.mysema.query.Tuple;
-import com.mysema.query.jpa.impl.JPAQuery;
-import com.mysema.query.jpa.impl.JPAQueryFactory;
-import com.mysema.query.types.EntityPath;
-import com.mysema.query.types.Expression;
-import com.mysema.query.types.OrderSpecifier;
-import com.mysema.query.types.expr.BooleanExpression;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.EntityPath;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -200,7 +200,7 @@ public abstract class AbstractASelectQuery implements ASelectQuery, SelectQueryC
     {
       // run query
       am.getDatabase().logQuery(q);
-      final List<Tuple> result = q.list(JpaFns.toExpressionArray(fetch));
+      final List<Tuple> result = q.select(JpaFns.toExpressionArray(fetch)).fetch();
       logger.debug("Pure query ms " + (System.nanoTime() - startTime) / 1000000);
       // map result based on the fact whether properties have been fetched or not
       if (!toFetchProperties) {

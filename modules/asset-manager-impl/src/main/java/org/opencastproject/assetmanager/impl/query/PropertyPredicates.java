@@ -28,8 +28,8 @@ import org.opencastproject.assetmanager.impl.query.DeleteQueryContribution.Where
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
-import com.mysema.query.jpa.JPASubQuery;
-import com.mysema.query.types.expr.BooleanExpression;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.sql.SQLExpressions;
 
 /**
  * A place to share common predicate constructor methods for properties.
@@ -76,7 +76,7 @@ public final class PropertyPredicates implements EntityPaths {
       Opt<String> namespace,
       Opt<String> propertyName,
       Fn<QPropertyDto, Opt<BooleanExpression>> mkValueExpression) {
-    return new JPASubQuery().from(Q_PROPERTY_ALIAS)
+    return SQLExpressions.select(Q_PROPERTY_ALIAS)
         .where(Q_SNAPSHOT.mediaPackageId.eq(Q_PROPERTY_ALIAS.mediaPackageId)
             .and(namespace.isSome()
                 ? Q_PROPERTY_ALIAS.namespace.eq(namespace.get())
@@ -111,16 +111,14 @@ public final class PropertyPredicates implements EntityPaths {
     //
     return new Where() {
       @Override public BooleanExpression fromSnapshot(QSnapshotDto e) {
-        return new JPASubQuery()
-                .from(Q_PROPERTY)
+        return SQLExpressions.select(Q_PROPERTY)
                 .where(e.mediaPackageId.eq(Q_PROPERTY.mediaPackageId).and(propertyPredicate))
                 .exists();
       }
 
       @Override public BooleanExpression fromProperty(QPropertyDto p) {
         return p.mediaPackageId.in(
-                new JPASubQuery()
-                        .from(p)
+                SQLExpressions.select(p)
                         .where(propertyPredicate)
                         .distinct()
                         .list(p.mediaPackageId));

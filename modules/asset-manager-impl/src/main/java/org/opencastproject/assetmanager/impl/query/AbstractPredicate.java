@@ -24,8 +24,8 @@ import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.assetmanager.impl.RuntimeTypes;
 
 import com.entwinemedia.fn.Fn2;
-import com.mysema.query.jpa.impl.JPAQueryFactory;
-import com.mysema.query.types.expr.BooleanExpression;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 public abstract class AbstractPredicate implements Predicate, QueryContributor {
   private final AbstractPredicate self = this;

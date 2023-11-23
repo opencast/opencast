@@ -46,10 +46,10 @@ public class TestDto {
   @GeneratedValue
   private long id;
 
-  @Column(name = "key", length = 128, nullable = false)
+  @Column(name = "a", length = 128, nullable = false)
   private String key;
 
-  @Column(name = "value", length = 128, nullable = false)
+  @Column(name = "b", length = 128, nullable = false)
   private String value;
 
   public static TestDto create(String key, String value) {

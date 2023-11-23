@@ -38,13 +38,13 @@ import org.opencastproject.util.data.Function;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.SetB;
-import com.mysema.query.Tuple;
-import com.mysema.query.jpa.JPASubQuery;
-import com.mysema.query.jpa.impl.JPADeleteClause;
-import com.mysema.query.jpa.impl.JPAQueryFactory;
-import com.mysema.query.support.Expressions;
-import com.mysema.query.types.EntityPath;
-import com.mysema.query.types.expr.BooleanExpression;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.EntityPath;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPADeleteClause;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.sql.SQLExpressions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -232,12 +232,11 @@ HAVING v = (SELECT count(*)
                  WHERE (t2.organization_id = ?)
            */
           where = Q_PROPERTY.mediaPackageId.in(
-              new JPASubQuery()
-                  .from(Q_PROPERTY)
-                  .join(Q_SNAPSHOT)
+              SQLExpressions.select(Q_PROPERTY)
+                  .leftJoin(Q_SNAPSHOT)
                   // move the join condition from the "ON" clause (mediapackage_id) to the
                   // where clause. Find an explanation above.
-                  .where(Q_PROPERTY.mediaPackageId.eq(Q_SNAPSHOT.mediaPackageId).and(w))
+                  .on(Q_PROPERTY.mediaPackageId.eq(Q_SNAPSHOT.mediaPackageId).and(w))
                   .distinct()
                   .list(Q_PROPERTY.mediaPackageId));
         } else {

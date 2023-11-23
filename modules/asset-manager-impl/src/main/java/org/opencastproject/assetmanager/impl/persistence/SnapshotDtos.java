@@ -23,9 +23,9 @@ package org.opencastproject.assetmanager.impl.persistence;
 import org.opencastproject.assetmanager.api.Availability;
 
 import com.entwinemedia.fn.Fn;
-import com.mysema.query.Tuple;
-import com.mysema.query.jpa.impl.JPAQuery;
-import com.mysema.query.types.Expression;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Expression;
+import com.querydsl.jpa.impl.JPAQuery;
 
 import javax.persistence.EntityManager;
 
@@ -102,8 +102,8 @@ public final class SnapshotDtos {
 
     /**
      * Parameter for query execution methods like
-     * {@link com.mysema.query.jpa.impl.JPAQuery#singleResult(com.mysema.query.types.Expression[])} or
-     * {@link com.mysema.query.jpa.impl.JPAQuery#list(Expression[])}.
+     * {@link com.com.querydsl.jpa.JPAQuery#singleResult(com.querydsl.core.types.Expression[])} or
+     * {@link com.com.querydsl.jpa.JPAQuery#list(Expression[])}.
      */
     public static final Expression<?>[] select = new Expression[] {
         QSnapshotDto.snapshotDto,

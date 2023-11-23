@@ -21,17 +21,17 @@
 package org.opencastproject.assetmanager.impl.persistence;
 
 import static com.entwinemedia.fn.Stream.$;
-import static com.mysema.query.types.PathMetadataFactory.forVariable;
+import static com.querydsl.core.types.PathMetadataFactory.forVariable;
 
 import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.ListBuilders;
-import com.mysema.query.Tuple;
-import com.mysema.query.jpa.impl.JPAQuery;
-import com.mysema.query.types.Expression;
-import com.mysema.query.types.path.PathInits;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.dsl.PathInits;
+import com.querydsl.jpa.impl.JPAQuery;
 
 import javax.persistence.EntityManager;
 
@@ -105,8 +105,8 @@ public final class AssetDtos {
 
     /**
      * Parameter for query execution methods like
-     * {@link com.mysema.query.jpa.impl.JPAQuery#singleResult(com.mysema.query.types.Expression[])} or
-     * {@link com.mysema.query.jpa.impl.JPAQuery#list(Expression[])}.
+     * {@link com.com.querydsl.jpa.JPAQuery#singleResult(com.querydsl.core.types.Expression[])} or
+     * {@link com.com.querydsl.jpa.JPAQuery#list(Expression[])}.
      */
     public static final Expression<?>[] select = new Expression[] {
         QAssetDto.assetDto,
@@ -148,8 +148,8 @@ public final class AssetDtos {
 
     /**
      * Parameter for query execution methods like
-     * {@link com.mysema.query.jpa.impl.JPAQuery#singleResult(com.mysema.query.types.Expression[])} or
-     * {@link com.mysema.query.jpa.impl.JPAQuery#list(Expression[])}.
+     * {@link com.com.querydsl.jpa.JPAQuery#singleResult(com.querydsl.core.types.Expression[])} or
+     * {@link com.com.querydsl.jpa.JPAQuery#list(Expression[])}.
      */
     public static final Expression<?>[] select =
             $(Medium.select).append(ListBuilders.SIA.mk(
