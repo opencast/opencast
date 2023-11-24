@@ -25,7 +25,7 @@
     <commons-io.version>2.8.0</commons-io.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
     <commons-text.version>1.10.0</commons-text.version>
-    <cxf.version>3.5.5</cxf.version>
+    <cxf.version>3.5.7</cxf.version>
     <eclipselink.version>2.7.11</eclipselink.version>
     <eclipselink.asm.version>9.5.0</eclipselink.asm.version>
     <failureaccess.version>1.0.1</failureaccess.version>
@@ -43,7 +43,7 @@
     <jettison.version>1.5.4</jettison.version>
     <joda-time.version>2.12.5</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
-    <karaf.version>4.4.3</karaf.version>
+    <karaf.version>4.4.4</karaf.version>
     <node.version>v18.16.0</node.version>
     <osgi.core.version>8.0.0</osgi.core.version>
     <osgi.annotation.version>8.1.0</osgi.annotation.version>
@@ -54,7 +54,6 @@
     <org.osgi.service.http.version>1.2.1</org.osgi.service.http.version>
     <org.osgi.service.http.whiteboard.version>1.1.1</org.osgi.service.http.whiteboard.version>
     <org.osgi.service.jaxrs.version>1.0.1</org.osgi.service.jaxrs.version>
-    <pax.web.version>8.0.15</pax.web.version>
     <querydsl.version>3.7.4</querydsl.version>
     <rest-assured.version>4.4.0</rest-assured.version>
     <spring.version>3.1.4.RELEASE</spring.version>
@@ -1384,17 +1383,6 @@
             <artifactId>stax-api</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.ops4j.pax.web</groupId>
-        <artifactId>pax-web-api</artifactId>
-        <version>${pax.web.version}</version>
-        <scope>compile</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.ops4j.pax.web</groupId>
-        <artifactId>pax-web-extender-whiteboard</artifactId>
-        <version>${pax.web.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
