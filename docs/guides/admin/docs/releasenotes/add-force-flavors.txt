@@ -1,0 +1,2 @@
+PR 4617 added a new config option for publish-engage `add-force-flavors` that allows us to add elements to an existing
+publication via the `merge` strategy without overwriting elements with the same flavor.
