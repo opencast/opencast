@@ -62,11 +62,6 @@
       <version>3.1.4</version>
     </dependency>
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.43</version>
-    </dependency>
-    <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <version>42.5.3</version>
@@ -99,7 +94,6 @@
             <ignoredUnusedDeclaredDependency>org.checkerframework:checker-qual</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>net.java.dev.jna:jna</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>com.h2database:h2</ignoredUnusedDeclaredDependency>
-          	<ignoredUnusedDeclaredDependency>com.mysql:mysql-connector-java</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
@@ -133,8 +127,7 @@
               mariadb-java-client;inline=true,
               jna,
               postgresql;inline=true,
-              checker-qual;inline=true,
-              mysql-connector-java;inline=true
+              checker-qual;inline=true
             </Embed-Dependency>
             <Export-Package>
               org.opencastproject.db;version=${project.version}
