@@ -104,7 +104,7 @@
          "SUBHEADING": "Wählen Sie die Standard-Daten, die Sie in der {{ tableName }}-Ansicht anzeigen möchten",
          "AVAILABLE_COLUMNS": "Verfügbare Spalten",
          "SELECTED_COLUMNS": "Ausgewählte Spalten",
-         "FOOTER_TEXT": "Die Reihenfolge und Auswahl wird automatisch gespeichert. Press \"{{resetTranslation}}\" to restore the default view."
+         "FOOTER_TEXT": "Die Reihenfolge und Auswahl wird automatisch gespeichert. Drücken Sie \"{{resetTranslation}}\", um die Standardansicht wiederherzustellen."
       }
    },
    "CONFIRMATIONS": {
@@ -150,9 +150,9 @@
       "ADOPTER_REGISTRATION": "Adopter Registrierung"
    },
    "REBUILD": {
-      "TITLE": "Index Rebuild",
-      "WARNING": "Attention!",
-      "HEADER": "Index rebuild in progress!",
+      "TITLE": "Neuaufbau des Indexes",
+      "WARNING": "Achtung!",
+      "HEADER": "Neuaufbau des Indexes läuft!",
       "THEME_SERVICE": "Theme Service",
       "SERIES_SERVICE": "Series Service",
       "SCHEDULER_SERVICE": "Scheduler Service",
@@ -294,7 +294,7 @@
          "GENERAL": {
             "CAPTION": "Allgemein",
             "SUMMARY": "({{ count }} Videos ausgewählt)",
-            "CANNOTSTART": "Hervorgehobene Ereignisse(n) können momentan nicht verarbeitet werden. Deselect it/them or try again later."
+            "CANNOTSTART": "Hervorgehobene Ereignisse(n) können momentan nicht verarbeitet werden. Entfernen Sie diese(s) oder versuchen Sie es später erneut."
          },
          "TASKS": {
             "CAPTION": "Aufgaben",
@@ -352,7 +352,7 @@
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Bearbeiten und/oder wählen Sie die Metadatenfelder aus, die Sie aktualisieren möchten. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "DESCRIPTION": "Bearbeiten und/oder wählen Sie die Metadatenfelder aus, die Sie aktualisieren möchten. Ein Feld kann nicht ausgewählt werden, wenn sich nicht der Wert für min. eine Aufnahme ändern würde, oder der Wert nicht valide ist (z.B. dürfen Pflichtfelder nicht leer sein). Hervorgehobene Metadatenfelder haben abweichende Werte für die ausgewählten Aufnahmen.",
             "TABLE": {
                "CAPTION": "Metadaten gewählter Videos",
                "FIELDS": "Metadaten",
@@ -442,7 +442,7 @@
          },
          "INFORMATION_STATE": {
             "HEADER": "Danke, dass Sie Opencast nutzen!",
-            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
+            "INFORMATION_PARAGRAPH_1": "Unsere Entwickler arbeiten ständig daran, die Nutzererfahrung zu verbessern. Dafür benötigen wir mehr Informationen darüber, wer Opencast nutzt und wie. Sie können uns mit einer schnellen Registrierung helfen.",
             "INFORMATION_PARAGRAPH_2": "Wir freuen uns über jede Rückmeldung, da selbst ein Teil der Daten, die wir über die Opencast-Nutzung sammeln dürfen, helfen werden, bessere Software zu erstellen, die Chancen für zusätzliche Finanzierungen zu verbessern und mehr Unternehmen zu gewinnen, Dienstleistungen rund um Opencast anzubieten."
          },
          "FORM_STATE": {
@@ -459,7 +459,7 @@
             "LAST_NAME": "Nachname",
             "STREET": "Straße",
             "NUMBER": "Hausnummer",
-            "ADDITIONAL_ADDRESS_INFO": "Hinzufügen address information",
+            "ADDITIONAL_ADDRESS_INFO": "Hinzufügen Zusätzl. Adressinformationen",
             "MAIL": "E-Mail-Adresse",
             "CONTACT_ME": "Kontaktiere mich für Aktualisierungen und Sicherheitsupdates",
             "WHICH_DATA_TO_SHARE": "Welche Daten möchtest du teilen?",
@@ -484,7 +484,7 @@
             "TEXT": "Beim Ausführen der Abfrage ist ein Fehler aufgetreten."
          },
          "DELETE_SUBMIT_STATE": {
-            "TEXT": "Sind Sie sicher, dass Sie die Registrierung löschen möchten? Confirming this will also remove your registration data from the Opencast project server with the next update interval."
+            "TEXT": "Sind Sie sicher, dass Sie die Registrierung löschen möchten? Mit der Bestätigung werden auch ihre Registrierungsdaten beim nächsten Update-Intervall von den Opencast-Servern entfernt."
          }
       }
    },
@@ -907,7 +907,7 @@
                   "NEW": "Neue Richtlinie",
                   "NEW_USER": "Neuer Nutzer",
                   "DETAILS": "Nicht-Benutzer-Rollen",
-                  "USER": "User",
+                  "USER": "Benutzer",
                   "USERS": "Benutzer, die für das Event autorisiert sind",
                   "NONEXISTENT_USER": "Nicht existierender Nutzer",
                   "HELP": {
@@ -1141,7 +1141,7 @@
                   "NEW": "Neue Richtlinie",
                   "NEW_USER": "Neuer Nutzer",
                   "DETAILS": "Nicht-Nutzer-Rollen",
-                  "USER": "User",
+                  "USER": "Benutzer",
                   "USERS": "Nutzer, die für das Event autorisiert sind",
                   "HELP": {
                      "READ": "Durch das Setzen von Leserechte wird die Serie für den ausgewählten Nutzer sichtbar",
@@ -1160,7 +1160,7 @@
             "THEME": {
                "CAPTION": "Branding",
                "DESCRIPTION": {
-                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
+                  "TEXT": "Optional können Sie ihre Aufzeichnungen mit Brandings versehen. Brandings können Vor- und Abspänne sowie Wasserzeichen und Titelfolien mit Metadaten enthalten."
                },
                "TITLE": "Branding",
                "LABEL": "Branding auswählen",
@@ -1168,7 +1168,7 @@
             },
             "TOBIRA": {
                "CAPTION": "Tobira",
-               "DESCRIPTION": "Here you can select where you want the series to show up in the Tobira video portal. You can only select one location here, and it needs to be empty (marked in bold). You can create new pages here, but note that they are only persisted if they are on the path to the selected page.",
+               "DESCRIPTION": "Hier können Sie auswählen, wo die Serie im Videoportal Tobira erscheinen soll. Sie können hier nur einen Ort auswählen, der leer sein muss (fett markiert). Sie können hier neue Seiten anlegen, aber beachten Sie, dass diese nur persistiert werden, wenn sie im Pfad der ausgewählten Seite liegen.",
                "SELECT_PAGE": "Zielseite auswählen",
                "PAGE_TITLE": "Titel der Unterseite",
                "PATH_SEGMENT": "Pfadsegment",
@@ -1236,7 +1236,7 @@
                   "LOAD_MORE_LIMIT": "angezeigte Richtlinien.",
                   "LOAD_MORE_LINK": "Mehr laden",
                   "NEW_USER": "Neuer Nutzer",
-                  "USER": "User",
+                  "USER": "Benutzer",
                   "USERS": "Nutzer, die für das Event autorisiert sind",
                   "NONEXISTENT_USER": "Nicht existierender Nutzer",
                   "HELP": {
@@ -1492,7 +1492,7 @@
                   "DETAILS": "Nicht-Nutzer-Rollen",
                   "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu",
                   "NEW_USER": "Neuer Nutzer",
-                  "USER": "User",
+                  "USER": "Benutzer",
                   "USERS": "Nutzer, die durch diese Zugriffsrichtlinie autorisiert sind",
                   "HELP": {
                      "READ": "Durch das Setzen von Leseberechtigungen wird das Medium, dem diese Zugriffsrichtlinie zugewiesen wird, für den ausgewählten Benutzer sichtbar.",
@@ -1541,7 +1541,7 @@
                   "DETAILS": "Nicht-Nutzer-Rollen",
                   "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu",
                   "NEW_USER": "Neuer Nutzer",
-                  "USER": "User",
+                  "USER": "Benutzer",
                   "USERS": "Nutzer, die durch diese Zugriffsrichtlinie autorisiert sind",
                   "NONEXISTENT_USER": "Nicht existierender Nutzer",
                   "HELP": {
@@ -1777,7 +1777,7 @@
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "Warnung: Einige Ihrer Änderungen wurden nicht gespeichert. Wenn Sie den Video-Editor verlassen, gehen diese Änderungen verloren. Do you really want to continue?",
+      "WARNING_UNSAVED": "Warnung: Einige Ihrer Änderungen wurden nicht gespeichert. Wenn Sie den Video-Editor verlassen, gehen diese Änderungen verloren. Möchten Sie wirklich fortfahren?",
       "TIMELINE": "Zeitleiste",
       "ZOOMLEVEL": "Zoomlevel",
       "PREVIEW_MODE": "Vorschau Modus",
@@ -1825,7 +1825,7 @@
          "END": "Ende"
       },
       "THUMBNAIL": {
-         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
+         "DESCRIPTION": "Ein Standardvorschaubild für die Aufnahme wird automatisch generiert. Falls Sie ein anderes Vorschaubild verwenden wollen, können Sie dieses an der aktuellen Videoposition extrahieren oder ein Bild hochladen.",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
@@ -1852,7 +1852,7 @@
          },
          "PREVIEW": {
             "NOT_AVAILABLE": "Keine Vorschau vorhanden",
-            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
+            "OUTDATED": "Die Vorschau ist nicht mehr aktuell, weil Segmente angepasst wurden. Dies wird geupdatet, sobald sie Ihre Änderungen speichern."
          },
          "CURRENT": {
             "DEFAULT": "Sie verwenden aktuell das automatisch erstellte Vorschaubild.",
@@ -1861,7 +1861,7 @@
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
+         "DESCRIPTION": "Sie können Spuren deaktivieren, um diese von der weiteren Verarbeitung auszuschließen. Bitte beachten Sie, dass die Aufnahmen (erneut) publiziert werden müssen, um die Änderungen anzuwenden.",
          "NOTIFICATION": {
             "NO_VIDEO_TRACK_SELECTED": "Bitte wählen Sie mindestens eine Videospur aus",
             "NO_AUDIO_TRACK_SELECTED": "Bitte wählen Sie mindestens eine Audiospur aus"
@@ -1875,8 +1875,8 @@
             "NO_PREVIEW_AVAILABLE": "Keine Vorschau verfügbar",
             "NO_TRACK_SELECTED": "Es sind keine Videospuren ausgewählt",
             "TOOLTIPS": {
-               "HIDE": "This video track is currently enabled. Click to disable",
-               "UNHIDE": "This video track is currently disabled. Click to enable."
+               "HIDE": "Diese Videospur ist aktuell aktiviert. Klicken zum Deaktivieren",
+               "UNHIDE": "Diese Videospur ist aktuell deaktiviert. Klicken zum Aktivieren."
             }
          },
          "AUDIO": {
@@ -1885,8 +1885,8 @@
             "NO_PREVIEW_AVAILABLE": "Keine Vorschau vorhanden",
             "NO_TRACK_SELECTED": "Keine Audiospuren ausgewählt",
             "TOOLTIPS": {
-               "HIDE": "This audio track is currently enabled. Click to disable",
-               "UNHIDE": "This audio track is currently disabled. Click to enable"
+               "HIDE": "Diese Audiospur ist aktuell aktiviert. Klicken zum Deaktivieren",
+               "UNHIDE": "Diese Audiospur ist aktuell deaktiviert. Klicken zum Aktivieren"
             }
          }
       },
@@ -2165,7 +2165,7 @@
    "HOTKEYS": {
       "CHEAT_SHEET": {
          "TITLE": "Tastenkürzel",
-         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+         "HINT": "Diese Ansicht listet die aktuell verfügbaren Tastaturkombinationen auf. Beachten Sie, dass sich diese in Abhängigkeit von der betrachteten Seite ändern können."
       },
       "KEYS": {
          "CTRL": "Strg",
@@ -2254,7 +2254,7 @@
       }
    },
    "STATISTICS": {
-      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Bitte versuche es später erneut.",
+      "NOT_AVAILABLE": "Es können aktuell keine Statistiken dargestellt werden. Bitte versuche es später erneut.",
       "UNSUPPORTED_TYPE": "Diese Statistik-Daten können nicht dargestellt werden.",
       "FROM": "Von",
       "TO": "Bis",
@@ -2270,7 +2270,7 @@
          "PUBLISHEDHOURS": "Veröffentlichte Stunden an Videomaterial"
       },
       "DESCRIPTION": {
-         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
+         "RANDOM": "Dies zeigt zufällige Daten als Beispiel an. Sie können dieses Diagramm deaktivieren, indem sie die entsprechende Statistikkonfiguration aus /etc/providers entfernen",
          "VIEWS_SUM": "Diese Statistik zeigt die Summe der Zugriffe pro Zeiteinheit.",
          "VIEWS_AVG": "Diese Statistik zeigt die durchschnittliche Anzahl von Zugriffe pro Zeiteinheit.",
          "PUBLISHEDHOURS": "Dies zeigt die veröffentlichten Videostunden an"
