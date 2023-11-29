@@ -23,11 +23,9 @@ package org.opencastproject.speechtotext.impl.engine;
 
 import org.opencastproject.speechtotext.api.SpeechToTextEngine;
 import org.opencastproject.speechtotext.api.SpeechToTextEngineException;
-import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -38,15 +36,18 @@ import org.osgi.service.component.annotations.Modified;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /** Whisper implementation of the Speech-to-text engine interface. */
 @Component(
@@ -95,6 +96,9 @@ public class WhisperEngine implements SpeechToTextEngine {
 
   /** Enable Voice Activity Detection for whisper-ctranslate2 */
   private Option<Boolean> isVADEnabled = Option.none();
+
+  /** Pattern for whisper output. Searches for timestamps like this for example: [00:00.000 --> 00:06.000] */
+  private final Pattern outputPattern = Pattern.compile("\\[\\d{2}:\\d{2}.\\d{3} --> \\d{2}:\\d{2}.\\d{3}]");
 
   /** Config key for additional Whisper args */
   private static final String WHISPER_ARGS_CONFIG_KEY = "whisper.args";
@@ -168,58 +172,59 @@ public class WhisperEngine implements SpeechToTextEngine {
         "--model", whisperModel,
         "--output_dir", preparedOutputFile.getParent()};
 
-    List<String> command = new ArrayList<>(Arrays.asList(baseCommands));
+    List<String> transcriptionCommand = new ArrayList<>(Arrays.asList(baseCommands));
 
     if (translate) {
-      command.add("--task");
-      command.add("translate");
+      transcriptionCommand.add("--task");
+      transcriptionCommand.add("translate");
       logger.debug("Translation enabled");
       language = "en";
     }
 
     if (!language.isBlank() && !translate) {
       logger.debug("Using language {} from workflows", language);
-      command.add("--language");
-      command.add(language);
+      transcriptionCommand.add("--language");
+      transcriptionCommand.add(language);
     }
 
     if (quantization.isSome()) {
       logger.debug("Using quantization {}", quantization.get());
-      command.add("--compute_type");
-      command.add(quantization.get().toString());
+      transcriptionCommand.add("--compute_type");
+      transcriptionCommand.add(quantization.get().toString());
     }
 
     if (isVADEnabled.isSome()) {
       logger.debug("Setting VAD to {}", isVADEnabled.get());
-      command.add("--vad_filter");
-      command.add(isVADEnabled.get().toString());
+      transcriptionCommand.add("--vad_filter");
+      transcriptionCommand.add(isVADEnabled.get().toString());
     }
 
-    command.addAll(Arrays.asList(whisperArgs));
+    transcriptionCommand.addAll(Arrays.asList(whisperArgs));
 
-    logger.info("Executing Whisper's transcription command: {}", command);
+    logger.info("Executing Whisper's transcription command: {}", transcriptionCommand);
 
-    Process process = null;
-
+    Process transcriptonProcess = null;
     String mediaFileNameWithoutExtension;
 
     try {
-      ProcessBuilder processBuilder = new ProcessBuilder(command);
+      ProcessBuilder processBuilder = new ProcessBuilder(transcriptionCommand);
       processBuilder.redirectErrorStream(true);
-      process = processBuilder.start();
+      transcriptonProcess = processBuilder.start();
 
-
-      // wait until the task is finished
-      int exitCode = process.waitFor();
-      logger.debug("Whisper process finished with exit code {}",exitCode);
-
-      if (exitCode != 0) {
-        var error = "";
-        try (var errorStream = process.getInputStream()) {
-          error = "\n Output:\n" + IOUtils.toString(errorStream, StandardCharsets.UTF_8);
+      try (BufferedReader in = new BufferedReader(new InputStreamReader(transcriptonProcess.getInputStream()))) {
+        String line;
+        while ((line = in.readLine()) != null) { // consume process output
+          handleTranscriptionOutput(line);
         }
-        throw new SpeechToTextEngineException(
-            String.format("Whisper exited abnormally with status %d (command: %s)%s", exitCode, command, error));
+
+        // wait until the task is finished
+        int exitCode = transcriptonProcess.waitFor();
+        logger.debug("Whisper process finished with exit code {}", exitCode);
+
+        if (exitCode != 0) {
+          throw new SpeechToTextEngineException(
+              String.format("Whisper exited abnormally with status %d (command: %s)", exitCode, transcriptionCommand));
+        }
       }
 
       // Renaming output whisper filename to the expected output filename
@@ -236,7 +241,12 @@ public class WhisperEngine implements SpeechToTextEngine {
       logger.debug("Transcription failed closing Whisper transcription process for: {}", mediaFile);
       throw new SpeechToTextEngineException(e);
     } finally {
-      IoSupport.closeQuietly(process);
+      if (transcriptonProcess != null) {
+        transcriptonProcess.destroy();
+        if (transcriptonProcess.isAlive()) {
+          transcriptonProcess.destroyForcibly();
+        }
+      }
     }
 
     // Detect language if not set
@@ -262,5 +272,24 @@ public class WhisperEngine implements SpeechToTextEngine {
 
     return returnValues; // Subtitles data
   }
+
+  /**
+   * Handles the transcription process output
+   *
+   * @param message the message returned by the transcription process
+   */
+  private void handleTranscriptionOutput(String message) {
+    message = message.trim();
+    if ("".equals(message)) {
+      return;
+    }
+    // We do not want to log output lines starting with timestamps like this: [00:00.000 --> 00:06.000]
+    // Lines like this containing transcriptions. It would be too much output (and is probably unnecessary anyway)
+    Matcher matcher = outputPattern.matcher(message);
+    if (!matcher.find()) {
+      logger.debug(message);
+    }
+  }
+
 }
 
