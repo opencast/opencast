@@ -7,9 +7,9 @@ Description
 -----------
 
 The speech to text operation can be used to generate subtitles for Videos or Audio files. Currently, there are three STT
-engines available, [Whisper](../configuration/transcription.modules/whisper.md),
-[WhisperC++](../configuration/transcription.modules/whispercpp.md) and
-[Vosk](../configuration/transcription.modules/vosk.md).
+engines available, [Whisper](../configuration/transcription.configuration/whisper.md),
+[WhisperC++](../configuration/transcription.configuration/whispercpp.md) and
+[Vosk](../configuration/transcription.configuration/vosk.md).
 The subtitles file format ist WebVTT.
 
 
