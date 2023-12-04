@@ -343,13 +343,19 @@ systemctl start opencast.service
 systemctl enable opencast.service
 ```
 
-You should be able to go to https://admin.example.com , login with your specified credentials and start uploading videos. If everything works as expected you can also start checking out the plethora of possibilities and configuration options that Opencast provides. In general it is advisable to only change one functonality at a time in order to test if the configuration was successfull. If the admin-ui does not show up or anything unexpected happens, refer to the next section.
+Before trying to login you should check, if the startup was successful. You can do so by running:
+
+```sh
+systemctl status opencast.service
+```
+
+If the status says "running" and no errors are to be seen, you should now be able to go to https://admin.example.com , login with your specified credentials and start uploading videos. If everything works as expected you can also start checking out the plethora of possibilities and configuration options that Opencast provides. In general it is advisable to only change one functonality at a time in order to test if the configuration was successfull. If the admin-ui does not show up or anything unexpected happens, refer to the next section.
 
 Troubleshooting
 ------------
 If there are any problems with starting up Opencast, accessing a video or any errors during processing of a video a good place to start your investigation are the most recent Opencast logs which are located by default in `/var/logs/opencast/opencast.log`. Open the file, find the first error message that appeared and check what it says.
 In most cases, if there are some faulty configurations, files missing or connection problems there will be a corresponding message which should lead you to the solution.
 
-If Opencast is running, but the AdminUI does not show up you should also check if nginx is started and the configuration file is valid.
+If Opencast is running, but the AdminUI does not show up you should also check if nginx is started and the configuration file is valid. Invalid server certificates may also be an issue.
 
 If you can not solve the problem on your own you can also always ask in the appropriate Opencast mailing lists or community chatrooms.
