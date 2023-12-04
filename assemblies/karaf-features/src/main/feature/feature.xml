@@ -26,15 +26,6 @@
     <bundle start-level="55">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-httpclient/3.1_7</bundle>
     <bundle start-level="55">mvn:commons-codec/commons-codec/${commons-codec.version}</bundle>
 
-    <!-- General specifications -->
-    <bundle>mvn:javax.el/javax.el-api/3.0.0</bundle>
-    <bundle>mvn:javax.servlet.jsp/javax.servlet.jsp-api/2.3.1</bundle>
-    <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/1.1.1</bundle>
-    <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/1.1.1</bundle>
-    <bundle>mvn:org.apache.geronimo.specs/geronimo-j2ee-management_1.1_spec/1.0.1</bundle>
-    <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr339-api-2.0.1/2.6.0</bundle>
-    <bundle>mvn:org.fusesource.hawtbuf/hawtbuf/1.11</bundle>
-
     <!-- JPA -->
     <feature>jndi</feature>
     <feature>jpa</feature>
@@ -64,7 +55,6 @@
     <bundle>mvn:org.apache.commons/commons-csv/${commons-csv.version}</bundle>
     <bundle>mvn:org.apache.commons/commons-lang3/${commons-lang3.version}</bundle>
     <bundle>mvn:org.apache.commons/commons-text/${commons-text.version}</bundle>
-    <bundle>mvn:org.apache.neethi/neethi/3.0.1</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xalan/2.7.2_3</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.bcel/5.2_3</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.batik/1.7_3</bundle>
@@ -78,7 +68,6 @@
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlresolver/1.2_1</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlschema/1.4.3_1</bundle>
     <bundle>mvn:org.codehaus.jettison/jettison/${jettison.version}</bundle>
-    <bundle>mvn:org.codehaus.groovy/groovy/2.4.3</bundle>
     <bundle>mvn:org.opencastproject/android-mms/1.2</bundle>
     <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/${json-simple.version}</bundle>
 
