@@ -174,9 +174,11 @@
               com.google.api.*
             </_exportcontents>
             <Import-Package>
+              !android.os*,
               !com.google.appengine*,
               !com.google.apphosting*,
               !javax.annotation,
+              !javax.annotation.meta,
               !oracle.xml.parser.*,
               !org.jaxen.*,
               !sun.security.util,
