@@ -26,6 +26,7 @@ import org.opencastproject.speechtotext.api.SpeechToTextEngineException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -42,9 +43,7 @@ import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -151,14 +150,14 @@ public class WhisperEngine implements SpeechToTextEngine {
    */
 
   @Override
-  public Map<String, Object> generateSubtitlesFile(File mediaFile,
-      File preparedOutputFile, String language, Boolean translate)
+  public Result generateSubtitlesFile(File mediaFile,
+      File workingDirectory, String language, Boolean translate)
           throws SpeechToTextEngineException {
 
     String[] baseCommands = { whisperExecutable,
     mediaFile.getAbsolutePath(),
         "--model", whisperModel,
-        "--output_dir", preparedOutputFile.getParent()};
+        "--output_dir", workingDirectory.getAbsolutePath()};
 
     List<String> transcriptionCommand = new ArrayList<>(Arrays.asList(baseCommands));
 
@@ -192,7 +191,7 @@ public class WhisperEngine implements SpeechToTextEngine {
     logger.info("Executing Whisper's transcription command: {}", transcriptionCommand);
 
     Process transcriptonProcess = null;
-    String mediaFileNameWithoutExtension;
+    File output;
 
     try {
       ProcessBuilder processBuilder = new ProcessBuilder(transcriptionCommand);
@@ -216,15 +215,14 @@ public class WhisperEngine implements SpeechToTextEngine {
       }
 
       // Renaming output whisper filename to the expected output filename
-      String mediaFileName = mediaFile.getName();
-      mediaFileNameWithoutExtension = mediaFileName.lastIndexOf('.') != -1
-          ? mediaFileName.substring(0, mediaFileName.lastIndexOf('.')) : mediaFileName;
-      preparedOutputFile = new File((preparedOutputFile.getParent() + "/" + mediaFileNameWithoutExtension + ".vtt"));
+      String outputFileName = FilenameUtils.getBaseName(mediaFile.getAbsolutePath()) + ".vtt";
+      output = new File(workingDirectory, outputFileName);
+      logger.debug("Whisper output file {}", output);
 
-      if (!preparedOutputFile.isFile()) {
+      if (!output.isFile()) {
         throw new SpeechToTextEngineException("Whisper produced no output");
       }
-      logger.info("Subtitles file generated successfully: {}", preparedOutputFile);
+      logger.info("Subtitles file generated successfully: {}", output);
     } catch (Exception e) {
       logger.debug("Transcription failed closing Whisper transcription process for: {}", mediaFile);
       throw new SpeechToTextEngineException(e);
@@ -239,10 +237,10 @@ public class WhisperEngine implements SpeechToTextEngine {
 
     // Detect language if not set
     if (language.isBlank()) {
-      JSONParser jsonParser = new JSONParser();
+      var jsonFile = FilenameUtils.removeExtension(output.getAbsolutePath()) + ".json";
+      var jsonParser = new JSONParser();
       try {
-        FileReader reader = new FileReader((preparedOutputFile.getParent() + "/"
-            + mediaFileNameWithoutExtension + ".json"));
+        FileReader reader = new FileReader(jsonFile);
         Object obj = jsonParser.parse(reader);
         JSONObject jsonObject = (JSONObject) obj;
         language = (String) jsonObject.get("language");
@@ -253,11 +251,7 @@ public class WhisperEngine implements SpeechToTextEngine {
       }
     }
 
-    Map<String,Object> returnValues = new HashMap<>();
-    returnValues.put("subFile",preparedOutputFile);
-    returnValues.put("language",language);
-
-    return returnValues; // Subtitles data
+    return new Result(language, output);
   }
 
   /**
