@@ -48,7 +48,7 @@
     <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/${jackson.version}</bundle>
-    <bundle>mvn:org.yaml/snakeyaml/1.33</bundle>
+    <bundle>mvn:org.yaml/snakeyaml/2.0</bundle>
     <bundle>mvn:com.google.guava/guava/${guava.version}</bundle>
     <bundle>mvn:com.google.guava/failureaccess/${failureaccess.version}</bundle>
     <bundle>mvn:com.google.code.gson/gson/${gson.version}</bundle>
@@ -191,7 +191,6 @@
     <bundle start-level="83">mvn:org.opencastproject/opencast-editor-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-email-template-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-email-template-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player-7/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-event-comment/${project.version}</bundle>
@@ -435,7 +434,6 @@
     <bundle start-level="83">mvn:org.opencastproject/opencast-editor-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-email-template-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-email-template-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player-7/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-event-comment/${project.version}</bundle>
@@ -631,7 +629,6 @@
     <bundle start-level="83">mvn:org.opencastproject/opencast-editor/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-editor-service-remote/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-editor-service-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player-7/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
@@ -730,6 +727,15 @@
     </conditional>
     <bundle start-level="82">mvn:org.opencastproject/opencast-annotation-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-annotation-impl/${project.version}</bundle>
+  </feature>
+
+  <feature name="opencast-plugin-paella-player-6" version="${project.version}">
+    <conditional>
+      <condition>opencast-allinone</condition>
+      <condition>opencast-presentation</condition>
+      <condition>opencast-adminpresentation</condition>
+    </conditional>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-pluginmanager" version="${project.version}">

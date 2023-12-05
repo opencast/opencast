@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -109,9 +109,11 @@ public class AttachTranscriptionOperationHandlerTest {
     // Transcription service set up
     service = EasyMock.createStrictMock(TranscriptionService.class);
 
-    EasyMock.expect(service.getGeneratedTranscription("mpId1", "transcriptionJob")).andReturn(captionDfxp);
+    EasyMock.expect(service.getGeneratedTranscription("mpId1", "transcriptionJob", Attachment.TYPE)).
+            andReturn(captionDfxp);
     EasyMock.expect(service.getLanguage()).andReturn("en").once();
-    EasyMock.expect(service.getGeneratedTranscription("mpId2", "transcriptionJob")).andReturn(captionVtt);
+    EasyMock.expect(service.getGeneratedTranscription("mpId2", "transcriptionJob", Attachment.TYPE)).
+            andReturn(captionVtt);
     EasyMock.expect(service.getLanguage()).andReturn("en").once();
     EasyMock.replay(service);
 
@@ -151,15 +153,16 @@ public class AttachTranscriptionOperationHandlerTest {
     EasyMock.replay(captionService);
 
     operation.setConfiguration(AttachTranscriptionOperationHandler.TRANSCRIPTION_JOB_ID, "transcriptionJob");
-    // operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/timedtext");
+    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/source");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TAGS, "tag1,tag2");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_CAPTION_FORMAT, "dfxp");
+    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TYPE, "attachment");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
     Assert.assertEquals(Action.CONTINUE, result.getAction());
 
     MediaPackage updatedMp = result.getMediaPackage();
-    Attachment[] attachments = updatedMp.getAttachments(MediaPackageElementFlavor.parseFlavor("captions/dfxp+en"));
+    Attachment[] attachments = updatedMp.getAttachments(MediaPackageElementFlavor.parseFlavor("captions/source"));
 
     Assert.assertNotNull(attachments);
     Assert.assertEquals(1, attachments.length);
@@ -177,15 +180,16 @@ public class AttachTranscriptionOperationHandlerTest {
     EasyMock.replay(captionService);
 
     operation.setConfiguration(AttachTranscriptionOperationHandler.TRANSCRIPTION_JOB_ID, "transcriptionJob");
-    // operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/timedtext");
+    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/source");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TAGS, "tag1,tag2");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_CAPTION_FORMAT, "vtt");
+    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TYPE, "attachment");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
     Assert.assertEquals(Action.CONTINUE, result.getAction());
 
     MediaPackage updatedMp = result.getMediaPackage();
-    Attachment[] attachments = updatedMp.getAttachments(MediaPackageElementFlavor.parseFlavor("captions/vtt+en"));
+    Attachment[] attachments = updatedMp.getAttachments(MediaPackageElementFlavor.parseFlavor("captions/source"));
 
     Assert.assertNotNull(attachments);
     Assert.assertEquals(1, attachments.length);

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -18,6 +18,8 @@
  * the License.
  *
  */
+import { translate } from 'paella-core';
+
 /* eslint no-console: "warn" */
 const g_contentTypes = {
   'presentation/delivery': 'presentation',
@@ -305,16 +307,25 @@ function readCaptions(potentialNewCaptions, captions) {
       let captions_match = captions_regex.exec(potentialCaption.type);
 
       if (captions_match) {
+        // Fallback for captions which use the old flavor style, e.g. "captions/vtt+en"
         let captions_lang = captions_match[3];
+        let captions_generated = '';
+        let captions_closed = '';
         const captions_subtype = captions_match[1];
 
-        if (!captions_lang && potentialCaption.tags && potentialCaption.tags.tag) {
+        if (potentialCaption.tags && potentialCaption.tags.tag) {
           if (!(potentialCaption.tags.tag instanceof Array)) {
             potentialCaption.tags.tag = [potentialCaption.tags.tag];
           }
           potentialCaption.tags.tag.forEach((tag)=>{
             if (tag.startsWith('lang:')){
               captions_lang = tag.substring('lang:'.length);
+            }
+            if (tag.startsWith('generator-type:') && tag.substring('generator-type:'.length) === 'auto') {
+              captions_generated = ' (' + translate('automatically generated') + ')';
+            }
+            if (tag.startsWith('type:') && tag.substring('type:'.length) === 'closed-caption') {
+              captions_closed = '[CC] ';
             }
           });
         }
@@ -325,10 +336,17 @@ function readCaptions(potentialNewCaptions, captions) {
           captions_format = captions_subtype;
         }
 
+        let captions_description = translate('Undefined caption');
+        if (captions_lang) {
+          let languageNames = new Intl.DisplayNames([window.navigator.language], {type: 'language'});
+          let captions_language_name = languageNames.of(captions_lang) || translate('Unknown language');
+          captions_description = captions_closed + captions_language_name + captions_generated;
+        }
+
         captions.push({
           id: potentialCaption.id,
           lang: captions_lang,
-          text: captions_lang || 'unknown language',
+          text: captions_description,
           url: potentialCaption.url,
           format: captions_format
         });
@@ -342,10 +360,8 @@ function getCaptions(episode) {
   var captions = [];
 
   var attachments = episode.mediapackage.attachments.attachment;
-  var catalogs = episode.mediapackage.metadata.catalog;
   var tracks = episode.mediapackage.media.track;
   if (!(attachments instanceof Array)) { attachments = attachments ? [attachments] : []; }
-  if (!(catalogs instanceof Array)) { catalogs = catalogs ? [catalogs] : []; }
   if (!(tracks instanceof Array)) { tracks = tracks ? [tracks] : []; }
 
   // Read the attachments
@@ -353,37 +369,6 @@ function getCaptions(episode) {
 
   // Read the tracks
   readCaptions(tracks, captions);
-
-  // Read the catalogs
-  catalogs.forEach((currentCatalog) => {
-    try {
-      // backwards compatibility:
-      // Catalogs flavored as 'captions/timedtext' are assumed to be dfxp
-      if (currentCatalog.type == 'captions/timedtext') {
-        let captions_lang;
-        if (currentCatalog.tags && currentCatalog.tags.tag) {
-          if (!(currentCatalog.tags.tag instanceof Array)) {
-            currentCatalog.tags.tag = [currentCatalog.tags.tag];
-          }
-          currentCatalog.tags.tag.forEach((tag)=>{
-            if (tag.startsWith('lang:')){
-              captions_lang = tag.substring('lang:'.length);
-            }
-          });
-        }
-
-        let captions_label = captions_lang || 'unknown language';
-        captions.push({
-          id: currentCatalog.id,
-          lang: captions_lang,
-          text: captions_label,
-          url: currentCatalog.url,
-          format: 'dfxp'
-        });
-      }
-    }
-    catch (err) {/**/}
-  });
 
   return captions;
 }

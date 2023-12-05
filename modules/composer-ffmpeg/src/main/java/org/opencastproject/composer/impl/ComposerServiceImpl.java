@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -1298,17 +1298,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     }
 
     return imageAttachments;
-  }
-
-  private void validateVideoStream(Job job, Track sourceTrack) throws EncoderException {
-    // make sure there is a video stream in the track
-    if (sourceTrack != null && !sourceTrack.hasVideo()) {
-      Map<String, String> params = new HashMap<>();
-      params.put("track-id", sourceTrack.getIdentifier());
-      params.put("track-url", sourceTrack.getURI().toString());
-      incident().recordFailure(job, IMAGE_EXTRACTION_NO_VIDEO, params);
-      throw new EncoderException("Cannot extract an image without a video stream");
-    }
   }
 
   /**

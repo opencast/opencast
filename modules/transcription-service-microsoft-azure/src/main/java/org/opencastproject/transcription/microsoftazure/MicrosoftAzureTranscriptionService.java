@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -28,7 +28,6 @@ import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.kernel.mail.SmtpService;
-import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
@@ -871,7 +870,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   }
 
   @Override
-  public MediaPackageElement getGeneratedTranscription(String mpId, String jobId)
+  public MediaPackageElement getGeneratedTranscription(String mpId, String jobId, MediaPackageElement.Type type)
           throws TranscriptionServiceException {
     try {
       // If jobId is unknown, look for all jobs associated to that mpId
@@ -882,7 +881,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       // Results already saved?
       URI uri = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, getTranscriptFileName(jobId));
       MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-      return builder.elementFromURI(uri, Attachment.TYPE, new MediaPackageElementFlavor("captions",
+      return builder.elementFromURI(uri, type, new MediaPackageElementFlavor("captions",
               "microsoft-azure"));
     } catch (TranscriptionDatabaseException e) {
       throw new TranscriptionServiceException("Job id not informed and could not find transcription", e);

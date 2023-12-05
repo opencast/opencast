@@ -21,7 +21,7 @@ listprovider properties file:
 
     etc/listproviders/event.upload.asset.options.properties
 
-Two source types are enabled by default for use in the Admin UI.
+Three source types are enabled by default for use in the Admin UI.
 
     EVENTS.EVENTS.NEW.SOURCE.UPLOAD.NON_SEGMENTABLE={\
       "id":"track_presenter",\
@@ -38,6 +38,16 @@ Two source types are enabled by default for use in the Admin UI.
       "flavorSubType":"source",\
       "multiple":false,\
       "displayOrder": 2}
+      
+    EVENTS.EVENTS.NEW.SOURCE.UPLOAD.SUBTITLES={\
+        "id": "track_subtitles",\
+        "type":"track",\
+        "flavorType": "captions",\
+        "flavorSubType": "source",\
+        "tags": "generator:unknown",\
+        "displayOrder":3,\
+        "accept": ".vtt"}
+
 
 Source upload options as displayed in the Admin UI Create event:
     ![assetUploadSource](images/assetUploadSource.png)
@@ -72,35 +82,43 @@ Example of variables in a workflow:
 How to Enable Preconfigured Asset Options
 -------------------------------------------
 
-Catalogs and attachments can be added to new and existing events. New source tracks can only be defined for the upload of new events. Some
+Catalogs and attachments can be added to new and existing events. Some
 predefined catalog and attachment examples are commented out in the properties file. You can uncomment any of these
 to make them upload options in the Admin UI. The sample workflow `publish-uploaded-assets` will automatically distribute,
 publish, and archive uploaded assets on existing events.
 
     # Asset upload options are for new and existing events.
-    # EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CAPTIONS_DFXP={"id":"catalog_captions_dfxp", "type": "catalog",
-    #     "flavorType": "captions", "flavorSubType": "timedtext", "displayOrder": 2}
-    # EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CAPTIONS_WEBVTT={"id":"attachment_captions_webvtt",
-    #     "type": "attachment", "flavorType": "text", "flavorSubType": "webvtt", "displayOrder": 3}
     # EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CLASS_HANDOUT_NOTES={"id": "attachment_class_handout_notes",
-    #     "type": "attachment", "flavorType": "attachment", "flavorSubType": "notes", "displayOrder": 4}
-    # EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.SMIL={"id":"catalog_smil", "type":"catalog", "flavorType": "smil",
-    #      "flavorSubType": "smil", "displayOrder": 5}
-    # EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.PREVIEW_IMAGE={"id":"attachment_preview_image",
-    #     "type":"attachment", "flavorType": "presenter","flavorSubType": "search+preview", "displayOrder": 6}
+    #   "type": "attachment", "flavorType": "attachment", "flavorSubType": "notes", "displayOrder":1}
+    # EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.PREVIEW_IMAGE={"id":"attachment_preview_image", "type":"attachment",
+    #   "flavorType": "presenter","flavorSubType": "search+preview", "displayOrder":2,
+    #   "accept": ".bmp,.gif,.jpeg,.jpg,.png,.tif,.tiff"}
+    # EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.SUBTITLES={"id": "track_subtitles_option", "type":"track"
+    #   "flavorType": "captions","flavorSubType": "source", "tags": "generator:unknown", "displayOrder":3,
+    #   "accept": ".vtt"}
     EVENTS.EVENTS.NEW.UPLOAD_ASSET.WORKFLOWDEFID=publish-uploaded-assets
 
     # The video source track upload options are only for new events.
-    # The MULTIPLE_PARTS example shows how to enable choosing multiple source files for a single flavor. In this case,
-    # a fictional "multipart/part+source".
-    # EVENTS.EVENTS.NEW.SOURCE.UPLOAD.MULTIPLE_PARTS={"id": "track_parts","type":"track",
-    #    "flavorType": "multipart", "flavorSubType": "part+source", "multiple":true, "displayOrder": 10}
-    # EVENTS.EVENTS.NEW.SOURCE.UPLOAD.AUDIO_ONLY={"id": "track_audio","type":"track",
-    #     "flavorType": "presenter-audio", "flavorSubType": "source", "multiple":false, "displayOrder": 11}
     EVENTS.EVENTS.NEW.SOURCE.UPLOAD.NON_SEGMENTABLE={"id": "track_presenter","type":"track",
-         "flavorType":"presenter", "flavorSubType": "source", "multiple":false, "displayOrder": 12}
+        "flavorType": "presenter","flavorSubType": "source", "multiple":false, "displayOrder":1,
+        "accept": ".avi,.flv,.m4v,.mkv,.mov,.mp4,.mpeg,.mpg,.ogv,.webm,.wmv,.flac,.m4a,.mp3,.ogg,.wav,.wma,.f4v"}
     EVENTS.EVENTS.NEW.SOURCE.UPLOAD.SEGMENTABLE={"id": "track_presentation","type":"track",
-         "flavorType":"presentation", "flavorSubType": "source", "multiple":false, "displayOrder": 13}
+        "flavorType": "presentation","flavorSubType": "source", "multiple":false, "displayOrder":2,
+        "accept": ".avi,.flv,.m4v,.mkv,.mov,.mp4,.mpeg,.mpg,.ogv,.webm,.wmv,.flac,.m4a,.mp3,.ogg,.wav,.wma,.f4v"}
+    EVENTS.EVENTS.NEW.SOURCE.UPLOAD.SUBTITLES={"id": "track_subtitles", "type":"track",
+        "flavorType": "captions", "flavorSubType": "source", "tags": "generator:unknown", "displayOrder":3,
+        "accept": ".vtt"}
+    # The MULTIPLE_PARTS example shows how to enable choosing multiple source files for a single flavor. In this case, a fictional "multipart/part+source".
+    # EVENTS.EVENTS.NEW.SOURCE.UPLOAD.MULTIPLE_PARTS={"id": "track_parts","type":"track", "flavorType": "multipart",
+    #   "flavorSubType": "part+source", "multiple":true, "displayOrder":4,
+    #   "accept": ".avi,.flv,.m4v,.mkv,.mov,.mp4,.mpeg,.mpg,.ogv,.webm,.wmv,.flac,.m4a,.mp3,.ogg,.wav,.wma"}
+    # EVENTS.EVENTS.NEW.SOURCE.UPLOAD.AUDIO_ONLY={"id": "track_audio","type":"track", "flavorType": "presenter-audio",
+    #   "flavorSubType": "source", "multiple":false, "displayOrder":5, "accept": ".flac,.m4a,.mp3,.ogg,.wav,.wma"}
+    # Presenter and Presentation tracks uploaded in a single container
+    # EVENTS.EVENTS.NEW.SOURCE.UPLOAD.MULTIPLE_TRACKS={"id": "track_multi","type":"track", "flavorType": "multitrack",
+    #   "flavorSubType": "source", "multiple":false, "displayOrder":6,
+    #   "accept": ".avi,.flv,.m4v,.mkv,.mov,.mp4,.mpeg,.mpg,.ogv,.webm,.wmv,.flac,.m4a,.mp3,.ogg,.wav,.wma"}
+
 
 Sample `publish-uploaded-assets` workflow:
 
@@ -247,7 +265,7 @@ The translation language files are located:
 
     modules/admin-ui-frontend/resources/public/org/opencastproject/adminui/languages/...
 
-Example of US English translation for `EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CAPTIONS_WEBVTT`:
+Example of US English translation for `EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.SUBTITLES`:
 
     modules/admin-ui-frontend/resources/public/org/opencastproject/adminui/languages/lang-en_US.json
 
@@ -263,7 +281,7 @@ Example of US English translation for `EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CAP
         ...
         "UPLOAD_ASSET": {
              ...
-            "CAPTIONS_WEBVTT" : "Captions WebVTT",
+            "SUBTITLES" : "Subtitles",
              ...
 ```
 Now you are ready to test and deploy.

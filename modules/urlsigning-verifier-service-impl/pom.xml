@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>14-SNAPSHOT</version>
+    <version>15-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -19,6 +19,7 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -27,6 +28,7 @@
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>

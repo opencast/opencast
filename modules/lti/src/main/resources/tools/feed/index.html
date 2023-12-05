@@ -1,0 +1,79 @@
+<html>
+<head>
+<title>Lecture Downloads</title>
+<link href="https://vula.uct.ac.za/library/skin/tool_base.css" type="text/css" rel="stylesheet" media="all" />
+<link href="https://vula.uct.ac.za//library/skin/neo-default/tool.css" type="text/css" rel="stylesheet" media="all" />
+<style>
+body {
+  font-family: "Open Sans", Ubuntu, "Segoe UI", "Helvetica Neue", sans-serif;
+}
+.btn {
+  padding: 0 0.5rem;
+  line-height: 2rem;
+  margin: 0.25rem;
+  border: none;
+  box-shadow: 0 0 1px black;
+  background: white;
+  background: linear-gradient(180deg, white 0%, #eee 100%);
+  text-decoration: none;
+  color: #222;
+  display: inline-block;
+}
+</style>
+</head>
+<body>
+<a class="btn btn-back" href="/ltitools/courses/index.html?sid=%courseID%&upload=%upload%">Back</a>
+<script src="jquery-latest.js"></script>
+<div id="content-div"></div>
+<script language="JavaScript">
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+var seriesId = getParameterByName("sid");
+var uploadSetting = getParameterByName('upload');
+
+$.get("/feeds/atom/1.0/series/" + seriesId, function(data) {
+    var $XML = $(data);
+    $XML.find("entry").each(function() {
+        var $entry = $(this),
+            item = {
+                title:       $entry.find("[nodeName=dc\\:title],title").text(),
+                link:        $entry.find("link").text(),
+                description: $entry.find("description").text(),
+                pubDate:     $entry.find("published").text(),
+                author:      $entry.find("author").find("name").text()
+            };
+        $('#content-div').append($("<h3>" + item.title + "</h3>"));
+        $('#content-div').append($('<p/>').text(item.author));
+	var jsDate = new Date(item.pubDate);
+        $('#content-div').append($('<p/>').text(jsDate));
+
+	$entry.find("link").each(function() {
+       	var $link = $(this),
+            links = {
+                url:   $link.attr("href"),
+		rel:   $link.attr("rel"),
+		title:  $link.attr("title"),
+		type:   $link.attr("type")
+            };
+	if (links.rel == "enclosure" && links.url) {
+        	$('#content-div').append($("<a target='_blank' href='" + links.url.replace('http://media', 'https://media') + "'>" + links.title.replace("/delivery","") + ": " + links.type + "</a><br/>"));
+	}
+    	});
+
+    });
+});
+
+var backButton = document.querySelector('a.btn');
+if (backButton) {
+  backButton.href = backButton.href.replace('%courseID%', seriesId).replace('%upload%', uploadSetting);
+}
+
+</script>
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i" rel="stylesheet">
+</body>
+</html>

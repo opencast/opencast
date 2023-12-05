@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>14-SNAPSHOT</version>
+    <version>15-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -80,8 +80,7 @@
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <scope>test</scope>
+      <artifactId>slf4j-reload4j</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -101,6 +100,7 @@
     <dependency>
       <groupId>com.mchange</groupId>
       <artifactId>c3p0</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
@@ -117,7 +117,7 @@
         <configuration>
           <ignoredUnusedDeclaredDependencies>
             <!-- provide a logger for tests -->
-            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
             <!-- provides database for testing -->
             <ignoredUnusedDeclaredDependency>com.h2database:h2</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
