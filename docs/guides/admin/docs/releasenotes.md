@@ -135,7 +135,7 @@ WebVTT is the only one that will be guaranteed to work.
   [[#5352](https://github.com/opencast/opencast/pull/5352)]
 - Paella Player 6 has been turned into a plugin. If you are still using it, you will need to enable it.
   [[#4965](https://github.com/opencast/opencast/pull/4965)]
-- The publish-engage workflow operation has a new configuration option called `add-force-flavors`. It allows adding 
+- The publish-engage workflow operation has a new configuration option called `add-force-flavors`. It allows adding
   elements to an existing publication via the `merge` strategy without overwriting elements with the same flavor.
   [[#4617](https://github.com/opencast/opencast/pull/4617)]
 
