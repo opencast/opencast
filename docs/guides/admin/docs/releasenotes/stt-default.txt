@@ -1,0 +1,2 @@
+Whisper is the new default STT engine
+(See #5473)
