@@ -30,7 +30,7 @@
   "username": "Användarnamn",
   "password": "Lösenord",
   "remember_me": "Kom ihåg mig.",
-  "sthWentWrong": "Något gick fel. Vänligen försök igen.",
+  "sthWentWrong": "Something went wrong. Please try again.",
   "loading": "Laddar ...",
   "no_data": "Inga data tillgängliga.",
   "login_success": "Inloggad.",

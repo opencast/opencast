@@ -30,7 +30,7 @@
   "username": "用户名",
   "password": "密码",
   "remember_me": "记住用户",
-  "sthWentWrong": "出现错误。请重试。",
+  "sthWentWrong": "Something went wrong. Please try again.",
   "loading": "载入中...",
   "no_data": "无可用数据",
   "login_success": "登录成功。",

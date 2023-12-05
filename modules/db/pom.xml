@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>15-SNAPSHOT</version>
+    <version>14-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -59,7 +59,7 @@
     <dependency>
       <groupId>org.mariadb.jdbc</groupId>
       <artifactId>mariadb-java-client</artifactId>
-      <version>3.1.4</version>
+      <version>3.1.2</version>
     </dependency>
     <dependency>
       <groupId>org.postgresql</groupId>
@@ -93,7 +93,6 @@
             <ignoredUnusedDeclaredDependency>org.postgresql:postgresql</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.checkerframework:checker-qual</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>net.java.dev.jna:jna</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>com.h2database:h2</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>

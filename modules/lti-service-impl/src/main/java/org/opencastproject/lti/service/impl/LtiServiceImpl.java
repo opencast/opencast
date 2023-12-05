@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -291,17 +291,17 @@ public class LtiServiceImpl implements LtiService {
 
       if (captions != null) {
         final MediaPackageElementFlavor captionsFlavor = new MediaPackageElementFlavor(
-            "captions", "source"
+            "captions", captionFormat + "+" + captionLanguage
         );
         final MediaPackageElementBuilder elementBuilder =
             MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
         final MediaPackageElement captionsMediaPackage = elementBuilder
-                .newElement(MediaPackageElement.Type.Track, captionsFlavor);
-        if (!"vtt".equals(captionFormat)) {
-          throw new IllegalArgumentException("Subtitle format must be vtt, but was " + captionFormat);
+                .newElement(MediaPackageElement.Type.Attachment, captionsFlavor);
+        if ("dfxp".equals(captionFormat)) {
+          captionsMediaPackage.setMimeType(mimeType("application", "xml"));
+        } else {
+          captionsMediaPackage.setMimeType(mimeType("text", captionFormat));
         }
-        captionsMediaPackage.setMimeType(mimeType("text", captionFormat));
-
         captionsMediaPackage.addTag("lang:" + captionLanguage);
         mediaPackage.add(captionsMediaPackage);
         final URI captionsUri = workspace

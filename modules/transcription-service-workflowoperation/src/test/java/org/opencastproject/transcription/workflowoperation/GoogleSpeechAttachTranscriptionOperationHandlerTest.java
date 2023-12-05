@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -118,10 +118,8 @@ public class GoogleSpeechAttachTranscriptionOperationHandlerTest {
     // Transcription service set up
     service = EasyMock.createStrictMock(TranscriptionService.class);
 
-    EasyMock.expect(service.getGeneratedTranscription("mpId1", "transcriptionJob", Attachment.TYPE)).
-            andReturn(catalog);
-    EasyMock.expect(service.getGeneratedTranscription("mpId2", "transcriptionJob", Attachment.TYPE)).
-            andReturn(attachment);
+    EasyMock.expect(service.getGeneratedTranscription("mpId1", "transcriptionJob")).andReturn(catalog);
+    EasyMock.expect(service.getGeneratedTranscription("mpId2", "transcriptionJob")).andReturn(attachment);
     EasyMock.replay(service);
 
     // Caption service set up
@@ -167,8 +165,6 @@ public class GoogleSpeechAttachTranscriptionOperationHandlerTest {
         GoogleSpeechAttachTranscriptionOperationHandler.TARGET_TAGS, "tag1,tag2");
     operation.setConfiguration(
         GoogleSpeechAttachTranscriptionOperationHandler.TARGET_CAPTION_FORMAT, "dfxp");
-    operation.setConfiguration(
-            GoogleSpeechAttachTranscriptionOperationHandler.TARGET_TYPE, "attachment");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
     Assert.assertEquals(Action.CONTINUE, result.getAction());
@@ -198,8 +194,6 @@ public class GoogleSpeechAttachTranscriptionOperationHandlerTest {
         GoogleSpeechAttachTranscriptionOperationHandler.TARGET_TAGS, "tag1,tag2");
     operation.setConfiguration(
         GoogleSpeechAttachTranscriptionOperationHandler.TARGET_CAPTION_FORMAT, "webvtt");
-    operation.setConfiguration(
-            GoogleSpeechAttachTranscriptionOperationHandler.TARGET_TYPE, "Attachment");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
     Assert.assertEquals(Action.CONTINUE, result.getAction());

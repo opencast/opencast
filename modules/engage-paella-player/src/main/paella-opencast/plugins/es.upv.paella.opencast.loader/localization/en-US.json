@@ -3,6 +3,7 @@
 	"Error loading video {0}": "Error loading video {0}",
 
 	"CAPTIONS_undefined": "Unknown language",
-	"CAPTIONS_unknown_language": "Unknown language",
-	"CAPTIONS_auto_generated": "automatically generated"
+	"CAPTIONS_es": "Spanish",
+	"CAPTIONS_en": "English",
+	"CAPTIONS_de": "German"
 }

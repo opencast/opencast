@@ -26,11 +26,11 @@ jobs:
       matrix:
         java:
           - 11
-          - 17
+          - 13
     name: build (java ${{ matrix.java }})
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
 
       - name: cache local maven repository
         uses: actions/cache@v2

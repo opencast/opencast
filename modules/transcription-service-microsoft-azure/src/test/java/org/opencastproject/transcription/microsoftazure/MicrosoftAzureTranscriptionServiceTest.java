@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -38,7 +38,6 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.Track;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -237,7 +236,7 @@ public class MicrosoftAzureTranscriptionServiceTest {
     EasyMock.expect(workspace.get(uri)).andReturn(null); // Doesn't matter what is returned
     EasyMock.replay(workspace);
 
-    MediaPackageElement mpe = service.getGeneratedTranscription(MP_ID, null, Track.TYPE);
+    MediaPackageElement mpe = service.getGeneratedTranscription(MP_ID, null);
     Assert.assertEquals("captions", mpe.getFlavor().getType());
     Assert.assertEquals("microsoft-azure", mpe.getFlavor().getSubtype());
   }

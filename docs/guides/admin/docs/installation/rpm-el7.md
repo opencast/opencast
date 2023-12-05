@@ -11,10 +11,6 @@ This guide is based on an RPM software repository available for Red Hat based Li
 by [Osnabrück University](https://uni-osnabrueck.de).
 This repository provides preconfigured Opencast installations and all necessary 3rd-party-tools.
 
-<div class=warn>
-  <b>Opencast {{ opencast_major_version() }}</b> is not yet available.
-</div>
-
 Currently Supported
 -------------------
 

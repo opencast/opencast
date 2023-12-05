@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>15-SNAPSHOT</version>
+    <version>14-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -89,10 +89,7 @@
                   <goal>install-node-and-npm</goal>
                 </goals>
                 <configuration>
-                  <!-- Still building this with the old version of node -->
-                  <!-- This is going soon anyway. -->
-                  <!-- No need to work on an update -->
-                  <nodeVersion>v16.13.0</nodeVersion>
+                  <nodeVersion>${node.version}</nodeVersion>
                 </configuration>
               </execution>
 

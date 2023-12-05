@@ -30,7 +30,7 @@
   "username": "Usuario",
   "password": "Contrasinal",
   "remember_me": "Lembrarme.",
-  "sthWentWrong": "Algo foi mal. Por favor, inténteo de novo.",
+  "sthWentWrong": "Something went wrong. Please try again.",
   "loading": "Cargando...",
   "no_data": "Non hai datos dispoñibles.",
   "login_success": "Inicio de sesión correcto.",

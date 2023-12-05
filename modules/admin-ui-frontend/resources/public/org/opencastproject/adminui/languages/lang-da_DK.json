@@ -104,7 +104,7 @@
          "SUBHEADING": "Vælg de standarddata, som skal fremgå af {{ tableName }}-visningen",
          "AVAILABLE_COLUMNS": "Tilgængelige kolonner",
          "SELECTED_COLUMNS": "Valgte kolonner",
-         "FOOTER_TEXT": "Rækkefølge og udvælgelse gemmes automatisk. Tryk på \"{{resetTranslation}}\" for at gendanne standardvisningen."
+         "FOOTER_TEXT": "The order and selection will be saved automatically. Press \"{{resetTranslation}}\" to restore the default view."
       }
    },
    "CONFIRMATIONS": {
@@ -130,7 +130,7 @@
          }
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "Denne serie indeholder begivenheder. Sletning af serien sletter ikke begivenhederne.",
+         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
          "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone.",
          "UNSAVED_CHANGES": "You have unsaved changes. If you continue, those changes will be discarded. Are you sure that you want to continue?"
       },
@@ -178,7 +178,7 @@
       "GROUP_NOT_SAVED": "Gruppen kunne ikke gemmes",
       "GROUP_DELETED": "Gruppen er blevet slettet",
       "GROUP_NOT_DELETED": "Gruppen kunne ikke slettes",
-      "ACCESS_DENIED": "Adgang nægtet. Du har ikke ret til at se denne side",
+      "ACCESS_DENIED": "Access denied. You're not allowed to view this page",
       "SERIES_ADDED": "Serien er blevet oprettet",
       "SERIES_NOT_SAVED": "Serien kunne ikke gemmes",
       "EVENTS_CREATED": "Begivenheden er blevet oprettet",
@@ -212,8 +212,8 @@
       "LOCATION_DELETED": "Placeringen er blevet slettet",
       "LOCATION_NOT_DELETED": "Placeringen kunne ikke slettes",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Placeringen kunne ikke slettes, da du ikke har tilladelse til at gøre det.",
-      "CONFLICT_DETECTED": "Planlægningskonflikt: Denne nye begivenhed overlapper en eksisterende begivenhed. Ændre sted, datoer eller tider.",
-      "CONFLICT_BULK_DETECTED": "Planlægningskonflikt: Ændring af begivenhederne resulterer i konflikter. Ændr placering, datoer eller tider.",
+      "CONFLICT_DETECTED": "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
+      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "Planlægningsfejl: Begivenheden er allerede afsluttet.",
       "CONFLICT_END_BEFORE_START": "Planlægningsfejl: Sluttidspunkt skal ligge efter starttidspunkt.",
       "CONFLICT_IN_THE_PAST": "Tidsplan kunne ikke opdateres: Begivenheder kan ikke planlægges i fortiden.",
@@ -247,8 +247,8 @@
       "THUMBNAIL_CHANGE_FAILED": "Mislykkedes at skifte miniaturebillede.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Du har ikke valgt nogen videospor at behandle",
       "VIDEO_TOO_MANY_AUDIOS": "Du kan ikke have flere end én lyd-stream på en enkelt video-stream",
-      "SERVER_UNRESPONSIVE": "Ups! Serveren lader ikke til at svare. Forsøg igen senere.",
-      "SERVICE_UNAVAILABLE": "Ups! Serveren lader ikke til at svare. Forsøg igen senere.",
+      "SERVER_UNRESPONSIVE": "Oops! The server seems to be unresponsive. Please try again later.",
+      "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Please try again later.",
       "ACTIVE_TRANSACTION": "Begivenheden kan ikke redigeres under en aktiv arbejdsgang eller overførsel.",
       "BULK_METADATA_UPDATE": {
          "UNEXPECTED_ERROR": "An unexpected error occurred while updating. Some events might have been updated.",
@@ -282,19 +282,19 @@
          "EVENTS": {
             "CAPTION": "Slet",
             "DELETE_EVENTS": "Slet begivenheder",
-            "UNAUTHORIZED": "Du har ikke tilladelse til at slette de markerede begivenheder. Afmarkér dem for at fortsætte."
+            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Efter sletning, slettes samtlige begivenhedsmetadata, lyd- og videofiler uigenkaldeligt.",
       "DELETE_EVENTS_WARNING_LINE2": "",
-      "DELETE_SERIES_WARNING_LINE1": "Efter sletning, kan ingen seriemetadata genoprettes. Begivenheder i serien slettes ikke.",
+      "DELETE_SERIES_WARNING_LINE1": "Once deleted, all series metadata will be unrecoverable. Events in the series will not be deleted.",
       "DELETE_SERIES_WARNING_LINE2": "",
       "SCHEDULE_TASK": {
          "CAPTION": "Start opgave",
          "GENERAL": {
             "CAPTION": "Generelt",
             "SUMMARY": "({{ count }} begivenheder valgt)",
-            "CANNOTSTART": "Fremhævede begivenhed(-er) kan pt. ikke behandles. Fravælg den/dem eller forsøg igen senere."
+            "CANNOTSTART": "Highlighted event(s) cannot be processed at the moment. Deselect it/them or try again later."
          },
          "TASKS": {
             "CAPTION": "Opgaver",
@@ -317,7 +317,7 @@
             "NOCHANGES": "Ingen ændringer i begivenhederne registreret!",
             "CONFLICT_FIRST_EVENT": "Ændret begivenhed",
             "CONFLICT_SECOND_EVENT": "Begivenhed i konflikt",
-            "CANNOTEDITSCHEDULE": "For de markerede begivenheder har du ikke tilladelse til at redigere planlægningsoplysninger. Du kan fortsætte, men du vil ikke kunne redigere planlægningsoplysninger for nogle begivenheder overhovedet."
+            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
          },
          "METADATA": {
             "EDIT": "Redigér metadata"
@@ -333,7 +333,7 @@
             "CAPTION": "Redigér",
             "EVENT": "begivenhed",
             "EVENTS": "begivenheder",
-            "HEADER": "Denne side muliggør redigering af planlagte begivenheder grupperet efter ugedage. Indtastningsfelterne er forudfyldte, hvis alle planlagte begivenheder har samme værdi i et bestemt felt - ellers er felterne tomme. Efterlades inputfelter tomme, betyder det, at de respektive værdier ikke skal ændres.",
+            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
             "METADATA": "Metadata",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -459,7 +459,7 @@
             "LAST_NAME": "Last name",
             "STREET": "Street",
             "NUMBER": "Number",
-            "ADDITIONAL_ADDRESS_INFO": "Ordre adresseoplysninger",
+            "ADDITIONAL_ADDRESS_INFO": "Add. address information",
             "MAIL": "Email",
             "CONTACT_ME": "Kontakt mig for opdateringer og sikkerhedsproblemer",
             "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
@@ -1160,7 +1160,7 @@
             "THEME": {
                "CAPTION": "Tema",
                "DESCRIPTION": {
-                  "TEXT": "Du kan evt. benytte temaer til at brande dine videoer. Temaer kan definere bumper- og trailervideoer, vandmærker og titeldiaser herunder metadata."
+                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
                },
                "TITLE": "Tema",
                "LABEL": "Vælg et tema",
@@ -1688,7 +1688,7 @@
                "BOTTOM_RIGHT": "Nederst, højre",
                "UPLOAD": "Upload",
                "POSITION": "Vandmærkeplacering og uddrag",
-               "FILEUPLOAD_DESCRIPTION": "Filen skal have en alfakanal (gennemsigtig baggrund). Understøttet filtyper er: .PNG, .GIF, .SVG, .WEBP",
+               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: .PNG, .GIF, .SVG, .WEBP",
                "UPLOAD_LABEL": "Upload billede",
                "UPLOAD_BUTTON": "Upload"
             },
@@ -1777,7 +1777,7 @@
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "Advarsel: Visse af dine ændringer blev ikke gemt. Forlader du videoredigerngsværktøjet nu, vil disse ændringer gå tabt. Fortsæt alligevel?",
+      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
       "TIMELINE": "Tidslinje",
       "ZOOMLEVEL": "Zoomniveau",
       "PREVIEW_MODE": "Eksempeltilstand",
@@ -1825,7 +1825,7 @@
          "END": "Slut"
       },
       "THUMBNAIL": {
-         "DESCRIPTION": "En standardminiature, benyttet som en visuel repræsentation af begivenheden, genereres automatisk. Vil du hellere benytte en anden miniature, kan du udtrække en fra videoen på den aktuelle afspilningsposition eller uploade et billede.",
+         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
@@ -1852,7 +1852,7 @@
          },
          "PREVIEW": {
             "NOT_AVAILABLE": "Intet eksempel tilgængeligt",
-            "OUTDATED": "Eksemplet er forældet, da segmenter er ændret. Det opdateres, så snart du gemmer dine ændringer."
+            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
          },
          "CURRENT": {
             "DEFAULT": "Du benytter aktuelt standardminiaturen.",
@@ -1861,7 +1861,7 @@
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "Du kan fravælge spor for at udelukke dem fra yderligere behandling. Bemærk, at du er nødt til at (gen-)udgive begivenheden for at effektuere ændringerne.",
+         "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
          "NOTIFICATION": {
             "NO_VIDEO_TRACK_SELECTED": "Du skal aktivere minimum ét videospor",
             "NO_AUDIO_TRACK_SELECTED": "Du skal aktivere minimum ét lydspor"
@@ -1875,8 +1875,8 @@
             "NO_PREVIEW_AVAILABLE": "Intet billedeksempel fundet",
             "NO_TRACK_SELECTED": "Intet videospor valgt",
             "TOOLTIPS": {
-               "HIDE": "Dette videospor er i øjeblikket aktivt. Klik for at deaktivere",
-               "UNHIDE": "Dette videospor er i øjeblikket inaktivt. Klik for at eaktivere."
+               "HIDE": "This video track is currently enabled. Click to disable",
+               "UNHIDE": "This video track is currently disabled. Click to enable."
             }
          },
          "AUDIO": {
@@ -1885,8 +1885,8 @@
             "NO_PREVIEW_AVAILABLE": "Intet billedeksempel fundet",
             "NO_TRACK_SELECTED": "Intet lydspor valgt",
             "TOOLTIPS": {
-               "HIDE": "Dette lydspor er i øjeblikket aktivt. Klik for at deaktivere",
-               "UNHIDE": "Dette videospor er i øjeblikket inaktivt. Klik for at aktivere"
+               "HIDE": "This audio track is currently enabled. Click to disable",
+               "UNHIDE": "This audio track is currently disabled. Click to enable"
             }
          }
       },
@@ -2165,7 +2165,7 @@
    "HOTKEYS": {
       "CHEAT_SHEET": {
          "TITLE": "Tastaturgenveje",
-         "HINT": "Denne side viser de aktuelt tilgængelige tastaturgenveje. Bemærk, at disse kan ændre sig, afhængigt af hvilken side du besøger."
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
       },
       "KEYS": {
          "CTRL": "Ctrl",

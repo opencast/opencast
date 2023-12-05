@@ -104,7 +104,7 @@
          "SUBHEADING": "בחר את הנתונים המוגדרים כברירת מחדל שתרצה להציג בתצוגה {{ tableName }}",
          "AVAILABLE_COLUMNS": "עמודות זמינות",
          "SELECTED_COLUMNS": "עמודות נבחרות",
-         "FOOTER_TEXT": "הסדר והבחירה יישמרו באופן אוטומטי. הקש \"{{resetTranslation}}\" כדי לשחזר את התצוגה המהווה ברירת מחדל."
+         "FOOTER_TEXT": "The order and selection will be saved automatically. Press \"{{resetTranslation}}\" to restore the default view."
       }
    },
    "CONFIRMATIONS": {
@@ -130,7 +130,7 @@
          }
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "סדרה זו מכילה אירועים. מחיקת הסדרה לא תמחק אירועים אלו.",
+         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
          "EVENT_WILL_BE_GONE": "אם תתקדמו, האירוע יעלם לצמיתות.",
          "UNSAVED_CHANGES": "You have unsaved changes. If you continue, those changes will be discarded. Are you sure that you want to continue?"
       },
@@ -178,7 +178,7 @@
       "GROUP_NOT_SAVED": "לא ניתן לשמור את הקבוצה",
       "GROUP_DELETED": "הקבוצה נמחקה",
       "GROUP_NOT_DELETED": "לא ניתן למחוק את הקבוצה",
-      "ACCESS_DENIED": "הגישה נדחתה. אסור לך כדי להציג דף זה",
+      "ACCESS_DENIED": "Access denied. You're not allowed to view this page",
       "SERIES_ADDED": "הסדרה נוצרה",
       "SERIES_NOT_SAVED": "לא ניתן לשמור את הסידרה",
       "EVENTS_CREATED": "הארוע נוצר",
@@ -212,8 +212,8 @@
       "LOCATION_DELETED": "המיקום נמחק",
       "LOCATION_NOT_DELETED": "לא ניתן למחוק את המיקום",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "המיקום לא ניתן למחיקה, מכיוון שאין לך את ההרשאות לבצע פעולה זו.",
-      "CONFLICT_DETECTED": "סתירה בתזמון: האירוע החדש מתנגש עם אירוע קיים. בבקשה שנו את המיקום, התאריך או השעה.",
-      "CONFLICT_BULK_DETECTED": "התנגשות בתזמון: שינוי האירועים יוצר התנגשויות. אנא שנה את המיקום, תאריכים או שעות.",
+      "CONFLICT_DETECTED": "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
+      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "שגיאה בתזמון: האירוע כבר נגמר.",
       "CONFLICT_END_BEFORE_START": "שגיאה בתזמון: תזמון הסיום חייב להיות אחרי תזמון ההתחלה.",
       "CONFLICT_IN_THE_PAST": "לא היתה אפשרות לעדכן את לוח הזמנים: לא ניתן לתזמן אירוע בעבר.",
@@ -247,8 +247,8 @@
       "THUMBNAIL_CHANGE_FAILED": "החלפת תמונה ממוזערת נכשלה.",
       "VIDEO_SOURCE_TRACKS_INVALID": "לא נבחרו רצועות וידאו",
       "VIDEO_TOO_MANY_AUDIOS": "לא ניתן להוסיף יותר ממקור שמע אחד עבור מקור וידאו בודד",
-      "SERVER_UNRESPONSIVE": ". אופס! נראה שהשרת לא מגיב. נא נסה שוב מאוחר יותר.",
-      "SERVICE_UNAVAILABLE": ". אופס! נראה שהשרת לא מגיב. נא נסה שוב מאוחר יותר.",
+      "SERVER_UNRESPONSIVE": "Oops! The server seems to be unresponsive. Please try again later.",
+      "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Please try again later.",
       "ACTIVE_TRANSACTION": "לא ניתן לערוך את האירוע הזה בזמן שהוא עובר עיבוד.",
       "BULK_METADATA_UPDATE": {
          "UNEXPECTED_ERROR": "An unexpected error occurred while updating. Some events might have been updated.",
@@ -282,19 +282,19 @@
          "EVENTS": {
             "CAPTION": "מחק",
             "DELETE_EVENTS": "מחק אירועים",
-            "UNAUTHORIZED": "אין לך הרשאה למחוק את האירועים המודגשים. בבקשה הסר את הסימון שלהם על מנת להמשיך."
+            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "לאחר מחיקתו, כל המטא נתונים של האירוע, קובצי האודיו והווידאו יימחקו ויהיו בלתי ניתנים לשחזור.",
       "DELETE_EVENTS_WARNING_LINE2": "",
-      "DELETE_SERIES_WARNING_LINE1": "לאחר מחיקה, כל הסידרה של מטא נתונים יהיו בלתי ניתנים לשחזור. אירועים בסדרה לא יימחקו.",
+      "DELETE_SERIES_WARNING_LINE1": "Once deleted, all series metadata will be unrecoverable. Events in the series will not be deleted.",
       "DELETE_SERIES_WARNING_LINE2": "",
       "SCHEDULE_TASK": {
          "CAPTION": "התחל משימה",
          "GENERAL": {
             "CAPTION": "כללי",
             "SUMMARY": "({{ count }} אירועים נבחרו)",
-            "CANNOTSTART": "לא ניתן לעבד כעת אירועים המסומנים. בטל את הבחירה או נסה שוב מאוחר יותר"
+            "CANNOTSTART": "Highlighted event(s) cannot be processed at the moment. Deselect it/them or try again later."
          },
          "TASKS": {
             "CAPTION": "משימות",
@@ -317,7 +317,7 @@
             "NOCHANGES": "לא זוהה שינויים לאירוע!",
             "CONFLICT_FIRST_EVENT": "אירוע שהשתנה",
             "CONFLICT_SECOND_EVENT": "סתירה באיורע",
-            "CANNOTEDITSCHEDULE": "עבור האירועים המסומנים, אין לך הרשאה כדי לערוך את התזמון. ניתן להמשיך, אך לא היה ניתן לערוך את התזמון באף אחד מהאירועים כלל."
+            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
          },
          "METADATA": {
             "EDIT": "לערוך מטא-נתונים"
@@ -333,7 +333,7 @@
             "CAPTION": "ערוך",
             "EVENT": "אירוע",
             "EVENTS": "אירועים",
-            "HEADER": "דף זה מאפשר לך לערוך אירועים מתוזמנים המקובצים לפי ימי השבוע. השדות מלאים מראש במקרה שלכל האירועים המתוזמנים יש אותו ערך עבור שדה מסוים. אחרת, השדה ישאר ריק. במקרה ושדה קלט נשאר ריק הערכים המתאימים יישארו ללא שינוי.",
+            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
             "METADATA": "מטא-נתונים",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -1160,7 +1160,7 @@
             "THEME": {
                "CAPTION": "ערכת נושא",
                "DESCRIPTION": {
-                  "TEXT": "באפשרותך להשתמש בערכות נושא ולמתג את סרטי הווידאו שלך. ערכות נושא עשויים להגדיר סרטח פתיח וקדימון, סימני מים, שקופיות הכותרת כולל מטא-נתונים."
+                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
                },
                "TITLE": "ערכת נושא",
                "LABEL": "אין ערכת נושא",
@@ -1688,7 +1688,7 @@
                "BOTTOM_RIGHT": "למטה מימין",
                "UPLOAD": "העלאה",
                "POSITION": "מיקום סימן מים ותצוגה מקדימה",
-               "FILEUPLOAD_DESCRIPTION": "קובץ צריך לכלול ערוץ אלפא (רקע שקוף). סוגי הקבצים האפשריים הם:. PNG. GIF. SVG. WEBP",
+               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: .PNG, .GIF, .SVG, .WEBP",
                "UPLOAD_LABEL": "העלה תמונה",
                "UPLOAD_BUTTON": "העלאה"
             },
@@ -1777,7 +1777,7 @@
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "אזהרה: חלק את מהשינויים שלך לא נשמרו. אם תצא מעורך הוידאו, שינויים אלה עלולה ללכת לאיבוד. אתה באמת רוצה להמשיך?",
+      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
       "TIMELINE": "ציר הזמן",
       "ZOOMLEVEL": "רמת גודל התצוגה",
       "PREVIEW_MODE": "מצב תצוגה מקדימה",
@@ -1825,7 +1825,7 @@
          "END": "סוף"
       },
       "THUMBNAIL": {
-         "DESCRIPTION": "תמונת ברירת מחדל ממוזערת המשמשת לתצוגה ויזואלית של אירוע מיוצרת באופן אוטומטי. במקרה ובו תרצו תמונה ממוזערת שונה, אתם צריכים לחלץ תמונה ממוזערת מתוך הוידאו במיקום הנוכחי של הסרטון או להעלות תמונה.",
+         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
@@ -1852,7 +1852,7 @@
          },
          "PREVIEW": {
             "NOT_AVAILABLE": "תצוגה מקדימה אינה זמינה",
-            "OUTDATED": "התצוגה המקדימה מיושנת מכיוון שישנם מקטעים ששונו. התצוגה המקדימה תתעדכן מייד לאחר שהשינויים שלך ישמרו."
+            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
          },
          "CURRENT": {
             "DEFAULT": "אתם משתמשים כרגע בתמונת ברירת מחדל ממוזערת.",
@@ -1861,7 +1861,7 @@
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "אתם יכולים לבטל בחירה של רצועות בשביל שלא יכללו בתהליך העיבוד בהמשך. סימו לב שעליכם לפרסם (מחדש) את האירוע בשביל להכיל את השינויים בפועל.",
+         "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
          "NOTIFICATION": {
             "NO_VIDEO_TRACK_SELECTED": "עליך לאפשר לפחות סרטון וידיאו אחד",
             "NO_AUDIO_TRACK_SELECTED": "עליך לאפשר לפחות רצועת שמע אחת"
@@ -1875,8 +1875,8 @@
             "NO_PREVIEW_AVAILABLE": "לא נמצאה תמונה מקדימה",
             "NO_TRACK_SELECTED": "לא נבחרה רצועת שמע",
             "TOOLTIPS": {
-               "HIDE": "רצועת וידאו זו כרגע מאופשרת. לחץ לביטול",
-               "UNHIDE": "רצועת וידאו זו כרגע מבוטלת. לחץ לאיפשור."
+               "HIDE": "This video track is currently enabled. Click to disable",
+               "UNHIDE": "This video track is currently disabled. Click to enable."
             }
          },
          "AUDIO": {
@@ -1885,8 +1885,8 @@
             "NO_PREVIEW_AVAILABLE": "לא נמצאה תמונה מקדימה",
             "NO_TRACK_SELECTED": "לא נבחרה רצועת שמע",
             "TOOLTIPS": {
-               "HIDE": "רצועת שמע זו כרגע מאופשרת. לחץ לביטול",
-               "UNHIDE": "רצועת שמע זו כרגע מבוטלת. לחץ לאיפשור"
+               "HIDE": "This audio track is currently enabled. Click to disable",
+               "UNHIDE": "This audio track is currently disabled. Click to enable"
             }
          }
       },
@@ -2165,7 +2165,7 @@
    "HOTKEYS": {
       "CHEAT_SHEET": {
          "TITLE": "מקשי קיצור במקלדת",
-         "HINT": "דף זה מפרט את קיצורי המקשים הזמינים כרגע. הערה כי אלו עשוים להשתנות, בהתאם לעמוד בו אתם מבקרים."
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
       },
       "KEYS": {
          "CTRL": "Ctrl",
@@ -2254,7 +2254,7 @@
       }
    },
    "STATISTICS": {
-      "NOT_AVAILABLE": "סטטיסטיקטות לא ניתנות להצגה ברגע זה. יש לנסות בשלב מאוחר יותר.",
+      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
       "UNSUPPORTED_TYPE": "מצטערים, Opencast לא יכולה לחשב את הנתון הסטטיסטי הזה.",
       "FROM": "מאת",
       "TO": "עבור",
@@ -2270,7 +2270,7 @@
          "PUBLISHEDHOURS": "Published Hours of Video"
       },
       "DESCRIPTION": {
-         "RANDOM": "מוצג מידע אקראי לצורך הצגת יכולות. ניתן לבטל תצוגת תרשים זה על ידי מחיקת קובץ json המכיל המספק מידע סטטיסטי מתקיית etc/providers",
+         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
          "VIEWS_SUM": "This displays the total number of views per time unit.",
          "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
          "PUBLISHEDHOURS": "This displays the published hours of video"

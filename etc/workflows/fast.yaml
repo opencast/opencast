@@ -44,16 +44,6 @@ operations:
       - target-tags: "engage-download,engage-streaming,rss,atom"
       - encoding-profile: "fast.http"
 
-  - id: tag
-    fail-on-error: true
-    exception-handler-workflow: "partial-error"
-    description: "Tag captions for publication"
-    configurations:
-      - source-flavor: "captions/source"
-      - target-flavor: "captions/preview"
-      - target-tags: "+engage-download"
-      - copy: true
-
   - id: image
     if: "${straightToPublishing}"
     fail-on-error: true
@@ -115,7 +105,7 @@ operations:
     exception-handler-workflow: "partial-error"
     description: "Publishing to Engage"
     configurations:
-      - download-source-flavors: "dublincore/*,security/*"
+      - download-source-flavors: "dublincore/*,security/*,captions/*"
       - download-source-tags: "engage-download"
       - check-availability: false
 
@@ -124,7 +114,7 @@ operations:
     exception-handler-workflow: "partial-error"
     description: "Archiving"
     configurations:
-      - source-flavors: "*/source,dublincore/*,security/*"
+      - source-flavors: "*/source,dublincore/*,security/*,captions/*"
 
   - id: cleanup
     fail-on-error: "false"

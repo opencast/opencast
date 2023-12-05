@@ -8,10 +8,6 @@ This repository provides preconfigured Opencast installations and all necessary 
 > In addition to this guide, we have also recorded [a full installation done in 30 minutes](https://vt.uos.de/71hfc)
 > if you like to see how this works before you try it yourself.
 
-<div class=warn>
-  <b>Opencast {{ opencast_major_version() }}</b> is not yet available.
-</div>
-
 Currently Supported
 -------------------
 

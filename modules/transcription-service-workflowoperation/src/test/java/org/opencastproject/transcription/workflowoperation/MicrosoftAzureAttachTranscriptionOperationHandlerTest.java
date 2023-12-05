@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -100,8 +100,7 @@ public class MicrosoftAzureAttachTranscriptionOperationHandlerTest {
     // Transcription service set up
     service = EasyMock.createStrictMock(TranscriptionService.class);
 
-    EasyMock.expect(service.getGeneratedTranscription("mpId1", "transcriptionJob", Attachment.TYPE)).
-            andReturn(attachment);
+    EasyMock.expect(service.getGeneratedTranscription("mpId1", "transcriptionJob")).andReturn(attachment);
     EasyMock.expect(service.getReturnValues("mpId1", "transcriptionJob")).andReturn(null);
     EasyMock.replay(service);
 
@@ -138,8 +137,6 @@ public class MicrosoftAzureAttachTranscriptionOperationHandlerTest {
     operation.setConfiguration("target-tags", "tag1,tag2");
     operation.setConfiguration(
             MicrosoftAzureAttachTranscriptionOperationHandler.TARGET_CAPTION_FORMAT, "webvtt");
-    operation.setConfiguration(
-            MicrosoftAzureAttachTranscriptionOperationHandler.TARGET_TYPE, "attachment");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
     Assert.assertEquals(Action.CONTINUE, result.getAction());

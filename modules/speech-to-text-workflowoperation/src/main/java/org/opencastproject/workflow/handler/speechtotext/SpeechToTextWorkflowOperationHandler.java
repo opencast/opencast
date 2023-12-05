@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -199,12 +199,12 @@ public class
 
       MediaPackageElement subtitleMediaPackageElement;
       switch (appendSubtitleAs) {
-        case attachment:
-          subtitleMediaPackageElement = new AttachmentImpl();
-          break;
         case track:
-        default:
           subtitleMediaPackageElement = new TrackImpl();
+          break;
+        case attachment:
+        default:
+          subtitleMediaPackageElement = new AttachmentImpl();
       }
 
       subtitleMediaPackageElement.setIdentifier(mediaPackageIdentifier);
@@ -214,6 +214,10 @@ public class
         subtitleMediaPackageElement.setURI(uri);
       }
       MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor().applyTo(track.getFlavor());
+      targetFlavor = new MediaPackageElementFlavor(
+          targetFlavor.getType(),
+          targetFlavor.getSubtype().replace(PLACEHOLDER_LANG, languageCode)
+      );
       subtitleMediaPackageElement.setFlavor(targetFlavor);
 
       List<String> targetTags = tagsAndFlavors.getTargetTags();
