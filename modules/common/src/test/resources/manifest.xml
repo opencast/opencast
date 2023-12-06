@@ -39,6 +39,15 @@
         <oc:samplingrate>44100</oc:samplingrate>
       </oc:audio>
     </oc:track>
+    <oc:track transport="FILE" id="track-3" type="caption/source">
+      <oc:mimetype>text/vtt</oc:mimetype>
+      <oc:url>tracks/sub.vtt</oc:url>
+      <oc:checksum type="md5">950f9fa49caa8f1c5bbc36892f6fd062</oc:checksum>
+      <oc:subtitle>
+        <oc:device type="UFG03" version="30112007" vendor="Unigraf" />
+        <oc:encoder type="WebVTT" version="1.0" vendor="Example Inc" />
+      </oc:subtitle>
+    </oc:track>
   </oc:media>
   <oc:metadata>
     <oc:catalog id="catalog-1" type="dublincore/episode">

@@ -194,17 +194,18 @@ public class
       String[] jobOutput = job.getPayload().split(",");
       URI output = new URI(jobOutput[0]);
       String outputLanguage = jobOutput[1];
+      String engineType = jobOutput[2];
 
       String mediaPackageIdentifier = UUID.randomUUID().toString();
 
       MediaPackageElement subtitleMediaPackageElement;
       switch (appendSubtitleAs) {
-        case track:
-          subtitleMediaPackageElement = new TrackImpl();
-          break;
         case attachment:
-        default:
           subtitleMediaPackageElement = new AttachmentImpl();
+          break;
+        case track:
+        default:
+          subtitleMediaPackageElement = new TrackImpl();
       }
 
       subtitleMediaPackageElement.setIdentifier(mediaPackageIdentifier);
@@ -214,14 +215,12 @@ public class
         subtitleMediaPackageElement.setURI(uri);
       }
       MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor().applyTo(track.getFlavor());
-      targetFlavor = new MediaPackageElementFlavor(
-          targetFlavor.getType(),
-          targetFlavor.getSubtype().replace(PLACEHOLDER_LANG, languageCode)
-      );
       subtitleMediaPackageElement.setFlavor(targetFlavor);
 
       List<String> targetTags = tagsAndFlavors.getTargetTags();
       targetTags.add("lang:" + outputLanguage);
+      targetTags.add("generator-type:auto");
+      targetTags.add("generator:" + engineType.toLowerCase());
 
       // this is used to set some values automatically, like the correct mimetype
       Job inspection = mediaInspectionService.enrich(subtitleMediaPackageElement, true);

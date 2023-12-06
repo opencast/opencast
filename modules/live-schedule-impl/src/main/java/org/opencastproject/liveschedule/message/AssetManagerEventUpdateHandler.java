@@ -63,7 +63,7 @@ public class AssetManagerEventUpdateHandler extends UpdateHandler implements Ass
         case Update:
           if (item instanceof TakeSnapshot) { // Check class just in case
             TakeSnapshot snapshotItem = (TakeSnapshot) item;
-            // If no episopde dc, there's nothing to do.
+            // If no episode dc, there's nothing to do.
             if (snapshotItem.getEpisodeDublincore().isNone()) {
               break;
             }

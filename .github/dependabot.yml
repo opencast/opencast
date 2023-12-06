@@ -1,5 +1,11 @@
 version: 2
 updates:
+- package-ecosystem: github-actions
+  directory: /
+  schedule:
+    interval: monthly
+
+# JavaScript dependencies
 - package-ecosystem: npm
   directory: "/docs/guides"
   schedule:

@@ -1,0 +1,2 @@
+The `generator` and `generator-type` tags will be set automatically by the speech-to-text WOH and no longer have to be
+configured in the workflow.

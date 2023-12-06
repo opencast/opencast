@@ -98,6 +98,7 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
       properties.put(varName + "_media", "true");
       properties.put(varName + "_video", Boolean.toString(track.hasVideo()));
       properties.put(varName + "_audio", Boolean.toString(track.hasAudio()));
+      properties.put(varName + "_subtitle", Boolean.toString(track.hasSubtitle()));
 
       // Check resolution
       if (track.hasVideo()) {

@@ -14,13 +14,12 @@ to the media package.
 Parameter Table
 ---------------
 
-| configuration keys    | description                                                                 | default               | example                                      |
-|-----------------------|-----------------------------------------------------------------------------|-----------------------|----------------------------------------------|
-| transcription-job-id  | This is filled out by the transcription service when starting the workflow. | ${transcriptionJobId} | **Should always be "${transcriptionJobId}"** |
-| target-flavor         | The flavor to apply to the captions/transcriptions file. Optional.          | captions/srt          | captions/vtt+en                              |
-| target-tag            | The tag to apply to the caption/transcription file generated. Optional.     | -                     | engage-download                              |
-| target-caption-format | The caption format to be generated. Optional.                               | srt                   | vtt                                          |
+| configuration keys    | required | description                                                                        | default               | example                                      |
+|-----------------------|----------|------------------------------------------------------------------------------------|-----------------------|----------------------------------------------|
+| transcription-job-id  | yes      | This is filled out by the transcription service when starting the workflow.        | -                     | **Should always be "${transcriptionJobId}"** |
+| target-flavor         | yes      | The flavor to apply to the captions/transcriptions file.                           | -                     | captions/source                              |
+| target-tag            | no       | The tag to apply to the caption/transcription file generated.*                     | -                     | generator-type:auto                          |
+| target-caption-format | no       | The caption format to be generated.                                                | vtt                   | srt                                          |
+| target-element-type   | no       | Define where to append the subtitles file. Accepted values: 'track', 'attachment'. | track                 | track                                        |
 
-Note: If you set the language property in
-`org.opencastproject.transcription.amberscript.AmberscriptTranscriptionService.cfg` the target flavor will be appended
-by +<language> (e.g. `captions/srt+de`).
+*For conventionally used tags see the general page on [Subtitles](../configuration/subtitles.md).

@@ -34,6 +34,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -187,6 +188,14 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   @Override
   public String getIdentifier() {
     return id;
+  }
+
+  /**
+   * @see org.opencastproject.mediapackage.MediaPackageElement#setTags(java.lang.String[])
+   */
+  @Override
+  public void setTags(String[] tags) {
+    this.tags = new TreeSet<String>(Arrays.asList(tags));
   }
 
   /**

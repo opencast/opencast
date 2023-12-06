@@ -30,10 +30,10 @@ jobs:
     name: build (java ${{ matrix.java }})
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: cache local maven repository
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -41,8 +41,9 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: setup java
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v4
         with:
+          distribution: 'temurin'
           java-version: ${{ matrix.java }}
 
       - name: install dependencies
@@ -116,6 +117,7 @@ jobs:
         run: |
           ./build/opencast-dist-allinone/bin/start-opencast daemon &
           curl -fisS --retry 30 --retry-delay 10 --retry-all-errors -u admin:opencast http://localhost:8080/sysinfo/bundles/version
+          ./build/opencast-dist-allinone/bin/stop-opencast
 
       - name: show logs on failure
         if: ${{ failure() }}
@@ -160,6 +162,13 @@ jobs:
         run: |
           s3cmd put -P *.commit opencast-dist-allinone*tar.gz s3://opencast-daily/
 
+      - name: clearing existing data
+        if: matrix.java == 11
+        working-directory: build
+        run: |
+          rm -rf opencast-dist-allinone
+          tar xf opencast-dist-allinone*.tar.gz
+
       - name: upload tarball as workflow asset
         if: >
           matrix.java == 11
@@ -167,4 +176,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: opencast-allinone
-          path: build/opencast-dist-allinone*.tar.gz
+          path: build/opencast-dist-allinone/

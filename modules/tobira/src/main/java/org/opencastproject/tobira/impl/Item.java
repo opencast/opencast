@@ -26,6 +26,7 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.metadata.dublincore.DublinCore;
@@ -48,12 +49,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -122,6 +123,18 @@ class Item {
 
       final var captions = findCaptions(mp);
 
+      // Obtain duration from tracks, as that's usually more accurate (stores information from
+      // inspect operations). Fall back to `getDcExtent`.
+      final var duration = Arrays.stream(mp.getTracks())
+          .filter(track -> track.hasVideo() || track.hasAudio())
+          .map(Track::getDuration)
+          .filter(d -> d != null && d > 0)
+          .mapToLong(Long::longValue)
+          // Not entirely clear how to combine different track durations. Taking the max is not
+          // worse than any other thing that I can think of. And usually all durations are basically
+          // the same.
+          .max()
+          .orElse(Math.max(0, event.getDcExtent()));
 
       this.obj = Jsons.obj(
           Jsons.p("kind", "event"),
@@ -133,7 +146,7 @@ class Item {
           Jsons.p("startTime", period.map(p -> p.getStart().getTime()).orElse(null)),
           Jsons.p("endTime", period.map(p -> p.getEnd().getTime()).orElse(null)),
           Jsons.p("creators", Jsons.arr(new ArrayList<>(creators))),
-          Jsons.p("duration", Math.max(0, event.getDcExtent())),
+          Jsons.p("duration", duration),
           Jsons.p("thumbnail", findThumbnail(mp)),
           Jsons.p("timelinePreview", findTimelinePreview(mp)),
           Jsons.p("tracks", Jsons.arr(assembleTracks(event, mp))),
@@ -164,7 +177,7 @@ class Item {
 
   /** Assembles the object containing all additional metadata. */
   private static Jsons.Obj dccToMetadata(List<DublinCoreCatalog> dccs) {
-    /** Metadata fields from dcterms that we already handle elsewhere. Therefore, we don't need to
+    /* Metadata fields from dcterms that we already handle elsewhere. Therefore, we don't need to
       * include them here again. */
     final var ignoredDcFields = Set.of(new String[] {
         "created", "creator", "title", "extent", "isPartOf", "description", "identifier",
@@ -225,6 +238,7 @@ class Item {
 
   private static List<Jsons.Val> assembleTracks(SearchResultItem event, MediaPackage mp) {
     return Arrays.stream(mp.getTracks())
+        .filter(track -> track.hasAudio() || track.hasVideo())
         .map(track -> {
           var videoStreams = TrackSupport.byType(track.getStreams(), VideoStream.class);
           var resolution = Jsons.NULL;
@@ -252,10 +266,7 @@ class Item {
   }
 
   private static List<Jsons.Val> findCaptions(MediaPackage mp) {
-    // We deduplicate the captions by URL and language in case we somehow find
-    // one twice.
-    var captions = new HashMap<String, HashSet<String>>();
-    Arrays.stream(mp.getElements())
+    return Arrays.stream(mp.getElements())
         .filter(element -> {
           final var isVTT = element.getFlavor().toString().startsWith("captions/vtt")
                 || element.getMimeType().eq("text", "vtt");
@@ -264,41 +275,36 @@ class Item {
 
           return isVTT && isCorrectType;
         })
-        .forEach(track -> {
-          final var uri = track.getURI().toString();
-          captions.putIfAbsent(uri, new HashSet<String>());
+        .map(track -> {
+          final var tags = track.getTags();
+          final Function<String, Optional<String>> findTag = (String prefix) -> Arrays.stream(tags)
+                .map(tag -> tag.split(":", 2))
+                .filter(tagArray -> (tagArray.length == 2 && tagArray[0].equals(prefix)))
+                .map(tagArray -> tagArray[1])
+                .findFirst();
 
-          // Try to get language from flavor. Otherwise there is an empty list
-          // in the map.
-          final var subflavor = track.getFlavor().getSubtype();
-          if (subflavor.startsWith("vtt+")) {
-            final var suffix = subflavor.substring("vtt+".length());
-            if (suffix.length() > 0) {
-              captions.get(uri).add(suffix);
+          // Try to get a language for this subtitle track. We first check the proper tag.
+          var lang = findTag.apply("lang");
+          if (lang.isEmpty()) {
+            // But for compatibility, we also check in the flavor.
+            final var subflavor = track.getFlavor().getSubtype();
+            if (subflavor.startsWith("vtt+")) {
+              final var suffix = subflavor.substring("vtt+".length());
+              if (suffix.length() > 0) {
+                lang = Optional.of(suffix);
+              }
             }
           }
 
-        });
-
-    return captions.entrySet()
-        .stream()
-        .flatMap(e -> {
-          final var languages = e.getValue();
-          final var uri = e.getKey();
-
-          // If this caption URL had no language associated with it, we push a
-          // `null` language to emit this caption at all. Otherwise, all
-          // languages are output as a separate track.
-          if (languages.isEmpty()) {
-            languages.add(null);
-          }
-
-          return languages.stream().map(lang -> Jsons.obj(
-            Jsons.p("uri", uri),
-            Jsons.p("lang", lang)
-          ));
+          return Jsons.obj(
+            Jsons.p("uri", track.getURI().toString()),
+            Jsons.p("lang", lang.orElse(null)),
+            Jsons.p("generatorType", findTag.apply("generator-type").orElse(null)),
+            Jsons.p("generator", findTag.apply("generator").orElse(null)),
+            Jsons.p("type", findTag.apply("type").orElse(null))
+          );
         })
-      .collect(Collectors.toCollection(ArrayList::new));
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 
   private static String findThumbnail(MediaPackage mp) {

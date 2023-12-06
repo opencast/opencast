@@ -27,7 +27,6 @@ import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
-import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
@@ -131,6 +130,8 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
   private static final String STATUS_OPEN = "OPEN";
   private static final String STATUS_DONE = "DONE";
   private static final String STATUS_ERROR = "ERROR";
+
+  private static final String ERROR_NO_SPEECH = "No speech found";
 
   private static final String PROVIDER = "amberscript";
 
@@ -736,9 +737,11 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
               logger.debug("Captions job '{}' has not finished yet.", jobId);
               return false;
             case STATUS_ERROR:
-              logger.warn("Captions job '{}' failed.", jobId);
+              var errorMsg = (String) result.get("errorMsg");
               throw new TranscriptionServiceException(
-                      String.format("Captions job '%s' failed: Return Code %d", jobId, code), code);
+                      String.format("Captions job '%s' failed: %s", jobId, errorMsg),
+                      code,
+                      ERROR_NO_SPEECH.equals(errorMsg));
             case STATUS_DONE:
               logger.info("Captions job '{}' has finished.", jobId);
               TranscriptionJobControl jc = database.findByJob(jobId);
@@ -821,7 +824,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
 
   @Override
   // Called by the attach workflow operation
-  public MediaPackageElement getGeneratedTranscription(String mpId, String jobId)
+  public MediaPackageElement getGeneratedTranscription(String mpId, String jobId, MediaPackageElement.Type type)
           throws TranscriptionServiceException {
     try {
       // If jobId is unknown, look for all jobs associated to that mpId
@@ -855,7 +858,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
       }
       MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
       logger.debug("Returning MPE with results file URI: {}", uri);
-      return builder.elementFromURI(uri, Attachment.TYPE, new MediaPackageElementFlavor("captions", "srt"));
+      return builder.elementFromURI(uri, type, new MediaPackageElementFlavor("captions", "srt"));
     } catch (TranscriptionDatabaseException e) {
       throw new TranscriptionServiceException("Job id not informed and could not find transcription", e);
     }

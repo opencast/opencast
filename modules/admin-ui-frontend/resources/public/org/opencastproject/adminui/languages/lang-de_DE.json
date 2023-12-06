@@ -43,7 +43,7 @@
       "VIDEOFILE": "Videodatei",
       "VIDEOFILE_DESCRIPTION": "Videodatei zum Hochladen",
       "CAPTION": "Untertitel",
-      "CAPTION_DESCRIPTION": "Untertiteldatei; VTT- oder dxfp-Dateiformat wird unterstützt",
+      "CAPTION_DESCRIPTION": "Untertiteldatei im VTT-Format",
       "UPLOAD": "Hochladen",
       "UPLOADING": "Lädt hoch",
       "EDIT": "Speichern",
@@ -150,9 +150,9 @@
       "ADOPTER_REGISTRATION": "Adopter Registrierung"
    },
    "REBUILD": {
-      "TITLE": "Index Rebuild",
-      "WARNING": "Attention!",
-      "HEADER": "Index rebuild in progress!",
+      "TITLE": "Neuaufbau des Indexes",
+      "WARNING": "Achtung!",
+      "HEADER": "Neuaufbau des Indexes läuft!",
       "THEME_SERVICE": "Theme Service",
       "SERIES_SERVICE": "Series Service",
       "SCHEDULER_SERVICE": "Scheduler Service",
@@ -541,6 +541,10 @@
                      "SHORT": "Vortragender",
                      "DETAIL": "Die Datei enthält die Aufnahme einer zum Publikum sprechenden Person."
                   },
+                  "SUBTITLES": {
+                     "SHORT": "Untertitel",
+                     "DETAIL": "Die Textdatei enthält die Wörter, die in den obigen Videos gesprochen werden."
+                  },
                   "AUDIO_ONLY": {
                      "SHORT": "Nur Audio",
                      "DETAIL": "Die Datei enthält nur Audio."
@@ -584,8 +588,7 @@
                "NO_OPTIONS": "Es wurden keine Optionen konfiguriert!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Unterrichtsnotizen",
-                  "CAPTIONS_DFXP": "Untertitel (DFXP)",
-                  "CAPTIONS_WEBVTT": "Untertitel (WebVTT)",
+                  "SUBTITLES": "Untertitel",
                   "PREVIEW_IMAGE": "Vorschaubild",
                   "SMIL": "SMIL-Katalog",
                   "TRACK_PARTS": "Spur-Teile"
@@ -907,7 +910,7 @@
                   "NEW": "Neue Richtlinie",
                   "NEW_USER": "Neuer Nutzer",
                   "DETAILS": "Nicht-Benutzer-Rollen",
-                  "USER": "User",
+                  "USER": "Benutzer",
                   "USERS": "Benutzer, die für das Event autorisiert sind",
                   "NONEXISTENT_USER": "Nicht existierender Nutzer",
                   "HELP": {
@@ -1141,7 +1144,7 @@
                   "NEW": "Neue Richtlinie",
                   "NEW_USER": "Neuer Nutzer",
                   "DETAILS": "Nicht-Nutzer-Rollen",
-                  "USER": "User",
+                  "USER": "Benutzer",
                   "USERS": "Nutzer, die für das Event autorisiert sind",
                   "HELP": {
                      "READ": "Durch das Setzen von Leserechte wird die Serie für den ausgewählten Nutzer sichtbar",
@@ -1236,7 +1239,7 @@
                   "LOAD_MORE_LIMIT": "angezeigte Richtlinien.",
                   "LOAD_MORE_LINK": "Mehr laden",
                   "NEW_USER": "Neuer Nutzer",
-                  "USER": "User",
+                  "USER": "Benutzer",
                   "USERS": "Nutzer, die für das Event autorisiert sind",
                   "NONEXISTENT_USER": "Nicht existierender Nutzer",
                   "HELP": {
@@ -1492,7 +1495,7 @@
                   "DETAILS": "Nicht-Nutzer-Rollen",
                   "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu",
                   "NEW_USER": "Neuer Nutzer",
-                  "USER": "User",
+                  "USER": "Benutzer",
                   "USERS": "Nutzer, die durch diese Zugriffsrichtlinie autorisiert sind",
                   "HELP": {
                      "READ": "Durch das Setzen von Leseberechtigungen wird das Medium, dem diese Zugriffsrichtlinie zugewiesen wird, für den ausgewählten Benutzer sichtbar.",
@@ -1541,7 +1544,7 @@
                   "DETAILS": "Nicht-Nutzer-Rollen",
                   "DESCRIPTION": "Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu",
                   "NEW_USER": "Neuer Nutzer",
-                  "USER": "User",
+                  "USER": "Benutzer",
                   "USERS": "Nutzer, die durch diese Zugriffsrichtlinie autorisiert sind",
                   "NONEXISTENT_USER": "Nicht existierender Nutzer",
                   "HELP": {
@@ -1863,8 +1866,10 @@
       "TRACKS": {
          "DESCRIPTION": "Sie können Spuren von der Auswahl entfernen, damit diese nicht verarbeitet werden. Bitte beachten Sie, dass Sie die Videos erneut publizieren müssen, damit die Änderung aktiv werden.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "Bitte wählen Sie mindestens eine Videospur aus",
-            "NO_AUDIO_TRACK_SELECTED": "Bitte wählen Sie mindestens eine Audiospur aus"
+            "NO_VIDEO_TRACK_SELECTED_WARNING": "Sie sollten mindestens eine Videospur aktivieren",
+            "NO_AUDIO_TRACK_SELECTED_WARNING": "Sie sollten mindestens eine Audiospur aktivieren",
+            "TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING": "Sie sollten nicht mehr Audio- als Videospuren aktivieren",
+            "NO_TRACK_SELECTED_ERROR": "Sie müssen mindestens eine Spur aktivieren"
          },
          "TRACK": {
             "HEADER": "Spur"

@@ -59,6 +59,8 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.util.requests.SortCriterion.Order;
+import org.opencastproject.workflow.api.WorkflowDatabaseException;
+import org.opencastproject.workflow.api.WorkflowService;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -130,6 +132,9 @@ public class UsersEndpoint {
   /** The security service */
   private SecurityService securityService;
 
+  /** The workflow service */
+  private WorkflowService workflowService;
+
   /** Base url of this endpoint */
   private String endpointBaseUrl;
 
@@ -167,12 +172,12 @@ public class UsersEndpoint {
   }
 
   /**
-   * @param jpaUserReferenceProvider
+   * @param workflowService
    *          the user provider to set
    */
   @Reference
-  public void setJpaUserReferenceProvider(JpaUserReferenceProvider jpaUserReferenceProvider) {
-    this.jpaUserReferenceProvider = jpaUserReferenceProvider;
+  public void setWorkflowService(WorkflowService workflowService) {
+    this.workflowService = workflowService;
   }
 
   /** OSGi callback. */
@@ -423,8 +428,18 @@ public class UsersEndpoint {
     boolean userNotFound = false;
 
     try {
+      if (workflowService.userHasActiveWorkflows(username)) {
+        logger.debug("Workflow still active for user {}:", username);
+        return Response.status(SC_CONFLICT).build();
+      }
+    } catch (WorkflowDatabaseException e) {
+      logger.error("Error during deletion of user {}: {}", username, e);
+      return Response.status(SC_INTERNAL_SERVER_ERROR).build();
+    }
+
+    try {
       try {
-        jpaUserReferenceProvider.deleteUser(username, organization.getId());
+        jpaUserAndRoleProvider.deleteUser(username, organization.getId());
       } catch (NotFoundException e) {
         userReferenceNotFound = true;
       }

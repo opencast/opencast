@@ -31,10 +31,11 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.NopService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.util.Log;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * No operation service.
@@ -49,7 +50,7 @@ import org.osgi.service.component.annotations.Reference;
   service = { NopService.class }
 )
 public final class NopServiceImpl extends OsgiAbstractJobProducer implements NopService {
-  private static final Log log = Log.mk(NopServiceImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(NopServiceImpl.class);
 
   public static final String PAYLOAD = "NopServicePayload";
 

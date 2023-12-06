@@ -363,7 +363,7 @@
                           pre-select-from="captureAgents"
                           ng-disabled="checkingConflicts || !hasCurrentAgentAccess()"
                           data-width="'200px'"
-                          ng-change="roomChanged(); saveScheduling()"
+                          ng-change="roomChanged(); saveScheduling(source.device, {{source.device || 'null'}})"
                           ng-model="source.device"
                           ng-options="ca.name for ca in captureAgents | filter:currentAgentOrAccess track by ca.id"
                           placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
@@ -624,7 +624,7 @@
                       </tr>
                       </thead>
                       <tbody>
-                      <tr ng-repeat="policy in policiesUser  | filter: userExists">
+                      <tr ng-repeat="policy in policiesUser | filter: userExists">
                         <td ng-show="!transactions.read_only">
                           <select chosen
                                   pre-select-from="users"
@@ -632,7 +632,7 @@
                                   data-width="'360px'"
                                   ng-model="policy.role"
                                   ng-options="user.userRole as userToStringForDetails(user) for user in users"
-                                  call-on-search="getMatchingUsers"
+                                  call-on-search="getMatchingRoles"
                                   placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.USERS.LABEL' | translate }}'"
                                   no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.USERS.EMPTY' | translate }}'"
                           ></select>

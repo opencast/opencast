@@ -1,9 +1,76 @@
 Changelog
 =========
 
-
 Opencast 14
 -----------
+
+### Opencast 14.6
+
+*Released on November 16th, 2023*
+
+- [[#5365](https://github.com/opencast/opencast/pull/5365)] -
+  Stream media packages to avoid memory issues
+- [[#5361](https://github.com/opencast/opencast/pull/5361)] -
+  Avoid a potential nullpointer exception in thumbnail generation
+- [[#5345](https://github.com/opencast/opencast/pull/5345)] -
+  Fix/improve parts of the Tobira harvest API (subtitles & duration)
+- [[#5315](https://github.com/opencast/opencast/pull/5315)] -
+  Improve Performance of Permission Check in AssetManager
+
+### Opencast 14.5
+
+*Released on October 19th, 2023*
+
+- [[#5259](https://github.com/opencast/opencast/pull/5259)] -
+  Improve asset manager event handler logging
+- [[#5254](https://github.com/opencast/opencast/pull/5254)] -
+  Update Opencast Studio to `2023-09-14`
+- [[#5252](https://github.com/opencast/opencast/pull/5252)] -
+  Paella 7: Fix vertically stretched thumbnails in transcriptions plugin
+- [[#5243](https://github.com/opencast/opencast/pull/5243)] -
+  Extend analyze-mp for tag variables
+- [[#5240](https://github.com/opencast/opencast/pull/5240)] -
+  Use context aware logger for workflow service
+
+### Opencast 14.4
+
+*Released on September 14th, 2023*
+
+- [[#5241](https://github.com/opencast/opencast/pull/5241)] -
+  Fix incorrect Debian install documentation
+- [[#5239](https://github.com/opencast/opencast/pull/5239)] -
+  Skip publications when removing temporary files
+- [[#5237](https://github.com/opencast/opencast/pull/5237)] -
+  Prevent concurrent cleanups
+- [[#5236](https://github.com/opencast/opencast/pull/5236)] -
+  Fix NPE when removing a workflow without creator
+- [[#5232](https://github.com/opencast/opencast/pull/5232)] -
+  Logging of delete snapshot workflow operation
+- [[#5229](https://github.com/opencast/opencast/pull/5229)] -
+  Fixed Admin UI redirect after login
+- [[#5228](https://github.com/opencast/opencast/pull/5228)] -
+  Fix AmberScript transcription failing if video contains no speech
+- [[#5194](https://github.com/opencast/opencast/pull/5194)] -
+  Fix Crowdin Sources
+- [[#5178](https://github.com/opencast/opencast/pull/5178)] -
+  Incorrect crowdin paths
+- [[#5176](https://github.com/opencast/opencast/pull/5176)] -
+  Opencast 14.3 release notes
+
+
+### Opencast 14.3
+
+*Released on August 23rd, 2023*
+
+- [[#5167](https://github.com/opencast/opencast/pull/5167)] -
+  Fix admin interface permissions
+- [[#5166](https://github.com/opencast/opencast/pull/5166)] -
+  Fix Admin Interface Redirect
+- [[#5165](https://github.com/opencast/opencast/pull/5165)] -
+  Fix crowdin package name
+- [[#5163](https://github.com/opencast/opencast/pull/5163)] -
+  Add Opencast 14.2 release notes
+
 
 ### Opencast 14.2
 
@@ -49,18 +116,6 @@ Opencast 14
   Drop orphan statistics database index
 - [[#4943](https://github.com/opencast/opencast/pull/4943)] -
   Update Paella 7 default theme
-- [[#4942](https://github.com/opencast/opencast/pull/4942)] -
-  Bump engine.io from 6.4.1 to 6.4.2 in /modules/admin-ui-frontend
-- [[#4936](https://github.com/opencast/opencast/pull/4936)] -
-  Bump grunt-contrib-cssmin from 4.0.0 to 5.0.0 in /modules/admin-ui-frontend
-- [[#4935](https://github.com/opencast/opencast/pull/4935)] -
-  Bump @types/react-dom from 18.2.0 to 18.2.1 in /modules/lti
-- [[#4934](https://github.com/opencast/opencast/pull/4934)] -
-  Bump sass from 1.57.1 to 1.62.1 in /modules/admin-ui-frontend
-- [[#4933](https://github.com/opencast/opencast/pull/4933)] -
-  Bump @types/node from 18.16.0 to 18.16.3 in /modules/lti
-- [[#4931](https://github.com/opencast/opencast/pull/4931)] -
-  Bump markdownlint-cli from 0.33.0 to 0.34.0 in /docs/guides
 - [[#4930](https://github.com/opencast/opencast/pull/4930)] -
   Karaf upgrade 4.4.3
 - [[#4928](https://github.com/opencast/opencast/pull/4928)] -
@@ -69,38 +124,6 @@ Opencast 14
   Update deprecated ACL code
 - [[#4921](https://github.com/opencast/opencast/pull/4921)] -
   Fix REST docs login problem
-- [[#4919](https://github.com/opencast/opencast/pull/4919)] -
-  Bump @types/react-dom from 18.0.11 to 18.2.0 in /modules/lti
-- [[#4917](https://github.com/opencast/opencast/pull/4917)] -
-  Bump maven-project-info-reports-plugin from 3.4.2 to 3.4.3 in /modules/db
-- [[#4912](https://github.com/opencast/opencast/pull/4912)] -
-  Bump checker-qual from 3.29.0 to 3.33.0 in /modules/db
-- [[#4908](https://github.com/opencast/opencast/pull/4908)] -
-  Bump chromedriver from 111.0.0 to 112.0.0 in /modules/admin-ui-frontend
-- [[#4907](https://github.com/opencast/opencast/pull/4907)] -
-  Bump eslint from 8.37.0 to 8.39.0 in /modules/admin-ui-frontend
-- [[#4905](https://github.com/opencast/opencast/pull/4905)] -
-  Bump karma from 6.4.1 to 6.4.2 in /modules/admin-ui-frontend
-- [[#4902](https://github.com/opencast/opencast/pull/4902)] -
-  Bump react-bootstrap from 2.7.2 to 2.7.4 in /modules/lti
-- [[#4898](https://github.com/opencast/opencast/pull/4898)] -
-  Bump react-i18next from 12.2.0 to 12.2.2 in /modules/lti
-- [[#4897](https://github.com/opencast/opencast/pull/4897)] -
-  Bump html-validate from 7.14.0 to 7.15.1 in /modules/admin-ui-frontend
-- [[#4895](https://github.com/opencast/opencast/pull/4895)] -
-  Bump @types/jest from 29.5.0 to 29.5.1 in /modules/lti
-- [[#4893](https://github.com/opencast/opencast/pull/4893)] -
-  Bump karma-chrome-launcher from 3.1.1 to 3.2.0 in /modules/admin-ui-frontend
-- [[#4892](https://github.com/opencast/opencast/pull/4892)] -
-  Bump i18next from 22.4.14 to 22.4.15 in /modules/lti
-- [[#4889](https://github.com/opencast/opencast/pull/4889)] -
-  Bump @types/node from 18.15.11 to 18.16.0 in /modules/lti
-- [[#4888](https://github.com/opencast/opencast/pull/4888)] -
-  Bump esapi from 2.3.0.0 to 2.5.2.0 in /modules/db
-- [[#4884](https://github.com/opencast/opencast/pull/4884)] -
-  Bump exec-maven-plugin from 1.6.0 to 3.1.0 in /modules/db
-- [[#4882](https://github.com/opencast/opencast/pull/4882)] -
-  Bump download-maven-plugin from 1.6.6 to 1.6.8 in /modules/db
 - [[#4881](https://github.com/opencast/opencast/pull/4881)] -
   Run auto-update on main repo only
 - [[#4878](https://github.com/opencast/opencast/pull/4878)] -
@@ -109,252 +132,34 @@ Opencast 14
   Set new default editor
 - [[#4875](https://github.com/opencast/opencast/pull/4875)] -
   Make Paella 7 Default
-- [[#4859](https://github.com/opencast/opencast/pull/4859)] -
-  Bump maven-scr-plugin from 1.26.2 to 1.26.4 in /modules/metrics-exporter
-- [[#4855](https://github.com/opencast/opencast/pull/4855)] -
-  Bump iframe-resizer from 4.3.4 to 4.3.6 in /modules/lti
-- [[#4854](https://github.com/opencast/opencast/pull/4854)] -
-  Bump maven-site-plugin from 3.10.0 to 3.12.1 in /modules/db
-- [[#4852](https://github.com/opencast/opencast/pull/4852)] -
-  Bump jackson.version from 2.14.1 to 2.14.2 in /modules/db
 - [[#4849](https://github.com/opencast/opencast/pull/4849)] -
   Set Dependabot Interval to Monthly
-- [[#4847](https://github.com/opencast/opencast/pull/4847)] -
-  Bump maven-enforcer-plugin from 3.0.0-M2 to 3.3.0 in /modules/metrics-exporter
-- [[#4845](https://github.com/opencast/opencast/pull/4845)] -
-  Bump maven-gpg-plugin from 1.5 to 3.0.1 in /modules/db
-- [[#4840](https://github.com/opencast/opencast/pull/4840)] -
-  Bump i18next from 22.0.4 to 22.4.14 in /modules/lti
-- [[#4838](https://github.com/opencast/opencast/pull/4838)] -
-  Bump maven-compiler-plugin from 3.8.1 to 3.11.0 in /modules/db
-- [[#4837](https://github.com/opencast/opencast/pull/4837)] -
-  Bump @types/jest from 29.4.0 to 29.5.0 in /modules/lti
-- [[#4836](https://github.com/opencast/opencast/pull/4836)] -
-  Bump @fortawesome/fontawesome-svg-core from 6.3.0 to 6.4.0 in /modules/lti
-- [[#4835](https://github.com/opencast/opencast/pull/4835)] -
-  Bump react-i18next from 12.1.4 to 12.2.0 in /modules/lti
-- [[#4834](https://github.com/opencast/opencast/pull/4834)] -
-  Bump react-select from 5.7.0 to 5.7.2 in /modules/lti
-- [[#4833](https://github.com/opencast/opencast/pull/4833)] -
-  Bump @types/node from 18.14.2 to 18.15.11 in /modules/lti
-- [[#4832](https://github.com/opencast/opencast/pull/4832)] -
-  Bump @fortawesome/free-solid-svg-icons from 6.3.0 to 6.4.0 in /modules/lti
-- [[#4827](https://github.com/opencast/opencast/pull/4827)] -
-  Bump joda-time from 2.10.10 to 2.12.5 in /modules/metrics-exporter
-- [[#4818](https://github.com/opencast/opencast/pull/4818)] -
-  Bump eslint from 8.36.0 to 8.37.0 in /modules/admin-ui-frontend
-- [[#4811](https://github.com/opencast/opencast/pull/4811)] -
-  Bump html-validate from 7.13.3 to 7.14.0 in /modules/admin-ui-frontend
-- [[#4810](https://github.com/opencast/opencast/pull/4810)] -
-  Bump maven-install-plugin from 2.5.2 to 3.1.1 in /modules/metrics-exporter
-- [[#4807](https://github.com/opencast/opencast/pull/4807)] -
-  Bump maven-resources-plugin from 3.2.0 to 3.3.1 in /modules/db
-- [[#4803](https://github.com/opencast/opencast/pull/4803)] -
-  Bump jettison from 1.5.2 to 1.5.4
 - [[#4798](https://github.com/opencast/opencast/pull/4798)] -
   Paella7: Add paella7 i18n strings and fix localization path in crowdin config file
-- [[#4784](https://github.com/opencast/opencast/pull/4784)] -
-  Bump jasmine-core from 4.5.0 to 4.6.0 in /modules/admin-ui-frontend
-- [[#4775](https://github.com/opencast/opencast/pull/4775)] -
-  Bump webpack from 5.73.0 to 5.76.1 in /modules/lti
-- [[#4766](https://github.com/opencast/opencast/pull/4766)] -
-  Bump eslint from 8.35.0 to 8.36.0 in /modules/admin-ui-frontend
 - [[#4763](https://github.com/opencast/opencast/pull/4763)] -
   Fix `esline` vs. `eslint` typo in some POMs
-- [[#4760](https://github.com/opencast/opencast/pull/4760)] -
-  Bump chromedriver from 110.0.0 to 111.0.0 in /modules/admin-ui-frontend
-- [[#4759](https://github.com/opencast/opencast/pull/4759)] -
-  Bump html-validate from 7.13.2 to 7.13.3 in /modules/admin-ui-frontend
-- [[#4752](https://github.com/opencast/opencast/pull/4752)] -
-  Bump jquery from 3.6.3 to 3.6.4 in /modules/runtime-info-ui-ng
-- [[#4751](https://github.com/opencast/opencast/pull/4751)] -
-  Bump jquery from 3.6.3 to 3.6.4 in /modules/runtime-info-ui
-- [[#4750](https://github.com/opencast/opencast/pull/4750)] -
-  Bump jquery from 3.6.3 to 3.6.4 in /modules/engage-ui
 - [[#4745](https://github.com/opencast/opencast/pull/4745)] -
   Include Amberscript-Transcription Documentation in Module Overview
-- [[#4731](https://github.com/opencast/opencast/pull/4731)] -
-  Bump @fortawesome/free-solid-svg-icons from 6.2.1 to 6.3.0 in /modules/lti
-- [[#4730](https://github.com/opencast/opencast/pull/4730)] -
-  Bump @types/node from 18.11.18 to 18.14.2 in /modules/lti
-- [[#4728](https://github.com/opencast/opencast/pull/4728)] -
-  Bump @fortawesome/fontawesome-svg-core from 6.2.1 to 6.3.0 in /modules/lti
-- [[#4727](https://github.com/opencast/opencast/pull/4727)] -
-  Bump react-bootstrap from 2.7.0 to 2.7.2 in /modules/lti
-- [[#4725](https://github.com/opencast/opencast/pull/4725)] -
-  Bump @types/react-dom from 18.0.10 to 18.0.11 in /modules/lti
-- [[#4724](https://github.com/opencast/opencast/pull/4724)] -
-  Bump iframe-resizer from 4.3.3 to 4.3.4 in /modules/lti
-- [[#4718](https://github.com/opencast/opencast/pull/4718)] -
-  Bump eslint from 8.34.0 to 8.35.0 in /modules/admin-ui-frontend
-- [[#4712](https://github.com/opencast/opencast/pull/4712)] -
-  Bump maven-assembly-plugin from 3.3.0 to 3.5.0 in /modules/db
-- [[#4710](https://github.com/opencast/opencast/pull/4710)] -
-  Bump commons-fileupload from 1.4 to 1.5
 - [[#4695](https://github.com/opencast/opencast/pull/4695)] -
   Add new admin UI as beta
-- [[#4686](https://github.com/opencast/opencast/pull/4686)] -
-  Bump eslint from 8.33.0 to 8.34.0 in /modules/admin-ui-frontend
-- [[#4678](https://github.com/opencast/opencast/pull/4678)] -
-  Bump httpcore-osgi from 4.4.15 to 4.4.16 in /modules/db
-- [[#4675](https://github.com/opencast/opencast/pull/4675)] -
-  Bump chromedriver from 109.0.0 to 110.0.0 in /modules/admin-ui-frontend
-- [[#4674](https://github.com/opencast/opencast/pull/4674)] -
-  Bump html-validate from 7.13.1 to 7.13.2 in /modules/admin-ui-frontend
-- [[#4671](https://github.com/opencast/opencast/pull/4671)] -
-  Bump postgresql from 42.5.1 to 42.5.3 in /modules/db
-- [[#4667](https://github.com/opencast/opencast/pull/4667)] -
-  Bump typescript from 4.9.4 to 4.9.5 in /modules/lti
-- [[#4666](https://github.com/opencast/opencast/pull/4666)] -
-  Bump grunt from 1.5.3 to 1.6.1 in /modules/admin-ui-frontend
-- [[#4665](https://github.com/opencast/opencast/pull/4665)] -
-  Bump @types/jest from 29.2.5 to 29.4.0 in /modules/lti
-- [[#4663](https://github.com/opencast/opencast/pull/4663)] -
-  Bump @types/react-helmet from 6.1.5 to 6.1.6 in /modules/lti
-- [[#4660](https://github.com/opencast/opencast/pull/4660)] -
-  Bump iframe-resizer from 4.3.2 to 4.3.3 in /modules/lti
-- [[#4656](https://github.com/opencast/opencast/pull/4656)] -
-  Bump eslint from 8.32.0 to 8.33.0 in /modules/admin-ui-frontend
-- [[#4652](https://github.com/opencast/opencast/pull/4652)] -
-  Bump ua-parser-js from 0.7.31 to 0.7.33 in /modules/admin-ui-frontend
-- [[#4647](https://github.com/opencast/opencast/pull/4647)] -
-  Bump maven-surefire-report-plugin from 2.20 to 2.22.2 in /modules/db
-- [[#4645](https://github.com/opencast/opencast/pull/4645)] -
-  Bump nexus-staging-maven-plugin from 1.6.8 to 1.6.13 in /modules/db
-- [[#4639](https://github.com/opencast/opencast/pull/4639)] -
-  Bump org.apache.felix.fileinstall from 3.6.4 to 3.7.4 in /modules/db
-- [[#4637](https://github.com/opencast/opencast/pull/4637)] -
-  Bump maven-source-plugin from 2.2.1 to 3.2.1 in /modules/metrics-exporter
-- [[#4632](https://github.com/opencast/opencast/pull/4632)] -
-  Bump gson from 2.8.9 to 2.10.1 in /modules/metrics-exporter
-- [[#4629](https://github.com/opencast/opencast/pull/4629)] -
-  Bump maven-project-info-reports-plugin from 2.8.1 to 3.4.2 in /modules/metrics-exporter
-- [[#4621](https://github.com/opencast/opencast/pull/4621)] -
-  Bump mariadb-java-client from 3.1.1 to 3.1.2 in /modules/db
 - [[#4609](https://github.com/opencast/opencast/pull/4609)] -
   Fix documentation syntax error
-- [[#4606](https://github.com/opencast/opencast/pull/4606)] -
-  Bump jna from 5.12.1 to 5.13.0 in /modules/db
-- [[#4602](https://github.com/opencast/opencast/pull/4602)] -
-  Bump eslint from 8.31.0 to 8.32.0 in /modules/admin-ui-frontend
-- [[#4601](https://github.com/opencast/opencast/pull/4601)] -
-  Bump html-validate from 7.12.2 to 7.13.1 in /modules/admin-ui-frontend
-- [[#4598](https://github.com/opencast/opencast/pull/4598)] -
-  Bump mariadb-java-client from 3.1.0 to 3.1.1 in /modules/db
-- [[#4597](https://github.com/opencast/opencast/pull/4597)] -
-  Bump chromedriver from 108.0.0 to 109.0.0 in /modules/admin-ui-frontend
 - [[#4595](https://github.com/opencast/opencast/pull/4595)] -
   Document feature pull request targetting rules
-- [[#4593](https://github.com/opencast/opencast/pull/4593)] -
-  Bump html-validate from 7.12.1 to 7.12.2 in /modules/admin-ui-frontend
-- [[#4592](https://github.com/opencast/opencast/pull/4592)] -
-  Bump react-i18next from 12.0.0 to 12.1.4 in /modules/lti
-- [[#4589](https://github.com/opencast/opencast/pull/4589)] -
-  Bump markdownlint-cli from 0.32.2 to 0.33.0 in /docs/guides
-- [[#4587](https://github.com/opencast/opencast/pull/4587)] -
-  Bump checker-qual from 3.26.0 to 3.29.0 in /modules/db
-- [[#4586](https://github.com/opencast/opencast/pull/4586)] -
-  Bump json5 from 1.0.1 to 1.0.2 in /modules/lti
-- [[#4585](https://github.com/opencast/opencast/pull/4585)] -
-  Bump json5 from 1.0.1 to 1.0.2 in /modules/engage-paella-player-7
-- [[#4581](https://github.com/opencast/opencast/pull/4581)] -
-  Bump html-validate from 7.12.0 to 7.12.1 in /modules/admin-ui-frontend
-- [[#4580](https://github.com/opencast/opencast/pull/4580)] -
-  Bump jettison from 1.5.1 to 1.5.2
-- [[#4577](https://github.com/opencast/opencast/pull/4577)] -
-  Bump eslint from 8.30.0 to 8.31.0 in /modules/admin-ui-frontend
-- [[#4576](https://github.com/opencast/opencast/pull/4576)] -
-  Bump bootstrap from 5.2.2 to 5.2.3 in /modules/lti
-- [[#4575](https://github.com/opencast/opencast/pull/4575)] -
-  Bump @types/jest from 29.2.3 to 29.2.5 in /modules/lti
-- [[#4574](https://github.com/opencast/opencast/pull/4574)] -
-  Bump @fortawesome/free-solid-svg-icons from 6.2.0 to 6.2.1 in /modules/lti
-- [[#4573](https://github.com/opencast/opencast/pull/4573)] -
-  Bump react-i18next from 12.0.0 to 12.1.1 in /modules/lti
-- [[#4572](https://github.com/opencast/opencast/pull/4572)] -
-  Bump @types/react-dom from 18.0.9 to 18.0.10 in /modules/lti
-- [[#4571](https://github.com/opencast/opencast/pull/4571)] -
-  Bump @types/node from 18.11.8 to 18.11.18 in /modules/lti
-- [[#4568](https://github.com/opencast/opencast/pull/4568)] -
-  Bump react-bootstrap from 2.6.0 to 2.7.0 in /modules/lti
-- [[#4567](https://github.com/opencast/opencast/pull/4567)] -
-  Bump json5 from 2.2.0 to 2.2.3 in /modules/admin-ui-frontend
-- [[#4564](https://github.com/opencast/opencast/pull/4564)] -
-  Bump html-validate from 7.11.1 to 7.12.0 in /modules/admin-ui-frontend
-- [[#4557](https://github.com/opencast/opencast/pull/4557)] -
-  Bump html-validate from 7.11.0 to 7.11.1 in /modules/admin-ui-frontend
 - [[#4556](https://github.com/opencast/opencast/pull/4556)] -
   image preview added
-- [[#4555](https://github.com/opencast/opencast/pull/4555)] -
-  Bump jquery from 3.6.2 to 3.6.3 in /modules/engage-ui
-- [[#4554](https://github.com/opencast/opencast/pull/4554)] -
-  Bump jquery from 3.6.2 to 3.6.3 in /modules/runtime-info-ui-ng
-- [[#4553](https://github.com/opencast/opencast/pull/4553)] -
-  Bump jquery from 3.6.2 to 3.6.3 in /modules/runtime-info-ui
-- [[#4551](https://github.com/opencast/opencast/pull/4551)] -
-  Bump sass from 1.55.0 to 1.57.1 in /modules/admin-ui-frontend
-- [[#4545](https://github.com/opencast/opencast/pull/4545)] -
-  Bump html-validate from 7.10.1 to 7.11.0 in /modules/admin-ui-frontend
-- [[#4544](https://github.com/opencast/opencast/pull/4544)] -
-  Bump eslint from 8.29.0 to 8.30.0 in /modules/admin-ui-frontend
-- [[#4534](https://github.com/opencast/opencast/pull/4534)] -
-  Bump jquery from 3.6.1 to 3.6.2 in /modules/runtime-info-ui
-- [[#4533](https://github.com/opencast/opencast/pull/4533)] -
-  Bump jquery from 3.6.1 to 3.6.2 in /modules/engage-ui
-- [[#4532](https://github.com/opencast/opencast/pull/4532)] -
-  Bump jquery from 3.6.1 to 3.6.2 in /modules/runtime-info-ui-ng
-- [[#4531](https://github.com/opencast/opencast/pull/4531)] -
-  Bump selenium-server-standalone-jar from 3.141.59 to 4.7.1 in /modules/admin-ui-frontend
 - [[#4530](https://github.com/opencast/opencast/pull/4530)] -
   Fix parent POM version of redirect module in develop
-- [[#4526](https://github.com/opencast/opencast/pull/4526)] -
-  Bump typescript from 4.8.4 to 4.9.4 in /modules/lti
 - [[#4520](https://github.com/opencast/opencast/pull/4520)] -
   Remove Twitter and Facebook links
 - [[#4511](https://github.com/opencast/opencast/pull/4511)] -
   Make debug output in the JWT filters simpler and more idiomatic
-- [[#4509](https://github.com/opencast/opencast/pull/4509)] -
-  Bump html-validate from 7.9.0 to 7.10.1 in /modules/admin-ui-frontend
-- [[#4507](https://github.com/opencast/opencast/pull/4507)] -
-  Bump chromedriver from 107.0.3 to 108.0.0 in /modules/admin-ui-frontend
-- [[#4506](https://github.com/opencast/opencast/pull/4506)] -
-  Bump decode-uri-component from 0.2.0 to 0.2.2 in /modules/lti
-- [[#4504](https://github.com/opencast/opencast/pull/4504)] -
-  Bump eslint from 8.27.0 to 8.29.0 in /modules/admin-ui-frontend
-- [[#4497](https://github.com/opencast/opencast/pull/4497)] -
-  Bump react-select from 5.5.9 to 5.7.0 in /modules/lti
-- [[#4491](https://github.com/opencast/opencast/pull/4491)] -
-  Bump bootbox from 5.5.3 to 6.0.0 in /modules/engage-ui
-- [[#4489](https://github.com/opencast/opencast/pull/4489)] -
-  Bump postgresql from 42.5.0 to 42.5.1 in /modules/db
 - [[#4488](https://github.com/opencast/opencast/pull/4488)] -
   Update board list in documentation
-- [[#4483](https://github.com/opencast/opencast/pull/4483)] -
-  Bump engine.io from 6.2.0 to 6.2.1 in /modules/admin-ui-frontend
-- [[#4467](https://github.com/opencast/opencast/pull/4467)] -
-  Bump i18next-browser-languagedetector from 7.0.0 to 7.0.1 in /modules/lti
-- [[#4466](https://github.com/opencast/opencast/pull/4466)] -
-  Bump @types/react-dom from 18.0.8 to 18.0.9 in /modules/lti
-- [[#4464](https://github.com/opencast/opencast/pull/4464)] -
-  Bump @fortawesome/fontawesome-svg-core from 6.2.0 to 6.2.1 in /modules/lti
-- [[#4463](https://github.com/opencast/opencast/pull/4463)] -
-  Bump @types/jest from 29.2.1 to 29.2.3 in /modules/lti
-- [[#4462](https://github.com/opencast/opencast/pull/4462)] -
-  Bump react-bootstrap from 2.5.0 to 2.6.0 in /modules/lti
 - [[#4456](https://github.com/opencast/opencast/pull/4456)] -
   New workflow implementation and migration fixes (OC 13)
-- [[#4452](https://github.com/opencast/opencast/pull/4452)] -
-  Bump mariadb-java-client from 3.0.8 to 3.1.0 in /modules/db
-- [[#4451](https://github.com/opencast/opencast/pull/4451)] -
-  Bump html-validate from 7.8.0 to 7.9.0 in /modules/admin-ui-frontend
 - [[#4450](https://github.com/opencast/opencast/pull/4450)] -
   Add index for oc_job_argument table (OC 13)
-- [[#4449](https://github.com/opencast/opencast/pull/4449)] -
-  Bump loader-utils from 2.0.2 to 2.0.4 in /modules/lti
-- [[#4447](https://github.com/opencast/opencast/pull/4447)] -
-  Bump loader-utils from 1.4.0 to 1.4.2 in /modules/engage-paella-player-7
-- [[#4443](https://github.com/opencast/opencast/pull/4443)] -
-  Bump minimatch and recursive-readdir in /modules/lti
 - [[#4440](https://github.com/opencast/opencast/pull/4440)] -
   Enrich LDAP users with name and mail address
 - [[#4423](https://github.com/opencast/opencast/pull/4423)] -
@@ -369,16 +174,371 @@ Opencast 14
   Add organization properties to mail template data
 - [[#4376](https://github.com/opencast/opencast/pull/4376)] -
   Allow use of extended metadata in send-email WOH
-- [[#4336](https://github.com/opencast/opencast/pull/4336)] -
-  Bump jackson from 2.13.2.x to 2.14.1
 - [[#4315](https://github.com/opencast/opencast/pull/4315)] -
   Remove Theodul
 - [[#4206](https://github.com/opencast/opencast/pull/4206)] -
   Changed rebuild order and added rebuild indicator
 
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/4942">4942</a>] -
+  Bump engine.io from 6.4.1 to 6.4.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4936">4936</a>] -
+  Bump grunt-contrib-cssmin from 4.0.0 to 5.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4935">4935</a>] -
+  Bump @types/react-dom from 18.2.0 to 18.2.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4934">4934</a>] -
+  Bump sass from 1.57.1 to 1.62.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4933">4933</a>] -
+  Bump @types/node from 18.16.0 to 18.16.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4931">4931</a>] -
+  Bump markdownlint-cli from 0.33.0 to 0.34.0 in /docs/guides</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4919">4919</a>] -
+  Bump @types/react-dom from 18.0.11 to 18.2.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4917">4917</a>] -
+  Bump maven-project-info-reports-plugin from 3.4.2 to 3.4.3 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4912">4912</a>] -
+  Bump checker-qual from 3.29.0 to 3.33.0 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4908">4908</a>] -
+  Bump chromedriver from 111.0.0 to 112.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4907">4907</a>] -
+  Bump eslint from 8.37.0 to 8.39.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4905">4905</a>] -
+  Bump karma from 6.4.1 to 6.4.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4902">4902</a>] -
+  Bump react-bootstrap from 2.7.2 to 2.7.4 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4898">4898</a>] -
+  Bump react-i18next from 12.2.0 to 12.2.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4897">4897</a>] -
+  Bump html-validate from 7.14.0 to 7.15.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4895">4895</a>] -
+  Bump @types/jest from 29.5.0 to 29.5.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4893">4893</a>] -
+  Bump karma-chrome-launcher from 3.1.1 to 3.2.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4892">4892</a>] -
+  Bump i18next from 22.4.14 to 22.4.15 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4889">4889</a>] -
+  Bump @types/node from 18.15.11 to 18.16.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4888">4888</a>] -
+  Bump esapi from 2.3.0.0 to 2.5.2.0 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4884">4884</a>] -
+  Bump exec-maven-plugin from 1.6.0 to 3.1.0 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4882">4882</a>] -
+  Bump download-maven-plugin from 1.6.6 to 1.6.8 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4859">4859</a>] -
+  Bump maven-scr-plugin from 1.26.2 to 1.26.4 in /modules/metrics-exporter</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4855">4855</a>] -
+  Bump iframe-resizer from 4.3.4 to 4.3.6 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4854">4854</a>] -
+  Bump maven-site-plugin from 3.10.0 to 3.12.1 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4852">4852</a>] -
+  Bump jackson.version from 2.14.1 to 2.14.2 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4847">4847</a>] -
+  Bump maven-enforcer-plugin from 3.0.0-M2 to 3.3.0 in /modules/metrics-exporter</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4845">4845</a>] -
+  Bump maven-gpg-plugin from 1.5 to 3.0.1 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4840">4840</a>] -
+  Bump i18next from 22.0.4 to 22.4.14 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4838">4838</a>] -
+  Bump maven-compiler-plugin from 3.8.1 to 3.11.0 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4837">4837</a>] -
+  Bump @types/jest from 29.4.0 to 29.5.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4836">4836</a>] -
+  Bump @fortawesome/fontawesome-svg-core from 6.3.0 to 6.4.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4835">4835</a>] -
+  Bump react-i18next from 12.1.4 to 12.2.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4834">4834</a>] -
+  Bump react-select from 5.7.0 to 5.7.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4833">4833</a>] -
+  Bump @types/node from 18.14.2 to 18.15.11 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4832">4832</a>] -
+  Bump @fortawesome/free-solid-svg-icons from 6.3.0 to 6.4.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4827">4827</a>] -
+  Bump joda-time from 2.10.10 to 2.12.5 in /modules/metrics-exporter</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4818">4818</a>] -
+  Bump eslint from 8.36.0 to 8.37.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4811">4811</a>] -
+  Bump html-validate from 7.13.3 to 7.14.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4810">4810</a>] -
+  Bump maven-install-plugin from 2.5.2 to 3.1.1 in /modules/metrics-exporter</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4807">4807</a>] -
+  Bump maven-resources-plugin from 3.2.0 to 3.3.1 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4803">4803</a>] -
+  Bump jettison from 1.5.2 to 1.5.4</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4784">4784</a>] -
+  Bump jasmine-core from 4.5.0 to 4.6.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4775">4775</a>] -
+  Bump webpack from 5.73.0 to 5.76.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4766">4766</a>] -
+  Bump eslint from 8.35.0 to 8.36.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4760">4760</a>] -
+  Bump chromedriver from 110.0.0 to 111.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4759">4759</a>] -
+  Bump html-validate from 7.13.2 to 7.13.3 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4752">4752</a>] -
+  Bump jquery from 3.6.3 to 3.6.4 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4751">4751</a>] -
+  Bump jquery from 3.6.3 to 3.6.4 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4750">4750</a>] -
+  Bump jquery from 3.6.3 to 3.6.4 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4731">4731</a>] -
+  Bump @fortawesome/free-solid-svg-icons from 6.2.1 to 6.3.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4730">4730</a>] -
+  Bump @types/node from 18.11.18 to 18.14.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4728">4728</a>] -
+  Bump @fortawesome/fontawesome-svg-core from 6.2.1 to 6.3.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4727">4727</a>] -
+  Bump react-bootstrap from 2.7.0 to 2.7.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4725">4725</a>] -
+  Bump @types/react-dom from 18.0.10 to 18.0.11 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4724">4724</a>] -
+  Bump iframe-resizer from 4.3.3 to 4.3.4 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4718">4718</a>] -
+  Bump eslint from 8.34.0 to 8.35.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4712">4712</a>] -
+  Bump maven-assembly-plugin from 3.3.0 to 3.5.0 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4710">4710</a>] -
+  Bump commons-fileupload from 1.4 to 1.5</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4686">4686</a>] -
+  Bump eslint from 8.33.0 to 8.34.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4678">4678</a>] -
+  Bump httpcore-osgi from 4.4.15 to 4.4.16 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4675">4675</a>] -
+  Bump chromedriver from 109.0.0 to 110.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4674">4674</a>] -
+  Bump html-validate from 7.13.1 to 7.13.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4671">4671</a>] -
+  Bump postgresql from 42.5.1 to 42.5.3 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4667">4667</a>] -
+  Bump typescript from 4.9.4 to 4.9.5 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4666">4666</a>] -
+  Bump grunt from 1.5.3 to 1.6.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4665">4665</a>] -
+  Bump @types/jest from 29.2.5 to 29.4.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4663">4663</a>] -
+  Bump @types/react-helmet from 6.1.5 to 6.1.6 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4660">4660</a>] -
+  Bump iframe-resizer from 4.3.2 to 4.3.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4656">4656</a>] -
+  Bump eslint from 8.32.0 to 8.33.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4652">4652</a>] -
+  Bump ua-parser-js from 0.7.31 to 0.7.33 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4647">4647</a>] -
+  Bump maven-surefire-report-plugin from 2.20 to 2.22.2 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4645">4645</a>] -
+  Bump nexus-staging-maven-plugin from 1.6.8 to 1.6.13 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4639">4639</a>] -
+  Bump org.apache.felix.fileinstall from 3.6.4 to 3.7.4 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4637">4637</a>] -
+  Bump maven-source-plugin from 2.2.1 to 3.2.1 in /modules/metrics-exporter</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4632">4632</a>] -
+  Bump gson from 2.8.9 to 2.10.1 in /modules/metrics-exporter</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4629">4629</a>] -
+  Bump maven-project-info-reports-plugin from 2.8.1 to 3.4.2 in /modules/metrics-exporter</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4621">4621</a>] -
+  Bump mariadb-java-client from 3.1.1 to 3.1.2 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4606">4606</a>] -
+  Bump jna from 5.12.1 to 5.13.0 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4602">4602</a>] -
+  Bump eslint from 8.31.0 to 8.32.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4601">4601</a>] -
+  Bump html-validate from 7.12.2 to 7.13.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4598">4598</a>] -
+  Bump mariadb-java-client from 3.1.0 to 3.1.1 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4597">4597</a>] -
+  Bump chromedriver from 108.0.0 to 109.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4593">4593</a>] -
+  Bump html-validate from 7.12.1 to 7.12.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4592">4592</a>] -
+  Bump react-i18next from 12.0.0 to 12.1.4 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4589">4589</a>] -
+  Bump markdownlint-cli from 0.32.2 to 0.33.0 in /docs/guides</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4587">4587</a>] -
+  Bump checker-qual from 3.26.0 to 3.29.0 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4586">4586</a>] -
+  Bump json5 from 1.0.1 to 1.0.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4585">4585</a>] -
+  Bump json5 from 1.0.1 to 1.0.2 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4581">4581</a>] -
+  Bump html-validate from 7.12.0 to 7.12.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4580">4580</a>] -
+  Bump jettison from 1.5.1 to 1.5.2</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4577">4577</a>] -
+  Bump eslint from 8.30.0 to 8.31.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4576">4576</a>] -
+  Bump bootstrap from 5.2.2 to 5.2.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4575">4575</a>] -
+  Bump @types/jest from 29.2.3 to 29.2.5 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4574">4574</a>] -
+  Bump @fortawesome/free-solid-svg-icons from 6.2.0 to 6.2.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4573">4573</a>] -
+  Bump react-i18next from 12.0.0 to 12.1.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4572">4572</a>] -
+  Bump @types/react-dom from 18.0.9 to 18.0.10 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4571">4571</a>] -
+  Bump @types/node from 18.11.8 to 18.11.18 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4568">4568</a>] -
+  Bump react-bootstrap from 2.6.0 to 2.7.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4567">4567</a>] -
+  Bump json5 from 2.2.0 to 2.2.3 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4564">4564</a>] -
+  Bump html-validate from 7.11.1 to 7.12.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4557">4557</a>] -
+  Bump html-validate from 7.11.0 to 7.11.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4555">4555</a>] -
+  Bump jquery from 3.6.2 to 3.6.3 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4554">4554</a>] -
+  Bump jquery from 3.6.2 to 3.6.3 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4553">4553</a>] -
+  Bump jquery from 3.6.2 to 3.6.3 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4551">4551</a>] -
+  Bump sass from 1.55.0 to 1.57.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4545">4545</a>] -
+  Bump html-validate from 7.10.1 to 7.11.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4544">4544</a>] -
+  Bump eslint from 8.29.0 to 8.30.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4534">4534</a>] -
+  Bump jquery from 3.6.1 to 3.6.2 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4533">4533</a>] -
+  Bump jquery from 3.6.1 to 3.6.2 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4532">4532</a>] -
+  Bump jquery from 3.6.1 to 3.6.2 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4531">4531</a>] -
+  Bump selenium-server-standalone-jar from 3.141.59 to 4.7.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4526">4526</a>] -
+  Bump typescript from 4.8.4 to 4.9.4 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4509">4509</a>] -
+  Bump html-validate from 7.9.0 to 7.10.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4507">4507</a>] -
+  Bump chromedriver from 107.0.3 to 108.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4506">4506</a>] -
+  Bump decode-uri-component from 0.2.0 to 0.2.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4504">4504</a>] -
+  Bump eslint from 8.27.0 to 8.29.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4497">4497</a>] -
+  Bump react-select from 5.5.9 to 5.7.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4491">4491</a>] -
+  Bump bootbox from 5.5.3 to 6.0.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4489">4489</a>] -
+  Bump postgresql from 42.5.0 to 42.5.1 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4483">4483</a>] -
+  Bump engine.io from 6.2.0 to 6.2.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4467">4467</a>] -
+  Bump i18next-browser-languagedetector from 7.0.0 to 7.0.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4466">4466</a>] -
+  Bump @types/react-dom from 18.0.8 to 18.0.9 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4464">4464</a>] -
+  Bump @fortawesome/fontawesome-svg-core from 6.2.0 to 6.2.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4463">4463</a>] -
+  Bump @types/jest from 29.2.1 to 29.2.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4462">4462</a>] -
+  Bump react-bootstrap from 2.5.0 to 2.6.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4452">4452</a>] -
+  Bump mariadb-java-client from 3.0.8 to 3.1.0 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4451">4451</a>] -
+  Bump html-validate from 7.8.0 to 7.9.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4449">4449</a>] -
+  Bump loader-utils from 2.0.2 to 2.0.4 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4447">4447</a>] -
+  Bump loader-utils from 1.4.0 to 1.4.2 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4443">4443</a>] -
+  Bump minimatch and recursive-readdir in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4336">4336</a>] -
+  Bump jackson from 2.13.2.x to 2.14.1</li>
+</ul>
+</details>
 
 Opencast 13
 -----------
+
+### Opencast 13.12
+
+*Released on November 15th, 2023*
+
+- [[#5411](https://github.com/opencast/opencast/pull/5411)] -
+  Update lockfile version in the old admin UI
+- [[#5407](https://github.com/opencast/opencast/pull/5407)] -
+  Fix manually entering time in `datetimepicker`-s in Safari
+- [[#5406](https://github.com/opencast/opencast/pull/5406)] -
+  Fix access policy tab always showing unsaved changes
+- [[#5404](https://github.com/opencast/opencast/pull/5404)] -
+  Add role for listprovider external api
+- [[#5354](https://github.com/opencast/opencast/pull/5354)] -
+  Get thumbnail for editor frontend from archive
+- [[#5350](https://github.com/opencast/opencast/pull/5350)] -
+  YT-Publish WOH: Fail more aggressively
+- [[#5349](https://github.com/opencast/opencast/pull/5349)] -
+  Youtube-Publication: Throw explicit error if client_secret is malformed
+- [[#5348](https://github.com/opencast/opencast/pull/5348)] -
+  Update Youtube Publication documentation
+- [[#5344](https://github.com/opencast/opencast/pull/5344)] -
+  Fix external api listprovider header
+- [[#5342](https://github.com/opencast/opencast/pull/5342)] -
+  Add option to pass additional args to Whisper
+- [[#5338](https://github.com/opencast/opencast/pull/5338)] -
+  Fixes connection test on NCast Hydra with CA user
+- [[#5337](https://github.com/opencast/opencast/pull/5337)] -
+  Document Registration
+- [[#5317](https://github.com/opencast/opencast/pull/5317)] -
+  Add config-keys to set minimum rules for cuts and segments duration
+- [[#5269](https://github.com/opencast/opencast/pull/5269)] -
+  Fix custom roles pattern now working in access policy tab
+
+### Opencast 13.12
+
+*Released on October 18th, 2023*
+
+- [[#5313](https://github.com/opencast/opencast/pull/5313)] -
+  Update events in archive in order on series change
+- [[#5260](https://github.com/opencast/opencast/pull/5260)] -
+  Update ES index before triggering event handlers from AssetManager
+- [[#5253](https://github.com/opencast/opencast/pull/5253)] -
+  Paella 7: Use the localstorage to store the user preferences and upgrades Paella core to 1.43
+- [[#5246](https://github.com/opencast/opencast/pull/5246)] -
+  Paella 7 plugins documentation
+
+### Opencast 13.11
+
+*Released on September 14th, 2023*
+
+- [[#5251](https://github.com/opencast/opencast/pull/5251)] -
+  Add Opencast 13.11 release notes
+- [[#5230](https://github.com/opencast/opencast/pull/5230)] -
+  Fix static file service exception on non-existing file
+- [[#5226](https://github.com/opencast/opencast/pull/5226)] -
+  Fix Workflow Index Rebuild
+- [[#5191](https://github.com/opencast/opencast/pull/5191)] -
+  Fix NPE when workflow user no longer exists
+- [[#5177](https://github.com/opencast/opencast/pull/5177)] -
+  Fix wrong failedOperation characterers in send email docs WoH and improves Freemaker documentation.
+- [[#5175](https://github.com/opencast/opencast/pull/5175)] -
+  Add Opencast 13.10 release notes
+- [[#5171](https://github.com/opencast/opencast/pull/5171)] -
+  Skip deleting non existent file
+- [[#5169](https://github.com/opencast/opencast/pull/5169)] -
+  Copy active inputs between CAs if they have the same set of inputs
+- [[#5164](https://github.com/opencast/opencast/pull/5164)] -
+  Fix editing custom actions in the ACL editor
+- [[#5101](https://github.com/opencast/opencast/pull/5101)] -
+  Add whisper-ctranslate2 flags to WhisperEngine.java
+- [[#5062](https://github.com/opencast/opencast/pull/5062)] -
+  Dont allow to delete user with active workflow in Admin UI
+- [[#4684](https://github.com/opencast/opencast/pull/4684)] -
+  Ensure workflows have an associated org after upgrade
+
+### Opencast 13.10
+
+*Released on August 23th, 2023*
+
+- [[#5162](https://github.com/opencast/opencast/pull/5162)] -
+  Add Opencast 13.9 release notes
+- [[#5157](https://github.com/opencast/opencast/pull/5157)] -
+  Test for broken JAR (zip) files
+- [[#5150](https://github.com/opencast/opencast/pull/5150)] -
+  Fix Endless Loop on Elasticsearch Exception
+- [[#5033](https://github.com/opencast/opencast/pull/5033)] -
+  Escape ES query string in external API endpoints
 
 ### Opencast 13.9
 
@@ -461,10 +621,6 @@ Opencast 13
   Mitigate not loading ACLs
 - [[#4920](https://github.com/opencast/opencast/pull/4920)] -
   Batch Dependabot Updates for Paella 7
-- [[#4890](https://github.com/opencast/opencast/pull/4890)] -
-  Bump eslint from 8.37.0 to 8.39.0 in /modules/engage-paella-player-7
-- [[#4885](https://github.com/opencast/opencast/pull/4885)] -
-  Bump html-validate from 7.14.0 to 7.15.1 in /modules/engage-paella-player-7
 - [[#4879](https://github.com/opencast/opencast/pull/4879)] -
   Editor Release 2023-04-20
 - [[#4870](https://github.com/opencast/opencast/pull/4870)] -
@@ -475,10 +631,19 @@ Opencast 13
   Extend configuration options of Amberscript integration
 - [[#4864](https://github.com/opencast/opencast/pull/4864)] -
   Remove dead `CONFIG_OPTIONS` from WOHs
-- [[#4853](https://github.com/opencast/opencast/pull/4853)] -
-  Bump webpack from 5.77.0 to 5.78.0 in /modules/engage-paella-player-7
-- [[#4851](https://github.com/opencast/opencast/pull/4851)] -
-  Bump paella-zoom-plugin from 1.2.1 to 1.27.0 in /modules/engage-paella-player-7
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/4890">4890</a>] -
+  Bump eslint from 8.37.0 to 8.39.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4885">4885</a>] -
+  Bump html-validate from 7.14.0 to 7.15.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4853">4853</a>] -
+  Bump webpack from 5.77.0 to 5.78.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4851">4851</a>] -
+  Bump paella-zoom-plugin from 1.2.1 to 1.27.0 in /modules/engage-paella-player-7</li>
+</ul>
+</details>
 
 ### Opencast 13.5
 
@@ -488,12 +653,8 @@ Opencast 13
   Add Opencast 13.5 release notes
 - [[#4843](https://github.com/opencast/opencast/pull/4843)] -
   Fixed pagination when reindexing asset manager
-- [[#4824](https://github.com/opencast/opencast/pull/4824)] -
-  Bump @babel/preset-env from 7.20.2 to 7.21.4 in /modules/engage-paella-player-7
 - [[#4823](https://github.com/opencast/opencast/pull/4823)] -
   Batch Dependabot Updates for Paella 7
-- [[#4813](https://github.com/opencast/opencast/pull/4813)] -
-  Bump html-validate from 7.13.3 to 7.14.0 in /modules/engage-paella-player-7
 - [[#4782](https://github.com/opencast/opencast/pull/4782)] -
   Paella 7: Allow to disable the cookie consent banner
 - [[#4772](https://github.com/opencast/opencast/pull/4772)] -
@@ -502,13 +663,27 @@ Opencast 13
   Whisper language detection and tagging
 - [[#4738](https://github.com/opencast/opencast/pull/4738)] -
   Enable Whisper English Translation
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/4824">4824</a>] -
+  Bump @babel/preset-env from 7.20.2 to 7.21.4 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4813">4813</a>] -
+  Bump html-validate from 7.13.3 to 7.14.0 in /modules/engage-paella-player-7</li>
+</ul>
+</details>
 
 ### Opencast 13.4
 
 *Released on March 21th, 2023*
 
-- [[#4780](https://github.com/opencast/opencast/pull/4780)] -
-  Bump @babel/eslint-parser from 7.19.1 to 7.21.3 in /modules/engage-paella-player-7
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/4780">4780</a>] -
+  Bump @babel/eslint-parser from 7.19.1 to 7.21.3 in /modules/engage-paella-player-7</li>
+</ul>
+</details>
 
 ### Opencast 13.3
 
@@ -520,8 +695,6 @@ Opencast 13
   Add Opencast 13.3 release notes
 - [[#4756](https://github.com/opencast/opencast/pull/4756)] -
   Batch Dependabot Updates for Paella 7
-- [[#4753](https://github.com/opencast/opencast/pull/4753)] -
-  Bump paella-core from 1.20.2 to 1.22.1 in /modules/engage-paella-player-7
 - [[#4740](https://github.com/opencast/opencast/pull/4740)] -
   Fix reindex of multi-tanant systems
 - [[#4739](https://github.com/opencast/opencast/pull/4739)] -
@@ -530,26 +703,33 @@ Opencast 13
   Batch Dependabot Updates for Paella 7
 - [[#4722](https://github.com/opencast/opencast/pull/4722)] -
   Paella 7 matomo plugin
-- [[#4719](https://github.com/opencast/opencast/pull/4719)] -
-  Bump eslint from 8.34.0 to 8.35.0 in /modules/engage-paella-player-7
 - [[#4717](https://github.com/opencast/opencast/pull/4717)] -
   Shows event Title on Paella 7 browser tab
-- [[#4713](https://github.com/opencast/opencast/pull/4713)] -
-  Bump paella-core from 1.20.0 to 1.20.2 in /modules/engage-paella-player-7
 - [[#4707](https://github.com/opencast/opencast/pull/4707)] -
   Dependabot-batcher update
-- [[#4706](https://github.com/opencast/opencast/pull/4706)] -
-  Bump @babel/core from 7.20.12 to 7.21.0 in /modules/engage-paella-player-7
-- [[#4705](https://github.com/opencast/opencast/pull/4705)] -
-  Bump paella-core from 1.16.0 to 1.20.0 in /modules/engage-paella-player-7
 - [[#4690](https://github.com/opencast/opencast/pull/4690)] -
   Add Opencast 13.2 release notes
-- [[#4688](https://github.com/opencast/opencast/pull/4688)] -
-  Bump paella-basic-plugins from 1.8.4 to 1.18.0 in /modules/engage-paella-player-7
 - [[#4683](https://github.com/opencast/opencast/pull/4683)] -
   Fix typo and adds recomendations to whisper doc
 - [[#4515](https://github.com/opencast/opencast/pull/4515)] -
   Allow hotkeys in create dialogs in input elements
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/4753">4753</a>] -
+  Bump paella-core from 1.20.2 to 1.22.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4719">4719</a>] -
+  Bump eslint from 8.34.0 to 8.35.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4713">4713</a>] -
+  Bump paella-core from 1.20.0 to 1.20.2 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4706">4706</a>] -
+  Bump @babel/core from 7.20.12 to 7.21.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4705">4705</a>] -
+  Bump paella-core from 1.16.0 to 1.20.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4688">4688</a>] -
+  Bump paella-basic-plugins from 1.8.4 to 1.18.0 in /modules/engage-paella-player-7</li>
+</ul>
+</details>
 
 ### Opencast 13.2
 
@@ -557,61 +737,42 @@ Opencast 13
 
 - [[#4616](https://github.com/opencast/opencast/pull/4616)] -
   Fix adopter data gathering bugs
-- [[#4687](https://github.com/opencast/opencast/pull/4687)] -
-  Bump eslint from 8.33.0 to 8.34.0 in /modules/engage-paella-player-7
-- [[#4680](https://github.com/opencast/opencast/pull/4680)] -
-  Bump html-validate from 7.13.1 to 7.13.2 in /modules/engage-paella-player-7
-- [[#4657](https://github.com/opencast/opencast/pull/4657)] -
-  Bump eslint from 8.32.0 to 8.33.0 in /modules/engage-paella-player-7
 - [[#4654](https://github.com/opencast/opencast/pull/4654)] -
   Add webvtt-to-cutmarks to list of workflow operations
-- [[#4648](https://github.com/opencast/opencast/pull/4648)] -
-  Bump paella-core from 1.14.2 to 1.16.0 in /modules/engage-paella-player-7
 - [[#4628](https://github.com/opencast/opencast/pull/4628)] -
   Add missing expected response code
 - [[#4619](https://github.com/opencast/opencast/pull/4619)] -
   Fix calendar.json endpoint
 - [[#4607](https://github.com/opencast/opencast/pull/4607)] -
   Add Opencast 13.1 release notes
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/4687">4687</a>] -
+  Bump eslint from 8.33.0 to 8.34.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4680">4680</a>] -
+  Bump html-validate from 7.13.1 to 7.13.2 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4657">4657</a>] -
+  Bump eslint from 8.32.0 to 8.33.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4648">4648</a>] -
+  Bump paella-core from 1.14.2 to 1.16.0 in /modules/engage-paella-player-7</li>
+</ul>
+</details>
 
 ### Opencast 13.1
 
 *Released on January 18th, 2023*
 
-- [[#4608](https://github.com/opencast/opencast/pull/4608)] -
-  Bump paella-core from 1.11.3 to 1.14.2 in /modules/engage-paella-player-7
 - [[#4607](https://github.com/opencast/opencast/pull/4607)] -
   Add Opencast 13.1 release notes
-- [[#4604](https://github.com/opencast/opencast/pull/4604)] -
-  Bump eslint from 8.30.0 to 8.32.0 in /modules/engage-paella-player-7
-- [[#4603](https://github.com/opencast/opencast/pull/4603)] -
-  Bump html-validate from 7.11.1 to 7.13.1 in /modules/engage-paella-player-7
 - [[#4599](https://github.com/opencast/opencast/pull/4599)] -
   Fix Syntax Error
-- [[#4584](https://github.com/opencast/opencast/pull/4584)] -
-  Bump @babel/core from 7.20.5 to 7.20.12 in /modules/engage-paella-player-7
-- [[#4582](https://github.com/opencast/opencast/pull/4582)] -
-  Bump babel-loader from 9.1.0 to 9.1.2 in /modules/engage-paella-player-7
-- [[#4578](https://github.com/opencast/opencast/pull/4578)] -
-  Bump paella-basic-plugins from 1.8.1 to 1.8.4 in /modules/engage-paella-player-7
-- [[#4558](https://github.com/opencast/opencast/pull/4558)] -
-  Bump html-validate from 7.11.0 to 7.11.1 in /modules/engage-paella-player-7
 - [[#4548](https://github.com/opencast/opencast/pull/4548)] -
   Mark OC13 RPMs as Stable
-- [[#4547](https://github.com/opencast/opencast/pull/4547)] -
-  Bump eslint from 8.29.0 to 8.30.0 in /modules/engage-paella-player-7
-- [[#4546](https://github.com/opencast/opencast/pull/4546)] -
-  Bump html-validate from 7.10.1 to 7.11.0 in /modules/engage-paella-player-7
-- [[#4541](https://github.com/opencast/opencast/pull/4541)] -
-  Bump paella-core from 1.11.1 to 1.11.3 in /modules/engage-paella-player-7
-- [[#4540](https://github.com/opencast/opencast/pull/4540)] -
-  Bump css-loader from 6.7.2 to 6.7.3 in /modules/engage-paella-player-7
 - [[#4536](https://github.com/opencast/opencast/pull/4536)] -
   Avoid using jobs in SeriesUpdatedEventHandler
 - [[#4516](https://github.com/opencast/opencast/pull/4516)] -
   Change default hotkeys for create dialogs in admin UI
-- [[#4512](https://github.com/opencast/opencast/pull/4512)] -
-  Bump webpack-cli from 5.0.0 to 5.0.1 in /modules/engage-paella-player-7
 - [[#4502](https://github.com/opencast/opencast/pull/4502)] -
   Fix: series deleted from search index cannot be re-added
 - [[#4484](https://github.com/opencast/opencast/pull/4484)] -
@@ -620,6 +781,35 @@ Opencast 13
   Add silient detection based on subtitles (webvtt-to-cutmarks woh)
 - [[#4478](https://github.com/opencast/opencast/pull/4478)] -
   Bug fix: publish engage woh with merge SKIP the operation if media package not in search index
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/4608">4608</a>] -
+  Bump paella-core from 1.11.3 to 1.14.2 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4604">4604</a>] -
+  Bump eslint from 8.30.0 to 8.32.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4603">4603</a>] -
+  Bump html-validate from 7.11.1 to 7.13.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4584">4584</a>] -
+  Bump @babel/core from 7.20.5 to 7.20.12 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4582">4582</a>] -
+  Bump babel-loader from 9.1.0 to 9.1.2 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4578">4578</a>] -
+  Bump paella-basic-plugins from 1.8.1 to 1.8.4 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4558">4558</a>] -
+  Bump html-validate from 7.11.0 to 7.11.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4547">4547</a>] -
+  Bump eslint from 8.29.0 to 8.30.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4546">4546</a>] -
+  Bump html-validate from 7.10.1 to 7.11.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4541">4541</a>] -
+  Bump paella-core from 1.11.1 to 1.11.3 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4540">4540</a>] -
+  Bump css-loader from 6.7.2 to 6.7.3 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4512">4512</a>] -
+  Bump webpack-cli from 5.0.0 to 5.0.1 in /modules/engage-paella-player-7</li>
+</ul>
+</details>
 
 ### Opencast 13.0
 
@@ -631,28 +821,10 @@ Opencast 13
   Reduce number of snapshots taken in the new editor backend
 - [[#4513](https://github.com/opencast/opencast/pull/4513)] -
   Adds Whisper STT to SpeechToText WoH
-- [[#4510](https://github.com/opencast/opencast/pull/4510)] -
-  Bump html-validate from 7.10.0 to 7.10.1 in /modules/engage-paella-player-7
-- [[#4505](https://github.com/opencast/opencast/pull/4505)] -
-  Bump eslint from 8.28.0 to 8.29.0 in /modules/engage-paella-player-7
-- [[#4495](https://github.com/opencast/opencast/pull/4495)] -
-  Bump @babel/core from 7.20.2 to 7.20.5 in /modules/engage-paella-player-7
-- [[#4492](https://github.com/opencast/opencast/pull/4492)] -
-  Bump paella-core from 1.8.9 to 1.11.1 in /modules/engage-paella-player-7
 - [[#4490](https://github.com/opencast/opencast/pull/4490)] -
   Add rules for merging pull requests to the docs
-- [[#4480](https://github.com/opencast/opencast/pull/4480)] -
-  Bump eslint from 8.27.0 to 8.28.0 in /modules/engage-paella-player-7
-- [[#4476](https://github.com/opencast/opencast/pull/4476)] -
-  Bump html-validate from 7.8.0 to 7.10.0 in /modules/engage-paella-player-7
-- [[#4471](https://github.com/opencast/opencast/pull/4471)] -
-  Bump @babel/preset-env from 7.19.4 to 7.20.2 in /modules/engage-paella-player-7
-- [[#4470](https://github.com/opencast/opencast/pull/4470)] -
-  Bump webpack-cli from 4.10.0 to 5.0.0 in /modules/engage-paella-player-7
 - [[#4456](https://github.com/opencast/opencast/pull/4456)] -
   New workflow implementation and migration fixes (OC 13)
-- [[#4451](https://github.com/opencast/opencast/pull/4451)] -
-  Bump html-validate from 7.8.0 to 7.9.0 in /modules/admin-ui-frontend
 - [[#4450](https://github.com/opencast/opencast/pull/4450)] -
   Add index for oc_job_argument table (OC 13)
 - [[#4445](https://github.com/opencast/opencast/pull/4445)] -
@@ -661,70 +833,24 @@ Opencast 13
   Update Karaf to 4.2.16
 - [[#4440](https://github.com/opencast/opencast/pull/4440)] -
   Enrich LDAP users with name and mail address
-- [[#4425](https://github.com/opencast/opencast/pull/4425)] -
-  Bump eslint from 8.26.0 to 8.27.0 in /modules/runtime-info-ui
-- [[#4424](https://github.com/opencast/opencast/pull/4424)] -
-  Bump eslint from 8.26.0 to 8.27.0 in /modules/runtime-info-ui-ng
 - [[#4422](https://github.com/opencast/opencast/pull/4422)] -
   More ESLint Auto-Updates
 - [[#4421](https://github.com/opencast/opencast/pull/4421)] -
   Fix Auto-update Tests
-- [[#4420](https://github.com/opencast/opencast/pull/4420)] -
-  Bump eslint from 8.26.0 to 8.27.0 in /modules/admin-ui-frontend
-- [[#4419](https://github.com/opencast/opencast/pull/4419)] -
-  Bump eslint from 8.26.0 to 8.27.0 in /modules/engage-paella-player
 - [[#4418](https://github.com/opencast/opencast/pull/4418)] -
   Opencast 13 release schedule
 - [[#4415](https://github.com/opencast/opencast/pull/4415)] -
   Publish Captions by Default
-- [[#4413](https://github.com/opencast/opencast/pull/4413)] -
-  Bump chromedriver from 107.0.2 to 107.0.3 in /modules/admin-ui-frontend
 - [[#4408](https://github.com/opencast/opencast/pull/4408)] -
   Add support for multipart mails using text and HTML
-- [[#4403](https://github.com/opencast/opencast/pull/4403)] -
-  Bump @types/node from 18.8.3 to 18.11.8 in /modules/lti
-- [[#4401](https://github.com/opencast/opencast/pull/4401)] -
-  Bump react-select from 5.4.0 to 5.5.9 in /modules/lti
-- [[#4399](https://github.com/opencast/opencast/pull/4399)] -
-  Bump @types/jest from 29.1.2 to 29.2.1 in /modules/lti
-- [[#4398](https://github.com/opencast/opencast/pull/4398)] -
-  Bump i18next from 21.10.0 to 22.0.4 in /modules/lti
-- [[#4397](https://github.com/opencast/opencast/pull/4397)] -
-  Bump i18next-browser-languagedetector from 6.1.8 to 7.0.0 in /modules/lti
-- [[#4396](https://github.com/opencast/opencast/pull/4396)] -
-  Bump react-i18next from 11.18.6 to 12.0.0 in /modules/lti
-- [[#4395](https://github.com/opencast/opencast/pull/4395)] -
-  Bump @types/react-dom from 18.0.6 to 18.0.8 in /modules/lti
-- [[#4394](https://github.com/opencast/opencast/pull/4394)] -
-  Bump html-validate from 7.7.1 to 7.8.0 in /modules/admin-ui-frontend
-- [[#4390](https://github.com/opencast/opencast/pull/4390)] -
-  Bump chromedriver from 107.0.1 to 107.0.2 in /modules/admin-ui-frontend
-- [[#4389](https://github.com/opencast/opencast/pull/4389)] -
-  Bump jasmine-core from 4.4.0 to 4.5.0 in /modules/admin-ui-frontend
 - [[#4388](https://github.com/opencast/opencast/pull/4388)] -
   Use valid URL for admin interface mock data
-- [[#4384](https://github.com/opencast/opencast/pull/4384)] -
-  Bump chromedriver from 107.0.0 to 107.0.1 in /modules/admin-ui-frontend
 - [[#4383](https://github.com/opencast/opencast/pull/4383)] -
   Simplify ldap user directory implementation
 - [[#4380](https://github.com/opencast/opencast/pull/4380)] -
   Add organization properties to mail template data
-- [[#4379](https://github.com/opencast/opencast/pull/4379)] -
-  Bump chromedriver from 106.0.1 to 107.0.0 in /modules/admin-ui-frontend
 - [[#4376](https://github.com/opencast/opencast/pull/4376)] -
   Allow use of extended metadata in send-email WOH
-- [[#4372](https://github.com/opencast/opencast/pull/4372)] -
-  Bump html-validate from 7.7.0 to 7.7.1 in /modules/admin-ui-frontend
-- [[#4364](https://github.com/opencast/opencast/pull/4364)] -
-  Bump eslint from 8.25.0 to 8.26.0 in /modules/runtime-info-ui-ng
-- [[#4363](https://github.com/opencast/opencast/pull/4363)] -
-  Bump eslint from 8.25.0 to 8.26.0 in /modules/runtime-info-ui
-- [[#4362](https://github.com/opencast/opencast/pull/4362)] -
-  Bump eslint from 8.25.0 to 8.26.0 in /modules/admin-ui-frontend
-- [[#4361](https://github.com/opencast/opencast/pull/4361)] -
-  Bump html-validate from 7.6.0 to 7.7.0 in /modules/admin-ui-frontend
-- [[#4360](https://github.com/opencast/opencast/pull/4360)] -
-  Bump eslint from 8.25.0 to 8.26.0 in /modules/engage-paella-player
 - [[#4359](https://github.com/opencast/opencast/pull/4359)] -
   Make PostgreSQL no longer experimental
 - [[#4358](https://github.com/opencast/opencast/pull/4358)] -
@@ -737,432 +863,88 @@ Opencast 13
   Replace fallback element identifiers with UUIDs
 - [[#4348](https://github.com/opencast/opencast/pull/4348)] -
   Use System cURL for Tests
-- [[#4335](https://github.com/opencast/opencast/pull/4335)] -
-  Bump jettison from 1.4.1 to 1.5.1
 - [[#4330](https://github.com/opencast/opencast/pull/4330)] -
   Enforce Workflow Operation Documentation Style
 - [[#4319](https://github.com/opencast/opencast/pull/4319)] -
   Remove unused class "DispatchableComparator"
-- [[#4301](https://github.com/opencast/opencast/pull/4301)] -
-  Bump eslint from 8.24.0 to 8.25.0 in /modules/runtime-info-ui-ng
-- [[#4300](https://github.com/opencast/opencast/pull/4300)] -
-  Bump eslint from 8.24.0 to 8.25.0 in /modules/runtime-info-ui
-- [[#4299](https://github.com/opencast/opencast/pull/4299)] -
-  Bump html-validate from 7.5.0 to 7.6.0 in /modules/admin-ui-frontend
-- [[#4298](https://github.com/opencast/opencast/pull/4298)] -
-  Bump eslint from 8.24.0 to 8.25.0 in /modules/admin-ui-frontend
-- [[#4297](https://github.com/opencast/opencast/pull/4297)] -
-  Bump eslint from 8.24.0 to 8.25.0 in /modules/engage-paella-player
-- [[#4296](https://github.com/opencast/opencast/pull/4296)] -
-  Bump express from 4.18.1 to 4.18.2 in /modules/engage-paella-player
-- [[#4292](https://github.com/opencast/opencast/pull/4292)] -
-  Bump @types/node from 18.7.23 to 18.8.3 in /modules/lti
-- [[#4290](https://github.com/opencast/opencast/pull/4290)] -
-  Bump i18next-browser-languagedetector from 6.1.5 to 6.1.8 in /modules/lti
-- [[#4286](https://github.com/opencast/opencast/pull/4286)] -
-  Bump bootstrap from 5.2.1 to 5.2.2 in /modules/lti
-- [[#4285](https://github.com/opencast/opencast/pull/4285)] -
-  Bump i18next from 21.9.2 to 21.10.0 in /modules/lti
-- [[#4284](https://github.com/opencast/opencast/pull/4284)] -
-  Bump @types/jest from 29.1.1 to 29.1.2 in /modules/lti
 - [[#4280](https://github.com/opencast/opencast/pull/4280)] -
   ADD support for f4v file type
-- [[#4272](https://github.com/opencast/opencast/pull/4272)] -
-  Bump checker-qual from 3.25.0 to 3.26.0 in /modules/db
-- [[#4264](https://github.com/opencast/opencast/pull/4264)] -
-  Bump @types/jest from 29.0.0 to 29.1.1 in /modules/lti
-- [[#4263](https://github.com/opencast/opencast/pull/4263)] -
-  Bump @types/node from 18.7.15 to 18.7.23 in /modules/lti
-- [[#4262](https://github.com/opencast/opencast/pull/4262)] -
-  Bump react-i18next from 11.18.5 to 11.18.6 in /modules/lti
-- [[#4260](https://github.com/opencast/opencast/pull/4260)] -
-  Bump i18next from 21.9.1 to 21.9.2 in /modules/lti
-- [[#4259](https://github.com/opencast/opencast/pull/4259)] -
-  Bump typescript from 4.8.2 to 4.8.4 in /modules/lti
-- [[#4258](https://github.com/opencast/opencast/pull/4258)] -
-  Bump bootstrap from 5.2.0 to 5.2.1 in /modules/lti
-- [[#4256](https://github.com/opencast/opencast/pull/4256)] -
-  Bump chromedriver from 105.0.1 to 106.0.1 in /modules/admin-ui-frontend
-- [[#4246](https://github.com/opencast/opencast/pull/4246)] -
-  Bump underscore from 1.13.4 to 1.13.6 in /modules/engage-ui
-- [[#4245](https://github.com/opencast/opencast/pull/4245)] -
-  Bump eslint from 8.23.1 to 8.24.0 in /modules/runtime-info-ui
-- [[#4244](https://github.com/opencast/opencast/pull/4244)] -
-  Bump eslint from 8.23.1 to 8.24.0 in /modules/runtime-info-ui-ng
-- [[#4243](https://github.com/opencast/opencast/pull/4243)] -
-  Bump eslint from 8.23.1 to 8.24.0 in /modules/admin-ui-frontend
 - [[#4236](https://github.com/opencast/opencast/pull/4236)] -
   Add equals() for AccessControlList
-- [[#4234](https://github.com/opencast/opencast/pull/4234)] -
-  Bump sass from 1.54.9 to 1.55.0 in /modules/admin-ui-frontend
 - [[#4232](https://github.com/opencast/opencast/pull/4232)] -
   Do not update default player components on legacy branches
 - [[#4225](https://github.com/opencast/opencast/pull/4225)] -
   PoC: Karaf shell opencast:plugin* commands
-- [[#4223](https://github.com/opencast/opencast/pull/4223)] -
-  Bump chromedriver from 105.0.0 to 105.0.1 in /modules/admin-ui-frontend
-- [[#4222](https://github.com/opencast/opencast/pull/4222)] -
-  Bump karma from 6.4.0 to 6.4.1 in /modules/admin-ui-frontend
-- [[#4216](https://github.com/opencast/opencast/pull/4216)] -
-  Bump html-validate from 7.4.1 to 7.5.0 in /modules/admin-ui-frontend
 - [[#4202](https://github.com/opencast/opencast/pull/4202)] -
   Add index on object_key field (needed when deleting assets).
 - [[#4201](https://github.com/opencast/opencast/pull/4201)] -
   When archiving version 0 to store properties, include metadata from dc catalog
-- [[#4194](https://github.com/opencast/opencast/pull/4194)] -
-  Bump eslint from 8.23.0 to 8.23.1 in /modules/runtime-info-ui
-- [[#4193](https://github.com/opencast/opencast/pull/4193)] -
-  Bump eslint from 8.23.0 to 8.23.1 in /modules/runtime-info-ui-ng
-- [[#4190](https://github.com/opencast/opencast/pull/4190)] -
-  Bump eslint from 8.23.0 to 8.23.1 in /modules/admin-ui-frontend
-- [[#4189](https://github.com/opencast/opencast/pull/4189)] -
-  Bump html-validate from 7.3.3 to 7.4.1 in /modules/admin-ui-frontend
 - [[#4186](https://github.com/opencast/opencast/pull/4186)] -
   Added correct type of keyword.
 - [[#4181](https://github.com/opencast/opencast/pull/4181)] -
   Add support for multiple common metadata catalogs
 - [[#4180](https://github.com/opencast/opencast/pull/4180)] -
   Add basic auth support ingest download
-- [[#4176](https://github.com/opencast/opencast/pull/4176)] -
-  Bump sass from 1.54.4 to 1.54.9 in /modules/admin-ui-frontend
-- [[#4166](https://github.com/opencast/opencast/pull/4166)] -
-  Bump @types/node from 18.7.14 to 18.7.15 in /modules/lti
-- [[#4160](https://github.com/opencast/opencast/pull/4160)] -
-  Bump jasmine-core from 4.3.0 to 4.4.0 in /modules/admin-ui-frontend
 - [[#4157](https://github.com/opencast/opencast/pull/4157)] -
   Allow setting explicit id for themes
 - [[#4156](https://github.com/opencast/opencast/pull/4156)] -
   Allow tags for ingesting attachments or catalogs via URL
-- [[#4152](https://github.com/opencast/opencast/pull/4152)] -
-  Bump checker-qual from 3.24.0 to 3.25.0 in /modules/db
-- [[#4149](https://github.com/opencast/opencast/pull/4149)] -
-  Bump @types/jest from 28.1.6 to 29.0.0 in /modules/lti
-- [[#4148](https://github.com/opencast/opencast/pull/4148)] -
-  Bump @fortawesome/fontawesome-svg-core from 6.1.2 to 6.2.0 in /modules/lti
-- [[#4147](https://github.com/opencast/opencast/pull/4147)] -
-  Bump react-i18next from 11.18.3 to 11.18.5 in /modules/lti
-- [[#4146](https://github.com/opencast/opencast/pull/4146)] -
-  Bump typescript from 4.7.4 to 4.8.2 in /modules/lti
-- [[#4145](https://github.com/opencast/opencast/pull/4145)] -
-  Bump i18next-browser-languagedetector from 6.1.4 to 6.1.5 in /modules/lti
-- [[#4144](https://github.com/opencast/opencast/pull/4144)] -
-  Bump @types/node from 18.6.3 to 18.7.14 in /modules/lti
-- [[#4143](https://github.com/opencast/opencast/pull/4143)] -
-  Bump @fortawesome/free-solid-svg-icons from 6.1.2 to 6.2.0 in /modules/lti
-- [[#4141](https://github.com/opencast/opencast/pull/4141)] -
-  Bump i18next from 21.8.16 to 21.9.1 in /modules/lti
-- [[#4140](https://github.com/opencast/opencast/pull/4140)] -
-  Bump chromedriver from 104.0.0 to 105.0.0 in /modules/admin-ui-frontend
-- [[#4139](https://github.com/opencast/opencast/pull/4139)] -
-  Bump react-bootstrap from 2.4.0 to 2.5.0 in /modules/lti
-- [[#4128](https://github.com/opencast/opencast/pull/4128)] -
-  Bump eslint from 8.22.0 to 8.23.0 in /modules/engage-paella-player-7
-- [[#4127](https://github.com/opencast/opencast/pull/4127)] -
-  Bump jquery from 3.6.0 to 3.6.1 in /modules/runtime-info-ui-ng
-- [[#4126](https://github.com/opencast/opencast/pull/4126)] -
-  Bump eslint from 8.22.0 to 8.23.0 in /modules/runtime-info-ui
-- [[#4125](https://github.com/opencast/opencast/pull/4125)] -
-  Bump eslint from 8.22.0 to 8.23.0 in /modules/runtime-info-ui-ng
-- [[#4124](https://github.com/opencast/opencast/pull/4124)] -
-  Bump jquery from 3.6.0 to 3.6.1 in /modules/engage-ui
-- [[#4123](https://github.com/opencast/opencast/pull/4123)] -
-  Bump jquery from 3.6.0 to 3.6.1 in /modules/runtime-info-ui
-- [[#4122](https://github.com/opencast/opencast/pull/4122)] -
-  Bump eslint from 8.22.0 to 8.23.0 in /modules/admin-ui-frontend
-- [[#4121](https://github.com/opencast/opencast/pull/4121)] -
-  Bump eslint from 8.22.0 to 8.23.0 in /modules/engage-paella-player
 - [[#4120](https://github.com/opencast/opencast/pull/4120)] -
   Use bulk inserts for all services during index rebuild
 - [[#4116](https://github.com/opencast/opencast/pull/4116)] -
   Remove Entwine Functional Library from Execute Service
-- [[#4115](https://github.com/opencast/opencast/pull/4115)] -
-  Bump html-validate from 7.3.2 to 7.3.3 in /modules/engage-paella-player-7
-- [[#4114](https://github.com/opencast/opencast/pull/4114)] -
-  Bump html-validate from 7.3.2 to 7.3.3 in /modules/admin-ui-frontend
-- [[#4112](https://github.com/opencast/opencast/pull/4112)] -
-  Bump postgresql from 42.4.1 to 42.5.0 in /modules/db
 - [[#4109](https://github.com/opencast/opencast/pull/4109)] -
   Remove Entwine Functional Library from Userdirectory
 - [[#4108](https://github.com/opencast/opencast/pull/4108)] -
   Remove code which is not loading any roles
-- [[#4106](https://github.com/opencast/opencast/pull/4106)] -
-  Bump html-validate from 7.3.1 to 7.3.2 in /modules/engage-paella-player-7
-- [[#4105](https://github.com/opencast/opencast/pull/4105)] -
-  Bump html-validate from 7.3.0 to 7.3.2 in /modules/admin-ui-frontend
 - [[#4102](https://github.com/opencast/opencast/pull/4102)] -
   Move thumbnail preview generation to the client
-- [[#4099](https://github.com/opencast/opencast/pull/4099)] -
-  Bump html-validate from 7.3.0 to 7.3.1 in /modules/engage-paella-player-7
 - [[#4098](https://github.com/opencast/opencast/pull/4098)] -
   Change default resolution of live schedule impl to standard 16:9
-- [[#4095](https://github.com/opencast/opencast/pull/4095)] -
-  Bump markdownlint-cli from 0.32.1 to 0.32.2 in /docs/guides
 - [[#4091](https://github.com/opencast/opencast/pull/4091)] -
   Generate more of the release notes
 - [[#4082](https://github.com/opencast/opencast/pull/4082)] -
   named the correct directory - Update workflow.md
-- [[#4081](https://github.com/opencast/opencast/pull/4081)] -
-  Bump eslint from 8.21.0 to 8.22.0 in /modules/engage-paella-player-7
-- [[#4080](https://github.com/opencast/opencast/pull/4080)] -
-  Bump eslint from 8.21.0 to 8.22.0 in /modules/runtime-info-ui-ng
-- [[#4079](https://github.com/opencast/opencast/pull/4079)] -
-  Bump eslint from 8.21.0 to 8.22.0 in /modules/runtime-info-ui
-- [[#4078](https://github.com/opencast/opencast/pull/4078)] -
-  Bump eslint from 8.21.0 to 8.22.0 in /modules/admin-ui-frontend
-- [[#4077](https://github.com/opencast/opencast/pull/4077)] -
-  Bump eslint from 8.21.0 to 8.22.0 in /modules/engage-paella-player
-- [[#4071](https://github.com/opencast/opencast/pull/4071)] -
-  Bump html-validate from 7.2.0 to 7.3.0 in /modules/engage-paella-player-7
-- [[#4070](https://github.com/opencast/opencast/pull/4070)] -
-  Bump html-validate from 7.2.0 to 7.3.0 in /modules/admin-ui-frontend
-- [[#4069](https://github.com/opencast/opencast/pull/4069)] -
-  Bump sass from 1.54.3 to 1.54.4 in /modules/admin-ui-frontend
 - [[#4061](https://github.com/opencast/opencast/pull/4061)] -
   Update List of Committers
-- [[#4060](https://github.com/opencast/opencast/pull/4060)] -
-  Bump eslint from 8.20.0 to 8.21.0 in /modules/engage-paella-player-7
-- [[#4058](https://github.com/opencast/opencast/pull/4058)] -
-  Bump sass from 1.53.0 to 1.54.3 in /modules/admin-ui-frontend
-- [[#4056](https://github.com/opencast/opencast/pull/4056)] -
-  Bump html-validate from 7.1.2 to 7.2.0 in /modules/engage-paella-player-7
-- [[#4055](https://github.com/opencast/opencast/pull/4055)] -
-  Bump postgresql from 42.4.0 to 42.4.1 in /modules/db
-- [[#4054](https://github.com/opencast/opencast/pull/4054)] -
-  Bump checker-qual from 3.23.0 to 3.24.0 in /modules/db
-- [[#4052](https://github.com/opencast/opencast/pull/4052)] -
-  Bump chromedriver from 103.0.0 to 104.0.0 in /modules/admin-ui-frontend
-- [[#4051](https://github.com/opencast/opencast/pull/4051)] -
-  Bump html-validate from 7.1.2 to 7.2.0 in /modules/admin-ui-frontend
-- [[#4046](https://github.com/opencast/opencast/pull/4046)] -
-  Bump @babel/preset-env from 7.18.6 to 7.18.10 in /modules/engage-paella-player-7
-- [[#4045](https://github.com/opencast/opencast/pull/4045)] -
-  Bump @babel/core from 7.18.6 to 7.18.10 in /modules/engage-paella-player-7
 - [[#4044](https://github.com/opencast/opencast/pull/4044)] -
   Target to released branches Paella 6 and 7 updates
-- [[#4042](https://github.com/opencast/opencast/pull/4042)] -
-  Bump eslint from 8.20.0 to 8.21.0 in /modules/runtime-info-ui-ng
-- [[#4043](https://github.com/opencast/opencast/pull/4043)] -
-  Bump eslint from 8.20.0 to 8.21.0 in /modules/runtime-info-ui
-- [[#4041](https://github.com/opencast/opencast/pull/4041)] -
-  Bump i18next from 21.8.14 to 21.8.16 in /modules/lti
-- [[#4040](https://github.com/opencast/opencast/pull/4040)] -
-  Bump @fortawesome/free-solid-svg-icons from 6.1.1 to 6.1.2 in /modules/lti
-- [[#4039](https://github.com/opencast/opencast/pull/4039)] -
-  Bump @types/node from 18.0.6 to 18.6.3 in /modules/lti
-- [[#4038](https://github.com/opencast/opencast/pull/4038)] -
-  Bump react-i18next from 11.18.1 to 11.18.3 in /modules/lti
-- [[#4037](https://github.com/opencast/opencast/pull/4037)] -
-  Bump @fortawesome/fontawesome-svg-core from 6.1.1 to 6.1.2 in /modules/lti
-- [[#4036](https://github.com/opencast/opencast/pull/4036)] -
-  Bump eslint from 8.20.0 to 8.21.0 in /modules/admin-ui-frontend
-- [[#4035](https://github.com/opencast/opencast/pull/4035)] -
-  Bump eslint from 8.20.0 to 8.21.0 in /modules/engage-paella-player
 - [[#4029](https://github.com/opencast/opencast/pull/4029)] -
   Add comments in the event index
-- [[#4021](https://github.com/opencast/opencast/pull/4021)] -
-  Bump paella-core from 1.1.5 to 1.2.4 in /modules/engage-paella-player-7
-- [[#4020](https://github.com/opencast/opencast/pull/4020)] -
-  Bump markdownlint-cli from 0.31.1 to 0.32.1 in /docs/guides
-- [[#4019](https://github.com/opencast/opencast/pull/4019)] -
-  Bump webpack from 5.73.0 to 5.74.0 in /modules/engage-paella-player-7
-- [[#4018](https://github.com/opencast/opencast/pull/4018)] -
-  Bump jasmine-core from 4.2.0 to 4.3.0 in /modules/admin-ui-frontend
 - [[#4014](https://github.com/opencast/opencast/pull/4014)] -
   Fail on configuration error
 - [[#4013](https://github.com/opencast/opencast/pull/4013)] -
   Faster Blend Effects on Cuts
-- [[#4010](https://github.com/opencast/opencast/pull/4010)] -
-  Bump paella-zoom-plugin from 1.0.11 to 1.2.0 in /modules/engage-paella-player-7
-- [[#4009](https://github.com/opencast/opencast/pull/4009)] -
-  Bump terser from 5.14.1 to 5.14.2 in /modules/lti
 - [[#4008](https://github.com/opencast/opencast/pull/4008)] -
   Fix Pom Version of Azure Transcription Service
-- [[#4002](https://github.com/opencast/opencast/pull/4002)] -
-  Bump paella-slide-plugins from 1.0.11 to 1.2.1 in /modules/engage-paella-player-7
-- [[#4001](https://github.com/opencast/opencast/pull/4001)] -
-  Bump @types/jest from 27.5.1 to 28.1.6 in /modules/lti
-- [[#4000](https://github.com/opencast/opencast/pull/4000)] -
-  Bump react-i18next from 11.18.0 to 11.18.1 in /modules/lti
-- [[#3999](https://github.com/opencast/opencast/pull/3999)] -
-  Bump bootstrap from 5.1.3 to 5.2.0 in /modules/lti
 - [[#3998](https://github.com/opencast/opencast/pull/3998)] -
   Add navigation shortcuts in admin ui modals
-- [[#3997](https://github.com/opencast/opencast/pull/3997)] -
-  Bump @types/node from 18.0.1 to 18.0.6 in /modules/lti
-- [[#3996](https://github.com/opencast/opencast/pull/3996)] -
-  Bump i18next from 21.8.12 to 21.8.14 in /modules/lti
-- [[#3992](https://github.com/opencast/opencast/pull/3992)] -
-  Bump @babel/eslint-parser from 7.18.2 to 7.18.9 in /modules/engage-paella-player-7
-- [[#3989](https://github.com/opencast/opencast/pull/3989)] -
-  Bump paella-basic-plugins from 1.0.16 to 1.2.0 in /modules/engage-paella-player-7
-- [[#3988](https://github.com/opencast/opencast/pull/3988)] -
-  Bump eslint from 8.19.0 to 8.20.0 in /modules/engage-paella-player-7
-- [[#3987](https://github.com/opencast/opencast/pull/3987)] -
-  Bump eslint from 8.19.0 to 8.20.0 in /modules/runtime-info-ui-ng
-- [[#3986](https://github.com/opencast/opencast/pull/3986)] -
-  Bump eslint from 8.19.0 to 8.20.0 in /modules/runtime-info-ui
-- [[#3985](https://github.com/opencast/opencast/pull/3985)] -
-  Bump eslint from 8.19.0 to 8.20.0 in /modules/admin-ui-frontend
-- [[#3984](https://github.com/opencast/opencast/pull/3984)] -
-  Bump eslint from 8.19.0 to 8.20.0 in /modules/engage-paella-player
-- [[#3980](https://github.com/opencast/opencast/pull/3980)] -
-  Bump checker-qual from 3.22.2 to 3.23.0 in /modules/db
-- [[#3950](https://github.com/opencast/opencast/pull/3950)] -
-  Bump @types/react-dom from 18.0.5 to 18.0.6 in /modules/lti
-- [[#3949](https://github.com/opencast/opencast/pull/3949)] -
-  Bump react-i18next from 11.17.4 to 11.18.0 in /modules/lti
-- [[#3945](https://github.com/opencast/opencast/pull/3945)] -
-  Bump html-validate from 7.1.1 to 7.1.2 in /modules/engage-paella-player-7
-- [[#3944](https://github.com/opencast/opencast/pull/3944)] -
-  Bump html-validate from 7.1.1 to 7.1.2 in /modules/admin-ui-frontend
-- [[#3942](https://github.com/opencast/opencast/pull/3942)] -
-  Bump @types/node from 17.0.38 to 18.0.1 in /modules/lti
 - [[#3940](https://github.com/opencast/opencast/pull/3940)] -
   Remove Helmet LTI Dependency
-- [[#3939](https://github.com/opencast/opencast/pull/3939)] -
-  Bump eslint from 8.18.0 to 8.19.0 in /modules/engage-paella-player-7
-- [[#3938](https://github.com/opencast/opencast/pull/3938)] -
-  Bump eslint from 8.18.0 to 8.19.0 in /modules/runtime-info-ui-ng
-- [[#3937](https://github.com/opencast/opencast/pull/3937)] -
-  Bump eslint from 8.18.0 to 8.19.0 in /modules/runtime-info-ui
-- [[#3936](https://github.com/opencast/opencast/pull/3936)] -
-  Bump eslint from 8.18.0 to 8.19.0 in /modules/admin-ui-frontend
-- [[#3935](https://github.com/opencast/opencast/pull/3935)] -
-  Bump eslint from 8.18.0 to 8.19.0 in /modules/engage-paella-player
 - [[#3933](https://github.com/opencast/opencast/pull/3933)] -
   Updates karma-jasmine to 5.1.0
-- [[#3918](https://github.com/opencast/opencast/pull/3918)] -
-  Bump webpack-dev-server from 4.9.2 to 4.9.3 in /modules/engage-paella-player-7
-- [[#3917](https://github.com/opencast/opencast/pull/3917)] -
-  Bump jna from 5.11.0 to 5.12.1 in /modules/db
-- [[#3916](https://github.com/opencast/opencast/pull/3916)] -
-  Bump mariadb-java-client from 3.0.5 to 3.0.6 in /modules/db
 - [[#3903](https://github.com/opencast/opencast/pull/3903)] -
   Common persistence util classes that also implement transaction retries
-- [[#3900](https://github.com/opencast/opencast/pull/3900)] -
-  Bump sass from 1.52.3 to 1.53.0 in /modules/admin-ui-frontend
-- [[#3899](https://github.com/opencast/opencast/pull/3899)] -
-  Bump chromedriver from 102.0.0 to 103.0.0 in /modules/admin-ui-frontend
-- [[#3897](https://github.com/opencast/opencast/pull/3897)] -
-  Bump grunt-contrib-uglify from 5.2.1 to 5.2.2 in /modules/admin-ui-frontend
 - [[#3893](https://github.com/opencast/opencast/pull/3893)] -
   Rerun Failed Tests
 - [[#3892](https://github.com/opencast/opencast/pull/3892)] -
   Corrects return value documentation for ingest endpoint
-- [[#3889](https://github.com/opencast/opencast/pull/3889)] -
-  Bump eslint from 8.17.0 to 8.18.0 in /modules/engage-paella-player-7
-- [[#3888](https://github.com/opencast/opencast/pull/3888)] -
-  Bump eslint from 8.17.0 to 8.18.0 in /modules/runtime-info-ui-ng
-- [[#3887](https://github.com/opencast/opencast/pull/3887)] -
-  Bump eslint from 8.17.0 to 8.18.0 in /modules/runtime-info-ui
-- [[#3886](https://github.com/opencast/opencast/pull/3886)] -
-  Bump eslint from 8.17.0 to 8.18.0 in /modules/admin-ui-frontend
-- [[#3885](https://github.com/opencast/opencast/pull/3885)] -
-  Bump eslint from 8.17.0 to 8.18.0 in /modules/engage-paella-player
 - [[#3880](https://github.com/opencast/opencast/pull/3880)] -
   Update adopter deletion copy
-- [[#3878](https://github.com/opencast/opencast/pull/3878)] -
-  Bump prometheus.version from 0.15.0 to 0.16.0 in /modules/metrics-exporter
-- [[#3868](https://github.com/opencast/opencast/pull/3868)] -
-  Bump checker-qual from 3.22.1 to 3.22.2 in /modules/db
-- [[#3863](https://github.com/opencast/opencast/pull/3863)] -
-  Bump karma from 6.3.20 to 6.4.0 in /modules/admin-ui-frontend
-- [[#3859](https://github.com/opencast/opencast/pull/3859)] -
-  Bump webpack-cli from 4.9.2 to 4.10.0 in /modules/engage-paella-player-7
-- [[#3858](https://github.com/opencast/opencast/pull/3858)] -
-  Bump @babel/core from 7.18.2 to 7.18.5 in /modules/engage-paella-player-7
-- [[#3856](https://github.com/opencast/opencast/pull/3856)] -
-  Bump source-map-loader from 3.0.1 to 4.0.0 in /modules/engage-paella-player-7
-- [[#3854](https://github.com/opencast/opencast/pull/3854)] -
-  Bump paella-basic-plugins from 1.0.15 to 1.0.16 in /modules/engage-paella-player-7
-- [[#3852](https://github.com/opencast/opencast/pull/3852)] -
-  Bump postgresql from 42.3.6 to 42.4.0 in /modules/db
-- [[#3850](https://github.com/opencast/opencast/pull/3850)] -
-  Bump jasmine-core from 4.1.1 to 4.2.0 in /modules/admin-ui-frontend
 - [[#3849](https://github.com/opencast/opencast/pull/3849)] -
   Amberscript configuration fix
-- [[#3846](https://github.com/opencast/opencast/pull/3846)] -
-  Bump sass from 1.52.1 to 1.52.3 in /modules/admin-ui-frontend
-- [[#3843](https://github.com/opencast/opencast/pull/3843)] -
-  Bump webpack-dev-server from 4.9.1 to 4.9.2 in /modules/engage-paella-player-7
-- [[#3842](https://github.com/opencast/opencast/pull/3842)] -
-  Bump chromedriver from 101.0.0 to 102.0.0 in /modules/admin-ui-frontend
-- [[#3840](https://github.com/opencast/opencast/pull/3840)] -
-  Bump eslint from 8.16.0 to 8.17.0 in /modules/engage-paella-player-7
-- [[#3839](https://github.com/opencast/opencast/pull/3839)] -
-  Bump eslint from 8.16.0 to 8.17.0 in /modules/runtime-info-ui
-- [[#3838](https://github.com/opencast/opencast/pull/3838)] -
-  Bump eslint from 8.16.0 to 8.17.0 in /modules/runtime-info-ui-ng
-- [[#3836](https://github.com/opencast/opencast/pull/3836)] -
-  Bump eslint from 8.16.0 to 8.17.0 in /modules/admin-ui-frontend
-- [[#3837](https://github.com/opencast/opencast/pull/3837)] -
-  Bump eslint from 8.16.0 to 8.17.0 in /modules/engage-paella-player
-- [[#3834](https://github.com/opencast/opencast/pull/3834)] -
-  Bump underscore from 1.13.3 to 1.13.4 in /modules/engage-ui
-- [[#3829](https://github.com/opencast/opencast/pull/3829)] -
-  Bump checker-qual from 3.22.0 to 3.22.1 in /modules/db
 - [[#3827](https://github.com/opencast/opencast/pull/3827)] -
   Missing setting track logical name when serverless HLS in process-smil
-- [[#3826](https://github.com/opencast/opencast/pull/3826)] -
-  Bump webpack-dev-server from 4.9.0 to 4.9.1 in /modules/engage-paella-player-7
-- [[#3825](https://github.com/opencast/opencast/pull/3825)] -
-  Bump @types/node from 17.0.33 to 17.0.38 in /modules/lti
-- [[#3824](https://github.com/opencast/opencast/pull/3824)] -
-  Bump @types/react-dom from 18.0.4 to 18.0.5 in /modules/lti
-- [[#3823](https://github.com/opencast/opencast/pull/3823)] -
-  Bump i18next from 21.8.1 to 21.8.5 in /modules/lti
-- [[#3822](https://github.com/opencast/opencast/pull/3822)] -
-  Bump react-bootstrap from 2.3.1 to 2.4.0 in /modules/lti
-- [[#3821](https://github.com/opencast/opencast/pull/3821)] -
-  Bump typescript from 4.6.4 to 4.7.2 in /modules/lti
-- [[#3815](https://github.com/opencast/opencast/pull/3815)] -
-  Bump paella-user-tracking from 1.0.13 to 1.0.14 in /modules/engage-paella-player-7
-- [[#3804](https://github.com/opencast/opencast/pull/3804)] -
-  Bump @babel/eslint-parser from 7.17.0 to 7.18.2 in /modules/engage-paella-player-7
-- [[#3801](https://github.com/opencast/opencast/pull/3801)] -
-  Bump mariadb-java-client from 3.0.4 to 3.0.5 in /modules/db
 - [[#3799](https://github.com/opencast/opencast/pull/3799)] -
   Update maven documentation
-- [[#3796](https://github.com/opencast/opencast/pull/3796)] -
-  Bump postgresql from 42.3.5 to 42.3.6 in /modules/db
 - [[#3794](https://github.com/opencast/opencast/pull/3794)] -
   Replace Deprecated Code
-- [[#3793](https://github.com/opencast/opencast/pull/3793)] -
-  Bump eslint from 8.15.0 to 8.16.0 in /modules/engage-paella-player-7
-- [[#3792](https://github.com/opencast/opencast/pull/3792)] -
-  Bump html-validate from 7.1.0 to 7.1.1 in /modules/engage-paella-player-7
-- [[#3791](https://github.com/opencast/opencast/pull/3791)] -
-  Bump eslint from 8.15.0 to 8.16.0 in /modules/runtime-info-ui
-- [[#3790](https://github.com/opencast/opencast/pull/3790)] -
-  Bump eslint from 8.15.0 to 8.16.0 in /modules/runtime-info-ui-ng
-- [[#3789](https://github.com/opencast/opencast/pull/3789)] -
-  Bump html-validate from 7.1.0 to 7.1.1 in /modules/admin-ui-frontend
-- [[#3788](https://github.com/opencast/opencast/pull/3788)] -
-  Bump eslint from 8.15.0 to 8.16.0 in /modules/admin-ui-frontend
-- [[#3787](https://github.com/opencast/opencast/pull/3787)] -
-  Bump sass from 1.50.1 to 1.52.1 in /modules/admin-ui-frontend
-- [[#3786](https://github.com/opencast/opencast/pull/3786)] -
-  Bump eslint from 8.15.0 to 8.16.0 in /modules/engage-paella-player
-- [[#3784](https://github.com/opencast/opencast/pull/3784)] -
-  Bump @babel/core from 7.17.10 to 7.18.0 in /modules/engage-paella-player-7
-- [[#3783](https://github.com/opencast/opencast/pull/3783)] -
-  Bump @babel/preset-env from 7.17.10 to 7.18.0 in /modules/engage-paella-player-7
 - [[#3778](https://github.com/opencast/opencast/pull/3778)] -
   Update Branch Cut Announcement
-- [[#3776](https://github.com/opencast/opencast/pull/3776)] -
-  Bump copy-webpack-plugin from 10.2.4 to 11.0.0 in /modules/engage-paella-player-7
-- [[#3771](https://github.com/opencast/opencast/pull/3771)] -
-  Bump paella-core from 1.0.49 to 1.0.51 in /modules/engage-paella-player-7
 - [[#3767](https://github.com/opencast/opencast/pull/3767)] -
   Patch for admin-ui-frontend Gruntfile.js when developing locally and using a remote proxy.
-- [[#3757](https://github.com/opencast/opencast/pull/3757)] -
-  Bump webpack from 5.72.0 to 5.72.1 in /modules/engage-paella-player-7
 - [[#3741](https://github.com/opencast/opencast/pull/3741)] -
   ADD specialist worker nodes
-- [[#3730](https://github.com/opencast/opencast/pull/3730)] -
-  Bump express from 4.17.3 to 4.18.1 in /modules/engage-paella-player
-- [[#3714](https://github.com/opencast/opencast/pull/3714)] -
-  Bump esapi from 2.1.0.1 to 2.3.0.0
 - [[#3713](https://github.com/opencast/opencast/pull/3713)] -
   Add catalog ui adapter organization wildcard support
 - [[#3670](https://github.com/opencast/opencast/pull/3670)] -
@@ -1173,6 +955,419 @@ Opencast 13
   Index Extended Metadata
 - [[#3218](https://github.com/opencast/opencast/pull/3218)] -
   Opencast Plugin Manager
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/4510">4510</a>] -
+  Bump html-validate from 7.10.0 to 7.10.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4505">4505</a>] -
+  Bump eslint from 8.28.0 to 8.29.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4495">4495</a>] -
+  Bump @babel/core from 7.20.2 to 7.20.5 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4492">4492</a>] -
+  Bump paella-core from 1.8.9 to 1.11.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4480">4480</a>] -
+  Bump eslint from 8.27.0 to 8.28.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4476">4476</a>] -
+  Bump html-validate from 7.8.0 to 7.10.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4471">4471</a>] -
+  Bump @babel/preset-env from 7.19.4 to 7.20.2 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4470">4470</a>] -
+  Bump webpack-cli from 4.10.0 to 5.0.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4451">4451</a>] -
+  Bump html-validate from 7.8.0 to 7.9.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4425">4425</a>] -
+  Bump eslint from 8.26.0 to 8.27.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4424">4424</a>] -
+  Bump eslint from 8.26.0 to 8.27.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4420">4420</a>] -
+  Bump eslint from 8.26.0 to 8.27.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4419">4419</a>] -
+  Bump eslint from 8.26.0 to 8.27.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4413">4413</a>] -
+  Bump chromedriver from 107.0.2 to 107.0.3 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4403">4403</a>] -
+  Bump @types/node from 18.8.3 to 18.11.8 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4401">4401</a>] -
+  Bump react-select from 5.4.0 to 5.5.9 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4399">4399</a>] -
+  Bump @types/jest from 29.1.2 to 29.2.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4398">4398</a>] -
+  Bump i18next from 21.10.0 to 22.0.4 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4397">4397</a>] -
+  Bump i18next-browser-languagedetector from 6.1.8 to 7.0.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4396">4396</a>] -
+  Bump react-i18next from 11.18.6 to 12.0.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4395">4395</a>] -
+  Bump @types/react-dom from 18.0.6 to 18.0.8 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4394">4394</a>] -
+  Bump html-validate from 7.7.1 to 7.8.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4390">4390</a>] -
+  Bump chromedriver from 107.0.1 to 107.0.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4389">4389</a>] -
+  Bump jasmine-core from 4.4.0 to 4.5.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4384">4384</a>] -
+  Bump chromedriver from 107.0.0 to 107.0.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4379">4379</a>] -
+  Bump chromedriver from 106.0.1 to 107.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4372">4372</a>] -
+  Bump html-validate from 7.7.0 to 7.7.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4364">4364</a>] -
+  Bump eslint from 8.25.0 to 8.26.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4363">4363</a>] -
+  Bump eslint from 8.25.0 to 8.26.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4362">4362</a>] -
+  Bump eslint from 8.25.0 to 8.26.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4361">4361</a>] -
+  Bump html-validate from 7.6.0 to 7.7.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4360">4360</a>] -
+  Bump eslint from 8.25.0 to 8.26.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4335">4335</a>] -
+  Bump jettison from 1.4.1 to 1.5.1</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4301">4301</a>] -
+  Bump eslint from 8.24.0 to 8.25.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4300">4300</a>] -
+  Bump eslint from 8.24.0 to 8.25.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4299">4299</a>] -
+  Bump html-validate from 7.5.0 to 7.6.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4298">4298</a>] -
+  Bump eslint from 8.24.0 to 8.25.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4297">4297</a>] -
+  Bump eslint from 8.24.0 to 8.25.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4296">4296</a>] -
+  Bump express from 4.18.1 to 4.18.2 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4292">4292</a>] -
+  Bump @types/node from 18.7.23 to 18.8.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4290">4290</a>] -
+  Bump i18next-browser-languagedetector from 6.1.5 to 6.1.8 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4286">4286</a>] -
+  Bump bootstrap from 5.2.1 to 5.2.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4285">4285</a>] -
+  Bump i18next from 21.9.2 to 21.10.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4284">4284</a>] -
+  Bump @types/jest from 29.1.1 to 29.1.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4272">4272</a>] -
+  Bump checker-qual from 3.25.0 to 3.26.0 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4264">4264</a>] -
+  Bump @types/jest from 29.0.0 to 29.1.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4263">4263</a>] -
+  Bump @types/node from 18.7.15 to 18.7.23 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4262">4262</a>] -
+  Bump react-i18next from 11.18.5 to 11.18.6 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4260">4260</a>] -
+  Bump i18next from 21.9.1 to 21.9.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4259">4259</a>] -
+  Bump typescript from 4.8.2 to 4.8.4 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4258">4258</a>] -
+  Bump bootstrap from 5.2.0 to 5.2.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4256">4256</a>] -
+  Bump chromedriver from 105.0.1 to 106.0.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4246">4246</a>] -
+  Bump underscore from 1.13.4 to 1.13.6 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4245">4245</a>] -
+  Bump eslint from 8.23.1 to 8.24.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4244">4244</a>] -
+  Bump eslint from 8.23.1 to 8.24.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4243">4243</a>] -
+  Bump eslint from 8.23.1 to 8.24.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4234">4234</a>] -
+  Bump sass from 1.54.9 to 1.55.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4223">4223</a>] -
+  Bump chromedriver from 105.0.0 to 105.0.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4222">4222</a>] -
+  Bump karma from 6.4.0 to 6.4.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4216">4216</a>] -
+  Bump html-validate from 7.4.1 to 7.5.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4194">4194</a>] -
+  Bump eslint from 8.23.0 to 8.23.1 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4193">4193</a>] -
+  Bump eslint from 8.23.0 to 8.23.1 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4190">4190</a>] -
+  Bump eslint from 8.23.0 to 8.23.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4189">4189</a>] -
+  Bump html-validate from 7.3.3 to 7.4.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4176">4176</a>] -
+  Bump sass from 1.54.4 to 1.54.9 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4166">4166</a>] -
+  Bump @types/node from 18.7.14 to 18.7.15 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4160">4160</a>] -
+  Bump jasmine-core from 4.3.0 to 4.4.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4152">4152</a>] -
+  Bump checker-qual from 3.24.0 to 3.25.0 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4149">4149</a>] -
+  Bump @types/jest from 28.1.6 to 29.0.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4148">4148</a>] -
+  Bump @fortawesome/fontawesome-svg-core from 6.1.2 to 6.2.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4147">4147</a>] -
+  Bump react-i18next from 11.18.3 to 11.18.5 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4146">4146</a>] -
+  Bump typescript from 4.7.4 to 4.8.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4145">4145</a>] -
+  Bump i18next-browser-languagedetector from 6.1.4 to 6.1.5 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4144">4144</a>] -
+  Bump @types/node from 18.6.3 to 18.7.14 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4143">4143</a>] -
+  Bump @fortawesome/free-solid-svg-icons from 6.1.2 to 6.2.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4141">4141</a>] -
+  Bump i18next from 21.8.16 to 21.9.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4140">4140</a>] -
+  Bump chromedriver from 104.0.0 to 105.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4139">4139</a>] -
+  Bump react-bootstrap from 2.4.0 to 2.5.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4128">4128</a>] -
+  Bump eslint from 8.22.0 to 8.23.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4127">4127</a>] -
+  Bump jquery from 3.6.0 to 3.6.1 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4126">4126</a>] -
+  Bump eslint from 8.22.0 to 8.23.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4125">4125</a>] -
+  Bump eslint from 8.22.0 to 8.23.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4124">4124</a>] -
+  Bump jquery from 3.6.0 to 3.6.1 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4123">4123</a>] -
+  Bump jquery from 3.6.0 to 3.6.1 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4122">4122</a>] -
+  Bump eslint from 8.22.0 to 8.23.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4121">4121</a>] -
+  Bump eslint from 8.22.0 to 8.23.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4115">4115</a>] -
+  Bump html-validate from 7.3.2 to 7.3.3 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4114">4114</a>] -
+  Bump html-validate from 7.3.2 to 7.3.3 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4112">4112</a>] -
+  Bump postgresql from 42.4.1 to 42.5.0 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4106">4106</a>] -
+  Bump html-validate from 7.3.1 to 7.3.2 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4105">4105</a>] -
+  Bump html-validate from 7.3.0 to 7.3.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4099">4099</a>] -
+  Bump html-validate from 7.3.0 to 7.3.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4095">4095</a>] -
+  Bump markdownlint-cli from 0.32.1 to 0.32.2 in /docs/guides</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4081">4081</a>] -
+  Bump eslint from 8.21.0 to 8.22.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4080">4080</a>] -
+  Bump eslint from 8.21.0 to 8.22.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4079">4079</a>] -
+  Bump eslint from 8.21.0 to 8.22.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4078">4078</a>] -
+  Bump eslint from 8.21.0 to 8.22.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4077">4077</a>] -
+  Bump eslint from 8.21.0 to 8.22.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4071">4071</a>] -
+  Bump html-validate from 7.2.0 to 7.3.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4070">4070</a>] -
+  Bump html-validate from 7.2.0 to 7.3.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4069">4069</a>] -
+  Bump sass from 1.54.3 to 1.54.4 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4060">4060</a>] -
+  Bump eslint from 8.20.0 to 8.21.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4058">4058</a>] -
+  Bump sass from 1.53.0 to 1.54.3 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4056">4056</a>] -
+  Bump html-validate from 7.1.2 to 7.2.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4055">4055</a>] -
+  Bump postgresql from 42.4.0 to 42.4.1 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4054">4054</a>] -
+  Bump checker-qual from 3.23.0 to 3.24.0 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4052">4052</a>] -
+  Bump chromedriver from 103.0.0 to 104.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4051">4051</a>] -
+  Bump html-validate from 7.1.2 to 7.2.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4046">4046</a>] -
+  Bump @babel/preset-env from 7.18.6 to 7.18.10 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4045">4045</a>] -
+  Bump @babel/core from 7.18.6 to 7.18.10 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4042">4042</a>] -
+  Bump eslint from 8.20.0 to 8.21.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4043">4043</a>] -
+  Bump eslint from 8.20.0 to 8.21.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4041">4041</a>] -
+  Bump i18next from 21.8.14 to 21.8.16 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4040">4040</a>] -
+  Bump @fortawesome/free-solid-svg-icons from 6.1.1 to 6.1.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4039">4039</a>] -
+  Bump @types/node from 18.0.6 to 18.6.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4038">4038</a>] -
+  Bump react-i18next from 11.18.1 to 11.18.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4037">4037</a>] -
+  Bump @fortawesome/fontawesome-svg-core from 6.1.1 to 6.1.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4036">4036</a>] -
+  Bump eslint from 8.20.0 to 8.21.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4035">4035</a>] -
+  Bump eslint from 8.20.0 to 8.21.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4021">4021</a>] -
+  Bump paella-core from 1.1.5 to 1.2.4 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4020">4020</a>] -
+  Bump markdownlint-cli from 0.31.1 to 0.32.1 in /docs/guides</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4019">4019</a>] -
+  Bump webpack from 5.73.0 to 5.74.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4018">4018</a>] -
+  Bump jasmine-core from 4.2.0 to 4.3.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4010">4010</a>] -
+  Bump paella-zoom-plugin from 1.0.11 to 1.2.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4009">4009</a>] -
+  Bump terser from 5.14.1 to 5.14.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4002">4002</a>] -
+  Bump paella-slide-plugins from 1.0.11 to 1.2.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4001">4001</a>] -
+  Bump @types/jest from 27.5.1 to 28.1.6 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4000">4000</a>] -
+  Bump react-i18next from 11.18.0 to 11.18.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3999">3999</a>] -
+  Bump bootstrap from 5.1.3 to 5.2.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3997">3997</a>] -
+  Bump @types/node from 18.0.1 to 18.0.6 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3996">3996</a>] -
+  Bump i18next from 21.8.12 to 21.8.14 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3992">3992</a>] -
+  Bump @babel/eslint-parser from 7.18.2 to 7.18.9 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3989">3989</a>] -
+  Bump paella-basic-plugins from 1.0.16 to 1.2.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3988">3988</a>] -
+  Bump eslint from 8.19.0 to 8.20.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3987">3987</a>] -
+  Bump eslint from 8.19.0 to 8.20.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3986">3986</a>] -
+  Bump eslint from 8.19.0 to 8.20.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3985">3985</a>] -
+  Bump eslint from 8.19.0 to 8.20.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3984">3984</a>] -
+  Bump eslint from 8.19.0 to 8.20.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3980">3980</a>] -
+  Bump checker-qual from 3.22.2 to 3.23.0 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3950">3950</a>] -
+  Bump @types/react-dom from 18.0.5 to 18.0.6 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3949">3949</a>] -
+  Bump react-i18next from 11.17.4 to 11.18.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3945">3945</a>] -
+  Bump html-validate from 7.1.1 to 7.1.2 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3944">3944</a>] -
+  Bump html-validate from 7.1.1 to 7.1.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3942">3942</a>] -
+  Bump @types/node from 17.0.38 to 18.0.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3939">3939</a>] -
+  Bump eslint from 8.18.0 to 8.19.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3938">3938</a>] -
+  Bump eslint from 8.18.0 to 8.19.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3937">3937</a>] -
+  Bump eslint from 8.18.0 to 8.19.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3936">3936</a>] -
+  Bump eslint from 8.18.0 to 8.19.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3935">3935</a>] -
+  Bump eslint from 8.18.0 to 8.19.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3918">3918</a>] -
+  Bump webpack-dev-server from 4.9.2 to 4.9.3 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3917">3917</a>] -
+  Bump jna from 5.11.0 to 5.12.1 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3916">3916</a>] -
+  Bump mariadb-java-client from 3.0.5 to 3.0.6 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3900">3900</a>] -
+  Bump sass from 1.52.3 to 1.53.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3899">3899</a>] -
+  Bump chromedriver from 102.0.0 to 103.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3897">3897</a>] -
+  Bump grunt-contrib-uglify from 5.2.1 to 5.2.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3889">3889</a>] -
+  Bump eslint from 8.17.0 to 8.18.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3888">3888</a>] -
+  Bump eslint from 8.17.0 to 8.18.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3887">3887</a>] -
+  Bump eslint from 8.17.0 to 8.18.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3886">3886</a>] -
+  Bump eslint from 8.17.0 to 8.18.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3885">3885</a>] -
+  Bump eslint from 8.17.0 to 8.18.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3878">3878</a>] -
+  Bump prometheus.version from 0.15.0 to 0.16.0 in /modules/metrics-exporter</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3868">3868</a>] -
+  Bump checker-qual from 3.22.1 to 3.22.2 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3863">3863</a>] -
+  Bump karma from 6.3.20 to 6.4.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3859">3859</a>] -
+  Bump webpack-cli from 4.9.2 to 4.10.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3858">3858</a>] -
+  Bump @babel/core from 7.18.2 to 7.18.5 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3856">3856</a>] -
+  Bump source-map-loader from 3.0.1 to 4.0.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3854">3854</a>] -
+  Bump paella-basic-plugins from 1.0.15 to 1.0.16 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3852">3852</a>] -
+  Bump postgresql from 42.3.6 to 42.4.0 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3850">3850</a>] -
+  Bump jasmine-core from 4.1.1 to 4.2.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3846">3846</a>] -
+  Bump sass from 1.52.1 to 1.52.3 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3843">3843</a>] -
+  Bump webpack-dev-server from 4.9.1 to 4.9.2 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3842">3842</a>] -
+  Bump chromedriver from 101.0.0 to 102.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3840">3840</a>] -
+  Bump eslint from 8.16.0 to 8.17.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3839">3839</a>] -
+  Bump eslint from 8.16.0 to 8.17.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3838">3838</a>] -
+  Bump eslint from 8.16.0 to 8.17.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3836">3836</a>] -
+  Bump eslint from 8.16.0 to 8.17.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3837">3837</a>] -
+  Bump eslint from 8.16.0 to 8.17.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3834">3834</a>] -
+  Bump underscore from 1.13.3 to 1.13.4 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3829">3829</a>] -
+  Bump checker-qual from 3.22.0 to 3.22.1 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3826">3826</a>] -
+  Bump webpack-dev-server from 4.9.0 to 4.9.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3825">3825</a>] -
+  Bump @types/node from 17.0.33 to 17.0.38 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3824">3824</a>] -
+  Bump @types/react-dom from 18.0.4 to 18.0.5 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3823">3823</a>] -
+  Bump i18next from 21.8.1 to 21.8.5 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3822">3822</a>] -
+  Bump react-bootstrap from 2.3.1 to 2.4.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3821">3821</a>] -
+  Bump typescript from 4.6.4 to 4.7.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3815">3815</a>] -
+  Bump paella-user-tracking from 1.0.13 to 1.0.14 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3804">3804</a>] -
+  Bump @babel/eslint-parser from 7.17.0 to 7.18.2 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3801">3801</a>] -
+  Bump mariadb-java-client from 3.0.4 to 3.0.5 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3796">3796</a>] -
+  Bump postgresql from 42.3.5 to 42.3.6 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3793">3793</a>] -
+  Bump eslint from 8.15.0 to 8.16.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3792">3792</a>] -
+  Bump html-validate from 7.1.0 to 7.1.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3791">3791</a>] -
+  Bump eslint from 8.15.0 to 8.16.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3790">3790</a>] -
+  Bump eslint from 8.15.0 to 8.16.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3789">3789</a>] -
+  Bump html-validate from 7.1.0 to 7.1.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3788">3788</a>] -
+  Bump eslint from 8.15.0 to 8.16.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3787">3787</a>] -
+  Bump sass from 1.50.1 to 1.52.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3786">3786</a>] -
+  Bump eslint from 8.15.0 to 8.16.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3784">3784</a>] -
+  Bump @babel/core from 7.17.10 to 7.18.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3783">3783</a>] -
+  Bump @babel/preset-env from 7.17.10 to 7.18.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3776">3776</a>] -
+  Bump copy-webpack-plugin from 10.2.4 to 11.0.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3771">3771</a>] -
+  Bump paella-core from 1.0.49 to 1.0.51 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3757">3757</a>] -
+  Bump webpack from 5.72.0 to 5.72.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3730">3730</a>] -
+  Bump express from 4.17.3 to 4.18.1 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3714">3714</a>] -
+  Bump esapi from 2.1.0.1 to 2.3.0.0</li>
+</ul>
+</details>
 
 Opencast 12
 -----------
@@ -1320,18 +1515,23 @@ Opencast 12
   Do not add roleprefix to extra roles
 - [[#4375](https://github.com/opencast/opencast/pull/4375)] -
   Use UTF-8 as charset for HTML mails
-- [[#4373](https://github.com/opencast/opencast/pull/4373)] -
-  Bump html-validate from 7.6.0 to 7.7.1 in /modules/engage-paella-player-7
 - [[#4370](https://github.com/opencast/opencast/pull/4370)] -
   Correctly identify the master playlist in the Tobira harvest
-- [[#4367](https://github.com/opencast/opencast/pull/4367)] -
-  Bump eslint from 8.25.0 to 8.26.0 in /modules/engage-paella-player-7
 - [[#4353](https://github.com/opencast/opencast/pull/4353)] -
   Fully Automate GitHub Release
 - [[#4352](https://github.com/opencast/opencast/pull/4352)] -
   Automate Release Process
 - [[#4350](https://github.com/opencast/opencast/pull/4350)] -
   Lower JWT error logging to debug level
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/4373">4373</a>] -
+  Bump html-validate from 7.6.0 to 7.7.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4367">4367</a>] -
+  Bump eslint from 8.25.0 to 8.26.0 in /modules/engage-paella-player-7</li>
+</ul>
+</details>
 
 ### Opencast 12.4
 
@@ -1343,8 +1543,6 @@ Opencast 12
   Add Opencast 12.4 release notes
 - [[#4340](https://github.com/opencast/opencast/pull/4340)] -
   Fix saving thumbnails if no previous ones existed
-- [[#4337](https://github.com/opencast/opencast/pull/4337)] -
-  Bump paella-core from 1.7.0 to 1.8.1 in /modules/engage-paella-player-7
 - [[#4329](https://github.com/opencast/opencast/pull/4329)] -
   Make Workflow Operation Docs Look Alike
 - [[#4328](https://github.com/opencast/opencast/pull/4328)] -
@@ -1359,22 +1557,10 @@ Opencast 12
   Reuse mediapackage object from workflow instance where possible
 - [[#4313](https://github.com/opencast/opencast/pull/4313)] -
   Skip check if user has global admin role
-- [[#4311](https://github.com/opencast/opencast/pull/4311)] -
-  Bump @babel/preset-env from 7.19.3 to 7.19.4 in /modules/engage-paella-player-7
 - [[#4308](https://github.com/opencast/opencast/pull/4308)] -
   Save button for event/series "Access policy"-tab
 - [[#4307](https://github.com/opencast/opencast/pull/4307)] -
   Publish Captions by Default
-- [[#4306](https://github.com/opencast/opencast/pull/4306)] -
-  Bump source-map-loader from 4.0.0 to 4.0.1 in /modules/engage-paella-player-7
-- [[#4305](https://github.com/opencast/opencast/pull/4305)] -
-  Bump html-validate from 7.5.0 to 7.6.0 in /modules/engage-paella-player-7
-- [[#4304](https://github.com/opencast/opencast/pull/4304)] -
-  Bump express from 4.18.1 to 4.18.2 in /modules/engage-paella-player-7
-- [[#4303](https://github.com/opencast/opencast/pull/4303)] -
-  Bump eslint from 8.24.0 to 8.25.0 in /modules/engage-paella-player-7
-- [[#4302](https://github.com/opencast/opencast/pull/4302)] -
-  Bump paella-slide-plugins from 1.2.1 to 1.7.1 in /modules/engage-paella-player-7
 - [[#4294](https://github.com/opencast/opencast/pull/4294)] -
   Batch Dependabot Updates for Paella 7
 - [[#4287](https://github.com/opencast/opencast/pull/4287)] -
@@ -1387,17 +1573,36 @@ Opencast 12
   Add back workflow API documentation
 - [[#4269](https://github.com/opencast/opencast/pull/4269)] -
   Fix snapshot moving
-- [[#4247](https://github.com/opencast/opencast/pull/4247)] -
-  Bump eslint from 8.23.1 to 8.24.0 in /modules/engage-paella-player-7
 - [[#4240](https://github.com/opencast/opencast/pull/4240)] -
   Group dependabot Paella 7 commits
 - [[#4238](https://github.com/opencast/opencast/pull/4238)] -
   Fixed azure transcription error message in case of Error
 - [[#4229](https://github.com/opencast/opencast/pull/4229)] -
   Make busy waiting explicit during InboxScannerService config update
-- [[#4227](https://github.com/opencast/opencast/pull/4227)] -
-  Bump mariadb-java-client from 3.0.7 to 3.0.8 in /modules/db
 
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/4337">4337</a>] -
+  Bump paella-core from 1.7.0 to 1.8.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4311">4311</a>] -
+  Bump @babel/preset-env from 7.19.3 to 7.19.4 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4306">4306</a>] -
+  Bump source-map-loader from 4.0.0 to 4.0.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4305">4305</a>] -
+  Bump html-validate from 7.5.0 to 7.6.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4304">4304</a>] -
+  Bump express from 4.18.1 to 4.18.2 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4303">4303</a>] -
+  Bump eslint from 8.24.0 to 8.25.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4302">4302</a>] -
+  Bump paella-slide-plugins from 1.2.1 to 1.7.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4247">4247</a>] -
+  Bump eslint from 8.23.1 to 8.24.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4227">4227</a>] -
+  Bump mariadb-java-client from 3.0.7 to 3.0.8 in /modules/db</li>
+</ul>
+</details>
 
 ### Opencast 12.3
 
@@ -1411,18 +1616,10 @@ Opencast 12
   Fix check if all workflows were loaded when using YAML
 - [[#4207](https://github.com/opencast/opencast/pull/4207)] -
   Do not run dependabot pushes multiple times
-- [[#4197](https://github.com/opencast/opencast/pull/4197)] -
-  Bump eslint from 8.23.0 to 8.23.1 in /modules/engage-paella-player-7
 - [[#4187](https://github.com/opencast/opencast/pull/4187)] -
   Dont run gh actions on dbot multiple times
 - [[#4178](https://github.com/opencast/opencast/pull/4178)] -
   Fix filename dependency on locale
-- [[#4177](https://github.com/opencast/opencast/pull/4177)] -
-  Bump webpack-dev-server from 4.9.3 to 4.11.0 in /modules/engage-paella-player-7
-- [[#4168](https://github.com/opencast/opencast/pull/4168)] -
-  Bump html-validate from 7.2.0 to 7.3.3 in /modules/engage-paella-player-7
-- [[#4165](https://github.com/opencast/opencast/pull/4165)] -
-  Bump eslint from 8.21.0 to 8.23.0 in /modules/engage-paella-player-7
 - [[#4151](https://github.com/opencast/opencast/pull/4151)] -
   Allow global admins to always get workflow instances for a media package
 - [[#4137](https://github.com/opencast/opencast/pull/4137)] -
@@ -1446,6 +1643,19 @@ Opencast 12
 - [[#4094](https://github.com/opencast/opencast/pull/4094)] -
   Replace DownloadDistributionService target filter with aws version
 
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/4197">4197</a>] -
+  Bump eslint from 8.23.0 to 8.23.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4177">4177</a>] -
+  Bump webpack-dev-server from 4.9.3 to 4.11.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4168">4168</a>] -
+  Bump html-validate from 7.2.0 to 7.3.3 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4165">4165</a>] -
+  Bump eslint from 8.21.0 to 8.23.0 in /modules/engage-paella-player-7</li>
+</ul>
+</details>
 
 ### Opencast 12.2
 
@@ -1457,8 +1667,6 @@ Opencast 12
   Fallback for Event Title in Publication
 - [[#4063](https://github.com/opencast/opencast/pull/4063)] -
   Warn About Removed Workflow Endpoint
-- [[#4059](https://github.com/opencast/opencast/pull/4059)] -
-  Bump mariadb-java-client from 3.0.6 to 3.0.7 in /modules/db
 - [[#4057](https://github.com/opencast/opencast/pull/4057)] -
   Fixed OSGI annotation for OaiPmhServer
 - [[#4049](https://github.com/opencast/opencast/pull/4049)] -
@@ -1488,6 +1696,13 @@ Opencast 12
 - [[#3995](https://github.com/opencast/opencast/pull/3995)] -
   Avoid GitHub Actions Scheduling Conflicts
 
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/4059">4059</a>] -
+  Bump mariadb-java-client from 3.0.6 to 3.0.7 in /modules/db</li>
+</ul>
+</details>
 
 ### Opencast 12.1
 
@@ -1717,14 +1932,19 @@ Opencast 11
   Actually Retract Live Publication
 - [[#4249](https://github.com/opencast/opencast/pull/4249)] -
   Make initialization of new event ACL with series ACL in the Admin UI configurable
-- [[#4242](https://github.com/opencast/opencast/pull/4242)] -
-  Bump eslint from 8.23.1 to 8.24.0 in /modules/engage-paella-player
 - [[#4230](https://github.com/opencast/opencast/pull/4230)] -
   Opencast 11.11 release notes
 - [[#4208](https://github.com/opencast/opencast/pull/4208)] -
   Fix composer incident codes and messages for process-smil and multiencode.
-- [[#4169](https://github.com/opencast/opencast/pull/4169)] -
-  Bump express from 4.17.3 to 4.18.1 in /modules/engage-paella-player
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/4242">4242</a>] -
+  Bump eslint from 8.23.1 to 8.24.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4169">4169</a>] -
+  Bump express from 4.17.3 to 4.18.1 in /modules/engage-paella-player</li>
+</ul>
+</details>
 
 ### Opencast 11.11
 
@@ -2016,24 +2236,14 @@ Opencast 11
   Replace native javascript with angularJS code
 - [[#3127](https://github.com/opencast/opencast/pull/3127)] -
   Fix minor bugs in AdaptivePlaylist
-- [[#3180](https://github.com/opencast/opencast/pull/3180)] -
-  Bump karma from 6.3.8 to 6.3.9 in /modules/admin-ui-frontend
 - [[#3176](https://github.com/opencast/opencast/pull/3176)] -
   Save Buttons for Metadata
-- [[#3175](https://github.com/opencast/opencast/pull/3175)] -
-  Bump bower from 1.8.12 to 1.8.13 in /modules/admin-ui-frontend
-- [[#3171](https://github.com/opencast/opencast/pull/3171)] -
-  Bump html-validate from 6.1.1 to 6.1.2 in /modules/admin-ui-frontend
-- [[#3170](https://github.com/opencast/opencast/pull/3170)] -
-  Bump http-errors from 1.8.0 to 1.8.1 in /modules/engage-paella-player
 - [[#3169](https://github.com/opencast/opencast/pull/3169)] -
   Add spa style redirect if resource does not exist
 - [[#3168](https://github.com/opencast/opencast/pull/3168)] -
   Fix content-type header of ingest endpoint
 - [[#3166](https://github.com/opencast/opencast/pull/3166)] -
   fix remote component typo name
-- [[#3163](https://github.com/opencast/opencast/pull/3163)] -
-  Bump html-validate from 6.1.0 to 6.1.1 in /modules/admin-ui-frontend
 - [[#3158](https://github.com/opencast/opencast/pull/3158)] -
   Fix mime type parsing for publish-oaipmh operation
 - [[#3157](https://github.com/opencast/opencast/pull/3157)] -
@@ -2052,22 +2262,6 @@ Opencast 11
   Typos & Style
 - [[#3144](https://github.com/opencast/opencast/pull/3144)] -
   Remove com.springsource.org.cyberneko.html
-- [[#3143](https://github.com/opencast/opencast/pull/3143)] -
-  Bump rest-assured to 4.4.0
-- [[#3141](https://github.com/opencast/opencast/pull/3141)] -
-  Bump eslint from 8.1.0 to 8.2.0 in /modules/runtime-info-ui-ng
-- [[#3140](https://github.com/opencast/opencast/pull/3140)] -
-  Bump eslint from 8.1.0 to 8.2.0 in /modules/engage-ui
-- [[#3139](https://github.com/opencast/opencast/pull/3139)] -
-  Bump eslint from 8.1.0 to 8.2.0 in /modules/runtime-info-ui
-- [[#3138](https://github.com/opencast/opencast/pull/3138)] -
-  Bump eslint from 8.1.0 to 8.2.0 in /modules/engage-theodul-core
-- [[#3137](https://github.com/opencast/opencast/pull/3137)] -
-  Bump eslint from 8.1.0 to 8.2.0 in /modules/admin-ui-frontend
-- [[#3136](https://github.com/opencast/opencast/pull/3136)] -
-  Bump karma from 6.3.7 to 6.3.8 in /modules/admin-ui-frontend
-- [[#3135](https://github.com/opencast/opencast/pull/3135)] -
-  Bump eslint from 8.1.0 to 8.2.0 in /modules/engage-paella-player
 - [[#3134](https://github.com/opencast/opencast/pull/3134)] -
   Remove Apache Mina
 - [[#3132](https://github.com/opencast/opencast/pull/3132)] -
@@ -2080,58 +2274,14 @@ Opencast 11
   Add config for service error states to service registry
 - [[#3125](https://github.com/opencast/opencast/pull/3125)] -
   Document impact of ROLE_CAPTURE_AGENT
-- [[#3124](https://github.com/opencast/opencast/pull/3124)] -
-  Bump karma-firefox-launcher from 2.1.1 to 2.1.2 in /modules/admin-ui-frontend
-- [[#3123](https://github.com/opencast/opencast/pull/3123)] -
-  Bump karma from 6.3.6 to 6.3.7 in /modules/admin-ui-frontend
-- [[#3121](https://github.com/opencast/opencast/pull/3121)] -
-  Bump i18next from 21.2.0 to 21.3.3 in /modules/lti
-- [[#3120](https://github.com/opencast/opencast/pull/3120)] -
-  Bump @types/react-dom from 17.0.9 to 17.0.10 in /modules/lti
 - [[#3119](https://github.com/opencast/opencast/pull/3119)] -
   Exclude administrators from artificial limit in `SolrRequester`
-- [[#3117](https://github.com/opencast/opencast/pull/3117)] -
-  Bump @types/node from 16.10.2 to 16.11.6 in /modules/lti
-- [[#3116](https://github.com/opencast/opencast/pull/3116)] -
-  Bump react-i18next from 11.12.0 to 11.13.0 in /modules/lti
-- [[#3115](https://github.com/opencast/opencast/pull/3115)] -
-  Bump react-bootstrap from 1.6.4 to 2.0.1 in /modules/lti
-- [[#3114](https://github.com/opencast/opencast/pull/3114)] -
-  Bump @fortawesome/react-fontawesome from 0.1.15 to 0.1.16 in /modules/lti
-- [[#3113](https://github.com/opencast/opencast/pull/3113)] -
-  Bump typescript from 4.4.3 to 4.4.4 in /modules/lti
-- [[#3112](https://github.com/opencast/opencast/pull/3112)] -
-  Bump @types/react from 17.0.26 to 17.0.33 in /modules/lti
-- [[#3110](https://github.com/opencast/opencast/pull/3110)] -
-  Bump bootstrap from 5.1.1 to 5.1.3 in /modules/lti
-- [[#3109](https://github.com/opencast/opencast/pull/3109)] -
-  Bump @types/react-helmet from 6.1.2 to 6.1.4 in /modules/lti
-- [[#3108](https://github.com/opencast/opencast/pull/3108)] -
-  Bump axios from 0.22.0 to 0.24.0 in /modules/lti
 - [[#3106](https://github.com/opencast/opencast/pull/3106)] -
   Added back encoding profiles removed by previous commit
 - [[#3104](https://github.com/opencast/opencast/pull/3104)] -
   Remove Deprecated Methods
 - [[#3103](https://github.com/opencast/opencast/pull/3103)] -
   Release Note Updates
-- [[#3102](https://github.com/opencast/opencast/pull/3102)] -
-  Bump karma from 6.3.5 to 6.3.6 in /modules/admin-ui-frontend
-- [[#3101](https://github.com/opencast/opencast/pull/3101)] -
-  Bump chromedriver from 94.0.0 to 95.0.0 in /modules/admin-ui-frontend
-- [[#3099](https://github.com/opencast/opencast/pull/3099)] -
-  Bump eslint from 8.0.1 to 8.1.0 in /modules/engage-theodul-core
-- [[#3098](https://github.com/opencast/opencast/pull/3098)] -
-  Bump eslint from 8.0.1 to 8.1.0 in /modules/runtime-info-ui-ng
-- [[#3097](https://github.com/opencast/opencast/pull/3097)] -
-  Bump eslint from 8.0.1 to 8.1.0 in /modules/runtime-info-ui
-- [[#3096](https://github.com/opencast/opencast/pull/3096)] -
-  Bump eslint from 8.0.1 to 8.1.0 in /modules/engage-ui
-- [[#3095](https://github.com/opencast/opencast/pull/3095)] -
-  Bump jasmine-core from 3.10.0 to 3.10.1 in /modules/admin-ui-frontend
-- [[#3094](https://github.com/opencast/opencast/pull/3094)] -
-  Bump eslint from 8.0.1 to 8.1.0 in /modules/admin-ui-frontend
-- [[#3093](https://github.com/opencast/opencast/pull/3093)] -
-  Bump eslint from 8.0.1 to 8.1.0 in /modules/engage-paella-player
 - [[#3092](https://github.com/opencast/opencast/pull/3092)] -
   Workflow Configuration Margin
 - [[#3091](https://github.com/opencast/opencast/pull/3091)] -
@@ -2146,88 +2296,22 @@ Opencast 11
   Fix “Loading” Message in Engage UI
 - [[#3086](https://github.com/opencast/opencast/pull/3086)] -
   Fix Episode Display in Engage UI
-- [[#3085](https://github.com/opencast/opencast/pull/3085)] -
-  Bump karma from 6.3.4 to 6.3.5 in /modules/admin-ui-frontend
 - [[#3076](https://github.com/opencast/opencast/pull/3076)] -
   Store modification & deletion dates for series and add range-lookup method to `SeriesService`
 - [[#3075](https://github.com/opencast/opencast/pull/3075)] -
   Expose ACLs in search service (via `SearchResultItem`)
-- [[#3073](https://github.com/opencast/opencast/pull/3073)] -
-  Bump eslint from 8.0.0 to 8.0.1 in /modules/runtime-info-ui
-- [[#3072](https://github.com/opencast/opencast/pull/3072)] -
-  Bump eslint from 8.0.0 to 8.0.1 in /modules/runtime-info-ui-ng
-- [[#3071](https://github.com/opencast/opencast/pull/3071)] -
-  Bump eslint from 8.0.0 to 8.0.1 in /modules/engage-theodul-core
-- [[#3070](https://github.com/opencast/opencast/pull/3070)] -
-  Bump eslint from 8.0.0 to 8.0.1 in /modules/engage-ui
-- [[#3069](https://github.com/opencast/opencast/pull/3069)] -
-  Bump jasmine-core from 3.9.0 to 3.10.0 in /modules/admin-ui-frontend
-- [[#3068](https://github.com/opencast/opencast/pull/3068)] -
-  Bump eslint from 8.0.0 to 8.0.1 in /modules/admin-ui-frontend
-- [[#3067](https://github.com/opencast/opencast/pull/3067)] -
-  Bump eslint from 8.0.0 to 8.0.1 in /modules/engage-paella-player
 - [[#3066](https://github.com/opencast/opencast/pull/3066)] -
   Fix LTI Tool Build
 - [[#3061](https://github.com/opencast/opencast/pull/3061)] -
   Use engage plugin name in URL to prevent random ID changes
-- [[#3057](https://github.com/opencast/opencast/pull/3057)] -
-  Bump eslint from 7.32.0 to 8.0.0 in /modules/runtime-info-ui
-- [[#3056](https://github.com/opencast/opencast/pull/3056)] -
-  Bump eslint from 7.32.0 to 8.0.0 in /modules/runtime-info-ui-ng
-- [[#3055](https://github.com/opencast/opencast/pull/3055)] -
-  Bump eslint from 7.32.0 to 8.0.0 in /modules/engage-theodul-core
-- [[#3054](https://github.com/opencast/opencast/pull/3054)] -
-  Bump eslint from 7.32.0 to 8.0.0 in /modules/engage-ui
-- [[#3053](https://github.com/opencast/opencast/pull/3053)] -
-  Bump eslint from 7.32.0 to 8.0.0 in /modules/admin-ui-frontend
-- [[#3052](https://github.com/opencast/opencast/pull/3052)] -
-  Bump eslint from 7.32.0 to 8.0.0 in /modules/engage-paella-player
 - [[#3050](https://github.com/opencast/opencast/pull/3050)] -
   Fixed limit value returned by search service endpoint
 - [[#3049](https://github.com/opencast/opencast/pull/3049)] -
   Removed ManagedService from Admin UI backend
-- [[#3048](https://github.com/opencast/opencast/pull/3048)] -
-  Bump grunt-contrib-concat from 1.0.1 to 2.0.0 in /modules/admin-ui-frontend
-- [[#3047](https://github.com/opencast/opencast/pull/3047)] -
-  Bump autoprefixer from 9.8.7 to 9.8.8 in /modules/admin-ui-frontend
-- [[#3046](https://github.com/opencast/opencast/pull/3046)] -
-  Bump coffeescript from 2.6.0 to 2.6.1 in /modules/admin-ui-frontend
-- [[#3045](https://github.com/opencast/opencast/pull/3045)] -
-  Bump markdownlint-cli from 0.28.1 to 0.29.0 in /docs/guides
-- [[#3043](https://github.com/opencast/opencast/pull/3043)] -
-  Bump grunt-contrib-jshint from 3.0.0 to 3.1.1 in /modules/admin-ui-frontend
-- [[#3042](https://github.com/opencast/opencast/pull/3042)] -
-  Bump html-validate from 6.0.2 to 6.1.0 in /modules/admin-ui-frontend
-- [[#3039](https://github.com/opencast/opencast/pull/3039)] -
-  Bump @types/jest from 27.0.1 to 27.0.2 in /modules/lti
-- [[#3038](https://github.com/opencast/opencast/pull/3038)] -
-  Bump axios from 0.21.2 to 0.22.0 in /modules/lti
-- [[#3037](https://github.com/opencast/opencast/pull/3037)] -
-  Bump i18next from 21.1.1 to 21.2.0 in /modules/lti
-- [[#3036](https://github.com/opencast/opencast/pull/3036)] -
-  Bump react-bootstrap from 1.6.3 to 1.6.4 in /modules/lti
-- [[#3033](https://github.com/opencast/opencast/pull/3033)] -
-  Bump @types/node from 16.10.1 to 16.10.2 in /modules/lti
-- [[#3032](https://github.com/opencast/opencast/pull/3032)] -
-  Bump @types/react from 17.0.20 to 17.0.26 in /modules/lti
 - [[#3031](https://github.com/opencast/opencast/pull/3031)] -
   Remove staticweave plugin
-- [[#3030](https://github.com/opencast/opencast/pull/3030)] -
-  Bump @types/node from 16.7.6 to 16.10.1 in /modules/lti
-- [[#3029](https://github.com/opencast/opencast/pull/3029)] -
-  Bump i18next from 20.4.0 to 21.1.1 in /modules/lti
-- [[#3027](https://github.com/opencast/opencast/pull/3027)] -
-  Bump html-validate from 5.4.1 to 6.0.2 in /modules/admin-ui-frontend
-- [[#3026](https://github.com/opencast/opencast/pull/3026)] -
-  Bump axios from 0.21.1 to 0.21.2 in /modules/lti
 - [[#3025](https://github.com/opencast/opencast/pull/3025)] -
   Replace “Click Here” Links on Documentation Landing Page
-- [[#3020](https://github.com/opencast/opencast/pull/3020)] -
-  Bump chromedriver from 92.0.2 to 94.0.0 in /modules/admin-ui-frontend
-- [[#3019](https://github.com/opencast/opencast/pull/3019)] -
-  Bump autoprefixer from 9.8.6 to 9.8.7 in /modules/admin-ui-frontend
-- [[#3018](https://github.com/opencast/opencast/pull/3018)] -
-  Bump grunt-html-validate from 1.0.1 to 1.0.2 in /modules/admin-ui-frontend
 - [[#3014](https://github.com/opencast/opencast/pull/3014)] -
   Spellcheck webinar section in docs landing page
 - [[#3012](https://github.com/opencast/opencast/pull/3012)] -
@@ -2236,52 +2320,16 @@ Opencast 11
   Add Learn section and webinars list
 - [[#3010](https://github.com/opencast/opencast/pull/3010)] -
   Don't update events in index twice when changing series metadata
-- [[#3009](https://github.com/opencast/opencast/pull/3009)] -
-  Bump xmlsec from 2.1.4 to 2.1.7
-- [[#3008](https://github.com/opencast/opencast/pull/3008)] -
-  Bump coffeescript from 2.5.1 to 2.6.0 in /modules/admin-ui-frontend
 - [[#3005](https://github.com/opencast/opencast/pull/3005)] -
   Set external API version v1.7.0 as default
 - [[#3002](https://github.com/opencast/opencast/pull/3002)] -
   Sign publication URL of events in External API
-- [[#3001](https://github.com/opencast/opencast/pull/3001)] -
-  Bump bootstrap from 5.1.0 to 5.1.1 in /modules/lti
-- [[#3000](https://github.com/opencast/opencast/pull/3000)] -
-  Bump react-bootstrap from 1.6.1 to 1.6.3 in /modules/lti
-- [[#2999](https://github.com/opencast/opencast/pull/2999)] -
-  Bump react-i18next from 11.11.4 to 11.12.0 in /modules/lti
-- [[#2996](https://github.com/opencast/opencast/pull/2996)] -
-  Bump typescript from 4.4.2 to 4.4.3 in /modules/lti
-- [[#2988](https://github.com/opencast/opencast/pull/2988)] -
-  Bump @types/react from 17.0.19 to 17.0.20 in /modules/lti
 - [[#2979](https://github.com/opencast/opencast/pull/2979)] -
   Update OC 11 release schedule
-- [[#2978](https://github.com/opencast/opencast/pull/2978)] -
-  Bump tar from 6.1.4 to 6.1.11 in /modules/admin-ui-frontend
-- [[#2977](https://github.com/opencast/opencast/pull/2977)] -
-  Bump chromedriver from 92.0.1 to 92.0.2 in /modules/admin-ui-frontend
 - [[#2976](https://github.com/opencast/opencast/pull/2976)] -
   Prepare release notes
-- [[#2975](https://github.com/opencast/opencast/pull/2975)] -
-  Bump prometheus.version from 0.11.0 to 0.12.0 in /modules/metrics-exporter
-- [[#2974](https://github.com/opencast/opencast/pull/2974)] -
-  Bump typescript from 4.3.5 to 4.4.2 in /modules/lti
-- [[#2973](https://github.com/opencast/opencast/pull/2973)] -
-  Bump @types/node from 16.7.1 to 16.7.6 in /modules/lti
-- [[#2972](https://github.com/opencast/opencast/pull/2972)] -
-  Bump html-validate from 5.4.0 to 5.4.1 in /modules/admin-ui-frontend
-- [[#2965](https://github.com/opencast/opencast/pull/2965)] -
-  Bump html-validate from 5.3.0 to 5.4.0 in /modules/admin-ui-frontend
 - [[#2962](https://github.com/opencast/opencast/pull/2962)] -
   Update Editor Profile
-- [[#2961](https://github.com/opencast/opencast/pull/2961)] -
-  Bump html-validate from 5.2.1 to 5.3.0 in /modules/admin-ui-frontend
-- [[#2959](https://github.com/opencast/opencast/pull/2959)] -
-  Bump @types/react from 17.0.18 to 17.0.19 in /modules/lti
-- [[#2958](https://github.com/opencast/opencast/pull/2958)] -
-  Bump @types/node from 16.6.1 to 16.7.1 in /modules/lti
-- [[#2957](https://github.com/opencast/opencast/pull/2957)] -
-  Bump jasmine-core from 3.8.0 to 3.9.0 in /modules/admin-ui-frontend
 - [[#2954](https://github.com/opencast/opencast/pull/2954)] -
   Fix episodeFromSeries plugin show "&nbsp;" while presenter is empty
 - [[#2953](https://github.com/opencast/opencast/pull/2953)] -
@@ -2300,58 +2348,16 @@ Opencast 11
   Cleanup S3 code
 - [[#2934](https://github.com/opencast/opencast/pull/2934)] -
   Update LTI Dependencies Monthly
-- [[#2933](https://github.com/opencast/opencast/pull/2933)] -
-  Bump @types/react from 17.0.16 to 17.0.18 in /modules/lti
-- [[#2932](https://github.com/opencast/opencast/pull/2932)] -
-  Bump i18next from 20.3.5 to 20.4.0 in /modules/lti
-- [[#2931](https://github.com/opencast/opencast/pull/2931)] -
-  Bump @types/jest from 26.0.24 to 27.0.1 in /modules/lti
-- [[#2930](https://github.com/opencast/opencast/pull/2930)] -
-  Bump @types/node from 16.4.13 to 16.6.1 in /modules/lti
 - [[#2925](https://github.com/opencast/opencast/pull/2925)] -
   Test only with Firefox or Chrome
 - [[#2924](https://github.com/opencast/opencast/pull/2924)] -
   Simplify getUserIdRole
-- [[#2921](https://github.com/opencast/opencast/pull/2921)] -
-  Bump path-parse from 1.0.6 to 1.0.7 in /modules/engage-paella-player
-- [[#2916](https://github.com/opencast/opencast/pull/2916)] -
-  Bump html-validate from 5.2.0 to 5.2.1 in /modules/admin-ui-frontend
 - [[#2910](https://github.com/opencast/opencast/pull/2910)] -
   Document Committers
-- [[#2909](https://github.com/opencast/opencast/pull/2909)] -
-  Bump @types/react from 17.0.15 to 17.0.16 in /modules/lti
-- [[#2908](https://github.com/opencast/opencast/pull/2908)] -
-  Bump @types/node from 16.4.12 to 16.4.13 in /modules/lti
-- [[#2905](https://github.com/opencast/opencast/pull/2905)] -
-  Bump @fortawesome/react-fontawesome from 0.1.14 to 0.1.15 in /modules/lti
-- [[#2904](https://github.com/opencast/opencast/pull/2904)] -
-  Bump @fortawesome/free-solid-svg-icons from 5.15.3 to 5.15.4 in /modules/lti
-- [[#2903](https://github.com/opencast/opencast/pull/2903)] -
-  Bump bootstrap from 5.0.2 to 5.1.0 in /modules/lti
-- [[#2902](https://github.com/opencast/opencast/pull/2902)] -
-  Bump @types/node from 16.4.7 to 16.4.12 in /modules/lti
-- [[#2901](https://github.com/opencast/opencast/pull/2901)] -
-  Bump @fortawesome/fontawesome-svg-core from 1.2.35 to 1.2.36 in /modules/lti
 - [[#2900](https://github.com/opencast/opencast/pull/2900)] -
   docs/developer: corrected java version 8>11 as mentioned here: https:…
 - [[#2899](https://github.com/opencast/opencast/pull/2899)] -
   Hello World Workflow Operation
-- [[#2898](https://github.com/opencast/opencast/pull/2898)] -
-  Bump tar from 6.1.0 to 6.1.4 in /modules/admin-ui-frontend
-- [[#2895](https://github.com/opencast/opencast/pull/2895)] -
-  Bump chromedriver from 92.0.0 to 92.0.1 in /modules/admin-ui-frontend
-- [[#2890](https://github.com/opencast/opencast/pull/2890)] -
-  Bump eslint from 7.31.0 to 7.32.0 in /modules/runtime-info-ui
-- [[#2889](https://github.com/opencast/opencast/pull/2889)] -
-  Bump eslint from 7.31.0 to 7.32.0 in /modules/runtime-info-ui-ng
-- [[#2888](https://github.com/opencast/opencast/pull/2888)] -
-  Bump eslint from 7.31.0 to 7.32.0 in /modules/engage-ui
-- [[#2887](https://github.com/opencast/opencast/pull/2887)] -
-  Bump eslint from 7.31.0 to 7.32.0 in /modules/engage-theodul-core
-- [[#2885](https://github.com/opencast/opencast/pull/2885)] -
-  Bump eslint from 7.31.0 to 7.32.0 in /modules/admin-ui-frontend
-- [[#2884](https://github.com/opencast/opencast/pull/2884)] -
-  Bump eslint from 7.31.0 to 7.32.0 in /modules/engage-paella-player
 - [[#2878](https://github.com/opencast/opencast/pull/2878)] -
   Add endpoint to resume Index Rebuild for specified service
 - [[#2877](https://github.com/opencast/opencast/pull/2877)] -
@@ -2362,244 +2368,66 @@ Opencast 11
   Minor Improvements to Cleanup Operation
 - [[#2871](https://github.com/opencast/opencast/pull/2871)] -
   No Manual Job Sorting
-- [[#2869](https://github.com/opencast/opencast/pull/2869)] -
-  Bump @types/react from 17.0.14 to 17.0.15 in /modules/lti
-- [[#2868](https://github.com/opencast/opencast/pull/2868)] -
-  Bump @types/node from 16.3.3 to 16.4.3 in /modules/lti
-- [[#2867](https://github.com/opencast/opencast/pull/2867)] -
-  Bump i18next from 20.3.3 to 20.3.5 in /modules/lti
-- [[#2866](https://github.com/opencast/opencast/pull/2866)] -
-  Bump html-validate from 5.1.1 to 5.2.0 in /modules/admin-ui-frontend
-- [[#2865](https://github.com/opencast/opencast/pull/2865)] -
-  Bump chromedriver from 91.0.1 to 92.0.0 in /modules/admin-ui-frontend
-- [[#2864](https://github.com/opencast/opencast/pull/2864)] -
-  Bump url-parse from 1.5.1 to 1.5.3 in /modules/admin-ui-frontend
 - [[#2862](https://github.com/opencast/opencast/pull/2862)] -
   Updating Release Manager responsibilities
 - [[#2861](https://github.com/opencast/opencast/pull/2861)] -
   Adding developer tips gathered in the technical meeting
 - [[#2860](https://github.com/opencast/opencast/pull/2860)] -
   UI Configuration Service Configuration
-- [[#2859](https://github.com/opencast/opencast/pull/2859)] -
-  Bump markdownlint-cli from 0.27.1 to 0.28.1 in /docs/guides
 - [[#2857](https://github.com/opencast/opencast/pull/2857)] -
   One Elasticsearch index to rule them all
 - [[#2856](https://github.com/opencast/opencast/pull/2856)] -
   Server Job Statistics
-- [[#2845](https://github.com/opencast/opencast/pull/2845)] -
-  Bump react-i18next from 11.11.0 to 11.11.3 in /modules/lti
-- [[#2844](https://github.com/opencast/opencast/pull/2844)] -
-  Bump eslint from 7.30.0 to 7.31.0 in /modules/runtime-info-ui
-- [[#2843](https://github.com/opencast/opencast/pull/2843)] -
-  Bump eslint from 7.30.0 to 7.31.0 in /modules/runtime-info-ui-ng
-- [[#2842](https://github.com/opencast/opencast/pull/2842)] -
-  Bump eslint from 7.30.0 to 7.31.0 in /modules/engage-theodul-core
-- [[#2841](https://github.com/opencast/opencast/pull/2841)] -
-  Bump eslint from 7.30.0 to 7.31.0 in /modules/engage-ui
-- [[#2840](https://github.com/opencast/opencast/pull/2840)] -
-  Bump @types/node from 16.0.0 to 16.3.3 in /modules/lti
-- [[#2839](https://github.com/opencast/opencast/pull/2839)] -
-  Bump i18next from 20.3.2 to 20.3.3 in /modules/lti
-- [[#2838](https://github.com/opencast/opencast/pull/2838)] -
-  Bump eslint from 7.30.0 to 7.31.0 in /modules/admin-ui-frontend
-- [[#2837](https://github.com/opencast/opencast/pull/2837)] -
-  Bump eslint from 7.30.0 to 7.31.0 in /modules/engage-paella-player
 - [[#2834](https://github.com/opencast/opencast/pull/2834)] -
   Remove Security-related Workaround in AssetManager
 - [[#2826](https://github.com/opencast/opencast/pull/2826)] -
   Update Deprecated Code
-- [[#2825](https://github.com/opencast/opencast/pull/2825)] -
-  Bump @types/react-dom from 17.0.8 to 17.0.9 in /modules/lti
-- [[#2824](https://github.com/opencast/opencast/pull/2824)] -
-  Bump @types/jest from 26.0.23 to 26.0.24 in /modules/lti
-- [[#2823](https://github.com/opencast/opencast/pull/2823)] -
-  Bump @types/react-select from 4.0.16 to 4.0.17 in /modules/lti
-- [[#2821](https://github.com/opencast/opencast/pull/2821)] -
-  Bump @types/react-js-pagination from 3.0.3 to 3.0.4 in /modules/lti
-- [[#2820](https://github.com/opencast/opencast/pull/2820)] -
-  Bump @types/react-helmet from 6.1.1 to 6.1.2 in /modules/lti
-- [[#2818](https://github.com/opencast/opencast/pull/2818)] -
-  Bump @types/react from 17.0.13 to 17.0.14 in /modules/lti
-- [[#2817](https://github.com/opencast/opencast/pull/2817)] -
-  Bump html-validate from 5.0.2 to 5.1.1 in /modules/admin-ui-frontend
 - [[#2814](https://github.com/opencast/opencast/pull/2814)] -
   Add track fields `is_master_playlist` and `is_live` to external API
-- [[#2808](https://github.com/opencast/opencast/pull/2808)] -
-  Bump html-validate from 4.14.0 to 5.0.2 in /modules/admin-ui-frontend
 - [[#2806](https://github.com/opencast/opencast/pull/2806)] -
   Fix Landing Page
 - [[#2803](https://github.com/opencast/opencast/pull/2803)] -
   Fix Landing Page
-- [[#2802](https://github.com/opencast/opencast/pull/2802)] -
-  Bump @types/node from 15.12.5 to 16.0.0 in /modules/lti
-- [[#2801](https://github.com/opencast/opencast/pull/2801)] -
-  Bump eslint from 7.29.0 to 7.30.0 in /modules/runtime-info-ui
-- [[#2800](https://github.com/opencast/opencast/pull/2800)] -
-  Bump eslint from 7.29.0 to 7.30.0 in /modules/runtime-info-ui-ng
-- [[#2799](https://github.com/opencast/opencast/pull/2799)] -
-  Bump eslint from 7.29.0 to 7.30.0 in /modules/engage-theodul-core
-- [[#2798](https://github.com/opencast/opencast/pull/2798)] -
-  Bump eslint from 7.29.0 to 7.30.0 in /modules/engage-ui
-- [[#2797](https://github.com/opencast/opencast/pull/2797)] -
-  Bump @types/react from 17.0.11 to 17.0.13 in /modules/lti
-- [[#2796](https://github.com/opencast/opencast/pull/2796)] -
-  Bump eslint from 7.29.0 to 7.30.0 in /modules/admin-ui-frontend
-- [[#2795](https://github.com/opencast/opencast/pull/2795)] -
-  Bump grunt-html-validate from 1.0.0 to 1.0.1 in /modules/admin-ui-frontend
-- [[#2794](https://github.com/opencast/opencast/pull/2794)] -
-  Bump eslint from 7.29.0 to 7.30.0 in /modules/engage-paella-player
-- [[#2789](https://github.com/opencast/opencast/pull/2789)] -
-  Bump jasmine-core from 3.7.1 to 3.8.0 in /modules/admin-ui-frontend
 - [[#2785](https://github.com/opencast/opencast/pull/2785)] -
   Added Arne Wilken as a developer to the main pom file
-- [[#2783](https://github.com/opencast/opencast/pull/2783)] -
-  Bump @types/react-select from 4.0.15 to 4.0.16 in /modules/lti
-- [[#2782](https://github.com/opencast/opencast/pull/2782)] -
-  Bump @types/node from 15.12.4 to 15.12.5 in /modules/lti
-- [[#2781](https://github.com/opencast/opencast/pull/2781)] -
-  Bump query-string from 7.0.0 to 7.0.1 in /modules/lti
-- [[#2780](https://github.com/opencast/opencast/pull/2780)] -
-  Bump bootstrap from 5.0.1 to 5.0.2 in /modules/lti
-- [[#2779](https://github.com/opencast/opencast/pull/2779)] -
-  Bump grunt-html-validate from 0.5.0 to 1.0.0 in /modules/admin-ui-frontend
 - [[#2775](https://github.com/opencast/opencast/pull/2775)] -
   Fix random error with Maven dependency download in GitHub Actions
 - [[#2774](https://github.com/opencast/opencast/pull/2774)] -
   Fix removal of remote assets
 - [[#2773](https://github.com/opencast/opencast/pull/2773)] -
   Don't force inclusion of referred elements in snapshot
-- [[#2772](https://github.com/opencast/opencast/pull/2772)] -
-  Bump node-sass from 6.0.0 to 6.0.1 in /modules/admin-ui-frontend
 - [[#2767](https://github.com/opencast/opencast/pull/2767)] -
   Fix Upgrade Documentation
-- [[#2760](https://github.com/opencast/opencast/pull/2760)] -
-  Bump i18next from 20.3.1 to 20.3.2 in /modules/lti
-- [[#2759](https://github.com/opencast/opencast/pull/2759)] -
-  Bump @types/react-dom from 17.0.7 to 17.0.8 in /modules/lti
-- [[#2758](https://github.com/opencast/opencast/pull/2758)] -
-  Bump @types/node from 15.12.2 to 15.12.4 in /modules/lti
-- [[#2757](https://github.com/opencast/opencast/pull/2757)] -
-  Bump eslint from 7.28.0 to 7.29.0 in /modules/engage-ui
-- [[#2756](https://github.com/opencast/opencast/pull/2756)] -
-  Bump eslint from 7.28.0 to 7.29.0 in /modules/engage-theodul-core
-- [[#2755](https://github.com/opencast/opencast/pull/2755)] -
-  Bump eslint from 7.28.0 to 7.29.0 in /modules/runtime-info-ui
-- [[#2754](https://github.com/opencast/opencast/pull/2754)] -
-  Bump eslint from 7.28.0 to 7.29.0 in /modules/runtime-info-ui-ng
-- [[#2753](https://github.com/opencast/opencast/pull/2753)] -
-  Bump i18next-browser-languagedetector from 6.1.1 to 6.1.2 in /modules/lti
-- [[#2752](https://github.com/opencast/opencast/pull/2752)] -
-  Bump eslint from 7.28.0 to 7.29.0 in /modules/admin-ui-frontend
-- [[#2751](https://github.com/opencast/opencast/pull/2751)] -
-  Bump eslint from 7.28.0 to 7.29.0 in /modules/engage-paella-player
 - [[#2750](https://github.com/opencast/opencast/pull/2750)] -
   JavaScript deployment on docs.opencast.org
 - [[#2749](https://github.com/opencast/opencast/pull/2749)] -
   Use HTTPS in Documentation Landing Page
 - [[#2744](https://github.com/opencast/opencast/pull/2744)] -
   Changed asset mime type  length from 64 to 255
-- [[#2737](https://github.com/opencast/opencast/pull/2737)] -
-  Bump chromedriver from 91.0.0 to 91.0.1 in /modules/admin-ui-frontend
 - [[#2735](https://github.com/opencast/opencast/pull/2735)] -
   Clarifies debug options in setenv file
-- [[#2729](https://github.com/opencast/opencast/pull/2729)] -
-  Bump @types/react-dom from 17.0.6 to 17.0.7 in /modules/lti
-- [[#2728](https://github.com/opencast/opencast/pull/2728)] -
-  Bump @types/node from 15.12.1 to 15.12.2 in /modules/lti
-- [[#2727](https://github.com/opencast/opencast/pull/2727)] -
-  Bump react-i18next from 11.10.0 to 11.11.0 in /modules/lti
-- [[#2726](https://github.com/opencast/opencast/pull/2726)] -
-  Bump @types/react from 17.0.9 to 17.0.11 in /modules/lti
-- [[#2725](https://github.com/opencast/opencast/pull/2725)] -
-  Bump karma from 6.3.3 to 6.3.4 in /modules/admin-ui-frontend
 - [[#2716](https://github.com/opencast/opencast/pull/2716)] -
   Fix URL to the Security Issue Process
 - [[#2712](https://github.com/opencast/opencast/pull/2712)] -
   fix URL to the development process documentation
 - [[#2705](https://github.com/opencast/opencast/pull/2705)] -
   Remove OAI-PMH Harvester
-- [[#2693](https://github.com/opencast/opencast/pull/2693)] -
-  Bump glob-parent from 5.1.0 to 5.1.2 in /modules/admin-ui-frontend
-- [[#2689](https://github.com/opencast/opencast/pull/2689)] -
-  Bump eslint from 7.27.0 to 7.28.0 in /modules/engage-theodul-core
-- [[#2688](https://github.com/opencast/opencast/pull/2688)] -
-  Bump eslint from 7.27.0 to 7.28.0 in /modules/runtime-info-ui
-- [[#2687](https://github.com/opencast/opencast/pull/2687)] -
-  Bump eslint from 7.27.0 to 7.28.0 in /modules/runtime-info-ui-ng
-- [[#2686](https://github.com/opencast/opencast/pull/2686)] -
-  Bump eslint from 7.27.0 to 7.28.0 in /modules/engage-ui
-- [[#2685](https://github.com/opencast/opencast/pull/2685)] -
-  Bump @types/node from 15.6.1 to 15.12.1 in /modules/lti
-- [[#2684](https://github.com/opencast/opencast/pull/2684)] -
-  Bump @types/react-dom from 17.0.5 to 17.0.6 in /modules/lti
-- [[#2683](https://github.com/opencast/opencast/pull/2683)] -
-  Bump @types/react from 17.0.8 to 17.0.9 in /modules/lti
-- [[#2682](https://github.com/opencast/opencast/pull/2682)] -
-  Bump react-bootstrap from 1.6.0 to 1.6.1 in /modules/lti
-- [[#2681](https://github.com/opencast/opencast/pull/2681)] -
-  Bump eslint from 7.27.0 to 7.28.0 in /modules/engage-paella-player
-- [[#2680](https://github.com/opencast/opencast/pull/2680)] -
-  Bump eslint from 7.27.0 to 7.28.0 in /modules/admin-ui-frontend
 - [[#2679](https://github.com/opencast/opencast/pull/2679)] -
   Update some documentation URLs from latest to develop
 - [[#2674](https://github.com/opencast/opencast/pull/2674)] -
   Fix `metrics-exporter` Prometheus dependency
-- [[#2672](https://github.com/opencast/opencast/pull/2672)] -
-  Bump karma-firefox-launcher from 2.1.0 to 2.1.1 in /modules/admin-ui-frontend
-- [[#2671](https://github.com/opencast/opencast/pull/2671)] -
-  Bump chromedriver from 90.0.1 to 91.0.0 in /modules/admin-ui-frontend
 - [[#2670](https://github.com/opencast/opencast/pull/2670)] -
   Update Responsibilities of a Committer
-- [[#2668](https://github.com/opencast/opencast/pull/2668)] -
-  Bump karma from 6.3.2 to 6.3.3 in /modules/admin-ui-frontend
-- [[#2663](https://github.com/opencast/opencast/pull/2663)] -
-  Bump prometheus.version from 0.10.0 to 0.11.0 in /modules/metrics-exporter
-- [[#2662](https://github.com/opencast/opencast/pull/2662)] -
-  Bump react-i18next from 11.8.15 to 11.10.0 in /modules/lti
-- [[#2661](https://github.com/opencast/opencast/pull/2661)] -
-  Bump @types/node from 15.6.0 to 15.6.1 in /modules/lti
-- [[#2660](https://github.com/opencast/opencast/pull/2660)] -
-  Bump @types/react from 17.0.6 to 17.0.8 in /modules/lti
-- [[#2659](https://github.com/opencast/opencast/pull/2659)] -
-  Bump i18next from 20.3.0 to 20.3.1 in /modules/lti
 - [[#2658](https://github.com/opencast/opencast/pull/2658)] -
   Document that hashes are worked with
 - [[#2655](https://github.com/opencast/opencast/pull/2655)] -
   Document encode WOH's source-flavors config key
-- [[#2642](https://github.com/opencast/opencast/pull/2642)] -
-  Bump grunt-cli from 1.4.2 to 1.4.3 in /modules/admin-ui-frontend
-- [[#2641](https://github.com/opencast/opencast/pull/2641)] -
-  Bump grunt from 1.4.0 to 1.4.1 in /modules/admin-ui-frontend
-- [[#2640](https://github.com/opencast/opencast/pull/2640)] -
-  Bump browserslist from 4.13.0 to 4.16.6 in /modules/admin-ui-frontend
-- [[#2639](https://github.com/opencast/opencast/pull/2639)] -
-  Bump eslint from 7.26.0 to 7.27.0 in /modules/engage-theodul-core
-- [[#2638](https://github.com/opencast/opencast/pull/2638)] -
-  Bump eslint from 7.26.0 to 7.27.0 in /modules/runtime-info-ui
-- [[#2637](https://github.com/opencast/opencast/pull/2637)] -
-  Bump eslint from 7.26.0 to 7.27.0 in /modules/engage-ui
-- [[#2636](https://github.com/opencast/opencast/pull/2636)] -
-  Bump eslint from 7.26.0 to 7.27.0 in /modules/runtime-info-ui-ng
-- [[#2635](https://github.com/opencast/opencast/pull/2635)] -
-  Bump @types/node from 15.3.0 to 15.6.0 in /modules/lti
-- [[#2634](https://github.com/opencast/opencast/pull/2634)] -
-  Bump @types/react from 17.0.5 to 17.0.6 in /modules/lti
-- [[#2633](https://github.com/opencast/opencast/pull/2633)] -
-  Bump i18next from 20.2.4 to 20.3.0 in /modules/lti
-- [[#2632](https://github.com/opencast/opencast/pull/2632)] -
-  Bump eslint from 7.26.0 to 7.27.0 in /modules/admin-ui-frontend
-- [[#2631](https://github.com/opencast/opencast/pull/2631)] -
-  Bump eslint from 7.26.0 to 7.27.0 in /modules/engage-paella-player
-- [[#2628](https://github.com/opencast/opencast/pull/2628)] -
-  Bump chromedriver from 90.0.0 to 90.0.1 in /modules/admin-ui-frontend
 - [[#2616](https://github.com/opencast/opencast/pull/2616)] -
   Document new ActiveMQ connection requirements
 - [[#2603](https://github.com/opencast/opencast/pull/2603)] -
   Update Node.js
 - [[#2596](https://github.com/opencast/opencast/pull/2596)] -
   New  woh: select-version
-- [[#2576](https://github.com/opencast/opencast/pull/2576)] -
-  Bump hosted-git-info from 2.8.4 to 2.8.9 in /modules/engage-paella-player
 - [[#2573](https://github.com/opencast/opencast/pull/2573)] -
   Refactoring workflows and encoding profiles
 - [[#2560](https://github.com/opencast/opencast/pull/2560)] -
@@ -2614,6 +2442,403 @@ Opencast 11
   LTI Tool Updates
 - [[#1227](https://github.com/opencast/opencast/pull/1227)] -
   Delete option of series for the SearchService
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/3180">3180</a>] -
+  Bump karma from 6.3.8 to 6.3.9 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3175">3175</a>] -
+  Bump bower from 1.8.12 to 1.8.13 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3171">3171</a>] -
+  Bump html-validate from 6.1.1 to 6.1.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3170">3170</a>] -
+  Bump http-errors from 1.8.0 to 1.8.1 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3163">3163</a>] -
+  Bump html-validate from 6.1.0 to 6.1.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3143">3143</a>] -
+  Bump rest-assured to 4.4.0</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3141">3141</a>] -
+  Bump eslint from 8.1.0 to 8.2.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3140">3140</a>] -
+  Bump eslint from 8.1.0 to 8.2.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3139">3139</a>] -
+  Bump eslint from 8.1.0 to 8.2.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3138">3138</a>] -
+  Bump eslint from 8.1.0 to 8.2.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3137">3137</a>] -
+  Bump eslint from 8.1.0 to 8.2.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3136">3136</a>] -
+  Bump karma from 6.3.7 to 6.3.8 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3135">3135</a>] -
+  Bump eslint from 8.1.0 to 8.2.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3124">3124</a>] -
+  Bump karma-firefox-launcher from 2.1.1 to 2.1.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3123">3123</a>] -
+  Bump karma from 6.3.6 to 6.3.7 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3121">3121</a>] -
+  Bump i18next from 21.2.0 to 21.3.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3120">3120</a>] -
+  Bump @types/react-dom from 17.0.9 to 17.0.10 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3117">3117</a>] -
+  Bump @types/node from 16.10.2 to 16.11.6 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3116">3116</a>] -
+  Bump react-i18next from 11.12.0 to 11.13.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3115">3115</a>] -
+  Bump react-bootstrap from 1.6.4 to 2.0.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3114">3114</a>] -
+  Bump @fortawesome/react-fontawesome from 0.1.15 to 0.1.16 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3113">3113</a>] -
+  Bump typescript from 4.4.3 to 4.4.4 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3112">3112</a>] -
+  Bump @types/react from 17.0.26 to 17.0.33 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3110">3110</a>] -
+  Bump bootstrap from 5.1.1 to 5.1.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3109">3109</a>] -
+  Bump @types/react-helmet from 6.1.2 to 6.1.4 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3108">3108</a>] -
+  Bump axios from 0.22.0 to 0.24.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3102">3102</a>] -
+  Bump karma from 6.3.5 to 6.3.6 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3101">3101</a>] -
+  Bump chromedriver from 94.0.0 to 95.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3099">3099</a>] -
+  Bump eslint from 8.0.1 to 8.1.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3098">3098</a>] -
+  Bump eslint from 8.0.1 to 8.1.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3097">3097</a>] -
+  Bump eslint from 8.0.1 to 8.1.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3096">3096</a>] -
+  Bump eslint from 8.0.1 to 8.1.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3095">3095</a>] -
+  Bump jasmine-core from 3.10.0 to 3.10.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3094">3094</a>] -
+  Bump eslint from 8.0.1 to 8.1.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3093">3093</a>] -
+  Bump eslint from 8.0.1 to 8.1.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3085">3085</a>] -
+  Bump karma from 6.3.4 to 6.3.5 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3073">3073</a>] -
+  Bump eslint from 8.0.0 to 8.0.1 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3072">3072</a>] -
+  Bump eslint from 8.0.0 to 8.0.1 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3071">3071</a>] -
+  Bump eslint from 8.0.0 to 8.0.1 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3070">3070</a>] -
+  Bump eslint from 8.0.0 to 8.0.1 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3069">3069</a>] -
+  Bump jasmine-core from 3.9.0 to 3.10.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3068">3068</a>] -
+  Bump eslint from 8.0.0 to 8.0.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3067">3067</a>] -
+  Bump eslint from 8.0.0 to 8.0.1 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3057">3057</a>] -
+  Bump eslint from 7.32.0 to 8.0.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3056">3056</a>] -
+  Bump eslint from 7.32.0 to 8.0.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3055">3055</a>] -
+  Bump eslint from 7.32.0 to 8.0.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3054">3054</a>] -
+  Bump eslint from 7.32.0 to 8.0.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3053">3053</a>] -
+  Bump eslint from 7.32.0 to 8.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3052">3052</a>] -
+  Bump eslint from 7.32.0 to 8.0.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3048">3048</a>] -
+  Bump grunt-contrib-concat from 1.0.1 to 2.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3047">3047</a>] -
+  Bump autoprefixer from 9.8.7 to 9.8.8 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3046">3046</a>] -
+  Bump coffeescript from 2.6.0 to 2.6.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3045">3045</a>] -
+  Bump markdownlint-cli from 0.28.1 to 0.29.0 in /docs/guides</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3043">3043</a>] -
+  Bump grunt-contrib-jshint from 3.0.0 to 3.1.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3042">3042</a>] -
+  Bump html-validate from 6.0.2 to 6.1.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3039">3039</a>] -
+  Bump @types/jest from 27.0.1 to 27.0.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3038">3038</a>] -
+  Bump axios from 0.21.2 to 0.22.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3037">3037</a>] -
+  Bump i18next from 21.1.1 to 21.2.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3036">3036</a>] -
+  Bump react-bootstrap from 1.6.3 to 1.6.4 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3033">3033</a>] -
+  Bump @types/node from 16.10.1 to 16.10.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3032">3032</a>] -
+  Bump @types/react from 17.0.20 to 17.0.26 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3030">3030</a>] -
+  Bump @types/node from 16.7.6 to 16.10.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3029">3029</a>] -
+  Bump i18next from 20.4.0 to 21.1.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3027">3027</a>] -
+  Bump html-validate from 5.4.1 to 6.0.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3026">3026</a>] -
+  Bump axios from 0.21.1 to 0.21.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3020">3020</a>] -
+  Bump chromedriver from 92.0.2 to 94.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3019">3019</a>] -
+  Bump autoprefixer from 9.8.6 to 9.8.7 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3018">3018</a>] -
+  Bump grunt-html-validate from 1.0.1 to 1.0.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3009">3009</a>] -
+  Bump xmlsec from 2.1.4 to 2.1.7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3008">3008</a>] -
+  Bump coffeescript from 2.5.1 to 2.6.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3001">3001</a>] -
+  Bump bootstrap from 5.1.0 to 5.1.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/3000">3000</a>] -
+  Bump react-bootstrap from 1.6.1 to 1.6.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2999">2999</a>] -
+  Bump react-i18next from 11.11.4 to 11.12.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2996">2996</a>] -
+  Bump typescript from 4.4.2 to 4.4.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2988">2988</a>] -
+  Bump @types/react from 17.0.19 to 17.0.20 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2978">2978</a>] -
+  Bump tar from 6.1.4 to 6.1.11 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2977">2977</a>] -
+  Bump chromedriver from 92.0.1 to 92.0.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2975">2975</a>] -
+  Bump prometheus.version from 0.11.0 to 0.12.0 in /modules/metrics-exporter</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2974">2974</a>] -
+  Bump typescript from 4.3.5 to 4.4.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2973">2973</a>] -
+  Bump @types/node from 16.7.1 to 16.7.6 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2972">2972</a>] -
+  Bump html-validate from 5.4.0 to 5.4.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2965">2965</a>] -
+  Bump html-validate from 5.3.0 to 5.4.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2961">2961</a>] -
+  Bump html-validate from 5.2.1 to 5.3.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2959">2959</a>] -
+  Bump @types/react from 17.0.18 to 17.0.19 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2958">2958</a>] -
+  Bump @types/node from 16.6.1 to 16.7.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2957">2957</a>] -
+  Bump jasmine-core from 3.8.0 to 3.9.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2933">2933</a>] -
+  Bump @types/react from 17.0.16 to 17.0.18 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2932">2932</a>] -
+  Bump i18next from 20.3.5 to 20.4.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2931">2931</a>] -
+  Bump @types/jest from 26.0.24 to 27.0.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2930">2930</a>] -
+  Bump @types/node from 16.4.13 to 16.6.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2921">2921</a>] -
+  Bump path-parse from 1.0.6 to 1.0.7 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2916">2916</a>] -
+  Bump html-validate from 5.2.0 to 5.2.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2909">2909</a>] -
+  Bump @types/react from 17.0.15 to 17.0.16 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2908">2908</a>] -
+  Bump @types/node from 16.4.12 to 16.4.13 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2905">2905</a>] -
+  Bump @fortawesome/react-fontawesome from 0.1.14 to 0.1.15 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2904">2904</a>] -
+  Bump @fortawesome/free-solid-svg-icons from 5.15.3 to 5.15.4 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2903">2903</a>] -
+  Bump bootstrap from 5.0.2 to 5.1.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2902">2902</a>] -
+  Bump @types/node from 16.4.7 to 16.4.12 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2901">2901</a>] -
+  Bump @fortawesome/fontawesome-svg-core from 1.2.35 to 1.2.36 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2898">2898</a>] -
+  Bump tar from 6.1.0 to 6.1.4 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2895">2895</a>] -
+  Bump chromedriver from 92.0.0 to 92.0.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2890">2890</a>] -
+  Bump eslint from 7.31.0 to 7.32.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2889">2889</a>] -
+  Bump eslint from 7.31.0 to 7.32.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2888">2888</a>] -
+  Bump eslint from 7.31.0 to 7.32.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2887">2887</a>] -
+  Bump eslint from 7.31.0 to 7.32.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2885">2885</a>] -
+  Bump eslint from 7.31.0 to 7.32.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2884">2884</a>] -
+  Bump eslint from 7.31.0 to 7.32.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2869">2869</a>] -
+  Bump @types/react from 17.0.14 to 17.0.15 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2868">2868</a>] -
+  Bump @types/node from 16.3.3 to 16.4.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2867">2867</a>] -
+  Bump i18next from 20.3.3 to 20.3.5 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2866">2866</a>] -
+  Bump html-validate from 5.1.1 to 5.2.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2865">2865</a>] -
+  Bump chromedriver from 91.0.1 to 92.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2864">2864</a>] -
+  Bump url-parse from 1.5.1 to 1.5.3 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2859">2859</a>] -
+  Bump markdownlint-cli from 0.27.1 to 0.28.1 in /docs/guides</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2845">2845</a>] -
+  Bump react-i18next from 11.11.0 to 11.11.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2844">2844</a>] -
+  Bump eslint from 7.30.0 to 7.31.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2843">2843</a>] -
+  Bump eslint from 7.30.0 to 7.31.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2842">2842</a>] -
+  Bump eslint from 7.30.0 to 7.31.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2841">2841</a>] -
+  Bump eslint from 7.30.0 to 7.31.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2840">2840</a>] -
+  Bump @types/node from 16.0.0 to 16.3.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2839">2839</a>] -
+  Bump i18next from 20.3.2 to 20.3.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2838">2838</a>] -
+  Bump eslint from 7.30.0 to 7.31.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2837">2837</a>] -
+  Bump eslint from 7.30.0 to 7.31.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2825">2825</a>] -
+  Bump @types/react-dom from 17.0.8 to 17.0.9 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2824">2824</a>] -
+  Bump @types/jest from 26.0.23 to 26.0.24 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2823">2823</a>] -
+  Bump @types/react-select from 4.0.16 to 4.0.17 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2821">2821</a>] -
+  Bump @types/react-js-pagination from 3.0.3 to 3.0.4 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2820">2820</a>] -
+  Bump @types/react-helmet from 6.1.1 to 6.1.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2818">2818</a>] -
+  Bump @types/react from 17.0.13 to 17.0.14 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2817">2817</a>] -
+  Bump html-validate from 5.0.2 to 5.1.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2808">2808</a>] -
+  Bump html-validate from 4.14.0 to 5.0.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2802">2802</a>] -
+  Bump @types/node from 15.12.5 to 16.0.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2801">2801</a>] -
+  Bump eslint from 7.29.0 to 7.30.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2800">2800</a>] -
+  Bump eslint from 7.29.0 to 7.30.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2799">2799</a>] -
+  Bump eslint from 7.29.0 to 7.30.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2798">2798</a>] -
+  Bump eslint from 7.29.0 to 7.30.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2797">2797</a>] -
+  Bump @types/react from 17.0.11 to 17.0.13 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2796">2796</a>] -
+  Bump eslint from 7.29.0 to 7.30.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2795">2795</a>] -
+  Bump grunt-html-validate from 1.0.0 to 1.0.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2794">2794</a>] -
+  Bump eslint from 7.29.0 to 7.30.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2789">2789</a>] -
+  Bump jasmine-core from 3.7.1 to 3.8.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2783">2783</a>] -
+  Bump @types/react-select from 4.0.15 to 4.0.16 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2782">2782</a>] -
+  Bump @types/node from 15.12.4 to 15.12.5 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2781">2781</a>] -
+  Bump query-string from 7.0.0 to 7.0.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2780">2780</a>] -
+  Bump bootstrap from 5.0.1 to 5.0.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2779">2779</a>] -
+  Bump grunt-html-validate from 0.5.0 to 1.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2772">2772</a>] -
+  Bump node-sass from 6.0.0 to 6.0.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2760">2760</a>] -
+  Bump i18next from 20.3.1 to 20.3.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2759">2759</a>] -
+  Bump @types/react-dom from 17.0.7 to 17.0.8 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2758">2758</a>] -
+  Bump @types/node from 15.12.2 to 15.12.4 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2757">2757</a>] -
+  Bump eslint from 7.28.0 to 7.29.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2756">2756</a>] -
+  Bump eslint from 7.28.0 to 7.29.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2755">2755</a>] -
+  Bump eslint from 7.28.0 to 7.29.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2754">2754</a>] -
+  Bump eslint from 7.28.0 to 7.29.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2753">2753</a>] -
+  Bump i18next-browser-languagedetector from 6.1.1 to 6.1.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2752">2752</a>] -
+  Bump eslint from 7.28.0 to 7.29.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2751">2751</a>] -
+  Bump eslint from 7.28.0 to 7.29.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2737">2737</a>] -
+  Bump chromedriver from 91.0.0 to 91.0.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2729">2729</a>] -
+  Bump @types/react-dom from 17.0.6 to 17.0.7 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2728">2728</a>] -
+  Bump @types/node from 15.12.1 to 15.12.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2727">2727</a>] -
+  Bump react-i18next from 11.10.0 to 11.11.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2726">2726</a>] -
+  Bump @types/react from 17.0.9 to 17.0.11 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2725">2725</a>] -
+  Bump karma from 6.3.3 to 6.3.4 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2693">2693</a>] -
+  Bump glob-parent from 5.1.0 to 5.1.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2689">2689</a>] -
+  Bump eslint from 7.27.0 to 7.28.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2688">2688</a>] -
+  Bump eslint from 7.27.0 to 7.28.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2687">2687</a>] -
+  Bump eslint from 7.27.0 to 7.28.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2686">2686</a>] -
+  Bump eslint from 7.27.0 to 7.28.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2685">2685</a>] -
+  Bump @types/node from 15.6.1 to 15.12.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2684">2684</a>] -
+  Bump @types/react-dom from 17.0.5 to 17.0.6 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2683">2683</a>] -
+  Bump @types/react from 17.0.8 to 17.0.9 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2682">2682</a>] -
+  Bump react-bootstrap from 1.6.0 to 1.6.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2681">2681</a>] -
+  Bump eslint from 7.27.0 to 7.28.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2680">2680</a>] -
+  Bump eslint from 7.27.0 to 7.28.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2672">2672</a>] -
+  Bump karma-firefox-launcher from 2.1.0 to 2.1.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2671">2671</a>] -
+  Bump chromedriver from 90.0.1 to 91.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2668">2668</a>] -
+  Bump karma from 6.3.2 to 6.3.3 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2663">2663</a>] -
+  Bump prometheus.version from 0.10.0 to 0.11.0 in /modules/metrics-exporter</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2662">2662</a>] -
+  Bump react-i18next from 11.8.15 to 11.10.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2661">2661</a>] -
+  Bump @types/node from 15.6.0 to 15.6.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2660">2660</a>] -
+  Bump @types/react from 17.0.6 to 17.0.8 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2659">2659</a>] -
+  Bump i18next from 20.3.0 to 20.3.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2642">2642</a>] -
+  Bump grunt-cli from 1.4.2 to 1.4.3 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2641">2641</a>] -
+  Bump grunt from 1.4.0 to 1.4.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2640">2640</a>] -
+  Bump browserslist from 4.13.0 to 4.16.6 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2639">2639</a>] -
+  Bump eslint from 7.26.0 to 7.27.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2638">2638</a>] -
+  Bump eslint from 7.26.0 to 7.27.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2637">2637</a>] -
+  Bump eslint from 7.26.0 to 7.27.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2636">2636</a>] -
+  Bump eslint from 7.26.0 to 7.27.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2635">2635</a>] -
+  Bump @types/node from 15.3.0 to 15.6.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2634">2634</a>] -
+  Bump @types/react from 17.0.5 to 17.0.6 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2633">2633</a>] -
+  Bump i18next from 20.2.4 to 20.3.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2632">2632</a>] -
+  Bump eslint from 7.26.0 to 7.27.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2631">2631</a>] -
+  Bump eslint from 7.26.0 to 7.27.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2628">2628</a>] -
+  Bump chromedriver from 90.0.0 to 90.0.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2576">2576</a>] -
+  Bump hosted-git-info from 2.8.4 to 2.8.9 in /modules/engage-paella-player</li>
+</ul>
+</details>
 
 Opencast 10
 ----------
@@ -2925,8 +3150,6 @@ Opencast 10
   Delete extra colon in paella description plugin's localization key
 - [[#2897](https://github.com/opencast/opencast/pull/2897)] -
   LTI upload / edit form styling, adding some sensible padding and margins
-- [[#2894](https://github.com/opencast/opencast/pull/2894)] -
-  Bump commons-compress from 1.20 to 1.21
 - [[#2893](https://github.com/opencast/opencast/pull/2893)] -
   Add index changes to release notes of 10.1
 - [[#2892](https://github.com/opencast/opencast/pull/2892)] -
@@ -2980,6 +3203,13 @@ Opencast 10
 - [[#2666](https://github.com/opencast/opencast/pull/2666)] -
   Fix checkstyle violations in 11 modules
 
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/2894">2894</a>] -
+  Bump commons-compress from 1.20 to 1.21</li>
+</ul>
+</details>
 
 ### Opencast 10.1
 
@@ -3092,90 +3322,22 @@ Opencast 10
   Update Comments in ElasticSearch Indices directly
 - [[#2612](https://github.com/opencast/opencast/pull/2612)] -
   Add board members to governance page
-- [[#2611](https://github.com/opencast/opencast/pull/2611)] -
-  Bump @types/node from 15.0.2 to 15.3.0 in /modules/lti
-- [[#2610](https://github.com/opencast/opencast/pull/2610)] -
-  Bump i18next from 20.2.2 to 20.2.4 in /modules/lti
-- [[#2609](https://github.com/opencast/opencast/pull/2609)] -
-  Bump react-bootstrap from 1.5.2 to 1.6.0 in /modules/lti
-- [[#2608](https://github.com/opencast/opencast/pull/2608)] -
-  Bump react-select from 4.3.0 to 4.3.1 in /modules/lti
-- [[#2607](https://github.com/opencast/opencast/pull/2607)] -
-  Bump @types/react-dom from 17.0.3 to 17.0.5 in /modules/lti
-- [[#2606](https://github.com/opencast/opencast/pull/2606)] -
-  Bump bootstrap from 5.0.0 to 5.0.1 in /modules/lti
 - [[#2605](https://github.com/opencast/opencast/pull/2605)] -
   Fix Graphs in Documentation
-- [[#2601](https://github.com/opencast/opencast/pull/2601)] -
-  Bump karma from 5.2.3 to 6.3.2 in /modules/admin-ui-frontend
-- [[#2600](https://github.com/opencast/opencast/pull/2600)] -
-  Bump grunt-karma from 4.0.0 to 4.0.2 in /modules/admin-ui-frontend
 - [[#2590](https://github.com/opencast/opencast/pull/2590)] -
   New woh: conditional-config
-- [[#2589](https://github.com/opencast/opencast/pull/2589)] -
-  Bump eslint from 7.25.0 to 7.26.0 in /modules/engage-ui
-- [[#2588](https://github.com/opencast/opencast/pull/2588)] -
-  Bump eslint from 7.25.0 to 7.26.0 in /modules/engage-theodul-core
-- [[#2587](https://github.com/opencast/opencast/pull/2587)] -
-  Bump eslint from 7.25.0 to 7.26.0 in /modules/runtime-info-ui
-- [[#2586](https://github.com/opencast/opencast/pull/2586)] -
-  Bump eslint from 7.25.0 to 7.26.0 in /modules/runtime-info-ui-ng
-- [[#2583](https://github.com/opencast/opencast/pull/2583)] -
-  Bump i18next-browser-languagedetector from 6.1.0 to 6.1.1 in /modules/lti
-- [[#2582](https://github.com/opencast/opencast/pull/2582)] -
-  Bump bootstrap from 4.6.0 to 5.0.0 in /modules/lti
-- [[#2581](https://github.com/opencast/opencast/pull/2581)] -
-  Bump @types/react from 17.0.4 to 17.0.5 in /modules/lti
-- [[#2580](https://github.com/opencast/opencast/pull/2580)] -
-  Bump @types/node from 15.0.1 to 15.0.2 in /modules/lti
-- [[#2579](https://github.com/opencast/opencast/pull/2579)] -
-  Bump node-sass from 5.0.0 to 6.0.0 in /modules/admin-ui-frontend
-- [[#2578](https://github.com/opencast/opencast/pull/2578)] -
-  Bump eslint from 7.25.0 to 7.26.0 in /modules/admin-ui-frontend
-- [[#2577](https://github.com/opencast/opencast/pull/2577)] -
-  Bump eslint from 7.25.0 to 7.26.0 in /modules/engage-paella-player
 - [[#2572](https://github.com/opencast/opencast/pull/2572)] -
   Dont index groups (fixes distributed develop)
 - [[#2558](https://github.com/opencast/opencast/pull/2558)] -
   Add organization ID to the S3 distribution object path
 - [[#2555](https://github.com/opencast/opencast/pull/2555)] -
   Add Java Version to Upgrade Docs
-- [[#2551](https://github.com/opencast/opencast/pull/2551)] -
-  Bump @types/react from 17.0.3 to 17.0.4 in /modules/lti
-- [[#2550](https://github.com/opencast/opencast/pull/2550)] -
-  Bump react-i18next from 11.8.13 to 11.8.15 in /modules/lti
-- [[#2549](https://github.com/opencast/opencast/pull/2549)] -
-  Bump @types/node from 14.14.41 to 15.0.1 in /modules/lti
-- [[#2548](https://github.com/opencast/opencast/pull/2548)] -
-  Bump @types/jest from 26.0.22 to 26.0.23 in /modules/lti
-- [[#2547](https://github.com/opencast/opencast/pull/2547)] -
-  Bump i18next from 20.2.1 to 20.2.2 in /modules/lti
-- [[#2542](https://github.com/opencast/opencast/pull/2542)] -
-  Bump eslint from 7.24.0 to 7.25.0 in /modules/engage-theodul-core
-- [[#2541](https://github.com/opencast/opencast/pull/2541)] -
-  Bump eslint from 7.24.0 to 7.25.0 in /modules/runtime-info-ui
-- [[#2540](https://github.com/opencast/opencast/pull/2540)] -
-  Bump eslint from 7.24.0 to 7.25.0 in /modules/runtime-info-ui-ng
-- [[#2539](https://github.com/opencast/opencast/pull/2539)] -
-  Bump eslint from 7.24.0 to 7.25.0 in /modules/engage-ui
-- [[#2538](https://github.com/opencast/opencast/pull/2538)] -
-  Bump eslint from 7.24.0 to 7.25.0 in /modules/admin-ui-frontend
-- [[#2537](https://github.com/opencast/opencast/pull/2537)] -
-  Bump eslint from 7.24.0 to 7.25.0 in /modules/engage-paella-player
-- [[#2533](https://github.com/opencast/opencast/pull/2533)] -
-  Bump grunt from 1.3.0 to 1.4.0 in /modules/admin-ui-frontend
 - [[#2531](https://github.com/opencast/opencast/pull/2531)] -
   Hand over Elasticsearch Index to Services for Index Rebuild
 - [[#2529](https://github.com/opencast/opencast/pull/2529)] -
   Expose some of the S3 client configuration for assets
 - [[#2524](https://github.com/opencast/opencast/pull/2524)] -
   Merge r/9.x into develop
-- [[#2523](https://github.com/opencast/opencast/pull/2523)] -
-  Bump @types/node from 14.14.37 to 14.14.41 in /modules/lti
-- [[#2522](https://github.com/opencast/opencast/pull/2522)] -
-  Bump @types/react-select from 4.0.14 to 4.0.15 in /modules/lti
-- [[#2521](https://github.com/opencast/opencast/pull/2521)] -
-  Bump react-i18next from 11.8.12 to 11.8.13 in /modules/lti
 - [[#2520](https://github.com/opencast/opencast/pull/2520)] -
   Do not build against Java 8
 - [[#2518](https://github.com/opencast/opencast/pull/2518)] -
@@ -3190,270 +3352,42 @@ Opencast 10
   Remove standard check-availability for publication
 - [[#2507](https://github.com/opencast/opencast/pull/2507)] -
   Change Paella Usertracking Default
-- [[#2505](https://github.com/opencast/opencast/pull/2505)] -
-  Bump underscore from 1.13.0 to 1.13.1 in /modules/engage-ui
-- [[#2503](https://github.com/opencast/opencast/pull/2503)] -
-  Bump chromedriver from 89.0.0 to 90.0.0 in /modules/admin-ui-frontend
-- [[#2495](https://github.com/opencast/opencast/pull/2495)] -
-  Bump js-yaml from 4.0.0 to 4.1.0 in /modules/engage-ui
-- [[#2488](https://github.com/opencast/opencast/pull/2488)] -
-  Bump underscore from 1.12.1 to 1.13.0 in /modules/engage-ui
-- [[#2487](https://github.com/opencast/opencast/pull/2487)] -
-  Bump eslint from 7.23.0 to 7.24.0 in /modules/engage-ui
-- [[#2486](https://github.com/opencast/opencast/pull/2486)] -
-  Bump eslint from 7.23.0 to 7.24.0 in /modules/engage-theodul-core
-- [[#2485](https://github.com/opencast/opencast/pull/2485)] -
-  Bump eslint from 7.23.0 to 7.24.0 in /modules/runtime-info-ui
-- [[#2484](https://github.com/opencast/opencast/pull/2484)] -
-  Bump eslint from 7.23.0 to 7.24.0 in /modules/runtime-info-ui-ng
-- [[#2483](https://github.com/opencast/opencast/pull/2483)] -
-  Bump i18next from 20.1.0 to 20.2.1 in /modules/lti
-- [[#2482](https://github.com/opencast/opencast/pull/2482)] -
-  Bump @types/react-helmet from 6.1.0 to 6.1.1 in /modules/lti
-- [[#2481](https://github.com/opencast/opencast/pull/2481)] -
-  Bump eslint from 7.23.0 to 7.24.0 in /modules/admin-ui-frontend
-- [[#2480](https://github.com/opencast/opencast/pull/2480)] -
-  Bump eslint from 7.23.0 to 7.24.0 in /modules/engage-paella-player
 - [[#2471](https://github.com/opencast/opencast/pull/2471)] -
   Remove broken admin-frontend test
-- [[#2469](https://github.com/opencast/opencast/pull/2469)] -
-  Bump @types/react-select from 3.0.21 to 4.0.14 in /modules/lti
-- [[#2468](https://github.com/opencast/opencast/pull/2468)] -
-  Bump grunt-cli from 1.4.1 to 1.4.2 in /modules/admin-ui-frontend
-- [[#2466](https://github.com/opencast/opencast/pull/2466)] -
-  Bump y18n from 4.0.0 to 4.0.1 in /modules/admin-ui-frontend
 - [[#2465](https://github.com/opencast/opencast/pull/2465)] -
   Exclude Dependabot from ICLA Check
-- [[#2463](https://github.com/opencast/opencast/pull/2463)] -
-  Bump grunt-contrib-uglify from 5.0.0 to 5.0.1 in /modules/admin-ui-frontend
-- [[#2461](https://github.com/opencast/opencast/pull/2461)] -
-  Bump y18n from 3.2.1 to 3.2.2 in /modules/engage-paella-player
 - [[#2459](https://github.com/opencast/opencast/pull/2459)] -
   Remove a duplicate dependency declaration
-- [[#2458](https://github.com/opencast/opencast/pull/2458)] -
-  Bump eslint from 7.22.0 to 7.23.0 in /modules/engage-ui
-- [[#2457](https://github.com/opencast/opencast/pull/2457)] -
-  Bump eslint from 7.22.0 to 7.23.0 in /modules/engage-theodul-core
-- [[#2456](https://github.com/opencast/opencast/pull/2456)] -
-  Bump eslint from 7.22.0 to 7.23.0 in /modules/runtime-info-ui-ng
-- [[#2455](https://github.com/opencast/opencast/pull/2455)] -
-  Bump eslint from 7.22.0 to 7.23.0 in /modules/runtime-info-ui
-- [[#2454](https://github.com/opencast/opencast/pull/2454)] -
-  Bump @types/node from 14.14.35 to 14.14.37 in /modules/lti
-- [[#2453](https://github.com/opencast/opencast/pull/2453)] -
-  Bump eslint from 7.22.0 to 7.23.0 in /modules/admin-ui-frontend
-- [[#2452](https://github.com/opencast/opencast/pull/2452)] -
-  Bump eslint from 7.22.0 to 7.23.0 in /modules/engage-paella-player
-- [[#2450](https://github.com/opencast/opencast/pull/2450)] -
-  Bump i18next from 19.9.2 to 20.1.0 in /modules/lti
-- [[#2449](https://github.com/opencast/opencast/pull/2449)] -
-  Bump react-i18next from 11.8.10 to 11.8.12 in /modules/lti
-- [[#2448](https://github.com/opencast/opencast/pull/2448)] -
-  Bump react and react-dom in /modules/lti
-- [[#2447](https://github.com/opencast/opencast/pull/2447)] -
-  Bump i18next-browser-languagedetector from 6.0.1 to 6.1.0 in /modules/lti
-- [[#2445](https://github.com/opencast/opencast/pull/2445)] -
-  Bump @types/jest from 26.0.21 to 26.0.22 in /modules/lti
-- [[#2444](https://github.com/opencast/opencast/pull/2444)] -
-  Bump @types/react-dom from 17.0.2 to 17.0.3 in /modules/lti
 - [[#2441](https://github.com/opencast/opencast/pull/2441)] -
   fixed publish-configure argument in fast-HLS
-- [[#2439](https://github.com/opencast/opencast/pull/2439)] -
-  Bump grunt-cli from 1.3.2 to 1.4.1 in /modules/admin-ui-frontend
-- [[#2434](https://github.com/opencast/opencast/pull/2434)] -
-  Bump @fortawesome/free-solid-svg-icons from 5.15.2 to 5.15.3 in /modules/lti
-- [[#2433](https://github.com/opencast/opencast/pull/2433)] -
-  Bump @fortawesome/fontawesome-svg-core from 1.2.34 to 1.2.35 in /modules/lti
-- [[#2432](https://github.com/opencast/opencast/pull/2432)] -
-  Bump query-string from 6.14.1 to 7.0.0 in /modules/lti
-- [[#2431](https://github.com/opencast/opencast/pull/2431)] -
-  Bump react-select from 4.2.1 to 4.3.0 in /modules/lti
-- [[#2430](https://github.com/opencast/opencast/pull/2430)] -
-  Bump @types/node from 14.14.34 to 14.14.35 in /modules/lti
-- [[#2429](https://github.com/opencast/opencast/pull/2429)] -
-  Bump @types/jest from 26.0.20 to 26.0.21 in /modules/lti
-- [[#2426](https://github.com/opencast/opencast/pull/2426)] -
-  Bump @types/react-select from 3.0.21 to 4.0.13 in /modules/lti
-- [[#2425](https://github.com/opencast/opencast/pull/2425)] -
-  Bump jasmine-core from 3.7.0 to 3.7.1 in /modules/admin-ui-frontend
-- [[#2422](https://github.com/opencast/opencast/pull/2422)] -
-  Bump jasmine-core from 3.6.0 to 3.7.0 in /modules/admin-ui-frontend
 - [[#2421](https://github.com/opencast/opencast/pull/2421)] -
   Create Dependabot config file
-- [[#2412](https://github.com/opencast/opencast/pull/2412)] -
-  Bump underscore from 1.12.0 to 1.12.1 in /modules/engage-ui
-- [[#2408](https://github.com/opencast/opencast/pull/2408)] -
-  Bump react-scripts from 3.4.1 to 4.0.3 in /modules/lti
-- [[#2406](https://github.com/opencast/opencast/pull/2406)] -
-  Bump @types/node from 14.14.32 to 14.14.34 in /modules/lti
-- [[#2405](https://github.com/opencast/opencast/pull/2405)] -
-  Bump react-i18next from 11.8.9 to 11.8.10 in /modules/lti
-- [[#2404](https://github.com/opencast/opencast/pull/2404)] -
-  Bump @types/react-dom from 17.0.1 to 17.0.2 in /modules/lti
-- [[#2403](https://github.com/opencast/opencast/pull/2403)] -
-  Bump eslint from 7.21.0 to 7.22.0 in /modules/admin-ui-frontend
-- [[#2402](https://github.com/opencast/opencast/pull/2402)] -
-  Bump eslint from 7.21.0 to 7.22.0 in /modules/runtime-info-ui
-- [[#2401](https://github.com/opencast/opencast/pull/2401)] -
-  Bump eslint from 7.21.0 to 7.22.0 in /modules/engage-theodul-core
-- [[#2400](https://github.com/opencast/opencast/pull/2400)] -
-  Bump eslint from 7.21.0 to 7.22.0 in /modules/engage-ui
-- [[#2399](https://github.com/opencast/opencast/pull/2399)] -
-  Bump eslint from 7.21.0 to 7.22.0 in /modules/runtime-info-ui-ng
-- [[#2398](https://github.com/opencast/opencast/pull/2398)] -
-  Bump eslint from 7.21.0 to 7.22.0 in /modules/engage-paella-player
 - [[#2396](https://github.com/opencast/opencast/pull/2396)] -
   Fix 9.x to develop merge conflicts
 - [[#2392](https://github.com/opencast/opencast/pull/2392)] -
   [Security] Bump yargs-parser from 5.0.0 to 5.0.1 in /modules/engage-paella-player
-- [[#2389](https://github.com/opencast/opencast/pull/2389)] -
-  Bump i18next from 19.8.9 to 19.9.2 in /modules/lti
 - [[#2388](https://github.com/opencast/opencast/pull/2388)] -
   [Security] Bump elliptic from 6.5.3 to 6.5.4 in /modules/lti
-- [[#2385](https://github.com/opencast/opencast/pull/2385)] -
-  Bump @types/react from 17.0.2 to 17.0.3 in /modules/lti
-- [[#2384](https://github.com/opencast/opencast/pull/2384)] -
-  Bump react and react-dom in /modules/lti
-- [[#2383](https://github.com/opencast/opencast/pull/2383)] -
-  Bump @types/node from 14.14.31 to 14.14.32 in /modules/lti
-- [[#2382](https://github.com/opencast/opencast/pull/2382)] -
-  Bump react-i18next from 11.0.0 to 11.8.9 in /modules/lti
-- [[#2381](https://github.com/opencast/opencast/pull/2381)] -
-  Bump react-select from 4.1.0 to 4.2.1 in /modules/lti
-- [[#2380](https://github.com/opencast/opencast/pull/2380)] -
-  Bump chromedriver from 88.0.0 to 89.0.0 in /modules/admin-ui-frontend
-- [[#2379](https://github.com/opencast/opencast/pull/2379)] -
-  Bump jquery from 3.5.1 to 3.6.0 in /modules/engage-ui
-- [[#2378](https://github.com/opencast/opencast/pull/2378)] -
-  Bump jquery from 3.5.1 to 3.6.0 in /modules/runtime-info-ui-ng
-- [[#2377](https://github.com/opencast/opencast/pull/2377)] -
-  Bump markdownlint-cli from 0.27.0 to 0.27.1 in /docs/guides
-- [[#2376](https://github.com/opencast/opencast/pull/2376)] -
-  Bump jquery from 3.5.1 to 3.6.0 in /modules/runtime-info-ui
-- [[#2375](https://github.com/opencast/opencast/pull/2375)] -
-  Bump markdownlint-cli from 0.26.0 to 0.27.0 in /docs/guides
-- [[#2372](https://github.com/opencast/opencast/pull/2372)] -
-  Bump query-string from 6.14.0 to 6.14.1 in /modules/lti
-- [[#2369](https://github.com/opencast/opencast/pull/2369)] -
-  Bump react-dom from 16.13.1 to 16.14.0 in /modules/lti
-- [[#2367](https://github.com/opencast/opencast/pull/2367)] -
-  Bump eslint from 7.20.0 to 7.21.0 in /modules/admin-ui-frontend
-- [[#2366](https://github.com/opencast/opencast/pull/2366)] -
-  Bump eslint from 7.20.0 to 7.21.0 in /modules/engage-theodul-core
-- [[#2365](https://github.com/opencast/opencast/pull/2365)] -
-  Bump eslint from 7.20.0 to 7.21.0 in /modules/runtime-info-ui
-- [[#2364](https://github.com/opencast/opencast/pull/2364)] -
-  Bump eslint from 7.20.0 to 7.21.0 in /modules/engage-paella-player
-- [[#2363](https://github.com/opencast/opencast/pull/2363)] -
-  Bump eslint from 7.20.0 to 7.21.0 in /modules/engage-ui
-- [[#2362](https://github.com/opencast/opencast/pull/2362)] -
-  Bump eslint from 7.20.0 to 7.21.0 in /modules/runtime-info-ui-ng
-- [[#2350](https://github.com/opencast/opencast/pull/2350)] -
-  Bump react from 16.13.1 to 16.14.0 in /modules/lti
-- [[#2349](https://github.com/opencast/opencast/pull/2349)] -
-  Bump @types/jest from 26.0.14 to 26.0.20 in /modules/lti
-- [[#2348](https://github.com/opencast/opencast/pull/2348)] -
-  Bump typescript from 3.6.3 to 3.9.9 in /modules/lti
-- [[#2347](https://github.com/opencast/opencast/pull/2347)] -
-  Bump @fortawesome/react-fontawesome from 0.1.11 to 0.1.14 in /modules/lti
-- [[#2345](https://github.com/opencast/opencast/pull/2345)] -
-  Bump @types/react-dom from 16.9.8 to 17.0.1 in /modules/lti
-- [[#2342](https://github.com/opencast/opencast/pull/2342)] -
-  Bump @types/node from 14.14.21 to 14.14.31 in /modules/lti
-- [[#2341](https://github.com/opencast/opencast/pull/2341)] -
-  Bump i18next from 17.3.1 to 19.8.9 in /modules/lti
-- [[#2337](https://github.com/opencast/opencast/pull/2337)] -
-  Bump url-parse from 1.4.7 to 1.5.1 in /modules/admin-ui-frontend
 - [[#2333](https://github.com/opencast/opencast/pull/2333)] -
   Added doc string to UserEndoint for the admin API
-- [[#2326](https://github.com/opencast/opencast/pull/2326)] -
-  Bump @types/react from 16.9.50 to 17.0.2 in /modules/lti
-- [[#2325](https://github.com/opencast/opencast/pull/2325)] -
-  Bump eslint from 7.19.0 to 7.20.0 in /modules/admin-ui-frontend
-- [[#2324](https://github.com/opencast/opencast/pull/2324)] -
-  Bump grunt-contrib-cssmin from 3.0.0 to 4.0.0 in /modules/admin-ui-frontend
-- [[#2323](https://github.com/opencast/opencast/pull/2323)] -
-  Bump eslint from 7.19.0 to 7.20.0 in /modules/runtime-info-ui-ng
-- [[#2322](https://github.com/opencast/opencast/pull/2322)] -
-  Bump eslint from 7.19.0 to 7.20.0 in /modules/engage-ui
-- [[#2321](https://github.com/opencast/opencast/pull/2321)] -
-  Bump eslint from 7.19.0 to 7.20.0 in /modules/runtime-info-ui
-- [[#2320](https://github.com/opencast/opencast/pull/2320)] -
-  Bump eslint from 7.19.0 to 7.20.0 in /modules/engage-theodul-core
-- [[#2319](https://github.com/opencast/opencast/pull/2319)] -
-  Bump eslint from 7.19.0 to 7.20.0 in /modules/engage-paella-player
-- [[#2315](https://github.com/opencast/opencast/pull/2315)] -
-  Bump query-string from 6.13.1 to 6.14.0 in /modules/lti
 - [[#2307](https://github.com/opencast/opencast/pull/2307)] -
   Don't Store Documentation Redirect in History
-- [[#2303](https://github.com/opencast/opencast/pull/2303)] -
-  Bump react-select from 3.1.0 to 4.1.0 in /modules/lti
 - [[#2293](https://github.com/opencast/opencast/pull/2293)] -
   Added the access_policy field to elasticsearch and made it searchable
 - [[#2289](https://github.com/opencast/opencast/pull/2289)] -
   Start Index Rebuild directly
-- [[#2288](https://github.com/opencast/opencast/pull/2288)] -
-  Bump eslint-plugin-header from 3.1.0 to 3.1.1 in /modules/admin-ui-frontend
-- [[#2287](https://github.com/opencast/opencast/pull/2287)] -
-  Bump eslint-plugin-header from 3.1.0 to 3.1.1 in /modules/engage-paella-player
-- [[#2286](https://github.com/opencast/opencast/pull/2286)] -
-  Bump eslint-plugin-header from 3.1.0 to 3.1.1 in /modules/engage-theodul-core
-- [[#2285](https://github.com/opencast/opencast/pull/2285)] -
-  Bump eslint-plugin-header from 3.1.0 to 3.1.1 in /modules/runtime-info-ui-ng
-- [[#2284](https://github.com/opencast/opencast/pull/2284)] -
-  Bump eslint-plugin-header from 3.1.0 to 3.1.1 in /modules/runtime-info-ui
-- [[#2283](https://github.com/opencast/opencast/pull/2283)] -
-  Bump eslint-plugin-header from 3.1.0 to 3.1.1 in /modules/engage-ui
-- [[#2269](https://github.com/opencast/opencast/pull/2269)] -
-  Bump eslint from 7.18.0 to 7.19.0 in /modules/admin-ui-frontend
-- [[#2268](https://github.com/opencast/opencast/pull/2268)] -
-  Bump eslint from 7.18.0 to 7.19.0 in /modules/runtime-info-ui
-- [[#2267](https://github.com/opencast/opencast/pull/2267)] -
-  Bump eslint from 7.18.0 to 7.19.0 in /modules/engage-paella-player
-- [[#2266](https://github.com/opencast/opencast/pull/2266)] -
-  Bump eslint from 7.18.0 to 7.19.0 in /modules/runtime-info-ui-ng
-- [[#2265](https://github.com/opencast/opencast/pull/2265)] -
-  Bump eslint from 7.18.0 to 7.19.0 in /modules/engage-ui
-- [[#2264](https://github.com/opencast/opencast/pull/2264)] -
-  Bump eslint from 7.18.0 to 7.19.0 in /modules/engage-theodul-core
 - [[#2262](https://github.com/opencast/opencast/pull/2262)] -
   Remove dom4j
 - [[#2255](https://github.com/opencast/opencast/pull/2255)] -
   Clean up PR review documentation
-- [[#2252](https://github.com/opencast/opencast/pull/2252)] -
-  Bump bootstrap from 4.5.3 to 4.6.0 in /modules/lti
-- [[#2250](https://github.com/opencast/opencast/pull/2250)] -
-  Bump chromedriver from 87.0.7 to 88.0.0 in /modules/admin-ui-frontend
 - [[#2240](https://github.com/opencast/opencast/pull/2240)] -
   [Security] Bump socket.io from 2.3.0 to 2.4.1 in /modules/admin-ui-frontend
-- [[#2232](https://github.com/opencast/opencast/pull/2232)] -
-  Bump bower from 1.8.10 to 1.8.12 in /modules/admin-ui-frontend
-- [[#2231](https://github.com/opencast/opencast/pull/2231)] -
-  Bump chromedriver from 87.0.5 to 87.0.7 in /modules/admin-ui-frontend
 - [[#2230](https://github.com/opencast/opencast/pull/2230)] -
   Don't ask Dependabot to sign ICLA
-- [[#2229](https://github.com/opencast/opencast/pull/2229)] -
-  Bump @fortawesome/fontawesome-svg-core from 1.2.30 to 1.2.34 in /modules/lti
-- [[#2227](https://github.com/opencast/opencast/pull/2227)] -
-  Bump @types/node from 14.11.2 to 14.14.21 in /modules/lti
 - [[#2226](https://github.com/opencast/opencast/pull/2226)] -
   [Security] Bump semver from 2.3.2 to 5.3.0 in /modules/admin-ui-frontend
 - [[#2225](https://github.com/opencast/opencast/pull/2225)] -
   [Security] Bump handlebars from 4.5.3 to 4.7.6 in /modules/admin-ui-frontend
-- [[#2224](https://github.com/opencast/opencast/pull/2224)] -
-  Bump eslint from 7.17.0 to 7.18.0 in /modules/admin-ui-frontend
-- [[#2223](https://github.com/opencast/opencast/pull/2223)] -
-  Bump eslint from 7.17.0 to 7.18.0 in /modules/runtime-info-ui
-- [[#2222](https://github.com/opencast/opencast/pull/2222)] -
-  Bump eslint from 7.17.0 to 7.18.0 in /modules/engage-theodul-core
-- [[#2221](https://github.com/opencast/opencast/pull/2221)] -
-  Bump eslint from 7.17.0 to 7.18.0 in /modules/engage-ui
-- [[#2220](https://github.com/opencast/opencast/pull/2220)] -
-  Bump eslint from 7.17.0 to 7.18.0 in /modules/engage-paella-player
-- [[#2219](https://github.com/opencast/opencast/pull/2219)] -
-  Bump eslint from 7.17.0 to 7.18.0 in /modules/runtime-info-ui-ng
-- [[#2217](https://github.com/opencast/opencast/pull/2217)] -
-  Bump bower from 1.8.8 to 1.8.10 in /modules/admin-ui-frontend
 - [[#2212](https://github.com/opencast/opencast/pull/2212)] -
   Securing Static Files by Default
 - [[#2211](https://github.com/opencast/opencast/pull/2211)] -
@@ -3466,38 +3400,8 @@ Opencast 10
   Fix user tracking duplicate session key error
 - [[#2206](https://github.com/opencast/opencast/pull/2206)] -
   Update Development Process
-- [[#2200](https://github.com/opencast/opencast/pull/2200)] -
-  Bump chromedriver from 87.0.4 to 87.0.5 in /modules/admin-ui-frontend
-- [[#2195](https://github.com/opencast/opencast/pull/2195)] -
-  Bump eslint from 7.16.0 to 7.17.0 in /modules/admin-ui-frontend
-- [[#2194](https://github.com/opencast/opencast/pull/2194)] -
-  Bump eslint from 7.16.0 to 7.17.0 in /modules/runtime-info-ui-ng
-- [[#2193](https://github.com/opencast/opencast/pull/2193)] -
-  Bump eslint from 7.16.0 to 7.17.0 in /modules/engage-theodul-core
-- [[#2192](https://github.com/opencast/opencast/pull/2192)] -
-  Bump eslint from 7.16.0 to 7.17.0 in /modules/runtime-info-ui
-- [[#2191](https://github.com/opencast/opencast/pull/2191)] -
-  Bump eslint from 7.16.0 to 7.17.0 in /modules/engage-ui
-- [[#2190](https://github.com/opencast/opencast/pull/2190)] -
-  Bump eslint from 7.16.0 to 7.17.0 in /modules/engage-paella-player
-- [[#2189](https://github.com/opencast/opencast/pull/2189)] -
-  Bump js-yaml from 3.14.1 to 4.0.0 in /modules/engage-ui
-- [[#2175](https://github.com/opencast/opencast/pull/2175)] -
-  Bump eslint from 7.15.0 to 7.16.0 in /modules/admin-ui-frontend
-- [[#2174](https://github.com/opencast/opencast/pull/2174)] -
-  Bump eslint from 7.15.0 to 7.16.0 in /modules/engage-theodul-core
-- [[#2173](https://github.com/opencast/opencast/pull/2173)] -
-  Bump eslint from 7.15.0 to 7.16.0 in /modules/engage-ui
-- [[#2172](https://github.com/opencast/opencast/pull/2172)] -
-  Bump eslint from 7.15.0 to 7.16.0 in /modules/runtime-info-ui
-- [[#2171](https://github.com/opencast/opencast/pull/2171)] -
-  Bump eslint from 7.15.0 to 7.16.0 in /modules/engage-paella-player
-- [[#2170](https://github.com/opencast/opencast/pull/2170)] -
-  Bump eslint from 7.15.0 to 7.16.0 in /modules/runtime-info-ui-ng
 - [[#2163](https://github.com/opencast/opencast/pull/2163)] -
   Added upload progressbar to the LTI upload tool
-- [[#2159](https://github.com/opencast/opencast/pull/2159)] -
-  Bump markdownlint-cli from 0.25.0 to 0.26.0 in /docs/guides
 - [[#2156](https://github.com/opencast/opencast/pull/2156)] -
   Fix Google transcription service indefinite errors generation #1664 #2146
 - [[#2154](https://github.com/opencast/opencast/pull/2154)] -
@@ -3512,8 +3416,6 @@ Opencast 10
   [Security] Bump ini from 1.3.5 to 1.3.8 in /modules/engage-paella-player
 - [[#2138](https://github.com/opencast/opencast/pull/2138)] -
   Adding Step-by-Step to Config docs and Minor Documentation Changes
-- [[#2126](https://github.com/opencast/opencast/pull/2126)] -
-  Bump js-yaml from 3.14.0 to 3.14.1 in /modules/engage-ui
 - [[#2125](https://github.com/opencast/opencast/pull/2125)] -
   Standardization of Tag and Flavor handling
 - [[#2102](https://github.com/opencast/opencast/pull/2102)] -
@@ -3524,12 +3426,8 @@ Opencast 10
   Fixes Maven dependencies in modules: common-jpa-impl, common, and cover-image-impl
 - [[#2052](https://github.com/opencast/opencast/pull/2052)] -
   Check for Apereo CLA
-- [[#2027](https://github.com/opencast/opencast/pull/2027)] -
-  Bump node-sass from 4.14.1 to 5.0.0 in /modules/admin-ui-frontend
 - [[#2019](https://github.com/opencast/opencast/pull/2019)] -
   Users in the admin ui filter can be reduced via regex now.
-- [[#1959](https://github.com/opencast/opencast/pull/1959)] -
-  Bump bootstrap from 4.5.0 to 4.5.3 in /modules/lti
 - [[#1955](https://github.com/opencast/opencast/pull/1955)] -
   Remove Ingest service reference from duplicate event WOH
 - [[#1938](https://github.com/opencast/opencast/pull/1938)] -
@@ -3540,11 +3438,348 @@ Opencast 10
   Drop broken theodul-plugin-timeline-statistics
 - [[#1877](https://github.com/opencast/opencast/pull/1877)] -
   Extended CoverImageWOH to be able to use extended and series metadata
-- [[#1784](https://github.com/opencast/opencast/pull/1784)] -
-  Bump i18next-browser-languagedetector from 3.1.1 to 6.0.1 in /modules/lti
 - [[#1634](https://github.com/opencast/opencast/pull/1634)] -
   LDAP Group Mapping
 
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/2611">2611</a>] -
+  Bump @types/node from 15.0.2 to 15.3.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2610">2610</a>] -
+  Bump i18next from 20.2.2 to 20.2.4 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2609">2609</a>] -
+  Bump react-bootstrap from 1.5.2 to 1.6.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2608">2608</a>] -
+  Bump react-select from 4.3.0 to 4.3.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2607">2607</a>] -
+  Bump @types/react-dom from 17.0.3 to 17.0.5 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2606">2606</a>] -
+  Bump bootstrap from 5.0.0 to 5.0.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2601">2601</a>] -
+  Bump karma from 5.2.3 to 6.3.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2600">2600</a>] -
+  Bump grunt-karma from 4.0.0 to 4.0.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2589">2589</a>] -
+  Bump eslint from 7.25.0 to 7.26.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2588">2588</a>] -
+  Bump eslint from 7.25.0 to 7.26.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2587">2587</a>] -
+  Bump eslint from 7.25.0 to 7.26.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2586">2586</a>] -
+  Bump eslint from 7.25.0 to 7.26.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2583">2583</a>] -
+  Bump i18next-browser-languagedetector from 6.1.0 to 6.1.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2582">2582</a>] -
+  Bump bootstrap from 4.6.0 to 5.0.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2581">2581</a>] -
+  Bump @types/react from 17.0.4 to 17.0.5 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2580">2580</a>] -
+  Bump @types/node from 15.0.1 to 15.0.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2579">2579</a>] -
+  Bump node-sass from 5.0.0 to 6.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2578">2578</a>] -
+  Bump eslint from 7.25.0 to 7.26.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2577">2577</a>] -
+  Bump eslint from 7.25.0 to 7.26.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2551">2551</a>] -
+  Bump @types/react from 17.0.3 to 17.0.4 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2550">2550</a>] -
+  Bump react-i18next from 11.8.13 to 11.8.15 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2549">2549</a>] -
+  Bump @types/node from 14.14.41 to 15.0.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2548">2548</a>] -
+  Bump @types/jest from 26.0.22 to 26.0.23 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2547">2547</a>] -
+  Bump i18next from 20.2.1 to 20.2.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2542">2542</a>] -
+  Bump eslint from 7.24.0 to 7.25.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2541">2541</a>] -
+  Bump eslint from 7.24.0 to 7.25.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2540">2540</a>] -
+  Bump eslint from 7.24.0 to 7.25.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2539">2539</a>] -
+  Bump eslint from 7.24.0 to 7.25.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2538">2538</a>] -
+  Bump eslint from 7.24.0 to 7.25.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2537">2537</a>] -
+  Bump eslint from 7.24.0 to 7.25.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2533">2533</a>] -
+  Bump grunt from 1.3.0 to 1.4.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2523">2523</a>] -
+  Bump @types/node from 14.14.37 to 14.14.41 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2522">2522</a>] -
+  Bump @types/react-select from 4.0.14 to 4.0.15 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2521">2521</a>] -
+  Bump react-i18next from 11.8.12 to 11.8.13 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2505">2505</a>] -
+  Bump underscore from 1.13.0 to 1.13.1 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2503">2503</a>] -
+  Bump chromedriver from 89.0.0 to 90.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2495">2495</a>] -
+  Bump js-yaml from 4.0.0 to 4.1.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2488">2488</a>] -
+  Bump underscore from 1.12.1 to 1.13.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2487">2487</a>] -
+  Bump eslint from 7.23.0 to 7.24.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2486">2486</a>] -
+  Bump eslint from 7.23.0 to 7.24.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2485">2485</a>] -
+  Bump eslint from 7.23.0 to 7.24.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2484">2484</a>] -
+  Bump eslint from 7.23.0 to 7.24.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2483">2483</a>] -
+  Bump i18next from 20.1.0 to 20.2.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2482">2482</a>] -
+  Bump @types/react-helmet from 6.1.0 to 6.1.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2481">2481</a>] -
+  Bump eslint from 7.23.0 to 7.24.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2480">2480</a>] -
+  Bump eslint from 7.23.0 to 7.24.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2469">2469</a>] -
+  Bump @types/react-select from 3.0.21 to 4.0.14 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2468">2468</a>] -
+  Bump grunt-cli from 1.4.1 to 1.4.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2466">2466</a>] -
+  Bump y18n from 4.0.0 to 4.0.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2463">2463</a>] -
+  Bump grunt-contrib-uglify from 5.0.0 to 5.0.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2461">2461</a>] -
+  Bump y18n from 3.2.1 to 3.2.2 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2458">2458</a>] -
+  Bump eslint from 7.22.0 to 7.23.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2457">2457</a>] -
+  Bump eslint from 7.22.0 to 7.23.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2456">2456</a>] -
+  Bump eslint from 7.22.0 to 7.23.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2455">2455</a>] -
+  Bump eslint from 7.22.0 to 7.23.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2454">2454</a>] -
+  Bump @types/node from 14.14.35 to 14.14.37 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2453">2453</a>] -
+  Bump eslint from 7.22.0 to 7.23.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2452">2452</a>] -
+  Bump eslint from 7.22.0 to 7.23.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2450">2450</a>] -
+  Bump i18next from 19.9.2 to 20.1.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2449">2449</a>] -
+  Bump react-i18next from 11.8.10 to 11.8.12 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2448">2448</a>] -
+  Bump react and react-dom in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2447">2447</a>] -
+  Bump i18next-browser-languagedetector from 6.0.1 to 6.1.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2445">2445</a>] -
+  Bump @types/jest from 26.0.21 to 26.0.22 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2444">2444</a>] -
+  Bump @types/react-dom from 17.0.2 to 17.0.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2439">2439</a>] -
+  Bump grunt-cli from 1.3.2 to 1.4.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2434">2434</a>] -
+  Bump @fortawesome/free-solid-svg-icons from 5.15.2 to 5.15.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2433">2433</a>] -
+  Bump @fortawesome/fontawesome-svg-core from 1.2.34 to 1.2.35 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2432">2432</a>] -
+  Bump query-string from 6.14.1 to 7.0.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2431">2431</a>] -
+  Bump react-select from 4.2.1 to 4.3.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2430">2430</a>] -
+  Bump @types/node from 14.14.34 to 14.14.35 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2429">2429</a>] -
+  Bump @types/jest from 26.0.20 to 26.0.21 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2426">2426</a>] -
+  Bump @types/react-select from 3.0.21 to 4.0.13 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2425">2425</a>] -
+  Bump jasmine-core from 3.7.0 to 3.7.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2422">2422</a>] -
+  Bump jasmine-core from 3.6.0 to 3.7.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2412">2412</a>] -
+  Bump underscore from 1.12.0 to 1.12.1 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2408">2408</a>] -
+  Bump react-scripts from 3.4.1 to 4.0.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2406">2406</a>] -
+  Bump @types/node from 14.14.32 to 14.14.34 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2405">2405</a>] -
+  Bump react-i18next from 11.8.9 to 11.8.10 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2404">2404</a>] -
+  Bump @types/react-dom from 17.0.1 to 17.0.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2403">2403</a>] -
+  Bump eslint from 7.21.0 to 7.22.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2402">2402</a>] -
+  Bump eslint from 7.21.0 to 7.22.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2401">2401</a>] -
+  Bump eslint from 7.21.0 to 7.22.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2400">2400</a>] -
+  Bump eslint from 7.21.0 to 7.22.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2399">2399</a>] -
+  Bump eslint from 7.21.0 to 7.22.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2398">2398</a>] -
+  Bump eslint from 7.21.0 to 7.22.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2389">2389</a>] -
+  Bump i18next from 19.8.9 to 19.9.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2385">2385</a>] -
+  Bump @types/react from 17.0.2 to 17.0.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2384">2384</a>] -
+  Bump react and react-dom in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2383">2383</a>] -
+  Bump @types/node from 14.14.31 to 14.14.32 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2382">2382</a>] -
+  Bump react-i18next from 11.0.0 to 11.8.9 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2381">2381</a>] -
+  Bump react-select from 4.1.0 to 4.2.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2380">2380</a>] -
+  Bump chromedriver from 88.0.0 to 89.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2379">2379</a>] -
+  Bump jquery from 3.5.1 to 3.6.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2378">2378</a>] -
+  Bump jquery from 3.5.1 to 3.6.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2377">2377</a>] -
+  Bump markdownlint-cli from 0.27.0 to 0.27.1 in /docs/guides</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2376">2376</a>] -
+  Bump jquery from 3.5.1 to 3.6.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2375">2375</a>] -
+  Bump markdownlint-cli from 0.26.0 to 0.27.0 in /docs/guides</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2372">2372</a>] -
+  Bump query-string from 6.14.0 to 6.14.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2369">2369</a>] -
+  Bump react-dom from 16.13.1 to 16.14.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2367">2367</a>] -
+  Bump eslint from 7.20.0 to 7.21.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2366">2366</a>] -
+  Bump eslint from 7.20.0 to 7.21.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2365">2365</a>] -
+  Bump eslint from 7.20.0 to 7.21.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2364">2364</a>] -
+  Bump eslint from 7.20.0 to 7.21.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2363">2363</a>] -
+  Bump eslint from 7.20.0 to 7.21.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2362">2362</a>] -
+  Bump eslint from 7.20.0 to 7.21.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2350">2350</a>] -
+  Bump react from 16.13.1 to 16.14.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2349">2349</a>] -
+  Bump @types/jest from 26.0.14 to 26.0.20 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2348">2348</a>] -
+  Bump typescript from 3.6.3 to 3.9.9 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2347">2347</a>] -
+  Bump @fortawesome/react-fontawesome from 0.1.11 to 0.1.14 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2345">2345</a>] -
+  Bump @types/react-dom from 16.9.8 to 17.0.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2342">2342</a>] -
+  Bump @types/node from 14.14.21 to 14.14.31 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2341">2341</a>] -
+  Bump i18next from 17.3.1 to 19.8.9 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2337">2337</a>] -
+  Bump url-parse from 1.4.7 to 1.5.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2326">2326</a>] -
+  Bump @types/react from 16.9.50 to 17.0.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2325">2325</a>] -
+  Bump eslint from 7.19.0 to 7.20.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2324">2324</a>] -
+  Bump grunt-contrib-cssmin from 3.0.0 to 4.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2323">2323</a>] -
+  Bump eslint from 7.19.0 to 7.20.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2322">2322</a>] -
+  Bump eslint from 7.19.0 to 7.20.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2321">2321</a>] -
+  Bump eslint from 7.19.0 to 7.20.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2320">2320</a>] -
+  Bump eslint from 7.19.0 to 7.20.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2319">2319</a>] -
+  Bump eslint from 7.19.0 to 7.20.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2315">2315</a>] -
+  Bump query-string from 6.13.1 to 6.14.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2303">2303</a>] -
+  Bump react-select from 3.1.0 to 4.1.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2288">2288</a>] -
+  Bump eslint-plugin-header from 3.1.0 to 3.1.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2287">2287</a>] -
+  Bump eslint-plugin-header from 3.1.0 to 3.1.1 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2286">2286</a>] -
+  Bump eslint-plugin-header from 3.1.0 to 3.1.1 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2285">2285</a>] -
+  Bump eslint-plugin-header from 3.1.0 to 3.1.1 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2284">2284</a>] -
+  Bump eslint-plugin-header from 3.1.0 to 3.1.1 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2283">2283</a>] -
+  Bump eslint-plugin-header from 3.1.0 to 3.1.1 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2269">2269</a>] -
+  Bump eslint from 7.18.0 to 7.19.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2268">2268</a>] -
+  Bump eslint from 7.18.0 to 7.19.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2267">2267</a>] -
+  Bump eslint from 7.18.0 to 7.19.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2266">2266</a>] -
+  Bump eslint from 7.18.0 to 7.19.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2265">2265</a>] -
+  Bump eslint from 7.18.0 to 7.19.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2264">2264</a>] -
+  Bump eslint from 7.18.0 to 7.19.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2252">2252</a>] -
+  Bump bootstrap from 4.5.3 to 4.6.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2250">2250</a>] -
+  Bump chromedriver from 87.0.7 to 88.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2232">2232</a>] -
+  Bump bower from 1.8.10 to 1.8.12 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2231">2231</a>] -
+  Bump chromedriver from 87.0.5 to 87.0.7 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2229">2229</a>] -
+  Bump @fortawesome/fontawesome-svg-core from 1.2.30 to 1.2.34 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2227">2227</a>] -
+  Bump @types/node from 14.11.2 to 14.14.21 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2224">2224</a>] -
+  Bump eslint from 7.17.0 to 7.18.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2223">2223</a>] -
+  Bump eslint from 7.17.0 to 7.18.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2222">2222</a>] -
+  Bump eslint from 7.17.0 to 7.18.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2221">2221</a>] -
+  Bump eslint from 7.17.0 to 7.18.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2220">2220</a>] -
+  Bump eslint from 7.17.0 to 7.18.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2219">2219</a>] -
+  Bump eslint from 7.17.0 to 7.18.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2217">2217</a>] -
+  Bump bower from 1.8.8 to 1.8.10 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2200">2200</a>] -
+  Bump chromedriver from 87.0.4 to 87.0.5 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2195">2195</a>] -
+  Bump eslint from 7.16.0 to 7.17.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2194">2194</a>] -
+  Bump eslint from 7.16.0 to 7.17.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2193">2193</a>] -
+  Bump eslint from 7.16.0 to 7.17.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2192">2192</a>] -
+  Bump eslint from 7.16.0 to 7.17.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2191">2191</a>] -
+  Bump eslint from 7.16.0 to 7.17.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2190">2190</a>] -
+  Bump eslint from 7.16.0 to 7.17.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2189">2189</a>] -
+  Bump js-yaml from 3.14.1 to 4.0.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2175">2175</a>] -
+  Bump eslint from 7.15.0 to 7.16.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2174">2174</a>] -
+  Bump eslint from 7.15.0 to 7.16.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2173">2173</a>] -
+  Bump eslint from 7.15.0 to 7.16.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2172">2172</a>] -
+  Bump eslint from 7.15.0 to 7.16.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2171">2171</a>] -
+  Bump eslint from 7.15.0 to 7.16.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2170">2170</a>] -
+  Bump eslint from 7.15.0 to 7.16.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2159">2159</a>] -
+  Bump markdownlint-cli from 0.25.0 to 0.26.0 in /docs/guides</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2126">2126</a>] -
+  Bump js-yaml from 3.14.0 to 3.14.1 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/2027">2027</a>] -
+  Bump node-sass from 4.14.1 to 5.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1959">1959</a>] -
+  Bump bootstrap from 4.5.0 to 4.5.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1784">1784</a>] -
+  Bump i18next-browser-languagedetector from 3.1.1 to 6.0.1 in /modules/lti</li>
+</ul>
+</details>
 
 Opencast 9
 ----------
@@ -3795,8 +4030,6 @@ Opencast 9
   Changed the content-type of the adopter POST request.
 - [[#2464](https://github.com/opencast/opencast/pull/2464)] -
   Use a different ServiceType for the Standalone Video Editor on the presentation Node
-- [[#2443](https://github.com/opencast/opencast/pull/2443)] -
-  Bump guava from 24.1.1-jre to 30.1.1-jre
 - [[#2437](https://github.com/opencast/opencast/pull/2437)] -
   Updated new editor with new frontend-release 2021-03-24
 - [[#2427](https://github.com/opencast/opencast/pull/2427)] -
@@ -3831,6 +4064,13 @@ Opencast 9
   Only persist users with specific LTI role
 - [[#1792](https://github.com/opencast/opencast/pull/1792)] -
   Standalone downloads Paella plugin
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/2443">2443</a>] -
+  Bump guava from 24.1.1-jre to 30.1.1-jre</li>
+</ul>
+</details>
 
 ### Opencast 9.3
 
@@ -4061,48 +4301,24 @@ Opencast 9
   Docs: admin-ui moved to admin-ui-frontend
 - [[#1898](https://github.com/opencast/opencast/pull/1898)] -
   Add preencode option to partialImport WOH
-- [[#1897](https://github.com/opencast/opencast/pull/1897)] -
-  Bump markdownlint-cli from 0.23.2 to 0.24.0 in /docs/guides
-- [[#1896](https://github.com/opencast/opencast/pull/1896)] -
-  Bump @types/react from 16.9.2 to 16.9.50 in /modules/lti
 - [[#1895](https://github.com/opencast/opencast/pull/1895)] -
   Development Runtime Dependency Containers
 - [[#1890](https://github.com/opencast/opencast/pull/1890)] -
   Fix error while searching episode by browser
-- [[#1889](https://github.com/opencast/opencast/pull/1889)] -
-  Bump @types/react-select from 3.0.14 to 3.0.21 in /modules/lti
-- [[#1888](https://github.com/opencast/opencast/pull/1888)] -
-  Bump bootbox from 5.4.0 to 5.4.1 in /modules/engage-ui
 - [[#1886](https://github.com/opencast/opencast/pull/1886)] -
   Remove Spring's Patched JDOM
-- [[#1884](https://github.com/opencast/opencast/pull/1884)] -
-  Bump eslint from 7.9.0 to 7.10.0 in /modules/admin-ui-frontend
-- [[#1883](https://github.com/opencast/opencast/pull/1883)] -
-  Bump eslint from 7.9.0 to 7.10.0 in /modules/engage-theodul-core
-- [[#1882](https://github.com/opencast/opencast/pull/1882)] -
-  Bump eslint from 7.9.0 to 7.10.0 in /modules/runtime-info-ui
-- [[#1881](https://github.com/opencast/opencast/pull/1881)] -
-  Bump eslint from 7.9.0 to 7.10.0 in /modules/engage-ui
-- [[#1880](https://github.com/opencast/opencast/pull/1880)] -
-  Bump eslint from 7.9.0 to 7.10.0 in /modules/engage-paella-player
-- [[#1879](https://github.com/opencast/opencast/pull/1879)] -
-  Bump eslint from 7.9.0 to 7.10.0 in /modules/runtime-info-ui-ng
 - [[#1876](https://github.com/opencast/opencast/pull/1876)] -
   OSGi Dependency Update
 - [[#1875](https://github.com/opencast/opencast/pull/1875)] -
   Update NodeJS
 - [[#1874](https://github.com/opencast/opencast/pull/1874)] -
   PostgreSQL and auto-generated databases
-- [[#1873](https://github.com/opencast/opencast/pull/1873)] -
-  Bump karma from 5.2.2 to 5.2.3 in /modules/admin-ui-frontend
 - [[#1872](https://github.com/opencast/opencast/pull/1872)] -
   Fix Version Check
 - [[#1871](https://github.com/opencast/opencast/pull/1871)] -
   Workflow conditioner to handle floats correctly
 - [[#1869](https://github.com/opencast/opencast/pull/1869)] -
   Extend the documentation concerning multiple audio tracks
-- [[#1868](https://github.com/opencast/opencast/pull/1868)] -
-  Bump @types/node from 12.7.5 to 14.11.2 in /modules/lti
 - [[#1867](https://github.com/opencast/opencast/pull/1867)] -
   Update Mock Data
 - [[#1866](https://github.com/opencast/opencast/pull/1866)] -
@@ -4111,46 +4327,14 @@ Opencast 9
   User and role provider for Canvas LMS
 - [[#1857](https://github.com/opencast/opencast/pull/1857)] -
   Refactor Metadata classes (Updated version)
-- [[#1854](https://github.com/opencast/opencast/pull/1854)] -
-  Bump @types/jest from 24.0.18 to 26.0.14 in /modules/lti
-- [[#1844](https://github.com/opencast/opencast/pull/1844)] -
-  Bump eslint from 7.8.1 to 7.9.0 in /modules/admin-ui-frontend
-- [[#1843](https://github.com/opencast/opencast/pull/1843)] -
-  Bump eslint from 7.8.1 to 7.9.0 in /modules/engage-ui
-- [[#1841](https://github.com/opencast/opencast/pull/1841)] -
-  Bump eslint from 7.8.1 to 7.9.0 in /modules/runtime-info-ui
-- [[#1840](https://github.com/opencast/opencast/pull/1840)] -
-  Bump eslint from 7.8.1 to 7.9.0 in /modules/engage-paella-player
-- [[#1839](https://github.com/opencast/opencast/pull/1839)] -
-  Bump eslint from 7.8.1 to 7.9.0 in /modules/runtime-info-ui-ng
-- [[#1838](https://github.com/opencast/opencast/pull/1838)] -
-  Bump eslint from 7.8.1 to 7.9.0 in /modules/engage-theodul-core
 - [[#1833](https://github.com/opencast/opencast/pull/1833)] -
   Add Merge Conflict Check
 - [[#1831](https://github.com/opencast/opencast/pull/1831)] -
   Clarify the documentation on when new source tracks can be added
-- [[#1830](https://github.com/opencast/opencast/pull/1830)] -
-  Bump karma from 5.2.1 to 5.2.2 in /modules/admin-ui-frontend
-- [[#1829](https://github.com/opencast/opencast/pull/1829)] -
-  Bump chromedriver from 85.0.0 to 85.0.1 in /modules/admin-ui-frontend
-- [[#1825](https://github.com/opencast/opencast/pull/1825)] -
-  Bump eslint from 7.7.0 to 7.8.1 in /modules/admin-ui-frontend
-- [[#1824](https://github.com/opencast/opencast/pull/1824)] -
-  Bump karma from 5.1.1 to 5.2.1 in /modules/admin-ui-frontend
 - [[#1823](https://github.com/opencast/opencast/pull/1823)] -
   Update Studio from 2020-06-25 to 2020-09-14
-- [[#1822](https://github.com/opencast/opencast/pull/1822)] -
-  Bump eslint from 7.7.0 to 7.8.1 in /modules/runtime-info-ui-ng
-- [[#1819](https://github.com/opencast/opencast/pull/1819)] -
-  Bump eslint from 7.7.0 to 7.8.1 in /modules/engage-theodul-core
-- [[#1817](https://github.com/opencast/opencast/pull/1817)] -
-  Bump eslint from 7.7.0 to 7.8.1 in /modules/engage-paella-player
-- [[#1816](https://github.com/opencast/opencast/pull/1816)] -
-  Bump eslint from 7.7.0 to 7.8.1 in /modules/engage-ui
 - [[#1814](https://github.com/opencast/opencast/pull/1814)] -
   Add a 'defaultValue' to getComponentContextProperty
-- [[#1808](https://github.com/opencast/opencast/pull/1808)] -
-  Bump underscore from 1.10.2 to 1.11.0 in /modules/engage-ui
 - [[#1801](https://github.com/opencast/opencast/pull/1801)] -
   Remove Unused Servicewarnings Backend
 - [[#1800](https://github.com/opencast/opencast/pull/1800)] -
@@ -4181,14 +4365,6 @@ Opencast 9
   HTTPS with Apache httpd
 - [[#1746](https://github.com/opencast/opencast/pull/1746)] -
   VideoGrid WOH
-- [[#1743](https://github.com/opencast/opencast/pull/1743)] -
-  Bump @types/react-helmet from 5.0.16 to 6.1.0 in /modules/lti
-- [[#1728](https://github.com/opencast/opencast/pull/1728)] -
-  Bump @types/react-dom from 16.9.0 to 16.9.8 in /modules/lti
-- [[#1727](https://github.com/opencast/opencast/pull/1727)] -
-  Bump react-helmet from 5.2.1 to 6.1.0 in /modules/lti
-- [[#1724](https://github.com/opencast/opencast/pull/1724)] -
-  Bump react-i18next from 10.13.2 to 11.0.0 in /modules/lti
 - [[#1719](https://github.com/opencast/opencast/pull/1719)] -
   Download button in theodul player
 - [[#1684](https://github.com/opencast/opencast/pull/1684)] -
@@ -4201,120 +4377,30 @@ Opencast 9
   Shibboleth dynamic login handler
 - [[#1580](https://github.com/opencast/opencast/pull/1580)] -
   TagWorkflowOperationHandler now allows wildcards in target flavor
-- [[#1825](https://github.com/opencast/opencast/pull/1825)] -
-  Bump eslint from 7.7.0 to 7.8.1 in /modules/admin-ui-frontend
-- [[#1824](https://github.com/opencast/opencast/pull/1824)] -
-  Bump karma from 5.1.1 to 5.2.1 in /modules/admin-ui-frontend
-- [[#1822](https://github.com/opencast/opencast/pull/1822)] -
-  Bump eslint from 7.7.0 to 7.8.1 in /modules/runtime-info-ui-ng
-- [[#1819](https://github.com/opencast/opencast/pull/1819)] -
-  Bump eslint from 7.7.0 to 7.8.1 in /modules/engage-theodul-core
-- [[#1817](https://github.com/opencast/opencast/pull/1817)] -
-  Bump eslint from 7.7.0 to 7.8.1 in /modules/engage-paella-player
-- [[#1816](https://github.com/opencast/opencast/pull/1816)] -
-  Bump eslint from 7.7.0 to 7.8.1 in /modules/engage-ui
-- [[#1813](https://github.com/opencast/opencast/pull/1813)] -
-  Bump eslint from 7.7.0 to 7.8.1 in /modules/runtime-info-ui
-- [[#1811](https://github.com/opencast/opencast/pull/1811)] -
-  Bump chromedriver from 84.0.1 to 85.0.0 in /modules/admin-ui-frontend
-- [[#1810](https://github.com/opencast/opencast/pull/1810)] -
-  Bump eslint-plugin-header from 3.0.0 to 3.1.0 in /modules/admin-ui-frontend
-- [[#1809](https://github.com/opencast/opencast/pull/1809)] -
-  Bump eslint-plugin-header from 3.0.0 to 3.1.0 in /modules/runtime-info-ui
-- [[#1808](https://github.com/opencast/opencast/pull/1808)] -
-  Bump underscore from 1.10.2 to 1.11.0 in /modules/engage-ui
-- [[#1807](https://github.com/opencast/opencast/pull/1807)] -
-  Bump eslint-plugin-header from 3.0.0 to 3.1.0 in /modules/engage-ui
-- [[#1806](https://github.com/opencast/opencast/pull/1806)] -
-  Bump eslint-plugin-header from 3.0.0 to 3.1.0 in /modules/engage-theodul-core
-- [[#1803](https://github.com/opencast/opencast/pull/1803)] -
-  Bump eslint-plugin-header from 3.0.0 to 3.1.0 in /modules/engage-paella-player
-- [[#1802](https://github.com/opencast/opencast/pull/1802)] -
-  Bump eslint-plugin-header from 3.0.0 to 3.1.0 in /modules/runtime-info-ui-ng
-- [[#1785](https://github.com/opencast/opencast/pull/1785)] -
-  Bump grunt from 1.2.1 to 1.3.0 in /modules/admin-ui-frontend
-- [[#1781](https://github.com/opencast/opencast/pull/1781)] -
-  Bump eslint from 7.6.0 to 7.7.0 in /modules/engage-paella-player
-- [[#1780](https://github.com/opencast/opencast/pull/1780)] -
-  Bump eslint from 7.6.0 to 7.7.0 in /modules/admin-ui-frontend
-- [[#1777](https://github.com/opencast/opencast/pull/1777)] -
-  Bump eslint from 7.6.0 to 7.7.0 in /modules/engage-theodul-core
-- [[#1776](https://github.com/opencast/opencast/pull/1776)] -
-  Bump eslint from 7.6.0 to 7.7.0 in /modules/engage-ui
-- [[#1775](https://github.com/opencast/opencast/pull/1775)] -
-  Bump eslint from 7.6.0 to 7.7.0 in /modules/runtime-info-ui-ng
-- [[#1774](https://github.com/opencast/opencast/pull/1774)] -
-  Bump eslint from 7.6.0 to 7.7.0 in /modules/runtime-info-ui
 - [[#1768](https://github.com/opencast/opencast/pull/1768)] -
   Remove Empty Test Classes
 - [[#1766](https://github.com/opencast/opencast/pull/1766)] -
   Fix minor typos
-- [[#1765](https://github.com/opencast/opencast/pull/1765)] -
-  Bump karma-jasmine from 4.0.0 to 4.0.1 in /modules/admin-ui-frontend
 - [[#1763](https://github.com/opencast/opencast/pull/1763)] -
   Fix for issue 1280:  Notification of Newer Opencast Version in Admin UI
 - [[#1762](https://github.com/opencast/opencast/pull/1762)] -
   Fixed a typo in es.upv.paella.opencast.loader.md
-- [[#1761](https://github.com/opencast/opencast/pull/1761)] -
-  Bump karma-jasmine from 3.3.1 to 4.0.0 in /modules/admin-ui-frontend
 - [[#1760](https://github.com/opencast/opencast/pull/1760)] -
   User interface to sort by number of publications
 - [[#1759](https://github.com/opencast/opencast/pull/1759)] -
   Create admin user cleanup
 - [[#1758](https://github.com/opencast/opencast/pull/1758)] -
   Fix events sorted by publication
-- [[#1742](https://github.com/opencast/opencast/pull/1742)] -
-  Bump eslint from 7.5.0 to 7.6.0 in /modules/engage-paella-player
-- [[#1741](https://github.com/opencast/opencast/pull/1741)] -
-  Bump eslint from 7.5.0 to 7.6.0 in /modules/admin-ui-frontend
-- [[#1739](https://github.com/opencast/opencast/pull/1739)] -
-  Bump eslint from 7.5.0 to 7.6.0 in /modules/runtime-info-ui
-- [[#1738](https://github.com/opencast/opencast/pull/1738)] -
-  Bump eslint from 7.5.0 to 7.6.0 in /modules/engage-theodul-core
-- [[#1737](https://github.com/opencast/opencast/pull/1737)] -
-  Bump eslint from 7.5.0 to 7.6.0 in /modules/engage-ui
-- [[#1736](https://github.com/opencast/opencast/pull/1736)] -
-  Bump eslint from 7.5.0 to 7.6.0 in /modules/runtime-info-ui-ng
-- [[#1734](https://github.com/opencast/opencast/pull/1734)] -
-  Bump autoprefixer from 9.8.5 to 9.8.6 in /modules/admin-ui-frontend
-- [[#1722](https://github.com/opencast/opencast/pull/1722)] -
-  Bump karma from 5.1.0 to 5.1.1 in /modules/admin-ui-frontend
-- [[#1717](https://github.com/opencast/opencast/pull/1717)] -
-  Bump karma-coverage from 2.0.2 to 2.0.3 in /modules/admin-ui-frontend
-- [[#1715](https://github.com/opencast/opencast/pull/1715)] -
-  Bump jasmine-core from 3.5.0 to 3.6.0 in /modules/admin-ui-frontend
-- [[#1714](https://github.com/opencast/opencast/pull/1714)] -
-  Bump chromedriver from 84.0.0 to 84.0.1 in /modules/admin-ui-frontend
 - [[#1713](https://github.com/opencast/opencast/pull/1713)] -
   Fixed double encoding of search-field in engage-ui
 - [[#1710](https://github.com/opencast/opencast/pull/1710)] -
   Added Elasticsearch dependency to developer installation guide
 - [[#1709](https://github.com/opencast/opencast/pull/1709)] -
   Use FontAwesome Icon
-- [[#1708](https://github.com/opencast/opencast/pull/1708)] -
-  Bump eslint from 7.4.0 to 7.5.0 in /modules/engage-paella-player
-- [[#1707](https://github.com/opencast/opencast/pull/1707)] -
-  Bump eslint from 7.4.0 to 7.5.0 in /modules/admin-ui-frontend
-- [[#1706](https://github.com/opencast/opencast/pull/1706)] -
-  Bump eslint from 7.4.0 to 7.5.0 in /modules/engage-ui
-- [[#1705](https://github.com/opencast/opencast/pull/1705)] -
-  Bump eslint from 7.4.0 to 7.5.0 in /modules/runtime-info-ui-ng
-- [[#1704](https://github.com/opencast/opencast/pull/1704)] -
-  Bump eslint from 7.4.0 to 7.5.0 in /modules/runtime-info-ui
-- [[#1703](https://github.com/opencast/opencast/pull/1703)] -
-  Bump eslint from 7.4.0 to 7.5.0 in /modules/lti
-- [[#1702](https://github.com/opencast/opencast/pull/1702)] -
-  Bump eslint from 7.4.0 to 7.5.0 in /modules/engage-theodul-core
 - [[#1701](https://github.com/opencast/opencast/pull/1701)] -
   Window Selection Style
 - [[#1700](https://github.com/opencast/opencast/pull/1700)] -
   Document bundle:watch
-- [[#1699](https://github.com/opencast/opencast/pull/1699)] -
-  Bump chromedriver from 83.0.1 to 84.0.0 in /modules/admin-ui-frontend
-- [[#1698](https://github.com/opencast/opencast/pull/1698)] -
-  Bump grunt-contrib-connect from 2.1.0 to 3.0.0 in /modules/admin-ui-frontend
-- [[#1697](https://github.com/opencast/opencast/pull/1697)] -
-  Bump grunt-contrib-uglify from 4.0.1 to 5.0.0 in /modules/admin-ui-frontend
 - [[#1696](https://github.com/opencast/opencast/pull/1696)] -
   [Security] Bump lodash from 4.17.15 to 4.17.19 in /modules/runtime-info-ui
 - [[#1695](https://github.com/opencast/opencast/pull/1695)] -
@@ -4325,202 +4411,54 @@ Opencast 9
   [Security] Bump lodash from 4.17.15 to 4.17.19 in /modules/engage-theodul-core
 - [[#1692](https://github.com/opencast/opencast/pull/1692)] -
   [Security] Bump lodash from 4.17.15 to 4.17.19 in /modules/engage-ui
-- [[#1691](https://github.com/opencast/opencast/pull/1691)] -
-  Bump lodash from 4.17.15 to 4.17.19 in /modules/engage-paella-player
-- [[#1689](https://github.com/opencast/opencast/pull/1689)] -
-  Bump autoprefixer from 9.8.4 to 9.8.5 in /modules/admin-ui-frontend
-- [[#1687](https://github.com/opencast/opencast/pull/1687)] -
-  Bump grunt from 1.2.0 to 1.2.1 in /modules/admin-ui-frontend
-- [[#1683](https://github.com/opencast/opencast/pull/1683)] -
-  Bump chromedriver from 83.0.0 to 83.0.1 in /modules/admin-ui-frontend
-- [[#1681](https://github.com/opencast/opencast/pull/1681)] -
-  Bump eslint from 7.3.1 to 7.4.0 in /modules/engage-paella-player
-- [[#1680](https://github.com/opencast/opencast/pull/1680)] -
-  Bump eslint from 7.3.1 to 7.4.0 in /modules/admin-ui-frontend
-- [[#1679](https://github.com/opencast/opencast/pull/1679)] -
-  Bump grunt from 1.1.0 to 1.2.0 in /modules/admin-ui-frontend
-- [[#1678](https://github.com/opencast/opencast/pull/1678)] -
-  Bump eslint from 7.3.1 to 7.4.0 in /modules/lti
-- [[#1677](https://github.com/opencast/opencast/pull/1677)] -
-  Bump eslint from 7.3.1 to 7.4.0 in /modules/engage-ui
-- [[#1676](https://github.com/opencast/opencast/pull/1676)] -
-  Bump eslint from 7.3.1 to 7.4.0 in /modules/runtime-info-ui
-- [[#1675](https://github.com/opencast/opencast/pull/1675)] -
-  Bump eslint from 7.3.1 to 7.4.0 in /modules/engage-theodul-core
-- [[#1674](https://github.com/opencast/opencast/pull/1674)] -
-  Bump eslint from 7.3.1 to 7.4.0 in /modules/runtime-info-ui-ng
 - [[#1671](https://github.com/opencast/opencast/pull/1671)] -
   Python < 3.0 requirement deleted
 - [[#1670](https://github.com/opencast/opencast/pull/1670)] -
   Python < 3.0 requirement deleted
 - [[#1668](https://github.com/opencast/opencast/pull/1668)] -
   Improved ffmpeg profile for extracting the last image of a video in P…
-- [[#1666](https://github.com/opencast/opencast/pull/1666)] -
-  Bump markdownlint-cli from 0.23.1 to 0.23.2 in /docs/guides
-- [[#1665](https://github.com/opencast/opencast/pull/1665)] -
-  Bump http-errors from 1.7.3 to 1.8.0 in /modules/engage-paella-player
 - [[#1663](https://github.com/opencast/opencast/pull/1663)] -
   Enable publish-configure to publish to streaming
-- [[#1660](https://github.com/opencast/opencast/pull/1660)] -
-  Bump autoprefixer from 9.8.2 to 9.8.4 in /modules/admin-ui-frontend
-- [[#1658](https://github.com/opencast/opencast/pull/1658)] -
-  Bump eslint from 7.3.0 to 7.3.1 in /modules/engage-paella-player
-- [[#1656](https://github.com/opencast/opencast/pull/1656)] -
-  Bump eslint from 7.3.0 to 7.3.1 in /modules/admin-ui-frontend
-- [[#1655](https://github.com/opencast/opencast/pull/1655)] -
-  Bump eslint from 7.3.0 to 7.3.1 in /modules/lti
-- [[#1654](https://github.com/opencast/opencast/pull/1654)] -
-  Bump eslint from 7.3.0 to 7.3.1 in /modules/engage-theodul-core
-- [[#1653](https://github.com/opencast/opencast/pull/1653)] -
-  Bump eslint from 7.3.0 to 7.3.1 in /modules/runtime-info-ui
-- [[#1652](https://github.com/opencast/opencast/pull/1652)] -
-  Bump eslint from 7.3.0 to 7.3.1 in /modules/runtime-info-ui-ng
-- [[#1651](https://github.com/opencast/opencast/pull/1651)] -
-  Bump eslint from 7.3.0 to 7.3.1 in /modules/engage-ui
-- [[#1650](https://github.com/opencast/opencast/pull/1650)] -
-  Bump eslint from 7.2.0 to 7.3.0 in /modules/engage-paella-player
-- [[#1649](https://github.com/opencast/opencast/pull/1649)] -
-  Bump eslint from 7.2.0 to 7.3.0 in /modules/admin-ui-frontend
-- [[#1648](https://github.com/opencast/opencast/pull/1648)] -
-  Bump autoprefixer from 9.8.0 to 9.8.2 in /modules/admin-ui-frontend
-- [[#1647](https://github.com/opencast/opencast/pull/1647)] -
-  Bump eslint from 7.2.0 to 7.3.0 in /modules/engage-ui
-- [[#1646](https://github.com/opencast/opencast/pull/1646)] -
-  Bump eslint from 7.2.0 to 7.3.0 in /modules/runtime-info-ui
-- [[#1645](https://github.com/opencast/opencast/pull/1645)] -
-  Bump eslint from 7.2.0 to 7.3.0 in /modules/lti
-- [[#1644](https://github.com/opencast/opencast/pull/1644)] -
-  Bump eslint from 7.2.0 to 7.3.0 in /modules/engage-theodul-core
-- [[#1643](https://github.com/opencast/opencast/pull/1643)] -
-  Bump eslint from 7.2.0 to 7.3.0 in /modules/runtime-info-ui-ng
 - [[#1640](https://github.com/opencast/opencast/pull/1640)] -
   Fix Capture Agent API REST Docs
-- [[#1638](https://github.com/opencast/opencast/pull/1638)] -
-  Bump karma from 5.0.9 to 5.1.0 in /modules/admin-ui-frontend
 - [[#1637](https://github.com/opencast/opencast/pull/1637)] -
   Fix: Multiple identical workflow IDs prevent Opencast form starting properly
 - [[#1635](https://github.com/opencast/opencast/pull/1635)] -
   Admin UI embedding code
-- [[#1632](https://github.com/opencast/opencast/pull/1632)] -
-  Bump eslint from 6.8.0 to 7.2.0 in /modules/engage-paella-player
-- [[#1631](https://github.com/opencast/opencast/pull/1631)] -
-  Bump eslint from 7.1.0 to 7.2.0 in /modules/runtime-info-ui
 - [[#1630](https://github.com/opencast/opencast/pull/1630)] -
   Fix Series in Media Module
 - [[#1629](https://github.com/opencast/opencast/pull/1629)] -
   LTI User Data
-- [[#1628](https://github.com/opencast/opencast/pull/1628)] -
-  Bump eslint from 6.8.0 to 7.2.0 in /modules/admin-ui-frontend
-- [[#1627](https://github.com/opencast/opencast/pull/1627)] -
-  Bump eslint from 6.8.0 to 7.2.0 in /modules/engage-theodul-core
-- [[#1626](https://github.com/opencast/opencast/pull/1626)] -
-  Bump eslint from 6.8.0 to 7.2.0 in /modules/lti
-- [[#1625](https://github.com/opencast/opencast/pull/1625)] -
-  Bump eslint from 6.8.0 to 7.2.0 in /modules/engage-ui
-- [[#1624](https://github.com/opencast/opencast/pull/1624)] -
-  Bump eslint from 6.8.0 to 7.2.0 in /modules/runtime-info-ui-ng
 - [[#1623](https://github.com/opencast/opencast/pull/1623)] -
   Update Node.js
 - [[#1621](https://github.com/opencast/opencast/pull/1621)] -
   [Security] Bump websocket-extensions from 0.1.3 to 0.1.4 in /modules/admin-ui-frontend
-- [[#1619](https://github.com/opencast/opencast/pull/1619)] -
-  Bump angular from 1.7.9 to 1.8.0 in /modules/runtime-info-ui
-- [[#1618](https://github.com/opencast/opencast/pull/1618)] -
-  Bump angular-route from 1.7.9 to 1.8.0 in /modules/runtime-info-ui
-- [[#1614](https://github.com/opencast/opencast/pull/1614)] -
-  Bump karma-jasmine from 3.2.0 to 3.3.1 in /modules/admin-ui-frontend
-- [[#1606](https://github.com/opencast/opencast/pull/1606)] -
-  Bump karma-jasmine from 3.1.1 to 3.2.0 in /modules/admin-ui-frontend
 - [[#1605](https://github.com/opencast/opencast/pull/1605)] -
   Update Several JavaScript Libraries
-- [[#1601](https://github.com/opencast/opencast/pull/1601)] -
-  Bump js-yaml from 3.13.1 to 3.14.0 in /modules/engage-ui
-- [[#1599](https://github.com/opencast/opencast/pull/1599)] -
-  Bump eslint from 6.8.0 to 7.1.0 in /modules/runtime-info-ui
-- [[#1591](https://github.com/opencast/opencast/pull/1591)] -
-  Bump karma from 5.0.8 to 5.0.9 in /modules/admin-ui-frontend
-- [[#1590](https://github.com/opencast/opencast/pull/1590)] -
-  Bump chromedriver from 81.0.0 to 83.0.0 in /modules/admin-ui-frontend
-- [[#1587](https://github.com/opencast/opencast/pull/1587)] -
-  Bump karma from 5.0.5 to 5.0.8 in /modules/admin-ui-frontend
-- [[#1585](https://github.com/opencast/opencast/pull/1585)] -
-  Bump http-proxy from 1.18.0 to 1.18.1 in /modules/engage-paella-player
-- [[#1584](https://github.com/opencast/opencast/pull/1584)] -
-  Bump autoprefixer from 9.7.6 to 9.8.0 in /modules/admin-ui-frontend
-- [[#1582](https://github.com/opencast/opencast/pull/1582)] -
-  Bump markdownlint-cli from 0.23.0 to 0.23.1 in /docs/guides
-- [[#1569](https://github.com/opencast/opencast/pull/1569)] -
-  Bump karma from 5.0.4 to 5.0.5 in /modules/admin-ui-frontend
 - [[#1567](https://github.com/opencast/opencast/pull/1567)] -
   Update Python on Travis CI
 - [[#1566](https://github.com/opencast/opencast/pull/1566)] -
   Switching to Paella player by default
-- [[#1563](https://github.com/opencast/opencast/pull/1563)] -
-  Bump node-sass from 4.14.0 to 4.14.1 in /modules/admin-ui-frontend
-- [[#1562](https://github.com/opencast/opencast/pull/1562)] -
-  Bump jquery from 3.5.0 to 3.5.1 in /modules/runtime-info-ui-ng
-- [[#1561](https://github.com/opencast/opencast/pull/1561)] -
-  Bump markdownlint-cli from 0.22.0 to 0.23.0 in /docs/guides
-- [[#1560](https://github.com/opencast/opencast/pull/1560)] -
-  Bump jquery from 3.5.0 to 3.5.1 in /modules/runtime-info-ui
-- [[#1559](https://github.com/opencast/opencast/pull/1559)] -
-  Bump jquery from 3.5.0 to 3.5.1 in /modules/engage-ui
-- [[#1558](https://github.com/opencast/opencast/pull/1558)] -
-  Bump jquery from 3.5.0 to 3.5.1 in /modules/lti
-- [[#1555](https://github.com/opencast/opencast/pull/1555)] -
-  Bump karma from 5.0.3 to 5.0.4 in /modules/admin-ui-frontend
 - [[#1553](https://github.com/opencast/opencast/pull/1553)] -
   Fix custom roles in admin ui
-- [[#1552](https://github.com/opencast/opencast/pull/1552)] -
-  Bump karma from 5.0.2 to 5.0.3 in /modules/admin-ui-frontend
 - [[#1549](https://github.com/opencast/opencast/pull/1549)] -
   Resolution based encoding extension: if-width-or-height-geq-
 - [[#1548](https://github.com/opencast/opencast/pull/1548)] -
   #1541 adding write access parameter to events and series endpoint
 - [[#1547](https://github.com/opencast/opencast/pull/1547)] -
   Download paella source code from github instead of using npm + paella update to 6.4.3
-- [[#1544](https://github.com/opencast/opencast/pull/1544)] -
-  Bump node-sass from 4.13.1 to 4.14.0 in /modules/admin-ui-frontend
 - [[#1536](https://github.com/opencast/opencast/pull/1536)] -
   Typo correction
-- [[#1531](https://github.com/opencast/opencast/pull/1531)] -
-  Bump karma from 4.4.1 to 5.0.2 in /modules/admin-ui-frontend
 - [[#1530](https://github.com/opencast/opencast/pull/1530)] -
   REST Docs: Ingest: WF parameters, WFIID deprecated
-- [[#1524](https://github.com/opencast/opencast/pull/1524)] -
-  Bump grunt-karma from 3.0.2 to 4.0.0 in /modules/admin-ui-frontend
 - [[#1523](https://github.com/opencast/opencast/pull/1523)] -
   Documentation: OsgiAclServiceRestEndpoint
-- [[#1522](https://github.com/opencast/opencast/pull/1522)] -
-  Bump karma-coverage from 2.0.1 to 2.0.2 in /modules/admin-ui-frontend
-- [[#1521](https://github.com/opencast/opencast/pull/1521)] -
-  Bump chromedriver from 80.0.1 to 81.0.0 in /modules/admin-ui-frontend
-- [[#1520](https://github.com/opencast/opencast/pull/1520)] -
-  Bump jquery from 3.4.1 to 3.5.0 in /modules/runtime-info-ui
-- [[#1519](https://github.com/opencast/opencast/pull/1519)] -
-  Bump jquery from 3.4.1 to 3.5.0 in /modules/runtime-info-ui-ng
-- [[#1518](https://github.com/opencast/opencast/pull/1518)] -
-  Bump jquery from 3.4.1 to 3.5.0 in /modules/lti
-- [[#1517](https://github.com/opencast/opencast/pull/1517)] -
-  Bump jquery from 3.4.1 to 3.5.0 in /modules/engage-ui
-- [[#1511](https://github.com/opencast/opencast/pull/1511)] -
-  Bump autoprefixer from 9.7.5 to 9.7.6 in /modules/admin-ui-frontend
-- [[#1510](https://github.com/opencast/opencast/pull/1510)] -
-  Bump grunt-ng-annotate from 3.0.0 to 4.0.0 in /modules/admin-ui-frontend
 - [[#1499](https://github.com/opencast/opencast/pull/1499)] -
   Add NUT container format
-- [[#1498](https://github.com/opencast/opencast/pull/1498)] -
-  Bump underscore from 1.9.2 to 1.10.2 in /modules/engage-ui
 - [[#1497](https://github.com/opencast/opencast/pull/1497)] -
   Documentation: Update asset-delete-woh.md
 - [[#1490](https://github.com/opencast/opencast/pull/1490)] -
   Make encoding profiles support odd widths and heights develop
-- [[#1484](https://github.com/opencast/opencast/pull/1484)] -
-  Bump autoprefixer from 9.7.4 to 9.7.5 in /modules/admin-ui-frontend
-- [[#1469](https://github.com/opencast/opencast/pull/1469)] -
-  Bump grunt from 1.0.4 to 1.1.0 in /modules/admin-ui-frontend
-- [[#1466](https://github.com/opencast/opencast/pull/1466)] -
-  Bump mustache from 4.0.0 to 4.0.1 in /modules/lti
 - [[#1465](https://github.com/opencast/opencast/pull/1465)] -
   [Security] Bump minimist from 1.2.0 to 1.2.5 in /docs/guides
 - [[#1464](https://github.com/opencast/opencast/pull/1464)] -
@@ -4559,12 +4497,6 @@ Opencast 9
   Override all LANG and LC_ environment variables for stable tests
 - [[#1419](https://github.com/opencast/opencast/pull/1419)] -
   Set fixed LANG for stable tests. Fixes #1418
-- [[#1417](https://github.com/opencast/opencast/pull/1417)] -
-  Bump karma-jasmine from 3.1.0 to 3.1.1 in /modules/admin-ui-frontend
-- [[#1416](https://github.com/opencast/opencast/pull/1416)] -
-  Bump chromedriver from 80.0.0 to 80.0.1 in /modules/admin-ui-frontend
-- [[#1415](https://github.com/opencast/opencast/pull/1415)] -
-  Bump request from 2.88.0 to 2.88.2 in /modules/admin-ui-frontend
 - [[#1413](https://github.com/opencast/opencast/pull/1413)] -
   Remove Unused Admin Interface Ressources
 - [[#1407](https://github.com/opencast/opencast/pull/1407)] -
@@ -4577,8 +4509,6 @@ Opencast 9
   Quick-links in documentation
 - [[#1401](https://github.com/opencast/opencast/pull/1401)] -
   Fix More Dependencies
-- [[#1398](https://github.com/opencast/opencast/pull/1398)] -
-  Bump markdownlint-cli from 0.21.0 to 0.22.0 in /docs/guides
 - [[#1397](https://github.com/opencast/opencast/pull/1397)] -
   Silence Detector Cleanup
 - [[#1396](https://github.com/opencast/opencast/pull/1396)] -
@@ -4587,20 +4517,14 @@ Opencast 9
   Fix Image Extraction At Position Zero
 - [[#1391](https://github.com/opencast/opencast/pull/1391)] -
   Documentation: Text Extraction Configuration
-- [[#1389](https://github.com/opencast/opencast/pull/1389)] -
-  Bump chromedriver from 79.0.2 to 80.0.0 in /modules/admin-ui
 - [[#1388](https://github.com/opencast/opencast/pull/1388)] -
   Return bibliographic start date of event via API
 - [[#1387](https://github.com/opencast/opencast/pull/1387)] -
   Speedup silence detection in case there is a video stream
-- [[#1383](https://github.com/opencast/opencast/pull/1383)] -
-  Bump checkstyle from 8.21 to 8.29
 - [[#1382](https://github.com/opencast/opencast/pull/1382)] -
   Show search results after changing chosen list
 - [[#1381](https://github.com/opencast/opencast/pull/1381)] -
   Remove get acl scheduler endpoint as it's not used
-- [[#1378](https://github.com/opencast/opencast/pull/1378)] -
-  Bump chromedriver from 79.0.0 to 79.0.2 in /modules/admin-ui
 - [[#1377](https://github.com/opencast/opencast/pull/1377)] -
   Update to MariaDB Client
 - [[#1376](https://github.com/opencast/opencast/pull/1376)] -
@@ -4615,12 +4539,6 @@ Opencast 9
   Remove Drupal Based Pingback Service
 - [[#1363](https://github.com/opencast/opencast/pull/1363)] -
   Added the adopter registration form for statistics.
-- [[#1361](https://github.com/opencast/opencast/pull/1361)] -
-  Bump node-sass from 4.13.0 to 4.13.1 in /modules/admin-ui
-- [[#1360](https://github.com/opencast/opencast/pull/1360)] -
-  Bump mustache from 3.2.1 to 4.0.0 in /modules/lti
-- [[#1355](https://github.com/opencast/opencast/pull/1355)] -
-  Bump autoprefixer from 9.7.3 to 9.7.4 in /modules/admin-ui
 - [[#1354](https://github.com/opencast/opencast/pull/1354)] -
   Addition of trim segment configuration and new documentation
 - [[#1350](https://github.com/opencast/opencast/pull/1350)] -
@@ -4633,42 +4551,10 @@ Opencast 9
   LDAP Configuration
 - [[#1346](https://github.com/opencast/opencast/pull/1346)] -
   Adjust documentation regarding Elasticsearch setup
-- [[#1344](https://github.com/opencast/opencast/pull/1344)] -
-  Bump karma-jasmine from 3.0.3 to 3.1.0 in /modules/admin-ui
-- [[#1342](https://github.com/opencast/opencast/pull/1342)] -
-  Bump karma-jasmine from 3.0.1 to 3.0.3 in /modules/admin-ui
-- [[#1334](https://github.com/opencast/opencast/pull/1334)] -
-  Bump karma-firefox-launcher from 1.2.0 to 1.3.0 in /modules/admin-ui
-- [[#1332](https://github.com/opencast/opencast/pull/1332)] -
-  Bump karma-jasmine from 2.0.1 to 3.0.1 in /modules/admin-ui
-- [[#1331](https://github.com/opencast/opencast/pull/1331)] -
-  Bump underscore from 1.9.1 to 1.9.2 in /modules/engage-ui
 - [[#1330](https://github.com/opencast/opencast/pull/1330)] -
   ESLint For Theodul Connection Plugin
-- [[#1322](https://github.com/opencast/opencast/pull/1322)] -
-  Bump markdownlint-cli from 0.20.0 to 0.21.0 in /docs/guides
-- [[#1317](https://github.com/opencast/opencast/pull/1317)] -
-  Bump mustache from 3.1.0 to 3.2.1 in /modules/lti
 - [[#1316](https://github.com/opencast/opencast/pull/1316)] -
   [Security] Bump handlebars from 4.2.0 to 4.5.3 in /modules/admin-ui
-- [[#1314](https://github.com/opencast/opencast/pull/1314)] -
-  Bump eslint from 6.7.2 to 6.8.0 in /modules/engage-ui
-- [[#1313](https://github.com/opencast/opencast/pull/1313)] -
-  Bump bootbox from 5.3.4 to 5.4.0 in /modules/engage-ui
-- [[#1312](https://github.com/opencast/opencast/pull/1312)] -
-  Bump eslint from 6.7.2 to 6.8.0 in /modules/engage-paella-player
-- [[#1311](https://github.com/opencast/opencast/pull/1311)] -
-  Bump eslint from 6.7.2 to 6.8.0 in /modules/engage-theodul-core
-- [[#1310](https://github.com/opencast/opencast/pull/1310)] -
-  Bump eslint from 6.7.2 to 6.8.0 in /modules/runtime-info-ui
-- [[#1309](https://github.com/opencast/opencast/pull/1309)] -
-  Bump eslint from 6.7.2 to 6.8.0 in /modules/admin-ui
-- [[#1308](https://github.com/opencast/opencast/pull/1308)] -
-  Bump eslint from 6.7.2 to 6.8.0 in /modules/lti
-- [[#1307](https://github.com/opencast/opencast/pull/1307)] -
-  Bump eslint from 6.7.2 to 6.8.0 in /modules/runtime-info-ui-ng
-- [[#1298](https://github.com/opencast/opencast/pull/1298)] -
-  Bump markdownlint-cli from 0.19.0 to 0.20.0 in /docs/guides
 - [[#1295](https://github.com/opencast/opencast/pull/1295)] -
   Change npm install to npm ci
 - [[#1293](https://github.com/opencast/opencast/pull/1293)] -
@@ -4683,8 +4569,6 @@ Opencast 9
   Add option to remove running workflows, fix restdocs for delete requests
 - [[#1283](https://github.com/opencast/opencast/pull/1283)] -
   Fix hourly statistics export
-- [[#1282](https://github.com/opencast/opencast/pull/1282)] -
-  Bump chromedriver from 78.0.1 to 79.0.0 in /modules/admin-ui
 - [[#1277](https://github.com/opencast/opencast/pull/1277)] -
   Fixed streaming distribution remote
 - [[#1275](https://github.com/opencast/opencast/pull/1275)] -
@@ -4695,22 +4579,6 @@ Opencast 9
   Additional logging for ACL parse errors
 - [[#1267](https://github.com/opencast/opencast/pull/1267)] -
   Log the Ids of items being indexed
-- [[#1264](https://github.com/opencast/opencast/pull/1264)] -
-  Bump eslint from 6.7.1 to 6.7.2 in /modules/engage-theodul-core
-- [[#1263](https://github.com/opencast/opencast/pull/1263)] -
-  Bump eslint from 6.7.1 to 6.7.2 in /modules/lti
-- [[#1262](https://github.com/opencast/opencast/pull/1262)] -
-  Bump eslint from 6.7.1 to 6.7.2 in /modules/runtime-info-ui-ng
-- [[#1261](https://github.com/opencast/opencast/pull/1261)] -
-  Bump autoprefixer from 9.7.2 to 9.7.3 in /modules/admin-ui
-- [[#1260](https://github.com/opencast/opencast/pull/1260)] -
-  Bump eslint from 6.7.1 to 6.7.2 in /modules/engage-ui
-- [[#1259](https://github.com/opencast/opencast/pull/1259)] -
-  Bump eslint from 6.7.1 to 6.7.2 in /modules/admin-ui
-- [[#1258](https://github.com/opencast/opencast/pull/1258)] -
-  Bump eslint from 6.7.1 to 6.7.2 in /modules/runtime-info-ui
-- [[#1257](https://github.com/opencast/opencast/pull/1257)] -
-  Bump eslint from 6.7.1 to 6.7.2 in /modules/engage-paella-player
 - [[#1255](https://github.com/opencast/opencast/pull/1255)] -
   Update paella player to 6.3.2
 - [[#1254](https://github.com/opencast/opencast/pull/1254)] -
@@ -4721,20 +4589,6 @@ Opencast 9
   Drop Unused Tables
 - [[#1249](https://github.com/opencast/opencast/pull/1249)] -
   Documentation: Metadata fixes
-- [[#1242](https://github.com/opencast/opencast/pull/1242)] -
-  Bump eslint from 6.6.0 to 6.7.1 in /modules/engage-paella-player
-- [[#1241](https://github.com/opencast/opencast/pull/1241)] -
-  Bump eslint from 6.6.0 to 6.7.1 in /modules/engage-theodul-core
-- [[#1240](https://github.com/opencast/opencast/pull/1240)] -
-  Bump eslint from 6.6.0 to 6.7.1 in /modules/admin-ui
-- [[#1239](https://github.com/opencast/opencast/pull/1239)] -
-  Bump eslint from 6.6.0 to 6.7.1 in /modules/engage-ui
-- [[#1238](https://github.com/opencast/opencast/pull/1238)] -
-  Bump eslint from 6.6.0 to 6.7.1 in /modules/runtime-info-ui
-- [[#1237](https://github.com/opencast/opencast/pull/1237)] -
-  Bump eslint from 6.6.0 to 6.7.1 in /modules/runtime-info-ui-ng
-- [[#1236](https://github.com/opencast/opencast/pull/1236)] -
-  Bump eslint from 6.6.0 to 6.7.1 in /modules/lti
 - [[#1235](https://github.com/opencast/opencast/pull/1235)] -
   Update selected components to use OSGI annotations
 - [[#1234](https://github.com/opencast/opencast/pull/1234)] -
@@ -4743,50 +4597,10 @@ Opencast 9
   Single image video fix
 - [[#1226](https://github.com/opencast/opencast/pull/1226)] -
   Implement StreamingDistributionService remotely
-- [[#1225](https://github.com/opencast/opencast/pull/1225)] -
-  Bump autoprefixer from 9.7.1 to 9.7.2 in /modules/admin-ui
-- [[#1222](https://github.com/opencast/opencast/pull/1222)] -
-  Bump paginationjs from 2.1.4 to 2.1.5 in /modules/lti
-- [[#1211](https://github.com/opencast/opencast/pull/1211)] -
-  Bump eslint from 6.5.0 to 6.6.0 in /modules/admin-ui
-- [[#1210](https://github.com/opencast/opencast/pull/1210)] -
-  Bump autoprefixer from 9.7.0 to 9.7.1 in /modules/admin-ui
-- [[#1209](https://github.com/opencast/opencast/pull/1209)] -
-  Bump bootbox from 5.3.3 to 5.3.4 in /modules/engage-ui
-- [[#1208](https://github.com/opencast/opencast/pull/1208)] -
-  Bump bootbox from 5.3.2 to 5.3.3 in /modules/engage-ui
 - [[#1205](https://github.com/opencast/opencast/pull/1205)] -
   Dropping SysV-Init
 - [[#1198](https://github.com/opencast/opencast/pull/1198)] -
   Introduce ESlint for Theodul Controls Plugin
-- [[#1196](https://github.com/opencast/opencast/pull/1196)] -
-  Bump eslint from 6.5.0 to 6.6.0 in /modules/runtime-info-ui-ng
-- [[#1195](https://github.com/opencast/opencast/pull/1195)] -
-  Bump http-proxy from 1.17.0 to 1.18.0 in /modules/engage-paella-player
-- [[#1194](https://github.com/opencast/opencast/pull/1194)] -
-  Bump karma from 4.3.0 to 4.4.1 in /modules/admin-ui
-- [[#1193](https://github.com/opencast/opencast/pull/1193)] -
-  Bump node-sass from 4.12.0 to 4.13.0 in /modules/admin-ui
-- [[#1192](https://github.com/opencast/opencast/pull/1192)] -
-  Bump eslint from 6.5.0 to 6.6.0 in /modules/engage-ui
-- [[#1191](https://github.com/opencast/opencast/pull/1191)] -
-  Bump autoprefixer from 9.6.1 to 9.7.0 in /modules/admin-ui
-- [[#1190](https://github.com/opencast/opencast/pull/1190)] -
-  Bump chromedriver from 76.0.1 to 78.0.1 in /modules/admin-ui
-- [[#1189](https://github.com/opencast/opencast/pull/1189)] -
-  Bump jasmine-core from 3.4.0 to 3.5.0 in /modules/admin-ui
-- [[#1188](https://github.com/opencast/opencast/pull/1188)] -
-  Bump seedrandom from 3.0.3 to 3.0.5 in /modules/engage-ui
-- [[#1187](https://github.com/opencast/opencast/pull/1187)] -
-  Bump eslint from 6.5.0 to 6.6.0 in /modules/engage-paella-player
-- [[#1186](https://github.com/opencast/opencast/pull/1186)] -
-  Bump eslint from 6.5.0 to 6.6.0 in /modules/lti
-- [[#1184](https://github.com/opencast/opencast/pull/1184)] -
-  Bump eslint from 6.5.0 to 6.6.0 in /modules/runtime-info-ui
-- [[#1183](https://github.com/opencast/opencast/pull/1183)] -
-  Bump eslint from 6.5.0 to 6.6.0 in /modules/engage-theodul-core
-- [[#1182](https://github.com/opencast/opencast/pull/1182)] -
-  Bump markdownlint-cli from 0.18.0 to 0.19.0 in /docs/guides
 - [[#1179](https://github.com/opencast/opencast/pull/1179)] -
   Make wowza configuration tenant-specific
 - [[#1171](https://github.com/opencast/opencast/pull/1171)] -
@@ -4845,6 +4659,437 @@ Opencast 9
   S3 S3 compatibility - Endpoint configuration for Amazon S3 alternatives added
 - [[#884](https://github.com/opencast/opencast/pull/884)] -
   Display global notifications as overlay
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/1897">1897</a>] -
+  Bump markdownlint-cli from 0.23.2 to 0.24.0 in /docs/guides</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1896">1896</a>] -
+  Bump @types/react from 16.9.2 to 16.9.50 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1889">1889</a>] -
+  Bump @types/react-select from 3.0.14 to 3.0.21 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1888">1888</a>] -
+  Bump bootbox from 5.4.0 to 5.4.1 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1884">1884</a>] -
+  Bump eslint from 7.9.0 to 7.10.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1883">1883</a>] -
+  Bump eslint from 7.9.0 to 7.10.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1882">1882</a>] -
+  Bump eslint from 7.9.0 to 7.10.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1881">1881</a>] -
+  Bump eslint from 7.9.0 to 7.10.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1880">1880</a>] -
+  Bump eslint from 7.9.0 to 7.10.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1879">1879</a>] -
+  Bump eslint from 7.9.0 to 7.10.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1873">1873</a>] -
+  Bump karma from 5.2.2 to 5.2.3 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1868">1868</a>] -
+  Bump @types/node from 12.7.5 to 14.11.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1854">1854</a>] -
+  Bump @types/jest from 24.0.18 to 26.0.14 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1844">1844</a>] -
+  Bump eslint from 7.8.1 to 7.9.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1843">1843</a>] -
+  Bump eslint from 7.8.1 to 7.9.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1841">1841</a>] -
+  Bump eslint from 7.8.1 to 7.9.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1840">1840</a>] -
+  Bump eslint from 7.8.1 to 7.9.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1839">1839</a>] -
+  Bump eslint from 7.8.1 to 7.9.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1838">1838</a>] -
+  Bump eslint from 7.8.1 to 7.9.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1830">1830</a>] -
+  Bump karma from 5.2.1 to 5.2.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1829">1829</a>] -
+  Bump chromedriver from 85.0.0 to 85.0.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1825">1825</a>] -
+  Bump eslint from 7.7.0 to 7.8.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1824">1824</a>] -
+  Bump karma from 5.1.1 to 5.2.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1822">1822</a>] -
+  Bump eslint from 7.7.0 to 7.8.1 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1819">1819</a>] -
+  Bump eslint from 7.7.0 to 7.8.1 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1817">1817</a>] -
+  Bump eslint from 7.7.0 to 7.8.1 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1816">1816</a>] -
+  Bump eslint from 7.7.0 to 7.8.1 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1808">1808</a>] -
+  Bump underscore from 1.10.2 to 1.11.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1743">1743</a>] -
+  Bump @types/react-helmet from 5.0.16 to 6.1.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1728">1728</a>] -
+  Bump @types/react-dom from 16.9.0 to 16.9.8 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1727">1727</a>] -
+  Bump react-helmet from 5.2.1 to 6.1.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1724">1724</a>] -
+  Bump react-i18next from 10.13.2 to 11.0.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1825">1825</a>] -
+  Bump eslint from 7.7.0 to 7.8.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1824">1824</a>] -
+  Bump karma from 5.1.1 to 5.2.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1822">1822</a>] -
+  Bump eslint from 7.7.0 to 7.8.1 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1819">1819</a>] -
+  Bump eslint from 7.7.0 to 7.8.1 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1817">1817</a>] -
+  Bump eslint from 7.7.0 to 7.8.1 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1816">1816</a>] -
+  Bump eslint from 7.7.0 to 7.8.1 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1813">1813</a>] -
+  Bump eslint from 7.7.0 to 7.8.1 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1811">1811</a>] -
+  Bump chromedriver from 84.0.1 to 85.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1810">1810</a>] -
+  Bump eslint-plugin-header from 3.0.0 to 3.1.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1809">1809</a>] -
+  Bump eslint-plugin-header from 3.0.0 to 3.1.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1808">1808</a>] -
+  Bump underscore from 1.10.2 to 1.11.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1807">1807</a>] -
+  Bump eslint-plugin-header from 3.0.0 to 3.1.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1806">1806</a>] -
+  Bump eslint-plugin-header from 3.0.0 to 3.1.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1803">1803</a>] -
+  Bump eslint-plugin-header from 3.0.0 to 3.1.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1802">1802</a>] -
+  Bump eslint-plugin-header from 3.0.0 to 3.1.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1785">1785</a>] -
+  Bump grunt from 1.2.1 to 1.3.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1781">1781</a>] -
+  Bump eslint from 7.6.0 to 7.7.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1780">1780</a>] -
+  Bump eslint from 7.6.0 to 7.7.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1777">1777</a>] -
+  Bump eslint from 7.6.0 to 7.7.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1776">1776</a>] -
+  Bump eslint from 7.6.0 to 7.7.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1775">1775</a>] -
+  Bump eslint from 7.6.0 to 7.7.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1774">1774</a>] -
+  Bump eslint from 7.6.0 to 7.7.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1765">1765</a>] -
+  Bump karma-jasmine from 4.0.0 to 4.0.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1761">1761</a>] -
+  Bump karma-jasmine from 3.3.1 to 4.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1742">1742</a>] -
+  Bump eslint from 7.5.0 to 7.6.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1741">1741</a>] -
+  Bump eslint from 7.5.0 to 7.6.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1739">1739</a>] -
+  Bump eslint from 7.5.0 to 7.6.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1738">1738</a>] -
+  Bump eslint from 7.5.0 to 7.6.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1737">1737</a>] -
+  Bump eslint from 7.5.0 to 7.6.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1736">1736</a>] -
+  Bump eslint from 7.5.0 to 7.6.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1734">1734</a>] -
+  Bump autoprefixer from 9.8.5 to 9.8.6 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1722">1722</a>] -
+  Bump karma from 5.1.0 to 5.1.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1717">1717</a>] -
+  Bump karma-coverage from 2.0.2 to 2.0.3 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1715">1715</a>] -
+  Bump jasmine-core from 3.5.0 to 3.6.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1714">1714</a>] -
+  Bump chromedriver from 84.0.0 to 84.0.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1708">1708</a>] -
+  Bump eslint from 7.4.0 to 7.5.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1707">1707</a>] -
+  Bump eslint from 7.4.0 to 7.5.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1706">1706</a>] -
+  Bump eslint from 7.4.0 to 7.5.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1705">1705</a>] -
+  Bump eslint from 7.4.0 to 7.5.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1704">1704</a>] -
+  Bump eslint from 7.4.0 to 7.5.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1703">1703</a>] -
+  Bump eslint from 7.4.0 to 7.5.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1702">1702</a>] -
+  Bump eslint from 7.4.0 to 7.5.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1699">1699</a>] -
+  Bump chromedriver from 83.0.1 to 84.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1698">1698</a>] -
+  Bump grunt-contrib-connect from 2.1.0 to 3.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1697">1697</a>] -
+  Bump grunt-contrib-uglify from 4.0.1 to 5.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1691">1691</a>] -
+  Bump lodash from 4.17.15 to 4.17.19 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1689">1689</a>] -
+  Bump autoprefixer from 9.8.4 to 9.8.5 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1687">1687</a>] -
+  Bump grunt from 1.2.0 to 1.2.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1683">1683</a>] -
+  Bump chromedriver from 83.0.0 to 83.0.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1681">1681</a>] -
+  Bump eslint from 7.3.1 to 7.4.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1680">1680</a>] -
+  Bump eslint from 7.3.1 to 7.4.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1679">1679</a>] -
+  Bump grunt from 1.1.0 to 1.2.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1678">1678</a>] -
+  Bump eslint from 7.3.1 to 7.4.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1677">1677</a>] -
+  Bump eslint from 7.3.1 to 7.4.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1676">1676</a>] -
+  Bump eslint from 7.3.1 to 7.4.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1675">1675</a>] -
+  Bump eslint from 7.3.1 to 7.4.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1674">1674</a>] -
+  Bump eslint from 7.3.1 to 7.4.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1666">1666</a>] -
+  Bump markdownlint-cli from 0.23.1 to 0.23.2 in /docs/guides</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1665">1665</a>] -
+  Bump http-errors from 1.7.3 to 1.8.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1660">1660</a>] -
+  Bump autoprefixer from 9.8.2 to 9.8.4 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1658">1658</a>] -
+  Bump eslint from 7.3.0 to 7.3.1 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1656">1656</a>] -
+  Bump eslint from 7.3.0 to 7.3.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1655">1655</a>] -
+  Bump eslint from 7.3.0 to 7.3.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1654">1654</a>] -
+  Bump eslint from 7.3.0 to 7.3.1 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1653">1653</a>] -
+  Bump eslint from 7.3.0 to 7.3.1 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1652">1652</a>] -
+  Bump eslint from 7.3.0 to 7.3.1 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1651">1651</a>] -
+  Bump eslint from 7.3.0 to 7.3.1 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1650">1650</a>] -
+  Bump eslint from 7.2.0 to 7.3.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1649">1649</a>] -
+  Bump eslint from 7.2.0 to 7.3.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1648">1648</a>] -
+  Bump autoprefixer from 9.8.0 to 9.8.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1647">1647</a>] -
+  Bump eslint from 7.2.0 to 7.3.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1646">1646</a>] -
+  Bump eslint from 7.2.0 to 7.3.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1645">1645</a>] -
+  Bump eslint from 7.2.0 to 7.3.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1644">1644</a>] -
+  Bump eslint from 7.2.0 to 7.3.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1643">1643</a>] -
+  Bump eslint from 7.2.0 to 7.3.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1638">1638</a>] -
+  Bump karma from 5.0.9 to 5.1.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1632">1632</a>] -
+  Bump eslint from 6.8.0 to 7.2.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1631">1631</a>] -
+  Bump eslint from 7.1.0 to 7.2.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1628">1628</a>] -
+  Bump eslint from 6.8.0 to 7.2.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1627">1627</a>] -
+  Bump eslint from 6.8.0 to 7.2.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1626">1626</a>] -
+  Bump eslint from 6.8.0 to 7.2.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1625">1625</a>] -
+  Bump eslint from 6.8.0 to 7.2.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1624">1624</a>] -
+  Bump eslint from 6.8.0 to 7.2.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1619">1619</a>] -
+  Bump angular from 1.7.9 to 1.8.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1618">1618</a>] -
+  Bump angular-route from 1.7.9 to 1.8.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1614">1614</a>] -
+  Bump karma-jasmine from 3.2.0 to 3.3.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1606">1606</a>] -
+  Bump karma-jasmine from 3.1.1 to 3.2.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1601">1601</a>] -
+  Bump js-yaml from 3.13.1 to 3.14.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1599">1599</a>] -
+  Bump eslint from 6.8.0 to 7.1.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1591">1591</a>] -
+  Bump karma from 5.0.8 to 5.0.9 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1590">1590</a>] -
+  Bump chromedriver from 81.0.0 to 83.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1587">1587</a>] -
+  Bump karma from 5.0.5 to 5.0.8 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1585">1585</a>] -
+  Bump http-proxy from 1.18.0 to 1.18.1 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1584">1584</a>] -
+  Bump autoprefixer from 9.7.6 to 9.8.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1582">1582</a>] -
+  Bump markdownlint-cli from 0.23.0 to 0.23.1 in /docs/guides</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1569">1569</a>] -
+  Bump karma from 5.0.4 to 5.0.5 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1563">1563</a>] -
+  Bump node-sass from 4.14.0 to 4.14.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1562">1562</a>] -
+  Bump jquery from 3.5.0 to 3.5.1 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1561">1561</a>] -
+  Bump markdownlint-cli from 0.22.0 to 0.23.0 in /docs/guides</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1560">1560</a>] -
+  Bump jquery from 3.5.0 to 3.5.1 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1559">1559</a>] -
+  Bump jquery from 3.5.0 to 3.5.1 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1558">1558</a>] -
+  Bump jquery from 3.5.0 to 3.5.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1555">1555</a>] -
+  Bump karma from 5.0.3 to 5.0.4 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1552">1552</a>] -
+  Bump karma from 5.0.2 to 5.0.3 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1544">1544</a>] -
+  Bump node-sass from 4.13.1 to 4.14.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1531">1531</a>] -
+  Bump karma from 4.4.1 to 5.0.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1524">1524</a>] -
+  Bump grunt-karma from 3.0.2 to 4.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1522">1522</a>] -
+  Bump karma-coverage from 2.0.1 to 2.0.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1521">1521</a>] -
+  Bump chromedriver from 80.0.1 to 81.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1520">1520</a>] -
+  Bump jquery from 3.4.1 to 3.5.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1519">1519</a>] -
+  Bump jquery from 3.4.1 to 3.5.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1518">1518</a>] -
+  Bump jquery from 3.4.1 to 3.5.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1517">1517</a>] -
+  Bump jquery from 3.4.1 to 3.5.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1511">1511</a>] -
+  Bump autoprefixer from 9.7.5 to 9.7.6 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1510">1510</a>] -
+  Bump grunt-ng-annotate from 3.0.0 to 4.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1498">1498</a>] -
+  Bump underscore from 1.9.2 to 1.10.2 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1484">1484</a>] -
+  Bump autoprefixer from 9.7.4 to 9.7.5 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1469">1469</a>] -
+  Bump grunt from 1.0.4 to 1.1.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1466">1466</a>] -
+  Bump mustache from 4.0.0 to 4.0.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1417">1417</a>] -
+  Bump karma-jasmine from 3.1.0 to 3.1.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1416">1416</a>] -
+  Bump chromedriver from 80.0.0 to 80.0.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1415">1415</a>] -
+  Bump request from 2.88.0 to 2.88.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1398">1398</a>] -
+  Bump markdownlint-cli from 0.21.0 to 0.22.0 in /docs/guides</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1389">1389</a>] -
+  Bump chromedriver from 79.0.2 to 80.0.0 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1383">1383</a>] -
+  Bump checkstyle from 8.21 to 8.29</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1378">1378</a>] -
+  Bump chromedriver from 79.0.0 to 79.0.2 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1361">1361</a>] -
+  Bump node-sass from 4.13.0 to 4.13.1 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1360">1360</a>] -
+  Bump mustache from 3.2.1 to 4.0.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1355">1355</a>] -
+  Bump autoprefixer from 9.7.3 to 9.7.4 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1344">1344</a>] -
+  Bump karma-jasmine from 3.0.3 to 3.1.0 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1342">1342</a>] -
+  Bump karma-jasmine from 3.0.1 to 3.0.3 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1334">1334</a>] -
+  Bump karma-firefox-launcher from 1.2.0 to 1.3.0 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1332">1332</a>] -
+  Bump karma-jasmine from 2.0.1 to 3.0.1 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1331">1331</a>] -
+  Bump underscore from 1.9.1 to 1.9.2 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1322">1322</a>] -
+  Bump markdownlint-cli from 0.20.0 to 0.21.0 in /docs/guides</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1317">1317</a>] -
+  Bump mustache from 3.1.0 to 3.2.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1314">1314</a>] -
+  Bump eslint from 6.7.2 to 6.8.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1313">1313</a>] -
+  Bump bootbox from 5.3.4 to 5.4.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1312">1312</a>] -
+  Bump eslint from 6.7.2 to 6.8.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1311">1311</a>] -
+  Bump eslint from 6.7.2 to 6.8.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1310">1310</a>] -
+  Bump eslint from 6.7.2 to 6.8.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1309">1309</a>] -
+  Bump eslint from 6.7.2 to 6.8.0 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1308">1308</a>] -
+  Bump eslint from 6.7.2 to 6.8.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1307">1307</a>] -
+  Bump eslint from 6.7.2 to 6.8.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1298">1298</a>] -
+  Bump markdownlint-cli from 0.19.0 to 0.20.0 in /docs/guides</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1282">1282</a>] -
+  Bump chromedriver from 78.0.1 to 79.0.0 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1264">1264</a>] -
+  Bump eslint from 6.7.1 to 6.7.2 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1263">1263</a>] -
+  Bump eslint from 6.7.1 to 6.7.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1262">1262</a>] -
+  Bump eslint from 6.7.1 to 6.7.2 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1261">1261</a>] -
+  Bump autoprefixer from 9.7.2 to 9.7.3 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1260">1260</a>] -
+  Bump eslint from 6.7.1 to 6.7.2 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1259">1259</a>] -
+  Bump eslint from 6.7.1 to 6.7.2 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1258">1258</a>] -
+  Bump eslint from 6.7.1 to 6.7.2 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1257">1257</a>] -
+  Bump eslint from 6.7.1 to 6.7.2 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1242">1242</a>] -
+  Bump eslint from 6.6.0 to 6.7.1 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1241">1241</a>] -
+  Bump eslint from 6.6.0 to 6.7.1 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1240">1240</a>] -
+  Bump eslint from 6.6.0 to 6.7.1 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1239">1239</a>] -
+  Bump eslint from 6.6.0 to 6.7.1 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1238">1238</a>] -
+  Bump eslint from 6.6.0 to 6.7.1 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1237">1237</a>] -
+  Bump eslint from 6.6.0 to 6.7.1 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1236">1236</a>] -
+  Bump eslint from 6.6.0 to 6.7.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1225">1225</a>] -
+  Bump autoprefixer from 9.7.1 to 9.7.2 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1222">1222</a>] -
+  Bump paginationjs from 2.1.4 to 2.1.5 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1211">1211</a>] -
+  Bump eslint from 6.5.0 to 6.6.0 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1210">1210</a>] -
+  Bump autoprefixer from 9.7.0 to 9.7.1 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1209">1209</a>] -
+  Bump bootbox from 5.3.3 to 5.3.4 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1208">1208</a>] -
+  Bump bootbox from 5.3.2 to 5.3.3 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1196">1196</a>] -
+  Bump eslint from 6.5.0 to 6.6.0 in /modules/runtime-info-ui-ng</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1195">1195</a>] -
+  Bump http-proxy from 1.17.0 to 1.18.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1194">1194</a>] -
+  Bump karma from 4.3.0 to 4.4.1 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1193">1193</a>] -
+  Bump node-sass from 4.12.0 to 4.13.0 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1192">1192</a>] -
+  Bump eslint from 6.5.0 to 6.6.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1191">1191</a>] -
+  Bump autoprefixer from 9.6.1 to 9.7.0 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1190">1190</a>] -
+  Bump chromedriver from 76.0.1 to 78.0.1 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1189">1189</a>] -
+  Bump jasmine-core from 3.4.0 to 3.5.0 in /modules/admin-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1188">1188</a>] -
+  Bump seedrandom from 3.0.3 to 3.0.5 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1187">1187</a>] -
+  Bump eslint from 6.5.0 to 6.6.0 in /modules/engage-paella-player</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1186">1186</a>] -
+  Bump eslint from 6.5.0 to 6.6.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1184">1184</a>] -
+  Bump eslint from 6.5.0 to 6.6.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1183">1183</a>] -
+  Bump eslint from 6.5.0 to 6.6.0 in /modules/engage-theodul-core</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/1182">1182</a>] -
+  Bump markdownlint-cli from 0.18.0 to 0.19.0 in /docs/guides</li>
+</ul>
+</details>
 
 Opencast 8
 ----------
@@ -5622,8 +5867,6 @@ Opencast 7
   Secure FPS For SMIL Processing
 - [[#1318](https://github.com/opencast/opencast/pull/1318)] -
   Remove Custom Plugin Repositories
-- [[#1315](https://github.com/opencast/opencast/pull/1315)] -
-  Bump spring-security-oauth from 2.3.6.RELEASE to 2.3.7.RELEASE
 - [[#1276](https://github.com/opencast/opencast/pull/1276)] -
   Don't add the internal publication of the original event twice
 - [[#1271](https://github.com/opencast/opencast/pull/1271)] -
@@ -5634,6 +5877,13 @@ Opencast 7
   Some error operations referencing the wrong error-handler.
 - [[#1246](https://github.com/opencast/opencast/pull/1246)] -
   Remove default storage_id setting from asset Manager
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/1315">1315</a>] -
+  Bump spring-security-oauth from 2.3.6.RELEASE to 2.3.7.RELEASE</li>
+</ul>
+</details>
 
 ### Opencast 7.5
 
@@ -8882,4 +9132,3 @@ Opencast 2.0.x
 - [[MH-10946]](https://opencast.jira.com/browse/MH-10946) - Fix Opencast 2 Installation Guides
 - [[MH-10950]](https://opencast.jira.com/browse/MH-10950) - Fix DDL Readme
 - [[MH-10952]](https://opencast.jira.com/browse/MH-10952) - Fix matterhorn-execute-operations naming
-- [[MH-10957]](https://opencast.jira.com/browse/MH-10957) - Add License Guide for Developers

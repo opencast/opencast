@@ -27,7 +27,6 @@ import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 
 import org.opencastproject.terminationstate.api.TerminationStateService;
 import org.opencastproject.terminationstate.endpoint.api.TerminationStateRestService;
-import org.opencastproject.util.Log;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -37,6 +36,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.json.simple.JSONObject;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.FormParam;
@@ -78,7 +78,7 @@ import javax.ws.rs.core.Response;
 )
 public class AutoScalingTerminationStateRestService implements TerminationStateRestService {
 
-  private static final Log logger = new Log(LoggerFactory.getLogger(AutoScalingTerminationStateRestService.class));
+  private static final Logger logger = LoggerFactory.getLogger(AutoScalingTerminationStateRestService.class);
 
   private TerminationStateService service;
 

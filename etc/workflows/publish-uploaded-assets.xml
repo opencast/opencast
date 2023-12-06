@@ -11,45 +11,68 @@
 
   <operations>
 
-    <!-- Apply the default workflow configuration -->
+    <!-- Analyze current state of media package -->
 
     <operation
-      id="defaults"
-      description="Applying default configuration values">
+      id="analyze-mediapackage"
+      description="Set control variables for captions">
       <configurations>
-        <configuration key="publishToEngage">true</configuration>
+        <configuration key="set-tag-variables">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Tag new assets for archival -->
+
+    <operation
+      id="tag"
+      description="Tag newly uploaded assets for archival">
+      <configurations>
+        <configuration key="source-flavors">*/*</configuration>
+        <configuration key="target-tags">+archive</configuration>
       </configurations>
     </operation>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    <!-- Publish to publication channels                                   -->
+    <!-- Special handling for captions                                     -->
     <!--                                                                   -->
-    <!-- Update the recording metadata in the publication channels.        -->
+    <!-- Creates captions/prepared and captions/delivery.                  -->
+    <!-- Sets the following tags:                                          -->
+    <!--    captions/source     archive, exclude-publish                   -->
+    <!--    captions/prepared   archive                                    -->
+    <!--    captions/delivery   engage-download                            -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <operation
+      id="include"
+      if="NOT(${captions_source_hastag_archive})"
+      description="Include special handling for uploaded captions">
+      <configurations>
+        <configuration key="workflow-id">partial-process-uploaded-captions</configuration>
+      </configurations>
+    </operation>
 
     <!-- Publish to engage player -->
 
     <operation
       id="publish-engage"
-      if="${publishToEngage}"
       exception-handler-workflow="partial-error"
       description="Update recording in Opencast Media Module">
       <configurations>
         <configuration key="download-source-flavors">${download-source-flavors},dublincore/*,security/*</configuration>
-        <configuration key="download-source-tags">engage-download</configuration>
+        <configuration key="download-source-tags">engage-download,-exclude-publish</configuration>  <!-- exclude necessary bc of download_source_flavors -->
         <configuration key="streaming-source-tags">engage-streaming</configuration>
         <configuration key="strategy">merge</configuration>
         <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
 
-    <!-- Archive the current state of the mediapackage -->
+    <!-- Archive uploaded assets -->
 
     <operation
       id="snapshot"
       description="Archiving new assets">
       <configurations>
-        <configuration key="source-flavors">*/*</configuration>
+        <configuration key="source-tags">archive</configuration>
       </configurations>
     </operation>
 

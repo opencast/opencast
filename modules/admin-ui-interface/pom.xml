@@ -7,14 +7,14 @@
     <parent>
         <groupId>org.opencastproject</groupId>
         <artifactId>base</artifactId>
-        <version>15-SNAPSHOT</version>
+        <version>16-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <properties>
         <opencast.basedir>${project.basedir}/../..</opencast.basedir>
         <checkstyle.skip>false</checkstyle.skip>
-        <interface.url>https://github.com/opencast/opencast-admin-interface/releases/download/2023-04-12-2/oc-admin-ui-2023-04-12.tar.gz</interface.url>
-        <interface.sha256>8095f90953178410216d7b5900524f6440a37130be59666947f644872ff839ba</interface.sha256>
+        <interface.url>https://github.com/opencast/opencast-admin-interface/releases/download/2023-11-21/oc-admin-ui-2023-11-21.tar.gz</interface.url>
+        <interface.sha256>3575dc2b925357f9401a19fd7d41ed0d6b2fa58b7ab0df7ad9c05f21da63de00</interface.sha256>
     </properties>
     <build>
         <plugins>

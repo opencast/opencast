@@ -73,10 +73,18 @@ accomplished by running the following:
 If you wish to use the upstream OpenSearch repository directly be aware that Opencast only supported with OpenSearch 1.x
 and will not work with OpenSearch 2.x yet.  Future support for this is forthcoming.
 
-The default OpenSearch configuration should work for Opencast out of the box, although we encourage you to set your
-index up in a secure manner.
+Configure OpenSearch
+--------------------
 
-After installing an configuring make sure to start and enable the service:
+After installing OpenSearch please make sure to follow their
+[configuration documentation](https://opensearch.org/docs/1.3/install-and-configure/install-opensearch/debian/)
+to ensure that your OpenSearch instance is set up correctly and securely.  Once that setup is complete, ensure that
+your Opencast install matches your configured OpenSearch settings.  Notably, Opencast's current default assumes
+non-secured http rather than https, without a username and password.  Read the
+[Opencast OpenSearch Documentation](../configuration/searchindex/elasticsearch.md) to correctly configure Opencast's connection
+once Opencast has been installed below.
+
+After installing and configuring make sure to start and enable OpenSearch:
 
 ```sh
 systemctl restart opensearch

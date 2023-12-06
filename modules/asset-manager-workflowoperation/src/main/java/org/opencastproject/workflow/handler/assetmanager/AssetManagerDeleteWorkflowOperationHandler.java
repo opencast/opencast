@@ -91,22 +91,19 @@ public class AssetManagerDeleteWorkflowOperationHandler extends AbstractWorkflow
       final long deleted;
 
       if (keepLastSnapshot) {
+        logger.info("Deleting all but latest snapshot of episode {}", mpId);
         deleted = q.delete(DEFAULT_OWNER, q.snapshot())
                 .where(q.mediaPackageId(mpId).and(q.version().isLatest().not())).run();
-        logger.info("Deleting all but latest Snapshot {}", mpId);
       } else {
+        logger.info("Deleting all snapshots of episode {}", mpId);
         deleted = q.delete(DEFAULT_OWNER, q.snapshot())
                 .where(q.mediaPackageId(mpId)).run();
       }
 
-      if (deleted == 0) {
-        logger.info("The asset manager does not contain episode {}", mpId);
-      } else {
-        logger.info("Successfully deleted {} version/s episode {} from the asset manager", deleted, mpId);
-      }
+      logger.info("Successfully deleted {} version/s episode {} from the asset manager", deleted, mpId);
     } catch (Exception e) {
-      logger.warn("Error deleting episode {} from the asset manager: {}", mpId, e);
-      throw new WorkflowOperationException("Unable to delete episode from the asset manager", e);
+      var errorMessage = String.format("Error deleting episode %s from the asset manager", mpId);
+      throw new WorkflowOperationException(errorMessage, e);
     }
     return createResult(mediaPackage, Action.CONTINUE);
   }

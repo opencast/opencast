@@ -43,7 +43,7 @@
       "VIDEOFILE": "Archivo de vídeo",
       "VIDEOFILE_DESCRIPTION": "Archivo de vídeo para subir",
       "CAPTION": "Subtítulos",
-      "CAPTION_DESCRIPTION": "Archivo de subtítulos; formatos VTT o dfxp son soportados",
+      "CAPTION_DESCRIPTION": "Archivo de subtítulos en formato VTT",
       "UPLOAD": "Subir",
       "UPLOADING": "Subiendo",
       "EDIT": "Guardar",
@@ -541,6 +541,10 @@
                      "SHORT": "Ponente",
                      "DETAIL": "El archivo contiene la grabación de una persona dirigiéndose a una audiencia."
                   },
+                  "SUBTITLES": {
+                     "SHORT": "Subtítulos",
+                     "DETAIL": "El archivo de texto contiene las palabras habladas en el video anterior."
+                  },
                   "AUDIO_ONLY": {
                      "SHORT": "Solo audio",
                      "DETAIL": "El archivo solo contiene audio."
@@ -584,8 +588,7 @@
                "NO_OPTIONS": "¡No se ha proporcionado una lista de opciones de recursos para esta sección de la página web!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Notas",
-                  "CAPTIONS_DFXP": "Subtítulos DXFP",
-                  "CAPTIONS_WEBVTT": "Subtítulos WebVTT",
+                  "SUBTITLES": "Subtítulos",
                   "PREVIEW_IMAGE": "Imagen de vista previa",
                   "SMIL": "Catálogo SMIL",
                   "TRACK_PARTS": "Pistas"
@@ -1863,8 +1866,10 @@
       "TRACKS": {
          "DESCRIPTION": "Se pueden deseleccionar pistas para que no sigan siendo procesadas. Tenga en cuenta que es necesario (re-)publicar el evento para que los cambios tengan efecto.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "Debe activar al menos una pista de vídeo",
-            "NO_AUDIO_TRACK_SELECTED": "Debe activar al menos una pista de audio"
+            "NO_VIDEO_TRACK_SELECTED_WARNING": "Debe activar al menos una pista de vídeo",
+            "NO_AUDIO_TRACK_SELECTED_WARNING": "Debe activar al menos una pista de vídeo",
+            "TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING": "You probably shouldn't enable more audio than video tracks",
+            "NO_TRACK_SELECTED_ERROR": "Debe activar al menos una pista"
          },
          "TRACK": {
             "HEADER": "Pista"
@@ -1959,7 +1964,7 @@
          "COMMENTS": {
             "LABEL": "Comentarios",
             "NONE": "Ninguno",
-            "OPEN": "Abrir",
+            "OPEN": "Sin resolver",
             "RESOLVED": "Resuelto"
          },
          "CONTRIBUTORS": {

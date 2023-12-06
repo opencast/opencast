@@ -27,7 +27,6 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.DeleteEpisode;
-import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.DeleteSnapshot;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.TakeSnapshot;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCores;
@@ -64,23 +63,12 @@ public class AssetManagerItemTest {
     final AssetManagerItem deserialized = IoSupport.serializeDeserialize(item);
     assertEquals(item.getDate(), deserialized.getDate());
     assertEquals(item.getType(), deserialized.getType());
-    assertEquals(item.decompose(TakeSnapshot.getMediaPackage, null, null).getIdentifier(),
-            deserialized.decompose(TakeSnapshot.getMediaPackage, null, null).getIdentifier());
-    assertEquals(item.decompose(TakeSnapshot.getAcl, null, null).getEntries(),
-            deserialized.decompose(TakeSnapshot.getAcl, null, null).getEntries());
-    assertTrue(DublinCoreUtil.equals(item.decompose(TakeSnapshot.getEpisodeDublincore, null, null).get(),
-            deserialized.decompose(TakeSnapshot.getEpisodeDublincore, null, null).get()));
-  }
-
-  @Test
-  public void testSerializeDeleteSnapshot() throws Exception {
-    final Date now = new Date();
-    final AssetManagerItem item = AssetManagerItem.deleteSnapshot("id", 0L, now);
-    final AssetManagerItem deserialized = IoSupport.serializeDeserialize(item);
-    assertEquals(item.getDate(), deserialized.getDate());
-    assertEquals(item.getType(), deserialized.getType());
-    assertEquals(item.decompose(null, DeleteSnapshot.getMediaPackageId, null),
-            deserialized.decompose(null, DeleteSnapshot.getMediaPackageId, null));
+    assertEquals(item.decompose(TakeSnapshot.getMediaPackage, null).getIdentifier(),
+            deserialized.decompose(TakeSnapshot.getMediaPackage, null).getIdentifier());
+    assertEquals(item.decompose(TakeSnapshot.getAcl, null).getEntries(),
+            deserialized.decompose(TakeSnapshot.getAcl, null).getEntries());
+    assertTrue(DublinCoreUtil.equals(item.decompose(TakeSnapshot.getEpisodeDublincore, null).get(),
+            deserialized.decompose(TakeSnapshot.getEpisodeDublincore, null).get()));
   }
 
   @Test
@@ -90,7 +78,7 @@ public class AssetManagerItemTest {
     final AssetManagerItem deserialized = IoSupport.serializeDeserialize(item);
     assertEquals(item.getDate(), deserialized.getDate());
     assertEquals(item.getType(), deserialized.getType());
-    assertEquals(item.decompose(null, null, DeleteEpisode.getMediaPackageId),
-            deserialized.decompose(null, null, DeleteEpisode.getMediaPackageId));
+    assertEquals(item.decompose(null, DeleteEpisode.getMediaPackageId),
+            deserialized.decompose(null, DeleteEpisode.getMediaPackageId));
   }
 }

@@ -148,11 +148,16 @@ angular.module('adminNg.services')
 
               UserResource.get({ username: id }).$promise.then(function (data) {
                 policy.user = data;
-              }).catch(function() {
-                // User does not exist, remove associated policy from list
-                var index = me.ud.policiesUser.indexOf(policy);
-                if (index !== -1) {
-                  me.ud.policiesUser.splice(index, 1);
+                me.ud.policiesUser.push(policy);
+                // Did we get a user not present in Opencast (e.g. LDAP)? Add it to the list!
+                if (me.users.map(user => user.id).indexOf(id) == -1) {
+                  if (me.aclCreateDefaults['sanitize']) {
+                    // FixMe: See the FixMe above pertaining to sanitize
+                    data.userRole = me.roleUserPrefix + id.replace(/\W/g, '_').toUpperCase();
+                  } else {
+                    data.userRole = me.roleUserPrefix + id;
+                  }
+                  me.users.push(data);
                 }
               });
 
@@ -173,6 +178,11 @@ angular.module('adminNg.services')
         if (!user) {
           return undefined;
         }
+
+        if (!(user.name || user.username) && user.userRole) {
+          return user.userRole;
+        }
+
         var n = user.name ? user.name : user.username;
         var e = user.email ? '<' + user.email + '>' : '';
 
@@ -300,16 +310,13 @@ angular.module('adminNg.services')
           angular.forEach(data, function(newRole) {
             if (me.roles.indexOf(newRole) == -1) {
               me.roles.unshift(newRole);
-            }
-          });
-        });
-      };
 
-      this.getMatchingUsers = function (value) {
-        UsersResource.query({query: value}).$promise.then(function (data) {
-          angular.forEach(data, function(newRole) {
-            if (me.roles.indexOf(newRole) == -1) {
-              me.roles.unshift(newRole);
+              // So we can have user roles that match custom role patterns
+              if (newRole.startsWith(me.roleUserPrefix) ) {
+                var user = {};
+                user.userRole = newRole;
+                me.users.push(user);
+              }
             }
           });
         });

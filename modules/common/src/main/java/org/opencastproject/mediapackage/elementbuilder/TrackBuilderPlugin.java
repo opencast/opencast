@@ -29,6 +29,7 @@ import org.opencastproject.mediapackage.MediaPackageSerializer;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.UnsupportedElementException;
 import org.opencastproject.mediapackage.track.AudioStreamImpl;
+import org.opencastproject.mediapackage.track.SubtitleStreamImpl;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.VideoStreamImpl;
 import org.opencastproject.util.Checksum;
@@ -267,6 +268,21 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
         } catch (XPathException e) {
           throw new UnsupportedElementException("Error while parsing video settings from " + url + ": "
                   + e.getMessage());
+        }
+      }
+
+      // subtitle settings
+      Node subtitleSettingsNode = (Node) xpath.evaluate("subtitle", elementNode, XPathConstants.NODE);
+      if (subtitleSettingsNode != null && subtitleSettingsNode.hasChildNodes()) {
+        try {
+          SubtitleStreamImpl ss = SubtitleStreamImpl.fromManifest(createStreamID(track), subtitleSettingsNode, xpath);
+          track.addStream(ss);
+        } catch (IllegalStateException e) {
+          throw new UnsupportedElementException("Illegal state encountered while reading subtitle settings from " + url
+              + ": " + e.getMessage());
+        } catch (XPathException e) {
+          throw new UnsupportedElementException("Error while parsing subtitle settings from " + url + ": "
+              + e.getMessage());
         }
       }
 

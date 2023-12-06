@@ -53,7 +53,7 @@ angular.module('adminNg.controllers')
             write : write !== undefined ? write : false,
             actions : {
               name : 'event-acl-actions',
-              value : actionValues !== undefined ? actionValues : [],
+              value : actionValues !== undefined ? actionValues.slice() : [],
             },
             user: undefined,
           };
@@ -220,11 +220,23 @@ angular.module('adminNg.controllers')
 
               UserResource.get({ username: id }).$promise.then(function (data) {
                 policy.user = data;
+                $scope.policiesUser.push(policy);
+                getCurrentPolicies();
+                // Did we get a user not present in Opencast (e.g. LDAP)? Add it to the list!
+                if ($scope.users.map(user => user.id).indexOf(id) == -1) {
+                  if ($scope.aclCreateDefaults['sanitize']) {
+                    // FixMe: See the FixMe above pertaining to sanitize
+                    data.userRole = $scope.roleUserPrefix + id.replace(/\W/g, '_').toUpperCase();
+                  } else {
+                    data.userRole = $scope.roleUserPrefix + id;
+                  }
+                  $scope.users.push(data);
+                }
               }).catch(function() {
                 policy.userDoesNotExist = id;
+                $scope.policiesUser.push(policy);
+                getCurrentPolicies();
               });
-
-              $scope.policiesUser.push(policy);
             }
           });
         },
@@ -522,16 +534,13 @@ angular.module('adminNg.controllers')
         angular.forEach(data, function(newRole) {
           if ($scope.roles.indexOf(newRole) == -1) {
             $scope.roles.unshift(newRole);
-          }
-        });
-      });
-    };
 
-    $scope.getMatchingUsers = function (value) {
-      UsersResource.query({query: value}).$promise.then(function (data) {
-        angular.forEach(data, function(newRole) {
-          if ($scope.roles.indexOf(newRole) == -1) {
-            $scope.roles.unshift(newRole);
+            // So we can have user roles that match custom role patterns
+            if (newRole.startsWith($scope.roleUserPrefix) ) {
+              var user = {};
+              user.userRole = newRole;
+              $scope.users.push(user);
+            }
           }
         });
       });
@@ -626,7 +635,7 @@ angular.module('adminNg.controllers')
       });
     };
 
-    $scope.saveScheduling = function () {
+    $scope.saveScheduling = function (newObj, oldObj) {
       if (me.readyToPollConflicts()) {
         if (!me.checkValidity()) {
           return;
@@ -649,10 +658,26 @@ angular.module('adminNg.controllers')
 
           EventSchedulingResource.save({
             id: $scope.resourceId,
-            entries: $scope.source
+            entries: $scope.source,
+            previousId: oldObj ? oldObj.id : undefined,
+            previousEntries: oldObj ? oldObj.inputMethods : undefined
           }, function () {
             fetchChildResources($scope.resourceId);
           });
+
+          // Getting the update may take several seconds on large installations
+          // Fill in input channel values if possible
+          if (oldObj && $scope.source.device.inputs && oldObj.inputs) {
+            var sourceInputs = $scope.source.device.inputs.map(function(input){
+              return input.id;
+            }).join(',');
+            var oldObjInputs = oldObj.inputs.map(function(input){
+              return input.id;
+            }).join(',');
+            if (sourceInputs === oldObjInputs) {
+              $scope.source.device.inputMethods = oldObj.inputMethods;
+            }
+          }
         }, me.conflictsDetected);
       }
     };
@@ -705,6 +730,11 @@ angular.module('adminNg.controllers')
       if (!user) {
         return undefined;
       }
+
+      if (!(user.name || user.username) && user.userRole) {
+        return user.userRole;
+      }
+
       var n = user.name ? user.name : user.username;
       var e = user.email ? '<' + user.email + '>' : '';
 
@@ -1091,8 +1121,8 @@ angular.module('adminNg.controllers')
       getCurrentPolicies();
     };
 
-    let oldPolicies = {};
-    let oldPoliciesUser = {};
+    let oldPolicies = [];
+    let oldPoliciesUser = [];
 
     function getCurrentPolicies () {
       oldPolicies = JSON.parse(JSON.stringify($scope.policies));

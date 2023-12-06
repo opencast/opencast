@@ -102,10 +102,13 @@ public class JobDispatcher {
   protected static final String OPT_DISPATCHINTERVAL = "dispatch.interval";
 
   /** Minimum delay between job dispatching attempts, in seconds */
-  static final long MIN_DISPATCH_INTERVAL = 1;
+  static final float MIN_DISPATCH_INTERVAL = 1.0F;
 
   /** Default delay between job dispatching attempts, in seconds */
-  static final long DEFAULT_DISPATCH_INTERVAL = 0;
+  static final float DEFAULT_DISPATCH_INTERVAL = 0.0F;
+
+  /** Multiplicative factor to transform dispatch interval captured in seconds to milliseconds */
+  static final long DISPATCH_INTERVAL_MS_FACTOR = 1000;
 
   private static final Logger logger = LoggerFactory.getLogger(JobDispatcher.class);
 
@@ -199,13 +202,13 @@ public class JobDispatcher {
   @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) {
 
-    logger.info("Updating job dipatcher properties");
+    logger.info("Updating job dispatcher properties");
 
-    long dispatchInterval = DEFAULT_DISPATCH_INTERVAL;
+    float dispatchInterval = DEFAULT_DISPATCH_INTERVAL;
     String dispatchIntervalString = StringUtils.trimToNull((String) properties.get(OPT_DISPATCHINTERVAL));
     if (StringUtils.isNotBlank(dispatchIntervalString)) {
       try {
-        dispatchInterval = Long.parseLong(dispatchIntervalString);
+        dispatchInterval = Float.parseFloat(dispatchIntervalString);
       } catch (Exception e) {
         logger.warn("Dispatch interval '{}' is malformed, setting to {}", dispatchIntervalString, MIN_DISPATCH_INTERVAL);
         dispatchInterval = MIN_DISPATCH_INTERVAL;
@@ -213,14 +216,12 @@ public class JobDispatcher {
       if (dispatchInterval == 0) {
         logger.info("Dispatching disabled");
       } else if (dispatchInterval < MIN_DISPATCH_INTERVAL) {
-        logger.warn("Dispatch interval {} ms too low, adjusting to {}", dispatchInterval, MIN_DISPATCH_INTERVAL);
+        logger.warn("Dispatch interval {} seconds is too low, adjusting to {}", dispatchInterval, MIN_DISPATCH_INTERVAL);
         dispatchInterval = MIN_DISPATCH_INTERVAL;
       } else {
         logger.info("Dispatch interval set to {} seconds", dispatchInterval);
       }
     }
-
-    long dispatchDelay = dispatchInterval;
 
     // Stop the current dispatch thread so we can configure a new one
     if (jdfuture != null) {
@@ -229,10 +230,11 @@ public class JobDispatcher {
 
     // Schedule the job dispatching.
     if (dispatchInterval > 0) {
+      long dispatchIntervalMs = Math.round(dispatchInterval * DISPATCH_INTERVAL_MS_FACTOR);
       logger.info("Job dispatching is enabled");
       logger.debug("Starting job dispatching at a custom interval of {}s", dispatchInterval);
-      jdfuture = scheduledExecutor.scheduleWithFixedDelay(getJobDispatcherRunnable(), dispatchDelay, dispatchInterval,
-          TimeUnit.SECONDS);
+      jdfuture = scheduledExecutor.scheduleWithFixedDelay(getJobDispatcherRunnable(), dispatchIntervalMs, dispatchIntervalMs,
+          TimeUnit.MILLISECONDS);
     } else {
       logger.info("Job dispatching is disabled");
     }
