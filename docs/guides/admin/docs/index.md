@@ -1,10 +1,10 @@
 Opencast {{ opencast_major_version() }} Administration Guide
 ============================================================
 
-Welcome to the Opencast Universe! Opencast is a free, open-source enterprise level lecture recording system. The core of the
-system delivers functionality for scheduling, media encoding, editing and content delivery. For lecture capture,
-Opencast provides capture agent software and third party appliances are available. An awesome community provides new
-features and support.
+Welcome to the Opencast Universe! Opencast is a free, open-source enterprise level lecture recording system.
+The core of the system delivers functionality for scheduling, media encoding, editing and content delivery.
+For lecture capture, Opencast provides capture agent software and third party appliances are available.
+An awesome community provides new features and support.
 
 The Software
 ------------
@@ -28,7 +28,8 @@ Opencast includes the following features:
 * Distribution to local streaming and download servers and configuration capability for distribution to channels such as
   YouTube or learning management systems (LMS) like Moodle, StudIP and others.
 
-* Multi-stream media player for learners to engage with content, including slide preview, content based search and much more.
+* Multi-stream media player for learners to engage with content, including slide preview, content based search
+  and much more.
 
 The Opencast community is a collaboration of individuals, higher education institutions, corporations and integrators
 working together to explore, develop, define and document best practices and technologies for management of audiovisual
