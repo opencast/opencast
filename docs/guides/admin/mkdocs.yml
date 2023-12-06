@@ -67,7 +67,6 @@ nav:
       - Using Nginx: 'configuration/https/nginx.md'
       - Using Apache httpd: configuration/https/apache-httpd.md
       - Internal HTTPS: 'configuration/https/opencast.only.md'
-      - Migrating old content to HTTPS: 'configuration/https/migration.md'
       - Self-Signed Certificates: 'configuration/https/self-signed-certificates.md'
    - Admin UI Configuration:
         - Capture-Agent Access: configuration/admin-ui/capture-agent-access.md
@@ -274,4 +273,3 @@ nav:
    - Waveform: 'workflowoperationhandlers/waveform-woh.md'
    - WebVTT to CutMarks Operation: 'workflowoperationhandlers/webvtt-to-cutmarks.md'
    - Zip: 'workflowoperationhandlers/zip-woh.md'
-- Glossary: 'glossary.md'

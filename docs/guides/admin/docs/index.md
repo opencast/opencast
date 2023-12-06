@@ -9,7 +9,11 @@ features and support.
 The Software
 ------------
 
-Opencast contains everything you need for scheduling captures, trimming, captioning, and conversion of output media to several formats and our engage components. The core can be deployed on one (all-in-one deployment) or many (distributed deployment) Linux servers so your Opencast installation can grow with the needs of your university. Opencast includes the following features:
+Opencast contains everything you need for scheduling captures, trimming, captioning, and conversion of
+output media to several formats and our engage components. The core can be deployed on one
+(all-in-one deployment) or many (distributed deployment) Linux servers so your Opencast installation
+can grow with the needs of your university.
+Opencast includes the following features:
 
 * Administrative tools for scheduling automated single and multi-stream recordings, manually uploading files, and
   managing metadata, and processing functions
@@ -24,15 +28,11 @@ Opencast contains everything you need for scheduling captures, trimming, caption
 * Distribution to local streaming and download servers and configuration capability for distribution to channels such as
   YouTube or learning management systems (LMS) like Moodle, StudIP and others.
 
-* HTML5 multi-stream media player for learners to engage with content, including slide preview, content based search.
+* Multi-stream media player for learners to engage with content, including slide preview, content based search and much more.
 
 The Opencast community is a collaboration of individuals, higher education institutions, corporations and integrators
 working together to explore, develop, define and document best practices and technologies for management of audiovisual
 content in a multitude of settings.
-
-Opencast is supported by a growing international community that includes over 200 members from more than 100
-organizations.
-
 
 
 Release Documentation
