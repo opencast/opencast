@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Start</title>
+
+    <link rel="stylesheet" type="text/css" href="../shared/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../shared/css/admin.css?v=20170618" />
+    <link rel="stylesheet" type="text/css" href="../shared/css/lti.css?v=20170618" />
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css" />
+    <link href="css/record.css?v=20170619" rel="stylesheet" />
+    <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/cgifnbjkakdhgbflhdomcooakkdeinhh">
+</head>
+
+<body>
+    <input type="checkbox" class="hiddenCheck" id="cropVideoToggle" />
+    <input type="checkbox" class="hiddenCheck" id="positionVideoToggle" />
+    <input type="checkbox" class="hiddenCheck" id="magicVideoToggle" />
+    <div class="lti-outer">
+      <div id="recorder">
+        <div class="lti-oc-title row">
+
+          <div class="col-md-6">
+
+            <div class="row title">
+              <div class="col-md-2 text-right">
+                <h3>Recording</h3>
+              </div>
+              <div class="col-md-10" style="padding:0px">
+                <input type="text" placeholder="Title" id="recorder-title"/>
+              </div>
+            </div>
+            <div class="row presenter">
+              <div class="col-md-2 text-right">
+                <h4>Presenter</h4>
+              </div>
+              <div class="col-md-10" style="padding:0px">
+                <input type="text" placeholder="Presenter" id="recorder-presenter"/>
+              </div>
+            </div>
+          </div>
+          <div id="setupContainer" class="col-md-6">
+
+            <div id="stream-desktop">
+              <a href="#" class="btn btn-default empty invalid" data-stream="desktop"><i class="fa fa-desktop" aria-hidden="true"></i> Desktop</a>
+
+              <section>
+                  <a href="#" rel="change" class="btn btn-default btn-block" title="Change desktop window..."><i class="fa fa-refresh blue" aria-hidden="true"></i> Change</a>
+                  <a href="#" rel="remove-desktop" class="btn btn-default btn-block" title="Don't use desktop window anymore."><i class="fa fa-ban red" aria-hidden="true"></i></a>
+              </section>
+            </div>
+            <div id="stream-video">
+              <a href="#" class="btn btn-default empty invalid" data-stream="video"><i class="glyphicon glyphicon-facetime-video"></i> Webcam</a>
+
+              <section>
+                <a href="#" class="btn-block"><i class="glyphicon glyphicon-facetime-video" aria-hidden="true"></i> Webcam</a>
+                <a href="#" rel="remove-webcam" class="btn btn-default btn-block" title="Don't use webcam."><i class="fa fa-ban red" aria-hidden="true"></i></a>
+
+                <div id="position-panel">
+                  <div>
+                    <a href="#" rel="left-top" class="position"></a>
+                    <a href="#" rel="right-top" class="position"></a>
+                  </div>
+                  <div>
+                    <a href="#" rel="remove-webcam" class="btn btn-default" title="Don't use webcam."><i class="fa fa-ban red" aria-hidden="true"></i></a>
+                  </div>
+                  <div>
+                    <a href="#" rel="left-bottom" class="position"></a>
+                    <a href="#" rel="right-bottom" class="position"></a>
+                  </div>
+                </div>
+              </section>
+            </div>
+            <div id="stream-audio">
+              <a href="#" class="btn btn-default empty invalid" data-stream="audio" style="margin-left: 8px;"><i class="fa" aria-hidden="true"></i> Microphone</a>
+
+              <section style="margin-left: 8px;">
+
+                  <a href="#" rel="remove-audio" class="btn btn-default btn-block" title="Don't use microphone."><i class="fa fa-ban red" aria-hidden="true"></i></a>
+              </section>
+            </div>
+            <div id="transcription-lang" class="notCapable">
+              <input id="chooseLang" type="checkbox" class="hiddenCheck" />
+              <label for="chooseLang" class="btn btn-default" data-stream="transcript" style="margin-left: 8px;"><i class="fa" aria-hidden="true"></i> Transcript: en_ZA</label>
+
+              <ul id="transcription-list" data-lang="en-ZA">
+                 <li><a href="#en-ZA">English (South Africa)</a></li>
+                 <li><a href="#en-GB">English (UK)</a></li>
+                 <li><a href="#en-GH">English (Ghana)</a></li>
+                 <li><a href="#en-AU">English (Australia)</a></li>
+                 <li><a href="#en-US">English (US)</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div id="videoStreams" class="row">
+          <canvas id="canvas"></canvas>
+          <div id="edit">
+            <span title="Position &amp; resize">
+              <label for="positionVideoToggle"><i class="fa fa-arrows"></i></label>
+            </span>
+            <!--span title="Effects">
+              <label for="magicVideoToggle"><i class="fa fa-magic"></i></label>
+            </span-->
+            <span title="Crop videos">
+              <label for="cropVideoToggle"><i class="fa fa-crop"></i></label>
+            </span>
+          </div>
+          <div id="posTool" class="tool">
+            <label for="positionVideoToggle" class="close" title="Cancel &amp; close"></label>
+            <label for="positionVideoToggle" class="apply" title="Save"></label>
+            <div class="posVideos">
+              <div class="videoContainer" style="width: 320px; height: 240px;">
+                <div class="resizer"></div>
+              </div>
+            </div>
+          </div>
+          <div id="cc"></div>
+        </div>
+        <div id="audioDisplay">
+           <i class="fa fa-microphone" aria-hidden="true"></i><canvas id="audioLevel"></canvas>
+        </div>
+
+        <div class="row">
+          <div class="col-xs-4 text-center" style="float: none; margin: auto;">
+              <a href="#" rel="btn-start" class="btn btn-default btn-lg" title="Start recording."><i class="fa fa-circle red" aria-hidden="true"></i> </a>
+              <a href="#" rel="btn-pause" class="btn btn-default btn-lg hidden" title="Pause recording."><i class="fa fa-pause black" aria-hidden="true"></i> </a>
+              <a href="#" rel="btn-stop" class="btn btn-default btn-lg disabled" title="Stop recording." data-toggle="modal" data-target="#uploadModal"><i class="fa fa-square black" aria-hidden="true"></i> </a>
+
+              <div id="lbl-uploading" class="hidden"><i class="fa fa-cog fa-spin fa-3x fa-fw"></i> <span>Uploading recording. This might take a few minutes...</span></div>
+          </div>
+        </div>
+
+        <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="eModal">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="close">
+                  <span aria-hidden="true" title="Close Popup">&times;</span>
+                </button>
+                <h4 class="modal-title" id="uploadModal-title">Production Details: <small></small></h4>
+              </div>
+              <div class="modal-body" id="uploadModal-body">
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button id="uploadModal-save" type="button" class="btn btn-success">Save</button>
+                <button id="uploadModal-submit" type="button" class="btn btn-success" disabled>Save &amp; Upload</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal fade" id="extensionModal" tabindex="-1" role="dialog" aria-labelledby="exModal">
+          <div class="modal-dialog" role="document">
+            <form class="modal-content" id="extensionInstaller">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="close">
+                  <span aria-hidden="true" title="Close Popup">&times;</span>
+                </button>
+                <h4 class="modal-title" id="uploadModal-title">Chrome extension required<small></small></h4>
+              </div>
+              <div class="modal-body" id="uploadModal-body">
+                <p>This web application requires the use of an extension to capture your desktop stream.</p>
+                <p>&nbsp;</p>
+                <p>If you would like to install the extension, click the 'Install' button below.</p>
+                <p>&nbsp;</p>
+                <input type="checkbox" id="extensionReadMore" />
+                <label for='extensionReadMore'></label>
+                <div id="extMore">
+                  Installing the extension allows only this web application to capture your desktop. It does not allow other applications from sourcing your desktop.
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button id="installExtension" class="btn btn-success">Install</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="cropTool" class="tool">
+      <h1>Click &amp; drag to crop Video</h1>
+      <label for="cropVideoToggle" class="close" title="Cancel &amp; close"></label>
+      <label for="cropVideoToggle" class="apply" title="Save"></label>
+      <div id="cropWorkspace" class="workspace">
+      </div>
+      <div id="cropList" class="videoList">
+      </div>
+    </div>
+    <div id="effectsTool" class="tool">
+      <h1>Apply Effects</h1>
+      <label for="magicVideoToggle" class="close" title="Cancel &amp; close"></label>
+      <label for="magicVideoToggle" class="apply" title="Save"></label>
+      <div id="magicWorkspace" class="workspace">
+      </div>
+      <div id="magicList" class="videoList">
+      </div>
+    </div>
+
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/javascript" src="../shared/js/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../shared/js/jquery/plugins/jquery.utils.js"></script>
+    <script type="text/javascript" src="../shared/js/ext/moment.min.js"></script>
+    <script type="text/javascript" src="../shared/js/bootstrap.js?v=%version%"></script>
+
+    <script type="text/javascript" src="js/mediamanager.js?v=%version%"></script>
+    <script type="text/javascript" src="js/AnimationLoop.js?v=%version%"></script>
+    <script type="text/javascript" src="js/compositor.js?v=%version%"></script>
+    <script type="text/javascript" src="js/audioanalyser.js?v=%version%"></script>
+    <script type="text/javascript" src="js/seriously.js?v=%version%"></script>
+    <script type="text/javascript" src="js/seriously.chroma.js?v=%version%"></script>
+    <script type="text/javascript" src="js/speechrecognition.js?v=%version%"></script>
+    <script type="text/javascript" src="js/lti.record.js?v=%version%"></script>
+
+    </script>
+    <script type="text/x-tmpl" id="tmpl-audio-device">
+      <a href="#" data-id="{%=o.deviceId%}" data-title="{%=o.label%}" class="btn-block"><i class="fa fa-square-o" aria-hidden="true"></i>{%=o.label||o.deviceId%}</a>
+    </script>
+
+    <script type="text/x-tmpl" id="tmpl-upload-modal-body">
+      <form class="form-inline">
+        <div>
+          <div class="form-group">
+            <label for="uploadModal-input-title">Title</label>
+            <input type="text" class="form-control" id="uploadModal-input-title" placeholder="Title" value="{%=o.title%}">
+          </div>
+        </div>
+        <div>
+          <div class="form-group">
+            <label for="uploadModal-input-presenter">Presenter</label>
+            <input type="text" class="form-control" id="uploadModal-input-presenter" placeholder="Presenter" value="{%=o.presenter%}">
+          </div>
+        </div>
+        <div>
+          <div class="form-group" id="recorderFiles">
+            <label>Files</label>
+            <ul>
+            </ul>
+          </div>
+        </div>
+      </form>
+    </script>
+
+</body>
+
+</html>
