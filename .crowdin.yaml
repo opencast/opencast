@@ -1,4 +1,5 @@
-project_identifier: opencast-community
+project_id: 285795
+api_token_env: CROWDIN_TOKEN
 base_path: .
 preserve_hierarchy: true
 
