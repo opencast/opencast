@@ -20,8 +20,6 @@
  */
 package org.opencastproject.oaipmh.server;
 
-import static org.opencastproject.oaipmh.util.OsgiUtil.getContextProperty;
-
 import org.opencastproject.oaipmh.Granularity;
 import org.opencastproject.oaipmh.matterhorn.MatterhornInlinedMetadataProvider;
 import org.opencastproject.oaipmh.matterhorn.MatterhornMetadataProvider;
@@ -38,6 +36,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Factory for the default OAI-PMH repository that ships with each Opencast installation serving the
@@ -68,7 +67,7 @@ public class DefaultRepository extends OaiPmhRepository {
   /** OSGi callback */
   @Activate
   public void activate(ComponentContext cc) {
-    adminEmail = getContextProperty(cc, OpencastConstants.ADMIN_EMAIL_PROPERTY);
+    adminEmail = Objects.toString(cc.getBundleContext().getProperty(OpencastConstants.ADMIN_EMAIL_PROPERTY), "");
   }
 
   @Override
