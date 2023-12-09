@@ -345,7 +345,7 @@ function listEpisode(info) {
     creatorSpan.innerHTML = '<span>' + he.encode(info.dcCreator ? info.dcCreator : '') + '</span>';
     dateSpan.innerHTML = '<span>' + moment(info.dcCreated).format('D MMM YYYY HH:mm') || '' + '</span>';
 
-    vidLink.href = '/engage/theodul/ui/core.html?ltimode=true&id=' + info.id;
+    vidLink.href = '/paella/ui/watch.html?ltimode=true&id=' + info.id;
 
     picSpan.appendChild(vidLink);
 
