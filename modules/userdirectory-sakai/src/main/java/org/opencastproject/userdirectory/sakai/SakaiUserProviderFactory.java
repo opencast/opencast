@@ -97,10 +97,12 @@ public class SakaiUserProviderFactory implements ManagedServiceFactory {
   private static final String CACHE_EXPIRATION = "org.opencastproject.userdirectory.sakai.cache.expiration";
 
   /** A map of pid to sakai user provider instance */
-  private Map<String, ServiceRegistration> userProviderRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();;
+  private Map<String, ServiceRegistration> userProviderRegistrations =
+        new ConcurrentHashMap<String, ServiceRegistration>();;
 
   /** A map of pid to sakai role provider instance */
-  private Map<String, ServiceRegistration> roleProviderRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();;
+  private Map<String, ServiceRegistration> roleProviderRegistrations =
+        new ConcurrentHashMap<String, ServiceRegistration>();;
 
   /** The OSGI bundle context */
   protected BundleContext bundleContext = null;

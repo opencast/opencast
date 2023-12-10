@@ -114,8 +114,8 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
     this.sitePattern = sitePattern;
 
     logger.info("Creating new BrightspaceUserProviderInstance(pid={}, url={}, cacheSize={}, cacheExpiration={}, "
-                  + "InstructorRoles={}, ignoredUserNames={}), userPattern={}, sitePattern={}", pid, client.getURL(), cacheSize, cacheExpiration,
-                  instructorRoles, ignoredUsernames, userPattern, sitePattern);
+                  + "InstructorRoles={}, ignoredUserNames={}), userPattern={}, sitePattern={}", pid, client.getURL(),
+                  cacheSize, cacheExpiration, instructorRoles, ignoredUsernames, userPattern, sitePattern);
 
     cache = CacheBuilder.newBuilder().maximumSize(cacheSize).expireAfterWrite(cacheExpiration, TimeUnit.MINUTES)
             .build(new CacheLoader<String, Object>() {

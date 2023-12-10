@@ -326,8 +326,8 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
       }
 
       if (StringUtils.isBlank(ltiUsername)) {
-          // If no eid is set we use the supplied ID
-          ltiUsername = userIdFromConsumer;
+        // If no eid is set we use the supplied ID
+        ltiUsername = userIdFromConsumer;
       }
 
       // Check if the provided username should be trusted
