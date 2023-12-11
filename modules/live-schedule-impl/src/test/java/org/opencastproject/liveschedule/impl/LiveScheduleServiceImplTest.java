@@ -891,7 +891,7 @@ public class LiveScheduleServiceImplTest {
     }
 
     @Override
-    public boolean hasPermission(AccessControlList mp, String action) {
+    public boolean hasPermission(AccessControlList acl, String action) {
       return false;
     }
 
