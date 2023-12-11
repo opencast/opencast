@@ -44,6 +44,17 @@ public interface AuthorizationService {
   boolean hasPermission(MediaPackage mp, String action);
 
   /**
+   * Determines whether the current user can take the specified action given the access control list.
+   *
+   * @param mp
+   *          the access control list
+   * @param action
+   *          the action (e.g. read, modify, delete)
+   * @return whether the current user has the correct privileges to take this action
+   */
+  boolean hasPermission(AccessControlList mp, String action);
+
+  /**
    * Gets the active access control list associated with the given media package, as specified by its XACML
    * attachments. XACML attachments are evaluated in the following order:
    *

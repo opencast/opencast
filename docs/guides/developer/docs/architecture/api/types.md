@@ -482,4 +482,28 @@ Type          | Description
 `boolean`     | `true` or `false`
 `enumeration` | One of the values provided by the field `values`
 
+## Playlists
 
+### Playlist
+
+A playlist is represented as a JSON object or XML with the following fields:
+
+| Field                  | Type                                                     | Description                                                                 |
+|------------------------|----------------------------------------------------------|-----------------------------------------------------------------------------|
+| `id`                   | [`long`](types.md#basic)                                 | Identifier. Will be created if not set.                                     |
+| `entries`              | [`List<PlaylistEntry>`](types.md#PlaylistEntry)          | List of entries.                                                            |
+| `title`                | [`string`](types.md#basic)                               | Metadata.                                                                   |
+| `description`          | [`string`](types.md#basic)                               | Metadata.                                                                   |
+| `creator`              | [`string`](types.md#basic)                               | Metadata.                                                                   |
+| `updated`              | [`Date`](types.md#Date)                                  | Metadata. Updated by Opencast with current Date when playlist gets updated. |
+| `accessControlEntries` | [`List<AccessControlEntry`](types.md#AccessControlEntry) | List of access control entries, basically an ACL.                           |
+
+### Playlist Entry
+
+An entry for a playlist as a JSON object or XML. Represents an event
+
+| Field     | Type                       | Description                             |
+|-----------|----------------------------|-----------------------------------------|
+| `id`      | [`long`](types.md#basic)   | Identifier. Will be created if not set. |
+| `eventId` | [`string](types.md#basic)  | List of entries.                        |
+| `type`    | [`string`](types.md#basic) | Enumeration. EVENT, INACCESSIBLE        |

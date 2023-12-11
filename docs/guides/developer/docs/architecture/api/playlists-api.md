@@ -1,0 +1,215 @@
+[TOC]
+
+# Information
+
+The Playlists API is available since API version 1.11.0.
+
+### GET /api/playlists/playlist.json
+
+Returns a playlist.
+
+__Response__
+
+`200 (OK)`: A playlist as JSON.
+
+| Field              | Type                        | Description                                               |
+|--------------------|-----------------------------|-----------------------------------------------------------|
+| `id`               | [`long`](types.md#basic)    | The playlist identifier                                   |
+
+
+__Example__
+
+```json
+{
+  "playlist": {
+    "id": 551,
+    "organization": "mh_default_org",
+    "entries": [
+      {
+        "id": 553,
+        "eventId": "ID-about-opencast",
+        "type": "EVENT"
+      },
+      {
+        "id": 554,
+        "eventId": "ID-3d-print",
+        "type": "EVENT"
+      }
+    ],
+    "title": "Opencast Playlist",
+    "description": "This is a playlist about Opencast",
+    "creator": "Opencast",
+    "updated": 1701854481056,
+    "accessControlEntries": {
+      "allow": true,
+      "role": "ROLE_USER_BOB",
+      "action": "read"
+    }
+  }
+}
+```
+
+### GET /api/playlists/playlists.json
+
+Get playlists. Playlists that you do not have read access to will not show up.
+
+__Response__
+
+`200 (OK)`: A JSON object containing an array.
+
+| Field                    | Type                          | Description                                                  |
+|--------------------------|-------------------------------|--------------------------------------------------------------|
+| `limit`                  | [`int`](types.md#basic)       | The maximum number of results to return for a single request |
+| `offset`                 | [`int`](types.md#basic)       | The index of the first result to return                      |
+| `sortByUpdated`          | [`boolean`](types.md#basic)   | Sort the results based on updated field                      |
+| `sortByUpdatedAscending` | [`boolean`](types.md#basic)   | If sorting by updated, should it be ascending?               |
+
+__Example__
+
+```json
+{
+  "playlist": [
+    {
+      "playlist": {
+        "id": 551,
+        "organization": "mh_default_org",
+        "entries": [
+          {
+            "id": 553,
+            "eventId": "ID-about-opencast",
+            "type": "EVENT"
+          },
+          {
+            "id": 554,
+            "eventId": "ID-3d-print",
+            "type": "EVENT"
+          }
+        ],
+        "title": "Opencast Playlist",
+        "description": "This is a playlist about Opencast",
+        "creator": "Opencast",
+        "updated": 1701854481056,
+        "accessControlEntries": {
+          "allow": true,
+          "role": "ROLE_USER_BOB",
+          "action": "read"
+        }
+      }
+    },
+    {
+      "playlist": {
+        "id": 1051,
+        "organization": "mh_default_org",
+        "entries": [
+          {
+            "id": 1053,
+            "eventId": "ID-about-opencast",
+            "type": "EVENT"
+          },
+          {
+            "id": 1054,
+            "eventId": "ID-3d-print",
+            "type": "EVENT"
+          }
+        ],
+        "title": "Opencast Playlist",
+        "description": "This is a playlist about Opencast",
+        "creator": "Opencast",
+        "updated": 1701856455007,
+        "accessControlEntries": {
+          "allow": true,
+          "role": "ROLE_USER_BOB",
+          "action": "read"
+        }
+      }
+    }
+  ]
+}
+```
+
+### POST /api/playlists/update.json
+
+Updates a playlist or creates a new one.
+
+__Response__
+
+`200 (OK)`: The updated playlist.
+
+| Field       | Type                            | Description             |
+|-------------|---------------------------------|-------------------------|
+| `playlist`  | [`Playlist`](types.md#Playlist) | Playlist in JSON format |
+
+
+__Example__
+
+```json
+{
+  "playlist": {
+    "id": 551,
+    "organization": "mh_default_org",
+    "entries": [
+      {
+        "id": 553,
+        "eventId": "ID-about-opencast",
+        "type": "EVENT"
+      },
+      {
+        "id": 554,
+        "eventId": "ID-3d-print",
+        "type": "EVENT"
+      }
+    ],
+    "title": "Opencast Playlist",
+    "description": "This is a playlist about Opencast",
+    "creator": "Opencast",
+    "updated": 1701854481056,
+    "accessControlEntries": {
+      "allow": true,
+      "role": "ROLE_USER_BOB",
+      "action": "read"
+    }
+  }
+}
+```
+
+### POST /api/playlists/updateEntries.json
+
+Removes a playlist.
+
+__Response__
+
+`200 (OK)`: The removed playlist.
+
+| Field | Type                        | Description             |
+|-------|-----------------------------|-------------------------|
+| `id`  | [`long`](types.md#basic)    | The playlist identifier |
+
+
+### POST /api/playlists/update.json
+
+Updates the entries of a playlist.
+
+__Response__
+
+`200 (OK)`: The updated playlist.
+
+| Field             | Type                                            | Description             |
+|-------------------|-------------------------------------------------|-------------------------|
+| `id`              | [`long`](types.md#basic)                        | The playlist identifier |
+| `playlistEntries` | [`List<PlaylistEntry>`](types.md#PlaylistEntry) | Playlist in JSON format |
+
+
+__Example__
+
+```json
+[
+    {
+        "eventId": "ID-about-opencast",
+        "type": "EVENT"
+    },
+    {
+        "eventId": "ID-3d-print",
+        "type": "EVENT"
+    }
+]
+```
