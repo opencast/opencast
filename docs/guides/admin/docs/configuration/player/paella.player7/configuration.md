@@ -119,3 +119,24 @@ You can enable/disable the cookie consent banner in `config.json` file:
     ...
 }
 ```
+
+Hide/Show the timeline bar on Live events
+-----------------------------------------
+Paella can hide the timeline bar in live events using the `opencast.hideTimeLineOnLive` property
+in the configuration file.
+
+If your live stream offers a time buffer to go back in time, you can configure paella so that
+the time buffer bar is displayed and visitors will be able to go back in time.
+
+Example:
+
+```json
+{
+    ...
+    "opencast": {
+        "hideTimeLineOnLive": false
+        ...
+    }
+    ...
+}
+```
