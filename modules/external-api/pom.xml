@@ -195,6 +195,11 @@
       <artifactId>opencast-playlists</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
     <!-- Testing -->
     <dependency>
       <groupId>io.rest-assured</groupId>
@@ -226,12 +231,6 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-rest-test-environment</artifactId>
       <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

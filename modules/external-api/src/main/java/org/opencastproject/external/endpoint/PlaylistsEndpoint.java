@@ -54,6 +54,7 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
@@ -284,7 +285,7 @@ public class PlaylistsEndpoint {
       return ApiResponses.Json.ok(acceptHeader, playlistToJson(playlist));
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
-    } catch (IOException e) {
+    } catch (JsonProcessingException e) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     } catch (NotFoundException e) {
       return ApiResponses.notFound("Cannot find playlist instance with id '%d'.", playlistId);
