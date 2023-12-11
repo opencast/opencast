@@ -45,6 +45,8 @@ public interface AuthorizationService {
 
   /**
    * Determines whether the current user can take the specified action given the access control list.
+   * This is not restricted to access control lists in media packages, but works regardless of which entity the
+   * access control list belongs to.
    *
    * @param acl
    *          the access control list
