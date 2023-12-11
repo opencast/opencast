@@ -23,7 +23,7 @@ stream which makes the operation more expensive in terms of load.
 
 Not all encoding profiles required for the PartialImportWorkflowOperation are available in
 Opencast per default, so you will have to add them yourself.
-Examples can be found [further down](encoding-profiles).
+Examples can be found [further down](#encoding-profiles).
 
 
 Parameter Table

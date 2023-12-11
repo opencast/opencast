@@ -9,7 +9,7 @@ icons are based on [Font Awesome](http://fontawesome.io/) which gives us scalabl
 size, color, drop shadow, and anything that is provided by CSS.
 
 For more links and license information refer to [References - Font
-Awesome](/modules/admin-ui/style/references/#font-awesome).
+Awesome](references.md/#font-awesome).
 
 **Note:** Font Awesome contains over 630 icons, [the cheat sheet of icons](http://fontawesome.io/cheatsheet/) lists the
 icons and the corresponding CSS class.

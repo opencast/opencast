@@ -55,7 +55,7 @@ the display of information in a modal or more intricate displays.
     are sortable, and a link to edit the columns and their order.
     <br/><br/>
     The table body contains the information of an item in a row and the
-    <a href="../../../../modules/admin-ui/style/buttons/#action-buttons">action buttons</a>
+    <a href="../buttons/#action-buttons">action buttons</a>
     that allows a user to interact with that item.
   </p>
 </div>

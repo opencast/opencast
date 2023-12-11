@@ -5,7 +5,7 @@ look and feel, Open Sans enables users to quickly navigate the software without 
 typeface surpass both web and print applications offering excellent legibility for both forms of media. Open Sans is a
 widely available free font offered through Google Fonts and is widely seen as a web standard face.
 
-Please see [References - Open Sans](/modules/admin-ui/style/references/#open-sans) for license information.
+Please see [References - Open Sans](references.md/#open-sans) for license information.
 
 <div class="row typeface">
   <div class="light">

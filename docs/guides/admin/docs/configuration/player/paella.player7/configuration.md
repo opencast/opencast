@@ -17,7 +17,7 @@ Paella 7 will be a complete rewrite of Paella, aiming several issues
 - Solve the technical debt of 10 years of development.
 
 Have a look at the paella 7 [repository](https://github.com/polimediaupv/paella-core)
-or [documentation page](https://github.com/polimediaupv/paella-core/blob/main/doc/index.md).
+or [documentation page](https://paellaplayer.upv.es/#/doc/index.md).
 
 
 Configuration
