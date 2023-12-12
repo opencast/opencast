@@ -1,5 +1,11 @@
 # Opencast 14: Release Notes
 
+## Opencast 14.7
+
+Opencast 14.7 is a minor release. This release includes bug fixes and improvements.
+
+See [changelog](changelog.md#opencast-147) for a comprehensive list of changes.
+
 ## Opencast 14.6
 
 Opencast 14.6 is a minor release. This release includes bug fixes and improvements.
