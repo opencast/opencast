@@ -1,5 +1,5 @@
 {
-    "defaultLayout": "presenter-presentation-dynamic",
+    "defaultLayout": "presenter-presentation",
 
     "defaultLanguage": "en",
     "defaultVideoPreview": "/ui/config/paella7/default_preview_landscape.jpg",
@@ -124,23 +124,24 @@
                     "title": "Presentation"
                 },
                 {
-                    "id": "presenter-2",
+                    "id": "presentation-2",
                     "content": [
-                        "presenter-2"
+                        "presentation2"
                     ],
                     "icon": "present-mode-1.svg",
-                    "title": "Presentation"
+                    "title": "Presentation2"
                 }
             ],
             "dualVideoContentIds": [
-                "presenter-presentation-dynamic",
-                "presenter-2-presentation-dynamic",
-                "presenter-presenter-2-dynamic"
+                "presenter-presentation",
+                "presenter-presentation-2",
+                "presenter-2-presentation",
+                "presenter-2-presentation-2"
             ],
             "tabIndexStart": 40
         },
         "es.upv.paella.dualVideo": {
-            "enabled": false,
+            "enabled": true,
             "validContent": [
                 {
                     "id": "presenter-presentation",
@@ -152,56 +153,38 @@
                     "title": "Presenter and presentation"
                 },
                 {
-                    "id": "presenter-2-presentation",
+                    "id": "presenter-presentation",
                     "content": [
-                        "presenter-2",
+                        "presenter",
                         "presentation"
                     ],
                     "icon": "present-mode-3.svg",
-                    "title": "Presenter and presentation"
-                },
-                {
-                    "id": "presenter-presenter-2",
-                    "content": [
-                        "presenter",
-                        "presenter-2"
-                    ],
-                    "icon": "present-mode-3.svg",
-                    "title": "Presenter and presentation"
+                    "title": "Presenter and presentation2"
                 }
             ],
             "tabIndexStart": 40
         },
         "es.upv.paella.dualVideoDynamic": {
-            "enabled": true,
+            "enabled": false,
             "validContent": [
-              {
-                "id": "presenter-presentation-dynamic",
-                "content": [
-                  "presenter",
-                  "presentation"
-                ],
-                "icon": "present-mode-3.svg",
-                "title": "Presenter and presentation"
-              },
-              {
-                "id": "presenter-2-presentation-dynamic",
-                "content": [
-                  "presenter-2",
-                  "presentation"
-                ],
-                "icon": "present-mode-3.svg",
-                "title": "Presenter and presentation"
-              },
-              {
-                "id": "presenter-presenter-2-dynamic",
-                "content": [
-                  "presenter",
-                  "presenter-2"
-                ],
-                "icon": "present-mode-3.svg",
-                "title": "Presenter and presentation"
-              }
+                {
+                    "id": "presenter-presentation-dynamic",
+                    "content": [
+                    "presenter",
+                    "presentation"
+                    ],
+                    "icon": "present-mode-3.svg",
+                    "title": "Presenter and presentation"
+                },
+                {
+                    "id": "presenter-presentation-2-dynamic",
+                    "content": [
+                    "presenter",
+                    "presentation-2"
+                    ],
+                    "icon": "present-mode-3.svg",
+                    "title": "Presenter and presentation2"
+                }
             ],
             "tabIndexStart": 40
         },
@@ -209,34 +192,14 @@
             "enabled": true,
             "validContent": [
                 {
-                    "id": "presenter-presenter-2-presentation",
-                    "content": [
-                        "presenter",
-                        "presenter-2",
-                        "presentation"
-                    ],
-                    "icon": "present-mode-4.svg",
-                    "title": "Presenter and presentation"
-                },
-                {
-                    "id": "presenter-2-presenter-3-presentation",
-                    "content": [
-                        "presenter-2",
-                        "presenter-3",
-                        "presentation"
-                    ],
-                    "icon": "present-mode-4.svg",
-                    "title": "Presenter and presentation"
-                },
-		        {
-                    "id": "presenter-presentation-presentation-2",
+                    "id": "presenter-presentation-presentation2",
                     "content": [
                         "presenter",
                         "presentation",
                         "presentation2"
                     ],
                     "icon": "present-mode-4.svg",
-                    "title": "Presenter and presentation"
+                    "title": "Presenter, presentation and presentation2"
                 }
             ],
             "tabIndexStart": 40
