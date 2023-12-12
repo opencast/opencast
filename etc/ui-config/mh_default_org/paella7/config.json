@@ -153,10 +153,10 @@
                     "title": "Presenter and presentation"
                 },
                 {
-                    "id": "presenter-presentation",
+                    "id": "presenter-presentation-2",
                     "content": [
                         "presenter",
-                        "presentation"
+                        "presentation2"
                     ],
                     "icon": "present-mode-3.svg",
                     "title": "Presenter and presentation2"
