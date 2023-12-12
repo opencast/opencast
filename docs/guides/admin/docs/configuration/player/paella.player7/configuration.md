@@ -4,8 +4,8 @@ Paella Player 7
 Paella 7 is Opencast's default player.
 
 The Paella `(pronounced 'paeja')` [Player](https://paellaplayer.upv.es) is an Open Source
-JavaScript video player capable of playing an unlimited number of audio & video streams 
-synchronously, Live Streaming, Zoom, Captions, contributed user plugins and a lot more. 
+JavaScript video player capable of playing an unlimited number of audio & video streams
+synchronously, Live Streaming, Zoom, Captions, contributed user plugins and a lot more.
 It is easy to install and customize for your own needs.
 
 Paella 7 will be a complete rewrite of Paella, aiming several issues
@@ -98,11 +98,11 @@ Cookie consent
 Paella uses cookies to store some user parameters (layout configuration, volume, etc...).
 And, if enabled, the paella user tracking plugin can use cookie to track the user.
 
-To comply with GDPR, ePrivacy Directive, or any other privacy laws, the opencast player uses 
-the [Terms Feed Privacy Consent](https://www.termsfeed.com/privacy-consent/) banner and the 
-paella `config.json` file is configured to use it. 
+To comply with GDPR, ePrivacy Directive, or any other privacy laws, the opencast player uses
+the [Terms Feed Privacy Consent](https://www.termsfeed.com/privacy-consent/) banner and the
+paella `config.json` file is configured to use it.
 
-To Learn more about paella cookie consent you can read paella 
+To Learn more about paella cookie consent you can read paella
 [cookie consent documentation](https://paellaplayer.upv.es/#/doc/cookie_consent.md).
 
 You can enable/disable the cookie consent banner in `config.json` file:
@@ -114,6 +114,27 @@ You can enable/disable the cookie consent banner in `config.json` file:
         "cookieConsent": {
             "enable": true
         },
+        ...
+    }
+    ...
+}
+```
+
+Hide/Show the timeline bar on Live events
+-----------------------------------------
+Paella can hide the timeline bar in live events using the `opencast.hideTimeLineOnLive` property
+in the configuration file.
+
+If your live stream offers a time buffer to go back in time, you can configure paella so that
+the time buffer bar is displayed and visitors will be able to go back in time.
+
+Example:
+
+```json
+{
+    ...
+    "opencast": {
+        "hideTimeLineOnLive": false
         ...
     }
     ...

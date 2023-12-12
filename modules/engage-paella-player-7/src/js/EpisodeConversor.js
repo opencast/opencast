@@ -106,7 +106,7 @@ function getSourceData(track, config) {
   return data;
 }
 
-function getMetadata(episode) {
+function getMetadata(episode, config) {
   const { duration, title, language, series, seriestitle, subjects, license, type } = episode.mediapackage;
   const startDate = new Date(episode.dcCreated);
   const presenters = episode?.mediapackage?.creators?.creator
@@ -119,6 +119,9 @@ function getMetadata(episode) {
       ? episode.mediapackage.contributors.contributor
       : [episode.mediapackage.contributors.contributor])
     : [];
+
+  const isLive = episode?.mediapackage?.media?.track?.some((track) => track.live === true);
+  const visibleTimeLine = !(isLive && config?.hideTimeLineOnLive);
 
   const result = {
     title,
@@ -136,7 +139,8 @@ function getMetadata(episode) {
     location: episode?.dcSpatial,
     UID: episode?.id,
     type,
-    opencast: {episode}
+    opencast: {episode},
+    visibleTimeLine
   };
 
   return result;
