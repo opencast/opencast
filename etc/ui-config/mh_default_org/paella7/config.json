@@ -63,11 +63,14 @@
             "presentation/delivery": "presentation",
             "presenter/delivery": "presenter",
             "presentation/preview": "presentation",
-            "presenter/preview": "presenter"
+            "presenter/preview": "presenter",
+            "presentation2/delivery": "presentation2",
+            "presentation2/preview": "presentation2"
         },
         "videoPreviewAttachment": [
             "presenter/player+preview",
-            "presentation/player+preview"
+            "presentation/player+preview",
+            "presentation2/player+preview"
         ],
         "theme": "custom_theme"
     },
@@ -203,7 +206,7 @@
             "tabIndexStart": 40
         },
         "es.upv.paella.tripleVideo": {
-            "enabled": false,
+            "enabled": true,
             "validContent": [
                 {
                     "id": "presenter-presenter-2-presentation",
@@ -221,6 +224,16 @@
                         "presenter-2",
                         "presenter-3",
                         "presentation"
+                    ],
+                    "icon": "present-mode-4.svg",
+                    "title": "Presenter and presentation"
+                },
+		        {
+                    "id": "presenter-presentation-presentation-2",
+                    "content": [
+                        "presenter",
+                        "presentation",
+                        "presentation2"
                     ],
                     "icon": "present-mode-4.svg",
                     "title": "Presenter and presentation"
