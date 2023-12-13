@@ -108,18 +108,21 @@ Option | Description
 
 ### Build Single Modules
 
-When working on a single Opencast module, it can be extremely helpful having the new built version automatically included in the Opencast OSGi infrastructure. This can be achieved by watching the module with the [bundle:watch](https://karaf.apache.org/manual/latest/commands/bundle-watch.html) command in Karaf. The procedure would be as follows:
+When working on a single Opencast module, it can be extremely helpful having the new built version automatically
+included in the Opencast OSGi infrastructure. This can be achieved by watching the module with the
+[bundle:watch](https://karaf.apache.org/manual/latest/commands/bundle-watch.html) command in Karaf.
+The procedure would be as follows:
 
-* Start Opencast and use `la -u` in the Karaf console to list all installed bundles/modules. Note down the IDs of the
+- Start Opencast and use `la -u` in the Karaf console to list all installed bundles/modules. Note down the IDs of the
   bundles you want to watch.
-* Use `bundle:watch IDs` to watch the desired modules, e.g. `bundle:watch 190 199`
-* Make your changes and rebuild the module (e.g. execute `mvn clean install` in the module folder).
-* Watch how Karaf automatically redeploys the changed jars from your local Maven repository. You can verify that
+- Use `bundle:watch IDs` to watch the desired modules, e.g. `bundle:watch 190 199`
+- Make your changes and rebuild the module (e.g. execute `mvn clean install` in the module folder).
+- Watch how Karaf automatically redeploys the changed jars from your local Maven repository. You can verify that
   everything went smoothly by checking the log with `log:tail`.
 
 To see this technique in action, you can watch the following short video:
 
-* [Opencast development: Watch and reload modules](https://asciinema.org/a/348132)
+- [Opencast development: Watch and reload modules](https://asciinema.org/a/348132)
 
 The updated bundles are only available in the currently running Karaf instance. To create a Opencast version that contains your changes permanently, you have to run `mvn install` in the assemblies directory again. 
 
