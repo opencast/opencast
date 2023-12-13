@@ -117,6 +117,8 @@ To debug the frontend you can use the browser developer tools. For example in Ch
 In the developer tools you can find the tab `Sources`. In this tab you can find the source code of the frontend. You can
 set breakpoints in the source code and debug the frontend.
 
+
+
 ## Enable the Karaf web console
 
 The Karaf web console is a web interface to manage the OSGI bundles. You can enable the web console by adding the following:
