@@ -442,6 +442,19 @@ Opencast 15
 Opencast 14
 -----------
 
+### Opencast 14.7
+
+*Released on December 12th, 2023*
+
+- [[#5425](https://github.com/opencast/opencast/pull/5425)] -
+Fix Unsaved ACL Changes popup if user can't request ACL
+- [[#5416](https://github.com/opencast/opencast/pull/5416)] -
+Silence detection: Skip attaching smil file if empty
+- [[#5412](https://github.com/opencast/opencast/pull/5412)] -
+Update Karaf from 4.4.3 to 4.4.4
+- [[#5270](https://github.com/opencast/opencast/pull/5270)] -
+Fix logging for WhisperEngine
+
 ### Opencast 14.6
 
 *Released on November 16th, 2023*
