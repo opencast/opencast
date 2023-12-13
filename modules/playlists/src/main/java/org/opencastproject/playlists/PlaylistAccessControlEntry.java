@@ -46,7 +46,7 @@ public class PlaylistAccessControlEntry {
   @Column(name = "allow")
   private boolean allow;
 
-  @Column(name = "type")
+  @Column(name = "role")
   private String role;
 
   @Column(name = "action")
