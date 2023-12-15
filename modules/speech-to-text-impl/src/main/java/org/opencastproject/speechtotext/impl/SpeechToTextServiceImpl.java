@@ -222,7 +222,7 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
 
   @Reference(
           name = "SpeechToTextEngine",
-          target = "(engineType=vosk)"
+          target = "(enginetype=whisper)"
   )
   public void setSpeechToTextEngine(SpeechToTextEngine engine) {
     this.speechToTextEngine = engine;
