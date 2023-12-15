@@ -10,7 +10,10 @@ Returns a playlist.
 
 __Response__
 
-`200 (OK)`: A playlist as JSON.
+`200 (OK)`: A playlist as JSON.  
+`400 (BAD REQUEST)`: The request is invalid or inconsistent.  
+`403 (FORBIDDEN)`: The user doesn't have the rights to make this request.  
+`404 (NOT FOUND)`: The specified playlist does not exist.
 
 | Field              | Type                        | Description                                               |
 |--------------------|-----------------------------|-----------------------------------------------------------|
@@ -56,6 +59,7 @@ Get playlists. Playlists that you do not have read access to will not show up.
 __Response__
 
 `200 (OK)`: A JSON object containing an array.
+`400 (BAD REQUEST)`: The request is invalid or inconsistent.
 
 | Field                    | Type                          | Description                                                  |
 |--------------------------|-------------------------------|--------------------------------------------------------------|
@@ -134,6 +138,8 @@ Updates a playlist or creates a new one.
 __Response__
 
 `200 (OK)`: The updated playlist.
+`400 (BAD REQUEST)`: The request is invalid or inconsistent.  
+`403 (FORBIDDEN)`: The user doesn't have the rights to make this request.  
 
 | Field       | Type                            | Description             |
 |-------------|---------------------------------|-------------------------|
@@ -179,6 +185,8 @@ Removes a playlist.
 __Response__
 
 `200 (OK)`: The removed playlist.
+`403 (FORBIDDEN)`: The user doesn't have the rights to make this request.  
+`404 (NOT FOUND)`: The specified playlist does not exist.
 
 | Field | Type                        | Description             |
 |-------|-----------------------------|-------------------------|
@@ -192,6 +200,9 @@ Updates the entries of a playlist.
 __Response__
 
 `200 (OK)`: The updated playlist.
+`400 (BAD REQUEST)`: The request is invalid or inconsistent.  
+`403 (FORBIDDEN)`: The user doesn't have the rights to make this request.  
+`404 (NOT FOUND)`: The specified playlist does not exist.
 
 | Field             | Type                                            | Description             |
 |-------------------|-------------------------------------------------|-------------------------|
