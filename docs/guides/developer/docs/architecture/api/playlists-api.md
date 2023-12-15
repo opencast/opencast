@@ -15,9 +15,9 @@ __Response__
 `403 (FORBIDDEN)`: The user doesn't have the rights to make this request.  
 `404 (NOT FOUND)`: The specified playlist does not exist.
 
-| Field              | Type                        | Description                                               |
-|--------------------|-----------------------------|-----------------------------------------------------------|
-| `id`               | [`long`](types.md#basic)    | The playlist identifier                                   |
+| Field              | Type                          | Description                                               |
+|--------------------|-------------------------------|-----------------------------------------------------------|
+| `id`               | [`String`](types.md#basic)    | The playlist identifier                                   |
 
 
 __Example__
@@ -188,9 +188,9 @@ __Response__
 `403 (FORBIDDEN)`: The user doesn't have the rights to make this request.  
 `404 (NOT FOUND)`: The specified playlist does not exist.
 
-| Field | Type                        | Description             |
-|-------|-----------------------------|-------------------------|
-| `id`  | [`long`](types.md#basic)    | The playlist identifier |
+| Field | Type                         | Description             |
+|-------|------------------------------|-------------------------|
+| `id`  | [`String`](types.md#basic)   | The playlist identifier |
 
 
 ### POST /api/playlists/updateEntries.json
@@ -206,7 +206,7 @@ __Response__
 
 | Field             | Type                                            | Description             |
 |-------------------|-------------------------------------------------|-------------------------|
-| `id`              | [`long`](types.md#basic)                        | The playlist identifier |
+| `id`              | [`String`](types.md#basic)                      | The playlist identifier |
 | `playlistEntries` | [`List<PlaylistEntry>`](types.md#PlaylistEntry) | Playlist in JSON format |
 
 
