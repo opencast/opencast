@@ -178,7 +178,7 @@ __Example__
 }
 ```
 
-### POST /api/playlists/updateEntries.json
+### DELETE /api/playlists/remove
 
 Removes a playlist.
 
@@ -193,7 +193,7 @@ __Response__
 | `id`  | [`long`](types.md#basic)    | The playlist identifier |
 
 
-### POST /api/playlists/update.json
+### POST /api/playlists/updateEntries.json
 
 Updates the entries of a playlist.
 
