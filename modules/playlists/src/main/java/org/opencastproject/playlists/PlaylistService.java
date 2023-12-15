@@ -134,7 +134,7 @@ public class PlaylistService {
    * @throws IllegalStateException If something went wrong in the database service
    * @throws UnauthorizedException If the user does not have read access for the playlist
    */
-  public Playlist getPlaylistById(long id) throws NotFoundException, IllegalStateException, UnauthorizedException {
+  public Playlist getPlaylistById(String id) throws NotFoundException, IllegalStateException, UnauthorizedException {
     try {
       Playlist playlist = persistence.getPlaylist(id);
       if (!checkPermission(playlist, Permissions.Action.READ)) {
@@ -218,7 +218,7 @@ public class PlaylistService {
    * @throws IllegalStateException If something went wrong in the database service
    * @throws UnauthorizedException If the user does not have write access for the playlist
    */
-  public Playlist remove(long playlistId)
+  public Playlist remove(String playlistId)
           throws NotFoundException, IllegalStateException, UnauthorizedException {
     try {
       Playlist playlist = persistence.getPlaylist(playlistId);
@@ -241,7 +241,7 @@ public class PlaylistService {
    * @throws IllegalStateException If something went wrong in the database service
    * @throws UnauthorizedException If the user does not have write access for the playlist
    */
-  public Playlist updateEntries(long playlistId, List<PlaylistEntry> playlistEntries)
+  public Playlist updateEntries(String playlistId, List<PlaylistEntry> playlistEntries)
           throws NotFoundException, IllegalStateException, UnauthorizedException {
     Playlist playlist;
     try {
@@ -273,7 +273,7 @@ public class PlaylistService {
    * @throws IllegalStateException If something went wrong in the database service
    * @throws UnauthorizedException If the user does not have write access for the playlist
    */
-  public Playlist addEntry(long playlistId, String eventId, PlaylistEntryType type)
+  public Playlist addEntry(String playlistId, String eventId, PlaylistEntryType type)
           throws NotFoundException, IllegalStateException, UnauthorizedException {
     Playlist playlist;
     try {
@@ -307,7 +307,7 @@ public class PlaylistService {
    * @throws IllegalStateException If something went wrong in the database service
    * @throws UnauthorizedException If the user does not have write access for the playlist
    */
-  public Playlist removeEntry(long playlistId, long entryId)
+  public Playlist removeEntry(String playlistId, long entryId)
           throws NotFoundException, IllegalStateException, UnauthorizedException {
     Playlist playlist;
     try {

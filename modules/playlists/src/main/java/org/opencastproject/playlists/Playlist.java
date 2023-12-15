@@ -27,17 +27,18 @@ import static org.opencastproject.util.RequireUtil.notNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -68,10 +69,23 @@ import javax.persistence.TemporalType;
 })
 public class Playlist {
 
+  /**
+   * Workaround for generating a UUID for the id if we don't already have one.
+   *
+   * We cannot use EclipseLinks @UuidGenerator annotation for this, because it breaks our JUnit tests.
+   * We also cannot use Hibernates @GenericGenerator for this, since we lack the appropriate library (and possibly
+   * hibernate version).
+   */
+  @PrePersist
+  public void generateId() {
+    if (this.id == null) {
+      this.id = UUID.randomUUID().toString();
+    }
+  }
+
   @Id
-  @GeneratedValue
   @Column(name = "id")
-  private long id;
+  private String id;
 
   @Column(name = "organization")
   private String organization;
@@ -118,7 +132,7 @@ public class Playlist {
 
   }
 
-  public Playlist(long id, String organization, List<PlaylistEntry> entries, String title, String description,
+  public Playlist(String id, String organization, List<PlaylistEntry> entries, String title, String description,
       String creator, Date updated, List<PlaylistAccessControlEntry> accessControlEntries) {
     this.id = id;
     this.organization = organization;
@@ -130,11 +144,11 @@ public class Playlist {
     this.accessControlEntries = accessControlEntries;
   }
 
-  public Long getId() {
+  public String getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(String id) {
     this.id = id;
   }
 

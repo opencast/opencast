@@ -186,7 +186,7 @@ public class PlaylistRestService {
       description = "Get a playlist.",
       returnDescription = "A playlist as JSON",
       restParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "The playlist identifier", type = LONG),
+          @RestParameter(name = "id", isRequired = true, description = "The playlist identifier", type = STRING),
           @RestParameter(name = "withPublications", isRequired = false, description = "If available publications for an"
               + "event should be returned", type = BOOLEAN, defaultValue = "true")
       },
@@ -196,7 +196,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
   public JaxbPlaylist getPlaylistAsJson(
-      @FormParam("id") long id,
+      @FormParam("id") String id,
       @FormParam("withPublications") boolean withPublications)
           throws NotFoundException, UnauthorizedException {
     Playlist playlist = service.getPlaylistById(id);
@@ -219,7 +219,7 @@ public class PlaylistRestService {
       description = "Get a playlist.",
       returnDescription = "A playlist as XML",
       restParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "The playlist identifier", type = LONG),
+          @RestParameter(name = "id", isRequired = true, description = "The playlist identifier", type = STRING),
           @RestParameter(name = "withPublications", isRequired = false, description = "If available publications for an"
               + "event should be returned", type = BOOLEAN, defaultValue = "true")
       },
@@ -229,7 +229,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
   public JaxbPlaylist getPlaylistAsXml(
-      @FormParam("id") long id,
+      @FormParam("id") String id,
       @FormParam("withPublications") boolean withPublications)
           throws NotFoundException, UnauthorizedException {
     return getPlaylistAsJson(id, withPublications);
@@ -364,14 +364,14 @@ public class PlaylistRestService {
       description = "Removes a playlist.",
       returnDescription = "No content.",
       restParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = LONG)
+          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING)
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "Playlist removed."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No playlist with that identifier exists."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
-  public JaxbPlaylist remove(@FormParam("id") long id) throws NotFoundException, UnauthorizedException {
+  public JaxbPlaylist remove(@FormParam("id") String id) throws NotFoundException, UnauthorizedException {
     try {
       // Persist
       Playlist playlist = service.remove(id);
@@ -390,7 +390,7 @@ public class PlaylistRestService {
       description = "Updates the entries of a playlist",
       returnDescription = "The updated playlist.",
       restParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = LONG),
+          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING),
           @RestParameter(name = "playlistEntries", isRequired = false, description = "Playlist entries in JSON format",
               type = TEXT, jaxbClass = JaxbPlaylistEntry[].class, defaultValue = SAMPLE_PLAYLIST_ENTRIES_JSON)
       },
@@ -399,7 +399,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
   public JaxbPlaylist updateEntriesAsJson(
-      @FormParam("id") Long playlistId,
+      @FormParam("id") String playlistId,
       @FormParam("playlistEntries") String entriesText)
           throws UnauthorizedException {
     try {
@@ -423,7 +423,7 @@ public class PlaylistRestService {
       description = "Updates the entries of a playlist",
       returnDescription = "The updated playlist.",
       restParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = LONG),
+          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING),
           @RestParameter(name = "playlistEntries", isRequired = false, description = "Playlist entries in XML format",
               type = TEXT, jaxbClass = JaxbPlaylistEntry[].class, defaultValue = SAMPLE_PLAYLIST_ENTRIES_XML)
       },
@@ -432,7 +432,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
   public JaxbPlaylist updateEntriesAsXml(
-      @FormParam("id") Long playlistId,
+      @FormParam("id") String playlistId,
       @FormParam("playlistEntries") String entriesText)
           throws UnauthorizedException {
     try {
@@ -456,7 +456,7 @@ public class PlaylistRestService {
       returnDescription = "No content.",
       restParameters = {
           @RestParameter(name = "playlistId", isRequired = true, description = "Identifier of the playlist to add to",
-              type = LONG),
+              type = STRING),
           @RestParameter(name = "eventId", isRequired = false, description = "Event identifier", type = STRING),
           @RestParameter(name = "type", isRequired = false, description = "Entry type. Enum. Valid values are EVENT,"
               + " INACCESSIBLE.", type = STRING),
@@ -467,7 +467,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
   public JaxbPlaylist addEntry(
-      @FormParam("playlistId") Long playlistId,
+      @FormParam("playlistId") String playlistId,
       @FormParam("eventId") String eventId,
       @FormParam("type") PlaylistEntryType type)
           throws NotFoundException, UnauthorizedException {
@@ -487,7 +487,7 @@ public class PlaylistRestService {
       description = "Remove entry from playlist.",
       returnDescription = "Playlist without the enrty.",
       restParameters = {
-          @RestParameter(name = "playlistId", isRequired = true, type = LONG,
+          @RestParameter(name = "playlistId", isRequired = true, type = STRING,
               description = "Identifier of the playlist to delete from"),
           @RestParameter(name = "entryId", isRequired = false, type = LONG,
               description = "Identifier of the enrty that should be deleted")
@@ -498,7 +498,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
   public JaxbPlaylist addEntry(
-      @FormParam("playlistId") Long playlistId,
+      @FormParam("playlistId") String playlistId,
       @FormParam("entryId") Long entryId)
           throws NotFoundException, UnauthorizedException {
     try {

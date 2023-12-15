@@ -20,8 +20,8 @@
  */
 package org.opencastproject.external.endpoint;
 
-import static org.easymock.EasyMock.anyLong;
 import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.anyString;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -54,9 +54,9 @@ public class TestPlaylistsEndpoint extends PlaylistsEndpoint {
 
   public TestPlaylistsEndpoint() throws Exception {
 
-    long playlistId = 28L;
-    long missingPlaylistId = 4444L;
-    long unauthorizedPlaylistId = 1L;
+    String playlistId = "28";
+    String missingPlaylistId = "4444";
+    String unauthorizedPlaylistId = "1";
     String invalidPlaylistJson = "{{ \"title\": \"bad request\" }";
 
     PlaylistEntry entry1 = createNiceMock(PlaylistEntry.class);
@@ -93,11 +93,11 @@ public class TestPlaylistsEndpoint extends PlaylistsEndpoint {
 
     PlaylistService service = createNiceMock(PlaylistService.class);
     expect(service.getPlaylistById(playlistId)).andReturn(playlist);
-    expect(service.getPlaylistById(0L)).andThrow(new IllegalStateException());
+    expect(service.getPlaylistById(null)).andThrow(new IllegalStateException());
     expect(service.getPlaylists(100, 0, false, false)).andReturn(playlists);
     expect(service.update(anyObject(Playlist.class))).andReturn(playlist);
     expect(service.remove(playlistId)).andReturn(playlist);
-    expect(service.updateEntries(anyLong(), EasyMock.<List<PlaylistEntry>> anyObject())).andReturn(playlist);
+    expect(service.updateEntries(anyString(), EasyMock.<List<PlaylistEntry>> anyObject())).andReturn(playlist);
 
     expect(service.getPlaylistById(missingPlaylistId)).andThrow(new NotFoundException());
     expect(service.remove(missingPlaylistId)).andThrow(new NotFoundException());

@@ -33,7 +33,7 @@ import static org.opencastproject.playlists.PlaylistRestService.SAMPLE_PLAYLIST_
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
-import static org.opencastproject.util.doc.rest.RestParameter.Type.LONG;
+import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
 import org.opencastproject.external.common.ApiMediaType;
@@ -132,7 +132,7 @@ public class PlaylistsEndpoint {
       description = "Get a playlist.",
       returnDescription = "A playlist as JSON",
       restParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "The playlist identifier", type = LONG),
+          @RestParameter(name = "id", isRequired = true, description = "The playlist identifier", type = STRING),
       },
       responses = {
           @RestResponse(description = "Returns the playlist.", responseCode = HttpServletResponse.SC_OK),
@@ -142,13 +142,13 @@ public class PlaylistsEndpoint {
       })
   public Response getPlaylistAsJson(
       @HeaderParam("Accept") String acceptHeader,
-      @QueryParam("id") long id) {
+      @QueryParam("id") String id) {
     try {
       Playlist playlist = service.getPlaylistById(id);
 
       return ApiResponses.Json.ok(acceptHeader, playlistToJson(playlist));
     } catch (NotFoundException e) {
-      return ApiResponses.notFound("Cannot find playlist instance with id '%d'.", id);
+      return ApiResponses.notFound("Cannot find playlist instance with id '%s'.", id);
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
     } catch (IllegalStateException e) {
@@ -233,7 +233,7 @@ public class PlaylistsEndpoint {
       description = "Removes a playlist.",
       returnDescription = "No content.",
       restParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = LONG)
+          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING)
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "Playlist removed."),
@@ -242,13 +242,13 @@ public class PlaylistsEndpoint {
       })
   public Response remove(
       @HeaderParam("Accept") String acceptHeader,
-      @FormParam("id") long id) {
+      @FormParam("id") String id) {
     try {
       Playlist playlist = service.remove(id);
 
       return ApiResponses.Json.ok(acceptHeader, playlistToJson(playlist));
     } catch (NotFoundException e) {
-      return ApiResponses.notFound("Cannot find playlist instance with id '%d'.", id);
+      return ApiResponses.notFound("Cannot find playlist instance with id '%s'.", id);
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
     }
@@ -262,7 +262,7 @@ public class PlaylistsEndpoint {
       description = "Updates the entries of a playlist",
       returnDescription = "The updated playlist.",
       restParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = LONG),
+          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING),
           @RestParameter(name = "playlistEntries", isRequired = false, description = "Playlist entries in JSON format",
               type = TEXT, jaxbClass = JaxbPlaylistEntry[].class, defaultValue = SAMPLE_PLAYLIST_ENTRIES_JSON)
       },
@@ -274,7 +274,7 @@ public class PlaylistsEndpoint {
       })
   public Response updateEntriesAsJson(
       @HeaderParam("Accept") String acceptHeader,
-      @FormParam("id") Long playlistId,
+      @FormParam("id") String playlistId,
       @FormParam("playlistEntries") String entriesText) {
     try {
       // Map JSON to JPA
@@ -288,7 +288,7 @@ public class PlaylistsEndpoint {
     } catch (JsonProcessingException e) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     } catch (NotFoundException e) {
-      return ApiResponses.notFound("Cannot find playlist instance with id '%d'.", playlistId);
+      return ApiResponses.notFound("Cannot find playlist instance with id '%s'.", playlistId);
     }
   }
 

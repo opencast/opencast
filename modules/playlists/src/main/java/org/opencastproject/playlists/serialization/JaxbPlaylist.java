@@ -70,7 +70,7 @@ public class JaxbPlaylist {
   }
 
   @XmlAttribute()
-  private long id;
+  private String id;
 
   @XmlElement(name = "organization")
   private String organization;

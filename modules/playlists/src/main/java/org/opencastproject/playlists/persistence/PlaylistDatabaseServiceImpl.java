@@ -96,19 +96,19 @@ public class PlaylistDatabaseServiceImpl implements PlaylistDatabaseService {
 
   /**
    * {@inheritDoc}
-   * @see PlaylistDatabaseService#getPlaylist(long)
+   * @see PlaylistDatabaseService#getPlaylist(String)
    */
   @Override
-  public Playlist getPlaylist(long playlistId) throws NotFoundException, PlaylistDatabaseException {
+  public Playlist getPlaylist(String playlistId) throws NotFoundException, PlaylistDatabaseException {
     return getPlaylist(playlistId, securityService.getOrganization().getId());
   }
 
   /**
    * {@inheritDoc}
-   * @see PlaylistDatabaseService#getPlaylist(long, String)
+   * @see PlaylistDatabaseService#getPlaylist(String, String)
    */
   @Override
-  public Playlist getPlaylist(long playlistId, String orgId) throws NotFoundException, PlaylistDatabaseException {
+  public Playlist getPlaylist(String playlistId, String orgId) throws NotFoundException, PlaylistDatabaseException {
     try {
       return db.execTxChecked(em -> {
         Optional<Playlist> playlist = getPlaylistById(playlistId, orgId).apply(em);
@@ -212,7 +212,7 @@ public class PlaylistDatabaseServiceImpl implements PlaylistDatabaseService {
    * @param orgId the organisation identifier
    * @return the playlist in an optional
    */
-  protected Function<EntityManager, Optional<Playlist>> getPlaylistById(long playlistId, String orgId) {
+  protected Function<EntityManager, Optional<Playlist>> getPlaylistById(String playlistId, String orgId) {
     return em -> getPotentiallyDeletedPlaylist(playlistId, orgId).apply(em).filter(e -> !e.isDeleted());
   }
 
@@ -223,7 +223,7 @@ public class PlaylistDatabaseServiceImpl implements PlaylistDatabaseService {
    * @param orgId the organisation identifier
    * @return the playlist in an optional
    */
-  protected Function<EntityManager, Optional<Playlist>> getPotentiallyDeletedPlaylist(long playlistId, String orgId) {
+  protected Function<EntityManager, Optional<Playlist>> getPotentiallyDeletedPlaylist(String playlistId, String orgId) {
     return namedQuery.findOpt(
         "Playlist.findById",
         Playlist.class,

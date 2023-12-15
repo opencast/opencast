@@ -49,10 +49,10 @@ public class PlaylistsEndpointTest {
 
   private static final JSONParser parser = new JSONParser();
 
-  private static final long PLAYLIST_ID = 28L;
-  private static final long MISSING_PLAYLIST_ID = 4444L;
+  private static final String PLAYLIST_ID = "28";
+  private static final String MISSING_PLAYLIST_ID = "4444";
 
-  private static final long UNAUTHORIZED_PLAYLIST_ID = 1L;
+  private static final String UNAUTHORIZED_PLAYLIST_ID = "1";
 
   private static final String INVALID_PLAYLIST_JSON = "{{ \"title\": \"bad request\" }";
 

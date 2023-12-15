@@ -37,7 +37,7 @@ public interface PlaylistDatabaseService {
    * @throws NotFoundException if there is no playlist  with this identifier
    * @throws PlaylistDatabaseException if there is a problem communicating with the underlying data store
    */
-  Playlist getPlaylist(long playlistId) throws NotFoundException, PlaylistDatabaseException;
+  Playlist getPlaylist(String playlistId) throws NotFoundException, PlaylistDatabaseException;
 
   /**
    * Gets a single playlist by its identifier.
@@ -47,7 +47,7 @@ public interface PlaylistDatabaseService {
    * @throws NotFoundException if there is no playlist  with this identifier
    * @throws PlaylistDatabaseException if there is a problem communicating with the underlying data store
    */
-  Playlist getPlaylist(long playlistId, String orgId) throws NotFoundException, PlaylistDatabaseException;
+  Playlist getPlaylist(String playlistId, String orgId) throws NotFoundException, PlaylistDatabaseException;
 
   /**
    * Get several playlists based on their order in the database

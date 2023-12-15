@@ -59,7 +59,7 @@ public class PlaylistDatabaseServiceTest {
     playlistAccessControlEntries.add(new PlaylistAccessControlEntry(true, "ROLE_USER_BOB", "read"));
 
     testPlaylist = new Playlist();
-    testPlaylist.setId(42L);
+    testPlaylist.setId("42");
     testPlaylist.setOrganization("mh_default_org");
     testPlaylist.addEntry(playlistEntry);
     testPlaylist.addEntry(playlistEntry2);
