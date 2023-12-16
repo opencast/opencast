@@ -28,7 +28,7 @@ import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Strings;
 
-import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
@@ -46,9 +46,9 @@ import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /** WhisperC++ implementation of the Speech-to-text engine interface. */
@@ -251,32 +251,27 @@ public class WhisperCppEngine implements SpeechToTextEngine {
     logger.debug("Finished activating/updating speech-to-text service");
   }
 
-  //TODO: Add method for language detection
-
   /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.speechtotext.api.SpeechToTextEngine#generateSubtitlesFile(File, File, String, Boolean)
    */
-
   @Override
   public Map<String, Object> generateSubtitlesFile(File mediaFile,
       File preparedOutputFile, String language, Boolean translate)
           throws SpeechToTextEngineException {
 
-    if (!FilenameUtils.isExtension(mediaFile.getPath(), "wav")) {
+    if (!mediaFile.getPath().toLowerCase().endsWith(".wav")) {
       throw new SpeechToTextEngineException("WhisperC++ currently doesn't support any media extension other than wav");
     }
 
-    String[] baseCommands = { whispercppExecutable,
+    List<String> command = new ArrayList<>(List.of(
+        whispercppExecutable,
         mediaFile.getAbsolutePath(),
         "--model", whispercppModel,
         "-ovtt",
         "-oj",
-        "--output-file", preparedOutputFile.getAbsolutePath().replaceFirst("[.][^.]+$", "")};
-
-    List<String> command = new ArrayList<>(Arrays.asList(baseCommands));
-
+        "--output-file", preparedOutputFile.getAbsolutePath().replaceFirst("[.][^.]+$", "")));
     if (whispercppBeamSize.isSome()) {
       command.add("-bs");
       command.add(Integer.toString(whispercppBeamSize.get()));
@@ -306,15 +301,15 @@ public class WhisperCppEngine implements SpeechToTextEngine {
     }
     if (whispercppWordThreshold.isSome()) {
       command.add("-wt");
-      command.add(String.format("%f", whispercppWordThreshold.get()));
+      command.add(String.format(Locale.US, "%f", whispercppWordThreshold.get()));
     }
     if (whispercppEntropyThreshold.isSome()) {
       command.add("-et");
-      command.add(String.format("%f", whispercppEntropyThreshold.get()));
+      command.add(String.format(Locale.US, "%f", whispercppEntropyThreshold.get()));
     }
     if (whispercppLogProbThreshold.isSome()) {
       command.add("-lpt");
-      command.add(String.format("%f", whispercppLogProbThreshold.get()));
+      command.add(String.format(Locale.US, "%f", whispercppLogProbThreshold.get()));
     }
     if (whispercppDiarization.isSome() && whispercppDiarization.get()) {
       command.add("-di");
@@ -394,9 +389,10 @@ public class WhisperCppEngine implements SpeechToTextEngine {
     // Detect language if not set
     if (subtitleLanguage.isBlank()) {
       JSONParser jsonParser = new JSONParser();
+      File json = new File(preparedOutputFile.getAbsolutePath().replaceFirst("[.][^.]+$", "")
+          + ".json");
       try {
-        FileReader reader = new FileReader(preparedOutputFile.getAbsolutePath().replaceFirst("[.][^.]+$", "")
-            + ".json");
+        FileReader reader = new FileReader(json);
         Object obj = jsonParser.parse(reader);
         JSONObject jsonObject = (JSONObject) obj;
         JSONObject result = (JSONObject) jsonObject.get("result");
@@ -405,6 +401,8 @@ public class WhisperCppEngine implements SpeechToTextEngine {
       } catch (Exception e) {
         logger.info("Error reading WhisperC++ JSON file for: {}", mediaFile);
         throw new SpeechToTextEngineException(e);
+      } finally {
+        FileUtils.deleteQuietly(json);
       }
     }
 
