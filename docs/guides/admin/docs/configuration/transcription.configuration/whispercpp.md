@@ -23,8 +23,8 @@ Enable WhisperC++ engine
 To enable WhisperC++ as for the `SpeechToText` WoH, follow these steps.
 
 1. Install whispercpp binary and language models following the instruction on
-[whisper.cpp](https://github.com/ggerganov/whisper.cpp) repository or build and use your own RPMs for RHEL-based
-distributions from [whispercpp-rpmbuild](https://github.com/elearning-univie/whispercpp-rpmbuild).
+[whisper.cpp](https://github.com/ggerganov/whisper.cpp) repository or install the `whisper.cpp` package from the
+Opencast repository.
 2. Enable whispercpp engine and set job load in `org.opencastproject.speechtotext.impl.SpeechToTextServiceImpl.cfg`.
 3. Set the binary and target model path to use in `org.opencastproject.speechtotext.impl.engine.WhisperCppEngine`.
 4. WhisperC++ processes only PCM16 (wav) audio files. Therefore you probably have to add an `encode`-operation before
@@ -34,7 +34,7 @@ running `speechtotext` in your workflow and an encoder profile:
   - id: encode
     description: "Extract audio for processing with whispercpp"
     configurations:
-      - source-flavor: "*/themed"
+      - source-flavor: "*/source"
       - target-flavor: "*/audio+stt"
       - encoding-profile: audio-whispercpp
 
@@ -47,14 +47,13 @@ running `speechtotext` in your workflow and an encoder profile:
       - target-tags: >-
           archive,
           engage-download
-      # - translate: true
 ```
 
 ```
 # Audio-only encoding format used for whispercpp
 profile.audio-whispercpp.name = whispercpp wav
-profile.audio-whispercpp.input = audio
-profile.audio-whispercpp.output = audio
+profile.audio-whispercpp.input = stream
+profile.audio-whispercpp.output = stream
 profile.audio-whispercpp.suffix = -stt.wav
 profile.audio-whispercpp.ffmpeg.command = -i #{in.video.path} -vn -ar 16000 -ac 1 -c:a pcm_s16le #{out.dir}/#{out.name}#{out.suffix}
 profile.audio-whispercpp.jobload = 1.0
@@ -68,6 +67,6 @@ Additional Notes
   from the `Whisper Transcription Engine` are also valid for this engine.
 - WhisperC++ can be run on CPU only or (partially) on dedicated hardware (Nvidia GPU, Apple Core ML) - if whispercpp
   binary/library is built with appropriate options/modules.
-- Language models are based on Whisper and are transformed to a custom ggml format. You can download already converted
-  models or build and tweak your own models. For more informations visit
+- Language models are based on Whisper and are transformed to a custom ggml format. You can install them from Opencast
+  repository, download already converted models or build and tweak your own models. For more informations visit
   [models/README.md](https://github.com/ggerganov/whisper.cpp/blob/master/models/README.md).
