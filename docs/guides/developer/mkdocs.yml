@@ -38,7 +38,7 @@ nav:
    - Committers: 'participate/committer.md'
    - Release manager: 'participate/release-manager.md'
    - QA coordinator: 'participate/qa-coordinator.md'
-   - Translators: 'participate/translators.md'
+   - Localization: 'participate/localization.md'
    - Submit issues/PRs: 
       - Overview: 'participate/submit-issues-prs.md'
       - Security issues: participate/security.md
@@ -80,7 +80,6 @@ nav:
          - Typeface: 'develop/admin-ui/style/typeface.md'
          - View Structure: 'develop/admin-ui/style/view-structure.md'
    - Documentation: 'develop/documentation.md'
-   - Localization: 'develop/localization.md'
 - Opencast architecture:
    - Overview: 'architecture/overview.md'
    - Filesystem: 'architecture/filesystem.md'
