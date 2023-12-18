@@ -39,9 +39,9 @@ nav:
    - Release manager: 'participate/release-manager.md'
    - QA coordinator: 'participate/qa-coordinator.md'
    - Translators: 'participate/translators.md'
-   - Submit issues/PRs: 
-      - Overview: 'participate/submit-issues-prs.md'
-      - Security issues: participate/security.md
+   - Submit issues:
+      - Overview and How to: 'participate/submit-issues/submit-issues.md'
+      - Security issues: participate/submit-issues/security.md
    - Decision making:
       - Overview: 'participate/decision-making/index.md'
       - Lazy consensus: 'participate/decision-making/lazy-consensus.md'
