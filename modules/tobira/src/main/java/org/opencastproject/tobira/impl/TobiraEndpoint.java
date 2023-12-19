@@ -26,6 +26,7 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.opencastproject.util.doc.rest.RestParameter.Type;
 
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -94,11 +95,12 @@ public class TobiraEndpoint {
   // adding new JSON fields is a non-breaking change. You should also consider whether Tobira needs
   // to resynchronize, i.e. to get new data.
   private static final int VERSION_MAJOR = 1;
-  private static final int VERSION_MINOR = 3;
+  private static final int VERSION_MINOR = 4;
   private static final String VERSION = VERSION_MAJOR + "." + VERSION_MINOR;
 
   private SearchService searchService;
   private SeriesService seriesService;
+  private AuthorizationService authorizationService;
   private Workspace workspace;
 
   @Activate
@@ -114,6 +116,11 @@ public class TobiraEndpoint {
   @Reference
   public void setSeriesService(SeriesService service) {
     this.seriesService = service;
+  }
+
+  @Reference
+  public void setAuthorizationService(AuthorizationService service) {
+    this.authorizationService = service;
   }
 
   @Reference
@@ -190,7 +197,9 @@ public class TobiraEndpoint {
 
     try {
       var json = Harvest.harvest(
-          preferredAmount, new Date(since), searchService, seriesService, workspace);
+          preferredAmount,
+          new Date(since),
+          searchService, seriesService, authorizationService, workspace);
 
       // TODO: encoding
       return Response.ok(json.toJson()).build();
