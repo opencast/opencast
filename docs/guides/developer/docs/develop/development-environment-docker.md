@@ -89,7 +89,7 @@ $ curl -o docker-compose.yml https://raw.githubusercontent.com/opencast/opencast
 ```
 
 This file defines a three node (admin, presentation, worker) cluster for use in testing, with all the appropriate
-ports exported.  To access to a node run `docker-compose exec --user opencast-builder opencast-$nodetype bash`.  For
+ports exported.  To access a node run `docker-compose exec --user opencast-builder opencast-$nodetype bash`.  For
 example, to access the presentation node run `docker-compose exec --user opencast-builder opencast-presentation bash`.
 
 Available commands are otherwise identical.

@@ -74,7 +74,7 @@ And add this line:
 
     export KARAF_DEBUG=true
 
-In case you need to change the port for debugging, you can add this another line:
+In case you need to change the port for debugging, you can add another line:
 
     export JAVA_DEBUG_PORT={{PORT}}
 
@@ -85,12 +85,12 @@ Where `{{PORT}}` is the desired port.
 For more information on remote debugging with Karaf you can visit [this
 site.](https://karaf.apache.org/manual/latest/#_debugging)
 
-It is **not recommended** enabling remote debugging on production systems!
+Enabling remote debugging on production systems is **not recommended**!
 
 ### Adding Dummy Capture Agent
 
 
-In the case that is needed, you can create a dummy capture agent with testing porpoises.
+In the case that is needed, you can create a dummy capture agent with testing purposes.
 To add a dummy CA, go to the API Docs page in Opencast and enter a new capture agent in:
 
     {opencast-url}/docs.html?path=/capture-admin#setAgentStateConfiguration-4
@@ -108,12 +108,12 @@ To add a dummy CA, go to the API Docs page in Opencast and enter a new capture a
 
 Click on `submit` and is ready to go.
 
-Additional you can call this REST endpoint directly using `CURL` for example.
+Additional you can call this REST endpoint directly using `curl` for example.
 
 
 ## Frontend debugging
 
-To debug the frontend you can use the browser developer tools. For example in Chrome you can open the developer tools.
+To debug the frontend you can use the browser developer tools. For most browsers this is bound to your F12 key by default.
 In the developer tools you can find the tab `Sources`. In this tab you can find the source code of the frontend. You can
 set breakpoints in the source code and debug the frontend.
 
