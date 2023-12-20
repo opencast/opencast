@@ -130,7 +130,7 @@ __Example__
 }
 ```
 
-### POST /api/playlists/update.json
+### PUT /api/playlists/update.json
 
 Updates a playlist or creates a new one.
 

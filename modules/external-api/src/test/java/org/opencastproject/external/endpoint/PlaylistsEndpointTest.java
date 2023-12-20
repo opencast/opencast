@@ -152,7 +152,7 @@ public class PlaylistsEndpointTest {
         .formParam("playlist", new Playlist())
         .expect()
         .statusCode(SC_OK).when()
-        .post(env.host("/update.json"))
+        .put(env.host("/update.json"))
         .asString();
 
     assertPlaylist((JSONObject) parser.parse(response));
@@ -164,7 +164,7 @@ public class PlaylistsEndpointTest {
         .formParam("playlist", INVALID_PLAYLIST_JSON)
         .expect()
         .statusCode(SC_BAD_REQUEST).when()
-        .post(env.host("/update.json"));
+        .put(env.host("/update.json"));
   }
 
   @Test

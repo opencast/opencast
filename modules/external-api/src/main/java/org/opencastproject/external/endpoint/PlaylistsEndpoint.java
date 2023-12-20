@@ -77,6 +77,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -215,7 +216,7 @@ public class PlaylistsEndpoint {
     return ApiResponses.Json.ok(acceptHeader, arr(playlistsJson));
   }
 
-  @POST
+  @PUT
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
   @Path("update.json")
   @RestQuery(
