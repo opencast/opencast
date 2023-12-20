@@ -48,4 +48,4 @@ If your issue is security related, follow the [Opencast Security Issue Process](
       2023-12-18 15:34:33,200 | WARN  | (HttpSessionSecurityContextRepository$SaveToSessionResponseWrapper:343) - Failed to create a session, as response has been committed. Unable to store SecurityContext.
       ```
       ````
-  - Once you are happy with your issue, hit the "Submit new issue" button at the bottom of the page and you are done!
+  - Once you are happy with your issue, hit the "Submit new issue" button at the bottom of the page and you are done!  While we do not guarantee any timeline for a developer to address your issue, it does provide a single place where everything about your issue can be found when we do get to it.
