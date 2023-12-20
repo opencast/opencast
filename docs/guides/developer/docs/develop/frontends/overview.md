@@ -7,6 +7,7 @@ The following is a brief overview.
 ### Admin UI
 - Lives in the `admin-ui-frontend` module.
 - The main frontend for managing Opencast.
+- Was the default admin UI up until 15.0
 - Style guide can be found [here](./admin-ui/development.md).
 
 ### New Admin UI
