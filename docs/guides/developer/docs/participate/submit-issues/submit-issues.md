@@ -39,7 +39,7 @@ If your issue is security related, follow the [Opencast Security Issue Process](
     - Distribution: [e.g. allinone, admin+presentation+worker]
     - Installation method: [e.g. RPM packages, container]
     - Version [e.g. 12.4]
-  - Github used something called Markdown to make your text look pretty. Check the "Preview" tab to see how your
+  - Github uses something called Markdown to make your text look pretty. Check the "Preview" tab to see how your
     issue will look like once you are done.
     - Consider using Markdown yourself to enhance readability. For example, use triple backticks \`\`\` to surround
       log messages or stack traces like so:
