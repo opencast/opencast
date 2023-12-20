@@ -3,12 +3,12 @@
   "entries": [
     {
       "id": 0,
-      "eventId": "1234",
+      "contentId": "1234",
       "type": "EVENT"
     },
     {
       "id": 1,
-      "eventId": "abcd",
+      "contentId": "abcd",
       "type": "EVENT"
     }
   ],

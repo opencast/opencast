@@ -316,7 +316,7 @@ public class PlaylistsEndpoint {
     List<Field> fields = new ArrayList<>();
 
     fields.add(f("id", v(playlistEntry.getId())));
-    fields.add(f("eventId", v(playlistEntry.getEventId())));
+    fields.add(f("contentId", v(playlistEntry.getContentId())));
     fields.add(f("type", enumToJSON(playlistEntry.getType())));
     return obj(fields);
   }

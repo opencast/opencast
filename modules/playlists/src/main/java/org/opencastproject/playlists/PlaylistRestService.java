@@ -103,11 +103,11 @@ public class PlaylistRestService {
       + "        \"updated\": 1701361007521,\n"
       + "        \"entries\": [\n"
       + "            {\n"
-      + "                \"eventId\": \"ID-about-opencast\",\n"
+      + "                \"contentId\": \"ID-about-opencast\",\n"
       + "                \"type\": \"EVENT\"\n"
       + "            },\n"
       + "            {\n"
-      + "                \"eventId\": \"ID-3d-print\",\n"
+      + "                \"contentId\": \"ID-3d-print\",\n"
       + "                \"type\": \"EVENT\"\n"
       + "            }\n"
       + "        ],\n"
@@ -122,11 +122,11 @@ public class PlaylistRestService {
 
   public static final String SAMPLE_PLAYLIST_ENTRIES_JSON = "[\n"
       + "            {\n"
-      + "                \"eventId\": \"ID-about-opencast\",\n"
+      + "                \"contentId\": \"ID-about-opencast\",\n"
       + "                \"type\": \"EVENT\"\n"
       + "            },\n"
       + "            {\n"
-      + "                \"eventId\": \"ID-3d-print\",\n"
+      + "                \"contentId\": \"ID-3d-print\",\n"
       + "                \"type\": \"EVENT\"\n"
       + "            }\n"
       + "        ],";
@@ -134,8 +134,8 @@ public class PlaylistRestService {
   public static final String SAMPLE_PLAYLIST_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><"
       + "ns3:playlist xmlns:ns2=\"http://mediapackage.opencastproject.org\" "
       + "xmlns:ns3=\"http://playlist.opencastproject.org\" id=\"1059\"><organization>mh_default_org</organization>"
-      + "<entries id=\"1061\"><eventId>ID-av-portal</eventId><type>EVENT</type></entries><entries id=\"1062\">"
-      + "<eventId>ID-av-print</eventId><type>EVENT</type></entries><title>Opencast Playlist</title>"
+      + "<entries id=\"1061\"><contentId>ID-av-portal</contentId><type>EVENT</type></entries><entries id=\"1062\">"
+      + "<contentId>ID-av-print</contentId><type>EVENT</type></entries><title>Opencast Playlist</title>"
       + "<description>This is a playlist about Opencast</description><creator>Opencast</creator>"
       + "<updated>1701787700848</updated><accessControlEntries><allow>true</allow><role>ROLE_USER_BOB</role>"
       + "<action>read</action></accessControlEntries></ns3:playlist>";
@@ -143,9 +143,9 @@ public class PlaylistRestService {
   public static final String SAMPLE_PLAYLIST_ENTRIES_XML =
       "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
       + "<entries>\n"
-      + "\t<entry id=\"1061\">\n" + "\t\t<eventId>ID-av-portal</eventId>\n" + "\t\t<type>EVENT</type>\n"
+      + "\t<entry id=\"1061\">\n" + "\t\t<contentId>ID-av-portal</contentId>\n" + "\t\t<type>EVENT</type>\n"
       + "\t</entry>\n"
-      + "\t<entry id=\"1062\">\n" + "\t\t<eventId>ID-av-print</eventId>\n" + "\t\t<type>EVENT</type>\n"
+      + "\t<entry id=\"1062\">\n" + "\t\t<contentId>ID-av-print</contentId>\n" + "\t\t<type>EVENT</type>\n"
       + "\t</entry>\n" + "</entries>";
 
   /** The playlist service instance */
@@ -187,8 +187,9 @@ public class PlaylistRestService {
       returnDescription = "A playlist as JSON",
       restParameters = {
           @RestParameter(name = "id", isRequired = true, description = "The playlist identifier", type = STRING),
-          @RestParameter(name = "withPublications", isRequired = false, description = "If available publications for an"
-              + "event should be returned", type = BOOLEAN, defaultValue = "true")
+          @RestParameter(name = "withPublications", isRequired = false, description = "If available publications for"
+              + "the content should be returned. Only works for content of type EVENT.", type = BOOLEAN,
+              defaultValue = "true")
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "A playlist as JSON."),
@@ -220,8 +221,9 @@ public class PlaylistRestService {
       returnDescription = "A playlist as XML",
       restParameters = {
           @RestParameter(name = "id", isRequired = true, description = "The playlist identifier", type = STRING),
-          @RestParameter(name = "withPublications", isRequired = false, description = "If available publications for an"
-              + "event should be returned", type = BOOLEAN, defaultValue = "true")
+          @RestParameter(name = "withPublications", isRequired = false, description = "If available publications for"
+              + "the content should be returned. Only works for content of type EVENT.", type = BOOLEAN,
+              defaultValue = "true")
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "A playlist as XML."),
@@ -457,7 +459,7 @@ public class PlaylistRestService {
       restParameters = {
           @RestParameter(name = "playlistId", isRequired = true, description = "Identifier of the playlist to add to",
               type = STRING),
-          @RestParameter(name = "eventId", isRequired = false, description = "Event identifier", type = STRING),
+          @RestParameter(name = "contentId", isRequired = false, description = "Content identifier", type = STRING),
           @RestParameter(name = "type", isRequired = false, description = "Entry type. Enum. Valid values are EVENT,"
               + " INACCESSIBLE.", type = STRING),
       },
@@ -468,11 +470,11 @@ public class PlaylistRestService {
       })
   public JaxbPlaylist addEntry(
       @FormParam("playlistId") String playlistId,
-      @FormParam("eventId") String eventId,
+      @FormParam("contentId") String contentId,
       @FormParam("type") PlaylistEntryType type)
           throws NotFoundException, UnauthorizedException {
     try {
-      Playlist playlist = service.addEntry(playlistId, eventId, type);
+      Playlist playlist = service.addEntry(playlistId, contentId, type);
       return new JaxbPlaylist(playlist);
     } catch (Exception e) {
       throw new WebApplicationException(e);

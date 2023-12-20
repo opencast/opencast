@@ -30,8 +30,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
- * A playlist entry belongs to a playlist and cannot exist without it. It holds a reference to an event, as well as
- * additional metadata.
+ * A playlist entry belongs to a playlist and cannot exist without it. It holds a reference to some content (usually an
+ * Opencast event), as well as additional metadata.
  */
 @Entity(name = "PlaylistEntry")
 @Table(name = "oc_playlist_entry")
@@ -42,8 +42,8 @@ public class PlaylistEntry {
   @Column(name = "id")
   private long id;
 
-  @Column(name = "event_id")
-  private String eventId;
+  @Column(name = "content_id")
+  private String contentId;
 
   private PlaylistEntryType type;
 
@@ -58,14 +58,14 @@ public class PlaylistEntry {
 
   }
 
-  public PlaylistEntry(String eventId, PlaylistEntryType type) {
-    this.eventId = eventId;
+  public PlaylistEntry(String contentId, PlaylistEntryType type) {
+    this.contentId = contentId;
     this.type = type;
   }
 
-  public PlaylistEntry(long id, String eventId, PlaylistEntryType type) {
+  public PlaylistEntry(long id, String contentId, PlaylistEntryType type) {
     this.id = id;
-    this.eventId = eventId;
+    this.contentId = contentId;
     this.type = type;
   }
 
@@ -77,12 +77,12 @@ public class PlaylistEntry {
     this.id = id;
   }
 
-  public String getEventId() {
-    return eventId;
+  public String getContentId() {
+    return contentId;
   }
 
-  public void setEventId(String eventId) {
-    this.eventId = eventId;
+  public void setContentId(String contentId) {
+    this.contentId = contentId;
   }
 
   public PlaylistEntryType getType() {

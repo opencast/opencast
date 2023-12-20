@@ -61,13 +61,13 @@ public class TestPlaylistsEndpoint extends PlaylistsEndpoint {
 
     PlaylistEntry entry1 = createNiceMock(PlaylistEntry.class);
     expect(entry1.getId()).andReturn(0L);
-    expect(entry1.getEventId()).andReturn("1234");
+    expect(entry1.getContentId()).andReturn("1234");
     expect(entry1.getType()).andReturn(PlaylistEntryType.EVENT);
     replay(entry1);
 
     PlaylistEntry entry2 = createNiceMock(PlaylistEntry.class);
     expect(entry2.getId()).andReturn(1L);
-    expect(entry2.getEventId()).andReturn("abcd");
+    expect(entry2.getContentId()).andReturn("abcd");
     expect(entry2.getType()).andReturn(PlaylistEntryType.EVENT);
     replay(entry2);
 

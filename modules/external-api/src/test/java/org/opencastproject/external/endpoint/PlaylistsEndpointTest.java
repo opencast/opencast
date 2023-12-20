@@ -76,11 +76,11 @@ public class PlaylistsEndpointTest {
     assertEquals(2, entries.size());
 
     final JSONObject entry = (JSONObject) entries.get(0);
-    assertEquals("1234", entry.get("eventId"));
+    assertEquals("1234", entry.get("contentId"));
     assertEquals("EVENT", entry.get("type"));
 
     final JSONObject entryTwo = (JSONObject) entries.get(1);
-    assertEquals("abcd", entryTwo.get("eventId"));
+    assertEquals("abcd", entryTwo.get("contentId"));
     assertEquals("EVENT", entryTwo.get("type"));
 
     final JSONArray accessControlEntries = (JSONArray) json.get("accessControlEntries");

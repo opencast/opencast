@@ -57,7 +57,7 @@ public class PlaylistTest {
     Assert.assertEquals(1, playlist.getEntries().size());
 
     List<PlaylistEntry> playlistEntries = playlist.getEntries();
-    Assert.assertEquals(playlistEntries.get(0).getEventId(), "5687");
+    Assert.assertEquals(playlistEntries.get(0).getContentId(), "5687");
   }
 
   @Test
@@ -86,7 +86,7 @@ public class PlaylistTest {
     Playlist playlistParsed = jaxbPlaylistParsed.toPlaylist();
 
     Assert.assertEquals(playlistParsed.getTitle(), "title");
-    Assert.assertEquals(playlistParsed.getEntries().get(1).getEventId(), "abcd");
+    Assert.assertEquals(playlistParsed.getEntries().get(1).getContentId(), "abcd");
   }
 
   @Test
@@ -116,6 +116,6 @@ public class PlaylistTest {
     Playlist playlistParsed = jaxbPlaylistParsed.toPlaylist();
 
     Assert.assertEquals(playlist.getTitle(), playlistParsed.getTitle());
-    Assert.assertEquals(playlist.getEntries().get(1).getEventId(), playlistParsed.getEntries().get(1).getEventId());
+    Assert.assertEquals(playlist.getEntries().get(1).getContentId(), playlistParsed.getEntries().get(1).getContentId());
   }
 }

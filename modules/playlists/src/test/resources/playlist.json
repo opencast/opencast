@@ -1,11 +1,11 @@
 {
   "entries": [
     {
-      "eventId": "1234",
+      "contentId": "1234",
       "type": "EVENT"
     },
     {
-      "eventId": "abcd",
+      "contentId": "abcd",
       "type": "EVENT"
     }
   ],

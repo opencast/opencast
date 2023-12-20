@@ -53,8 +53,8 @@ public class JaxbPlaylistEntry {
   @XmlAttribute()
   private long id;
 
-  @XmlElement(name = "eventId")
-  private String eventId;
+  @XmlElement(name = "contentId")
+  private String contentId;
 
   @XmlElement(name = "type")
   private PlaylistEntryType type;
@@ -78,20 +78,20 @@ public class JaxbPlaylistEntry {
   public JaxbPlaylistEntry(PlaylistEntry playlistEntry) {
     this();
     this.id = playlistEntry.getId();
-    this.eventId = playlistEntry.getEventId();
+    this.contentId = playlistEntry.getContentId();
     this.type = playlistEntry.getType();
   }
 
   public PlaylistEntry toPlaylistEntry() {
     return new PlaylistEntry(
         id,
-        eventId,
+        contentId,
         type
     );
   }
 
-  public String getEventId() {
-    return eventId;
+  public String getContentId() {
+    return contentId;
   }
 
   public PlaylistEntryType getType() {
@@ -124,7 +124,7 @@ public class JaxbPlaylistEntry {
 
     return new EqualsBuilder()
         .append(id, jaxbPlaylistEntry.id)
-        .append(eventId, jaxbPlaylistEntry.eventId)
+        .append(contentId, jaxbPlaylistEntry.contentId)
         .append(type, jaxbPlaylistEntry.type)
         .isEquals();
   }
@@ -133,7 +133,7 @@ public class JaxbPlaylistEntry {
   public int hashCode() {
     return new HashCodeBuilder(17, 37)
         .append(id)
-        .append(eventId)
+        .append(contentId)
         .append(type)
         .toHashCode();
   }

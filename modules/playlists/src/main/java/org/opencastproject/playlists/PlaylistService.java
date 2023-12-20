@@ -266,14 +266,14 @@ public class PlaylistService {
   /**
    * Adds a new entry at the end of a playlist and persists it
    * @param playlistId The playlist identifier
-   * @param eventId mediapackage identifier
+   * @param contentId content (e.g. mediapacakge) identifier
    * @param type arbitrary string
    * @return {@link Playlist} with the new entry
    * @throws NotFoundException If no playlist with the given id could be found
    * @throws IllegalStateException If something went wrong in the database service
    * @throws UnauthorizedException If the user does not have write access for the playlist
    */
-  public Playlist addEntry(String playlistId, String eventId, PlaylistEntryType type)
+  public Playlist addEntry(String playlistId, String contentId, PlaylistEntryType type)
           throws NotFoundException, IllegalStateException, UnauthorizedException {
     Playlist playlist;
     try {
@@ -285,7 +285,7 @@ public class PlaylistService {
       throw new UnauthorizedException("User does not have read permissions");
     }
     PlaylistEntry playlistEntry = new PlaylistEntry();
-    playlistEntry.setEventId(eventId);
+    playlistEntry.setContentId(contentId);
     playlistEntry.setType(type);
     playlist.addEntry(playlistEntry);
 
@@ -336,8 +336,8 @@ public class PlaylistService {
   }
 
   /**
-   * Enrich each entry of a playlist with information about the event. Intended to be used by endpoints when
-   * returning information about a playlist.
+   * Enrich each entry of a playlist with information about the content. Intended to be used by endpoints when
+   * returning information about a playlist. Currently only adds publication information for entries of type EVENT.
    * @param playlist The playlist to enrich
    * @return The serialization class of the playlist, since the added information does not belong to the playlist
    * itself.
@@ -350,15 +350,17 @@ public class PlaylistService {
     for (int i = 0; i < jaxbPlaylistEntries.size(); i++) {
       try {
         JaxbPlaylistEntry entry = jaxbPlaylistEntries.get(i);
-        Opt<Event> optEvent = indexService.getEvent(jaxbPlaylistEntries.get(i).getEventId(), elasticsearchIndex);
-        // We only get an event from the indexService if we have permission to do so (and if it exists ofc)
-        if (optEvent.isSome()) {
-          Event event = optEvent.get();
-          entry.setPublications(event.getPublications());
-        } else {
-          entry.setType(PlaylistEntryType.INACCESSIBLE);
+        if (entry.getType() == PlaylistEntryType.EVENT) {
+          Opt<Event> optEvent = indexService.getEvent(jaxbPlaylistEntries.get(i).getContentId(), elasticsearchIndex);
+          // We only get an event from the indexService if we have permission to do so (and if it exists ofc)
+          if (optEvent.isSome()) {
+            Event event = optEvent.get();
+            entry.setPublications(event.getPublications());
+          } else {
+            entry.setType(PlaylistEntryType.INACCESSIBLE);
+          }
+          jaxbPlaylistEntries.set(i, entry);
         }
-        jaxbPlaylistEntries.set(i, entry);
       } catch (SearchIndexException e) {
         throw new RuntimeException(e);
       }

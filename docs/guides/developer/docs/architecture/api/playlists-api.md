@@ -30,12 +30,12 @@ __Example__
     "entries": [
       {
         "id": 553,
-        "eventId": "ID-about-opencast",
+        "contentId": "ID-about-opencast",
         "type": "EVENT"
       },
       {
         "id": 554,
-        "eventId": "ID-3d-print",
+        "contentId": "ID-3d-print",
         "type": "EVENT"
       }
     ],
@@ -80,12 +80,12 @@ __Example__
         "entries": [
           {
             "id": 553,
-            "eventId": "ID-about-opencast",
+            "contentId": "ID-about-opencast",
             "type": "EVENT"
           },
           {
             "id": 554,
-            "eventId": "ID-3d-print",
+            "contentId": "ID-3d-print",
             "type": "EVENT"
           }
         ],
@@ -107,12 +107,12 @@ __Example__
         "entries": [
           {
             "id": 1053,
-            "eventId": "ID-about-opencast",
+            "contentId": "ID-about-opencast",
             "type": "EVENT"
           },
           {
             "id": 1054,
-            "eventId": "ID-3d-print",
+            "contentId": "ID-3d-print",
             "type": "EVENT"
           }
         ],
@@ -156,12 +156,12 @@ __Example__
     "entries": [
       {
         "id": 553,
-        "eventId": "ID-about-opencast",
+        "contentId": "ID-about-opencast",
         "type": "EVENT"
       },
       {
         "id": 554,
-        "eventId": "ID-3d-print",
+        "contentId": "ID-3d-print",
         "type": "EVENT"
       }
     ],
@@ -215,11 +215,11 @@ __Example__
 ```json
 [
     {
-        "eventId": "ID-about-opencast",
+        "contentId": "ID-about-opencast",
         "type": "EVENT"
     },
     {
-        "eventId": "ID-3d-print",
+        "contentId": "ID-3d-print",
         "type": "EVENT"
     }
 ]
