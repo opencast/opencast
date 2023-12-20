@@ -61,12 +61,11 @@ __Response__
 `200 (OK)`: A JSON object containing an array.
 `400 (BAD REQUEST)`: The request is invalid or inconsistent.
 
-| Field                    | Type                          | Description                                                  |
-|--------------------------|-------------------------------|--------------------------------------------------------------|
-| `limit`                  | [`int`](types.md#basic)       | The maximum number of results to return for a single request |
-| `offset`                 | [`int`](types.md#basic)       | The index of the first result to return                      |
-| `sortByUpdated`          | [`boolean`](types.md#basic)   | Sort the results based on updated field                      |
-| `sortByUpdatedAscending` | [`boolean`](types.md#basic)   | If sorting by updated, should it be ascending?               |
+| Field                    | Type                       | Description                                                                                                                                                                                                                                                                                     |
+|--------------------------|----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `limit`                  | [`int`](types.md#basic)    | The maximum number of results to return for a single request                                                                                                                                                                                                                                    |
+| `offset`                 | [`int`](types.md#basic)    | The index of the first result to return                                                                                                                                                                                                                                                         |
+| `sort`                   | [`string`](types.md#basic) | Sort the results based upon a sorting criteria. A criteria is specified as a pair such as: <Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory. Sort Name is case sensitive. Supported Sort Names are 'updated' |
 
 __Example__
 

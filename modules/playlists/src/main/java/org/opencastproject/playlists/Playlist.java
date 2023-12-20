@@ -52,18 +52,6 @@ import javax.persistence.TemporalType;
 @Table(name = "oc_playlist")
 @NamedQueries({
     @NamedQuery(
-        name = "Playlist.findAll",
-        query = "select p from Playlist p where p.organization=:organizationId order by p.id"
-    ),
-    @NamedQuery(
-        name = "Playlist.findAllOrderedByDateAscending",
-        query = "select p from Playlist p where p.organization=:organizationId order by p.updated ASC"
-    ),
-    @NamedQuery(
-        name = "Playlist.findAllOrderedByDateDescending",
-        query = "select p from Playlist p where p.organization=:organizationId order by p.updated DESC"
-    ),
-    @NamedQuery(
         name = "Playlist.findById",
         query = "SELECT p FROM Playlist p WHERE p.id = :id and p.organization = :organizationId"
     ),

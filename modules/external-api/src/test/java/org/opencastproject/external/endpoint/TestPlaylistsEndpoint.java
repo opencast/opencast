@@ -34,6 +34,7 @@ import org.opencastproject.playlists.PlaylistRestService;
 import org.opencastproject.playlists.PlaylistService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.requests.SortCriterion;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
@@ -94,7 +95,7 @@ public class TestPlaylistsEndpoint extends PlaylistsEndpoint {
     PlaylistService service = createNiceMock(PlaylistService.class);
     expect(service.getPlaylistById(playlistId)).andReturn(playlist);
     expect(service.getPlaylistById(null)).andThrow(new IllegalStateException());
-    expect(service.getPlaylists(100, 0, false, false)).andReturn(playlists);
+    expect(service.getPlaylists(100, 0, new SortCriterion("", SortCriterion.Order.None))).andReturn(playlists);
     expect(service.update(anyObject(Playlist.class))).andReturn(playlist);
     expect(service.remove(playlistId)).andReturn(playlist);
     expect(service.updateEntries(anyString(), EasyMock.<List<PlaylistEntry>> anyObject())).andReturn(playlist);

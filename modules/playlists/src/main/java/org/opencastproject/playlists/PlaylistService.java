@@ -39,6 +39,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.requests.SortCriterion;
 
 import com.entwinemedia.fn.data.Opt;
 
@@ -154,13 +155,13 @@ public class PlaylistService {
    * @throws IllegalStateException If something went wrong in the database service
    */
   public List<Playlist> getPlaylists(int limit, int offset) throws IllegalStateException {
-    return getPlaylists(limit, offset, false, false);
+    return getPlaylists(limit, offset, new SortCriterion("", SortCriterion.Order.None));
   }
 
-  public List<Playlist> getPlaylists(int limit, int offset, boolean sortByUpdated, boolean updatedAscending)
+  public List<Playlist> getPlaylists(int limit, int offset, SortCriterion sortCriterion)
           throws IllegalStateException {
     try {
-      List<Playlist> playlists = persistence.getPlaylists(limit, offset, sortByUpdated, updatedAscending);
+      List<Playlist> playlists = persistence.getPlaylists(limit, offset, sortCriterion);
       playlists.removeIf(playlist -> !checkPermission(playlist, Permissions.Action.READ));
       return playlists;
     } catch (PlaylistDatabaseException e) {

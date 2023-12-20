@@ -34,6 +34,7 @@ import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.util.requests.SortCriterion;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -107,10 +108,10 @@ public class PlaylistDatabaseServiceTest {
   public void testRetrieving() throws Exception {
     playlistDatabaseService.updatePlaylist(testPlaylist, securityService.getOrganization().getId());
 
-    List playlists = playlistDatabaseService.getPlaylists(100, 0, false, false);
+    List playlists = playlistDatabaseService.getPlaylists(100, 0, new SortCriterion("", SortCriterion.Order.None));
     assertTrue("Exactly one playlists should be returned", playlists.size() == 1);
     playlistDatabaseService.deletePlaylist(testPlaylist, securityService.getOrganization().getId());
-    playlists = playlistDatabaseService.getPlaylists(100, 0, false, false);
+    playlists = playlistDatabaseService.getPlaylists(100, 0, new SortCriterion("", SortCriterion.Order.None));
     assertTrue("Exactly zero playlists should be returned", playlists.isEmpty());
   }
 }

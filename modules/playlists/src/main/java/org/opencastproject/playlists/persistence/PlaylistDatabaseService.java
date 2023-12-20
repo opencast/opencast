@@ -22,6 +22,7 @@ package org.opencastproject.playlists.persistence;
 
 import org.opencastproject.playlists.Playlist;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.requests.SortCriterion;
 
 import java.util.List;
 
@@ -56,7 +57,7 @@ public interface PlaylistDatabaseService {
    * @return a list of {@link Playlist}s
    * @throws PlaylistDatabaseException if there is a problem communicating with the underlying data store
    */
-  List<Playlist> getPlaylists(int limit, int offset, boolean sortByUpdated, boolean updatedAscending)
+  List<Playlist> getPlaylists(int limit, int offset, SortCriterion sortCriterion)
           throws PlaylistDatabaseException;
 
   /**

@@ -28,10 +28,10 @@ import static com.entwinemedia.fn.data.json.Jsons.v;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.playlists.PlaylistRestService.SAMPLE_PLAYLIST_ENTRIES_JSON;
 import static org.opencastproject.playlists.PlaylistRestService.SAMPLE_PLAYLIST_JSON;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
-import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
@@ -47,10 +47,12 @@ import org.opencastproject.playlists.serialization.JaxbPlaylist;
 import org.opencastproject.playlists.serialization.JaxbPlaylistEntry;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.util.requests.SortCriterion;
 
 import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
@@ -168,10 +170,11 @@ public class PlaylistsEndpoint {
               description = "The maximum number of results to return for a single request.", defaultValue = "100"),
           @RestParameter(name = "offset", isRequired = false, type = INTEGER,
               description = "The index of the first result to return."),
-          @RestParameter(name = "sortByUpdated", isRequired = false, type = BOOLEAN,
-              description = "Sort the results based on updated field.", defaultValue = "false"),
-          @RestParameter(name = "sortByUpdatedAscending", isRequired = false, type = BOOLEAN,
-              description = "If sorting by updated, should it be ascending?", defaultValue = "false")
+          @RestParameter(name = "sort", isRequired = false, type = STRING,
+              description = "Sort the results based upon a sorting criteria. A criteria is specified as a pair such as:"
+                  + "<Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or"
+                  + "descending order and is mandatory. Sort Name is case sensitive. Supported Sort Names are 'updated'"
+              , defaultValue = "updated:ASC"),
       },
       responses = {
           @RestResponse(description = "Returns the playlist.", responseCode = HttpServletResponse.SC_OK),
@@ -181,9 +184,29 @@ public class PlaylistsEndpoint {
       @HeaderParam("Accept") String acceptHeader,
       @QueryParam("limit") int limit,
       @QueryParam("offset") int offset,
-      @QueryParam("sortByUpdated") boolean sortByUpdated,
-      @QueryParam("sortByUpdatedAscending") boolean sortByUpdatedAscending) {
-    List<Playlist> playlists = service.getPlaylists(limit, offset, sortByUpdatedAscending, sortByUpdatedAscending);
+      @QueryParam("sort") String sort) {
+    if (offset < 0) {
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
+    if (limit < 0) {
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
+    SortCriterion sortCriterion = new SortCriterion("", SortCriterion.Order.None);
+    Option<String> optSort = Option.option(trimToNull(sort));
+    if (optSort.isSome()) {
+      sortCriterion = SortCriterion.parse(optSort.get());
+
+      switch (sortCriterion.getFieldName()) {
+        case "updated":
+          break;
+        default:
+          logger.info("Unknown sort criteria {}", sortCriterion.getFieldName());
+          Response.serverError().status(Response.Status.BAD_REQUEST).build();
+      }
+    }
+    List<Playlist> playlists = service.getPlaylists(limit, offset, sortCriterion);
 
     List<JValue> playlistsJson = playlists.stream()
         .map(p -> playlistToJson(p))

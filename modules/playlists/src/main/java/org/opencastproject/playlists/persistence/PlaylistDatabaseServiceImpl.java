@@ -27,6 +27,7 @@ import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.playlists.Playlist;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.requests.SortCriterion;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.osgi.service.component.ComponentContext;
@@ -40,10 +41,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 @Component(
     immediate = true,
@@ -127,33 +131,29 @@ public class PlaylistDatabaseServiceImpl implements PlaylistDatabaseService {
 
   /**
    * {@inheritDoc}
-   * @see PlaylistDatabaseService#getPlaylists(int, int, boolean, boolean)
+   * @see PlaylistDatabaseService#getPlaylists(int, int, SortCriterion)
    */
   @Override
-  public List<Playlist> getPlaylists(int limit, int offset, boolean sortByUpdated, boolean updatedAscending)
+  public List<Playlist> getPlaylists(int limit, int offset, SortCriterion sortCriterion)
           throws PlaylistDatabaseException {
-    String namedQuery;
-    if (sortByUpdated) {
-      if (updatedAscending) {
-        namedQuery = "Playlist.findAllOrderedByDateAscending";
-      } else {
-        namedQuery = "Playlist.findAllOrderedByDateDescending";
-      }
-    } else {
-      namedQuery = "Playlist.findAll";
-    }
+
     try {
       return db.exec(em -> {
-        var query = em
-            .createNamedQuery(namedQuery, Playlist.class)
-            .setParameter("organizationId", securityService.getOrganization().getId())
-            .setMaxResults(limit)
-            .setFirstResult(offset);
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<Playlist> criteriaQuery = criteriaBuilder.createQuery(Playlist.class);
+        Root<Playlist> from = criteriaQuery.from(Playlist.class);
+        CriteriaQuery<Playlist> select = criteriaQuery.select(from)
+            .where(criteriaBuilder.isNull(from.get("deletionDate")));
 
-        logger.debug("Requesting playlists using query: {}", query);
-        return query.getResultList().stream()
-            .filter(playlist -> !playlist.isDeleted())
-            .collect(Collectors.toList());
+        if (sortCriterion.getOrder().equals(SortCriterion.Order.Ascending)) {
+          criteriaQuery.orderBy(criteriaBuilder.asc(from.get(sortCriterion.getFieldName())));
+        } else if (sortCriterion.getOrder().equals(SortCriterion.Order.Descending)) {
+          criteriaQuery.orderBy(criteriaBuilder.desc(from.get(sortCriterion.getFieldName())));
+        }
+
+        TypedQuery<Playlist> allQuery = em.createQuery(select);
+
+        return allQuery.getResultList();
       });
     } catch (Exception e) {
       throw new PlaylistDatabaseException("Error fetching playlists from database", e);
