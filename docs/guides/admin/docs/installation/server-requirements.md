@@ -15,18 +15,22 @@ Sensible requirements for an Opencast server:
 For a production ready Opencast cluster it is generally recommended to have at least three VMs with the following specs in addition to a dedicated NFS storage:
 
 Admin node:
+
 - Four cores
 - 8GB of memory
 
 Worker node:
+
 - Four cores
 - 8GB of memory
 
 Presentation node:
+
 - Four cores
 - 4GB of memory
 
 NFS share:
+
 - 5TB disk space
 
 You can have a look at the [overview](multiple-servers.md) and decide which setup is most suited for your use-case.
