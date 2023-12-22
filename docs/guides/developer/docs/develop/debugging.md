@@ -6,11 +6,11 @@ This guide will show you how to debug Opencast.
 ## Debugging strategies
 
 There are different ways to debug Opencast. You can debug the backend and the frontend.
-The backend is the Java code while the frontend is the Angular code.
+The backend is the Java code while the frontend is the Angular code but soon to be replaced for Typescript.
 
 ### How to know what to debug?
 
-First, you want to know you to identify where is the problem. The frontend problems are mostly visible in the browser.
+First, you need to determine where the problem is. The frontend problems are mostly visible in the browser.
 These problems normally are JavaScript errors or problems with the user interface.
 The backend problems are mostly visible in the logs and the API calls. These problems are mostly exceptions or errors.
 
@@ -53,7 +53,7 @@ The easiest way is to attach a remote debugger here are some two ways to do that
 To debug a running Opencast system, you can attach a remote debugger in your IDE (Eclipse, NetBeans, etc.). For that
 you have to enable the remote debugging in Karaf OSGI server that runs Opencast.
 
-You have to add “debug” as an additional parameter to the Opencast start script:
+You have to add "debug" as an additional parameter to the Opencast start script:
 
     bin/start-opencast debug
 
