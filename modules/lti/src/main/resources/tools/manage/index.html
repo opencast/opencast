@@ -329,12 +329,12 @@
             <input type="checkbox" id="scheduleMultiple" name="multipleSchedule" autocomplete="off" />
             <ul class="modal-page active infoList">
               <li>
-                <label for="scheduleTitle">Title</label>
-                <span><input type="text" id="scheduleTitle" name="title" required autocomplete="off" /></span>
+                <span><label class="inputLabel" for="sTitle">Title</label></span>
+                <span><input type="text" id="sTitle" name="title" required autocomplete="off" /></span>
               </li>
               <li data-field="presenters">
-                <label for="presenters">Presenters</label>
-                <span><textarea id="presenters" name="presenters" required></textarea></span>
+                <span><label class="inputLabel" for="sPresenters">Presenters</label></span>
+                <span><textarea id="sPresenters" name="presenters" required></textarea></span>
               </li>
               <li>
                 <span>Repeat Recordings?</span>
@@ -454,15 +454,15 @@
           <div class="modal-body">
             <ul class="modal-page active infoList">
               <li>
-                <label for="title">Title</label>
+                <span><label for="title">Title</label></span>
                 <span><input autocomplete="off" type="text" name="title" id="title" required /></span>
               </li>
               <li data-field="presenters">
-                <label for="presenters1">Presenters</label>
+                <span><label for="presenters1">Presenters</label></span>
                 <span><textarea id="presenters1" name="presenters" rows="2" required></textarea></span>
               </li>
               <li>
-                <label for="description">Description</label>
+                <span><label for="description">Description</label></span>
                 <span><textarea id="description" name="description" placeholder="(Optional)" rows="2"></textarea></span>
               </li>
               <li>
@@ -474,19 +474,19 @@
               </li>
               <hr/>
               <li data-field="presenter">
-                <label for="populatedPresVid">Webcam video or audio file</label>
+                <span><label for="populatedPresVid">Webcam video or audio file</label></span>
                 <input autocomplete="off" type="checkbox" id="populatedPresVid" class="filePopulated" />
                 <span class="fileContainer" data-mediatype="video" >
                   <input autocomplete="off" type="file" name="presenter" data-mediatype="video" title="Choose a presenter/webcam video or audio file" aria-label="Choose a file"/>
                   <progress min="0" value=0 max="100"></progress>
                 </span>
-                <label for="populatedPresVid" class="removeFile"></label>
+                  <label for="populatedPresVid" class="removeFile"></label>
                   <span class="videoPreview">
                     <img alt="empty image tag" />
                   </span>
               </li>
               <li>
-                <label for="populatedPresentationVid">Screenshare video</label>
+                <span><label for="populatedPresentationVid">Screenshare video</label></span>
                 <input autocomplete="off" type="checkbox" id="populatedPresentationVid" class="filePopulated" />
                 <span class="presentationContainer" data-mediatype="video" >
                    <input autocomplete="off" type="file" name="presentation" data-mediatype="video" title="Choose a presentation/screenshare video"/>

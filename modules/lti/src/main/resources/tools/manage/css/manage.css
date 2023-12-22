@@ -1602,6 +1602,10 @@ input.hiddenCheck {
   cursor: pointer;
 }
 
+.hiddenChecks .inputLabel {
+  border: none;
+}
+
 label.checkBox {
   display: inline-block;
   vertical-align: text-top;
