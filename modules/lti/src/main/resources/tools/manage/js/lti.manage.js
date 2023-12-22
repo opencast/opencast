@@ -1114,7 +1114,7 @@ function retractedControls(id) {
 }
 
 function personalEventEditable(id, has_preview) {
-    var str = '<a type="button" style="padding: 0.5rem;" href="/paella/ui/watch.html?id=' + id + '" target="_blank" title="Watch in player"><i class="fa fa-play-circle-o" style="font-size: 1.25em"></i></a>';
+    var str = '<a type="button" style="padding: 0.5rem;" href="/play/' + id + '" target="_blank" title="Watch in player"><i class="fa fa-play-circle-o" style="font-size: 1.25em"></i></a>';
 
     if (has_preview) {
         str += '<a type="button" style="padding: 0.5rem;" href="/admin-ng/index.html#!/events/events/' + id + '/tools/editor' +

@@ -345,7 +345,7 @@ function listEpisode(info) {
     creatorSpan.innerHTML = '<span>' + he.encode(info.dcCreator ? info.dcCreator : '') + '</span>';
     dateSpan.innerHTML = '<span>' + moment(info.dcCreated).format('D MMM YYYY HH:mm') || '' + '</span>';
 
-    vidLink.href = '/paella/ui/watch.html?ltimode=true&id=' + info.id;
+    vidLink.href = '/play/' + info.id;
 
     picSpan.appendChild(vidLink);
 
