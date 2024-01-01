@@ -16,7 +16,7 @@
   "devDependencies": {
     "@babel/core": "^7.23.0",
     "@babel/eslint-parser": "^7.23.3",
-    "@babel/preset-env": "^7.22.14",
+    "@babel/preset-env": "^7.23.7",
     "@playwright/test": "^1.40.1",
     "babel-loader": "^9.1.3",
     "copy-webpack-plugin": "^11.0.0",
