@@ -103,6 +103,7 @@ export default class DownloadsPlugin extends PopUpButtonPlugin {
         type: track.type,
         mimetype: track.mimetype,
         url: track.url,
+        tags: track?.tags?.tag ?? [],
         metadata: {
           video: vmeta,
           audio: ameta
@@ -133,11 +134,20 @@ export default class DownloadsPlugin extends PopUpButtonPlugin {
       streamDownloads.forEach(d => {
         const vmeta = d?.metadata?.video?.res;
         const ameta = d?.metadata?.audio?.samplingrate ? `${d?.metadata?.audio?.samplingrate} Hz` : null;
-        const meta = vmeta ?? ameta ?? '';
+        let cmeta = '';
+        if (d.mimetype == 'text/vtt') {
+          const lang_tag = d?.tags?.filter(x => x.startsWith('lang:'));
+          if (lang_tag.length > 0) {
+            const captions_lang = lang_tag[0].split(':')[1];
+            const languageNames = new Intl.DisplayNames([window.navigator.language], {type: 'language'});
+            cmeta = languageNames.of(captions_lang) || translate('Unknown language');
+          }
+        }
+        const meta = vmeta ?? ameta ?? cmeta ?? '';
 
         createElementWithHtmlText(`
                 <li>
-                  <a href="${d.url}" target="_blank">
+                  <a href="${d.url}" download target="_blank">
                     <span class="mimetype">[${d.mimetype}]</span><span class="res">${meta}</span>
                   </a>
                 </li>
