@@ -34,6 +34,13 @@ For some external software, like the ILIAS plugin, it is required to set `authen
 An alternative method to this is Opencast's [token based authorization system](stream-security.md) which allows (and
 requires) to defer all security checks to external systems.
 
+Tobira
+------
+
+Tobira's current configuration calls for completely disabling static file authorization.  If you are using Tobira, you
+will need to set `authentication.required` in `etc/org.opencastproject.fsresources.StaticResourceServlet.cfg` to
+`false`, then restart Opencast.
+
 
 Available Static File Authorization Plug-ins
 --------------------------------------------
