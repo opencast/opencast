@@ -6,9 +6,9 @@
 <meta name=viewport content="width=device-width, initial-scale=1">
 <link rel=stylesheet type=text/css href=deeplink.css />
 <link rel=stylesheet type=text/css href=/engage/ui/css/engage-ui.css />
-<link rel=stylesheet href=/ltitools/lib/font-awesome/css/font-awesome.min.css />
-<link rel=stylesheet href=/ltitools/lib/paginationjs/dist/pagination.css />
-<link rel=stylesheet href=/ltitools/lib/bootstrap/dist/css/bootstrap.min.css />
+  <link rel="stylesheet" type="text/css" href="../shared/css/font-awesome.min.css?v=%version%">
+  <link rel="stylesheet" type="text/css" href="bootstrap/bootstrap.min.css?v=%version%">
+  <link rel="stylesheet" type="text/css" href="../shared/css/pagination.min.css?v=%version%">
 
 
 <title>Opencast: Deep Linking</title>
@@ -20,15 +20,15 @@
   </ul>
 
 <div class="tab-content">
-  <div id=episodes role="tabpanel" aria-labelledby="episodes-tab" class="tab-pane fade show active">
+  <div id=episodes role="tabpanel" aria-labelledby="episodes-tab" class="tab-pane fade show active container-fluid">
     <div id=episodes-searchfield class="searchfield"></div>
-    <div id=episodes-results class="container-fluid"></div>
-    <div class=clearfix></div>
+    <div id=episodes-results class="row"></div>
+    <div class="clearfix row"></div>
     <div id=episodes-pager></div>
   </div>
   <div id=series role="tabpanel" aria-labelledby="series-tab" class="tab-pane fade">
     <div id=series-searchfield class="searchfield"></div>
-    <div id=series-results class="container-fluid"></div>
+    <div id=series-results class=""></div>
     <div class=clearfix></div>
     <div id=series-pager></div>
   </div>
@@ -132,11 +132,11 @@
   </div>
 </script>
 
-<script type=text/javascript src=/ltitools/lib/jquery/dist/jquery.min.js></script>
-<script type=text/javascript src=/ltitools/lib/bootstrap/dist/js/bootstrap.min.js></script>
-<script type=text/javascript src=/ltitools/lib/axios/dist/axios.min.js></script>
-<script type=text/javascript src=/ltitools/lib/mustache/mustache.min.js></script>
-<script type=text/javascript src=/ltitools/lib/paginationjs/dist/pagination.min.js></script>
+  <script type="text/javascript" src="../shared/js/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="bootstrap/bootstrap.js?v=%version%"></script>
+  <script type="text/javascript" src="../shared/js/pagination.min.js?v=%version%"></script>
+  <script type="text/javascript" src="../shared/js/axios.min.js?v=%version%"></script>
+  <script type="text/javascript" src="../shared/js/mustache.min.js?v=%version%"></script>
 <script type=text/javascript src=/ltitools/i18n-data.js></script>
 <script type=text/javascript src=deeplink.js></script>
 </body>
