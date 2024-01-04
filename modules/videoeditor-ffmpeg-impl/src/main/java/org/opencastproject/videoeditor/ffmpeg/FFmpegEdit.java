@@ -238,7 +238,6 @@ public class FFmpegEdit {
       }
       outmap = "o";                 // if more than one clip
     }
-    command.add("-y");      // overwrite old pathname
     for (String o : inputfiles) {
       command.add("-i");   // Add inputfile in the order of entry
       command.add(o);
