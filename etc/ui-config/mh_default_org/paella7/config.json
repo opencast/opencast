@@ -413,7 +413,7 @@
 
             "downloadFlavors": false,
             "downloadTags": false,
-            "downloadMimeTypes": ["audio/m4a", "video/mp4"],
+            "downloadMimeTypes": ["audio/m4a", "video/mp4", "text/vtt"],
 
             "enableOnLicenses": [
                 "CC-BY",
