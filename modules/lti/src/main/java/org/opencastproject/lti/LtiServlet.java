@@ -241,7 +241,7 @@ public class LtiServlet extends HttpServlet {
         builder = UriBuilder.fromUri(toolUri).scheme(null).host(null).userInfo(null).port(-1);
       }
     } catch (URISyntaxException ex) {
-      logger.warn("The 'custom_tool' parameter was invalid: '{}'. Reverting to default: '{}'",
+      logger.debug("The 'custom_tool' parameter was invalid: '{}'. Reverting to default: '{}'",
               Arrays.toString(req.getParameterValues(LTI_CUSTOM_TOOL)), TOOLS_URL);
       builder = UriBuilder.fromPath(TOOLS_URL);
     }
