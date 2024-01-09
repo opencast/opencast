@@ -139,7 +139,7 @@ const initParams = {
       const data = await fetch(getUrlFromOpencastServer('/info/me.json'));
       const me = await data.json();
 
-      if (me.userRole === 'ROLE_USER_ANONYMOUS') {
+      if (!me.roles.includes('ROLE_USER')) {
         player.log.info('Video not found and user is not authenticated. Try to log in.');
         location.href = getUrlFromOpencastPaella('auth.html?redirect=' + encodeURIComponent(window.location.href));
       }
