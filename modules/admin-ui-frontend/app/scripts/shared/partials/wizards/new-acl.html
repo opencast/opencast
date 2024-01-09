@@ -62,7 +62,9 @@
                                          ng-options="id as name for (id, name) in wizard.step.acls"
                                          placeholder-text-single="'{{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                          no-results-text="'{{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
-                                         ></select>
+                                         >
+                                         <option value=""></option>
+                          </select>
                         </div>
                       </td>
                     </tr>
