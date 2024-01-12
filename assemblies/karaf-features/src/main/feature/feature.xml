@@ -658,7 +658,7 @@
   <feature name="opencast-security-cas" version="${project.version}">
     <bundle start-level="82">mvn:commons-collections/commons-collections/3.2.1</bundle>
     <bundle start-level="82">mvn:org.apache.velocity/velocity/1.7</bundle>
-    <bundle start-level="82">mvn:org.apache.santuario/xmlsec/2.1.2</bundle>
+    <bundle start-level="82">mvn:org.apache.santuario/xmlsec/${xmlsec.version}</bundle>
     <bundle start-level="82">mvn:org.bouncycastle/bcprov-jdk15on/1.51</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-security-cas-client-wrapper/${project.version}</bundle>
     <bundle start-level="82">mvn:org.springframework.security/spring-security-core/3.1.7.RELEASE</bundle>
