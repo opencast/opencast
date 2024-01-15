@@ -1,14 +1,14 @@
 blank_issues_enabled: true
 contact_links:
-  - name: Opencast Studio
-    url: https://github.com/elan-ev/opencast-studio/issues
-    about: Report issues with Opencast Studio in its own repository.
+  - name: Opencast Admin Interface
+    url: https://github.com/opencast/opencast-admin-interface/issues
+    about: Report issues with the admin interface in its own repository.
   - name: Opencast Editor
     url: https://github.com/opencast/opencast-editor/issues
     about: Report issues with Opencast Editor in its own repository.
-  - name: Security issue report
-    url: https://github.com/opencast/opencast/blob/develop/SECURITY.md
-    about: Please report security vulnerabilities here.
+  - name: Opencast Studio
+    url: https://github.com/elan-ev/opencast-studio/issues
+    about: Report issues with Opencast Studio in its own repository.
   - name: Community Support
     url: https://groups.google.com/a/opencast.org/forum/#!forum/users
     about: Join the mailing list to get help running and configuring Opencast.
