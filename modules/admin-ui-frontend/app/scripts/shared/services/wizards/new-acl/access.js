@@ -41,7 +41,7 @@ angular.module('adminNg.services')
 
       me.isAccessState = true;
       me.ud = {};
-      me.ud.id = {};
+      me.ud.id = undefined;
       me.ud.policies = [];
       me.ud.policiesUser = [];
       me.ud.baseAcl = {};
