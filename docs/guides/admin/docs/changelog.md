@@ -442,6 +442,19 @@ Opencast 15
 Opencast 14
 -----------
 
+### Opencast 14.8
+
+*Released on January 16th, 2024*
+
+- [[#5538](https://github.com/opencast/opencast/pull/5538)] -
+  Don't warn about using the default tool
+- [[#5537](https://github.com/opencast/opencast/pull/5537)] -
+  Fix ACL template selection breaking after first selection
+- [[#5492](https://github.com/opencast/opencast/pull/5492)] -
+  Add support for custom actions in ACL to Tobira harvest API
+- [[#5481](https://github.com/opencast/opencast/pull/5481)] -
+  Fix Paella Player 7 login redirect
+
 ### Opencast 14.7
 
 *Released on December 12th, 2023*

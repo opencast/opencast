@@ -78,7 +78,7 @@ angular.module('adminNg.services')
           };
 
       me.ud = {};
-      me.ud.id = {};
+      me.ud.id = undefined;
       me.ud.policies = [];
       me.ud.policiesUser = [];
       me.ud.baseAcl = {};

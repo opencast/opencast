@@ -23,6 +23,7 @@ package org.opencastproject.tobira.impl;
 
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
@@ -71,6 +72,7 @@ final class Harvest {
       Date since,
       SearchService searchService,
       SeriesService seriesService,
+      AuthorizationService authorizationService,
       Workspace workspace
   ) throws UnauthorizedException, SeriesException {
     // Retrieve episodes from index.
@@ -137,7 +139,7 @@ final class Harvest {
         })
         .map(event -> {
           try {
-            return new Item(event, workspace);
+            return new Item(event, authorizationService, workspace);
           } catch (Exception e) {
             var id = event == null ? null : event.getId();
             logger.error("Error reading event '{}' (skipping...)", id, e);
