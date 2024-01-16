@@ -36,7 +36,8 @@ import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
-import org.opencastproject.security.api.Permissions;
+import org.opencastproject.security.api.AclScope;
+import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.series.api.Series;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.MimeType;
@@ -69,7 +70,7 @@ class Item {
   private Jsons.Val obj;
 
   /** Converts a event into the corresponding JSON representation */
-  Item(SearchResultItem event, Workspace workspace) {
+  Item(SearchResultItem event, AuthorizationService authorizationService, Workspace workspace) {
     this.modifiedDate = event.getModified();
 
     if (event.getDeletionDate() != null) {
@@ -150,7 +151,7 @@ class Item {
           Jsons.p("thumbnail", findThumbnail(mp)),
           Jsons.p("timelinePreview", findTimelinePreview(mp)),
           Jsons.p("tracks", Jsons.arr(assembleTracks(event, mp))),
-          Jsons.p("acl", assembleAcl(event.getAccessControlList())),
+          Jsons.p("acl", assembleAcl(authorizationService.getAcl(mp, AclScope.Merged).getA())),
           Jsons.p("isLive", isLive),
           Jsons.p("metadata", dccToMetadata(dccs)),
           Jsons.p("captions", Jsons.arr(captions)),
@@ -221,19 +222,21 @@ class Item {
   }
 
   private static Jsons.Obj assembleAcl(AccessControlList acl) {
-    final var canReadRoles = new ArrayList<Jsons.Val>();
-    final var canWriteRoles = new ArrayList<Jsons.Val>();
+    // We just transform the ACL into a map with one field per action, and the
+    // value being a list of roles, e.g.
+    // `{ "read": ["ROLE_USER", "ROLE_FOO"], "write": [...] }`
+    final var actionToRoles = new HashMap<String, ArrayList<Jsons.Val>>();
     for (final var entry: acl.getEntries()) {
-      if (entry.getAction().equals(Permissions.Action.READ.toString())) {
-        canReadRoles.add(Jsons.v(entry.getRole()));
-      } else if (entry.getAction().equals(Permissions.Action.WRITE.toString())) {
-        canWriteRoles.add(Jsons.v(entry.getRole()));
-      }
+      final var action = entry.getAction();
+      actionToRoles.putIfAbsent(action, new ArrayList());
+      actionToRoles.get(action).add(Jsons.v(entry.getRole()));
     }
-    return Jsons.obj(
-        Jsons.p("read", Jsons.arr(canReadRoles)),
-        Jsons.p("write", Jsons.arr(canWriteRoles))
-    );
+
+    final var props = actionToRoles.entrySet().stream()
+        .map(e -> Jsons.p(e.getKey(), Jsons.arr(e.getValue())))
+        .toArray(Jsons.Prop[]::new);
+
+    return Jsons.obj(props);
   }
 
   private static List<Jsons.Val> assembleTracks(SearchResultItem event, MediaPackage mp) {
