@@ -109,7 +109,7 @@ angular.module('adminNg.controllers')
     $scope.policies = [];
     $scope.policiesUser = [];
     $scope.baseAcl = {};
-    $scope.baseAclId = '';
+    $scope.baseAclId = undefined;
 
     AuthService.getUser().$promise.then(function (user) {
       var mode = user.org.properties['admin.series.acl.event.update.mode'];
@@ -425,6 +425,7 @@ angular.module('adminNg.controllers')
             changePolicies(json.acl.ace, true);
             getCurrentPolicies();
             $scope.baseAclId = data.series_access.current_acl.toString();
+            $scope.baseAclId = $scope.baseAclId === 0 ? $scope.baseAclId : undefined;
 
             $scope.aclLocked = data.series_access.locked;
 

@@ -484,6 +484,7 @@ angular.module('adminNg.controllers')
           $scope.access = EventAccessResource.get({ id: id }, function (data) {
             if (angular.isDefined(data.episode_access)) {
               $scope.baseAclId = data.episode_access.current_acl.toString();
+              $scope.baseAclId = $scope.baseAclId === 0 ? $scope.baseAclId : undefined;
               var json = angular.fromJson(data.episode_access.acl);
               $scope.aclCreateDefaults.$promise.then(function () { // needed for roleUserPrefix
                 changePolicies(json.acl.ace, true);
@@ -704,7 +705,7 @@ angular.module('adminNg.controllers')
     $scope.policies = [];
     $scope.policiesUser = [];
     $scope.baseAcl = {};
-    $scope.baseAclId = '';
+    $scope.baseAclId = undefined;
 
     $scope.not = function(func) {
       return function (item) {
@@ -1038,6 +1039,7 @@ angular.module('adminNg.controllers')
       $scope.access = EventAccessResource.get({ id: $scope.resourceId }, function (data) {
         if (angular.isDefined(data.episode_access)) {
           $scope.baseAclId = data.episode_access.current_acl.toString();
+          $scope.baseAclId = $scope.baseAclId === 0 ? $scope.baseAclId : undefined;
           var json = angular.fromJson(data.episode_access.acl);
           $scope.aclCreateDefaults.$promise.then(function () { // needed for roleUserPrefix
             changePolicies(json.acl.ace, true);
