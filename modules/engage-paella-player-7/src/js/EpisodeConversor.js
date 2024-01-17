@@ -120,7 +120,13 @@ function getMetadata(episode, config) {
       : [episode.mediapackage.contributors.contributor])
     : [];
 
-  const isLive = episode?.mediapackage?.media?.track?.some((track) => track.live === true);
+  const tracks = episode?.mediapackage?.media?.track
+    ? (Array.isArray(episode.mediapackage.media.track)
+      ? episode.mediapackage.media.track
+      : [episode.mediapackage.media.track])
+    : [];
+
+  const isLive = tracks.some((track) => track.live === true);
   const visibleTimeLine = !(isLive && config?.hideTimeLineOnLive);
 
   const result = {
