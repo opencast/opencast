@@ -30,6 +30,29 @@ This patch fixes a number of minor bugs and inconveniences in the whisper transc
 This patch fixes an error in the ACL template selection
 [[#5537](https://github.com/opencast/opencast/pull/5537)]
 
+### (New) Admin UI Bug fixes
+
+- **Fix publication link not clickable:**
+Fixes the little pop-up for the publications of an event in the events table.
+[[#217](https://github.com/opencast/opencast-admin-interface/pull/217)]
+- **Fix mixed_text metadata fields without collection:**
+Fixes a bug that would crash the ui when opening event or series metadata details
+[[#232](https://github.com/opencast/opencast-admin-interface/pull/232)]
+- **Fix exception when opening timepicker:**
+This also prevented scheduling events
+[[#205](https://github.com/opencast/opencast-admin-interface/pull/205)]
+- **Don't call Object.entries on undefined:**
+Fixes a problem where opening workflow details would break entire ui
+[[#239](https://github.com/opencast/opencast-admin-interface/pull/239)]
+- **Don't render "invalid date" in table cells:**
+Instead render nothing, like in the old admin ui
+[[#241](https://github.com/opencast/opencast-admin-interface/pull/241)]
+- **Refresh workflow operations in event details**
+[[#219](https://github.com/opencast/opencast-admin-interface/pull/219)]
+- **Remove useAppDispatch from tableThunks.ts:**
+Fixes the ui crashing when switching between pages in a table
+[[#246](https://github.com/opencast/opencast-admin-interface/pull/246)]
+
 ### Improvements
 
 - **Don't warn about using the default tool:**
@@ -43,6 +66,8 @@ ROLE_ADMIN is not explicitly included in the event ACL for the Tobira specific A
 - **Paella7: Add support for text/vtt captions in DownloadsPlugin:**
 This PR adds the captions files to the Paella Player 7 downloads plugin
 [[#5491](https://github.com/opencast/opencast/pull/5491)]
+
+See [changelog](./changelog.md#opencast-151) for a comprehensive list of changes.
 
 ## Opencast 15.0
 
@@ -186,7 +211,7 @@ WebVTT is the only one that will be guaranteed to work.
 ### API changes
 - There are no API changes
 
-See [changelog](./changelog.md) for a comprehensive list of changes.
+See [changelog](./changelog.md#opencast-150) for a comprehensive list of changes.
 
 Release Schedule
 ----------------
