@@ -40,6 +40,7 @@
     "paella-core": "^1.46.1",
     "paella-skins": "^1.32.3",
     "paella-slide-plugins": "^1.41.4",
+    "paella-webgl-plugins": "^1.41.0",
     "paella-user-tracking": "^1.42.0",
     "paella-zoom-plugin": "^1.41.1"
   }

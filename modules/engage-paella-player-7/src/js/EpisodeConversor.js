@@ -99,7 +99,9 @@ function getSourceData(track, config) {
       data = {
         source: streamType.getSourceData(track, config),
         type: streamType.streamType,
-        content: type
+        content: type,
+        flavor: track.type,
+        tags: track.tags.tag
       };
     }
   }
@@ -152,6 +154,26 @@ function getMetadata(episode, config) {
   return result;
 }
 
+function splitFlavor(flavor) {
+  const flavorTypes = flavor.split('/');
+  if (flavorTypes.length != 2) {
+    throw new Error('Invalid flavor');
+  }
+  return flavorTypes;
+}
+
+function matchesFlavor(flavor, configFlavor) {
+  const [ flavorType, flavorSubtype ] = splitFlavor(flavor);
+  const [ configFlavorType, configFlavorSubtype ] = splitFlavor(configFlavor);
+
+  if ((configFlavorType === '*' || configFlavorType === flavorType) &&
+  (configFlavorSubtype === '*' || configFlavorSubtype === flavorSubtype)) {
+    return true;
+  }
+  return false;
+}
+
+
 function mergeSources(sources, config) {
   const streams = [];
   // Does the sources contain any flavour compatible with the main audio content?
@@ -168,12 +190,40 @@ function mergeSources(sources, config) {
   });
 
   sources.forEach(sourceData => {
-    const { content, type, source } = sourceData;
+    const { content, type, source, flavor, tags } = sourceData;
     let stream = streams.find(s => s.content === content);
+
     if (!stream) {
+      // check which video canvases to use
+      let canvas = [];
+      for (var key of Object.keys(config.videoCanvas)) {
+        let canvasConfig = config.videoCanvas[key];
+        // check if the flavor matches
+        if (canvasConfig.flavor && matchesFlavor(flavor, canvasConfig.flavor)) {
+          canvas.push(key);
+          continue;
+        }
+
+        // check if a tag matches
+        if (canvasConfig.tag) {
+          for (let i = 0; i < tags.length; i++) {
+            if (tags[i] === canvasConfig.tag) {
+              canvas.push(key);
+              break;
+            }
+          }
+        }
+      }
+
+      // fall back to default canvas if necessary
+      if (!canvas.length) {
+        canvas.push('video');
+      }
+
       stream = {
         sources: {},
-        content: content
+        content: content,
+        canvas: canvas
       };
 
       if (content === audioContent) {

@@ -140,3 +140,38 @@ Example:
     ...
 }
 ```
+
+Configure video canvas
+----------------------
+
+Paella Player 7 supports multiple types of video canvas to render videos. The default is `video`, but there is for
+example also `video360` for 360° videos.
+
+In Opencast it is possible to configure which video canvas will be used for which track, depending on its tags and/or
+flavor. Only one tag _or_ the flavor has to match for the canvas to be used. If the track meets the conditions of
+multiple canvases, all of them are set and the `order` field of the respective plugins controls in which order
+the player will try to use them.
+
+In any case, you should not remove the `video` option so it can be used as a fallback by the player in case the other
+canvases cannot be rendered for any reason.
+
+Example:
+
+```json
+{
+    ...
+    "opencast": {
+      "videoCanvas": {
+        "video360": {
+          "flavor": "*/delivery+360",
+          "tag": "video360"
+        },
+        "video": {
+          "flavor": "*/delivery"
+        }
+      }
+        ...
+    }
+    ...
+}
+```
