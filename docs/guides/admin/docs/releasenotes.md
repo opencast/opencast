@@ -6,25 +6,43 @@ Opencast 15.1 includes important bug fixes and improvements.
 
 ### Bug fixes
 
-- **Fix Paella Player 7 for single stream videos:** This patch fixes the issue that Paella Player 7 will run into an error if a video has only one stream [[#5539](https://github.com/opencast/opencast/pull/5539)] 
+- **Fix Paella Player 7 for single stream videos:**
+This patch fixes the issue that Paella Player 7 will run into an error if a video has only one stream
+[[#5539](https://github.com/opencast/opencast/pull/5539)]
 
-- **Fix Paella 7 with no segments:** This patch fixes the issue that Paella Player 7 will run into an error if a video has no segments [[#5488](https://github.com/opencast/opencast/pull/5488)]
+- **Fix Paella 7 with no segments:**
+This patch fixes the issue that Paella Player 7 will run into an error if a video has no segments
+[[#5488](https://github.com/opencast/opencast/pull/5488)]
 
-- **Fix Paella Player 7 login redirect:** Paella Player 7 now redirects to the login page if a user doesn't have the role ROLE_USER [[#5481](https://github.com/opencast/opencast/pull/5481)]
+- **Fix Paella Player 7 login redirect:**
+Paella Player 7 now redirects to the login page if a user doesn't have the role ROLE_USER
+[[#5481](https://github.com/opencast/opencast/pull/5481)]
 
-- **Update xmlsec version (CAS fix):** This patch fixes a dependency mismatch for CAS users [[#5540](https://github.com/opencast/opencast/pull/5540)]
+- **Update xmlsec version (CAS fix):**
+This patch fixes a dependency mismatch for CAS users
+[[#5540](https://github.com/opencast/opencast/pull/5540)]
 
-- **Whisper transcription engine bug fixing:** This patch fixes a number of minor bugs and inconveniences in the whisper transcription engine [[#5436](https://github.com/opencast/opencast/pull/5436)]
+- **Whisper transcription engine bug fixing:**
+This patch fixes a number of minor bugs and inconveniences in the whisper transcription engine
+[[#5436](https://github.com/opencast/opencast/pull/5436)]
 
-- **Fix ACL template selection breaking after first selection** [[#5537](https://github.com/opencast/opencast/pull/5537)]
+- **Fix ACL template selection breaking after first selection:**
+This patch fixes an error in the ACL template selection
+[[#5537](https://github.com/opencast/opencast/pull/5537)]
 
 ### Improvements
 
-- **Don't warn about using the default tool:** Changes the log level when Opencast uses the default tool for a LTI Consumer from warn to debug [[#5538](https://github.com/opencast/opencast/pull/5538)]
+- **Don't warn about using the default tool:**
+Changes the log level when Opencast uses the default tool for a LTI Consumer from warn to debug
+[[#5538](https://github.com/opencast/opencast/pull/5538)]
 
-- **Add support for custom actions in ACL to Tobira harvest API:** ROLE_ADMIN is not explicitly included in the event ACL for the tobira specific API anymore [[#5492](https://github.com/opencast/opencast/pull/5492)]
+- **Add support for custom actions in ACL to Tobira harvest API:**
+ROLE_ADMIN is not explicitly included in the event ACL for the Tobira specific API anymore
+[[#5492](https://github.com/opencast/opencast/pull/5492)]
 
-- **Paella7: Add support for text/vtt captions in DownloadsPlugin:** This PR adds the captions files to the paella7 downloads plugin [[#5491](https://github.com/opencast/opencast/pull/5491)]
+- **Paella7: Add support for text/vtt captions in DownloadsPlugin:**
+This PR adds the captions files to the Paella Player 7 downloads plugin
+[[#5491](https://github.com/opencast/opencast/pull/5491)]
 
 ## Opencast 15.0
 
