@@ -1,0 +1,19 @@
+{
+  "extends": ["@opencast/eslint-config-ts-react"],
+  "rules": {
+    "@typescript-eslint/member-delimiter-style": "warn"
+  },
+  "overrides": [
+      {
+          "files": ["./webpack.config.ts"],
+          "parserOptions": {
+              "project": false
+          }
+      }
+  ],
+  "ignorePatterns": [
+    "node_modules",
+    "old-src",
+    "build"
+  ]
+}
