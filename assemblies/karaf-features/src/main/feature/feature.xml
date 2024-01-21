@@ -19,6 +19,7 @@
     <feature>scr</feature>
     <feature>cxf-jaxrs</feature>
     <feature>cxf-http-jetty</feature>
+    <feature>war</feature>
 
     <!-- httpclient needs to start before common so that it can get org.apache.commons.logging -->
     <bundle start-level="55">mvn:org.apache.httpcomponents/httpclient-osgi/${httpcomponents-httpclient.version}</bundle>
@@ -727,6 +728,14 @@
       <condition>opencast-adminpresentation</condition>
     </conditional>
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui-frontend/${project.version}</bundle>
+  </feature>
+
+  <feature name="opencast-plugin-graphql" version="${project.version}">
+    <feature>opencast-allinone</feature>
+    <feature>opencast-admin</feature>
+    <feature>opencast-adminpresentation</feature>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-graphql/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-graphql-ui/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-pluginmanager" version="${project.version}">
