@@ -139,6 +139,8 @@
     <module>modules/execute-workflowoperation</module>
     <module>modules/external-api</module>
     <module>modules/fileupload</module>
+    <module>modules/graphql</module>
+    <module>modules/graphql-ui</module>
     <module>modules/hello-world-api</module>
     <module>modules/hello-world-impl</module>
     <module>modules/hello-world-workflowoperation</module>
