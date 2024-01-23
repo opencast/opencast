@@ -1,3 +1,5 @@
+const os = require('os');
+
 module.exports = function (config) {
     config.set({
         basePath : './',
@@ -71,13 +73,20 @@ module.exports = function (config) {
             preferHeadless: true,
             // limit the list of browsers used by karma
             postDetection: (browsers) => {
-                const allowed = new Set(['ChromeHeadless', 'FirefoxHeadless']);
+                const allowed = ['Chrome'];
+                // Karma can't start FirefoxHeadless on M1 Macs
+                // See https://github.com/opencast/opencast/issues/3894
+                const isM1Mac = os.platform() === 'darwin' && os.arch() === 'arm64';
+                if (!isM1Mac) {
+                    allowed.push('Firefox');
+                }
+                const allowedSet = new Set(allowed.map(browser => browser + 'Headless'));
                 console.info('Detected browsers: ' + browsers);
-                browsers = browsers.filter(browser => allowed.has(browser));
+                browsers = browsers.filter(browser => allowedSet.has(browser));
                 console.info('Usable browsers: ' + browsers);
                 if (browsers.length < 1) {
                     console.error('No browsers detected');
-                    console.error('Suggest installing Firefox or other FOSS browser');
+                    console.error('Install one of ' + allowed.join(', '));
                     throw 'No browsers detected';
                 }
                 return browsers;
