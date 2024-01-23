@@ -23,28 +23,38 @@ module.exports = function (config) {
             '../bower_components/angular-chart.js/dist/angular-chart.js',
             '../bower_components/angular-mocks/angular-mocks.js',
             // endbower
-      '../app/scripts/lib/chosen.jquery.js',
-      '../app/scripts/lib/angular-chosen.js',
-      '../app/scripts/lib/underscore-1.5.2.js',
-      '../app/scripts/lib/video-js/video.js',
-      '../app/scripts/lib/moment-with-locales.js',
+            '../app/scripts/lib/chosen.jquery.js',
+            '../app/scripts/lib/angular-chosen.js',
+            '../app/scripts/lib/underscore-1.5.2.js',
+            '../app/scripts/lib/video-js/video.js',
+            '../app/scripts/lib/moment-with-locales.js',
 
-      '../app/scripts/app.js',
-      '../app/scripts/shared/filters/filters.js',
-      '../app/scripts/shared/resources/resources.js',
-      '../app/scripts/shared/directives/directives.js',
-      '../app/scripts/shared/controllers/controllers.js',
-      '../app/scripts/shared/services/services.js',
-      '../app/scripts/modules/**/*.js',
-      '../app/scripts/shared/**/*.js',
-      '../app/**/*.html',
+            '../app/scripts/app.js',
+            '../app/scripts/shared/filters/filters.js',
+            '../app/scripts/shared/resources/resources.js',
+            '../app/scripts/shared/directives/directives.js',
+            '../app/scripts/shared/controllers/controllers.js',
+            '../app/scripts/shared/services/services.js',
+            '../app/scripts/modules/**/*.js',
+            '../app/scripts/shared/**/*.js',
+            '../app/**/*.html',
 
             'test/lib/jasmine-jquery.js',
             'test/lib/jquery-deparam.js',
 
             // fixtures
-      {pattern: '../resources/public/**/*.json', watched: true, served: true, included: false},
-      {pattern: 'app/GET/**/*', watched: true, served: true, included: false},
+            {
+                pattern: '../resources/public/**/*.json',
+                watched: true,
+                served: true,
+                included: false
+            },
+            {
+                pattern: 'app/GET/**/*',
+                watched: true,
+                served: true,
+                included: false
+            },
 
             'test/unit/setup.js',
             'test/unit/**/*Helper.js',
@@ -61,14 +71,14 @@ module.exports = function (config) {
             preferHeadless: true,
             // limit the list of browsers used by karma
             postDetection: (browsers) => {
-                const allowed = new Set(['ChromeHeadless', 'FirefoxHeadless'])
+                const allowed = new Set(['ChromeHeadless', 'FirefoxHeadless']);
                 console.info('Detected browsers: ' + browsers);
                 browsers = browsers.filter(browser => allowed.has(browser));
                 console.info('Usable browsers: ' + browsers);
                 if (browsers.length < 1) {
-                    console.error("No browsers detected");
-                    console.error("Suggest installing Firefox or other FOSS browser");
-                    throw "No browsers detected";
+                    console.error('No browsers detected');
+                    console.error('Suggest installing Firefox or other FOSS browser');
+                    throw 'No browsers detected';
                 }
                 return browsers;
             }
@@ -80,21 +90,21 @@ module.exports = function (config) {
         browserNoActivityTimeout : 60000, // by default 10000
 
         preprocessors: {
-      '../app/scripts/shared/**/*.js': ['coverage'],
-      '../app/scripts/modules/**/*.js': ['coverage'],
-      '../app/**/*.html': ['ng-html2js']
+            '../app/scripts/shared/**/*.js': ['coverage'],
+            '../app/scripts/modules/**/*.js': ['coverage'],
+            '../app/**/*.html': ['ng-html2js']
         },
 
         reporters: ['progress'],
 
         coverageReporter: {
             type : 'html',
-      dir : '../target/grunt/coverage/'
+            dir : '../target/grunt/coverage/'
         },
 
         ngHtml2JsPreprocessor: {
             cacheIdFromPath: function (filepath) {
-        var match = filepath.match(/.*app\/scripts\/(.*)/);
+                var match = filepath.match(/.*app\/scripts\/(.*)/);
                 if (match !== null) {
                     return match[1];
                 } else {
