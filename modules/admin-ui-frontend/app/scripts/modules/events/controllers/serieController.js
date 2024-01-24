@@ -425,7 +425,7 @@ angular.module('adminNg.controllers')
             changePolicies(json.acl.ace, true);
             getCurrentPolicies();
             $scope.baseAclId = data.series_access.current_acl.toString();
-            $scope.baseAclId = $scope.baseAclId === 0 ? $scope.baseAclId : undefined;
+            $scope.baseAclId = $scope.baseAclId === '0' ? undefined : $scope.baseAclId;
 
             $scope.aclLocked = data.series_access.locked;
 
