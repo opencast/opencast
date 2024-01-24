@@ -74,10 +74,9 @@ module.exports = function (config) {
             // limit the list of browsers used by karma
             postDetection: (browsers) => {
                 const allowed = ['Chrome'];
-                // Karma can't start FirefoxHeadless on M1 Macs
+                // Karma can't start FirefoxHeadless on Macs
                 // See https://github.com/opencast/opencast/issues/3894
-                const isM1Mac = os.platform() === 'darwin' && os.arch() === 'arm64';
-                if (!isM1Mac) {
+                if (os.platform() !== 'darwin') {
                     allowed.push('Firefox');
                 }
                 const allowedSet = new Set(allowed.map(browser => browser + 'Headless'));
