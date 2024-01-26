@@ -1,1 +1,0 @@
-Opencast Studio now allows users to select a series (from all series they have write access to) when uploading. If `upload.seriesId` is set, then that series is pre-selected in the series-selector, but the user can still change it. If you require the old behavior, set `upload.seriesField` to `hidden`.

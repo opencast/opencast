@@ -46,7 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Matcher;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /** Whisper implementation of the Speech-to-text engine interface. */
@@ -85,11 +85,7 @@ public class WhisperEngine implements SpeechToTextEngine {
   /** Config key for quantization */
   private static final String WHISPER_QUANTIZATION = "whisper.quantization";
 
-  /** Quantization for whisper-ctranslate2 */
-  private enum Quantizations {
-    auto, int8, int8_float16, int16, float16, float32
-  }
-  private Option<Quantizations> quantization = Option.none();
+  private String quantization;
 
   /** Config key for Voice Activity Detection */
   private static final String WHISPER_VAD = "whisper.vad_enabled";
@@ -104,7 +100,7 @@ public class WhisperEngine implements SpeechToTextEngine {
   private static final String WHISPER_ARGS_CONFIG_KEY = "whisper.args";
 
   /** Currently used Whisper args */
-  private String[] whisperArgs = {};
+  private String[] whisperArgs;
 
   /** Map to get ISO 639 language code for language name in English */
   private Map<String, String> languageMap = new HashMap<>();
@@ -117,31 +113,22 @@ public class WhisperEngine implements SpeechToTextEngine {
   @Activate
   @Modified
   public void activate(ComponentContext cc) {
-    logger.debug("Activated/Modified Whisper engine service class");
-    whisperExecutable = StringUtils.defaultIfBlank(
-        (String) cc.getProperties().get(WHISPER_EXECUTABLE_PATH_CONFIG_KEY), WHISPER_EXECUTABLE_DEFAULT_PATH);
+    var prop = cc.getProperties();
+    logger.debug("Activated/Modified Whisper engine service");
+    whisperExecutable = Objects.toString(prop.get(WHISPER_EXECUTABLE_PATH_CONFIG_KEY), WHISPER_EXECUTABLE_DEFAULT_PATH);
     logger.debug("Set Whisper path to {}", whisperExecutable);
 
-    whisperModel = StringUtils.defaultIfBlank(
-        (String) cc.getProperties().get(WHISPER_MODEL_CONFIG_KEY), WHISPER_MODEL_DEFAULT);
-    logger.debug("Whisper Language model set to {}", whisperModel);
+    whisperModel = Objects.toString(prop.get(WHISPER_MODEL_CONFIG_KEY), WHISPER_MODEL_DEFAULT);
+    logger.debug("Whisper model set to {}", whisperModel);
 
-    String t = (String) cc.getProperties().get(WHISPER_QUANTIZATION);
-    if (!StringUtils.isBlank(t)) {
-      quantization = Option.some(Quantizations.valueOf(t));
-    }
+    quantization = Objects.toString(prop.get(WHISPER_QUANTIZATION), null);
     logger.debug("Whisper quantization set to {}", quantization);
 
-    isVADEnabled = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), WHISPER_VAD);
-    logger.debug("Whisper Voice Activity Detection  set to {}", isVADEnabled);
+    isVADEnabled = OsgiUtil.getOptCfgAsBoolean(prop, WHISPER_VAD);
+    logger.debug("Whisper Voice Activity Detection set to {}", isVADEnabled.getOrElse(false));
 
-    String whisperArgsString = (String) cc.getProperties().get(WHISPER_ARGS_CONFIG_KEY);
-    if (!StringUtils.isBlank(whisperArgsString)) {
-      logger.debug("Additional args for Whisper configured: {}", whisperArgsString);
-      whisperArgs = whisperArgsString.trim().split("\\s+");
-    } else {
-      logger.debug("No additional args for Whisper configured.");
-    }
+    whisperArgs = StringUtils.split(Objects.toString(prop.get(WHISPER_ARGS_CONFIG_KEY), ""));
+    logger.debug("Additional args for Whisper: {}", (Object) whisperArgs);
 
     String[] languageCodes = Locale.getISOLanguages();
     for (String languageCode: languageCodes) {
@@ -187,10 +174,10 @@ public class WhisperEngine implements SpeechToTextEngine {
       transcriptionCommand.add(language);
     }
 
-    if (quantization.isSome()) {
-      logger.debug("Using quantization {}", quantization.get());
+    if (quantization != null) {
+      logger.debug("Using quantization {}", quantization);
       transcriptionCommand.add("--compute_type");
-      transcriptionCommand.add(quantization.get().toString());
+      transcriptionCommand.add(quantization);
     }
 
     if (isVADEnabled.isSome()) {
@@ -208,23 +195,26 @@ public class WhisperEngine implements SpeechToTextEngine {
 
     try {
       ProcessBuilder processBuilder = new ProcessBuilder(transcriptionCommand);
+      processBuilder.redirectInput(ProcessBuilder.Redirect.PIPE)
+          .redirectOutput(ProcessBuilder.Redirect.PIPE)
+          .redirectError(ProcessBuilder.Redirect.PIPE);
       processBuilder.redirectErrorStream(true);
       transcriptonProcess = processBuilder.start();
 
       try (BufferedReader in = new BufferedReader(new InputStreamReader(transcriptonProcess.getInputStream()))) {
         String line;
         while ((line = in.readLine()) != null) { // consume process output
-          handleTranscriptionOutput(line);
+          logger.debug(line);
         }
+      }
 
-        // wait until the task is finished
-        int exitCode = transcriptonProcess.waitFor();
-        logger.debug("Whisper process finished with exit code {}", exitCode);
+      // wait until the task is finished
+      int exitCode = transcriptonProcess.waitFor();
+      logger.debug("Whisper process finished with exit code {}", exitCode);
 
-        if (exitCode != 0) {
-          throw new SpeechToTextEngineException(
-              String.format("Whisper exited abnormally with status %d (command: %s)", exitCode, transcriptionCommand));
-        }
+      if (exitCode != 0) {
+        throw new SpeechToTextEngineException(
+            String.format("Whisper exited abnormally with status %d (command: %s)", exitCode, transcriptionCommand));
       }
 
       // Renaming output whisper filename to the expected output filename
@@ -272,24 +262,4 @@ public class WhisperEngine implements SpeechToTextEngine {
 
     return returnValues; // Subtitles data
   }
-
-  /**
-   * Handles the transcription process output
-   *
-   * @param message the message returned by the transcription process
-   */
-  private void handleTranscriptionOutput(String message) {
-    message = message.trim();
-    if ("".equals(message)) {
-      return;
-    }
-    // We do not want to log output lines starting with timestamps like this: [00:00.000 --> 00:06.000]
-    // Lines like this containing transcriptions. It would be too much output (and is probably unnecessary anyway)
-    Matcher matcher = outputPattern.matcher(message);
-    if (!matcher.find()) {
-      logger.debug(message);
-    }
-  }
-
 }
-

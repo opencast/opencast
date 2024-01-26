@@ -39,9 +39,9 @@ nav:
    - Release manager: 'participate/release-manager.md'
    - QA coordinator: 'participate/qa-coordinator.md'
    - Localization: 'participate/localization.md'
-   - Submit issues/PRs: 
-      - Overview: 'participate/submit-issues-prs.md'
-      - Security issues: participate/security.md
+   - Submit issues:
+      - Overview and How to: 'participate/submit-issues/submit-issues.md'
+      - Security issues: participate/submit-issues/security.md
    - Decision making:
       - Overview: 'participate/decision-making/index.md'
       - Lazy consensus: 'participate/decision-making/lazy-consensus.md'
@@ -82,19 +82,12 @@ nav:
    - Documentation: 'develop/documentation.md'
 - Opencast architecture:
    - Overview: 'architecture/overview.md'
-   - Filesystem: 'architecture/filesystem.md'
-   - Asset manager: 'architecture/asset-manager.md'
-   - Scheduler: 'architecture/scheduler.md'
-   - Statistics: 'architecture/statistics.md'
-   - Job dispatch: 'architecture/job-dispatch.md'
    - Admin-UI: 'architecture/admin-ui.md'
-   - Paella player 7: 'architecture/paella-player-7/index.md'
+   - Asset manager: 'architecture/asset-manager.md'
    - Capture agent:
       - Introduction: 'architecture/capture-agent/capture-agent.md'
       - Input: 'architecture/capture-agent/capture-agent-input.md'
       - Test Cases for Capture Agents: 'architecture/capture-agent/testcases.md'
-   - Stream security: 'architecture/stream-security.md'
-   - OAI-PMH: 'architecture/oaipmh.md'
    - External API:
       - Introduction: 'architecture/api/index.md'
       - Usage: 'architecture/api/usage.md'
@@ -111,6 +104,13 @@ nav:
       - Workflow API: 'architecture/api/workflow-api.md'
       - Data Types: 'architecture/api/types.md'
       - Glossary: 'architecture/api/glossary.md'
+   - Filesystem: 'architecture/filesystem.md'
+   - Job dispatch: 'architecture/job-dispatch.md'
+   - OAI-PMH: 'architecture/oaipmh.md'
+   - Paella player 7: 'architecture/paella-player-7/index.md'
+   - Scheduler: 'architecture/scheduler.md'
+   - Statistics: 'architecture/statistics.md'
+   - Stream security: 'architecture/stream-security.md'
 - Licenses and Legal Matters: 'license.md'
 - Glossary: 'glossary.md'
 

@@ -1,127 +1,161 @@
-# Opencast 14: Release Notes
+# Opencast 15: Release Notes
 
-## Opencast 14.7
-
-Opencast 14.7 is a minor release. This release includes bug fixes and improvements.
-
-See [changelog](changelog.md#opencast-147) for a comprehensive list of changes.
-
-## Opencast 14.6
-
-Opencast 14.6 is a minor release. This release includes bug fixes and improvements.
-
-See [changelog](changelog.md#opencast-146) for a comprehensive list of changes.
-
-## Opencast 14.5
-
-Opencast 14.5 is a minor release. This release includes bug fixes and improvements.
-
-The analyze-mediapackage WOH was extended so it will also create variables regarding the existence of elements of a
-certain flavor _and tag_ (example: `captions_source_hastag_archive`). These new variables are not created by default.
-
-See [changelog](changelog.md#opencast-145) for a comprehensive list of changes.
-
-## Opencast 14.4
-
-Opencast 14.4 is a minor release. This release includes bug fixes and improvements.
-
-See [changelog](changelog.md#opencast-144) for a comprehensive list of changes.
-
-## Opencast 14.3
-
-The off-schedule release of Opencast 14. This release includes fixes from Opencast 13.10 release,
-see [release notes of Opencast 13.10](https://docs.opencast.org/r/13.x/admin/#releasenotes/#opencast-1310)
-
-Additionally, the following changes are part of this release.
-
-- Fix admin interface permissions ([#5167](https://github.com/opencast/opencast/pull/5167))
-- Fix Admin Interface Redirect ([#5166](https://github.com/opencast/opencast/pull/5166))
-
-See [changelog](changelog.md#opencast-143) for a comprehensive list of changes.
-
-## Opencast 14.2
-
-Opencast 14.2 is a minor release. The release fixes corrupt zip headers in the distributed jar files and elasticsearch
-package imports. This was causing Opencast to fail at startup in combination with a recent OpenJDK security update.
-
-The alternative to updating to this release is to run Java with `-Djdk.util.zip.disableZip64ExtraFieldValidation=true`.
-Setting this will disable the new security check.
-
-Additionally, the following changes are part of this release.
-
-- Fix changed pax web config keys ([#5124](https://github.com/opencast/opencast/pull/5124))
-- Upgrade Crowdin Integration ([#5114](https://github.com/opencast/opencast/pull/5114))
-
-See [changelog](changelog.md#opencast-142) for a comprehensive list of changes.
-
-## Opencast 14.1
-
-Opencast 14.1 is a minor release, containing documentation improvements and Paella Player 7 trimming URL parameter fix.
-For more details, make sure to check out the [documentation](configuration/player/paella.player7/url.parameter.md).
-
-See [changelog](changelog.md#opencast-141) for a comprehensive list of changes.
-
-## Opencast 14.0
-
-### New Admin UI
-
-Opencast 14 brings with it a new version of the Admin UI. The new Admin UI continues with the same look and
-feel, but uses new technologies under the hood. It strives to be robust and easy to develop for, while having all the
-same functionality users expect from the old UI.
-
-For now, the new Admin UI has not quite reached those goals yet. Therefore, it is not enabled by default and marked
-as beta. If you wish to try it out, you can easily do so by going to `https://your-opencast/admin-ui/index.html`
-(don't worry if it looks like nothing has changed, the look is *really* similar :)). If you find any issues,
-please report them at [GitHub project issue board](https://github.com/opencast/opencast-admin-interface/issues).
-
-For notes on how to set the new Admin UI as your default, check [Admin UI](configuration/admin-ui/new-admin-ui.md).
+## Opencast 15.0
 
 ### Features
-- The new Admin UI (beta) is now shipped with Opencast [[#4695](https://github.com/opencast/opencast/pull/4695)]
-- Global `oc-remember-me` cookie can be configured [[#4951](https://github.com/opencast/opencast/pull/4951)]
-- Status of the index rebuild will be shown as an indicator in the Admin UI [[#4206](https://github.com/opencast/opencast/pull/4206)]
+
+#### Subtitles as first class citizens
+With Opencast 15 we want to put more emphasis on subtitles. You can find more details on how subtitles should be
+handled going forward in [Subtitles](./configuration/subtitles.md).
+
+This comes with a bit of migration. Namely, subtitles should not be stored as "attachments" or "catalogs" anymore, but
+as "media" (as they are called in the Admin UI) or "tracks" (as they are called internally). Therefore, all subtitle
+files currently stored as attachments or catalogs in your events should be moved to tracks. This can easily be
+accomplished with the "changetype" workflow operation handler new to Opencast 15. See example below. (Subtitles should
+then be republished)
+
+Additionally, we recommend adding a language tag `lang:<language-code>` to your subtitle files. While tags for subtitles
+are optional, the flavor will not encode the given language for a subtitle anymore, so a language tag is useful for
+identification and display purposes.
+You can read more about subtitles tags in [Subtitles](./configuration/subtitles.md).
+
+If your subtitles are not in WebVTT format, they should be converted to WebVTT as well. While other formats are possible,
+WebVTT is the only one that will be guaranteed to work.
+
+<details>
+
+<summary>Example workflow for changing subtitle type to track</summary>
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>change-subtitles</id>
+  <title>Change Subtitles Type</title>
+  <tags>
+    <tag>archive</tag>
+  </tags>
+  <description></description>
+  <operations>
+
+    <!-- Add a language tag for the english subtitles -->
+
+    <operation
+        id="tag"
+        description="Tagging media package elements">
+      <configurations>
+        <configuration key="source-flavors">captions/vtt+en</configuration>
+        <configuration key="target-tags">+lang:en</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Change the type of all files with the "captions/*" flavor to track -->
+    <!-- And their flavor to "captions/source" -->
+
+    <operation
+        id="changetype"
+        description="Retracting elements flavored with presentation and tagged with preview from Engage">
+      <configurations>
+        <configuration key="source-flavors">captions/*</configuration>
+        <configuration key="target-flavor">captions/source</configuration>
+        <configuration key="target-type">track</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Save changes -->
+
+    <operation
+        id="snapshot"
+        if="NOT (${presenter_delivery_exists} OR ${presentation_delivery_exists})"
+        description="Archive publishing information">
+      <configurations>
+        <configuration key="source-tags">archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Clean up work artifacts -->
+
+    <operation
+        id="cleanup"
+        fail-on-error="false"
+        description="Remove temporary processing artifacts">
+      <configurations>
+        <!-- On systems with shared workspace or working file repository -->
+        <!-- you want to set this option to false. -->
+        <configuration key="delete-external">true</configuration>
+        <!-- ACLs are required again when working through ActiveMQ messages -->
+        <configuration key="preserve-flavors">security/*</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+</definition>
+```
+</details>
 
 ### Improvements
-- Fixed session IllegalStateException [[#5050](https://github.com/opencast/opencast/pull/5050)]
-- Backwards support for old captions/dfxp flavored xml files in Paella 7 [[#5051](https://github.com/opencast/opencast/pull/5051)]
-- Enabled dfxp captions support for Paella 7 [[#5049](https://github.com/opencast/opencast/pull/5049)]
-- Added missing metadata in Paella 7 [[#5048](https://github.com/opencast/opencast/pull/5048)]
-- OSGI bundle info database table will be truncated by the database migration script [[#4946](https://github.com/opencast/opencast/pull/4946)]
-- Orphan statistics database index will be dropped by database migration script [[#4945](https://github.com/opencast/opencast/pull/4945)]
-- Updated Karaf to version 4.4.3 [[#4930](https://github.com/opencast/opencast/pull/4930)]
-- Fixed rest docs forms [[#4928](https://github.com/opencast/opencast/pull/4928)]
-- Updateed deprecated ACL code [[#4924](https://github.com/opencast/opencast/pull/4924)]
-- Fixed REST docs login problem [[#4921](https://github.com/opencast/opencast/pull/4921)]
-- Github actions will run auto-update on main repo only [[#4881](https://github.com/opencast/opencast/pull/4881)]
-- Includeed Amberscript-Transcription documentation in module overview [[#4745](https://github.com/opencast/opencast/pull/4745)]
-- Fixed documentation syntax error [[#4609](https://github.com/opencast/opencast/pull/4609)]
-- Documented feature pull request targetting rules [[#4595](https://github.com/opencast/opencast/pull/4595)]
-- Image preview added in the asset details view in the Admin UI [[#4556](https://github.com/opencast/opencast/pull/4556)]
-- Fixed parent POM version of redirect module [[#4530](https://github.com/opencast/opencast/pull/4530)]
-- Removed Twitter and Facebook links from the readme [[#4520](https://github.com/opencast/opencast/pull/4520)]
-- Simplified debug output in the JWT filters and made it more idiomatic [[#4511](https://github.com/opencast/opencast/pull/4511)]
-- Updated board list in documentation [[#4488](https://github.com/opencast/opencast/pull/4488)]
-- Updated Issue template [[#4423](https://github.com/opencast/opencast/pull/4423)]
+- The analyze-mediapackage workflow operation can now generate variables regarding the existence of publications
+  (example: `publication_engage_player_exists`) [[#5419](https://github.com/opencast/opencast/pull/5419)]
+- Opencast Studio now allows users to select a series (from all series they have write access to) when uploading.
+  If `upload.seriesId` is set, then that series is pre-selected in the series-selector, but the user can still change it.
+  If you require the old behavior, set `upload.seriesField` to `hidden`.
+  [[#5418](https://github.com/opencast/opencast/pull/5418)]
+- Opencast Studio and Opencast Editor received a graphical redesign. This just changes their appearance, not their
+  functionality.
+- Java 17 is now supported.
+  [[#4966](https://github.com/opencast/opencast/pull/4966)]
+- The asset manager now supports multiple archive storages. Please be aware that spreading your archive across multiple
+  file system will likely result in performance decrease, so it is still recommended to avoid it if you can.
+  [[#4955](https://github.com/opencast/opencast/pull/4955)]
+- The oc-remember-me cookie can now be shared between nodes, so users don't have to log into every node individually.
+  [[#4951](https://github.com/opencast/opencast/pull/4951)]
 
 ### Behavior changes
-- Improved Paella 7 default theme [[#4943](https://github.com/opencast/opencast/pull/4943)]
-- Made Paella 7 the new default player in Opencast [[#4875](https://github.com/opencast/opencast/pull/4875)]
-- Removed Theodul player (plugin) [[#4315](https://github.com/opencast/opencast/pull/4315)]
-- Made standalone Editor default videoeditor in Opencast [[#4876](https://github.com/opencast/opencast/pull/4876)]
-- Made Composite Ffmpeg command configurable to support GPU encoding [[#4878](https://github.com/opencast/opencast/pull/4878)]
+- The default admin ui is now the "new" admin ui. If it does not suit your needs for whatever reason, you can always
+  switch back the "old" admin ui in `etc/ui-config/mh_default_org/runtime-info-ui/settings.json`
+  [[#5414](https://github.com/opencast/opencast/pull/5414)]
+- The editor workflow operation now copies over tags from source tracks to trimmed tracks.
+  This was already the case when trimming was skipped. If you relied on the old behavior,
+  you might need to amend your workflows.
+  [[#5409](https://github.com/opencast/opencast/pull/5409)]
+- With this release, there will no longer be a snapshot taken to archive new assets uploaded to an existing event _before_
+  the workflow is started. Instead, the workflow is expected to take care of this. The community workflow already did
+  this, but if you have custom workflows, you might need to make changes to ensure this.
+  [[#5247](https://github.com/opencast/opencast/pull/5247)]
+- Restrictions in regard to what kind of streams can be selected in the old integrated video editor were eased to allow
+  for more diverse use cases. Previous errors were demoted to warnings. The user still has to select at least one stream,
+  but publishing of e.g. an audio stream without a video stream is now allowed. For more details see PR 5023.
+  [[#5023](https://github.com/opencast/opencast/pull/5023)]
+- The default workflow for publishing videos will no longer render the video metadata on the preview Image.
+  Instead, a simple cover image without any text will be created and displayed.
+  You can revert this by simply adding the "coverimage" WOH back to the "partial-publish" workflow (look out for the
+  target-flavor and tags).
+  [[#5353](https://github.com/opencast/opencast/pull/5353)]
+- The speech-to-text workflow operation will automatically set the tags `generator` and `generator-type` and no longer
+  have to be configured in the workflow.
+  [[#5352](https://github.com/opencast/opencast/pull/5352)]
+- Paella Player 6 has been turned into a plugin. If you are still using it, you will need to enable it.
+  [[#4965](https://github.com/opencast/opencast/pull/4965)]
+- The publish-engage workflow operation has a new configuration option called `add-force-flavors`. It allows adding
+  elements to an existing publication via the `merge` strategy without overwriting elements with the same flavor.
+  [[#4617](https://github.com/opencast/opencast/pull/4617)]
+
+### API changes
+- There are no API changes
+
+See [changelog](./changelog.md) for a comprehensive list of changes.
 
 Release Schedule
 ----------------
 
-| Date          | Phase                      |
-|---------------|----------------------------|
-| May 15, 2023  | Cutting the release branch |
-| May 15, 2023  | Translation week           |
-| May 30, 2023  | Public QA phase            |
-| June 22, 2023 | Release of Opencast 14.0   |
+| Date              | Phase                    |
+|-------------------|--------------------------|
+| November 22, 2023 | Feature Freeze           |
+| November 29, 2023 | Translation week         |
+| December 06, 2023 | Public QA phase          |
+| December 12, 2023 | Release of Opencast 15.0 |
 
 Release Managers
 ----------------
 
-- Waldemar Smirnow (ELAN e.V.)
-- Stefanos Georgopoulos (FAU Erlangen Nürnberg)
+- Arne Wilken (ELAN e.V.)
+- Berthold Bußkamp (ssystems GmbH)

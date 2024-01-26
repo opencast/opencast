@@ -101,7 +101,7 @@ angular.module('adminNg.controllers')
     $scope.policies = [];
     $scope.policiesUser = [];
     $scope.baseAcl = {};
-    $scope.baseAclId = '';
+    $scope.baseAclId = undefined;
     $scope.metadata = {};
 
     $scope.changeBaseAcl = function (id) {
@@ -251,6 +251,7 @@ angular.module('adminNg.controllers')
             var json = angular.fromJson(data.acl);
             changePolicies(json.ace, true);
             $scope.baseAclId = data.acl.id.toString();
+            $scope.baseAclId = $scope.baseAclId === 0 ? $scope.baseAclId : undefined;
           }
 
           angular.forEach(angular.fromJson(data.acl.ace), function(value, key) {

@@ -1,2 +1,0 @@
-The analyze-mediapackage WOH was extended so it will also create variables regarding the existence of publications
-(example: `publication_engage_player_exists`). These new variables are not created by default.
