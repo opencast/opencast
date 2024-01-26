@@ -116,6 +116,7 @@
               !org.jboss.resource.adapter.jdbc.*,
               !software.amazon.awssdk.*,
               !waffle.*,
+              !org.codehaus.groovy*,
               org.w3c.dom;version=0,
               *
             </Import-Package>
