@@ -154,7 +154,7 @@ source.
 ### Status of Translations
 
 After the release branch is cut, the release managers should check if there are languages to be in- or excluded for the
-upcoming release as specified by the [criteria in the localization documentation](../develop/localization.md) and notify the
+upcoming release as specified by the [criteria in the localization documentation](localization.md) and notify the
 community about the status of Opencast's translations if necessary.
 
 Example announcement for included languages:
@@ -299,7 +299,7 @@ For example, to merge the latest release branch into `develop`, follow these ste
 
 ### Updating Translations
 
-Updating the [localization translations](../develop/localization.md) is automated for existing translation files. If new files need
+Updating the [localization translations](localization.md) is automated for existing translation files. If new files need
 to be added, it is something that should happen early during the release process. If files need to be removed, this
 needs to be done manually.
 
