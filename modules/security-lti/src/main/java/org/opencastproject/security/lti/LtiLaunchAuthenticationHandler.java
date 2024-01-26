@@ -56,12 +56,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 import javax.persistence.RollbackException;
 import javax.servlet.http.HttpServletRequest;
@@ -134,11 +136,17 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
   /** The user reference provider */
   private UserReferenceProvider userReferenceProvider = null;
 
-  /** The role name of the user to add custom Roles to **/
+  /** The role name of the user to add custom Roles to (Legacy) **/
   private static final String CUSTOM_ROLE_NAME = "lti.custom_role_name";
 
-  /** A List of Roles to add to the user if he has the custom role name **/
+  /** A List of Roles to add to the user if he has the custom role name (Legacy) **/
   private static final String CUSTOM_ROLES = "lti.custom_roles";
+
+  /** Key prefix for names of the custom roles of the user **/
+  private static final String CUSTOM_ROLE_NAME_PREFIX = "lti.custom_role_name.";
+
+  /** Key prefix for list of roles to add to user if the user has the custom role **/
+  private static final String CUSTOM_ROLES_LIST_PREFIX = "lti.custom_roles.";
 
   /** Key prefix for configuring consumer role prefixes */
   private static final String ROLE_PREFIX_KEY = "lti.consumer_role_prefix.";
@@ -146,9 +154,8 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
   /** Consumer role prefix store */
   private final ConcurrentHashMap<String, String> rolePrefixes = new ConcurrentHashMap<>();
 
-  private String customRoleName = "";
-
-  private String[] customRoles;
+  /** Custom role regex pattern */
+  private HashMap<Pattern, String[]> customRolePatterns = new HashMap<>();
 
   /** The user details service */
   private UserDetailsService userDetailsService;
@@ -253,10 +260,25 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
     ltiRolesForUserCreation = extractLtiRolesForUserCreation(
             Objects.toString(properties.get(LTI_ROLES_TO_CREATE_JPA_USER_REFERENCES_FROM), "*"));
 
-    customRoleName = StringUtils.trimToNull((String) properties.get(CUSTOM_ROLE_NAME));
+    for (int i = 1; true; i++) {
+      logger.debug("Looking for custom role configuration of {}", CUSTOM_ROLE_NAME_PREFIX + i);
+      String customRoleName = StringUtils.trimToNull((String) properties.get(CUSTOM_ROLE_NAME_PREFIX + i));
+      if (customRoleName == null) {
+        break;
+      }
+      String customRolesString = StringUtils.trimToNull((String) properties.get(CUSTOM_ROLES_LIST_PREFIX + i));
+      if (customRolesString == null) {
+        continue;
+      }
+      enrichLtiCustomRoles(customRoleName, customRolesString);
+    }
+
+    // Add support for legacy custom_role_name
+    String customRoleName = StringUtils.trimToNull((String) properties.get(CUSTOM_ROLE_NAME));
+
     if (customRoleName != null) {
-      String custumRolesString = StringUtils.trimToNull((String) properties.get(CUSTOM_ROLES));
-      customRoles = custumRolesString.split(",");
+      String customRolesString = StringUtils.trimToNull((String) properties.get(CUSTOM_ROLES));
+      enrichLtiCustomRoles(customRoleName, customRolesString);
     }
 
     // Allow configuring prefixes for certain consumer
@@ -449,9 +471,12 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
 
       for (final String ltiRole : roleList) {
         // Build the role
-        if (ltiRole.equals(customRoleName)) {
-          for (String roleName : customRoles) {
-            userAuthorities.add(new SimpleGrantedAuthority(roleName));
+        for (Pattern rolePattern : customRolePatterns.keySet()) {
+          logger.debug("Matching role pattern '{}' against '{}'", rolePattern.pattern(), ltiRole);
+          if (rolePattern.matcher(ltiRole).matches()) {
+            for (String roleName : customRolePatterns.get(rolePattern)) {
+              userAuthorities.add(new SimpleGrantedAuthority(roleName));
+            }
           }
         }
 
@@ -469,6 +494,12 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
         userAuthorities.add(new SimpleGrantedAuthority(role));
       }
     }
+  }
+
+  private void enrichLtiCustomRoles(String roleName, String customRolesString) {
+    String[] customRoles = customRolesString.split(",");
+    Pattern customRolePattern = Pattern.compile(roleName);
+    customRolePatterns.put(customRolePattern, customRoles);
   }
 
   /**
@@ -519,5 +550,4 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
     }
     return false;
   }
-
 }
