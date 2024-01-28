@@ -111,6 +111,9 @@ public class FFmpegEdit {
     BufferedReader in = null;
     Process encoderProcess = null;
     try {
+      params.add(0, "-nostats");
+      params.add(0, "-nostdin");
+      params.add(0, "-hide_banner");
       params.add(0, binary);
       logger.info("executing command: " + StringUtils.join(params, " "));
       ProcessBuilder pbuilder = new ProcessBuilder(params);
