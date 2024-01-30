@@ -37,7 +37,8 @@ import java.util.Objects;
  */
 @Component(
     property = {
-        "service.description=Hello World Service"
+        "service.description=Hello World Service",
+        "service.exported.interfaces=*"
     },
     immediate = true,
     service = HelloWorldService.class

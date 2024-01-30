@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <features name="opencast-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0">
 
+  <repository>mvn:org.apache.karaf.cellar/apache-karaf-cellar/${karaf.cellar.version}/xml/features</repository>
+
   <feature name="query-dsl" version="${project.version}">
     <bundle>mvn:com.google.guava/guava/${guava.version}</bundle>
     <bundle>mvn:com.google.guava/failureaccess/${failureaccess.version}</bundle>
@@ -19,6 +21,8 @@
     <feature>scr</feature>
     <feature>cxf-jaxrs</feature>
     <feature>cxf-http-jetty</feature>
+    <feature>cellar</feature>
+    <feature>cellar-dosgi</feature>
 
     <!-- httpclient needs to start before common so that it can get org.apache.commons.logging -->
     <bundle start-level="55">mvn:org.apache.httpcomponents/httpclient-osgi/${httpcomponents-httpclient.version}</bundle>
@@ -147,7 +151,6 @@
     <feature>opencast-core</feature>
     <feature>opencast-services-processing-heavy-load</feature>
     <feature>opencast-services-processing-light-load</feature>
-
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui-frontend/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui-interface/${project.version}</bundle>

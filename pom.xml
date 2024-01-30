@@ -44,6 +44,7 @@
     <joda-time.version>2.12.5</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
     <karaf.version>4.4.4</karaf.version>
+    <karaf.cellar.version>4.2.1</karaf.cellar.version>
     <node.version>v18.16.0</node.version>
     <osgi.core.version>8.0.0</osgi.core.version>
     <osgi.annotation.version>8.1.0</osgi.annotation.version>
@@ -138,6 +139,7 @@
     <module>modules/fileupload</module>
     <module>modules/hello-world-api</module>
     <module>modules/hello-world-impl</module>
+    <module>modules/hello-world-endpoint-dosgi</module>
     <module>modules/hello-world-workflowoperation</module>
     <module>modules/incident-workflowoperation</module>
     <module>modules/index-service</module>
