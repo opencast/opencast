@@ -46,7 +46,7 @@
     "karma-ng-html2js-preprocessor": "^1.0.0",
     "request": "^2.88.2",
     "request-digest": "^1.0.13",
-    "selenium-server-standalone-jar": "4.16.1",
+    "selenium-server-standalone-jar": "4.17.0",
     "serve-static": "^1.15.0",
     "time-grunt": "^2.0.0",
     "url-parse": "^1.5.10"
