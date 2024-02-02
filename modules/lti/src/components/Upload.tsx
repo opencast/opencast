@@ -86,7 +86,8 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
     componentDidMount() {
         getEventMetadata(this.state.eventId).then((metadataCollection) => {
             if (metadataCollection.length > 0) {
-                const metadata = metadataCollection[0];
+                const metadata = metadataCollection.find(col => col.flavor === "dublincore/episode");
+                if (metadata === undefined) { throw Error("Could not find episode metadata catalog")}
                 const seriesId = this.resolveSeries(metadata)
                 if (seriesId === undefined) {
                     this.setState({
