@@ -80,7 +80,8 @@ public class MicrosoftAzureSpeechServicesClientTest {
 
   @Test
   public void getTranscription()
-          throws MicrosoftAzureNotAllowedException, IOException, MicrosoftAzureSpeechClientException {
+          throws MicrosoftAzureNotAllowedException, IOException, MicrosoftAzureSpeechClientException,
+          MicrosoftAzureNotFoundException {
     if (!enabled) {
       return;
     }

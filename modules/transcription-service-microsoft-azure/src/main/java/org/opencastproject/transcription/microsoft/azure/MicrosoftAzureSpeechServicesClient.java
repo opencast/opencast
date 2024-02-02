@@ -122,14 +122,16 @@ public class MicrosoftAzureSpeechServicesClient {
   }
 
   public MicrosoftAzureSpeechTranscription getTranscriptionById(String transcriptionId)
-          throws IOException, MicrosoftAzureNotAllowedException, MicrosoftAzureSpeechClientException {
+          throws IOException, MicrosoftAzureNotAllowedException, MicrosoftAzureSpeechClientException,
+          MicrosoftAzureNotFoundException {
     String transcriptionUrl = azureSpeechServicesEndpoint + "/speechtotext/v3.1/transcriptions/"
         + StringUtils.trimToEmpty(transcriptionId);
     return getTranscription(transcriptionUrl);
   }
 
   public MicrosoftAzureSpeechTranscription getTranscription(String transcriptionUrl)
-          throws IOException, MicrosoftAzureNotAllowedException, MicrosoftAzureSpeechClientException {
+          throws IOException, MicrosoftAzureNotAllowedException, MicrosoftAzureSpeechClientException,
+          MicrosoftAzureNotFoundException {
     if (StringUtils.isBlank(transcriptionUrl)) {
       throw new IllegalArgumentException("Transcription URL not set.");
     }
@@ -151,6 +153,8 @@ public class MicrosoftAzureSpeechServicesClient {
           case HttpStatus.SC_FORBIDDEN: // 403
             throw new MicrosoftAzureNotAllowedException(String.format("Not allowed to get transcription '%s'. "
                     + "Microsoft Azure Speech Services response: %s", transcriptionUrl, responseString));
+          case HttpStatus.SC_NOT_FOUND: // 404
+            throw new MicrosoftAzureNotFoundException(String.format("Transcription '%s' not found.", transcriptionUrl));
           default:
             throw new MicrosoftAzureSpeechClientException(String.format(
                 "Getting transcription '%s' failed with HTTP response code %d. "

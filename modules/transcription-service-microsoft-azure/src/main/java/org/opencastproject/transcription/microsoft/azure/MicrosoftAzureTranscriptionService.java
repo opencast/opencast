@@ -425,7 +425,8 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     MicrosoftAzureSpeechTranscription transcription;
     try {
       transcription = azureSpeechServicesClient.getTranscriptionById(jobId);
-    } catch (IOException | MicrosoftAzureNotAllowedException | MicrosoftAzureSpeechClientException e) {
+    } catch (IOException | MicrosoftAzureNotAllowedException | MicrosoftAzureSpeechClientException
+             | MicrosoftAzureNotFoundException e) {
       throw new TranscriptionServiceException(String.format(
           "Unable to get transcription '%s' for media package '%s'.", jobId, mpId), e);
     }
@@ -759,6 +760,9 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
           } catch (MicrosoftAzureNotAllowedException | IOException | MicrosoftAzureSpeechClientException e) {
             logger.error("Unable to get or update transcription {} or transcription file from media package {}.",
                 transcriptionId, mpId, e);
+          } catch (MicrosoftAzureNotFoundException e) {
+            logger.warn("Transcription {} from media package {} not found.", transcriptionId, mpId);
+            database.updateJobControl(transcriptionId, TranscriptionJobControl.Status.Error.name());
           } catch (TranscriptionServiceException e) {
             logger.error(e.getMessage(), e);
           }
@@ -782,10 +786,13 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
               logger.info("Attach transcription workflow {} scheduled for mp {}, microsoft azure transcription job {}",
                   workflowId, mpId, transcriptionId);
             }
-          } catch (MicrosoftAzureNotAllowedException | MicrosoftAzureNotFoundException | IOException
+          } catch (MicrosoftAzureNotAllowedException | IOException
                    | MicrosoftAzureSpeechClientException e) {
             logger.warn("Unable to get transcription {} or transcription file from media package {}.",
                 transcriptionId, mpId, e);
+          } catch (MicrosoftAzureNotFoundException e) {
+            logger.warn("Transcription {} from media package {} not found.", transcriptionId, mpId);
+            database.updateJobControl(transcriptionId, TranscriptionJobControl.Status.Error.name());
           } catch (TranscriptionServiceException e) {
             logger.warn(e.getMessage(), e);
           } catch (NotFoundException e) {
