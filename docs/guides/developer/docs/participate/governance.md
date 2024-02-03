@@ -163,5 +163,5 @@ The last board elections took place during the Opencast Summit 2021. The current
 - Stephen Marquard, University of Cape Town
 - Carlos Turró Ribalta, Universitat Politécnica de Valencia
 - Rüdiger Rolf, Osnabrück University
-- Lars Kiesow, ELAN e.V.
+- Lars Kiesow, Osnabrück University
 - Matthew Coupe, University of Manchester
