@@ -733,13 +733,14 @@
   <feature name="opencast-graphql-tp" version="${project.version}">
     <!-- graphql -->
     <bundle dependency="true">wrap:mvn:com.graphql-java/java-dataloader/3.2.2$Bundle-SymbolicName=java-dataloader&amp;Bundle-Version=3.2.2</bundle>
-    <bundle dependency="true">mvn:com.graphql-java/graphql-java/21.3</bundle>
-    <bundle dependency="true">mvn:io.github.graphql-java/graphql-java-annotations/21.1</bundle>
+    <bundle dependency="true">mvn:com.graphql-java/graphql-java/${graphql.version}</bundle>
+    <bundle dependency="true">mvn:io.github.graphql-java/graphql-java-annotations/${graphql-annotations.version}</bundle>
     <bundle dependency="true">wrap:mvn:com.graphql-java/graphql-java-extended-scalars/21.0$Bundle-SymbolicName=graphql-java-extended-scalars&amp;Bundle-Version=21.0</bundle>
 
     <!-- graphql transitive dependencies -->
     <bundle dependency="true">mvn:org.antlr/antlr4-runtime/4.7.2</bundle>
     <bundle dependency="true">mvn:com.fasterxml.jackson.datatype/jackson-datatype-jdk8/${jackson.version}</bundle>
+    <bundle dependency="true">mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/${jackson.version}</bundle>
     <bundle dependency="true">mvn:org.reactivestreams/reactive-streams/1.0.4</bundle>
     <bundle dependency="true">mvn:commons-beanutils/commons-beanutils/1.9.4</bundle>
     <bundle dependency="true">mvn:commons-collections/commons-collections/3.2.2</bundle>
