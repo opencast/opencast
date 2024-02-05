@@ -33,6 +33,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -176,10 +177,6 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
 
     boolean setWfProps = Boolean.valueOf(StringUtils.trimToNull(operation.getConfiguration(SET_WF_PROPS_PROPERTY)));
 
-    MediaPackageElementFlavor matchingFlavor = null;
-    if (!sourceFlavor.isEmpty())
-      matchingFlavor = sourceFlavor.get(0);
-
     // Unmarshall target flavor
     MediaPackageElementFlavor targetFlavor = null;
     if (!targetFlavorList.isEmpty())
@@ -200,28 +197,33 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
 
     // Select the tracks based on source flavors and tags
     Set<MediaPackageElement> inputSet = new HashSet<>();
-    for (MediaPackageElement element : mediaPackage.getElementsByTags(sourceTagList)) {
-      MediaPackageElementFlavor elementFlavor = element.getFlavor();
-      if (sourceFlavor == null || (elementFlavor != null && elementFlavor.matches(matchingFlavor))) {
 
-        // Check for audio or video streams in the track, if specified
-        if ((element instanceof Track) && (sourceAudio != null)
-            && (Boolean.parseBoolean(sourceAudio) != ((Track) element).hasAudio())) {
-          continue;
-        }
+    SimpleElementSelector elementSelector = new SimpleElementSelector();
+    for (MediaPackageElementFlavor flavor : sourceFlavor) {
+      elementSelector.addFlavor(flavor);
+    }
+    for (String tag : sourceTagList) {
+      elementSelector.addTag(tag);
+    }
 
-        if ((element instanceof Track) && (sourceVideo != null)
-            && (Boolean.parseBoolean(sourceVideo) != ((Track) element).hasVideo())) {
-          continue;
-        }
-
-        if ((element instanceof Track) && (sourceSubtitle != null)
-            && (Boolean.parseBoolean(sourceSubtitle) != ((Track) element).hasSubtitle())) {
-          continue;
-        }
-
-        inputSet.add(element);
+    for (MediaPackageElement element : elementSelector.select(mediaPackage, true)) {
+      // Check for audio or video streams in the track, if specified
+      if ((element instanceof Track) && (sourceAudio != null)
+          && (Boolean.parseBoolean(sourceAudio) != ((Track) element).hasAudio())) {
+        continue;
       }
+
+      if ((element instanceof Track) && (sourceVideo != null)
+          && (Boolean.parseBoolean(sourceVideo) != ((Track) element).hasVideo())) {
+        continue;
+      }
+
+      if ((element instanceof Track) && (sourceSubtitle != null)
+          && (Boolean.parseBoolean(sourceSubtitle) != ((Track) element).hasSubtitle())) {
+        continue;
+      }
+
+      inputSet.add(element);
     }
 
     if (inputSet.size() == 0) {

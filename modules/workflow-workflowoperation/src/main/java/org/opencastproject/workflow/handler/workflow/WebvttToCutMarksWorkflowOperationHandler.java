@@ -28,6 +28,7 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.subtitleparser.SubtitleParsingException;
 import org.opencastproject.subtitleparser.webvttparser.WebVTTParser;
@@ -58,6 +59,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -356,7 +358,10 @@ public class WebvttToCutMarksWorkflowOperationHandler extends AbstractWorkflowOp
   private WebVTTSubtitle readAndParseWebVTT(MediaPackage mp, MediaPackageElementFlavor sourceFlavor)
           throws WorkflowOperationException {
     // Identify WebVTT Element to process
-    MediaPackageElement[] webvttElements = mp.getElementsByFlavor(sourceFlavor);
+    SimpleElementSelector elementSelector = new SimpleElementSelector();
+    elementSelector.addFlavor(sourceFlavor);
+    Collection<MediaPackageElement> elements = elementSelector.select(mp, false);
+    MediaPackageElement[] webvttElements = elements.toArray(new MediaPackageElement[elements.size()]);
     if (webvttElements.length != 1) {
       throw new WorkflowOperationException("Couldn't uniqly identify WebVTT Element");
     }
