@@ -53,8 +53,6 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
-import org.opencastproject.search.api.SearchQuery;
-import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
@@ -501,18 +499,11 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     securityService.setUser(SecurityUtil.createSystemUser(systemUserName, org));
     try {
       // Look for the media package in the search index
-      SearchQuery query = new SearchQuery().withId(mediaPackageId);
-      SearchResult result = searchService.getForAdministrativeRead(query);
-      if (result.size() == 0) {
-        logger.debug("The search service doesn't know live mediapackage {}", mediaPackageId);
-        return null;
-      } else if (result.size() > 1) {
-        logger.warn("More than one live mediapackage with id {} returned from search service", mediaPackageId);
-        throw new LiveScheduleException("More than one live mediapackage with id " + mediaPackageId + " found");
-      }
-      return result.getItems()[0].getMediaPackage();
+      return searchService.get(mediaPackageId);
     } catch (UnauthorizedException e) {
       logger.warn("Unexpected unauthorized exception when querying the search index for mp {}", mediaPackageId, e);
+      return null;
+    } catch (NotFoundException e) {
       return null;
     } finally {
       securityService.setUser(prevUser);
