@@ -29,11 +29,12 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
+import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
-import org.opencastproject.search.api.SearchResultItem;
+import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AclScope;
@@ -70,14 +71,14 @@ class Item {
   private Jsons.Val obj;
 
   /** Converts a event into the corresponding JSON representation */
-  Item(SearchResultItem event, AuthorizationService authorizationService, Workspace workspace) {
-    this.modifiedDate = event.getModified();
+  Item(SearchResult event, AuthorizationService authorizationService, Workspace workspace) {
+    this.modifiedDate = event.getModifiedDate();
 
     if (event.getDeletionDate() != null) {
       this.obj = Jsons.obj(
           Jsons.p("kind", "event-deleted"),
           Jsons.p("id", event.getId()),
-          Jsons.p("updated", event.getModified().getTime())
+          Jsons.p("updated", event.getModifiedDate().getTime())
       );
     } else {
       final var mp = event.getMediaPackage();
@@ -107,16 +108,13 @@ class Item {
                 }
               });
 
-      // Get title. We require a title and will consult all three sources for it, in decreasing
+      // Get title. We require a title and will consult both sources (DC and MP) for it, in decreasing
       // order of trust in that source.
       var title = dccs.stream()
               .map(dcc -> dcc.getFirst(DublinCore.PROPERTY_TITLE))
               .filter(Objects::nonNull)
               .findFirst()
               .orElse(mp.getTitle());
-      if (title == null) {
-        title = event.getDcTitle();
-      }
       if (title == null) {
         // If there is no title to be found, we throw an exception to skip this event.
         throw new RuntimeException("Event has no title");
@@ -135,15 +133,20 @@ class Item {
           // worse than any other thing that I can think of. And usually all durations are basically
           // the same.
           .max()
-          .orElse(Math.max(0, event.getDcExtent()));
+          //NB: This is an else case, so we ignore the item(s) in the stream
+          .orElseGet(() -> {
+            String dcExtent = event.getDublinCore().getFirst(DublinCore.PROPERTY_EXTENT);
+            DCMIPeriod p = EncodingSchemeUtils.decodeMandatoryPeriod(dcExtent);
+            return Math.max(0L, p.getEnd().getTime() - p.getStart().getTime());
+          });
 
       this.obj = Jsons.obj(
           Jsons.p("kind", "event"),
           Jsons.p("id", event.getId()),
           Jsons.p("title", title),
-          Jsons.p("partOf", event.getDcIsPartOf()),
-          Jsons.p("description", event.getDcDescription()),
-          Jsons.p("created", event.getDcCreated().getTime()),
+          Jsons.p("partOf", event.getDublinCore().getFirst(DublinCore.PROPERTY_IS_PART_OF)),
+          Jsons.p("description", event.getDublinCore().getFirst(PROPERTY_DESCRIPTION)),
+          Jsons.p("created", event.getDublinCore().getFirst(DublinCore.PROPERTY_CREATED)),
           Jsons.p("startTime", period.map(p -> p.getStart().getTime()).orElse(null)),
           Jsons.p("endTime", period.map(p -> p.getEnd().getTime()).orElse(null)),
           Jsons.p("creators", Jsons.arr(new ArrayList<>(creators))),
@@ -155,7 +158,7 @@ class Item {
           Jsons.p("isLive", isLive),
           Jsons.p("metadata", dccToMetadata(dccs)),
           Jsons.p("captions", Jsons.arr(captions)),
-          Jsons.p("updated", event.getModified().getTime())
+          Jsons.p("updated", event.getModifiedDate().getTime())
       );
     }
   }
@@ -172,8 +175,8 @@ class Item {
               final var isXml = Objects.equals(mpe.getMimeType(), MimeType.mimeType("text", "xml"));
               return isCatalog && isForEpisode && isXml;
             })
-            .map(mpe -> DublinCoreUtil.loadDublinCore(workspace, mpe))
-            .collect(Collectors.toCollection(ArrayList::new));
+           .map(mpe -> DublinCoreUtil.loadDublinCore(workspace, mpe))
+           .collect(Collectors.toCollection(ArrayList::new));
   }
 
   /** Assembles the object containing all additional metadata. */
@@ -239,7 +242,7 @@ class Item {
     return Jsons.obj(props);
   }
 
-  private static List<Jsons.Val> assembleTracks(SearchResultItem event, MediaPackage mp) {
+  private static List<Jsons.Val> assembleTracks(SearchResult event, MediaPackage mp) {
     return Arrays.stream(mp.getTracks())
         .filter(track -> track.hasAudio() || track.hasVideo())
         .map(track -> {
