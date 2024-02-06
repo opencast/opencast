@@ -106,19 +106,26 @@ function getSourceData(track, config) {
   return data;
 }
 
+function ensureArray(thing) {
+  //Ensure that thing is an array, if it's not wrap it into an array.  If it's null then return an empty array.
+  return thing ?
+    (Array.isArray(thing) ?
+      thing :
+      [ thing ]) :
+    [];
+}
+
+function ensureSingle(thing) {
+  //Ensure we get a single thing, either by taking the first element in an array, returning the input, or a blank string
+  return thing ?
+    (Array.isArray(thing) ?
+      thing[0] :
+      thing) :
+    '';
+}
+
 function getMetadata(episode, config) {
-  const { duration, title, language, series, seriestitle, subjects, license, type } = episode.mediapackage;
-  const startDate = new Date(episode.dcCreated);
-  const presenters = episode?.mediapackage?.creators?.creator
-    ? (Array.isArray(episode?.mediapackage?.creators?.creator)
-      ? episode?.mediapackage?.creators?.creator
-      : [episode?.mediapackage?.creators?.creator])
-    : [];
-  const contributors = episode?.mediapackage?.contributors?.contributor
-    ? (Array.isArray(episode.mediapackage.contributors.contributor)
-      ? episode.mediapackage.contributors.contributor
-      : [episode.mediapackage.contributors.contributor])
-    : [];
+  const dc = episode?.dc;
 
   const tracks = episode?.mediapackage?.media?.track
     ? (Array.isArray(episode.mediapackage.media.track)
@@ -130,21 +137,20 @@ function getMetadata(episode, config) {
   const visibleTimeLine = !(isLive && config?.hideTimeLineOnLive);
 
   const result = {
-    title,
-    subject: subjects?.subject,
-    description: episode?.dcDescription,
-    language,
-    rights: episode?.dcRightsHolder,
-    license,
-    series,
-    seriestitle,
-    presenters,
-    contributors,
-    startDate,
-    duration: duration / 1000,
-    location: episode?.dcSpatial,
-    UID: episode?.id,
-    type,
+    title: ensureSingle(dc?.title),
+    subject: ensureSingle(dc?.subject),
+    description: ensureArray(dc?.description),
+    language: ensureSingle(dc?.language),
+    rights: ensureArray(dc?.rightsHolder),
+    license: ensureSingle(dc?.license),
+    series: ensureSingle(dc?.isParfOf),
+    seriestitle: ensureSingle(episode?.mediapackage?.seriestitle), //FIXME: This isn't in the DC fields yet.
+    presenters: ensureArray(dc?.creator),
+    contributors: ensureArray(dc?.contributor),
+    startDate: new Date(dc?.created),
+    duration: episode?.mediapackage?.duration / 1000, //FIXME: Parse from DC:extent (cf "PT9M57.002S")
+    location: ensureSingle(episode?.dc?.spatial),
+    UID: episode?.mediapackage?.id, //FIXME: Move this to the DC fields?
     opencast: {episode},
     visibleTimeLine
   };
@@ -376,9 +382,9 @@ function getCaptions(episode) {
 }
 
 export function episodeToManifest(ocResponse, config) {
-  const searchResults = ocResponse['search-results'];
-  if (searchResults?.total === 1) {
-    const episode = searchResults.result;
+  const searchResults = ocResponse['result'];
+  if (searchResults?.length === 1) {
+    const episode = searchResults[0];
     const metadata = getMetadata(episode, config);
     const streams = getStreams(episode, config);
     const captions = getCaptions(episode, config);
