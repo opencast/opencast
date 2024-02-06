@@ -1,0 +1,86 @@
+{
+  "properties": {
+    "searchable_acl": {
+      "properties": {
+        "read": {
+          "type": "keyword"
+        },
+        "write": {
+          "type": "keyword"
+        }
+      }
+    },
+    "dc": {
+      "properties": {
+        "abstract": {
+          "type": "keyword",
+          "copy_to": "fulltext"
+        },
+        "contributor": {
+          "type": "keyword",
+          "copy_to": "fulltext"
+        },
+        "created": {
+          "type": "date"
+        },
+        "creator": {
+          "type": "keyword",
+          "copy_to": "fulltext"
+        },
+        "description": {
+          "type": "keyword",
+          "copy_to": "fulltext"
+        },
+        "extent": {
+          "type": "text"
+        },
+        "identifier": {
+          "type": "keyword"
+        },
+        "isPartOf": {
+          "type": "keyword"
+        },
+        "publisher": {
+          "type": "keyword",
+          "copy_to": "fulltext"
+        },
+        "subject": {
+          "type": "keyword",
+          "copy_to": "fulltext"
+        },
+        "temporal": {
+          "type": "text"
+        },
+        "title": {
+          "type": "keyword",
+          "copy_to": "fulltext"
+        }
+      }
+    },
+    "deleted": {
+      "type": "date"
+    },
+    "fulltext": {
+      "type": "text"
+    },
+    "id": {
+      "type": "keyword"
+    },
+    "mediapackage": {
+      "type": "object",
+      "enabled": false
+    },
+    "mediapackage_xml": {
+      "type": "text"
+    },
+    "modified": {
+      "type": "date"
+    },
+    "org": {
+      "type": "keyword"
+    },
+    "type": {
+      "type": "keyword"
+    }
+  }
+}

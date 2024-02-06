@@ -626,7 +626,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     return this.indexIdentifier + "_" + type;
   }
 
-  protected RestHighLevelClient getClient() {
+  public RestHighLevelClient getClient() {
     return client;
   }
 

@@ -574,13 +574,13 @@ public abstract class OpencastDctermsDublinCore {
     return Opt.nul(dc.getFirstVal(property));
   }
 
-  protected void set(EName property, String value) {
+  public void set(EName property, String value) {
     if (StringUtils.isNotBlank(value)) {
       dc.set(property, value);
     }
   }
 
-  protected void set(EName property, List<String> values) {
+  public void set(EName property, List<String> values) {
     final List<DublinCoreValue> valuesFiltered = $(values).filter(Strings.isNotBlank).map(mkValue).toList();
     if (!valuesFiltered.isEmpty()) {
       dc.remove(property);

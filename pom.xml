@@ -28,6 +28,8 @@
     <cxf.version>3.5.7</cxf.version>
     <eclipselink.version>2.7.11</eclipselink.version>
     <eclipselink.asm.version>9.5.0</eclipselink.asm.version>
+    <elasticsearch.version>7.10.2</elasticsearch.version>
+    <failureaccess.version>1.0.1</failureaccess.version>
     <freemarker.version>2.3.32</freemarker.version>
     <functional.version>1.4.2</functional.version>
     <gson.version>2.10.1</gson.version>
@@ -44,6 +46,7 @@
     <joda-time.version>2.12.5</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
     <karaf.version>4.4.4</karaf.version>
+    <lucene.version>8.7.0</lucene.version>
     <node.version>v18.16.0</node.version>
     <osgi.core.version>8.0.0</osgi.core.version>
     <osgi.annotation.version>8.1.0</osgi.annotation.version>

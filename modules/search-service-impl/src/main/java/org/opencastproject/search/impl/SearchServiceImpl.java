@@ -22,26 +22,16 @@
 package org.opencastproject.search.impl;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
-import org.opencastproject.mediapackage.MediaPackageSerializer;
-import org.opencastproject.metadata.api.StaticMetadataService;
-import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
 import org.opencastproject.search.api.SearchException;
-import org.opencastproject.search.api.SearchQuery;
-import org.opencastproject.search.api.SearchResult;
+import org.opencastproject.search.api.SearchResultList;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.search.impl.persistence.SearchServiceDatabase;
 import org.opencastproject.search.impl.persistence.SearchServiceDatabaseException;
-import org.opencastproject.search.impl.solr.SolrIndexManager;
-import org.opencastproject.search.impl.solr.SolrRequester;
-import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -49,56 +39,34 @@ import org.opencastproject.security.api.StaticFileAuthorization;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.security.util.SecurityUtil;
-import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.solr.SolrServerFactory;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
-import org.opencastproject.workspace.api.Workspace;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.osgi.framework.ServiceException;
-import org.osgi.service.cm.ConfigurationException;
+import org.apache.commons.lang3.tuple.Pair;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 /**
  * A Solr-based {@link SearchService} implementation.
@@ -111,17 +79,12 @@ import java.util.stream.Stream;
         "service.pid=org.opencastproject.search.impl.SearchServiceImpl"
     }
 )
+//FIXME: Should this be a ManagedService?
 public final class SearchServiceImpl extends AbstractJobProducer implements SearchService, ManagedService,
-    StaticFileAuthorization {
+        StaticFileAuthorization {
 
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
-
-  /** Configuration key for a remote solr server */
-  public static final String CONFIG_SOLR_URL = "org.opencastproject.search.solr.url";
-
-  /** Configuration key for an embedded solr configuration and data directory */
-  public static final String CONFIG_SOLR_ROOT = "org.opencastproject.search.solr.dir";
 
   /** The job type */
   public static final String JOB_TYPE = "org.opencastproject.search";
@@ -132,10 +95,8 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   /** The load introduced on the system by creating a delete job */
   public static final float DEFAULT_DELETE_JOB_LOAD = 0.1f;
 
-  /** The key to look for in the service configuration file to override the {@link DEFAULT_ADD_JOB_LOAD} */
   public static final String ADD_JOB_LOAD_KEY = "job.load.add";
 
-  /** The key to look for in the service configuration file to override the {@link DEFAULT_DELETE_JOB_LOAD} */
   public static final String DELETE_JOB_LOAD_KEY = "job.load.delete";
 
   /** The load introduced on the system by creating an add job */
@@ -144,35 +105,15 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   /** The load introduced on the system by creating a delete job */
   private float deleteJobLoad = DEFAULT_DELETE_JOB_LOAD;
 
-  /** counter how often the index has already been tried to populate */
-  private int retriesToPopulateIndex = 0;
-
   /** List of available operations on jobs */
   private enum Operation {
-    Add, Delete, DeleteSeries
-  };
+    Add, Delete
+  }
 
-  /** Solr server */
-  private SolrServer solrServer;
-
-  private SolrRequester solrRequester;
-
-  private SolrIndexManager indexManager;
-
-  private List<StaticMetadataService> mdServices = new ArrayList<StaticMetadataService>();
-
-  private Mpeg7CatalogService mpeg7CatalogService;
-
-  private SeriesService seriesService;
-
-  /** The local workspace */
-  private Workspace workspace;
+  private SearchServiceIndex index;
 
   /** The security service */
   private SecurityService securityService;
-
-  /** The authorization service */
-  private AuthorizationService authorizationService;
 
   /** The service registry */
   private ServiceRegistry serviceRegistry;
@@ -186,10 +127,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   /** The organization directory service */
   protected OrganizationDirectoryService organizationDirectory = null;
 
-  /** The optional Mediapackage serializer */
-  protected MediaPackageSerializer serializer = null;
-
-  private LoadingCache<Tuple<User, String>, Boolean> cache = null;
+  private final LoadingCache<Tuple<User, String>, Boolean> cache;
 
   private static final Pattern staticFilePattern = Pattern.compile("^/([^/]+)/engage-player/([^/]+)/.*$");
 
@@ -202,21 +140,12 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     cache = CacheBuilder.newBuilder()
         .maximumSize(2048)
         .expireAfterWrite(1, TimeUnit.MINUTES)
-        .build(new CacheLoader<Tuple<User, String>, Boolean>() {
+        .build(new CacheLoader<>() {
           @Override
           public Boolean load(Tuple<User, String> key) {
             return loadUrlAccess(key.getB());
           }
         });
-  }
-
-  /**
-   * Return the solr index manager
-   *
-   * @return indexManager
-   */
-  public SolrIndexManager getSolrIndexManager() {
-    return indexManager;
   }
 
   /**
@@ -231,143 +160,6 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   @Activate
   public void activate(final ComponentContext cc) throws IllegalStateException {
     super.activate(cc);
-    final String solrServerUrlConfig = StringUtils.trimToNull(cc.getBundleContext().getProperty(CONFIG_SOLR_URL));
-
-    logger.info("Setting up solr server");
-
-    solrServer = new Object() {
-      SolrServer create() {
-        if (solrServerUrlConfig != null) {
-          /* Use external SOLR server */
-          try {
-            logger.info("Setting up solr server at {}", solrServerUrlConfig);
-            URL solrServerUrl = new URL(solrServerUrlConfig);
-            return setupSolr(solrServerUrl);
-          } catch (MalformedURLException e) {
-            throw connectError(solrServerUrlConfig, e);
-          }
-        } else {
-          /* Set-up embedded SOLR */
-          String solrRoot = SolrServerFactory.getEmbeddedDir(cc, CONFIG_SOLR_ROOT, "search");
-
-          try {
-            logger.debug("Setting up solr server at {}", solrRoot);
-            return setupSolr(new File(solrRoot));
-          } catch (IOException e) {
-            throw connectError(solrServerUrlConfig, e);
-          } catch (SolrServerException e) {
-            throw connectError(solrServerUrlConfig, e);
-          }
-        }
-      }
-
-      IllegalStateException connectError(String target, Exception e) {
-        logger.error("Unable to connect to solr at {}: {}", target, e.getMessage());
-        return new IllegalStateException("Unable to connect to solr at " + target, e);
-      }
-      // CHECKSTYLE:OFF
-    }.create();
-    // CHECKSTYLE:ON
-
-    solrRequester = new SolrRequester(solrServer, securityService, serializer);
-    indexManager = new SolrIndexManager(solrServer, workspace, mdServices, seriesService, mpeg7CatalogService,
-            securityService);
-
-    String systemUserName = cc.getBundleContext().getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
-    populateIndex(systemUserName);
-  }
-
-  /**
-   * Service deactivator, called via declarative services configuration.
-   */
-  @Deactivate
-  public void deactivate() {
-    SolrServerFactory.shutdown(solrServer);
-  }
-
-  /**
-   * Prepares the embedded solr environment.
-   *
-   * @param solrRoot
-   *          the solr root directory
-   */
-  static SolrServer setupSolr(File solrRoot) throws IOException, SolrServerException {
-    logger.info("Setting up solr search index at {}", solrRoot);
-    File solrConfigDir = new File(solrRoot, "conf");
-
-    // Create the config directory
-    if (solrConfigDir.exists()) {
-      logger.info("solr search index found at {}", solrConfigDir);
-    } else {
-      logger.info("solr config directory doesn't exist.  Creating {}", solrConfigDir);
-      FileUtils.forceMkdir(solrConfigDir);
-    }
-
-    // Make sure there is a configuration in place
-    copyClasspathResourceToFile("/solr/conf/protwords.txt", solrConfigDir);
-    copyClasspathResourceToFile("/solr/conf/schema.xml", solrConfigDir);
-    copyClasspathResourceToFile("/solr/conf/scripts.conf", solrConfigDir);
-    copyClasspathResourceToFile("/solr/conf/solrconfig.xml", solrConfigDir);
-    copyClasspathResourceToFile("/solr/conf/stopwords.txt", solrConfigDir);
-    copyClasspathResourceToFile("/solr/conf/synonyms.txt", solrConfigDir);
-
-    // Test for the existence of a data directory
-    File solrDataDir = new File(solrRoot, "data");
-    if (!solrDataDir.exists()) {
-      FileUtils.forceMkdir(solrDataDir);
-    }
-
-    // Test for the existence of the index. Note that an empty index directory will prevent solr from
-    // completing normal setup.
-    File solrIndexDir = new File(solrDataDir, "index");
-    if (solrIndexDir.isDirectory() && solrIndexDir.list().length == 0) {
-      FileUtils.deleteDirectory(solrIndexDir);
-    }
-
-    return SolrServerFactory.newEmbeddedInstance(solrRoot, solrDataDir);
-  }
-
-  /**
-   * Prepares the embedded solr environment.
-   *
-   * @param url
-   *          the url of the remote solr server
-   */
-  static SolrServer setupSolr(URL url) {
-    logger.info("Connecting to solr search index at {}", url);
-    return SolrServerFactory.newRemoteInstance(url);
-  }
-
-  // TODO: generalize this method
-  static void copyClasspathResourceToFile(String classpath, File dir) {
-    InputStream in = null;
-    FileOutputStream fos = null;
-    try {
-      in = SearchServiceImpl.class.getResourceAsStream(classpath);
-      File file = new File(dir, FilenameUtils.getName(classpath));
-      logger.debug("copying " + classpath + " to " + file);
-      fos = new FileOutputStream(file);
-      IOUtils.copy(in, fos);
-    } catch (IOException e) {
-      throw new RuntimeException("Error copying solr classpath resource to the filesystem", e);
-    } finally {
-      IOUtils.closeQuietly(in);
-      IOUtils.closeQuietly(fos);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.search.api.SearchService#getByQuery(java.lang.String, int, int)
-   */
-  public SearchResult getByQuery(String query, int limit, int offset) throws SearchException {
-    try {
-      logger.debug("Searching index using custom query '" + query + "'");
-      return solrRequester.getByQuery(query, limit, offset);
-    } catch (SolrServerException e) {
-      throw new SearchException(e);
-    }
   }
 
   /**
@@ -375,8 +167,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    *
    * @see org.opencastproject.search.api.SearchService#add(org.opencastproject.mediapackage.MediaPackage)
    */
-  public Job add(MediaPackage mediaPackage) throws SearchException, MediaPackageException, IllegalArgumentException,
-          UnauthorizedException, ServiceRegistryException {
+  public Job add(MediaPackage mediaPackage) throws SearchException, IllegalArgumentException {
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Add.toString(),
           Collections.singletonList(MediaPackageParser.getAsXml(mediaPackage)), addJobLoad);
@@ -385,325 +176,53 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     }
   }
 
-  /**
-   * Immediately adds the mediapackage to the search index.
-   *
-   * @param mediaPackage
-   *          the media package
-   * @throws SearchException
-   *           if the media package cannot be added to the search index
-   * @throws IllegalArgumentException
-   *           if the mediapackage is <code>null</code>
-   * @throws UnauthorizedException
-   *           if the user does not have the rights to add the mediapackage
-   */
+  @Override
   public void addSynchronously(MediaPackage mediaPackage)
           throws SearchException, IllegalArgumentException, UnauthorizedException {
-    if (mediaPackage == null) {
-      throw new IllegalArgumentException("Unable to add a null mediapackage");
-    }
-    final String mediaPackageId = mediaPackage.getIdentifier().toString();
-    logger.debug("Attempting to add media package {} to search index", mediaPackageId);
-    AccessControlList acl = authorizationService.getActiveAcl(mediaPackage).getA();
-
-    AccessControlList seriesAcl;
     try {
-      seriesAcl = persistence.getAccessControlLists(mediaPackage.getSeries(), mediaPackageId).stream()
-              .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
-      logger.debug("Updating series with merged access control list: {}", seriesAcl);
+      index.addSynchronously(mediaPackage);
     } catch (SearchServiceDatabaseException e) {
-      throw new SearchException(e);
-    }
-
-    Date now = new Date();
-
-    try {
-      if (indexManager.add(mediaPackage, acl, seriesAcl, now)) {
-        logger.info("Added media package `{}` to the search index, using ACL `{}`", mediaPackageId, acl);
-      } else {
-        logger.warn("Failed to add media package {} to the search index", mediaPackageId);
-      }
-    } catch (SolrServerException e) {
-      throw new SearchException(e);
-    }
-
-    try {
-      persistence.storeMediaPackage(mediaPackage, acl, now);
-    } catch (SearchServiceDatabaseException e) {
-      throw new SearchException(
-          String.format("Could not store media package to search database %s", mediaPackageId), e);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.search.api.SearchService#delete(java.lang.String)
-   */
-  public Job delete(String mediaPackageId) throws SearchException, UnauthorizedException, NotFoundException {
-    try {
-      return serviceRegistry.createJob(
-        JOB_TYPE, Operation.Delete.toString(), Arrays.asList(mediaPackageId), deleteJobLoad);
-    } catch (ServiceRegistryException e) {
-      throw new SearchException(e);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.search.api.SearchService#delete(java.lang.String)
-   */
-  public Job deleteSeries(String seriesId) throws SearchException, UnauthorizedException, NotFoundException {
-    try {
-      return serviceRegistry.createJob(
-          JOB_TYPE, Operation.DeleteSeries.toString(), Arrays.asList(seriesId), deleteJobLoad);
-    } catch (ServiceRegistryException e) {
-      throw new SearchException(e);
-    }
-  }
-
-  /**
-   * Immediately removes the given mediapackage from the search service.
-   *
-   * @param mediaPackageId
-   *          the mediapackage
-   * @return <code>true</code> if the mediapackage was deleted
-   * @throws SearchException
-   *           if deletion failed
-   */
-  public boolean deleteSynchronously(final String mediaPackageId) throws SearchException {
-    SearchResult result;
-    try {
-      SearchQuery q = new SearchQuery().withId(mediaPackageId);
-      User user = securityService.getUser();
-      // allow ca users to retract live publications without putting them into the ACL
-      if (user.hasRole(GLOBAL_CAPTURE_AGENT_ROLE)) {
-        result = solrRequester.getForAdministrativeRead(q); // action doesn't matter here
-      } else {
-        result = solrRequester.getForWrite(q); // also checks admin rights which are always part of the ACL in search
-      }
-      if (result.getItems().length == 0) {
-        logger.warn("Can not delete mediapackage {}, which is not available for the current user to delete from the "
-                    + "search index.", mediaPackageId);
-        return false;
-      }
-      final String seriesId = result.getItems()[0].getDcIsPartOf();
-      logger.info("Removing media package {} from search index", mediaPackageId);
-
-      Date now = new Date();
-      try {
-        persistence.deleteMediaPackage(mediaPackageId, now);
-        logger.info("Removed mediapackage {} from search persistence", mediaPackageId);
-      } catch (NotFoundException e) {
-        // even if mp not found in persistence, it might still exist in search index.
-        logger.info("Could not find mediapackage with id {} in persistence, but will try remove it from index anyway.",
-                mediaPackageId);
-      } catch (SearchServiceDatabaseException e) {
-        throw new SearchException(String.format("Could not delete mediapackage with id %s from persistence storage",
-            mediaPackageId), e);
-      }
-
-      final boolean success = indexManager.delete(mediaPackageId, now);
-
-      // Update series
-      if (seriesId != null) {
-        if (persistence.getMediaPackages(seriesId).size() > 0) {
-          // Update series acl if there are still episodes in the series
-          final AccessControlList seriesAcl = persistence.getAccessControlLists(seriesId).stream()
-              .reduce(new AccessControlList(), AccessControlList::mergeActions);
-          indexManager.addSeries(seriesId, seriesAcl);
-
-        } else {
-          // Remove series if there are no episodes in the series any longer
-          indexManager.delete(seriesId, now);
-        }
-      }
-
-      return success;
-    } catch (SolrServerException | SearchServiceDatabaseException e) {
-      logger.info("Could not delete media package with id {} from search index", mediaPackageId);
-      throw new SearchException(e);
-    }
-  }
-
-  /**
-   * Immediately removes the given series from the search service.
-   *
-   * @param seriesId
-   *          the series
-   * @return <code>true</code> if the series was deleted
-   * @throws SearchException
-   */
-  public boolean deleteSeriesSynchronously(String seriesId) throws SearchException {
-    SearchResult result;
-    try {
-      SearchQuery searchQuery = new SearchQuery();
-      searchQuery.withId(seriesId);
-      searchQuery.includeSeries(true);
-
-      result = solrRequester.getForWrite(searchQuery);
-      if (result.getItems().length == 0) {
-        logger.warn(
-                "Can not delete series {}, which is not available for the current user to delete from the search index."
-                    + "",
-                seriesId);
-        return false;
-      }
-      logger.info("Removing series {} from search index", seriesId);
-
-      Date now = new Date();
-      //only delete from searchindex, there is no series Element in the Database
-      return indexManager.delete(seriesId, now);
-    } catch (SolrServerException e) {
-      logger.info("Could not delete series with id {} from search index", seriesId);
-      throw new SearchException(e);
-    }
-  }
-
-  /**
-   * Clears the complete solr index.
-   *
-   * @throws SearchException
-   *           if clearing the index fails
-   */
-  public void clear() throws SearchException {
-    try {
-      logger.info("Clearing the search index");
-      indexManager.clear();
-    } catch (SolrServerException e) {
-      throw new SearchException(e);
-    }
-  }
-
-  public SearchResult getByQuery(SearchQuery q) throws SearchException {
-    try {
-      logger.debug("Searching index using query object '" + q + "'");
-      return solrRequester.getForRead(q);
-    } catch (SolrServerException e) {
       throw new SearchException(e);
     }
   }
 
   @Override
-  public SearchResult getForAdministrativeRead(SearchQuery q) throws SearchException, UnauthorizedException {
-    User user = securityService.getUser();
-    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole())) {
-      throw new UnauthorizedException(user, getClass().getName() + ".getForAdministrativeRead");
-    }
-
+  public Collection<Pair<Organization, MediaPackage>> getSeries(String seriesId) {
     try {
-      return solrRequester.getForAdministrativeRead(q);
-    } catch (SolrServerException e) {
+      return persistence.getSeries(seriesId);
+    } catch (SearchServiceDatabaseException e) {
       throw new SearchException(e);
     }
   }
 
-  protected void populateIndex(String systemUserName) {
-    long instancesInSolr = 0L;
-
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.search.api.SearchService#delete(java.lang.String)
+   */
+  public Job delete(String mediaPackageId) throws SearchException {
     try {
-      instancesInSolr = indexManager.count();
-    } catch (Exception e) {
-      throw new IllegalStateException(e);
-    }
-
-    if (instancesInSolr > 0) {
-      logger.debug("Search index found");
-      return;
-    }
-
-    if (instancesInSolr == 0L) {
-      logger.info("No search index found");
-      Stream<Tuple<MediaPackage, String>> mediaPackages;
-      AtomicInteger total = new AtomicInteger(0);
-      try {
-        total.addAndGet(persistence.countMediaPackages());
-        logger.info("Starting population of search index from {} items in database", total);
-        mediaPackages = persistence.getAllMediaPackages();
-      } catch (SearchServiceDatabaseException e) {
-        logger.error("Unable to load the search entries: {}", e.getMessage());
-        throw new ServiceException(e.getMessage());
-      }
-      AtomicInteger errors = new AtomicInteger(0);
-      AtomicInteger current = new AtomicInteger(0);
-      mediaPackages.forEach(episode -> {
-        current.incrementAndGet();
-        try {
-          final MediaPackage mediaPackage = episode.getA();
-          final String mediaPackageId = mediaPackage.getIdentifier().toString();
-          final Organization organization = organizationDirectory.getOrganization(episode.getB());
-
-          securityService.setOrganization(organization);
-          securityService.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
-
-          AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
-          Date modificationDate = persistence.getModificationDate(mediaPackageId);
-          Date deletionDate = persistence.getDeletionDate(mediaPackageId);
-
-
-          AccessControlList seriesAcl = persistence.getAccessControlLists(mediaPackage.getSeries(), mediaPackageId)
-              .stream()
-              .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
-          logger.debug("Updating series with merged access control list: {}", seriesAcl);
-
-          indexManager.add(episode.getA(), acl, seriesAcl, deletionDate, modificationDate);
-        } catch (Exception e) {
-          logger.error("Unable to index search instances", e);
-          if (retryToPopulateIndex(systemUserName)) {
-            logger.warn("Trying to re-index search index later. Aborting for now.");
-            return;
-          }
-          errors.incrementAndGet();
-        } finally {
-          securityService.setOrganization(null);
-          securityService.setUser(null);
-        }
-
-        // log progress
-        if (current.get() % 100 == 0) {
-          logger.info("Indexing search {}/{} ({} percent done)", current.get(), total.get(),
-              current.get() * 100 / total.get());
-        }
-      });
-      if (errors.get() > 0) {
-        logger.error("Skipped {} erroneous search entries while populating the search index", errors.get());
-      }
-      logger.info("Finished populating search index");
+      return serviceRegistry.createJob(
+        JOB_TYPE, Operation.Delete.toString(), Collections.singletonList(mediaPackageId), deleteJobLoad);
+    } catch (ServiceRegistryException e) {
+      throw new SearchException(e);
     }
   }
 
-  private boolean retryToPopulateIndex(final String systemUserName) {
-    if (retriesToPopulateIndex > 0) {
-      return false;
-    }
-
-    long instancesInSolr = 0L;
-
+  @Override
+  public MediaPackage get(String mediaPackageId) throws NotFoundException, UnauthorizedException {
     try {
-      instancesInSolr = indexManager.count();
-    } catch (Exception e) {
-      throw new IllegalStateException(e);
+      return persistence.getMediaPackage(mediaPackageId);
+    } catch (SearchServiceDatabaseException e) {
+      throw new SearchException(e);
     }
-
-    if (instancesInSolr > 0) {
-      logger.debug("Search index found, other files could be indexed. No retry needed.");
-      return false;
-    }
-
-    retriesToPopulateIndex++;
-
-    new Thread() {
-        public void run() {
-          try {
-            Thread.sleep(30000);
-          } catch (InterruptedException ex) {
-          }
-          populateIndex(systemUserName);
-        }
-      }.start();
-    return true;
   }
+
+  public SearchResultList search(SearchSourceBuilder searchSource) throws SearchException {
+    SearchResponse idxResp = this.index.search(searchSource);
+    return new SearchResultList(idxResp.getHits());
+  }
+
 
   /**
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
@@ -718,15 +237,11 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
       switch (op) {
         case Add:
           MediaPackage mediaPackage = MediaPackageParser.getFromXml(arguments.get(0));
-          addSynchronously(mediaPackage);
+          index.addSynchronously(mediaPackage);
           return null;
         case Delete:
           String mediapackageId = arguments.get(0);
-          boolean deleted = deleteSynchronously(mediapackageId);
-          return Boolean.toString(deleted);
-        case DeleteSeries:
-          String seriesId = arguments.get(0);
-          deleted = deleteSeriesSynchronously(seriesId);
+          boolean deleted = index.deleteSynchronously(mediapackageId);
           return Boolean.toString(deleted);
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
@@ -740,36 +255,9 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     }
   }
 
-  /** For testing purposes only! */
-  void testSetup(SolrServer server, SolrRequester requester, SolrIndexManager manager) {
-    this.solrServer = server;
-    this.solrRequester = requester;
-    this.indexManager = manager;
-  }
-
-  /** Dynamic reference. */
-  @Reference(
-      cardinality = ReferenceCardinality.AT_LEAST_ONE,
-      policy = ReferencePolicy.DYNAMIC,
-      unbind = "unsetStaticMetadataService"
-  )
-  public void setStaticMetadataService(StaticMetadataService mdService) {
-    this.mdServices.add(mdService);
-    if (indexManager != null) {
-      indexManager.setStaticMetadataServices(mdServices);
-    }
-  }
-
-  public void unsetStaticMetadataService(StaticMetadataService mdService) {
-    this.mdServices.remove(mdService);
-    if (indexManager != null) {
-      indexManager.setStaticMetadataServices(mdServices);
-    }
-  }
-
-  @Reference(name = "mpeg7")
-  public void setMpeg7CatalogService(Mpeg7CatalogService mpeg7CatalogService) {
-    this.mpeg7CatalogService = mpeg7CatalogService;
+  @Reference
+  public void setSearchIndex(SearchServiceIndex ssi) {
+    this.index = ssi;
   }
 
   @Reference
@@ -777,20 +265,6 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     this.persistence = persistence;
   }
 
-  @Reference
-  public void setSeriesService(SeriesService seriesService) {
-    this.seriesService = seriesService;
-  }
-
-  @Reference
-  public void setWorkspace(Workspace workspace) {
-    this.workspace = workspace;
-  }
-
-  @Reference
-  public void setAuthorizationService(AuthorizationService authorizationService) {
-    this.authorizationService = authorizationService;
-  }
 
   @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
@@ -862,36 +336,9 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     return userDirectoryService;
   }
 
-  /**
-   * Sets the optional MediaPackage serializer.
-   *
-   * @param serializer
-   *          the serializer
-   */
-  @Reference(
-      cardinality = ReferenceCardinality.OPTIONAL,
-      policy = ReferencePolicy.DYNAMIC,
-      target = "(service.pid=org.opencastproject.mediapackage.ChainingMediaPackageSerializer)",
-      unbind = "unsetMediaPackageSerializer"
-  )
-  protected void setMediaPackageSerializer(MediaPackageSerializer serializer) {
-    this.serializer = serializer;
-    if (solrRequester != null) {
-      solrRequester.setMediaPackageSerializer(serializer);
-    }
-  }
-
-  protected void unsetMediaPackageSerializer(MediaPackageSerializer serializer) {
-    if (this.serializer == serializer) {
-      this.serializer = null;
-      if (solrRequester != null) {
-        solrRequester.setMediaPackageSerializer(null);
-      }
-    }
-  }
-
   @Override
-  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+  public void updated(Dictionary properties) {
+    // TODO: Move to modified()
     addJobLoad = LoadUtil.getConfiguredLoadValue(properties, ADD_JOB_LOAD_KEY, DEFAULT_ADD_JOB_LOAD, serviceRegistry);
     deleteJobLoad = LoadUtil.getConfiguredLoadValue(
         properties, DELETE_JOB_LOAD_KEY, DEFAULT_DELETE_JOB_LOAD, serviceRegistry);
@@ -904,11 +351,12 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   private boolean loadUrlAccess(final String mediaPackageId) {
     logger.debug("Check if user `{}` has access to media package `{}`", securityService.getUser(), mediaPackageId);
-    final SearchQuery query = new SearchQuery()
-        .withId(mediaPackageId)
-        .includeEpisodes(true)
-        .includeSeries(false);
-    return getByQuery(query).size() > 0;
+    try {
+      persistence.getMediaPackage(mediaPackageId);
+    } catch (NotFoundException | SearchServiceDatabaseException | UnauthorizedException e) {
+      return false;
+    }
+    return true;
   }
 
   @Override

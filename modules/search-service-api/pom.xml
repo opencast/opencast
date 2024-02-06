@@ -16,12 +16,8 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>jakarta.xml.bind</groupId>
-      <artifactId>jakarta.xml.bind-api</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -29,9 +25,23 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-series-service-api</artifactId>
+      <artifactId>opencast-dublincore</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.elasticsearch</groupId>
+      <artifactId>elasticsearch</artifactId>
+      <version>${elasticsearch.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-core</artifactId>
+      <version>${lucene.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -50,7 +60,6 @@
             <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
               org.opencastproject.search.api;version=${project.version},
-              org.opencastproject.feed.api;version=${project.version}
             </Export-Package>
           </instructions>
         </configuration>

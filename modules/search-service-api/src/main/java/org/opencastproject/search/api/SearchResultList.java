@@ -19,13 +19,35 @@
  *
  */
 
-/**
- * Search service.
- */
-@XmlSchema(elementFormDefault = XmlNsForm.QUALIFIED, attributeFormDefault = XmlNsForm.UNQUALIFIED, namespace = "http://search.opencastproject.org", xmlns = { @XmlNs(prefix = "mp", namespaceURI = "http://mediapackage.opencastproject.org") })
+
 package org.opencastproject.search.api;
 
-import javax.xml.bind.annotation.XmlNs;
-import javax.xml.bind.annotation.XmlNsForm;
-import javax.xml.bind.annotation.XmlSchema;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class SearchResultList {
+  private final List<SearchResult> list;
+
+  private final long totalhits;
+
+  public SearchResultList(SearchHits hits) {
+    list = Arrays.stream(hits.getHits())
+        .map(SearchHit::getSourceAsMap)
+        .map(SearchResult::rehydrate)
+        .collect(Collectors.toUnmodifiableList());
+    totalhits = hits.getTotalHits().value;
+  }
+
+  public List<SearchResult> getHits() {
+    return list;
+  }
+
+  public long getTotalHits() {
+    return totalhits;
+  }
+
+}
