@@ -200,13 +200,13 @@ class Item {
         final var ns = key.getNamespaceURI().equals("http://purl.org/dc/terms/")
             ? "dcterms"
             : key.getNamespaceURI();
-        final var fields = namespaces.computeIfAbsent(ns, k -> new ArrayList<>());
 
         // We skip fields that we already include elsewhere.
         if (ns.equals("dcterms") && ignoredDcFields.contains(key.getLocalName())) {
           continue;
         }
 
+        final var fields = namespaces.computeIfAbsent(ns, k -> new ArrayList<>());
         final var values = e.getValue().stream()
             .map(v -> Jsons.v(v.getValue()))
             .collect(Collectors.toCollection(ArrayList::new));
