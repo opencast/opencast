@@ -21,6 +21,7 @@
 
 package org.opencastproject.tobira.impl;
 
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_CREATED;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_DESCRIPTION;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 
@@ -46,6 +47,9 @@ import org.opencastproject.workspace.api.Workspace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -153,7 +157,9 @@ class Item {
           Jsons.p("tracks", Jsons.arr(assembleTracks(event, mp))),
           Jsons.p("acl", assembleAcl(authorizationService.getAcl(mp, AclScope.Merged).getA())),
           Jsons.p("isLive", isLive),
-          Jsons.p("metadata", dccToMetadata(dccs)),
+          Jsons.p("metadata", dccToMetadata(dccs, Set.of(new String[] {
+              "created", "creator", "title", "extent", "isPartOf", "description", "identifier",
+          }))),
           Jsons.p("captions", Jsons.arr(captions)),
           Jsons.p("updated", event.getModified().getTime())
       );
@@ -176,15 +182,13 @@ class Item {
             .collect(Collectors.toCollection(ArrayList::new));
   }
 
-  /** Assembles the object containing all additional metadata. */
-  private static Jsons.Obj dccToMetadata(List<DublinCoreCatalog> dccs) {
-    /* Metadata fields from dcterms that we already handle elsewhere. Therefore, we don't need to
-      * include them here again. */
-    final var ignoredDcFields = Set.of(new String[] {
-        "created", "creator", "title", "extent", "isPartOf", "description", "identifier",
-    });
-
-
+  /**
+   * Assembles the object containing all additional metadata.
+   *
+   * The second argument is a list of dcterms metadata fields that is already included elsewhere in
+   * the response. They will be ignored here.
+   */
+  private static Jsons.Obj dccToMetadata(List<DublinCoreCatalog> dccs, Set<String> ignoredDcFields) {
     final var namespaces = new HashMap<String, ArrayList<Jsons.Prop>>();
 
     for (final var dcc : (Iterable<DublinCoreCatalog>) dccs::iterator) {
@@ -373,12 +377,28 @@ class Item {
         Jsons.p("updated", series.getModifiedDate().getTime())
       );
     } else {
+      // Created date
+      var createdDateString = series.getDublinCore().getFirst(PROPERTY_CREATED);
+      var created = Jsons.NULL;
+      try {
+        var ta = DateTimeFormatter.ISO_INSTANT.parse(createdDateString);
+        created = Jsons.v(Instant.from(ta).toEpochMilli());
+      } catch (DateTimeParseException e) {
+        logger.warn("Series {} has bad created-date: ", series.getId(), e);
+      }
+
+      var additionalMetadata = dccToMetadata(Arrays.asList(series.getDublinCore()), Set.of(new String[] {
+          "created", "title", "description", "identifier",
+      }));
+
       this.obj = Jsons.obj(
         Jsons.p("kind", "series"),
         Jsons.p("id", series.getId()),
         Jsons.p("title", series.getDublinCore().getFirst(PROPERTY_TITLE)),
         Jsons.p("description", series.getDublinCore().getFirst(PROPERTY_DESCRIPTION)),
         Jsons.p("acl", assembleAcl(acl)),
+        Jsons.p("metadata", additionalMetadata),
+        Jsons.p("created", created),
         Jsons.p("updated", series.getModifiedDate().getTime())
       );
     }
