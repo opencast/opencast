@@ -118,7 +118,7 @@ public class SearchResult {
       String org = (String) data.get(ORG);
 
       Instant deleted = null;
-      if (data.containsKey(DELETED_DATE) && !data.get(DELETED_DATE).equals("null")) {
+      if (data.containsKey(DELETED_DATE) && null != data.get(DELETED_DATE)) {
         deleted = Instant.parse((String) data.get(DELETED_DATE));
       }
 
@@ -209,14 +209,14 @@ public class SearchResult {
   public Map<String, Object> dehydrateForIndex() {
     return dehydrate().entrySet().stream()
         .filter(entry -> !entry.getKey().equals(REST_ACL))
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        .collect(HashMap::new, (m,v)->m.put(v.getKey(), v.getValue()), HashMap::putAll);
   }
 
   public Map<String, Object> dehydrateForREST() {
     return dehydrate().entrySet().stream()
         .filter(entry -> !entry.getKey().equals(INDEX_ACL))
         .filter(entry -> !entry.getKey().equals(MEDIAPACKAGE_XML))
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        .collect(HashMap::new, (m,v)->m.put(v.getKey(), v.getValue()), HashMap::putAll);
   }
 
   public Map<String, Object> dehydrate() {
@@ -233,28 +233,30 @@ public class SearchResult {
     Map<String, List<String>> metadata = SearchResult.dehydrateDC(this.dublinCore, now);
 
     var mediaPackageJson = gson.fromJson(MediaPackageParser.getAsJSON(this.mp), Map.class).get(MEDIAPACKAGE);
-    var jsonDel = null == this.deleted ? "null" : DateTimeFormatter.ISO_INSTANT.format(this.deleted);
-    var jsonMod = null == this.modified ? "null" : DateTimeFormatter.ISO_INSTANT.format(this.modified);
 
-    return Map.of(MEDIAPACKAGE, mediaPackageJson, MEDIAPACKAGE_XML, MediaPackageParser.getAsXml(this.mp),
-        INDEX_ACL, SearchResult.dehydrateAclForIndex(acl), REST_ACL, SearchResult.dehydrateAclForREST(acl),
-        DUBLINCORE, metadata,
-        ORG, this.orgId, TYPE, this.type.name(),
-        DELETED_DATE, jsonDel, MODIFIED_DATE, jsonMod);
+    var ret = new HashMap<>(
+        Map.of(MEDIAPACKAGE, mediaPackageJson, MEDIAPACKAGE_XML, MediaPackageParser.getAsXml(this.mp), INDEX_ACL,
+            SearchResult.dehydrateAclForIndex(acl), REST_ACL, SearchResult.dehydrateAclForREST(acl), DUBLINCORE,
+            metadata, ORG, this.orgId, TYPE, this.type.name(),
+            MODIFIED_DATE, DateTimeFormatter.ISO_INSTANT.format(this.modified)));
 
+    ret.put(DELETED_DATE, null == this.deleted ? null : DateTimeFormatter.ISO_INSTANT.format(this.deleted));
+
+    return ret;
   }
 
   public Map<String, Object> dehydrateSeries() {
     Instant now = Instant.now();
     Map<String, List<String>> metadata = SearchResult.dehydrateDC(this.dublinCore, now);
-    var jsonDel = null == this.deleted ? "null" : DateTimeFormatter.ISO_INSTANT.format(this.deleted);
-    var jsonMod = null == this.modified ? "null" : DateTimeFormatter.ISO_INSTANT.format(this.modified);
 
-    return Map.of(
-        INDEX_ACL, SearchResult.dehydrateAclForIndex(acl), REST_ACL, SearchResult.dehydrateAclForREST(acl),
-        DUBLINCORE, metadata,
-        ORG, this.orgId, TYPE, this.type.name(),
-        MODIFIED_DATE, jsonMod, DELETED_DATE, jsonDel);
+    var ret = new HashMap<>(
+        Map.of(INDEX_ACL, SearchResult.dehydrateAclForIndex(acl), REST_ACL, SearchResult.dehydrateAclForREST(acl),
+            DUBLINCORE, metadata, ORG, this.orgId, TYPE, this.type.name(),
+            MODIFIED_DATE, DateTimeFormatter.ISO_INSTANT.format(this.modified)));
+
+    ret.put(DELETED_DATE, null == this.deleted ? null : DateTimeFormatter.ISO_INSTANT.format(this.deleted));
+
+    return ret;
   }
 
   public DublinCoreCatalog getDublinCore() {

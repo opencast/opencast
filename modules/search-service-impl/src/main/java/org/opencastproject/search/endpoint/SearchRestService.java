@@ -174,7 +174,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     final var query = QueryBuilders.boolQuery()
         .must(QueryBuilders.termQuery(SearchResult.ORG, org))
         .must(QueryBuilders.termQuery(SearchResult.TYPE, type))
-        .must(QueryBuilders.termQuery(SearchResult.DELETED_DATE, "null"));
+        .mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE));
 
     if (StringUtils.isNotEmpty(id)) {
       query.must(QueryBuilders.idsQuery().addIds(id));
@@ -331,7 +331,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     var query = QueryBuilders.boolQuery()
         .must(QueryBuilders.termQuery(SearchResult.ORG, org))
         .must(QueryBuilders.termQuery(SearchResult.TYPE, type))
-        .must(QueryBuilders.termQuery(SearchResult.DELETED_DATE, "null"));
+        .mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE));
 
     if (StringUtils.isNotEmpty(id)) {
       query.must(QueryBuilders.idsQuery().addIds(id));

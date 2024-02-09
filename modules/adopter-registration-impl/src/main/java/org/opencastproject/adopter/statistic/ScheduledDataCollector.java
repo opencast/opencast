@@ -308,7 +308,7 @@ public class ScheduledDataCollector extends TimerTask {
                 QueryBuilders.boolQuery()
                     .must(QueryBuilders.termQuery(SearchResult.TYPE, SearchService.IndexEntryType.Episode))
                     .must(QueryBuilders.termQuery(SearchResult.ORG, org.getId()))
-                    .must(QueryBuilders.termQuery(SearchResult.DELETED_DATE, "null")));
+                    .mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE)));
         final SearchResultList results = searchService.search(q);
         long orgMilis = results.getHits().stream().map(
                 result -> EncodingSchemeUtils.decodeDuration(

@@ -58,7 +58,8 @@
       }
     },
     "deleted": {
-      "type": "date"
+      "type": "date",
+      "null_value": "null"
     },
     "fulltext": {
       "type": "text"
