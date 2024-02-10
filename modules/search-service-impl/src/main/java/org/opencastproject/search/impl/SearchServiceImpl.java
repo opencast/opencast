@@ -22,6 +22,7 @@
 package org.opencastproject.search.impl;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+import static org.opencastproject.util.data.functions.Functions.chuck;
 
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
@@ -39,6 +40,7 @@ import org.opencastproject.security.api.StaticFileAuthorization;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.LoadUtil;
@@ -234,15 +236,26 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     List<String> arguments = job.getArguments();
     try {
       op = Operation.valueOf(operation);
+      Organization org = organizationDirectory.getOrganization(job.getOrganization());
+      User user = userDirectoryService.loadUser(job.getCreator());
       switch (op) {
         case Add:
           MediaPackage mediaPackage = MediaPackageParser.getFromXml(arguments.get(0));
-          index.addSynchronously(mediaPackage);
+          SecurityUtil.runAs(securityService, org, user, () -> {
+            try {
+              index.addSynchronously(mediaPackage);
+            } catch (UnauthorizedException | SearchServiceDatabaseException e) {
+              chuck(e);
+            }
+          });
           return null;
         case Delete:
           String mediapackageId = arguments.get(0);
-          boolean deleted = index.deleteSynchronously(mediapackageId);
-          return Boolean.toString(deleted);
+          final boolean[] deleted = new boolean[1];
+          SecurityUtil.runAs(securityService, org, user, () -> {
+            deleted[0] = index.deleteSynchronously(mediapackageId);
+          });
+          return Boolean.toString(deleted[0]);
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
       }

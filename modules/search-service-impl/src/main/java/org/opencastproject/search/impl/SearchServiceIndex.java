@@ -39,6 +39,9 @@ import org.opencastproject.search.impl.persistence.SearchServiceDatabaseExceptio
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.Permissions;
+import org.opencastproject.security.api.Role;
+import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
@@ -198,6 +201,9 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       throw new IllegalArgumentException("Unable to add a null mediapackage");
     }
     var mediaPackageId = mediaPackage.getIdentifier().toString();
+
+    checkMPWritePermission(mediaPackageId);
+
     logger.debug("Attempting to add media package {} to search index", mediaPackageId);
     var acl = authorizationService.getActiveAcl(mediaPackage).getA();
     var now = new Date();
@@ -264,6 +270,28 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     }
   }
 
+  private void checkMPWritePermission(final String mediaPackageId) throws SearchException {
+    try {
+      MediaPackage mp = persistence.getMediaPackage(mediaPackageId);
+      if (!authorizationService.hasPermission(mp, Permissions.Action.WRITE.toString())) {
+        boolean isAdmin = securityService.getUser().getRoles().stream()
+            .map(Role::getName)
+            .anyMatch(r -> r.equals(SecurityConstants.GLOBAL_ADMIN_ROLE));
+        if (!isAdmin) {
+          throw new UnauthorizedException(securityService.getUser(), "Write permission denied for " + mediaPackageId,
+              authorizationService.getActiveAcl(mp).getA());
+        } else {
+          logger.debug("Write for {} is not allowed by ACL, but user has {}",
+              mediaPackageId, SecurityConstants.GLOBAL_ADMIN_ROLE);
+        }
+      }
+    } catch (NotFoundException e) {
+      logger.debug("Mediapackage {} not found, allowing writes", mediaPackageId);
+    } catch (SearchServiceDatabaseException | UnauthorizedException e) {
+      throw new SearchException(e);
+    }
+  }
+
   /**
    * Immediately removes the given mediapackage from the search service.
    *
@@ -275,8 +303,10 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
    */
   public boolean deleteSynchronously(final String mediaPackageId) throws SearchException {
 
+    checkMPWritePermission(mediaPackageId);
+
     String deletionString = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
-    // TODO: Permission checks
+
     try {
       logger.info("Marking media package {} as deleted in search index", mediaPackageId);
       JsonElement json = gson.toJsonTree(Map.of(
