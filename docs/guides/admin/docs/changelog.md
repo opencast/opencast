@@ -4,6 +4,27 @@ Changelog
 Opencast 14
 -----------
 
+### Opencast 14.9
+
+*Released on February 13th, 2024*
+
+- [[#5555](https://github.com/opencast/opencast/pull/5555)] -
+  Debian installation documentation fixed
+- [[#5554](https://github.com/opencast/opencast/pull/5554)] -
+  Fix ACL Template Display for Series in old Admin UI
+- [[#5553](https://github.com/opencast/opencast/pull/5553)] -
+  Don't duplicate user roles when switching ACL templates in old Admin UI
+- [[#5551](https://github.com/opencast/opencast/pull/5551)] -
+  Disable running Firefox from Karma on Macs
+- [[#5548](https://github.com/opencast/opencast/pull/5548)] -
+  Encoding profile fix for portrait videos
+- [[#5526](https://github.com/opencast/opencast/pull/5526)] -
+  Document how to turn static file auth off for Tobira usage.
+- [[#5472](https://github.com/opencast/opencast/pull/5472)] -
+  Fix concurrency problem in Whisper integration
+- [[#5231](https://github.com/opencast/opencast/pull/5231)] -
+  Update Stud.IP User Provider
+
 ### Opencast 14.8
 
 *Released on January 16th, 2024*
