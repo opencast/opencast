@@ -21,13 +21,26 @@
 
 package org.opencastproject.graphql.schema;
 
+import org.opencastproject.graphql.providers.GraphQLProvider;
 import org.opencastproject.security.api.Organization;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.propertytypes.ServiceDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import graphql.schema.GraphQLSchema;
 
@@ -37,10 +50,24 @@ import graphql.schema.GraphQLSchema;
 @ServiceDescription("GraphQL Schema Service")
 public class SchemaService  {
 
+  public @interface Config {
+    int schemaUpdateTriggerDelay() default 2000;
+  }
+
   private static final Logger logger = LoggerFactory.getLogger(SchemaService.class);
 
+  private final ScheduledExecutorService schemaUpdateExecutor;
+
+  private final List<GraphQLProvider> providers = new CopyOnWriteArrayList<>();
+
+
+
   @Activate
-  public SchemaService() {
+  public SchemaService(final Config config) {
+    if (config.schemaUpdateTriggerDelay() < 0) {
+      throw new IllegalArgumentException("Schema update trigger delay must be greater than or equal to 0");
+    }
+    schemaUpdateExecutor = Executors.newSingleThreadScheduledExecutor(new SchemaUpdateThreadFactory());
 
   }
 
@@ -49,5 +76,47 @@ public class SchemaService  {
 
     return schemaBuilder.build();
   }
+
+  private triggerSchemaUpdate() {
+    if (schemaUpdateTask != null) {
+      schemaUpdateTask.cancel();
+    }
+    schemaUpdateTask = new SchemaUpdateTask();
+
+  }
+
+  @Reference(
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC
+  )
+  public void addProvider(GraphQLProvider provider) {
+    providers.add(provider);
+  }
+
+  public void removeProvider(GraphQLProvider provider) {
+    providers.remove(provider);
+  }
+
+
+  public static class SchemaUpdateTask extends TimerTask {
+    @Override
+    public void run() {
+
+    }
+  }
+
+  public static class SchemaUpdateThreadFactory implements ThreadFactory {
+
+    private final AtomicInteger threadNumber = new AtomicInteger(0);
+
+    @Override
+    public Thread newThread(Runnable r) {
+      var thread = new Thread(r, "GraphQL-Schema-Update-" + threadNumber.getAndIncrement());
+      thread.setDaemon(true);
+      return thread;
+    }
+
+  }
+
 
 }

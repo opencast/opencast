@@ -1,0 +1,5 @@
+{
+  "org.opencastproject.graphql.schema.SchemaService": {
+    "schema_update_trigger_delay:Integer": 1000
+  }
+}

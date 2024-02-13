@@ -33,6 +33,10 @@
       <artifactId>org.osgi.service.http.whiteboard</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.configurator</artifactId>
+    </dependency>
+    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <scope>compile</scope>

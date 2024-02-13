@@ -83,7 +83,6 @@ public class ExecutionService implements OrganizationDirectoryListener {
     GraphQL graphQL = GraphQL.newGraphQL(schemaService.buildSchema(organization))
         .queryExecutionStrategy(new AsyncExecutionStrategy())
         .mutationExecutionStrategy(new AsyncSerialExecutionStrategy())
-        .subscriptionExecutionStrategy(new AsyncSerialExecutionStrategy())
         .executionIdProvider(executionIdProvider)
         .build();
     organizationEnvironment.put(organization.getId(), new OrganizationEnvironment(organization.getId(), graphQL));
