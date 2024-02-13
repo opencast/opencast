@@ -25,6 +25,7 @@ import org.opencastproject.speechtotext.api.SpeechToTextEngine;
 import org.opencastproject.speechtotext.api.SpeechToTextEngineException;
 import org.opencastproject.util.IoSupport;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
@@ -37,9 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /** Vosk implementation of the Speech-to-text engine interface. */
 @Component(
@@ -98,7 +97,7 @@ public class VoskEngine implements SpeechToTextEngine {
    * @see org.opencastproject.speechtotext.api.SpeechToTextEngine#generateSubtitlesFile(File, File, String, Boolean)
    */
   @Override
-  public Map<String, Object> generateSubtitlesFile(File mediaFile, File preparedOutputFile,
+  public Result generateSubtitlesFile(File mediaFile, File workingDirectory,
       String language, Boolean translate)
           throws SpeechToTextEngineException {
 
@@ -107,11 +106,11 @@ public class VoskEngine implements SpeechToTextEngine {
       language = voskLanguage;
     }
 
-
+    var output = new File(workingDirectory, FilenameUtils.getBaseName(mediaFile.getAbsolutePath()));
     final List<String> command = Arrays.asList(
             voskExecutable,
             "-i", mediaFile.getAbsolutePath(),
-            "-o", preparedOutputFile.getAbsolutePath(),
+            "-o", output.getAbsolutePath(),
             "-l", language);
     logger.info("Executing Vosk's transcription command: {}", command);
 
@@ -131,21 +130,17 @@ public class VoskEngine implements SpeechToTextEngine {
         throw new SpeechToTextEngineException(
                 String.format("Vosk exited abnormally with status %d (command: %s)%s", exitCode, command, error));
       }
-      if (!preparedOutputFile.isFile()) {
+      if (!output.isFile()) {
         throw new SpeechToTextEngineException("Vosk produced no output");
       }
-      logger.info("Subtitles file generated successfully: {}", preparedOutputFile);
+      logger.info("Subtitles file generated successfully: {}", output);
     } catch (Exception e) {
       logger.debug("Transcription failed closing Vosk transcription process for: {}", mediaFile);
       throw new SpeechToTextEngineException(e);
     } finally {
       IoSupport.closeQuietly(process);
     }
-    Map<String,Object> returnValues = new HashMap<>();
-    returnValues.put("subFile",preparedOutputFile);
-    returnValues.put("language",language);
-
-    return returnValues; // List containing the output File and language parameter
+    return new Result(language, output);
   }
 
 }

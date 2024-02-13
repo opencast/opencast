@@ -4,6 +4,21 @@ Changelog
 Opencast 15
 -----------
 
+### Opencast 15.1
+
+- [[#5546](https://github.com/opencast/opencast/pull/5546)] -
+  Update (New) Admin UI to 2024-01-17
+- [[#5540](https://github.com/opencast/opencast/pull/5540)] -
+  Update xmlsec version (CAS fix)
+- [[#5539](https://github.com/opencast/opencast/pull/5539)] -
+  Fix Paella Player 7 for single stream videos
+- [[#5493](https://github.com/opencast/opencast/pull/5493)] -
+  Fix broken link in markdown documentation
+- [[#5491](https://github.com/opencast/opencast/pull/5491)] -
+  Paella7: Add support for text/vtt captions in DownloadsPlugin
+- [[#5488](https://github.com/opencast/opencast/pull/5488)] -
+  Fix Paella 7 with no segments
+
 ### Opencast 15.0
 
 *Released on December 13th, 2023*
@@ -441,6 +456,29 @@ Opencast 15
 
 Opencast 14
 -----------
+
+### Opencast 14.9
+
+*Released on February 13th, 2024*
+
+- [[#5603](https://github.com/opencast/opencast/pull/5603)] -
+  Fixed encoding profile typo
+- [[#5555](https://github.com/opencast/opencast/pull/5555)] -
+  Debian installation documentation fixed
+- [[#5554](https://github.com/opencast/opencast/pull/5554)] -
+  Fix ACL Template Display for Series in old Admin UI
+- [[#5553](https://github.com/opencast/opencast/pull/5553)] -
+  Don't duplicate user roles when switching ACL templates in old Admin UI
+- [[#5551](https://github.com/opencast/opencast/pull/5551)] -
+  Disable running Firefox from Karma on Macs
+- [[#5548](https://github.com/opencast/opencast/pull/5548)] -
+  Encoding profile fix for portrait videos
+- [[#5526](https://github.com/opencast/opencast/pull/5526)] -
+  Document how to turn static file auth off for Tobira usage.
+- [[#5472](https://github.com/opencast/opencast/pull/5472)] -
+  Fix concurrency problem in Whisper integration
+- [[#5231](https://github.com/opencast/opencast/pull/5231)] -
+  Update Stud.IP User Provider
 
 ### Opencast 14.8
 
