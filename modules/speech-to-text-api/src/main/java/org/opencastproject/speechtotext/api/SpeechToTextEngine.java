@@ -22,10 +22,27 @@
 package org.opencastproject.speechtotext.api;
 
 import java.io.File;
-import java.util.Map;
 
 /** Interface for speech-to-text implementations. */
 public interface SpeechToTextEngine {
+
+  class Result {
+    private final String language;
+    private final File subtitleFile;
+
+    public Result(String language, File subtitleFile) {
+      this.language = language;
+      this.subtitleFile = subtitleFile;
+    }
+
+    public String getLanguage() {
+      return language;
+    }
+
+    public File getSubtitleFile() {
+      return subtitleFile;
+    }
+  }
 
   /**
    * Returns the name of the implemented engine.
@@ -38,13 +55,13 @@ public interface SpeechToTextEngine {
    * Generates the subtitles file.
    *
    * @param mediaFile          The media package containing the audio track.
-   * @param preparedOutputFile The prepared output file where the subtitle's data should be saved.
+   * @param workingDirectory   A unique working directory to safely operate in.
    * @param language           The language of the audio track.
    * @param translate          If the subtitles should be translated into english
-   * @return HashMap which contains the language code and the subtitles file path.
+   * @return Result containing the language code and the subtitles file path.
    * @throws SpeechToTextEngineException Thrown when an error occurs at the process.
    */
-  Map<String, Object> generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language,
+  Result generateSubtitlesFile(File mediaFile, File workingDirectory, String language,
           Boolean translate) throws SpeechToTextEngineException;
 
 }
