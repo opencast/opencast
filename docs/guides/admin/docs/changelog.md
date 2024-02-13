@@ -8,6 +8,8 @@ Opencast 14
 
 *Released on February 13th, 2024*
 
+- [[#5603](https://github.com/opencast/opencast/pull/5603)] -
+  Fixed encoding profile typo
 - [[#5555](https://github.com/opencast/opencast/pull/5555)] -
   Debian installation documentation fixed
 - [[#5554](https://github.com/opencast/opencast/pull/5554)] -
