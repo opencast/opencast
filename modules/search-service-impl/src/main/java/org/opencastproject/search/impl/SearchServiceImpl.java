@@ -54,18 +54,18 @@ import com.google.common.cache.LoadingCache;
 import org.apache.commons.lang3.tuple.Pair;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -75,15 +75,13 @@ import java.util.regex.Pattern;
  */
 @Component(
     immediate = true,
-    service = { SearchService.class,SearchServiceImpl.class,ManagedService.class,StaticFileAuthorization.class },
+    service = { SearchService.class, SearchServiceImpl.class, StaticFileAuthorization.class },
     property = {
         "service.description=Search Service",
         "service.pid=org.opencastproject.search.impl.SearchServiceImpl"
     }
 )
-//FIXME: Should this be a ManagedService?
-public final class SearchServiceImpl extends AbstractJobProducer implements SearchService, ManagedService,
-        StaticFileAuthorization {
+public final class SearchServiceImpl extends AbstractJobProducer implements SearchService, StaticFileAuthorization {
 
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
@@ -349,9 +347,14 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     return userDirectoryService;
   }
 
-  @Override
-  public void updated(Dictionary properties) {
-    // TODO: Move to modified()
+  @Modified
+  public void modified(Map<String, Object> properties) {
+    if (properties == null) {
+      logger.info("No configuration available, using defaults");
+      properties = Map.of();
+    }
+
+    logger.info("Configuring SearchServiceImpl");
     addJobLoad = LoadUtil.getConfiguredLoadValue(properties, ADD_JOB_LOAD_KEY, DEFAULT_ADD_JOB_LOAD, serviceRegistry);
     deleteJobLoad = LoadUtil.getConfiguredLoadValue(
         properties, DELETE_JOB_LOAD_KEY, DEFAULT_DELETE_JOB_LOAD, serviceRegistry);
