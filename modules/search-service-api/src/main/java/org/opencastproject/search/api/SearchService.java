@@ -66,6 +66,15 @@ public interface SearchService {
   Job add(MediaPackage mediaPackage) throws SearchException, MediaPackageException, UnauthorizedException,
           ServiceRegistryException;
 
+  /**
+   * Returns a list of {@link Organization},{@link MediaPackage} pairs of mediapackages within a series.
+   * Note that the Organization should always be the same since series should not cross organizational bounds.
+   *
+   * @param seriesId
+   *          the series ID to query
+   * @return
+   *          A list of {@link Organization},{@link MediaPackage} pairs of mediapackages within the series.
+   */
   Collection<Pair<Organization, MediaPackage>> getSeries(String seriesId);
 
   /**
@@ -96,7 +105,31 @@ public interface SearchService {
    */
   Job delete(String mediaPackageId) throws SearchException, UnauthorizedException, NotFoundException;
 
+  /**
+   * Gets the {@link MediaPackage} for an event, based on its mediapackage ID.
+   *
+   * @param mediaPackageId
+   *          The ID of the mediapackage in question
+   * @return
+   *          The {@link MediaPackage}
+   * @throws NotFoundException
+   *          If the mediapackage is not found.
+   * @throws SearchException
+   *          If an error occurs while searching for the mediapackage.
+   * @throws UnauthorizedException
+   *           if the current user is not authorized to view this mediapackage.
+   */
   MediaPackage get(String mediaPackageId) throws NotFoundException, SearchException, UnauthorizedException;
 
+  /**
+   * Searches the index based on a {@link SearchSourceBuilder}'s query
+   *
+   * @param searchSource
+   *          The {@link SearchSourceBuilder} defining the search query
+   * @return
+   *          A {@link SearchResultList} of the search's results
+   * @throws SearchException
+   *          If an error occurs while searching the index.
+   */
   SearchResultList search(SearchSourceBuilder searchSource) throws SearchException;
 }
