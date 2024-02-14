@@ -116,12 +116,12 @@ function ensureArray(thing) {
 }
 
 function ensureSingle(thing) {
-  //Ensure we get a single thing, either by taking the first element in an array, returning the input, or a blank string
+  //Ensure we get a single thing, either by taking the first element in an array, returning the input, or undefined
   return thing ?
     (Array.isArray(thing) ?
       thing[0] :
       thing) :
-    '';
+    undefined ;
 }
 
 function getMetadata(episode, config) {
@@ -143,8 +143,7 @@ function getMetadata(episode, config) {
     language: ensureSingle(dc?.language),
     rights: ensureArray(dc?.rightsHolder),
     license: ensureSingle(dc?.license),
-    series: ensureSingle(dc?.isParfOf),
-    seriestitle: ensureSingle(episode?.mediapackage?.seriestitle), //FIXME: This isn't in the DC fields yet.
+    series: ensureSingle(dc?.isPartOf),
     presenters: ensureArray(dc?.creator),
     contributors: ensureArray(dc?.contributor),
     startDate: new Date(dc?.created),
