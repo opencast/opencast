@@ -77,7 +77,10 @@ export default class EpisodesFromSeriesPlugin extends PopUpButtonPlugin {
     const thisId = this.player.videoId;
     if (this._episodesData) {
       const result = this._episodesData['result'];
-      (Array.isArray(result) ? result : [result]).forEach(({id,dcTitle,mediapackage}) => {
+      (Array.isArray(result) ? result : [result]).forEach((thing) => {
+        const id = thing.mediapackage.id;
+        const dcTitle = thing.dc.title[0];
+        const mediapackage = thing.mediapackage;
         if (id !== thisId) {
           const preview = getVideoPreview(mediapackage,this.player.config);
           const url = `watch.html?id=${id}`;
