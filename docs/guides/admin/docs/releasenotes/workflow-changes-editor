@@ -1,1 +1,0 @@
-Creating composites for the editor was removed from the `schedule-and-upload` workflow since the new editor can display multiple tracks. If you still use the old one, you can comment the necessary operations back in.

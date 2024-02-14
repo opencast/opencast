@@ -1,5 +1,31 @@
 # Opencast 15: Release Notes
 
+## Opencast 15.2
+
+Opencast valentines edition! A small release this time, but Opencast 15.2 includes a small change to the standard
+workflows. Please check if it affects you.
+
+### Configuration changes
+
+- **Don't create composites for new editor**
+  Creating composites for the editor was removed from the `schedule-and-upload` workflow since the new editor can display multiple tracks. If you still use the old one, you can comment the necessary operations back in.
+  [[#5556](https://github.com/opencast/opencast/pull/5556)]
+
+### Feature
+
+- **Paella 7: Download audio transcripts (without timestamps)**
+   Adds the ability to download the captions files without the timestamps.
+  [[#5532](https://github.com/opencast/opencast/pull/5532)]
+ 
+### Bug fixes
+
+- **Don't log internal AmberScript service state**
+  [[#5530](https://github.com/opencast/opencast/pull/5530)] -
+- **Avoid unnecessary FFmpeg logs**
+  [[#5529](https://github.com/opencast/opencast/pull/5529)] - 
+- **Editor shouldn't just overwrite existing files**
+  [[#5528](https://github.com/opencast/opencast/pull/5528)] -
+
 ## Opencast 15.1
 
 Opencast 15.1 includes important bug fixes and improvements.
