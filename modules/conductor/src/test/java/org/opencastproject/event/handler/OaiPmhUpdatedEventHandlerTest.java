@@ -78,6 +78,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -288,7 +289,7 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
     expect(selectQuery2.run()).andReturn(queryResult);
     expect(assetManagerMock.createQuery()).andReturn(queryBuilder);
     snapshotVersionCapture = EasyMock.newCapture();
-    expect(assetManagerMock.toVersion(capture(snapshotVersionCapture))).andReturn(Opt.some(mock(Version.class)));
+    expect(assetManagerMock.toVersion(capture(snapshotVersionCapture))).andReturn(Optional.of(mock(Version.class)));
     ARecord record = mock(ARecord.class);
     expect(queryResult.getRecords()).andReturn(Stream.$(record));
     Snapshot snapshot = mock(Snapshot.class);

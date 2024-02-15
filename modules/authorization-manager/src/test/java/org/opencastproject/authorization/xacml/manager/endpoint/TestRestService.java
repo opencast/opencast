@@ -70,6 +70,8 @@ import com.entwinemedia.fn.data.Opt;
 import org.easymock.EasyMock;
 import org.junit.Ignore;
 
+import java.util.Optional;
+
 import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.Path;
 
@@ -208,8 +210,8 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     EasyMock.expect(query.select(EasyMock.anyObject(Target.class))).andReturn(select).anyTimes();
 
     AssetManager assetManager = EasyMock.createNiceMock(AssetManager.class);
-    EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.some(new MediaPackageBuilderImpl()
-            .createNew())).anyTimes();
+    EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Optional.of(
+        new MediaPackageBuilderImpl().createNew())).anyTimes();
     EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
     EasyMock.replay(assetManager, version, query, predicate, select, result, record, snapshot);
     return assetManager;

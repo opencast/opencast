@@ -21,7 +21,6 @@
 package org.opencastproject.assetmanager.impl;
 
 import static com.entwinemedia.fn.Stream.$;
-import static com.entwinemedia.fn.fns.Booleans.eq;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.util.data.Tuple.tuple;
 
@@ -364,8 +363,10 @@ public abstract class AssetManagerTestBase {
         }
       }
 
-      @Override public Opt<InputStream> get(StoragePath path) throws AssetStoreException {
-        return IoSupport.openClassPathResource("/dublincore-a.xml").toOpt();
+      @Override public Optional<InputStream> get(StoragePath path) throws AssetStoreException {
+        return IoSupport.openClassPathResource("/dublincore-a.xml").isSome()
+            ? Optional.of(IoSupport.openClassPathResource("/dublincore-a.xml").get())
+            : Optional.empty();
       }
 
       @Override public boolean contains(StoragePath path) throws AssetStoreException {
@@ -379,7 +380,7 @@ public abstract class AssetManagerTestBase {
         for (StoragePath s : store) {
           if (!(sel.getOrganizationId().equals(s.getOrganizationId())
               && sel.getMediaPackageId().equals(s.getMediaPackageId())
-              && sel.getVersion().map(eq(s.getVersion())).getOr(true))) {
+              && (sel.getVersion().isPresent() ? sel.getVersion().get().equals(s.getVersion()) : true))) {
             newStore.add(s);
           } else {
             deleted = true;
@@ -434,8 +435,10 @@ public abstract class AssetManagerTestBase {
         }
       }
 
-      @Override public Opt<InputStream> get(StoragePath path) throws AssetStoreException {
-        return IoSupport.openClassPathResource("/dublincore-a.xml").toOpt();
+      @Override public Optional<InputStream> get(StoragePath path) throws AssetStoreException {
+        return IoSupport.openClassPathResource("/dublincore-a.xml").isSome()
+            ? Optional.of(IoSupport.openClassPathResource("/dublincore-a.xml").get())
+            : Optional.empty();
       }
 
       @Override public boolean contains(StoragePath path) throws AssetStoreException {
@@ -449,7 +452,7 @@ public abstract class AssetManagerTestBase {
         for (StoragePath s : store) {
           if (!(sel.getOrganizationId().equals(s.getOrganizationId())
                   && sel.getMediaPackageId().equals(s.getMediaPackageId())
-                  && sel.getVersion().map(eq(s.getVersion())).getOr(true))) {
+                  && (sel.getVersion().isPresent() ? sel.getVersion().get().equals(s.getVersion()) : true))) {
             newStore.add(s);
           } else {
             deleted = true;

@@ -20,15 +20,13 @@
  */
 package org.opencastproject.assetmanager.api.storage;
 
-import static com.entwinemedia.fn.Equality.eq;
 import static java.lang.String.format;
 
 import org.opencastproject.assetmanager.api.Version;
 
-import com.entwinemedia.fn.Equality;
-import com.entwinemedia.fn.data.Opt;
-
 import java.io.Serializable;
+import java.util.Objects;
+import java.util.Optional;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
@@ -40,20 +38,20 @@ public final class DeletionSelector implements Serializable {
 
   private final String mediaPackageId;
   private final String organizationId;
-  private final Opt<Version> version;
+  private final Optional<Version> version;
 
-  public DeletionSelector(String organizationId, String mediaPackageId, Opt<Version> version) {
+  public DeletionSelector(String organizationId, String mediaPackageId, Optional<Version> version) {
     this.mediaPackageId = mediaPackageId;
     this.organizationId = organizationId;
     this.version = version;
   }
 
   public static DeletionSelector delete(String organizationId, String mediaPackageId, Version version) {
-    return new DeletionSelector(organizationId, mediaPackageId, Opt.some(version));
+    return new DeletionSelector(organizationId, mediaPackageId, Optional.of(version));
   }
 
   public static DeletionSelector deleteAll(String organizationId, String mediaPackageId) {
-    return new DeletionSelector(organizationId, mediaPackageId, Opt.<Version>none());
+    return new DeletionSelector(organizationId, mediaPackageId, Optional.<Version>empty());
   }
 
   public String getMediaPackageId() {
@@ -64,7 +62,7 @@ public final class DeletionSelector implements Serializable {
     return organizationId;
   }
 
-  public Opt<Version> getVersion() {
+  public Optional<Version> getVersion() {
     return version;
   }
 
@@ -74,14 +72,14 @@ public final class DeletionSelector implements Serializable {
   }
 
   private boolean eqFields(DeletionSelector that) {
-    return eq(this.mediaPackageId, that.mediaPackageId)
-            && eq(this.organizationId, that.organizationId)
-            && eq(this.version, that.version);
+    return Objects.equals(this.mediaPackageId, that.mediaPackageId)
+            && Objects.equals(this.organizationId, that.organizationId)
+            && Objects.equals(this.version, that.version);
   }
 
   @Override
   public int hashCode() {
-    return Equality.hash(mediaPackageId, organizationId, version);
+    return Objects.hash(mediaPackageId, organizationId, version);
   }
 
   @Override public String toString() {

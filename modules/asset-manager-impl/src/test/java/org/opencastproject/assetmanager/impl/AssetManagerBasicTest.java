@@ -42,12 +42,11 @@ import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderImpl;
 import org.opencastproject.mediapackage.MediaPackageElements;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.junit.Test;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.Optional;
 
 // CHECKSTYLE:OFF
 public class AssetManagerBasicTest extends AssetManagerTestBase {
@@ -84,13 +83,13 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
   public void testSerializeVersion() throws Exception {
     final MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     final Version v1 = am.takeSnapshot(OWNER, mp).getVersion();
-    assertTrue("Version should be ", am.toVersion(v1.toString()).isSome());
+    assertTrue("Version should be ", am.toVersion(v1.toString()).isPresent());
     assertEquals(v1, am.toVersion(v1.toString()).get());
   }
 
   @Test
   public void testUnwrapException() {
-    assertTrue(AssetManagerImpl.unwrapExceptionUntil(Exception.class, new AssetManagerException()).isSome());
+    assertTrue(AssetManagerImpl.unwrapExceptionUntil(Exception.class, new AssetManagerException()).isPresent());
     assertThat(AssetManagerImpl.unwrapExceptionUntil(Exception.class, new AssetManagerException()).get(), instanceOf(AssetManagerException.class));
     assertEquals("error", AssetManagerImpl.unwrapExceptionUntil(
             AssetManagerException.class,
@@ -124,16 +123,16 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
     MediaPackageElement element = new MediaPackageElementBuilderImpl().newElement(Type.Track,
             MediaPackageElements.PRESENTER_SOURCE);
 
-    Opt<String> fileNameFromUrn = AssetManagerImpl.getFileNameFromUrn(element);
-    assertTrue(fileNameFromUrn.isNone());
+    Optional<String> fileNameFromUrn = AssetManagerImpl.getFileNameFromUrn(element);
+    assertTrue(fileNameFromUrn.isEmpty());
 
     element.setURI(URI.create("file://test.txt"));
     fileNameFromUrn = AssetManagerImpl.getFileNameFromUrn(element);
-    assertTrue(fileNameFromUrn.isNone());
+    assertTrue(fileNameFromUrn.isEmpty());
 
     element.setURI(URI.create("urn:matterhorn:uuid:22:uuid2:caption-ger.vtt"));
     fileNameFromUrn = AssetManagerImpl.getFileNameFromUrn(element);
-    assertTrue(fileNameFromUrn.isSome());
+    assertTrue(fileNameFromUrn.isPresent());
     assertEquals("caption-ger.vtt", fileNameFromUrn.get());
   }
 

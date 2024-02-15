@@ -63,6 +63,7 @@ import org.junit.runners.MethodSorters;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -82,18 +83,18 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     assertThat("Snapshot should be available", snapshot.getAvailability(), equalTo(Availability.ONLINE));
     assertThat("Snapshot should belong to the default organization",
                snapshot.getOrganizationId(), equalTo(DefaultOrganization.DEFAULT_ORGANIZATION_ID));
-    final Opt<Asset> asset = am.getAsset(version, mp.getIdentifier().toString(), mpe.getIdentifier());
-    assertTrue("Asset should be found", asset.isSome());
+    final Optional<Asset> asset = am.getAsset(version, mp.getIdentifier().toString(), mpe.getIdentifier());
+    assertTrue("Asset should be found", asset.isPresent());
     assertEquals("Media package element part of the asset ID should equal the element's ID",
                  mpe.getIdentifier(), asset.get().getId().getMediaPackageElementId());
     assertEquals("Mime types should equal", mpe.getMimeType(), asset.get().getMimeType().get());
-    assertFalse("Asset should not be found", am.getAsset(version, "id", "id").isSome());
+    assertFalse("Asset should not be found", am.getAsset(version, "id", "id").isPresent());
     // try to find the catalog of the media package by checksum
     final MediaPackage mpCopy = MediaPackageSupport.copy(mp);
     am.calcChecksumsForMediaPackageElements(AssetManagerImpl.assetsOnly(mpCopy));
     assertEquals("Media package should be set up with a single catalog", 1, mpCopy.getCatalogs().length);
     final String checksum = mpCopy.getCatalogs()[0].getChecksum().toString();
-    assertTrue("Media package element should be retrievable by checksum", am.getDatabase().findAssetByChecksum(checksum).isSome());
+    assertTrue("Media package element should be retrievable by checksum", am.getDatabase().findAssetByChecksum(checksum).isPresent());
     // issue some queries
     {
       logger.info("Run a failing query");

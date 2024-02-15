@@ -20,15 +20,13 @@
  */
 package org.opencastproject.assetmanager.api;
 
-import static com.entwinemedia.fn.Equality.eq;
-import static com.entwinemedia.fn.Equality.hash;
 import static java.lang.String.format;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.P1;
-import com.entwinemedia.fn.Prelude;
 
 import java.util.Date;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -118,7 +116,7 @@ public abstract class Value {
 
   /**
    * Decompose (or pattern match) the value instance. Provide a function to handle each possible type.
-   * Use {@link #doNotMatch()} as a placeholder that yields an {@link Prelude#unexhaustiveMatch()} error.
+   * Use {@link #doNotMatch()} as a placeholder that yields an error.
    */
   public final <A> A decompose(
           Fn<? super String, ? extends A> stringValue,
@@ -138,14 +136,14 @@ public abstract class Value {
       return versionValue.apply(((VersionValue) this).get());
     } else {
       // catch bug
-      return Prelude.unexhaustiveMatch(this);
+      throw new Error("Unexhaustive match: " + this);
     }
   }
 
   //
 
   /**
-   * Use as a placeholder that yields an {@link Prelude#unexhaustiveMatch()} error in
+   * Use as a placeholder that yields an error in
    * value decomposition.
    *
    * @see #decompose(Fn, Fn, Fn, Fn, Fn)
@@ -153,7 +151,7 @@ public abstract class Value {
   public static <B> Fn<Object, B> doNotMatch() {
     return new Fn<Object, B>() {
       @Override public B apply(Object a) {
-        return Prelude.unexhaustiveMatch(a);
+        throw new Error("Unexhaustive match: " + a);
       }
     };
   }
@@ -300,7 +298,7 @@ public abstract class Value {
     }
 
     @Override public int hashCode() {
-      return hash(value);
+      return Objects.hash(value);
     }
 
     // generic implementation of equals
@@ -310,7 +308,7 @@ public abstract class Value {
     }
 
     private boolean eqFields(TypedValue that) {
-      return eq(value, that.value);
+      return Objects.equals(value, that.value);
     }
 
     @Override public String toString() {

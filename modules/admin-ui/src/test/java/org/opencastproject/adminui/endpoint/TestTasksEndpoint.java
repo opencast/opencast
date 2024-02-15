@@ -66,8 +66,6 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
 import org.junit.Ignore;
@@ -231,13 +229,13 @@ public class TestTasksEndpoint extends TasksEndpoint {
       }
 
       @Override
-      public Opt<InputStream> get(StoragePath path) throws AssetStoreException {
+      public Optional<InputStream> get(StoragePath path) throws AssetStoreException {
         File file = new File(baseDir, UrlSupport.concat(path.getMediaPackageId(), path.getMediaPackageElementId(),
                 path.getVersion().toString()));
         InputStream inputStream;
         try {
           inputStream = new ByteArrayInputStream(FileUtils.readFileToByteArray(file));
-          return Opt.some(inputStream);
+          return Optional.of(inputStream);
         } catch (IOException e) {
           throw new RuntimeException(e);
         }

@@ -190,7 +190,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   private static final String SNAPSHOT_OWNER = SchedulerService.JOB_TYPE;
 
   private static final Gson gson = new Gson();
-
   /**
    * Deserializes properties stored in string columns of the extended event table
    * @param props Properties as retrieved from the DB
@@ -855,9 +854,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     if (dcCatalog.isNone())
       return Opt.none();
 
-    Opt<Asset> asset = assetManager.getAsset(snapshot.getVersion(),
+    Optional<Asset> asset = assetManager.getAsset(snapshot.getVersion(),
             snapshot.getMediaPackage().getIdentifier().toString(), dcCatalog.get().getIdentifier());
-    if (asset.isNone())
+    if (asset.isEmpty())
       return Opt.none();
 
     if (Availability.OFFLINE.equals(asset.get().getAvailability()))

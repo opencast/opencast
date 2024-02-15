@@ -55,6 +55,7 @@ import org.junit.Test;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class SelectVersionWorkflowOperationHandlerTest {
   private static final String SOURCE_FLAVORS = "presenter/delivery,presentation/delivery";
@@ -125,7 +126,7 @@ public class SelectVersionWorkflowOperationHandlerTest {
     EasyMock.expect(query.version()).andReturn(v);
     EasyMock.expect(assetManager.createQuery()).andReturn(query);
     Version version = EasyMock.createNiceMock(Version.class);
-    Opt<Version> optV = Opt.some(version);
+    Optional<Version> optV = Optional.of(version);
     EasyMock.expect(assetManager.toVersion(EasyMock.anyObject(String.class))).andReturn(optV);
 
     EasyMock.replay(assetManager, p, r, t, selectQuery, order, query, v, version);

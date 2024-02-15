@@ -20,9 +20,6 @@
  */
 package org.opencastproject.assetmanager.storage.impl.fs;
 
-import static com.entwinemedia.fn.data.Opt.none;
-import static com.entwinemedia.fn.data.Opt.nul;
-import static com.entwinemedia.fn.data.Opt.some;
 import static org.apache.commons.io.FilenameUtils.EXTENSION_SEPARATOR;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
@@ -31,7 +28,6 @@ import static org.opencastproject.util.IoSupport.file;
 import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.data.functions.Strings.trimToNone;
 
-import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
@@ -42,7 +38,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.FileUtils;
@@ -58,6 +53,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.Optional;
 
 public abstract class AbstractFileSystemAssetStore implements AssetStore {
   /** Log facility */
@@ -106,40 +102,41 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
 
   @Override
   public boolean copy(final StoragePath from, final StoragePath to) throws AssetStoreException {
-    return findStoragePathFile(from).map(new Fn<File, Boolean>() {
-      @Override public Boolean apply(File f) {
-        final File t = createFile(to, f);
-        mkParent(t);
-        logger.debug("Copying {} to {}", f.getAbsolutePath(), t.getAbsolutePath());
-        try {
-          link(f, t, true);
-        } catch (IOException e) {
-          logger.error("Error copying archive file {} to {}", f, t);
-          throw new AssetStoreException(e);
-        }
-        return true;
+    var file = findStoragePathFile(from);
+    if (file.isPresent()) {
+      var f = file.get();
+
+      final File t = createFile(to, f);
+      mkParent(t);
+      logger.debug("Copying {} to {}", f.getAbsolutePath(), t.getAbsolutePath());
+      try {
+        link(f, t, true);
+      } catch (IOException e) {
+        logger.error("Error copying archive file {} to {}", f, t);
+        throw new AssetStoreException(e);
       }
-    }).getOr(false);
+      return true;
+    }
+    return false;
   }
 
   @Override
-  public Opt<InputStream> get(final StoragePath path) throws AssetStoreException {
-    return findStoragePathFile(path).map(new Fn<File, InputStream>() {
-      @Override
-      public InputStream apply(File file) {
-        try {
-          return new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-          logger.error("Error getting archive file {}", file);
-          throw new AssetStoreException(e);
-        }
+  public Optional<InputStream> get(final StoragePath path) throws AssetStoreException {
+    var file = findStoragePathFile(path);
+    if (file.isPresent()) {
+      try {
+        return Optional.of(new FileInputStream(file.get()));
+      } catch (FileNotFoundException e) {
+        logger.error("Error getting archive file {}", file);
+        throw new AssetStoreException(e);
       }
-    });
+    }
+    return Optional.empty();
   }
 
   @Override
   public boolean contains(StoragePath path) throws AssetStoreException {
-    return findStoragePathFile(path).isSome();
+    return findStoragePathFile(path).isPresent();
   }
 
   @Override
@@ -167,8 +164,8 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
   private File getDeletionSelectorDir(DeletionSelector sel) {
     final String basePath = path(getRootDirectory(sel.getOrganizationId(), sel.getMediaPackageId()),
             sel.getOrganizationId(), sel.getMediaPackageId());
-    for (Version v : sel.getVersion()) {
-      return file(basePath, v.toString());
+    if (sel.getVersion().isPresent()) {
+      return file(basePath, sel.getVersion().get().toString());
     }
     return file(basePath);
   }
@@ -248,7 +245,7 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
    *          the storage path
    * @return the file {@link Option}
    */
-  private Opt<File> findStoragePathFile(final StoragePath storagePath) {
+  private Optional<File> findStoragePathFile(final StoragePath storagePath) {
     final FilenameFilter filter = new FilenameFilter() {
       @Override
       public boolean accept(File dir, String name) {
@@ -256,20 +253,20 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
       }
     };
     final File containerDir = getExistingFile(storagePath, Opt.none(String.class)).getParentFile();
-    return nul(containerDir.listFiles(filter)).bind(new Fn<File[], Opt<File>>() {
-      @Override
-      public Opt<File> apply(File[] files) {
-        switch (files.length) {
-          case 0:
-            return none();
-          case 1:
-            return some(files[0]);
-          default:
-            throw new AssetStoreException("Storage path " + files[0].getParent()
-                    + "contains multiple files with the same element id!: " + storagePath.getMediaPackageElementId());
-        }
-      }
-    });
+
+    var files = containerDir.listFiles(filter);
+    if (files == null) {
+      return Optional.empty();
+    }
+    switch (files.length) {
+      case 0:
+        return Optional.empty();
+      case 1:
+        return Optional.of(files[0]);
+      default:
+        throw new AssetStoreException("Storage path " + files[0].getParent()
+            + "contains multiple files with the same element id!: " + storagePath.getMediaPackageElementId());
+    }
   }
 
   @Override

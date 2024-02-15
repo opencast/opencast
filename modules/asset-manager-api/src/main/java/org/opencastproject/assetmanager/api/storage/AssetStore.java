@@ -22,9 +22,8 @@ package org.opencastproject.assetmanager.api.storage;
 
 import org.opencastproject.storage.StorageUsage;
 
-import com.entwinemedia.fn.data.Opt;
-
 import java.io.InputStream;
+import java.util.Optional;
 
 /**
  * Versioned storage for binary resources.
@@ -47,7 +46,7 @@ public interface AssetStore extends StorageUsage {
   boolean copy(StoragePath from, StoragePath to) throws AssetStoreException;
 
   /** Get an input stream to a resource. */
-  Opt<InputStream> get(StoragePath path) throws AssetStoreException;
+  Optional<InputStream> get(StoragePath path) throws AssetStoreException;
 
   /** Check if a resource exists. */
   boolean contains(StoragePath path) throws AssetStoreException;

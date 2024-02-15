@@ -1675,7 +1675,7 @@ public class SchedulerServiceImplTest {
       public Snapshot prepareForDelivery(Snapshot snapshot) {
         return AssetManagerImpl.rewriteUris(snapshot, new Fn<MediaPackageElement, URI>() {
           @Override public URI apply(MediaPackageElement mpe) {
-            String baseName = AssetManagerImpl.getFileNameFromUrn(mpe).getOr(mpe.getElementType().toString());
+            String baseName = AssetManagerImpl.getFileNameFromUrn(mpe).orElse(mpe.getElementType().toString());
 
             // the returned uri must match the path of the {@link #getAsset} method
             return uri(archiveDir.toURI(),
@@ -1764,13 +1764,13 @@ public class SchedulerServiceImplTest {
       }
 
       @Override
-      public Opt<InputStream> get(StoragePath path) throws AssetStoreException {
+      public Optional<InputStream> get(StoragePath path) throws AssetStoreException {
         File file = getFirstFile(new File(archiveDir, UrlSupport.concat(path.getMediaPackageId(),
                 path.getVersion().toString(), path.getMediaPackageElementId())));
         InputStream inputStream;
         try {
           inputStream = new ByteArrayInputStream(FileUtils.readFileToByteArray(file));
-          return Opt.some(inputStream);
+          return Optional.of(inputStream);
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
