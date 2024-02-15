@@ -43,11 +43,16 @@ public interface SearchServiceDatabase {
   /**
    * Returns all search entries in persistent storage.
    *
+   * @param pagesize
+   *          the number of results to get from the database at once
+   * @param offset
+   *          the offset into the full result list to fetch
    * @return {@link Tuple} array of mediapackage-orgid pairs representing stored media packages
    * @throws SearchServiceDatabaseException
    *           if exception occurs
    */
-  Stream<Tuple<MediaPackage, String>> getAllMediaPackages() throws SearchServiceDatabaseException;
+  Stream<Tuple<MediaPackage, String>> getAllMediaPackages(int pagesize, int offset)
+          throws SearchServiceDatabaseException;
 
   /**
    * Returns the organization id of the selected media package

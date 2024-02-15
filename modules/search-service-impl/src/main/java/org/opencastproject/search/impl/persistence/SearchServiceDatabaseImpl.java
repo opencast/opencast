@@ -211,10 +211,11 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getAllMediaPackages()
+   * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getAllMediaPackages(int, int)
    */
   @Override
-  public Stream<Tuple<MediaPackage, String>> getAllMediaPackages() throws SearchServiceDatabaseException {
+  public Stream<Tuple<MediaPackage, String>> getAllMediaPackages(int pagesize, int offset)
+          throws SearchServiceDatabaseException {
     List<SearchEntity> searchEntities;
     try {
       searchEntities = db.exec(namedQuery.findAll("Search.findAll", SearchEntity.class));

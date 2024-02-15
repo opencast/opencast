@@ -47,6 +47,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.Gson;
@@ -74,8 +75,10 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * A Solr-based {@link SearchService} implementation.
@@ -391,30 +394,36 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     try {
       int total = persistence.countMediaPackages();
       int pageSize = 50;
+      int offset = 0;
       AtomicInteger current = new AtomicInteger(0);
       logIndexRebuildBegin(logger, esIndex.getIndexName(), total, "search");
+      List<Tuple<MediaPackage, String>> page = null;
 
-      persistence.getAllMediaPackages().forEach(tuple -> {
-        try {
-          MediaPackage mediaPackage = tuple.getA();
-          String mediaPackageId = mediaPackage.getIdentifier().toString();
+      do {
+        page = persistence.getAllMediaPackages(pageSize, offset).collect(Collectors.toList());
+        page.forEach(tuple -> {
+          try {
+            MediaPackage mediaPackage = tuple.getA();
+            String mediaPackageId = mediaPackage.getIdentifier().toString();
 
-          AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
-          Date modificationDate = persistence.getModificationDate(mediaPackageId);
-          Date deletionDate = persistence.getDeletionDate(mediaPackageId);
+            AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
+            Date modificationDate = persistence.getModificationDate(mediaPackageId);
+            Date deletionDate = persistence.getDeletionDate(mediaPackageId);
 
-          AccessControlList seriesAcl = persistence.getAccessControlLists(mediaPackage.getSeries(), mediaPackageId)
-              .stream().reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
-          logger.debug("Updating series ACL with merged access control list: {}", seriesAcl);
+            AccessControlList seriesAcl = persistence.getAccessControlLists(mediaPackage.getSeries(), mediaPackageId)
+                .stream().reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
+            logger.debug("Updating series ACL with merged access control list: {}", seriesAcl);
 
-          logIndexRebuildProgress(logger, esIndex.getIndexName(), total, current.getAndIncrement(), pageSize);
-          indexMediaPackage(mediaPackage, acl, modificationDate, deletionDate);
-        } catch (SearchServiceDatabaseException | UnauthorizedException | NotFoundException e) {
-          logIndexRebuildError(logger, "search", total, current.get(), e);
-          //NB: Runtime exception thrown to escape the functional interfacing
-          throw new RuntimeException("Internal Index Rebuild Failure", e);
-        }
-      });
+            logIndexRebuildProgress(logger, esIndex.getIndexName(), total, current.getAndIncrement(), pageSize);
+            indexMediaPackage(mediaPackage, acl, modificationDate, deletionDate);
+          } catch (SearchServiceDatabaseException | UnauthorizedException | NotFoundException e) {
+            logIndexRebuildError(logger, "search", total, current.get(), e);
+            //NB: Runtime exception thrown to escape the functional interfacing
+            throw new RuntimeException("Internal Index Rebuild Failure", e);
+          }
+        });
+        offset += pageSize;
+      } while (page.size() == pageSize);
       //NB: Catching RuntimeException since it can be thrown inside the functional forEach here
     } catch (SearchServiceDatabaseException | RuntimeException e) {
       logIndexRebuildError(logger, "search", e);
