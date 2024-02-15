@@ -22,9 +22,6 @@
 package org.opencastproject.graphql.execution;
 
 import org.opencastproject.graphql.schema.SchemaService;
-import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.OrganizationDirectoryListener;
-import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 
 import org.osgi.framework.BundleContext;
@@ -44,59 +41,30 @@ import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.execution.AsyncExecutionStrategy;
 import graphql.execution.AsyncSerialExecutionStrategy;
+import graphql.schema.GraphQLSchema;
 
 @Component(
-    service = { ExecutionService.class, OrganizationDirectoryListener.class }
+    service = { ExecutionService.class }
 )
-public class ExecutionService implements OrganizationDirectoryListener {
+public class ExecutionService {
 
   private static final Logger logger = LoggerFactory.getLogger(ExecutionService.class);
 
-  private final Map<String, OrganizationEnvironment> organizationEnvironment =
-      new ConcurrentHashMap<>(8, 0.9f, 1);
-  private final OrganizationDirectoryService organizationDirectoryService;
   private final SecurityService securityService;
   private final SchemaService schemaService;
   private final BundleContext context;
 
+  private final Map<String, GraphQL> organizationGraphQL = new ConcurrentHashMap<>();
+
   @Activate
   public ExecutionService(
       @Reference SchemaService schemaService,
-      @Reference OrganizationDirectoryService organizationDirectoryService,
       @Reference SecurityService securityService,
       BundleContext context
   ) {
     this.schemaService = schemaService;
-    this.organizationDirectoryService = organizationDirectoryService;
     this.securityService = securityService;
     this.context = context;
-
-    for (Organization organization : organizationDirectoryService.getOrganizations()) {
-      organizationRegistered(organization);
-    }
-  }
-
-  @Override
-  public void organizationRegistered(Organization organization) {
-    logger.info("Building GraphQL schema for organization {}", organization.getId());
-    var executionIdProvider = new OrganizationExecutionIdProvider(organization.getId());
-    GraphQL graphQL = GraphQL.newGraphQL(schemaService.buildSchema(organization))
-        .queryExecutionStrategy(new AsyncExecutionStrategy())
-        .mutationExecutionStrategy(new AsyncSerialExecutionStrategy())
-        .executionIdProvider(executionIdProvider)
-        .build();
-    organizationEnvironment.put(organization.getId(), new OrganizationEnvironment(organization.getId(), graphQL));
-  }
-
-  @Override
-  public void organizationUnregistered(Organization organization) {
-    logger.info("Removing GraphQL schema for organization {}", organization.getId());
-    organizationEnvironment.remove(organization.getId());
-  }
-
-  @Override
-  public void organizationUpdated(Organization organization) {
-    logger.trace("Organization {} updated", organization.getId());
   }
 
   public ExecutionResult execute(
@@ -117,13 +85,29 @@ public class ExecutionService implements OrganizationDirectoryListener {
   }
 
   public ExecutionResult execute(ExecutionInput executionInput) {
-    OrganizationEnvironment environment = organizationEnvironment.get(securityService.getOrganization().getId());
+    var graphQL = getGraphQL(securityService.getOrganization().getId());
 
-    if (environment == null) {
-      throw new IllegalStateException("No GraphQL schema found for organization '"
-          + securityService.getOrganization().getId() + "'");
+    if (graphQL == null) {
+      throw new IllegalStateException("No GraphQL schema found for organization `"
+          + securityService.getOrganization().getId() + "`");
     }
 
-    return environment.getGraphQL().execute(executionInput);
+    return graphQL.execute(executionInput);
   }
+
+  private GraphQL getGraphQL(String organizationId) {
+    GraphQL graphQL = organizationGraphQL.get(organizationId);
+    GraphQLSchema schema = schemaService.get(organizationId);
+
+    if (graphQL == null || !schema.equals(graphQL.getGraphQLSchema())) {
+      graphQL = GraphQL.newGraphQL(schema)
+          .queryExecutionStrategy(new AsyncExecutionStrategy())
+          .mutationExecutionStrategy(new AsyncSerialExecutionStrategy())
+          .executionIdProvider(new OrganizationExecutionIdProvider(organizationId)).build();
+      organizationGraphQL.put(organizationId, graphQL);
+    }
+
+    return graphQL;
+  }
+
 }

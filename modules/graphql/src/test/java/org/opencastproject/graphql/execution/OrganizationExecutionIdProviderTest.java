@@ -21,44 +21,25 @@
 
 package org.opencastproject.graphql.execution;
 
-import java.util.Objects;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import graphql.GraphQL;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class OrganizationEnvironment {
+import graphql.execution.ExecutionId;
 
-  private final String organizationId;
+public class OrganizationExecutionIdProviderTest {
+  private OrganizationExecutionIdProvider provider;
 
-  private final GraphQL graphQL;
-
-  public OrganizationEnvironment(String organizationId, GraphQL graphQL) {
-    this.organizationId = organizationId;
-    this.graphQL = graphQL;
+  @BeforeEach
+  public void setup() {
+    provider = new OrganizationExecutionIdProvider("testOrganization");
   }
 
-  public String getOrganizationId() {
-    return organizationId;
+  @Test
+  public void testProvide() {
+    ExecutionId id1 = provider.provide("query", "operation", null);
+    ExecutionId id2 = provider.provide("query", "operation", null);
+    assertNotEquals(id1, id2, "Execution IDs should be unique");
   }
-
-  public GraphQL getGraphQL() {
-    return graphQL;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    OrganizationEnvironment that = (OrganizationEnvironment) o;
-    return Objects.equals(organizationId, that.organizationId) && Objects.equals(graphQL, that.graphQL);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(organizationId, graphQL);
-  }
-
 }
