@@ -77,7 +77,7 @@ of what work has been done. To this end, there are a few expectations for all pu
 * Any actions that would be required for a version upgrade (e.g: from 3.x to 4.x) must be documented in
   `docs/guides/admin/docs/upgrade.md`
 * New features require a release note in `docs/guides/admin/releasenotes` of at least one line describing the change
-* The commands `mvn clean install`, `mvn javadoc:javadoc javadoc:aggregate`, and `mvn site` should all succeed
+* The commands `./mvnw clean install`, `./mvnw javadoc:javadoc javadoc:aggregate`, and `./mvnw site` should all succeed
 * The licenses of any external libraries used in the pull request comply with the [licensing rules](../license.md) both
   in terms of the license itself as well as its listing in NOTICES
 
