@@ -127,7 +127,6 @@
     <module>modules/email-template-service-api</module>
     <module>modules/email-template-service-impl</module>
     <module>modules/engage-paella-player-7</module>
-    <module>modules/engage-paella-player</module>
     <module>modules/engage-ui</module>
     <module>modules/event-comment</module>
     <module>modules/execute-api</module>
