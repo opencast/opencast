@@ -50,8 +50,8 @@ Example:
 ### Java Libraries / Maven Dependencies
 
 Java dependencies are listed pre module. Maven provides some helpful tools to list dependencies and even report
-libraries. Have a look at the output of `./mvnw dependency:list` and `./mvnw dependency:tree` or generate a full report for a
-module using:
+libraries. Have a look at the output of `./mvnw dependency:list` and `./mvnw dependency:tree` or generate a full report
+for a module using:
 
     ./mvnw -s settings.xml project-info-reports:dependencies
 
