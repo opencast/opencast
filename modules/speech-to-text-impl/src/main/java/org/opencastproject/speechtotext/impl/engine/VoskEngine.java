@@ -107,6 +107,8 @@ public class VoskEngine implements SpeechToTextEngine {
     }
 
     var output = new File(workingDirectory, FilenameUtils.getBaseName(mediaFile.getAbsolutePath()));
+    //Vosk takes an -o $output_filenanme and writes the actual output to $output_filename.vtt...
+    var actualOutputFile = new File(output + ".vtt");
     final List<String> command = Arrays.asList(
             voskExecutable,
             "-i", mediaFile.getAbsolutePath(),
@@ -130,17 +132,17 @@ public class VoskEngine implements SpeechToTextEngine {
         throw new SpeechToTextEngineException(
                 String.format("Vosk exited abnormally with status %d (command: %s)%s", exitCode, command, error));
       }
-      if (!output.isFile()) {
+      if (!actualOutputFile.isFile()) {
         throw new SpeechToTextEngineException("Vosk produced no output");
       }
-      logger.info("Subtitles file generated successfully: {}", output);
+      logger.info("Subtitles file generated successfully: {}", actualOutputFile);
     } catch (Exception e) {
       logger.debug("Transcription failed closing Vosk transcription process for: {}", mediaFile);
       throw new SpeechToTextEngineException(e);
     } finally {
       IoSupport.closeQuietly(process);
     }
-    return new Result(language, output);
+    return new Result(language, actualOutputFile);
   }
 
 }
