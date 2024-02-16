@@ -169,13 +169,17 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   private String streamMimeType;
   private String[] streamResolution;
   private MediaPackageElementFlavor[] liveFlavors;
-  private String distributionServiceType = DEFAULT_LIVE_DISTRIBUTION_SERVICE;
+  private String distributionServiceType;
   private String serverUrl;
   private Cache<String, Version> snapshotVersionCache
       = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build();
   /** Which streaming formats should be published automatically */
   private List<String> publishedStreamingFormats = null;
   private String systemUserName;
+
+  /** References to all distribution services (used while activate not called yet) */
+  private HashMap<String, DownloadDistributionService> tempDistributionServices =
+          new HashMap<String, DownloadDistributionService>();
 
   /** Services */
   private DownloadDistributionService downloadDistributionService; // to distribute episode and series catalogs
@@ -257,6 +261,12 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
 
     if (!StringUtils.isBlank((String) properties.get(LIVE_DISTRIBUTION_SERVICE))) {
       distributionServiceType = StringUtils.trimToEmpty((String) properties.get(LIVE_DISTRIBUTION_SERVICE));
+    } else {
+      distributionServiceType = DEFAULT_LIVE_DISTRIBUTION_SERVICE;
+    }
+    if (tempDistributionServices.get(distributionServiceType) != null) {
+      downloadDistributionService = tempDistributionServices.get(distributionServiceType);
+      logger.info("Distribution service with type {} set.", distributionServiceType);
     }
     publishedStreamingFormats = Arrays.asList(Optional.ofNullable(StringUtils.split(
             (String)properties.get(LIVE_PUBLISH_STREAMING), ",")).orElse(new String[0]));
@@ -911,7 +921,10 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       unbind = "unsetDownloadDistributionService"
   )
   public void setDownloadDistributionService(DownloadDistributionService service) {
-    if (distributionServiceType.equalsIgnoreCase(service.getDistributionType())) {
+    // activate() not executed yet so we may not know which distribution service we want. Cache it.
+    if (distributionServiceType == null) {
+      tempDistributionServices.put(service.getDistributionType(), service);
+    } else if (distributionServiceType.equalsIgnoreCase(service.getDistributionType())) {
       this.downloadDistributionService = service;
     }
   }
