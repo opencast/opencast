@@ -17,7 +17,7 @@ There is a preconfigured Docker image for a Nexus server set-up for Opencast. To
 follow these steps:
 
     docker run \
-        --name ./mvnwcache \
+        --name mvncache \
         -p 8000:8000 \
         docker.io/lkiesow/opencast-maven-repository
 
