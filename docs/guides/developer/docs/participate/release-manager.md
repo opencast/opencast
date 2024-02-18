@@ -123,7 +123,7 @@ Example on how to create the Opencast 7 release branch:
 5. That is it for the release branch. Now update the versions in `develop` in preparation for the next release:
 
         git checkout develop
-        mvn versions:set -DnewVersion=8-SNAPSHOT versions:commit
+        ./mvnw versions:set -DnewVersion=8-SNAPSHOT versions:commit
 
 6. Have a look at the changes. Make sure that nothing else was modified:
 
@@ -353,7 +353,7 @@ The following steps outline the necessary steps for cutting the final release:
 
 4. Make the version changes for the release:
 
-        mvn versions:set -DnewVersion=6.0 versions:commit
+        ./mvnw versions:set -DnewVersion=6.0 versions:commit
 
 5. Have a look at the changes. Make sure that nothing else was modified:
 
