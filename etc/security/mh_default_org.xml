@@ -409,11 +409,6 @@
     <!-- Enables log out -->
     <sec:logout success-handler-ref="logoutSuccessHandler" />
 
-    <!-- Shibboleth log out
-         Please specifiy the URL to return to after logging out
-    <sec:logout logout-success-url="/Shibboleth.sso/Logout?return=http://www.opencast.org" />
-    -->
-
     <!-- JWT single log out
          Please specify the URL to return to after logging out. Comment out the logoutSuccessHandler above.
     <sec:logout logout-success-url="https://auth.example.org/sign_out?rd=http://www.opencast.org" />
@@ -548,6 +543,9 @@
 
   <bean id="logoutSuccessHandler" class="org.opencastproject.kernel.security.LogoutSuccessHandler">
     <property name="userDirectoryService" ref="userDirectoryService" />
+    <!-- Shibboleth log out
+    <property name="defaultTargetUrl" value="/Shibboleth.sso/Logout?return=www.opencast.org"/>
+    -->
   </bean>
 
   <!-- ################# -->
