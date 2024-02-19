@@ -47,9 +47,6 @@ import org.opencastproject.workspace.api.Workspace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -380,11 +377,11 @@ class Item {
       // Created date
       var createdDateString = series.getDublinCore().getFirst(PROPERTY_CREATED);
       var created = Jsons.NULL;
-      try {
-        var ta = DateTimeFormatter.ISO_INSTANT.parse(createdDateString);
-        created = Jsons.v(Instant.from(ta).toEpochMilli());
-      } catch (DateTimeParseException e) {
-        logger.warn("Series {} has bad created-date: ", series.getId(), e);
+      var date = EncodingSchemeUtils.decodeDate(createdDateString);
+      if (date != null) {
+        created = Jsons.v(date.getTime());
+      } else {
+        logger.warn("Series {} has unparsable created-date: {}", series.getId(), createdDateString);
       }
 
       var additionalMetadata = dccToMetadata(Arrays.asList(series.getDublinCore()), Set.of(new String[] {
