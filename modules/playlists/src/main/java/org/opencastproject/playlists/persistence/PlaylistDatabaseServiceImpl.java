@@ -163,6 +163,29 @@ public class PlaylistDatabaseServiceImpl implements PlaylistDatabaseService {
     }
   }
 
+  public List<Playlist> getAllForAdministrativeRead(Date startDate, Date endDate, int limit)
+          throws PlaylistDatabaseException {
+    try {
+      return db.exec(em -> {
+        final var criteriaBuilder = em.getCriteriaBuilder();
+        final var criteriaQuery = criteriaBuilder.createQuery(Playlist.class);
+        final var from = criteriaQuery.from(Playlist.class);
+        final var select = criteriaQuery.select(from)
+            .where(
+                criteriaBuilder.greaterThanOrEqualTo(from.get("updated"), startDate),
+                criteriaBuilder.lessThan(from.get("updated"), endDate)
+            )
+            .orderBy(criteriaBuilder.asc(from.get("updated")));
+
+        return em.createQuery(select)
+            .setMaxResults(limit)
+            .getResultList();
+      });
+    } catch (Exception e) {
+      throw new PlaylistDatabaseException("Error fetching playlists from database", e);
+    }
+  }
+
   /**
    * {@inheritDoc}
    * @see PlaylistDatabaseService#updatePlaylist(Playlist, String)
