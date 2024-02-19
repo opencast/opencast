@@ -21,6 +21,7 @@
 
 package org.opencastproject.tobira.impl;
 
+import org.opencastproject.playlists.PlaylistService;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AuthorizationService;
@@ -38,6 +39,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -73,12 +75,15 @@ final class Harvest {
       SearchService searchService,
       SeriesService seriesService,
       AuthorizationService authorizationService,
+      PlaylistService playlistService,
       Workspace workspace
   ) throws UnauthorizedException, SeriesException {
-    // Retrieve episodes from index.
+    // ===== Retrieve information about events, series, and playlists =============================
     //
-    // We actually fetch `preferredAmount + 1` to get some useful extra information: whether there
-    // are more events and if so, what timestamp that extra event was modified at.
+    // In this step, we always request `preferredAmount + 1` in order to figure out the values for
+    // `hasMore` and `includesItemsUntil` more precisely.
+
+    // Retrieve episodes from index.
     final var q = new SearchQuery()
         .withUpdatedSince(since)
         .withSort(SearchQuery.Sort.DATE_MODIFIED)
@@ -99,10 +104,6 @@ final class Harvest {
 
 
     // Retrieve series from DB.
-    //
-    // We also fetch `preferredAmount + 1` here to be able to know whether there are more series
-    // in the given time range, which allows us to figure out `hasMore` and `includesItemsUntil`
-    // more precisely.
     final var rawSeries = seriesService.getAllForAdministrativeRead(
         since,
         Optional.of(includesItemsUntilRaw),
@@ -118,8 +119,27 @@ final class Harvest {
       }
     }
 
-    // Convert events and series into JSON representation. We limit both to `preferredAmount` here
-    // again, because we fetched `preferredAmount + 1` above.
+
+    // Retrieve playlists from DB.
+    final var rawPlaylists = playlistService.getAllForAdministrativeRead(
+        since,
+        includesItemsUntilRaw,
+        preferredAmount + 1
+    );
+    final var hasMorePlaylistsInRange = rawPlaylists.size() == preferredAmount + 1;
+    logger.debug("Retrieved {} playlists from the database during harvest", rawPlaylists.size());
+
+    if (hasMorePlaylistsInRange) {
+      final var lastPlaylistUpdated = rawPlaylists.get(rawPlaylists.size() - 1).getUpdated();
+      if (lastPlaylistUpdated.before(includesItemsUntilRaw)) {
+        includesItemsUntilRaw = lastPlaylistUpdated;
+      }
+    }
+
+
+    // ===== Convert all items into the JSON output representation ================================
+
+    // We limit to `preferredAmount` here again, because we fetched `preferredAmount + 1` above.
     final var eventItems = Arrays.stream(rawEvents)
         .limit(preferredAmount)
         .map(event -> {
@@ -146,23 +166,37 @@ final class Harvest {
         })
         .filter(item -> item != null);
 
+    final var playlistItems = rawPlaylists.stream()
+        .limit(preferredAmount)
+        .map(playlist -> {
+          try {
+            return new Item(playlist);
+          } catch (Exception e) {
+            var id = playlist == null ? null : playlist.getId();
+            logger.error("Error reading playlist '{}' (skipping...)", id, e);
+            return null;
+          }
+        })
+        .filter(item -> item != null);
 
-    // Combine series and events into one combined list and sort it. We filter out all items that
-    // were modified after `includesItemsUntilRaw` as those are transferred in the next request
-    // anyway. So this is just about response size savings.
+
+    // Combine events, series, and playlists into one combined list and sort it. We filter out all
+    // items that were modified after `includesItemsUntilRaw` as those are transferred in the next
+    // request anyway. So this is just about response size savings.
     //
     // The sorting is, again, not for correctness, because consumers of this API need to be
     // able to deal with that. However, sorting this here will result in fewer temporary objects
     // or invalid states in the consumer.
     Date finalIncludesItemsUntilRaw = includesItemsUntilRaw; // copy for lambda
-    final var items = Stream.concat(eventItems, seriesItems)
+    final var items = Stream.of(eventItems, seriesItems, playlistItems)
+        .flatMap(Function.identity())
         .filter(item -> !item.getModifiedDate().after(finalIncludesItemsUntilRaw))
         .collect(Collectors.toCollection(ArrayList::new));
     items.sort(Comparator.comparing(item -> item.getModifiedDate()));
 
 
     // Obtain information to allow Tobira to plan the next harvesting request.
-    final var hasMore = hasMoreEvents || hasMoreSeriesInRange;
+    final var hasMore = hasMoreEvents || hasMoreSeriesInRange || hasMorePlaylistsInRange;
 
     // The `includesItemsUntil` we return has to be at least `TIME_BUFFER_SIZE` in the past. See
     // the constant's documentation for more information on that.
