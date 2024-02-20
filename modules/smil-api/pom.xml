@@ -77,8 +77,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
               org.w3c.dom.smil;version=1.1,
               org.opencastproject.smil.api.*;version=${project.version},

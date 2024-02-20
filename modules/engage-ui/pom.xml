@@ -192,8 +192,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Private-Package>ui.*</Private-Package>
             <Http-Alias>/engage/ui</Http-Alias>
             <Http-Classpath>/ui</Http-Classpath>

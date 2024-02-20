@@ -87,8 +87,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
               org.opencastproject.assetmanager.util;version=${project.version}
             </Export-Package>

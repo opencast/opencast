@@ -131,8 +131,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               org.osgi.framework,
               org.apache.commons.lang3,
