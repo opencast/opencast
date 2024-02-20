@@ -29,6 +29,7 @@ import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Strings;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
@@ -46,10 +47,8 @@ import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 /** WhisperC++ implementation of the Speech-to-text engine interface. */
 @Component(
@@ -257,13 +256,14 @@ public class WhisperCppEngine implements SpeechToTextEngine {
    * @see org.opencastproject.speechtotext.api.SpeechToTextEngine#generateSubtitlesFile(File, File, String, Boolean)
    */
   @Override
-  public Map<String, Object> generateSubtitlesFile(File mediaFile,
-      File preparedOutputFile, String language, Boolean translate)
+  public Result generateSubtitlesFile(File mediaFile, File workingDirectory, String language, Boolean translate)
           throws SpeechToTextEngineException {
 
     if (!mediaFile.getPath().toLowerCase().endsWith(".wav")) {
       throw new SpeechToTextEngineException("WhisperC++ currently doesn't support any media extension other than wav");
     }
+
+    String outputName = FilenameUtils.getBaseName(mediaFile.getAbsolutePath());
 
     List<String> command = new ArrayList<>(List.of(
         whispercppExecutable,
@@ -271,7 +271,7 @@ public class WhisperCppEngine implements SpeechToTextEngine {
         "--model", whispercppModel,
         "-ovtt",
         "-oj",
-        "--output-file", preparedOutputFile.getAbsolutePath().replaceFirst("[.][^.]+$", "")));
+        "--output-file", FilenameUtils.concat(workingDirectory.getAbsolutePath(), outputName)));
     if (whispercppBeamSize.isSome()) {
       command.add("-bs");
       command.add(Integer.toString(whispercppBeamSize.get()));
@@ -346,6 +346,7 @@ public class WhisperCppEngine implements SpeechToTextEngine {
     logger.info("Executing WhisperC++'s transcription command: {}", command);
 
     Process process = null;
+    File vtt;
 
     try {
       ProcessBuilder processBuilder = new ProcessBuilder(command);
@@ -364,7 +365,7 @@ public class WhisperCppEngine implements SpeechToTextEngine {
 
       // wait until the task is finished
       int exitCode = process.waitFor();
-      logger.info("WhisperC++ process finished with exit code {}",exitCode);
+      logger.info("WhisperC++ process finished with exit code {}", exitCode);
 
       if (exitCode != 0) {
         var error = "";
@@ -375,10 +376,11 @@ public class WhisperCppEngine implements SpeechToTextEngine {
             String.format("WhisperC++ exited abnormally with status %d (command: %s)%s", exitCode, command, error));
       }
 
-      if (!preparedOutputFile.isFile()) {
+      vtt = new File(workingDirectory, outputName + ".vtt");
+      if (!vtt.isFile()) {
         throw new SpeechToTextEngineException("WhisperC++ produced no output");
       }
-      logger.info("Subtitles file generated successfully: {}", preparedOutputFile);
+      logger.info("Subtitles file generated successfully: {}", vtt);
     } catch (Exception e) {
       logger.info("Transcription failed closing WhisperC++ transcription process for: {}", mediaFile);
       throw new SpeechToTextEngineException(e);
@@ -389,8 +391,7 @@ public class WhisperCppEngine implements SpeechToTextEngine {
     // Detect language if not set
     if (subtitleLanguage.isBlank()) {
       JSONParser jsonParser = new JSONParser();
-      File json = new File(preparedOutputFile.getAbsolutePath().replaceFirst("[.][^.]+$", "")
-          + ".json");
+      File json = new File(workingDirectory, outputName + ".json");
       try {
         FileReader reader = new FileReader(json);
         Object obj = jsonParser.parse(reader);
@@ -406,10 +407,6 @@ public class WhisperCppEngine implements SpeechToTextEngine {
       }
     }
 
-    Map<String,Object> returnValues = new HashMap<>();
-    returnValues.put("subFile",preparedOutputFile);
-    returnValues.put("language",subtitleLanguage);
-
-    return returnValues; // Subtitles data
+    return new Result(subtitleLanguage, vtt);
   }
 }
