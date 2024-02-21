@@ -106,7 +106,6 @@ public class PlaylistRestService {
       + "        \"title\": \"Opencast Playlist\",\n"
       + "        \"description\": \"This is a playlist about Opencast\",\n"
       + "        \"creator\": \"Opencast\",\n"
-      + "        \"updated\": 1701361007521,\n"
       + "        \"entries\": [\n"
       + "            {\n"
       + "                \"contentId\": \"ID-about-opencast\",\n"
