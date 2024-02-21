@@ -603,7 +603,7 @@ public class PlaylistRestService {
   @RestQuery(
       name = "removeEntry",
       description = "Remove entry from playlist.",
-      returnDescription = "Playlist without the enrty.",
+      returnDescription = "Playlist without the entry.",
       restParameters = {
           @RestParameter(
               name = "playlistId",
@@ -615,7 +615,7 @@ public class PlaylistRestService {
               name = "entryId",
               isRequired = false,
               type = LONG,
-              description = "Identifier of the enrty that should be deleted"
+              description = "Identifier of the entry that should be deleted"
           )
       },
       responses = {
