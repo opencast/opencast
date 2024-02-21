@@ -19,7 +19,7 @@
     <aws.version>1.12.269_1</aws.version>
     <commons-codec.version>1.15</commons-codec.version>
     <commons-collections.version>4.4</commons-collections.version>
-    <commons-compress.version>1.24.0</commons-compress.version>
+    <commons-compress.version>1.26.0</commons-compress.version>
     <commons-csv.version>1.9.0</commons-csv.version>
     <commons-fileupload.version>1.5</commons-fileupload.version>
     <commons-io.version>2.8.0</commons-io.version>
