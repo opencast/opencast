@@ -557,7 +557,7 @@ public class PlaylistRestService {
   @RestQuery(
       name = "addEntry",
       description = "Add entry to playlist.",
-      returnDescription = "No content.",
+      returnDescription = "The playlist with the new entry.",
       restParameters = {
           @RestParameter(
               name = "playlistId",
