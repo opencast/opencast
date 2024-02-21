@@ -220,7 +220,7 @@ public class PlaylistService {
     try {
       Playlist playlist = persistence.getPlaylist(playlistId);
       if (!checkPermission(playlist, Permissions.Action.WRITE)) {
-        throw new UnauthorizedException("User does not have read permissions");
+        throw new UnauthorizedException("User does not have write permissions");
       }
       playlist = persistence.deletePlaylist(playlist, securityService.getOrganization().getId());
       return playlist;
@@ -247,7 +247,7 @@ public class PlaylistService {
       throw new IllegalStateException(e);
     }
     if (!checkPermission(playlist, Permissions.Action.WRITE)) {
-      throw new UnauthorizedException("User does not have read permissions");
+      throw new UnauthorizedException("User does not have write permissions");
     }
     playlist.setEntries(playlistEntries);
 
@@ -279,7 +279,7 @@ public class PlaylistService {
       throw new IllegalStateException(e);
     }
     if (!checkPermission(playlist, Permissions.Action.WRITE)) {
-      throw new UnauthorizedException("User does not have read permissions");
+      throw new UnauthorizedException("User does not have write permissions");
     }
     PlaylistEntry playlistEntry = new PlaylistEntry();
     playlistEntry.setContentId(contentId);
@@ -310,7 +310,7 @@ public class PlaylistService {
     try {
       playlist = persistence.getPlaylist(playlistId);
       if (!checkPermission(playlist, Permissions.Action.WRITE)) {
-        throw new UnauthorizedException("User does not have read permissions");
+        throw new UnauthorizedException("User does not have write permissions");
       }
     } catch (PlaylistDatabaseException e) {
       throw new IllegalStateException(e);
