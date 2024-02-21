@@ -59,8 +59,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Fragment-Host>opencast-kernel</Fragment-Host>
             <Import-Package>
               javax.servlet.http,
