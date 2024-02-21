@@ -224,7 +224,7 @@ public class PlaylistService {
       playlist = persistence.deletePlaylist(playlist, securityService.getOrganization().getId());
       return playlist;
     } catch (PlaylistDatabaseException e) {
-      throw new IllegalStateException("Could not delete playlist from database with id ");
+      throw new IllegalStateException("Could not delete playlist from database with id " + playlistId);
     }
   }
 
@@ -255,7 +255,7 @@ public class PlaylistService {
 
       return playlist;
     } catch (PlaylistDatabaseException e) {
-      throw new IllegalStateException("Could not delete playlist from database with id ");
+      throw new IllegalStateException("Could not delete playlist from database with id " + playlistId);
     }
   }
 
@@ -290,7 +290,7 @@ public class PlaylistService {
 
       return playlist;
     } catch (PlaylistDatabaseException e) {
-      throw new IllegalStateException("Could not delete playlist from database with id ");
+      throw new IllegalStateException("Could not delete playlist from database with id " + playlistId);
     }
   }
 
@@ -327,7 +327,7 @@ public class PlaylistService {
       playlist = persistence.updatePlaylist(playlist, securityService.getOrganization().getId());
       return playlist;
     } catch (PlaylistDatabaseException e) {
-      throw new IllegalStateException("Could not delete playlist from database with id ");
+      throw new IllegalStateException("Could not delete playlist from database with id " + playlistId);
     }
   }
 
