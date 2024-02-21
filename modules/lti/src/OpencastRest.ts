@@ -275,7 +275,7 @@ export async function uploadFile(
         hostAndPort() + "/lti-service-gui",
         data,
         setUploadPogress !== undefined ? {
-            onUploadProgress: progressEvent => setUploadPogress(Math.round(progressEvent.loaded * percentage / progressEvent.total))
+            onUploadProgress: progressEvent => setUploadPogress(Math.round(progressEvent.loaded * percentage / (progressEvent.total ?? 1)))
         } : {}
     );
 }
