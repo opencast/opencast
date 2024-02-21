@@ -225,10 +225,20 @@ public class PlaylistRestService {
       description = "Get a playlist.",
       returnDescription = "A playlist as XML",
       restParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "The playlist identifier", type = STRING),
-          @RestParameter(name = "withPublications", isRequired = false, description = "If available publications for"
-              + "the content should be returned. Only works for content of type EVENT.", type = BOOLEAN,
-              defaultValue = "true")
+          @RestParameter(
+              name = "id",
+              isRequired = true,
+              description = "The playlist identifier",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "withPublications",
+              isRequired = false,
+              description = "If available publications for"
+              + "the content should be returned. Only works for content of type EVENT.",
+              type = BOOLEAN,
+              defaultValue = "true"
+          )
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "A playlist as XML."),
@@ -250,15 +260,29 @@ public class PlaylistRestService {
       description = "Get playlists. Playlists that you do not have read access to will not show up.",
       returnDescription = "A JSON object containing an array.",
       restParameters = {
-          @RestParameter(name = "limit", isRequired = false, type = INTEGER,
-              description = "The maximum number of results to return for a single request.", defaultValue = "100"),
-          @RestParameter(name = "offset", isRequired = false, type = INTEGER,
-              description = "The index of the first result to return."),
-          @RestParameter(name = "sort", isRequired = false, type = STRING,
+          @RestParameter(
+              name = "limit",
+              isRequired = false,
+              type = INTEGER,
+              description = "The maximum number of results to return for a single request.",
+              defaultValue = "100"
+          ),
+          @RestParameter(
+              name = "offset",
+              isRequired = false,
+              type = INTEGER,
+              description = "The index of the first result to return."
+          ),
+          @RestParameter(
+              name = "sort",
+              isRequired = false,
+              type = STRING,
               description = "Sort the results based upon a sorting criteria. A criteria is specified as a pair such as:"
                   + "<Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or"
                   + "descending order and is mandatory. Sort Name is case sensitive. Supported Sort Names are 'updated'"
-              , defaultValue = "updated:ASC"),
+              ,
+              defaultValue = "updated:ASC"
+          ),
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "A playlist as JSON."),
@@ -306,15 +330,29 @@ public class PlaylistRestService {
       description = "Get playlists. Playlists that you do not have read access to will not show up.",
       returnDescription = "A XML object containing an array.",
       restParameters = {
-          @RestParameter(name = "limit", isRequired = false, type = INTEGER,
-              description = "The maximum number of results to return for a single request.", defaultValue = "100"),
-          @RestParameter(name = "offset", isRequired = false, type = INTEGER,
-              description = "The index of the first result to return."),
-          @RestParameter(name = "sort", isRequired = false, type = STRING,
+          @RestParameter(
+              name = "limit",
+              isRequired = false,
+              type = INTEGER,
+              description = "The maximum number of results to return for a single request.",
+              defaultValue = "100"
+          ),
+          @RestParameter(
+              name = "offset",
+              isRequired = false,
+              type = INTEGER,
+              description = "The index of the first result to return."
+          ),
+          @RestParameter(
+              name = "sort",
+              isRequired = false,
+              type = STRING,
               description = "Sort the results based upon a sorting criteria. A criteria is specified as a pair such as:"
                   + "<Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or"
                   + "descending order and is mandatory. Sort Name is case sensitive. Supported Sort Names are 'updated'"
-              , defaultValue = "updated:ASC"),
+              ,
+              defaultValue = "updated:ASC"
+          ),
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "A playlist as XML."),
@@ -336,8 +374,14 @@ public class PlaylistRestService {
       description = "Updates a playlist or creates a new one.",
       returnDescription = "The updated playlist.",
       restParameters = {
-          @RestParameter(name = "playlist", isRequired = false, description = "Playlist in JSON format", type = TEXT,
-              jaxbClass = JaxbPlaylist.class, defaultValue = SAMPLE_PLAYLIST_JSON)
+          @RestParameter(
+              name = "playlist",
+              isRequired = false,
+              description = "Playlist in JSON format",
+              type = TEXT,
+              jaxbClass = JaxbPlaylist.class,
+              defaultValue = SAMPLE_PLAYLIST_JSON
+          )
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "Playlist updated."),
@@ -365,8 +409,14 @@ public class PlaylistRestService {
       description = "Updates a playlist or creates a new one.",
       returnDescription = "The updated playlist.",
       restParameters = {
-          @RestParameter(name = "playlist", isRequired = false, description = "Playlist in XML format", type = TEXT,
-              jaxbClass = JaxbPlaylist.class, defaultValue = SAMPLE_PLAYLIST_XML)
+          @RestParameter(
+              name = "playlist",
+              isRequired = false,
+              description = "Playlist in XML format",
+              type = TEXT,
+              jaxbClass = JaxbPlaylist.class,
+              defaultValue = SAMPLE_PLAYLIST_XML
+          )
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "Playlist updated."),
@@ -394,7 +444,12 @@ public class PlaylistRestService {
       description = "Removes a playlist.",
       returnDescription = "No content.",
       restParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING)
+          @RestParameter(
+              name = "id",
+              isRequired = true,
+              description = "Playlist identifier",
+              type = STRING
+          )
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "Playlist removed."),
@@ -420,9 +475,20 @@ public class PlaylistRestService {
       description = "Updates the entries of a playlist",
       returnDescription = "The updated playlist.",
       restParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING),
-          @RestParameter(name = "playlistEntries", isRequired = false, description = "Playlist entries in JSON format",
-              type = TEXT, jaxbClass = JaxbPlaylistEntry[].class, defaultValue = SAMPLE_PLAYLIST_ENTRIES_JSON)
+          @RestParameter(
+              name = "id",
+              isRequired = true,
+              description = "Playlist identifier",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "playlistEntries",
+              isRequired = false,
+              description = "Playlist entries in JSON format",
+              type = TEXT,
+              jaxbClass = JaxbPlaylistEntry[].class,
+              defaultValue = SAMPLE_PLAYLIST_ENTRIES_JSON
+          )
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "Playlist updated."),
@@ -453,9 +519,20 @@ public class PlaylistRestService {
       description = "Updates the entries of a playlist",
       returnDescription = "The updated playlist.",
       restParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING),
-          @RestParameter(name = "playlistEntries", isRequired = false, description = "Playlist entries in XML format",
-              type = TEXT, jaxbClass = JaxbPlaylistEntry[].class, defaultValue = SAMPLE_PLAYLIST_ENTRIES_XML)
+          @RestParameter(
+              name = "id",
+              isRequired = true,
+              description = "Playlist identifier",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "playlistEntries",
+              isRequired = false,
+              description = "Playlist entries in XML format",
+              type = TEXT,
+              jaxbClass = JaxbPlaylistEntry[].class,
+              defaultValue = SAMPLE_PLAYLIST_ENTRIES_XML
+          )
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "Playlist updated."),
@@ -485,11 +562,25 @@ public class PlaylistRestService {
       description = "Add entry to playlist.",
       returnDescription = "No content.",
       restParameters = {
-          @RestParameter(name = "playlistId", isRequired = true, description = "Identifier of the playlist to add to",
-              type = STRING),
-          @RestParameter(name = "contentId", isRequired = false, description = "Content identifier", type = STRING),
-          @RestParameter(name = "type", isRequired = false, description = "Entry type. Enum. Valid values are EVENT,"
-              + " INACCESSIBLE.", type = STRING),
+          @RestParameter(
+              name = "playlistId",
+              isRequired = true,
+              description = "Identifier of the playlist to add to",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "contentId",
+              isRequired = false,
+              description = "Content identifier",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "type",
+              isRequired = false,
+              description = "Entry type. Enum. Valid values are EVENT,"
+              + " INACCESSIBLE.",
+              type = STRING
+          ),
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "Playlist updated."),
@@ -517,10 +608,18 @@ public class PlaylistRestService {
       description = "Remove entry from playlist.",
       returnDescription = "Playlist without the enrty.",
       restParameters = {
-          @RestParameter(name = "playlistId", isRequired = true, type = STRING,
-              description = "Identifier of the playlist to delete from"),
-          @RestParameter(name = "entryId", isRequired = false, type = LONG,
-              description = "Identifier of the enrty that should be deleted")
+          @RestParameter(
+              name = "playlistId",
+              isRequired = true,
+              type = STRING,
+              description = "Identifier of the playlist to delete from"
+          ),
+          @RestParameter(
+              name = "entryId",
+              isRequired = false,
+              type = LONG,
+              description = "Identifier of the enrty that should be deleted"
+          )
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "Playlist updated."),
