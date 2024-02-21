@@ -255,7 +255,7 @@ public class PlaylistsEndpoint {
   @RestQuery(
       name = "remove",
       description = "Removes a playlist.",
-      returnDescription = "No content.",
+      returnDescription = "The removed playlist.",
       restParameters = {
           @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING)
       },
