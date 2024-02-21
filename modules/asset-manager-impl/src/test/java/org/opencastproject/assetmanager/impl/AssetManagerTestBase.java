@@ -20,13 +20,11 @@
  */
 package org.opencastproject.assetmanager.impl;
 
-import static com.entwinemedia.fn.Stream.$;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.api.fn.Snapshots;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.PropertyField;
 import org.opencastproject.assetmanager.api.query.PropertySchema;
@@ -79,11 +77,13 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Base class for {@link org.opencastproject.assetmanager.api.AssetManager} tests.
@@ -248,9 +248,9 @@ public abstract class AssetManagerTestBase {
       final int maxVersions,
       final Opt<String> seriesId
   ) {
-    return $(createAndAddMediaPackages(amount, minVersions, maxVersions, seriesId))
-        .map(Snapshots.getMediaPackageId)
-        .toSet()
+    return Arrays.stream(createAndAddMediaPackages(amount, minVersions, maxVersions, seriesId))
+        .map(s -> s.getMediaPackage().getIdentifier().toString())
+        .collect(Collectors.toSet())
         .toArray(new String[]{});
   }
 
