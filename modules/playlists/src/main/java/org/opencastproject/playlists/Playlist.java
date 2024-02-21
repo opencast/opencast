@@ -161,13 +161,15 @@ public class Playlist {
   }
 
   public boolean addEntry(PlaylistEntry entry) {
+    notNull(entry, "entry");
     entry.setPlaylist(this);
-    return entries.add(notNull(entry, "entry"));
+    return entries.add(entry);
   }
 
   public boolean removeEntry(PlaylistEntry entry) {
+    notNull(entry, "entry");
     entry.setPlaylist(null);
-    return entries.remove(notNull(entry, "entry"));
+    return entries.remove(entry);
   }
 
   public String getTitle() {
