@@ -70,7 +70,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
@@ -294,11 +294,11 @@ public class PlaylistRestService {
       @FormParam("sort") String sort)
           throws NotFoundException {
     if (offset < 0) {
-      Response.serverError().status(Response.Status.BAD_REQUEST).build();
+      throw new WebApplicationException(Status.BAD_REQUEST);
     }
 
     if (limit < 0) {
-      Response.serverError().status(Response.Status.BAD_REQUEST).build();
+      throw new WebApplicationException(Status.BAD_REQUEST);
     }
 
     SortCriterion sortCriterion = new SortCriterion("", SortCriterion.Order.None);
@@ -311,7 +311,7 @@ public class PlaylistRestService {
           break;
         default:
           logger.info("Unknown sort criteria {}", sortCriterion.getFieldName());
-          Response.serverError().status(Response.Status.BAD_REQUEST).build();
+          throw new WebApplicationException(Status.BAD_REQUEST);
       }
     }
 
