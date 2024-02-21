@@ -131,14 +131,20 @@ public class JaxbPlaylist {
     return new Playlist(
         id,
         organization,
-        Optional.ofNullable(entries).orElseGet(Collections::emptyList)
-        .stream().map(JaxbPlaylistEntry::toPlaylistEntry).collect(Collectors.toList()),
+        Optional.ofNullable(entries)
+            .orElseGet(Collections::emptyList)
+            .stream()
+            .map(JaxbPlaylistEntry::toPlaylistEntry)
+            .collect(Collectors.toList()),
         title,
         description,
         creator,
         updated,
-        Optional.ofNullable(accessControlEntries).orElseGet(Collections::emptyList)
-            .stream().map(JaxbPlaylistAccessControlEntry::toPlaylistAccessControlEntry).collect(Collectors.toList())
+        Optional.ofNullable(accessControlEntries)
+            .orElseGet(Collections::emptyList)
+            .stream()
+            .map(JaxbPlaylistAccessControlEntry::toPlaylistAccessControlEntry)
+            .collect(Collectors.toList())
 
     );
   }
