@@ -193,14 +193,10 @@ public class PlaylistService {
       playlist.setOrganization(securityService.getOrganization().getId());
     }
     for (PlaylistEntry entry : playlist.getEntries()) {
-      if (entry.getPlaylist() == null) {
-        entry.setPlaylist(playlist);
-      }
+      entry.setPlaylist(playlist);
     }
     for (PlaylistAccessControlEntry entry : playlist.getAccessControlEntries()) {
-      if (entry.getPlaylist() == null) {
-        entry.setPlaylist(playlist);
-      }
+      entry.setPlaylist(playlist);
     }
 
     try {
