@@ -76,7 +76,7 @@ public class Playlist {
   @Column(name = "id")
   private String id;
 
-  @Column(name = "organization")
+  @Column(name = "organization", nullable = false, length = 128)
   private String organization;
 
   @OneToMany(
@@ -97,7 +97,7 @@ public class Playlist {
   @Column(name = "creator")
   private String creator;
 
-  @Column(name = "updated")
+  @Column(name = "updated", nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
   private Date updated;
 
