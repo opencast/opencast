@@ -204,7 +204,7 @@ public class PlaylistsEndpoint {
           break;
         default:
           logger.info("Unknown sort criteria {}", sortCriterion.getFieldName());
-          Response.serverError().status(Response.Status.BAD_REQUEST).build();
+          return Response.serverError().status(Response.Status.BAD_REQUEST).build();
       }
     }
     List<Playlist> playlists = service.getPlaylists(limit, offset, sortCriterion);
