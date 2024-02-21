@@ -52,7 +52,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component(
     property = {
@@ -320,8 +319,8 @@ public class PlaylistService {
         playlist.getEntries()
             .stream()
             .filter(e -> e.getId() == entryId)
-            .collect(Collectors.toList())
-            .get(0)
+            .findFirst()
+            .get()
     );
 
     try {
