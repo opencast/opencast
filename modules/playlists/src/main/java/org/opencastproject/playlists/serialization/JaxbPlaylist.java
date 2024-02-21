@@ -90,7 +90,7 @@ public class JaxbPlaylist {
   @XmlElement
   private Date updated;
 
-  private List<JaxbPlaylistAccessControlEntry> accessControlEntries ;
+  private List<JaxbPlaylistAccessControlEntry> accessControlEntries;
 
   void beforeMarshal(Marshaller u) {
     // Explicitly set empty lists to `null`. This is to avoid having an empty list wrongly show up in a JSON
