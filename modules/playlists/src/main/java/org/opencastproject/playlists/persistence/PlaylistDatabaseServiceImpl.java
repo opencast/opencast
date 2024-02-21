@@ -153,6 +153,9 @@ public class PlaylistDatabaseServiceImpl implements PlaylistDatabaseService {
 
         TypedQuery<Playlist> allQuery = em.createQuery(select);
 
+        allQuery.setMaxResults(limit);
+        allQuery.setFirstResult(offset);
+
         return allQuery.getResultList();
       });
     } catch (Exception e) {
