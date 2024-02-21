@@ -45,6 +45,7 @@ public class PlaylistEntry {
   @Column(name = "content_id")
   private String contentId;
 
+  @Column(name = "type")
   private PlaylistEntryType type;
 
   @ManyToOne(fetch = FetchType.LAZY)
