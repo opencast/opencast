@@ -4,6 +4,19 @@ Changelog
 Opencast 15
 -----------
 
+### Opencast 15.2
+
+- [[#5556](https://github.com/opencast/opencast/pull/5556)] -
+  Don't create composites for new editor
+- [[#5532](https://github.com/opencast/opencast/pull/5532)] -
+  Paella 7: Download audio trancripts (without timestamps)
+- [[#5530](https://github.com/opencast/opencast/pull/5530)] -
+  Don't log internal AmberScript service state
+- [[#5529](https://github.com/opencast/opencast/pull/5529)] -
+  Avoid unnecessary FFmpeg logs
+- [[#5528](https://github.com/opencast/opencast/pull/5528)] -
+  Editor shouldn't just overwrite existing files
+
 ### Opencast 15.1
 
 - [[#5546](https://github.com/opencast/opencast/pull/5546)] -

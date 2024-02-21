@@ -158,7 +158,7 @@ Update Node Dependencies
 Installing `npm-check-updates` and running it at the start of developing / improving a component can ensure that the
 node modules stays up-to-date and dependency bugs are reduced.
 
-*Note: Test the build (`mvn install`, `npm install`, `grunt`) thoroughly when upgrading modules as this might cause some
+*Note: Test the build (`./mvnw install`, `npm install`, `grunt`) thoroughly when upgrading modules as this might cause some
 unexpected build failures (resetting the grunt version to "grunt": "^0.4.0" might resolve some of the initial issues).*
 
 1. Installation.
