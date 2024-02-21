@@ -367,7 +367,6 @@ public class PlaylistRestService {
 
   @PUT
   @Produces(MediaType.APPLICATION_JSON)
-//  @Consumes(MediaType.APPLICATION_JSON)
   @Path("update.json")
   @RestQuery(
       name = "update",
@@ -468,7 +467,6 @@ public class PlaylistRestService {
 
   @POST
   @Produces(MediaType.APPLICATION_JSON)
-  //  @Consumes(MediaType.APPLICATION_JSON)
   @Path("updateEntries.json")
   @RestQuery(
       name = "updateEntries",
@@ -512,7 +510,6 @@ public class PlaylistRestService {
 
   @POST
   @Produces(MediaType.APPLICATION_XML)
-  //  @Consumes(MediaType.APPLICATION_JSON)
   @Path("updateEntries.xml")
   @RestQuery(
       name = "updateEntries",
