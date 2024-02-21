@@ -76,10 +76,6 @@
       <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.entwinemedia.common</groupId>
-      <artifactId>functional</artifactId>
-    </dependency>
-    <dependency>
       <groupId>jakarta.ws.rs</groupId>
       <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
@@ -173,7 +169,6 @@
         <configuration>
           <ignoredNonTestScopedDependencies>
             <ignoredNonTestScopedDependency>org.opencastproject:opencast-elasticsearch-impl</ignoredNonTestScopedDependency>
-            <ignoredNonTestScopedDependency>com.entwinemedia.common</ignoredNonTestScopedDependency>
           </ignoredNonTestScopedDependencies>
           <ignoredUnusedDeclaredDependencies>
             <!-- provide a logger for tests -->

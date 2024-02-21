@@ -24,11 +24,13 @@ import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.fn.ARecords;
-import org.opencastproject.assetmanager.api.fn.Snapshots;
 
-import com.entwinemedia.fn.Stream;
-
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Extensions for {@link AResult}.
@@ -40,36 +42,36 @@ public final class RichAResult implements AResult {
     this.result = result;
   }
 
-  public Stream<Property> getProperties() {
-    return result.getRecords().bind(ARecords.getProperties);
+  public List<Property> getProperties() {
+    return ARecords.getProperties(result.getRecords());
   }
 
   /** Count all properties contained in the result. */
   public int countProperties() {
-    return sizeOf(getProperties());
+    return new HashSet(getProperties()).size();
   }
 
   /** Get all selected snapshots. */
-  public Stream<Snapshot> getSnapshots() {
-    return result.getRecords().bind(ARecords.getSnapshot);
+  public List<Snapshot> getSnapshots() {
+    return result.getRecords()
+        .stream()
+        .map(record -> record.getSnapshot())
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .collect(Collectors.toList());
   }
 
   /** Count all snapshots contained in the result. */
   public int countSnapshots() {
-    return sizeOf(getSnapshots());
+    return new HashSet(getSnapshots()).size();
   }
 
   /** Get all selected versions. */
-  public Stream<Version> getVersions() {
-    return getSnapshots().map(Snapshots.getVersion);
-  }
-
-  private static <A> int sizeOf(Stream<A> stream) {
-    int count = 0;
-    for (A ignore : stream) {
-      count++;
-    }
-    return count;
+  public List<Version> getVersions() {
+    return getSnapshots()
+        .stream()
+        .map(snapshot -> snapshot.getVersion())
+        .collect(Collectors.toList());
   }
 
   //
@@ -80,7 +82,7 @@ public final class RichAResult implements AResult {
     return result.iterator();
   }
 
-  @Override public Stream<ARecord> getRecords() {
+  @Override public LinkedHashSet<ARecord> getRecords() {
     return result.getRecords();
   }
 

@@ -27,6 +27,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.opencastproject.assetmanager.api.fn.ARecords.getMediaPackageId;
 import static org.opencastproject.assetmanager.api.fn.ARecords.getProperties;
 import static org.opencastproject.assetmanager.api.fn.ARecords.getSnapshot;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
@@ -39,9 +40,7 @@ import org.opencastproject.assetmanager.api.PropertyName;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.api.fn.ARecords;
 import org.opencastproject.assetmanager.api.fn.Properties;
-import org.opencastproject.assetmanager.api.fn.Snapshots;
 import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.Predicate;
@@ -61,9 +60,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -110,14 +112,14 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
               .where(q.mediaPackageId(mp.getIdentifier().toString()).and(q.availability(Availability.ONLINE)))
               .run();
       assertEquals("The result set should contain exactly one record", 1, r.getSize());
-      assertEquals("The media package IDs should be equal", mp.getIdentifier().toString(), r.getRecords().head2().getMediaPackageId());
-      assertTrue("The snapshot should be contained in the record", r.getRecords().head2().getSnapshot().isSome());
-      assertEquals("The media package IDs should be equal", mp.getIdentifier(), r.getRecords().head2().getSnapshot().get().getMediaPackage().getIdentifier());
+      assertEquals("The media package IDs should be equal", mp.getIdentifier().toString(), r.getRecords().stream().findFirst().get().getMediaPackageId());
+      assertTrue("The snapshot should be contained in the record", r.getRecords().stream().findFirst().get().getSnapshot().isPresent());
+      assertEquals("The media package IDs should be equal", mp.getIdentifier(), r.getRecords().stream().findFirst().get().getSnapshot().get().getMediaPackage().getIdentifier());
     }
     {
       final AResult r = q.select().where(q.mediaPackageId(mp.getIdentifier().toString()).and(q.availability(Availability.ONLINE))).run();
       assertEquals("The result should contain one record", 1, r.getSize());
-      assertTrue("The result should not contain a snapshot", r.getRecords().head2().getSnapshot().isNone());
+      assertTrue("The result should not contain a snapshot", r.getRecords().stream().findFirst().get().getSnapshot().isEmpty());
     }
   }
 
@@ -128,7 +130,7 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     final RichAResult r = enrich(q.select(q.snapshot()).where(q.hasPropertiesOf(p.namespace())).run());
     assertEquals("The result set should contain one record", 1, r.getSize());
     assertEquals("The result set should contain one snapshot", 1, r.countSnapshots());
-    assertEquals("The result set should contain media package " + mp[0], mp[0], r.getSnapshots().head2().getMediaPackage().getIdentifier().toString());
+    assertEquals("The result set should contain media package " + mp[0], mp[0], r.getSnapshots().stream().findFirst().get().getMediaPackage().getIdentifier().toString());
   }
 
   @Test
@@ -139,7 +141,7 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     final RichAResult r = enrich(q.select(q.snapshot()).where(q.hasProperties()).run());
     assertEquals("The result set should contain one record", 1, r.getSize());
     assertEquals("The result set should contain one snapshot", 1, r.countSnapshots());
-    assertEquals("The result set should contain media package " + mp[0], mp[0], r.getSnapshots().head2().getMediaPackage().getIdentifier().toString());
+    assertEquals("The result set should contain media package " + mp[0], mp[0], r.getSnapshots().stream().findFirst().get().getMediaPackage().getIdentifier().toString());
   }
 
   @Test
@@ -172,12 +174,12 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     }
     {
       final AResult r = q.select(q.snapshot()).where(p.hasPropertiesOfNamespace()).run();
-      assertEquals("Two snapshots should be found", 2, r.getRecords().bind(getSnapshot).toList().size());
+      assertEquals("Two snapshots should be found", 2, getSnapshot(r.getRecords()).size());
       logger.info(r.getSearchTime() + "ms");
     }
     {
       final AResult r = q.select(q.snapshot(), p.allProperties()).where(p.hasPropertiesOfNamespace()).run();
-      assertEquals("Two snapshots should be found", 2, r.getRecords().bind(getSnapshot).toList().size());
+      assertEquals("Two snapshots should be found", 2, getSnapshot(r.getRecords()).size());
       logger.info(r.getSearchTime() + "ms");
     }
     {
@@ -210,16 +212,16 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     {
       final AResult r = q.select(p.count.target()).run();
       assertEquals("One record should be selected", 1, r.getSize());
-      assertEquals("No snapshot should be selected", 0, r.getRecords().bind(getSnapshot).toList().size());
-      assertEquals("One property should be selected", 1, r.getRecords().bind(getProperties).toList().size());
+      assertEquals("No snapshot should be selected", 0, getSnapshot(r.getRecords()).size());
+      assertEquals("One property should be selected", 1, getProperties(r.getRecords()).size());
     }
     {
       final AResult r = q.select(q.properties(
               PropertyName.mk(p.namespace(), p.count.name().getName()),
               PropertyName.mk(p.namespace(), "unkown-property"))).run();
       assertEquals("One record should be selected", 1, r.getSize());
-      assertEquals("No snapshot should be selected", 0, r.getRecords().bind(getSnapshot).toList().size());
-      assertEquals("One property should be selected", 1, r.getRecords().bind(getProperties).toList().size());
+      assertEquals("No snapshot should be selected", 0, getSnapshot(r.getRecords()).size());
+      assertEquals("One property should be selected", 1, getProperties(r.getRecords()).size());
     }
   }
 
@@ -231,29 +233,29 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     am.setProperty(p.count.mk(mp1.getIdentifier().toString(), 10L));
     am.setProperty(p.start.mk(mp1.getIdentifier().toString(), new Date()));
     assertEquals("Querying all properties, three should be found",
-                 3, sizeOf(q.select(q.properties()).run().getRecords().bind(getProperties)));
+                 3, getProperties(q.select(q.properties()).run().getRecords()).size());
     assertEquals("Querying 'approved' and 'count', both should be found",
-                 2, sizeOf(q.select(p.approved.target(), p.count.target())
+                 2, getProperties(q.select(p.approved.target(), p.count.target())
                                    .where(q.mediaPackageId(mp1.getIdentifier().toString()))
-                                   .run().getRecords().bind(getProperties)));
+                                   .run().getRecords()).size());
     assertEquals("Querying 'approved' and 'count' in a different style, both should be found again",
-                 2, sizeOf(q.select(q.properties(p.approved.name(), p.count.name()))
+                 2, getProperties(q.select(q.properties(p.approved.name(), p.count.name()))
                                    .where(q.mediaPackageId(mp1.getIdentifier().toString()))
-                                   .run().getRecords().bind(getProperties)));
+                                   .run().getRecords()).size());
     logger.info("Add another media package with some properties");
     final MediaPackage mp2 = mkMediaPackage(mkCatalog());
     am.takeSnapshot(OWNER, mp2);
     am.setProperty(p.approved.mk(mp2.getIdentifier().toString(), true));
     am.setProperty(p.start.mk(mp2.getIdentifier().toString(), new Date()));
     assertEquals("Querying all properties, five should be found",
-                 5, sizeOf(q.select(q.properties()).run().getRecords().bind(getProperties)));
+                 5, getProperties(q.select(q.properties()).run().getRecords()).size());
     assertEquals("Querying target and count of the first media package, both should be found",
-                 2, sizeOf(q.select(p.approved.target(), p.count.target())
+                 2, getProperties(q.select(p.approved.target(), p.count.target())
                                    .where(q.mediaPackageId(mp1.getIdentifier().toString()))
-                                   .run().getRecords().bind(getProperties)));
+                                   .run().getRecords()).size());
     assertEquals("Querying target and count of all media packages, 3 properties should be found",
-                 3, sizeOf(q.select(q.properties(p.approved.name(), p.count.name()))
-                                   .run().getRecords().bind(getProperties)));
+                 3, getProperties(q.select(q.properties(p.approved.name(), p.count.name()))
+                                   .run().getRecords()).size());
   }
 
   @Test
@@ -319,15 +321,28 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
       assertEquals("Five records should be found since there is no filtering", 5, r.getSize());
       assertEquals("There should be 6 properties total", 6, r.countProperties());
       assertEquals("There should be 2 properties in the 'service' namespace, 'count' and 'approved'",
-                   2, sizeOf(r.getProperties().filter(Properties.byNamespace(p.namespace()))));
+                   2,
+              r.getProperties().stream()
+              .filter(property -> property.getId().getNamespace().equals(p.namespace()))
+              .collect(Collectors.toList()).size());
       assertEquals("There should be 3 properties in the 'scheduler' namespace",
-                   3, sizeOf(r.getProperties().filter(Properties.byNamespace("org.opencastproject.scheduler"))));
+                   3,
+              r.getProperties().stream()
+              .filter(property -> property.getId().getNamespace().equals("org.opencastproject.scheduler"))
+              .collect(Collectors.toList()).size());
       assertEquals("There should be 1 property in the 'annotation' namespace",
-                   1, sizeOf(r.getProperties().filter(Properties.byNamespace("org.opencastproject.annotation"))));
+                   1,
+              r.getProperties().stream()
+              .filter(property -> property.getId().getNamespace().equals("org.opencastproject.annotation"))
+              .collect(Collectors.toList()).size());
       assertEquals("There should be 5 snapshots", 5, r.countSnapshots());
-      assertEquals("Only one record should have properties", 1, sizeOf(r.getRecords().filter(ARecords.hasProperties)));
+      assertEquals("Only one record should have properties", 1, r.getRecords().stream()
+          .filter(record -> !record.getProperties().isEmpty())
+          .collect(Collectors.toList()).size());
       assertEquals("The record with properties should have media package ID " + mp[0],
-              mp[0], r.getRecords().filter(ARecords.hasProperties).map(ARecords.getMediaPackageId).head().get());
+              mp[0], getMediaPackageId(r.getRecords().stream()
+              .filter(record -> !record.getProperties().isEmpty())
+              .collect(Collectors.toCollection(LinkedHashSet::new))));
     }
     {
       final RichAResult r = enrich(
@@ -382,7 +397,10 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
       assertEquals("No snapshots should be contained in the records", 0, r.countSnapshots());
       assertEquals("Four properties should be contained in the records", 4, r.countProperties());
       assertEquals("All four properties should belong to one media package",
-                   4, sizeOf(r.getProperties().filter(Properties.byMediaPackageId(mp[0]))));
+                   4,
+              r.getProperties().stream()
+              .filter(property -> property.getId().getMediaPackageId().equals(mp[0]))
+              .collect(Collectors.toList()).size());
     }
     {
       logger.info("'approved' == true");
@@ -403,14 +421,14 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
       assertEquals("Only one record should match", 1, r.getSize());
       assertEquals("Four properties should be contained", 4, r.countProperties());
       assertEquals("The matching record should represent the first media package",
-                   mp[0], r.getRecords().map(ARecords.getMediaPackageId).head().get());
+                   mp[0], getMediaPackageId(r.getRecords()));
     }
     {
       logger.info("'approved' notExists");
       final RichAResult r = enrich(q.select(allProperties).where(p.approved.notExists()).run());
       assertEquals("Only one record should match", 1, r.getSize());
       assertEquals("The found record should represent the second media package since it does not have an 'approved' property",
-                   mp[1], r.getRecords().map(ARecords.getMediaPackageId).head().get());
+                   mp[1], getMediaPackageId(r.getRecords()));
     }
   }
 
@@ -433,7 +451,7 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
       assertEquals("One property should be returned", 1, r.countProperties());
       assertEquals("Property of namespace-1 should be returned",
                    PropertyId.mk(mp.getIdentifier().toString(), "namespace-1", "prop-1"),
-                   r.getProperties().head2().getId());
+                   r.getProperties().stream().findFirst().get().getId());
     }
     {
       final RichAResult r = enrich(q.select(q.propertiesOf("namespace-1")).where(q.hasPropertiesOf("namespace-2")).run());
@@ -442,7 +460,7 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
       assertEquals("One property should be returned", 1, r.countProperties());
       assertEquals("Property of namespace-1 should be returned",
                    PropertyId.mk(mp.getIdentifier().toString(), "namespace-1", "prop-1"),
-                   r.getProperties().head2().getId());
+                   r.getProperties().stream().findFirst().get().getId());
     }
   }
 
@@ -454,15 +472,15 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     {
       final AResult r = q.select(q.snapshot()).run();
       assertEquals("One record should be found", 1, r.getSize());
-      assertEquals("One snapshot should be found", 1, r.getRecords().bind(getSnapshot).toList().size());
-      assertEquals("No properties should be found", 0, r.getRecords().bind(getProperties).toList().size());
+      assertEquals("One snapshot should be found", 1, getSnapshot(r.getRecords()).size());
+      assertEquals("No properties should be found", 0, getProperties(r.getRecords()).size());
     }
     // select snapshots and properties
     {
       final AResult r = q.select(q.snapshot(), p.allProperties()).run();
       assertEquals("One record should be found", 1, r.getSize());
-      assertEquals("One snapshot should be found", 1, r.getRecords().bind(getSnapshot).toList().size());
-      assertEquals("No properties should be found", 0, r.getRecords().bind(getProperties).toList().size());
+      assertEquals("One snapshot should be found", 1, getSnapshot(r.getRecords()).size());
+      assertEquals("No properties should be found", 0, getProperties(r.getRecords()).size());
     }
   }
 
@@ -494,13 +512,13 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     {
       AResult r = q.select(q.snapshot()).where(q.version().isLatest()).run();
       assertEquals("1 latest record should be found", 1, r.getSize());
-      latest = r.getRecords().head2().getSnapshot().get().getVersion();
+      latest = r.getRecords().stream().findFirst().get().getSnapshot().get().getVersion();
     }
     final Version first;
     {
       AResult r = q.select(q.snapshot()).where(q.version().isFirst()).run();
       assertEquals("1 first record should be found", 1, r.getSize());
-      first = r.getRecords().head2().getSnapshot().get().getVersion();
+      first = r.getRecords().stream().findFirst().get().getSnapshot().get().getVersion();
     }
     assertTrue("The first version should be older", first.isOlder(latest));
     assertTrue("The last version should be younger", latest.isYounger(first));
@@ -537,13 +555,13 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
       final RichAResult r = enrich(q.select(q.snapshot()).where(q.seriesId().eq(p.seriesId)).run());
       assertEquals("Query should return all versions which are two", 2, r.getSize());
       assertEquals(mp1[0].getMediaPackage().getIdentifier().toString(),
-                   r.getSnapshots().head2().getMediaPackage().getIdentifier().toString());
+                   r.getSnapshots().stream().findFirst().get().getMediaPackage().getIdentifier().toString());
     }
     {
       final RichAResult r = enrich(q.select(q.snapshot()).where(q.seriesId().eq(p.seriesId).and(q.version().isLatest())).run());
       assertEquals("Query should return only the latest version", 1, r.getSize());
       assertEquals(mp1[0].getMediaPackage().getIdentifier().toString(),
-                   r.getSnapshots().head2().getMediaPackage().getIdentifier().toString());
+                   r.getSnapshots().stream().findFirst().get().getMediaPackage().getIdentifier().toString());
     }
     // now set a seriesId property to a media package that belongs to "series-2"
     am.setProperty(Properties.mkProperty(p.seriesId, mp2[0], "series-1"));
@@ -551,14 +569,14 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
       final RichAResult r = enrich(q.select(q.snapshot()).where(q.seriesId().eq(p.seriesId).and(q.version().isLatest())).run());
       assertEquals("Query should not return the media package of series-2", 1, r.getSize());
       assertEquals(mp1[0].getMediaPackage().getIdentifier().toString(),
-                   r.getSnapshots().head2().getMediaPackage().getIdentifier().toString());
+                   r.getSnapshots().stream().findFirst().get().getMediaPackage().getIdentifier().toString());
     }
     {
       // do a greater than comparison
       final RichAResult r = enrich(q.select(q.snapshot()).where(q.seriesId().gt(p.seriesId).and(q.version().isLatest())).run());
       assertEquals("Query should return the media package of series-2", 1, r.getSize());
       assertEquals(mp2[0].getMediaPackage().getIdentifier().toString(),
-                   r.getSnapshots().head2().getMediaPackage().getIdentifier().toString());
+                   r.getSnapshots().stream().findFirst().get().getMediaPackage().getIdentifier().toString());
     }
   }
 
@@ -574,7 +592,7 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
       final RichAResult r = enrich(q.select(q.snapshot()).where(q.version().eq(p.versionId)).run());
       assertEquals("Query should return only the first version", 1, r.getSize());
       assertEquals(mp1[0].getMediaPackage().getIdentifier().toString(),
-                   r.getSnapshots().head2().getMediaPackage().getIdentifier().toString());
+                   r.getSnapshots().stream().findFirst().get().getMediaPackage().getIdentifier().toString());
     }
     // set version to version of second snapshot
     am.setProperty(Properties.mkProperty(p.versionId, mp1[0], mp1[1].getVersion()));
@@ -582,7 +600,7 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
       final RichAResult r = enrich(q.select(q.snapshot()).where(q.version().eq(p.versionId)).run());
       assertEquals("Query should now return only the second version", 1, r.getSize());
       assertEquals(mp1[1].getMediaPackage().getIdentifier().toString(),
-                   r.getSnapshots().head2().getMediaPackage().getIdentifier().toString());
+                   r.getSnapshots().stream().findFirst().get().getMediaPackage().getIdentifier().toString());
     }
   }
 
@@ -606,14 +624,14 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     {
       final AResult r = q.select(q.snapshot()).run();
       assertEquals("One record should be found", 1, r.getSize());
-      assertEquals("One snapshot should be found", 1, r.getRecords().bind(getSnapshot).toList().size());
-      assertEquals("No properties should be found", 0, r.getRecords().bind(getProperties).toList().size());
+      assertEquals("One snapshot should be found", 1, getSnapshot(r.getRecords()).size());
+      assertEquals("No properties should be found", 0, getProperties(r.getRecords()).size());
     }
     {
       final AResult r = q.select(q.snapshot()).where(q.always()).run();
       assertEquals("One record should be found", 1, r.getSize());
-      assertEquals("One snapshot should be found", 1, r.getRecords().bind(getSnapshot).toList().size());
-      assertEquals("No properties should be found", 0, r.getRecords().bind(getProperties).toList().size());
+      assertEquals("One snapshot should be found", 1, getSnapshot(r.getRecords()).size());
+      assertEquals("No properties should be found", 0, getProperties(r.getRecords()).size());
     }
     {
       final AResult r = q.select(q.snapshot()).where(q.always().not()).run();
@@ -624,8 +642,8 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
       final boolean selectAll = true;
       final AResult r = q.select(q.snapshot()).where(selectAll ? q.always() : q.mediaPackageId("bla")).run();
       assertEquals("One record should be found", 1, r.getSize());
-      assertEquals("One snapshot should be found", 1, r.getRecords().bind(getSnapshot).toList().size());
-      assertEquals("No properties should be found", 0, r.getRecords().bind(getProperties).toList().size());
+      assertEquals("One snapshot should be found", 1, getSnapshot(r.getRecords()).size());
+      assertEquals("No properties should be found", 0, getProperties(r.getRecords()).size());
     }
   }
 
@@ -656,7 +674,8 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     am.setProperty(p.approved.mk(mp[0], true));
     assertThat(
             q.select(p.agent.target(), p.approved.target()).where(p.approved.eq(true).and(p.versionId.eq(v3)))
-                    .run().getRecords().head().get().getProperties().map(Properties.getValue),
+                    .run().getRecords().stream().findFirst().get().getProperties().stream()
+                    .map(p -> p.getValue()).collect(Collectors.toList()),
             Matchers.containsInAnyOrder(equalTo((Value) Value.mk("agent")), equalTo((Value) Value.mk(true))));
   }
 
@@ -712,7 +731,7 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     am.setProperty(p.count.mk(mp[2], 4L));
     assertEquals("Five records should be found", 5, q.select().run().getSize());
     for (final ARecord r : q.select().run()) {
-      assertTrue("No snapshots should be included in the record", r.getSnapshot().isNone());
+      assertTrue("No snapshots should be included in the record", r.getSnapshot().isEmpty());
       assertTrue("No properties should be included in the record", r.getProperties().isEmpty());
     }
   }
@@ -724,25 +743,39 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     createAndAddMediaPackagesSimple(1, 1, 1, Opt.some("series-3"));
     {
       final List<String> orgAsc = enrich(q.select(q.snapshot()).orderBy(q.seriesId().asc()).run())
-              .getSnapshots().bind(Snapshots.getSeriesId).toList();
+          .getSnapshots().stream()
+          .map(s -> s.getMediaPackage().getSeries())
+          .collect(Collectors.toList());
       final List<String> orgDesc = enrich(q.select(q.snapshot()).orderBy(q.seriesId().desc()).run())
-              .getSnapshots().bind(Snapshots.getSeriesId).toList();
+          .getSnapshots().stream()
+          .map(s -> s.getMediaPackage().getSeries())
+          .collect(Collectors.toList());
       assertEquals($("series-1", "series-2", "series-3").toList(), orgAsc);
       assertEquals($("series-3", "series-2", "series-1").toList(), orgDesc);
     }
     {
-      assertEquals(
-              enrich(q.select(q.snapshot()).orderBy(q.archived().asc()).run())
-                      .getSnapshots().map(Snapshots.getArchivalDate).toList(),
-              enrich(q.select(q.snapshot()).orderBy(q.archived().desc()).run())
-                      .getSnapshots().map(Snapshots.getArchivalDate).reverse().toList());
+      final List<Date> snapshotAsc = enrich(q.select(q.snapshot()).orderBy(q.archived().asc()).run())
+          .getSnapshots().stream()
+          .map(s -> s.getArchivalDate())
+          .collect(Collectors.toList());
+      final List<Date> snapshotDesc = enrich(q.select(q.snapshot()).orderBy(q.archived().desc()).run())
+          .getSnapshots().stream()
+          .map(s -> s.getArchivalDate())
+          .collect(Collectors.toList());
+      Collections.reverse(snapshotDesc);
+      assertEquals(snapshotAsc, snapshotDesc);
     }
     {
-      assertEquals(
-              enrich(q.select(q.snapshot()).orderBy(q.version().asc()).run())
-                      .getSnapshots().map(Snapshots.getVersion).toList(),
-              enrich(q.select(q.snapshot()).orderBy(q.version().desc()).run())
-                      .getSnapshots().map(Snapshots.getVersion).reverse().toList());
+      final List<Version> snapshotAsc = enrich(q.select(q.snapshot()).orderBy(q.version().asc()).run())
+          .getSnapshots().stream()
+          .map(s -> s.getVersion())
+          .collect(Collectors.toList());
+      final List<Version> snapshotDesc = enrich(q.select(q.snapshot()).orderBy(q.version().desc()).run())
+          .getSnapshots().stream()
+          .map(s -> s.getVersion())
+          .collect(Collectors.toList());
+      Collections.reverse(snapshotDesc);
+      assertEquals(snapshotAsc, snapshotDesc);
     }
   }
 

@@ -21,7 +21,6 @@
 
 package org.opencastproject.authorization.xacml.manager.endpoint;
 
-import static com.entwinemedia.fn.Stream.$;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
@@ -65,11 +64,10 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.easymock.EasyMock;
 import org.junit.Ignore;
 
+import java.util.LinkedHashSet;
 import java.util.Optional;
 
 import javax.persistence.EntityManagerFactory;
@@ -189,10 +187,12 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     Snapshot snapshot = EasyMock.createNiceMock(Snapshot.class);
     EasyMock.expect(snapshot.getMediaPackage()).andReturn(new MediaPackageBuilderImpl().createNew()).anyTimes();
     ARecord record = EasyMock.createNiceMock(ARecord.class);
-    EasyMock.expect(record.getSnapshot()).andReturn(Opt.some(snapshot)).anyTimes();
+    LinkedHashSet<ARecord> records = new LinkedHashSet<>();
+    records.add(record);
+    EasyMock.expect(record.getSnapshot()).andReturn(Optional.of(snapshot)).anyTimes();
 
     AResult result = EasyMock.createNiceMock(AResult.class);
-    EasyMock.expect(result.getRecords()).andReturn($(record)).anyTimes();
+    EasyMock.expect(result.getRecords()).andReturn(records).anyTimes();
 
     ASelectQuery select = EasyMock.createNiceMock(ASelectQuery.class);
     EasyMock.expect(select.where(EasyMock.anyObject(Predicate.class))).andReturn(select).anyTimes();

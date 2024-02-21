@@ -20,14 +20,14 @@
  */
 package org.opencastproject.assetmanager.api.query;
 
-import com.entwinemedia.fn.Stream;
+import java.util.LinkedHashSet;
 
 /**
  * The result of a {@link ASelectQuery}. Groups {@link ARecord}s.
  */
 public interface AResult extends Iterable<ARecord> {
   /** Return the found records. */
-  Stream<ARecord> getRecords();
+  LinkedHashSet<ARecord> getRecords();
 
   /**
    * Return the size of the retrieved {@link #getRecords() slice}.

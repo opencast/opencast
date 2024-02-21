@@ -31,10 +31,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.entwinemedia.common</groupId>
-      <artifactId>functional</artifactId>
-    </dependency>
     <!-- Opencast -->
     <dependency>
       <groupId>org.opencastproject</groupId>

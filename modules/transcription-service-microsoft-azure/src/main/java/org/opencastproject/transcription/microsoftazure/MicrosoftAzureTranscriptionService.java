@@ -1109,7 +1109,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       return null;
     }
 
-    String org = Enrichments.enrich(r).getSnapshots().head2().getOrganizationId();
+    String org = Enrichments.enrich(r).getSnapshots().stream().findFirst().get().getOrganizationId();
     Organization organization = null;
     try {
       organization = organizationDirectoryService.getOrganization(org);

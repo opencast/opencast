@@ -24,10 +24,8 @@ import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.data.Opt.some;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.calculateChecksum;
-import static org.opencastproject.scheduler.impl.SchedulerUtil.episodeToMp;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.eventOrganizationFilter;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.isNotEpisodeDublinCore;
-import static org.opencastproject.scheduler.impl.SchedulerUtil.recordToMp;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.uiAdapterToFlavor;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.EqualsUtil.ne;
@@ -441,8 +439,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       AResult result = query.select(query.nothing())
               .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId).and(query.version().isLatest())))
               .run();
-      Opt<ARecord> record = result.getRecords().head();
-      if (record.isSome()) {
+      Optional<ARecord> record = result.getRecords().stream().findFirst();
+      if (record.isPresent()) {
         logger.warn("Mediapackage with id '{}' already exists!", mediaPackageId);
         throw new SchedulerConflictException("Mediapackage with id '" + mediaPackageId + "' already exists!");
       }
@@ -687,13 +685,13 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
               .select(query.snapshot())
               .where(withOrganization(query).and(query.mediaPackageId(mpId).and(query.version().isLatest())
                   .and(withOwner(query))));
-      Opt<ARecord> optEvent = select.run().getRecords().head();
+      Optional<ARecord> optEvent = select.run().getRecords().stream().findFirst();
       Opt<ExtendedEventDto> optExtEvent = persistence.getEvent(mpId);
-      if (optEvent.isNone() || optExtEvent.isNone())
+      if (optEvent.isEmpty() || optExtEvent.isNone())
         throw new NotFoundException("No event found while updating event " + mpId);
 
       ARecord record = optEvent.get();
-      if (record.getSnapshot().isNone())
+      if (record.getSnapshot().isEmpty())
         throw new NotFoundException("No mediapackage found while updating event " + mpId);
       Snapshot snapshot = record.getSnapshot().get();
       MediaPackage archivedMediaPackage = snapshot.getMediaPackage();
@@ -941,8 +939,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
               .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(withOwner(query))
               .and(query.version().isLatest()))
               .run();
-      Opt<ARecord> record = result.getRecords().head();
-      if (record.isNone())
+      Optional<ARecord> record = result.getRecords().stream().findFirst();
+      if (record.isEmpty())
         throw new NotFoundException();
 
       Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(record.get().getSnapshot().get());
@@ -1167,10 +1165,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
       final CalendarGenerator cal = new CalendarGenerator(seriesService);
       for (final ARecord record : result.getRecords()) {
-        final Opt<MediaPackage> optMp = record.getSnapshot().map(episodeToMp);
+        final Optional<MediaPackage> optMp = record.getSnapshot().isPresent()
+            ? Optional.of(record.getSnapshot().get().getMediaPackage())
+            : Optional.empty();
 
         // If the event media package is empty, skip the event
-        if (optMp.isNone()) {
+        if (optMp.isEmpty()) {
           logger.warn("Mediapackage for event '{}' can't be found, event is not recorded", record.getMediaPackageId());
           continue;
         }
@@ -1628,11 +1628,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       predicate = predicate.and(withOwner(query));
     }
 
-    Opt<ARecord> record = query.select(query.snapshot()).where(predicate).run().getRecords().head();
-    if (record.isNone())
+    Optional<ARecord> record = query.select(query.snapshot()).where(predicate).run().getRecords().stream().findFirst();
+    if (record.isEmpty())
       throw new RuntimeNotFoundException(new NotFoundException());
 
-    return record.bind(recordToMp).get();
+    return record.get().getSnapshot().get().getMediaPackage();
   }
 
   private MediaPackage getEventMediaPackage(final String mediaPackageId) {
@@ -1790,7 +1790,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       AQueryBuilder query = assetManager.createQuery();
       final AResult result = query.select(query.snapshot())
               .where(query.mediaPackageId(scheduledEvent.getMediaPackageId()).and(query.version().isLatest())).run();
-      final Snapshot snapshot = result.getRecords().head().get().getSnapshot().get();
+      final Snapshot snapshot = result.getRecords().stream().findFirst().get().getSnapshot().get();
 
       Opt<AccessControlList> acl = Opt.some(authorizationService.getActiveAcl(snapshot.getMediaPackage()).getA());
       Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(snapshot);

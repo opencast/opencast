@@ -42,7 +42,6 @@ import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.fn.Enrichments;
-import org.opencastproject.assetmanager.api.fn.Snapshots;
 import org.opencastproject.assetmanager.api.query.ADeleteQuery;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.ARecord;
@@ -324,7 +323,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     if (r.getSize() == 0) {
       return Optional.empty();
     }
-    return Optional.of(r.getRecords().head2().getSnapshot().get().getMediaPackage());
+    return Optional.of(r.getRecords().stream().findFirst().get().getSnapshot().get().getMediaPackage());
   }
 
   @Override
@@ -459,7 +458,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     AQueryBuilder queryBuilder = createQuery();
     AResult result = queryBuilder.select(queryBuilder.snapshot())
             .where(queryBuilder.mediaPackageId(mediaPackageId).and(queryBuilder.version().isLatest())).run();
-    Optional<ARecord> record = Optional.ofNullable(result.getRecords().head().get());
+    Optional<ARecord> record = result.getRecords().stream().findFirst();
     if (record.isPresent()) {
       Optional<Snapshot> snapshot = Optional.of(record.get().getSnapshot().get());
       if (snapshot.isPresent()) {
@@ -953,7 +952,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         offset += PAGE_SIZE;
         int n = 20;
 
-        final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
+        final Map<String, List<Snapshot>> byOrg = r.getSnapshots().stream()
+            .collect(Collectors.groupingBy(Snapshot::getOrganizationId));
         for (String orgId : byOrg.keySet()) {
           final Organization snapshotOrg;
           try {

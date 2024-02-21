@@ -24,43 +24,46 @@ import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.query.ARecord;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Pred;
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.Opt;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Functions to deal with {@link ARecord}s.
  */
 public final class ARecords {
-  public static final Fn<ARecord, String> getMediaPackageId = new Fn<ARecord, String>() {
-    @Override public String apply(ARecord item) {
-      return item.getMediaPackageId();
-    }
+  public static String getMediaPackageId(LinkedHashSet<ARecord> records) {
+    return records.stream()
+        .map(r -> r.getMediaPackageId())
+        .findFirst()
+        .get();
+
+  }
+
+  public static List<Property> getProperties(LinkedHashSet<ARecord> records) {
+    return records.stream()
+        .map(r -> r.getProperties())
+        .flatMap(List::stream)
+        .collect(Collectors.toList());
   };
 
-  public static final Fn<ARecord, Stream<Property>> getProperties = new Fn<ARecord, Stream<Property>>() {
-    @Override public Stream<Property> apply(ARecord item) {
-      return item.getProperties();
-    }
-  };
-
-  public static final Pred<ARecord> hasProperties = new Pred<ARecord>() {
-    @Override public Boolean apply(ARecord item) {
-      return !item.getProperties().isEmpty();
-    }
-  };
+  public static boolean hasProperties(ARecord record) {
+    return record.getProperties().isEmpty();
+  }
 
   /**
    * Get the snapshot from a record.
    *
    * @see ARecord#getSnapshot()
    */
-  public static final Fn<ARecord, Opt<Snapshot>> getSnapshot = new Fn<ARecord, Opt<Snapshot>>() {
-    @Override public Opt<Snapshot> apply(ARecord a) {
-      return a.getSnapshot();
-    }
-  };
+  public static List<Snapshot> getSnapshot(LinkedHashSet<ARecord> records) {
+    return records.stream()
+        .map(r -> r.getSnapshot())
+        .filter(s -> s.isPresent())
+        .map(s -> s.get())
+        .collect(Collectors.toList());
+
+  }
 
   private ARecords() {
   }

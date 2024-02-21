@@ -16,10 +16,6 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>com.entwinemedia.common</groupId>
-      <artifactId>functional</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-asset-manager-api</artifactId>
       <version>${project.version}</version>

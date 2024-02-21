@@ -2223,7 +2223,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                     logger.debug("Dropping {} from the index since it is missing from the database", mpId);
                     continue;
                   }
-                  orgid = results.getSnapshots().head2().getOrganizationId();
+                  orgid = results.getSnapshots().stream().findFirst().get().getOrganizationId();
                   //We try-catch here since it's possible for the WF to exist in the *index* but not in the *DB*
                   // It probably shouldn't be, but that won't keep it from happening anyway.
                   try {

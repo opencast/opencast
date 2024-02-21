@@ -43,6 +43,12 @@ import com.entwinemedia.fn.StreamOp;
 import com.entwinemedia.fn.data.Opt;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+// TODO: With the removal of Entwine, this class may eventually become obsolete.
+//       Either remove it or reconstruct it with new utility functions based on
+//       usage in asset-manager-api and asset-manager-impl test classes.
 
 /**
  * Utility functions for dealing with single {@link Property properties} and property streams.
@@ -56,8 +62,12 @@ public final class Properties {
    * They'll appear in the order of the returned
    * {@linkplain org.opencastproject.assetmanager.api.query.ARecord records}.
    */
-  public static Stream<Property> getProperties(AResult result) {
-    return result.getRecords().bind(ARecords.getProperties);
+  public static List<Property> getProperties(AResult result) {
+    return result.getRecords()
+        .stream()
+        .map(record -> record.getProperties())
+        .flatMap(List::stream)
+        .collect(Collectors.toList());
   }
 
   /**
@@ -162,14 +172,6 @@ public final class Properties {
   public static long removeProperties(AssetManager am, String owner, String orgId, String mpId, String namespace) {
     final AQueryBuilder q = am.createQuery();
     return q.delete(owner, q.propertiesOf(namespace)).where(q.organizationId(orgId).and(q.mediaPackageId(mpId))).run();
-  }
-
-  public static Opt<Property> getProperty(AssetManager am, String mpId, String namespace, String propertyName) {
-    final AQueryBuilder q = am.createQuery();
-    return q.select(q.properties(PropertyName.mk(namespace, propertyName)))
-            .where(q.mediaPackageId(mpId).and(q.property(Value.UNTYPED, namespace, propertyName).exists()))
-            .run()
-            .getRecords().bind(ARecords.getProperties).head();
   }
 
   /**

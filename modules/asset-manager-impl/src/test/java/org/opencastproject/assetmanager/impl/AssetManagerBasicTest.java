@@ -46,6 +46,7 @@ import org.junit.Test;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Optional;
 
 // CHECKSTYLE:OFF
@@ -115,7 +116,7 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
   public void testSetPropertyOnNonExistingMediaPackage() throws Exception {
     assertFalse("Property should not be stored since the referenced media package does not exist",
                 am.setProperty(Property.mk(PropertyId.mk("id", "namespace", "name"), Value.mk("value"))));
-    assertEquals("No properties should exist in the AssetManager", 0, q.select(q.properties()).run().getRecords().toList().size());
+    assertEquals("No properties should exist in the AssetManager", 0, q.select(q.properties()).run().getRecords().size());
   }
 
   @Test
@@ -150,18 +151,18 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
     {
       AResult r = q.select(p.allProperties()).where(q.mediaPackageId(mpId)).run();
       assertEquals("One record should be found", 1, r.getSize());
-      assertEquals("One property should be found", 1, r.getRecords().bind(getProperties).toList().size());
-      assertEquals("Value check", d1, r.getRecords().bind(getProperties).head2().getValue().get(Value.DATE));
-      assertEquals("One property should be found", 1, q.select(q.properties()).run().getRecords().toList().size());
+      assertEquals("One property should be found", 1, getProperties(r.getRecords()).size());
+      assertEquals("Value check", d1, getProperties(r.getRecords()).stream().findFirst().get().getValue().get(Value.DATE));
+      assertEquals("One property should be found", 1, q.select(q.properties()).run().getRecords().size());
     }
     logger.info("Update the property");
     assertTrue("The property should be updated", am.setProperty(p.start.mk(mpId, d2)));
     {
       AResult r = q.select(p.allProperties()).where(q.mediaPackageId(mpId)).run();
       assertEquals("One record should be found", 1, r.getSize());
-      assertEquals("One property should be found", 1, r.getRecords().bind(getProperties).toList().size());
-      assertEquals("Value check", d2, r.getRecords().bind(getProperties).head2().getValue().get(Value.DATE));
-      assertEquals("One record should be found", 1, q.select(q.properties()).run().getRecords().toList().size());
+      assertEquals("One property should be found", 1, getProperties(r.getRecords()).size());
+      assertEquals("Value check", d2, getProperties(r.getRecords()).stream().findFirst().get().getValue().get(Value.DATE));
+      assertEquals("One record should be found", 1, q.select(q.properties()).run().getRecords().size());
     }
     logger.info("The existence of multiple versions of a media package should not affect property storage");
     logger.info("Add a new version of the media package");
@@ -172,10 +173,10 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
       AResult r = q.select(p.allProperties()).where(q.mediaPackageId(mpId)).run();
       assertEquals("Two records should be found since there are now two versions of the media package and no version restriction has been applied",
                    2, r.getSize());
-      assertEquals("Two properties should be found, one per found record", 2, r.getRecords().bind(getProperties).toList().size());
-      assertEquals("There should be one distinct property in all of the found records", 1, r.getRecords().bind(getProperties).toSet().size());
-      assertEquals("Value check", d3, r.getRecords().bind(getProperties).head2().getValue().get(Value.DATE));
-      assertEquals("Two record should be found", 2, q.select(q.properties()).run().getRecords().toList().size());
+      assertEquals("Two properties should be found, one per found record", 2, getProperties(r.getRecords()).size());
+      assertEquals("There should be one distinct property in all of the found records", 1, new HashSet(getProperties(r.getRecords())).size());
+      assertEquals("Value check", d3, getProperties(r.getRecords()).stream().findFirst().get().getValue().get(Value.DATE));
+      assertEquals("Two record should be found", 2, q.select(q.properties()).run().getRecords().size());
     }
   }
 }

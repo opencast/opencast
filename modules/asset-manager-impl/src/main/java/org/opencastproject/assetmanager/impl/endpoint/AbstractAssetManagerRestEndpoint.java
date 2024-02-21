@@ -387,8 +387,8 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
 
       // build map from properties
       HashMap<String, HashMap<String, String>> properties = new HashMap<>();
-      if (result.getRecords().head().isSome()) {
-        for (final Property property : result.getRecords().head().get().getProperties()) {
+      if (result.getRecords().stream().findFirst().isPresent()) {
+        for (final Property property : result.getRecords().stream().findFirst().get().getProperties()) {
           final String key = property.getId().getNamespace() + "." + property.getId().getName();
           final HashMap<String, String> val = new HashMap<>();
           val.put("type", property.getValue().getType().getClass().getSimpleName());
@@ -437,8 +437,8 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
 
       // build map from properties
       HashMap<String, String> properties = new HashMap<>();
-      if (result.getRecords().head().isSome()) {
-        for (final Property property : result.getRecords().head().get().getProperties()) {
+      if (result.getRecords().stream().findFirst().isPresent()) {
+        for (final Property property : result.getRecords().stream().findFirst().get().getProperties()) {
           properties.put(property.getId().getName(), property.getValue().get(Value.STRING));
         }
       }
