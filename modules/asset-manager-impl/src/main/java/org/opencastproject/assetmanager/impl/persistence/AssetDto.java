@@ -22,9 +22,6 @@ package org.opencastproject.assetmanager.impl.persistence;
 
 import org.opencastproject.util.MimeType;
 
-import com.entwinemedia.fn.ProductBuilder;
-import com.entwinemedia.fn.Products;
-
 import java.util.Optional;
 
 import javax.persistence.Column;
@@ -48,7 +45,6 @@ import javax.persistence.TableGenerator;
 // Otherwise duplicate key errors will most likely happen.
 @TableGenerator(name = "seq_oc_assets_asset", initialValue = 0, allocationSize = 50)
 public class AssetDto {
-  private static final ProductBuilder p = Products.E;
 
   @Id
   @GeneratedValue(strategy = GenerationType.TABLE, generator = "seq_oc_assets_asset")

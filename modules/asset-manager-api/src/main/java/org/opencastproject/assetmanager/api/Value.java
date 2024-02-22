@@ -22,11 +22,11 @@ package org.opencastproject.assetmanager.api;
 
 import static java.lang.String.format;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.P1;
+import org.opencastproject.assetmanager.api.fn.Product;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.function.Function;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -91,23 +91,23 @@ public abstract class Value {
   }
 
   public final ValueType<?> getType() {
-    return decompose(new Fn<String, ValueType<?>>() {
+    return decompose(new Function<String, ValueType<?>>() {
       @Override public ValueType<?> apply(String a) {
         return STRING;
       }
-    }, new Fn<Date, ValueType<?>>() {
+    }, new Function<Date, ValueType<?>>() {
       @Override public ValueType<?> apply(Date a) {
         return DATE;
       }
-    }, new Fn<Long, ValueType<?>>() {
+    }, new Function<Long, ValueType<?>>() {
       @Override public ValueType<?> apply(Long a) {
         return LONG;
       }
-    }, new Fn<Boolean, ValueType<?>>() {
+    }, new Function<Boolean, ValueType<?>>() {
       @Override public ValueType<?> apply(Boolean a) {
         return BOOLEAN;
       }
-    }, new Fn<Version, ValueType<?>>() {
+    }, new Function<Version, ValueType<?>>() {
       @Override public ValueType<?> apply(Version a) {
         return VERSION;
       }
@@ -118,14 +118,37 @@ public abstract class Value {
    * Decompose (or pattern match) the value instance. Provide a function to handle each possible type.
    * Use {@link #doNotMatch()} as a placeholder that yields an error.
    */
+//  public final <A> A decompose(
+//          Fn<? super String, ? extends A> stringValue,
+//          Fn<? super Date, ? extends A> dateValue,
+//          Fn<? super Long, ? extends A> longValue,
+//          Fn<? super Boolean, ? extends A> booleanValue,
+//          Fn<? super Version, ? extends A> versionValue) {
+//    if (this instanceof StringValue) {
+//      return stringValue.apply(((StringValue) this).get());
+//    } else if (this instanceof DateValue) {
+//      return dateValue.apply(((DateValue) this).get());
+//    } else if (this instanceof LongValue) {
+//      return longValue.apply(((LongValue) this).get());
+//    } else if (this instanceof BooleanValue) {
+//      return booleanValue.apply(((BooleanValue) this).get());
+//    } else if (this instanceof VersionValue) {
+//      return versionValue.apply(((VersionValue) this).get());
+//    } else {
+//      // catch bug
+//      throw new Error("Unexhaustive match: " + this);
+//    }
+//  }
+
   public final <A> A decompose(
-          Fn<? super String, ? extends A> stringValue,
-          Fn<? super Date, ? extends A> dateValue,
-          Fn<? super Long, ? extends A> longValue,
-          Fn<? super Boolean, ? extends A> booleanValue,
-          Fn<? super Version, ? extends A> versionValue) {
+      Function<? super String, ? extends  A> stringValue,
+      Function<? super Date, ? extends A> dateValue,
+      Function<? super Long, ? extends A> longValue,
+      Function<? super Boolean, ? extends A> booleanValue,
+      Function<? super Version, ? extends A> versionValue
+  ) {
     if (this instanceof StringValue) {
-      return stringValue.apply(((StringValue) this).get());
+      return  stringValue.apply(((StringValue) this).get());
     } else if (this instanceof DateValue) {
       return dateValue.apply(((DateValue) this).get());
     } else if (this instanceof LongValue) {
@@ -148,8 +171,16 @@ public abstract class Value {
    *
    * @see #decompose(Fn, Fn, Fn, Fn, Fn)
    */
-  public static <B> Fn<Object, B> doNotMatch() {
-    return new Fn<Object, B>() {
+//  public static <B> Fn<Object, B> doNotMatch() {
+//    return new Fn<Object, B>() {
+//      @Override public B apply(Object a) {
+//        throw new Error("Unexhaustive match: " + a);
+//      }
+//    };
+//  }
+
+  public static <B> Function<Object, B> doNotMatch() {
+    return new Function<Object, B>() {
       @Override public B apply(Object a) {
         throw new Error("Unexhaustive match: " + a);
       }
@@ -180,11 +211,11 @@ public abstract class Value {
     public abstract TypedValue<A> mk(A a);
 
     public abstract <B> B match(
-            P1<? extends B> stringType,
-            P1<? extends B> dateType,
-            P1<? extends B> longType,
-            P1<? extends B> booleanType,
-            P1<? extends B> versionType);
+            Product<? extends B> stringType,
+            Product<? extends B> dateType,
+            Product<? extends B> longType,
+            Product<? extends B> booleanType,
+            Product<? extends B> versionType);
   }
 
   public static final class StringType extends ValueType<String> {
@@ -193,11 +224,11 @@ public abstract class Value {
     }
 
     @Override public <B> B match(
-            P1<? extends B> stringType,
-            P1<? extends B> dateType,
-            P1<? extends B> longType,
-            P1<? extends B> booleanType,
-            P1<? extends B> versionType) {
+            Product<? extends B> stringType,
+            Product<? extends B> dateType,
+            Product<? extends B> longType,
+            Product<? extends B> booleanType,
+            Product<? extends B> versionType) {
       return stringType.get1();
     }
   }
@@ -208,11 +239,11 @@ public abstract class Value {
     }
 
     @Override public <B> B match(
-            P1<? extends B> stringType,
-            P1<? extends B> dateType,
-            P1<? extends B> longType,
-            P1<? extends B> booleanType,
-            P1<? extends B> versionType) {
+            Product<? extends B> stringType,
+            Product<? extends B> dateType,
+            Product<? extends B> longType,
+            Product<? extends B> booleanType,
+            Product<? extends B> versionType) {
       return dateType.get1();
     }
   }
@@ -223,11 +254,11 @@ public abstract class Value {
     }
 
     @Override public <B> B match(
-            P1<? extends B> stringType,
-            P1<? extends B> dateType,
-            P1<? extends B> longType,
-            P1<? extends B> booleanType,
-            P1<? extends B> versionType) {
+            Product<? extends B> stringType,
+            Product<? extends B> dateType,
+            Product<? extends B> longType,
+            Product<? extends B> booleanType,
+            Product<? extends B> versionType) {
       return longType.get1();
     }
   }
@@ -238,11 +269,11 @@ public abstract class Value {
     }
 
     @Override public <B> B match(
-            P1<? extends B> stringType,
-            P1<? extends B> dateType,
-            P1<? extends B> longType,
-            P1<? extends B> booleanType,
-            P1<? extends B> versionType) {
+            Product<? extends B> stringType,
+            Product<? extends B> dateType,
+            Product<? extends B> longType,
+            Product<? extends B> booleanType,
+            Product<? extends B> versionType) {
       return booleanType.get1();
     }
   }
@@ -253,11 +284,11 @@ public abstract class Value {
     }
 
     @Override public <B> B match(
-            P1<? extends B> stringType,
-            P1<? extends B> dateType,
-            P1<? extends B> longType,
-            P1<? extends B> booleanType,
-            P1<? extends B> versionType) {
+            Product<? extends B> stringType,
+            Product<? extends B> dateType,
+            Product<? extends B> longType,
+            Product<? extends B> booleanType,
+            Product<? extends B> versionType) {
       return versionType.get1();
     }
   }
@@ -268,11 +299,11 @@ public abstract class Value {
     }
 
     @Override public <B> B match(
-            P1<? extends B> stringType,
-            P1<? extends B> dateType,
-            P1<? extends B> longType,
-            P1<? extends B> booleanType,
-            P1<? extends B> versionType) {
+            Product<? extends B> stringType,
+            Product<? extends B> dateType,
+            Product<? extends B> longType,
+            Product<? extends B> booleanType,
+            Product<? extends B> versionType) {
       throw new RuntimeException("Cannot match an untyped value type");
     }
   }
