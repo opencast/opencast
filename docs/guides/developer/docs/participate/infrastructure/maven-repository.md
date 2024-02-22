@@ -58,7 +58,7 @@ Pushing artifacts to a Maven repository
 The following command will add a file to your local Maven repository.  This is useful for testing if your artifacts are
 correctly placed prior to pushing to the mainline Nexus repository.
 
-    mvn install:install-file \
+    ./mvnw install:install-file \
      -Dfile=$filename \
      -DgroupId=$groupId \
      -DartifactId=$artifactId \
@@ -118,7 +118,7 @@ Pushing Snapshots
 Snapshots are pushed automatically by the CI servers.  For historical purposes, this is accomplished by:
 
 ```bash
-mvn deploy
+./mvnw deploy
 ```
 
 To verify, your artifacts can be found [here](https://oss.sonatype.org/content/repositories/snapshots/org/opencastproject/)
@@ -140,27 +140,27 @@ Pushing releases is similar to snapshots, with the added requirements that you a
 This is automated with the `release` profile.  To push a release run
 
 ```bash
-mvn nexus-staging:deploy -P release
+./mvnw nexus-staging:deploy -P release
 ```
 
 This creates a staging repository (https://oss.sonatype.org/content/groups/staging/org/opencastproject/) for your
 artifacts.  This is always safe to do - you can still rollback all changes with
 
 ```bash
-mvn nexus-staging:drop
+./mvnw nexus-staging:drop
 ```
 
 If things do not look ok, fix the issue and redeploy.  Once you are confident that everything is ok, you can run
 
 ```bash
-mvn nexus-staging:close
+./mvnw nexus-staging:close
 ```
 
 This closes the staging repository, and runs the Sonatype-side tests for things like GPG signatures.  If this fails,
 correct the issue locally, and redeploy.  Once this succeeds, you have two options: drop (to destroy the release) or:
 
 ```bash
-mvn nexus-staging:release
+./mvnw nexus-staging:release
 ```
 
 to permanently release the binaries in their current states.
@@ -175,7 +175,7 @@ timeout and not something you have done use one of the following.
 To reattempt a deploy use
 
 ```bash
-mvn nexus-staging:deploy-staged
+./mvnw nexus-staging:deploy-staged
 ```
 
 This will avoid recompiling, retesting, and resigning all of the binaries.
@@ -184,5 +184,5 @@ This will avoid recompiling, retesting, and resigning all of the binaries.
 To reattempt a close use
 
 ```bash
-mvn nexus-staging:close
+./mvnw nexus-staging:close
 ```

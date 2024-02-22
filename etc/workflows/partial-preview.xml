@@ -21,6 +21,8 @@
 
     <!-- Analyze media assets -->
 
+    <!-- CHANGEME: Activate this if you use the old editor -->
+    <!--
     <operation
       id="analyze-tracks"
       exception-handler-workflow="partial-error"
@@ -29,12 +31,15 @@
         <configuration key="source-flavor">*/source</configuration>
       </configurations>
     </operation>
+    -->
 
     <!-- Transcode video previews -->
 
+    <!-- CHANGEME: Add
+        if="NOT (${presenter_source_video} AND ${presentation_source_video})"
+    to this operation if you use the old editor -->
     <operation
       id="encode"
-      if="NOT (${presenter_source_video} AND ${presentation_source_video})"
       exception-handler-workflow="partial-error"
       description="Create single-stream video preview">
       <configurations>
@@ -45,6 +50,8 @@
       </configurations>
     </operation>
 
+    <!-- CHANGEME: Activate this if you use the old editor -->
+    <!--
     <operation
       id="composite"
       if="${presenter_source_video} AND ${presentation_source_video}"
@@ -66,6 +73,7 @@
         </configuration>
       </configurations>
     </operation>
+    -->
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Audio waveform                                                    -->
