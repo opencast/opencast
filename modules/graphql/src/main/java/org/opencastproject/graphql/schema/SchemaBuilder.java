@@ -21,12 +21,22 @@
 
 package org.opencastproject.graphql.schema;
 
+import org.opencastproject.graphql.provider.GraphQLAdditionalTypeProvider;
+import org.opencastproject.graphql.provider.GraphQLDynamicTypeProvider;
+import org.opencastproject.graphql.provider.GraphQLExtensionProvider;
+import org.opencastproject.graphql.provider.GraphQLFieldVisibilityProvider;
+import org.opencastproject.graphql.provider.GraphQLMutationProvider;
+import org.opencastproject.graphql.provider.GraphQLQueryProvider;
+import org.opencastproject.graphql.schema.builder.DynamicTypeBuilder;
+import org.opencastproject.graphql.schema.builder.ExtensionBuilder;
+import org.opencastproject.graphql.type.input.Mutation;
 import org.opencastproject.graphql.type.output.Query;
 import org.opencastproject.security.api.Organization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Objects;
 
 import graphql.annotations.AnnotationsSchemaCreator;
@@ -41,9 +51,15 @@ public class SchemaBuilder {
 
   private final Organization organization;
 
+  private final ExtensionBuilder extensionBuilder;
+
+  private final DynamicTypeBuilder dynamicTypeBuilder;
+
   public SchemaBuilder(Organization organization) {
     Objects.requireNonNull(organization, "organization cannot be null");
     this.organization = organization;
+    this.dynamicTypeBuilder = new DynamicTypeBuilder(organization);
+    this.extensionBuilder = new ExtensionBuilder();
   }
 
   public GraphQLSchema build() {
@@ -53,13 +69,49 @@ public class SchemaBuilder {
 
     final var builder = GraphQLSchema.newSchema();
 
+    dynamicTypeBuilder.withAnnotations(annotations).build();
+    extensionBuilder.withAnnotations(annotations).build();
+
     final var annotationsSchema = AnnotationsSchemaCreator.newAnnotationsSchema();
+
 
     return annotationsSchema
         .setGraphQLSchemaBuilder(builder)
         .query(Query.class)
+        .mutation(Mutation.class)
+        .
         .setAnnotationsProcessor(this.annotations)
         .build();
+  }
+
+  public SchemaBuilder extensionProviders(List<GraphQLExtensionProvider> extensionProviders) {
+    extensionBuilder.withExtensionProviders(extensionProviders);
+    return this;
+  }
+
+  public SchemaBuilder dynamicTypeProviders(List<GraphQLDynamicTypeProvider> dynamicTypeProviders) {
+    dynamicTypeBuilder.withDynamicTypeProviders(dynamicTypeProviders);
+    return this;
+  }
+
+  public SchemaBuilder queryProviders(List<GraphQLQueryProvider> queryProviders) {
+    return this;
+  }
+
+  public SchemaBuilder mutationProviders(List<GraphQLMutationProvider> mutationProviders) {
+    return this;
+  }
+
+  public SchemaBuilder codeRegistryProviders(List<GraphQLAdditionalTypeProvider> additionalTypesProviders) {
+    return this;
+  }
+
+  public SchemaBuilder additionalTypeProviders(List<GraphQLAdditionalTypeProvider> additionalTypesProviders) {
+    return this;
+  }
+
+  public SchemaBuilder fieldVisibilityProviders(List<GraphQLFieldVisibilityProvider> fieldVisibilityProviders) {
+    return this;
   }
 
 }

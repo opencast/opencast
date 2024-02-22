@@ -19,19 +19,21 @@
  *
  */
 
-package org.opencastproject.graphql.providers;
+package org.opencastproject.graphql.type.output;
 
-import java.util.Collections;
-import java.util.Set;
+import org.opencastproject.mediapackage.Attachment;
+import org.opencastproject.mediapackage.MediaPackageElement;
 
-public interface GraphQLAdditionalTypeProvider extends GraphQLProvider {
+public class GqlAttachment implements GqlMediaPackageElement {
 
-  default Set<Class<?>> getAdditionalOutputTypes() {
-    return Collections.emptySet();
+  private final Attachment attachment;
+
+  public GqlAttachment(Attachment attachment) {
+    this.attachment = attachment;
   }
 
-  default Set<Class<?>> getAdditionalInputTypes() {
-    return Collections.emptySet();
+  @Override
+  public MediaPackageElement getElement() {
+    return attachment;
   }
-
 }

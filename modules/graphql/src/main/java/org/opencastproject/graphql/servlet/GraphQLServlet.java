@@ -131,7 +131,6 @@ public class GraphQLServlet extends HttpServlet implements Servlet {
 
     validateQuery(query);
     ExecutionResult result = executionService.execute(query, operationName, variables, extensions);
-
     resp.setContentType(APPLICATION_GRAPHQL);
     try (PrintWriter out = resp.getWriter()) {
       objectMapper.writeValue(out, result.toSpecification());

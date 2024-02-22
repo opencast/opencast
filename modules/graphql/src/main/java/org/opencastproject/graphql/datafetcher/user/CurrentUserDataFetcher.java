@@ -19,14 +19,19 @@
  *
  */
 
-package org.opencastproject.graphql.providers;
+package org.opencastproject.graphql.datafetcher.user;
 
-import java.util.Set;
+import org.opencastproject.graphql.datafetcher.ContextDataFetcher;
+import org.opencastproject.graphql.execution.context.OpencastContext;
+import org.opencastproject.graphql.type.output.GqlUser;
 
-import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.DataFetchingEnvironment;
 
-public interface GraphQLMutationProvider extends GraphQLProvider {
+public class CurrentUserDataFetcher implements ContextDataFetcher<GqlUser> {
 
-  Set<GraphQLFieldDefinition> getMutations();
+  @Override
+  public GqlUser get(OpencastContext context, DataFetchingEnvironment environment) {
+    return new GqlUser(context.getUser());
+  }
 
 }

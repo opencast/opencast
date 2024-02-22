@@ -19,18 +19,7 @@
  *
  */
 
-package org.opencastproject.graphql.providers;
+@RequireConfigurator
+package org.opencastproject.graphql.config;
 
-import java.util.Map;
-
-import graphql.annotations.processor.GraphQLAnnotations;
-import graphql.schema.GraphQLInputType;
-import graphql.schema.GraphQLOutputType;
-
-public interface GraphQLDynamicTypeProvider extends GraphQLProvider {
-
-  Map<String, GraphQLOutputType> getDynamicOutputTypes(GraphQLAnnotations graphQLAnnotations);
-
-  Map<String, GraphQLInputType> getDynamicInputTypes(GraphQLAnnotations graphQLAnnotations);
-
-}
+import org.osgi.service.configurator.annotations.RequireConfigurator;

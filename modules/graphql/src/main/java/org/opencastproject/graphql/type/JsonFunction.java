@@ -19,12 +19,30 @@
  *
  */
 
-package org.opencastproject.graphql.providers;
+package org.opencastproject.graphql.type;
 
-import java.util.Collection;
+import java.lang.reflect.AnnotatedType;
 
-public interface GraphQLExtensionProvider extends GraphQLProvider {
+import graphql.annotations.processor.ProcessingElementsContainer;
+import graphql.annotations.processor.typeFunctions.TypeFunction;
+import graphql.scalars.ExtendedScalars;
+import graphql.schema.GraphQLType;
 
-  Collection<Class<?>> getExtensions();
+public class JsonFunction implements TypeFunction {
+  @Override
+  public String getTypeName(Class<?> aClass, AnnotatedType annotatedType) {
+    return ExtendedScalars.Json.getName();
+  }
+
+  @Override
+  public boolean canBuildType(Class<?> aClass, AnnotatedType annotatedType) {
+    return aClass == Object.class;
+  }
+
+  @Override
+  public GraphQLType buildType(boolean input, Class<?> aClass, AnnotatedType annotatedType,
+      ProcessingElementsContainer container) {
+    return ExtendedScalars.Json;
+  }
 
 }

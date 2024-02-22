@@ -19,12 +19,26 @@
  *
  */
 
-package org.opencastproject.graphql.providers;
+package org.opencastproject.graphql.datafetcher;
 
-import graphql.schema.GraphQLCodeRegistry;
+import org.opencastproject.graphql.util.GraphQLObjectMapper;
 
-public interface GraphQLCodeRegistryProvider extends GraphQLProvider {
+import java.util.Objects;
 
-  GraphQLCodeRegistry.Builder getCodeRegistry(GraphQLCodeRegistry codeRegistry);
+import graphql.schema.DataFetchingEnvironment;
+
+public abstract class ParameterDataFetcher<T> implements ContextDataFetcher<T> {
+
+  protected <E> E parseObjectParam(String name, Class<E> clazz, final DataFetchingEnvironment environment) {
+    final Object param = environment.getArgument(name);
+    if (param == null) {
+      return null;
+    }
+    return GraphQLObjectMapper.newInstance().convertValue(param, clazz);
+  }
+
+  protected <K> K parseParam(final String name, K defaultValue, final DataFetchingEnvironment environment) {
+    return Objects.requireNonNullElse(environment.getArgument(name), defaultValue);
+  }
 
 }

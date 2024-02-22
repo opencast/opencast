@@ -21,88 +21,104 @@
 
 package org.opencastproject.graphql.type.output;
 
-import static org.opencastproject.userdirectory.UserIdRoleProvider.getUserIdRole;
-
+import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.graphql.datafetcher.event.EventOffsetDataFetcher;
-import org.opencastproject.graphql.datafetcher.series.SeriesOffsetDataFetcher;
+import org.opencastproject.graphql.datafetcher.series.CommonSeriesMetadataV2DataFetcher;
 import org.opencastproject.graphql.type.input.EventOrderByInput;
-import org.opencastproject.graphql.type.input.SeriesOrderByInput;
-import org.opencastproject.security.api.Role;
-import org.opencastproject.security.api.User;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
+import graphql.annotations.annotationTypes.GraphQLDataFetcher;
 import graphql.annotations.annotationTypes.GraphQLDescription;
 import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLID;
 import graphql.annotations.annotationTypes.GraphQLName;
 import graphql.annotations.annotationTypes.GraphQLNonNull;
 import graphql.schema.DataFetchingEnvironment;
 
-public class GqlUser {
+@GraphQLName(GqlSeries.TYPE_NAME)
+@GraphQLDescription("A series of episodes.")
+public class GqlSeries {
 
-  private final User user;
+  public static final String TYPE_NAME = "GqlSeries";
 
-  public GqlUser(User user) {
-    this.user = user;
+  private final Series series;
+
+  public GqlSeries(Series series) {
+    this.series = series;
   }
 
+  @GraphQLID
   @GraphQLField
-  public String username() {
-    return user.getUsername();
-  }
-
-  @GraphQLField
-  public String name() {
-    return user.getName();
-  }
-
-  @GraphQLField
-  public String email() {
-    return user.getEmail();
-  }
-
-  @GraphQLField
-  public String provider() {
-    return user.getProvider();
+  @GraphQLNonNull
+  public String id() {
+    return series.getIdentifier();
   }
 
   @GraphQLField
   @GraphQLNonNull
-  @GraphQLDescription("A list of series under the owner.")
-  public GqlSeriesList mySeries(
-      @GraphQLName("limit") Integer limit,
-      @GraphQLName("offset") Integer offset,
-      @GraphQLName("query") String query,
-      @GraphQLName("orderBy") SeriesOrderByInput orderBy,
-      final DataFetchingEnvironment environment) {
-    return new SeriesOffsetDataFetcher().withUser(user).writeOnly(true).get(environment);
+  public String title() {
+    return series.getTitle();
+  }
+
+  @GraphQLField
+  public String description() {
+    return series.getDescription();
+  }
+
+  @GraphQLField
+  public List<String> organizers() {
+    return series.getOrganizers();
+  }
+
+  @GraphQLField
+  public List<String> contributors() {
+    return series.getContributors();
+  }
+
+  @GraphQLField
+  public String creator() {
+    return series.getCreator();
+  }
+
+  @GraphQLField
+  public String license() {
+    return series.getLicense();
+  }
+
+  @GraphQLField
+  public String created() {
+    return series.getCreatedDateTime().toInstant().toString();
+  }
+
+  @GraphQLField
+  public List<String> publishers() {
+    return series.getPublishers();
+  }
+
+  @GraphQLField
+  public String rightsHolder() {
+    return series.getRightsHolder();
   }
 
   @GraphQLField
   @GraphQLNonNull
   @GraphQLDescription("A list of events under the owner.")
-  public GqlEventList myEvents(
+  public GqlEventList events(
       @GraphQLName("limit") Integer limit,
       @GraphQLName("offset") Integer offset,
       @GraphQLName("query") String query,
       @GraphQLName("orderBy") EventOrderByInput orderBy,
       final DataFetchingEnvironment environment) {
-    return new EventOffsetDataFetcher().withUser(user).writeOnly(true).get(environment);
+    return new EventOffsetDataFetcher().withSeriesId(series.getIdentifier()).get(environment);
   }
 
   @GraphQLField
   @GraphQLNonNull
-  @GraphQLDescription("A list of roles assigned to the user.")
-  public List<String> roles() {
-    return user.getRoles().stream().map(Role::getName).collect(Collectors.toList());
-  }
-
-  @GraphQLField
-  @GraphQLNonNull
-  @GraphQLDescription("User r")
-  public String userRole() {
-    return getUserIdRole(user.getUsername());
+  @GraphQLDescription("Common metadata of the series.")
+  @GraphQLDataFetcher(CommonSeriesMetadataV2DataFetcher.class)
+  public GqlCommonSeriesMetadataV2 commonMetadataV2(final DataFetchingEnvironment environment) {
+    return null;
   }
 
 }

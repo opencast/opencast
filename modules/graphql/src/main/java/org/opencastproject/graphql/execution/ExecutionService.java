@@ -21,6 +21,7 @@
 
 package org.opencastproject.graphql.execution;
 
+import org.opencastproject.graphql.execution.context.OpencastContextManager;
 import org.opencastproject.graphql.schema.SchemaService;
 import org.opencastproject.security.api.SecurityService;
 
@@ -52,7 +53,8 @@ public class ExecutionService {
 
   private final SecurityService securityService;
   private final SchemaService schemaService;
-  private final BundleContext context;
+  private final BundleContext bundleContext;
+
 
   private final Map<String, GraphQL> organizationGraphQL = new ConcurrentHashMap<>();
 
@@ -60,11 +62,11 @@ public class ExecutionService {
   public ExecutionService(
       @Reference SchemaService schemaService,
       @Reference SecurityService securityService,
-      BundleContext context
+      BundleContext bundleContext
   ) {
     this.schemaService = schemaService;
     this.securityService = securityService;
-    this.context = context;
+    this.bundleContext = bundleContext;
   }
 
   public ExecutionResult execute(
@@ -85,14 +87,25 @@ public class ExecutionService {
   }
 
   public ExecutionResult execute(ExecutionInput executionInput) {
-    var graphQL = getGraphQL(securityService.getOrganization().getId());
+    try {
+      var context = OpencastContextManager.initiateContext(bundleContext);
 
-    if (graphQL == null) {
-      throw new IllegalStateException("No GraphQL schema found for organization `"
-          + securityService.getOrganization().getId() + "`");
+      context.setOrganization(securityService.getOrganization());
+      context.setUser(securityService.getUser());
+
+      executionInput.getGraphQLContext().put(OpencastContextManager.CONTEXT, context);
+
+      var graphQL = getGraphQL(securityService.getOrganization().getId());
+
+      if (graphQL == null) {
+        throw new IllegalStateException(
+            "No GraphQL schema found for organization `" + securityService.getOrganization().getId() + "`");
+      }
+
+      return graphQL.execute(executionInput);
+    } finally {
+      OpencastContextManager.clearContext();
     }
-
-    return graphQL.execute(executionInput);
   }
 
   private GraphQL getGraphQL(String organizationId) {
@@ -100,10 +113,13 @@ public class ExecutionService {
     GraphQLSchema schema = schemaService.get(organizationId);
 
     if (graphQL == null || !schema.equals(graphQL.getGraphQLSchema())) {
+      var exceptionHandler = new OpencastDataFetcherExceptionHandler();
       graphQL = GraphQL.newGraphQL(schema)
-          .queryExecutionStrategy(new AsyncExecutionStrategy())
-          .mutationExecutionStrategy(new AsyncSerialExecutionStrategy())
-          .executionIdProvider(new OrganizationExecutionIdProvider(organizationId)).build();
+          .queryExecutionStrategy(new AsyncExecutionStrategy(exceptionHandler))
+          .mutationExecutionStrategy(new AsyncSerialExecutionStrategy(exceptionHandler))
+          .executionIdProvider(new OrganizationExecutionIdProvider(organizationId))
+          .defaultDataFetcherExceptionHandler(exceptionHandler)
+          .build();
       organizationGraphQL.put(organizationId, graphQL);
     }
 

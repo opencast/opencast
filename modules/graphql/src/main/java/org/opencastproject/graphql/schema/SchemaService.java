@@ -21,19 +21,24 @@
 
 package org.opencastproject.graphql.schema;
 
-import org.opencastproject.graphql.providers.GraphQLAdditionalTypeProvider;
-import org.opencastproject.graphql.providers.GraphQLExtensionProvider;
-import org.opencastproject.graphql.providers.GraphQLFieldVisibilityProvider;
-import org.opencastproject.graphql.providers.GraphQLMutationProvider;
-import org.opencastproject.graphql.providers.GraphQLQueryProvider;
+import org.opencastproject.graphql.provider.GraphQLAdditionalTypeProvider;
+import org.opencastproject.graphql.provider.GraphQLDynamicTypeProvider;
+import org.opencastproject.graphql.provider.GraphQLExtensionProvider;
+import org.opencastproject.graphql.provider.GraphQLFieldVisibilityProvider;
+import org.opencastproject.graphql.provider.GraphQLMutationProvider;
+import org.opencastproject.graphql.provider.GraphQLQueryProvider;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryListener;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.propertytypes.ServiceDescription;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,9 +61,10 @@ import graphql.schema.GraphQLSchema;
 @ServiceDescription("GraphQL Schema Service")
 public class SchemaService implements OrganizationDirectoryListener {
 
+  @ObjectClassDefinition
   public @interface Config {
 
-    int schemaUpdateTriggerDelay() default 2000;
+    int schema_update_trigger_delay() default 2000;
 
   }
 
@@ -78,22 +84,33 @@ public class SchemaService implements OrganizationDirectoryListener {
 
   private final List<GraphQLFieldVisibilityProvider> fieldVisibilityProviders = new CopyOnWriteArrayList<>();
 
+  private final List<GraphQLDynamicTypeProvider> dynamicTypeProviders = new CopyOnWriteArrayList<>();
+
   private final ScheduledExecutorService schemaUpdateExecutor;
   private final int schemaUpdateTriggerDelay;
-  private ScheduledFuture<?> schemaUpdateFuture;
+
+  private final Map<Organization, ScheduledFuture<?>> scheduledFutureMap = new ConcurrentHashMap<>();
 
   @Activate
   public SchemaService(
       @Reference OrganizationDirectoryService organizationDirectoryService,
       final Config config
   ) {
-    if (config.schemaUpdateTriggerDelay() < 0) {
+    if (config.schema_update_trigger_delay() < 0) {
       throw new IllegalArgumentException("Schema update trigger delay must be greater than or equal to 0");
     }
     this.organizationDirectoryService = organizationDirectoryService;
-    this.schemaUpdateTriggerDelay = config.schemaUpdateTriggerDelay();
+    this.schemaUpdateTriggerDelay = config.schema_update_trigger_delay();
     schemaUpdateExecutor = Executors.newSingleThreadScheduledExecutor(new SchemaUpdateThreadFactory());
     triggerSchemaUpdate();
+  }
+
+  @Deactivate
+  protected void dispose() {
+    scheduledFutureMap.forEach((organization, scheduledFuture) -> {
+      scheduledFuture.cancel(true);
+    });
+    schemaUpdateExecutor.shutdown();
   }
 
   public GraphQLSchema get(String organizationId) {
@@ -101,8 +118,15 @@ public class SchemaService implements OrganizationDirectoryListener {
   }
 
   public GraphQLSchema buildSchema(Organization organization) {
-    var schemaBuilder = new SchemaBuilder(organization);
-
+    logger.info("Building GraphQL schema for organization {}", organization.getId());
+    var schemaBuilder = new SchemaBuilder(organization)
+        .extensionProviders(extensionsProviders)
+        .dynamicTypeProviders(dynamicTypeProviders)
+        .queryProviders(queryProviders)
+        .mutationProviders(mutationProviders)
+        .codeRegistryProviders(additionalTypesProviders)
+        .additionalTypeProviders(additionalTypesProviders)
+        .fieldVisibilityProviders(fieldVisibilityProviders);
     return schemaBuilder.build();
   }
 
@@ -111,18 +135,22 @@ public class SchemaService implements OrganizationDirectoryListener {
   }
 
   private void triggerSchemaUpdate(Organization organization) {
-    if (schemaUpdateFuture != null) {
-      schemaUpdateFuture.cancel(true);
+    ScheduledFuture<?> future = scheduledFutureMap.get(organization);
+    if (future != null) {
+      future.cancel(true);
     }
-    schemaUpdateFuture = schemaUpdateExecutor.schedule(
-        () -> updateSchema(organization),
-        schemaUpdateTriggerDelay,
-        TimeUnit.MILLISECONDS
-    );
+
+    scheduledFutureMap.put(organization,
+        schemaUpdateExecutor.schedule(() -> updateSchema(organization), schemaUpdateTriggerDelay,
+            TimeUnit.MILLISECONDS));
   }
 
   public void updateSchema(Organization organization) {
-    schemas.put(organization.getId(), buildSchema(organization));
+    try {
+      schemas.put(organization.getId(), buildSchema(organization));
+    } catch (Throwable t) {
+      logger.error("Error building GraphQL schema for organization {}", organization.getId(), t);
+    }
   }
 
   @Override
@@ -141,6 +169,90 @@ public class SchemaService implements OrganizationDirectoryListener {
   public void organizationUpdated(Organization organization) {
     logger.trace("Organization {} updated", organization.getId());
     triggerSchemaUpdate(organization);
+  }
+
+  @Reference(
+      policy = ReferencePolicy.DYNAMIC,
+      cardinality = ReferenceCardinality.MULTIPLE
+  )
+  public void bindQueryProvider(GraphQLQueryProvider provider) {
+    queryProviders.add(provider);
+    triggerSchemaUpdate();
+  }
+
+  public void unbindQueryProvider(GraphQLQueryProvider provider) {
+    queryProviders.remove(provider);
+    triggerSchemaUpdate();
+  }
+
+  @Reference(
+      policy = ReferencePolicy.DYNAMIC,
+      cardinality = ReferenceCardinality.MULTIPLE
+  )
+  public void bindMutationProvider(GraphQLMutationProvider provider) {
+    mutationProviders.add(provider);
+    triggerSchemaUpdate();
+  }
+
+  public void unbindMutationProvider(GraphQLMutationProvider provider) {
+    mutationProviders.remove(provider);
+    triggerSchemaUpdate();
+  }
+
+  @Reference(
+      policy = ReferencePolicy.DYNAMIC,
+      cardinality = ReferenceCardinality.MULTIPLE
+  )
+  public void bindExtensionProvider(GraphQLExtensionProvider provider) {
+    extensionsProviders.add(provider);
+    triggerSchemaUpdate();
+  }
+
+  public void unbindExtensionProvider(GraphQLExtensionProvider provider) {
+    extensionsProviders.remove(provider);
+    triggerSchemaUpdate();
+  }
+
+  @Reference(
+      policy = ReferencePolicy.DYNAMIC,
+      cardinality = ReferenceCardinality.MULTIPLE
+  )
+  public void bindAdditionalTypeProvider(GraphQLAdditionalTypeProvider provider) {
+    additionalTypesProviders.add(provider);
+    triggerSchemaUpdate();
+  }
+
+  public void unbindAdditionalTypeProvider(GraphQLAdditionalTypeProvider provider) {
+    additionalTypesProviders.remove(provider);
+    triggerSchemaUpdate();
+  }
+
+  @Reference(
+      policy = ReferencePolicy.DYNAMIC,
+      cardinality = ReferenceCardinality.MULTIPLE
+  )
+  public void bindFieldVisibilityProvider(GraphQLFieldVisibilityProvider provider) {
+    fieldVisibilityProviders.add(provider);
+    triggerSchemaUpdate();
+  }
+
+  public void unbindFieldVisibilityProvider(GraphQLFieldVisibilityProvider provider) {
+    fieldVisibilityProviders.remove(provider);
+    triggerSchemaUpdate();
+  }
+
+  @Reference(
+      policy = ReferencePolicy.DYNAMIC,
+      cardinality = ReferenceCardinality.MULTIPLE
+  )
+  public void bindDynamicTypeProvider(GraphQLDynamicTypeProvider provider) {
+    dynamicTypeProviders.add(provider);
+    triggerSchemaUpdate();
+  }
+
+  public void unbindDynamicTypeProvider(GraphQLDynamicTypeProvider provider) {
+    dynamicTypeProviders.remove(provider);
+    triggerSchemaUpdate();
   }
 
   public static class SchemaUpdateThreadFactory implements ThreadFactory {

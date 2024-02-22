@@ -19,7 +19,10 @@
  *
  */
 
-@RequireConfigurator
-package org.opencastproject.graphql;
+package org.opencastproject.graphql.type.output;
 
-import org.osgi.service.configurator.annotations.RequireConfigurator;
+public interface GqlDublinCoreMetadata {
+
+  String catalogType();
+
+}

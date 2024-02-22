@@ -1,5 +1,7 @@
 {
+  ":configurator:resource-version" : 1,
+  ":configurator:symbolic-name" : "org.opencastproject.graphql.config",
   "org.opencastproject.graphql.schema.SchemaService": {
-    "schema_update_trigger_delay:Integer": 1000
+    "schema.update.trigger.delay:Integer": 1000
   }
 }

@@ -19,7 +19,14 @@
  *
  */
 
-package org.opencastproject.graphql.providers;
+package org.opencastproject.graphql.provider;
 
-public interface GraphQLProvider {
+import java.util.Set;
+
+import graphql.schema.GraphQLFieldDefinition;
+
+public interface GraphQLMutationProvider extends GraphQLProvider {
+
+  Set<GraphQLFieldDefinition> getMutations();
+
 }

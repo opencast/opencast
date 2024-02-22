@@ -19,11 +19,7 @@
  *
  */
 
-package org.opencastproject.graphql.providers;
+package org.opencastproject.graphql.provider;
 
-import graphql.schema.visibility.GraphqlFieldVisibility;
-
-public interface GraphQLFieldVisibilityProvider extends GraphQLProvider {
-  GraphqlFieldVisibility getFieldVisibility();
-
+public interface GraphQLProvider {
 }

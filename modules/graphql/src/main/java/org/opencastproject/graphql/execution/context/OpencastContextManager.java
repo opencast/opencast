@@ -19,14 +19,36 @@
  *
  */
 
-package org.opencastproject.graphql.providers;
+package org.opencastproject.graphql.execution.context;
 
-import java.util.Set;
+import org.osgi.framework.BundleContext;
 
-import graphql.schema.GraphQLFieldDefinition;
+public final class OpencastContextManager {
 
-public interface GraphQLQueryProvider extends GraphQLProvider {
+  public static final String CONTEXT = "context";
 
-  Set<GraphQLFieldDefinition> getQueries();
+  private static final InheritableThreadLocal<OpencastContext> contextHolder = new InheritableThreadLocal<>();
+
+  private OpencastContextManager() {
+  }
+
+  public static OpencastContext initiateContext(BundleContext bundleContext) {
+
+    var context = getCurrentContext();
+    if (context == null) {
+      context = OpencastContext.newContext(bundleContext);
+    }
+
+    contextHolder.set(context);
+    return context;
+  }
+
+  public static OpencastContext getCurrentContext() {
+    return contextHolder.get();
+  }
+
+  public static void clearContext() {
+    contextHolder.remove();
+  }
 
 }
