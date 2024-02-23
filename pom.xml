@@ -1631,9 +1631,9 @@
     <developer>
       <id>mtneug</id>
       <name>Matthias Neugebauer</name>
-      <email>matthias.neugebauer@uni-muenster.de</email>
-      <organization>University of Muenster</organization>
-      <organizationUrl>https://www.uni-muenster.de/</organizationUrl>
+      <email>mtneug@shio.solutions</email>
+      <organization>shio solutions GmbH, University of Muenster</organization>
+      <organizationUrl>https://shio.solutions, https://www.uni-muenster.de/</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
