@@ -74,12 +74,10 @@ public class SchemaBuilder {
 
     final var annotationsSchema = AnnotationsSchemaCreator.newAnnotationsSchema();
 
-
     return annotationsSchema
         .setGraphQLSchemaBuilder(builder)
         .query(Query.class)
         .mutation(Mutation.class)
-        .
         .setAnnotationsProcessor(this.annotations)
         .build();
   }

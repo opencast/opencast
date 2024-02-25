@@ -30,8 +30,7 @@ import graphql.schema.DataFetchingEnvironment;
 public interface ContextDataFetcher<T> extends DataFetcher<T> {
 
   default T get(final DataFetchingEnvironment environment) {
-    OpencastContext opencastContext = OpencastContextManager.getCurrentContext();
-
+    OpencastContext opencastContext = OpencastContextManager.enrichContext(environment);
     return get(opencastContext, environment);
   }
 

@@ -24,11 +24,11 @@ package org.opencastproject.graphql.datafetcher.event;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.graphql.datafetcher.ContextDataFetcher;
+import org.opencastproject.graphql.event.GqlEvent;
 import org.opencastproject.graphql.exception.GraphQLNotFoundException;
 import org.opencastproject.graphql.exception.GraphQLRuntimeException;
 import org.opencastproject.graphql.exception.OpencastErrorType;
 import org.opencastproject.graphql.execution.context.OpencastContext;
-import org.opencastproject.graphql.type.output.GqlEvent;
 import org.opencastproject.security.api.SecurityService;
 
 import java.util.Objects;

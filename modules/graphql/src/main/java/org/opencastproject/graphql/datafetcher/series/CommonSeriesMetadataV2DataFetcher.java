@@ -24,7 +24,7 @@ package org.opencastproject.graphql.datafetcher.series;
 import org.opencastproject.graphql.datafetcher.ContextDataFetcher;
 import org.opencastproject.graphql.exception.GraphQLNotFoundException;
 import org.opencastproject.graphql.execution.context.OpencastContext;
-import org.opencastproject.graphql.type.output.GqlSeries;
+import org.opencastproject.graphql.series.GqlSeries;
 import org.opencastproject.graphql.type.output.field.GqlJsonMetadataField;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;

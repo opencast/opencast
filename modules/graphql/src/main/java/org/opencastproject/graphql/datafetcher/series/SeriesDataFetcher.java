@@ -28,7 +28,7 @@ import org.opencastproject.graphql.exception.GraphQLNotFoundException;
 import org.opencastproject.graphql.exception.GraphQLRuntimeException;
 import org.opencastproject.graphql.exception.OpencastErrorType;
 import org.opencastproject.graphql.execution.context.OpencastContext;
-import org.opencastproject.graphql.type.output.GqlSeries;
+import org.opencastproject.graphql.series.GqlSeries;
 import org.opencastproject.security.api.SecurityService;
 
 import java.util.Objects;

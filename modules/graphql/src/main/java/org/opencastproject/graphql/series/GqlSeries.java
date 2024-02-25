@@ -19,12 +19,14 @@
  *
  */
 
-package org.opencastproject.graphql.type.output;
+package org.opencastproject.graphql.series;
 
 import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.graphql.datafetcher.event.EventOffsetDataFetcher;
 import org.opencastproject.graphql.datafetcher.series.CommonSeriesMetadataV2DataFetcher;
+import org.opencastproject.graphql.event.GqlEventList;
 import org.opencastproject.graphql.type.input.EventOrderByInput;
+import org.opencastproject.graphql.type.output.GqlCommonSeriesMetadataV2;
 
 import java.util.List;
 

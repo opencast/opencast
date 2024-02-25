@@ -19,12 +19,11 @@
  *
  */
 
-package org.opencastproject.graphql.type.output;
-
+package org.opencastproject.graphql.series;
 
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,16 +34,16 @@ import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 import graphql.annotations.annotationTypes.GraphQLNonNull;
 
-@GraphQLName(GqlEventList.TYPE_NAME)
+@GraphQLName(GqlSeriesList.TYPE_NAME)
 @GraphQLNonNull
-@GraphQLDescription("A list of events")
-public class GqlEventList {
+@GraphQLDescription("A list of series")
+public class GqlSeriesList {
 
-  public static final String TYPE_NAME = "GqlEventList";
+  public static final String TYPE_NAME = "GqlSeriesList";
 
-  protected final SearchResult<Event> searchResult;
+  private final SearchResult<Series> searchResult;
 
-  public GqlEventList(SearchResult<Event> searchResult) {
+  public GqlSeriesList(SearchResult<Series> searchResult) {
     this.searchResult = searchResult;
   }
 
@@ -54,11 +53,11 @@ public class GqlEventList {
   }
 
   @GraphQLField
-  public List<GqlEvent> nodes() {
+  public List<GqlSeries> nodes() {
 
     return Arrays.stream(searchResult.getItems())
         .map(SearchResultItem::getSource)
-        .map(GqlEvent::new)
+        .map(GqlSeries::new)
         .collect(Collectors.toList());
   }
 

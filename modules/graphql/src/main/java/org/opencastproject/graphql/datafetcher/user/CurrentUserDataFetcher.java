@@ -23,15 +23,15 @@ package org.opencastproject.graphql.datafetcher.user;
 
 import org.opencastproject.graphql.datafetcher.ContextDataFetcher;
 import org.opencastproject.graphql.execution.context.OpencastContext;
-import org.opencastproject.graphql.type.output.GqlUser;
+import org.opencastproject.graphql.user.GqlCurrentUser;
 
 import graphql.schema.DataFetchingEnvironment;
 
-public class CurrentUserDataFetcher implements ContextDataFetcher<GqlUser> {
+public class CurrentUserDataFetcher implements ContextDataFetcher<GqlCurrentUser> {
 
   @Override
-  public GqlUser get(OpencastContext context, DataFetchingEnvironment environment) {
-    return new GqlUser(context.getUser());
+  public GqlCurrentUser get(OpencastContext context, DataFetchingEnvironment environment) {
+    return new GqlCurrentUser(context.getUser());
   }
 
 }

@@ -22,7 +22,6 @@
 package org.opencastproject.graphql.schema.builder;
 
 import org.opencastproject.graphql.provider.GraphQLExtensionProvider;
-import org.opencastproject.security.api.Organization;
 
 import java.util.List;
 

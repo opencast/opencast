@@ -23,6 +23,8 @@ package org.opencastproject.graphql.execution.context;
 
 import org.osgi.framework.BundleContext;
 
+import graphql.schema.DataFetchingEnvironment;
+
 public final class OpencastContextManager {
 
   public static final String CONTEXT = "context";
@@ -43,8 +45,26 @@ public final class OpencastContextManager {
     return context;
   }
 
+  public static OpencastContext restoreContext(final DataFetchingEnvironment environment) {
+    OpencastContext context = environment.getGraphQlContext().get(CONTEXT);
+    contextHolder.set(context);
+    return context;
+  }
+
   public static OpencastContext getCurrentContext() {
     return contextHolder.get();
+  }
+
+  public static OpencastContext enrichContext(final DataFetchingEnvironment environment) {
+    OpencastContext context = getCurrentContext();
+    if (context == null) {
+      context = restoreContext(environment);
+    }
+
+    environment.getGraphQlContext().put(CONTEXT, context);
+    contextHolder.set(context);
+
+    return context;
   }
 
   public static void clearContext() {

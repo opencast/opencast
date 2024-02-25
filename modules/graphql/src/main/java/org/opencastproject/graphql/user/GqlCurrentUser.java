@@ -19,14 +19,10 @@
  *
  */
 
-package org.opencastproject.graphql.type.output;
+package org.opencastproject.graphql.user;
 
 import static org.opencastproject.userdirectory.UserIdRoleProvider.getUserIdRole;
 
-import org.opencastproject.graphql.datafetcher.event.EventOffsetDataFetcher;
-import org.opencastproject.graphql.datafetcher.series.SeriesOffsetDataFetcher;
-import org.opencastproject.graphql.type.input.EventOrderByInput;
-import org.opencastproject.graphql.type.input.SeriesOrderByInput;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.User;
 
@@ -37,13 +33,16 @@ import graphql.annotations.annotationTypes.GraphQLDescription;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 import graphql.annotations.annotationTypes.GraphQLNonNull;
-import graphql.schema.DataFetchingEnvironment;
 
-public class GqlUser {
+@GraphQLName(GqlCurrentUser.TYPE_NAME)
+@GraphQLDescription("Represents the current user.")
+public class GqlCurrentUser {
+
+  public static final String TYPE_NAME = "GqlCurrentUser";
 
   private final User user;
 
-  public GqlUser(User user) {
+  public GqlCurrentUser(User user) {
     this.user = user;
   }
 
@@ -63,35 +62,6 @@ public class GqlUser {
   }
 
   @GraphQLField
-  public String provider() {
-    return user.getProvider();
-  }
-
-  @GraphQLField
-  @GraphQLNonNull
-  @GraphQLDescription("A list of series under the owner.")
-  public GqlSeriesList mySeries(
-      @GraphQLName("limit") Integer limit,
-      @GraphQLName("offset") Integer offset,
-      @GraphQLName("query") String query,
-      @GraphQLName("orderBy") SeriesOrderByInput orderBy,
-      final DataFetchingEnvironment environment) {
-    return new SeriesOffsetDataFetcher().withUser(user).writeOnly(true).get(environment);
-  }
-
-  @GraphQLField
-  @GraphQLNonNull
-  @GraphQLDescription("A list of events under the owner.")
-  public GqlEventList myEvents(
-      @GraphQLName("limit") Integer limit,
-      @GraphQLName("offset") Integer offset,
-      @GraphQLName("query") String query,
-      @GraphQLName("orderBy") EventOrderByInput orderBy,
-      final DataFetchingEnvironment environment) {
-    return new EventOffsetDataFetcher().withUser(user).writeOnly(true).get(environment);
-  }
-
-  @GraphQLField
   @GraphQLNonNull
   @GraphQLDescription("A list of roles assigned to the user.")
   public List<String> roles() {
@@ -100,9 +70,13 @@ public class GqlUser {
 
   @GraphQLField
   @GraphQLNonNull
-  @GraphQLDescription("User r")
+  @GraphQLDescription("The role of the user.")
   public String userRole() {
     return getUserIdRole(user.getUsername());
+  }
+
+  public User getUser() {
+    return user;
   }
 
 }

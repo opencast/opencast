@@ -21,76 +21,11 @@
 
 package org.opencastproject.graphql.type.output;
 
-import org.opencastproject.graphql.datafetcher.event.EventDataFetcher;
-import org.opencastproject.graphql.datafetcher.event.EventOffsetDataFetcher;
-import org.opencastproject.graphql.datafetcher.series.SeriesDataFetcher;
-import org.opencastproject.graphql.datafetcher.series.SeriesOffsetDataFetcher;
-import org.opencastproject.graphql.datafetcher.user.CurrentUserDataFetcher;
-import org.opencastproject.graphql.type.input.EventOrderByInput;
-import org.opencastproject.graphql.type.input.SeriesOrderByInput;
-
-import graphql.annotations.annotationTypes.GraphQLDescription;
-import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
-import graphql.annotations.annotationTypes.GraphQLNonNull;
-import graphql.schema.DataFetchingEnvironment;
 
 @GraphQLName(Query.TYPE_NAME)
 public class Query {
   public static final String TYPE_NAME = "Query";
-
-  @GraphQLField
-  @GraphQLNonNull
-  @GraphQLDescription("The current user")
-  public static GqlUser currentUser(
-      final DataFetchingEnvironment environment
-  ) {
-    return new CurrentUserDataFetcher().get(environment);
-  }
-
-  @GraphQLField
-  @GraphQLNonNull
-  @GraphQLDescription("Returns series list")
-  public static GqlSeriesList allSeries(
-      @GraphQLName("limit") Integer limit,
-      @GraphQLName("offset") Integer offset,
-      @GraphQLName("query") String query,
-      @GraphQLName("orderBy") SeriesOrderByInput orderBy,
-      final DataFetchingEnvironment environment) {
-    return new SeriesOffsetDataFetcher().get(environment);
-  }
-
-  @GraphQLField
-  @GraphQLDescription("Returns series list")
-  public static GqlSeries seriesById(
-      @GraphQLName("id")@GraphQLNonNull String id,
-      final DataFetchingEnvironment environment) {
-    return new SeriesDataFetcher(id).get(environment);
-  }
-
-  @GraphQLField
-  @GraphQLNonNull
-  @GraphQLDescription("Returns event list")
-  public static GqlEventList allEvents(
-      @GraphQLName("limit") Integer limit,
-      @GraphQLName("offset") Integer offset,
-      @GraphQLName("query") String query,
-      @GraphQLName("orderBy") EventOrderByInput orderBy,
-      final DataFetchingEnvironment environment) {
-    return new EventOffsetDataFetcher().get(environment);
-  }
-
-  @GraphQLField
-  @GraphQLNonNull
-  @GraphQLDescription("A event by id")
-  public static GqlEvent eventById(
-      @GraphQLName("id")@GraphQLNonNull String id,
-      final DataFetchingEnvironment environment
-  ) {
-    return new EventDataFetcher(id).get(environment);
-
-  }
-
 
   @Override
   public String toString() {

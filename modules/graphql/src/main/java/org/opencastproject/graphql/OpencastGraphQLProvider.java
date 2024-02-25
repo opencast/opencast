@@ -46,8 +46,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.propertytypes.ServiceDescription;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -76,11 +74,6 @@ public class OpencastGraphQLProvider implements GraphQLExtensionProvider, GraphQ
   ) {
     this.indexService = indexService;
     this.securityService = securityService;
-  }
-
-  @Override
-  public Collection<Class<?>> getExtensions() {
-    return Collections.singleton(GqlUserExtension.class);
   }
 
   @Override

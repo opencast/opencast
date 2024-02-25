@@ -19,21 +19,31 @@
  *
  */
 
-package org.opencastproject.graphql;
+package org.opencastproject.graphql.user;
 
-import org.opencastproject.graphql.type.output.GqlUser;
+import org.opencastproject.graphql.datafetcher.user.CurrentUserDataFetcher;
+import org.opencastproject.graphql.type.output.Query;
 
+import graphql.annotations.annotationTypes.GraphQLDescription;
+import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLNonNull;
 import graphql.annotations.annotationTypes.GraphQLTypeExtension;
+import graphql.schema.DataFetchingEnvironment;
 
-@GraphQLTypeExtension(GqlUser.class)
-public class GqlUserExtension {
+@GraphQLTypeExtension(Query.class)
+public final class UserQueryExtension {
 
-  private final GqlUser user;
-
-  public GqlUserExtension(GqlUser user) {
-    this.user = user;
+  private UserQueryExtension() {
   }
 
+  @GraphQLField
+  @GraphQLNonNull
+  @GraphQLDescription("The current user")
+  public static GqlCurrentUser currentUser(
+      final DataFetchingEnvironment environment
+  ) {
+    return new CurrentUserDataFetcher().get(environment);
+  }
 
 
 }

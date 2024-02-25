@@ -21,10 +21,27 @@
 
 package org.opencastproject.graphql.provider;
 
+import org.opencastproject.graphql.util.AnnotationScanner;
+
 import java.util.Collection;
 
+import graphql.annotations.annotationTypes.GraphQLTypeExtension;
+
+/**
+ * This interface extends the GraphQLProvider interface and provides a method for getting extensions.
+ * The extensions are a collection of classes that are annotated with the GraphQLTypeExtension annotation.
+ */
 public interface GraphQLExtensionProvider extends GraphQLProvider {
 
-  Collection<Class<?>> getExtensions();
+  /**
+   * Provides a default implementation for getting extensions.
+   * It uses the AnnotationScanner to find and return a collection of classes that are annotated
+   * with the GraphQLTypeExtension annotation.
+   *
+   * @return A collection of classes that are annotated with the GraphQLTypeExtension annotation.
+   */
+  default Collection<Class<?>> getExtensions() {
+    return AnnotationScanner.findAnnotatedClasses(this.getClass(), GraphQLTypeExtension.class);
+  }
 
 }
