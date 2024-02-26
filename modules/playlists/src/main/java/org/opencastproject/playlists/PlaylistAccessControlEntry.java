@@ -43,13 +43,13 @@ public class PlaylistAccessControlEntry {
   @Column(name = "id")
   private long id;
 
-  @Column(name = "allow")
+  @Column(name = "allow", nullable = false)
   private boolean allow;
 
-  @Column(name = "role")
+  @Column(name = "role", nullable = false)
   private String role;
 
-  @Column(name = "action")
+  @Column(name = "action", nullable = false)
   private String action;
 
   @ManyToOne(fetch = FetchType.LAZY)
