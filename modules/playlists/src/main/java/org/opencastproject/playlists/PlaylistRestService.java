@@ -442,7 +442,7 @@ public class PlaylistRestService {
   @RestQuery(
       name = "remove",
       description = "Removes a playlist.",
-      returnDescription = "No content.",
+      returnDescription = "The removed playlist.",
       restParameters = {
           @RestParameter(
               name = "id",
