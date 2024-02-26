@@ -200,8 +200,8 @@ public class PlaylistDatabaseServiceImpl implements PlaylistDatabaseService {
           playlist.setDeletionDate(now);
           em.merge(playlist);
         }
+        logger.debug("Playlist with id {} was deleted.", playlist.getId());
       });
-      logger.debug("Playlist with id {} was deleted.", playlist.getId());
       return playlist;
     } catch (Exception e) {
       throw new PlaylistDatabaseException("Could not delete playlist with ID '" + playlist.getId() + "'", e);
