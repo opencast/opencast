@@ -62,21 +62,6 @@ public class PlaylistTest {
 
   @Test
   public void testPlaylistDeserialization() throws Exception {
-//    PlaylistEntry playlistEntry = new PlaylistEntry("1234", "type");
-//    List<PlaylistAccessControlEntry> playlistAccessControlEntries = new ArrayList<>();
-//    playlistAccessControlEntries.add(new PlaylistAccessControlEntry(true, "ROLE_USER_BOB", "read"));
-
-//    Playlist playlist = new Playlist();
-//    playlist.setOrganization("mh_default_org");
-//    playlist.addEntry(playlistEntry);
-//    playlist.setTitle("title");
-//    playlist.setDescription("description");
-//    playlist.setCreator("creator");
-//    playlist.setUpdated(new Date(1701361007521L));
-//    playlist.setAccessControlEntries(playlistAccessControlEntries);
-//
-//    JaxbPlaylist jaxbPlaylistOriginal = new JaxbPlaylist(playlist);
-
     JaxbAnnotationModule module = new JaxbAnnotationModule();
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.registerModule(module);
