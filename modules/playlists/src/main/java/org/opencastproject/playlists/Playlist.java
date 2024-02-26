@@ -45,8 +45,11 @@ import javax.persistence.TemporalType;
 
 /**
  * Entity object for storing playlists in persistence storage. Playlists contain an ordered list of entries,
- * which represent Opencast entities (event, series and the like). Playlists also contain some metadata and their own
- * access control list.
+ * which represent Opencast entities (for now they can only hold events, but in the future they may also hold series
+ * and the like). Playlists also contain some metadata and their own access control list.
+ *
+ * The playlist ACL only pertains to itself and its entries. The contents of an entry (i.e. the publication of an
+ * event) is still only governed by the contents ACL.
  */
 @Entity(name = "Playlist")
 @Table(name = "oc_playlist")

@@ -32,6 +32,8 @@ import javax.persistence.Table;
 /**
  * A playlist entry belongs to a playlist and cannot exist without it. It holds a reference to some content (usually an
  * Opencast event), as well as additional metadata.
+ *
+ * `type` denotes what kind of content the entry contians, or if it is inaccessible to the user getting the playlist
  */
 @Entity(name = "PlaylistEntry")
 @Table(name = "oc_playlist_entry")
