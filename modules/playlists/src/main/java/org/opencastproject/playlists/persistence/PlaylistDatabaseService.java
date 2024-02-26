@@ -32,7 +32,7 @@ import java.util.List;
 public interface PlaylistDatabaseService {
 
   /**
-   * Gets a single playlist by its identifier.
+   * Gets a single playlist in the current organization context by its identifier.
    * @param playlistId the playlist identifier
    * @return the {@link Playlist} with the given identifier
    * @throws NotFoundException if there is no playlist  with this identifier
