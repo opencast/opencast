@@ -68,9 +68,9 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
@@ -201,7 +201,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No playlist with that identifier exists."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
-  public JaxbPlaylist getPlaylistAsJson(
+  public Response getPlaylistAsJson(
       @FormParam("id") String id,
       @FormParam("withPublications") boolean withPublications)
           throws NotFoundException, UnauthorizedException {
@@ -214,7 +214,7 @@ public class PlaylistRestService {
       jaxbPlaylist = new JaxbPlaylist(playlist);
     }
 
-    return jaxbPlaylist;
+    return Response.ok().entity(jaxbPlaylist).build();
   }
 
   @GET
@@ -245,7 +245,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No playlist with that identifier exists."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
-  public JaxbPlaylist getPlaylistAsXml(
+  public Response getPlaylistAsXml(
       @FormParam("id") String id,
       @FormParam("withPublications") boolean withPublications)
           throws NotFoundException, UnauthorizedException {
@@ -288,17 +288,17 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_OK, description = "A playlist as JSON."),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "A request parameter was illegal."),
       })
-  public List<JaxbPlaylist> getPlaylistsAsJson(
+  public Response getPlaylistsAsJson(
       @FormParam("limit") int limit,
       @FormParam("offset") int offset,
       @FormParam("sort") String sort)
           throws NotFoundException {
     if (offset < 0) {
-      throw new WebApplicationException(Status.BAD_REQUEST);
+      return Response.status(SC_BAD_REQUEST).build();
     }
 
     if (limit < 0) {
-      throw new WebApplicationException(Status.BAD_REQUEST);
+      return Response.status(SC_BAD_REQUEST).build();
     }
 
     SortCriterion sortCriterion = new SortCriterion("", SortCriterion.Order.None);
@@ -311,7 +311,7 @@ public class PlaylistRestService {
           break;
         default:
           logger.info("Unknown sort criteria {}", sortCriterion.getFieldName());
-          throw new WebApplicationException(Status.BAD_REQUEST);
+          return Response.status(SC_BAD_REQUEST).build();
       }
     }
 
@@ -319,7 +319,8 @@ public class PlaylistRestService {
     for (Playlist playlist : service.getPlaylists(limit, offset, sortCriterion)) {
       jaxbPlaylists.add(new JaxbPlaylist(playlist));
     }
-    return jaxbPlaylists;
+
+    return Response.ok().entity(new GenericEntity<>(jaxbPlaylists) { }).build();
   }
 
   @GET
@@ -357,7 +358,7 @@ public class PlaylistRestService {
       responses = {
           @RestResponse(responseCode = SC_OK, description = "A playlist as XML."),
       })
-  public List<JaxbPlaylist> getPlaylistsAsXml(
+  public Response getPlaylistsAsXml(
       @FormParam("limit") int limit,
       @FormParam("offset") int offset,
       @FormParam("sort") String sort)
@@ -386,7 +387,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_OK, description = "Playlist updated."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
-  public JaxbPlaylist updateAsJson(@FormParam("playlist") String playlistText)
+  public Response updateAsJson(@FormParam("playlist") String playlistText)
           throws UnauthorizedException {
     try {
       // Map JSON to JPA
@@ -394,9 +395,9 @@ public class PlaylistRestService {
 
       // Persist
       playlist = service.update(playlist);
-      return new JaxbPlaylist(playlist);
+      return Response.ok().entity(new JaxbPlaylist(playlist)).build();
     } catch (Exception e) {
-      throw new WebApplicationException(e);
+      return Response.serverError().build();
     }
   }
 
@@ -421,7 +422,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_OK, description = "Playlist updated."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
-  public JaxbPlaylist updateAsXml(@FormParam("playlist") String playlistText)
+  public Response updateAsXml(@FormParam("playlist") String playlistText)
           throws UnauthorizedException {
     try {
       // Map XML to JPA
@@ -429,9 +430,9 @@ public class PlaylistRestService {
 
       // Persist
       playlist = service.update(playlist);
-      return new JaxbPlaylist(playlist);
+      return Response.ok().entity(new JaxbPlaylist(playlist)).build();
     } catch (Exception e) {
-      throw new WebApplicationException(e);
+      return Response.serverError().build();
     }
   }
 
@@ -455,13 +456,13 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No playlist with that identifier exists."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
-  public JaxbPlaylist remove(@FormParam("id") String id) throws NotFoundException, UnauthorizedException {
+  public Response remove(@FormParam("id") String id) throws NotFoundException, UnauthorizedException {
     try {
       // Persist
       Playlist playlist = service.remove(id);
-      return new JaxbPlaylist(playlist);
+      return Response.ok().entity(new JaxbPlaylist(playlist)).build();
     } catch (Exception e) {
-      throw new WebApplicationException(e);
+      return Response.serverError().build();
     }
   }
 
@@ -492,7 +493,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_OK, description = "Playlist updated."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
-  public JaxbPlaylist updateEntriesAsJson(
+  public Response updateEntriesAsJson(
       @FormParam("id") String playlistId,
       @FormParam("playlistEntries") String entriesText)
           throws UnauthorizedException {
@@ -502,9 +503,9 @@ public class PlaylistRestService {
 
       // Persist
       Playlist playlist = service.updateEntries(playlistId, playlistEntries);
-      return new JaxbPlaylist(playlist);
+      return Response.ok().entity(new JaxbPlaylist(playlist)).build();
     } catch (Exception e) {
-      throw new WebApplicationException(e);
+      return Response.serverError().build();
     }
   }
 
@@ -535,7 +536,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_OK, description = "Playlist updated."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
-  public JaxbPlaylist updateEntriesAsXml(
+  public Response updateEntriesAsXml(
       @FormParam("id") String playlistId,
       @FormParam("playlistEntries") String entriesText)
           throws UnauthorizedException {
@@ -545,9 +546,9 @@ public class PlaylistRestService {
 
       // Persist
       Playlist playlist = service.updateEntries(playlistId, playlistEntries);
-      return new JaxbPlaylist(playlist);
+      return Response.ok().entity(new JaxbPlaylist(playlist)).build();
     } catch (Exception e) {
-      throw new WebApplicationException(e);
+      return Response.serverError().build();
     }
   }
 
@@ -584,16 +585,16 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No playlist with that identifier exists."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
-  public JaxbPlaylist addEntry(
+  public Response addEntry(
       @FormParam("playlistId") String playlistId,
       @FormParam("contentId") String contentId,
       @FormParam("type") PlaylistEntryType type)
           throws NotFoundException, UnauthorizedException {
     try {
       Playlist playlist = service.addEntry(playlistId, contentId, type);
-      return new JaxbPlaylist(playlist);
+      return Response.ok().entity(new JaxbPlaylist(playlist)).build();
     } catch (Exception e) {
-      throw new WebApplicationException(e);
+      return Response.serverError().build();
     }
   }
 
@@ -623,15 +624,15 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No playlist or entry with that identifier exists."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
-  public JaxbPlaylist addEntry(
+  public Response addEntry(
       @FormParam("playlistId") String playlistId,
       @FormParam("entryId") Long entryId)
           throws NotFoundException, UnauthorizedException {
     try {
       Playlist playlist = service.removeEntry(playlistId, entryId);
-      return new JaxbPlaylist(playlist);
+      return Response.ok().entity(new JaxbPlaylist(playlist)).build();
     } catch (Exception e) {
-      throw new WebApplicationException(e);
+      return Response.serverError().build();
     }
   }
 
