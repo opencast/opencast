@@ -98,7 +98,7 @@ Organization.prototype = {
       this.properties['lti.manage.captureagent.url'] = this.properties['lti.manage.captureagent.url'] || '/admin-ng/capture-agents/agents.json?inputs=true';
       this.properties['lti.manage.captureagent.names'] = this.properties['lti.manage.captureagent.names'] || '/mrtg/dashboard/cainfo.json';
       this.properties['lti.manage.downloads'] = this.properties['lti.manage.downloads'] ? this.properties['lti.manage.downloads'] === 'true' : false;
-      this.properties['lti.manage.workflow.schedule'] = this.properties['lti.manage.workflow.schedule'] || 'uct-process-for-editing';
+      this.properties['lti.manage.workflow.schedule'] = this.properties['lti.manage.workflow.schedule'] || 'uct-process-before-edit';
       this.properties['lti.manage.workflow.upload'] = this.properties['lti.manage.workflow.upload'] || 'uct-process-upload';
       this.properties['lti.manage.scheduling.api'] = this.properties['lti.manage.scheduling.api'] || 'admin';
 
