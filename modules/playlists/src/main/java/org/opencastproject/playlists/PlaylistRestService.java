@@ -509,7 +509,7 @@ public class PlaylistRestService {
     }
   }
 
-  @POST
+  @PUT
   @Produces(MediaType.APPLICATION_XML)
   @Path("updateEntries.xml")
   @RestQuery(
