@@ -58,7 +58,7 @@ jobs:
           echo "Head SHA: $HEAD_SHA"
           echo "HEAD_SHA=$HEAD_SHA" >> "$GITHUB_ENV"
       - name: Find Comment
-        uses: peter-evans/find-comment@v2
+        uses: peter-evans/find-comment@v3
         id: find-comment
         if: env.PR_NUMBER != 'null' && env.PREVIOUS_TYPE == 'pull_request'
         with:
