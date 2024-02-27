@@ -86,8 +86,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Embed-Dependency>
               influxdb-java;inline=true,
               okhttp3;inline=true,
