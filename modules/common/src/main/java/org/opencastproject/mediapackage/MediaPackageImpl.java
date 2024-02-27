@@ -94,9 +94,6 @@ public final class MediaPackageImpl implements MediaPackage {
   /** Context for serializing and deserializing */
   static final JAXBContext context;
 
-  /** List of observers */
-  private final List<MediaPackageObserver> observers = new ArrayList<MediaPackageObserver>();
-
   /** The media package element builder, may remain <code>null</code> */
   private MediaPackageElementBuilder mediaPackageElementBuilder = null;
 
@@ -448,7 +445,6 @@ public final class MediaPackageImpl implements MediaPackage {
   public void add(Catalog catalog) {
     integrateCatalog(catalog);
     addInternal(catalog);
-    fireElementAdded(catalog);
   }
 
   /**
@@ -458,7 +454,6 @@ public final class MediaPackageImpl implements MediaPackage {
   public void add(Track track) {
     integrateTrack(track);
     addInternal(track);
-    fireElementAdded(track);
   }
 
   /**
@@ -468,7 +463,6 @@ public final class MediaPackageImpl implements MediaPackage {
   public void add(Attachment attachment) {
     integrateAttachment(attachment);
     addInternal(attachment);
-    fireElementAdded(attachment);
   }
 
   /**
@@ -872,7 +866,6 @@ public final class MediaPackageImpl implements MediaPackage {
    */
   void removeElement(MediaPackageElement element) {
     removeInternal(element);
-    fireElementRemoved(element);
     if (element instanceof AbstractMediaPackageElement) {
       ((AbstractMediaPackageElement) element).setMediaPackage(null);
     }
@@ -894,7 +887,6 @@ public final class MediaPackageImpl implements MediaPackage {
     MediaPackageElement element = mediaPackageElementBuilder.elementFromURI(url);
     integrate(element);
     addInternal(element);
-    fireElementAdded(element);
     return element;
   }
 
@@ -916,7 +908,6 @@ public final class MediaPackageImpl implements MediaPackage {
     MediaPackageElement element = mediaPackageElementBuilder.elementFromURI(uri, type, flavor);
     integrate(element);
     addInternal(element);
-    fireElementAdded(element);
     return element;
   }
 
@@ -937,7 +928,6 @@ public final class MediaPackageImpl implements MediaPackage {
       integrate(element);
     }
     addInternal(element);
-    fireElementAdded(element);
   }
 
   /**
@@ -991,42 +981,6 @@ public final class MediaPackageImpl implements MediaPackage {
         elements.add(element);
     }
     return elements.toArray(new MediaPackageElement[elements.size()]);
-  }
-
-  /**
-   * Notify observers of a removed media package element.
-   *
-   * @param element
-   *          the removed element
-   */
-  private void fireElementAdded(MediaPackageElement element) {
-    synchronized (observers) {
-      for (MediaPackageObserver o : observers) {
-        try {
-          o.elementAdded(element);
-        } catch (Throwable th) {
-          logger.error("MediaPackageOberserver " + o + " throw exception while processing callback", th);
-        }
-      }
-    }
-  }
-
-  /**
-   * Notify observers of a removed media package element.
-   *
-   * @param element
-   *          the removed element
-   */
-  private void fireElementRemoved(MediaPackageElement element) {
-    synchronized (observers) {
-      for (MediaPackageObserver o : observers) {
-        try {
-          o.elementRemoved(element);
-        } catch (Throwable th) {
-          logger.error("MediaPackageObserver " + o + " threw exception while processing callback", th);
-        }
-      }
-    }
   }
 
   /**
