@@ -1718,6 +1718,7 @@ public class SchedulerServiceImplTest {
     am.setIndex(esIndex);
     am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
     am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
+    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
     return am;
   }
 

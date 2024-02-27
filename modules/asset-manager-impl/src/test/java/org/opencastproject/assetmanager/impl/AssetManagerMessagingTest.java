@@ -44,15 +44,18 @@ import java.io.Serializable;
 public class AssetManagerMessagingTest extends AssetManagerTestBase {
   private AssetManagerUpdateHandler handler1;
   private AssetManagerUpdateHandler handler2;
+  private AssetManagerUpdateHandler handler3;
 
   @Override
   public AssetManagerImpl makeAssetManager() throws Exception {
     handler1 = EasyMock.createMock(AssetManagerUpdateHandler.class);
     handler2 = EasyMock.createMock(AssetManagerUpdateHandler.class);
+    handler3 = EasyMock.createMock(AssetManagerUpdateHandler.class);
 
     AssetManagerImpl am = super.makeAssetManagerWithoutHandlers();
     am.addEventHandler(handler1);
     am.addEventHandler(handler2);
+    am.addEventHandler(handler3);
     return am;
   }
 

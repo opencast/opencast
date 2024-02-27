@@ -38,6 +38,8 @@ import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.distribution.api.DownloadDistributionService;
+import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
@@ -92,6 +94,7 @@ import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
+import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AclScope;
@@ -224,6 +227,9 @@ public class IndexServiceImpl implements IndexService {
   private WorkflowService workflowService;
   private Workspace workspace;
   private ElasticsearchIndex elasticsearchIndex;
+  private DownloadDistributionService downloadDistributionService = null;
+  private StreamingDistributionService streamingDistributionService = null;
+  private SearchService searchService = null;
 
   /** The single thread executor service */
   private ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -428,6 +434,21 @@ public class IndexServiceImpl implements IndexService {
   @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
+  }
+
+  @Reference(target = "(distribution.channel=streaming)")
+  protected void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
+    this.streamingDistributionService = streamingDistributionService;
+  }
+
+  @Reference(target = "(distribution.channel=download)")
+  protected void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
+    this.downloadDistributionService = downloadDistributionService;
+  }
+
+  @Reference
+  protected void setSearchService(SearchService searchService) {
+    this.searchService = searchService;
   }
 
   /**
