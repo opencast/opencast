@@ -43,11 +43,13 @@ __Example__
     "description": "This is a playlist about Opencast",
     "creator": "Opencast",
     "updated": 1701854481056,
-    "accessControlEntries": {
-      "allow": true,
-      "role": "ROLE_USER_BOB",
-      "action": "read"
-    }
+    "accessControlEntries": [
+      {
+        "allow": true,
+        "role": "ROLE_USER_BOB",
+        "action": "read"
+      }
+    ]
   }
 }
 ```
@@ -92,11 +94,13 @@ __Example__
         "description": "This is a playlist about Opencast",
         "creator": "Opencast",
         "updated": 1701854481056,
-        "accessControlEntries": {
-          "allow": true,
-          "role": "ROLE_USER_BOB",
-          "action": "read"
-        }
+        "accessControlEntries": [
+          {
+            "allow": true,
+            "role": "ROLE_USER_BOB",
+            "action": "read"
+          }
+        ]
       }
     },
     {
@@ -119,11 +123,13 @@ __Example__
         "description": "This is a playlist about Opencast",
         "creator": "Opencast",
         "updated": 1701856455007,
-        "accessControlEntries": {
-          "allow": true,
-          "role": "ROLE_USER_BOB",
-          "action": "read"
-        }
+        "accessControlEntries": [
+          {
+            "allow": true,
+            "role": "ROLE_USER_BOB",
+            "action": "read"
+          }
+        ]
       }
     }
   ]
@@ -168,11 +174,13 @@ __Example__
     "description": "This is a playlist about Opencast",
     "creator": "Opencast",
     "updated": 1701854481056,
-    "accessControlEntries": {
-      "allow": true,
-      "role": "ROLE_USER_BOB",
-      "action": "read"
-    }
+    "accessControlEntries": [
+      {
+        "allow": true,
+        "role": "ROLE_USER_BOB",
+        "action": "read"
+      }
+    ]
   }
 }
 ```
