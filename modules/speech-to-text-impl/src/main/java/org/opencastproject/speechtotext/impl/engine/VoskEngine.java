@@ -106,7 +106,7 @@ public class VoskEngine implements SpeechToTextEngine {
       language = voskLanguage;
     }
 
-    var output = new File(workingDirectory, FilenameUtils.getBaseName(mediaFile.getAbsolutePath()));
+    var output = new File(workingDirectory, FilenameUtils.getBaseName(mediaFile.getAbsolutePath()) + ".vtt");
     final List<String> command = Arrays.asList(
             voskExecutable,
             "-i", mediaFile.getAbsolutePath(),
