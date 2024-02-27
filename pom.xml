@@ -42,6 +42,7 @@
     <jettison.version>1.5.4</jettison.version>
     <joda-time.version>2.12.5</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
+    <junit5.version>5.10.0</junit5.version>
     <karaf.version>4.4.4</karaf.version>
     <node.version>v16.13.0</node.version>
     <osgi.core.version>8.0.0</osgi.core.version>
@@ -1302,6 +1303,18 @@
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>4.13.2</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>${junit5.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-api</artifactId>
+        <version>${junit5.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
