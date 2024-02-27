@@ -95,39 +95,31 @@ public class PlaylistsEndpointTest {
   @Test
   public void testGetPlaylist() throws Exception {
     String response = given()
-        .queryParam("id", PLAYLIST_ID)
+        .pathParam("id", PLAYLIST_ID)
         .expect()
         .statusCode(SC_OK).when()
-        .get(env.host("/playlist.json"))
+        .get(env.host("/{id}"))
         .asString();
 
     assertPlaylist((JSONObject) parser.parse(response));
   }
 
   @Test
-  public void testGetPlaylistWithoutId() throws Exception {
-    given()
-        .expect()
-        .statusCode(SC_BAD_REQUEST).when()
-        .get(env.host("/playlist.json"));
-  }
-
-  @Test
   public void testGetPlaylistThatDoesNotExist() throws Exception {
     given()
-        .queryParam("id", MISSING_PLAYLIST_ID)
+        .pathParam("id", MISSING_PLAYLIST_ID)
         .expect()
         .statusCode(SC_NOT_FOUND).when()
-        .get(env.host("/playlist.json"));
+        .get(env.host("/{id}"));
   }
 
   @Test
   public void testGetPlaylistUnauthorized() throws Exception {
     given()
-        .queryParam("id", UNAUTHORIZED_PLAYLIST_ID)
+        .pathParam("id", UNAUTHORIZED_PLAYLIST_ID)
         .expect()
         .statusCode(SC_FORBIDDEN).when()
-        .get(env.host("/playlist.json"));
+        .get(env.host("/{id}"));
   }
 
   @Test
@@ -139,7 +131,7 @@ public class PlaylistsEndpointTest {
         .queryParam("sortByUpdatedAscending", false)
         .expect()
         .statusCode(SC_OK).when()
-        .get(env.host("/playlists.json"))
+        .get(env.host("/"))
         .asString();
 
     JSONArray playlists = (JSONArray) parser.parse(response);
@@ -152,7 +144,7 @@ public class PlaylistsEndpointTest {
         .formParam("playlist", new Playlist())
         .expect()
         .statusCode(SC_OK).when()
-        .put(env.host("/update.json"))
+        .post(env.host("/"))
         .asString();
 
     assertPlaylist((JSONObject) parser.parse(response));
@@ -164,44 +156,44 @@ public class PlaylistsEndpointTest {
         .formParam("playlist", INVALID_PLAYLIST_JSON)
         .expect()
         .statusCode(SC_BAD_REQUEST).when()
-        .put(env.host("/update.json"));
+        .post(env.host("/"));
   }
 
   @Test
   public void testRemovePlaylist() throws Exception {
     given()
-        .formParam("id", PLAYLIST_ID)
+        .pathParam("id", PLAYLIST_ID)
         .expect()
         .statusCode(SC_OK).when()
-        .delete(env.host("/remove"));
+        .delete(env.host("/{id}"));
   }
 
   @Test
   public void testRemoveMissingPlaylist() throws Exception {
     given()
-        .formParam("id", MISSING_PLAYLIST_ID)
+        .pathParam("id", MISSING_PLAYLIST_ID)
         .expect()
         .statusCode(SC_NOT_FOUND).when()
-        .delete(env.host("/remove"));
+        .delete(env.host("/{id}"));
   }
 
   @Test
   public void testRemovePlaylistUnauthorized() throws Exception {
     given()
-        .formParam("id", UNAUTHORIZED_PLAYLIST_ID)
+        .pathParam("id", UNAUTHORIZED_PLAYLIST_ID)
         .expect()
         .statusCode(SC_FORBIDDEN).when()
-        .delete(env.host("/remove"));
+        .delete(env.host("/{id}"));
   }
 
   @Test
   public void testUpdateEntriesPlaylist() throws Exception {
     String response = given()
-        .formParam("id", PLAYLIST_ID)
+        .pathParam("id", PLAYLIST_ID)
         .formParam("playlistEntries", new ArrayList<PlaylistEntry>())
         .expect()
         .statusCode(SC_OK).when()
-        .post(env.host("/updateEntries.json"))
+        .post(env.host("/{id}/entries"))
         .asString();
   }
 }
