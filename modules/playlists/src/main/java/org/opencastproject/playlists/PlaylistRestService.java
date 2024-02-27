@@ -67,6 +67,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
@@ -185,13 +186,15 @@ public class PlaylistRestService {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  @Path("playlist.json")
+  @Path("{id}.json")
   @RestQuery(
       name = "playlist",
       description = "Get a playlist.",
       returnDescription = "A playlist as JSON",
-      restParameters = {
+      pathParameters = {
           @RestParameter(name = "id", isRequired = true, description = "The playlist identifier", type = STRING),
+      },
+      restParameters = {
           @RestParameter(name = "withPublications", isRequired = false, description = "If available publications for"
               + "the content should be returned. Only works for content of type EVENT.", type = BOOLEAN,
               defaultValue = "true")
@@ -202,7 +205,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
   public Response getPlaylistAsJson(
-      @FormParam("id") String id,
+      @PathParam("id") String id,
       @FormParam("withPublications") boolean withPublications)
           throws NotFoundException, UnauthorizedException {
     Playlist playlist = service.getPlaylistById(id);
@@ -219,18 +222,15 @@ public class PlaylistRestService {
 
   @GET
   @Produces(MediaType.APPLICATION_XML)
-  @Path("playlist.xml")
+  @Path("{id}.xml")
   @RestQuery(
       name = "playlist",
       description = "Get a playlist.",
       returnDescription = "A playlist as XML",
+      pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "The playlist identifier", type = STRING),
+      },
       restParameters = {
-          @RestParameter(
-              name = "id",
-              isRequired = true,
-              description = "The playlist identifier",
-              type = STRING
-          ),
           @RestParameter(
               name = "withPublications",
               isRequired = false,
@@ -246,7 +246,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
   public Response getPlaylistAsXml(
-      @FormParam("id") String id,
+      @PathParam("id") String id,
       @FormParam("withPublications") boolean withPublications)
           throws NotFoundException, UnauthorizedException {
     return getPlaylistAsJson(id, withPublications);
@@ -366,13 +366,13 @@ public class PlaylistRestService {
     return getPlaylistsAsJson(limit, offset, sort);
   }
 
-  @PUT
+  @POST
   @Produces(MediaType.APPLICATION_JSON)
-  @Path("update.json")
+  @Path("new.json")
   @RestQuery(
-      name = "update",
-      description = "Updates a playlist or creates a new one.",
-      returnDescription = "The updated playlist.",
+      name = "create",
+      description = "Creates a playlist.",
+      returnDescription = "The created playlist.",
       restParameters = {
           @RestParameter(
               name = "playlist",
@@ -387,7 +387,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_OK, description = "Playlist updated."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
-  public Response updateAsJson(@FormParam("playlist") String playlistText)
+  public Response createAsJson(@FormParam("playlist") String playlistText)
           throws UnauthorizedException {
     try {
       // Map JSON to JPA
@@ -401,13 +401,13 @@ public class PlaylistRestService {
     }
   }
 
-  @PUT
+  @POST
   @Produces(MediaType.APPLICATION_XML)
-  @Path("update.xml")
+  @Path("new.xml")
   @RestQuery(
-      name = "update",
-      description = "Updates a playlist or creates a new one.",
-      returnDescription = "The updated playlist.",
+      name = "create",
+      description = "Creates a playlist.",
+      returnDescription = "The created playlist.",
       restParameters = {
           @RestParameter(
               name = "playlist",
@@ -422,7 +422,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_OK, description = "Playlist updated."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
-  public Response updateAsXml(@FormParam("playlist") String playlistText)
+  public Response createAsXml(@FormParam("playlist") String playlistText)
           throws UnauthorizedException {
     try {
       // Map XML to JPA
@@ -436,14 +436,98 @@ public class PlaylistRestService {
     }
   }
 
+  @PUT
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("{id}.json")
+  @RestQuery(
+      name = "update",
+      description = "Updates a playlist.",
+      returnDescription = "The updated playlist.",
+      pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING)
+      },
+      restParameters = {
+          @RestParameter(
+              name = "playlist",
+              isRequired = false,
+              description = "Playlist in JSON format",
+              type = TEXT,
+              jaxbClass = JaxbPlaylist.class,
+              defaultValue = SAMPLE_PLAYLIST_JSON
+          )
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "Playlist updated."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
+      })
+  public Response updateAsJson(
+      @PathParam("id") String id,
+      @FormParam("playlist") String playlistText
+  )
+          throws UnauthorizedException {
+    try {
+      // Map JSON to JPA
+      Playlist playlist = parseJsonToPlaylist(playlistText);
+      playlist.setId(id);
+
+      // Persist
+      playlist = service.update(playlist);
+      return Response.ok().entity(new JaxbPlaylist(playlist)).build();
+    } catch (Exception e) {
+      return Response.serverError().build();
+    }
+  }
+
+  @PUT
+  @Produces(MediaType.APPLICATION_XML)
+  @Path("{id}.xml")
+  @RestQuery(
+      name = "update",
+      description = "Updates a playlist.",
+      returnDescription = "The updated playlist.",
+      pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING)
+      },
+      restParameters = {
+          @RestParameter(
+              name = "playlist",
+              isRequired = false,
+              description = "Playlist in XML format",
+              type = TEXT,
+              jaxbClass = JaxbPlaylist.class,
+              defaultValue = SAMPLE_PLAYLIST_XML
+          )
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "Playlist updated."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
+      })
+  public Response updateAsXml(
+      @PathParam("id") String id,
+      @FormParam("playlist") String playlistText
+  )
+          throws UnauthorizedException {
+    try {
+      // Map XML to JPA
+      Playlist playlist = parseXmlToPlaylist(playlistText);
+      playlist.setId(id);
+
+      // Persist
+      playlist = service.update(playlist);
+      return Response.ok().entity(new JaxbPlaylist(playlist)).build();
+    } catch (Exception e) {
+      return Response.serverError().build();
+    }
+  }
+
   @DELETE
   @Produces(MediaType.APPLICATION_JSON)
-  @Path("remove")
+  @Path("{id}")
   @RestQuery(
       name = "remove",
       description = "Removes a playlist.",
       returnDescription = "The removed playlist.",
-      restParameters = {
+      pathParameters = {
           @RestParameter(
               name = "id",
               isRequired = true,
@@ -456,7 +540,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No playlist with that identifier exists."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
-  public Response remove(@FormParam("id") String id) throws NotFoundException, UnauthorizedException {
+  public Response remove(@PathParam("id") String id) throws NotFoundException, UnauthorizedException {
     try {
       // Persist
       Playlist playlist = service.remove(id);
@@ -468,18 +552,15 @@ public class PlaylistRestService {
 
   @POST
   @Produces(MediaType.APPLICATION_JSON)
-  @Path("updateEntries.json")
+  @Path("{id}/entries.json")
   @RestQuery(
       name = "updateEntries",
       description = "Updates the entries of a playlist",
       returnDescription = "The updated playlist.",
+      pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING),
+      },
       restParameters = {
-          @RestParameter(
-              name = "id",
-              isRequired = true,
-              description = "Playlist identifier",
-              type = STRING
-          ),
           @RestParameter(
               name = "playlistEntries",
               isRequired = false,
@@ -494,7 +575,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
   public Response updateEntriesAsJson(
-      @FormParam("id") String playlistId,
+      @PathParam("id") String playlistId,
       @FormParam("playlistEntries") String entriesText)
           throws UnauthorizedException {
     try {
@@ -509,20 +590,17 @@ public class PlaylistRestService {
     }
   }
 
-  @PUT
+  @POST
   @Produces(MediaType.APPLICATION_XML)
-  @Path("updateEntries.xml")
+  @Path("{id}/entries.xml")
   @RestQuery(
       name = "updateEntries",
       description = "Updates the entries of a playlist",
       returnDescription = "The updated playlist.",
+      pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING),
+      },
       restParameters = {
-          @RestParameter(
-              name = "id",
-              isRequired = true,
-              description = "Playlist identifier",
-              type = STRING
-          ),
           @RestParameter(
               name = "playlistEntries",
               isRequired = false,
@@ -537,7 +615,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
   public Response updateEntriesAsXml(
-      @FormParam("id") String playlistId,
+      @PathParam("id") String playlistId,
       @FormParam("playlistEntries") String entriesText)
           throws UnauthorizedException {
     try {
@@ -554,18 +632,15 @@ public class PlaylistRestService {
 
   @POST
   @Produces(MediaType.APPLICATION_JSON)
-  @Path("addEntry")
+  @Path("{id}/entries/new")
   @RestQuery(
       name = "addEntry",
       description = "Add entry to playlist.",
       returnDescription = "The playlist with the new entry.",
+      pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING),
+      },
       restParameters = {
-          @RestParameter(
-              name = "playlistId",
-              isRequired = true,
-              description = "Identifier of the playlist to add to",
-              type = STRING
-          ),
           @RestParameter(
               name = "contentId",
               isRequired = false,
@@ -586,7 +661,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
   public Response addEntry(
-      @FormParam("playlistId") String playlistId,
+      @PathParam("playlistId") String playlistId,
       @FormParam("contentId") String contentId,
       @FormParam("type") PlaylistEntryType type)
           throws NotFoundException, UnauthorizedException {
@@ -600,14 +675,14 @@ public class PlaylistRestService {
 
   @POST
   @Produces(MediaType.APPLICATION_JSON)
-  @Path("removeEntry")
+  @Path("{id}/entries/{entryId}")
   @RestQuery(
       name = "removeEntry",
       description = "Remove entry from playlist.",
       returnDescription = "Playlist without the entry.",
-      restParameters = {
+      pathParameters = {
           @RestParameter(
-              name = "playlistId",
+              name = "id",
               isRequired = true,
               type = STRING,
               description = "Identifier of the playlist to delete from"
@@ -625,8 +700,8 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
   public Response addEntry(
-      @FormParam("playlistId") String playlistId,
-      @FormParam("entryId") Long entryId)
+      @PathParam("id") String playlistId,
+      @PathParam("entryId") Long entryId)
           throws NotFoundException, UnauthorizedException {
     try {
       Playlist playlist = service.removeEntry(playlistId, entryId);

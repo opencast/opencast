@@ -79,6 +79,7 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
@@ -128,13 +129,13 @@ public class PlaylistsEndpoint {
   }
 
   @GET
-  @Path("playlist.json")
+  @Path("{id}")
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
   @RestQuery(
       name = "playlist",
       description = "Get a playlist.",
       returnDescription = "A playlist as JSON",
-      restParameters = {
+      pathParameters = {
           @RestParameter(name = "id", isRequired = true, description = "The playlist identifier", type = STRING),
       },
       responses = {
@@ -145,7 +146,7 @@ public class PlaylistsEndpoint {
       })
   public Response getPlaylistAsJson(
       @HeaderParam("Accept") String acceptHeader,
-      @QueryParam("id") String id) {
+      @PathParam("id") String id) {
     try {
       Playlist playlist = service.getPlaylistById(id);
 
@@ -161,7 +162,7 @@ public class PlaylistsEndpoint {
 
   @GET
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
-  @Path("playlists.json")
+  @Path("")
   @RestQuery(
       name = "playlists",
       description = "Get playlists. Playlists that you do not have read access to will not show up.",
@@ -216,13 +217,13 @@ public class PlaylistsEndpoint {
     return ApiResponses.Json.ok(acceptHeader, arr(playlistsJson));
   }
 
-  @PUT
+  @POST
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
-  @Path("update.json")
+  @Path("")
   @RestQuery(
-      name = "update",
-      description = "Updates a playlist or creates a new one.",
-      returnDescription = "The updated playlist.",
+      name = "create",
+      description = "Creates a playlist.",
+      returnDescription = "The created playlist.",
       restParameters = {
           @RestParameter(name = "playlist", isRequired = false, description = "Playlist in JSON format", type = TEXT,
               jaxbClass = JaxbPlaylist.class, defaultValue = SAMPLE_PLAYLIST_JSON)
@@ -232,7 +233,7 @@ public class PlaylistsEndpoint {
           @RestResponse(description = "The user doesn't have the rights to make this request.", responseCode = HttpServletResponse.SC_FORBIDDEN),
           @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
       })
-  public Response updateAsJson(
+  public Response createAsJson(
       @HeaderParam("Accept") String acceptHeader,
       @FormParam("playlist") String playlistText) {
     try {
@@ -249,14 +250,52 @@ public class PlaylistsEndpoint {
     }
   }
 
+  @PUT
+  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
+  @Path("{id}")
+  @RestQuery(
+      name = "update",
+      description = "Updates a playlist.",
+      returnDescription = "The updated playlist.",
+      pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "playlist", isRequired = false, description = "Playlist in JSON format", type = TEXT,
+              jaxbClass = JaxbPlaylist.class, defaultValue = SAMPLE_PLAYLIST_JSON)
+      },
+      responses = {
+          @RestResponse(description = "Playlist updated.", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "The user doesn't have the rights to make this request.", responseCode = HttpServletResponse.SC_FORBIDDEN),
+          @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+      })
+  public Response updateAsJson(
+      @HeaderParam("Accept") String acceptHeader,
+      @PathParam("id") String id,
+      @FormParam("playlist") String playlistText) {
+    try {
+      // Map JSON to JPA
+      Playlist playlist = restService.parseJsonToPlaylist(playlistText);
+      playlist.setId(id);
+
+      // Persist
+      playlist = service.update(playlist);
+      return ApiResponses.Json.ok(acceptHeader, playlistToJson(playlist));
+    } catch (UnauthorizedException e) {
+      return Response.status(Response.Status.FORBIDDEN).build();
+    } catch (ParseException | IOException e) {
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+  }
+
   @DELETE
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
-  @Path("remove")
+  @Path("{id}")
   @RestQuery(
       name = "remove",
       description = "Removes a playlist.",
       returnDescription = "The removed playlist.",
-      restParameters = {
+      pathParameters = {
           @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING)
       },
       responses = {
@@ -266,7 +305,7 @@ public class PlaylistsEndpoint {
       })
   public Response remove(
       @HeaderParam("Accept") String acceptHeader,
-      @FormParam("id") String id) {
+      @PathParam("id") String id) {
     try {
       Playlist playlist = service.remove(id);
 
@@ -280,13 +319,15 @@ public class PlaylistsEndpoint {
 
   @POST
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
-  @Path("updateEntries.json")
+  @Path("{id}/entries")
   @RestQuery(
       name = "updateEntries",
       description = "Updates the entries of a playlist",
       returnDescription = "The updated playlist.",
-      restParameters = {
+      pathParameters = {
           @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING),
+      },
+      restParameters = {
           @RestParameter(name = "playlistEntries", isRequired = false, description = "Playlist entries in JSON format",
               type = TEXT, jaxbClass = JaxbPlaylistEntry[].class, defaultValue = SAMPLE_PLAYLIST_ENTRIES_JSON)
       },
@@ -298,7 +339,7 @@ public class PlaylistsEndpoint {
       })
   public Response updateEntriesAsJson(
       @HeaderParam("Accept") String acceptHeader,
-      @FormParam("id") String playlistId,
+      @PathParam("id") String playlistId,
       @FormParam("playlistEntries") String entriesText) {
     try {
       // Map JSON to JPA

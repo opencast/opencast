@@ -4,7 +4,7 @@
 
 The Playlists API is available since API version 1.11.0.
 
-### GET /api/playlists/playlist.json
+### GET /api/playlists/{id}
 
 Returns a playlist.
 
@@ -14,11 +14,6 @@ __Response__
 `400 (BAD REQUEST)`: The request is invalid or inconsistent.  
 `403 (FORBIDDEN)`: The user doesn't have the rights to make this request.  
 `404 (NOT FOUND)`: The specified playlist does not exist.
-
-| Field              | Type                          | Description                                               |
-|--------------------|-------------------------------|-----------------------------------------------------------|
-| `id`               | [`String`](types.md#basic)    | The playlist identifier                                   |
-
 
 __Example__
 
@@ -54,7 +49,7 @@ __Example__
 }
 ```
 
-### GET /api/playlists/playlists.json
+### GET /api/playlists/
 
 Get playlists. Playlists that you do not have read access to will not show up.
 
@@ -136,7 +131,7 @@ __Example__
 }
 ```
 
-### PUT /api/playlists/update.json
+### POST /api/playlists/
 
 Updates a playlist or creates a new one.
 
@@ -144,7 +139,7 @@ __Response__
 
 `200 (OK)`: The updated playlist.
 `400 (BAD REQUEST)`: The request is invalid or inconsistent.  
-`403 (FORBIDDEN)`: The user doesn't have the rights to make this request.  
+`403 (FORBIDDEN)`: The user doesn't have the rights to make this request.
 
 | Field       | Type                            | Description             |
 |-------------|---------------------------------|-------------------------|
@@ -156,7 +151,6 @@ __Example__
 ```json
 {
   "playlist": {
-    "id": 551,
     "organization": "mh_default_org",
     "entries": [
       {
@@ -185,7 +179,56 @@ __Example__
 }
 ```
 
-### DELETE /api/playlists/remove
+
+### PUT /api/playlists/{id}
+
+Updates a playlist or creates a new one.
+
+__Response__
+
+`200 (OK)`: The updated playlist.
+`400 (BAD REQUEST)`: The request is invalid or inconsistent.  
+`403 (FORBIDDEN)`: The user doesn't have the rights to make this request.  
+
+| Field       | Type                            | Description             |
+|-------------|---------------------------------|-------------------------|
+| `playlist`  | [`Playlist`](types.md#Playlist) | Playlist in JSON format |
+
+
+__Example__
+
+```json
+{
+  "playlist": {
+    "organization": "mh_default_org",
+    "entries": [
+      {
+        "id": 553,
+        "contentId": "ID-about-opencast",
+        "type": "EVENT"
+      },
+      {
+        "id": 554,
+        "contentId": "ID-3d-print",
+        "type": "EVENT"
+      }
+    ],
+    "title": "Opencast Playlist",
+    "description": "This is a playlist about Opencast",
+    "creator": "Opencast",
+    "updated": 1701854481056,
+    "accessControlEntries": [
+      {
+        "allow": true,
+        "role": "ROLE_USER_BOB",
+        "action": "read"
+      }
+    ]
+  }
+}
+```
+
+### DELETE /api/playlists/{id}
 
 Removes a playlist.
 
@@ -195,12 +238,8 @@ __Response__
 `403 (FORBIDDEN)`: The user doesn't have the rights to make this request.  
 `404 (NOT FOUND)`: The specified playlist does not exist.
 
-| Field | Type                         | Description             |
-|-------|------------------------------|-------------------------|
-| `id`  | [`String`](types.md#basic)   | The playlist identifier |
 
-
-### POST /api/playlists/updateEntries.json
+### POST /api/playlists/{id}/entries
 
 Updates the entries of a playlist.
 
@@ -213,7 +252,6 @@ __Response__
 
 | Field             | Type                                            | Description             |
 |-------------------|-------------------------------------------------|-------------------------|
-| `id`              | [`String`](types.md#basic)                      | The playlist identifier |
 | `playlistEntries` | [`List<PlaylistEntry>`](types.md#PlaylistEntry) | Playlist in JSON format |
 
 
