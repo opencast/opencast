@@ -21,13 +21,11 @@
 
 package org.opencastproject.graphql.event;
 
-import org.opencastproject.graphql.command.CreateOrUpdateEventCommand;
 import org.opencastproject.graphql.command.DeleteEventCommand;
-import org.opencastproject.graphql.defaultvalue.DefaultTrue;
+import org.opencastproject.graphql.command.UpdateEventCommand;
 import org.opencastproject.graphql.type.input.GqlCommonEventMetadataInput;
 import org.opencastproject.graphql.type.input.Mutation;
 
-import graphql.annotations.annotationTypes.GraphQLDefaultValue;
 import graphql.annotations.annotationTypes.GraphQLDescription;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
@@ -47,9 +45,8 @@ public final class EventMutationExtension {
   public static Boolean updateEvent(
       @GraphQLName("id") @GraphQLNonNull String id,
       @GraphQLName("metadata") @GraphQLNonNull GqlCommonEventMetadataInput eventMetadataInput,
-      @GraphQLName("publishChanges") @GraphQLDefaultValue(DefaultTrue.class) Boolean publishChanges,
       final DataFetchingEnvironment environment) {
-    CreateOrUpdateEventCommand
+    UpdateEventCommand
         .create(id, eventMetadataInput)
         .environment(environment)
         .build()

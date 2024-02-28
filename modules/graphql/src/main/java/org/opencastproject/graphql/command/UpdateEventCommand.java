@@ -42,11 +42,11 @@ import org.opencastproject.util.NotFoundException;
 
 import java.util.Map;
 
-public class CreateOrUpdateEventCommand extends AbstractCommand<GqlEvent> {
+public class UpdateEventCommand extends AbstractCommand<GqlEvent> {
 
   private final String eventId;
 
-  public CreateOrUpdateEventCommand(final Builder builder) {
+  public UpdateEventCommand(final Builder builder) {
     super(builder);
     this.eventId = builder.eventId;
   }
@@ -123,9 +123,9 @@ public class CreateOrUpdateEventCommand extends AbstractCommand<GqlEvent> {
     }
 
     @Override
-    public CreateOrUpdateEventCommand build() {
+    public UpdateEventCommand build() {
       validate();
-      return new CreateOrUpdateEventCommand(this);
+      return new UpdateEventCommand(this);
     }
   }
 

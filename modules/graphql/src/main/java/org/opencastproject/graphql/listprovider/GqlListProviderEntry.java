@@ -19,13 +19,39 @@
  *
  */
 
-package org.opencastproject.graphql.defaultvalue;
+package org.opencastproject.graphql.listprovider;
 
-import java.util.function.Supplier;
+import java.util.Map;
 
-public class DefaultFalse implements Supplier<Object> {
-  @Override
-  public Boolean get() {
-    return false;
+import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLName;
+
+@GraphQLName(GqlListProviderEntry.TYPE_NAME)
+public class GqlListProviderEntry {
+
+  public static final String TYPE_NAME = "GqlListProviderEntry";
+
+  private final String key;
+  private final String value;
+
+  public GqlListProviderEntry(Map.Entry<String, String> entry) {
+    this.key = entry.getKey();
+    this.value = entry.getValue();
   }
+
+  public GqlListProviderEntry(String key, String value) {
+    this.key = key;
+    this.value = value;
+  }
+
+  @GraphQLField
+  public String key() {
+    return key;
+  }
+
+  @GraphQLField
+  public String value() {
+    return value;
+  }
+
 }

@@ -58,7 +58,6 @@ public class CreateOrUpdateSeriesCommand extends AbstractCommand<GqlSeries> {
     final IndexService indexService = context.getService(IndexService.class);
 
     final Map<String, Object> seriesMetadata = environment.getArgument("metadata");
-
     try {
       indexService.updateAllSeriesMetadata(this.seriesId,
           createMetadataList(seriesMetadata, indexService), index);
