@@ -19,36 +19,33 @@
  *
  */
 
-package org.opencastproject.graphql.series;
+package org.opencastproject.graphql.event;
 
-import org.opencastproject.graphql.command.CreateOrUpdateSeriesCommand;
-import org.opencastproject.graphql.type.input.GqlCommonSeriesMetadataInput;
-import org.opencastproject.graphql.type.input.Mutation;
 
 import graphql.annotations.annotationTypes.GraphQLDescription;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
-import graphql.annotations.annotationTypes.GraphQLNonNull;
-import graphql.annotations.annotationTypes.GraphQLTypeExtension;
-import graphql.schema.DataFetchingEnvironment;
 
-@GraphQLTypeExtension(Mutation.class)
-public final class SeriesMutationExtension {
+@GraphQLName(GqlDeleteEventPayload.TYPE_NAME)
+@GraphQLDescription("DeleteEventPayload")
+public class GqlDeleteEventPayload {
+  public static final String TYPE_NAME = "GqlDeleteEventPayload";
 
-  private SeriesMutationExtension() {
+  public GqlDeleteEventPayload() {
+
+  }
+
+  public GqlDeleteEventPayload(@GraphQLName("id") String id) {
+    this.id = id;
   }
 
   @GraphQLField
-  @GraphQLNonNull
-  @GraphQLDescription("Update series metadata")
-  public static Boolean updateSeries(
-      @GraphQLName("id") @GraphQLNonNull String id,
-      @GraphQLName("metadata") @GraphQLNonNull GqlCommonSeriesMetadataInput seriesMetadataInput,
-      final DataFetchingEnvironment environment) {
-    CreateOrUpdateSeriesCommand.create(id, seriesMetadataInput)
-        .environment(environment)
-        .build()
-        .execute();
-    return true;
+  @GraphQLDescription("A unique identifier for the client performing the mutation.")
+  private String id;
+
+  public String getId() {
+    return id;
   }
+
+
 }

@@ -21,6 +21,7 @@
 
 package org.opencastproject.graphql;
 
+import org.opencastproject.graphql.provider.GraphQLAdditionalTypeProvider;
 import org.opencastproject.graphql.provider.GraphQLDynamicTypeProvider;
 import org.opencastproject.graphql.provider.GraphQLExtensionProvider;
 import org.opencastproject.graphql.type.input.DublinCoreMetadataInput;
@@ -61,7 +62,8 @@ import graphql.schema.GraphQLOutputType;
 
 @Component
 @ServiceDescription("Opencast GraphQL Provider")
-public class OpencastGraphQLProvider implements GraphQLExtensionProvider, GraphQLDynamicTypeProvider {
+public class OpencastGraphQLProvider implements GraphQLExtensionProvider, GraphQLDynamicTypeProvider,
+    GraphQLAdditionalTypeProvider {
 
   private final IndexService indexService;
 

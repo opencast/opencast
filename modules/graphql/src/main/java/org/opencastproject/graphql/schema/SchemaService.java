@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
@@ -131,7 +132,14 @@ public class SchemaService implements OrganizationDirectoryListener {
   }
 
   private void triggerSchemaUpdate() {
-    organizationDirectoryService.getOrganizations().forEach(this::triggerSchemaUpdate);
+    try {
+      organizationDirectoryService.getOrganizations().forEach(this::triggerSchemaUpdate);
+    } catch (RejectedExecutionException e) {
+      logger.debug("Scheduler [shutdown: {}, terminated: {}] does not except jobs, skipping schema update trigger.",
+          schemaUpdateExecutor.isShutdown(),
+          schemaUpdateExecutor.isTerminated()
+      );
+    }
   }
 
   private void triggerSchemaUpdate(Organization organization) {

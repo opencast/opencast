@@ -61,6 +61,11 @@ public class GraphQLRuntimeException extends RuntimeException implements GraphQL
     this.extensions = extensions;
   }
 
+  public GraphQLRuntimeException(Throwable cause) {
+    super(cause);
+    this.errorType = OpencastErrorType.InternalError;
+  }
+
   public GraphQLRuntimeException(OpencastErrorType errorType, Throwable cause) {
     super(cause);
     this.errorType = errorType;

@@ -19,12 +19,15 @@
  *
  */
 
-package org.opencastproject.graphql.series;
+package org.opencastproject.graphql.event;
 
-import org.opencastproject.graphql.command.CreateOrUpdateSeriesCommand;
-import org.opencastproject.graphql.type.input.GqlCommonSeriesMetadataInput;
+import org.opencastproject.graphql.command.CreateOrUpdateEventCommand;
+import org.opencastproject.graphql.command.DeleteEventCommand;
+import org.opencastproject.graphql.defaultvalue.DefaultTrue;
+import org.opencastproject.graphql.type.input.GqlCommonEventMetadataInput;
 import org.opencastproject.graphql.type.input.Mutation;
 
+import graphql.annotations.annotationTypes.GraphQLDefaultValue;
 import graphql.annotations.annotationTypes.GraphQLDescription;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
@@ -33,22 +36,37 @@ import graphql.annotations.annotationTypes.GraphQLTypeExtension;
 import graphql.schema.DataFetchingEnvironment;
 
 @GraphQLTypeExtension(Mutation.class)
-public final class SeriesMutationExtension {
+public final class EventMutationExtension {
 
-  private SeriesMutationExtension() {
+  private EventMutationExtension() {
   }
 
   @GraphQLField
   @GraphQLNonNull
-  @GraphQLDescription("Update series metadata")
-  public static Boolean updateSeries(
+  @GraphQLDescription("Update event metadata")
+  public static Boolean updateEvent(
       @GraphQLName("id") @GraphQLNonNull String id,
-      @GraphQLName("metadata") @GraphQLNonNull GqlCommonSeriesMetadataInput seriesMetadataInput,
+      @GraphQLName("metadata") @GraphQLNonNull GqlCommonEventMetadataInput eventMetadataInput,
+      @GraphQLName("publishChanges") @GraphQLDefaultValue(DefaultTrue.class) Boolean publishChanges,
       final DataFetchingEnvironment environment) {
-    CreateOrUpdateSeriesCommand.create(id, seriesMetadataInput)
+    CreateOrUpdateEventCommand
+        .create(id, eventMetadataInput)
         .environment(environment)
         .build()
         .execute();
     return true;
   }
+
+  @GraphQLField
+  @GraphQLDescription("Delete event")
+  public static GqlDeleteEventPayload deleteEvent(
+      @GraphQLName("id") @GraphQLNonNull String id,
+      final DataFetchingEnvironment environment) {
+    return DeleteEventCommand
+        .create(id)
+        .environment(environment)
+        .build()
+        .execute();
+  }
+
 }
