@@ -28,14 +28,13 @@ import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyName;
 import org.opencastproject.assetmanager.api.Value;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import junitparams.JUnitParamsRunner;
@@ -185,24 +184,24 @@ public class PropertiesTest {
   // TODO: Remove this?
   @Test
   public void testGetValueFoldOpt() throws Exception {
-    assertEquals(Opt.some("Bad audio"),
-        Opt.some(ps.stream()
+    assertEquals(Optional.of("Bad audio"),
+        Optional.of(ps.stream()
             .filter(p -> p.getId().getName().equals("comment"))
             .findFirst()
             .get()
             .getValue()
             .get(Value.STRING))
     );
-    assertEquals(Opt.some(false),
-        Opt.some(ps.stream()
+    assertEquals(Optional.of(false),
+        Optional.of(ps.stream()
             .filter(p -> p.getId().getName().equals("approved"))
             .findFirst()
             .get()
             .getValue()
             .get(Value.BOOLEAN))
     );
-    assertEquals(Opt.some(new Date(0)),
-        Opt.some(ps.stream()
+    assertEquals(Optional.of(new Date(0)),
+        Optional.of(ps.stream()
             .filter(p -> p.getId().getName().equals("date"))
             .findFirst()
             .get()
@@ -213,8 +212,8 @@ public class PropertiesTest {
 
   @Test
   public void testGetValueFoldOptNotFound() throws Exception {
-    assertEquals(Opt.none(),
-        Opt.nul(ps.stream()
+    assertEquals(Optional.empty(),
+        Optional.ofNullable(ps.stream()
             .filter(p -> p.getId().getName().equals("unknown"))
             .findFirst()
             .map(p -> p.getValue().get(Value.STRING))
@@ -224,8 +223,8 @@ public class PropertiesTest {
 
   @Test(expected = java.lang.RuntimeException.class)
   public void testGetValueFoldOptTypeDoesNotMatch() throws Exception {
-    assertEquals(Opt.none(),
-        Opt.nul(ps.stream()
+    assertEquals(Optional.empty(),
+        Optional.ofNullable(ps.stream()
             .filter(p -> p.getId().getName().equals("comment"))
             .findFirst()
             .map(p -> p.getValue().get(Value.BOOLEAN))
@@ -364,15 +363,15 @@ public class PropertiesTest {
 
   @Test
   public void testGetStringOpt() throws Exception {
-    assertEquals(Opt.some("Bad audio"),
-        Opt.some(ps.stream()
+    assertEquals(Optional.of("Bad audio"),
+        Optional.of(ps.stream()
             .filter(p -> p.getId().getName().equals("comment"))
             .findFirst()
             .map(p -> p.getValue().get(Value.STRING))
             .orElse(null))
     );
-    assertEquals(Opt.none(),
-        Opt.nul(ps.stream()
+    assertEquals(Optional.empty(),
+        Optional.ofNullable(ps.stream()
             .filter(p -> p.getId().getName().equals("unknown"))
             .findFirst()
             .map(p -> p.getValue().get(Value.STRING))
@@ -382,15 +381,15 @@ public class PropertiesTest {
 
   @Test
   public void testGetDateOpt() throws Exception {
-    assertEquals(Opt.some(new Date(0)),
-        Opt.some(ps.stream()
+    assertEquals(Optional.of(new Date(0)),
+        Optional.of(ps.stream()
             .filter(p -> p.getId().getName().equals("date"))
             .findFirst()
             .map(p -> p.getValue().get(Value.DATE))
             .orElse(null))
     );
-    assertEquals(Opt.none(),
-        Opt.nul(ps.stream()
+    assertEquals(Optional.empty(),
+        Optional.ofNullable(ps.stream()
             .filter(p -> p.getId().getName().equals("unknown"))
             .findFirst()
             .map(p -> p.getValue().get(Value.DATE))
@@ -400,15 +399,15 @@ public class PropertiesTest {
 
   @Test
   public void testGetLongOpt() throws Exception {
-    assertEquals(Opt.some(1L),
-        Opt.some(ps.stream()
+    assertEquals(Optional.of(1L),
+        Optional.of(ps.stream()
             .filter(p -> p.getId().getName().equals("count"))
             .findFirst()
             .map(p -> p.getValue().get(Value.LONG))
             .orElse(null))
     );
-    assertEquals(Opt.none(),
-        Opt.nul(ps.stream()
+    assertEquals(Optional.empty(),
+        Optional.ofNullable(ps.stream()
             .filter(p -> p.getId().getName().equals("unknown"))
             .findFirst()
             .map(p -> p.getValue().get(Value.LONG))
