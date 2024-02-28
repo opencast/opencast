@@ -13,18 +13,17 @@ concurrency:
 jobs:
   deploy-translation-keys:
     if: github.repository_owner == 'opencast'
-    runs-on: ubuntu-20.04
-    env:
-      CROWDIN_API_KEY: ${{ secrets.CROWDIN_API_KEY }}
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: prepare crowdin client
       run: |
-        wget --quiet https://artifacts.crowdin.com/repo/deb/crowdin.deb
-        sudo dpkg -i crowdin.deb
-        echo "api_key: ${CROWDIN_API_KEY}" > ~/.crowdin.yaml
+        wget --quiet https://artifacts.crowdin.com/repo/deb/crowdin3.deb
+        sudo dpkg -i crowdin3.deb
 
     - name: upload translation source
+      env:
+        CROWDIN_TOKEN: ${{ secrets.CROWDIN_TOKEN }}
       run: |
-        crowdin --config .crowdin.yaml upload sources -b "${GITHUB_REF##*/}"
+        crowdin upload sources --config .crowdin.yaml -b "${GITHUB_REF##*/}"

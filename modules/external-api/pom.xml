@@ -183,6 +183,11 @@
       <artifactId>opencast-asset-manager-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>${gson.version}</version>
+    </dependency>
     <!-- Testing -->
     <dependency>
       <groupId>io.rest-assured</groupId>

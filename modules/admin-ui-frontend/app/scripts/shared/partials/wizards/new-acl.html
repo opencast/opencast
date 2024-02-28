@@ -62,7 +62,9 @@
                                          ng-options="id as name for (id, name) in wizard.step.acls"
                                          placeholder-text-single="'{{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                          no-results-text="'{{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
-                                         ></select>
+                                         >
+                                         <option value=""></option>
+                          </select>
                         </div>
                       </td>
                     </tr>
@@ -109,7 +111,7 @@
                       <tr ng-repeat="policy in wizard.step.ud.policiesUser">
                         <td>
                           <select chosen pre-select-from="users"
-                                         call-on-search="wizard.step.getMatchingUsers"
+                                         call-on-search="wizard.step.getMatchingRoles"
                                          data-width="'360px'"
                                          ng-model="policy.role"
                                          ng-options="user.userRole as wizard.step.userToStringForDetails(user) for user in wizard.step.users"

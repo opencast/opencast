@@ -48,6 +48,7 @@ import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
+import org.opencastproject.userdirectory.JpaUserReferenceProvider;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SmartIterator;
 import org.opencastproject.util.UrlSupport;
@@ -58,6 +59,8 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.util.requests.SortCriterion.Order;
+import org.opencastproject.workflow.api.WorkflowDatabaseException;
+import org.opencastproject.workflow.api.WorkflowService;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -123,8 +126,14 @@ public class UsersEndpoint {
   /** The internal role and user provider */
   private JpaUserAndRoleProvider jpaUserAndRoleProvider;
 
+  /** The internal user reference provider */
+  private JpaUserReferenceProvider jpaUserReferenceProvider;
+
   /** The security service */
   private SecurityService securityService;
+
+  /** The workflow service */
+  private WorkflowService workflowService;
 
   /** Base url of this endpoint */
   private String endpointBaseUrl;
@@ -160,6 +169,15 @@ public class UsersEndpoint {
   @Reference
   public void setJpaUserAndRoleProvider(JpaUserAndRoleProvider jpaUserAndRoleProvider) {
     this.jpaUserAndRoleProvider = jpaUserAndRoleProvider;
+  }
+
+  /**
+   * @param workflowService
+   *          the user provider to set
+   */
+  @Reference
+  public void setWorkflowService(WorkflowService workflowService) {
+    this.workflowService = workflowService;
   }
 
   /** OSGi callback. */
@@ -406,9 +424,35 @@ public class UsersEndpoint {
           @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.") })
   public Response deleteUser(@PathParam("username") String username) throws NotFoundException {
     Organization organization = securityService.getOrganization();
+    boolean userReferenceNotFound = false;
+    boolean userNotFound = false;
 
     try {
-      jpaUserAndRoleProvider.deleteUser(username, organization.getId());
+      if (workflowService.userHasActiveWorkflows(username)) {
+        logger.debug("Workflow still active for user {}:", username);
+        return Response.status(SC_CONFLICT).build();
+      }
+    } catch (WorkflowDatabaseException e) {
+      logger.error("Error during deletion of user {}: {}", username, e);
+      return Response.status(SC_INTERNAL_SERVER_ERROR).build();
+    }
+
+    try {
+      try {
+        jpaUserAndRoleProvider.deleteUser(username, organization.getId());
+      } catch (NotFoundException e) {
+        userReferenceNotFound = true;
+      }
+      try {
+        jpaUserAndRoleProvider.deleteUser(username, organization.getId());
+      } catch (NotFoundException e) {
+        userNotFound = true;
+      }
+
+      if (userNotFound && userReferenceNotFound) {
+        throw new NotFoundException();
+      }
+
       userDirectoryService.invalidate(username);
     } catch (NotFoundException e) {
       logger.debug("User {} not found.", username);

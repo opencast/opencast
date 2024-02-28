@@ -438,11 +438,11 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                 mkPropertyName(ace.getRole(), ace.getAction())), Value.mk(ace.isAllow())));
       }
 
+      updateEventInIndex(snapshot);
+
       logger.info("Trigger update handlers for snapshot {}, version {}",
           snapshot.getMediaPackage().getIdentifier(), snapshot.getVersion());
       fireEventHandlers(mkTakeSnapshotMessage(snapshot));
-
-      updateEventInIndex(snapshot);
 
       return snapshot;
     }
@@ -918,13 +918,13 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   @Override
   public void handleDeletedSnapshot(String mpId, VersionImpl version) {
-    logger.info("Firing event handlers for event {}, snapshot {}", mpId, version);
+    logger.info("Firing event handlers for deleting snapshot of event {}, snapshot {}", mpId, version);
     fireEventHandlers(AssetManagerItem.deleteSnapshot(mpId, version.value(), new Date()));
   }
 
   @Override
   public void handleDeletedEpisode(String mpId) {
-    logger.info("Firing event handlers for event {}", mpId);
+    logger.info("Firing event handlers for deleting event {}", mpId);
     fireEventHandlers(AssetManagerItem.deleteEpisode(mpId, new Date()));
 
     removeArchivedVersionFromIndex(mpId);
@@ -955,12 +955,12 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       RichAResult r;
       int current = 0;
       logIndexRebuildBegin(logger, index.getIndexName(), total, "snapshot(s)");
+      var updatedEventRange = new ArrayList<Event>();
       do {
         r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).orderBy(q.mediapackageId().desc())
           .page(offset, PAGE_SIZE).run());
         offset += PAGE_SIZE;
-        int n = 16;
-        var updatedEventRange = new ArrayList<Event>();
+        int n = 20;
 
         final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
         for (String orgId : byOrg.keySet()) {
@@ -981,7 +981,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
                 if (updatedEventRange.size() >= n || current >= total) {
                   index.bulkEventUpdate(updatedEventRange);
-                  logIndexRebuildProgress(logger, index.getIndexName(), total, current);
+                  logIndexRebuildProgress(logger, index.getIndexName(), total, current, n);
                   updatedEventRange.clear();
                 }
               } catch (Throwable t) {
@@ -1080,7 +1080,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                 .collect(Collectors.toList());
         return getDatabase().selectProperties(mediaPackageId, SECURITY_NAMESPACE).parallelStream()
                 .map(p -> p.getId().getName())
-                .anyMatch(p -> roles.parallelStream().anyMatch(r -> r.equals(p)));
+                .filter(p -> p.endsWith(action))
+                .anyMatch(p -> roles.stream().anyMatch(r -> r.equals(p)));
     }
   }
 

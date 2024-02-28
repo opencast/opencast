@@ -515,7 +515,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       final int total = databaseSeries.size();
       logIndexRebuildBegin(logger, index.getIndexName(), total, "series");
       int current = 0;
-      int n = 16;
+      int n = 20;
       var updatedSeriesRange = new ArrayList<Series>();
 
       for (SeriesEntity series: databaseSeries) {
@@ -579,7 +579,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
         if (updatedSeriesRange.size() >= n || current >= databaseSeries.size()) {
           // do the actual index update
           index.bulkSeriesUpdate(updatedSeriesRange);
-          logIndexRebuildProgress(logger, index.getIndexName(), total, current);
+          logIndexRebuildProgress(logger, index.getIndexName(), total, current, n);
           updatedSeriesRange.clear();
         }
       }

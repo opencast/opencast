@@ -53,42 +53,46 @@ First you have to install the necessary repositories so that your package manage
 
         wget -qO - https://pkg.opencast.org/gpgkeys/opencast-deb.key | sudo apt-key add -
 
+    On latest Debian based systems (Debian 11+, Ubuntu 22.04+) importing gpg keys with `apt-key` is deprecated. You can use an alternative step:
+
+        wget -qO - https://pkg.opencast.org/gpgkeys/opencast-deb.key | gpg --dearmor | sudo dd of=/etc/apt/trusted.gpg.d/opencast-deb.gpg
+
 * Update your package listing
 
         apt-get update
 
 
-Install Elasticsearch
----------------------
+Install OpenSearch
+------------------
 
-Starting with Opencast 9, Elasticsearch is now a dependency.  Our packages do not explicitly depend on Elasticsearch
-because it runs externally to Opencast.  By default we expect Elasticsearch to be running on the admin node, however
+Starting with Opencast 14, OpenSearch is now a dependency.  Our packages do not explicitly depend on OpenSearch
+because it runs externally to Opencast.  By default we expect OpenSearch to be running on the admin node, however
 you can configure the URL in Opencast's configuration files.
 
-In our repository we provide validated Elasticsearch packages copied from the upstream repository.  Installation can be
+In our repository we provide validated OpenSearch packages copied from the upstream repository.  Installation can be
 accomplished by running the following:
 
-    apt-get install elasticsearch-oss
+    apt-get install opensearch
 
-If you wish to use the upstream Elasticsearch repository directly be aware that Opencast only formally supports Elasticsearch
-versions with the same major and minor version values.  That is, if our 9.x repository has Elasticsearch 7.9.2 then
-Opencast only formally supports Elasticsearch versions starting with 7.9.
+If you wish to use the upstream OpenSearch repository directly be aware that Opencast only supported with OpenSearch 1.x
+and will not work with OpenSearch 2.x yet.  Future support for this is forthcoming.
 
-The default Elasticsearch configuration should work for Opencast out of the box, however there is one change you should make.
-[Log4Shell](https://nvd.nist.gov/vuln/detail/CVE-2021-44228) affects Elasticsearch, and you should mitigate this by adding a
-file at `/etc/elasticsearch/jvm.options.d/log4shell.options` with the content:
+Configure OpenSearch
+--------------------
 
-```
--Dlog4j2.formatMsgNoLookups=true
-```
+After installing OpenSearch please make sure to follow their
+[configuration documentation](https://opensearch.org/docs/1.3/install-and-configure/install-opensearch/debian/)
+to ensure that your OpenSearch instance is set up correctly and securely.  Once that setup is complete, ensure that
+your Opencast install matches your configured OpenSearch settings.  Notably, Opencast's current default assumes
+non-secured http rather than https, without a username and password.  Read the
+[Opencast OpenSearch Documentation](../configuration/opensearch.md) to correctly configure Opencast's connection
+once Opencast has been installed below.
 
-This applies a mitigation for the security issue.  Once applied, you should restart Elasticsearch.
-
-Finally, make sure to start and enable the service:
+After installing and configuring make sure to start and enable OpenSearch:
 
 ```sh
-systemctl start elasticsearch
-systemctl enable elasticsearch
+systemctl restart opensearch
+systemctl enable opensearch
 ```
 
 
@@ -99,7 +103,7 @@ Install Opencast
 
 For a basic installation (All-In-One) just run:
 
-    apt-get install opencast-{{ opencast_major_version() }}-allinone elasticsearch-oss
+    apt-get install opencast-{{ opencast_major_version() }}-allinone opensearch
 
 This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.  Note
 that while the repository provides a packaged version of FFmpeg, your distribution may have a version which is

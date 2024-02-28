@@ -124,6 +124,7 @@ import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.util.SecurityUtil;
@@ -223,6 +224,8 @@ public abstract class AbstractEventEndpoint {
   public static final String SCHEDULING_START_KEY = "start";
   public static final String SCHEDULING_END_KEY = "end";
   private static final String SCHEDULING_AGENT_CONFIGURATION_KEY = "agentConfiguration";
+  public static final String SCHEDULING_PREVIOUS_AGENTID = "previousAgentId";
+  public static final String SCHEDULING_PREVIOUS_PREVIOUSENTRIES = "previousEntries";
 
   private static final String WORKFLOW_ACTION_STOP = "STOP";
 
@@ -273,6 +276,8 @@ public abstract class AbstractEventEndpoint {
   public abstract Boolean getOnlySeriesWithWriteAccessEventModal();
 
   public abstract Boolean getOnlyEventsWithWriteAccessEventsTab();
+
+  public abstract UserDirectoryService getUserDirectoryService();
 
   /** Default server URL */
   protected String serverUrl = "http://localhost:8080";
@@ -661,7 +666,22 @@ public abstract class AbstractEventEndpoint {
     if (schedulingJson.has(SCHEDULING_AGENT_ID_KEY)) {
       agentId = Opt.some(schedulingJson.getString(SCHEDULING_AGENT_ID_KEY));
       logger.trace("Updating agent id of event '{}' from '{}' to '{}'",
-        event.getIdentifier(), technicalMetadata.getAgentId(), agentId);
+              event.getIdentifier(), technicalMetadata.getAgentId(), agentId);
+    }
+
+    Opt<String> previousAgentId = Opt.none();
+    if (schedulingJson.has(SCHEDULING_PREVIOUS_AGENTID)) {
+      previousAgentId = Opt.some(schedulingJson.getString(SCHEDULING_PREVIOUS_AGENTID));
+    }
+
+    Optional<String> previousAgentInputs = Optional.empty();
+    Optional<String> agentInputs = Optional.empty();
+    if (agentId.isSome() && previousAgentId.isSome()) {
+      Agent previousAgent = getCaptureAgentStateService().getAgent(previousAgentId.get());
+      Agent agent = getCaptureAgentStateService().getAgent(agentId.get());
+
+      previousAgentInputs = Optional.ofNullable(previousAgent.getCapabilities().getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES));
+      agentInputs = Optional.ofNullable(agent.getCapabilities().getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES));
     }
 
     // Check if we are allowed to re-schedule on this agent
@@ -691,6 +711,27 @@ public abstract class AbstractEventEndpoint {
       agentConfiguration = Opt.some(JSONUtils.toMap(schedulingJson.getJSONObject(SCHEDULING_AGENT_CONFIGURATION_KEY)));
       logger.trace("Updating agent configuration of event '{}' id from '{}' to '{}'",
         event.getIdentifier(), technicalMetadata.getCaptureAgentConfiguration(), agentConfiguration);
+    }
+
+    Opt<Map<String, String>> previousAgentInputMethods = Opt.none();
+    if (schedulingJson.has(SCHEDULING_PREVIOUS_PREVIOUSENTRIES)) {
+      previousAgentInputMethods = Opt.some(
+              JSONUtils.toMap(schedulingJson.getJSONObject(SCHEDULING_PREVIOUS_PREVIOUSENTRIES)));
+    }
+
+    // If we had previously selected an agent, and both the old and new agent have the same set of input channels,
+    // copy which input channels are active to the new agent
+    if (previousAgentInputs.isPresent() && previousAgentInputs.isPresent() && agentInputs.isPresent()) {
+      Map<String, String> map = previousAgentInputMethods.get();
+      String mapAsString = map.keySet().stream()
+              .collect(Collectors.joining(","));
+      String previousInputs = mapAsString;
+
+      if (previousAgentInputs.equals(agentInputs)) {
+        final Map<String, String> configMap = new HashMap<>(agentConfiguration.get());
+        configMap.put(CaptureParameters.CAPTURE_DEVICE_NAMES, previousInputs);
+        agentConfiguration = Opt.some(configMap);
+      }
     }
 
     if ((start.isSome() || end.isSome())
@@ -1813,11 +1854,22 @@ public abstract class AbstractEventEndpoint {
         for (WorkflowInstance instance : workflowInstances) {
           long instanceId = instance.getId();
           Date created = instance.getDateCreated();
-          String creatorName = instance.getCreatorName();
+          String submitter = instance.getCreatorName();
+
+          User user = getUserDirectoryService().loadUser(submitter);
+          String submitterName = null;
+          String submitterEmail = null;
+          if (user != null) {
+            submitterName = user.getName();
+            submitterEmail = user.getEmail();
+          }
+
           jsonList.add(obj(f("id", v(instanceId)), f("title", v(instance.getTitle(), Jsons.BLANK)),
                   f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + instance.getState().toString())),
                   f("submitted", v(created != null ? DateTimeSupport.toUTC(created.getTime()) : "", Jsons.BLANK)),
-                  f("submitter", v(creatorName, Jsons.BLANK))));
+                  f("submitter", v(submitter, Jsons.BLANK)),
+                  f("submitterName", v(submitterName, Jsons.BLANK)),
+                  f("submitterEmail", v(submitterEmail, Jsons.BLANK))));
         }
         JObject json = obj(f("results", arr(jsonList)), f("count", v(workflowInstances.size())));
         return okJson(json);

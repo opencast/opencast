@@ -1722,7 +1722,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       }
       logIndexRebuildBegin(logger, index.getIndexName(), total, "scheduled events");
       final int[] current = {0};
-      int n = 16;
+      int n = 20;
       var updatedEventRange = new ArrayList<Event>();
 
       for (Organization organization: orgDirectoryService.getOrganizations()) {
@@ -1748,7 +1748,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
                       if (updatedEventRange.size() >= n || current[0] >= events.size()) {
                         index.bulkEventUpdate(updatedEventRange);
-                        logIndexRebuildProgress(logger, index.getIndexName(), total, current[0]);
+                        logIndexRebuildProgress(logger, index.getIndexName(), total, current[0], n);
                         updatedEventRange.clear();
                       }
                     } catch (SearchIndexException e) {

@@ -36,7 +36,7 @@ angular.module('adminNg.services')
           write : write !== undefined ? write : false,
           actions : {
             name : 'new-event-acl-actions',
-            value : actionValues !== undefined ? actionValues : [],
+            value : actionValues !== undefined ? actionValues.slice() : [],
           },
           user: undefined,
         };
@@ -150,7 +150,7 @@ angular.module('adminNg.services')
 
       me.isAccessState = true;
       me.ud = {};
-      me.ud.id = {};
+      me.ud.id = undefined;
       me.ud.policies = [];
       me.ud.policiesUser = [];
       me.ud.baseAcl = {};
@@ -166,6 +166,11 @@ angular.module('adminNg.services')
         if (!user) {
           return undefined;
         }
+
+        if (!(user.name || user.username) && user.userRole) {
+          return user.userRole;
+        }
+
         var n = user.name ? user.name : user.username;
         var e = user.email ? '<' + user.email + '>' : '';
 
@@ -186,16 +191,6 @@ angular.module('adminNg.services')
           return true;
         }
         return !item.includes(me.roleUserPrefix);
-      };
-
-      this.userToStringForDetails = function (user) {
-        if (!user) {
-          return undefined;
-        }
-        var n = user.name ? user.name : user.username;
-        var e = user.email ? '<' + user.email + '>' : '';
-
-        return n + ' ' + e;
       };
 
       this.setMetadata = function (metadata) {
@@ -276,9 +271,19 @@ angular.module('adminNg.services')
 
               UserResource.get({ username: id }).$promise.then(function (data) {
                 policy.user = data;
-              });
+                // Did we get a user not present in Opencast (e.g. LDAP)? Add it to the list!
+                if (me.users.map(user => user.id).indexOf(id) == -1) {
+                  if (me.aclCreateDefaults['sanitize']) {
+                    // FixMe: See the FixMe above pertaining to sanitize
+                    data.userRole = me.roleUserPrefix + id.replace(/\W/g, '_').toUpperCase();
+                  } else {
+                    data.userRole = me.roleUserPrefix + id;
+                  }
+                  me.users.push(data);
+                }
 
-              me.ud.policiesUser.push(policy);
+                me.ud.policiesUser.push(policy);
+              });
             }
           });
         });
@@ -404,16 +409,13 @@ angular.module('adminNg.services')
           angular.forEach(data, function(newRole) {
             if (me.roles.indexOf(newRole) == -1) {
               me.roles.unshift(newRole);
-            }
-          });
-        });
-      };
 
-      this.getMatchingUsers = function (value) {
-        UsersResource.query({query: value}).$promise.then(function (data) {
-          angular.forEach(data, function(newRole) {
-            if (me.roles.indexOf(newRole) == -1) {
-              me.roles.unshift(newRole);
+              // So we can have user roles that match custom role patterns
+              if (newRole.startsWith(me.roleUserPrefix) ) {
+                var user = {};
+                user.userRole = newRole;
+                me.users.push(user);
+              }
             }
           });
         });

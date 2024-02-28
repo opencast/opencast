@@ -29,7 +29,7 @@ access control lists published to Engage before allowing access.
 The configuration options for requiring authentication can be found in the service's configuration file at
 `etc/org.opencastproject.fsresources.StaticResourceServlet.cfg`.
 
-For some external software, like the ILIAS plugin, it is required to set `authentication.required` to `false` as static files authorization is active by default.
+For some external software, like the ILIAS plugin and Tobira, it is required to set `authentication.required` to `false` as static files authorization is active by default.
 
 An alternative method to this is Opencast's [token based authorization system](stream-security.md) which allows (and
 requires) to defer all security checks to external systems.

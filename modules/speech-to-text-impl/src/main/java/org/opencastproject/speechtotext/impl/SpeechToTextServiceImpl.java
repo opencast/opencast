@@ -45,13 +45,12 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.List;
-import java.util.Map;
 
 /** Creates a subtitles file for a video. */
 @Component(
@@ -146,34 +145,26 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
       translate = false;
     }
     URI subtitleFilesURI;
-    File subtitlesFile = null;
-    String vttFileName = String.format("%s%d_%s.%s", TMP_PREFIX,
-            job.getId(), FilenameUtils.getBaseName(mediaFile.getPath()), "vtt");
+    var name = String.format("job-%d", job.getId());
+    var jobDir  = Path.of(workspace.rootDirectory(), "collection", COLLECTION, name).toFile();
 
     try {
       // prepare the output file
-      subtitlesFile = new File(String.format("%s/collection/%s/%s",
-              workspace.rootDirectory(), COLLECTION, vttFileName));
-      subtitlesFile.deleteOnExit();
-      FileUtils.forceMkdirParent(subtitlesFile);
-      Map<String,Object> subOutput = speechToTextEngine.generateSubtitlesFile(
-              workspace.get(mediaFile), subtitlesFile, language, translate);
-
-      subtitlesFile = (File) subOutput.get("subFile");
-      language = (String) subOutput.get("language");
+      jobDir.mkdirs();
+      SpeechToTextEngine.Result result = speechToTextEngine.generateSubtitlesFile(
+              workspace.get(mediaFile), jobDir, language, translate);
+      language = result.getLanguage();
 
       // we need to call the "putInCollection" method to get
       // a URI, that can be used in the following processes
-      try (FileInputStream subtitlesFileIS = new FileInputStream(subtitlesFile)) {
-        subtitleFilesURI = workspace.putInCollection(COLLECTION,
-                vttFileName.replaceFirst(TMP_PREFIX, ""), subtitlesFileIS);
+      final var outputName = String.format("%d-%s.vtt", job.getId(), FilenameUtils.getBaseName(mediaFile.getPath()));
+      try (FileInputStream in = new FileInputStream(result.getSubtitleFile())) {
+        subtitleFilesURI = workspace.putInCollection(COLLECTION, outputName, in);
       }
     } catch (Exception e) {
       throw new SpeechToTextServiceException("Error while generating subtitle from " + mediaFile, e);
     } finally {
-      if (subtitlesFile != null && subtitlesFile.exists()) {
-        FileUtils.deleteQuietly(subtitlesFile);
-      }
+      FileUtils.deleteQuietly(jobDir);
     }
     return subtitleFilesURI.toString() + "," + language;
   }

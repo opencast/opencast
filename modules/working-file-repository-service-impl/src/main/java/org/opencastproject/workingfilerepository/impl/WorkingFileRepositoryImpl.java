@@ -432,9 +432,12 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     // Clean up any other files
     if (filesToDelete != null && filesToDelete.length > 0) {
       for (File fileToDelete : filesToDelete) {
-        if (!fileToDelete.equals(f) && !fileToDelete.equals(md5File)) {
+        if (!fileToDelete.equals(f) && !fileToDelete.equals(md5File)
+            // On shared filesystems like NFS the move operation may create temporary .nfsXXX files
+            // which will be removed by the NFS subsystem itself. We should skip these files.
+            && !StringUtils.startsWith(fileToDelete.getName(), ".nfs")) {
           logger.trace("delete {}", fileToDelete.getAbsolutePath());
-          if (!fileToDelete.delete()) {
+          if (!fileToDelete.delete() && fileToDelete.exists()) {
             throw new IllegalStateException("Unable to delete file: " + fileToDelete.getAbsolutePath());
           }
         }

@@ -171,7 +171,7 @@
                   <th class="medium">
                     <a translate="EVENTS.EVENTS.NEW.UPLOAD_ASSET.ADD"
                        class="details-link"
-                       ng-show="(uploadAssetOptions && !transactions.read_only)"
+                       ng-show="((uploadAssetOptions | filter: {showAs: 'uploadAsset'}).length > 0 && !transactions.read_only)"
                        ng-click="openSubTab('newAssetUpload', 'EventAssetAttachmentsResource', 'newassetupload', false, true)"
                        with-role="ROLE_UI_EVENTS_DETAILS_ASSETS_EDIT">
                     </a>
@@ -363,7 +363,7 @@
                           pre-select-from="captureAgents"
                           ng-disabled="checkingConflicts || !hasCurrentAgentAccess()"
                           data-width="'200px'"
-                          ng-change="roomChanged(); saveScheduling()"
+                          ng-change="roomChanged(); saveScheduling(source.device, {{source.device || 'null'}})"
                           ng-model="source.device"
                           ng-options="ca.name for ca in captureAgents | filter:currentAgentOrAccess track by ca.id"
                           placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
@@ -422,7 +422,7 @@
                     <tr ng-repeat="item in workflows.entries|orderBy:'submitted':true track by $index">
                       <td>{{ item.id }}</td>
                       <td>{{ item.title }}</td>
-                      <td>{{ item.submitter }}</td>
+                      <td>{{ item.submitterName + '&lt;' + item.submitterEmail + '&gt;' + ' (' + item.submitter + ')'}}</td>
                       <td>{{ item.submitted | localizeDate : 'dateTime' : 'medium' }}</td>
                       <td>{{ item.status | translate }}</td>
                       <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')">
@@ -579,7 +579,9 @@
                                       ng-options="id as name for (id, name) in acls"
                                       placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                       no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
-                                      ></select>
+                                      >
+                                      <option value=""></option>
+                              </select>
                             </div>
                             <p ng-show="transactions.read_only">{{baseAclId}}</p>
                           </div>
@@ -624,7 +626,7 @@
                       </tr>
                       </thead>
                       <tbody>
-                      <tr ng-repeat="policy in policiesUser  | filter: userExists">
+                      <tr ng-repeat="policy in policiesUser | filter: userExists">
                         <td ng-show="!transactions.read_only">
                           <select chosen
                                   pre-select-from="users"
@@ -632,7 +634,7 @@
                                   data-width="'360px'"
                                   ng-model="policy.role"
                                   ng-options="user.userRole as userToStringForDetails(user) for user in users"
-                                  call-on-search="getMatchingUsers"
+                                  call-on-search="getMatchingRoles"
                                   placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.USERS.LABEL' | translate }}'"
                                   no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.USERS.EMPTY' | translate }}'"
                           ></select>

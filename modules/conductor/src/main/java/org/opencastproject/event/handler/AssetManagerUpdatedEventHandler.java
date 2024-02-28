@@ -48,6 +48,8 @@ import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.entwinemedia.fn.Stream;
+
 import org.apache.commons.io.FilenameUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -58,6 +60,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Comparator;
 
 /**
  * Responds to series events by re-distributing metadata and security policy files to episodes.
@@ -175,7 +178,9 @@ public class AssetManagerUpdatedEventHandler {
 
       final AQueryBuilder q = assetManager.createQuery();
       final AResult result = q.select(q.snapshot()).where(q.seriesId().eq(seriesId).and(q.version().isLatest())).run();
-      for (Snapshot snapshot : enrich(result).getSnapshots()) {
+      Stream<Snapshot> snapshots = enrich(result).getSnapshots().sort(
+              Comparator.comparing(s->s.getMediaPackage().getIdentifier().toString()));
+      for (Snapshot snapshot : snapshots) {
         final String orgId = snapshot.getOrganizationId();
         final Organization organization = organizationDirectoryService.getOrganization(orgId);
         if (organization == null) {

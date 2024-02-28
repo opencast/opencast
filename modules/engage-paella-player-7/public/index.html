@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=utf-8;" http-equiv="Content-type">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+
+    <title>Opencast Paella Player 7</title>
+
+    <script type="text/javascript">
+        function onLoad() {
+            const url = new URL(window.location.href);
+            window.location.href = 'watch.html?' + url.searchParams.toString()
+        }
+    </script>
+  </head>
+
+  <body id="body" onload="onLoad();">
+  </body>
+
+</html>

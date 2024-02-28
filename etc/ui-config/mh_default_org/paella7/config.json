@@ -396,7 +396,7 @@
             "enabled": true,
             "parentContainer": "settingsGroup",
             "order": 40,
-            "description": "Audio transcriptions"
+            "description": "Transcriptions"
         },
         "es.upv.paella.downloadsPlugin": {
             "enabled": true,
@@ -504,14 +504,17 @@
             "enabled": true,
             "order": 1
         },
-        "es.upv.paella.cookieDataPlugin": {
+
+        "es.upv.paella.localStorageDataPlugin": {
             "enabled": true,
             "order": 0,
             "context": [
                 "default",
-                "trimming"
+                "trimming",
+                "preferences"
             ]
         },
+
         "org.opencast.paella.cookieconsent": {
             "enabled": true,
             "side": "right"
@@ -522,7 +525,9 @@
         "es.upv.paella.vttManifestCaptionsPlugin": {
             "enabled": true
         },
-
+        "es.upv.paella.dfxpManifestCaptionsPlugin": {
+            "enabled": true
+        },
         "es.upv.paella.hlsCaptionsPlugin": {
             "enabled": true
         },

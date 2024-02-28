@@ -14,11 +14,11 @@ operations should be executed or skipped.
 Workflow Instance Variables
 ---------------------------
 
-|Name              |Example                        |Description                                                  |
-|------------------|-------------------------------|-------------------------------------------------------------|
-|`*flavor*_exists` |`presenter_source_exists=true` |Whether an element with given flavor is in the mediapackage. |
-|`*flavor*_type`   |`presenter_source_type=Track`  |The type of the element with the given flavor. Possible values are: `Attachment`, `Catalog`, `Track`. |
-
+| Name                    | Example                           | Description                                                                                               |
+|-------------------------|-----------------------------------|-----------------------------------------------------------------------------------------------------------|
+| `*flavor*_exists`       | `presenter_source_exists=true`    | Whether an element with given flavor is in the mediapackage.                                              |
+| `*flavor*_type`         | `presenter_source_type=Track`     | The type of the element with the given flavor. Possible values are: `Attachment`, `Catalog`, `Track`.     |
+| `*flavor*_hastag_*tag*` | `presenter_source_hastag_archive` | Whether an element with given flavor and tag is in the mediapackage (only if `set-tag-variables` is set). |
 
 
 Parameter Table
@@ -28,10 +28,11 @@ If no configuration keys are specified, workflow instance variables will be set 
 
 If no mediapackage element matches a configuration key, no workflow instance variables will be set for that key. For example, the operation will never generate `presentation_work_exists=false`.
 
-|Configuration Key|Example            |Description                                       |
-|-----------------|-------------------|--------------------------------------------------|
-|source-flavors   |`*/work`           |The comma separated list of flavors of the elements we are interested in. |
-|source-tags      |`delivery, 1080p`  |The comma separated list of tags of the elements we are interested in.|
+| Configuration Key | Example           | Description                                                                |
+|-------------------|-------------------|----------------------------------------------------------------------------|
+| source-flavors    | `*/work`          | The comma separated list of flavors of the elements we are interested in.  |
+| source-tags       | `delivery, 1080p` | The comma separated list of tags of the elements we are interested in.     |
+| set-tag-variables | `true`            | Whether to set tag variables (default: false).                             |
 
 
 Operation Example

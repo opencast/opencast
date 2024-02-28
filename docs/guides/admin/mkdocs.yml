@@ -39,6 +39,7 @@ nav:
 - Release Notes: 'releasenotes.md'
 - Upgrade: 'upgrade.md'
 - Changelog: 'changelog.md'
+- Registration: 'registration.md'
 - Installation:
    - Overview: 'installation/index.md'
    - Hardware Requirements: installation/server-requirements.md
@@ -70,7 +71,7 @@ nav:
    - Firewall: 'configuration/firewall.md'
    - Asset Manager: 'configuration/asset-manager.md'
    - Elasticsearch: 'configuration/elasticsearch.md'
-   - Opensearch: 'configuration/opensearch.md'
+   - OpenSearch: 'configuration/opensearch.md'
    - Metadata: 'configuration/metadata.md'
    - Encoding: 'configuration/encoding.md'
    - Inbox: 'configuration/inbox.md'
@@ -136,6 +137,18 @@ nav:
         - es.upv.paella.opencast.userTrackingSaverPlugIn: 'modules/paella.player/plugins/es.upv.paella.opencast.userTrackingSaverPlugIn.md'
    - Paella player 7:
       - Configuration: 'modules/paella.player7/configuration.md'
+      - URL Parameters: 'modules/paella.player7/url.parameter.md'
+      - Paella plugins:
+        - Overview: 'modules/paella.player7/plugins.md'
+        - org.opencast.paella.cookieconsent: 'modules/paella.player7/plugins/org.opencast.paella.cookieconsent.md'
+        - org.opencast.paella.descriptionPlugin: 'modules/paella.player7/plugins/org.opencast.paella.descriptionPlugin.md'
+        - org.opencast.paella.editorPlugin: 'modules/paella.player7/plugins/org.opencast.paella.editorPlugin.md'
+        - org.opencast.paella.episodesFromSeries: 'modules/paella.player7/plugins/org.opencast.paella.episodesFromSeries.md'
+        - org.opencast.paella.loginPlugin: 'modules/paella.player7/plugins/org.opencast.paella.loginPlugin.md'
+        - org.opencast.paella.opencast.userTrackingDataPlugin: 'modules/paella.player7/plugins/org.opencast.paella.opencast.userTrackingDataPlugin.md'
+        - org.opencast.paella.matomo.userTrackingDataPlugin: 'modules/paella.player7/plugins/org.opencast.paella.matomo.userTrackingDataPlugin.md'
+        - org.opencast.paella.transcriptionsPlugin: 'modules/paella.player7/plugins/org.opencast.paella.transcriptionsPlugin.md'
+        - org.opencast.paella.versionButton.js: 'modules/paella.player7/plugins/org.opencast.paella.versionButton.md'
    - Search Index:
       - Overview: 'modules/searchindex/index.md'
       - Solr: 'modules/searchindex/solr.md'

@@ -86,7 +86,9 @@
                                     ng-options="id as name for (id, name) in acls"
                                     placeholder-text-single="'{{ 'USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                     no-results-text="'{{ 'USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
-                                    ></select>
+                                    >
+                                    <option value=""></option>
+                            </select>
                           </div>
                         </td>
                       </tr>
@@ -137,7 +139,7 @@
                                     data-width="'360px'"
                                     ng-model="policy.role"
                                     ng-options="user.userRole as userToStringForDetails(user) for user in users"
-                                    call-on-search="getMatchingUsers"
+                                    call-on-search="getMatchingRoles"
                                     placeholder-text-single="'{{ 'USERS.ACLS.DETAILS.ACCESS.ROLES.LABEL' | translate }}'"
                                     no-results-text="'{{ 'USERS.ACLS.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
                                     ></select>

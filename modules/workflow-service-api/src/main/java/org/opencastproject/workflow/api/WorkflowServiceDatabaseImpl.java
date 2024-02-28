@@ -110,13 +110,25 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
    */
   @Override
   public WorkflowInstance getWorkflow(long workflowId) throws NotFoundException, WorkflowDatabaseException {
+    return getWorkflow(workflowId, securityService.getOrganization().getId());
+  }
+
+  public WorkflowInstance getWorkflow(long workflowId, String orgId) throws NotFoundException, WorkflowDatabaseException {
     try {
-      return db.exec(namedQuery.find(
-          "Workflow.workflowById",
-          WorkflowInstance.class,
-          Pair.of("workflowId", workflowId),
-          Pair.of("organizationId", securityService.getOrganization().getId())
-      ));
+      if (null != orgId) {
+        return db.exec(namedQuery.find(
+            "Workflow.workflowById",
+            WorkflowInstance.class,
+            Pair.of("workflowId", workflowId),
+            Pair.of("organizationId", orgId)
+        ));
+      } else {
+        return db.exec(namedQuery.find(
+            "Workflow.workflowByIdOrganizationIndependent",
+            WorkflowInstance.class,
+            Pair.of("workflowId", workflowId)
+        ));
+      }
     } catch (NoResultException e) {
       throw new NotFoundException("No workflow with id=" + workflowId + " exists");
     } catch (Exception e) {
@@ -275,6 +287,29 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
           Pair.of("stateRunning", WorkflowInstance.WorkflowState.RUNNING),
           Pair.of("statePaused", WorkflowInstance.WorkflowState.PAUSED),
           Pair.of("stateFailing", WorkflowInstance.WorkflowState.FAILING)
+      ));
+      return count > 0;
+    } catch (Exception e) {
+      throw new WorkflowDatabaseException(e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see WorkflowServiceDatabase#userHasActiveWorkflows(String mediaPackageId)
+   */
+  public boolean userHasActiveWorkflows(String userId) throws WorkflowDatabaseException {
+    try {
+      long count = db.exec(namedQuery.find(
+              "Workflow.countActiveByUser",
+              Long.class,
+              Pair.of("organizationId", securityService.getOrganization().getId()),
+              Pair.of("userId", userId),
+              Pair.of("stateInstantiated", WorkflowInstance.WorkflowState.INSTANTIATED),
+              Pair.of("stateRunning", WorkflowInstance.WorkflowState.RUNNING),
+              Pair.of("statePaused", WorkflowInstance.WorkflowState.PAUSED),
+              Pair.of("stateFailing", WorkflowInstance.WorkflowState.FAILING)
       ));
       return count > 0;
     } catch (Exception e) {

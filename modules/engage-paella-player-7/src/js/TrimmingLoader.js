@@ -23,10 +23,11 @@ import { getUrlFromOpencastServer } from './PaellaOpencast';
 
 export const loadTrimming = async (player,videoId) => {
   const requestUrl = `/annotation/annotations.json?episode=${videoId}&type=paella%2Ftrimming&day=&limit=1&offset=0`;
-  let trimmingData = { start: 0, end: 0, enabled: false };
-  const response = await fetch(getUrlFromOpencastServer(requestUrl));
-  if (response.ok) {
-    try {
+  const videoDuration = player.videoManifest?.metadata?.duration;
+  let trimmingData = { start: 0, end: videoDuration, enabled: false };
+  try {
+    const response = await fetch(getUrlFromOpencastServer(requestUrl));
+    if (response.ok) {
       const data = await response.json();
       const annotation = Array.isArray(data.annotations?.annotation) ?
         data.annotations?.annotation[0] : data.annotations?.annotation;
@@ -35,9 +36,9 @@ export const loadTrimming = async (player,videoId) => {
       trimmingData.end = value.end;
       trimmingData.enabled = trimmingData.start < trimmingData.end && trimmingData.end > 0;
     }
-    catch (e) {
-      player.log.warn('Error loading trimming annotations');
-    }
+  }
+  catch (e) {
+    player.log.warn('Error loading trimming annotations');
   }
   return trimmingData;
 };

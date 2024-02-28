@@ -88,7 +88,9 @@
                                   ng-options="id as name for (id, name) in wizard.step.acls"
                                   placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                   no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
-                                  ></select>
+                                  >
+                                  <option value=""></option>
+                          </select>
                         </div>
                       </td>
                     </tr>
@@ -138,7 +140,7 @@
                                   data-width="'360px'"
                                   ng-model="policy.role"
                                   ng-options="user.userRole as wizard.step.userToStringForDetails(user) for user in wizard.step.users"
-                                  call-on-search="wizard.step.getMatchingUsers"
+                                  call-on-search="wizard.step.getMatchingRoles"
                                   data-placeholder=" "
                                   no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.USERS.EMPTY' | translate }}'"
                                   placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.ACCESS.USERS.LABEL' | translate }}'">

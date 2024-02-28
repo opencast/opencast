@@ -223,13 +223,13 @@ public class SearchUpdatedEventHandler {
           if (seriesItem.getOverrideEpisodeAcl()) {
 
             MediaPackageElement[] distributedEpisodeAcls = mp.getElementsByFlavor(XACML_POLICY_EPISODE);
-            authorizationService.removeAcl(mp, AclScope.Episode);
-
             for (MediaPackageElement distributedEpisodeAcl : distributedEpisodeAcls) {
               List<MediaPackageElement> mpes = distributionService.retractSync(CHANNEL_ID, mp,
                       distributedEpisodeAcl.getIdentifier());
               if (mpes == null) {
                 logger.error("Unable to retract episode XACML {}", distributedEpisodeAcl.getIdentifier());
+              } else {
+                authorizationService.removeAcl(mp, AclScope.Episode);
               }
             }
           }

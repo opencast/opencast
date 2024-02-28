@@ -96,6 +96,10 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
                 query = "SELECT w FROM WorkflowInstance as w where w.workflowId=:workflowId and w.organizationId=:organizationId"
         ),
         @NamedQuery(
+            name = "Workflow.workflowByIdOrganizationIndependent",
+            query = "SELECT w FROM WorkflowInstance as w where w.workflowId=:workflowId"
+        ),
+        @NamedQuery(
                 name = "Workflow.getCount",
                 query = "select COUNT(w) from WorkflowInstance w where w.organizationId=:organizationId "
                         + "and (:state is null or w.state = :state) "
@@ -117,6 +121,12 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
                 + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId and "
                 + "(w.state = :stateInstantiated or w.state = :statePaused or w.state = :stateRunning "
                 + "or w.state = :stateFailing) order by w.dateCreated"),
+
+        // For users
+        @NamedQuery(name = "Workflow.countActiveByUser", query = "SELECT COUNT(w) FROM WorkflowInstance w where "
+                + "w.creatorName = :userId and w.organizationId = :organizationId and "
+                + "(w.state = :stateInstantiated or w.state = :statePaused or w.state = :stateRunning "
+                + "or w.state = :stateFailing)"),
 })
 public class WorkflowInstance {
 
@@ -143,7 +153,7 @@ public class WorkflowInstance {
   @Column(name = "creator_id")
   private String creatorName;
 
-  @Column(name = "organization_id")
+  @Column(name = "organization_id")  //NB: This column definition needs to match WorkflowIndexData!
   private String organizationId;
 
   @Column(name = "date_created")
@@ -183,7 +193,7 @@ public class WorkflowInstance {
   @Column(name = "configuration_value")
   protected Map<String, String> configurations;
 
-  @Column(name = "mediapackage_id", length = 128)
+  @Column(name = "mediapackage_id", length = 128) //NB: This column definition needs to match WorkflowIndexData!
   protected String mediaPackageId;
 
   @Column(name = "series_id", length = 128)

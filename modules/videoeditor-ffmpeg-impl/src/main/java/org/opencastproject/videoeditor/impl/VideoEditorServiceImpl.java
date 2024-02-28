@@ -106,6 +106,18 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
 
   private float jobload = DEFAULT_JOB_LOAD;
 
+  public static final String SEGMENTS_MIN_DURATION_KEY = "segments.min.duration";
+
+  private static final int DEFAULT_SEGMENTS_MIN_DURATION = 2000;
+
+  private int segmentsMinDuration = DEFAULT_SEGMENTS_MIN_DURATION;
+
+  public static final String SEGMENTS_MIN_CUT_DURATION_KEY = "segments.min.cut.duration";
+
+  private static final int DEFAULT_SEGMENTS_MIN_CUT_DURATION = 2000;
+
+  private int segmentsMinCutDuration = DEFAULT_SEGMENTS_MIN_CUT_DURATION;
+
   /**
    * The logging instance
    */
@@ -312,7 +324,8 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
 
       // If we are cutting video/audio, use ffmpeg
       if (videoclips.size() > 0) {
-        List<VideoClip> cleanclips = sortSegments(videoclips);    // remove very short cuts that will look bad
+        // remove very short cuts that will look bad
+        List<VideoClip> cleanclips = sortSegments(videoclips, segmentsMinDuration, segmentsMinCutDuration);
         String error = null;
         String outputResolution = "";    //TODO: fetch the largest output resolution from SMIL.head.layout.root-layout
         // When outputResolution is set to WxH, all clips are scaled to that size in the output video.
@@ -332,7 +345,8 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       // Or give up
       // TODO: It might be better if subtitle tracks were assigned the mediatype "texttrack" in the first place
       if (refElements.size() > 0) {
-        List<VideoClip> cleanclips = sortSegments(refElements);    // remove very short cuts that will look bad
+        // remove very short cuts that will look bad
+        List<VideoClip> cleanclips = sortSegments(refElements, segmentsMinDuration, segmentsMinCutDuration);
         String extension = FilenameUtils.getExtension(sourceTrackUri);
         if (VideoEditorProperties.WEBVTT_EXTENSION.equals(extension)) {
           // Parse
@@ -442,7 +456,8 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
   /* Clean up the edit points, make sure they are at least 2 seconds apart (default fade duration)
    * Otherwise it can be very slow to run and output will be ugly because of the cross fades
    */
-  private static List<VideoClip> sortSegments(List<VideoClip> edits) {
+  private static List<VideoClip> sortSegments(List<VideoClip> edits, int segmentsMinDuration,
+      int segmentsMinCutDuration) {
     LinkedList<VideoClip> ll = new LinkedList<>();
     List<VideoClip> clips = new ArrayList<>();
     Iterator<VideoClip> it = edits.iterator();
@@ -450,17 +465,18 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     VideoClip nextclip;
     while (it.hasNext()) {     // Check for legal durations
       clip = it.next();
-      if (clip.getDurationInSeconds() > 2) { // Keep segments at least 2 seconds long
+      if (clip.getDurationInMilliseconds() > segmentsMinDuration) { // Keep segments longer than segmentsMinDuration
         ll.add(clip);
       }
     }
     clip = ll.pop();        // initialize
-    while (!ll.isEmpty()) { // Check that 2 consecutive segments from same src are at least 2 secs apart
+    while (!ll.isEmpty()) { // Check that 2 consecutive segments from same src are at least segmentsMinCutDuration apart
       if (ll.peek() != null) {
         nextclip = ll.pop();  // check next consecutive segment
         // collapse two segments into one
-        if (nextclip.getSrc() == clip.getSrc() && nextclip.getStartInSeconds() - clip.getEndInSeconds() < 2) {
-          clip.setEnd(nextclip.getEndInMilliseconds());   // by using inpt of seg 1 and outpoint of seg 2
+        if (nextclip.getSrc() == clip.getSrc()
+            && nextclip.getStartInMilliseconds() - clip.getEndInMilliseconds() < segmentsMinCutDuration) {
+          clip.setEnd(nextclip.getEndInMilliseconds());   // by using input of seg 1 and outpoint of seg 2
         } else {
           clips.add(clip);   // keep last segment
           clip = nextclip;   // check next segment
@@ -567,6 +583,10 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     logger.debug("Properties updated!");
 
     jobload = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_KEY, DEFAULT_JOB_LOAD, serviceRegistry);
+    segmentsMinDuration = Integer.parseInt(this.properties.getProperty(SEGMENTS_MIN_DURATION_KEY,
+        String.valueOf(DEFAULT_SEGMENTS_MIN_DURATION)));
+    segmentsMinCutDuration = Integer.parseInt(this.properties.getProperty(SEGMENTS_MIN_CUT_DURATION_KEY,
+        String.valueOf(DEFAULT_SEGMENTS_MIN_CUT_DURATION)));
   }
 
   @Reference

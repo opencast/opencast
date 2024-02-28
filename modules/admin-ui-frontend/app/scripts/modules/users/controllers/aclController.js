@@ -75,11 +75,21 @@ angular.module('adminNg.controllers')
 
               UserResource.get({ username: id }).$promise.then(function (data) {
                 policy.user = data;
+                $scope.policiesUser.push(policy);
+                // Did we get a user not present in Opencast (e.g. LDAP)? Add it to the list!
+                if ($scope.users.map(user => user.id).indexOf(id) == -1) {
+                  if ($scope.aclCreateDefaults['sanitize']) {
+                    // FixMe: See the FixMe above pertaining to sanitize
+                    data.userRole = $scope.roleUserPrefix + id.replace(/\W/g, '_').toUpperCase();
+                  } else {
+                    data.userRole = $scope.roleUserPrefix + id;
+                  }
+                  $scope.users.push(data);
+                }
               }).catch(function() {
                 policy.userDoesNotExist = id;
+                $scope.policiesUser.push(policy);
               });
-
-              $scope.policiesUser.push(policy);
             }
           });
 
@@ -91,7 +101,7 @@ angular.module('adminNg.controllers')
     $scope.policies = [];
     $scope.policiesUser = [];
     $scope.baseAcl = {};
-    $scope.baseAclId = '';
+    $scope.baseAclId = undefined;
     $scope.metadata = {};
 
     $scope.changeBaseAcl = function (id) {
@@ -143,6 +153,11 @@ angular.module('adminNg.controllers')
       if (!user) {
         return undefined;
       }
+
+      if (!(user.name || user.username) && user.userRole) {
+        return user.userRole;
+      }
+
       var n = user.name ? user.name : user.username;
       var e = user.email ? '<' + user.email + '>' : '';
 
@@ -182,20 +197,17 @@ angular.module('adminNg.controllers')
     };
 
     $scope.getMatchingRoles = function (value) {
-      RolesResource.queryNameOnly({query: value, target:'ACL'}).$promise.then(function (data) {
+      RolesResource.queryNameOnly({query: value, target: 'ACL'}).$promise.then(function (data) {
         angular.forEach(data, function(newRole) {
           if ($scope.roles.indexOf(newRole) == -1) {
             $scope.roles.unshift(newRole);
-          }
-        });
-      });
-    };
 
-    $scope.getMatchingUsers = function (value) {
-      UsersResource.query({query: value}).$promise.then(function (data) {
-        angular.forEach(data, function(newRole) {
-          if ($scope.roles.indexOf(newRole) == -1) {
-            $scope.roles.unshift(newRole);
+            // So we can have user roles that match custom role patterns
+            if (newRole.startsWith($scope.roleUserPrefix) ) {
+              var user = {};
+              user.userRole = newRole;
+              $scope.users.push(user);
+            }
           }
         });
       });
@@ -239,6 +251,7 @@ angular.module('adminNg.controllers')
             var json = angular.fromJson(data.acl);
             changePolicies(json.ace, true);
             $scope.baseAclId = data.acl.id.toString();
+            $scope.baseAclId = $scope.baseAclId === '0' ? undefined : $scope.baseAclId;
           }
 
           angular.forEach(angular.fromJson(data.acl.ace), function(value, key) {

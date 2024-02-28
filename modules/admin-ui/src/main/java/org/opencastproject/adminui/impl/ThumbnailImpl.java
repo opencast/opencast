@@ -462,15 +462,22 @@ public final class ThumbnailImpl {
 
     final Collection<URI> deletionUris = new ArrayList<>(0);
     try {
+      boolean downscale;
       if (optPreview.isPresent()) {
         createTempThumbnail(mp, optPreview.get().getA(), optPreview.get().getB());
         archive(mp);
+        downscale = false;
+      } else {
+        tempThumbnail = composerService.imageSync(track, this.masterProfile, position).get(0).getURI();
+        tempThumbnailMimeType = MimeTypes.fromURI(tempThumbnail);
+        tempThumbnailFileName = tempThumbnail.getPath().substring(tempThumbnail.getPath().lastIndexOf('/') + 1);
+        downscale = true;
       }
 
       // Remove any uploaded thumbnails
       Arrays.stream(mp.getElementsByFlavor(uploadedFlavor)).forEach(mp::remove);
 
-      final Tuple<URI, List<MediaPackageElement>> internalPublicationResult = updateInternalPublication(mp, false);
+      final Tuple<URI, List<MediaPackageElement>> internalPublicationResult = updateInternalPublication(mp, downscale);
       deletionUris.add(internalPublicationResult.getA());
 
       if (distributionConfigurable.getEnabled()) {
