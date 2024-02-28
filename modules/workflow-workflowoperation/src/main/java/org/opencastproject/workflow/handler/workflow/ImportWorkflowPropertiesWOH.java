@@ -22,7 +22,6 @@
 package org.opencastproject.workflow.handler.workflow;
 
 import static com.entwinemedia.fn.Stream.$;
-import static java.lang.String.format;
 import static org.opencastproject.workflow.api.WorkflowOperationResult.Action.CONTINUE;
 import static org.opencastproject.workflow.api.WorkflowOperationResult.Action.SKIP;
 
@@ -30,6 +29,7 @@ import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.mediapackage.selector.AttachmentSelector;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
@@ -39,7 +39,6 @@ import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.fns.Strings;
 
 import org.osgi.service.component.annotations.Component;
@@ -52,6 +51,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -92,32 +92,19 @@ public class ImportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
         Configuration.none, Configuration.one, Configuration.none, Configuration.none);
     final MediaPackageElementFlavor sourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
     MediaPackage mp = wi.getMediaPackage();
-    Opt<Attachment> propertiesElem = loadPropertiesElementFromMediaPackage(
-            sourceFlavor, mp);
-    if (propertiesElem.isSome()) {
-      Properties properties = loadPropertiesFromXml(workspace, propertiesElem.get().getURI());
+    AttachmentSelector attachmentSelector = new AttachmentSelector();
+    attachmentSelector.addFlavor(sourceFlavor);
+    Collection<Attachment> attachments = attachmentSelector.select(mp, false);
+
+    if (attachments.size() == 1) {
+      Attachment propertiesElem = attachments.iterator().next();
+      Properties properties = loadPropertiesFromXml(workspace, propertiesElem.getURI());
       final Set<String> keys = $(getOptConfig(wi, KEYS_PROPERTY)).bind(Strings.splitCsv).toSet();
       return createResult(mp, convertToWorkflowProperties(properties, keys), CONTINUE, 0);
     } else {
       logger.info("No attachment with workflow properties found, skipping...");
       return createResult(mp, SKIP);
     }
-  }
-
-  static Opt<Attachment> loadPropertiesElementFromMediaPackage(MediaPackageElementFlavor sourceFlavor,
-      MediaPackage mp) throws WorkflowOperationException {
-    final Attachment[] elements = mp.getAttachments(sourceFlavor);
-
-    if (elements.length < 1) {
-      logger.info("Cannot import workflow properties - no element with flavor '{}' found in media package '{}'",
-              sourceFlavor, mp.getIdentifier());
-      return Opt.none();
-    } else if (elements.length > 1) {
-      throw new WorkflowOperationException(format("Found more than one element with flavor '%s' in media package '%s'",
-              sourceFlavor, mp.getIdentifier()));
-    }
-
-    return Opt.some(elements[0]);
   }
 
   static Properties loadPropertiesFromXml(Workspace workspace, URI uri) throws WorkflowOperationException {

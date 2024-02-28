@@ -37,6 +37,7 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageReference;
 import org.opencastproject.mediapackage.MediaPackageReferenceImpl;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.metadata.mpeg7.MediaTimePoint;
 import org.opencastproject.metadata.mpeg7.Mpeg7Catalog;
 import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
@@ -206,12 +207,16 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
       throw new IllegalStateException("Encoding profile '" + encodingProfileName + "' was not found");
 
     // Select the tracks based on the tags and flavors
+    TrackSelector trackSelector = new TrackSelector();
+    trackSelector.addFlavor(sourceVideoFlavor);
+    for (String tag : sourceTagSet) {
+      trackSelector.addTag(tag);
+    }
+    Collection<Track> tracks = trackSelector.select(mediaPackage, true);
+
     Set<Track> videoTrackSet = new HashSet<>();
-    for (Track track : mediaPackage.getTracksByTags(sourceTagSet)) {
-      if (sourceVideoFlavor == null
-              || (track.getFlavor() != null && sourceVideoFlavor.equals(track.getFlavor()))) {
-        if (!track.hasVideo())
-          continue;
+    for (Track track: tracks) {
+      if (track.hasVideo()) {
         videoTrackSet.add(track);
       }
     }

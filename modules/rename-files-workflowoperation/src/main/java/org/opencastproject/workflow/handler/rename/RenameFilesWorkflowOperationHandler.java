@@ -27,6 +27,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
+import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.util.NotFoundException;
@@ -120,39 +121,42 @@ public class RenameFilesWorkflowOperationHandler extends AbstractWorkflowOperati
     // Select tracks by evaluating source tags and flavors
     List<MediaPackageElementFlavor> sourceFlavors = tagsAndFlavors.getSrcFlavors();
 
-    for (var flavor: sourceFlavors) {
-      for (var track: mediaPackage.getTracks(flavor)) {
-        var uri = track.getURI();
-        var extension = FilenameUtils.getExtension(uri.toString());
-        var newElementId = UUID.randomUUID().toString();
+    TrackSelector trackSelector = new TrackSelector();
+    for (MediaPackageElementFlavor sourceFlavor: sourceFlavors) {
+      trackSelector.addFlavor(sourceFlavor);
+    }
 
-        // Prepare placeholders and filename
-        var filename = pattern;
-        for (var entry: placeholders(mediaPackage, track).entrySet()) {
-          filename = filename.replace(entry.getKey(), entry.getValue());
-        }
-        filename = filename.replaceAll("#\\{[a-z.]*}", "_");
+    for (var track: trackSelector.select(mediaPackage, false)) {
+      var uri = track.getURI();
+      var extension = FilenameUtils.getExtension(uri.toString());
+      var newElementId = UUID.randomUUID().toString();
 
-        // Put updated filename in working file repository and update the track.
-        // Make sure it has a new identifier to prevent conflicts with the old files.
-        try (var in = workspace.read(uri)) {
-          var newUri = workspace.put(mediaPackageId, newElementId, filename, in);
-          logger.info("Renaming {} to {}", uri, newUri);
-          track.setIdentifier(newElementId);
-          track.setURI(newUri);
-        } catch (NotFoundException | IOException e) {
-          throw new WorkflowOperationException("Failed moving track file", e);
-        }
-
-        // Delete the old files from the working file repository and workspace if they were in there
-        logger.debug("Removing old track file {}", uri);
-        try {
-          workspace.delete(uri);
-        } catch (NotFoundException | IOException e) {
-          logger.debug("Could not remove track from workspace. Could be it was never there.");
-        }
-
+      // Prepare placeholders and filename
+      var filename = pattern;
+      for (var entry: placeholders(mediaPackage, track).entrySet()) {
+        filename = filename.replace(entry.getKey(), entry.getValue());
       }
+      filename = filename.replaceAll("#\\{[a-z.]*}", "_");
+
+      // Put updated filename in working file repository and update the track.
+      // Make sure it has a new identifier to prevent conflicts with the old files.
+      try (var in = workspace.read(uri)) {
+        var newUri = workspace.put(mediaPackageId, newElementId, filename, in);
+        logger.info("Renaming {} to {}", uri, newUri);
+        track.setIdentifier(newElementId);
+        track.setURI(newUri);
+      } catch (NotFoundException | IOException e) {
+        throw new WorkflowOperationException("Failed moving track file", e);
+      }
+
+      // Delete the old files from the working file repository and workspace if they were in there
+      logger.debug("Removing old track file {}", uri);
+      try {
+        workspace.delete(uri);
+      } catch (NotFoundException | IOException e) {
+        logger.debug("Could not remove track from workspace. Could be it was never there.");
+      }
+
     }
 
     return createResult(mediaPackage, Action.CONTINUE);

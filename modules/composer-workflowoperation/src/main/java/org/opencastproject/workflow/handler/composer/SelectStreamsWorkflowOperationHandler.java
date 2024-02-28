@@ -31,6 +31,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -250,14 +251,16 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
     final MediaPackageElementFlavor targetTrackFlavor = tagsAndFlavors.getSingleTargetFlavor();
     final List<String> targetTrackTags = tagsAndFlavors.getTargetTags();
 
-    final Track[] tracks = mediaPackage.getTracks(sourceFlavor);
+    TrackSelector trackSelector = new TrackSelector();
+    trackSelector.addFlavor(sourceFlavor);
+    final Collection<Track> tracks = trackSelector.select(mediaPackage, false);
 
-    if (tracks.length == 0) {
+    if (tracks.size() == 0) {
       logger.info("No audio/video tracks with flavor '{}' found to prepare", sourceFlavor);
       return createResult(mediaPackage, WorkflowOperationResult.Action.CONTINUE);
     }
 
-    final List<AugmentedTrack> augmentedTracks = createAugmentedTracks(tracks, workflowInstance);
+    final List<AugmentedTrack> augmentedTracks = createAugmentedTracks(tracks.toArray(new Track[tracks.size()]), workflowInstance);
 
     final MuxResult result = MuxResult.empty();
     // Note that the logic below currently supports at most two input tracks
