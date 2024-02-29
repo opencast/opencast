@@ -2,7 +2,7 @@
   "name": "adminui",
   "private": true,
   "devDependencies": {
-    "autoprefixer": "^9.8.8",
+    "autoprefixer": "^10.4.17",
     "bower": "^1.8.14",
     "chromedriver": "^122.0.3",
     "eslint": "^8.56.0",
