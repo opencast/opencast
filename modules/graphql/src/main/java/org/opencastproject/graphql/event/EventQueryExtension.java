@@ -52,7 +52,6 @@ public final class EventQueryExtension {
   }
 
   @GraphQLField
-  @GraphQLNonNull
   @GraphQLDescription("Returns a event by id")
   public static GqlEvent eventById(
       @GraphQLName("id")@GraphQLNonNull String id,

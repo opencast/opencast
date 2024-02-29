@@ -25,7 +25,6 @@ import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.graphql.datafetcher.ContextDataFetcher;
 import org.opencastproject.graphql.event.GqlEvent;
-import org.opencastproject.graphql.exception.GraphQLNotFoundException;
 import org.opencastproject.graphql.exception.GraphQLRuntimeException;
 import org.opencastproject.graphql.exception.OpencastErrorType;
 import org.opencastproject.graphql.execution.context.OpencastContext;
@@ -35,6 +34,12 @@ import java.util.Objects;
 
 import graphql.schema.DataFetchingEnvironment;
 
+/**
+ * The EventDataFetcher class implements the ContextDataFetcher interface with GqlEvent as the generic type.
+ * This class is used to fetch event data in a GraphQL context.
+ * <p>
+ * If the requested event is not found, a null value is returned.
+ */
 public class EventDataFetcher implements ContextDataFetcher<GqlEvent> {
 
   private final String eventId;
@@ -51,9 +56,7 @@ public class EventDataFetcher implements ContextDataFetcher<GqlEvent> {
 
     try {
       return searchIndex.getEvent(eventId, securityService.getOrganization().toString(), securityService.getUser())
-          .map(GqlEvent::new).orElseThrow(() -> new GraphQLNotFoundException(
-                  String.format("Could not resolve to a %s with the id of %s", GqlEvent.TYPE_NAME, eventId))
-          );
+          .map(GqlEvent::new).orElse(null);
     } catch (SearchIndexException e) {
       throw new GraphQLRuntimeException(OpencastErrorType.InternalError, e);
     }

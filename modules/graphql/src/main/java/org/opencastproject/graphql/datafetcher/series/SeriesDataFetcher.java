@@ -24,7 +24,6 @@ package org.opencastproject.graphql.datafetcher.series;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.graphql.datafetcher.ContextDataFetcher;
-import org.opencastproject.graphql.exception.GraphQLNotFoundException;
 import org.opencastproject.graphql.exception.GraphQLRuntimeException;
 import org.opencastproject.graphql.exception.OpencastErrorType;
 import org.opencastproject.graphql.execution.context.OpencastContext;
@@ -35,6 +34,13 @@ import java.util.Objects;
 
 import graphql.schema.DataFetchingEnvironment;
 
+
+/**
+ * The SeriesDataFetcher class implements the ContextDataFetcher interface with GqlSeries as the generic type.
+ * This class is used to fetch series data in a GraphQL context.
+ * <p>
+ * If the requested series is not found, a null value is returned.
+ */
 public class SeriesDataFetcher implements ContextDataFetcher<GqlSeries> {
 
   private final String seriesId;
@@ -52,9 +58,7 @@ public class SeriesDataFetcher implements ContextDataFetcher<GqlSeries> {
 
     try {
       return searchIndex.getSeries(seriesId, securityService.getOrganization().toString(), securityService.getUser())
-          .map(GqlSeries::new).orElseThrow(() -> new GraphQLNotFoundException(
-                  String.format("Could not resolve to a %s with the id of %s", GqlSeries.TYPE_NAME, seriesId))
-          );
+          .map(GqlSeries::new).orElse(null);
     } catch (SearchIndexException e) {
       throw new GraphQLRuntimeException(OpencastErrorType.InternalError, e);
     }
