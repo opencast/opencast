@@ -67,7 +67,7 @@ public class ExecutionService {
   public @interface ExecutionConfiguration {
     int execution_max_query_complexity() default 1000;
 
-    int execution_max_query_depth() default 10;
+    int execution_max_query_depth() default 25;
 
   }
 
@@ -143,6 +143,10 @@ public class ExecutionService {
     if (logger.isTraceEnabled()) {
       logger.trace("Enabling tracing instrumentation for organization `{}`", organizationId);
       chainedList.add(new TracingInstrumentation());
+    }
+
+    if (schema == null) {
+      return null;
     }
 
     if (graphQL == null || !schema.equals(graphQL.getGraphQLSchema())) {
