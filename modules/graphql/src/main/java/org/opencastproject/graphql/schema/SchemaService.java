@@ -63,7 +63,7 @@ import graphql.schema.GraphQLSchema;
 public class SchemaService implements OrganizationDirectoryListener {
 
   @ObjectClassDefinition
-  public @interface Config {
+  public @interface SchemaConfiguration {
 
     int schema_update_trigger_delay() default 2000;
 
@@ -95,7 +95,7 @@ public class SchemaService implements OrganizationDirectoryListener {
   @Activate
   public SchemaService(
       @Reference OrganizationDirectoryService organizationDirectoryService,
-      final Config config
+      final SchemaConfiguration config
   ) {
     if (config.schema_update_trigger_delay() < 0) {
       throw new IllegalArgumentException("Schema update trigger delay must be greater than or equal to 0");

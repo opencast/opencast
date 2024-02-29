@@ -32,16 +32,23 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
+import graphql.analysis.MaxQueryComplexityInstrumentation;
+import graphql.analysis.MaxQueryDepthInstrumentation;
 import graphql.execution.AsyncExecutionStrategy;
 import graphql.execution.AsyncSerialExecutionStrategy;
+import graphql.execution.instrumentation.ChainedInstrumentation;
+import graphql.execution.instrumentation.Instrumentation;
+import graphql.execution.instrumentation.tracing.TracingInstrumentation;
 import graphql.schema.GraphQLSchema;
 
 @Component(
@@ -55,18 +62,35 @@ public class ExecutionService {
   private final SchemaService schemaService;
   private final BundleContext bundleContext;
 
-
   private final Map<String, GraphQL> organizationGraphQL = new ConcurrentHashMap<>();
+
+  public @interface ExecutionConfiguration {
+    int execution_max_query_complexity() default 1000;
+
+    int execution_max_query_depth() default 10;
+
+  }
+
+  private final ExecutionConfiguration config;
 
   @Activate
   public ExecutionService(
       @Reference SchemaService schemaService,
       @Reference SecurityService securityService,
-      BundleContext bundleContext
+      BundleContext bundleContext,
+      ExecutionConfiguration config
   ) {
+    if (config.execution_max_query_complexity() <= 0) {
+      throw new IllegalArgumentException("execution_max_query_complexity must be greater than 0");
+    }
+    if (config.execution_max_query_depth() <= 0) {
+      throw new IllegalArgumentException("execution_max_query_depth must be greater than 0");
+    }
+
     this.schemaService = schemaService;
     this.securityService = securityService;
     this.bundleContext = bundleContext;
+    this.config = config;
   }
 
   public ExecutionResult execute(
@@ -112,6 +136,15 @@ public class ExecutionService {
     GraphQL graphQL = organizationGraphQL.get(organizationId);
     GraphQLSchema schema = schemaService.get(organizationId);
 
+    List<Instrumentation> chainedList = new ArrayList<>(
+        List.of(new MaxQueryDepthInstrumentation(config.execution_max_query_depth()),
+            new MaxQueryComplexityInstrumentation(config.execution_max_query_complexity())));
+
+    if (logger.isTraceEnabled()) {
+      logger.trace("Enabling tracing instrumentation for organization `{}`", organizationId);
+      chainedList.add(new TracingInstrumentation());
+    }
+
     if (graphQL == null || !schema.equals(graphQL.getGraphQLSchema())) {
       var exceptionHandler = new OpencastDataFetcherExceptionHandler();
       graphQL = GraphQL.newGraphQL(schema)
@@ -119,6 +152,7 @@ public class ExecutionService {
           .mutationExecutionStrategy(new AsyncSerialExecutionStrategy(exceptionHandler))
           .executionIdProvider(new OrganizationExecutionIdProvider(organizationId))
           .defaultDataFetcherExceptionHandler(exceptionHandler)
+          .instrumentation(new ChainedInstrumentation(chainedList))
           .build();
       organizationGraphQL.put(organizationId, graphQL);
     }
