@@ -118,28 +118,6 @@ public abstract class Value {
    * Decompose (or pattern match) the value instance. Provide a function to handle each possible type.
    * Use {@link #doNotMatch()} as a placeholder that yields an error.
    */
-//  public final <A> A decompose(
-//          Fn<? super String, ? extends A> stringValue,
-//          Fn<? super Date, ? extends A> dateValue,
-//          Fn<? super Long, ? extends A> longValue,
-//          Fn<? super Boolean, ? extends A> booleanValue,
-//          Fn<? super Version, ? extends A> versionValue) {
-//    if (this instanceof StringValue) {
-//      return stringValue.apply(((StringValue) this).get());
-//    } else if (this instanceof DateValue) {
-//      return dateValue.apply(((DateValue) this).get());
-//    } else if (this instanceof LongValue) {
-//      return longValue.apply(((LongValue) this).get());
-//    } else if (this instanceof BooleanValue) {
-//      return booleanValue.apply(((BooleanValue) this).get());
-//    } else if (this instanceof VersionValue) {
-//      return versionValue.apply(((VersionValue) this).get());
-//    } else {
-//      // catch bug
-//      throw new Error("Unexhaustive match: " + this);
-//    }
-//  }
-
   public final <A> A decompose(
       Function<? super String, ? extends  A> stringValue,
       Function<? super Date, ? extends A> dateValue,
@@ -171,14 +149,6 @@ public abstract class Value {
    *
    * @see #decompose(Fn, Fn, Fn, Fn, Fn)
    */
-//  public static <B> Fn<Object, B> doNotMatch() {
-//    return new Fn<Object, B>() {
-//      @Override public B apply(Object a) {
-//        throw new Error("Unexhaustive match: " + a);
-//      }
-//    };
-//  }
-
   public static <B> Function<Object, B> doNotMatch() {
     return new Function<Object, B>() {
       @Override public B apply(Object a) {
