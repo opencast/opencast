@@ -204,5 +204,8 @@ public class GqlEvent {
     return null;
   }
 
+  public Event getEvent() {
+    return event;
+  }
 
 }

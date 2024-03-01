@@ -21,38 +21,30 @@
 
 package org.opencastproject.graphql.type.output;
 
-import org.opencastproject.graphql.type.AccessControlEntryTypeResolver;
-import org.opencastproject.security.api.AccessControlEntry;
+import org.opencastproject.security.api.AccessControlList;
 
+import graphql.annotations.annotationTypes.GraphQLDescription;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
-import graphql.annotations.annotationTypes.GraphQLUnion;
 
-@GraphQLName(GqlAccessControlEntry.TYPE_NAME)
-@GraphQLUnion(possibleTypes = {
-    GqlAccessControlUserEntry.class,
-    GqlAccessControlGroupEntry.class,
-    GqlAccessControlGenericEntry.class },
-    typeResolver = AccessControlEntryTypeResolver.class)
-public interface GqlAccessControlEntry {
+@GraphQLName(GqlAccessControlList.TYPE_NAME)
+@GraphQLDescription("Access control list")
+public class GqlAccessControlList {
 
-  String TYPE_NAME = "GqlAccessControlEntry";
+  public static final String TYPE_NAME = "GqlAccessControlList";
 
-  AccessControlEntry getAccessControlEntry();
+  private final AccessControlList accessControlList;
 
-  @GraphQLField
-  default String role() {
-    return getAccessControlEntry().getRole();
+  public GqlAccessControlList(AccessControlList accessControlList) {
+    this.accessControlList = accessControlList;
   }
 
   @GraphQLField
-  default String action() {
-    return getAccessControlEntry().getAction();
+  public GqlAccessControlEntry[] entries() {
+    return accessControlList.getEntries().stream()
+        .map(GqlAccessControlGenericEntry::new)
+        .toArray(GqlAccessControlEntry[]::new);
   }
 
-  @GraphQLField
-  default boolean allow() {
-    return getAccessControlEntry().isAllow();
-  }
 
 }
