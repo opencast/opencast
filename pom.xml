@@ -1244,7 +1244,7 @@
       <dependency>
         <groupId>org.influxdb</groupId>
         <artifactId>influxdb-java</artifactId>
-        <version>2.15</version>
+        <version>2.24</version>
       </dependency>
       <!-- testing -->
       <dependency>
