@@ -25,7 +25,6 @@ import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.fn.ARecords;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -48,7 +47,7 @@ public final class RichAResult implements AResult {
 
   /** Count all properties contained in the result. */
   public int countProperties() {
-    return new HashSet(getProperties()).size();
+    return getProperties().size();
   }
 
   /** Get all selected snapshots. */
@@ -63,7 +62,7 @@ public final class RichAResult implements AResult {
 
   /** Count all snapshots contained in the result. */
   public int countSnapshots() {
-    return new HashSet(getSnapshots()).size();
+    return getSnapshots().size();
   }
 
   /** Get all selected versions. */
