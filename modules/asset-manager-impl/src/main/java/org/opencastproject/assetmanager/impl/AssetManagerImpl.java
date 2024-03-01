@@ -177,6 +177,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private static final String MANIFEST_DEFAULT_NAME = "manifest";
 
+  private static final String CONFIG_EPISODE_ID_ROLE = "episode.id.role.access";
+
   private CopyOnWriteArrayList<AssetManagerUpdateHandler> handlers = new CopyOnWriteArrayList<>();
 
   private SecurityService securityService;
@@ -192,6 +194,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   private AclServiceFactory aclServiceFactory;
   private ElasticsearchIndex index;
   private Map<String, List<EventCatalogUIAdapter>> extendedEventCatalogUIAdapters = new HashMap<>();
+  private boolean episodeIdRole = false;
 
   // Settings for role filter
   private boolean includeAPIRoles;
@@ -218,6 +221,9 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     includeAPIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeAPIRoles"), null));
     includeCARoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeCARoles"), null));
     includeUIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeUIRoles"), null));
+
+    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get(CONFIG_EPISODE_ID_ROLE), "false"));
+    logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
   }
 
   /**
@@ -1582,6 +1588,17 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
       AccessControlList acl = authorizationService.getActiveAcl(mp).getA();
       List<ManagedAcl> acls = aclServiceFactory.serviceFor(securityService.getOrganization()).getAcls();
+
+      if (episodeIdRole) {
+        // Add custom roles to the ACL
+        // This allows users with a role of the form ROLE_EPISODE_<ID>_<ACTION> to access the event through the index
+        AccessControlEntry entry1 = new AccessControlEntry("ROLE_EPISODE_" + eventId + "_READ", "read", true);
+        AccessControlEntry entry2 = new AccessControlEntry("ROLE_EPISODE_" + eventId + "_WRITE", "read", true);
+        AccessControlEntry entry3 = new AccessControlEntry("ROLE_EPISODE_" + eventId + "_WRITE", "write", true);
+        AccessControlList customRoles = new AccessControlList(entry1, entry2, entry3);
+        acl = customRoles.merge(acl);
+      }
+
       for (final ManagedAcl managedAcl : AccessInformationUtil.matchAcls(acls, acl)) {
         event.setManagedAcl(managedAcl.getName());
       }
