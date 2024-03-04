@@ -31,7 +31,7 @@ public class GraphQLNotFoundException extends RuntimeException implements GraphQ
   private static final long serialVersionUID = 2925029942004451904L;
 
   public GraphQLNotFoundException(String message) {
-    super(message);
+    super(message, null, false, false);
   }
 
   @Override

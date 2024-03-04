@@ -21,6 +21,7 @@
 
 package org.opencastproject.graphql.execution;
 
+import org.opencastproject.graphql.exception.GraphQLNotFoundException;
 import org.opencastproject.graphql.execution.context.OpencastContextManager;
 import org.opencastproject.graphql.schema.SchemaService;
 import org.opencastproject.security.api.SecurityService;
@@ -122,8 +123,10 @@ public class ExecutionService {
       var graphQL = getGraphQL(securityService.getOrganization().getId());
 
       if (graphQL == null) {
-        throw new IllegalStateException(
-            "No GraphQL schema found for organization `" + securityService.getOrganization().getId() + "`");
+        return ExecutionErrorResult.newExecutionResult()
+            .addError(new GraphQLNotFoundException("No GraphQL schema found for organization `"
+                + securityService.getOrganization().getId() + "`")
+            ).build();
       }
 
       return graphQL.execute(executionInput);
