@@ -321,10 +321,10 @@ public class XACMLAuthorizationService implements AuthorizationService {
     var allowed = false;
 
     // Check special ROLE_EPISODE_<ID>_<ACTION> permissions
-    logger.error("episodeIdRole set to: {}", episodeIdRole);
+    logger.debug("episodeIdRole set to: {}", episodeIdRole);
     if (episodeIdRole) {
       var episodeRole = "ROLE_EPISODE_" + mp.getIdentifier() + "_" + action.toUpperCase();
-      logger.error("Checking for role: {}", episodeRole);
+      logger.debug("Checking for role: {}", episodeRole);
       allowed = user.getRoles().stream().map(Role::getName).anyMatch(r -> r.equals(episodeRole));
     }
 
