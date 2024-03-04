@@ -947,6 +947,11 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   @Override
   public void repopulate() throws IndexRebuildException {
+    repopulate(null);
+  }
+
+  @Override
+  public void repopulate(IndexRebuildService.ServicePart type) throws IndexRebuildException {
     final Organization originalOrg = securityService.getOrganization();
     final User originalUser = (originalOrg != null ? securityService.getUser() : null);
     try {
@@ -964,7 +969,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       var updatedEventRange = new ArrayList<Event>();
       do {
         r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).orderBy(q.mediapackageId().desc())
-          .page(offset, PAGE_SIZE).run());
+            .page(offset, PAGE_SIZE).run());
         offset += PAGE_SIZE;
         int n = 20;
 
@@ -982,7 +987,15 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
                 var updatedEventData = index.getEvent(snapshot.getMediaPackage().getIdentifier().toString(), orgId,
                     snapshotSystemUser);
-                updatedEventData = getEventUpdateFunction(snapshot, orgId, snapshotSystemUser).apply(updatedEventData);
+                if (IndexRebuildService.ServicePart.ACL.equals(type)) {
+                  // Only reindex ACLs
+                  updatedEventData = getEventUpdateFunctionOnlyAcl(snapshot, orgId, snapshotSystemUser)
+                      .apply(updatedEventData);
+                } else {
+                  // Reindex everything (default)
+                  updatedEventData = getEventUpdateFunction(snapshot, orgId, snapshotSystemUser)
+                      .apply(updatedEventData);
+                }
                 updatedEventRange.add(updatedEventData.get());
 
                 if (updatedEventRange.size() >= n || current >= total) {
@@ -992,7 +1005,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                 }
               } catch (Throwable t) {
                 logSkippingElement(logger, "event", snapshot.getMediaPackage().getIdentifier().toString(),
-                        snapshotOrg, t);
+                    snapshotOrg, t);
               }
             }
           } catch (Throwable t) {
@@ -1586,23 +1599,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       String eventId = mp.getIdentifier().toString();
       Event event = eventOpt.orElse(new Event(eventId, orgId));
 
-      AccessControlList acl = authorizationService.getActiveAcl(mp).getA();
-      List<ManagedAcl> acls = aclServiceFactory.serviceFor(securityService.getOrganization()).getAcls();
+      event = updateAclInEvent(event, mp, eventId);
 
-      if (episodeIdRole) {
-        // Add custom roles to the ACL
-        // This allows users with a role of the form ROLE_EPISODE_<ID>_<ACTION> to access the event through the index
-        AccessControlEntry entry1 = new AccessControlEntry("ROLE_EPISODE_" + eventId + "_READ", "read", true);
-        AccessControlEntry entry2 = new AccessControlEntry("ROLE_EPISODE_" + eventId + "_WRITE", "read", true);
-        AccessControlEntry entry3 = new AccessControlEntry("ROLE_EPISODE_" + eventId + "_WRITE", "write", true);
-        AccessControlList customRoles = new AccessControlList(entry1, entry2, entry3);
-        acl = customRoles.merge(acl);
-      }
-
-      for (final ManagedAcl managedAcl : AccessInformationUtil.matchAcls(acls, acl)) {
-        event.setManagedAcl(managedAcl.getName());
-      }
-      event.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
       event.setArchiveVersion(Long.parseLong(snapshot.getVersion().toString()));
       if (StringUtils.isBlank(event.getCreator())) {
         event.setCreator(securityService.getUser().getName());
@@ -1627,5 +1625,40 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       }
       return Optional.of(event);
     };
+  }
+
+  private Function<Optional<Event>, Optional<Event>> getEventUpdateFunctionOnlyAcl(Snapshot snapshot,
+      String orgId, User user) {
+    return (Optional<Event> eventOpt) -> {
+      MediaPackage mp = snapshot.getMediaPackage();
+      String eventId = mp.getIdentifier().toString();
+      Event event = eventOpt.orElse(new Event(eventId, orgId));
+
+      event = updateAclInEvent(event, mp, eventId);
+
+      return Optional.of(event);
+    };
+  }
+
+  private Event updateAclInEvent(Event event, MediaPackage mp, String eventId) {
+    AccessControlList acl = authorizationService.getActiveAcl(mp).getA();
+    List<ManagedAcl> acls = aclServiceFactory.serviceFor(securityService.getOrganization()).getAcls();
+
+    if (episodeIdRole) {
+      // Add custom roles to the ACL
+      // This allows users with a role of the form ROLE_EPISODE_<ID>_<ACTION> to access the event through the index
+      AccessControlEntry entry1 = new AccessControlEntry("ROLE_EPISODE_" + eventId + "_READ", "read", true);
+      AccessControlEntry entry2 = new AccessControlEntry("ROLE_EPISODE_" + eventId + "_WRITE", "read", true);
+      AccessControlEntry entry3 = new AccessControlEntry("ROLE_EPISODE_" + eventId + "_WRITE", "write", true);
+      AccessControlList customRoles = new AccessControlList(entry1, entry2, entry3);
+      acl = customRoles.merge(acl);
+    }
+
+    for (final ManagedAcl managedAcl : AccessInformationUtil.matchAcls(acls, acl)) {
+      event.setManagedAcl(managedAcl.getName());
+    }
+    event.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
+
+    return event;
   }
 }

@@ -31,6 +31,8 @@ public interface IndexProducer {
    */
   void repopulate() throws IndexRebuildException;
 
+  void repopulate(IndexRebuildService.ServicePart type) throws IndexRebuildException;
+
   /**
    * Get the service that implements IndexProducer.
    *
