@@ -1647,10 +1647,16 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     if (episodeIdRole) {
       // Add custom roles to the ACL
       // This allows users with a role of the form ROLE_EPISODE_<ID>_<ACTION> to access the event through the index
-      AccessControlEntry entry1 = new AccessControlEntry("ROLE_EPISODE_" + eventId + "_READ", "read", true);
-      AccessControlEntry entry2 = new AccessControlEntry("ROLE_EPISODE_" + eventId + "_WRITE", "read", true);
-      AccessControlEntry entry3 = new AccessControlEntry("ROLE_EPISODE_" + eventId + "_WRITE", "write", true);
-      AccessControlList customRoles = new AccessControlList(entry1, entry2, entry3);
+      List<AccessControlEntry> customEntries = new ArrayList<>();
+      for (AccessControlEntry entry : acl.getEntries()) {
+        customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + eventId + "_" + entry.getAction().toUpperCase(),
+            entry.getAction(), true));
+        // If write access, grant read access as well
+        if ("write".equals(entry.getAction())) {
+          customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + eventId + "_" + "READ", "read", true));
+        }
+      }
+      AccessControlList customRoles = new AccessControlList(customEntries);
       acl = customRoles.merge(acl);
     }
 
