@@ -37,6 +37,7 @@ import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardServletPatte
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -100,6 +101,7 @@ public class GraphQLServlet extends HttpServlet implements Servlet {
 
     validateQuery(query);
     ExecutionResult result = executionService.execute(query, operationName, variables, extensions);
+    resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
     resp.setContentType(APPLICATION_GRAPHQL);
     try (PrintWriter out = resp.getWriter()) {
       objectMapper.writeValue(out, result);
@@ -131,6 +133,7 @@ public class GraphQLServlet extends HttpServlet implements Servlet {
 
     validateQuery(query);
     ExecutionResult result = executionService.execute(query, operationName, variables, extensions);
+    resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
     resp.setContentType(APPLICATION_GRAPHQL);
     try (PrintWriter out = resp.getWriter()) {
       objectMapper.writeValue(out, result.toSpecification());

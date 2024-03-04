@@ -33,6 +33,7 @@ import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardServletPatte
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -80,6 +81,7 @@ public class SchemaServlet extends HttpServlet implements Servlet {
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
     resp.setContentType(CONTENT_TYPE);
 
     if (securityService.getOrganization() == null) {
