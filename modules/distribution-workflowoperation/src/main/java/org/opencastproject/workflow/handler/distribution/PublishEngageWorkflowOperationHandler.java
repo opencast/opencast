@@ -822,7 +822,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     } catch (SearchException e) {
       throw new WorkflowOperationException("Error retracting media package", e);
     } catch (UnauthorizedException | NotFoundException ex) {
-      logger.error("Retraction failed of Mediapackage: { }", distributedMediaPackage.getIdentifier().toString(), ex);
+      logger.error("Retraction failed of Mediapackage: {}", distributedMediaPackage.getIdentifier().toString(), ex);
     }
   }
 }
