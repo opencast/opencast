@@ -158,6 +158,9 @@ public class Playlist {
 
   public void setEntries(List<PlaylistEntry> entries) {
     for (var entry : entries) {
+      if (!entries.stream().anyMatch(e -> entry.getId() == e.getId())) {
+        entry.setId(0L);
+      }
       entry.setPlaylist(this);
     }
     this.entries = entries;
@@ -165,6 +168,9 @@ public class Playlist {
 
   public boolean addEntry(PlaylistEntry entry) {
     notNull(entry, "entry");
+    if (this.entries.contains(entry)) {
+      entries.remove(entry);
+    }
     entry.setPlaylist(this);
     return entries.add(entry);
   }

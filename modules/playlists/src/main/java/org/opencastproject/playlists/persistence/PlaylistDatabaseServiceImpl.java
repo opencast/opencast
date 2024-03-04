@@ -170,7 +170,7 @@ public class PlaylistDatabaseServiceImpl implements PlaylistDatabaseService {
   @Override
   public Playlist updatePlaylist(Playlist playlist, String orgId) throws PlaylistDatabaseException {
     try {
-      db.execTx(em -> {
+      return db.execTx(em -> {
         Optional<Playlist> fromDb = getPlaylistById(playlist.getId(), orgId).apply(em);
         playlist.setUpdated(new Date());
         if (fromDb.isEmpty()) {
@@ -178,8 +178,9 @@ public class PlaylistDatabaseServiceImpl implements PlaylistDatabaseService {
         } else {
           em.merge(playlist);
         }
+
+        return playlist;
       });
-      return playlist;
     } catch (Exception e) {
       throw new PlaylistDatabaseException("Could not update playlist with ID '" + playlist.getId() + "'", e);
     }
@@ -192,7 +193,7 @@ public class PlaylistDatabaseServiceImpl implements PlaylistDatabaseService {
   @Override
   public Playlist deletePlaylist(Playlist playlist, String orgId) throws PlaylistDatabaseException {
     try {
-      db.execTx(em -> {
+      return db.execTx(em -> {
         Optional<Playlist> fromDb = getPlaylistById(playlist.getId(), orgId).apply(em);
         if (fromDb.isPresent()) {
           Date now = new Date();
@@ -201,8 +202,8 @@ public class PlaylistDatabaseServiceImpl implements PlaylistDatabaseService {
           em.merge(playlist);
         }
         logger.debug("Playlist with id {} was deleted.", playlist.getId());
+        return playlist;
       });
-      return playlist;
     } catch (Exception e) {
       throw new PlaylistDatabaseException("Could not delete playlist with ID '" + playlist.getId() + "'", e);
     }

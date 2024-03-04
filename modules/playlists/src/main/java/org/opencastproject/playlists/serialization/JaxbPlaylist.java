@@ -154,6 +154,12 @@ public class JaxbPlaylist {
   }
 
   public void setEntries(List<JaxbPlaylistEntry> entries) {
+    for (var entry : entries) {
+      if (!this.entries.contains(entry)) {
+        entry.setId(0L);
+      }
+    }
+
     this.entries = entries;
   }
 
