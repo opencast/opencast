@@ -37,8 +37,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
               org.opencastproject.subtitleparser;version=${project.version},
               org.opencastproject.subtitleparser.webvttparser;version=${project.version}

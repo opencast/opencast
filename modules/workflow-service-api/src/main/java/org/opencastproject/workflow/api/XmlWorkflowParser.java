@@ -26,7 +26,6 @@ import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -113,11 +112,7 @@ public final class XmlWorkflowParser {
    *           if creating the workflow definition fails
    */
   public static WorkflowDefinition parseWorkflowDefinition(String in) throws WorkflowParsingException {
-    try {
-      return parseWorkflowDefinition(IOUtils.toInputStream(in, "UTF8"));
-    } catch (IOException e) {
-      throw new WorkflowParsingException(e);
-    }
+    return parseWorkflowDefinition(IOUtils.toInputStream(in, "UTF8"));
   }
 
   /**
@@ -153,11 +148,7 @@ public final class XmlWorkflowParser {
    *           if creating the workflow instance fails
    */
   public static WorkflowInstance parseWorkflowInstance(String in) throws WorkflowParsingException {
-    try {
-      return parseWorkflowInstance(IOUtils.toInputStream(in, "UTF8"));
-    } catch (IOException e) {
-      throw new WorkflowParsingException(e);
-    }
+    return parseWorkflowInstance(IOUtils.toInputStream(in, "UTF8"));
   }
 
   /**

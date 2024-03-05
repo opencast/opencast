@@ -25,6 +25,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
+import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
@@ -41,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -84,9 +86,12 @@ public class ProbeResolutionWorkflowOperationHandler extends AbstractWorkflowOpe
         Configuration.none, Configuration.one, Configuration.none, Configuration.none);
     final MediaPackageElementFlavor sourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
 
+    TrackSelector trackSelector = new TrackSelector();
+    trackSelector.addFlavor(sourceFlavor);
+
     // Ensure we have a matching track
-    final Track[] tracks = mediaPackage.getTracks(sourceFlavor);
-    if (tracks.length <= 0) {
+    final Collection<Track> tracks = trackSelector.select(mediaPackage, false);
+    if (tracks.size() <= 0) {
       logger.info("No tracks with specified flavor ({}).", sourceFlavor.toString());
       return createResult(mediaPackage, Action.CONTINUE);
     }

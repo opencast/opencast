@@ -218,8 +218,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
               org.opencastproject.scheduler.impl;version=${project.version},
               org.opencastproject.scheduler.impl.persistence;version=${project.version},

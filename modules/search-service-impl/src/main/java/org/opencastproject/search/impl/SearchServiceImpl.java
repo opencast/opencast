@@ -95,8 +95,10 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   /** The load introduced on the system by creating a delete job */
   public static final float DEFAULT_DELETE_JOB_LOAD = 0.1f;
 
+  /** The key to look for in the service configuration file to override the {@link #DEFAULT_ADD_JOB_LOAD} */
   public static final String ADD_JOB_LOAD_KEY = "job.load.add";
 
+  /** The key to look for in the service configuration file to override the {@link #DEFAULT_DELETE_JOB_LOAD} */
   public static final String DELETE_JOB_LOAD_KEY = "job.load.delete";
 
   /** The load introduced on the system by creating an add job */

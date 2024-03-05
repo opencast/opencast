@@ -33,8 +33,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Service-Component/>
             <Export-Package>
               org.opencastproject.distribution.aws.s3.api;version=${project.version}

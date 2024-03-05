@@ -166,8 +166,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               !com.carrotsearch.randomizedtesting,
               !com.conversantmedia.util.*,

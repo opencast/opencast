@@ -71,8 +71,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Embed-Dependency>
               org.springframework.beans;inline=true,
               org.springframework.core;inline=true,

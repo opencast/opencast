@@ -6,7 +6,7 @@ A list of commands to quickly build and configure a local Opencast cluster.
 First, build and extract distributions:
 
 ```sh
-mvn clean install
+./mvnw clean install
 cd build
 tar xf opencast-dist-admin-10-SNAPSHOT.tar.gz
 tar xf opencast-dist-presentation-10-SNAPSHOT.tar.gz

@@ -154,8 +154,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Bundle-Activator>org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService</Bundle-Activator>
             <!-- Only with this can the endpoint class use OSGI annotations while the IndexRebuildService doesn't -->
             <_dsannotations-options>norequirements</_dsannotations-options>
