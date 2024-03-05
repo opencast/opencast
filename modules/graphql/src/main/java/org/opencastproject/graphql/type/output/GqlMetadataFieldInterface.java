@@ -72,4 +72,9 @@ public interface GqlMetadataFieldInterface {
     return getMetadataField().getCollectionID();
   }
 
+  @GraphQLField
+  default Integer order() {
+    return getMetadataField().getOrder();
+  }
+
 }

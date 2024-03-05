@@ -46,46 +46,6 @@ public class GqlJsonMetadataField implements GqlMetadataFieldInterface {
   }
 
   @GraphQLField
-  public String outputId() {
-    return getMetadataField().getOutputID();
-  }
-
-  @GraphQLField
-  public String inputId() {
-    return getMetadataField().getInputID();
-  }
-
-  @GraphQLField
-  public String label() {
-    return getMetadataField().getLabel();
-  }
-
-  @GraphQLField
-  public MetadataField.Type type() {
-    return getMetadataField().getType();
-  }
-
-  @GraphQLField
-  public boolean readOnly() {
-    return getMetadataField().isReadOnly();
-  }
-
-  @GraphQLField
-  public boolean required() {
-    return getMetadataField().isRequired();
-  }
-
-  @GraphQLField
-  public String listProvider() {
-    return getMetadataField().getListprovider();
-  }
-
-  @GraphQLField
-  public String collectionId() {
-    return getMetadataField().getCollectionID();
-  }
-
-  @GraphQLField
   @GraphQLType(JsonFunction.class)
   public Object value() {
     return getMetadataField().getValue();
