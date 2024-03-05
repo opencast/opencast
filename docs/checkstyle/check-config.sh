@@ -24,12 +24,6 @@ if grep -rnI ' $' etc; then
   ret=1
 fi
 
-echo Checking that all modules include a build number…
-if ! grep -L '<Build-Number>${buildNumber}</Build-Number>' modules/*/pom.xml | wc -l | grep -q '^0$'; then
-  echo "Build number is missing from a module!"
-  ret=1
-fi
-
 echo Checking that modules use the maven-dependency-plugin…
 grep -L maven-dependency-plugin modules/*/pom.xml | cat > maven-dependency-plugin.list
 if ! diff -q maven-dependency-plugin.list docs/checkstyle/maven-dependency-plugin.exceptions; then

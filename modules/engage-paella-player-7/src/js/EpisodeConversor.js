@@ -99,7 +99,9 @@ function getSourceData(track, config) {
       data = {
         source: streamType.getSourceData(track, config),
         type: streamType.streamType,
-        content: type
+        content: type,
+        flavor: track.type,
+        tags: track.tags.tag
       };
     }
   }
@@ -152,6 +154,26 @@ function getMetadata(episode, config) {
   return result;
 }
 
+function splitFlavor(flavor) {
+  const flavorTypes = flavor.split('/');
+  if (flavorTypes.length != 2) {
+    throw new Error('Invalid flavor');
+  }
+  return flavorTypes;
+}
+
+function matchesFlavor(flavor, configFlavor) {
+  const [ flavorType, flavorSubtype ] = splitFlavor(flavor);
+  const [ configFlavorType, configFlavorSubtype ] = splitFlavor(configFlavor);
+
+  if ((configFlavorType === '*' || configFlavorType === flavorType) &&
+  (configFlavorSubtype === '*' || configFlavorSubtype === flavorSubtype)) {
+    return true;
+  }
+  return false;
+}
+
+
 function mergeSources(sources, config) {
   const streams = [];
   // Does the sources contain any flavour compatible with the main audio content?
@@ -168,12 +190,40 @@ function mergeSources(sources, config) {
   });
 
   sources.forEach(sourceData => {
-    const { content, type, source } = sourceData;
+    const { content, type, source, flavor, tags } = sourceData;
     let stream = streams.find(s => s.content === content);
+
     if (!stream) {
+      // check which video canvases to use
+      let canvas = [];
+      for (var key of Object.keys(config.videoCanvas)) {
+        let canvasConfig = config.videoCanvas[key];
+        // check if the flavor matches
+        if (canvasConfig.flavor && matchesFlavor(flavor, canvasConfig.flavor)) {
+          canvas.push(key);
+          continue;
+        }
+
+        // check if a tag matches
+        if (canvasConfig.tag) {
+          for (let i = 0; i < tags.length; i++) {
+            if (tags[i] === canvasConfig.tag) {
+              canvas.push(key);
+              break;
+            }
+          }
+        }
+      }
+
+      // fall back to default canvas if necessary
+      if (!canvas.length) {
+        canvas.push('video');
+      }
+
       stream = {
         sources: {},
-        content: content
+        content: content,
+        canvas: canvas
       };
 
       if (content === audioContent) {
@@ -229,77 +279,97 @@ function processSegments(episode, manifest) {
   }
 }
 
+// Extract the player preview to show prior to loading videos
 export function getVideoPreview(mediapackage, config) {
   const { attachments } = mediapackage;
-  let videoPreview = null;
+  let playerPreviewImage = null;
 
   let attachment = attachments?.attachment || [];
   if (!Array.isArray(attachment)) {
     attachment = [attachment];
   }
 
-  const videoPreviewAttachments = config.videoPreviewAttachments || [
+  const playerPreviewImageAttachments = config.playerPreviewImageAttachments || [
     'presenter/player+preview',
     'presentation/player+preview'
   ];
+
   attachment.forEach(att => {
-    videoPreviewAttachments.some(validAttachment => {
+    playerPreviewImageAttachments.some(validAttachment => {
       if (validAttachment === att.type) {
-        videoPreview = att.url;
+        playerPreviewImage = att.url;
       }
-      return videoPreview !== null;
+      return playerPreviewImage !== null;
     });
   });
   // Get first preview if no predefined was found
-  if (videoPreview === null) {
+  if (playerPreviewImage === null) {
     const firstPreviewAttachment = attachment.find(att => {
       return att.type.split('/').pop() === 'player+preview';
     });
-    videoPreview = firstPreviewAttachment?.url ?? null;
+    playerPreviewImage = firstPreviewAttachment?.url ?? null;
   }
 
-  return videoPreview;
+  return playerPreviewImage;
 }
 
 function processAttachments(episode, manifest, config) {
   const { attachments } = episode.mediapackage;
-  const previewImages = [];
-  let videoPreview = null;
+  const navigationPreviewImages = [];
+  let playerPreviewImage = null;
 
   let attachment = attachments?.attachment || [];
   if (!Array.isArray(attachment)) {
     attachment = [attachment];
   }
 
-  const previewAttachment = config.previewAttachment || 'presentation/segment+preview';
+  // Fallback array of segment preview images, when config flavor is not found
+  let previewAttachments = config.previewAttachment || [
+    'presenter/segment+preview',
+    'presentation/segment+preview'
+  ];
+  // Ensure format is array, incase config flavor was a string
+  if (!(previewAttachments instanceof Array)) {
+    previewAttachments = [previewAttachments];
+  }
+  // Capture the video flavor of the segment preview images, used when
+  // overlaying preview images on the video container
+  let targetContent;
   attachment.forEach(att => {
     const timeRE = /time=T(\d+):(\d+):(\d+)/.exec(att.ref);
-    if (att.type === previewAttachment && timeRE) {
+    // By default, Opencast workflows create segment preview slides for one media.
+    // However, the following might cause duplicates if your workflow creates navigation
+    // preview slides for all videos in a mediapackage.
+    if (previewAttachments.includes(att.type) && timeRE) {
       const h = Number(timeRE[1]) * 60 * 60;
       const m = Number(timeRE[2]) * 60;
       const s = Number(timeRE[3]);
       const t = h + m + s;
-      previewImages.push({
+      navigationPreviewImages.push({
         mimetype: att.mimetype,
         url: att.url,
         thumb: att.url,
         id: `frame_${t}`,
         time: t
       });
+      // Capture the target flavor (e.g. 'presenter', 'presentation', etc)
+      targetContent = att.type.split('/')[0];
     }
-    else {
-      videoPreview = getVideoPreview(episode.mediapackage, config);
+    else if (playerPreviewImage === null) {
+      playerPreviewImage = getVideoPreview(episode.mediapackage, config);
     }
   });
 
-  if (previewImages.length > 0) {
-    manifest.frameList = previewImages;
-  }
-
-  if (videoPreview) {
-    manifest.metadata = manifest.metadata || {};
-    manifest.metadata.preview = videoPreview;
-  }
+  // Define frameList, even when there are no navigation segment preview slides
+  // Include the video target, used to position the navigation frame
+  // Otherwise the target video for navigation slides might not be found.
+  // https://github.com/polimediaupv/paella-core/blob/main/src/js/core/ManifestParser.js#L101-L114
+  manifest.frameList = {};
+  manifest.frameList.frames = navigationPreviewImages || [];
+  manifest.frameList.targetContent = targetContent;
+  // Define manifest metadata even if a player preview image doesn't exist
+  manifest.metadata = manifest.metadata || {};
+  manifest.metadata.preview = playerPreviewImage;
 }
 
 function readCaptions(potentialNewCaptions, captions) {

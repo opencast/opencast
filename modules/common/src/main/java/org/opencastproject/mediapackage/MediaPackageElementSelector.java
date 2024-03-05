@@ -42,6 +42,20 @@ public interface MediaPackageElementSelector<T extends MediaPackageElement> {
   Collection<T> select(MediaPackage mediaPackage, boolean withTagsAndFlavors);
 
   /**
+   * Returns the elements that are matched by this selector from the given publication of the given media package.
+   * If the publication could not be found on the media package, returns an empty collection.
+   *
+   * @param mediaPackage
+   *          the media package
+   * @param publicationChannel
+   *          the publication to get elements from
+   * @param withTagsAndFlavors
+   *          define if the elements must match with flavors and tags, or just one of these parameters
+   * @return the selected elements
+   */
+  Collection<T> select(MediaPackage mediaPackage, String publicationChannel, boolean withTagsAndFlavors);
+
+  /**
    * Returns the media package elements that are matched by this selector.
    *
    * @param elements
@@ -51,5 +65,4 @@ public interface MediaPackageElementSelector<T extends MediaPackageElement> {
    * @return the selected elements
    */
   Collection<T> select(List<MediaPackageElement> elements, boolean withTagsAndFlavors);
-
 }

@@ -155,7 +155,7 @@ governance processes and must be communicated on list for greater participation 
 
 ## Current board
 
-The last board elections took place during the Opencast Summit 2021. The current board consists of:
+The last board elections took place in 2023. The current board consists of:
 
 - Olaf A. Schulte, ETH Zurich, Chair
 - Jody Fanto, Harvard University DCE
@@ -163,5 +163,5 @@ The last board elections took place during the Opencast Summit 2021. The current
 - Stephen Marquard, University of Cape Town
 - Carlos Turró Ribalta, Universitat Politécnica de Valencia
 - Rüdiger Rolf, Osnabrück University
-- Lars Kiesow, ELAN e.V.
+- Lars Kiesow, Osnabrück University
 - Matthew Coupe, University of Manchester

@@ -64,7 +64,16 @@
             "presentation/player+preview"
         ],
         "theme": "custom_theme",
-        "hideTimeLineOnLive": false
+        "hideTimeLineOnLive": false,
+        "videoCanvas": {
+            "video360": {
+               "flavor": "*/delivery+360",
+               "tag": "video360"
+            },
+            "video": {
+               "flavor": "*/delivery"
+            }
+        }
     },
 
     "cookieConsent": [
@@ -95,6 +104,14 @@
     ],
 
     "plugins": {
+       "es.upv.paella.video360Canvas": {
+            "enabled": true,
+            "maxZoom": 2,
+            "minZoom": 0.5,
+            "speedX": 0.4,
+            "speedY": 0.4,
+            "order": 0
+        },
         "/* layout plugins */": "*********************************************************",
         "es.upv.paella.singleVideo": {
             "enabled": true,
@@ -511,7 +528,7 @@
 
         "es.upv.paella.zoomPlugin": {
             "enabled": true,
-            "order": 0,
+            "order": 1,
             "maxZoom": 400,
             "showButtons": true,
             "target": "presenter"
@@ -519,7 +536,7 @@
 
         "es.upv.paella.videoCanvas": {
             "enabled": true,
-            "order": 1
+            "order": 2
         },
 
         "es.upv.paella.audioCanvas": {

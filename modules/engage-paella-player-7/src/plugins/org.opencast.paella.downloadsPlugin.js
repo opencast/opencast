@@ -21,6 +21,7 @@
 
 import {
   createElementWithHtmlText,
+  parseWebVTT,
   PopUpButtonPlugin,
   translate
 } from 'paella-core';
@@ -119,6 +120,30 @@ export default class DownloadsPlugin extends PopUpButtonPlugin {
   }
 
   async getContent() {
+    const log = this.player.log;
+    function downloadTranscript(url) {
+      return async function() {
+        try {
+          const response = await fetch(url);
+          const vttData = await response.text();
+          const vttCues = parseWebVTT(vttData);
+          const vttTranscript = vttCues.cues.map(cue => cue.captions.join('\n')).join('\n');
+
+          var element = document.createElement('a');
+          element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(vttTranscript));
+          element.setAttribute('download', url);
+
+          element.style.display = 'none';
+          document.body.appendChild(element);
+          element.click();
+          document.body.removeChild(element);
+        }
+        catch(e){
+          log.error(`Error downloading transcript: ${e}`);
+        }
+      };
+    }
+
     const container = createElementWithHtmlText(`
         <div class="downloads-plugin">
             <h4>${translate('Available downloads')}</h4>
@@ -132,26 +157,42 @@ export default class DownloadsPlugin extends PopUpButtonPlugin {
       const list = createElementWithHtmlText('<ul></ul>', J);
       const streamDownloads = this._downloads[k];
       streamDownloads.forEach(d => {
-        const vmeta = d?.metadata?.video?.res;
-        const ameta = d?.metadata?.audio?.samplingrate ? `${d?.metadata?.audio?.samplingrate} Hz` : null;
-        let cmeta = '';
         if (d.mimetype == 'text/vtt') {
+          let cmeta = '';
           const lang_tag = d?.tags?.filter(x => x.startsWith('lang:'));
           if (lang_tag.length > 0) {
             const captions_lang = lang_tag[0].split(':')[1];
             const languageNames = new Intl.DisplayNames([window.navigator.language], {type: 'language'});
             cmeta = languageNames.of(captions_lang) || translate('Unknown language');
           }
-        }
-        const meta = vmeta ?? ameta ?? cmeta ?? '';
 
-        createElementWithHtmlText(`
-                <li>
-                  <a href="${d.url}" download target="_blank">
-                    <span class="mimetype">[${d.mimetype}]</span><span class="res">${meta}</span>
-                  </a>
-                </li>
-            `, list);
+          const elm = createElementWithHtmlText(`
+            <li>
+              <a href="${d.url}" download target="_blank">
+                <span class="mimetype">[${d.mimetype}]</span><span class="res">${cmeta}</span>
+              </a>
+              <a href="#">
+                <span class="transcript">[transcript]</span>
+              </a>
+            </li>
+          `, list);
+
+          elm.getElementsByTagName('a')[1].onclick = downloadTranscript(d.url);
+        }
+        else {
+          const vmeta = d?.metadata?.video?.res;
+          const ameta = d?.metadata?.audio?.samplingrate ? `${d?.metadata?.audio?.samplingrate} Hz` : null;
+
+          const meta = vmeta ?? ameta ?? '';
+
+          createElementWithHtmlText(`
+            <li>
+              <a href="${d.url}" download target="_blank">
+                <span class="mimetype">[${d.mimetype}]</span><span class="res">${meta}</span>
+              </a>
+            </li>
+          `, list);
+        }
       });
     });
     return container;

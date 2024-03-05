@@ -29,6 +29,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
+import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.metadata.api.MediaPackageMetadata;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
@@ -56,6 +57,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -132,13 +134,16 @@ public class
             Configuration.many, Configuration.one);
     MediaPackageElementFlavor sourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
 
-    Track[] tracks = mediaPackage.getTracks(sourceFlavor);
-    if (tracks.length == 0) {
+    TrackSelector trackSelector = new TrackSelector();
+    trackSelector.addFlavor(sourceFlavor);
+    Collection<Track> tracks = trackSelector.select(mediaPackage, false);
+
+    if (tracks.size() == 0) {
       throw new WorkflowOperationException(
               String.format("No tracks with source flavor '%s' found for transcription", sourceFlavor));
     }
 
-    logger.info("Found {} track(s) with source flavor '{}'.", tracks.length, sourceFlavor);
+    logger.info("Found {} track(s) with source flavor '{}'.", tracks.size(), sourceFlavor);
 
     // Get the information in which language the audio track should be
     String languageCode = getMediaPackageLanguage(mediaPackage, workflowInstance);

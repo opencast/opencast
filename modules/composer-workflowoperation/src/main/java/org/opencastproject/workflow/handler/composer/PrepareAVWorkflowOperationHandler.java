@@ -31,6 +31,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -51,6 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -178,21 +180,23 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
     String audioMuxingSourceFlavors = StringUtils.trimToNull(operation.getConfiguration(OPT_AUDIO_MUXING_SOURCE_FLAVORS));
 
     // Select those tracks that have matching flavors
-    Track[] tracks = mediaPackage.getTracks(sourceFlavor);
+    TrackSelector trackSelector = new TrackSelector();
+    trackSelector.addFlavor(sourceFlavor);
+    Collection<Track> tracks = trackSelector.select(mediaPackage, false);
 
     Track audioTrack = null;
     Track videoTrack = null;
 
-    switch (tracks.length) {
+    switch (tracks.size()) {
       case 0:
         logger.info("No audio/video tracks with flavor '{}' found to prepare", sourceFlavor);
         return createResult(mediaPackage, Action.CONTINUE);
       case 1:
-        videoTrack = tracks[0];
-        if (!tracks[0].hasAudio() && tracks[0].hasVideo() && (audioMuxingSourceFlavors != null)) {
-          audioTrack = findAudioTrack(tracks[0], mediaPackage, audioMuxingSourceFlavors);
+        videoTrack = tracks.iterator().next();
+        if (!videoTrack.hasAudio() && videoTrack.hasVideo() && (audioMuxingSourceFlavors != null)) {
+          audioTrack = findAudioTrack(videoTrack, mediaPackage, audioMuxingSourceFlavors);
         } else {
-          audioTrack = tracks[0];
+          audioTrack = videoTrack;
         }
         break;
       case 2:

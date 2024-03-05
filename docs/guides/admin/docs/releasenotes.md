@@ -1,5 +1,101 @@
 # Opencast 15: Release Notes
 
+## Opencast 15.2
+
+Opencast valentines edition! A small release this time, but Opencast 15.2 includes a small change to the standard
+workflows. Please check if it affects you.
+
+### Configuration changes
+
+- **Don't create composites for new editor**
+  Creating composites for the editor was removed from the `schedule-and-upload` workflow since the new editor can
+  display multiple tracks. If you still use the old one, you can comment the necessary operations back in.
+  [[#5556](https://github.com/opencast/opencast/pull/5556)]
+
+### Feature
+
+- **Paella 7: Download audio transcripts (without timestamps)**
+   Adds the ability to download the captions files without the timestamps.
+  [[#5532](https://github.com/opencast/opencast/pull/5532)]
+
+### Bug fixes
+
+- **Don't log internal AmberScript service state**
+  [[#5530](https://github.com/opencast/opencast/pull/5530)] -
+- **Avoid unnecessary FFmpeg logs**
+  [[#5529](https://github.com/opencast/opencast/pull/5529)] -
+- **Editor shouldn't just overwrite existing files**
+  [[#5528](https://github.com/opencast/opencast/pull/5528)] -
+
+## Opencast 15.1
+
+Opencast 15.1 includes important bug fixes and improvements.
+
+### Bug fixes
+
+- **Fix Paella Player 7 for single stream videos:**
+This patch fixes the issue that Paella Player 7 will run into an error if a video has only one stream
+[[#5539](https://github.com/opencast/opencast/pull/5539)]
+
+- **Fix Paella 7 with no segments:**
+This patch fixes the issue that Paella Player 7 will run into an error if a video has no segments
+[[#5488](https://github.com/opencast/opencast/pull/5488)]
+
+- **Fix Paella Player 7 login redirect:**
+Paella Player 7 now redirects to the login page if a user doesn't have the role ROLE_USER
+[[#5481](https://github.com/opencast/opencast/pull/5481)]
+
+- **Update xmlsec version (CAS fix):**
+This patch fixes a dependency mismatch for CAS users
+[[#5540](https://github.com/opencast/opencast/pull/5540)]
+
+- **Whisper transcription engine bug fixing:**
+This patch fixes a number of minor bugs and inconveniences in the whisper transcription engine
+[[#5436](https://github.com/opencast/opencast/pull/5436)]
+
+- **Fix ACL template selection breaking after first selection:**
+This patch fixes an error in the ACL template selection
+[[#5537](https://github.com/opencast/opencast/pull/5537)]
+
+### (New) Admin UI Bug fixes
+
+- **Fix publication link not clickable:**
+Fixes the little pop-up for the publications of an event in the events table.
+[[#217](https://github.com/opencast/opencast-admin-interface/pull/217)]
+- **Fix mixed_text metadata fields without collection:**
+Fixes a bug that would crash the ui when opening event or series metadata details
+[[#232](https://github.com/opencast/opencast-admin-interface/pull/232)]
+- **Fix exception when opening timepicker:**
+This also prevented scheduling events
+[[#205](https://github.com/opencast/opencast-admin-interface/pull/205)]
+- **Don't call Object.entries on undefined:**
+Fixes a problem where opening workflow details would break entire ui
+[[#239](https://github.com/opencast/opencast-admin-interface/pull/239)]
+- **Don't render "invalid date" in table cells:**
+Instead render nothing, like in the old admin ui
+[[#241](https://github.com/opencast/opencast-admin-interface/pull/241)]
+- **Refresh workflow operations in event details**
+[[#219](https://github.com/opencast/opencast-admin-interface/pull/219)]
+- **Remove useAppDispatch from tableThunks.ts:**
+Fixes the ui crashing when switching between pages in a table
+[[#246](https://github.com/opencast/opencast-admin-interface/pull/246)]
+
+### Improvements
+
+- **Don't warn about using the default tool:**
+Changes the log level when Opencast uses the default tool for a LTI Consumer from warn to debug
+[[#5538](https://github.com/opencast/opencast/pull/5538)]
+
+- **Add support for custom actions in ACL to Tobira harvest API:**
+ROLE_ADMIN is not explicitly included in the event ACL for the Tobira specific API anymore
+[[#5492](https://github.com/opencast/opencast/pull/5492)]
+
+- **Paella7: Add support for text/vtt captions in DownloadsPlugin:**
+This PR adds the captions files to the Paella Player 7 downloads plugin
+[[#5491](https://github.com/opencast/opencast/pull/5491)]
+
+See [changelog](./changelog.md#opencast-151) for a comprehensive list of changes.
+
 ## Opencast 15.0
 
 ### Features
@@ -142,7 +238,7 @@ WebVTT is the only one that will be guaranteed to work.
 ### API changes
 - There are no API changes
 
-See [changelog](./changelog.md) for a comprehensive list of changes.
+See [changelog](./changelog.md#opencast-150) for a comprehensive list of changes.
 
 Release Schedule
 ----------------

@@ -47,8 +47,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Private-Package>editor.*</Private-Package>
             <Http-Alias>/editor-ui</Http-Alias>
             <Http-Classpath>/editor</Http-Classpath>
