@@ -55,21 +55,23 @@ public class TestPlaylistsEndpoint extends PlaylistsEndpoint {
 
   public TestPlaylistsEndpoint() throws Exception {
 
+    this.endpointBaseUrl = "https://api.opencast.org";
+
     String playlistId = "28";
     String missingPlaylistId = "4444";
     String unauthorizedPlaylistId = "1";
     String invalidPlaylistJson = "{{ \"title\": \"bad request\" }";
 
     PlaylistEntry entry1 = createNiceMock(PlaylistEntry.class);
-    expect(entry1.getId()).andReturn(0L);
-    expect(entry1.getContentId()).andReturn("1234");
-    expect(entry1.getType()).andReturn(PlaylistEntryType.EVENT);
+    expect(entry1.getId()).andReturn(0L).anyTimes();
+    expect(entry1.getContentId()).andReturn("1234").anyTimes();
+    expect(entry1.getType()).andReturn(PlaylistEntryType.EVENT).anyTimes();
     replay(entry1);
 
     PlaylistEntry entry2 = createNiceMock(PlaylistEntry.class);
-    expect(entry2.getId()).andReturn(1L);
-    expect(entry2.getContentId()).andReturn("abcd");
-    expect(entry2.getType()).andReturn(PlaylistEntryType.EVENT);
+    expect(entry2.getId()).andReturn(1L).anyTimes();
+    expect(entry2.getContentId()).andReturn("abcd").anyTimes();
+    expect(entry2.getType()).andReturn(PlaylistEntryType.EVENT).anyTimes();
     replay(entry2);
 
     PlaylistAccessControlEntry accessControlEntry1 = createNiceMock(PlaylistAccessControlEntry.class);
@@ -80,13 +82,13 @@ public class TestPlaylistsEndpoint extends PlaylistsEndpoint {
     replay(accessControlEntry1);
 
     Playlist playlist = createNiceMock(Playlist.class);
-    expect(playlist.getId()).andReturn(playlistId);
-    expect(playlist.getTitle()).andReturn("title");
-    expect(playlist.getDescription()).andReturn("description");
-    expect(playlist.getCreator()).andReturn("creator");
+    expect(playlist.getId()).andReturn(playlistId).anyTimes();
+    expect(playlist.getTitle()).andReturn("title").anyTimes();
+    expect(playlist.getDescription()).andReturn("description").anyTimes();
+    expect(playlist.getCreator()).andReturn("creator").anyTimes();
     expect(playlist.getUpdated()).andReturn(new Date(1701361007521L)).anyTimes();
-    expect(playlist.getEntries()).andReturn(Lists.newArrayList(entry1, entry2));
-    expect(playlist.getAccessControlEntries()).andReturn(Lists.newArrayList(accessControlEntry1));
+    expect(playlist.getEntries()).andReturn(Lists.newArrayList(entry1, entry2)).anyTimes();
+    expect(playlist.getAccessControlEntries()).andReturn(Lists.newArrayList(accessControlEntry1)).anyTimes();
     replay(playlist);
 
     List<Playlist> playlists = new ArrayList<>();

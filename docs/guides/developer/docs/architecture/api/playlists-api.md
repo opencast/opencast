@@ -133,11 +133,11 @@ __Example__
 
 ### POST /api/playlists/
 
-Updates a playlist or creates a new one.
+Creates a new playlist.
 
 __Response__
 
-`200 (OK)`: The updated playlist.
+`201 (CREATED)`: The created playlist.
 `400 (BAD REQUEST)`: The request is invalid or inconsistent.  
 `403 (FORBIDDEN)`: The user doesn't have the rights to make this request.
 
@@ -182,7 +182,7 @@ __Example__
 
 ### PUT /api/playlists/{id}
 
-Updates a playlist or creates a new one.
+Updates a playlist.
 
 __Response__
 

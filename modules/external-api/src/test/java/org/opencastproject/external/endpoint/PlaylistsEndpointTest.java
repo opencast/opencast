@@ -22,6 +22,7 @@ package org.opencastproject.external.endpoint;
 
 import static io.restassured.RestAssured.given;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -139,11 +140,11 @@ public class PlaylistsEndpointTest {
   }
 
   @Test
-  public void testUpdatePlaylist() throws Exception {
+  public void testCreatePlaylist() throws Exception {
     String response = given()
         .formParam("playlist", new Playlist())
         .expect()
-        .statusCode(SC_OK).when()
+        .statusCode(SC_CREATED).when()
         .post(env.host("/"))
         .asString();
 
@@ -151,7 +152,7 @@ public class PlaylistsEndpointTest {
   }
 
   @Test
-  public void testUpdatePlaylistInvalid() throws Exception {
+  public void testCreatePlaylistInvalid() throws Exception {
     given()
         .formParam("playlist", INVALID_PLAYLIST_JSON)
         .expect()

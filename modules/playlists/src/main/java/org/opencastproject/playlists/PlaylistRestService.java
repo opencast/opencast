@@ -21,6 +21,7 @@
 package org.opencastproject.playlists;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
@@ -384,7 +385,7 @@ public class PlaylistRestService {
           )
       },
       responses = {
-          @RestResponse(responseCode = SC_OK, description = "Playlist updated."),
+          @RestResponse(responseCode = SC_CREATED, description = "Playlist created."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
   public Response createAsJson(@FormParam("playlist") String playlistText)
@@ -395,7 +396,7 @@ public class PlaylistRestService {
 
       // Persist
       playlist = service.update(playlist);
-      return Response.ok().entity(new JaxbPlaylist(playlist)).build();
+      return Response.status(Response.Status.CREATED).entity(new JaxbPlaylist(playlist)).build();
     } catch (Exception e) {
       return Response.serverError().build();
     }

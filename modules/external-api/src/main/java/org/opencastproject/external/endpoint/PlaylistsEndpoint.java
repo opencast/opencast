@@ -32,6 +32,7 @@ import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.playlists.PlaylistRestService.SAMPLE_PLAYLIST_ENTRIES_JSON;
 import static org.opencastproject.playlists.PlaylistRestService.SAMPLE_PLAYLIST_JSON;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
+import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
@@ -45,9 +46,13 @@ import org.opencastproject.playlists.PlaylistRestService;
 import org.opencastproject.playlists.PlaylistService;
 import org.opencastproject.playlists.serialization.JaxbPlaylist;
 import org.opencastproject.playlists.serialization.JaxbPlaylistEntry;
+import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -67,6 +72,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -106,6 +112,9 @@ public class PlaylistsEndpoint {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ListProviderEndpoint.class);
 
+  /** Base URL of this endpoint */
+  protected String endpointBaseUrl;
+
   /** The capture agent service */
   private PlaylistService service;
 
@@ -126,6 +135,10 @@ public class PlaylistsEndpoint {
   @Activate
   void activate(ComponentContext cc) {
     logger.info("Activating External API - Playlists Endpoint");
+
+    final Tuple<String, String> endpointUrl = getEndpointUrl(cc, OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY,
+        RestConstants.SERVICE_PATH_PROPERTY);
+    endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
   }
 
   @GET
@@ -229,7 +242,7 @@ public class PlaylistsEndpoint {
               jaxbClass = JaxbPlaylist.class, defaultValue = SAMPLE_PLAYLIST_JSON)
       },
       responses = {
-          @RestResponse(description = "Playlist updated.", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Playlist created.", responseCode = HttpServletResponse.SC_CREATED),
           @RestResponse(description = "The user doesn't have the rights to make this request.", responseCode = HttpServletResponse.SC_FORBIDDEN),
           @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
       })
@@ -242,7 +255,11 @@ public class PlaylistsEndpoint {
 
       // Persist
       playlist = service.update(playlist);
-      return ApiResponses.Json.ok(acceptHeader, playlistToJson(playlist));
+      return ApiResponses.Json.created(
+          acceptHeader,
+          URI.create(getPlaylistUrl(playlist.getId())),
+          playlistToJson(playlist)
+      );
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
     } catch (ParseException | IOException e) {
@@ -399,5 +416,9 @@ public class PlaylistsEndpoint {
 
   private JValue enumToJSON(Enum e) {
     return e == null ? null : v(e.toString());
+  }
+
+  private String getPlaylistUrl(String playlistId) {
+    return UrlSupport.concat(endpointBaseUrl, playlistId);
   }
 }
