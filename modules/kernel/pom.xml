@@ -126,6 +126,18 @@
       <artifactId>cxf-rt-frontend-jaxrs</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
+      <version>${cxf.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-rs-service-description-swagger-ui</artifactId>
+      <version>${cxf.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>com.entwinemedia.common</groupId>
       <artifactId>functional</artifactId>
     </dependency>
@@ -156,6 +168,10 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.service.http.whiteboard</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.configurator</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.felix</groupId>
