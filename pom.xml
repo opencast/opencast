@@ -58,6 +58,7 @@
     <org.osgi.service.http.version>1.2.2</org.osgi.service.http.version>
     <org.osgi.service.http.whiteboard.version>1.1.1</org.osgi.service.http.whiteboard.version>
     <org.osgi.service.jaxrs.version>1.0.1</org.osgi.service.jaxrs.version>
+    <org.osgi.service.configurator.version>1.0.1</org.osgi.service.configurator.version>
     <querydsl.version>3.7.4</querydsl.version>
     <rest-assured.version>4.4.0</rest-assured.version>
     <spring.version>3.1.4.RELEASE</spring.version>
@@ -886,6 +887,11 @@
         <groupId>org.osgi</groupId>
         <artifactId>org.osgi.service.jaxrs</artifactId>
         <version>${org.osgi.service.jaxrs.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.configurator</artifactId>
+        <version>${org.osgi.service.configurator.version}</version>
       </dependency>
       <dependency>
         <groupId>org.osgi</groupId>

@@ -42,7 +42,10 @@ import org.apache.cxf.jaxrs.ext.ResourceComparator;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.openapi.OpenApiCustomizer;
+import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
+import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.apache.http.HttpStatus;
@@ -368,6 +371,23 @@ public class RestPublisher implements RestConstants {
     sf.setResourceComparator(new OsgiCxfEndpointComparator());
 
     sf.setAddress("/");
+
+    // Open API config
+    final OpenApiFeature openApiFeature = new OpenApiFeature();
+    openApiFeature.setContactEmail("dev@opencast.org");
+    openApiFeature.setLicense("Educational Community License, Version 2.0");
+    openApiFeature.setLicenseUrl("https://opensource.org/licenses/ecl2.txt");
+    openApiFeature.setScan(false);
+    openApiFeature.setUseContextBasedConfig(true);
+    OpenApiCustomizer customizer = new OpenApiCustomizer();
+    customizer.setDynamicBasePath(false);
+    openApiFeature.setCustomizer(customizer);
+    SwaggerUiConfig config = new SwaggerUiConfig();
+    config.setDeepLinking(true);
+    config.setUrl("/openapi.json");
+    config.setQueryConfigEnabled(false);
+    openApiFeature.setSwaggerUiConfig(config);
+    sf.getFeatures().add(openApiFeature);
 
     sf.setProperties(new HashMap<>());
     BindingFactoryManager manager = sf.getBus().getExtension(BindingFactoryManager.class);

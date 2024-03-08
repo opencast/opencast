@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <features name="opencast-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0">
 
+  <repository>mvn:org.apache.aries.jax.rs/org.apache.aries.jax.rs.features/2.0.2/xml</repository>
+
   <feature name="query-dsl" version="${project.version}">
     <bundle>mvn:com.google.guava/guava/${guava.version}</bundle>
     <bundle>mvn:com.google.guava/failureaccess/${failureaccess.version}</bundle>
@@ -11,6 +13,14 @@
     <bundle>mvn:com.mysema.querydsl/querydsl-jpa/${querydsl.version}</bundle>
   </feature>
 
+  <feature name="opencast-jax-rs-whiteboard" description="Aries JAX-RS Whiteboard" version="${project.version}">
+    <feature>aries-jax-rs-whiteboard</feature>
+    <feature>aries-jax-rs-whiteboard-openapi</feature>
+    <feature>cxf-rs-description-openapi-v3</feature>
+    <bundle start-level="75">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxws-api-2.3/2.3_2</bundle>
+    <bundle start-level="75">mvn:org.webjars/swagger-ui/5.11.8</bundle>
+  </feature>
+
   <feature name="ext-core" version="${project.version}">
     <!-- Base features -->
     <feature>http</feature>
@@ -19,6 +29,7 @@
     <feature>scr</feature>
     <feature>cxf-jaxrs</feature>
     <feature>cxf-http-jetty</feature>
+    <feature>opencast-jax-rs-whiteboard</feature>
 
     <!-- httpclient needs to start before common so that it can get org.apache.commons.logging -->
     <bundle start-level="55">mvn:org.apache.httpcomponents/httpclient-osgi/${httpcomponents-httpclient.version}</bundle>
