@@ -78,7 +78,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 
-@Path("/")
+@Path("/admin-ng/statistics")
 @RestService(name = "statistics", title = "statistics façade service",
   abstractText = "Provides statistics",
   notes = {"This service provides statistics."

@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
 import javax.ws.rs.Path;
 
 /** OSGi bound implementation. */
-@Path("/")
+@Path("/sysinfo")
 @Component(
     immediate = true,
     service = OsgiBundleInfoRestEndpoint.class,

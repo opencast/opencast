@@ -72,7 +72,7 @@ import javax.ws.rs.core.Response;
 /**
  * The REST endpoint
  */
-@Path("/")
+@Path("/search")
 @RestService(
     name = "search",
     title = "Search Service",

@@ -52,7 +52,7 @@ import javax.ws.rs.core.Response;
 /**
  * REST endpoint for {@link CoverImageService}
  */
-@Path("/")
+@Path("/cover-image")
 @RestService(
     name = "coverimage",
     title = "Cover Image Service",

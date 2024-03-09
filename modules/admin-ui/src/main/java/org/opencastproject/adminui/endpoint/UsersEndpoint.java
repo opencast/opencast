@@ -98,7 +98,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/admin-ng/users")
 @RestService(name = "users", title = "User service",
   abstractText = "Provides operations for users",
   notes = { "This service offers the default users CRUD Operations for the admin UI.",

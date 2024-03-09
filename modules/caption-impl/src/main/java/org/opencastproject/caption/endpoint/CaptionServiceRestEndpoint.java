@@ -65,7 +65,7 @@ import javax.xml.transform.stream.StreamResult;
 /**
  * Rest endpoint for {@link CaptionService}.
  */
-@Path("/")
+@Path("/caption")
 @RestService(name = "caption", title = "Caption Service", abstractText = "This service enables conversion from one caption format to another.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "

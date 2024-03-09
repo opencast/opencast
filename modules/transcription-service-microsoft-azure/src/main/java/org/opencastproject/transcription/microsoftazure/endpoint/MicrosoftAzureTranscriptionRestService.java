@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Path;
 
-@Path("/")
+@Path("/transcripts/microsoftazure")
 @RestService(
       name = "MicrosoftAzureTranscriptionRestService",
       title = "Transcription Service REST Endpoint (uses Microsoft Azure services)",

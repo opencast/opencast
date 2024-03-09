@@ -47,7 +47,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/termination/aws/autoscaling")
 @RestService(
     name = "terminationstateservice",
     title = "Termination State Service: AWS Auto Scaling",

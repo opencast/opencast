@@ -53,7 +53,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/api/listproviders")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0 })
 @RestService(
         name = "externalapilistproviders",

@@ -63,7 +63,7 @@ import javax.ws.rs.core.Response;
 /**
  * A REST EndPoint for JpaGroupRoleProvider.
  */
-@Path("/")
+@Path("/groups")
 @RestService(
     name = "groups",
     title = "Internal group manager",

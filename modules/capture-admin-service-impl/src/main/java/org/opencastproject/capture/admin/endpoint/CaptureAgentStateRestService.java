@@ -82,7 +82,7 @@ import javax.ws.rs.core.Response;
 /**
  * The REST endpoint for the capture agent service on the capture device
  */
-@Path("/")
+@Path("/capture-admin")
 @RestService(name = "captureadminservice",
   title = "Capture Admin Service",
   abstractText = "This service is a registry of capture agents and their recordings.",

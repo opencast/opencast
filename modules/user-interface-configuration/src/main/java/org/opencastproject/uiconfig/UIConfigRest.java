@@ -60,7 +60,7 @@ import javax.ws.rs.core.Response;
 /**
  * Serves UI configuration files via REST
  */
-@Path("/")
+@Path("/ui/config")
 @RestService(name = "UIConfigEndpoint",
     title = "UI Config Endpoint",
     abstractText = "Serves the configuration of the UI",

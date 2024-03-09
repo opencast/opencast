@@ -49,7 +49,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/waveform")
 @RestService(
     name = "WaveformServiceEndpoint",
     title = "Waveform Service REST Endpoint",

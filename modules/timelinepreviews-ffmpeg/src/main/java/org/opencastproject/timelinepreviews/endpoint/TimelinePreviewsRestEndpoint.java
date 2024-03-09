@@ -54,7 +54,7 @@ import javax.ws.rs.core.Response;
 /**
  * The REST endpoint for the {@link TimelinePreviewsService} service
  */
-@Path("/")
+@Path("/timelinepreviews")
 @RestService(
     name = "TimelinePreviewsEndpoint",
     title = "Timeline Previews Service REST Endpoint",

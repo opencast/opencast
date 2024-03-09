@@ -65,7 +65,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * The REST endpoint for the annotation service.
  */
-@Path("/")
+@Path("/annotation")
 @RestService(name = "annotation", title = "Annotation Service",
     abstractText = "This service is used for managing user generated annotations.",
     notes = {

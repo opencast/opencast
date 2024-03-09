@@ -64,7 +64,7 @@ import javax.ws.rs.core.Response;
  * REST endpoint for Statistics Service.
  *
  */
-@Path("/")
+@Path("/statistics")
 @RestService(
     name = "statisticsservice",
     title = "Statistics Service",

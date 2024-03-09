@@ -151,7 +151,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * REST Endpoint for Scheduler Service
  */
-@Path("/")
+@Path("/recordings")
 @RestService(name = "schedulerservice", title = "Scheduler Service", abstractText = "This service creates, edits and retrieves and helps managing scheduled capture events.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "

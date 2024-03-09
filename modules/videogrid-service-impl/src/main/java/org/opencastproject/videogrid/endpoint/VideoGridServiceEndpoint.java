@@ -62,7 +62,7 @@ import javax.ws.rs.core.Response;
 /**
  * A service endpoint to expose the {@link VideoGridService} via REST.
  */
-@Path("/")
+@Path("/videogrid")
 @RestService(
     name = "videogrid",
     title = "VideoGrid Service",

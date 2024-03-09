@@ -71,7 +71,7 @@ import javax.ws.rs.core.Response;
  * The external service endpoint acts as a location for external apis to query the current server of the external
  * supported API.
  */
-@Path("/")
+@Path("/api")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
             ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,

@@ -57,7 +57,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * Rest endpoint for publishing media to youtube.
  */
-@Path("/")
+@Path("/youtube")
 @RestService(name = "youtubepublicationservice",
     title = "YouTube Publication Service",
     abstractText = "",

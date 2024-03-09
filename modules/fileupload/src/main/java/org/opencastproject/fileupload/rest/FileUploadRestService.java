@@ -62,7 +62,7 @@ import javax.ws.rs.core.Response;
 /** REST endpoint for large file uploads.
  *
  */
-@Path("/")
+@Path("/upload")
 @RestService(
     name = "fileupload",
     title = "Big File Upload Service",
