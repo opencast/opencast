@@ -56,7 +56,7 @@ import javax.ws.rs.core.Response;
 /**
  * The REST endpoint for the adopter statistics service.
  */
-@Path("/")
+@Path("/admin-ng/adopter")
 @RestService(name = "registrationController",
         title = "Adopter Statistics Registration Service Endpoint",
         abstractText = "Rest Endpoint for the registration form.",

@@ -78,7 +78,7 @@ import javax.ws.rs.core.Response;
 /**
  * Provides a sorted set of known users
  */
-@Path("/")
+@Path("/user-utils")
 @RestService(
     name = "UsersUtils",
     title = "User utils",

@@ -51,7 +51,7 @@ import javax.ws.rs.core.Response;
 /**
  * The REST endpoint for the {@link IngestDownloadService} service
  */
-@Path("/")
+@Path("/ingestdownload")
 @RestService(name = "IngestDownloadServiceEndpoint",
     title = "Ingest download REST endpoint",
     abstractText = "The REST endpoint for the ingest download service.",

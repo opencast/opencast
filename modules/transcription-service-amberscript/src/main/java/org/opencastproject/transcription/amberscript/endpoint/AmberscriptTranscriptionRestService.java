@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.Path;
 
 
-@Path("/")
+@Path("/transcripts/amberscript")
 @RestService(
     name = "AmberscriptTranscriptionRestService",
     title = "Transcription Service REST Endpoint (uses Amberscript services)",

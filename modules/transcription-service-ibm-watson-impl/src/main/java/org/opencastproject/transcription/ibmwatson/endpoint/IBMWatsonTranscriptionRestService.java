@@ -53,7 +53,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/transcripts/watson")
 @RestService(
     name = "IBMWatsonTranscriptionRestService",
     title = "Transcription Service REST Endpoint (uses IBM Watson services)",

@@ -102,7 +102,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/admin-ng/acl")
 @RestService(name = "acl", title = "Acl service",
   abstractText = "Provides operations for acl",
   notes = { "This service offers the default acl CRUD Operations for the admin UI.",

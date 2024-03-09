@@ -54,7 +54,7 @@ import javax.ws.rs.core.MediaType;
   immediate = true,
   service = { OrganizationEndpoint.class }
 )
-@Path("/")
+@Path("/org")
 @RestService(name = "organization", title = "Organizations", notes = { "" }, abstractText = "Displays the organizations served by this system")
 public class OrganizationEndpoint {
 

@@ -97,7 +97,7 @@ import javax.ws.rs.core.Response;
 /**
  * A proxy to a remote series service.
  */
-@Path("/")
+@Path("/series")
 @RestService(
     name = "seriesservice",
     title = "Series Service Remote",

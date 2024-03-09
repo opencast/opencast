@@ -56,7 +56,7 @@ import javax.ws.rs.core.Response;
 /**
  * The REST endpoint for {@link ExecuteService}s
  */
-@Path("/")
+@Path("/execute")
 // Endpoint to the execute service, that runs CLI commands using MediaPackageElement's as parameters
 @RestService(name = "execute", title = "Execute Service", notes = {"" }, abstractText = "Runs CLI commands with MediaPackageElement's as parameters")
 @Component(

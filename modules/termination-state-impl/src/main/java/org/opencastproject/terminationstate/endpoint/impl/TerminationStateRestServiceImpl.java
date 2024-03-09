@@ -47,7 +47,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/termination")
 @RestService(name = "terminationstateservice", title = "Termination State Service",
         abstractText = "When put into a termination 'wait' state, this service stops the node accepting further jobs,"
         + " and once any running jobs complete will change termination to 'ready'."

@@ -40,7 +40,7 @@ import javax.ws.rs.core.MediaType;
 /**
  * Provides a sorted set of known roles
  */
-@Path("/")
+@Path("/roles")
 @RestService(
     name = "roles",
     title = "User Roles",

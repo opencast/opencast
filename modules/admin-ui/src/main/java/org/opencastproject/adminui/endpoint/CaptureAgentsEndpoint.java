@@ -82,7 +82,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-@Path("/")
+@Path("/admin-ng/capture-agents")
 @RestService(name = "captureAgents", title = "Capture agents façade service",
   abstractText = "Provides operations for the capture agents",
   notes = { "This service offers the default capture agents CRUD Operations for the admin UI.",

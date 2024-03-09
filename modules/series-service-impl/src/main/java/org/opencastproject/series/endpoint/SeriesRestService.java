@@ -109,7 +109,7 @@ import javax.ws.rs.core.Response;
  * REST endpoint for Series Service.
  *
  */
-@Path("/")
+@Path("/series")
 @RestService(
     name = "seriesservice",
     title = "Series Service",

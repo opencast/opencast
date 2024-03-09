@@ -76,7 +76,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-@Path("/")
+@Path("/admin-ng/tasks")
 @RestService(name = "TasksService", title = "UI Tasks",
   abstractText = "Provides resources and operations related to the tasks",
   notes = { "All paths above are relative to the REST endpoint base (something like http://your.server/files)",

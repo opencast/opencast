@@ -65,7 +65,7 @@ import javax.ws.rs.Path;
 /**
  * A proxy to a remote series service.
  */
-@Path("/")
+@Path("/statistics")
 @RestService(
     name = "statisticsservice",
     title = "Statistics Service Remote",

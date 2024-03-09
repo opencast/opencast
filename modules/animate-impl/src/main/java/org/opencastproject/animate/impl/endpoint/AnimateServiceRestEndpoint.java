@@ -61,7 +61,7 @@ import javax.ws.rs.core.Response;
 /**
  * A service endpoint to expose the {@link AnimateService} via REST.
  */
-@Path("/")
+@Path("/animate")
 @RestService(
     name = "animate",
     title = "Animate Service",

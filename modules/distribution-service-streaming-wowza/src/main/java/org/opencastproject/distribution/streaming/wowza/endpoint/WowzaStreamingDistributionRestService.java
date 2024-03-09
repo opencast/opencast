@@ -66,7 +66,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * Rest endpoint for distributing media to the streaming distribution channel.
  */
-@Path("/")
+@Path("/distribution/streaming")
 @RestService(
     name = "streamingdistributionservice",
     title = "Streaming Distribution Service",

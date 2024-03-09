@@ -66,7 +66,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/admin-ng/server")
 @RestService(name = "ServerProxyService", title = "UI Servers",
   abstractText = "This service provides the server data for the UI.",
   notes = { "These Endpoints deliver informations about the server required for the UI.",

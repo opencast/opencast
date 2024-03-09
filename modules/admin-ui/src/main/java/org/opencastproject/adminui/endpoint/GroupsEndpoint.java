@@ -93,7 +93,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-@Path("/")
+@Path("/admin-ng/groups")
 @RestService(name = "groups", title = "Group service",
   abstractText = "Provides operations for groups",
   notes = { "This service offers the default groups CRUD operations for the admin interface.",

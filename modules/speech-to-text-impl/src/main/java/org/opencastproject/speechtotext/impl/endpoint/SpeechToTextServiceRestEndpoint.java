@@ -57,7 +57,7 @@ import javax.ws.rs.core.Response;
 /**
  * A service endpoint to expose the {@link SpeechToTextService} via REST.
  */
-@Path("/")
+@Path("/speechtotext")
 @RestService(
     name = "speechtotext",
     title = "Speech to Text Service",

@@ -66,7 +66,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * The endpoint for the LTI gui
  */
-@Path("/")
+@Path("/lti-service-gui")
 @RestService(
     name = "ltirestserviceguiendpoint",
     title = "LTI Service",

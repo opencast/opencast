@@ -50,7 +50,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/transcripts/googlespeech")
 @RestService(
     name = "GoogleSpeechTranscriptionRestService",
     title = "Transcription Service REST Endpoint (uses Google Speech services)",

@@ -67,7 +67,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * Rest endpoint for distributing media to the local distribution channel.
  */
-@Path("/")
+@Path("/distribution/download")
 @RestService(name = "localdistributionservice", title = "Local Distribution Service",
     abstractText = "This service distributes media packages to the Opencast feed and engage services.",
     notes = {

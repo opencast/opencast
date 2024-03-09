@@ -71,7 +71,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/admin-ng/services")
 @RestService(name = "ServicesProxyService", title = "UI Services",
   abstractText = "This service provides the services data for the UI.",
   notes = { "These Endpoints deliver informations about the services required for the UI.",

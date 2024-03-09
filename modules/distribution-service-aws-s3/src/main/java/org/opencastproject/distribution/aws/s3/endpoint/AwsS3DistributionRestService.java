@@ -64,7 +64,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * Rest endpoint for distributing files to AWS S3.
  */
-@Path("/")
+@Path("/distribution/s3")
 @RestService(
     name = "awss3distributionservice",
     title = "AWS S3 Distribution Service",

@@ -85,7 +85,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/admin-ng/job")
 @RestService(name = "JobProxyService", title = "UI Jobs",
   abstractText = "This service provides the job data for the UI.",
   notes = { "These Endpoints deliver informations about the job required for the UI.",

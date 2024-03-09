@@ -49,7 +49,7 @@ import javax.ws.rs.core.Response;
  * This REST endpoint redirects users to the currently configured default player, allowing the default to be changed
  * without re-publishing all events.
  */
-@Path("/")
+@Path("/play")
 @RestService(
     name = "PlayerRedirect",
     title = "Configurable Player Endpoint",
