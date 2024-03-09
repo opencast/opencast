@@ -64,7 +64,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * Rest endpoint for publishing media to the OAI-PMH publication channel.
  */
-@Path("/")
+@Path("/publication/oaipmh")
 @RestService(
     name = "oaipmhpublicationservice",
     title = "OAI-PMH Publication Service",

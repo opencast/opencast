@@ -59,7 +59,7 @@ import javax.ws.rs.core.Response;
 /**
  * Rest endpoint, mainly for publishing media to a configurable channel
  */
-@Path("/")
+@Path("/publication/api")
 @RestService(
     name = "configurablepublicationservice",
     title = "Configurable Publication Service",

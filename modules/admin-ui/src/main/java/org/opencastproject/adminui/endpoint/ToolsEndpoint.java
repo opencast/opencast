@@ -154,7 +154,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 
-@Path("/")
+@Path("/admin-ng/tools")
 @RestService(name = "toolsService", title = "Tools API Service",
   abstractText = "Provides a location for the tools API.",
   notes = { "This service provides a location for the tools API for the admin UI.",

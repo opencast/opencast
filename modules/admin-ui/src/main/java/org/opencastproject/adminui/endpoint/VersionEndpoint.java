@@ -49,7 +49,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("/")
+@Path("/admin-ng/oc-version")
 @RestService(name = "VersionService", title = "Version service",
   abstractText = "Provides latest opencast version",
   notes = { "This service offers the GET method to retrieve the latest opencast version from https://api.github.com ."})

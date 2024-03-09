@@ -50,7 +50,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/admin-ng/presets")
 @RestService(name = "PresetsProxyService", title = "UI Presets",
   abstractText = "This service provides the presets data for the UI.",
   notes = { "This service offers information about organizations and series for the admin UI.",

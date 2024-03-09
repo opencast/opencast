@@ -68,7 +68,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 /**
  * The REST endpoint
  */
-@Path("/")
+@Path("/search")
 @RestService(
     name = "search",
     title = "Search Service",

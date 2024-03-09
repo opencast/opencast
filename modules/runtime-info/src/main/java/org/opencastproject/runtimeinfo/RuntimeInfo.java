@@ -82,7 +82,7 @@ import javax.ws.rs.core.MediaType;
  * If the 'org.opencastproject.anonymous.feedback.url' is set in config.properties, this service will also update the
  * opencast project with the contents of the getRuntimeInfo() json feed.
  */
-@Path("/")
+@Path("/info")
 @RestService(
     name = "RuntimeInfo",
     title = "Runtime Information",

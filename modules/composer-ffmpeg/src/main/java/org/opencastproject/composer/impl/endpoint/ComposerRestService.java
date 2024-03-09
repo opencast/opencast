@@ -81,7 +81,7 @@ import javax.ws.rs.core.Response;
 /**
  * A REST endpoint delegating functionality to the {@link ComposerService}
  */
-@Path("/")
+@Path("/composer/ffmpeg")
 @RestService(name = "composer", title = "Composer", abstractText = "This service creates and augments Opencast media packages that include media tracks, metadata "
         + "catalogs and attachments.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",

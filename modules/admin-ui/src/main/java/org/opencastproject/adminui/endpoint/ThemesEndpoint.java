@@ -109,7 +109,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-@Path("/")
+@Path("/admin-ng/themes")
 @RestService(name = "themes", title = "Themes facade service",
   abstractText = "Provides operations for the themes",
   notes = { "This service offers the default themes CRUD Operations for the admin UI.",

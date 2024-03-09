@@ -36,7 +36,7 @@ function monitorService($http, $location, $translate, Storage) {
   var OK = 'OK';
   var SERVICES_FRAGMENT = '/systems/services';
   var SERVICE_NAME_ATTRIBUTE = 'service-name';
-  var LATEST_VERSION_PATH = 'oc-version/version.json';
+  var LATEST_VERSION_PATH = '/admin-ng/oc-version/version.json';
   var MY_VERSION_PATH = '/sysinfo/bundles/version?prefix=opencast';
 
   Monitoring.run = function() {

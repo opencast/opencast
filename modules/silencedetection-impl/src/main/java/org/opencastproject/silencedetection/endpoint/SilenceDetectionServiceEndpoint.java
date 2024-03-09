@@ -50,7 +50,7 @@ import javax.ws.rs.core.Response;
 /**
  * SilenceDetectionService REST Endpoint.
  */
-@Path("/")
+@Path("/silencedetection")
 @RestService(
     name = "SilenceDetectionServiceEndpoint",
     title = "Silence Detection Service REST Endpoint",

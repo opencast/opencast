@@ -51,7 +51,7 @@ import java.util.Objects;
 import javax.ws.rs.Path;
 
 /** OSGi bound implementation. */
-@Path("/")
+@Path("/admin-ng/event")
 @RestService(name = "eventservice", title = "Event Service",
         abstractText = "Provides resources and operations related to the events",
         notes = { "This service offers the event CRUD Operations for the admin UI.",

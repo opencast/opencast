@@ -94,7 +94,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 /** REST endpoint for Incident Service. */
-@Path("/")
+@Path("/incidents")
 @RestService(name = "incidentservice", title = "Incident Service", abstractText = "This service creates, edits and retrieves and helps managing incidents.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "

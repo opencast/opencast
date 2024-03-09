@@ -56,7 +56,7 @@ import javax.ws.rs.core.Response;
 /**
  * A REST endpoint delegating functionality to the {@link SoxService}
  */
-@Path("/")
+@Path("/sox")
 @RestService(
     name = "sox",
     title = "Sox",

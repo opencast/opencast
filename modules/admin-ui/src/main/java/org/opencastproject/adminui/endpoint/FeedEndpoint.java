@@ -44,7 +44,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/admin-ng/feeds")
 @RestService(name = "FeedService", title = "Admin UI Feed Service",
   abstractText = "Provides Feed Information",
   notes = {"This service offers Feed information for the admin UI."})

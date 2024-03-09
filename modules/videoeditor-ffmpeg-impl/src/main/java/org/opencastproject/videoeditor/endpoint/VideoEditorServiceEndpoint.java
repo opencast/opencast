@@ -50,7 +50,7 @@ import javax.ws.rs.core.Response;
 /**
  * VideoEditorService REST Endpoint.
  */
-@Path("/")
+@Path("/videoeditor")
 @RestService(
     name = "VideoEditorServiceEndpoint",
     title = "Video Editor Service REST Endpoint",

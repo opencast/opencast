@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
 
 import javax.ws.rs.Path;
 
-@Path("/")
+@Path("/oaipmhinfo")
 @RestService(
         name = "oaipmhserverinfo",
         title = "OAI-PMH server info service",

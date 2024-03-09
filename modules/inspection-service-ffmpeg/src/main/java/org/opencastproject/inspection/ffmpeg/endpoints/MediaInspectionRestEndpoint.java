@@ -58,7 +58,7 @@ import javax.ws.rs.core.Response;
 /**
  * A service endpoint to expose the {@link MediaInspectionService} via REST.
  */
-@Path("/")
+@Path("/inspection")
 @RestService(name = "mediainspection", title = "Media Inspection Service", abstractText = "This service extracts technical metadata from media files.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "

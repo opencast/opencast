@@ -61,7 +61,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/admin-ng/user-settings")
 @RestService(name = "usersettings", title = "User Settings service",
   abstractText = "Provides operations for user settings",
   notes = { "This service offers the default CRUD Operations for user settings for the admin UI.",

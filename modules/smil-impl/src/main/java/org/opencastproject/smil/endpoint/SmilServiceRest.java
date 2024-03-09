@@ -52,7 +52,7 @@ import javax.ws.rs.core.Response;
 /**
  * Implement {@link SmilService} as REST Endpoint.
  */
-@Path("/")
+@Path("/smil")
 @RestService(
     name = "smil",
     title = "SmilService Rest Endpoint",

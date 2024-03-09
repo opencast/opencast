@@ -64,7 +64,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/assets/aws/s3")
 @RestService(name = "archive-aws-s3", title = "AWS S3 Archive",
     notes = {
         "All paths are relative to the REST endpoint base (something like http://your.server/files)",

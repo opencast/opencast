@@ -64,7 +64,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Variant;
 
-@Path("/")
+@Path("/feeds")
 @RestService(name = "feedservice", title = "Feed Service",
     abstractText = "This class is responsible of creating RSS and Atom feeds.", notes = {})
 /**

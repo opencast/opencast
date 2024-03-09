@@ -105,7 +105,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * A REST endpoint for the {@link WorkflowService}
  */
-@Path("/")
+@Path("/workflow")
 @RestService(name = "workflowservice", title = "Workflow Service", abstractText = "This service lists available workflows and starts, stops, suspends and resumes workflow instances.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "

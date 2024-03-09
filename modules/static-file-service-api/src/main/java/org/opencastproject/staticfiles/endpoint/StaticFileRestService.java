@@ -77,7 +77,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * Stores and serves static files via HTTP.
  */
-@Path("/")
+@Path("/staticfiles")
 @RestService(
     name = "StaticResourceService",
     title = "Static Resources Service",

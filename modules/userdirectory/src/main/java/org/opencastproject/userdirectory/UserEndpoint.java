@@ -54,7 +54,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * Provides a sorted set of known users
  */
-@Path("/")
+@Path("/users")
 @RestService(
     name = "users",
     title = "User account manager",

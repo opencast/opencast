@@ -70,7 +70,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/admin-ng/resources")
 @RestService(name = "ResourceListsProviders", title = "Admin UI - Resources List",
   abstractText = "This service provides key-value list from different resources to use in the admin UI.",
   notes = { "This service offers access to list providers for the admin UI.",
