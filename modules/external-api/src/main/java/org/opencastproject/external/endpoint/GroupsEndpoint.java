@@ -63,6 +63,7 @@ import org.apache.commons.collections4.ComparatorUtils;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,6 +106,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.path=/api/groups"
     }
 )
+@JaxrsResource
 public class GroupsEndpoint {
 
   /** The logging facility */

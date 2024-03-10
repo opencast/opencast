@@ -36,6 +36,7 @@ import org.opencastproject.videoeditor.api.VideoEditorService;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import java.util.List;
 
@@ -67,6 +68,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.jobproducer=true"
     }
 )
+@JaxrsResource
 public class VideoEditorServiceEndpoint extends AbstractJobProducerEndpoint {
 
   private ServiceRegistry serviceRegistry;

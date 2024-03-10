@@ -33,6 +33,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.apache.http.client.methods.HttpGet;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +58,7 @@ import javax.ws.rs.core.Response;
     "opencast.service.path=/admin-ng/feeds"
   }
 )
+@JaxrsResource
 public class FeedEndpoint extends RemoteBase {
 
   public FeedEndpoint() {
