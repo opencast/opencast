@@ -69,6 +69,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,6 +123,7 @@ import javax.ws.rs.core.Response;
     immediate = true,
     service = { SeriesService.class, SeriesServiceRemoteImpl.class }
 )
+@JaxrsResource
 public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService {
 
   private static final Logger logger = LoggerFactory.getLogger(SeriesServiceRemoteImpl.class);

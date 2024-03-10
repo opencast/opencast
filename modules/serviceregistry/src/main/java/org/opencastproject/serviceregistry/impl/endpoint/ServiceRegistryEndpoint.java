@@ -65,6 +65,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -105,6 +106,7 @@ import javax.ws.rs.core.Response.Status;
   immediate = true,
   service = { ServiceRegistryEndpoint.class }
 )
+@JaxrsResource
 public class ServiceRegistryEndpoint {
 
   /** The remote service maanger */

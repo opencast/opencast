@@ -39,6 +39,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +55,7 @@ import javax.ws.rs.core.Response;
 /**
  * The REST endpoint for the {@link CropService} service.
  */
-@Path("")
+@Path("/crop")
 @RestService(
     name = "crop",
     title = "Video CROP Service",
@@ -71,6 +72,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.jobproducer=true"
     }
 )
+@JaxrsResource
 public class CropRestEndpoint extends AbstractJobProducerEndpoint {
   /**
    * The logger

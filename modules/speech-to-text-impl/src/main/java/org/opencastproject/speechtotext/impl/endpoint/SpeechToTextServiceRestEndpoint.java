@@ -40,6 +40,7 @@ import com.google.gson.JsonSyntaxException;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,6 +75,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.jobproducer=true"
     }
 )
+@JaxrsResource
 public class SpeechToTextServiceRestEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logger. */

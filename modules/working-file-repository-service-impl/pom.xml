@@ -62,6 +62,10 @@
       <artifactId>org.osgi.service.component.annotations</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.jaxrs</artifactId>
+    </dependency>
+    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>

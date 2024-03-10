@@ -59,6 +59,7 @@ import com.entwinemedia.fn.data.json.Jsons;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,6 +100,7 @@ import javax.ws.rs.core.Response.Status;
     "opencast.service.path=/admin-ng/capture-agents"
   }
 )
+@JaxrsResource
 public class CaptureAgentsEndpoint {
 
   private static final String TRANSLATION_KEY_PREFIX = "CAPTURE_AGENT.DEVICE.";

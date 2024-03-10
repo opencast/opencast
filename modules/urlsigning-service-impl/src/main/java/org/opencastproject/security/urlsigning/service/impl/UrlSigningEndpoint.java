@@ -35,6 +35,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -62,6 +63,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.jobproducer=false"
     }
 )
+@JaxrsResource
 public class UrlSigningEndpoint {
 
   private UrlSigningService signingService;
