@@ -70,6 +70,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,6 +111,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.path=/api/workflows"
     }
 )
+@JaxrsResource
 public class WorkflowsEndpoint {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(WorkflowsEndpoint.class);

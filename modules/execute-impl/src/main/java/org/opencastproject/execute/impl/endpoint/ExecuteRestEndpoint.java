@@ -42,6 +42,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +70,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.jobproducer=true"
     }
 )
+@JaxrsResource
 public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logging facility */

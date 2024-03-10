@@ -1230,7 +1230,14 @@
       <dependency>
         <groupId>io.swagger.core.v3</groupId>
         <artifactId>swagger-annotations</artifactId>
-        <version>2.2.20</version>
+        <version>2.1.13</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.swagger.core.v3</groupId>
+        <artifactId>swagger-models</artifactId>
+        <version>2.1.13</version>
+        <scope>provided</scope>
       </dependency>
       <!-- influx -->
       <dependency>

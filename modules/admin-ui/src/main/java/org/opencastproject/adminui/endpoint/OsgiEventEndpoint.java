@@ -44,14 +44,12 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import java.util.Dictionary;
 import java.util.Objects;
 
-import javax.ws.rs.Path;
-
 /** OSGi bound implementation. */
-@Path("/admin-ng/event")
 @RestService(name = "eventservice", title = "Event Service",
         abstractText = "Provides resources and operations related to the events",
         notes = { "This service offers the event CRUD Operations for the admin UI.",
@@ -68,6 +66,7 @@ import javax.ws.rs.Path;
                 "opencast.service.path=/admin-ng/event",
         }
 )
+@JaxrsResource
 public class OsgiEventEndpoint extends AbstractEventEndpoint {
 
   private AclServiceFactory aclServiceFactory;

@@ -44,6 +44,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,6 +89,7 @@ import javax.ws.rs.core.Response;
     immediate = false,
     service = { GroupRoleEndpoint.class }
 )
+@JaxrsResource
 public class GroupRoleEndpoint {
 
   /** The logger */

@@ -48,6 +48,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -90,6 +91,7 @@ import javax.ws.rs.Path;
         "opencast.service.publish=false"
     }
 )
+@JaxrsResource
 public class StatisticsServiceRemoteImpl extends RemoteBase implements StatisticsService {
 
   private static final JSONParser jsonParser = new JSONParser();

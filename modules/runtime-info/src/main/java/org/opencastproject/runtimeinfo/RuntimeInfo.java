@@ -51,6 +51,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,6 +99,7 @@ import javax.ws.rs.core.MediaType;
         "opencast.service.path=/info",
     }
 )
+@JaxrsResource
 public class RuntimeInfo {
 
   private static final Logger logger = LoggerFactory.getLogger(RuntimeInfo.class);

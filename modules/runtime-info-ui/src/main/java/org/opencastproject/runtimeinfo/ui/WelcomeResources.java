@@ -24,6 +24,7 @@ package org.opencastproject.runtimeinfo.ui;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import java.io.InputStream;
 import java.util.Objects;
@@ -46,6 +47,7 @@ import io.swagger.v3.oas.annotations.Hidden;
     }
 )
 @Hidden
+@JaxrsResource
 public class WelcomeResources {
 
   @GET
