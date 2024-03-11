@@ -39,7 +39,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.external.common.ApiMediaType;
-import org.opencastproject.external.common.ApiResponses;
+import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
@@ -226,7 +226,7 @@ public class GroupsEndpoint {
       fields.add(f("members", v(join(group.getMembers(), ","), Jsons.BLANK)));
       groupsJSON.add(obj(fields));
     }
-    return ApiResponses.Json.ok(acceptHeader, arr(groupsJSON));
+    return ApiResponseBuilder.Json.ok(acceptHeader, arr(groupsJSON));
   }
 
   /**
@@ -263,10 +263,10 @@ public class GroupsEndpoint {
     JpaGroup group = jpaGroupRoleProvider.getGroup(id);
 
     if (group == null) {
-      return ApiResponses.notFound("Cannot find a group with id '%s'.", id);
+      return ApiResponseBuilder.notFound("Cannot find a group with id '%s'.", id);
     }
 
-    return ApiResponses.Json.ok(acceptHeader,
+    return ApiResponseBuilder.Json.ok(acceptHeader,
             obj(
                     f("identifier", v(group.getGroupId())),
                     f("organization", v(group.getOrganization().getId())),  f("role", v(group.getRole())),
@@ -362,7 +362,7 @@ public class GroupsEndpoint {
       if (jpaGroupRoleProvider.addMemberToGroup(id, member)) {
         return Response.ok().build();
       } else {
-        return ApiResponses.Json.ok(acceptHeader, "Member is already member of group.");
+        return ApiResponseBuilder.Json.ok(acceptHeader, "Member is already member of group.");
       }
     } catch (IllegalArgumentException e) {
       logger.warn("Unable to add member to group id {}.", id, e);
@@ -370,10 +370,10 @@ public class GroupsEndpoint {
     } catch (UnauthorizedException ex) {
       return Response.status(SC_FORBIDDEN).build();
     } catch (NotFoundException e) {
-      return ApiResponses.notFound("Cannot find group with id '%s'.", id);
+      return ApiResponseBuilder.notFound("Cannot find group with id '%s'.", id);
     } catch (Exception e) {
       logger.warn("Could not update the group with id {}.",id, e);
-      return ApiResponses.serverError("Could not update group with id '%s', reason: '%s'",id,getMessage(e));
+      return ApiResponseBuilder.serverError("Could not update group with id '%s', reason: '%s'",id,getMessage(e));
     }
   }
 
@@ -390,7 +390,7 @@ public class GroupsEndpoint {
       if (jpaGroupRoleProvider.removeMemberFromGroup(id, memberId)) {
         return Response.ok().build();
       } else {
-        return ApiResponses.Json.ok(acceptHeader, "Member is already not member of group.");
+        return ApiResponseBuilder.Json.ok(acceptHeader, "Member is already not member of group.");
       }
     } catch (IllegalArgumentException e) {
       logger.warn("Unable to remove member from group id {}.", id, e);
@@ -398,10 +398,10 @@ public class GroupsEndpoint {
     } catch (UnauthorizedException ex) {
       return Response.status(SC_FORBIDDEN).build();
     } catch (NotFoundException e) {
-      return ApiResponses.notFound("Cannot find group with id '%s'.", id);
+      return ApiResponseBuilder.notFound("Cannot find group with id '%s'.", id);
     } catch (Exception e) {
       logger.warn("Could not update the group with id {}.", id, e);
-      return ApiResponses.serverError("Could not update group with id '%s', reason: '%s'", id, getMessage(e));
+      return ApiResponseBuilder.serverError("Could not update group with id '%s', reason: '%s'", id, getMessage(e));
     }
   }
 }

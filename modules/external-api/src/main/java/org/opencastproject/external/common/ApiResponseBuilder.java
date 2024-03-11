@@ -34,11 +34,11 @@ import javax.ws.rs.core.Response.Status;
 /**
  * A utility class for creating responses from the external api.
  */
-public final class ApiResponses {
+public final class ApiResponseBuilder {
 
   private static final String APPLICATION_PREFIX = "application/";
 
-  private ApiResponses() {
+  private ApiResponseBuilder() {
 
   }
 

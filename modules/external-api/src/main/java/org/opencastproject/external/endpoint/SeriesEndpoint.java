@@ -48,7 +48,7 @@ import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.external.common.ApiMediaType;
-import org.opencastproject.external.common.ApiResponses;
+import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.ExternalMetadataUtils;
@@ -347,7 +347,7 @@ public class SeriesEndpoint {
   }
 
   private Response queryResultToJson(SearchResult<Series> result, boolean includeAcl, ApiVersion requestedVersion) {
-    return ApiResponses.Json.ok(requestedVersion, arr($(result.getItems()).map(new Fn<SearchResultItem<Series>, JValue>() {
+    return ApiResponseBuilder.Json.ok(requestedVersion, arr($(result.getItems()).map(new Fn<SearchResultItem<Series>, JValue>() {
       @Override
       public JValue apply(SearchResultItem<Series> a) {
         final Series s = a.getSource();
@@ -487,9 +487,9 @@ public class SeriesEndpoint {
         }
       }
 
-      return ApiResponses.Json.ok(requestedVersion, responseContent);
+      return ApiResponseBuilder.Json.ok(requestedVersion, responseContent);
     }
-    return ApiResponses.notFound("Cannot find an series with id '%s'.", id);
+    return ApiResponseBuilder.notFound("Cannot find an series with id '%s'.", id);
   }
 
   private List<JValue> splitSubjectIntoArray(final String subject) {
@@ -521,7 +521,7 @@ public class SeriesEndpoint {
   private Response getAllMetadata(String id, ApiVersion requestedVersion) throws SearchIndexException {
     Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser());
     if (optSeries.isEmpty())
-      return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
+      return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
 
     MetadataList metadataList = new MetadataList();
     List<SeriesCatalogUIAdapter> catalogUIAdapters = indexService.getSeriesCatalogUIAdapters();
@@ -535,19 +535,19 @@ public class SeriesEndpoint {
     DublinCoreMetadataCollection collection = getSeriesMetadata(optSeries.get());
     ExternalMetadataUtils.changeSubjectToSubjects(collection);
     metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), collection);
-    return ApiResponses.Json.ok(requestedVersion, MetadataJson.listToJson(metadataList, false));
+    return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.listToJson(metadataList, false));
   }
 
   private Response getMetadataByType(String id, String type, ApiVersion requestedVersion) throws SearchIndexException {
     Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser());
     if (optSeries.isEmpty())
-      return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
+      return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
 
     // Try the main catalog first as we load it from the index.
     if (typeMatchesSeriesCatalogUIAdapter(type, indexService.getCommonSeriesCatalogUIAdapter())) {
       DublinCoreMetadataCollection collection = getSeriesMetadata(optSeries.get());
       ExternalMetadataUtils.changeSubjectToSubjects(collection);
-      return ApiResponses.Json.ok(requestedVersion, MetadataJson.collectionToJson(collection, false));
+      return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(collection, false));
     }
 
     // Try the other catalogs
@@ -558,11 +558,11 @@ public class SeriesEndpoint {
       if (typeMatchesSeriesCatalogUIAdapter(type, adapter)) {
         final Opt<DublinCoreMetadataCollection> optSeriesMetadata = adapter.getFields(id);
         if (optSeriesMetadata.isSome()) {
-          return ApiResponses.Json.ok(requestedVersion, MetadataJson.collectionToJson(optSeriesMetadata.get(), true));
+          return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(optSeriesMetadata.get(), true));
         }
       }
     }
-    return ApiResponses.notFound("Cannot find a catalog with type '%s' for series with id '%s'.", type, id);
+    return ApiResponseBuilder.notFound("Cannot find a catalog with type '%s' for series with id '%s'.", type, id);
   }
 
   /**
@@ -727,7 +727,7 @@ public class SeriesEndpoint {
 
     Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser());
     if (optSeries.isEmpty())
-      return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
+      return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
 
     MetadataList metadataList = new MetadataList();
 
@@ -757,7 +757,7 @@ public class SeriesEndpoint {
     }
 
     if (optCollection.isNone()) {
-      return ApiResponses.notFound("Cannot find a catalog with type '%s' for series with id '%s'.", type, id);
+      return ApiResponseBuilder.notFound("Cannot find a catalog with type '%s' for series with id '%s'.", type, id);
     }
 
     DublinCoreMetadataCollection collection = optCollection.get();
@@ -765,7 +765,7 @@ public class SeriesEndpoint {
     for (String key : updatedFields.keySet()) {
       MetadataField field = collection.getOutputFields().get(key);
       if (field == null) {
-        return ApiResponses.notFound(
+        return ApiResponseBuilder.notFound(
                 "Cannot find a metadata field with id '%s' from event with id '%s' and the metadata type '%s'.", key,
                 id, type);
       } else if (field.isRequired() && StringUtils.isBlank(updatedFields.get(key))) {
@@ -779,7 +779,7 @@ public class SeriesEndpoint {
 
     metadataList.add(adapter, collection);
     indexService.updateAllSeriesMetadata(id, metadataList, elasticsearchIndex);
-    return ApiResponses.Json.ok(acceptHeader, "");
+    return ApiResponseBuilder.Json.ok(acceptHeader, "");
   }
 
   @DELETE
@@ -813,12 +813,12 @@ public class SeriesEndpoint {
 
     Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser());
     if (optSeries.isEmpty())
-      return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
+      return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
 
     try {
       indexService.removeCatalogByFlavor(optSeries.get(), MediaPackageElementFlavor.parseFlavor(type));
     } catch (NotFoundException e) {
-      return ApiResponses.notFound(e.getMessage());
+      return ApiResponseBuilder.notFound(e.getMessage());
     }
     return Response.noContent().build();
   }
@@ -837,18 +837,18 @@ public class SeriesEndpoint {
       Series series = optSeries.get();
       // The ACL is stored as JSON string in the index. Parse it and extract the part we want to have in the API.
       if (series.getAccessPolicy() == null) {
-        return ApiResponses.notFound("Acl for series with id '%s' is not defined.", id);
+        return ApiResponseBuilder.notFound("Acl for series with id '%s' is not defined.", id);
       }
       JSONObject acl = (JSONObject) parser.parse(series.getAccessPolicy());
 
       if (!((JSONObject) acl.get("acl")).containsKey("ace")) {
-        return ApiResponses.notFound("Cannot find acl for series with id '%s'.", id);
+        return ApiResponseBuilder.notFound("Cannot find acl for series with id '%s'.", id);
       } else {
-        return ApiResponses.Json.ok(requestedVersion, ((JSONArray) ((JSONObject) acl.get("acl")).get("ace")).toJSONString());
+        return ApiResponseBuilder.Json.ok(requestedVersion, ((JSONArray) ((JSONObject) acl.get("acl")).get("ace")).toJSONString());
       }
     }
 
-    return ApiResponses.notFound("Cannot find an series with id '%s'.", id);
+    return ApiResponseBuilder.notFound("Cannot find an series with id '%s'.", id);
   }
 
   @GET
@@ -861,14 +861,14 @@ public class SeriesEndpoint {
     if (elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser()).isPresent()) {
       final Map<String, String> properties = seriesService.getSeriesProperties(id);
 
-      return ApiResponses.Json.ok(acceptHeader, obj($(properties.entrySet()).map(new Fn<Entry<String, String>, Field>() {
+      return ApiResponseBuilder.Json.ok(acceptHeader, obj($(properties.entrySet()).map(new Fn<Entry<String, String>, Field>() {
                 @Override
                 public Field apply(Entry<String, String> a) {
                   return f(a.getKey(), v(a.getValue(), BLANK));
                 }
               }).toList()));
     } else {
-      return ApiResponses.notFound("Cannot find an series with id '%s'.", id);
+      return ApiResponseBuilder.notFound("Cannot find an series with id '%s'.", id);
     }
   }
 
@@ -884,7 +884,7 @@ public class SeriesEndpoint {
       indexService.removeSeries(id);
       return Response.noContent().build();
     } catch (NotFoundException e) {
-      return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
+      return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
     } catch (Exception e) {
       logger.error("Unable to delete the series '{}' due to", id, e);
       return Response.serverError().build();
@@ -904,7 +904,7 @@ public class SeriesEndpoint {
           throws UnauthorizedException, NotFoundException, SearchIndexException {
     try {
       MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, elasticsearchIndex);
-      return ApiResponses.Json.ok(acceptHeader, MetadataJson.listToJson(metadataList, true));
+      return ApiResponseBuilder.Json.ok(acceptHeader, MetadataJson.listToJson(metadataList, true));
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to update series '{}' with metadata '{}'", seriesID, metadataJSON, e);
       return RestUtil.R.badRequest(e.getMessage());
@@ -968,7 +968,7 @@ public class SeriesEndpoint {
 
     try {
       String seriesId = indexService.createSeries(metadataList, options, Opt.some(acl), optThemeId);
-      return ApiResponses.Json.created(acceptHeader, URI.create(getSeriesUrl(seriesId)),
+      return ApiResponseBuilder.Json.created(acceptHeader, URI.create(getSeriesUrl(seriesId)),
                                        obj(f("identifier", v(seriesId, BLANK))));
     } catch (IndexServiceException e) {
       logger.error("Unable to create series with metadata '{}', acl '{}', theme '{}'",
@@ -1091,7 +1091,7 @@ public class SeriesEndpoint {
     }).toList();
 
     seriesService.updateAccessControl(seriesID, new AccessControlList(accessControlEntries), override);
-    return ApiResponses.Json.ok(acceptHeader, aclJson);
+    return ApiResponseBuilder.Json.ok(acceptHeader, aclJson);
   }
 
   @SuppressWarnings("unchecked")
@@ -1122,7 +1122,7 @@ public class SeriesEndpoint {
       seriesService.updateSeriesProperty(seriesID, field.getKey(), field.getValue().toString());
     }
 
-    return ApiResponses.Json.ok(acceptHeader, propertiesJson);
+    return ApiResponseBuilder.Json.ok(acceptHeader, propertiesJson);
   }
 
   @GET

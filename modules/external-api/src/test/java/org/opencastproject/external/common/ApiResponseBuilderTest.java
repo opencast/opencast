@@ -33,11 +33,11 @@ import org.junit.Test;
 
 import javax.ws.rs.core.Response;
 
-public class ApiResponsesTest {
+public class ApiResponseBuilderTest {
 
   @Test
   public void testJsonStringOk() throws Exception {
-    Response response = ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, "body");
+    Response response = ApiResponseBuilder.Json.ok(ApiVersion.VERSION_1_0_0, "body");
 
     assertEquals(HttpStatus.SC_OK, response.getStatus());
     assertEquals("application/v1.0.0+json", response.getMetadata().get("Content-Type").get(0));
@@ -46,7 +46,7 @@ public class ApiResponsesTest {
   @Test
   public void testJsonOk() throws Exception {
     final JValue json = obj(f("id", v("abcd")), f("values", arr(v("a"), v("b"))));
-    Response response = ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, json);
+    Response response = ApiResponseBuilder.Json.ok(ApiVersion.VERSION_1_0_0, json);
 
     assertEquals(HttpStatus.SC_OK, response.getStatus());
     assertEquals("application/v1.0.0+json", response.getMetadata().get("Content-Type").get(0));

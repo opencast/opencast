@@ -21,7 +21,7 @@
 package org.opencastproject.external.endpoint;
 
 import org.opencastproject.external.common.ApiMediaType;
-import org.opencastproject.external.common.ApiResponses;
+import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.impl.ListProviderNotFoundException;
@@ -101,7 +101,7 @@ public class ListProviderEndpoint {
 
     list.add(listProvidersService.getAvailableProviders());
 
-    return ApiResponses.Json.ok(acceptHeader, list.toJSONString());
+    return ApiResponseBuilder.Json.ok(acceptHeader, list.toJSONString());
   }
 
   @GET
@@ -124,15 +124,15 @@ public class ListProviderEndpoint {
       autocompleteList = listProvidersService.getList(source, query, false);
     } catch (ListProviderNotFoundException e) {
       logger.debug("No list found for {}", source, e);
-      return ApiResponses.notFound("");
+      return ApiResponseBuilder.notFound("");
     } catch (ListProviderException e) {
       logger.error("Server error when getting list from provider {}", source, e);
-      return ApiResponses.serverError("");
+      return ApiResponseBuilder.serverError("");
     }
 
     Gson gson = new Gson();
     String jsonList = gson.toJson(autocompleteList);
-    return ApiResponses.Json.ok(acceptHeader, jsonList);
+    return ApiResponseBuilder.Json.ok(acceptHeader, jsonList);
   }
 
   /**

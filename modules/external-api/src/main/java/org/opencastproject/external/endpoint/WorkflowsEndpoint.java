@@ -37,7 +37,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.external.common.ApiMediaType;
-import org.opencastproject.external.common.ApiResponses;
+import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -183,7 +183,7 @@ public class WorkflowsEndpoint {
       // Media Package
       Opt<Event> event = indexService.getEvent(eventId, elasticsearchIndex);
       if (event.isNone()) {
-        return ApiResponses.notFound("Cannot find an event with id '%s'.", eventId);
+        return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", eventId);
       }
       MediaPackage mp = indexService.getEventMediapackage(event.get());
 
@@ -192,7 +192,7 @@ public class WorkflowsEndpoint {
       try {
         wd = workflowService.getWorkflowDefinitionById(workflowDefinitionIdentifier);
       } catch (NotFoundException e) {
-        return ApiResponses.notFound("Cannot find a workflow definition with id '%s'.", workflowDefinitionIdentifier);
+        return ApiResponseBuilder.notFound("Cannot find a workflow definition with id '%s'.", workflowDefinitionIdentifier);
       }
 
       // Configuration
@@ -208,14 +208,14 @@ public class WorkflowsEndpoint {
 
       // Start workflow
       WorkflowInstance wi = workflowService.start(wd, mp, null, properties);
-      return ApiResponses.Json.created(acceptHeader, URI.create(getWorkflowUrl(wi.getId())),
+      return ApiResponseBuilder.Json.created(acceptHeader, URI.create(getWorkflowUrl(wi.getId())),
               workflowInstanceToJSON(wi, withOperations, withConfiguration));
     } catch (IllegalStateException e) {
       final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-      return ApiResponses.Json.conflict(requestedVersion, obj(f("message", v(e.getMessage(), BLANK))));
+      return ApiResponseBuilder.Json.conflict(requestedVersion, obj(f("message", v(e.getMessage(), BLANK))));
     } catch (Exception e) {
       logger.error("Could not create workflow instances", e);
-      return ApiResponses.serverError("Could not create workflow instances, reason: '%s'", e.getMessage());
+      return ApiResponseBuilder.serverError("Could not create workflow instances, reason: '%s'", e.getMessage());
     }
   }
 
@@ -235,15 +235,15 @@ public class WorkflowsEndpoint {
     try {
       wi = workflowService.getWorkflowById(id);
     } catch (NotFoundException e) {
-      return ApiResponses.notFound("Cannot find workflow instance with id '%d'.", id);
+      return ApiResponseBuilder.notFound("Cannot find workflow instance with id '%d'.", id);
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
     } catch (Exception e) {
       logger.error("The workflow service was not able to get the workflow instance", e);
-      return ApiResponses.serverError("Could not retrieve workflow instance, reason: '%s'", e.getMessage());
+      return ApiResponseBuilder.serverError("Could not retrieve workflow instance, reason: '%s'", e.getMessage());
     }
 
-    return ApiResponses.Json.ok(acceptHeader, workflowInstanceToJSON(wi, withOperations, withConfiguration));
+    return ApiResponseBuilder.Json.ok(acceptHeader, workflowInstanceToJSON(wi, withOperations, withConfiguration));
   }
 
   @PUT
@@ -335,14 +335,14 @@ public class WorkflowsEndpoint {
       }
 
       wi = workflowService.getWorkflowById(id);
-      return ApiResponses.Json.ok(acceptHeader, workflowInstanceToJSON(wi, withOperations, withConfiguration));
+      return ApiResponseBuilder.Json.ok(acceptHeader, workflowInstanceToJSON(wi, withOperations, withConfiguration));
     } catch (NotFoundException e) {
-      return ApiResponses.notFound("Cannot find workflow instance with id '%d'.", id);
+      return ApiResponseBuilder.notFound("Cannot find workflow instance with id '%d'.", id);
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
     } catch (Exception e) {
       logger.error("The workflow service was not able to get the workflow instance", e);
-      return ApiResponses.serverError("Could not retrieve workflow instance, reason: '%s'", e.getMessage());
+      return ApiResponseBuilder.serverError("Could not retrieve workflow instance, reason: '%s'", e.getMessage());
     }
   }
 
@@ -361,12 +361,12 @@ public class WorkflowsEndpoint {
     } catch (WorkflowStateException e) {
       return RestUtil.R.conflict("Cannot delete workflow instance in this workflow state");
     } catch (NotFoundException e) {
-      return ApiResponses.notFound("Cannot find workflow instance with id '%d'.", id);
+      return ApiResponseBuilder.notFound("Cannot find workflow instance with id '%d'.", id);
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
     } catch (Exception e) {
       logger.error("Could not delete workflow instances", e);
-      return ApiResponses.serverError("Could not delete workflow instances, reason: '%s'", e.getMessage());
+      return ApiResponseBuilder.serverError("Could not delete workflow instances, reason: '%s'", e.getMessage());
     }
 
     return Response.noContent().build();
