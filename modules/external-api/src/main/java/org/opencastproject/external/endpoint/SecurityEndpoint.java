@@ -29,7 +29,7 @@ import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.external.common.ApiMediaType;
-import org.opencastproject.external.common.ApiResponses;
+import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.util.DateTimeSupport;
@@ -158,11 +158,11 @@ public class SecurityEndpoint implements ManagedService {
         signedUrl = urlSigningService.sign(url, validUntil, null, validSource);
       } catch (UrlSigningException e) {
         log.warn("Error while trying to sign url '{}':", url, e);
-        return ApiResponses.Json.ok(acceptHeader, obj(f("error", "Error while signing url")));
+        return ApiResponseBuilder.Json.ok(acceptHeader, obj(f("error", "Error while signing url")));
       }
-      return ApiResponses.Json.ok(acceptHeader, obj(f("url", signedUrl), f("valid-until", toUTC(validUntil.getMillis()))));
+      return ApiResponseBuilder.Json.ok(acceptHeader, obj(f("url", signedUrl), f("valid-until", toUTC(validUntil.getMillis()))));
     } else {
-      return ApiResponses.Json.ok(acceptHeader, obj(f("error", "Given URL cannot be signed")));
+      return ApiResponseBuilder.Json.ok(acceptHeader, obj(f("error", "Given URL cannot be signed")));
     }
   }
 }

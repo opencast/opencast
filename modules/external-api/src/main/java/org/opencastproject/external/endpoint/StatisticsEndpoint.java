@@ -29,7 +29,7 @@ import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.external.common.ApiMediaType;
-import org.opencastproject.external.common.ApiResponses;
+import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.external.util.statistics.QueryUtils;
 import org.opencastproject.external.util.statistics.ResourceTypeUtils;
 import org.opencastproject.external.util.statistics.StatisticsProviderUtils;
@@ -203,7 +203,7 @@ public class StatisticsEndpoint {
     JSONArray result = new JSONArray();
     providers.stream().map(p -> StatisticsProviderUtils.toJson(p, withParameters)).forEach(result::add);
 
-    return ApiResponses.Json.ok(acceptHeader, result.toJSONString());
+    return ApiResponseBuilder.Json.ok(acceptHeader, result.toJSONString());
   }
 
   @GET
@@ -234,10 +234,10 @@ public class StatisticsEndpoint {
     if (StringUtils.isNotBlank(id)) {
       Optional<StatisticsProvider> provider = statisticsService.getProvider(id);
       if (provider.isPresent()) {
-        return ApiResponses.Json.ok(acceptHeader, StatisticsProviderUtils.toJson(provider.get(),
+        return ApiResponseBuilder.Json.ok(acceptHeader, StatisticsProviderUtils.toJson(provider.get(),
             withParameters).toJSONString());
       } else {
-        return ApiResponses.notFound("Cannot find a statistics provider with id '%s'.", id);
+        return ApiResponseBuilder.notFound("Cannot find a statistics provider with id '%s'.", id);
       }
     } else {
       return RestUtil.R.badRequest("Invalid value for providerId");
@@ -279,7 +279,7 @@ public class StatisticsEndpoint {
       .map(query -> QueryUtils.execute(query))
       .forEach(result::add);
 
-    return ApiResponses.Json.ok(acceptHeader, result.toJSONString());
+    return ApiResponseBuilder.Json.ok(acceptHeader, result.toJSONString());
   }
 
   @POST
@@ -355,7 +355,7 @@ public class StatisticsEndpoint {
             filters
     );
 
-    return ApiResponses.Json.ok(acceptHeader, new JSONObject(Collections.singletonMap("csv", result)).toJSONString());
+    return ApiResponseBuilder.Json.ok(acceptHeader, new JSONObject(Collections.singletonMap("csv", result)).toJSONString());
   }
 
   private void checkAccess(final String resourceId, final ResourceType resourceType) {

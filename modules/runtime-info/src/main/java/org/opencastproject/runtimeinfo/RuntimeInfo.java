@@ -76,6 +76,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * This REST endpoint provides information about the runtime environment, including the services and user interfaces
  * deployed and the current login context.
@@ -91,6 +96,8 @@ import javax.ws.rs.core.MediaType;
       + "deployed and the current user context.",
     notes = {}
 )
+@Tag(name = "Runtime Information", description = "This service provides information about the runtime environment, "
+    + "including the services that are deployed and the current user context.")
 @Component(
     service = RuntimeInfo.class,
     property = {
@@ -179,6 +186,14 @@ public class RuntimeInfo {
       },
       returnDescription = ""
   )
+  @Operation(
+      summary = "List the REST services and user interfaces running on this host",
+      description = "List the REST services and user interfaces running on this host"
+  )
+  @ApiResponse(
+      responseCode = "200",
+      description = "The components running on this host"
+  )
   public String getRuntimeInfo(@Context HttpServletRequest request) throws MalformedURLException,
           InvalidSyntaxException {
     final Organization organization = securityService.getOrganization();
@@ -247,6 +262,14 @@ public class RuntimeInfo {
       },
       returnDescription = ""
   )
+  @Operation(
+      summary = "Information about the curent user",
+      description = "Returns information about the current user"
+  )
+  @ApiResponse(
+      responseCode = "200",
+      description = "Returns information about the current user"
+  )
   public String getMyInfo() {
     Map<String, Object> result = new HashMap<>();
 
@@ -298,6 +321,23 @@ public class RuntimeInfo {
           ),
       },
       returnDescription = "Details of the Opencast node's health status"
+  )
+  @Operation(
+      summary = "Opencast node health check",
+      description = "Implements this internet-draft health check api "
+          + "https://inadarei.github.io/rfc-healthcheck"
+  )
+  @ApiResponses(
+      value = {
+          @ApiResponse(
+              responseCode = "200",
+              description = "Node is running, check response for details"
+          ),
+          @ApiResponse(
+              responseCode = "503",
+              description = "Node is offline or unresponsive, check response for details"
+          )
+      }
   )
   public String getHealth(@Context HttpServletResponse response) {
     /* Response implements https://inadarei.github.io/rfc-healthcheck

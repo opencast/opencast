@@ -184,6 +184,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @Path("/api/events")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
@@ -191,6 +199,9 @@ import javax.ws.rs.core.Response.Status;
             ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0 })
 @RestService(name = "externalapievents", title = "External API Events Service", notes = {},
              abstractText = "Provides resources and operations related to the events")
+@Tag(name = "External API")
+@Tag(name = "External API - Events",
+    description = "The events endpoint provides resources and operations related to the events")
 @Component(
     immediate = true,
     service = { EventsEndpoint.class,ManagedService.class },
@@ -401,11 +412,24 @@ public class EventsEndpoint implements ManagedService {
                   @RestParameter(name = "includeInternalPublication", isRequired = false, description = "Whether internal publications should be included.", type = Type.BOOLEAN)}, responses = {
                           @RestResponse(description = "The event is returned.", responseCode = HttpServletResponse.SC_OK),
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
-  public Response getEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
-          @QueryParam("sign") boolean sign, @QueryParam("withacl") Boolean withAcl,
-          @QueryParam("withmetadata") Boolean withMetadata, @QueryParam("withscheduling") Boolean withScheduling,
-          @QueryParam("withpublications") Boolean withPublications, @QueryParam("includeInternalPublication") Boolean includeInternalPublication)
-          throws Exception {
+  @Operation(summary = "Get a single event", description = "Returns a single event. By setting the optional sign parameter to true, the method will pre-sign distribution urls if signing is turned on in Opencast. Remember to consider the maximum validity of signed URLs when caching this response.")
+  public Response getEvent(
+      @HeaderParam("Accept") String acceptHeader,
+      @Parameter(description = "The event id", required = true)
+      @PathParam("eventId") String id,
+      @Parameter(description = "Whether public distribution urls should be signed.")
+      @QueryParam("sign") boolean sign,
+      @Parameter(description = "Whether the acl metadata should be included in the response.")
+      @QueryParam("withacl") Boolean withAcl,
+      @Parameter(description = "Whether the metadata catalogs should be included in the response.")
+      @QueryParam("withmetadata") Boolean withMetadata,
+      @Parameter(description = "Whether the scheduling information should be included in the response.")
+      @QueryParam("withscheduling") Boolean withScheduling,
+      @Parameter(description = "Whether the publication ids and urls should be included in the response.")
+      @QueryParam("withpublications") Boolean withPublications,
+      @Parameter(description = "Whether internal publications should be included.")
+      @QueryParam("includeInternalPublication") Boolean includeInternalPublication)
+        throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     if (requestedVersion.isSmallerThan(VERSION_1_1_0)) {
       // withScheduling was added in version 1.1.0 and should be ignored for smaller versions
@@ -425,6 +449,15 @@ public class EventsEndpoint implements ManagedService {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, responses = {
       @RestResponse(description = "The event's media is returned.", responseCode = HttpServletResponse.SC_OK),
       @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @Operation(summary = "Get media tracks of a single event", description = "Returns media tracks of specific single event.")
+  @Parameters({
+      @Parameter(name = "eventId", description = "The event id", required = true, in = ParameterIn.PATH),
+      @Parameter(name = "Accept", description = "The accept header", required = true, in = ParameterIn.HEADER)
+  })
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "The event's media is returned."),
+      @ApiResponse(responseCode = "404", description = "The specified event does not exist.")
+  })
   public Response getEventMedia(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();

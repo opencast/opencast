@@ -27,7 +27,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.external.common.ApiMediaType;
-import org.opencastproject.external.common.ApiResponses;
+import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -124,10 +124,10 @@ public class CaptureAgentsEndpoint {
     final Agent agent = agentStateService.getAgent(id);
 
     if (agent == null) {
-      return ApiResponses.notFound("Cannot find an agent with id '%s'.", id);
+      return ApiResponseBuilder.notFound("Cannot find an agent with id '%s'.", id);
     }
 
-    return ApiResponses.Json.ok(acceptHeader, generateJsonAgent(agent));
+    return ApiResponseBuilder.Json.ok(acceptHeader, generateJsonAgent(agent));
   }
 
   @GET
@@ -165,7 +165,7 @@ public class CaptureAgentsEndpoint {
         .map(a -> generateJsonAgent(a))
         .collect(Collectors.toList());
 
-    return ApiResponses.Json.ok(acceptHeader, arr(agentsJSON));
+    return ApiResponseBuilder.Json.ok(acceptHeader, arr(agentsJSON));
   }
 
 
