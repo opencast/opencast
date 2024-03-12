@@ -162,6 +162,7 @@ nav:
         - Microsoft Azure: 'configuration/transcription.configuration/microsoftazuretranscripts.md'
         - Vosk: 'configuration/transcription.configuration/vosk.md'
         - Whisper: 'configuration/transcription.configuration/whisper.md'
+        - WhisperC++: 'configuration/transcription.configuration/whispercpp.md'
    - User Statistics and Privacy Configuration: 'configuration/user-statistics.and.privacy.md'
    - Video Editor:
         - Overview: 'configuration/videoeditor.overview.md'
