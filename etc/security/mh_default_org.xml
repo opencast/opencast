@@ -230,7 +230,7 @@
     <sec:intercept-url pattern="/api/events/*/scheduling" method="PUT" access="ROLE_ADMIN, ROLE_API_EVENTS_SCHEDULING_EDIT"/>
     <sec:intercept-url pattern="/api/events/*/track" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_TRACK_EDIT"/>
     <sec:intercept-url pattern="/api/groups/*" method="PUT" access="ROLE_ADMIN, ROLE_API_GROUPS_EDIT"/>
-    <sec:intercept-url pattern="/api/playlists" method="PUT" access="ROLE_ADMIN, ROLE_API_PLAYLISTS_CREATE, ROLE_API_PLAYLISTS_EDIT"/>
+    <sec:intercept-url pattern="/api/playlists/*" method="PUT" access="ROLE_ADMIN, ROLE_API_PLAYLISTS_CREATE, ROLE_API_PLAYLISTS_EDIT"/>
     <sec:intercept-url pattern="/api/series/*" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_EDIT"/>
     <sec:intercept-url pattern="/api/series/*/acl" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_ACL_EDIT"/>
     <sec:intercept-url pattern="/api/series/*/metadata" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_EDIT"/>
@@ -246,7 +246,8 @@
     <sec:intercept-url pattern="/api/clearIndex" method="POST" access="ROLE_ADMIN"/>
     <sec:intercept-url pattern="/api/recreateIndex" method="POST" access="ROLE_ADMIN"/>
     <sec:intercept-url pattern="/api/recreateIndex/*" method="POST" access="ROLE_ADMIN"/>
-    <sec:intercept-url pattern="/api/playlists" method="POST" access="ROLE_ADMIN, ROLE_API_PLAYLISTS_CREATE, ROLE_API_PLAYLISTS_EDIT"/>
+    <sec:intercept-url pattern="/api/playlists/*" method="POST" access="ROLE_ADMIN, ROLE_API_PLAYLISTS_CREATE, ROLE_API_PLAYLISTS_EDIT"/>
+    <sec:intercept-url pattern="/api/playlists/*/entries" method="POST" access="ROLE_ADMIN, ROLE_API_PLAYLISTS_CREATE, ROLE_API_PLAYLISTS_EDIT"/>
     <sec:intercept-url pattern="/api/series" method="POST" access="ROLE_ADMIN, ROLE_API_SERIES_CREATE"/>
     <sec:intercept-url pattern="/api/security/sign" method="POST" access="ROLE_ADMIN, ROLE_API_SECURITY_EDIT"/>
     <sec:intercept-url pattern="/api/statistics/data/query" method="POST" access="ROLE_ADMIN, ROLE_API_STATISTICS_VIEW"/>
