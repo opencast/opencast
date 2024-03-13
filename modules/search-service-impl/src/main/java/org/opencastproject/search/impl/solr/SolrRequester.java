@@ -629,7 +629,6 @@ public class SolrRequester {
    */
   private SolrQuery getForAction(SearchQuery q, String action, boolean applyPermissions) throws SolrServerException {
     StringBuilder sb = new StringBuilder();
-    logger.error("Called getForAction");
 
     if (StringUtils.isNotBlank(q.getQuery())) {
       sb.append(q.getQuery());
