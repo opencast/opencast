@@ -52,7 +52,7 @@
     <org.osgi.service.component.annotations.version>1.5.1</org.osgi.service.component.annotations.version>
     <org.osgi.service.cm.version>1.6.0</org.osgi.service.cm.version>
     <org.osgi.service.log.version>1.5.0</org.osgi.service.log.version>
-    <org.osgi.service.http.version>1.2.1</org.osgi.service.http.version>
+    <org.osgi.service.http.version>1.2.2</org.osgi.service.http.version>
     <org.osgi.service.http.whiteboard.version>1.1.1</org.osgi.service.http.whiteboard.version>
     <org.osgi.service.jaxrs.version>1.0.1</org.osgi.service.jaxrs.version>
     <querydsl.version>3.7.4</querydsl.version>
