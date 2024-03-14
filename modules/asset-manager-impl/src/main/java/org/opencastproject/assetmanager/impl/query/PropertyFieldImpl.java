@@ -27,6 +27,7 @@ import org.opencastproject.assetmanager.api.PropertyId;
 import org.opencastproject.assetmanager.api.PropertyName;
 import org.opencastproject.assetmanager.api.Value.ValueType;
 import org.opencastproject.assetmanager.api.Version;
+import org.opencastproject.assetmanager.api.fn.ProductBuilder;
 import org.opencastproject.assetmanager.api.query.Order;
 import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.assetmanager.api.query.PropertyField;
@@ -37,9 +38,6 @@ import org.opencastproject.assetmanager.impl.persistence.QPropertyDto;
 import org.opencastproject.assetmanager.impl.persistence.QSnapshotDto;
 import org.opencastproject.assetmanager.impl.query.DeleteQueryContribution.Where;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.ProductBuilder;
-import com.entwinemedia.fn.Products;
 import com.entwinemedia.fn.data.Opt;
 import com.mysema.query.jpa.JPASubQuery;
 import com.mysema.query.jpa.impl.JPAQueryFactory;
@@ -51,12 +49,13 @@ import com.mysema.query.types.expr.BooleanExpression;
 import com.mysema.query.types.expr.BooleanOperation;
 
 import java.util.Date;
+import java.util.function.Function;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 public class PropertyFieldImpl<A> implements PropertyField<A>, EntityPaths {
-  private static final ProductBuilder p = Products.E;
+  private static final ProductBuilder pTest = ProductBuilder.E;
 
   private final PropertyFieldImpl self = this;
 
@@ -176,27 +175,30 @@ public class PropertyFieldImpl<A> implements PropertyField<A>, EntityPaths {
   /**
    * Create a predicate to compare this field's value with a constant value.
    */
-  private Fn<QPropertyDto, Opt<BooleanExpression>> mkValuePredicate(final Operator<? super Boolean> op, final A value) {
-    return new Fn<QPropertyDto, Opt<BooleanExpression>>() {
+  private Function<QPropertyDto, Opt<BooleanExpression>> mkValuePredicate(
+      final Operator<? super Boolean> op,
+      final A value
+  ) {
+    return new Function<QPropertyDto, Opt<BooleanExpression>>() {
       @Override public Opt<BooleanExpression> apply(final QPropertyDto dto) {
         final BooleanExpression expr = mkValue.mk(value).decompose(
-            new Fn<String, BooleanExpression>() {
+            new Function<String, BooleanExpression>() {
               @Override public BooleanExpression apply(String a) {
                 return BooleanOperation.create(op, dto.stringValue, ConstantImpl.create(a));
               }
-            }, new Fn<Date, BooleanExpression>() {
+            }, new Function<Date, BooleanExpression>() {
               @Override public BooleanExpression apply(Date a) {
                 return BooleanOperation.create(op, dto.dateValue, ConstantImpl.create(a));
               }
-            }, new Fn<Long, BooleanExpression>() {
+            }, new Function<Long, BooleanExpression>() {
               @Override public BooleanExpression apply(Long a) {
                 return BooleanOperation.create(op, dto.longValue, ConstantImpl.create(a));
               }
-            }, new Fn<Boolean, BooleanExpression>() {
+            }, new Function<Boolean, BooleanExpression>() {
               @Override public BooleanExpression apply(Boolean a) {
                 return BooleanOperation.create(op, dto.boolValue, ConstantImpl.create(a));
               }
-            }, new Fn<Version, BooleanExpression>() {
+            }, new Function<Version, BooleanExpression>() {
               @Override public BooleanExpression apply(Version a) {
                 return BooleanOperation.create(op, dto.longValue, ConstantImpl.create(RuntimeTypes.convert(a).value()));
               }
@@ -208,11 +210,11 @@ public class PropertyFieldImpl<A> implements PropertyField<A>, EntityPaths {
 
   public Path<?> getPath(QPropertyDto dto) {
     return mkValue.match(
-            p.p1(dto.stringValue),
-            p.p1(dto.dateValue),
-            p.p1(dto.longValue),
-            p.p1(dto.boolValue),
-            p.p1(dto.longValue));
+        pTest.p1(dto.stringValue),
+        pTest.p1(dto.dateValue),
+        pTest.p1(dto.longValue),
+        pTest.p1(dto.boolValue),
+        pTest.p1(dto.longValue));
   }
 
 //  /**
@@ -290,7 +292,7 @@ public class PropertyFieldImpl<A> implements PropertyField<A>, EntityPaths {
    *
    * @param valueExpression a function that creates a property value expression
    */
-  private Where mkWhereDeleteBase(final Fn<QPropertyDto, Opt<BooleanExpression>> valueExpression) {
+  private Where mkWhereDeleteBase(final Function<QPropertyDto, Opt<BooleanExpression>> valueExpression) {
     return PropertyPredicates.mkWhereDelete(name, valueExpression);
   }
 
@@ -299,7 +301,7 @@ public class PropertyFieldImpl<A> implements PropertyField<A>, EntityPaths {
    *
    * @param valueExpression a function that creates a property value expression
    */
-  private BooleanExpression mkWhereSelectBase(Fn<QPropertyDto, Opt<BooleanExpression>> valueExpression) {
+  private BooleanExpression mkWhereSelectBase(Function<QPropertyDto, Opt<BooleanExpression>> valueExpression) {
     return PropertyPredicates.mkWhereSelect(name, valueExpression);
   }
 }

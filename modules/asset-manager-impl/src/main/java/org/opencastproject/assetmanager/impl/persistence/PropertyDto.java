@@ -26,8 +26,6 @@ import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.impl.RuntimeTypes;
 
-import com.entwinemedia.fn.Fx;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,31 +132,36 @@ public class PropertyDto {
 
   private static void setValue(final PropertyDto dto, final Value value) {
     value.decompose(
-        new Fx<String>() {
-          @Override public void apply(String a) {
+        new Function<String, Void>() {
+          @Override public Void apply(String a) {
             dto.stringValue = a;
+            return null;
           }
-        }.toFn(),
-        new Fx<Date>() {
-          @Override public void apply(Date a) {
+        },
+        new Function<Date, Void>() {
+          @Override public Void apply(Date a) {
             dto.dateValue = a;
+            return null;
           }
-        }.toFn(),
-        new Fx<Long>() {
-          @Override public void apply(Long a) {
+        },
+        new Function<Long, Void>() {
+          @Override public Void apply(Long a) {
             dto.longValue = a;
+            return null;
           }
-        }.toFn(),
-        new Fx<Boolean>() {
-          @Override public void apply(Boolean a) {
+        },
+        new Function<Boolean, Void>() {
+          @Override public Void apply(Boolean a) {
             dto.boolValue = a;
+            return null;
           }
-        }.toFn(),
-        new Fx<Version>() {
-          @Override public void apply(Version a) {
+        },
+        new Function<Version, Void>() {
+          @Override public Void apply(Version a) {
             dto.longValue = RuntimeTypes.convert(a).value();
+            return null;
           }
-        }.toFn());
+        });
   }
 
   public static Function<EntityManager, Integer> deleteQuery(final String mediaPackageId) {

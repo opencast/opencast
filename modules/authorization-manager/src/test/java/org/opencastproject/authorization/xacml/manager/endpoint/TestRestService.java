@@ -21,7 +21,6 @@
 
 package org.opencastproject.authorization.xacml.manager.endpoint;
 
-import static com.entwinemedia.fn.Stream.$;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
@@ -65,10 +64,11 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.easymock.EasyMock;
 import org.junit.Ignore;
+
+import java.util.LinkedHashSet;
+import java.util.Optional;
 
 import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.Path;
@@ -187,10 +187,12 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     Snapshot snapshot = EasyMock.createNiceMock(Snapshot.class);
     EasyMock.expect(snapshot.getMediaPackage()).andReturn(new MediaPackageBuilderImpl().createNew()).anyTimes();
     ARecord record = EasyMock.createNiceMock(ARecord.class);
-    EasyMock.expect(record.getSnapshot()).andReturn(Opt.some(snapshot)).anyTimes();
+    LinkedHashSet<ARecord> records = new LinkedHashSet<>();
+    records.add(record);
+    EasyMock.expect(record.getSnapshot()).andReturn(Optional.of(snapshot)).anyTimes();
 
     AResult result = EasyMock.createNiceMock(AResult.class);
-    EasyMock.expect(result.getRecords()).andReturn($(record)).anyTimes();
+    EasyMock.expect(result.getRecords()).andReturn(records).anyTimes();
 
     ASelectQuery select = EasyMock.createNiceMock(ASelectQuery.class);
     EasyMock.expect(select.where(EasyMock.anyObject(Predicate.class))).andReturn(select).anyTimes();
@@ -208,8 +210,8 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     EasyMock.expect(query.select(EasyMock.anyObject(Target.class))).andReturn(select).anyTimes();
 
     AssetManager assetManager = EasyMock.createNiceMock(AssetManager.class);
-    EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.some(new MediaPackageBuilderImpl()
-            .createNew())).anyTimes();
+    EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Optional.of(
+        new MediaPackageBuilderImpl().createNew())).anyTimes();
     EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
     EasyMock.replay(assetManager, version, query, predicate, select, result, record, snapshot);
     return assetManager;

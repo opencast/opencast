@@ -1595,8 +1595,8 @@ public class IndexServiceImpl implements IndexService {
           throw new IndexServiceException("Unable to get event media package " + event.getIdentifier() + " from WorkflowService because", e);
         }
       case ARCHIVE:
-        Opt<MediaPackage> mpOpt = assetManager.getMediaPackage(event.getIdentifier());
-        if (mpOpt.isSome()) {
+        Optional<MediaPackage> mpOpt = assetManager.getMediaPackage(event.getIdentifier());
+        if (mpOpt.isPresent()) {
           logger.debug("Found event in archive with id {}", event.getIdentifier());
           return mpOpt.get();
         }

@@ -72,7 +72,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -654,8 +653,8 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       // Media package not archived?.
       throw new LiveScheduleException(String.format("Unexpected error: media package %s has not been archived.", mpId));
     }
-    Opt<ARecord> record = result.getRecords().head();
-    if (record.isNone()) {
+    Optional<ARecord> record = result.getRecords().stream().findFirst();
+    if (record.isEmpty()) {
       // No snapshot?
       throw new LiveScheduleException(String.format("Unexpected error: media package %s has not been archived.", mpId));
     }

@@ -224,7 +224,7 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
         assertTrue(am.getAsset(
             snapshot.getVersion(),
             snapshot.getMediaPackage().getIdentifier().toString(),
-            snapshot.getMediaPackage().getElements()[0].getIdentifier()).isSome());
+            snapshot.getMediaPackage().getElements()[0].getIdentifier()).isPresent());
         return Unit.unit;
       }
     });

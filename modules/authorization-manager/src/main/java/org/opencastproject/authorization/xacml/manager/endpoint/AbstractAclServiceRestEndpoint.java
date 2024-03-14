@@ -60,8 +60,6 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -335,9 +333,9 @@ public abstract class AbstractAclServiceRestEndpoint {
     }
     try {
       Option<AccessControlList> aclOpt = Option.some(macl.get().getAcl());
-      Opt<MediaPackage> mediaPackage = getAssetManager().getMediaPackage(episodeId);
+      Optional<MediaPackage> mediaPackage = getAssetManager().getMediaPackage(episodeId);
       // the episode service is the source of authority for the retrieval of media packages
-      if (mediaPackage.isSome()) {
+      if (mediaPackage.isPresent()) {
         MediaPackage episodeSvcMp = mediaPackage.get();
         aclOpt.fold(new Option.EMatch<AccessControlList>() {
           // set the new episode ACL
