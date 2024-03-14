@@ -36,6 +36,7 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageReferenceImpl;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.UnsupportedElementException;
+import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
@@ -64,6 +65,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -243,6 +246,25 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
         DublinCoreValue date = EncodingSchemeUtils.encodeDate(mediaPackage.getDate(), Precision.Minute);
         dublinCore.set(DublinCore.PROPERTY_CREATED, date);
         logger.debug("Setting dc:date to '{}'", date.getValue());
+      }
+
+      // Temporal
+      if (mediaPackage.getDuration() != null
+          && dublinCore.hasValue(DublinCore.PROPERTY_CREATED)
+          && !dublinCore.hasValue(DublinCore.PROPERTY_TEMPORAL)) {
+        var created = EncodingSchemeUtils.decodeDate(dublinCore.getFirst(DublinCore.PROPERTY_CREATED));
+        if (created != null) {
+          // Instant end =
+          var end = Date.from(created.toInstant().plus(mediaPackage.getDuration(), ChronoUnit.MILLIS));
+          var temporal = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(created, end), Precision.Second);
+          dublinCore.set(DublinCore.PROPERTY_TEMPORAL, temporal);
+          logger.debug("Setting dc:temporal to '{}'", temporal.getValue());
+        } else {
+          logger.warn("Unable to parse dc:created value '{}'; mediapackage '{}'",
+              dublinCore.getFirst(DublinCore.PROPERTY_CREATED),
+              mediaPackage.getIdentifier()
+          );
+        }
       }
 
       // Serialize changed dublin core
