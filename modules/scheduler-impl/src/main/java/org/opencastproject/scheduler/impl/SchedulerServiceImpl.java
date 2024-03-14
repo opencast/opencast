@@ -586,6 +586,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         DublinCoreValue eventTime = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(startDate, endDate),
                 Precision.Second);
         dc.set(DublinCore.PROPERTY_TEMPORAL, eventTime);
+        dc.set(DublinCore.PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(startDate, Precision.Second));
         try {
           mediaPackage = updateDublincCoreCatalog(mediaPackage, dc);
         } catch (Exception e) {
