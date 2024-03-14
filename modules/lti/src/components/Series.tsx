@@ -52,7 +52,7 @@ const dropdownCustomToggle = React.forwardRef<any, DOMAttributes<any>>(({childre
   </button>
 );
 
-const SeriesEpisode: React.StatelessComponent<EpisodeProps> = ({ episode, deleteCallback, editCallback, annotateCallback, downloadCallback, t }) => {
+const SeriesEpisode: React.FC<EpisodeProps> = ({episode, deleteCallback, editCallback, annotateCallback, downloadCallback, t}) => {
     const attachments = episode.mediapackage.attachments;
     const imageAttachment = attachments.find((a) => a.type.endsWith("/search+preview"));
     const image = imageAttachment !== undefined ? imageAttachment.url : "";
@@ -106,7 +106,7 @@ const SeriesEpisode: React.StatelessComponent<EpisodeProps> = ({ episode, delete
                 }
             </div>}
     </div>;
-}
+};
 
 const EPISONDES_PER_PAGE:number = 15;
 

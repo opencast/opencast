@@ -17,6 +17,10 @@
     "react-bootstrap": "^2.9.2",
     "react-dom": "^18.1.0",
     "react-i18next": "^14.0.0",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.9.1",
+    "react-dom": "^18.2.0",
+    "react-i18next": "^14.0.0",
     "react-js-pagination": "^3.0.2",
     "react-scripts": "^5.0.1",
     "react-select": "^5.8.0",
@@ -66,7 +70,7 @@
   "devDependencies": {
     "@types/jest": "29.5.12",
     "@types/node": "20.11.24",
-    "@types/react": "17.0.39",
+    "@types/react": "18.2.51",
     "@types/react-dom": "18.2.19",
     "@types/react-helmet": "^6.1.9",
     "@types/react-js-pagination": "^3.0.7"
