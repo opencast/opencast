@@ -11,6 +11,7 @@
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <packaging.definition>${project.basedir}/target/classes/package.xml</packaging.definition>
     <enableJobDispatching>true</enableJobDispatching>
+    <enableDeveloperMode>true</enableDeveloperMode>
   </properties>
   <artifactId>opencast-dist-develop</artifactId>
   <packaging>karaf-assembly</packaging>
