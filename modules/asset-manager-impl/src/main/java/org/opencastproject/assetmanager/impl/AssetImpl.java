@@ -36,8 +36,27 @@ public class AssetImpl implements Asset {
   private final Opt<MimeType> mimeType;
   private final long size;
   private final Availability availability;
+  private final int nextCheck;
   private final String storageId;
   private final Checksum checksum;
+
+  public AssetImpl(
+      AssetId id,
+      InputStream in,
+      Opt<MimeType> mimeType,
+      long size,
+      String storeId,
+      Availability availability,
+      Checksum checksum) {
+    this.id = id;
+    this.in = in;
+    this.mimeType = mimeType;
+    this.size = size;
+    this.availability = availability;
+    this.nextCheck = 0;
+    this.storageId = storeId;
+    this.checksum = checksum;
+  }
 
   public AssetImpl(
           AssetId id,
@@ -46,12 +65,14 @@ public class AssetImpl implements Asset {
           long size,
           String storeId,
           Availability availability,
+          int nextCheck,
           Checksum checksum) {
     this.id = id;
     this.in = in;
     this.mimeType = mimeType;
     this.size = size;
     this.availability = availability;
+    this.nextCheck = nextCheck;
     this.storageId = storeId;
     this.checksum = checksum;
   }
@@ -75,6 +96,11 @@ public class AssetImpl implements Asset {
   @Override public Availability getAvailability() {
     return availability;
   }
+
+  @Override public int getNextCheckIn() {
+    return nextCheck;
+  }
+
 
   @Override public String getStorageId() {
     return storageId;

@@ -20,6 +20,7 @@
  */
 package org.opencastproject.assetmanager.impl.endpoint;
 
+import static javax.servlet.http.HttpServletResponse.SC_ACCEPTED;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
@@ -41,6 +42,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyId;
 import org.opencastproject.assetmanager.api.Value;
@@ -70,6 +72,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -274,6 +277,9 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
               responseCode = SC_OK,
               description = "File returned"),
           @RestResponse(
+              responseCode = SC_ACCEPTED,
+              description = "File is in cold storage, check again later.  See Retry-After header for timing."),
+          @RestResponse(
               responseCode = SC_NOT_FOUND,
               description = "Not found"),
           @RestResponse(
@@ -319,6 +325,15 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
 
           // Write the file contents back
           Option<Long> length = asset.getSize() > 0 ? Option.some(asset.getSize()) : Option.none();
+          if (Availability.OFFLINE == asset.getAvailability()) {
+            Calendar cal = java.util.Calendar.getInstance();
+            cal.add(java.util.Calendar.MILLISECOND, asset.getNextCheckIn());
+            return Response
+                .status(Response.Status.ACCEPTED)
+                .header("Retry-After", cal.getTime())
+                .build();
+          }
+
           return ok(asset.getInputStream(),
                   Option.fromOpt(asset.getMimeType().map(MimeTypeUtil.Fns.toString)),
                   length,

@@ -23,6 +23,7 @@ package org.opencastproject.assetmanager.aws.s3;
 
 import static java.lang.String.format;
 
+import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
@@ -32,6 +33,8 @@ import org.opencastproject.assetmanager.aws.AwsUploadOperationResult;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabase;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabaseException;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetMapping;
+import org.opencastproject.assetmanager.impl.RuntimeTypes;
+import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.OsgiUtil;
@@ -80,14 +83,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component(
     property = {
-    "service.description=Amazon S3 based asset store",
-    "store.type=aws-s3"
+      "service.description=Amazon S3 based asset store",
+      "store.type=aws-s3"
     },
     immediate = true,
     service = { RemoteAssetStore.class, AwsS3AssetStore.class }
@@ -99,7 +105,12 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
 
   private static final Tag freezable = new Tag("Freezable", "true");
   private static final Integer RESTORE_MIN_WAIT = 1080000; // 3h
-  private static final Integer RESTORE_POLL = 900000; // 15m
+  private static final Integer RESTORE_POLL = 900000; //
+
+  private static final List<String> COLD_STORAGE =
+      new ArrayList<>(List.of(StorageClass.DeepArchive.toString(),StorageClass.Glacier.toString()));
+
+  private static Map<String, Date> pollTimes = new LinkedHashMap<>();
 
 
   // Service configuration
@@ -115,6 +126,8 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   public static final String AWS_S3_MAX_RETRIES = "org.opencastproject.assetmanager.aws.s3.max.retries";
   public static final String AWS_GLACIER_RESTORE_DAYS = "org.opencastproject.assetmanager.aws.s3.glacier.restore.days";
 
+  public static final String AWS_OVERRIDE_RESTORE_MIN_WAIT = "org.opencastproject.assetmanager.aws.s3.glacier.min.wait";
+  public static final String AWS_OVERRIDE_RESTORE_POLL = "org.opencastproject.assetmanager.aws.s3.glacier.poll";
   public static final Integer AWS_S3_GLACIER_RESTORE_DAYS_DEFAULT = 2;
 
   // defaults
@@ -138,6 +151,9 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   /** The Glacier storage class, restore period **/
   private Integer restorePeriod;
 
+  private Integer glacierRestoreInitialWait = RESTORE_MIN_WAIT;
+  private Integer glacierRestorePollTime = RESTORE_POLL;
+
   protected boolean bucketCreated = false;
 
   /** OSGi Di */
@@ -152,6 +168,12 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   @Reference
   public void setDatabase(AwsAssetDatabase db) {
     super.setDatabase(db);
+  }
+
+  @Override
+  @Reference
+  public void setAssetManagerDatabase(Database db) {
+    super.setAssetManagerDatabase(db);
   }
 
   /**
@@ -198,6 +220,11 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       // Glacier storage class restore period
       restorePeriod = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_GLACIER_RESTORE_DAYS)
           .getOrElse(AWS_S3_GLACIER_RESTORE_DAYS_DEFAULT);
+
+      glacierRestoreInitialWait = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_OVERRIDE_RESTORE_MIN_WAIT)
+          .getOrElse(RESTORE_MIN_WAIT);
+      glacierRestorePollTime = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_OVERRIDE_RESTORE_POLL)
+          .getOrElse(RESTORE_POLL);
 
       // Explicit credentials are optional.
       AWSCredentialsProvider provider = null;
@@ -368,58 +395,79 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     }
   }
 
+  public Availability getAvailability(StoragePath path) throws AssetStoreException {
+    String storageClassId = getAssetStorageClass(path);
+    String objectName = getAssetObjectKey(path);
+    //Something in cold storage, but restored (ie, thawed to S3 temporarily) is ONLINE
+    if (COLD_STORAGE.contains(storageClassId) && !isRestored(objectName)) {
+      return Availability.OFFLINE;
+    }
+    return Availability.ONLINE;
+  }
+
   /**
    * Change the storage class of the object if possible
    * @param storagePath asset storage path
-   * @param storageClassId metadata storage class id
+   * @param storageClassId the desired storage class id
    * @see <a href="https://aws.amazon.com/s3/storage-classes/">The S3 storage class docs</a>
    */
   public String modifyAssetStorageClass(StoragePath storagePath, String storageClassId) throws AssetStoreException {
     try {
       StorageClass storageClass = StorageClass.fromValue(storageClassId);
       AwsAssetMapping map = database.findMapping(storagePath);
-      return modifyObjectStorageClass(map.getObjectKey(), storageClass).toString();
+      String newStorageClass =  modifyObjectStorageClass(map.getObjectKey(), storageClass).toString();
+      //We have no way to query the availability from the DB directly, so we blindly update the avail
+      if (COLD_STORAGE.contains(newStorageClass)) {
+        amDatabase.setAvailability(RuntimeTypes.convert(storagePath.getVersion()),
+                                   storagePath.getMediaPackageId(),
+                                   Availability.OFFLINE);
+      } else {
+        amDatabase.setAvailability(RuntimeTypes.convert(storagePath.getVersion()),
+                storagePath.getMediaPackageId(),
+                Availability.ONLINE);
+      }
+      return newStorageClass;
     } catch (AwsAssetDatabaseException | IllegalArgumentException e) {
       throw new AssetStoreException(e);
     }
   }
 
-  private StorageClass modifyObjectStorageClass(String objectName, StorageClass storageClass)
+  private StorageClass modifyObjectStorageClass(String objectName, StorageClass targetStorageClass)
           throws AssetStoreException {
     try {
-      StorageClass objectStorageClass = StorageClass.fromValue(getObjectStorageClass(objectName));
+      StorageClass currentStorageClass = StorageClass.fromValue(getObjectStorageClass(objectName));
 
-      if (storageClass != objectStorageClass) {
+      if (targetStorageClass != currentStorageClass) {
         /* objects can only be retrieved from Glacier not moved */
-        if (objectStorageClass == StorageClass.Glacier || objectStorageClass == StorageClass.DeepArchive) {
+        if (COLD_STORAGE.contains(currentStorageClass.toString())) {
           boolean isRestoring = isRestoring(objectName);
-          boolean isRestored = null != s3.getObjectMetadata(bucketName, objectName).getRestoreExpirationTime();
+          boolean isRestored = isRestored(objectName);
           if (!isRestoring && !isRestored) {
             logger.warn("S3 Object {} can not be moved from storage class {} to {} without restoring the object first",
-                objectStorageClass, storageClass);
-            return objectStorageClass;
+                objectName, currentStorageClass, targetStorageClass);
+            return currentStorageClass;
           }
         }
 
         /* Only put suitable objects in Glacier */
-        if (storageClass == StorageClass.Glacier || objectStorageClass == StorageClass.DeepArchive) {
+        if (COLD_STORAGE.contains(targetStorageClass.toString())) {
           GetObjectTaggingRequest gotr = new GetObjectTaggingRequest(bucketName, objectName);
           GetObjectTaggingResult objectTaggingRequest = s3.getObjectTagging(gotr);
           if (!objectTaggingRequest.getTagSet().contains(freezable)) {
-            logger.info("S3 object {} is not suitable for storage class {}", objectName, storageClass);
-            return objectStorageClass;
+            logger.info("S3 object {} is not suitable for storage class {}", objectName, targetStorageClass);
+            return currentStorageClass;
           }
         }
 
         CopyObjectRequest copyRequest = new CopyObjectRequest(bucketName, objectName, bucketName, objectName)
-                                            .withStorageClass(storageClass);
+                                            .withStorageClass(targetStorageClass);
         s3.copyObject(copyRequest);
-        logger.info("S3 object {} moved to storage class {}", objectName, storageClass);
+        logger.info("S3 object {} moved to storage class {}", objectName, targetStorageClass);
       } else {
-        logger.info("S3 object {} already in storage class {}", objectName, storageClass);
+        logger.info("S3 object {} already in storage class {}", objectName, targetStorageClass);
       }
 
-      return storageClass;
+      return targetStorageClass;
     } catch (SdkClientException e) {
       throw new AssetStoreException(e);
     }
@@ -429,12 +477,19 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
    *
    */
   @Override
-  protected InputStream getObject(AwsAssetMapping map) {
+  protected InputStream getObject(StoragePath path, AwsAssetMapping map) {
     String storageClassId = getObjectStorageClass(map.getObjectKey());
 
-    if (StorageClass.Glacier.name().equals(storageClassId) || StorageClass.DeepArchive.name().equals(storageClassId)) {
+    if (COLD_STORAGE.contains(storageClassId)) {
       // restore object and wait until available if necessary
-      restoreGlacierObject(map.getObjectKey(), restorePeriod, true);
+      restoreGlacierObject(map.getObjectKey(), restorePeriod, false);
+
+      // Flag that the stream is not yet ready
+      if (!isRestored(map.getObjectKey())) {
+        logger.debug("Object {} is still restoring from Glacier class storage", map.getObjectKey());
+        return RemoteAssetStore.streamNotReady;
+      }
+
     }
 
     try {
@@ -500,6 +555,16 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     return false;
   }
 
+  private boolean isRestored(String objectName) {
+    return null != s3.getObjectMetadata(bucketName, objectName).getRestoreExpirationTime();
+  }
+
+  public Integer getReadyEstimate(StoragePath path) throws AssetStoreException {
+    String objectName = getAssetObjectKey(path);
+    Date now = new Date();
+    return (int) (pollTimes.get(objectName).getTime() - now.getTime());
+  }
+
   private void restoreGlacierObject(String objectName, Integer objectRestorePeriod, Boolean wait) {
     boolean newRestore = false;
     if (isRestoring(objectName)) {
@@ -515,7 +580,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
 
     // if the object had already been restored the restore request will just
     // increase the expiration time
-    if (s3.getObjectMetadata(bucketName, objectName).getRestoreExpirationTime() == null) {
+    if (!isRestored(objectName)) {
       logger.info("Restoring object {} from Glacier class storage", objectName);
 
       // Just initiate restore?
@@ -527,13 +592,20 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       // Wait min restore time and then poll ofter that
       try {
         if (newRestore) {
-          Thread.sleep(RESTORE_MIN_WAIT);
+          Calendar until = Calendar.getInstance();
+          until.add(Calendar.SECOND, RESTORE_MIN_WAIT);
+          pollTimes.put(objectName, until.getTime());
+          Thread.sleep(glacierRestoreInitialWait);
         }
 
         while (s3.getObjectMetadata(bucketName, objectName).getOngoingRestore()) {
-          Thread.sleep(RESTORE_POLL);
+          Calendar until = Calendar.getInstance();
+          until.add(Calendar.SECOND, RESTORE_MIN_WAIT);
+          pollTimes.put(objectName, until.getTime());
+          Thread.sleep(glacierRestorePollTime);
         }
 
+        pollTimes.remove(objectName);
         logger.info("Object {} has been restored from Glacier class storage, for {} days", objectName,
                                                                                            objectRestorePeriod);
       } catch (InterruptedException e) {
@@ -565,9 +637,4 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   void setS3TransferManager(TransferManager s3TransferManager) {
     this.s3TransferManager = s3TransferManager;
   }
-
-  void setBucketName(String bucketName) {
-    this.bucketName = bucketName;
-  }
-
 }

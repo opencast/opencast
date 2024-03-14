@@ -32,6 +32,7 @@ import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabase;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabaseException;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetMapping;
 import org.opencastproject.assetmanager.impl.VersionImpl;
+import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
@@ -58,6 +59,7 @@ public abstract class AwsAbstractArchive implements AssetStore {
   private static final Logger logger = LoggerFactory.getLogger(AwsAbstractArchive.class);
 
   protected Workspace workspace;
+  protected Database amDatabase;
   protected AwsAssetDatabase database;
 
   /** The store type e.g. aws (long-term), or other implementations */
@@ -105,6 +107,11 @@ public abstract class AwsAbstractArchive implements AssetStore {
   /** OSGi Di */
   public void setDatabase(AwsAssetDatabase db) {
     this.database = db;
+  }
+
+  /** OSGi Di */
+  public void setAssetManagerDatabase(Database amDatabase) {
+    this.amDatabase = amDatabase;
   }
 
   /** @see AssetStore#copy(StoragePath, StoragePath) */
@@ -207,7 +214,7 @@ public abstract class AwsAbstractArchive implements AssetStore {
       }
 
       logger.debug("Getting archive object from AWS {}: {}", getStoreType(), map.getObjectKey());
-      return Opt.some(getObject(map));
+      return Opt.some(getObject(path, map));
 
     } catch (AssetStoreException e) {
       throw e;
@@ -216,7 +223,7 @@ public abstract class AwsAbstractArchive implements AssetStore {
     }
   }
 
-  protected abstract InputStream getObject(AwsAssetMapping map) throws AssetStoreException;
+  protected abstract InputStream getObject(StoragePath path, AwsAssetMapping map) throws AssetStoreException;
 
   /** @see AssetStore#delete(DeletionSelector) */
   public boolean delete(DeletionSelector sel) throws AssetStoreException {

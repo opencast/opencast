@@ -25,6 +25,7 @@ import static com.entwinemedia.fn.fns.Booleans.eq;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.util.data.Tuple.tuple;
 
+import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.fn.Snapshots;
@@ -413,6 +414,17 @@ public abstract class AssetManagerTestBase {
    */
   protected RemoteAssetStore mkRemoteAssetStore(String storeType) {
     return new RemoteAssetStore() {
+
+      @Override
+      public Availability getAvailability(StoragePath path) throws AssetStoreException {
+        return Availability.ONLINE;
+      }
+
+      @Override
+      public Integer getReadyEstimate(StoragePath path) throws AssetStoreException {
+        return 0;
+      }
+
       private Set<StoragePath> store = new HashSet<>();
 
       private void logSize() {

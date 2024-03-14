@@ -21,8 +21,34 @@
 
 package org.opencastproject.assetmanager.api.storage;
 
+import org.opencastproject.assetmanager.api.Availability;
+
+import java.io.InputStream;
+
 public interface RemoteAssetStore extends AssetStore {
   // Defines the root directory to be used for any caching done by a remote
   // asset store.  Caches should live as directories under this directory.
   String ASSET_STORE_CACHE_ROOT = "org.opencastproject.assetmanager.storage.cache.rootdir";
+
+  InputStream streamNotReady = new InputStream() {
+    @Override
+    public int read() {
+      return -1;  // end of stream
+    }
+
+    @Override
+    public int available() {
+      return 0;
+    }
+  };
+
+  Availability getAvailability(StoragePath path) throws AssetStoreException;
+
+  /**
+   * Returns an estimate in millisecs of when the element stream might be ready to read
+   * @param path to element
+   * @return
+   * @throws AssetStoreException
+   */
+  Integer getReadyEstimate(StoragePath path) throws AssetStoreException;
 }
