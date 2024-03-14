@@ -1,5 +1,31 @@
 # Opencast 15: Release Notes
 
+## Opencast 15.3
+
+This release comes with another small change to the community workflows, please check if it works for you.
+
+### Configuration changes
+
+- **Changes the partial-publish.xml workflow to use thumbnails created in the editor for publication**
+  [[#5543](https://github.com/opencast/opencast/pull/5543)]
+
+### Feature
+
+- **Adds a C/C++ implementation of OpenAI's Whisper automatic speech recognition**
+  [[#4973](https://github.com/opencast/opencast/pull/4973)]
+- **Run Maven without installing**
+  [[#5487]](https://github.com/opencast/opencast/pull/5487)
+
+### Bug fixes
+
+- **Fixes a paella-core issue regarding the frameList.getImage function and
+    extends the options for types of flavors for navigation slides**
+  [[#5339](https://github.com/opencast/opencast/pull/5339)]
+- **Updates the chrome drivers to circumvent temporary 500 errors**
+  [[#5618](https://github.com/opencast/opencast/pull/5618)]
+
+See [changelog](./changelog.md#opencast-151) for a comprehensive list of changes.
+
 ## Opencast 15.2
 
 Opencast valentines edition! A small release this time, but Opencast 15.2 includes a small change to the standard
