@@ -36,6 +36,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.json.simple.JSONObject;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/termination")
 @RestService(name = "terminationstateservice", title = "Termination State Service",
         abstractText = "When put into a termination 'wait' state, this service stops the node accepting further jobs,"
         + " and once any running jobs complete will change termination to 'ready'."
@@ -68,6 +69,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.path=/termination"
     }
 )
+@JaxrsResource
 public class TerminationStateRestServiceImpl implements TerminationStateRestService {
 
   private static final Logger logger = LoggerFactory.getLogger(TerminationStateRestServiceImpl.class);

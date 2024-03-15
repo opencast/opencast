@@ -41,6 +41,7 @@ import com.google.gson.reflect.TypeToken;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +62,7 @@ import javax.ws.rs.core.Response;
 /**
  * A service endpoint to expose the {@link AnimateService} via REST.
  */
-@Path("/")
+@Path("/animate")
 @RestService(
     name = "animate",
     title = "Animate Service",
@@ -78,6 +79,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.jobproducer=true"
     }
 )
+@JaxrsResource
 public class AnimateServiceRestEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logger */

@@ -34,7 +34,7 @@ describe('Application controller', function () {
         $httpBackend.whenGET('/sysinfo/bundles/version?prefix=opencast').respond(
             {'buildNumber': '01b60ff', 'consistent': true, 'version': '1.6.0.SNAPSHOT'}
         );
-        $httpBackend.whenGET('oc-version/version.json').respond({'data': '1.6.0SNAPSHOT'});
+        $httpBackend.whenGET('/admin-ng/oc-version/version.json').respond({'data': '1.6.0SNAPSHOT'});
         $httpBackend.whenGET('/admin-ng/adopter/isUpToDate').respond('true');
         $httpBackend.whenGET('/broker/status').respond('{}');
         $httpBackend.whenGET('/services/services.json').respond(

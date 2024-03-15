@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +61,7 @@ import javax.ws.rs.core.Response;
 /**
  * Serves UI configuration files via REST
  */
-@Path("/")
+@Path("/ui/config")
 @RestService(name = "UIConfigEndpoint",
     title = "UI Config Endpoint",
     abstractText = "Serves the configuration of the UI",
@@ -83,6 +84,7 @@ import javax.ws.rs.core.Response;
     immediate = true,
     service = UIConfigRest.class
 )
+@JaxrsResource
 public class UIConfigRest {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(UIConfigRest.class);

@@ -79,6 +79,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,7 +106,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * A REST endpoint for the {@link WorkflowService}
  */
-@Path("/")
+@Path("/workflow")
 @RestService(name = "workflowservice", title = "Workflow Service", abstractText = "This service lists available workflows and starts, stops, suspends and resumes workflow instances.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
@@ -123,6 +124,7 @@ import javax.ws.rs.core.Response.Status;
         "opencast.service.jobproducer=true"
     }
 )
+@JaxrsResource
 public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /** The default number of results returned */

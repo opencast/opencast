@@ -34,12 +34,13 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/nop")
 @RestService(
         name = "nopservice",
         title = "Nop Service",
@@ -55,6 +56,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.jobproducer=true"
     }
 )
+@JaxrsResource
 public class NopServiceEndpoint extends OsgiAbstractJobProducerEndpoint<NopServiceImpl> {
   @GET
   @Path("nop")

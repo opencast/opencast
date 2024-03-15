@@ -54,6 +54,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +83,7 @@ import javax.ws.rs.core.Response;
 /**
  * The REST endpoint for the capture agent service on the capture device
  */
-@Path("/")
+@Path("/capture-admin")
 @RestService(name = "captureadminservice",
   title = "Capture Admin Service",
   abstractText = "This service is a registry of capture agents and their recordings.",
@@ -102,6 +103,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.path=/capture-admin"
     }
 )
+@JaxrsResource
 public class CaptureAgentStateRestService {
 
   private static final Logger logger = LoggerFactory.getLogger(CaptureAgentStateRestService.class);

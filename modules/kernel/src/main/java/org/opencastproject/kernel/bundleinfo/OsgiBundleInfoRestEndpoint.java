@@ -23,11 +23,12 @@ package org.opencastproject.kernel.bundleinfo;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import javax.ws.rs.Path;
 
 /** OSGi bound implementation. */
-@Path("/")
+@Path("/sysinfo")
 @Component(
     immediate = true,
     service = OsgiBundleInfoRestEndpoint.class,
@@ -37,6 +38,7 @@ import javax.ws.rs.Path;
         "opencast.service.path=/sysinfo"
     }
 )
+@JaxrsResource
 public class OsgiBundleInfoRestEndpoint extends BundleInfoRestEndpoint {
   private BundleInfoDb db;
 

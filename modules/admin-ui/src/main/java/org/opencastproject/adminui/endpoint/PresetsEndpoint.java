@@ -39,6 +39,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/admin-ng/presets")
 @RestService(name = "PresetsProxyService", title = "UI Presets",
   abstractText = "This service provides the presets data for the UI.",
   notes = { "This service offers information about organizations and series for the admin UI.",
@@ -67,6 +68,7 @@ import javax.ws.rs.core.Response;
                 "opencast.service.path=/admin-ng/presets",
         }
 )
+@JaxrsResource
 public class PresetsEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(PresetsEndpoint.class);

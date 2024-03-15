@@ -48,6 +48,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +67,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * Rest endpoint for distributing media to the streaming distribution channel.
  */
-@Path("/")
+@Path("/distribution/streaming")
 @RestService(
     name = "streamingdistributionservice",
     title = "Streaming Distribution Service",
@@ -90,6 +91,7 @@ import javax.ws.rs.core.Response.Status;
         "opencast.service.jobproducer=true"
     }
 )
+@JaxrsResource
 public class WowzaStreamingDistributionRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */

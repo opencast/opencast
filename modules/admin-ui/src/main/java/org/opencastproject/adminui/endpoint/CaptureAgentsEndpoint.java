@@ -59,6 +59,7 @@ import com.entwinemedia.fn.data.json.Jsons;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +83,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-@Path("/")
+@Path("/admin-ng/capture-agents")
 @RestService(name = "captureAgents", title = "Capture agents façade service",
   abstractText = "Provides operations for the capture agents",
   notes = { "This service offers the default capture agents CRUD Operations for the admin UI.",
@@ -99,6 +100,7 @@ import javax.ws.rs.core.Response.Status;
     "opencast.service.path=/admin-ng/capture-agents"
   }
 )
+@JaxrsResource
 public class CaptureAgentsEndpoint {
 
   private static final String TRANSLATION_KEY_PREFIX = "CAPTURE_AGENT.DEVICE.";
