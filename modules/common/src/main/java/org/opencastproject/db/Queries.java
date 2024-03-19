@@ -150,6 +150,22 @@ public final class Queries {
       return em -> createTypedQuery(em, q, clazz, params).getResultList();
     }
 
+    /**
+     * Execute a named query and return a subset of the results.
+     *
+     * @param q Name of the query.
+     * @param clazz Entity class.
+     * @param params Parameters passed to the query.
+     * @return A list of entities.
+     * @param <T> Entity type.
+     */
+    public <T> Function<EntityManager, List<T>> findAll(String q, Class<T> clazz, int firstResult, int maxResults, Object... params) {
+      return em -> createTypedQuery(em, q, clazz, params)
+          .setFirstResult(firstResult)
+          .setMaxResults(maxResults)
+          .getResultList();
+    }
+
     protected abstract <T> TypedQuery<T> createTypedQuery(EntityManager em, String queryName, Class<T> clazz,
         Object... params);
 
