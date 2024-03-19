@@ -322,7 +322,8 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       var seriesSearchSource = new SearchSourceBuilder().query(QueryBuilders.boolQuery()
           .must(QueryBuilders.termQuery(SearchResult.ORG, org))
           .must(QueryBuilders.termQuery(SearchResult.TYPE, SearchService.IndexEntryType.Series))
-          .must(QueryBuilders.termQuery(SearchResult.DUBLINCORE + ".title", seriesName)));
+          .must(QueryBuilders.termQuery(SearchResult.DUBLINCORE + ".title", seriesName))
+          .mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE)));
       series = searchService.search(seriesSearchSource).getHits().stream()
           .map(h -> h.getDublinCore().getFirst(DublinCore.PROPERTY_IDENTIFIER))
           .collect(Collectors.toList());
