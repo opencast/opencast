@@ -85,8 +85,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,17 +167,12 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   private String streamMimeType;
   private String[] streamResolution;
   private MediaPackageElementFlavor[] liveFlavors;
-  private String distributionServiceType;
   private String serverUrl;
   private Cache<String, Version> snapshotVersionCache
       = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build();
   /** Which streaming formats should be published automatically */
   private List<String> publishedStreamingFormats = null;
   private String systemUserName;
-
-  /** References to all distribution services (used while activate not called yet) */
-  private HashMap<String, DownloadDistributionService> tempDistributionServices =
-          new HashMap<String, DownloadDistributionService>();
 
   /** Services */
   private DownloadDistributionService downloadDistributionService; // to distribute episode and series catalogs
@@ -259,15 +252,6 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       liveFlavors[i++] = MediaPackageElementFlavor.parseFlavor(f);
     }
 
-    if (!StringUtils.isBlank((String) properties.get(LIVE_DISTRIBUTION_SERVICE))) {
-      distributionServiceType = StringUtils.trimToEmpty((String) properties.get(LIVE_DISTRIBUTION_SERVICE));
-    } else {
-      distributionServiceType = DEFAULT_LIVE_DISTRIBUTION_SERVICE;
-    }
-    if (tempDistributionServices.get(distributionServiceType) != null) {
-      downloadDistributionService = tempDistributionServices.get(distributionServiceType);
-      logger.info("Distribution service with type {} set.", distributionServiceType);
-    }
     publishedStreamingFormats = Arrays.asList(Optional.ofNullable(StringUtils.split(
             (String)properties.get(LIVE_PUBLISH_STREAMING), ",")).orElse(new String[0]));
 
@@ -277,8 +261,8 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     }
 
     logger.info(
-        "Configured live stream name: {}, mime type: {}, resolution: {}, target flavors: {}, distribution service: {}",
-        streamName, streamMimeType, resolution, flavors, distributionServiceType);
+            "Configured live stream name: {}, mime type: {}, resolution: {}, target flavors: {}",
+            streamName, streamMimeType, resolution, flavors);
   }
 
   @Override
@@ -916,24 +900,12 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   }
 
   @Reference(
-      cardinality = ReferenceCardinality.AT_LEAST_ONE,
-      policy = ReferencePolicy.DYNAMIC,
-      unbind = "unsetDownloadDistributionService"
+      name = "DownloadDistributionService",
+      target = "(distribution.channel=download)"
   )
   public void setDownloadDistributionService(DownloadDistributionService service) {
-    // activate() not executed yet so we may not know which distribution service we want. Cache it.
-    if (distributionServiceType == null) {
-      tempDistributionServices.put(service.getDistributionType(), service);
-    } else if (distributionServiceType.equalsIgnoreCase(service.getDistributionType())) {
-      this.downloadDistributionService = service;
-    }
-  }
-
-  public void unsetDownloadDistributionService(DownloadDistributionService service) {
-    if (distributionServiceType.equalsIgnoreCase(service.getDistributionType())
-        && downloadDistributionService.equals(service)) {
-      this.downloadDistributionService = null;
-    }
+    this.downloadDistributionService = service;
+    logger.info("Distribution service with type '{}' set.", downloadDistributionService.getDistributionType());
   }
 
   @Reference
