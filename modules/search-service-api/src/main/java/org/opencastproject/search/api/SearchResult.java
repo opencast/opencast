@@ -139,7 +139,7 @@ public class SearchResult {
     }
   }
 
-  public static Map<String, List<String>> dehydrateDC(DublinCoreCatalog dublinCoreCatalog, Instant now) {
+  public static Map<String, List<String>> dehydrateDC(DublinCoreCatalog dublinCoreCatalog) {
     var metadata = new HashMap<String, List<String>>();
     for (var entry : dublinCoreCatalog.getValues().entrySet()) {
       var key = entry.getKey().getLocalName();
@@ -229,8 +229,7 @@ public class SearchResult {
   }
 
   public Map<String, Object> dehydrateEpisode() {
-    Instant now = Instant.now();
-    Map<String, List<String>> metadata = SearchResult.dehydrateDC(this.dublinCore, now);
+    Map<String, List<String>> metadata = SearchResult.dehydrateDC(this.dublinCore);
 
     var mediaPackageJson = gson.fromJson(MediaPackageParser.getAsJSON(this.mp), Map.class).get(MEDIAPACKAGE);
 
@@ -246,8 +245,7 @@ public class SearchResult {
   }
 
   public Map<String, Object> dehydrateSeries() {
-    Instant now = Instant.now();
-    Map<String, List<String>> metadata = SearchResult.dehydrateDC(this.dublinCore, now);
+    Map<String, List<String>> metadata = SearchResult.dehydrateDC(this.dublinCore);
 
     var ret = new HashMap<>(
         Map.of(INDEX_ACL, SearchResult.dehydrateAclForIndex(acl), REST_ACL, SearchResult.dehydrateAclForREST(acl),
