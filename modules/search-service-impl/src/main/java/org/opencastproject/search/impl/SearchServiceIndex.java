@@ -81,7 +81,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
- * A Solr-based {@link SearchService} implementation.
+ * A Elasticsearch-based {@link SearchService} implementation.
  */
 @Component(
         immediate = true,
@@ -91,7 +91,6 @@ import java.util.stream.Collectors;
                 "service.pid=org.opencastproject.search.impl.SearchServiceIndex"
         }
 )
-//FIXME: Should this be a ManagedService?
 public final class SearchServiceIndex extends AbstractIndexProducer implements IndexProducer {
 
   @Override
@@ -132,9 +131,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
   }
 
   /**
-   * Service activator, called via declarative services configuration. If the
-   * solr server url is configured, we try to connect to it. If not, the solr
-   * data directory with an embedded Solr server is used.
+   * Service activator, called via declarative services configuration.
    *
    * @param cc
    *          the component context
