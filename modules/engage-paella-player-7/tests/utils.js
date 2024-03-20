@@ -48,20 +48,20 @@ export const pauseVideo = async (page) => await page.evaluate(`${playerInstanceS
 
 
 export const test = base.extend({
-  page: async ({ baseURL, page }, use) => {
+  page: async ({ page }, use) => {
     await page.route('**/search/episode.json?id=ID-strong-river-flowing-down-the-green-forest', async route => {
       const json = ID_strong_river;
       await route.fulfill({ json });
-    });  
-    
+    });
+
     await page.route('**/info/me.json', async route => {
       const json = infome;
       await route.fulfill({ json });
-    });    
+    });
     await page.route('**/annotation/**', async route => {
       await route.fulfill({status: 404});
-    });    
-    
+    });
+
 
     await use(page);
   },
