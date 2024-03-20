@@ -182,6 +182,24 @@ public class PlaylistService {
       if (!checkPermission(existingPlaylist, Permissions.Action.WRITE)) {
         throw new UnauthorizedException("User does not have write permissions");
       }
+
+      // Validate entry IDs
+      for (PlaylistEntry entry : playlist.getEntries()) {
+        if (existingPlaylist.getEntries().stream().noneMatch(e -> entry.getId() == e.getId())) {
+          if (entry.getId() != 0) {
+            throw new IllegalArgumentException("When updating a playlist, entries should either have the id of an "
+                + "existing entry, or no id at all.");
+          }
+        }
+      }
+      for (PlaylistAccessControlEntry entry : playlist.getAccessControlEntries()) {
+        if (existingPlaylist.getAccessControlEntries().stream().noneMatch(e -> entry.getId() == e.getId())) {
+          if (entry.getId() != 0) {
+            throw new IllegalArgumentException("When updating a playlist, ACL entries should either have the id of an "
+                + "existing entry, or no id at all.");
+          }
+        }
+      }
     } catch (NotFoundException e) {
       // This means we are creating a new playlist
       for (PlaylistEntry entry : playlist.getEntries()) {
@@ -197,7 +215,6 @@ public class PlaylistService {
     } catch (PlaylistDatabaseException e) {
       throw new IllegalStateException("Could not get playlist from database with id ");
     }
-
 
     if (playlist.getOrganization() == null) {
       playlist.setOrganization(securityService.getOrganization().getId());
