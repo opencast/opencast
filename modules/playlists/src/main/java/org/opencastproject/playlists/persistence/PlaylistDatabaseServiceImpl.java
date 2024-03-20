@@ -176,7 +176,7 @@ public class PlaylistDatabaseServiceImpl implements PlaylistDatabaseService {
         if (fromDb.isEmpty()) {
           em.persist(playlist);
         } else {
-          em.merge(playlist);
+          return em.merge(playlist);
         }
 
         return playlist;
