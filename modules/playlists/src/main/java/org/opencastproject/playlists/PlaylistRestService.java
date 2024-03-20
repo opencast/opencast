@@ -662,7 +662,7 @@ public class PlaylistRestService {
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
       })
   public Response addEntry(
-      @PathParam("playlistId") String playlistId,
+      @PathParam("id") String playlistId,
       @FormParam("contentId") String contentId,
       @FormParam("type") PlaylistEntryType type)
           throws NotFoundException, UnauthorizedException {
