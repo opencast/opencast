@@ -29,7 +29,7 @@ import getSlidePluginContext from 'paella-slide-plugins';
 import getZoomPluginContext from 'paella-zoom-plugin';
 import getUserTrackingPluginContext from 'paella-user-tracking';
 import getVideo360CanvasPluginContext from 'paella-webgl-plugins';
-import getMP4MultiQualityContext from "paella-mp4multiquality-plugin";
+import getMP4MultiQualityContext from 'paella-mp4multiquality-plugin';
 
 import { loadTrimming, setTrimming } from './TrimmingLoader';
 import EpisodeConversor from './EpisodeConversor.js';
