@@ -20,6 +20,8 @@
  */
 package org.opencastproject.playlists;
 
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -102,5 +104,22 @@ public class PlaylistEntry {
 
   public void setPlaylist(Playlist playlist) {
     this.playlist = playlist;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    PlaylistEntry that = (PlaylistEntry) o;
+    return getId() != 0 && getId() == that.getId();
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(getId());
   }
 }

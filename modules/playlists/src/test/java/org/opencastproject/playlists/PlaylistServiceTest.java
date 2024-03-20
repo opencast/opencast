@@ -123,4 +123,62 @@ public class PlaylistServiceTest {
       // expected
     }
   }
+
+  @Test
+  public void addEntryShouldAddNewEntryWhenNotAlreadyPresent() throws Exception {
+    Playlist playlist = new Playlist();
+    PlaylistEntry playlistEntry = new PlaylistEntry(1, "1234", PlaylistEntryType.EVENT);
+
+    boolean result = playlist.addEntry(playlistEntry);
+
+    Assert.assertTrue(result);
+    Assert.assertEquals(1, playlist.getEntries().size());
+    Assert.assertEquals(playlistEntry, playlist.getEntries().get(0));
+  }
+
+  @Test
+  public void addEntryShouldReplaceExistingEntry() throws Exception {
+    Playlist playlist = new Playlist();
+    PlaylistEntry playlistEntry = new PlaylistEntry(1, "1234", PlaylistEntryType.EVENT);
+    playlist.addEntry(playlistEntry);
+
+    PlaylistEntry newPlaylistEntry = new PlaylistEntry(1, "5678", PlaylistEntryType.EVENT);
+    boolean result = playlist.addEntry(newPlaylistEntry);
+
+    Assert.assertTrue(result);
+    Assert.assertEquals(1, playlist.getEntries().size());
+    Assert.assertEquals(newPlaylistEntry, playlist.getEntries().get(0));
+  }
+
+  @Test
+  public void addEntryWithoutIdNotEqual() throws Exception {
+    Playlist playlist = new Playlist();
+    PlaylistEntry playlistEntry = new PlaylistEntry(0, "1234", PlaylistEntryType.EVENT);
+    playlist.addEntry(playlistEntry);
+
+    PlaylistEntry newPlaylistEntry = new PlaylistEntry(0, "5678", PlaylistEntryType.EVENT);
+    boolean result = playlist.addEntry(newPlaylistEntry);
+
+    Assert.assertTrue(result);
+    Assert.assertEquals(2, playlist.getEntries().size());
+  }
+
+  @Test
+  public void removeExistingEntry() throws Exception {
+    Playlist playlist = new Playlist();
+    PlaylistEntry playlistEntry = new PlaylistEntry(1, "1234", PlaylistEntryType.EVENT);
+    playlist.addEntry(playlistEntry);
+
+    PlaylistEntry removePlaylistEntry = new PlaylistEntry(1, "1234", PlaylistEntryType.EVENT);
+    boolean result = playlist.removeEntry(removePlaylistEntry);
+
+    Assert.assertTrue(result);
+    Assert.assertEquals(0, playlist.getEntries().size());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void addEntryShouldThrowExceptionWhenEntryIsNull() throws Exception {
+    Playlist playlist = new Playlist();
+    playlist.addEntry(null);
+  }
 }
