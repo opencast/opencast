@@ -84,7 +84,7 @@ public class Playlist {
 
   @OneToMany(
       fetch = FetchType.LAZY,
-      cascade = { CascadeType.PERSIST, CascadeType.REMOVE },
+      cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE },
       mappedBy = "playlist",
       orphanRemoval = true
   )
