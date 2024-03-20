@@ -139,6 +139,7 @@ nav:
                  - org.opencast.paella.matomo.userTrackingDataPlugin: 'configuration/player/paella.player7/plugins/org.opencast.paella.matomo.userTrackingDataPlugin.md'
                  - org.opencast.paella.transcriptionsPlugin: 'configuration/player/paella.player7/plugins/org.opencast.paella.transcriptionsPlugin.md'
                  - org.opencast.paella.versionButton.js: 'configuration/player/paella.player7/plugins/org.opencast.paella.versionButton.md'
+   - Playlists: configuration/playlists.md
    - Plugin Management: configuration/plugin-management.md
    - Search Index:
         - Overview: 'configuration/searchindex/index.md'
