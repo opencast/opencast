@@ -175,7 +175,8 @@ public class PlaylistService {
    * @throws IllegalStateException If something went wrong in the database service
    * @throws UnauthorizedException If the user does not have write access for an existing playlist
    */
-  public Playlist update(Playlist playlist) throws IllegalStateException, UnauthorizedException {
+  public Playlist update(Playlist playlist)
+          throws IllegalStateException, UnauthorizedException, IllegalArgumentException {
     try {
       Playlist existingPlaylist = persistence.getPlaylist(playlist.getId());
       if (!checkPermission(existingPlaylist, Permissions.Action.WRITE)) {
@@ -183,6 +184,16 @@ public class PlaylistService {
       }
     } catch (NotFoundException e) {
       // This means we are creating a new playlist
+      for (PlaylistEntry entry : playlist.getEntries()) {
+        if (entry.getId() != 0) {
+          throw new IllegalArgumentException("Entries for new playlists should not have identifiers set");
+        }
+      }
+      for (PlaylistAccessControlEntry entry : playlist.getAccessControlEntries()) {
+        if (entry.getId() != 0) {
+          throw new IllegalArgumentException("ACL Entries for new playlists should not have identifiers set");
+        }
+      }
     } catch (PlaylistDatabaseException e) {
       throw new IllegalStateException("Could not get playlist from database with id ");
     }

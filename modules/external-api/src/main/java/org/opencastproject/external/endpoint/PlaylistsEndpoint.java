@@ -262,7 +262,7 @@ public class PlaylistsEndpoint {
       );
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
-    } catch (ParseException | IOException e) {
+    } catch (ParseException | IOException | IllegalArgumentException e) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
   }
@@ -300,7 +300,7 @@ public class PlaylistsEndpoint {
       return ApiResponses.Json.ok(acceptHeader, playlistToJson(playlist));
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
-    } catch (ParseException | IOException e) {
+    } catch (ParseException | IOException | IllegalArgumentException e) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
   }
