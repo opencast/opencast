@@ -158,7 +158,7 @@ public class Playlist {
 
   public void setEntries(List<PlaylistEntry> entries) {
     for (var entry : entries) {
-      if (!entries.stream().anyMatch(e -> entry.getId() == e.getId())) {
+      if (this.entries.stream().noneMatch(e -> entry.getId() == e.getId())) {
         entry.setId(0L);
       }
       entry.setPlaylist(this);
