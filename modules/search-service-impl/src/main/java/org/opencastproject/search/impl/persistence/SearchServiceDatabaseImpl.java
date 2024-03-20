@@ -219,7 +219,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
     List<SearchEntity> searchEntities;
     try {
       int firstResult = pagesize * offset;
-      searchEntities = db.exec(namedQuery.findAll("Search.findAll", SearchEntity.class, firstResult, pagesize));
+      searchEntities = db.exec(namedQuery.findSome("Search.findAll", firstResult, pagesize, SearchEntity.class));
     } catch (Exception e) {
       logger.error("Could not retrieve all episodes: {}", e.getMessage());
       throw new SearchServiceDatabaseException(e);

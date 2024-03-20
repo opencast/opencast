@@ -154,12 +154,14 @@ public final class Queries {
      * Execute a named query and return a subset of the results.
      *
      * @param q Name of the query.
+     * @param firstResult The index of the first result returned.  Gets passed into the JPA internals.
+     * @param maxResults How many results to return
      * @param clazz Entity class.
      * @param params Parameters passed to the query.
      * @return A list of entities.
      * @param <T> Entity type.
      */
-    public <T> Function<EntityManager, List<T>> findAll(String q, Class<T> clazz, int firstResult, int maxResults, Object... params) {
+    public <T> Function<EntityManager, List<T>> findSome(String q, int firstResult, int maxResults, Class<T> clazz, Object... params) {
       return em -> createTypedQuery(em, q, clazz, params)
           .setFirstResult(firstResult)
           .setMaxResults(maxResults)
