@@ -18,16 +18,15 @@
  * the License.
  *
  */
-import { test, expect } from '@playwright/test';
-import { clickToStartVideo } from './utils';
-
+import { expect } from '@playwright/test';
+import { test, clickToStartVideo } from './utils';
 
 test('Has the correct title', async ({ page }) => {
-  await page.goto('/paella7/ui/watch.html?id=ID-dual-stream-demo');
-  await expect(page).toHaveTitle('Dual-Stream Demo - No series | Opencast');
+  await page.goto('/paella7/ui/watch.html?id=ID-strong-river-flowing-down-the-green-forest');
+  await expect(page).toHaveTitle('Strong river flowing down the forest - No series | Opencast');
 });
 
 test('Video is loaded', async ({ page }) => {
-  await page.goto('/paella7/ui/watch.html?id=ID-dual-stream-demo');
+  await page.goto('/paella7/ui/watch.html?id=ID-strong-river-flowing-down-the-green-forest');
   await clickToStartVideo(page);
 });

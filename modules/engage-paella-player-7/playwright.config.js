@@ -63,7 +63,8 @@ module.exports = defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npm run testenv:dev',
+    // command: 'npm run testenv:dev',
+    command: 'npm run dev',
     url: 'http://127.0.0.1:7070/paella7/ui/watch.html',
     reuseExistingServer: !process.env.CI,
   },
