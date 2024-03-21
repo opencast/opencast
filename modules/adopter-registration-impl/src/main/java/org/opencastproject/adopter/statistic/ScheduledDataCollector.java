@@ -38,16 +38,25 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
 import org.opencastproject.userdirectory.JpaUserReferenceProvider;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 import org.osgi.service.component.annotations.Activate;
@@ -89,6 +98,8 @@ public class ScheduledDataCollector extends TimerTask {
   /* How many records to get from the search index at once */
   private static final int SEARCH_ITERATION_SIZE = 100;
 
+  private static final Gson gson = new Gson();
+
   //================================================================================
   // OSGi properties
   //================================================================================
@@ -120,6 +131,10 @@ public class ScheduledDataCollector extends TimerTask {
 
   /** The security service */
   protected SecurityService securityService;
+
+  private TobiraRemoteRequester tobiraRemoteRequester;
+
+  protected TrustedHttpClient httpClient;
 
 
   //================================================================================
@@ -186,6 +201,10 @@ public class ScheduledDataCollector extends TimerTask {
   public void run() {
     logger.info("Executing adopter statistic scheduler task.");
 
+    this.tobiraRemoteRequester = new TobiraRemoteRequester();
+    this.tobiraRemoteRequester.setRemoteServiceManager(serviceRegistry);
+    this.tobiraRemoteRequester.setTrustedHttpClient(httpClient);
+
     Form adopter;
     try {
       adopter = (Form) adopterFormService.retrieveFormData();
@@ -228,8 +247,16 @@ public class ScheduledDataCollector extends TimerTask {
 
       if (adopter.allowsStatistics()) {
         try {
-          String statisticDataAsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
-          sender.sendStatistics(statisticDataAsJson);
+          StatisticData statisticData = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
+          sender.sendStatistics(statisticData.jsonify());
+          JsonObject tobiraJson = tobiraRemoteRequester.getStats();
+          // This is null in the case that Tobira hasn't sent any stats yet.
+          // This could be due to Tobira not existing, or because we've just rebooted.
+          if (null != tobiraJson) {
+            sender.sendTobiraData(
+                "{ \"statistic_key\": \"" + statisticData.getStatisticKey()
+                  + "\", \"data\": " + tobiraJson.toString() + " }");
+          }
           //Note: save the form (unmodified) (again!) to update the dates.  Old dates cause warnings to the user!
           adopterFormService.saveFormData(adopter);
         } catch (Exception e) {
@@ -244,12 +271,18 @@ public class ScheduledDataCollector extends TimerTask {
     String generalJson = collectGeneralData(adopter);
     String statsJson;
     if (adopter.allowsStatistics()) {
-      statsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
+      statsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey()).jsonify();
     } else {
       statsJson = "{}";
     }
-    //It's not stupid if it works!
-    return "{ \"general\":" + generalJson + ", \"statistics\":" + statsJson + "}";
+    JsonObject tobiraJson = tobiraRemoteRequester.getStats();
+
+    if (null != tobiraJson) {
+      //It's not stupid if it works!
+      return "{ \"general\":" + generalJson + ", \"statistics\":" + statsJson + ", \"tobira\":" + tobiraJson + "}";
+    } else {
+      return "{ \"general\":" + generalJson + ", \"statistics\":" + statsJson + "}";
+    }
   }
 
 
@@ -273,7 +306,7 @@ public class ScheduledDataCollector extends TimerTask {
    * @return The statistic data as JSON string.
    * @throws Exception General exception that can occur while gathering data.
    */
-  private String collectStatisticData(String adopterKey, String statisticKey) throws Exception {
+  private StatisticData collectStatisticData(String adopterKey, String statisticKey) throws Exception {
     StatisticData statisticData = new StatisticData(statisticKey);
     statisticData.setAdopterKey(adopterKey);
     serviceRegistry.getHostRegistrations().forEach(host -> {
@@ -342,7 +375,7 @@ public class ScheduledDataCollector extends TimerTask {
       });
     }
     statisticData.setVersion(version);
-    return statisticData.jsonify();
+    return statisticData;
   }
 
 
@@ -408,4 +441,29 @@ public class ScheduledDataCollector extends TimerTask {
     this.organizationDirectoryService = orgDirServ;
   }
 
+  @Reference
+  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
+    this.httpClient = trustedHttpClient;
+  }
+
+  private class TobiraRemoteRequester extends RemoteBase {
+    private static final String SERVICE_TYPE = "org.opencastproject.tobira";
+    TobiraRemoteRequester() {
+      super(SERVICE_TYPE);
+    }
+
+    public JsonObject getStats() throws IOException {
+      HttpGet get = new HttpGet("/stats");
+      HttpResponse response = this.getResponse(get);
+      try {
+        if (response != null) {
+          String json = IOUtils.toString(response.getEntity().getContent());
+          return gson.fromJson(json, JsonElement.class).getAsJsonObject();
+        }
+      } finally {
+        this.closeConnection(response);
+      }
+      return null;
+    }
+  }
 }

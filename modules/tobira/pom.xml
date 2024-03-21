@@ -58,6 +58,18 @@
       <artifactId>opencast-dublincore</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -80,7 +92,8 @@
               *
             </Import-Package>
             <Export-Package>
-              org.opencastproject.tobira;version=${project.version}
+              org.opencastproject.tobira;version=${project.version},
+              org.opencastproject.tobira.impl;version=${project.version}
             </Export-Package>
           </instructions>
         </configuration>
