@@ -106,6 +106,20 @@ public interface SearchService {
   Job delete(String mediaPackageId) throws SearchException, UnauthorizedException, NotFoundException;
 
   /**
+   * Removes the series identified by <code>seriseId</code> from the search index.  Does *not* remove the associated
+   * events from the index!
+   *
+   * @param seriesId
+   *          id of the series to remove
+   * @return <code>true</code> if the series was found and deleted
+   * @throws SearchException
+   *           if an error occurs while removing the series
+   * @throws UnauthorizedException
+   *           if the current user is not authorized to remove this series from the search index
+   */
+  Job deleteSeries(String seriesId) throws SearchException, UnauthorizedException, NotFoundException;
+
+  /**
    * Gets the {@link MediaPackage} for an event, based on its mediapackage ID.
    *
    * @param mediaPackageId

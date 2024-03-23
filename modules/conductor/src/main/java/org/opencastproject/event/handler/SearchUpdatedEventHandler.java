@@ -286,6 +286,10 @@ public class SearchUpdatedEventHandler {
         // Update the search index with the modified mediapackage
         searchService.addSynchronously(mp);
       }
+      //We remove the episode->series links above, which effectively orphaned the series in the index, now we remove it
+      if (SeriesItem.Type.Delete.equals(seriesItem.getType())) {
+        searchService.deleteSeries(seriesId);
+      }
     } catch (SearchException e) {
       logger.warn("Unable to find mediapackages for series {} in search: {}", seriesItem, e.getMessage());
     } catch (UnauthorizedException | MediaPackageException | ServiceRegistryException

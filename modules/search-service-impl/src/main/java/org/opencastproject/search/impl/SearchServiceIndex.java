@@ -55,10 +55,12 @@ import com.google.gson.JsonElement;
 
 import org.apache.commons.io.IOUtils;
 import org.elasticsearch.ElasticsearchStatusException;
+import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -373,14 +375,16 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
    *          the series
    * @throws SearchException
    */
-  public void deleteSeriesSynchronously(String seriesId) throws SearchException {
+  public boolean deleteSeriesSynchronously(String seriesId) throws SearchException {
     try {
       logger.info("Marking {} as deleted in the search index", seriesId);
       JsonElement json = gson.toJsonTree(Map.of(
           "deleted", Instant.now().getEpochSecond(),
           "modified", Instant.now().toString()));
       var updateRequest = new UpdateRequest(INDEX_NAME, seriesId).doc(gson.toJson(json), XContentType.JSON);
-      esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
+      UpdateResponse response = esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
+      //NB: We're marking things as deleted but *not actually deleting them**
+      return DocWriteResponse.Result.UPDATED == response.getResult();
     } catch (IOException e) {
       throw new SearchException("Could not delete series " + seriesId + " from index", e);
     }

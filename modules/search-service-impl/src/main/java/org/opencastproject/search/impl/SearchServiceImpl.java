@@ -109,7 +109,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /** List of available operations on jobs */
   private enum Operation {
-    Add, Delete
+    Add, Delete, DeleteSeries
   }
 
   private SearchServiceIndex index;
@@ -211,6 +211,20 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     }
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.search.api.SearchService#deleteSeries(java.lang.String)
+   */
+  public Job deleteSeries(String seriesId) throws SearchException {
+    try {
+      return serviceRegistry.createJob(
+          JOB_TYPE, Operation.DeleteSeries.toString(), Collections.singletonList(seriesId), deleteJobLoad);
+    } catch (ServiceRegistryException e) {
+      throw new SearchException(e);
+    }
+  }
+
   @Override
   public MediaPackage get(String mediaPackageId) throws NotFoundException, UnauthorizedException {
     try {
@@ -238,6 +252,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
       op = Operation.valueOf(operation);
       Organization org = organizationDirectory.getOrganization(job.getOrganization());
       User user = userDirectoryService.loadUser(job.getCreator());
+      boolean[] deleted = new boolean[1];
       switch (op) {
         case Add:
           MediaPackage mediaPackage = MediaPackageParser.getFromXml(arguments.get(0));
@@ -251,9 +266,14 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
           return null;
         case Delete:
           String mediapackageId = arguments.get(0);
-          final boolean[] deleted = new boolean[1];
           SecurityUtil.runAs(securityService, org, user, () -> {
             deleted[0] = index.deleteSynchronously(mediapackageId);
+          });
+          return Boolean.toString(deleted[0]);
+        case DeleteSeries:
+          String seriesId = arguments.get(0);
+          SecurityUtil.runAs(securityService, org, user, () -> {
+            deleted[0] = index.deleteSeriesSynchronously(seriesId);
           });
           return Boolean.toString(deleted[0]);
         default:
