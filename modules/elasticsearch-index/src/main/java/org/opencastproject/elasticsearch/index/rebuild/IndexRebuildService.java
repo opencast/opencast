@@ -162,7 +162,7 @@ public class IndexRebuildService implements BundleActivator {
 
   public synchronized void rebuildIndex(ElasticsearchIndex index, String serviceName, ServicePart part)
           throws IllegalArgumentException, IndexRebuildException {
-    IndexRebuildService.Service service = IndexRebuildService.Service.valueOf("AssetManager");
+    IndexRebuildService.Service service = IndexRebuildService.Service.valueOf(serviceName);
     logger.info("Starting partial rebuild of the {} index from service '{}'.", index.getIndexName(), service);
     setRebuildState(service, IndexRebuildService.State.PENDING);
     rebuildIndex(index, service, part);
