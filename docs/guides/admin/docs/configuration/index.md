@@ -31,7 +31,7 @@ General Configuration
     - [JWT-based Authentication and Authorization (e.g. for OIDC)](security.jwt.md)
     - [Access Control Lists](acl.md)
     - [Stream Security](stream-security.md)
-    - [Role Based Event Access](role-based-event-access.md)
+    - [Role Based Event Access](episode-id-roles.md)
 - [Serving Static Files](serving-static-files.md)
 - [Workflow Configuration](workflow.md)
     - [Workflow Operation Handler](../workflowoperationhandlers/index.md)

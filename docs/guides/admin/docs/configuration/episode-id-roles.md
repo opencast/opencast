@@ -1,4 +1,4 @@
-Role based event access
+Episode ID roles
 =================================
 
 If activated, users with a role like ROLE_EPISODE_<ID>_<ACTION> will have access to the episode with the given
@@ -17,3 +17,6 @@ To make this work for the Admin UI and External API, the Elasticsearch Index nee
 ACLs. You can achieve this by calling the /index/rebuild/AssetManager/ACL endpoint AFTER enabling this feature
 in the aforementioned configuration files.
 The endpoint will reindex only event ACLs.
+
+In case that you have custom actions configured, this will only work for the actions that were configured during the
+reindex of the Elasticsearch Index. If you later add custom actions, you will have to reindex again.

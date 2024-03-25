@@ -1,0 +1,2 @@
+Adds the feature "Episode ID Roles". For more information see the doc file
+`guides/admin/docs/configuration/episode-id-roles.md`.

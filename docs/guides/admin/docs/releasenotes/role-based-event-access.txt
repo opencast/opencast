@@ -1,2 +1,0 @@
-Adds the feature "Role Based Event Access". For more information see the doc file
-`guides/admin/docs/configuration/role-based-event-access.md`.
