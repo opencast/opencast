@@ -24,16 +24,30 @@ package org.opencastproject.graphql;
 import org.opencastproject.graphql.provider.GraphQLAdditionalTypeProvider;
 import org.opencastproject.graphql.provider.GraphQLDynamicTypeProvider;
 import org.opencastproject.graphql.provider.GraphQLExtensionProvider;
+import org.opencastproject.graphql.provider.GraphQLTypeFunctionProvider;
+import org.opencastproject.graphql.type.DateTimeFunction;
+import org.opencastproject.graphql.type.DurationFunction;
+import org.opencastproject.graphql.type.JsonFunction;
+import org.opencastproject.graphql.type.MapFunction;
+import org.opencastproject.graphql.type.TimeFunction;
 import org.opencastproject.graphql.type.input.DublinCoreMetadataInput;
 import org.opencastproject.graphql.type.input.GqlCommonEventMetadataInput;
 import org.opencastproject.graphql.type.input.GqlCommonSeriesMetadataInput;
+import org.opencastproject.graphql.type.output.GqlAccessControlGenericEntry;
+import org.opencastproject.graphql.type.output.GqlAccessControlGroupEntry;
+import org.opencastproject.graphql.type.output.GqlAccessControlUserEntry;
 import org.opencastproject.graphql.type.output.GqlCommonEventMetadata;
 import org.opencastproject.graphql.type.output.GqlCommonEventMetadataV2;
 import org.opencastproject.graphql.type.output.GqlCommonSeriesMetadata;
 import org.opencastproject.graphql.type.output.GqlCommonSeriesMetadataV2;
 import org.opencastproject.graphql.type.output.GqlDublinCoreMetadata;
+import org.opencastproject.graphql.type.output.field.GqlDurationMetadataField;
+import org.opencastproject.graphql.type.output.field.GqlIntMetadataField;
 import org.opencastproject.graphql.type.output.field.GqlJsonMetadataField;
+import org.opencastproject.graphql.type.output.field.GqlListMetadataField;
+import org.opencastproject.graphql.type.output.field.GqlLongMetadataField;
 import org.opencastproject.graphql.util.MetadataFieldToGraphQLConverter;
+import org.opencastproject.graphql.util.MetadataFieldToGraphQLFieldMapper;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.ConfigurableDCCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
@@ -53,6 +67,7 @@ import java.util.Map;
 import java.util.Set;
 
 import graphql.annotations.processor.GraphQLAnnotations;
+import graphql.annotations.processor.typeFunctions.TypeFunction;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
@@ -63,7 +78,7 @@ import graphql.schema.GraphQLOutputType;
 @Component
 @ServiceDescription("Opencast GraphQL Provider")
 public class OpencastGraphQLProvider implements GraphQLExtensionProvider, GraphQLDynamicTypeProvider,
-    GraphQLAdditionalTypeProvider {
+    GraphQLAdditionalTypeProvider, GraphQLTypeFunctionProvider {
 
   private final IndexService indexService;
 
@@ -76,6 +91,20 @@ public class OpencastGraphQLProvider implements GraphQLExtensionProvider, GraphQ
   ) {
     this.indexService = indexService;
     this.securityService = securityService;
+  }
+
+  @Override
+  public Set<Class<?>> getAdditionalOutputTypes() {
+    return Set.of(
+        GqlAccessControlUserEntry.class,
+        GqlAccessControlGroupEntry.class,
+        GqlAccessControlGenericEntry.class,
+        GqlJsonMetadataField.class,
+        GqlLongMetadataField.class,
+        GqlDurationMetadataField.class,
+        GqlIntMetadataField.class,
+        GqlListMetadataField.class
+    );
   }
 
   @Override
@@ -134,7 +163,7 @@ public class OpencastGraphQLProvider implements GraphQLExtensionProvider, GraphQ
     adapter.getRawFields().getFields().stream().filter(f -> !f.isReadOnly()).forEach(
         f -> fieldDefinitions.add(
             GraphQLInputObjectField.newInputObjectField()
-                .name(f.getInputID())
+                .name(f.getOutputID())
                 .type((GraphQLInputType) MetadataFieldToGraphQLConverter.convertType(f))
                 .description(f.getLabel())
                 .build()
@@ -231,8 +260,9 @@ public class OpencastGraphQLProvider implements GraphQLExtensionProvider, GraphQ
       var outputId = m.getOutputID();
 
       builder.name(outputId != null ? outputId : m.getInputID());
+      var outputType = MetadataFieldToGraphQLFieldMapper.mapToClass(m.getType());
       builder.type((GraphQLOutputType) graphQLAnnotations.getObjectHandler().getTypeRetriever()
-          .getGraphQLType(GqlJsonMetadataField.class, graphQLAnnotations.getContainer(), false));
+          .getGraphQLType(outputType, graphQLAnnotations.getContainer(), false));
       builder.description(m.getLabel());
 
       fieldDefinitions.add(builder.build());
@@ -247,4 +277,14 @@ public class OpencastGraphQLProvider implements GraphQLExtensionProvider, GraphQ
     outputTypes.put(graphQLTypeName, transformedObjectType);
   }
 
+  @Override
+  public Set<TypeFunction> getTypeFunctions() {
+    return Set.of(
+        new DateTimeFunction(),
+        new DurationFunction(),
+        new JsonFunction(),
+        new MapFunction(),
+        new TimeFunction()
+    );
+  }
 }

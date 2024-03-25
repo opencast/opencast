@@ -19,18 +19,35 @@
  *
  */
 
-package org.opencastproject.graphql.type.output;
+package org.opencastproject.graphql.type.output.field;
 
+import org.opencastproject.graphql.type.DurationFunction;
+import org.opencastproject.graphql.type.output.GqlMetadataFieldInterface;
+import org.opencastproject.metadata.dublincore.MetadataField;
+
+import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
+import graphql.annotations.annotationTypes.GraphQLType;
 
-@GraphQLName(GqlCommonEventMetadata.TYPE_NAME)
-public class GqlCommonEventMetadata implements GqlDublinCoreMetadata {
+@GraphQLName(GqlDurationMetadataField.TYPE_NAME)
+public class GqlDurationMetadataField implements GqlMetadataFieldInterface {
 
-  public static final String TYPE_NAME = "CommonEventMetadata";
+  public static final String TYPE_NAME = "DurationMetadataField";
 
-  @Override
-  public String catalogType() {
-    return "events";
+  private final MetadataField metadataField;
+
+  public GqlDurationMetadataField(MetadataField metadataField) {
+    this.metadataField = metadataField;
   }
 
+  @Override
+  public MetadataField getMetadataField() {
+    return metadataField;
+  }
+
+  @GraphQLField
+  @GraphQLType(DurationFunction.class)
+  public Object value() {
+    return metadataField.getValue();
+  }
 }

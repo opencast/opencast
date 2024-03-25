@@ -30,7 +30,8 @@ import org.opencastproject.graphql.exception.GraphQLNotFoundException;
 import org.opencastproject.graphql.exception.GraphQLRuntimeException;
 import org.opencastproject.graphql.exception.OpencastErrorType;
 import org.opencastproject.graphql.execution.context.OpencastContext;
-import org.opencastproject.graphql.type.output.field.GqlJsonMetadataField;
+import org.opencastproject.graphql.type.output.GqlMetadataFieldInterface;
+import org.opencastproject.graphql.util.MetadataFieldToGraphQLFieldMapper;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.impl.util.EventUtils;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
@@ -44,10 +45,10 @@ import java.util.Map;
 
 import graphql.schema.DataFetchingEnvironment;
 
-public class CommonEventMetadataV2DataFetcher implements ContextDataFetcher<Map<String, GqlJsonMetadataField>> {
+public class CommonEventMetadataV2DataFetcher implements ContextDataFetcher<Map<String, GqlMetadataFieldInterface>> {
 
   @Override
-  public Map<String, GqlJsonMetadataField> get(OpencastContext opencastContext,
+  public Map<String, GqlMetadataFieldInterface> get(OpencastContext opencastContext,
       DataFetchingEnvironment dataFetchingEnvironment) {
     String eventId = ((GqlEvent)dataFetchingEnvironment.getSource()).id();
     ElasticsearchIndex searchIndex = opencastContext.getService(ElasticsearchIndex.class);
@@ -60,9 +61,11 @@ public class CommonEventMetadataV2DataFetcher implements ContextDataFetcher<Map<
       }
       Event event = opt.get();
       EventCatalogUIAdapter eventCatalogUiAdapter = indexService.getCommonEventCatalogUIAdapter();
-      Map<String, GqlJsonMetadataField> result = new HashMap<>();
+      Map<String, GqlMetadataFieldInterface> result = new HashMap<>();
       DublinCoreMetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUiAdapter);
-      collection.getOutputFields().forEach((key, value) -> result.put(key, new GqlJsonMetadataField(value)));
+      collection.getOutputFields().forEach(
+          (key, value) -> result.put(key, MetadataFieldToGraphQLFieldMapper.mapType(value))
+      );
       return result;
     } catch (SearchIndexException | ParseException e) {
       throw new GraphQLRuntimeException(OpencastErrorType.InternalError, e);

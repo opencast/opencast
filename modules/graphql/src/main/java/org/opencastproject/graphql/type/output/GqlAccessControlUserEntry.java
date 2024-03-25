@@ -28,7 +28,7 @@ import graphql.annotations.annotationTypes.GraphQLName;
 @GraphQLName(GqlAccessControlUserEntry.TYPE_NAME)
 public class GqlAccessControlUserEntry implements GqlAccessControlEntry {
 
-  public static final String TYPE_NAME = "GqlAccessControlUserEntry";
+  public static final String TYPE_NAME = "AccessControlUserEntry";
 
   private final AccessControlEntry accessControlEntry;
 

@@ -33,11 +33,11 @@ import graphql.annotations.annotationTypes.GraphQLTypeExtension;
 import graphql.schema.DataFetchingEnvironment;
 
 @GraphQLTypeExtension(GqlCurrentUser.class)
-public class EventUserExtension {
+public class EventCurrentUserExtension {
 
   private final GqlCurrentUser currentUser;
 
-  public EventUserExtension(GqlCurrentUser currentUser) {
+  public EventCurrentUserExtension(GqlCurrentUser currentUser) {
     this.currentUser = currentUser;
   }
 

@@ -21,32 +21,37 @@
 
 package org.opencastproject.graphql.schema.builder;
 
-import org.opencastproject.graphql.provider.GraphQLExtensionProvider;
+import org.opencastproject.graphql.provider.GraphQLTypeFunctionProvider;
 
 import java.util.List;
 
 import graphql.annotations.processor.GraphQLAnnotations;
 
-public class ExtensionBuilder {
+public class TypeFunctionBuilder {
 
   private GraphQLAnnotations annotations;
 
-  private List<GraphQLExtensionProvider> extensionProviders;
+  private List<GraphQLTypeFunctionProvider> typeFunctionProviders;
 
-  public void build() {
-    extensionProviders.stream()
-        .flatMap(e -> e.getExtensions().stream())
-        .forEach(annotations::registerTypeExtension);
-  }
-
-  public ExtensionBuilder withAnnotations(GraphQLAnnotations annotations) {
+  public TypeFunctionBuilder withAnnotations(GraphQLAnnotations annotations) {
     this.annotations = annotations;
     return this;
   }
 
-  public ExtensionBuilder withExtensionProviders(List<GraphQLExtensionProvider> extensionProviders) {
-    this.extensionProviders = extensionProviders;
+  public TypeFunctionBuilder withTypeFunctionProviders(
+      List<GraphQLTypeFunctionProvider> typeFunctionProviders
+  ) {
+    this.typeFunctionProviders = typeFunctionProviders;
     return this;
+  }
+
+  public void build() {
+    if (typeFunctionProviders == null || typeFunctionProviders.isEmpty()) {
+      return;
+    }
+
+    typeFunctionProviders.stream().flatMap(e -> e.getTypeFunctions().stream())
+        .forEach(annotations::registerTypeFunction);
   }
 
 }

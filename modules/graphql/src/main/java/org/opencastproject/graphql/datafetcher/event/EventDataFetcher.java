@@ -22,7 +22,10 @@
 package org.opencastproject.graphql.datafetcher.event;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.graphql.datafetcher.ContextDataFetcher;
 import org.opencastproject.graphql.event.GqlEvent;
 import org.opencastproject.graphql.exception.GraphQLRuntimeException;
@@ -55,8 +58,19 @@ public class EventDataFetcher implements ContextDataFetcher<GqlEvent> {
     ElasticsearchIndex searchIndex = opencastContext.getService(ElasticsearchIndex.class);
 
     try {
-      return searchIndex.getEvent(eventId, securityService.getOrganization().toString(), securityService.getUser())
-          .map(GqlEvent::new).orElse(null);
+      SearchResult<Event> result = searchIndex.getByQuery(
+          new EventSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
+              .withIdentifier(eventId)
+      );
+      if (result.getDocumentCount() == 0) {
+        return null;
+      } else if (result.getDocumentCount() == 1) {
+        return new GqlEvent(result.getItems()[0].getSource());
+      }
+      throw new GraphQLRuntimeException(
+          "Multiple events found with the same identifier",
+          OpencastErrorType.InternalError
+      );
     } catch (SearchIndexException e) {
       throw new GraphQLRuntimeException(OpencastErrorType.InternalError, e);
     }

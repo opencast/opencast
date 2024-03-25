@@ -19,26 +19,24 @@
  *
  */
 
-package org.opencastproject.graphql.type;
-
-import org.opencastproject.graphql.type.output.GqlAccessControlGenericEntry;
-import org.opencastproject.graphql.type.output.GqlAccessControlGroupEntry;
-import org.opencastproject.graphql.type.output.GqlAccessControlUserEntry;
+package org.opencastproject.graphql.type.resolver;
 
 import graphql.TypeResolutionEnvironment;
+import graphql.annotations.annotationTypes.GraphQLName;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.TypeResolver;
 
-public class AccessControlEntryTypeResolver implements TypeResolver {
+public class MetadataFieldInterfaceResolver implements TypeResolver {
   @Override
   public GraphQLObjectType getType(TypeResolutionEnvironment env) {
-    Object obj = env.getObject();
-    if (obj instanceof GqlAccessControlGroupEntry) {
-      return env.getSchema().getObjectType(GqlAccessControlGroupEntry.TYPE_NAME);
-    } else if (obj instanceof GqlAccessControlUserEntry) {
-      return env.getSchema().getObjectType(GqlAccessControlUserEntry.TYPE_NAME);
+    final Class<?> field = env.getObject().getClass();
+    final GraphQLName graphQLName = field.getAnnotation(GraphQLName.class);
+    String objectTypeName;
+    if (graphQLName == null) {
+      objectTypeName = field.getSimpleName();
     } else {
-      return env.getSchema().getObjectType(GqlAccessControlGenericEntry.TYPE_NAME);
+      objectTypeName = graphQLName.value();
     }
+    return env.getSchema().getObjectType(objectTypeName);
   }
 }

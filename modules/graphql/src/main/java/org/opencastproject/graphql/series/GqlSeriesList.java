@@ -24,6 +24,7 @@ package org.opencastproject.graphql.series;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.graphql.type.output.OffsetPageInfo;
 
 import java.util.Arrays;
 import java.util.List;
@@ -39,7 +40,7 @@ import graphql.annotations.annotationTypes.GraphQLNonNull;
 @GraphQLDescription("A list of series")
 public class GqlSeriesList {
 
-  public static final String TYPE_NAME = "GqlSeriesList";
+  public static final String TYPE_NAME = "SeriesList";
 
   private final SearchResult<Series> searchResult;
 
@@ -48,13 +49,20 @@ public class GqlSeriesList {
   }
 
   @GraphQLField
+  @GraphQLNonNull
   public Long totalCount() {
     return searchResult.getHitCount();
   }
 
   @GraphQLField
-  public List<GqlSeries> nodes() {
+  @GraphQLNonNull
+  public OffsetPageInfo pageInfo() {
+    return OffsetPageInfo.from(searchResult);
+  }
 
+  @GraphQLField
+  @GraphQLNonNull
+  public List<GqlSeries> nodes() {
     return Arrays.stream(searchResult.getItems())
         .map(SearchResultItem::getSource)
         .map(GqlSeries::new)

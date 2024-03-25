@@ -27,6 +27,7 @@ import org.opencastproject.graphql.provider.GraphQLExtensionProvider;
 import org.opencastproject.graphql.provider.GraphQLFieldVisibilityProvider;
 import org.opencastproject.graphql.provider.GraphQLMutationProvider;
 import org.opencastproject.graphql.provider.GraphQLQueryProvider;
+import org.opencastproject.graphql.provider.GraphQLTypeFunctionProvider;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryListener;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -87,6 +88,8 @@ public class SchemaService implements OrganizationDirectoryListener {
 
   private final List<GraphQLDynamicTypeProvider> dynamicTypeProviders = new CopyOnWriteArrayList<>();
 
+  private final List<GraphQLTypeFunctionProvider> typeFunctionProviders = new CopyOnWriteArrayList<>();
+
   private final ScheduledExecutorService schemaUpdateExecutor;
   private final int schemaUpdateTriggerDelay;
 
@@ -127,7 +130,8 @@ public class SchemaService implements OrganizationDirectoryListener {
         .mutationProviders(mutationProviders)
         .codeRegistryProviders(additionalTypesProviders)
         .additionalTypeProviders(additionalTypesProviders)
-        .fieldVisibilityProviders(fieldVisibilityProviders);
+        .fieldVisibilityProviders(fieldVisibilityProviders)
+        .typeFunctionProviders(typeFunctionProviders);
     return schemaBuilder.build();
   }
 
@@ -260,6 +264,20 @@ public class SchemaService implements OrganizationDirectoryListener {
 
   public void unbindDynamicTypeProvider(GraphQLDynamicTypeProvider provider) {
     dynamicTypeProviders.remove(provider);
+    triggerSchemaUpdate();
+  }
+
+  @Reference(
+      policy = ReferencePolicy.DYNAMIC,
+      cardinality = ReferenceCardinality.MULTIPLE
+  )
+  public void bindTypeFunctionProvider(GraphQLTypeFunctionProvider provider) {
+    typeFunctionProviders.add(provider);
+    triggerSchemaUpdate();
+  }
+
+  public void unbindTypeFunctionProvider(GraphQLTypeFunctionProvider provider) {
+    typeFunctionProviders.remove(provider);
     triggerSchemaUpdate();
   }
 

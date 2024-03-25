@@ -25,7 +25,7 @@ import graphql.annotations.annotationTypes.GraphQLName;
 @GraphQLName(GqlCommonEventMetadataInput.TYPE_NAME)
 public class GqlCommonEventMetadataInput implements DublinCoreMetadataInput {
 
-  public static final String TYPE_NAME = "GqlCommonEventMetadataInput";
+  public static final String TYPE_NAME = "CommonEventMetadataInput";
 
   @Override
   public String catalogType() {

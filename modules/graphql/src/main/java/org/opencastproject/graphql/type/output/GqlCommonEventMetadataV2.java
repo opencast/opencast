@@ -26,7 +26,7 @@ import graphql.annotations.annotationTypes.GraphQLName;
 @GraphQLName(GqlCommonEventMetadataV2.TYPE_NAME)
 public class GqlCommonEventMetadataV2 implements GqlDublinCoreMetadata {
 
-  public static final String TYPE_NAME = "GqlCommonEventMetadataV2";
+  public static final String TYPE_NAME = "CommonEventMetadataV2";
 
   @Override
   public String catalogType() {

@@ -32,7 +32,7 @@ import graphql.annotations.annotationTypes.GraphQLName;
 @GraphQLName(GqlStringMetadataField.TYPE_NAME)
 public class GqlStringMetadataField implements GqlMetadataFieldInterface {
 
-  public static final String TYPE_NAME = "GqlStringMetadataField";
+  public static final String TYPE_NAME = "StringMetadataField";
 
   private final MetadataField metadataField;
 
@@ -46,8 +46,7 @@ public class GqlStringMetadataField implements GqlMetadataFieldInterface {
   }
 
   @GraphQLField
-  @GraphQLName("value")
-  public String getValue() {
+  public String value() {
     Object o = metadataField.getValue();
     if (o instanceof String) {
       return (String)(metadataField.getValue());

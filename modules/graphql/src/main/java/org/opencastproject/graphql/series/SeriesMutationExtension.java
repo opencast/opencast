@@ -41,14 +41,13 @@ public final class SeriesMutationExtension {
   @GraphQLField
   @GraphQLNonNull
   @GraphQLDescription("Update series metadata")
-  public static Boolean updateSeries(
+  public static GqlSeries updateSeries(
       @GraphQLName("id") @GraphQLNonNull String id,
       @GraphQLName("metadata") @GraphQLNonNull GqlCommonSeriesMetadataInput seriesMetadataInput,
       final DataFetchingEnvironment environment) {
-    CreateOrUpdateSeriesCommand.create(id, seriesMetadataInput)
+    return CreateOrUpdateSeriesCommand.create(id, seriesMetadataInput)
         .environment(environment)
         .build()
         .execute();
-    return true;
   }
 }

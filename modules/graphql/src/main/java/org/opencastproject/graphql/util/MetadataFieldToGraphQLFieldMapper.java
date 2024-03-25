@@ -24,11 +24,14 @@ package org.opencastproject.graphql.util;
 
 import org.opencastproject.graphql.type.output.GqlMetadataFieldInterface;
 import org.opencastproject.graphql.type.output.field.GqlBooleanMetadataField;
-import org.opencastproject.graphql.type.output.field.GqlIntMetadataField;
+import org.opencastproject.graphql.type.output.field.GqlDateTimeMetadataField;
+import org.opencastproject.graphql.type.output.field.GqlDurationMetadataField;
 import org.opencastproject.graphql.type.output.field.GqlListMetadataField;
 import org.opencastproject.graphql.type.output.field.GqlLongMetadataField;
 import org.opencastproject.graphql.type.output.field.GqlStringMetadataField;
 import org.opencastproject.metadata.dublincore.MetadataField;
+
+import java.lang.reflect.InvocationTargetException;
 
 public final class MetadataFieldToGraphQLFieldMapper {
 
@@ -36,47 +39,46 @@ public final class MetadataFieldToGraphQLFieldMapper {
 
   public static GqlMetadataFieldInterface mapType(MetadataField field) {
     GqlMetadataFieldInterface gqlField;
-    switch (field.getType()) {
-      case DATE:
-        gqlField = new GqlStringMetadataField(field);
-        break;
-      case LONG:
-        gqlField = new GqlLongMetadataField(field);
-        break;
-      case TEXT:
-        gqlField = new GqlStringMetadataField(field);
-        break;
-      case BOOLEAN:
-        gqlField = new GqlBooleanMetadataField(field);
-        break;
-      case DURATION:
-        gqlField = new GqlIntMetadataField(field);
-        break;
-      case TEXT_LONG:
-        gqlField = new GqlStringMetadataField(field);
-        break;
-      case MIXED_TEXT:
-        gqlField = new GqlListMetadataField(field);
-        break;
-      case START_DATE:
-        gqlField = new GqlStringMetadataField(field);
-        break;
-      case START_TIME:
-        gqlField = new GqlStringMetadataField(field);
-        break;
-      case ORDERED_TEXT:
-        gqlField = new GqlStringMetadataField(field);
-        break;
-      case ITERABLE_TEXT:
-        gqlField = new GqlListMetadataField(field);
-        break;
-      default:
-        // Should not happen but fallback to string.
-        gqlField = new GqlStringMetadataField(field);
-        break;
+    var clazz = mapToClass(field.getType());
+    try {
+      gqlField = clazz.getConstructor(MetadataField.class).newInstance(field);
+    } catch (InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+      throw new IllegalArgumentException(e);
     }
-
     return gqlField;
   }
 
+  public static Class<? extends GqlMetadataFieldInterface> mapToClass(MetadataField.Type type) {
+    Class<? extends GqlMetadataFieldInterface> clazz;
+    switch (type) {
+      case DATE:
+      case START_DATE:
+        clazz = GqlDateTimeMetadataField.class;
+        break;
+      case LONG:
+        clazz = GqlLongMetadataField.class;
+        break;
+      case TEXT:
+      case ORDERED_TEXT:
+      case TEXT_LONG:
+        clazz = GqlStringMetadataField.class;
+        break;
+      case BOOLEAN:
+        clazz = GqlBooleanMetadataField.class;
+        break;
+      case DURATION:
+      case START_TIME:
+        clazz = GqlDurationMetadataField.class;
+        break;
+      case MIXED_TEXT:
+      case ITERABLE_TEXT:
+        clazz = GqlListMetadataField.class;
+        break;
+      default:
+        // Should not happen but fallback to string.
+        clazz = GqlStringMetadataField.class;
+        break;
+    }
+    return clazz;
+  }
 }

@@ -19,16 +19,30 @@
  *
  */
 
-package org.opencastproject.graphql.type.input;
+package org.opencastproject.graphql.type;
 
-import graphql.annotations.annotationTypes.GraphQLName;
-@GraphQLName(GqlCommonSeriesMetadataInput.TYPE_NAME)
-public class GqlCommonSeriesMetadataInput implements DublinCoreMetadataInput {
+import java.lang.reflect.AnnotatedType;
+import java.time.OffsetTime;
 
-  public static final String TYPE_NAME = "CommonSeriesMetadataInput";
+import graphql.annotations.processor.ProcessingElementsContainer;
+import graphql.annotations.processor.typeFunctions.TypeFunction;
+import graphql.scalars.ExtendedScalars;
+import graphql.schema.GraphQLType;
+
+public class TimeFunction implements TypeFunction {
+  @Override
+  public String getTypeName(Class<?> aClass, AnnotatedType annotatedType) {
+    return "Time";
+  }
 
   @Override
-  public String catalogType() {
-    return "series";
+  public boolean canBuildType(Class<?> aClass, AnnotatedType annotatedType) {
+    return aClass == OffsetTime.class;
+  }
+
+  @Override
+  public GraphQLType buildType(boolean input, Class<?> aClass, AnnotatedType annotatedType,
+      ProcessingElementsContainer container) {
+    return ExtendedScalars.Time;
   }
 }

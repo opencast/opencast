@@ -32,7 +32,10 @@ import graphql.annotations.annotationTypes.GraphQLDescription;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 
+@GraphQLName(GqlPublication.TYPE_NAME)
 public class GqlPublication implements GqlMediaPackageElement {
+
+  public static final String TYPE_NAME = "Publication";
 
   private final Publication publication;
 

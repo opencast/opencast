@@ -21,7 +21,7 @@
 
 package org.opencastproject.graphql.type.output;
 
-import org.opencastproject.graphql.type.resolver.GqlMetadataFieldInterfaceResolver;
+import org.opencastproject.graphql.type.resolver.MetadataFieldInterfaceResolver;
 import org.opencastproject.metadata.dublincore.MetadataField;
 
 import graphql.annotations.annotationTypes.GraphQLDescription;
@@ -30,11 +30,11 @@ import graphql.annotations.annotationTypes.GraphQLName;
 import graphql.annotations.annotationTypes.GraphQLTypeResolver;
 
 @GraphQLName(GqlMetadataFieldInterface.TYPE_NAME)
-@GraphQLTypeResolver(GqlMetadataFieldInterfaceResolver.class)
+@GraphQLTypeResolver(MetadataFieldInterfaceResolver.class)
 @GraphQLDescription("The metadata field interface provides common fields for all metadata fields.")
 public interface GqlMetadataFieldInterface {
 
-  String TYPE_NAME = "GqlMetadataFieldInterface";
+  String TYPE_NAME = "MetadataFieldInterface";
 
   MetadataField getMetadataField();
 

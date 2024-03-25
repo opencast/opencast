@@ -29,7 +29,7 @@ import graphql.annotations.annotationTypes.GraphQLName;
 @GraphQLName(GqlDeleteEventPayload.TYPE_NAME)
 @GraphQLDescription("DeleteEventPayload")
 public class GqlDeleteEventPayload {
-  public static final String TYPE_NAME = "GqlDeleteEventPayload";
+  public static final String TYPE_NAME = "DeleteEventPayload";
 
   public GqlDeleteEventPayload() {
 

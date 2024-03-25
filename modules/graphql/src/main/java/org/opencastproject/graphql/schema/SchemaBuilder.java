@@ -27,8 +27,11 @@ import org.opencastproject.graphql.provider.GraphQLExtensionProvider;
 import org.opencastproject.graphql.provider.GraphQLFieldVisibilityProvider;
 import org.opencastproject.graphql.provider.GraphQLMutationProvider;
 import org.opencastproject.graphql.provider.GraphQLQueryProvider;
+import org.opencastproject.graphql.provider.GraphQLTypeFunctionProvider;
+import org.opencastproject.graphql.schema.builder.AdditionalTypeBuilder;
 import org.opencastproject.graphql.schema.builder.DynamicTypeBuilder;
 import org.opencastproject.graphql.schema.builder.ExtensionBuilder;
+import org.opencastproject.graphql.schema.builder.TypeFunctionBuilder;
 import org.opencastproject.graphql.type.input.Mutation;
 import org.opencastproject.graphql.type.output.Query;
 import org.opencastproject.security.api.Organization;
@@ -55,11 +58,17 @@ public class SchemaBuilder {
 
   private final DynamicTypeBuilder dynamicTypeBuilder;
 
+  private final AdditionalTypeBuilder additionalTypeBuilder;
+
+  private final TypeFunctionBuilder typeFunctionBuilder;
+
   public SchemaBuilder(Organization organization) {
     Objects.requireNonNull(organization, "organization cannot be null");
     this.organization = organization;
     this.dynamicTypeBuilder = new DynamicTypeBuilder(organization);
     this.extensionBuilder = new ExtensionBuilder();
+    this.additionalTypeBuilder = new AdditionalTypeBuilder();
+    this.typeFunctionBuilder = new TypeFunctionBuilder();
   }
 
   public GraphQLSchema build() {
@@ -69,10 +78,14 @@ public class SchemaBuilder {
 
     final var builder = GraphQLSchema.newSchema();
 
-    dynamicTypeBuilder.withAnnotations(annotations).build();
+    typeFunctionBuilder.withAnnotations(annotations).build();
+
     extensionBuilder.withAnnotations(annotations).build();
 
+    dynamicTypeBuilder.withAnnotations(annotations).build();
+
     final var annotationsSchema = AnnotationsSchemaCreator.newAnnotationsSchema();
+    additionalTypeBuilder.withAnnotationSchema(annotationsSchema).build();
 
     return annotationsSchema
         .setGraphQLSchemaBuilder(builder)
@@ -105,6 +118,7 @@ public class SchemaBuilder {
   }
 
   public SchemaBuilder additionalTypeProviders(List<GraphQLAdditionalTypeProvider> additionalTypesProviders) {
+    additionalTypeBuilder.withAdditionalTypeProviders(additionalTypesProviders);
     return this;
   }
 
@@ -112,4 +126,8 @@ public class SchemaBuilder {
     return this;
   }
 
+  public SchemaBuilder typeFunctionProviders(List<GraphQLTypeFunctionProvider> typeFunctionProviders) {
+    typeFunctionBuilder.withTypeFunctionProviders(typeFunctionProviders);
+    return this;
+  }
 }

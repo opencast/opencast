@@ -28,7 +28,7 @@ import graphql.annotations.annotationTypes.GraphQLName;
 @GraphQLName(GqlAccessControlGenericEntry.TYPE_NAME)
 public class GqlAccessControlGenericEntry implements GqlAccessControlEntry {
 
-  public static final String TYPE_NAME = "GqlAccessControlGenericEntry";
+  public static final String TYPE_NAME = "AccessControlGenericEntry";
 
   private final AccessControlEntry accessControlEntry;
 

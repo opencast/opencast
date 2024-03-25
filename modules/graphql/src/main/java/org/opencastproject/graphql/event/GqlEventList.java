@@ -25,6 +25,7 @@ package org.opencastproject.graphql.event;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.graphql.type.output.OffsetPageInfo;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,7 +41,7 @@ import graphql.annotations.annotationTypes.GraphQLNonNull;
 @GraphQLDescription("A list of events")
 public class GqlEventList {
 
-  public static final String TYPE_NAME = "GqlEventList";
+  public static final String TYPE_NAME = "EventList";
 
   protected final SearchResult<Event> searchResult;
 
@@ -49,13 +50,20 @@ public class GqlEventList {
   }
 
   @GraphQLField
+  @GraphQLNonNull
   public Long totalCount() {
     return searchResult.getHitCount();
   }
 
   @GraphQLField
-  public List<GqlEvent> nodes() {
+  @GraphQLNonNull
+  public OffsetPageInfo pageInfo() {
+    return OffsetPageInfo.from(searchResult);
+  }
 
+  @GraphQLField
+  @GraphQLNonNull
+  public List<GqlEvent> nodes() {
     return Arrays.stream(searchResult.getItems())
         .map(SearchResultItem::getSource)
         .map(GqlEvent::new)

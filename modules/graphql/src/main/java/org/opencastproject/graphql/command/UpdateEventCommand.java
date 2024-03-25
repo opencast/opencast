@@ -30,6 +30,7 @@ import org.opencastproject.graphql.exception.GraphQLUnauthorizedException;
 import org.opencastproject.graphql.execution.context.OpencastContext;
 import org.opencastproject.graphql.execution.context.OpencastContextManager;
 import org.opencastproject.graphql.type.input.GqlCommonEventMetadataInput;
+import org.opencastproject.graphql.util.MetadataFieldToGraphQLConverter;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
@@ -40,7 +41,13 @@ import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 
+import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
+
+import graphql.schema.GraphQLScalarType;
+import graphql.schema.GraphQLTypeUtil;
 
 public class UpdateEventCommand extends AbstractCommand<GqlEvent> {
 
@@ -58,7 +65,6 @@ public class UpdateEventCommand extends AbstractCommand<GqlEvent> {
     final IndexService indexService = context.getService(IndexService.class);
 
     final Map<String, Object> eventMetadata = environment.getArgument("metadata");
-
     try {
       indexService.updateEventMetadata(eventId, createMetadataList(eventMetadata, indexService), index);
     } catch (IndexServiceException | SearchIndexException e) {
@@ -76,7 +82,10 @@ public class UpdateEventCommand extends AbstractCommand<GqlEvent> {
     }
   }
 
-  private MetadataList createMetadataList(Map<String, Object> eventMetadata, IndexService indexService) {
+  private MetadataList createMetadataList(
+      Map<String, Object> eventMetadata,
+      IndexService indexService
+  ) {
     CommonEventCatalogUIAdapter adapter = (CommonEventCatalogUIAdapter) indexService
         .getCommonEventCatalogUIAdapter();
 
@@ -88,10 +97,58 @@ public class UpdateEventCommand extends AbstractCommand<GqlEvent> {
 
     final DublinCoreMetadataCollection collection = list.getMetadataByFlavor(flavor.toString());
 
-    eventMetadata.keySet().forEach(k -> {
-      final MetadataField target = collection.getOutputFields().get(k);
-      target.setValue(eventMetadata.get(k));
-    });
+    for (Map.Entry<String, Object> entry: eventMetadata.entrySet()) {
+      String key = entry.getKey();
+      final MetadataField target = collection.getOutputFields().get(key);
+      var type = (GraphQLScalarType) GraphQLTypeUtil.unwrapNonNull(MetadataFieldToGraphQLConverter.convertType(target));
+
+      Object value = type.getCoercing().parseValue(
+          eventMetadata.get(key),
+          environment.getGraphQlContext(),
+          environment.getLocale()
+      );
+
+      if (value == null) {
+        continue;
+      }
+
+      switch (target.getType()) {
+        case DATE:
+        case START_DATE:
+          target.setValue(DateTimeFormatter.ofPattern(target.getPattern()).format((OffsetDateTime)value));
+          break;
+        case LONG:
+          target.setValue(value);
+          break;
+        case TEXT:
+          target.setValue(value);
+          break;
+        case BOOLEAN:
+          target.setValue(value);
+          break;
+        case DURATION:
+          target.setValue(((Duration) value).toMillis());
+          break;
+        case TEXT_LONG:
+          target.setValue(value);
+          break;
+        case MIXED_TEXT:
+          target.setValue(value);
+          break;
+        case START_TIME:
+          target.setValue(value);
+          break;
+        case ORDERED_TEXT:
+          target.setValue(value);
+          break;
+        case ITERABLE_TEXT:
+          target.setValue(value);
+          break;
+        default:
+          target.setValue(value);
+          break;
+      }
+    }
 
     return list;
   }

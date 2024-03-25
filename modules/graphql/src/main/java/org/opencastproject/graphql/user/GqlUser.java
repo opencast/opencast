@@ -35,7 +35,7 @@ import graphql.annotations.annotationTypes.GraphQLNonNull;
 @GraphQLName(GqlUser.TYPE_NAME)
 public class GqlUser {
 
-  public static final String TYPE_NAME = "GqlUser";
+  public static final String TYPE_NAME = "User";
 
   private final User user;
 

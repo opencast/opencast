@@ -42,16 +42,15 @@ public final class EventMutationExtension {
   @GraphQLField
   @GraphQLNonNull
   @GraphQLDescription("Update event metadata")
-  public static Boolean updateEvent(
+  public static GqlEvent updateEvent(
       @GraphQLName("id") @GraphQLNonNull String id,
       @GraphQLName("metadata") @GraphQLNonNull GqlCommonEventMetadataInput eventMetadataInput,
       final DataFetchingEnvironment environment) {
-    UpdateEventCommand
+    return UpdateEventCommand
         .create(id, eventMetadataInput)
         .environment(environment)
         .build()
         .execute();
-    return true;
   }
 
   @GraphQLField

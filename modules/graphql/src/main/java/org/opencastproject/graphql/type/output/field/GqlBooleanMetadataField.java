@@ -30,7 +30,7 @@ import graphql.annotations.annotationTypes.GraphQLName;
 @GraphQLName(GqlBooleanMetadataField.TYPE_NAME)
 public class GqlBooleanMetadataField implements GqlMetadataFieldInterface {
 
-  public static final String TYPE_NAME = "GqlBooleanMetadataField";
+  public static final String TYPE_NAME = "BooleanMetadataField";
 
   private final MetadataField metadataField;
 
@@ -44,8 +44,7 @@ public class GqlBooleanMetadataField implements GqlMetadataFieldInterface {
   }
 
   @GraphQLField
-  @GraphQLName("value")
-  public Boolean getValue() {
+  public Boolean value() {
     Object o = metadataField.getValue();
     if (o instanceof String) {
       return (Boolean) (metadataField.getValue());

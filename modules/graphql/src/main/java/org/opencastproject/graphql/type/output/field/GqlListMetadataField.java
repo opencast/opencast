@@ -34,7 +34,7 @@ import graphql.annotations.annotationTypes.GraphQLName;
 @GraphQLName(GqlListMetadataField.TYPE_NAME)
 public class GqlListMetadataField implements GqlMetadataFieldInterface {
 
-  public static final String TYPE_NAME = "GqlListMetadataField";
+  public static final String TYPE_NAME = "ListMetadataField";
 
   private final MetadataField metadataField;
 
@@ -48,8 +48,7 @@ public class GqlListMetadataField implements GqlMetadataFieldInterface {
   }
 
   @GraphQLField
-  @GraphQLName("value")
-  public List<String> getValue() {
+  public List<String> value() {
     Object o = metadataField.getValue();
     if (o instanceof List) {
       return (List<String>)(metadataField.getValue());

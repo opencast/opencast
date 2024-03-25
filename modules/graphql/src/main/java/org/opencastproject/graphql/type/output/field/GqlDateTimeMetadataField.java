@@ -21,22 +21,25 @@
 
 package org.opencastproject.graphql.type.output.field;
 
-import static org.opencastproject.graphql.type.output.field.GqlLongMetadataField.TYPE_NAME;
-
+import org.opencastproject.graphql.type.DateTimeFunction;
 import org.opencastproject.graphql.type.output.GqlMetadataFieldInterface;
 import org.opencastproject.metadata.dublincore.MetadataField;
 
+import java.time.ZoneOffset;
+import java.util.Date;
+
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
+import graphql.annotations.annotationTypes.GraphQLType;
 
-@GraphQLName(GqlLongMetadataField.TYPE_NAME)
-public class GqlLongMetadataField implements GqlMetadataFieldInterface {
+@GraphQLName(GqlDateTimeMetadataField.TYPE_NAME)
+public class GqlDateTimeMetadataField implements GqlMetadataFieldInterface {
 
-  public static final String TYPE_NAME = "LongMetadataField";
+  public static final String TYPE_NAME = "DateTimeMetadataField";
 
   private final MetadataField metadataField;
 
-  public GqlLongMetadataField(MetadataField metadataField) {
+  public GqlDateTimeMetadataField(MetadataField metadataField) {
     this.metadataField = metadataField;
   }
 
@@ -46,13 +49,12 @@ public class GqlLongMetadataField implements GqlMetadataFieldInterface {
   }
 
   @GraphQLField
-  public Long value() {
-    Object o = metadataField.getValue();
-    if (o instanceof Long) {
-      return (Long)(metadataField.getValue());
-    } else {
-      return null;
+  @GraphQLType(DateTimeFunction.class)
+  public Object value() {
+    if (metadataField.getValue() instanceof Date) {
+      return ((Date) metadataField.getValue()).toInstant().atOffset(ZoneOffset.UTC);
     }
+    return metadataField.getValue();
   }
 
 }

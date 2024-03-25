@@ -27,6 +27,8 @@ import org.opencastproject.graphql.datafetcher.event.CommonEventMetadataV2DataFe
 import org.opencastproject.graphql.datafetcher.series.SeriesDataFetcher;
 import org.opencastproject.graphql.execution.context.OpencastContextManager;
 import org.opencastproject.graphql.series.GqlSeries;
+import org.opencastproject.graphql.type.DateTimeFunction;
+import org.opencastproject.graphql.type.DurationFunction;
 import org.opencastproject.graphql.type.output.GqlCommonEventMetadata;
 import org.opencastproject.graphql.type.output.GqlCommonEventMetadataV2;
 import org.opencastproject.graphql.type.output.GqlPublication;
@@ -43,10 +45,11 @@ import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLID;
 import graphql.annotations.annotationTypes.GraphQLName;
 import graphql.annotations.annotationTypes.GraphQLNonNull;
+import graphql.annotations.annotationTypes.GraphQLType;
 import graphql.schema.DataFetchingEnvironment;
 
 @GraphQLName(GqlEvent.TYPE_NAME)
-@GraphQLDescription("A series.")
+@GraphQLDescription("A Event.")
 public class GqlEvent {
 
   public static final String TYPE_NAME = "GqlEvent";
@@ -64,7 +67,6 @@ public class GqlEvent {
     return this.event.getIdentifier();
   }
 
-  @GraphQLID
   @GraphQLField
   @GraphQLNonNull
   public String title() {
@@ -107,21 +109,26 @@ public class GqlEvent {
   }
 
   @GraphQLField
+  @GraphQLType(DateTimeFunction.class)
   public String created() {
     return this.event.getCreated();
   }
 
   @GraphQLField
+  @GraphQLNonNull
+  @GraphQLType(DurationFunction.class)
   public Long duration() {
     return this.event.getDuration();
   }
 
   @GraphQLField
+  @GraphQLType(DateTimeFunction.class)
   public String startDate() {
     return this.event.getRecordingStartDate();
   }
 
   @GraphQLField
+  @GraphQLType(DateTimeFunction.class)
   public String endDate() {
     return this.event.getRecordingEndDate();
   }
@@ -137,6 +144,7 @@ public class GqlEvent {
   }
 
   @GraphQLField
+  @GraphQLNonNull
   public String eventStatus() {
     return this.event.getEventStatus();
   }
@@ -184,6 +192,7 @@ public class GqlEvent {
   }
 
   @GraphQLField
+  @GraphQLNonNull
   public Boolean hasPreview() {
     return this.event.hasPreview();
   }

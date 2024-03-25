@@ -22,6 +22,7 @@
 package org.opencastproject.graphql.util;
 
 
+import org.opencastproject.graphql.scalar.OpencastScalars;
 import org.opencastproject.metadata.dublincore.MetadataField;
 
 import graphql.Scalars;
@@ -38,7 +39,7 @@ public final class MetadataFieldToGraphQLConverter {
     GraphQLType graphQLType;
     switch (field.getType()) {
       case DATE:
-        graphQLType = Scalars.GraphQLString;
+        graphQLType = ExtendedScalars.DateTime;
         break;
       case LONG:
         graphQLType = ExtendedScalars.GraphQLLong;
@@ -50,7 +51,7 @@ public final class MetadataFieldToGraphQLConverter {
         graphQLType = Scalars.GraphQLBoolean;
         break;
       case DURATION:
-        graphQLType = Scalars.GraphQLInt;
+        graphQLType = OpencastScalars.Duration;
         break;
       case TEXT_LONG:
         graphQLType = Scalars.GraphQLString;
@@ -59,10 +60,10 @@ public final class MetadataFieldToGraphQLConverter {
         graphQLType = GraphQLList.list(Scalars.GraphQLString);
         break;
       case START_DATE:
-        graphQLType = Scalars.GraphQLString;
+        graphQLType = ExtendedScalars.DateTime;
         break;
       case START_TIME:
-        graphQLType = Scalars.GraphQLString;
+        graphQLType = ExtendedScalars.Time;
         break;
       case ORDERED_TEXT:
         graphQLType = Scalars.GraphQLString;

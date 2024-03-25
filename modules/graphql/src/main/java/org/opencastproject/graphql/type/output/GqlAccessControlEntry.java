@@ -21,22 +21,18 @@
 
 package org.opencastproject.graphql.type.output;
 
-import org.opencastproject.graphql.type.AccessControlEntryTypeResolver;
+import org.opencastproject.graphql.type.resolver.AccessControlEntryTypeResolver;
 import org.opencastproject.security.api.AccessControlEntry;
 
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
-import graphql.annotations.annotationTypes.GraphQLUnion;
+import graphql.annotations.annotationTypes.GraphQLTypeResolver;
 
 @GraphQLName(GqlAccessControlEntry.TYPE_NAME)
-@GraphQLUnion(possibleTypes = {
-    GqlAccessControlUserEntry.class,
-    GqlAccessControlGroupEntry.class,
-    GqlAccessControlGenericEntry.class },
-    typeResolver = AccessControlEntryTypeResolver.class)
+@GraphQLTypeResolver(AccessControlEntryTypeResolver.class)
 public interface GqlAccessControlEntry {
 
-  String TYPE_NAME = "GqlAccessControlEntry";
+  String TYPE_NAME = "AccessControlEntry";
 
   AccessControlEntry getAccessControlEntry();
 

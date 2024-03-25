@@ -33,7 +33,7 @@ import graphql.annotations.annotationTypes.GraphQLType;
 public class GqlJsonMetadataField implements GqlMetadataFieldInterface {
 
 
-  public static final String TYPE_NAME = "GqlJsonMetadataField";
+  public static final String TYPE_NAME = "JsonMetadataField";
 
   private final MetadataField metadataField;
 

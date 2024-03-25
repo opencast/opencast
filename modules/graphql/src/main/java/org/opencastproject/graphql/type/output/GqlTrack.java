@@ -27,8 +27,12 @@ import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
 
 import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLName;
 
+@GraphQLName(GqlTrack.TYPE_NAME)
 public class GqlTrack implements GqlMediaPackageElement {
+
+  public static final String TYPE_NAME = "Track";
 
   private final Track track;
 

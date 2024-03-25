@@ -31,7 +31,7 @@ import graphql.annotations.annotationTypes.GraphQLName;
 @GraphQLDescription("Access control list")
 public class GqlAccessControlList {
 
-  public static final String TYPE_NAME = "GqlAccessControlList";
+  public static final String TYPE_NAME = "AccessControlList";
 
   private final AccessControlList accessControlList;
 

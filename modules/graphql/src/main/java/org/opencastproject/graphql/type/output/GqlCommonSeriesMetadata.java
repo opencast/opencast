@@ -26,7 +26,7 @@ import graphql.annotations.annotationTypes.GraphQLName;
 @GraphQLName(GqlCommonSeriesMetadata.TYPE_NAME)
 public class GqlCommonSeriesMetadata implements GqlDublinCoreMetadata {
 
-  public static final String TYPE_NAME = "GqlCommonSeriesMetadata";
+  public static final String TYPE_NAME = "CommonSeriesMetadata";
 
   @Override
   public String catalogType() {

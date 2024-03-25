@@ -19,24 +19,14 @@
  *
  */
 
-package org.opencastproject.graphql.type.resolver;
+package org.opencastproject.graphql.provider;
 
-import graphql.TypeResolutionEnvironment;
-import graphql.annotations.annotationTypes.GraphQLName;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.TypeResolver;
+import java.util.Set;
 
-public class GqlMetadataFieldInterfaceResolver implements TypeResolver {
-  @Override
-  public GraphQLObjectType getType(TypeResolutionEnvironment env) {
-    final Class<?> field = env.getObject().getClass();
-    final GraphQLName graphQLName = field.getAnnotation(GraphQLName.class);
-    String objectTypeName;
-    if (graphQLName == null) {
-      objectTypeName = field.getSimpleName();
-    } else {
-      objectTypeName = graphQLName.value();
-    }
-    return env.getSchema().getObjectType(objectTypeName);
-  }
+import graphql.annotations.processor.typeFunctions.TypeFunction;
+
+public interface GraphQLTypeFunctionProvider extends GraphQLProvider {
+
+  Set<TypeFunction> getTypeFunctions();
+
 }

@@ -22,7 +22,10 @@
 package org.opencastproject.graphql.datafetcher.series;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.graphql.datafetcher.ContextDataFetcher;
 import org.opencastproject.graphql.exception.GraphQLRuntimeException;
 import org.opencastproject.graphql.exception.OpencastErrorType;
@@ -57,8 +60,19 @@ public class SeriesDataFetcher implements ContextDataFetcher<GqlSeries> {
     ElasticsearchIndex searchIndex = opencastContext.getService(ElasticsearchIndex.class);
 
     try {
-      return searchIndex.getSeries(seriesId, securityService.getOrganization().toString(), securityService.getUser())
-          .map(GqlSeries::new).orElse(null);
+      SearchResult<Series> result = searchIndex.getByQuery(
+          new SeriesSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
+          .withIdentifier(seriesId)
+      );
+      if (result.getDocumentCount() == 0) {
+        return null;
+      } else if (result.getDocumentCount() == 1) {
+        return new GqlSeries(result.getItems()[0].getSource());
+      }
+      throw new GraphQLRuntimeException(
+          "Multiple series found with the same identifier",
+          OpencastErrorType.InternalError
+      );
     } catch (SearchIndexException e) {
       throw new GraphQLRuntimeException(OpencastErrorType.InternalError, e);
     }

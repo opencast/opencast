@@ -29,7 +29,7 @@ import graphql.annotations.annotationTypes.GraphQLName;
 @GraphQLName(GqlListProviderEntry.TYPE_NAME)
 public class GqlListProviderEntry {
 
-  public static final String TYPE_NAME = "GqlListProviderEntry";
+  public static final String TYPE_NAME = "ListProviderEntry";
 
   private final String key;
   private final String value;

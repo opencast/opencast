@@ -19,43 +19,47 @@
  *
  */
 
-package org.opencastproject.graphql.listprovider;
+package org.opencastproject.graphql.type.output;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import org.opencastproject.elasticsearch.api.SearchResult;
 
-import graphql.annotations.annotationTypes.GraphQLDescription;
 import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
 import graphql.annotations.annotationTypes.GraphQLNonNull;
 
-@GraphQLName(GqlListProvider.TYPE_NAME)
-@GraphQLNonNull
-@GraphQLDescription("A list provider")
-public class GqlListProvider {
+public class OffsetPageInfo {
 
-  public static final String TYPE_NAME = "ListProvider";
+  private final Long pageCount;
+  private final Long limit;
+  private final Long offset;
 
-  private final Map<String, String> searchResult;
+  public OffsetPageInfo(Long pageCount, Long limit, Long offset) {
+    this.pageCount = pageCount;
+    this.limit = limit;
+    this.offset = offset;
+  }
 
-  private final boolean translatable;
-
-  public GqlListProvider(Map<String, String> searchResult, boolean translatable) {
-    this.searchResult = searchResult;
-    this.translatable = translatable;
+  public static OffsetPageInfo from(SearchResult<?> searchResult) {
+    return new OffsetPageInfo(
+        (searchResult.getHitCount() + searchResult.getLimit() - 1) / searchResult.getLimit(),
+        searchResult.getLimit(), searchResult.getOffset());
   }
 
   @GraphQLField
-  public Boolean translatable() {
-    return translatable;
+  @GraphQLNonNull
+  public Long pageCount() {
+    return pageCount;
   }
 
   @GraphQLField
-  public List<GqlListProviderEntry> nodes() {
-    return searchResult.entrySet().stream()
-        .map(GqlListProviderEntry::new)
-        .collect(Collectors.toList());
+  @GraphQLNonNull
+  public Long limit() {
+    return limit;
+  }
+
+  @GraphQLField
+  @GraphQLNonNull
+  public Long offset() {
+    return offset;
   }
 
 }
