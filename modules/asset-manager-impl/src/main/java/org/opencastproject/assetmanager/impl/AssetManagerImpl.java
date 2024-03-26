@@ -30,7 +30,6 @@ import static org.opencastproject.mediapackage.MediaPackageSupport.getFileName;
 import static org.opencastproject.mediapackage.MediaPackageSupport.getMediaPackageElementId;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
-import static org.opencastproject.util.OsgiUtil.getContextProperty;
 
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetId;
@@ -74,6 +73,10 @@ import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.list.api.ResourceListQuery;
+import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -185,6 +188,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private SecurityService securityService;
   private AuthorizationService authorizationService;
+  private ListProvidersService listProvidersService;
   private OrganizationDirectoryService orgDir;
   private Workspace workspace;
   private AssetStore assetStore;
@@ -224,7 +228,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     includeCARoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeCARoles"), null));
     includeUIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeUIRoles"), null));
 
-    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(getContextProperty(cc, CONFIG_EPISODE_ID_ROLE), "false"));
+    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(
+        cc.getBundleContext().getProperty(CONFIG_EPISODE_ID_ROLE), "false"));
     logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
   }
 
@@ -250,6 +255,11 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
+  }
+
+  @Reference
+  public void setListProvidersService(ListProvidersService listProvidersService) {
+    this.listProvidersService = listProvidersService;
   }
 
   @Reference
@@ -1648,14 +1658,23 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       // Add custom roles to the ACL
       // This allows users with a role of the form ROLE_EPISODE_<ID>_<ACTION> to access the event through the index
       Set<AccessControlEntry> customEntries = new HashSet<>();
-      for (AccessControlEntry entry : acl.getEntries()) {
-        customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + eventId + "_" + entry.getAction().toUpperCase(),
-            entry.getAction(), true));
-        // If write access, grant read access as well
-        if ("write".equals(entry.getAction())) {
-          customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + eventId + "_" + "READ", "read", true));
+      customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + eventId + "_" + "READ", "read", true));
+      customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + eventId + "_" + "WRITE", "write", true));
+
+      ResourceListQuery query = new ResourceListQueryImpl();
+      if (listProvidersService.hasProvider("ACL.ACTIONS")) {
+        Map<String, String> actions = new HashMap<>();
+        try {
+          actions = listProvidersService.getList("ACL.ACTIONS", query, true);
+        } catch (ListProviderException e) {
+          throw new RuntimeException("Listproviders not loaded. " + e);
+        }
+        for (String action : actions.keySet()) {
+          customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + eventId + "_" + action.toUpperCase(),
+              action, true));
         }
       }
+
       AccessControlList customRoles = new AccessControlList(new ArrayList<>(customEntries));
       acl = customRoles.merge(acl);
     }

@@ -23,7 +23,6 @@ package org.opencastproject.authorization.xacml;
 
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_EPISODE;
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_SERIES;
-import static org.opencastproject.util.OsgiUtil.getContextProperty;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.mediapackage.Attachment;
@@ -126,7 +125,8 @@ public class XACMLAuthorizationService implements AuthorizationService {
     }
     logger.debug("Merge mode set to {}", mergeMode);
 
-    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(getContextProperty(cc, CONFIG_EPISODE_ID_ROLE), "false"));
+    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(
+        cc.getBundleContext().getProperty(CONFIG_EPISODE_ID_ROLE), "false"));
     logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
   }
 

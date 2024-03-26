@@ -66,6 +66,15 @@
       <artifactId>opencast-authorization-manager</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-list-providers-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- -->
     <dependency>
       <groupId>com.entwinemedia.common</groupId>
