@@ -23,6 +23,7 @@ package org.opencastproject.authorization.xacml;
 
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_EPISODE;
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_SERIES;
+import static org.opencastproject.util.OsgiUtil.getContextProperty;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.mediapackage.Attachment;
@@ -93,7 +94,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
   private MediaPackageSerializer serializer;
 
   private static final String CONFIG_MERGE_MODE = "merge.mode";
-  private static final String CONFIG_EPISODE_ID_ROLE = "episode.id.role.access";
+  private static final String CONFIG_EPISODE_ID_ROLE = "org.opencastproject.episode.id.role.access";
 
   /** Definition of how merging of series and episode ACLs work */
   private static MergeMode mergeMode = MergeMode.OVERRIDE;
@@ -125,7 +126,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
     }
     logger.debug("Merge mode set to {}", mergeMode);
 
-    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(properties.get(CONFIG_EPISODE_ID_ROLE), "false"));
+    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(getContextProperty(cc, CONFIG_EPISODE_ID_ROLE), "false"));
     logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
   }
 

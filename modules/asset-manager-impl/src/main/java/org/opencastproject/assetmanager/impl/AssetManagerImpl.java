@@ -30,6 +30,7 @@ import static org.opencastproject.mediapackage.MediaPackageSupport.getFileName;
 import static org.opencastproject.mediapackage.MediaPackageSupport.getMediaPackageElementId;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
+import static org.opencastproject.util.OsgiUtil.getContextProperty;
 
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetId;
@@ -177,7 +178,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private static final String MANIFEST_DEFAULT_NAME = "manifest";
 
-  private static final String CONFIG_EPISODE_ID_ROLE = "episode.id.role.access";
+  private static final String CONFIG_EPISODE_ID_ROLE = "org.opencastproject.episode.id.role.access";
 
   private CopyOnWriteArrayList<AssetManagerUpdateHandler> handlers = new CopyOnWriteArrayList<>();
 
@@ -222,7 +223,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     includeCARoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeCARoles"), null));
     includeUIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeUIRoles"), null));
 
-    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get(CONFIG_EPISODE_ID_ROLE), "false"));
+    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(getContextProperty(cc, CONFIG_EPISODE_ID_ROLE), "false"));
     logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
   }
 
