@@ -1711,11 +1711,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   @Override
-  public void repopulate() throws IndexRebuildException {
-    repopulate(null);
-  }
-
-  @Override
   public void repopulate(IndexRebuildService.ServicePart type) throws IndexRebuildException {
     try {
       final int total;

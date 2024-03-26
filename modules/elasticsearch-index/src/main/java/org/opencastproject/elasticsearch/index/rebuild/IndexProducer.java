@@ -27,10 +27,9 @@ package org.opencastproject.elasticsearch.index.rebuild;
 public interface IndexProducer {
 
   /**
-   * Re-add all data of this service to the index.
+   * Re-add the data of this service to the index for the given type.
+   * R-add ALL data of this service if null is passed instead.
    */
-  void repopulate() throws IndexRebuildException;
-
   void repopulate(IndexRebuildService.ServicePart type) throws IndexRebuildException;
 
   /**

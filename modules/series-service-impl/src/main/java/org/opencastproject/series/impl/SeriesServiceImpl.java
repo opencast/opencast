@@ -509,11 +509,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   @Override
-  public void repopulate() throws IndexRebuildException {
-    repopulate(null);
-  }
-
-  @Override
   public void repopulate(IndexRebuildService.ServicePart type) throws IndexRebuildException {
     try {
       List<SeriesEntity> databaseSeries = persistence.getAllSeries();

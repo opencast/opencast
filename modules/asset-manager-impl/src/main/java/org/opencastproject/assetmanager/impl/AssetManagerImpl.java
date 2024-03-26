@@ -946,11 +946,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
-  public void repopulate() throws IndexRebuildException {
-    repopulate(null);
-  }
-
-  @Override
   public void repopulate(IndexRebuildService.ServicePart type) throws IndexRebuildException {
     final Organization originalOrg = securityService.getOrganization();
     final User originalUser = (originalOrg != null ? securityService.getUser() : null);
@@ -991,10 +986,13 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                   // Only reindex ACLs
                   updatedEventData = getEventUpdateFunctionOnlyAcl(snapshot, orgId, snapshotSystemUser)
                       .apply(updatedEventData);
-                } else {
+                } else if (type == null) {
                   // Reindex everything (default)
                   updatedEventData = getEventUpdateFunction(snapshot, orgId, snapshotSystemUser)
                       .apply(updatedEventData);
+                } else {
+                  throw new IndexRebuildException("The value for service part was " + type + ", which is not an"
+                      + "accepted value. Accepted values are ACL, null.");
                 }
                 updatedEventRange.add(updatedEventData.get());
 
