@@ -138,6 +138,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -1646,7 +1647,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     if (episodeIdRole) {
       // Add custom roles to the ACL
       // This allows users with a role of the form ROLE_EPISODE_<ID>_<ACTION> to access the event through the index
-      List<AccessControlEntry> customEntries = new ArrayList<>();
+      Set<AccessControlEntry> customEntries = new HashSet<>();
       for (AccessControlEntry entry : acl.getEntries()) {
         customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + eventId + "_" + entry.getAction().toUpperCase(),
             entry.getAction(), true));
@@ -1655,7 +1656,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + eventId + "_" + "READ", "read", true));
         }
       }
-      AccessControlList customRoles = new AccessControlList(customEntries);
+      AccessControlList customRoles = new AccessControlList(new ArrayList<>(customEntries));
       acl = customRoles.merge(acl);
     }
 
