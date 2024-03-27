@@ -98,6 +98,17 @@ public interface SearchService {
   Job deleteSeries(String seriesId) throws SearchException, UnauthorizedException, NotFoundException;
 
   /**
+   * Immediately removes the given mediapackage from the search service.
+   *
+   * @param mediaPackageId
+   *          the mediapackage
+   * @return <code>true</code> if the mediapackage was deleted
+   * @throws SearchException
+   *           if deletion failed
+   */
+  boolean deleteSynchronously(String mediaPackageId) throws SearchException;
+
+  /**
    * Find search results based on the specified query object
    *
    * @param q
