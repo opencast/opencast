@@ -509,7 +509,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   @Override
-  public void repopulate(IndexRebuildService.ServicePart type) throws IndexRebuildException {
+  public void repopulate(String type) throws IndexRebuildException {
     try {
       List<SeriesEntity> databaseSeries = persistence.getAllSeries();
       final int total = databaseSeries.size();

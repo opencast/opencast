@@ -2175,7 +2175,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   @Override
-  public void repopulate(IndexRebuildService.ServicePart type) throws IndexRebuildException {
+  public void repopulate(String type) throws IndexRebuildException {
     try {
       final int total;
       try {
