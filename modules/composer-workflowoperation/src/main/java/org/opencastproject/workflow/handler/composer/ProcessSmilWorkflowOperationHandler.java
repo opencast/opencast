@@ -493,9 +493,12 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
   private void tagByProfile(Track track, List<EncodingProfile> profiles) {
     String rawfileName = track.getURI().getRawPath();
     for (EncodingProfile ep : profiles) {
-      String suffix = ep.getSuffix();
+      // #5687: Add any character at the beginning of the suffix so that it is properly
+      // converted in toSafeName (because the regex used there may treat the first
+      // character differently; the default regex currently does).
+      String suffixToSanitize = "X" + ep.getSuffix();
       // !! workspace.putInCollection renames the file - need to do the same with suffix
-      suffix = workspace.toSafeName(suffix);
+      String suffix = workspace.toSafeName(suffixToSanitize).substring(1);
       if (suffix.length() > 0 && rawfileName.endsWith(suffix)) {
         track.addTag(ep.getIdentifier());
         return;
