@@ -73,10 +73,6 @@ import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
-import org.opencastproject.list.api.ListProviderException;
-import org.opencastproject.list.api.ListProvidersService;
-import org.opencastproject.list.api.ResourceListQuery;
-import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -141,7 +137,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -182,13 +177,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private static final String MANIFEST_DEFAULT_NAME = "manifest";
 
-  private static final String CONFIG_EPISODE_ID_ROLE = "org.opencastproject.episode.id.role.access";
-
   private CopyOnWriteArrayList<AssetManagerUpdateHandler> handlers = new CopyOnWriteArrayList<>();
 
   private SecurityService securityService;
   private AuthorizationService authorizationService;
-  private ListProvidersService listProvidersService;
   private OrganizationDirectoryService orgDir;
   private Workspace workspace;
   private AssetStore assetStore;
@@ -200,7 +192,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   private AclServiceFactory aclServiceFactory;
   private ElasticsearchIndex index;
   private Map<String, List<EventCatalogUIAdapter>> extendedEventCatalogUIAdapters = new HashMap<>();
-  private boolean episodeIdRole = false;
 
   // Settings for role filter
   private boolean includeAPIRoles;
@@ -227,10 +218,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     includeAPIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeAPIRoles"), null));
     includeCARoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeCARoles"), null));
     includeUIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeUIRoles"), null));
-
-    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(
-        cc.getBundleContext().getProperty(CONFIG_EPISODE_ID_ROLE), "false"));
-    logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
   }
 
   /**
@@ -255,11 +242,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
-  }
-
-  @Reference
-  public void setListProvidersService(ListProvidersService listProvidersService) {
-    this.listProvidersService = listProvidersService;
   }
 
   @Reference
@@ -1653,31 +1635,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   private Event updateAclInEvent(Event event, MediaPackage mp, String eventId) {
     AccessControlList acl = authorizationService.getActiveAcl(mp).getA();
     List<ManagedAcl> acls = aclServiceFactory.serviceFor(securityService.getOrganization()).getAcls();
-
-    if (episodeIdRole) {
-      // Add custom roles to the ACL
-      // This allows users with a role of the form ROLE_EPISODE_<ID>_<ACTION> to access the event through the index
-      Set<AccessControlEntry> customEntries = new HashSet<>();
-      customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + eventId + "_" + "READ", "read", true));
-      customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + eventId + "_" + "WRITE", "write", true));
-
-      ResourceListQuery query = new ResourceListQueryImpl();
-      if (listProvidersService.hasProvider("ACL.ACTIONS")) {
-        Map<String, String> actions = new HashMap<>();
-        try {
-          actions = listProvidersService.getList("ACL.ACTIONS", query, true);
-        } catch (ListProviderException e) {
-          throw new RuntimeException("Listproviders not loaded. " + e);
-        }
-        for (String action : actions.keySet()) {
-          customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + eventId + "_" + action.toUpperCase(),
-              action, true));
-        }
-      }
-
-      AccessControlList customRoles = new AccessControlList(new ArrayList<>(customEntries));
-      acl = customRoles.merge(acl);
-    }
 
     for (final ManagedAcl managedAcl : AccessInformationUtil.matchAcls(acls, acl)) {
       event.setManagedAcl(managedAcl.getName());
