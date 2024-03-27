@@ -153,10 +153,15 @@ public class IndexRebuildService implements BundleActivator {
    */
   public synchronized void rebuildIndex(ElasticsearchIndex index, String serviceName)
           throws IllegalArgumentException, IndexRebuildException {
+    rebuildIndex(index, serviceName, null);
+  }
+
+  public synchronized void rebuildIndex(ElasticsearchIndex index, String serviceName, String part)
+          throws IllegalArgumentException, IndexRebuildException {
     IndexRebuildService.Service service = IndexRebuildService.Service.valueOf(serviceName);
     logger.info("Starting partial rebuild of the {} index from service '{}'.", index.getIndexName(), service);
     setRebuildState(service, IndexRebuildService.State.PENDING);
-    rebuildIndex(index, service);
+    rebuildIndex(index, service, part);
   }
 
   /**
@@ -197,6 +202,11 @@ public class IndexRebuildService implements BundleActivator {
    */
   private void rebuildIndex(ElasticsearchIndex index, IndexRebuildService.Service service)
           throws IndexRebuildException {
+    rebuildIndex(index, service, null);
+  }
+
+  private void rebuildIndex(ElasticsearchIndex index, IndexRebuildService.Service service, String part)
+          throws IndexRebuildException {
 
     if (!indexProducers.containsKey(service)) {
       throw new IllegalStateException(format("Service %s is not available", service));
@@ -206,7 +216,7 @@ public class IndexRebuildService implements BundleActivator {
     logger.info("Starting to rebuild the {} index from service '{}'", index.getIndexName(), service);
     setRebuildState(service, IndexRebuildService.State.RUNNING);
     try {
-      indexProducer.repopulate();
+      indexProducer.repopulate(part);
       setRebuildState(service, IndexRebuildService.State.OK);
     } catch (IndexRebuildException e) {
       setRebuildState(service, IndexRebuildService.State.ERROR);
