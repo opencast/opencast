@@ -30,7 +30,7 @@ public interface IndexProducer {
    * Re-add the data of this service to the index for the given type.
    * R-add ALL data of this service if null is passed instead.
    */
-  void repopulate(IndexRebuildService.ServicePart type) throws IndexRebuildException;
+  void repopulate(String type) throws IndexRebuildException;
 
   /**
    * Get the service that implements IndexProducer.

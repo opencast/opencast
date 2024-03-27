@@ -22,6 +22,8 @@
 package org.opencastproject.elasticsearch.index.endpoint;
 
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityContext;
@@ -154,7 +156,7 @@ public class IndexEndpoint {
   }
 
   @POST
-  @Path("rebuild/AssetManager/{part}")
+  @Path("rebuild/{service}/{part}")
   @RestQuery(name = "partiallyRebuildIndexByPart",
       description = "Repopulates the AssetManager index for a specific service, but only for the specified part "
         + "in order to save time. "
@@ -163,10 +165,17 @@ public class IndexEndpoint {
       returnDescription = "OK if repopulation has started",
       pathParameters = {
           @RestParameter(
+              name = "service",
+              isRequired = true,
+              description = "The service to recreate index from. "
+                  + "The available services are: AssetManager. ",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
               name = "part",
               isRequired = true,
               description = "The part of the service to recreate index from. "
-                  + "The available parts are: ACL. ",
+                  + "The available parts for AssetManager are: ACL. ",
               type = RestParameter.Type.STRING
           )
       },
@@ -181,22 +190,21 @@ public class IndexEndpoint {
         )
       }
   )
-  public Response partiallyRebuildAssetManagerIndex(@PathParam("part") final String part) {
+  public Response partiallyRebuildAssetManagerIndex(
+      @PathParam("service") final String service,
+      @PathParam("part") final String part
+  ) {
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
         securityService.getUser());
 
-    if (!EnumUtils.isValidEnum(IndexRebuildService.ServicePart.class, part)) {
-      return R.badRequest("The given path param for part was invalid.");
+    if (!EnumUtils.isValidEnum(IndexRebuildService.Service.class, service)) {
+      return R.badRequest("The given path param for service was invalid.");
     }
 
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the index from service {}", "AssetManager");
-        indexRebuildService.rebuildIndex(
-            elasticsearchIndex,
-            "AssetManager",
-            IndexRebuildService.ServicePart.valueOf(part)
-        );
+        indexRebuildService.rebuildIndex(elasticsearchIndex, service, part);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }

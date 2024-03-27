@@ -297,7 +297,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   }
 
   @Override
-  public void repopulate(IndexRebuildService.ServicePart type) throws IndexRebuildException {
+  public void repopulate(String type) throws IndexRebuildException {
     try {
       for (final Organization organization : organizationDirectoryService.getOrganizations()) {
         try {

@@ -117,6 +117,7 @@ import com.google.common.collect.Sets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -205,6 +206,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   );
 
   private final HashMap<String, RemoteAssetStore> remoteStores = new LinkedHashMap<>();
+
+  public enum ServicePart {
+    ACL
+  }
 
   /**
    * OSGi callback.
@@ -940,7 +945,13 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
-  public void repopulate(IndexRebuildService.ServicePart type) throws IndexRebuildException {
+  public void repopulate(String type) throws IndexRebuildException {
+    if (type != null && !EnumUtils.isValidEnum(ServicePart.class, type)) {
+      throw new IndexRebuildException("The given type " + type + " was not valid. Should be null or "
+          + ServicePart.values());
+    }
+    ServicePart parsedType = ServicePart.valueOf(type);
+
     final Organization originalOrg = securityService.getOrganization();
     final User originalUser = (originalOrg != null ? securityService.getUser() : null);
     try {
@@ -976,7 +987,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
                 var updatedEventData = index.getEvent(snapshot.getMediaPackage().getIdentifier().toString(), orgId,
                     snapshotSystemUser);
-                if (IndexRebuildService.ServicePart.ACL.equals(type)) {
+                if (ServicePart.ACL.equals(parsedType)) {
                   // Only reindex ACLs
                   updatedEventData = getEventUpdateFunctionOnlyAcl(snapshot, orgId, snapshotSystemUser)
                       .apply(updatedEventData);
@@ -985,7 +996,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                   updatedEventData = getEventUpdateFunction(snapshot, orgId, snapshotSystemUser)
                       .apply(updatedEventData);
                 } else {
-                  throw new IndexRebuildException("The value for service part was " + type + ", which is not an"
+                  throw new IndexRebuildException("The value for service part was " + type + ", which is not an "
                       + "accepted value. Accepted values are ACL, null.");
                 }
                 updatedEventRange.add(updatedEventData.get());

@@ -72,10 +72,6 @@ public class IndexRebuildService implements BundleActivator {
     PENDING, RUNNING, OK, ERROR
   }
 
-  public enum ServicePart {
-    ACL
-  }
-
   private static final Logger logger = LoggerFactory.getLogger(IndexRebuildService.class);
   private final Map<IndexRebuildService.Service, IndexProducer> indexProducers = new ConcurrentHashMap<>();
   private ServiceRegistration<?> serviceRegistration = null;
@@ -160,7 +156,7 @@ public class IndexRebuildService implements BundleActivator {
     rebuildIndex(index, serviceName, null);
   }
 
-  public synchronized void rebuildIndex(ElasticsearchIndex index, String serviceName, ServicePart part)
+  public synchronized void rebuildIndex(ElasticsearchIndex index, String serviceName, String part)
           throws IllegalArgumentException, IndexRebuildException {
     IndexRebuildService.Service service = IndexRebuildService.Service.valueOf(serviceName);
     logger.info("Starting partial rebuild of the {} index from service '{}'.", index.getIndexName(), service);
@@ -209,7 +205,7 @@ public class IndexRebuildService implements BundleActivator {
     rebuildIndex(index, service, null);
   }
 
-  private void rebuildIndex(ElasticsearchIndex index, IndexRebuildService.Service service, ServicePart part)
+  private void rebuildIndex(ElasticsearchIndex index, IndexRebuildService.Service service, String part)
           throws IndexRebuildException {
 
     if (!indexProducers.containsKey(service)) {
