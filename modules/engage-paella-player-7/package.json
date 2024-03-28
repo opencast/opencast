@@ -14,7 +14,7 @@
     "test": "playwright test"
   },
   "devDependencies": {
-    "@babel/core": "^7.23.9",
+    "@babel/core": "^7.24.0",
     "@babel/eslint-parser": "^7.23.3",
     "@babel/preset-env": "^7.23.9",
     "@playwright/test": "^1.42.0",
