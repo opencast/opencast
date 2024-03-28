@@ -47,10 +47,16 @@ module.exports = function (env) {
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
         'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization'
       },
-      static: {
-        directory: path.join(__dirname, '../../etc/ui-config/mh_default_org/paella7'),
-        publicPath: env.OPENCAST_CONFIG_URL ?? '/ui/config/paella7'
-      },
+      static: [
+        {
+          directory: path.join(__dirname, '../../etc/ui-config/mh_default_org/paella7'),
+          publicPath: env.OPENCAST_CONFIG_URL ?? '/ui/config/paella7'
+        },
+        {
+          directory: path.join(__dirname, 'tests/mock/static'),
+          publicPath: '/test_mock_static'
+        }
+      ],
       proxy: {
         '/search/**': proxyOpts,
         '/info/**': proxyOpts,

@@ -19,6 +19,10 @@
  *
  */
 import { expect } from '@playwright/test';
+import { test as base } from '@playwright/test';
+import ID_strong_river from './mock/search/episode/ID-strong-river-flowing-down-the-green-forest.json';
+import infome from './mock/info/me.json';
+
 
 export const playerInstanceStr = '__paella_instances__[0]';
 
@@ -41,3 +45,24 @@ export const clickToStartVideo = async (page) => {
 
 export const playVideo = async (page) => await page.evaluate(`${playerInstanceStr}.play()`);
 export const pauseVideo = async (page) => await page.evaluate(`${playerInstanceStr}.pause()`);
+
+
+export const test = base.extend({
+  page: async ({ page }, use) => {
+    await page.route('**/search/episode.json?id=ID-strong-river-flowing-down-the-green-forest', async route => {
+      const json = ID_strong_river;
+      await route.fulfill({ json });
+    });
+
+    await page.route('**/info/me.json', async route => {
+      const json = infome;
+      await route.fulfill({ json });
+    });
+    await page.route('**/annotation/**', async route => {
+      await route.fulfill({status: 404});
+    });
+
+
+    await use(page);
+  },
+});
