@@ -73,6 +73,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -152,7 +153,11 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     }
     try {
       logger.debug("Trying to create index for '{}'", INDEX_NAME);
-      var request = new CreateIndexRequest(INDEX_NAME).mapping(mapping, XContentType.JSON);
+      InputStream is = getClass().getResourceAsStream("/elasticsearch/indexSettings.json");
+      String indexSettings = IOUtils.toString(is, StandardCharsets.UTF_8);
+      final CreateIndexRequest request = new CreateIndexRequest(INDEX_NAME)
+          .settings(indexSettings, XContentType.JSON)
+          .mapping(mapping, XContentType.JSON);
       var response = esIndex.getClient().indices().create(request, RequestOptions.DEFAULT);
       if (!response.isAcknowledged()) {
         throw new SearchException("Unable to create index for '" + INDEX_NAME + "'");
