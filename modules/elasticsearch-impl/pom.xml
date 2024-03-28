@@ -15,7 +15,7 @@
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
     <lucene.version>8.7.0</lucene.version>
-    <elasticsearch.version>7.10.2</elasticsearch.version>
+    <elasticsearch.version>7.17.19</elasticsearch.version>
   </properties>
   <dependencies>
     <dependency>
