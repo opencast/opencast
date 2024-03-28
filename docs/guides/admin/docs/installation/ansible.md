@@ -11,6 +11,8 @@ using them to make sure they fit your needs.
 
 Examples in this document refer to `7.x` and `r/7.x`.  You should replace those with the version you want to install!
 
+In addition to the mentioned scripts there is a selection of [ansible galaxy](https://galaxy.ansible.com/ui/standalone/namespaces/8850/) roles, written and maintained by ELAN e.V. which can be used to automate the installation of nearly all needed services.
+
 
 Install Ansible
 ---------------

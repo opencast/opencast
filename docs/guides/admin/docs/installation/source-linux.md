@@ -1,7 +1,7 @@
 Install from Source (Linux)
 ===========================
 
-These instructions outline how to install and build an all-in-one Opencast system on Linux.
+These instructions outline how to install and build an all-in-one Opencast system on Linux from source.
 
 Preparation
 -----------
