@@ -21,6 +21,7 @@
 
 package org.opencastproject.tobira.impl;
 
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_CREATED;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_DESCRIPTION;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 
@@ -156,7 +157,9 @@ class Item {
           Jsons.p("tracks", Jsons.arr(assembleTracks(event, mp))),
           Jsons.p("acl", assembleAcl(authorizationService.getAcl(mp, AclScope.Merged).getA())),
           Jsons.p("isLive", isLive),
-          Jsons.p("metadata", dccToMetadata(dccs)),
+          Jsons.p("metadata", dccToMetadata(dccs, Set.of(new String[] {
+              "created", "creator", "title", "extent", "isPartOf", "description", "identifier",
+          }))),
           Jsons.p("captions", Jsons.arr(captions)),
           Jsons.p("updated", event.getModifiedDate().getTime())
       );
@@ -179,15 +182,13 @@ class Item {
            .collect(Collectors.toCollection(ArrayList::new));
   }
 
-  /** Assembles the object containing all additional metadata. */
-  private static Jsons.Obj dccToMetadata(List<DublinCoreCatalog> dccs) {
-    /* Metadata fields from dcterms that we already handle elsewhere. Therefore, we don't need to
-      * include them here again. */
-    final var ignoredDcFields = Set.of(new String[] {
-        "created", "creator", "title", "extent", "isPartOf", "description", "identifier",
-    });
-
-
+  /**
+   * Assembles the object containing all additional metadata.
+   *
+   * The second argument is a list of dcterms metadata fields that is already included elsewhere in
+   * the response. They will be ignored here.
+   */
+  private static Jsons.Obj dccToMetadata(List<DublinCoreCatalog> dccs, Set<String> ignoredDcFields) {
     final var namespaces = new HashMap<String, ArrayList<Jsons.Prop>>();
 
     for (final var dcc : (Iterable<DublinCoreCatalog>) dccs::iterator) {
@@ -199,13 +200,13 @@ class Item {
         final var ns = key.getNamespaceURI().equals("http://purl.org/dc/terms/")
             ? "dcterms"
             : key.getNamespaceURI();
-        final var fields = namespaces.computeIfAbsent(ns, k -> new ArrayList<>());
 
         // We skip fields that we already include elsewhere.
         if (ns.equals("dcterms") && ignoredDcFields.contains(key.getLocalName())) {
           continue;
         }
 
+        final var fields = namespaces.computeIfAbsent(ns, k -> new ArrayList<>());
         final var values = e.getValue().stream()
             .map(v -> Jsons.v(v.getValue()))
             .collect(Collectors.toCollection(ArrayList::new));
@@ -376,12 +377,28 @@ class Item {
         Jsons.p("updated", series.getModifiedDate().getTime())
       );
     } else {
+      // Created date
+      var createdDateString = series.getDublinCore().getFirst(PROPERTY_CREATED);
+      var created = Jsons.NULL;
+      var date = EncodingSchemeUtils.decodeDate(createdDateString);
+      if (date != null) {
+        created = Jsons.v(date.getTime());
+      } else {
+        logger.warn("Series {} has unparsable created-date: {}", series.getId(), createdDateString);
+      }
+
+      var additionalMetadata = dccToMetadata(Arrays.asList(series.getDublinCore()), Set.of(new String[] {
+          "created", "title", "description", "identifier",
+      }));
+
       this.obj = Jsons.obj(
         Jsons.p("kind", "series"),
         Jsons.p("id", series.getId()),
         Jsons.p("title", series.getDublinCore().getFirst(PROPERTY_TITLE)),
         Jsons.p("description", series.getDublinCore().getFirst(PROPERTY_DESCRIPTION)),
         Jsons.p("acl", assembleAcl(acl)),
+        Jsons.p("metadata", additionalMetadata),
+        Jsons.p("created", created),
         Jsons.p("updated", series.getModifiedDate().getTime())
       );
     }

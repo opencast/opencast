@@ -470,6 +470,24 @@ Opencast 15
 Opencast 14
 -----------
 
+### Opencast 14.10
+
+*Released on March 14th, 2024*
+
+- [[#5619](https://github.com/opencast/opencast/pull/5619)] -
+Update setenv with currently supported options for Karaf
+- [[#5607](https://github.com/opencast/opencast/pull/5607)] -
+Fixed created value on scheduling event series
+- [[#5606](https://github.com/opencast/opencast/pull/5606)] -
+Fix vosk output filenames
+- [[#5604](https://github.com/opencast/opencast/pull/5604)] -
+Encode player redirect id parameter
+- [[#5600](https://github.com/opencast/opencast/pull/5600)] -
+Fix removal of event ACL from search when updating series ACL
+- [[#5594](https://github.com/opencast/opencast/pull/5594)] -
+Include all metadata in Tobira harvest API for series
+
+
 ### Opencast 14.9
 
 *Released on February 13th, 2024*

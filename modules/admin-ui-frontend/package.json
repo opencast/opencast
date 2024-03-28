@@ -4,8 +4,8 @@
   "devDependencies": {
     "autoprefixer": "^9.8.8",
     "bower": "^1.8.14",
-    "chromedriver": "^122.0.3",
-    "eslint": "^8.56.0",
+    "chromedriver": "^122.0.4",
+    "eslint": "^8.57.0",
     "eslint-plugin-header": "^3.1.1",
     "grunt": "^1.6.1",
     "grunt-cli": "^1.4.3",
@@ -33,11 +33,11 @@
     "grunt-usemin": "^3.1.1",
     "grunt-wiredep": "^3.0.1",
     "html-linter": "^1.1.1",
-    "html-validate": "^8.9.1",
-    "jasmine-core": "^5.1.1",
+    "html-validate": "^8.11.1",
+    "jasmine-core": "^5.1.2",
     "jit-grunt": "^0.10.0",
     "jshint-stylish": "^2.2.1",
-    "karma": "^6.4.2",
+    "karma": "^6.4.3",
     "karma-chrome-launcher": "^3.2.0",
     "karma-coverage": "^2.2.1",
     "karma-detect-browsers": "^2.0",
@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "coffeescript": "^2.7.0",
-    "sass": "^1.70.0"
+    "sass": "^1.71.1"
   },
   "optionalDependencies": {
     "fsevents": "^2.3.2"

@@ -23,8 +23,6 @@ package org.opencastproject.scheduler.impl;
 import static com.entwinemedia.fn.Prelude.chuck;
 import static com.entwinemedia.fn.Stream.$;
 
-import org.opencastproject.assetmanager.api.Snapshot;
-import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -270,19 +268,4 @@ public final class SchedulerUtil {
       return catalogUIAdapter.getOrganization().equals(organization);
     }
   };
-
-  public static final Fn<Snapshot, MediaPackage> episodeToMp = new Fn<Snapshot, MediaPackage>() {
-    @Override
-    public MediaPackage apply(Snapshot snapshot) {
-      return snapshot.getMediaPackage();
-    }
-  };
-
-  public static final Fn<ARecord, Opt<MediaPackage>> recordToMp = new Fn<ARecord, Opt<MediaPackage>>() {
-    @Override
-    public Opt<MediaPackage> apply(ARecord record) {
-      return record.getSnapshot().map(episodeToMp);
-    }
-  };
-
 }

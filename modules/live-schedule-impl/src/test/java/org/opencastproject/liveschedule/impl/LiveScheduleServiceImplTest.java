@@ -72,9 +72,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.Opt;
-
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Assert;
@@ -86,12 +83,15 @@ import org.osgi.service.component.ComponentContext;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
@@ -423,8 +423,8 @@ public class LiveScheduleServiceImplTest {
     EasyMock.expect(snapshot.getOrganizationId()).andReturn(org.getId()).anyTimes();
     EasyMock.expect(snapshot.getVersion()).andReturn(version);
     ARecord aRec = EasyMock.createNiceMock(ARecord.class);
-    EasyMock.expect(aRec.getSnapshot()).andReturn(Opt.some(snapshot)).anyTimes();
-    Stream<ARecord> recStream = Stream.mk(aRec);
+    EasyMock.expect(aRec.getSnapshot()).andReturn(Optional.of(snapshot)).anyTimes();
+    LinkedHashSet<ARecord> recStream = new LinkedHashSet<>(Arrays.asList(aRec));
     Predicate p = EasyMock.createNiceMock(Predicate.class);
     EasyMock.expect(p.and(p)).andReturn(p).anyTimes();
     AResult r = EasyMock.createNiceMock(AResult.class);
@@ -880,6 +880,11 @@ public class LiveScheduleServiceImplTest {
 
     @Override
     public boolean hasPermission(MediaPackage mp, String action) {
+      return false;
+    }
+
+    @Override
+    public boolean hasPermission(AccessControlList acl, String action) {
       return false;
     }
 

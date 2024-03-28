@@ -1066,7 +1066,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
               continue;
             }
 
-            String org = Enrichments.enrich(r).getSnapshots().head2().getOrganizationId();
+            String org = Enrichments.enrich(r).getSnapshots().stream().findFirst().get().getOrganizationId();
             Organization organization = organizationDirectoryService.getOrganization(org);
             if (organization == null) {
               logger.warn("Media package {} has an unknown organization {}. Skipped.", mpId, org);

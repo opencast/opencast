@@ -24,7 +24,8 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.data.Either;
 
 import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.data.Opt;
+
+import java.util.Optional;
 
 /**
  * A protected resource.
@@ -65,13 +66,13 @@ public final class Protected<A> {
     return wrapped.left().value();
   }
 
-  public Opt<A> getGrantedOpt() {
-    return wrapped.right().toOption().toOpt();
+  public Optional<A> getGrantedOpt() {
+    return wrapped.right().toOptional();
   }
 
-  public static <A> Fn<Protected<A>, Opt<A>> getGrantedOptFn() {
-    return new Fn<Protected<A>, Opt<A>>() {
-      @Override public Opt<A> apply(Protected<A> p) {
+  public static <A> Fn<Protected<A>, Optional<A>> getGrantedOptFn() {
+    return new Fn<Protected<A>, Optional<A>>() {
+      @Override public Optional<A> apply(Protected<A> p) {
         return p.getGrantedOpt();
       }
     };

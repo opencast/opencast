@@ -26,10 +26,9 @@ import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.util.NotFoundException;
 
-import com.entwinemedia.fn.data.Opt;
-
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The AssetManager stores versioned {@linkplain Snapshot snapshots} of media packages.
@@ -64,7 +63,7 @@ public interface AssetManager {
    * @param mediaPackageId
    * @return mediapackage
    */
-  Opt<MediaPackage> getMediaPackage(String mediaPackageId);
+  Optional<MediaPackage> getMediaPackage(String mediaPackageId);
 
   /**
    * Get the asset that is uniquely identified by the triple {version, media package ID, media package element ID}.
@@ -74,7 +73,7 @@ public interface AssetManager {
    * @param mpeId the media package element ID
    * @return the asset or none, if no such asset exists
    */
-  Opt<Asset> getAsset(Version version, String mpId, String mpeId);
+  Optional<Asset> getAsset(Version version, String mpId, String mpeId);
 
   /**
    * Get an asset store by id (local or remote).
@@ -82,7 +81,7 @@ public interface AssetManager {
    * @param storeId the store id
    * @return the asset store if it exists
    */
-  Opt<AssetStore> getAssetStore(String storeId);
+  Optional<AssetStore> getAssetStore(String storeId);
 
   /**
    * Get the remote asset stores as a list.
@@ -351,7 +350,7 @@ public interface AssetManager {
    *
    * @return a version or none, if no version can be archived from the given string
    */
-  Opt<Version> toVersion(String version);
+  Optional<Version> toVersion(String version);
 
   /**
    * Count the number of events stored for a given organization.

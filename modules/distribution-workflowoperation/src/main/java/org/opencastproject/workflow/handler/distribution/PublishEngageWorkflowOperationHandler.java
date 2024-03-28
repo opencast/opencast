@@ -564,9 +564,9 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         continue;
       }
 
-      List <MediaPackageElement> distributedElements = null;
+      List<? extends MediaPackageElement> distributedElements = null;
       try {
-        distributedElements = (List <MediaPackageElement>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
+        distributedElements = MediaPackageElementParser.getArrayFromXml(job.getPayload());
       } catch (MediaPackageException e) {
         throw new WorkflowOperationException(e);
       }
@@ -817,7 +817,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     } catch (SearchException e) {
       throw new WorkflowOperationException("Error retracting media package", e);
     } catch (UnauthorizedException | NotFoundException ex) {
-      logger.error("Retraction failed of Mediapackage: { }", distributedMediaPackage.getIdentifier().toString(), ex);
+      logger.error("Retraction failed of Mediapackage: {}", distributedMediaPackage.getIdentifier().toString(), ex);
     }
   }
 }

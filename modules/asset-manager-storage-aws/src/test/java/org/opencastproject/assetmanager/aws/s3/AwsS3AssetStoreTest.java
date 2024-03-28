@@ -51,7 +51,6 @@ import com.amazonaws.services.s3.model.StorageClass;
 import com.amazonaws.services.s3.model.Tag;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
-import com.entwinemedia.fn.data.Opt;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import org.easymock.Capture;
@@ -69,6 +68,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public class AwsS3AssetStoreTest {
   private ComboPooledDataSource pooledDataSource;
@@ -287,11 +287,11 @@ public class AwsS3AssetStoreTest {
     String[] mimetypes = { "audio", "image", "video" };
     StoragePath path;
     String objectKey;
-    Opt<MimeType> type;
+    Optional<MimeType> type;
     Source source;
     for (String mimetype : mimetypes) {
       path = new StoragePath(ORG_ID, MP_ID, new VersionImpl(1L), mimetype);
-      type = Opt.some(MimeType.mimeType(mimetype, "fake"));
+      type = Optional.of(MimeType.mimeType(mimetype, "fake"));
       objectKey = KEY_VERSION_1 + mimetype + ".xml";
       source = Source.mk(uri, null, type);
       //We need to do this every time we upload something.
@@ -312,7 +312,7 @@ public class AwsS3AssetStoreTest {
       tags.reset();
     }
     path = new StoragePath(ORG_ID, MP_ID, new VersionImpl(1L), "fake");
-    type = Opt.some(MimeType.mimeType("non-freezable", "fake"));
+    type = Optional.of(MimeType.mimeType("non-freezable", "fake"));
     objectKey = KEY_VERSION_1 + "fake.xml";
     source = Source.mk(uri, null, type);
     setupUpload(objectKey);
@@ -396,7 +396,7 @@ public class AwsS3AssetStoreTest {
     EasyMock.replay(metadata, gotr, s3Client, s3Transfer);
 
     StoragePath path = new StoragePath(ORG_ID, MP_ID, new VersionImpl(2L), ASSET_ID);
-    Opt<MimeType> type = Opt.some(MimeType.mimeType("non-freezable", "fake"));
+    Optional<MimeType> type = Optional.of(MimeType.mimeType("non-freezable", "fake"));
     Source source = Source.mk(uri, null, type);
     store.put(path, source);
 
@@ -473,8 +473,8 @@ public class AwsS3AssetStoreTest {
     StoragePath path = new StoragePath(ORG_ID, MP_ID, new VersionImpl(1L), ASSET_ID);
     store.put(path, Source.mk(uri));
 
-    Opt<InputStream> streamOpt = store.get(path);
-    Assert.assertTrue(streamOpt.isSome());
+    Optional<InputStream> streamOpt = store.get(path);
+    Assert.assertTrue(streamOpt.isPresent());
   }
 
   @Test
@@ -483,8 +483,8 @@ public class AwsS3AssetStoreTest {
 
     StoragePath path = new StoragePath(ORG_ID, MP_ID, new VersionImpl(1L), ASSET_ID);
 
-    Opt<InputStream> streamOpt = store.get(path);
-    Assert.assertFalse(streamOpt.isSome());
+    Optional<InputStream> streamOpt = store.get(path);
+    Assert.assertFalse(streamOpt.isPresent());
   }
 
   @Test
@@ -719,7 +719,7 @@ public class AwsS3AssetStoreTest {
     Source source = Source.mk(uri);
     store.put(path, source);
     store.modifyAssetStorageClass(path, StorageClass.Glacier.toString());
-    Opt<InputStream> stream = store.get(path);
+    Optional<InputStream> stream = store.get(path);
     Assert.fail("Not done yet");
   }
 }

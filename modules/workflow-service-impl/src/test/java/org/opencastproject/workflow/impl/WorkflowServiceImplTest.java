@@ -77,8 +77,6 @@ import org.opencastproject.workflow.handler.workflow.ErrorResolutionWorkflowOper
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
@@ -95,6 +93,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class WorkflowServiceImplTest {
@@ -182,7 +181,8 @@ public class WorkflowServiceImplTest {
       EasyMock.expect(assetManager.selectProperties(EasyMock.anyString(), EasyMock.anyString()))
               .andReturn(Collections.emptyList())
               .anyTimes();
-      EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.some(mediapackage1)).anyTimes();
+      EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString()))
+          .andReturn(Optional.of(mediapackage1)).anyTimes();
       EasyMock.expect(assetManager.snapshotExists(EasyMock.anyString())).andReturn(true).anyTimes();
       EasyMock.replay(assetManager);
       service.setAssetManager(assetManager);
