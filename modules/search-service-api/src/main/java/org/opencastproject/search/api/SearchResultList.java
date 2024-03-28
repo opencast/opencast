@@ -20,22 +20,34 @@
  */
 
 
-package org.opencastproject.feed.api;
+package org.opencastproject.search.api;
 
-/**
- * Modules are external namespaces than can be baked into a feed. A good example of such a module is the dublin core
- * extension.
- * <p>
- * Note that this interface is heavily inspired and backed by the excellent rss/atom feed library <code>Rome</code>
- * (http://https://rome.dev.java.net).
- */
-public interface FeedExtension {
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 
-  /**
-   * Returns the URI of the module.
-   *
-   * @return URI of the module.
-   */
-  String getUri();
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class SearchResultList {
+  private final List<SearchResult> list;
+
+  private final long totalhits;
+
+  public SearchResultList(SearchHits hits) {
+    list = Arrays.stream(hits.getHits())
+        .map(SearchHit::getSourceAsMap)
+        .map(SearchResult::rehydrate)
+        .collect(Collectors.toUnmodifiableList());
+    totalhits = hits.getTotalHits().value;
+  }
+
+  public List<SearchResult> getHits() {
+    return list;
+  }
+
+  public long getTotalHits() {
+    return totalhits;
+  }
 
 }

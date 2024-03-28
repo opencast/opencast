@@ -32,12 +32,11 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.search.api.SearchException;
-import org.opencastproject.search.api.SearchQuery;
-import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -131,15 +130,12 @@ public class TagEngageWorkflowOperationHandler extends AbstractWorkflowOperation
     }
 
     // get published mp
-    SearchResult result = searchService.getByQuery(new SearchQuery().withId(mediaPackageId));
-    if (result.size() == 0) {
-      throw new WorkflowOperationException(
-              "Media package " + mediaPackageId + " can't be updated in Search because it " + "isn't published.");
-    } else if (result.size() > 1) {
-      throw new WorkflowOperationException("Media package " + mediaPackageId + " can't be updated in Search because "
-              + "more than one media package with that id was found.");
+    MediaPackage mediaPackageForSearch = null;
+    try {
+      mediaPackageForSearch = searchService.get(mediaPackageId);
+    } catch (NotFoundException | UnauthorizedException e) {
+      throw new WorkflowOperationException(e);
     }
-    MediaPackage mediaPackageForSearch = result.getItems()[0].getMediaPackage();
 
     // update tags & flavors in published mp
     Collection<MediaPackageElement> searchElements = mpeSelector.select(mediaPackageForSearch, false);

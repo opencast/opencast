@@ -23,9 +23,12 @@ package org.opencastproject.search.impl.persistence;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Collection;
 import java.util.Date;
@@ -40,11 +43,16 @@ public interface SearchServiceDatabase {
   /**
    * Returns all search entries in persistent storage.
    *
-   * @return {@link Tuple} array representing stored media packages
+   * @param pagesize
+   *          the number of results to get from the database at once
+   * @param offset
+   *          the offset into the full result list to fetch
+   * @return {@link Tuple} array of mediapackage-orgid pairs representing stored media packages
    * @throws SearchServiceDatabaseException
    *           if exception occurs
    */
-  Stream<Tuple<MediaPackage, String>> getAllMediaPackages() throws SearchServiceDatabaseException;
+  Stream<Tuple<MediaPackage, String>> getAllMediaPackages(int pagesize, int offset)
+          throws SearchServiceDatabaseException;
 
   /**
    * Returns the organization id of the selected media package
@@ -79,18 +87,17 @@ public interface SearchServiceDatabase {
    * @throws SearchServiceDatabaseException
    *           if there is a problem communicating with the underlying data store
    */
-  MediaPackage getMediaPackage(String mediaPackageId) throws NotFoundException, SearchServiceDatabaseException;
+  MediaPackage getMediaPackage(String mediaPackageId)
+          throws NotFoundException, SearchServiceDatabaseException, UnauthorizedException;
 
   /**
    * Gets media packages from a specific series
    *
-   * @param seriesId
-   *          the series identifier
+   * @param seriesId the series identifier
    * @return collection of media packages
-   * @throws SearchServiceDatabaseException
-   *           if there is a problem communicating with the underlying data store
+   * @throws SearchServiceDatabaseException if there is a problem communicating with the underlying data store
    */
-  Collection<MediaPackage> getMediaPackages(String seriesId) throws SearchServiceDatabaseException;
+  Collection<Pair<Organization, MediaPackage>> getSeries(String seriesId) throws SearchServiceDatabaseException;
 
   /**
    * Retrieves ACL for episode with given ID.

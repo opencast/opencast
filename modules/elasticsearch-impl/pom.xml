@@ -14,8 +14,6 @@
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <lucene.version>8.7.0</lucene.version>
-    <elasticsearch.version>7.10.2</elasticsearch.version>
   </properties>
   <dependencies>
     <dependency>
@@ -174,6 +172,7 @@
               !com.fasterxml.jackson.dataformat.smile,
               !com.fasterxml.jackson.dataformat.xml.*,
               !com.fasterxml.jackson.dataformat.yaml.*,
+              !com.google.common.*,
               !com.lmax.disruptor.*,
               !com.sun.jna.*,
               !com.sun.management*,
@@ -193,12 +192,14 @@
               !org.jctools.queues.*,
               !org.locationtech.jts.geom.*,
               !org.locationtech.spatial4j.*,
+              !org.tartarus.*,
               !org.zeromq.*,
               !com.github.mustachejava.*,
               *
             </Import-Package>
             <Export-Package>
               org.apache.logging.log4j*,
+              org.apache.lucene.*,
               org.opencastproject.elasticsearch.impl;version=${project.version}
             </Export-Package>
             <Embed-Dependency>

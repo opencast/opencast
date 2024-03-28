@@ -28,17 +28,15 @@ import org.opencastproject.adopter.statistic.dto.Host;
 import org.opencastproject.adopter.statistic.dto.StatisticData;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
-import org.opencastproject.search.api.SearchQuery;
+import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.search.api.SearchResult;
-import org.opencastproject.search.api.SearchResultItem;
+import org.opencastproject.search.api.SearchResultList;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.security.util.SecurityUtil;
@@ -48,6 +46,8 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
 import org.opencastproject.userdirectory.JpaUserReferenceProvider;
 
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 import org.osgi.service.component.annotations.Activate;
@@ -58,7 +58,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
@@ -292,14 +291,6 @@ public class ScheduledDataCollector extends TimerTask {
     statisticData.setJobCount(serviceRegistry.count(null, null));
 
     statisticData.setSeriesCount(seriesService.getSeriesCount());
-    SearchQuery sq = new SearchQuery();
-    sq.withId("");
-    sq.withElementTags(new String[0]);
-    sq.withElementFlavors(new MediaPackageElementFlavor[0]);
-    sq.signURLs(false);
-    sq.includeEpisodes(true);
-    sq.includeSeries(false);
-    sq.withLimit(SEARCH_ITERATION_SIZE);
 
     List<Organization> orgs = organizationDirectoryService.getOrganizations();
     statisticData.setTenantCount(orgs.size());
@@ -313,28 +304,18 @@ public class ScheduledDataCollector extends TimerTask {
         int orgCAs = caStateService.getKnownAgents().size();
         statisticData.setCACount(current + orgCAs);
 
-        //Calculate the total number of minutes for this org, add it to the total
-        current = statisticData.getTotalMinutes();
-        long orgDuration = 0L;
-        long total = 0;
-        int offset = 0;
-        try {
-          do {
-            sq.withOffset(offset);
-            SearchResult sr = searchService.getForAdministrativeRead(sq);
-            offset += SEARCH_ITERATION_SIZE;
-            total = sr.getTotalSize();
-            orgDuration = Arrays.stream(sr.getItems())
-                                       .map(SearchResultItem::getMediaPackage)
-                                       .map(MediaPackage::getDuration)
-                                       .mapToLong(Long::valueOf)
-                                       .sum() / 1000L;
-          } while (offset + SEARCH_ITERATION_SIZE <= total);
-        } catch (UnauthorizedException e) {
-          //This should never happen, but...
-          logger.warn("Unable to calculate total minutes, unauthorized");
-        }
-        statisticData.setTotalMinutes(current + orgDuration);
+        final SearchSourceBuilder q = new SearchSourceBuilder().query(
+                QueryBuilders.boolQuery()
+                    .must(QueryBuilders.termQuery(SearchResult.TYPE, SearchService.IndexEntryType.Episode))
+                    .must(QueryBuilders.termQuery(SearchResult.ORG, org.getId()))
+                    .mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE)));
+        final SearchResultList results = searchService.search(q);
+        long orgMilis = results.getHits().stream().map(
+                result -> EncodingSchemeUtils.decodeDuration(
+                    result.getDublinCore().getFirst(DublinCore.PROPERTY_EXTENT)))
+            .filter(Objects::nonNull)
+            .reduce(Long::sum).orElse(0L);
+        statisticData.setTotalMinutes(statisticData.getTotalMinutes() + (orgMilis / 1000 / 60));
 
         //Add the users for each org
         long currentUsers = statisticData.getUserCount();

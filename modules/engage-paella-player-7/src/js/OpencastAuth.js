@@ -44,7 +44,7 @@ export default class OpencastAuth {
       const response = await fetch(getUrlFromOpencastServer(`/search/episode.json?id=${this.player.videoId}`));
       if (response.ok) {
         const episode = await response.json();
-        return episode['search-results']?.result?.acl;
+        return episode['result'][0]?.acl;
       }
       return null;
     }

@@ -65,7 +65,7 @@ public class IndexRebuildService implements BundleActivator {
    * Attention: The order is relevant for the index rebuild and should not be changed!
    */
   public enum Service {
-    Themes, Series, Scheduler, AssetManager, Comments, Workflow
+    Themes, Series, Scheduler, AssetManager, Comments, Workflow, Search
   }
 
   public enum State {

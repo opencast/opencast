@@ -48,7 +48,7 @@ function($, bootbox, _, alertify, jsyaml) {
   var bufferEntries = 18; // number of entries to load for one page.
   var restData = '';
   var active = 'episodes';
-  var tabIndexNumber = 100;
+  var tabNr = 100;
   var seriesRgbMax = new Array(220, 220, 220); //color range.
   var seriesRgbOffset = new Array(20, 20, 20); //darkest possible color
   var sortMap = {};
@@ -568,14 +568,14 @@ function($, bootbox, _, alertify, jsyaml) {
         if (cleanGrid) {
           $($main_container).empty();
           window.scrollTo(0, 0);
-          tabIndexNumber = 100;
+          tabNr = 100;
         }
 
-        if (data && data['search-results'] && data['search-results']['total']) {
+        if (data && data['result'] && data['total']) {
           // number of total search results
-          totalEntries = data['search-results']['total'];
+          totalEntries = data['total'];
 
-          var result = (data['search-results'] || {})['result'];
+          var result = (data || {})['result'];
           var total = Array.isArray(result) ? result.length : 1;
 
           if (total === undefined) {
@@ -601,7 +601,7 @@ function($, bootbox, _, alertify, jsyaml) {
           }
 
           if (total == 1) {
-            buildGrid(result);
+            buildGrid(result[0]);
             return;
           }
           $.each(result, function(index, val) {
@@ -616,11 +616,13 @@ function($, bootbox, _, alertify, jsyaml) {
 
   function buildGrid(data) {
     if (data) {
-      var serID = data['id'];
+      var epId = 0;
 
-      if (data['id'] == undefined) {
+      if (data.mediapackage == undefined || data.mediapackage['id'] == undefined) {
         log('Error: Episode with no ID.');
-        serID = '0';
+        epId = '0';
+      } else {
+        epId = data.mediapackage['id'];
       }
 
       var seriesClass = '';
@@ -629,10 +631,10 @@ function($, bootbox, _, alertify, jsyaml) {
       }
 
       var tile = mediaContainer +
-                    '<a class="tile" id="' + serID + '" role="menuitem" tabindex="' + tabIndexNumber++ + '">' +
+                    '<a class="tile" id="' + epId + '" role="menuitem" tabindex="' + tabNr++ + '">' +
                     '<div class="' + seriesClass + 'seriesindicator"></div> ' +
                     '<div class="tilecontent">' +
-                    '<h4 class="title">' + _.escape(data.dcTitle) + '</h4>';
+                    '<h4 class="title">' + _.escape(data.dc.title) + '</h4>';
 
       // append thumbnail
       var thumb = '';
@@ -677,8 +679,8 @@ function($, bootbox, _, alertify, jsyaml) {
         }
         tile = tile + '<div class="seriestitle">' + seriestitle + '</div>';
 
-        if (data.dcCreated) {
-          date = new Date(data.dcCreated);
+        if (data.dc.created) {
+          date = new Date(data.dc.created);
         }
         tile = tile + '<div class="date">' + date.toLocaleDateString() + '</div>';
 
@@ -720,9 +722,9 @@ function($, bootbox, _, alertify, jsyaml) {
         $($main_container).append(tile);
 
         if (canLaunch) {
-          $('#' + _.escape(data['id'])).attr('href', _.escape(playerEndpoint + data['id']));
+          $('#' + _.escape(data.mediapackage['id'])).attr('href', _.escape(playerEndpoint + data.mediapackage['id']));
 
-          $('#' + _.escape(data['id'])).on('keypress', function(ev) {
+          $('#' + _.escape(data.mediapackage['id'])).on('keypress', function(ev) {
             if (ev.which == 13 || ev.which == 32) {
               $(location).attr('href', _.escape(playerEndpoint + data['id']));
             }
@@ -747,37 +749,37 @@ function($, bootbox, _, alertify, jsyaml) {
 
   function createSeriesGrid(data) {
     log('build series grid');
-    if (data && data.id) {
-      var seriesClass = 'series' + _.escape(data.id) + ' ';
-      var color = generateSeriesColor(data.id);
+    if (data && data.dc.identifier) {
+      var seriesClass = 'series' + _.escape(data.dc.identifier) + ' ';
+      var color = generateSeriesColor(_.escape(data.dc.identifier));
 
       var creator = '<br>';
       var contributor = '<br>';
 
       var tile = mediaContainer +
-                  '<a class=tile id="' + _.escape(data.id) + '" role=menuitem tabindex="' + tabIndexNumber++ + '"> ' +
+                  '<a class=tile id="' + _.escape(data.dc.identifier) + '" role=menuitem tabindex="' + tabNr++ + '"> ' +
                   '<div class="' + seriesClass + 'seriesindicator"></div>' +
                   '<div class="tilecontent">' +
-                  '<h4 class="title">' + (data.dcTitle ? _.escape(data.dcTitle) : 'Unknown title') + '</h4>';
+                  '<h4 class="title">' + (data.dc.title ? _.escape(data.dc.title) : 'Unknown title') + '</h4>';
 
-      if (data.dcCreator) {
-        creator = _.escape(data.dcCreator);
+      if (data.dc.creator) {
+        creator = _.escape(data.dc.creator);
       }
       tile = tile + '<div class="creator">' + creator + '</div>';
 
-      if (data.dcContributor) {
-        contributor = _.escape(data.dcContributor);
+      if (data.dc.contributor) {
+        contributor = _.escape(data.dc.contributor);
       }
       tile += '<div class="contributor">' + contributor + '</div>' +
               '</div></a></div>';
 
       $($main_container).append(tile);
-      $('#' + _.escape(data.id)).attr('href', '?e=1&p=1&epFrom=' + _.escape(data.id));
+      $('#' + _.escape(data.dc.identifier)).attr('href', '?e=1&p=1&epFrom=' + _.escape(data.dc.identifier));
 
-      $('#' + _.escape(data.id)).on('keypress', function(ev) {
+      $('#' + _.escape(data.dc.identifier)).on('keypress', function(ev) {
         log('keypress');
         if (ev.which == 13 || ev.which == 32) {
-          restData = 'sid=' + data.id;
+          restData = 'sid=' + data.dc.identifier;
           page = 1;
           active = 'episodes';
           $($navbarEpisodes).addClass('active');
@@ -805,16 +807,16 @@ function($, bootbox, _, alertify, jsyaml) {
       url: requestUrl,
       dataType: 'json',
       success: function(data2) {
-        if (data2 && data2['search-results'] && data2['search-results']['total']) {
+        if (data2 && data2['result'] && data2['total']) {
           if (cleanGrid) {
             $($main_container).empty();
             window.scrollTo(0, 0);
-            tabIndexNumber = 100;
+            tabNr = 100;
           }
 
-          totalEntries = data2['search-results']['total'];
+          totalEntries = data2['total'];
 
-          var result = (data2['search-results'] || {})['result'];
+          var result = (data2 || {})['result'];
           var total = Array.isArray(result) ? result.length : 1;
 
           if (total == 0) {
@@ -834,7 +836,7 @@ function($, bootbox, _, alertify, jsyaml) {
           }
 
           if (total == 1) {
-            createSeriesGrid(result);
+            createSeriesGrid(result[0]);
             return;
           }
 

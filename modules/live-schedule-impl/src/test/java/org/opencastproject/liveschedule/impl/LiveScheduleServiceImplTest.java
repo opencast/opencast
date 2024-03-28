@@ -50,8 +50,6 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
-import org.opencastproject.search.api.SearchResult;
-import org.opencastproject.search.api.SearchResultImpl;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
@@ -70,6 +68,7 @@ import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -468,9 +467,9 @@ public class LiveScheduleServiceImplTest {
 
   @Test
   public void testGetMediaPackageFromSearch() throws Exception {
-    URI searchResultURI = LiveScheduleServiceImplTest.class.getResource("/search-result.xml").toURI();
-    SearchResult searchResult = SearchResultImpl.valueOf(searchResultURI.toURL().openStream());
-    EasyMock.expect(searchService.getForAdministrativeRead(EasyMock.anyObject())).andReturn(searchResult);
+    var id = new IdImpl(MP_ID);
+    var mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew(id);
+    EasyMock.expect(searchService.get(EasyMock.anyString())).andReturn(mediaPackage).anyTimes();
     replayServices();
 
     MediaPackage mp = service.getMediaPackageFromSearch(MP_ID);
@@ -480,9 +479,7 @@ public class LiveScheduleServiceImplTest {
 
   @Test
   public void testGetMediaPackageFromSearchNotFound() throws Exception {
-    URI searchResultURI = LiveScheduleServiceImplTest.class.getResource("/search-result-empty.xml").toURI();
-    SearchResult searchResult = SearchResultImpl.valueOf(searchResultURI.toURL().openStream());
-    EasyMock.expect(searchService.getForAdministrativeRead(EasyMock.anyObject())).andReturn(searchResult);
+    EasyMock.expect(searchService.get(EasyMock.anyString())).andThrow(new NotFoundException("")).anyTimes();
     replayServices();
 
     MediaPackage mp = service.getMediaPackageFromSearch(MP_ID);
@@ -738,9 +735,7 @@ public class LiveScheduleServiceImplTest {
 
   @Test
   public void testCreateOuUpdateLiveEventAlreadyPast() throws Exception {
-    URI searchResultURI = LiveScheduleServiceImplTest.class.getResource("/search-result-empty.xml").toURI();
-    SearchResult searchResult = SearchResultImpl.valueOf(searchResultURI.toURL().openStream());
-    EasyMock.expect(searchService.getForAdministrativeRead(EasyMock.anyObject())).andReturn(searchResult);
+    EasyMock.expect(searchService.get(EasyMock.anyString())).andThrow(new NotFoundException("")).anyTimes();
     replayServices();
 
     Assert.assertFalse(service.createOrUpdateLiveEvent(MP_ID, episodeDC));
@@ -749,9 +744,7 @@ public class LiveScheduleServiceImplTest {
   @Test
   public void testCreateOuUpdateLiveEventAlreadyPublished() throws Exception {
 
-    URI searchResultURI = LiveScheduleServiceImplTest.class.getResource("/no-live-search-result.xml").toURI();
-    SearchResult searchResult = SearchResultImpl.valueOf(searchResultURI.toURL().openStream());
-    EasyMock.expect(searchService.getForAdministrativeRead(EasyMock.anyObject())).andReturn(searchResult);
+    EasyMock.expect(searchService.get(EasyMock.anyString())).andThrow(new NotFoundException("")).anyTimes();
     replayServices();
 
     Assert.assertFalse(service.createOrUpdateLiveEvent(MP_ID, episodeDC));

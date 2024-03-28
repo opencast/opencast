@@ -24,7 +24,6 @@
       "org.opencastproject.adminui.endpoint.tools":"org.opencastproject.adminui.endpoint.tools",
       "org.opencastproject.series":"org.opencastproject.series",
       "org.opencastproject.message.broker.endpoint":"org.opencastproject.message.broker.endpoint",
-      "org.opencastproject.feed.impl.FeedServiceImpl":"org.opencastproject.feed.impl.FeedServiceImpl",
       "org.opencastproject.adminui.endpoint.GroupsEndpoint":"org.opencastproject.adminui.endpoint.GroupsEndpoint",
       "org.opencastproject.external.groups":"org.opencastproject.external.groups",
       "org.opencastproject.userdirectory.roles":"org.opencastproject.userdirectory.roles",

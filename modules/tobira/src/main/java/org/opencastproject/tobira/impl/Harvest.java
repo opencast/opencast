@@ -21,7 +21,8 @@
 
 package org.opencastproject.tobira.impl;
 
-import org.opencastproject.search.api.SearchQuery;
+import org.opencastproject.search.api.SearchResult;
+import org.opencastproject.search.api.SearchResultList;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -30,13 +31,16 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -79,14 +83,16 @@ final class Harvest {
     //
     // We actually fetch `preferredAmount + 1` to get some useful extra information: whether there
     // are more events and if so, what timestamp that extra event was modified at.
-    final var q = new SearchQuery()
-        .withUpdatedSince(since)
-        .withSort(SearchQuery.Sort.DATE_MODIFIED)
-        .includeDeleted(true)
-        .withLimit(preferredAmount + 1);
-    final var rawEvents = searchService.getForAdministrativeRead(q).getItems();
-    final var hasMoreEvents = rawEvents.length == preferredAmount + 1;
-    logger.debug("Retrieved {} events from the index during harvest", rawEvents.length);
+    final SearchSourceBuilder q = new SearchSourceBuilder().query(
+        QueryBuilders.boolQuery()
+            .must(QueryBuilders.rangeQuery(SearchResult.MODIFIED_DATE).gte(since.getTime()))
+            .must(QueryBuilders.termQuery(SearchResult.TYPE, SearchService.IndexEntryType.Episode)))
+        .sort(SearchResult.MODIFIED_DATE, SortOrder.ASC)
+        .size(preferredAmount + 1);
+    final SearchResultList results = searchService.search(q);
+    final var hasMoreEvents = results.getTotalHits() == preferredAmount + 1;
+
+    logger.debug("Retrieved {} events from the index during harvest", results.getHits().size());
 
 
     // Retrieve series from DB.
@@ -103,7 +109,7 @@ final class Harvest {
     // in the given time range, which allows us to figure out `hasMore` and `includesItemsUntil`
     // more precisely.
     final Optional<Date> seriesRangeEnd = hasMoreEvents
-        ? Optional.of(rawEvents[rawEvents.length - 1].getModified())
+        ? Optional.of(results.getHits().get(results.getHits().size() - 1).getModifiedDate())
         : Optional.empty();
     final var rawSeries = seriesService.getAllForAdministrativeRead(
         since,
@@ -116,7 +122,7 @@ final class Harvest {
 
     // Convert events and series into JSON representation. We limit both to `preferredAmount` here
     // again, because we fetched `preferredAmount + 1` above.
-    final var eventItems = Arrays.stream(rawEvents)
+    final var eventItems = results.getHits().stream()
         .limit(preferredAmount)
         .filter(event -> {
           // Here, we potentially filter out some events. Compare to above: when loading series
@@ -135,18 +141,18 @@ final class Harvest {
           }
 
           final var lastSeriesModifiedDate = rawSeries.get(rawSeries.size() - 1).getModifiedDate();
-          return !event.getModified().after(lastSeriesModifiedDate);
+          return !event.getModifiedDate().after(lastSeriesModifiedDate);
         })
         .map(event -> {
           try {
             return new Item(event, authorizationService, workspace);
           } catch (Exception e) {
-            var id = event == null ? null : event.getId();
+            var id = event.getId();
             logger.error("Error reading event '{}' (skipping...)", id, e);
             return null;
           }
         })
-        .filter(item -> item != null);
+        .filter(Objects::nonNull);
 
     final var seriesItems = rawSeries.stream()
         .limit(preferredAmount)
@@ -187,7 +193,7 @@ final class Harvest {
       // There are more events, but no additional series in the range from `since` to the modified
       // date of the last raw event. So we know there are no other events or series before the
       // last raw events.
-      includesItemsUntilRaw = rawEvents[rawEvents.length - 1].getModified();
+      includesItemsUntilRaw = results.getHits().get(results.getHits().size() - 1).getModifiedDate();
     } else {
       // There are more events and more series in the given range. In theory, this would be
       // `Math.min()` of the last raw event and last raw series. However, since `hasMoreEvents`
