@@ -246,6 +246,23 @@ public class AbstractSearchQuery implements SearchQuery {
     return this;
   }
 
+  /**
+   * Sort the result set by the sort multi field and the given order. The insertion-order is kept.
+   *
+   * @param field
+   *          the field name, must not be {@code null}
+   * @param order
+   *          the order direction, must not be {@code null}
+   * @return the updated search query
+   */
+  public SearchQuery withNormalizerSortOrder(String field, Order order) {
+    sortOrders.put(
+        requireNonNull(field).concat(IndexSchema.NORMALIZER_SORT_FIELD_NAME_EXTENSION),
+        requireNonNull(order)
+    );
+    return this;
+  }
+
   @Override
   public Map<String, Order> getSortOrders() {
     return Collections.unmodifiableMap(sortOrders);
