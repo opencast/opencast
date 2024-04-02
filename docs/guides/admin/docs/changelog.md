@@ -4,6 +4,33 @@ Changelog
 Opencast 15
 -----------
 
+### Opencast 15.3
+
+- [[#5669](https://github.com/opencast/opencast/pull/5669)] -
+  Update temporal if empty
+- [[#5663](https://github.com/opencast/opencast/pull/5663)] -
+  `publish-engage` nitpicks
+- [[#5630](https://github.com/opencast/opencast/pull/5630)] -
+  Add jersey to engage-ui build
+- [[#5618](https://github.com/opencast/opencast/pull/5618)] -
+  Update chromedriver
+- [[#5611](https://github.com/opencast/opencast/pull/5611)] -
+  Update maven bundle configuration
+- [[#5596](https://github.com/opencast/opencast/pull/5596)] -
+  Update build plugins
+- [[#5588](https://github.com/opencast/opencast/pull/5588)] -
+  Update typescript type definitions in ltitools
+- [[#5586](https://github.com/opencast/opencast/pull/5586)] -
+  Update axios from 0 to 1 in ltitools
+- [[#5543](https://github.com/opencast/opencast/pull/5543)] -
+  Use edited thumbnails in partial-publish.xml
+- [[#5487](https://github.com/opencast/opencast/pull/5487)] -
+  Add maven wrapper
+- [[#5339](https://github.com/opencast/opencast/pull/5339)] -
+  #5663 Paella7 patches frameList undefined exception
+- [[#4973](https://github.com/opencast/opencast/pull/4973)] -
+  Add WhisperC++ engine to speech-to-text-impl
+
 ### Opencast 15.2
 
 - [[#5556](https://github.com/opencast/opencast/pull/5556)] -

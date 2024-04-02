@@ -104,9 +104,9 @@ public final class SeriesItem implements MessageItem, Serializable {
    *          The update type.
    * @param seriesId
    *          The series ID to update. If you provide both, the seriesId and the series DublinCore catalog,
-   *          the seriesId must match the value of {@link DublinCore.PROPERTY_IDENTIFIER}.
+   *          the seriesId must match the value of {@link DublinCore#PROPERTY_IDENTIFIER}.
    * @param series
-   *          The series DublinCore catalog to update. The value of {@link DublinCore.PROPERTY_IDENTIFIER} must match
+   *          The series DublinCore catalog to update. The value of {@link DublinCore#PROPERTY_IDENTIFIER} must match
    *          the value of seriesId if you provide both.
    * @param acl
    *          The series ACL to update. Note: the series ID must be also provided.
@@ -121,7 +121,7 @@ public final class SeriesItem implements MessageItem, Serializable {
    *
    * @throws IllegalStateException
    *          If the series ID and the series are not provided or the series ID and the value of
-   *          {@link DublinCore.PROPERTY_IDENTIFIER} in the series catalog does not match.
+   *          {@link DublinCore#PROPERTY_IDENTIFIER} in the series catalog does not match.
    */
   private SeriesItem(Type type, String seriesId, DublinCoreCatalog series, String acl, String propertyName,
           String propertyValue, String elementType, String element, Boolean overrideEpisodeAcl) {
