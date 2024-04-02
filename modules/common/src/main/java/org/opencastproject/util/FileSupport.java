@@ -248,6 +248,7 @@ public final class FileSupport {
 
       try {
         createLink(targetPath, sourcePath);
+        targetPath.toFile().length(); // this forces a stat call which is a quickfix for a bug in ceph (https://www.mail-archive.com/ceph-users@lists.ceph.com/msg53368.html)
       } catch (UnsupportedOperationException e) {
         logger.debug("Copy file because creating hard-links is not supported by the current file system: {}",
                 ExceptionUtils.getMessage(e));
@@ -290,6 +291,7 @@ public final class FileSupport {
     try {
       deleteIfExists(targetPath);
       createLink(targetPath, sourcePath);
+      targetPath.toFile().length(); // this forces a stat call which is a quickfix for a bug in ceph (https://www.mail-archive.com/ceph-users@lists.ceph.com/msg53368.html)
     } catch (Exception e) {
       logger.debug("Unable to create a link from {} to {}: {}", sourcePath, targetPath, e);
       return false;
