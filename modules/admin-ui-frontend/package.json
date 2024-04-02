@@ -33,7 +33,7 @@
     "grunt-usemin": "^3.1.1",
     "grunt-wiredep": "^3.0.1",
     "html-linter": "^1.1.1",
-    "html-validate": "^8.11.1",
+    "html-validate": "^8.18.1",
     "jasmine-core": "^5.1.2",
     "jit-grunt": "^0.10.0",
     "jshint-stylish": "^2.2.1",
