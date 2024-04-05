@@ -9,7 +9,7 @@ Initial Release Notes Document for Opencast 16
 
 | Date              | Phase                    |
 |-------------------|--------------------------|
-| Mai 06, 2024 	    | Release Branch Cut       |
+| Mai 06, 2024      | Release Branch Cut       |
 | June 12, 2024     | Release of Opencast 16.0 |
 
 
