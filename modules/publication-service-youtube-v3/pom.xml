@@ -15,7 +15,7 @@
     <checkstyle.skip>false</checkstyle.skip>
     <project.youtube.version>v3-rev183-1.22.0</project.youtube.version>
     <project.http.version>1.22.0</project.http.version>
-    <project.oauth.version>1.22.0</project.oauth.version>
+    <project.oauth.version>1.33.3</project.oauth.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencies>
