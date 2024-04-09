@@ -111,6 +111,20 @@
       </configurations>
     </operation>
 
+    <!-- Generate captions -->
+
+    <operation
+      id="speechtotext"
+      description="Generates subtitles for video and audio files, derive language-code from metadata"
+      fail-on-error="false">
+      <configurations>
+        <configuration key="source-flavor">*/source</configuration>
+        <configuration key="target-flavor">captions/vtt+#{lang}</configuration>
+        <configuration key="target-element">attachment</configuration>
+        <configuration key="target-tags">archive,subtitle,engage-download</configuration>
+      </configurations>
+    </operation>
+
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Tag for review and cutting                                        -->
     <!--                                                                   -->
