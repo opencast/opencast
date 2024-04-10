@@ -570,7 +570,11 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
                 editedTrack.getIdentifier(), FilenameUtils.getName(editedTrack.getURI().toString()));
         editedTrack.setURI(editedTrackNewUri);
         for (Track track : sourceTracks) {
-          if (track.getIdentifier().equals(editedTrack.getReference().getIdentifier())) {
+          var reference = editedTrack.getReference();
+          if (reference == null) {
+            logger.warn("Edited track {} has no reference track assigned; skip restoring tags.",
+                editedTrack.getIdentifier());
+          } else if (track.getIdentifier().equals(reference.getIdentifier())) {
             editedTrack.setTags(track.getTags());
             mp.addDerived(editedTrack, track);
             mpAdded = true;

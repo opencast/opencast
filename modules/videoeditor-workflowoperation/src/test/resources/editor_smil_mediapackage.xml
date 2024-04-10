@@ -6,7 +6,7 @@
   <ns3:title>editor test</ns3:title>
   <ns3:license>Creative Commons 3.0: Attribution-NonCommercial-NoDerivs</ns3:license>
   <ns3:media>
-    <ns3:track ref="track:d3d6736c-e6d5-11ee-bdf1-18c04d393d83" type="presenter/work" id="66177125-bf92-46bd-b404-e5eb11790faa">
+    <ns3:track type="presenter/work" id="66177125-bf92-46bd-b404-e5eb11790faa">
       <ns3:mimetype>video/mp4</ns3:mimetype>
       <ns3:tags/>
       <ns3:url>http://localhost:8080/files/mediapackage/eb18ea5d-d948-4c18-9566-1cf929563493/905f86b4-a0eb-47db-b54f-9f0e5f12b14b/mh720p.mp4</ns3:url>
