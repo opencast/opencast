@@ -467,12 +467,7 @@ public class PlaylistRestService {
   )
           throws UnauthorizedException {
     try {
-      // Map JSON to JPA
-      Playlist playlist = parseJsonToPlaylist(playlistText);
-      playlist.setId(id);
-
-      // Persist
-      playlist = service.update(playlist);
+      Playlist playlist = service.updateWithJson(id, playlistText);
       return Response.ok().entity(new JaxbPlaylist(playlist)).build();
     } catch (Exception e) {
       return Response.serverError().build();

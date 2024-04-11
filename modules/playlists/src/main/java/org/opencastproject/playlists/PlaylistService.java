@@ -42,6 +42,10 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.requests.SortCriterion;
 
 import com.entwinemedia.fn.data.Opt;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -231,6 +235,34 @@ public class PlaylistService {
       return playlist;
     } catch (PlaylistDatabaseException e) {
       throw new IllegalStateException("Could not update playlist from database with id ");
+    }
+  }
+
+  /**
+   * Overwrite an existing playlist with a playlist in JSON format.
+   * Only fields present in the JSON will be overwritten! Conversely, if a field is not present in the JSON,
+   * the field in the existing playlist will not change.
+   * @param id Identifier of the playlist to update.
+   * @param json JSON containing data to update the playlist with.
+   * @return The updated {@link Playlist}
+   */
+  public Playlist updateWithJson(String id, String json) throws JsonProcessingException, UnauthorizedException {
+    try {
+      Playlist existingPlaylist = persistence.getPlaylist(id);
+      if (!checkPermission(existingPlaylist, Permissions.Action.WRITE)) {
+        throw new UnauthorizedException("User does not have write permissions");
+      }
+
+      JaxbAnnotationModule module = new JaxbAnnotationModule();
+      ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.registerModule(module);
+
+      ObjectReader updater = objectMapper.readerForUpdating(new JaxbPlaylist(existingPlaylist));
+      JaxbPlaylist merged = updater.readValue(json);
+
+      return update(merged.toPlaylist());
+    } catch (NotFoundException | PlaylistDatabaseException e) {
+      throw new IllegalStateException("Could not get playlist from database with id " + id);
     }
   }
 

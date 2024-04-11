@@ -291,16 +291,11 @@ public class PlaylistsEndpoint {
       @PathParam("id") String id,
       @FormParam("playlist") String playlistText) {
     try {
-      // Map JSON to JPA
-      Playlist playlist = restService.parseJsonToPlaylist(playlistText);
-      playlist.setId(id);
-
-      // Persist
-      playlist = service.update(playlist);
+      Playlist playlist = service.updateWithJson(id, playlistText);
       return ApiResponses.Json.ok(acceptHeader, playlistToJson(playlist));
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
-    } catch (ParseException | IOException | IllegalArgumentException e) {
+    } catch (IOException | IllegalArgumentException e) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
   }
