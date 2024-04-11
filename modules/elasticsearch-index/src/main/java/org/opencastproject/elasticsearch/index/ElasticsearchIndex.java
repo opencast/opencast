@@ -897,13 +897,13 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     return sb.toString();
   }
 
-  private Event updateEventAclWithCustomRoles(Event event) {
+  private Event updateEventAclWithCustomRoles(Event event) throws SearchIndexException {
     AccessControlList acl = new AccessControlList();
 
     try {
       acl = AccessControlParser.parseAcl(event.getAccessPolicy());
     } catch (Exception e) {
-      logger.error("Unable to parse access policy", e);
+      throw new SearchIndexException("Unable to parse access policy", e);
     }
 
     // Add custom roles to the ACL
