@@ -43,6 +43,7 @@ import org.opencastproject.util.requests.SortCriterion;
 
 import com.entwinemedia.fn.data.Opt;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
@@ -256,6 +257,7 @@ public class PlaylistService {
       JaxbAnnotationModule module = new JaxbAnnotationModule();
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.registerModule(module);
+      objectMapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
 
       ObjectReader updater = objectMapper.readerForUpdating(new JaxbPlaylist(existingPlaylist));
       JaxbPlaylist merged = updater.readValue(json);

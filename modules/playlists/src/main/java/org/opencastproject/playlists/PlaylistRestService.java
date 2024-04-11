@@ -45,7 +45,10 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 import org.apache.commons.io.IOUtils;
@@ -138,8 +141,8 @@ public class PlaylistRestService {
 
   public static final String SAMPLE_PLAYLIST_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><"
       + "ns3:playlist xmlns:ns2=\"http://mediapackage.opencastproject.org\" "
-      + "xmlns:ns3=\"http://playlist.opencastproject.org\" id=\"1059\"><organization>mh_default_org</organization>"
-      + "<entries id=\"1061\"><contentId>ID-av-portal</contentId><type>EVENT</type></entries><entries id=\"1062\">"
+      + "xmlns:ns3=\"http://playlist.opencastproject.org\"><organization>mh_default_org</organization>"
+      + "<entries><contentId>ID-av-portal</contentId><type>EVENT</type></entries><entries>"
       + "<contentId>ID-av-print</contentId><type>EVENT</type></entries><title>Opencast Playlist</title>"
       + "<description>This is a playlist about Opencast</description><creator>Opencast</creator>"
       + "<updated>1701787700848</updated><accessControlEntries><allow>true</allow><role>ROLE_USER_BOB</role>"
@@ -502,12 +505,14 @@ public class PlaylistRestService {
   )
           throws UnauthorizedException {
     try {
-      // Map XML to JPA
-      Playlist playlist = parseXmlToPlaylist(playlistText);
-      playlist.setId(id);
+      XmlMapper xmlMapper = new XmlMapper();
+      JsonNode node = xmlMapper.readTree(playlistText.getBytes());
 
-      // Persist
-      playlist = service.update(playlist);
+      ObjectMapper jsonMapper = new ObjectMapper();
+      jsonMapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+      String json = jsonMapper.writeValueAsString(node);
+
+      Playlist playlist = service.updateWithJson(id, json);
       return Response.ok().entity(new JaxbPlaylist(playlist)).build();
     } catch (Exception e) {
       return Response.serverError().build();
