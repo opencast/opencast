@@ -639,10 +639,8 @@ public class SolrRequester {
     if (solrIdRequest != null) {
 
       // If user has ROLE_EPISODE_<ID>_READ/WRITE, no further permission checks are necessary
-      for (var suffix: ACL_ID_SUFFIX) {
-        if (user.hasRole(ACL_ID_PREFIX_EPISODE + solrIdRequest + suffix)) {
-          applyPermissions = false;
-        }
+      if (user.hasRole(ACL_ID_PREFIX_EPISODE + solrIdRequest + action.toUpperCase())) {
+        applyPermissions = false;
       }
       String cleanSolrIdRequest = SolrUtils.clean(solrIdRequest);
       if (sb.length() > 0) {
@@ -776,18 +774,19 @@ public class SolrRequester {
 
           // Check ROLE_EPISODE_<ID>_<ACTION>
           if (roleName.startsWith(ACL_ID_PREFIX_EPISODE)) {
-            for (var suffix: ACL_ID_SUFFIX) {
-              if (roleName.endsWith(suffix)) {
-                var id = roleName.substring(ACL_ID_PREFIX_EPISODE.length(), roleName.length() - suffix.length());
-                if (!ids.contains(id)) {
-                  if (roleList.length() > 0) {
-                    roleList.append(" OR ");
-                  }
-                  roleList.append(Schema.ID).append(":").append(id);
-                  ids.add(id);
+            if (roleName.endsWith(action.toUpperCase())) {
+              var id = roleName.substring(
+                  ACL_ID_PREFIX_EPISODE.length(),
+                  roleName.length() - action.toUpperCase().length()
+              );
+              if (!ids.contains(id)) {
+                if (roleList.length() > 0) {
+                  roleList.append(" OR ");
                 }
-                break;
+                roleList.append(Schema.ID).append(":").append(id);
+                ids.add(id);
               }
+              break;
             }
           } else {
             // Check non-id user roles
