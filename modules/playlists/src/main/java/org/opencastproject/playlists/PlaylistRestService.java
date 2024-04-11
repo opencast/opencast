@@ -33,7 +33,6 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
 import org.opencastproject.playlists.serialization.JaxbPlaylist;
-import org.opencastproject.playlists.serialization.JaxbPlaylistEntry;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -46,7 +45,6 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
@@ -548,86 +546,6 @@ public class PlaylistRestService {
 
   @POST
   @Produces(MediaType.APPLICATION_JSON)
-  @Path("{id}/entries.json")
-  @RestQuery(
-      name = "updateEntries",
-      description = "Updates the entries of a playlist",
-      returnDescription = "The updated playlist.",
-      pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING),
-      },
-      restParameters = {
-          @RestParameter(
-              name = "playlistEntries",
-              isRequired = false,
-              description = "Playlist entries in JSON format",
-              type = TEXT,
-              jaxbClass = JaxbPlaylistEntry[].class,
-              defaultValue = SAMPLE_PLAYLIST_ENTRIES_JSON
-          )
-      },
-      responses = {
-          @RestResponse(responseCode = SC_OK, description = "Playlist updated."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
-      })
-  public Response updateEntriesAsJson(
-      @PathParam("id") String playlistId,
-      @FormParam("playlistEntries") String entriesText)
-          throws UnauthorizedException {
-    try {
-      // Map JSON to JPA
-      List<PlaylistEntry> playlistEntries = parseJsonToPlaylistEntries(entriesText);
-
-      // Persist
-      Playlist playlist = service.updateEntries(playlistId, playlistEntries);
-      return Response.ok().entity(new JaxbPlaylist(playlist)).build();
-    } catch (Exception e) {
-      return Response.serverError().build();
-    }
-  }
-
-  @POST
-  @Produces(MediaType.APPLICATION_XML)
-  @Path("{id}/entries.xml")
-  @RestQuery(
-      name = "updateEntries",
-      description = "Updates the entries of a playlist",
-      returnDescription = "The updated playlist.",
-      pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING),
-      },
-      restParameters = {
-          @RestParameter(
-              name = "playlistEntries",
-              isRequired = false,
-              description = "Playlist entries in XML format",
-              type = TEXT,
-              jaxbClass = JaxbPlaylistEntry[].class,
-              defaultValue = SAMPLE_PLAYLIST_ENTRIES_XML
-          )
-      },
-      responses = {
-          @RestResponse(responseCode = SC_OK, description = "Playlist updated."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action")
-      })
-  public Response updateEntriesAsXml(
-      @PathParam("id") String playlistId,
-      @FormParam("playlistEntries") String entriesText)
-          throws UnauthorizedException {
-    try {
-      // Map JSON to JPA
-      List<PlaylistEntry> playlistEntries = parseXmlToPlaylistEntries(entriesText);
-
-      // Persist
-      Playlist playlist = service.updateEntries(playlistId, playlistEntries);
-      return Response.ok().entity(new JaxbPlaylist(playlist)).build();
-    } catch (Exception e) {
-      return Response.serverError().build();
-    }
-  }
-
-  @POST
-  @Produces(MediaType.APPLICATION_JSON)
   @Path("{id}/entries/new")
   @RestQuery(
       name = "addEntry",
@@ -724,44 +642,11 @@ public class PlaylistRestService {
     return jaxbPlaylist.toPlaylist();
   }
 
-  /**
-   * More string to JAXB conversions, this time for a list of entries
-   * @param json a JSON array of playlist entries
-   * @return A list of playlist entries
-   * @throws JsonProcessingException
-   */
-  public List<PlaylistEntry> parseJsonToPlaylistEntries(String json) throws JsonProcessingException {
-    JaxbAnnotationModule module = new JaxbAnnotationModule();
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.registerModule(module);
-
-    JaxbPlaylistEntry[] jaxbPlaylistEntries = objectMapper.readValue(json, JaxbPlaylistEntry[].class);
-
-    List<PlaylistEntry> playlistEntries = new ArrayList<>();
-    for (JaxbPlaylistEntry entry : jaxbPlaylistEntries) {
-      playlistEntries.add(entry.toPlaylistEntry());
-    }
-    return playlistEntries;
-  }
-
   private Playlist parseXmlToPlaylist(String xml) throws JAXBException, IOException, SAXException {
     JAXBContext context = JAXBContext.newInstance(JaxbPlaylist.class);
     JaxbPlaylist jaxbPlaylist = context.createUnmarshaller()
         .unmarshal(XmlSafeParser.parse(IOUtils.toInputStream(xml, "UTF8")), JaxbPlaylist.class)
         .getValue();
     return jaxbPlaylist.toPlaylist();
-  }
-
-  private List<PlaylistEntry>  parseXmlToPlaylistEntries(String xml) throws JAXBException, IOException, SAXException {
-    JAXBContext context = JAXBContext.newInstance(JaxbPlaylistEntry[].class);
-    JaxbPlaylistEntry[] jaxbPlaylistEntries = context.createUnmarshaller()
-        .unmarshal(XmlSafeParser.parse(IOUtils.toInputStream(xml, "UTF8")), JaxbPlaylistEntry[].class)
-        .getValue();
-
-    List<PlaylistEntry> playlistEntries = new ArrayList<>();
-    for (JaxbPlaylistEntry entry : jaxbPlaylistEntries) {
-      playlistEntries.add(entry.toPlaylistEntry());
-    }
-    return playlistEntries;
   }
 }

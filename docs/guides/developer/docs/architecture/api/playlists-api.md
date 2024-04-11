@@ -237,35 +237,3 @@ __Response__
 `200 (OK)`: The removed playlist.
 `403 (FORBIDDEN)`: The user doesn't have the rights to make this request.  
 `404 (NOT FOUND)`: The specified playlist does not exist.
-
-
-### POST /api/playlists/{id}/entries
-
-Updates the entries of a playlist.
-
-__Response__
-
-`200 (OK)`: The updated playlist.
-`400 (BAD REQUEST)`: The request is invalid or inconsistent.  
-`403 (FORBIDDEN)`: The user doesn't have the rights to make this request.  
-`404 (NOT FOUND)`: The specified playlist does not exist.
-
-| Field             | Type                                            | Description             |
-|-------------------|-------------------------------------------------|-------------------------|
-| `playlistEntries` | [`List<PlaylistEntry>`](types.md#PlaylistEntry) | Playlist in JSON format |
-
-
-__Example__
-
-```json
-[
-    {
-        "contentId": "ID-about-opencast",
-        "type": "EVENT"
-    },
-    {
-        "contentId": "ID-3d-print",
-        "type": "EVENT"
-    }
-]
-```

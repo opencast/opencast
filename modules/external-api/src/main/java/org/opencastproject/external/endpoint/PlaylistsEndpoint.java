@@ -29,7 +29,6 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
-import static org.opencastproject.playlists.PlaylistRestService.SAMPLE_PLAYLIST_ENTRIES_JSON;
 import static org.opencastproject.playlists.PlaylistRestService.SAMPLE_PLAYLIST_JSON;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
@@ -45,7 +44,6 @@ import org.opencastproject.playlists.PlaylistEntry;
 import org.opencastproject.playlists.PlaylistRestService;
 import org.opencastproject.playlists.PlaylistService;
 import org.opencastproject.playlists.serialization.JaxbPlaylist;
-import org.opencastproject.playlists.serialization.JaxbPlaylistEntry;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.OpencastConstants;
@@ -61,7 +59,6 @@ import org.opencastproject.util.requests.SortCriterion;
 
 import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
@@ -326,46 +323,6 @@ public class PlaylistsEndpoint {
       return ApiResponses.notFound("Cannot find playlist instance with id '%s'.", id);
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
-    }
-  }
-
-  @POST
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
-  @Path("{id}/entries")
-  @RestQuery(
-      name = "updateEntries",
-      description = "Updates the entries of a playlist",
-      returnDescription = "The updated playlist.",
-      pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "Playlist identifier", type = STRING),
-      },
-      restParameters = {
-          @RestParameter(name = "playlistEntries", isRequired = false, description = "Playlist entries in JSON format",
-              type = TEXT, jaxbClass = JaxbPlaylistEntry[].class, defaultValue = SAMPLE_PLAYLIST_ENTRIES_JSON)
-      },
-      responses = {
-          @RestResponse(responseCode = SC_OK, description = "Playlist updated."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No playlist with that identifier exists."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action"),
-          @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-      })
-  public Response updateEntriesAsJson(
-      @HeaderParam("Accept") String acceptHeader,
-      @PathParam("id") String playlistId,
-      @FormParam("playlistEntries") String entriesText) {
-    try {
-      // Map JSON to JPA
-      List<PlaylistEntry> playlistEntries = restService.parseJsonToPlaylistEntries(entriesText);
-
-      // Persist
-      Playlist playlist = service.updateEntries(playlistId, playlistEntries);
-      return ApiResponses.Json.ok(acceptHeader, playlistToJson(playlist));
-    } catch (UnauthorizedException e) {
-      return Response.status(Response.Status.FORBIDDEN).build();
-    } catch (JsonProcessingException e) {
-      return Response.status(Response.Status.BAD_REQUEST).build();
-    } catch (NotFoundException e) {
-      return ApiResponses.notFound("Cannot find playlist instance with id '%s'.", playlistId);
     }
   }
 
