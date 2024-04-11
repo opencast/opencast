@@ -220,6 +220,7 @@ public class IndexRebuildService implements BundleActivator {
       setRebuildState(service, IndexRebuildService.State.OK);
     } catch (IndexRebuildException e) {
       setRebuildState(service, IndexRebuildService.State.ERROR);
+      throw e;
     }
     logger.info("Finished to rebuild the {} index from service '{}'", index.getIndexName(), service);
   }
