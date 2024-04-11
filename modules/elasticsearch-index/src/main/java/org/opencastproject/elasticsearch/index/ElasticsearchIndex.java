@@ -920,7 +920,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
       try {
         actions = listProvidersService.getList("ACL.ACTIONS", query, true);
       } catch (ListProviderException e) {
-        throw new RuntimeException("Listproviders not loaded. " + e);
+        throw new SearchIndexException("Listproviders not loaded. " + e);
       }
       for (String action : actions.keySet()) {
         customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + event.getIdentifier()
