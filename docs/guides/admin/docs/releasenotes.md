@@ -1,5 +1,32 @@
 # Opencast 15: Release Notes
 
+## Opencast 15.4
+
+### Bug Fixes
+
+- **Quickfix dangling hard links on cephfs volumes:**
+Fixes Bug for CephFS regarding strayed inodes when hard linking
+[[#5682](https://github.com/opencast/opencast/pull/5682)]
+- **Fixed NPE on filtering data:**
+Fixes NullPointerException on roles without a description when calling REST endpoint
+[[#5667](https://github.com/opencast/opencast/pull/5667)]
+- **Paella7: Avoid opening downloaded video:**
+Fixes bug where a video is opened in another window instead of beeing downloaded in the Paella7 download plugin
+[[#5673](https://github.com/opencast/opencast/pull/5673)]
+- **Mark RPMs as available:**
+Fixes an issue in the Opencast documentation, accidentally
+marking the RPMs for Opencast 15 as not yet available
+[[#5696](https://github.com/opencast/opencast/pull/5696)]
+
+### Improvements
+
+- **Remove Warnings During Build**
+[[#5678](https://github.com/opencast/opencast/pull/5678)]
+- **Fix more JavaDoc**
+[[#5677](https://github.com/opencast/opencast/pull/5677)]
+- **Make a dynamic OSGi dependency static**
+[[#5670](https://github.com/opencast/opencast/pull/5670)]
+
 ## Opencast 15.3
 
 This release comes with another small change to the community workflows, please check if it works for you.

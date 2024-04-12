@@ -4,6 +4,19 @@ Changelog
 Opencast 15
 -----------
 
+### Opencast 15.4
+
+- [[#5696](https://github.com/opencast/opencast/pull/5696)] -
+  Mark RPMs as available
+- [[#5678](https://github.com/opencast/opencast/pull/5678)] -
+  Remove Spurious Warnings During Build
+- [[#5677](https://github.com/opencast/opencast/pull/5677)] -
+  Fix more JavaDoc
+- [[#5673](https://github.com/opencast/opencast/pull/5673)] -
+  Paella7: Avoid opening downloaded video
+- [[#5670](https://github.com/opencast/opencast/pull/5670)] -
+  Make a dynamic OSGi dependency static
+
 ### Opencast 15.3
 
 - [[#5669](https://github.com/opencast/opencast/pull/5669)] -
