@@ -23,22 +23,36 @@ package org.opencastproject.graphql.type.output;
 
 import org.opencastproject.security.api.AccessControlEntry;
 
-import graphql.annotations.annotationTypes.GraphQLName;
+import java.util.Set;
 
-@GraphQLName(GqlAccessControlGenericEntry.TYPE_NAME)
-public class GqlAccessControlGenericEntry implements GqlAccessControlEntry {
 
-  public static final String TYPE_NAME = "AccessControlGenericEntry";
+public abstract class AbstractAccessControlItem {
 
-  private final AccessControlEntry accessControlEntry;
+  private final Set<AccessControlEntry> accessControlEntries;
 
-  public GqlAccessControlGenericEntry(AccessControlEntry accessControlEntry) {
-    this.accessControlEntry = accessControlEntry;
+  private final String uniqueRole;
+
+  public AbstractAccessControlItem(AccessControlEntry accessControlEntry) {
+    this(Set.of(accessControlEntry));
   }
 
-  @Override
-  public AccessControlEntry getAccessControlEntry() {
-    return accessControlEntry;
+  public AbstractAccessControlItem(Set<AccessControlEntry> accessControlEntries) {
+    String uniqueRole = accessControlEntries.iterator().next().getRole();
+    for (AccessControlEntry ace : accessControlEntries) {
+      if (!uniqueRole.equals(ace.getRole())) {
+        throw new IllegalArgumentException("All access control entries must have the same role");
+      }
+    }
+    this.uniqueRole = uniqueRole;
+    this.accessControlEntries = accessControlEntries;
+  }
+
+  public String getUniqueRole() {
+    return uniqueRole;
+  }
+
+  public Set<AccessControlEntry> getAccessControlEntries() {
+    return accessControlEntries;
   }
 
 }

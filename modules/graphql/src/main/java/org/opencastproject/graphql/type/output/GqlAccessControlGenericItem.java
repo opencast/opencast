@@ -23,22 +23,21 @@ package org.opencastproject.graphql.type.output;
 
 import org.opencastproject.security.api.AccessControlEntry;
 
+import java.util.Set;
+
 import graphql.annotations.annotationTypes.GraphQLName;
 
-@GraphQLName(GqlAccessControlUserEntry.TYPE_NAME)
-public class GqlAccessControlUserEntry implements GqlAccessControlEntry {
+@GraphQLName(GqlAccessControlGenericItem.TYPE_NAME)
+public class GqlAccessControlGenericItem extends AbstractAccessControlItem implements GqlAccessControlItem {
 
-  public static final String TYPE_NAME = "AccessControlUserEntry";
+  public static final String TYPE_NAME = "AccessControlGenericItem";
 
-  private final AccessControlEntry accessControlEntry;
-
-  public GqlAccessControlUserEntry(AccessControlEntry accessControlEntry) {
-    this.accessControlEntry = accessControlEntry;
+  public GqlAccessControlGenericItem(AccessControlEntry accessControlEntry) {
+    super(accessControlEntry);
   }
 
-  @Override
-  public AccessControlEntry getAccessControlEntry() {
-    return accessControlEntry;
+  public GqlAccessControlGenericItem(Set<AccessControlEntry> accessControlEntries) {
+    super(accessControlEntries);
   }
 
 }

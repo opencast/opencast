@@ -19,25 +19,35 @@
  *
  */
 
-package org.opencastproject.graphql.type.resolver;
+package org.opencastproject.graphql.type.input;
 
-import graphql.TypeResolutionEnvironment;
+import graphql.annotations.annotationTypes.GraphQLDescription;
+import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.TypeResolver;
 
-public class AccessControlEntryTypeResolver implements TypeResolver {
-  @Override
-  public GraphQLObjectType getType(TypeResolutionEnvironment env) {
-    final Class<?> field = env.getObject().getClass();
-    final GraphQLName graphQLName = field.getAnnotation(GraphQLName.class);
-    String objectTypeName;
-    if (graphQLName == null) {
-      objectTypeName = field.getSimpleName();
-    } else {
-      objectTypeName = graphQLName.value();
-    }
-    return env.getSchema().getObjectType(objectTypeName);
+@GraphQLName(ManagedAclOrderByInput.TYPE_NAME)
+@GraphQLDescription("Ordering options for managed ACLs")
+public class ManagedAclOrderByInput {
+
+  public static final String TYPE_NAME = "ManagedAclOrderByInput";
+
+  @GraphQLField
+  @GraphQLName("name")
+  private OrderDirection name;
+
+
+  public ManagedAclOrderByInput() {
+
+  }
+
+  public ManagedAclOrderByInput(
+      @GraphQLName("name") OrderDirection name
+  ) {
+    this.name = name;
+  }
+
+  public OrderDirection getTitle() {
+    return name;
   }
 
 }

@@ -21,7 +21,15 @@
 
 package org.opencastproject.graphql.type.output;
 
+import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.Group;
+import org.opencastproject.userdirectory.UserIdRoleProvider;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import graphql.annotations.annotationTypes.GraphQLDescription;
 import graphql.annotations.annotationTypes.GraphQLField;
@@ -35,16 +43,45 @@ public class GqlAccessControlList {
 
   private final AccessControlList accessControlList;
 
+  private final List<GqlAccessControlItem> items;
+
   public GqlAccessControlList(AccessControlList accessControlList) {
     this.accessControlList = accessControlList;
+    this.items = getItems();
   }
 
   @GraphQLField
-  public GqlAccessControlEntry[] entries() {
-    return accessControlList.getEntries().stream()
-        .map(GqlAccessControlGenericEntry::new)
-        .toArray(GqlAccessControlEntry[]::new);
+  public GqlAccessControlUserItem[] users() {
+    return items.stream()
+        .filter(i -> i instanceof GqlAccessControlUserItem)
+        .toArray(GqlAccessControlUserItem[]::new);
   }
 
+  @GraphQLField
+  public GqlAccessControlItem[] entries() {
+    return items.toArray(new GqlAccessControlItem[0]);
+  }
+
+  private List<GqlAccessControlItem> getItems() {
+    String groupPrefix = Group.ROLE_PREFIX;
+    String userPrefix = UserIdRoleProvider.getUserIdRole("");
+
+    Map<String, Set<AccessControlEntry>> entries = accessControlList.getEntries().stream()
+        .collect(Collectors.groupingBy(AccessControlEntry::getRole, Collectors.toSet()));
+
+    return entries.entrySet().stream()
+        .map(e -> {
+          String role = e.getKey();
+          Set<AccessControlEntry> ace = e.getValue();
+          if (role.startsWith(groupPrefix)) {
+            return new GqlAccessControlGroupItem(ace);
+          } else if (role.startsWith(userPrefix)) {
+            return new GqlAccessControlUserItem(ace);
+          } else {
+            return new GqlAccessControlGenericItem(ace);
+          }
+        })
+        .collect(Collectors.toList());
+  }
 
 }

@@ -21,7 +21,10 @@
 
 package org.opencastproject.graphql.series;
 
-import org.opencastproject.graphql.command.CreateOrUpdateSeriesCommand;
+import org.opencastproject.graphql.command.CreateSeriesCommand;
+import org.opencastproject.graphql.command.UpdateSeriesAclCommand;
+import org.opencastproject.graphql.command.UpdateSeriesCommand;
+import org.opencastproject.graphql.type.input.AccessControlListInput;
 import org.opencastproject.graphql.type.input.GqlCommonSeriesMetadataInput;
 import org.opencastproject.graphql.type.input.Mutation;
 
@@ -40,14 +43,42 @@ public final class SeriesMutationExtension {
 
   @GraphQLField
   @GraphQLNonNull
-  @GraphQLDescription("Update series metadata")
-  public static GqlSeries updateSeries(
-      @GraphQLName("id") @GraphQLNonNull String id,
+  @GraphQLDescription("Create series with metadata and acl")
+  public static GqlSeries createSeries(
       @GraphQLName("metadata") @GraphQLNonNull GqlCommonSeriesMetadataInput seriesMetadataInput,
+      @GraphQLName("acl") @GraphQLNonNull AccessControlListInput aclInput,
       final DataFetchingEnvironment environment) {
-    return CreateOrUpdateSeriesCommand.create(id, seriesMetadataInput)
+    return CreateSeriesCommand.create(seriesMetadataInput, aclInput)
         .environment(environment)
         .build()
         .execute();
   }
+
+  @GraphQLField
+  @GraphQLNonNull
+  @GraphQLDescription("Update series metadata and optional the acl")
+  public static GqlSeries updateSeries(
+      @GraphQLName("id") @GraphQLNonNull String id,
+      @GraphQLName("metadata") @GraphQLNonNull GqlCommonSeriesMetadataInput seriesMetadataInput,
+      @GraphQLName("acl") AccessControlListInput aclInput,
+      final DataFetchingEnvironment environment) {
+    return UpdateSeriesCommand.create(id, seriesMetadataInput)
+        .environment(environment)
+        .build()
+        .execute();
+  }
+
+  @GraphQLField
+  @GraphQLNonNull
+  @GraphQLDescription("Update series acl")
+  public static GqlSeries updateSeriesAcl(
+      @GraphQLName("id") @GraphQLNonNull String id,
+      @GraphQLName("acl") @GraphQLNonNull AccessControlListInput aclInput,
+      final DataFetchingEnvironment environment) {
+    return UpdateSeriesAclCommand.create(id)
+        .environment(environment)
+        .build()
+        .execute();
+  }
+
 }

@@ -22,7 +22,9 @@
 package org.opencastproject.graphql.event;
 
 import org.opencastproject.graphql.command.DeleteEventCommand;
+import org.opencastproject.graphql.command.UpdateEventAclCommand;
 import org.opencastproject.graphql.command.UpdateEventCommand;
+import org.opencastproject.graphql.type.input.AccessControlListInput;
 import org.opencastproject.graphql.type.input.GqlCommonEventMetadataInput;
 import org.opencastproject.graphql.type.input.Mutation;
 
@@ -45,9 +47,24 @@ public final class EventMutationExtension {
   public static GqlEvent updateEvent(
       @GraphQLName("id") @GraphQLNonNull String id,
       @GraphQLName("metadata") @GraphQLNonNull GqlCommonEventMetadataInput eventMetadataInput,
+      @GraphQLName("acl") AccessControlListInput aclInput,
       final DataFetchingEnvironment environment) {
     return UpdateEventCommand
         .create(id, eventMetadataInput)
+        .environment(environment)
+        .build()
+        .execute();
+  }
+
+  @GraphQLField
+  @GraphQLNonNull
+  @GraphQLDescription("Update event acl")
+  public static GqlEvent updateEventAcl(
+      @GraphQLName("id") @GraphQLNonNull String id,
+      @GraphQLName("acl") @GraphQLNonNull AccessControlListInput aclInput,
+      final DataFetchingEnvironment environment) {
+    return UpdateEventAclCommand
+        .create(id)
         .environment(environment)
         .build()
         .execute();

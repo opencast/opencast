@@ -33,9 +33,9 @@ import org.opencastproject.graphql.type.TimeFunction;
 import org.opencastproject.graphql.type.input.DublinCoreMetadataInput;
 import org.opencastproject.graphql.type.input.GqlCommonEventMetadataInput;
 import org.opencastproject.graphql.type.input.GqlCommonSeriesMetadataInput;
-import org.opencastproject.graphql.type.output.GqlAccessControlGenericEntry;
-import org.opencastproject.graphql.type.output.GqlAccessControlGroupEntry;
-import org.opencastproject.graphql.type.output.GqlAccessControlUserEntry;
+import org.opencastproject.graphql.type.output.GqlAccessControlGenericItem;
+import org.opencastproject.graphql.type.output.GqlAccessControlGroupItem;
+import org.opencastproject.graphql.type.output.GqlAccessControlUserItem;
 import org.opencastproject.graphql.type.output.GqlCommonEventMetadata;
 import org.opencastproject.graphql.type.output.GqlCommonEventMetadataV2;
 import org.opencastproject.graphql.type.output.GqlCommonSeriesMetadata;
@@ -96,9 +96,9 @@ public class OpencastGraphQLProvider implements GraphQLExtensionProvider, GraphQ
   @Override
   public Set<Class<?>> getAdditionalOutputTypes() {
     return Set.of(
-        GqlAccessControlUserEntry.class,
-        GqlAccessControlGroupEntry.class,
-        GqlAccessControlGenericEntry.class,
+        GqlAccessControlUserItem.class,
+        GqlAccessControlGroupItem.class,
+        GqlAccessControlGenericItem.class,
         GqlJsonMetadataField.class,
         GqlLongMetadataField.class,
         GqlDurationMetadataField.class,

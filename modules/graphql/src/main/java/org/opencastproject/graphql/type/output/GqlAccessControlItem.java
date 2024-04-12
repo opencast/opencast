@@ -24,31 +24,33 @@ package org.opencastproject.graphql.type.output;
 import org.opencastproject.graphql.type.resolver.AccessControlEntryTypeResolver;
 import org.opencastproject.security.api.AccessControlEntry;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 import graphql.annotations.annotationTypes.GraphQLTypeResolver;
 
-@GraphQLName(GqlAccessControlEntry.TYPE_NAME)
+@GraphQLName(GqlAccessControlItem.TYPE_NAME)
 @GraphQLTypeResolver(AccessControlEntryTypeResolver.class)
-public interface GqlAccessControlEntry {
+public interface GqlAccessControlItem {
 
-  String TYPE_NAME = "AccessControlEntry";
+  String TYPE_NAME = "AccessControlItem";
 
-  AccessControlEntry getAccessControlEntry();
+  Set<AccessControlEntry> getAccessControlEntries();
+
+  String getUniqueRole();
 
   @GraphQLField
   default String role() {
-    return getAccessControlEntry().getRole();
+    return getUniqueRole();
   }
 
   @GraphQLField
-  default String action() {
-    return getAccessControlEntry().getAction();
-  }
-
-  @GraphQLField
-  default boolean allow() {
-    return getAccessControlEntry().isAllow();
+  default Set<String> action() {
+    return getAccessControlEntries().stream()
+        .filter(AccessControlEntry::isAllow).map(AccessControlEntry::getAction)
+        .collect(Collectors.toUnmodifiableSet());
   }
 
 }

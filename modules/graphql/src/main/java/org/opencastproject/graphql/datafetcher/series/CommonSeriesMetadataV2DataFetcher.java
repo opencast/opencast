@@ -25,7 +25,8 @@ import org.opencastproject.graphql.datafetcher.ContextDataFetcher;
 import org.opencastproject.graphql.exception.GraphQLNotFoundException;
 import org.opencastproject.graphql.execution.context.OpencastContext;
 import org.opencastproject.graphql.series.GqlSeries;
-import org.opencastproject.graphql.type.output.field.GqlJsonMetadataField;
+import org.opencastproject.graphql.type.output.GqlMetadataFieldInterface;
+import org.opencastproject.graphql.util.MetadataFieldToGraphQLFieldMapper;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 
@@ -36,20 +37,23 @@ import java.util.Map;
 
 import graphql.schema.DataFetchingEnvironment;
 
-public class CommonSeriesMetadataV2DataFetcher implements ContextDataFetcher<Map> {
+public class CommonSeriesMetadataV2DataFetcher implements ContextDataFetcher<Map<String, GqlMetadataFieldInterface>> {
 
   @Override
-  public Map get(OpencastContext opencastContext, DataFetchingEnvironment dataFetchingEnvironment) {
+  public Map<String, GqlMetadataFieldInterface> get(
+      OpencastContext opencastContext,
+      DataFetchingEnvironment dataFetchingEnvironment) {
     String seriesId = ((GqlSeries)dataFetchingEnvironment.getSource()).id();
     IndexService indexService = opencastContext.getService(IndexService.class);
 
-    Map<String, GqlJsonMetadataField> result = new HashMap<>();
+    Map<String, GqlMetadataFieldInterface> result = new HashMap<>();
     Opt<DublinCoreMetadataCollection> optSeries = indexService.getCommonSeriesCatalogUIAdapter().getFields(seriesId);
     if (optSeries.isNone()) {
       throw new GraphQLNotFoundException("Series with id `" + seriesId + "` not found.");
     }
-
-    optSeries.get().getOutputFields().forEach((key, value) -> result.put(key, new GqlJsonMetadataField(value)));
+    optSeries.get().getOutputFields().forEach(
+        (key, value) -> result.put(key, MetadataFieldToGraphQLFieldMapper.mapType(value))
+    );
     return result;
   }
 }
